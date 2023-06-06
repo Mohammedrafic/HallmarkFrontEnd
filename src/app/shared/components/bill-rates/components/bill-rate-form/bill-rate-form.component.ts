@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
@@ -96,7 +97,9 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     const intervalMinControl = this.billRateForm.controls['intervalMin'];
     const intervalMaxControl = this.billRateForm.controls['intervalMax'];
 
-    intervalMinControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+    intervalMinControl.valueChanges
+    .pipe(takeWhile(() => this.isAlive))
+    .subscribe(() => {
       this.isIntervalMinEnabled = intervalMinControl.hasValidator(Validators.required);
     });
 
@@ -105,7 +108,6 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     });
 
     this.startEffectiveDateWatching();
-
     this.onBillRateConfigIdChanged();
   }
 
@@ -119,7 +121,8 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   }
 
   private startBillRatesOptionsWatching(): void {
-    this.store.select(OrderManagementContentState.predefinedBillRatesOptions).pipe(
+    this.store.select(OrderManagementContentState.predefinedBillRatesOptions)
+    .pipe(
       takeWhile(() => this.isAlive),
     ).subscribe((options: BillRateOption[]) => {
       this.predefinedBillRates = this.store.selectSnapshot(OrderManagementContentState.predefinedBillRates);
@@ -129,7 +132,8 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   }
 
   private startEffectiveDateWatching(): void {
-    this.billRateForm.controls['effectiveDate']?.valueChanges.pipe(
+    this.billRateForm.controls['effectiveDate']?.valueChanges
+    .pipe(
       takeWhile(() => this.isAlive),
     ).subscribe(() => {
       this.setOTValue();
@@ -159,11 +163,11 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+
   private onBillRateConfigIdChanged(): void {
-    this.billRateForm
-      .get('billRateConfigId')
-      ?.valueChanges.pipe(takeWhile(() => this.isAlive))
-      .subscribe(() => {
+    this.billRateForm.get('billRateConfigId')?.valueChanges
+    .pipe(takeWhile(() => this.isAlive))
+      .subscribe((rateId) => {
         const configId = this.billRateForm.get('billRateConfigId')?.value;
         const billRateConfig = this.billRateOptions.find((option) => configId === option.id) as BillRateOption;
         this.billRateConfigControl?.patchValue({
@@ -220,10 +224,22 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
           intervalMinControl?.setValue(0);
         }
 
+        if (rateId === BillRateTitleId.MissedMeal) {
+          this.billRateForm.get('rateHour')?.patchValue(1);
+        }
+
+        if (rateId === BillRateTitleId.FacilityCalledOff || rateId === BillRateTitleId.ResourceCalledOff) {
+          this.billRateForm.get('rateHour')?.disable();
+          this.billRateForm.get('rateHour')?.patchValue(0);
+          this.billRateForm.get('rateHour')?.removeValidators(Validators.required);
+        } else {
+          this.billRateForm.get('rateHour')?.addValidators(Validators.required);
+          this.billRateForm.get('rateHour')?.enable();
+        }
+
         if (billRateConfig) {
           this.changeFieldsSettingByType(billRateConfig.id);
         }
-
 
         intervalMaxControl?.updateValueAndValidity();
         intervalMinControl?.updateValueAndValidity();

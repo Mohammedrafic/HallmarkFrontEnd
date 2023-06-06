@@ -32,6 +32,8 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   @Input() jobId: number;
   @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() comments: Comment[] = [];
+  @Input() CanOrganizationEditOrdersIRP : boolean;
+  @Input() CanOrganizationViewOrdersIRP: boolean;
   @Input() set currentOrder(value: Order) {
     this.order = value;
     this.getContactDetails();

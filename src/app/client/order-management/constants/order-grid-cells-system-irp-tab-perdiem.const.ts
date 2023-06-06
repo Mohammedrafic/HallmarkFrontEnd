@@ -185,7 +185,7 @@ export const GridCellsSystemIRPTabPerDiem = (
   ...(isIRPEnabled ? [{
     ...DefaultOrderCol,
     field: 'irpCandidatesCount',
-    headerName: isIRPEnabled && !isVMSEnabled ? 'CAND.' : 'IRP CANDID',
+    headerName: 'Employees',
     width: 120,
     minWidth: 120,
     maxWidth: 120,
@@ -193,7 +193,7 @@ export const GridCellsSystemIRPTabPerDiem = (
   ...(isVMSEnabled ? [{
     ...DefaultOrderCol,
     field: 'vmsCandidatesCount',
-    headerName: 'VMS CANDID',
+    headerName: 'Candidates',
     width: 120,
     minWidth: 120,
     maxWidth: 120,

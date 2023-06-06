@@ -213,27 +213,9 @@
       [height]="300"
     >
       <e-columns>
-        <e-column textAlign="Right" width="140">
+        <e-column textAlign="Right" width="80">
           <ng-template #template let-data>
             <div class="row-tool-buttons">
-              <div
-                ejs-button
-                cssClass="e-flat primary-icon-button custom-button"
-                [class.btn-icon__disabled]="selectedOrder?.irpOrderMetadata?.status === orderStatus.Closed
-                 || data.status === applicantStatus.Offboard"
-              >
-              <span class="edit-button"><i-feather name="flag" class="icon"></i-feather></span>
-              </div>
-              <div
-                ejs-button
-                cssClass="e-flat primary-icon-button custom-button"
-                [class.btn-icon__disabled]="selectedOrder?.irpOrderMetadata?.status === orderStatus.Closed
-                || data.status === applicantStatus.Offboard"
-              >
-              <ejs-tooltip id="tooltip" content="Notify" position="TopCenter">
-                <span class="edit-button"><i-feather name="mail" class="icon"></i-feather></span>
-              </ejs-tooltip>
-              </div>
               <div
                 [class.btn-icon__disabled]="!data.isOriented"
                 ejs-button
@@ -344,6 +326,8 @@
   [handleOpenModal]="editCandidateDialogState"
   (handleCloseModal)="closeEditCandidateModal($event)"
   (handleSuccessSaveCandidate)="saveIrpCandidate()"
+  [commentContainerId] = "commentContainerId"
+  [CanOrganizationViewOrdersIRP]="userPermission[userPermissions.CanOrganizationViewOrdersIRP]"
 ></app-edit-irp-candidate>
 
 <ejs-dialog

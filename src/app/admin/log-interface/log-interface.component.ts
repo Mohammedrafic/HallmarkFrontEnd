@@ -170,12 +170,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       headerName: 'Status',
       field: 'status',
       minWidth: 250,
-      filter: 'agTextColumnFilter',
-      filterParams: {
-        buttons: ['reset'],
-        debounceMs: 1000,
-        suppressAndOrCondition: true,
-      },
+      filter: true,
       sortable: true,
       resizable: true
     },
@@ -281,10 +276,8 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
         this.logFileDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
           .subscribe((data: any) => {
             if (data) {
-              if (this.downloadedFileName != data.fileName) {
                 this.downloadedFileName = data.fileName;
                 this.createLinkToDownload(data.fileAsBase64, data.fileName, data.contentType);
-              }
             }
           });
     }

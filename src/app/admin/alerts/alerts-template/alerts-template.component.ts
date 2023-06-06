@@ -670,6 +670,9 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
 
   adjustBusinessUnitTypeBasedActiveSystem(){
     const user = this.store.selectSnapshot(UserState.user);    
+    if(user?.businessUnitType == BusinessUnitType.Organization){
+      this.businessUnitControl.disable();
+    }
     if(this.userBusinessType == BusinessUnitType.Hallmark)
       this.businessControl.patchValue(0);
     this.filteredBusinessUnits = this.businessUnits;
@@ -677,6 +680,9 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
       if(user?.businessUnitType == BusinessUnitType.Hallmark){
         this.businessUnitControl.patchValue(this.filteredBusinessUnits[0].id);
+      }
+      if(user?.businessUnitType == BusinessUnitType.Organization){
+        this.businessUnitControl.enable();
       }
     }
         

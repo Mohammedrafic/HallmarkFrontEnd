@@ -18,12 +18,24 @@ export interface TiersInputConfig {
   dataSource?: TierDataSource;
   showAllToggle?: boolean;
   customFiltering?: boolean;
+  radiobuttons? : RadioButtonGroup[];
+}
+
+export interface RadioButtonGroup {
+  title: string;
+  value : string;
 }
 
 export interface TierDialogConfig {
     title: string;
     editTitle: string;
     fields: TiersInputConfig[];
+}
+
+export enum Skillvalue {
+  All = "1",
+  Primary = "2",
+  Secondary = "3"
 }
 
 export interface TierDetails {
@@ -39,6 +51,9 @@ export interface TierDetails {
   regionId: number;
   regionName: string;
   organizationTierId: number;
+  WorkCommitmentIds : any;
+  workCommitments: any;
+  skills:any;
 }
 
 export type TiersPage = PageOfCollections<TierDetails>;

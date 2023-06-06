@@ -39,18 +39,6 @@
       background: $secondary-dark-blue-50 !important;
     }
 
-    .empty-table {
-      .ag-body-viewport {
-        height: 100px;
-        background: $secondary-dark-blue-45;
-      }
-
-      & .ag-overlay-wrapper.ag-overlay-no-rows-wrapper {
-        font-size: 14px !important;
-        color: $secondary-dark-blue-30 !important;
-      }
-    }
-
     .ag-root-wrapper {
       border-top-left-radius: var(--grid-border-radius);
       border-top-right-radius: var(--grid-border-radius);
@@ -83,18 +71,6 @@
   
     .ag-row-hover {
       background-color: var(--grid-row-background-color-hover);
-    }
-
-    .empty-table {
-      .ag-body-viewport {
-        height: 100px;
-        background: #eaecf2;
-      }
-
-      & .ag-overlay-wrapper.ag-overlay-no-rows-wrapper {
-        font-size: 14px !important;
-        color: #9198ac !important;
-      }
     }
   }
 

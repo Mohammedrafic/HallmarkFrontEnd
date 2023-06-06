@@ -3,6 +3,8 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationStructure } from '@shared/models/organization.model';
 
 import {
+  ChipsFilterStructure,
+  ChipsInitialState,
   ScheduleFilterFormConfig,
   ScheduleFilterFormFieldConfig,
   ScheduleFiltersConfig,
@@ -230,4 +232,17 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
 export const ScheduleFilterFormGroupConfig: ScheduleFilterFormConfig = {
   formClass: 'schedule-filter-form',
   formFields: scheduleFilterFormFields,
+};
+
+export const ChipsStructureState: ChipsInitialState = {
+  regions: [],
+  locations: [],
+  departments: [],
+};
+
+export const FilterChipsStructure: ChipsFilterStructure = {
+  regionIds: [],
+  locationIds: [],
+  departmentsIds: [],
+  skillIds: [],
 };

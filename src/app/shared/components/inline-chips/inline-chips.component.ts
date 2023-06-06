@@ -20,7 +20,7 @@ export class InlineChipsComponent {
     this.showClearAllBtn = chips && !!chips.length;
     this.chipsData = chips;
   }
-  
+
   @Output() filterChipDelted: EventEmitter<ChipDeleteEventType> = new EventEmitter();
 
   chipsExpanded = false;

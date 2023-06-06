@@ -70,6 +70,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() hasApproveRejectMileagesPermission: boolean;
 
+  @Input() canRecalculateTimesheet: boolean;
+
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
   @Output() readonly uploadSideDialog: EventEmitter<TimesheetAttachments> = new EventEmitter<TimesheetAttachments>();
@@ -279,7 +281,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.setEditModeColDef();
   }
 
-  public onGridReady(params: GridReadyEvent): void {
+  public setGridApi(params: GridReadyEvent): void {
     this.gridApi = params.api;
     this.gridApi.showLoadingOverlay();
   }
@@ -295,7 +297,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public saveChanges(): void {
     if (!this.timesheetRecordsService.checkFormsValidation(this.formControls)) {
-      this.cd.markForCheck();
+      this.cd.detectChanges();
       return;
     }
 
@@ -338,11 +340,11 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     });
   }
 
-  public onRejectButtonClick(): void {
+  public reject(): void {
     this.rejectEvent.emit(this.currentTab === RecordFields.Time);
   }
 
-  public handleApprove(): void {
+  public approve(): void {
     this.approveEvent.emit(this.currentTab === RecordFields.Time);
   }
 
@@ -380,6 +382,21 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public onComponentStateChanged(event: ComponentStateChangedEvent): void {
     this.componentStateChanged$.next(event);
+  }
+
+  public recalculateTimesheets():void {
+    this.confirmService.confirm(TimesheetConfirmMessages.recalcTimesheets, {
+      title: 'Recalculate Timesheets',
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'delete-button',
+    })
+    .pipe(
+      filter((confirm) => confirm),
+      take(1),
+    )
+    .subscribe(() => {
+      this.store.dispatch(new TimesheetDetails.RecalculateTimesheets(this.timesheetDetails.jobId));
+    });
   }
 
   private selectTab(index: number): void {

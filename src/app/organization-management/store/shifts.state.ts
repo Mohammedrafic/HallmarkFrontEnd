@@ -80,8 +80,7 @@ export class ShiftsState {
         return payload;
       }),
       catchError((error: any) => {
-        const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Shift', error.error.errors['EntityInUse']) : 'Shift cannot be deleted';
-        return dispatch(new ShowToast(MessageTypes.Error, message));
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
       }));
   }
 

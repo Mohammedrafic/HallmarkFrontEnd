@@ -7,6 +7,7 @@
     "build": "ng build --base-href /ui/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessCustom",
     "test-headless": "ng test --watch=false --browsers=ChromeHeadless",
     "test-coverage": "ng test --code-coverage",
     "lint": "ng lint",
@@ -96,6 +97,7 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
     "prettier": "^2.6.2",
-    "typescript": "~4.6.2"
+    "typescript": "~4.6.2",
+    "puppeteer": "^20.5.0"
   }
 }

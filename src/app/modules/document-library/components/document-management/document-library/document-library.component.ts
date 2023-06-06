@@ -737,7 +737,20 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       }
       else {
         this.gridApi?.hideOverlay();
-        const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))]
+        const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))];
+        if(this.filterSelecetdBusinesType == BusinessUnitType.Agency){
+          this.agencyColumnDefinitions.forEach(element => {
+            if(element.field == "businessUnitName"){
+              element.headerName = 'Organization Name';
+            }
+          });
+        }else{
+          this.agencyColumnDefinitions.forEach(element => {
+            if(element.field == "businessUnitName"){
+              element.headerName = 'Agency Name';
+            }
+          });
+        }
         this.gridApi.setColumnDefs(this.agencyColumnDefinitions);
         this.rowData = documentData;
         this.totalRecordsCount = data.totalCount;
@@ -769,7 +782,20 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       else {
         this.gridApi?.hideOverlay();
         if(this.isAgency){
-          this.gridApi.setColumnDefs(this.agencyColumnDefinitions)
+          if(this.filterSelecetdBusinesType == BusinessUnitType.Agency){
+            this.agencyColumnDefinitions.forEach(element => {
+              if(element.field == "businessUnitName"){
+                element.headerName = 'Agency Name';
+              }
+            });
+          }else{
+            this.agencyColumnDefinitions.forEach(element => {
+              if(element.field == "businessUnitName"){
+                element.headerName = 'Organization Name';
+              }
+            });
+          }
+          this.gridApi.setColumnDefs(this.agencyColumnDefinitions);
         }else{
           this.gridApi.setColumnDefs(this.columnDefinitions);
         }

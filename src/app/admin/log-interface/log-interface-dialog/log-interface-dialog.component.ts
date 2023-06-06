@@ -85,7 +85,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       filter: false,
     },
     {
-      headerName: 'Timesheet ID',
+      headerName: 'Timesheet Id',
       field: 'timesheetitemid',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -98,7 +98,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'Employee ID',
+      headerName: 'Employee Id',
       field: 'employeeid',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -222,8 +222,13 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = this.datePipe?.transform(params.data.punchIndate, 'MM/dd/yyyy') as string
-        return str?.length > 0 ? str : "";
+        if(!Number.isNaN(Date.parse(params.data?.punchIndate)))
+        {
+          const str = this.datePipe?.transform(params.data.punchIndate, 'MM/dd/yyyy') as string
+          return str?.length > 0 ? str : "";
+        }else{
+          return params.data.punchIndate;
+        }
       },
       sortable: true,
       resizable: true
@@ -271,8 +276,12 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = this.datePipe?.transform(params.data.punchOutdate, 'MM/dd/yyyy') as string
-        return str?.length > 0 ? str : "";
+        if (!Number.isNaN(Date.parse(params.data?.punchOutdate))){
+          const str = this.datePipe?.transform(params.data.punchOutdate, 'MM/dd/yyyy') as string
+          return str?.length > 0 ? str : "";
+        }else{
+          return params.data.punchOutdate;
+        }
       },
       sortable: true,
       resizable: true
@@ -313,7 +322,10 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       headerName: 'Deleted',
       field: 'deleted',
       minWidth: 150,
-      resizable: true
+      resizable: true,
+      cellRenderer: (params:any) => {
+        return params.data.deleted == "0" ? 'No' :  params.data.deleted == "1" ? 'Yes' : params.data.deleted;
+      },      
     },
     {
       headerName: 'Error Description',
@@ -325,24 +337,24 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
   public defaultFileName: string;
   public fileName: string;
   public columnsToExport: ExportColumn[] = [
-    { text: 'Timesheet ID', column: 'timesheetitemid' },
-    { text: 'Employee ID', column: 'employeeid' },
-    { text: 'First Name', column: 'fname' },
-    { text: 'Middle Name', column: 'mname' },
-    { text: 'Last Name', column: 'lname' },
-    { text: 'Location Id', column: 'locationId' },
-    { text: 'Worked LocationId', column: 'workedlocationid' },
-    { text: 'Worked DeptId', column: 'workedccid'},
-    { text: 'Shift Type', column: 'shiftType' },
-    { text: 'PunchIn Date', column: 'punchIndate' },
-    { text: 'PunchIn Time', column: 'punchIntime' },
-    { text: 'PunchOut Date', column: 'punchOutdate' },
-    { text: 'PunchOut Time', column: 'punchOuttime' },
-    { text: 'Lunch', column: 'lunch' },
-    { text: 'Total Hours', column: 'totalHours' },
-    { text: 'Job Code', column: 'jobcode' },
-    { text: 'Deleted', column: 'deleted' },
-    { text: 'Error Description', column: 'failureReason' },
+    { text: 'Timesheet ID', column: 'TimesheetId' },
+    { text: 'Employee ID', column: 'EmployeeId' },
+    { text: 'First Name', column: 'FirstName' },
+    { text: 'Middle Name', column: 'MiddleName' },
+    { text: 'Last Name', column: 'LastName' },
+    { text: 'Location Id', column: 'LocationId' },
+    { text: 'Worked LocationId', column: 'WorkedLocationId' },
+    { text: 'Worked DeptId', column: 'WorkedDeptId'},
+    { text: 'Shift Type', column: 'ShiftType' },
+    { text: 'PunchIn Date', column: 'PunchInDate' },
+    { text: 'PunchIn Time', column: 'PunchInTime' },
+    { text: 'PunchOut Date', column: 'PunchOutDate' },
+    { text: 'PunchOut Time', column: 'PunchOutTime' },
+    { text: 'Lunch', column: 'Lunch' },
+    { text: 'Total Hours', column: 'TotalHours' },
+    { text: 'Job Code', column: 'JobCode' },
+    { text: 'Deleted', column: 'Deleted' },
+    { text: 'Error Description', column: 'ErrorDescription' },
   ];
   
   constructor(

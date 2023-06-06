@@ -234,12 +234,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     date: string,
     candidate: ScheduleInt.ScheduleCandidate,
     schedule?: ScheduleInt.ScheduleDateItem): void {
-    if(!this.hasSchedulePermission) {
+
+    if (!this.hasSchedulePermission) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, PermissionRequired));
       return;
     }
 
-    if(!schedule?.isDisabled) {
+    if (schedule?.isOnHold) {
+      return;
+    }
+
+    if (!schedule?.isDisabled) {
       this.selectDateSlot(date, candidate, schedule);
       this.processCellSelection(candidate, schedule);
     }

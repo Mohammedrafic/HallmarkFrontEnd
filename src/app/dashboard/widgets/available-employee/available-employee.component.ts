@@ -16,13 +16,14 @@ export class AvailableEmployeeComponent  implements OnInit {
   @Input() public isLoading: boolean;
   @ViewChild('availableEmployees') availableEmployees:AgGridAngular
 
-  ngOnInit(): void {
+  ngOnInit(): void { 
   }
   public rowData: AvailableEmployeeModel[] ;
   public columnDefs:ColDef[] = [
     { field: 'fullName', headerName:"Name",width:180},
-    { field: 'startDateTime', headerName:"Start Date Time",width:180},
-    { field: 'endDateTime', headerName:"End Date Time",width:180},
+    { field: 'startDateTime', headerName:"Start Date Time",width:160},
+    { field: 'endDateTime', headerName:"End Date Time",width:160},
   ];
+  
  
 }

@@ -341,7 +341,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
 
     this.payRateFilterFormGroup.get('departmentIds')?.valueChanges.subscribe((departmentIds: number[]) => {
       if (departmentIds && departmentIds.length > 0) {
-        this.store.dispatch(new GetSkillsbyDepartment(departmentIds));
+        this.getSkills(departmentIds);
         this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
           if(skills && skills.length > 0){
             this.filterColumns.skillIds.dataSource = sortByField(skills, "name");
@@ -349,6 +349,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
             this.filterColumns.skillIds.dataSource = [];
             this.payRateFilterFormGroup.get("skillIds")?.setValue(null);
           }
+          this.getWorkCommitment();
           this.cd.markForCheck();
         });
       }
@@ -356,6 +357,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdatePayRateSucceed)).subscribe(() => {
       this.store.dispatch(new ShowSideDialog(false));
+      this.workcommitments = [];
       this.clearFormDetails();
     });
 
@@ -378,11 +380,11 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
             this.store.dispatch(new SaveUpdatePayRate(this.billRateToPost, filters));
           } else {
             this.store.dispatch(new ShowSideDialog(false));
+            this.workcommitments = [];
             this.clearFormDetails();
           }
         });
     });
-    this.getWorkCommitment();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -391,7 +393,10 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
 
   public getWorkCommitment():void {
     this.store.dispatch(new GetWorkCommitmentByPage(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected));
-    
+  }
+
+  public getSkills(deptId : any):void {
+    this.store.dispatch(new GetSkillsbyDepartment(deptId));
   }
 
   ngOnDestroy(): void {
@@ -447,7 +452,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       for(let i=0; i<this.departments.length; i++){
         this.deptId.push(this.departments[i].id);
       }
-      this.store.dispatch(new GetSkillsbyDepartment(this.deptId));
+      this.getSkills(this.deptId);
       this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
         if(skills && skills.length > 0){
           this.skills = sortByField(skills, "name");
@@ -461,11 +466,11 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     } else {
       departmentsControl.enable();
     }
+    this.getWorkCommitment();
   }
 
   public loadData(): void {
     this.store.dispatch(new GetAssignedSkillsByOrganization());
-    this.getWorkCommitment();
     this.filters = this.PayRatesFormGroup.getRawValue();
     this.store.dispatch(new GetPayRates({  
       pageNumber: this.currentPage, 
@@ -513,11 +518,13 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
+          this.workcommitments = [];
           this.clearFormDetails();
           this.removeActiveCssClass();
         });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
+      this.workcommitments = [];
       this.clearFormDetails();
       this.removeActiveCssClass();
     }
@@ -568,7 +575,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.addActiveCssClass(event);
     this.isEdit = true;
     this.editRecordId = data.payRateSettingId;
-
+    this.getWorkCommitment();
     setTimeout(() => this.setupFormValues(data));
 
     this.store.dispatch(new ShowSideDialog(true));
@@ -783,6 +790,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   }
 
   private setupFormValues(data: PayRateSetup): void {
+    this.getSkills([data.departmentId]);
     this.allRegionsChange({ checked: !data.regionId });
     this.allLocationsChange({ checked: !data.locationId });
     this.allDepartmentsChange({ checked: !data.departmentId });
@@ -823,15 +831,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       this.PayRatesFormGroup.controls['orderTypes'].setValue(data.orderTypes);
     }
 
-    if (data.workCommitments.length === 0) {
-      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(null);
-    } else {
-      this.workcommitmentsedit = [];
-      for(let i=0; i < data.workCommitments.length; i++){
-        this.workcommitmentsedit.push(data.workCommitments[i].workCommitmentId);
-      }
-      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(this.workcommitmentsedit);
-    }
+    
     
     this.PayRatesFormGroup.controls['amountMultiplier'].setValue(data.amountMultiplier);
     this.PayRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
@@ -846,10 +846,15 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         this.PayRatesFormGroup.controls['skillIds'].setValue(null);
       } else {
         this.skillsEdit = [];
-        for(let i=0; i < data.skills.length; i++){
-          this.skillsEdit.push(data.skills[i].skillId);
-        }
+        this.skillsEdit = data.skills.map((x: { skillId: any; }) => x.skillId);
         this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
+      }
+      if (data.workCommitments.length === 0) {
+        this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(null);
+      } else {
+        this.workcommitmentsedit = [];
+        this.workcommitmentsedit = data.workCommitments.map((x: { workCommitmentId: any; }) => x.workCommitmentId)
+        this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(this.workcommitmentsedit);
       }
     },1000)
   }

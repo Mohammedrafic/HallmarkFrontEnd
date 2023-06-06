@@ -1,10 +1,10 @@
 import { Tiers } from '@shared/enums/tiers.enum';
 import { FieldType } from '@core/enums';
-import { TierDialogConfig } from '@shared/components/tiers-dialog/interfaces';
+import { Skillvalue, TierDialogConfig } from '@shared/components/tiers-dialog/interfaces';
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { FieldNames } from './tiers.constant';
 
-export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers, TierDialogConfig> => ({
+export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitmentIds? : any): Record<Tiers, TierDialogConfig> => ({
   [Tiers.tierSettings]: {
     title: 'Add Tier',
     editTitle: 'Edit Tier',
@@ -24,33 +24,37 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers,
         type: FieldType.Number,
       },
       {
-        field: FieldNames.regionIds,
-        title: 'Region',
+        field: 'workCommitments',
+        title: 'WorkCommitment',
         disabled: false,
-        required: true,
+        required: false,
         type: FieldType.MultiSelectDropdown,
-        dataSource: regions ?? [],
-        showAllToggle: true,
+        dataSource: workcommitmentIds ?? [],
+        customFiltering: true
       },
       {
-        field: FieldNames.locationIds,
-        title: 'Location',
+        field: 'skills',
+        title: 'Skills',
         disabled: false,
         required: true,
-        type: FieldType.MultiSelectDropdown,
+        type: FieldType.RadioButton,
         dataSource: [],
-        showAllToggle: true,
-      },
-      {
-        field: FieldNames.departmentIds,
-        title: 'Department',
-        disabled: false,
-        required: true,
-        type: FieldType.MultiSelectDropdown,
-        dataSource: [],
-        showAllToggle: true,
         customFiltering: true,
-      }
+        radiobuttons : [
+          {
+            title : "All",
+            value : Skillvalue.All
+          },
+          {
+            title : "Primary",
+            value : Skillvalue.Primary
+          },
+          {
+            title : "Secondary",
+            value : Skillvalue.Secondary
+          },
+        ]
+      },
     ]
   },
   [Tiers.tierException]: {

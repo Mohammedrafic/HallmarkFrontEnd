@@ -3,11 +3,13 @@ import { SystemType } from '@shared/enums/system-type.enum';
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { SettingsFilterColsConfig } from './settings.interface';
+import { OrganizationSettingKeys } from '@shared/constants';
 
 export const AssociatedLink = '/client/associate-list';
 export const TierSettingsKey = 'TieringLogic';
 export const BillingSettingsKey = 'BillingContactEmails';
 export const InvoiceGeneratingSettingsKey = 'InvoiceAutoGeneration';
+export const DepartmentSkillRequired = OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired];
 
 export const SettingsSystemFilterCols = {
   includeInIRP: {
@@ -68,6 +70,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'OTHours',
   'PayPeriod',
   'OnHoldDefault',
+  'DepartmentSkillRequired',
+  'CreatePartialOrder'
 ];
 
 export const DisabledSettingsByDefault = [
@@ -84,6 +88,7 @@ export const DisabledSettingsByDefault = [
   'PayPeriod',
   'OnHoldDefault',
   'LockIRPCandidateAvailability',
+  'DepartmentSkillRequired',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

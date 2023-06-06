@@ -19,7 +19,7 @@ pool:
   demands:
     - agent.name -equals LinuxAgentforBuildE2-2
 
-resources: 
+resources:
 - repo: self
 
 variables:
@@ -29,13 +29,13 @@ variables:
   majorVersion: '1'
   minorVersion: '0'
   patchVersion: $[counter(format('{0}.{1}', variables['majorVersion'], variables['minorVersion']), 0)]
-  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release') }}: 
+  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release') }}:
    packageVersionIdentifier: ''
    imageVersionIdentifier: ''
   ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/qa') }}:
     packageVersionIdentifier: '-beta'
     imageVersionIdentifier: '-qa'
-  ${{ else }}: 
+  ${{ else }}:
    packageVersionIdentifier: '-beta'
    imageVersionIdentifier: '-dev'
 
@@ -64,6 +64,13 @@ steps:
     script: 'yarn install --frozen-lockfile'
 
 - task: PowerShell@2
+  displayName: Run Tests
+  condition: eq(variables.imageVersionIdentifier, '-dev')
+  inputs:
+    targetType: 'inline'
+    script: 'yarn run test:ci'
+
+- task: PowerShell@2
   displayName: Build angular
   inputs:
     targetType: 'inline'
@@ -80,7 +87,7 @@ steps:
     tags: |
       $(buildId)$(imageVersionIdentifier)
       latest$(imageVersionIdentifier)
-      
+
 - task: HelmInstaller@1
   inputs:
     helmVersionToInstall: '3.10.2'

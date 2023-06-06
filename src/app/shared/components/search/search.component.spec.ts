@@ -10,7 +10,7 @@ describe('SearchComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ SearchComponent ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
@@ -23,3 +23,4 @@ describe('SearchComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

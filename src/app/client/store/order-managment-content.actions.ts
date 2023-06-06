@@ -13,7 +13,11 @@ import {
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { ExportPayload } from '@shared/models/export.model';
-import { OrderManagementIRPSystemId, OrderManagementIRPTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import {
+  OrderManagementIRPSystemId,
+  OrderManagementIRPTabs,
+  OrganizationOrderManagementTabs,
+} from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.model';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
@@ -87,7 +91,8 @@ export class GetIrpOrderCandidates {
     public organizationId: number,
     public pageNumber: number,
     public pageSize: number,
-    public isAvailable: boolean
+    public isAvailable: boolean,
+    public searchTerm?: string
   ) {}
 }
 
@@ -407,7 +412,7 @@ export class UpdateRegRateSucceeded {
   constructor(public payload: UpdateRegrateModel) {}
 }
 
-export class GetCandidateCancellationReason{
+export class GetCandidateCancellationReason {
   static readonly type ='[order management] Get Candidate Cancellation Reason';
   constructor(public payload:CandidateCancellationReasonFilter){}
 }

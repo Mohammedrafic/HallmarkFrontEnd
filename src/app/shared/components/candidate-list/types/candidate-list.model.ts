@@ -1,7 +1,8 @@
-import { PageOfCollections } from '../../../models/page.model';
-import { CandidateStatus } from '../../../enums/status';
+import { ListOfSkills } from '@shared/models/skill.model';
 import { ApplicantStatus } from '../../../enums/applicant-status.enum';
 import { ExportedFileType } from '../../../enums/exported-file-type';
+import { CandidateStatus } from '../../../enums/status';
+import { PageOfCollections } from '../../../models/page.model';
 
 export type CandidateRow = {
   candidateProfileId: number;
@@ -121,3 +122,20 @@ export type CandidateListExport = {
 export type CandidateList = PageOfCollections<CandidateRow>;
 
 export type IRPCandidateList = PageOfCollections<IRPCandidate>;
+
+
+export interface CandidatePagingState {
+  pageNumber: number;
+  pageSize: number;
+}
+
+export type CandidateListTableState = CandidateListFilters & CandidatePagingState & { includeDeployedCandidates: boolean; };
+
+export interface CandidateListStateModel {
+  isCandidateLoading: boolean;
+  candidateList: CandidateList | null;
+  IRPCandidateList: IRPCandidateList | null;
+  listOfSkills: ListOfSkills[] | null;
+  listOfRegions: string[] | null;
+  tableState: CandidateListTableState | null;
+}

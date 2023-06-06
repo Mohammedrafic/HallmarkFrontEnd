@@ -2,18 +2,18 @@
   [billRatesData]="billRatesControl.value"
   [billRateOptions]="billRatesOptions"
   [readOnlyMode]="readOnlyMode"
-  [disabledActionMode]="!userPermission[userPermissions.CanEditOrderBillRate]"
-  (add)="onAddBillRate()"
-  (edit)="onEditBillRate($event)"
-  (remove)="onRemoveBillRate($event)">
+  [disabledActionMode]="!userPermission[userPermissions.CanEditOrderBillRate] && !userPermission[userPermissions.CanUpdateBillRates]"
+  (add)="addBillRate()"
+  (edit)="editBillRate($event)"
+  (remove)="removeBillRate($event)">
 </app-bill-rates-grid>
 
 <app-side-dialog
   *ngIf="isActive"
   [header]="billRateFormHeader"
   [width]="'436px'"
-  (formCancelClicked)="onDialogCancel()"
-  (formSaveClicked)="onDialogOk()">
+  (formCancelClicked)="cancelChanges()"
+  (formSaveClicked)="saveChanges()">
   <app-bill-rate-form
   [billRateForm]="billRateForm"
   [selectedBillRateUnit]="selectedBillRateUnit"

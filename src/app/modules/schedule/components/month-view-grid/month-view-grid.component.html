@@ -7,7 +7,6 @@
       [candidate]="scheduleItem"
       [selectedFilters]="selectedFilters"
       [showScheduledHours]="false"
-      (click)="handleSelectCandidate.emit(scheduleItem.candidate)"
     ></app-candidate-card>
   </td>
   <ng-container *ngFor="let item of dateList; trackBy: trackByDateList">

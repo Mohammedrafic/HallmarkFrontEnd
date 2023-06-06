@@ -61,7 +61,6 @@ import {
   UploadOrderImportFile,
   UploadOrderImportFileSucceeded,
   UpdateRegRateorder,
-  UpdateRegRateSucceeded,
   GetCandidateCancellationReason,
   ExportIRPOrders,
   ClearOrderFilterDataSources,
@@ -102,7 +101,7 @@ import {
   updateCandidateJobMessage,
   UpdateRegularRatesucceedcount,
   PerDiemReOrdersErrorMessage,
-  TravelerContracttoPermOrdersSucceedMessage
+  TravelerContracttoPermOrdersSucceedMessage,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -201,7 +200,7 @@ export interface OrderManagementContentStateModel {
     irpCandidates: null,
     candidateCancellationReasons:null,
     allShifts:null
-	
+
   },
 })
 @Injectable()
@@ -516,12 +515,13 @@ export class OrderManagementContentState {
   @Action(GetIrpOrderCandidates)
   GetIrpOrderCandidates(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, pageNumber, pageSize, isAvailable }: GetIrpOrderCandidates
+    { orderId, pageNumber, pageSize, isAvailable, searchTerm }: GetIrpOrderCandidates
   ): Observable<PageOfCollections<IrpOrderCandidate>> {
     const params: IrpCandidatesParams = {
       PageSize: pageSize,
       PageNumber: pageNumber,
       isAvailable,
+      searchTerm
     };
 
     return this.orderManagementService.getIrpCandidates(orderId, params)
@@ -952,7 +952,7 @@ export class OrderManagementContentState {
       })
     );
   }
-  
+
   @Action(ClearOrderFilterDataSources)
   ClearOrderFilterDataSources(
     { patchState }: StateContext<OrderManagementContentStateModel>
@@ -1001,7 +1001,7 @@ export class OrderManagementContentState {
       })
     );
   }
-  
+
   @Action(ExportOrdersJourney)
   ExportOrdersJourney({}: StateContext<OrderManagementContentStateModel>, { payload}: ExportOrdersJourney): Observable<any> {
     return this.orderManagementService.orderJourneyexport(payload).pipe(
@@ -1128,9 +1128,9 @@ export class OrderManagementContentState {
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
       tap((data) => {
         const count = data.length;
-        if(count>0 && payload.perDiemIds.length===0) 
+        if(count>0 && payload.perDiemIds.length===0)
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
-        else if(count==0 && payload.perDiemIds.length===0) 
+        else if(count==0 && payload.perDiemIds.length===0)
           dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersSucceedMessage));
         else if(payload.perDiemIds.length===payload.orderIds.length)
           dispatch(new ShowToast(MessageTypes.Error, PerDiemReOrdersErrorMessage));
@@ -1147,7 +1147,7 @@ export class OrderManagementContentState {
     ) : Observable<CandidateCancellationReason[] |null>{
       return this.orderManagementService.GetCandidateCancellationReasons(payload).pipe(tap((payload: CandidateCancellationReason[]) => {
         patchState({ candidateCancellationReasons: payload });
-        return payload
+        return payload;
       }));
     }
 

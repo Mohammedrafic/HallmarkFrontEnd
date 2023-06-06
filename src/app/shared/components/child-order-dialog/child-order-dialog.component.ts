@@ -96,7 +96,7 @@ import {
   CandidateCancellationReason,
   CandidateCancellationReasonFilter,
 } from '@shared/models/order-management.model';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { addDays, toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
@@ -114,6 +114,7 @@ import { PermissionService } from '../../../security/services/permission.service
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SettingsViewService } from '@shared/services';
+import { UserPermissions } from '@core/enums';
 
 enum Template {
   accept,
@@ -222,6 +223,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private isAlive = true;
   private isLastExtension = false;
   private ignoreMissingCredentials = false;
+  private readonly permissions = UserPermissions;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -229,6 +231,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   get isCancelled(): boolean {
     return this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.Cancelled;
+  }
+
+  get canEditClosedBillRates(): boolean {
+    return this.userPermission[this.permissions.CanUpdateBillRates];
   }
 
   get isOnboard(): boolean {

@@ -162,6 +162,8 @@
                   *ngIf="sideDialog.visible"
                   [currentOrder]="order"
                   [comments]="orderComments"
+                  [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
+                  [CanOrganizationViewOrdersIRP]="CanOrganizationViewOrdersIRP"
                   [activeSystem]="activeSystem"></app-order-details-container>
               </ng-template>
             </e-tabitem>
@@ -190,7 +192,7 @@
             <e-tabitem *ngIf="orderType.OpenPerDiem === order?.orderType">
               <ng-template #headerText>
                 Re-Orders
-                <span class="e-badge e-badge-success e-badge-pill"> {{ order?.reOrders?.length || '0' }}</span>
+                <span class="e-badge e-badge-success e-badge-pill"> {{ (reOrderList$ | async)?.totalCount || '0' }}</span>
               </ng-template>
               <ng-template #content>
                 <app-order-reorders-container
@@ -198,6 +200,7 @@
                   (editReorder)="editNestedReOrder($event)"
                   [currentOrder]="order"
                   [activeSystem]="activeSystem"
+                  [reOrders]="reOrderList$ | async"
                 >
                 </app-order-reorders-container>
               </ng-template>

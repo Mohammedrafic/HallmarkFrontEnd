@@ -115,7 +115,7 @@ import { TiersDialogModule } from '@shared/components/tiers-dialog/tiers-dialog.
 import { TIER_DIALOG_TYPE } from '@shared/components/tiers-dialog/constants';
 import { Tiers } from '@shared/enums/tiers.enum';
 import { TiersState } from '@organization-management/store/tiers.state';
-import { TiersApiService } from '@shared/services';
+import { SettingsViewService, TiersApiService } from '@shared/services';
 import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { AssignSkillComponent } from './skills/assign-skill/assign-skill.component';
@@ -285,6 +285,7 @@ const sidebarIcons = {
     LocationsService,
     ShiftsService,
     SideMenuService,
+    SettingsViewService,
     {
       provide: TIER_DIALOG_TYPE,
       useValue: Tiers.tierSettings,

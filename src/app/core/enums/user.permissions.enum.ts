@@ -149,6 +149,12 @@ export enum UserPermissions {
   ViewUnavailabilityReasons = 2811,
   CanEditUnavailabilityReasons = 2812,
 
+  // Order management
+  CanUpdateBillRates = 8101,
+
+  //Timesheets
+  CanRecalculateTimesheets = 8102,
+
   // Organization Invoices
   OrganizationInvoices = 3500,
   CanOrganizationViewInvoices = 3501,
@@ -202,4 +208,16 @@ export enum UserPermissions {
   //View Order Journey
   ViewOrderJourney = 8001,
 
+  //DoNotReturn
+  CanViewDoNotReturnList = 6003,
+  CanAddEditDoNotReturn = 6004,
+
+
+  CanOrganizationViewOrdersIRP = 6406,
+  CanOrganizationEditOrdersIRP = 6407,
+  CanCreateOrdersIRP = 6408,
+  CanOnboardCandidateIRP = 6409,
+  CanRejectCandidateIRP = 6410,
+  CanEditOrderBillRateIRP = 6411,
+  CanCloseOrdersIRP = 6412
 }

@@ -454,6 +454,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/unit-profile',
     },
+    98: {
+      // Unit profile Report
+      icon: '',
+      route: '/analytics/hours-by-department',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -684,6 +689,11 @@ export const MENU_CONFIG: any = {
       // Unit profile Report
       icon: '',
       route: '/analytics/unit-profile',
+    },
+    98: {
+      // Unit profile Report
+      icon: '',
+      route: '/analytics/hours-by-department',
     },
   },
 
@@ -1097,6 +1107,11 @@ export const MENU_CONFIG: any = {
       // Unit profile Report
       icon: '',
       route: '/analytics/unit-profile',
+    },
+    98: {
+      // Unit profile Report
+      icon: '',
+      route: '/analytics/hours-by-department',
     },
   },
 

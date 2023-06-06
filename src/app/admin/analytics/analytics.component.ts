@@ -47,6 +47,9 @@ export class AnalyticsComponent implements OnInit, OnDestroy  {
           this.isLoad = true;
         }
       }
+      if (this.sideMenuConfig.length == 0) {
+        this.router.navigate(['/']);
+      }
     });
   }
 }

@@ -1,6 +1,6 @@
 import { FieldType, UserPermissions } from '@core/enums';
 
-import { ScheduleType } from '../enums';
+import { ScheduleAttributeTitles, ScheduleType } from '../enums';
 import * as ScheduleInt from '../interface';
 import { CreateScheduleTypesConfig } from '../interface';
 import { REQUIRED_PERMISSIONS } from '@shared/constants';
@@ -161,6 +161,7 @@ const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
     gridAreaName: 'toggle1',
     required: false,
     show: true,
+    tooltipContent: ScheduleAttributeTitles.ORI,
   },
   {
     field: 'critical',
@@ -169,6 +170,7 @@ const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
     gridAreaName: 'toggle2',
     required: false,
     show: true,
+    tooltipContent: ScheduleAttributeTitles.CRT,
   },
   {
     field: 'onCall',
@@ -177,6 +179,7 @@ const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
     gridAreaName: 'toggle3',
     required: false,
     show: true,
+    tooltipContent: ScheduleAttributeTitles.OC,
   },
   {
     field: 'charge',
@@ -185,6 +188,7 @@ const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
     gridAreaName: 'toggle4',
     required: false,
     show: true,
+    tooltipContent: ScheduleAttributeTitles.CHG,
   },
   {
     field: 'preceptor',
@@ -193,6 +197,7 @@ const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
     gridAreaName: 'toggle5',
     required: false,
     show: true,
+    tooltipContent: ScheduleAttributeTitles.PRC,
   },
   {
     field: 'meal',
@@ -201,6 +206,7 @@ const bookingToggleForm: ScheduleInt.ScheduleFormFieldConfig[] = [
     gridAreaName: 'meal',
     required: false,
     show: true,
+    tooltipContent: ScheduleAttributeTitles.MEAL,
   },
 ];
 

@@ -69,7 +69,7 @@
     </div>
   </div>
   <div #showIRPOnlyToggle class="active-toggle">
-    <ejs-switch class="switch" (change)="isShowIRPOnly($event)"></ejs-switch>
+    <ejs-switch class="switch" [(checked)]="toggle" (change)="isShowIRPOnly($event)"></ejs-switch>
     <span class="e-text">Show IRP Only</span>
   </div>
 </div>
@@ -89,7 +89,7 @@
   <ejs-treeview
     #tree
     [disabled]="(isNewRoleDataLoading$ | async) || form.disabled"
-    [fields]="roleTreeField$ | async"
+    [fields]="fields"
     [showCheckBox]="true"
     (nodeClicked)="onSelecting()"
     (drawNode)="drawNode($event)"

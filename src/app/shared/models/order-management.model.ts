@@ -41,6 +41,7 @@ export class OrderManagement {
   candidates: number;
   startDate: string;
   isLocked?: boolean;
+  isTemplate?: boolean;
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
@@ -230,6 +231,7 @@ export type AgencyOrderManagement = {
   organizationPrefix: string;
   extensionFromId?: number;
   candidates?: CandidateModel[];
+  irpOrderMetadata?: IRPMetaData;
 };
 
 export interface OrderManagementChild  {
@@ -287,6 +289,7 @@ export type OrderCandidatesList = {
   agencyName?: string;
   organizationId?: number;
   workflowStepType: WorkflowStepType;
+  availabilityOverlap?: OrderAvailabilityOverlap;
 };
 
 export interface WorkflowStepType {
@@ -783,6 +786,15 @@ export interface IrpOrderCandidateDto {
   payRate: number;
   organizationOrientationDate: string | null;
   departmentOrientationDate: string | null;
+  availabilityOverlap: OrderAvailabilityOverlap | null;
+}
+
+export interface OrderAvailabilityOverlap {
+  end: string;
+  isFullOverlap: boolean;
+  overlapHours: number;
+  start: string;
+  tooltip: string;
 }
 
 export type IrpOrderCandidate = IrpOrderCandidateDto & IrpCandidateShiftTime;
@@ -791,6 +803,7 @@ export interface IrpCandidatesParams {
   PageSize: number;
   PageNumber: number;
   isAvailable: boolean;
+  searchTerm?: string;
 }
 
 export class CandidateCancellationReason{

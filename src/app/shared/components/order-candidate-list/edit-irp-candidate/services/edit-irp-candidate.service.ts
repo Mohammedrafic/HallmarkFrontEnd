@@ -92,7 +92,7 @@ constructor(
     if(status === CandidatStatus.OnBoard && state.candidate.status !== status) {
       return this.orderCandidateApiService.createIrpCandidate(
         CreateCandidateDto(
-          state.candidate.candidateProfileId,
+          state.candidate,
           state.order.id,
           actualStartDate,
           actualEndDate,
@@ -114,7 +114,7 @@ constructor(
     } else {
       return this.orderCandidateApiService.createIrpCandidate(
         CreateCandidateDto(
-          state.candidate.candidateProfileId,
+          state.candidate,
           state.order.id,
           actualStartDate,
           actualEndDate,

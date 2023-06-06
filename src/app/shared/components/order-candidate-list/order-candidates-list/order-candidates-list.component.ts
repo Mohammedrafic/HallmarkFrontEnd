@@ -51,6 +51,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @ViewChild('offerDeployment') offerDeployment: OfferDeploymentComponent;
 
   @Input() system: OrderManagementIRPSystemId;
+  @Input() orderDetails : Order;
 
   @Select(OrderManagementState.selectedOrder)
   public selectedAgOrder$: Observable<Order>;
@@ -96,7 +97,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     candidate: {} as IrpOrderCandidate,
     order: {} as Order,
   };
-
+  commentContainerId: number = 0;
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
   }
@@ -131,6 +132,9 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     ).subscribe((id) => {
       this.getOrganization(id);
     });
+    if(this.orderDetails.commentContainerId != undefined){
+    this.commentContainerId = this.orderDetails.commentContainerId;
+    }
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {

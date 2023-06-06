@@ -228,13 +228,13 @@
                 <form
                   *ngIf="listOfKeyForms[config.formList][i]"
                   [formGroup]="listOfKeyForms[config.formList][i]"
-                  class="form-list bootstrap"
+                  class="form-list bootstrap {{config.formList}}"
                 >
                     <ng-container  *ngFor="let item of form; trackBy:trackByField">
                       <ng-container [ngSwitch]="item.type">
 
                         <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-                          <div>
+                          <div class="{{item.cssClass}}">
                             <label [for]="item.field">{{ item.title }} <span *ngIf="item.required" class="required">*</span></label>
                             <div class="input-group dropdown">
                               <ejs-dropdownlist
@@ -249,7 +249,7 @@
                         </ng-template>
 
                         <ng-template [ngSwitchCase]="FieldTypes.Input">
-                          <div class="input-container">
+                          <div class="input-container {{item.cssClass}}">
                             <label [for]="item.field">{{ item.title }} <span *ngIf="item.required" class="required">*</span></label>
                             <div class="input-group">
                               <input
@@ -264,7 +264,7 @@
                         </ng-template >
 
                         <ng-template [ngSwitchCase]="FieldTypes.Phone">
-                          <div class="input-container">
+                          <div class="input-container {{item.cssClass}}">
                             <label [for]="item.field">{{ item.title }} <span *ngIf="item.required" class="required">*</span></label>
                           <div class="input-group">
                               <ejs-maskedtextbox
@@ -295,7 +295,7 @@
                         </ng-template>
 
                         <ng-template [ngSwitchCase]="FieldTypes.RadioButton">
-                          <div class="radio-button" *ngIf="item.show">
+                          <div class="radio-button {{item.cssClass}}" *ngIf="item.show">
                             <label [for]="item.field">{{ item.title }} <span *ngIf="item.required" class="required">*</span></label>
                             <ejs-radiobutton
                               [name]="item.field"

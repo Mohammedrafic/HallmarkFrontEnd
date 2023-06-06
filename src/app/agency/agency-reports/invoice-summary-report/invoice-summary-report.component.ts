@@ -167,7 +167,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
     private readonly ngZone: NgZone,
     @Inject(APP_SETTINGS) private appSettings: AppSettings) {
     this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
-    this.store.dispatch(new SetHeaderState({ title: "Reports", iconName: 'file' }));
+    this.store.dispatch(new SetHeaderState({ title: "Reports", iconName: 'pie-chart' }));
     this.initForm();
     this.user = this.store.selectSnapshot(UserState.user);
     //if (this.user?.id != null) {
@@ -214,7 +214,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.enable() : this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.enable() : this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.disable();
 
     });
 

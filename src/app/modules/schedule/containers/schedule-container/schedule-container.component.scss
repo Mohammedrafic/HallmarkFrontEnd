@@ -40,6 +40,13 @@
     display: flex;
     justify-content: space-between;
 
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 32px;
+      color: $black;
+    }
+
     &.block {
       display: block;
     }

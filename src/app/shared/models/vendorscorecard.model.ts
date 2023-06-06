@@ -44,8 +44,8 @@ export class VendorScorecardresponse {
   ordersDistributed: Double
   timetoSubmit: Double
   timetoStart: Double
-  vendorOverallScorePercent: string
-  vendorOverallScore: number
+  vendorOverallScorePercent: number
+  vendorOverallScore: string
 }
 
 

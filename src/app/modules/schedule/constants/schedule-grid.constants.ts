@@ -2,8 +2,9 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 
 import { DatesRangeType, WeekDays } from '@shared/enums';
 import { IrpOrderType } from '@shared/enums/order-type';
+import { isCandidateOriented } from '../components/candidate-card/candidate-card.helper';
 import { CardTitle, CreateScheduleAttributes, HasMultipleFilters } from '../helpers';
-import { DatePeriodId, ScheduleType } from '../enums';
+import { DatePeriodId, EmployeeIcons, ScheduleType } from '../enums';
 import { ScheduleCandidate, ScheduleDateItem, ScheduleEventConfig, ScheduleFilters } from '../interface';
 
 export const DatesPeriods: ItemModel[] = [
@@ -28,16 +29,22 @@ export const MonthPeriod: ItemModel[] = [
   },
 ];
 
-export const CandidateIconName = (scheduleCandidate: ScheduleCandidate, filters: ScheduleFilters): string => {
-  if (!HasMultipleFilters(filters)) {
-    return 'compass';
+export const CandidateIconName = (
+  scheduleCandidate: ScheduleCandidate,
+  filters: ScheduleFilters,
+  startDate: string
+): EmployeeIcons | null => {
+  const candidateOrientation = isCandidateOriented(startDate, scheduleCandidate.orientationDate);
+
+  if (!HasMultipleFilters(filters) && !(scheduleCandidate.orientationDate && candidateOrientation)) {
+    return EmployeeIcons.Compass;
   }
 
   if (scheduleCandidate.employeeNote) {
-    return 'flag';
+    return EmployeeIcons.Flag;
   }
 
-  return '';
+  return null;
 };
 
 export const GetScheduleEventConfig = (scheduleItem: ScheduleDateItem, eventIndex: number): ScheduleEventConfig => {

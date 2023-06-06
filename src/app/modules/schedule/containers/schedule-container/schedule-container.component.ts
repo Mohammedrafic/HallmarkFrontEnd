@@ -4,26 +4,24 @@ import { Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
+import { DateTimeHelper } from '@core/helpers';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { Permission } from '@core/interface';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
-import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
-import { FilterErrorMessage, TabListConfig } from '../../constants';
-import { ActiveTabIndex } from '../../enums';
+import { FilterErrorMessage } from '../../constants';
 import * as ScheduleInt from '../../interface';
 import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ScheduledItem, SelectedCells, SideBarSettings } from '../../interface';
 import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters, GetScheduledShift } from '../../helpers';
-import { DateTimeHelper } from '@core/helpers';
 import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 
 @Component({
@@ -33,11 +31,6 @@ import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleContainerComponent extends AbstractPermission implements OnInit {
-  tabsListConfig: TabsListConfig[] = TabListConfig;
-
-  activeTabIndex: ActiveTabIndex = ActiveTabIndex.Scheduling;
-
-  tabIndex = ActiveTabIndex;
 
   scheduleData: ScheduleInt.ScheduleModelPage | null;
 
@@ -94,10 +87,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
     this.store.dispatch(new ResetPageFilters());
-  }
-
-  changeTab(tabIndex: ActiveTabIndex): void {
-    this.activeTabIndex = tabIndex;
   }
 
   loadMoreData(pageNumber: number): void {

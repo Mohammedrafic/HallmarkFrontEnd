@@ -13,11 +13,15 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { TiersPage } from '@shared/components/tiers-dialog/interfaces';
 import { TiersStateModel } from '@organization-management/interfaces';
+import { CommitmentStateModel } from '@admin/store/commitment.state';
+import { MasterCommitmentsPage } from '@shared/models/commitment.model';
 
 @State<TiersStateModel>({
   name: 'tiers',
   defaults: {
-    tiersByPage: null
+    tiersByPage: null,
+    isCommitmentLoading : false,
+    commitmentsPage : null
   }
 })
 @Injectable()
@@ -27,6 +31,10 @@ export class TiersState {
   @Selector()
   static tiersPage(state: TiersStateModel): TiersPage | null {
     return state.tiersByPage;
+  }
+  @Selector()
+  static workCommitmentsPageforTier(state: CommitmentStateModel): MasterCommitmentsPage | null {
+    return state.commitmentsPage;
   }
 
   @Action(Tiers.GetTiersByPage)
@@ -94,6 +102,19 @@ export class TiersState {
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(Tiers.GetWorkCommitmentByPageforTiers)
+  GetWorkCommitmentByPageforTiers(
+    { patchState }: StateContext<TiersStateModel>,
+    ): Observable<TiersPage> {
+
+    return this.tiersApiService.getMasterWorkCommitments().pipe(
+      tap((payload : any) => {
+        patchState({commitmentsPage: payload, isCommitmentLoading: false});
+        return payload;
       })
     );
   }

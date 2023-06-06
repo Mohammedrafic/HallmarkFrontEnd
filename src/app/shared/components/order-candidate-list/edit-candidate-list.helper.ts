@@ -1,20 +1,22 @@
 import { FormGroup } from '@angular/forms';
 import { formatDate } from '@angular/common';
 
-import { CreateIrpCandidateDto, UpdateIrpCandidateDto } from '@shared/components/order-candidate-list/interfaces';
 import { DateTimeHelper } from '@core/helpers';
+import { CreateIrpCandidateDto, UpdateIrpCandidateDto } from '@shared/components/order-candidate-list/interfaces';
 import { CandidateField } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
+import { IrpOrderCandidate, OrderCandidatesList } from '@shared/models/order-management.model';
 
 export const CreateCandidateDto = (
-  employeeId: number,
+  candidate: IrpOrderCandidate | OrderCandidatesList,
   orderId: number,
   actualStartDate?: string,
   actualEndDate?: string
 ): CreateIrpCandidateDto => ({
-  employeeId,
+  employeeId: candidate.candidateProfileId,
   orderId,
   actualStartDate: actualStartDate ?? null,
   actualEndDate: actualEndDate ?? null,
+  availabilityOverlap: candidate.availabilityOverlap ?? null,
 });
 
 export const UpdateCandidateDto = (

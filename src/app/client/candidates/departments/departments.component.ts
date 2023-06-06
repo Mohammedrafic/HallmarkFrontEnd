@@ -172,7 +172,6 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     }
     if (event.type === BulkTypeAction.DELETE) {
       this.deleteAssignedDepartments(this.selectedDepartments, true);
-      return;
     }
   }
 

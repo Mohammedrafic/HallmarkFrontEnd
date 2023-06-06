@@ -41,6 +41,7 @@ export interface ScheduleCandidate {
   isOriented: boolean;
   fullName?: string;
   workCommitmentText?: string;
+  isOnHold: boolean;
 }
 
 export interface LtaAssignment {
@@ -111,6 +112,7 @@ export interface ScheduleDateItem {
   departmentStartDate: string;
   departmentEndDate: string;
   isDisabled?: boolean;
+  isOnHold: boolean;
 }
 
 export interface ScheduledItem {
@@ -274,8 +276,40 @@ export interface RemovedSlot {
   candidate: ScheduleCandidate;
 }
 
-
 export interface DateRangeOption {
   dateText: string;
   noBorder: boolean;
+}
+
+export interface ChipsFilterStructure {
+  regionIds: number[];
+  locationIds: number[];
+  departmentsIds: number[];
+  skillIds: number[];
+}
+
+export interface ChipsInitialState {
+  regions: OrganizationLocation[];
+  locations: OrganizationDepartment[];
+  departments: OrganizationDepartment[];
+}
+
+export interface ChipSettings {
+  editedChips: boolean;
+  preservedChipsSkills: number[];
+}
+
+export interface RegionChipsStructureState {
+  regionIds: number[];
+  regions: OrganizationLocation[];
+}
+
+export interface LocationChipsStructureState {
+  locationIds: number[];
+  locations: OrganizationDepartment[];
+}
+
+export interface DepartmentChipsStructureState {
+  departmentIds: number[];
+  departments: OrganizationDepartment[];
 }

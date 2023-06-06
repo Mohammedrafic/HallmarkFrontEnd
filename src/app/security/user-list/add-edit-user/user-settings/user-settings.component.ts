@@ -96,7 +96,12 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
         map((fn) => fn(this.businessUnitControl?.value)),
         takeWhile(() => this.isAlive)
       )
-      .subscribe((value) => (this.businessValue = value));
+      .subscribe((value) => {
+        this.businessValue = value;
+          if(this.businessUnitControl?.value === BusinessUnitType.Hallmark && this.firstLoadModal && value && value.length > 0) {
+            this.businessUnitIdControl?.setValue(value[0].id);
+          }
+        });
   }
 
   public toggleActive(): void {
