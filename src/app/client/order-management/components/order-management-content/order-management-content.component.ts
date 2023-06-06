@@ -561,7 +561,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.subscribeOnUserSearch();
     this.watchForUpdateCandidate();
     this.preservedOrderHandler();
-    let isIrpEnabled = this.canViewOrderIRP;
+    let isIrpEnabled = JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean;;
     if (isIrpEnabled === true) {
       this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
       this.activeSystem = OrderManagementIRPSystemId.IRP;
@@ -620,7 +620,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.canCreateOrder = canCreateOrder;
       this.canCloseOrder = canCloseOrder;
       this.canOrderJourney = canOrderJourney;
-      this.canCreateOrder=canCreateOrderIRP;
+      this.canCreateOrderIRP=canCreateOrderIRP;
       this.canCloseOrderIRP=canCloseOrderIRP;
       this.CanEditOrderBillRateIRP = CanEditOrderBillRateIRP;
       this.initMenuItems();
@@ -2167,7 +2167,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.dispatchAgencyOrderCandidatesList(this.selectedCandidate.orderId, this.selectedCandidate.organizationId,
         this.selectedCandidate.irpOrderMetadata);
     });
-  }
+  } 
 
   private handleRedirectFromQuickOrderToast(): void {
     if (this.isRedirectedFromToast) {
@@ -2271,7 +2271,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (!this.previousSelectedSystemId) {
         this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
       }
-      this.systemGroupConfig = SystemGroupConfig(this.canViewOrderIRP, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
+      this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       this.setOrderTypesFilterDataSource();
       this.initMenuItems();
       this.initGridColumns();
@@ -2594,7 +2594,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else if (obj == "VMS") {
       this.activeSystem = OrderManagementIRPSystemId.VMS;
     }
-    this.systemGroupConfig = SystemGroupConfig(this.canViewOrderIRP, this.isOrgVMSEnabled, this.activeSystem, this.canOrderJourney);
+    this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem, this.canOrderJourney);
     this.clearFilters();
     this.clearOrderJourneyFilters();
     this.store.dispatch([new PreservedFilters.ResetPageFilters(), new ClearOrders()]);

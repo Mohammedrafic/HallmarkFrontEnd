@@ -179,14 +179,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     
           statusConfigField.dataSource = this.editIrpCandidateService
           .createStatusOptions([...candidateDetails.availableStatuses ?? []]);
-          if(this.canOnboardCandidateIRP){
-            const objWithIdIndex = statusConfigField.dataSource.findIndex((obj:any) => obj.applicantStatus === "Onboard");
+          if(!this.canOnboardCandidateIRP){
+            const objWithIdIndex = statusConfigField.dataSource.findIndex((obj:any) => obj.text === "Onboard");
             if (objWithIdIndex > -1) {
               statusConfigField.dataSource.splice(objWithIdIndex, 1);
             }
           }
-          if(this.canRejectedCandidateIRP){
-            const objWithIdIndex = statusConfigField.dataSource.findIndex((obj:any) => obj.applicantStatus === "Reject");
+          if(!this.canRejectedCandidateIRP){
+            const objWithIdIndex = statusConfigField.dataSource.findIndex((obj:any) => obj.text === "Reject");
             if (objWithIdIndex > -1) {
               statusConfigField.dataSource.splice(objWithIdIndex, 1);
             }
@@ -284,14 +284,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       text: jobStatus.statusText,
       value: jobStatus.applicantStatus,
     }];
-    if(this.canOnboardCandidateIRP){
-      const objWithIdIndex = statusConfig.dataSource.findIndex((obj:any) => obj.applicantStatus === "Onboard");
+    if(!this.canOnboardCandidateIRP){
+      const objWithIdIndex = statusConfig.dataSource.findIndex((obj:any) => obj.text === "Onboard");
       if (objWithIdIndex > -1) {
         statusConfig.dataSource.splice(objWithIdIndex, 1);
       }
     }
-    if(this.canRejectedCandidateIRP){
-      const objWithIdIndex = statusConfig.dataSource.findIndex((obj:any) => obj.applicantStatus === "Reject");
+    if(!this.canRejectedCandidateIRP){
+      const objWithIdIndex = statusConfig.dataSource.findIndex((obj:any) => obj.text === "Reject");
       if (objWithIdIndex > -1) {
         statusConfig.dataSource.splice(objWithIdIndex, 1);
       }

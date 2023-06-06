@@ -41,7 +41,7 @@
           [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
         >
           <button
-            [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]||!userPermission[userPermissions.CanCreateOrdersIRP]"
+            [disabled]="isActiveSystemIRP || !canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
             ejs-button
             appHideBeforeSyncfusionLoad
             (click)="openImportDialog()"
@@ -70,7 +70,7 @@
         </button>
 
         <button *ngIf="isActiveSystemIRP" ejs-dropdownbutton appHideBeforeSyncfusionLoad [items]="exportOptions" (select)="exportSelected($event)"
-          id="importButton" cssClass="e-outline button-export">
+          id="importButton" cssClass="e-outline button-export" [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]">
           <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
 
@@ -81,7 +81,23 @@
         </ng-container>
 
         <app-tooltip-container
-          *ngIf="!isMobile"
+          *ngIf="!isMobile && isActiveSystemIRP"
+          [message]="toolTipMessage"
+          [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
+        >
+          <button
+            [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]"
+            ejs-button
+            appHideBeforeSyncfusionLoad
+            [isPrimary]="true"
+            (click)="navigateToOrderForm()"
+          >
+            Create Order
+          </button>
+        </app-tooltip-container>
+
+        <app-tooltip-container
+          *ngIf="!isMobile && !isActiveSystemIRP"
           [message]="toolTipMessage"
           [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
         >
