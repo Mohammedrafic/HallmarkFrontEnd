@@ -43,6 +43,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Permission } from '@core/interface';
 import { UserPermissionsService } from '@core/services';
 import { PermissionsAdapter } from '@core/helpers/adapters';
+import { RoleNames } from '@shared/enums/role-names.enum';
 
 export interface UserStateModel {
   user: User | null;
@@ -193,6 +194,11 @@ export class UserState {
   @Selector([UserState.isHallmarkUser, UserState.isMspUser])
   static isHallmarkMspUser(state: UserState, isHalmark: boolean, isMsp: boolean): boolean {
     return isHalmark || isMsp;
+  }
+
+  @Selector()
+  static isHallmarkSystemAdmin(state: UserStateModel): boolean {
+    return state.user?.roleNames === RoleNames.HallmarkSystemAdmin;
   }
 
   @Selector()
