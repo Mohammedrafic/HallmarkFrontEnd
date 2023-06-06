@@ -61,7 +61,7 @@
             <div class="title">
               <span class="title__text">{{ dayCardConfig.source[i].title }}</span>
             </div>
-            <div class="additional-attributes" *ngIf="dayCardConfig.source[i].additionalAttributes">
+            <div class="additional-attributes" *ngIf="dayCardConfig.source[i].additionalAttributes; else onHoldText">
               <span>{{dayCardConfig.source[i].additionalAttributes}}</span>
             </div>
           </div>
