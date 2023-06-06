@@ -546,7 +546,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.subscribeForSettings();
     this.handleRedirectFromQuickOrderToast();
     this.showFilterFormAfterOpenDialog();
-    this.getProjectSpecialData();
     this.subscribeOnPermissions();
     this.subscribeOnChanges();
     this.firstInitGridColumns();
@@ -2258,6 +2257,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.initMenuItems();
       this.initGridColumns();
       this.getOrders();
+      this.getProjectSpecialData();
 
       this.previousSelectedSystemId = null;
     });
