@@ -18,7 +18,7 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
-import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { endDateValidator, endTimeValidator, startDateValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-general-info',
@@ -117,7 +117,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.candidateForm.get('holdStartDate')?.setValidators([
       Validators.required,
       startDateValidator(this.candidateForm, 'holdEndDate'),
-      endDateValidator(this.candidateForm, 'hireDate'),
+      endTimeValidator(this.candidateForm, 'hireDate'),
     ]);
     this.candidateForm.get('holdEndDate')?.setValidators(endDateValidator(this.candidateForm, 'holdStartDate'));
     this.removeValidatorsAndReset(['terminationDate', 'terminationReasonId']);
@@ -127,7 +127,10 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.isTerminatedSelected = true;
     this.isOnHoldSelected = false;
     this.candidateForm.get('terminationDate')?.setValue(this.today);
-    this.candidateForm.get('terminationDate')?.setValidators(Validators.required);
+    this.candidateForm.get('terminationDate')?.setValidators([
+      Validators.required,
+      endTimeValidator(this.candidateForm, 'hireDate'),
+    ]);
     this.candidateForm.get('terminationReasonId')?.setValidators(Validators.required);
     this.removeValidatorsAndReset(['holdStartDate', 'holdEndDate']);
   }
