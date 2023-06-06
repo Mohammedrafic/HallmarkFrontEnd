@@ -210,6 +210,13 @@ export class DonotReturnState {
           })
           dispatch(new DoNotReturn.UploadDoNotReturnFileSucceeded(payload));
         }
+        if(payload.succesfullRecords.length > 0){          
+          payload.succesfullRecords.forEach(data=>{
+            if(data.ssn != ''){
+              data = CommonHelper.formatTheSSN(data);
+            }
+          })
+        }
         dispatch(new DoNotReturn.SaveDoNotReturnImportResultFailAndSucceeded(payload));
         return payload;
       }),
