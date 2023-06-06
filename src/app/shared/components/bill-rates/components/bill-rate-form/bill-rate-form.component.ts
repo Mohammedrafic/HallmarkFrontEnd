@@ -229,7 +229,12 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
         }
 
         if (rateId === BillRateTitleId.FacilityCalledOff || rateId === BillRateTitleId.ResourceCalledOff) {
-            this.billRateForm.get('rateHour')?.patchValue(0);
+          this.billRateForm.get('rateHour')?.disable();
+          this.billRateForm.get('rateHour')?.patchValue(0);
+          this.billRateForm.get('rateHour')?.removeValidators(Validators.required);
+        } else {
+          this.billRateForm.get('rateHour')?.addValidators(Validators.required);
+          this.billRateForm.get('rateHour')?.enable();
         }
 
         if (billRateConfig) {

@@ -625,6 +625,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       .get('billRateTitleId')
       ?.valueChanges
       .pipe(takeUntil(this.unsubscribe$))
+      // eslint-disable-next-line max-lines-per-function
       .subscribe((typeId: number) => {
         this.isMileageTitleType = typeId !== BillRateTitleId.Mileage;
         const foundBillRateOption = this.billRatesOptions.find((option) => option.id === typeId);
@@ -688,6 +689,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         if (typeId === BillRateTitleId.MissedMeal
           || typeId === BillRateTitleId.FacilityCalledOff || typeId === BillRateTitleId.ResourceCalledOff) {
             this.otInputsEnabled = false;
+            this.billRatesFormGroup.get('considerForWeeklyOt')?.patchValue(false);
+            this.billRatesFormGroup.get('considerForDailyOt')?.patchValue(false);
+            this.billRatesFormGroup.get('considerFor7thDayOt')?.patchValue(false);
+            
         } else if (!this.otInputsEnabled) {
           this.otInputsEnabled = true;
         }
