@@ -2,18 +2,18 @@ import { ControlTypes, ValueType } from "@shared/enums/control-types.enum";
 import { FilterConfig, MasterDoNotReturnExportColumn } from "./do-not-return.interface";
 
 export const MasterDNRExportCols: MasterDoNotReturnExportColumn[] = [
-  { text: 'first name', column: 'FirstName' },
-  { text: 'middle name', column: 'MiddleName' },
-  { text: 'last name', column: 'LastName' },
-  {text: 'RegionName',column:'RegionBlocked'},
-  {text: 'LocationName',column:'LocationBlocked'},
-  { text: 'email', column: 'EMAIL' },
-  { text: 'ssn', column: 'SSN' },
-  { text: 'currentStatus', column: 'CurrentStatus' },
-  { text: 'lastUpdatedDate', column: 'LastUpdatedDate' },
-  { text: 'lastBlockedDate', column: 'LastBlockedDate' },
-  { text: 'lastUnBlockedDate', column: 'LastUnBlockedDate' },
-  { text: 'comment', column: 'Comment' },
+  { text: 'First Name', column: 'FirstName' },
+  { text: 'Middle Name', column: 'MiddleName' },
+  { text: 'Last Name', column: 'LastName' },
+  { text: 'Region Blocked', column: 'RegionBlocked' },
+  { text: 'Location Blocked', column: 'LocationBlocked' },
+  { text: 'Email', column: 'EMAIL' },
+  { text: 'SSN', column: 'SSN' },
+  { text: 'Current Status', column: 'CurrentStatus' },
+  { text: 'Last Updated Date', column: 'LastUpdatedDate' },
+  { text: 'Last Blocked Date', column: 'LastBlockedDate' },
+  { text: 'Last Unblocked Date', column: 'LastUnBlockedDate' },
+  { text: 'Comment', column: 'Comment' },
 ];
 
 export const doNotReturnFilterConfig: FilterConfig = {
