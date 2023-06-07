@@ -18,11 +18,12 @@ export class AvailableEmployeeComponent  implements OnInit {
 
   ngOnInit(): void { 
   }
+
   public rowData: AvailableEmployeeModel[] ;
   public columnDefs:ColDef[] = [
     { field: 'fullName', headerName:"Name",width:180},
-    { field: 'startDateTime', headerName:"Start Date Time",width:160},
-    { field: 'endDateTime', headerName:"End Date Time",width:160},
+    { field: 'startDate', headerName:"Start Date",width:160},
+    { field: 'shiftTime', headerName:"Shift Time",width:160},
   ];
   
  

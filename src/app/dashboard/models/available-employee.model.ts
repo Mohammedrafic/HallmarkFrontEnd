@@ -1,8 +1,8 @@
 export interface AvailableEmployeeModel {
     firstName: string;
     lastName: string;
-    startDateTime : string;
-    endDateTime : string;
+    startDate : string;
+    shiftTime : string;
     fullName: string;
   }
   
