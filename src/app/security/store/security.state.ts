@@ -47,7 +47,7 @@ import { PermissionsTree } from '@shared/models/permission.model';
 import { RoleTreeField } from '../roles-and-permissions/role-form/role-form.component';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
+import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
 import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
@@ -492,6 +492,7 @@ export class SecurityState {
           const items = state.rolesPage?.items.filter((item) => item.id !== id);
           const rolesPage = { ...state.rolesPage, items };
           patchState({ rolesPage });
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         }
       }),
       catchError((error: HttpErrorResponse) => {
