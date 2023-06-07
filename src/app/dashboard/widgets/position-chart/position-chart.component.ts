@@ -17,6 +17,7 @@ export class PositionChartComponent {
   @Input() public description: string;
   @Input() public isDarkTheme: boolean;
   @Input() public isLTAOrderEnding: boolean = false;
+  @Input() public slideBar: any = false;
   
 
   private mousePosition = {
