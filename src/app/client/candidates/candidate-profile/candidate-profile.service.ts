@@ -28,10 +28,7 @@ export class CandidateProfileService {
     const { value } = this.candidateProfileForm.candidateForm;
     const isOnHoldSetManually = this.candidateProfileForm.isOnHoldDateSetManually();
     const candidate = candidateId ? { id: candidateId, ...value, isOnHoldSetManually } : value;
-    const candidateDateInUTC = {
-      ...candidate,
-      ...this.convertDatesToUTC(candidate),
-       } as CandidateModel;
+    const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) } as CandidateModel;
     const payload = { ...candidateDateInUTC, generalNotes: this.generalNotesService.notes$.getValue() };
     const endpoint = `/api/employee/${candidateId ? 'update' : 'create'}`;
 
