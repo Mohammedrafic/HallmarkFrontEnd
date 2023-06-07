@@ -26,8 +26,12 @@ export class CandidateProfileService {
 
   public saveCandidateProfile(candidateId: number): Observable<CandidateModel> {
     const { value } = this.candidateProfileForm.candidateForm;
-    const candidate = candidateId ? { id: candidateId, ...value } : value;
-    const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) } as CandidateModel;
+    const isOnHoldSetManually = this.candidateProfileForm.isOnHoldDateSetManually();
+    const candidate = candidateId ? { id: candidateId, ...value, isOnHoldSetManually } : value;
+    const candidateDateInUTC = {
+      ...candidate,
+      ...this.convertDatesToUTC(candidate),
+       } as CandidateModel;
     const payload = { ...candidateDateInUTC, generalNotes: this.generalNotesService.notes$.getValue() };
     const endpoint = `/api/employee/${candidateId ? 'update' : 'create'}`;
 
@@ -39,8 +43,7 @@ export class CandidateProfileService {
         } else {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
-        this.candidateService.setEmployeeHireDate(candidateDateInUTC.hireDate as string);
-        this.candidateService.setTerminationDate(candidateDateInUTC.terminationDate);
+        this.candidateService.setProfileData(candidateDateInUTC);
         this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
       }),
       catchError((errorResponse: HttpErrorResponse) => {

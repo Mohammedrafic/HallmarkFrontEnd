@@ -117,7 +117,13 @@ export class CandidateProfileFormService {
     this.candidateForm.updateValueAndValidity();
   }
 
-  private getPartialFormValueByControls(value: CandidateModel): any {
+  public isOnHoldDateSetManually(): boolean {
+    const onHoldEndDateControl = this.candidateForm.get('holdEndDate');
+    const isOnHoldSetManually = this.candidateService.getProfileData()?.isOnHoldSetManually;
+    return isOnHoldSetManually || !!onHoldEndDateControl?.dirty;
+  }
+
+  private getPartialFormValueByControls(value: CandidateModel): Partial<CandidateModel> {
     return pick(Object.keys(this.candidateForm.controls), value);
   }
 
