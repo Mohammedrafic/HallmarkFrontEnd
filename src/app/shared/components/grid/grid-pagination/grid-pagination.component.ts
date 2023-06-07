@@ -1,15 +1,24 @@
-import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 import type { FieldSettingsModel, PopupEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { takeUntil, distinctUntilChanged, skip } from 'rxjs';
+import { distinctUntilChanged, skip, takeUntil } from 'rxjs';
 
+import { BreakpointObserverService } from '@core/services';
+import { PagerChangeEventModel } from '@shared/components/grid/grid-pagination/models/pager-change-event.model';
 import { GRID_CONFIG } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { PagerChangeEventModel } from '@shared/components/grid/grid-pagination/models/pager-change-event.model';
-import { BreakpointObserverService } from '@core/services';
-import { BulkActionConfig } from '@shared/models/bulk-action-data.model';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
+import { BulkActionConfig } from '@shared/models/bulk-action-data.model';
 
 @Component({
   selector: 'app-grid-pagination',
@@ -17,7 +26,7 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
   styleUrls: ['./grid-pagination.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GridPaginationComponent extends DestroyableDirective implements OnInit {
+export class GridPaginationComponent extends DestroyableDirective implements OnInit, OnChanges {
   @Input() public currentPage: number;
   @Input() public pageSize: number;
   @Input() public totalRecordsCount: number;
@@ -52,19 +61,26 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
 
   public constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly breakpointService: BreakpointObserverService
+    private readonly breakpointService: BreakpointObserverService,
   ) {
     super();
+    this.paginationFormGroup = this.getPaginationFormGroup();
   }
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.getDeviceScreen();
-    this.paginationFormGroup = this.getPaginationFormGroup();
     this.initPageSizeControlValueChangesListener();
+
     if (this.disableRowsPerPageDropdown) {
       this.paginationFormGroup.controls['pageSize'].disable();
     } else {
       this.paginationFormGroup.controls['pageSize'].enable();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['pageSize']) {
+      this.setPagingInputData();
     }
   }
 
@@ -80,6 +96,16 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
     }
 
     currentPage && this.navigateToPageEmitter.emit(currentPage);
+  }
+
+  public openDropdownPopup(args: PopupEventArgs): void {
+    // reset default responsive functionality of dropdown popup
+    if (this.isMobile || this.isTablet) {
+      args.popup.element.classList.remove('e-ddl-device', 'e-ddl-device-filter');
+      args.popup.collision = { X: 'flip', Y: 'flip' };
+      args.popup.position = { X: 'left', Y: 'top' };
+      args.popup.dataBind();
+    }
   }
 
   private getPaginationFormGroup(): FormGroup {
@@ -109,13 +135,7 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
       });
   }
 
-  public openDropdownPopup(args: PopupEventArgs): void {
-    // reset default responsive functionality of dropdown popup
-    if (this.isMobile || this.isTablet) {
-      args.popup.element.classList.remove('e-ddl-device', 'e-ddl-device-filter');
-      args.popup.collision = { X: 'flip', Y: 'flip' };
-      args.popup.position = { X: 'left', Y: 'top' };
-      args.popup.dataBind();
-    }
+  private setPagingInputData(): void {
+    this.paginationFormGroup.controls['pageSize'].patchValue(this.pageSize);
   }
 }
