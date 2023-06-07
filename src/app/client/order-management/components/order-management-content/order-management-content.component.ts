@@ -2207,7 +2207,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     ).subscribe((data) => {
       const { poNumbers, projectNames, specialProjectCategories } = data;
       this.filterColumns.projectTypeIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP? specialProjectCategories.filter(f=>f.includeInIRP == true) :  specialProjectCategories.filter(f=>f.includeInVMS == true);
-      this.filterColumns.projectNameIds.dataSource = projectNames;
+      // this.filterColumns.projectNameIds.dataSource = projectNames;
       this.filterColumns.poNumberIds.dataSource = poNumbers;
       this.cd$.next(true);
     });
@@ -2290,6 +2290,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.initMenuItems();
       this.initGridColumns();
       this.getOrders();
+      this.getProjectSpecialData();
 
       this.previousSelectedSystemId = null;
     });
