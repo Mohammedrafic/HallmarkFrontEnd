@@ -172,14 +172,13 @@ export interface ScheduleFilters {
   locationIds?: number[];
   departmentsIds?: number[];
   skillIds?: number[];
-  shiftId?: number[];
-  ShowAvailability?: boolean;
-  ShowUnavailability?: boolean;
-  ShowOnlyscheduledcandidates?: boolean;
+  isAvailablity?: boolean;
+  isUnavailablity?: boolean;
+  isOnlySchedulatedCandidate?: boolean;
   ShowGeneralnotes?: boolean;
-  ShowExcludenotoriented?: boolean;
-  ShiftStartTime? : any;
-  ShiftEndTime? : any;
+  isExcludeNotOrganized?: boolean;
+  startTime? : any;
+  endTime? : any;
   pageNumber?: number;
   pageSize?: number;
 }
@@ -189,14 +188,13 @@ export interface ScheduleFiltersConfig {
   [ScheduleFilterFormSourceKeys.Locations]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.Departments]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.Skills]: ScheduleFilterItem;
-  [ScheduleFilterFormSourceKeys.Shift]: ScheduleFilterItem;
-  [ScheduleFilterFormSourceKeys.ShowAvailability]: ScheduleFilterItem;
-  [ScheduleFilterFormSourceKeys.ShowUnavailability]: ScheduleFilterItem;
-  [ScheduleFilterFormSourceKeys.ShowOnlyscheduledcandidates]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isAvailablity]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isUnavailablity]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.ShowGeneralnotes]: ScheduleFilterItem;
-  [ScheduleFilterFormSourceKeys.ShowExcludenotoriented]: ScheduleFilterItem;
-  [ScheduleFilterFormSourceKeys.ShiftStartTime]: ScheduleFilterItem;
-  [ScheduleFilterFormSourceKeys.ShiftEndTime]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.startTime]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.endTime]: ScheduleFilterItem;
 }
 
 export interface ScheduleFilterFormFieldConfig {
@@ -230,6 +228,11 @@ export interface EmployeesFilters {
   endDate: string | Date;
   departmentsIds: number[];
   userLocalTime: string;
+  isOnlySchedulatedCandidate: boolean;
+  isAvailablity: boolean;
+  isUnavailablity: boolean;
+  startTime: string;
+  endTime: string;
 }
 
 export interface DatesByWeekday {

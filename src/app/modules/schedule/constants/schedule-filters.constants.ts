@@ -21,14 +21,13 @@ export enum ScheduleFilterFormSourceKeys {
   Locations = 'locationIds',
   Departments = 'departmentsIds',
   Skills = 'skillIds',
-  Shift = 'shiftId',
-  ShowAvailability = 'ShowAvailability',
-  ShowUnavailability = 'ShowUnavailability',
-  ShowOnlyscheduledcandidates = 'ShowOnlyscheduledcandidates',
+  isAvailablity = 'isAvailablity',
+  isUnavailablity = 'isUnavailablity',
+  isOnlySchedulatedCandidate = 'isOnlySchedulatedCandidate',
   ShowGeneralnotes = 'ShowGeneralnotes',
-  ShowExcludenotoriented = 'ShowExcludenotoriented',
-  ShiftStartTime = 'ShiftStartTime',
-  ShiftEndTime = 'ShiftEndTime'
+  startTime = 'startTime',
+  endTime = 'endTime',
+  isExcludeNotOrganized = "isExcludeNotOrganized"
 }
 
 export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
@@ -64,15 +63,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueId: 'value',
     filterTitle: 'Skill',
   },
-  [ScheduleFilterFormSourceKeys.Shift]: {
-    type: ControlTypes.Multiselect,
-    valueType: ValueType.Id,
-    dataSource: [],
-    valueField: 'text',
-    valueId: 'value',
-    filterTitle: 'shift',
-  },
-  [ScheduleFilterFormSourceKeys.ShiftStartTime]: {
+  [ScheduleFilterFormSourceKeys.startTime]: {
     type: ControlTypes.Dropdown,
     valueType: ValueType.Id,
     dataSource: [],
@@ -80,7 +71,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueId: 'value',
     filterTitle: 'Shift Start Time',
   },
-  [ScheduleFilterFormSourceKeys.ShiftEndTime]: {
+  [ScheduleFilterFormSourceKeys.endTime]: {
     type: ControlTypes.Dropdown,
     valueType: ValueType.Id,
     dataSource: [],
@@ -88,7 +79,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueId: 'value',
     filterTitle: 'Shift End Time',
   },
-  [ScheduleFilterFormSourceKeys.ShowAvailability]: {
+  [ScheduleFilterFormSourceKeys.isAvailablity]: {
     type: ControlTypes.Toggle,
     valueType: ValueType.Id,
     dataSource: [],
@@ -96,7 +87,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueId: 'value',
     filterTitle: 'Show Availability',
   },
-  [ScheduleFilterFormSourceKeys.ShowUnavailability]: {
+  [ScheduleFilterFormSourceKeys.isUnavailablity]: {
     type: ControlTypes.Toggle,
     valueType: ValueType.Id,
     dataSource: [],
@@ -104,7 +95,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueId: 'value',
     filterTitle: 'Show Unavailability',
   },
-  [ScheduleFilterFormSourceKeys.ShowOnlyscheduledcandidates]: {
+  [ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate]: {
     type: ControlTypes.Toggle,
     valueType: ValueType.Id,
     dataSource: [],
@@ -120,7 +111,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueId: 'value',
     filterTitle: 'Show General Notes',
   },
-  [ScheduleFilterFormSourceKeys.ShowExcludenotoriented]: {
+  [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: {
     type: ControlTypes.Toggle,
     valueType: ValueType.Id,
     dataSource: [],
@@ -172,46 +163,39 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     sourceKey: ScheduleFilterFormSourceKeys.Skills,
   },
   {
-    field: 'shiftIds',
-    title: 'Shift',
-    type: FieldType.MultiSelectDropdown,
-    required: false,
-    sourceKey: ScheduleFilterFormSourceKeys.Shift,
-  },
-  {
-    field: 'ShiftStartTime',
+    field: 'startTime',
     title: 'Shift Start Time',
     required: true,
     type: FieldType.Time,
-    sourceKey: ScheduleFilterFormSourceKeys.ShiftStartTime,
+    sourceKey: ScheduleFilterFormSourceKeys.startTime,
   },
   {
-    field: 'ShiftEndTime',
+    field: 'endTime',
     title: 'Shift End Time',
     required: true,
     type: FieldType.Time,
-    sourceKey: ScheduleFilterFormSourceKeys.ShiftEndTime,
+    sourceKey: ScheduleFilterFormSourceKeys.endTime,
   },
   {
-    field: 'ShowAvailability',
+    field: 'isAvailablity',
     title: 'Show Availability',
     type: FieldType.Toggle,
     required: false,
-    sourceKey: ScheduleFilterFormSourceKeys.ShowAvailability,
+    sourceKey: ScheduleFilterFormSourceKeys.isAvailablity,
   },
   {
-    field: 'ShowUnavailability',
+    field: 'isUnavailablity',
     title: 'Show Unavailability',
     type: FieldType.Toggle,
     required: false,
-    sourceKey: ScheduleFilterFormSourceKeys.ShowUnavailability,
+    sourceKey: ScheduleFilterFormSourceKeys.isUnavailablity,
   },
   {
-    field: 'ShowOnlyscheduledcandidates',
+    field: 'isOnlySchedulatedCandidate',
     title: 'Show Only Scheduled Candidates',
     type: FieldType.Toggle,
     required: false,
-    sourceKey: ScheduleFilterFormSourceKeys.ShowOnlyscheduledcandidates,
+    sourceKey: ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate,
   },
   {
     field: 'ShowGeneralnotes',
@@ -221,11 +205,11 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     sourceKey: ScheduleFilterFormSourceKeys.ShowGeneralnotes,
   },
   {
-    field: 'ShowExcludenotoriented',
+    field: 'isExcludeNotOrganized',
     title: 'Show Exclude not Oriented',
     type: FieldType.Toggle,
     required: false,
-    sourceKey: ScheduleFilterFormSourceKeys.ShowExcludenotoriented,
+    sourceKey: ScheduleFilterFormSourceKeys.isExcludeNotOrganized,
   },
 ];
 

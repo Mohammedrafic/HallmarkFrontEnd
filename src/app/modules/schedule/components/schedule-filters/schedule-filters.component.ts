@@ -40,6 +40,7 @@ import {
 } from '../../interface';
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
+import { TimeMask } from '@client/order-management/components/irp-tabs/order-details/constants';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -71,6 +72,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   private filters: ScheduleFilters = {};
 
   private isPreservedFilters = false;
+  public readonly timeMask = TimeMask;
 
   private filterStructure: ScheduleFilterStructure = {
     regions: [],

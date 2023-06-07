@@ -35,6 +35,24 @@
               </div>
             </div>
           </ng-template>
+          <ng-template [ngSwitchCase]="fieldTypes.Time">
+            <div class="input-container">
+              <label [for]="item.field">
+                {{ item.title }} <span *ngIf="item.required" class="required">*</span>
+              </label>
+              <div class="input-group datepicker bootstrap">
+                <ejs-timepicker
+                  placeholder="HH:MM"
+                  [formControlName]="item.field"
+                  appValidateWithMessage
+                  format="HH:mm"
+                  [maskPlaceholder]="timeMask"
+                  [enableMask]="true"
+                >
+                </ejs-timepicker>
+              </div>
+            </div>
+          </ng-template>
           <ng-template [ngSwitchCase]="fieldTypes.Toggle">
             <div class="input-container">
               <div class="input-group wide">
