@@ -72,6 +72,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() canRecalculateTimesheet: boolean;
 
+  @Input() disableEditButton: boolean = false;
+
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
   @Output() readonly uploadSideDialog: EventEmitter<TimesheetAttachments> = new EventEmitter<TimesheetAttachments>();
