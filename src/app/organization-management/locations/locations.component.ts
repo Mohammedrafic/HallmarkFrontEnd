@@ -11,7 +11,7 @@ import { combineLatest, delay, filter, map, Observable, Subject, take, takeUntil
 import { concatMap, tap } from 'rxjs/operators';
 
 import { TakeUntilDestroy } from '@core/decorators';
-import { FieldType, UserPermissions } from '@core/enums';
+import { FieldType } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { GetAllBusinessLines } from '@organization-management/store/business-lines.action';
 import { BusinessLinesState } from '@organization-management/store/business-lines.state';
@@ -165,9 +165,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.watchForOrgChange();
     this.watchForOrganizations();
     this.populateFormOptions();
-    if (this.isFeatureIrpEnabled) {
-      this.setPermissions();
-    }
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
     this.store.dispatch(new GetAllBusinessLines());
@@ -686,17 +683,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       }
 
       return column;
-    });
-  }
-
-  private setPermissions(): void {
-    this.getPermissionStream()
-    .pipe(
-      filter((permissions) => !permissions[UserPermissions.CanEditOrganizationalHierarchy]),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(() => {
-      this.locationDetailsFormGroup.get('includeInIRP')?.disable();
     });
   }
 
