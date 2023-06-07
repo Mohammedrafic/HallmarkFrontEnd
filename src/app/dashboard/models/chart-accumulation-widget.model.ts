@@ -7,5 +7,6 @@ export interface ChartAccumulation {
 export interface DonutChartData {
   label: string;
   value: number;
+  text: string;
   color?: string;
 }
