@@ -1931,7 +1931,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private onDeleteOrderSucceededHandler(): void {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(DeleteOrderSucceeded)).subscribe(() => {
-      this.gridWithChildRow.clearRowSelection();
+      this.gridWithChildRow?.clearRowSelection();
       this.getOrders();
       this.openDetails.next(false);
     });
