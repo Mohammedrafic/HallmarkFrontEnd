@@ -178,6 +178,8 @@ export interface ScheduleFilters {
   ShowOnlyscheduledcandidates?: boolean;
   ShowGeneralnotes?: boolean;
   ShowExcludenotoriented?: boolean;
+  ShiftStartTime? : any;
+  ShiftEndTime? : any;
   pageNumber?: number;
   pageSize?: number;
 }
@@ -193,6 +195,8 @@ export interface ScheduleFiltersConfig {
   [ScheduleFilterFormSourceKeys.ShowOnlyscheduledcandidates]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.ShowGeneralnotes]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.ShowExcludenotoriented]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.ShiftStartTime]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.ShiftEndTime]: ScheduleFilterItem;
 }
 
 export interface ScheduleFilterFormFieldConfig {
