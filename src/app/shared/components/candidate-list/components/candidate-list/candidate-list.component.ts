@@ -534,6 +534,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         const tableState = (this.store.snapshot().candidateList as CandidateListStateModel).tableState;
 
         this.currentPage = tableState?.pageNumber || this.currentPage;
+        this.pageSize = tableState?.pageSize || this.pageSettings.pageSize;
         this.pageSettings.pageSize = tableState?.pageSize || this.pageSettings.pageSize;
   
         if (!filters.isNotPreserved) {
