@@ -40,6 +40,7 @@ import {
   GetEmployeeUsers,
   ExportTimeSheetList,
   GetLogFileDownload,
+  GetNonEmployeeUsers,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -84,6 +85,7 @@ interface SecurityStateModel {
   logDialogOptions: DialogNextPreviousOption;
   logTimeSheetHistoryPage: LogTimeSheetHistoryPage | null;
   userData: User[];
+  nonEmployeeUserData: User[];
   logFileDownloadDetail:any;
 }
 
@@ -111,6 +113,7 @@ interface SecurityStateModel {
     },
     logTimeSheetHistoryPage:null,
     userData: [],
+    nonEmployeeUserData: [],
     logFileDownloadDetail:null
   },
 })
@@ -264,6 +267,11 @@ export class SecurityState {
   @Selector()
   static userData(state: SecurityStateModel): User[] {
     return state.userData;
+  }
+
+  @Selector()
+  static nonEmployeeUserData(state: SecurityStateModel): User[] {
+    return state.nonEmployeeUserData;
   }
 
   @Selector()
@@ -740,6 +748,22 @@ export class SecurityState {
     return this.userService.getEmployeeUsers(businessUnitId).pipe(
       tap((payload) => {
         patchState({ userData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetNonEmployeeUsers)
+  GetNonEmployeeUsers(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { businessUnitId }: GetNonEmployeeUsers
+  ): Observable<User[] | void> {
+    return this.userService.getNonEmployeeUsers(businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ nonEmployeeUserData: payload });
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
