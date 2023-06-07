@@ -553,7 +553,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.subscribeForSettings();
     this.handleRedirectFromQuickOrderToast();
     this.showFilterFormAfterOpenDialog();
-    this.getProjectSpecialData();
     this.subscribeOnPermissions();
     this.subscribeOnChanges();
     this.firstInitGridColumns();
@@ -1383,6 +1382,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.initGridColumns();
     this.getOrders();
     this.clearOrderJourneyFilters();
+    this.getProjectSpecialData()
   }
 
   gridSortHandler(sortEvent: SortChangedEvent): void {
@@ -1796,6 +1796,19 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       this.cd$.next(true);
     });
+    
+    this.OrderFilterFormGroup.get('projectTypeIds')?.valueChanges.subscribe((val: number[]) => {
+      if (val?.length) {
+        this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ProjectSpecialData) => {
+            this.filterColumns.projectNameIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP?  data.projectNames.filter((f)=>val.includes(f.projectTypeId??0) && f.includeInIRP==true):data.projectNames.filter((f)=>val.includes(f.projectTypeId??0) && f.includeInVMS==true) ;  
+        })
+
+      }else{
+        this.filterColumns.projectNameIds.dataSource = [];
+        this.OrderFilterFormGroup.get('projectNameIds')?.setValue([]);
+      }
+      this.cd$.next(true);
+    });
   }
 
   private onOrderDetailsDialogOpenEventHandler(): void {
@@ -2193,8 +2206,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       takeUntil(this.unsubscribe$),
     ).subscribe((data) => {
       const { poNumbers, projectNames, specialProjectCategories } = data;
-      this.filterColumns.projectTypeIds.dataSource = specialProjectCategories;
-      this.filterColumns.projectNameIds.dataSource = projectNames;
+      this.filterColumns.projectTypeIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP? specialProjectCategories.filter(f=>f.includeInIRP == true) :  specialProjectCategories.filter(f=>f.includeInVMS == true);
+      // this.filterColumns.projectNameIds.dataSource = projectNames;
       this.filterColumns.poNumberIds.dataSource = poNumbers;
       this.cd$.next(true);
     });
@@ -2236,7 +2249,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         organizationId,
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
-        isIrp ? this.orderManagementService.getIsAvailable() : this.orderManagementService.excludeDeployed,""
+        isIrp ? this.orderManagementService.getIsAvailable() : this.orderManagementService.excludeDeployed,
+        ""
       )
     );
   }
@@ -2276,6 +2290,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.initMenuItems();
       this.initGridColumns();
       this.getOrders();
+      this.getProjectSpecialData();
 
       this.previousSelectedSystemId = null;
     });
