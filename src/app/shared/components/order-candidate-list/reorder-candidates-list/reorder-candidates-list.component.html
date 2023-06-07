@@ -220,14 +220,14 @@
         </e-column>
         <e-column field="availabilityOverlap" headerText="Avail Match (HRS)" textAlign="Right" width="160">
           <ng-template  #template let-data>
-            <ng-container *ngIf="data.availabilityOverlap.isFullOverlap; else matchOverlap">
+            <ng-container *ngIf="data.availabilityOverlap?.isFullOverlap; else matchOverlap">
               <div class="fullOverlap">
                 Full
               </div>
             </ng-container>
             <ng-template #matchOverlap>
-              <ejs-tooltip [content]="data.availabilityOverlap.tooltip" position="TopCenter">
-                <span class="matchOverlap">{{ data.availabilityOverlap.overlapHours }}</span>
+              <ejs-tooltip [content]="data.availabilityOverlap?.tooltip || ''" position="TopCenter">
+                <span class="matchOverlap">{{ data.availabilityOverlap?.overlapHours }}</span>
               </ejs-tooltip>
             </ng-template>
           </ng-template>
