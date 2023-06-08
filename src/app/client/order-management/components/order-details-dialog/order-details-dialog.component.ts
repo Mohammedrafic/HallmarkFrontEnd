@@ -168,7 +168,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   get showApproveAndCancel(): boolean {
-    return this.order?.canApprove && !this.order?.orderOpenDate && this.order?.status === this.orderStatus.PreOpen;
+    return this.order?.canApprove && this.order?.status === this.orderStatus.PreOpen && (!this.order?.orderOpenDate || this.order?.extensionFromId != null);
   }
 
   get showLockOrder(): boolean {
