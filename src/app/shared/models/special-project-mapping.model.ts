@@ -17,6 +17,8 @@ export class SpecialProjectMapping {
   orderSpecialProjectCategoryName: string;
   orderSpecialProjectId: number;
   prePopulateInOrders: boolean;
+  includeInIRP:boolean;
+  includeInVMS:boolean;
 }
 
 export type SpecialProjectMappingPage = PageOfCollections<SpecialProjectMapping>;

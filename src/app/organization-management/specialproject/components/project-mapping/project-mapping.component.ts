@@ -18,6 +18,7 @@ import { FormGroup } from '@angular/forms';
 import { SpecialProjectMappingState } from '../../../store/special-project-mapping.state';
 import { DeletSpecialProjectMapping, GetSpecialProjectMappings } from '../../../store/special-project-mapping.actions';
 import { SpecilaProjectCategoryTableColumns } from '@organization-management/specialproject/enums/specialproject.enum';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 
 @Component({
   selector: 'app-project-mapping',
@@ -27,6 +28,7 @@ import { SpecilaProjectCategoryTableColumns } from '@organization-management/spe
 export class ProjectMappingComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() form: FormGroup;
   @Input() showSelectSystem:boolean;
+  @Input() selectedSystem: SelectedSystemsFlag;
   @Output() onEdit = new EventEmitter<SpecialProjectMapping>();
   @Select(SpecialProjectMappingState.specialProjectMappingPage)
   specialProjectMappingPage$: Observable<SpecialProjectMappingPage>;
@@ -147,7 +149,13 @@ export class ProjectMappingComponent extends AbstractGridConfigurationComponent 
       }
       else {
         this.gridApi?.hideOverlay();
-        this.rowData = data.items;
+        if(this.selectedSystem.isIRP && this.selectedSystem.isVMS){
+          this.rowData = data.items;
+        }else if(this.selectedSystem.isVMS){
+          this.rowData = data.items.filter(f=>f.includeInVMS==true);
+        }else{
+          this.rowData = data.items.filter(f=>f.includeInIRP==true);
+        }
         this.gridApi?.setRowData(this.rowData);
       }
     });
