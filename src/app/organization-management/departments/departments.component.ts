@@ -30,9 +30,6 @@ import { Location } from '@shared/models/location.model';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
-  AbstractGridConfigurationComponent,
-} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import {
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
@@ -63,6 +60,7 @@ import { ListOfSkills } from '@shared/models/skill.model';
 import { difference } from 'lodash';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { SettingsViewService } from '@shared/services';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -73,7 +71,7 @@ export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location wer
   styleUrls: ['./departments.component.scss'],
   providers: [MaskedDateTimeService],
 })
-export class DepartmentsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class DepartmentsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
@@ -138,7 +136,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   public maxInactivateDate: string | null;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
     private filterService: FilterService,
@@ -146,7 +144,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     private action$: Actions,
     private settingsViewService: SettingsViewService,
   ) {
-    super();
+    super(store);
 
     this.idFieldName = 'departmentId';
     this.checkIRPFlag();
@@ -156,7 +154,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     return this.isEdit ? 'Edit' : 'Add';
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.createDepartmentsForm();
 
     this.filterColumns = this.departmentService.initFilterColumns(this.isIRPFlagEnabled);
@@ -353,7 +352,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     }
   }
 
-  onRemoveDepartmentClick(department: Department, event: any): void {
+  onRemoveDepartmentClick(department: Department, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {

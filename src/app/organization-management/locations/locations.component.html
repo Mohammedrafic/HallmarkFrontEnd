@@ -38,6 +38,7 @@
         ejs-button
         id="importButton"
         cssClass="e-outline button-import"
+        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
         (click)="openImportDialog()">Import <i-feather name="download" class="icon"></i-feather></button>
       <button
         ejs-dropdownbutton
@@ -53,6 +54,7 @@
         ejs-button
         id="addDepartmentButton"
         [isPrimary]="true"
+        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
         (click)='openAddLocationDialog()'>Add Location</button>
     </section>
   </section>
@@ -79,10 +81,18 @@
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editLocation(data, $event)">
+            <button 
+              ejs-button
+              cssClass="e-flat primary-icon-button"
+              [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+              (click)="editLocation(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteLocation(data, $event)">
+            <button
+              ejs-button
+              cssClass="e-flat secondary-icon-button"
+              (click)="deleteLocation(data, $event)"
+              [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
