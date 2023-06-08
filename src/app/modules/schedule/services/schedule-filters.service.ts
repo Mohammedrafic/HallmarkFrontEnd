@@ -50,8 +50,8 @@ export class ScheduleFiltersService {
       isOnlySchedulatedCandidate : [false],
       ShowGeneralnotes : [false],
       isExcludeNotOrganized : [false],
-      startTime : [""],
-      endTime : [""]
+      startTime : [null],
+      endTime : [null]
     });
   }
 
