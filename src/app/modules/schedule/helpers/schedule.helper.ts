@@ -160,8 +160,8 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
     isAvailablity : isAvailablity || false,
     isUnavailablity : isUnavailablity || false, 
     isOnlySchedulatedCandidate : isOnlySchedulatedCandidate || false,
-    startTime : startTime || "",
-    endTime : endTime || ""
+    startTime : startTime,
+    endTime : endTime
   };
 };
 
