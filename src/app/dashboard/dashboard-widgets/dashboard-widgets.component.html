@@ -47,22 +47,22 @@
                               [chartData]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.IN_PROGRESS_POSITIONS"
-                              [isDarkTheme]="isDarkTheme"></app-position-chart>
+                              [isDarkTheme]="isDarkTheme" [slideBar]="isSideBarDocked$ | async"></app-position-chart>
           <app-position-chart *ngSwitchCase="widgetTypeEnum.OPEN_POSITIONS"  [isLTAOrderEnding]="true"
                               [chartData]="widgetsData?.[widgetTypeEnum.OPEN_POSITIONS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.OPEN_POSITIONS"
-                              [isDarkTheme]="isDarkTheme"></app-position-chart>
+                              [isDarkTheme]="isDarkTheme" [slideBar]="isSideBarDocked$ | async"></app-position-chart>
           <app-position-chart *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS"  [isLTAOrderEnding]="true"
                               [chartData]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.FILLED_POSITIONS"
-                              [isDarkTheme]="isDarkTheme"></app-position-chart>
+                              [isDarkTheme]="isDarkTheme" [slideBar]="isSideBarDocked$ | async"></app-position-chart>
           <app-position-chart *ngSwitchCase="widgetTypeEnum.LTA_ORDER_ENDING" [isLTAOrderEnding]="false"
                               [chartData]="widgetsData?.[widgetTypeEnum.LTA_ORDER_ENDING]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.LTA_ORDER_ENDING"
-                              [isDarkTheme]="isDarkTheme"></app-position-chart>
+                              [isDarkTheme]="isDarkTheme" [slideBar]="isSideBarDocked$ | async"></app-position-chart>
           <app-candidate-chart *ngSwitchCase="widgetTypeEnum.Candidate_Applied_In_Last_N_Days"  [isCandidateApplied]="true"
                               [chartData]="widgetsData?.[widgetTypeEnum.Candidate_Applied_In_Last_N_Days]"
                               [isLoading]="isLoading"

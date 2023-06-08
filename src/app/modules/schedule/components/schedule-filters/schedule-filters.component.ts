@@ -339,7 +339,12 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     } else {
       initialState.departments = this.scheduleFiltersService.getDepartmentInitialChipsStructure(initialState.locations);
       const hasPreviousState = filterStructure.regionIds.length && filterStructure.locationIds.length;
-      filterStructure.departmentsIds = hasPreviousState ? departmentsIds : [];
+      const filteredDepartment = this.scheduleFiltersService.getFilteredDepartmentsIds(
+        initialState.departments,
+        departmentsIds
+      );
+
+      filterStructure.departmentsIds = hasPreviousState ? filteredDepartment : [];
     }
 
     if(event.field === ScheduleFilterFormSourceKeys.Skills) {

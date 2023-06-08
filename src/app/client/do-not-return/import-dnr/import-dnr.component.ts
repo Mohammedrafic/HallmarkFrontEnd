@@ -16,7 +16,7 @@ const importConfig = {
   uploadFileSucceeded: { instance: DoNotReturn.UploadDoNotReturnFileSucceeded, message: 'There are no records in the file' },
   importTemplateSucceeded: { instance: DoNotReturn.GetDoNotReturnImportTemplateSucceeded, fileName: 'donotreturn.xlsx' },
   importErrorsSucceeded: { instance: DoNotReturn.GetDoNotReturnImportErrorsSucceeded, fileName: 'donotreturn_errors.xlsx' },
-  saveImportResultSucceeded: { instance: DoNotReturn.SaveDoNotReturnImportResultSucceeded, message: 'All <n> records successfully processed.' },
+  saveImportResultSucceeded: { instance: DoNotReturn.SaveDoNotReturnImportResultSucceeded, message: '<n> records successfully processed.' },
   saveImportResultFailAndSucess : { instance: DoNotReturn.SaveDoNotReturnImportResultFailAndSucceeded, message: '<sn> records successfully processed. <fn> failed to process.' }
 };
 
@@ -61,7 +61,7 @@ export class ImportDnrComponent  extends AbstractImport implements OnChanges {
       cellRenderer: GridErroredCellComponent,
     },
     {
-      field: 'ssn',
+      field: 'maskedssn',
       width: 200,
       headerName: 'SSN',
       cellRenderer: GridErroredCellComponent,

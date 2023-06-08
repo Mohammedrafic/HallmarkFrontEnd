@@ -13,6 +13,7 @@ export class User {
   isChatEnabled?: boolean;
   isDeleted?: boolean;
   isEmployee?: boolean;
+  roleNames?: string;
 }
 
 export class UsersPage {

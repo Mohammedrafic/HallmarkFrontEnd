@@ -158,6 +158,7 @@ export class DashboardService {
           chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
             label: status,
             value: count,
+            text:'',
             color:
               candidateLegendPalette[status as CandidateChartStatuses] ||
               candidateLegendPalette[CandidateChartStatuses.CUSTOM],

@@ -33,5 +33,6 @@ export interface CandidateModel {
   phone1: string,
   phone2: string,
   professionalSummary: string,
-  generalNotes: GeneralNotesModel[]
+  generalNotes: GeneralNotesModel[],
+  isOnHoldSetManually: boolean,
 }

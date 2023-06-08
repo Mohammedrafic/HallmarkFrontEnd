@@ -38,6 +38,7 @@ export class AccumulationChartComponent
   extends AbstractSFComponentDirective<SFAccumulationChartComponent>
   implements OnChanges, OnInit {
   @Input() public chartData: ChartAccumulation | undefined;
+  @Input() public chartDatachanges: ChartAccumulation | undefined;
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean;
   @Input() public description: string;
@@ -46,13 +47,15 @@ export class AccumulationChartComponent
   public filteredChartData$: Observable<DonutChartData[]>;
   public legendData: WidgetLegengDataModel[] = [];
   public totalScore: number = 0;
+  public totalval: number = 0;
   public legendPosition: LegendPositionEnum = LegendPositionEnum.Right;
   public datalabel: Object;
+  public ontooltipRender: Function;
 
   public readonly tooltipSettings: TooltipSettingsModel = {
-    enable: true,
-    template: '<div class="widget-tooltip"><div>${x}</div><b>${y}</b></div>',
-  }
+    enable: true,  
+    template: '<div class="widget-tooltip"><div>${x}</div><b>${tooltip}%</b></div>',       
+}
 
   public readonly legendSettings: LegendSettingsModel = { visible: false };
 
@@ -70,9 +73,9 @@ export class AccumulationChartComponent
   public redirectToSourceContent(status: string): void {
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
     let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
-    if(filteredList.length > 0){
-      let organizations = filteredList.filter((ele:any)=>ele.column == "organizationIds").sort((a:any,b:any)=> a.value - b.value);
-      if(organizations.length > 0 && organizations[0].value != lastSelectedOrganizationId){
+    if (filteredList.length > 0) {
+      let organizations = filteredList.filter((ele: any) => ele.column == "organizationIds").sort((a: any, b: any) => a.value - b.value);
+      if (organizations.length > 0 && organizations[0].value != lastSelectedOrganizationId) {
         this.store.dispatch(
           new SetLastSelectedOrganizationAgencyId({
             lastSelectedAgencyId: null,
@@ -132,9 +135,9 @@ export class AccumulationChartComponent
       }
       if (Enumvalues > 0) {
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-          this.dashboardService.redirectToUrl('agency/candidate-details',Enumvalues,undefined);
+          this.dashboardService.redirectToUrl('agency/candidate-details', Enumvalues, undefined);
         } else {
-          this.dashboardService.redirectToUrl('client/candidate-details',Enumvalues,undefined);
+          this.dashboardService.redirectToUrl('client/candidate-details', Enumvalues, undefined);
         }
       }
       else {
@@ -184,6 +187,16 @@ export class AccumulationChartComponent
   }
 
   private handleChartDataChanges(): void {
+    this.chartDatachanges = this.chartData;
+    this.chartDatachanges?.chartData.forEach(obj => {
+      this.totalval += obj.value;
+    });
+    this.chartDatachanges?.chartData.forEach(obj => {
+      obj.text = (Math.round(obj.value / this.totalval * 100)).toString();
+    });
+    
+
+
     this.legendData = this.chartData?.chartData as WidgetLegengDataModel[];
     this.chartData$.next(this.chartData ?? null);
     this.chartData?.chartData &&

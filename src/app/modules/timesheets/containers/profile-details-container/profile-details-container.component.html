@@ -193,6 +193,7 @@
           (rejectEvent)="onRejectButtonClick($event)"
           (approveEvent)="handleApprove($event)"
           (orgSubmitting)="orgSubmit()"
+          [disableEditButton]="disableEditButton"
         >
         </app-profile-timesheet-table>
       </section>

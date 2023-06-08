@@ -53,7 +53,8 @@ export enum OrganizationSettingKeys {
   CreateEmployeeWhenUserCreated,
   OnHoldDefault,
   CreatePartialOrder,
-  DepartmentSkillRequired,
+  DepartmentSkillRequired,  
+  TimesheetSubmissionProcess
 }
 
 export enum OrganizationalHierarchy {

@@ -32,6 +32,7 @@
               ejs-button
               id="addDepartmentButton"
               [isPrimary]="true"
+              [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
               (click)='onAddRegionClick()'>Add Region</button>
     </section>
   </section>
@@ -62,7 +63,11 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)" [class.hidden]="true">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveButtonClick(data, $event)">
+            <button
+              ejs-button
+              cssClass="e-flat secondary-icon-button"
+              (click)="onRemoveButtonClick(data, $event)"
+              [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>

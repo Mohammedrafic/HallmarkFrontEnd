@@ -50,8 +50,9 @@ import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
-import { DateTimeHelper } from '@core/helpers';
+import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
+import { formatNumber } from '@angular/common';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -344,12 +345,13 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       clockId: new FormControl(null),
     });
   }
-
+  
   private setFormValue(data: OrderCandidateJob): void {
     this.formGroup.setValue({
       jobId: `${data.organizationPrefix}-${data.orderPublicId}`,
-      jobDate: [DateTimeHelper.formatDateUTC(data.order.jobStartDate.toString(), 'MM/dd/yyyy'), data.order.jobEndDate ? DateTimeHelper.formatDateUTC(data.order.jobEndDate.toString(), 'MM/dd/yyyy') : null],
-      offeredBillRate: PriceUtils.formatNumbers(data.offeredBillRate || data.order.hourlyRate),
+      jobDate: [DateTimeHelper.formatDateUTC(data.order.jobStartDate.toString(),'MM/dd/yyyy'),
+      data.order.jobEndDate ? DateTimeHelper.formatDateUTC(data.order.jobEndDate.toString(), 'MM/dd/yyyy') : null],
+      offeredBillRate: formatNumber(CheckNumberValue(data.offeredBillRate || data.order.hourlyRate), 'en-US', '0.2-2'),
       orderBillRate: data.order.hourlyRate && PriceUtils.formatNumbers(data.order.hourlyRate),
       locationName: data.order.locationName,
       availableStartDate: DateTimeHelper.formatDateUTC(data.availableStartDate, 'MM/dd/yyyy'),
@@ -359,7 +361,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       yearsOfExperience: data.yearsOfExperience,
       expAsTravelers: data.expAsTravelers,
       guaranteedWorkWeek: data.guaranteedWorkWeek,
-      offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
+      offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate
+        || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
       candidatePayRate: data.candidatePayRate,
       clockId: data.clockId,
     });

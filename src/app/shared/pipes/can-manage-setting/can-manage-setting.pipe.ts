@@ -1,26 +1,36 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { Store } from '@ngxs/store';
+import { OrganizationSettingKeys } from '@shared/constants';
+
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
-import { User } from '@shared/models/user.model';
+import { UserState } from 'src/app/store/user.state';
 
 @Pipe({
   name: 'hasAccess',
 })
 export class CanManageSettingPipe implements PipeTransform {
+  constructor(private readonly store: Store) { }
+
   transform(
     hasPermission: Record<string, boolean>,
     data: OrganizationSettingsGet,
     overridableByOrg: boolean,
     disableSettingsKeys?: string[]
   ): boolean {
-    const user = JSON.parse(localStorage.getItem('User') || '') as User;
-    const isAdmin = [BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user.businessUnitType);
+    const isHallmarkMspUser = this.store.selectSnapshot(UserState.isHallmarkMspUser);
     const overridableBy = overridableByOrg
       ? !data.overridableByOrganization
       : !data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment;
-    const disableSettingKey = isAdmin && disableSettingsKeys ? disableSettingsKeys.includes(data.settingKey) : false;
 
-    return isAdmin ? disableSettingKey : !hasPermission[data.settingKey] || overridableBy;
+    if (isHallmarkMspUser && disableSettingsKeys) {
+      return disableSettingsKeys.includes(data.settingKey);
+    } else if (isHallmarkMspUser && !disableSettingsKeys) {
+      const departmentSkillRequired = OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired];
+      const disableSetting = data.settingKey === departmentSkillRequired ? !hasPermission[data.settingKey] : false;
+      return disableSetting;
+    } else {
+      return !hasPermission[data.settingKey] || overridableBy;
+    }
   }
 }
