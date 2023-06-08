@@ -12,8 +12,28 @@ export class CommonHelper{
         return Object.values(candidateAddress).filter(ele => ele === null || ele === '').length > 0;
       }
 
-    public static formatTheSSN(data:any){
-      data.ssn = data.ssn.substring(0,3) + "-" + data.ssn.substring(3,5)+ "-" + data.ssn.substring(5);
-      return data;
+    public static formatTheSSN(payload:any,format:boolean = false){
+      if(payload.errorRecords.length > 0){          
+        payload.errorRecords.forEach((data:any)=>{
+          if(data.ssn != ''){
+            data.maskedssn = data.ssn.replace(/\d/g, "X");
+            if(format){
+              data.maskedssn = data.maskedssn.substring(0,3) + "-" + data.maskedssn.substring(3,5)+ "-" + data.maskedssn.substring(5);
+            } 
+          }
+        })
+      }
+      if(payload.succesfullRecords.length > 0){          
+        payload.succesfullRecords.forEach((data:any)=>{
+          if(data.ssn != ''){
+            data.maskedssn = data.ssn.replace(/\d/g, "X");
+            if(format){
+              data.maskedssn = data.maskedssn.substring(0,3) + "-" + data.maskedssn.substring(3,5)+ "-" + data.maskedssn.substring(5);
+            } 
+          }
+        })
+      }    
+ 
+      return payload;
     }
 }
