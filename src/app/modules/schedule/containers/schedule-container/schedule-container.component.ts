@@ -167,6 +167,14 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.checkIsScheduleAvailabilityTurn();
 
     if (!this.store.selectSnapshot(UserState.user)?.isEmployee) {
+      for(let i=0;i < data.chipsData.length;i++){
+        if(data.chipsData[i].groupField == "startTime"){
+          data.chipsData[i].data = [data.filteredItems[i].value]
+        }
+        if(data.chipsData[i].groupField == "endTime"){
+          data.chipsData[i].data = [data.filteredItems[i].value]
+        }
+      }
       this.chipsData = data.chipsData;
     }
   }
@@ -207,7 +215,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private initScheduleData(isLoadMore = false): void {
-    console.log(this.scheduleFilters);
     this.scheduleApiService.getScheduleEmployees(this.scheduleFilters)
     .pipe(
       take(1),

@@ -65,7 +65,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.startTime]: {
     type: ControlTypes.Dropdown,
-    valueType: ValueType.Id,
+    valueType: ValueType.Text,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -73,7 +73,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.endTime]: {
     type: ControlTypes.Dropdown,
-    valueType: ValueType.Id,
+    valueType: ValueType.Text,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -81,7 +81,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.isAvailablity]: {
     type: ControlTypes.Toggle,
-    valueType: ValueType.Id,
+    valueType: ValueType.Text,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -89,7 +89,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.isUnavailablity]: {
     type: ControlTypes.Toggle,
-    valueType: ValueType.Id,
+    valueType: ValueType.Text,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -97,7 +97,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate]: {
     type: ControlTypes.Toggle,
-    valueType: ValueType.Id,
+    valueType: ValueType.Text,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -105,7 +105,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.ShowGeneralnotes]: {
     type: ControlTypes.Toggle,
-    valueType: ValueType.Id,
+    valueType: ValueType.Text,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -113,7 +113,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: {
     type: ControlTypes.Toggle,
-    valueType: ValueType.Id,
+    valueType: ValueType.Text,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',

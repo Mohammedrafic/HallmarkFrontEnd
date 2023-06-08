@@ -20,7 +20,7 @@ import {
 } from '@shared/models/organization.model';
 import { OrganizationStructureService } from '@shared/services';
 import { FilterService } from '@shared/services/filter.service';
-import { ShowFilterDialog } from 'src/app/store/app.actions';
+import { ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
   ChipsStructureState,
@@ -41,6 +41,8 @@ import {
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 import { TimeMask } from '@client/order-management/components/irp-tabs/order-details/constants';
+import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -70,9 +72,11 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   public readonly fieldTypes = FieldType;
 
   private filters: ScheduleFilters = {};
-
+  public firstLoop:number = 1;
   private isPreservedFilters = false;
   public readonly timeMask = TimeMask;
+  public getstartDate: any;
+  public getendDate: any;
 
   private filterStructure: ScheduleFilterStructure = {
     regions: [],
@@ -105,10 +109,13 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.watchForControls();
     this.observeInlineChipDeleteEvent();
     this.applyPreservedFilters();
+    this.changeTimeFormat();
   }
 
   public deleteFilter(event: FilteredItem): void {
     this.filterService.removeValue(event, this.scheduleFilterFormGroup, this.filterColumns);
+    event.column == "endTime" ? this.scheduleFilterFormGroup.get("endTime")?.patchValue("") : this.scheduleFilterFormGroup.get("startTime")?.patchValue("");
+    this.setFilteredItems(event.column);
     this.cdr.markForCheck();
   }
 
@@ -116,6 +123,8 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup.reset();
     this.filters = this.scheduleFilterFormGroup.getRawValue();
     this.filteredItems = [];
+    this.endDateChipdata = "";
+    this.startDateChipdata = "";
     this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: [] });
 
     if (clearPreservedFilters) {
@@ -124,7 +133,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   public applyFilter(): void {
-    console.log(this.scheduleFilterFormGroup);
     if (this.scheduleFilterFormGroup.valid) {
       this.setFilters();
       this.store.dispatch([
@@ -245,6 +253,33 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup.get('skillIds')?.valueChanges
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe(() => this.setFilteredItems());
+    this.scheduleFilterFormGroup.get('isAvailablity')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => this.setFilteredItems());
+    this.scheduleFilterFormGroup.get('isUnavailablity')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => this.setFilteredItems());
+    this.scheduleFilterFormGroup.get('isOnlySchedulatedCandidate')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => this.setFilteredItems());
+    this.scheduleFilterFormGroup.get('isExcludeNotOrganized')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => this.setFilteredItems());
+    this.scheduleFilterFormGroup.get('ShowGeneralnotes')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => this.setFilteredItems());
+    this.scheduleFilterFormGroup.get('startTime')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.changeTimeFormat();
+        this.setFilteredItems()
+      });
+    this.scheduleFilterFormGroup.get('endTime')?.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.changeTimeFormat();
+        this.setFilteredItems()
+      });
   }
 
   private observeInlineChipDeleteEvent(): void {
@@ -283,15 +318,57 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   private setFilters(skipDataUpdate = false): void {
     this.filters = this.scheduleFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
+    this.setUnfilteredItems(this.filteredItems);
+    if(this.scheduleFilterFormGroup.get("startTime")?.value != ""){
+      this.filteredItems.push(this.startDateChipdata)
+    }
+    if(this.scheduleFilterFormGroup.get("endTime")?.value != ""){
+      this.filteredItems.push(this.endDateChipdata)
+    }
+    for(let i=0; i< this.filteredItems.length; i++){
+        if(this.filteredItems[i].column == "isAvailablity"){
+          this.filteredItems[i].text = "Availability";
+        }
+        if(this.filteredItems[i].column == "isOnlySchedulatedCandidate"){
+          this.filteredItems[i].text = "Only Scheduled Candidate";
+        }
+        if(this.filteredItems[i].column == "isExcludeNotOrganized"){
+          this.filteredItems[i].text = "Exclude Not Oriented";
+        }
+        if(this.filteredItems[i].column == "isUnavailablity"){
+          this.filteredItems[i].text = "Unavailability";
+        }
+        if(this.filteredItems[i].column == "ShowGeneralnotes"){
+          this.filteredItems[i].text = "General Notes";
+        }
+      
+    }
     const chips = this.scheduleFiltersService
       .createChipsData(this.scheduleFilterFormGroup.getRawValue(), this.filterColumns);
-
+    this.changeTimeFormat();
+    if((this.filters.startTime != "") && (this.filters.startTime != undefined)){
+      this.filters.startTime = this.startDateChip.split(" ")[0];
+      if(this.filters.startTime.split(":")[0] <= 9){
+        this.filters.startTime = "0"+ this.filters.startTime;
+      }
+    }
+    if((this.filters.endTime != "") && (this.filters.endTime != undefined)){
+      this.filters.endTime = this.endDateChip.split(" ")[0];
+      if(this.filters.endTime.split(":")[0] <= 9){
+        this.filters.endTime = "0"+ this.filters.endTime;
+      }
+    }
+   if(this.scheduleFilterFormGroup.get("endTime")?.value > this.scheduleFilterFormGroup.get("startTime")?.value){
     this.updateScheduleFilter.emit({
       filters: this.filters,
       filteredItems: this.filteredItems,
       chipsData: chips,
       skipDataUpdate,
     });
+   } else {
+    this.store.dispatch(new ShowToast(MessageTypes.Error, "End Date should not be less than Start date"));
+   }
+    
   }
 
   private updateFiltersStructure(event: ChipDeleteEvent): ChipsFilterStructure {
@@ -368,9 +445,80 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.filterColumns.skillIds.dataSource = [];
     this.scheduleFilterFormGroup.get('skillIds')?.setValue([]);
   }
+  public startDateChip: any;
+  public endDateforChip: any;
+  public startDateChipdata: any;
+  public endDateChipdata: any;
+  public endDateChip : any;
+  public dateevent: any;
+  public startDateforChip: any;
+  public endDateevent: any;
+  changeTimeFormat(){
+    this.filters = this.scheduleFilterFormGroup.getRawValue();
+    if((this.filters?.startTime != undefined) && (this.filters?.startTime != null)){
+      this.dateevent = new Date(this.filters.startTime);
+      this.startDateforChip = this.dateevent.toLocaleTimeString('en-US')
+      this.startDateChip = this.startDateforChip;
+      this.startDateChipdata = {
+        column : "startTime",
+        value : this.startDateChip,
+        text : this.startDateChip
+      }
+    }
+    if((this.filters?.endTime != undefined) && (this.filters?.endTime != null)){
+      this.endDateevent = new Date(this.filters.endTime);
+      this.endDateforChip = this.endDateevent.toLocaleTimeString('en-US')
+      this.endDateChip = this.endDateforChip;
+      this.endDateChipdata = {
+        column : "endTime",
+        value : this.endDateChip,
+        text : this.endDateChip
+      }
+    }
+  }
 
-  private setFilteredItems(): void {
+  private setFilteredItems(columnname? : string): void {
     this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
+    this.setUnfilteredItems(this.filteredItems);
+    if((this.scheduleFilterFormGroup.get("startTime")?.value != "" ) && (this.scheduleFilterFormGroup.get("startTime")?.value != null )){
+      this.filteredItems.push(this.startDateChipdata)
+    } else {
+      this.filteredItems = this.filteredItems.filter(f => f.column !== "startTime");
+    }
+    if((this.scheduleFilterFormGroup.get("endTime")?.value != "") && (this.scheduleFilterFormGroup.get("endTime")?.value != null)){
+      this.filteredItems.push(this.endDateChipdata)
+    } else {
+      this.filteredItems = this.filteredItems.filter(f => f.column !== "endTime");
+    }
+    if(columnname == "startTime" || columnname == "endTime"){
+      this.filteredItems = this.filteredItems.filter(f => f.column !== columnname);
+    }
+
+    for(let i=0; i< this.filteredItems.length; i++){
+      if(this.filteredItems[i].value == true){
+        if(this.filteredItems[i].column == "isAvailablity"){
+          this.filteredItems[i].text = "Availability";
+        }
+        if(this.filteredItems[i].column == "isOnlySchedulatedCandidate"){
+          this.filteredItems[i].text = "Only Scheduled Candidate";
+        }
+        if(this.filteredItems[i].column == "isExcludeNotOrganized"){
+          this.filteredItems[i].text = "Exclude Not Oriented";
+        }
+        if(this.filteredItems[i].column == "isUnavailablity"){
+          this.filteredItems[i].text = "Unavailability";
+        }
+        if(this.filteredItems[i].column == "ShowGeneralnotes"){
+          this.filteredItems[i].text = "General Notes";
+        }
+      }
+    }
+    this.filteredItems = [...this.filteredItems];
+  }
+
+  private setUnfilteredItems(filteredItems : any) : void {
+    filteredItems = filteredItems.filter((f: { value: boolean; })=>f.value !== false);
+    this.filteredItems = [...filteredItems];
     this.cdr.markForCheck();
   }
 
@@ -429,13 +577,32 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       .subscribe((preservFilters) => {
         this.filters = preservFilters || {};
         this.isPreservedFilters = !!preservFilters;
-        const { regionIds, locationIds, departmentsIds } = this.filters;
-
-        this.scheduleFilterFormGroup.patchValue({
-          regionIds: regionIds ? [...regionIds] : [],
-          locationIds: locationIds ? [...locationIds] : [],
-          departmentsIds: departmentsIds ? [...departmentsIds] : [],
-        });
+        const { regionIds, locationIds, departmentsIds, isAvailablity, isExcludeNotOrganized, startTime, endTime, ShowGeneralnotes, isOnlySchedulatedCandidate, isUnavailablity } = this.filters;
+        if(preservFilters != null){
+          if(startTime != null){
+            const [startH, startM, startS] = getHoursMinutesSeconds(startTime);
+            this.getstartDate = new Date();
+            this.getstartDate.setHours(startH, startM, startS);
+          }
+          if(endTime != null){
+            const [endH, endM, endS] = getHoursMinutesSeconds(endTime);
+            this.getendDate = new Date();
+            this.getendDate.setHours(endH, endM, endS);
+          }
+          this.scheduleFilterFormGroup.patchValue({
+            regionIds: regionIds ? [...regionIds] : [],
+            locationIds: locationIds ? [...locationIds] : [],
+            departmentsIds: departmentsIds ? [...departmentsIds] : [],
+            isAvailablity : isAvailablity ? isAvailablity : false,
+            isUnavailablity : isUnavailablity ? isUnavailablity : false,
+            isExcludeNotOrganized : isExcludeNotOrganized ? isExcludeNotOrganized : false,
+            ShowGeneralnotes : ShowGeneralnotes ? ShowGeneralnotes : false, 
+            isOnlySchedulatedCandidate : isOnlySchedulatedCandidate ? isOnlySchedulatedCandidate : false,
+            startTime : startTime ? this.getstartDate : "",
+            endTime : endTime ? this.getendDate : ""
+          });
+        }
+        
 
         if (!this.filters.skillIds?.length) {
           this.setFilters();
