@@ -31,6 +31,10 @@ export class FilterService {
       form.controls[event.column].setValue(val);
     } else if (filterColumns[event.column].type === ControlTypes.Checkbox) {
       form.controls[event.column].setValue(false);
+    } else if (filterColumns[event.column].type === ControlTypes.Toggle) {
+      form.controls[event.column].setValue(false);
+    } else if (filterColumns[event.column].type === ControlTypes.Time) {
+      form.controls[event.column].setValue("");
     } else if (filterColumns[event.column].type === ControlTypes.Radio) {
       form.controls[event.column].setValue(filterColumns[event.column].default);
     } else if (
