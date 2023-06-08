@@ -311,9 +311,8 @@ export class UnitProfileComponent implements OnInit {
   private initForm(): void {
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.unitProfileReportForm = this.formBuilder.group({
@@ -332,9 +331,8 @@ export class UnitProfileComponent implements OnInit {
     this.isClearAll = true;
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.unitProfileReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
