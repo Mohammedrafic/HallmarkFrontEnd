@@ -210,3 +210,10 @@ export class GetEmployeeUsers {
     public businessUnitId: number
   ) {}
 }
+
+export class GetNonEmployeeUsers {
+  static readonly type = '[security] Get Users with non Employee role';
+  constructor(
+    public businessUnitId: number
+  ) {}
+}

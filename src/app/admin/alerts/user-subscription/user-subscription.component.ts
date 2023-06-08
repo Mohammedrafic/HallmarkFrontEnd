@@ -1,8 +1,8 @@
 import { AdminState } from './../../store/admin.state';
 import { OrderManagementService } from './../../../client/order-management/components/order-management-content/order-management.service';
-import { GetEmployeeUsers } from './../../../security/store/security.actions';
+import { GetEmployeeUsers, GetNonEmployeeUsers } from './../../../security/store/security.actions';
 import { ButtonModel } from './../../../shared/models/buttons-group.model';
-import { Component, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, NgZone, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -73,6 +73,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   @Select(SecurityState.userData)
   public employeeUserData$: Observable<User[]>;
+
+  @Select(SecurityState.nonEmployeeUserData)
+  public nonEmployeeUserData$: Observable<User[]>;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -145,7 +148,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   constructor(private actions$: Actions,
     private readonly ngZone: NgZone,
     private store: Store,
-    private orderManagementService: OrderManagementService) {
+    private orderManagementService: OrderManagementService,
+    private changeDetector: ChangeDetectorRef) {
     super();
     store.dispatch(new SetHeaderState({ title: this.title, iconName: 'lock' }));
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
@@ -389,11 +393,14 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       let businessUnitIds = [];
       if (value != 0 && value != null) {
         businessUnitIds.push(this.businessControl.value);
-      }
-      if(this.businessUnitControl?.value == BusinessUnitType.Candidates){
-        let userBusinessId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+      }      
+      let userBusinessId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+      let userBusinessType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+      if(this.businessUnitControl?.value == BusinessUnitType.Candidates){        
+        if(userBusinessType == BusinessUnitType.Organization){
         if(userBusinessId !=null && userBusinessId !=undefined)
           value = userBusinessId;        
+        }
         this.store.dispatch(new GetEmployeeUsers(value));
         this.employeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           if (data != undefined) {
@@ -403,9 +410,22 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
             this.businessControl.patchValue(userBusinessId, {emitEvent:false}); 
           }
         });
-      } else {
+      } else if(this.businessUnitControl?.value == BusinessUnitType.Organization 
+          && userBusinessType == BusinessUnitType.Hallmark 
+          && this.activeSystem == OrderManagementIRPSystemId.IRP) {
+            if(value){                   
+              this.store.dispatch(new GetNonEmployeeUsers(value));
+              this.nonEmployeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+                if (data != undefined) {                     
+                  this.userData = [];
+                  this.userData = data;                         
+                  this.changeDetector.detectChanges();
+                }
+              });
+            }
+      } else {        
         this.dispatchUserPage(businessUnitIds);
-      }
+      }      
     });
   }
   private onUserValueChanged(): void {
