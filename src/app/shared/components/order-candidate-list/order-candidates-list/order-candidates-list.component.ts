@@ -12,7 +12,6 @@ import { OrderCandidateListViewService } from '@shared/components/order-candidat
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { IrpOrderCandidate, Order, OrderCandidatesList } from '@shared/models/order-management.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
-
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
@@ -37,6 +36,7 @@ import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfa
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -65,16 +65,12 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
-  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
-  private isOrgIRPEnabled = false;
-  private previousSelectedSystemId: OrderManagementIRPSystemId | null;
-  private isOrgVMSEnabled = false;
   public templateState: Subject<any> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
   public applicantStatus = ApplicantStatus;
-  public defaultDuration: Duration = Duration.Other;
+  private defaultDuration: Duration = Duration.Other;
   public selectedOrder: Order;
   public agencyActionsAllowed = true;
   public deployedCandidateOrderIds: string[] = [];
@@ -97,9 +93,20 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     candidate: {} as IrpOrderCandidate,
     order: {} as Order,
   };
-  commentContainerId: number = 0;
+  public commentContainerId = 0;
+
+  private selectedSystem: SelectedSystemsFlag = SelectedSystems;
+  private isOrgIRPEnabled = false;
+  private previousSelectedSystemId: OrderManagementIRPSystemId | null;
+  private isOrgVMSEnabled = false;
+  private readonly permissions = UserPermissions;
+
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
+  }
+
+  get canEditClosedBillRates(): boolean {
+    return this.userPermission[this.permissions.CanUpdateBillRates];
   }
 
   constructor(
@@ -138,10 +145,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
-    if (this.order?.isClosed || data.status === ApplicantStatus.Offboard) {
-      return;
-    }
-
     this.candidate = { ...data };
     this.getDeployedCandidateOrders();
     this.getCandidatePayRateSetting();
@@ -173,6 +176,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           this.openDialog(this.accept);
         }
       } else if (this.isOrganization) {
+        
         const allowedOfferDeploymentStatuses = [
           ApplicantStatus.Withdraw,
           ApplicantStatus.Rejected,
@@ -185,6 +189,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           ApplicantStatus.Accepted,
           ApplicantStatus.OnBoarded,
           ApplicantStatus.Cancelled,
+          ApplicantStatus.Offboard,
         ];
 
         if (allowedOfferDeploymentStatuses.includes(this.candidate.status)) {
