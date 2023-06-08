@@ -33,7 +33,7 @@
               class="add-action spaced"
               cssClass="e-action-button"
               ejs-button
-              [disabled]="disableAnyAction || !hasEditPermissions "
+              [disabled]="disableAnyAction || !hasEditPermissions ||disableEditButton"
               (click)="openAddDialog()"
             >
               <i-feather name="plus" class="icon"></i-feather> <span class="action-text">Add Record</span>
@@ -134,7 +134,7 @@
       <button
         ejs-button
         [isPrimary]="true"
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions"
+        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions ||disableEditButton"
         cssClass="spinner-btn privilege"
         (click)="approve()"
       >
@@ -148,7 +148,7 @@
       <button
         ejs-button
         [isPrimary]="true"
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasEditPermissions"
+        [disabled]="disableAnyAction || actionButtonDisabled || !hasEditPermissions ||disableEditButton"
         cssClass="spinner-btn privilege"
         (click)="orgSubmit()"
       >
