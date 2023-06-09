@@ -172,6 +172,13 @@ export interface ScheduleFilters {
   locationIds?: number[];
   departmentsIds?: number[];
   skillIds?: number[];
+  isAvailablity?: boolean;
+  isUnavailablity?: boolean;
+  isOnlySchedulatedCandidate?: boolean;
+  ShowGeneralnotes?: boolean;
+  isExcludeNotOrganized?: boolean;
+  startTime? : any;
+  endTime? : any;
   pageNumber?: number;
   pageSize?: number;
 }
@@ -181,6 +188,13 @@ export interface ScheduleFiltersConfig {
   [ScheduleFilterFormSourceKeys.Locations]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.Departments]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.Skills]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isAvailablity]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isUnavailablity]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.ShowGeneralnotes]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.startTime]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.endTime]: ScheduleFilterItem;
 }
 
 export interface ScheduleFilterFormFieldConfig {
@@ -214,6 +228,11 @@ export interface EmployeesFilters {
   endDate: string | Date;
   departmentsIds: number[];
   userLocalTime: string;
+  isOnlySchedulatedCandidate: boolean;
+  isAvailablity: boolean;
+  isUnavailablity: boolean;
+  startTime: string;
+  endTime: string;
 }
 
 export interface DatesByWeekday {

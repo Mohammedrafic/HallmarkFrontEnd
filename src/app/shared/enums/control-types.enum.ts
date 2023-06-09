@@ -5,7 +5,8 @@ export enum ControlTypes {
   Checkbox,
   Radio,
   Date,
-  Autocomplete
+  Autocomplete,
+  Toggle
 }
 
 export enum ValueType {

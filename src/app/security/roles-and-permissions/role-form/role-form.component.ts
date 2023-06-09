@@ -81,6 +81,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     text: 'name',
     value: 'id',
   };
+  IsIrp:any=false;
   public toggle:boolean=false;
   public fields = {
     dataSource: null, id: 'id', text: 'name',parentID: 'parentId', hasChildren: 'hasChild', htmlAttributes:'htmlAttributes'
@@ -129,7 +130,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       })
     );
    }
-  
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['roleId']?.currentValue) {
       this.usersAssignedToRole = { userNames: [], hasUsersOutsideVisibility: false };
@@ -143,6 +144,14 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   ngAfterViewInit():void{
     this.roleTreeField$.subscribe((roleTreeField) => {
     this.treeData=roleTreeField.dataSource;
+    if(this.newRoleBussinesData !=null && this.newRoleBussinesData!=undefined){
+      var data=this.businessUnitIdControl?.value;
+      var selectedBussinessUnit=this.newRoleBussinesData.filter(x=>x.id==data);
+      this.ShowIsIRPToggle(selectedBussinessUnit)
+    }
+    else{
+      this.showIRPOnlyToggle.nativeElement.style.display='none';
+    }
     this.setTreeFilter(this.toggle);
     });
   }
@@ -165,7 +174,10 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
         if(x.includeInIRP==false){
           x.htmlAttributes={class:'e-show'}
         }
-        else{
+        else if(x.includeInIRP==true &&this.IsIrp==true){
+          x.htmlAttributes={class:'e-show'}
+        }
+        else if(x.includeInIRP==true &&this.IsIrp==false){
           x.htmlAttributes={class:'e-hidden'}
         }
       });
@@ -221,13 +233,13 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     if (fList1.length != 0) {
         let pNode = this.getFilterItems(fList1[0], list);
         for (let i = 0; i < pNode.length; i++) {
-            if (nodes.indexOf(pNode[i]) == -1 && pNode[i] != null)
-                nodes.push(pNode[i]);
-            }
-            return nodes;
+          if (nodes.indexOf(pNode[i]) == -1 && pNode[i] != null)
+            nodes.push(pNode[i]);
         }
         return nodes;
     }
+    return nodes;
+  }
 
   public onSelecting(): void {
     this.updatePermissionValue();
@@ -325,7 +337,10 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       const user = this.store.selectSnapshot(UserState.user);
       this.newRoleBussinesData =
       this.store.selectSnapshot(SecurityState.newRoleBussinesData)(user?.businessUnitType as BusinessUnitType);
-        this.defaultBusinessValue = this.newRoleBussinesData[0]?.id;
+      this.defaultBusinessValue = this.newRoleBussinesData.filter(x=>x.id==this.businessUnitIdControl?.value);
+      this.IsIrp=this.defaultBusinessValue[0].isIRPEnabled;
+      this.defaultBusinessValue=this.defaultBusinessValue[0].id;
+     
     });
   }
 
@@ -353,11 +368,21 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       });
   }
   ShowIsIRPToggle(arg:any){
-    if(arg.itemData.isIRPEnabled&&arg.itemData.isVMSEnabled){
-      this.showIRPOnlyToggle.nativeElement.style.display='block';
+    if(arg.itemData){
+      if(arg.itemData.isIRPEnabled&&arg.itemData.isVMSEnabled){
+        this.showIRPOnlyToggle.nativeElement.style.display='block';
+      }
+      else{
+        this.showIRPOnlyToggle.nativeElement.style.display='none';
+      }
     }
     else{
-      this.showIRPOnlyToggle.nativeElement.style.display='none';
+      if(arg[0].isIRPEnabled&&arg[0].isVMSEnabled){
+        this.showIRPOnlyToggle.nativeElement.style.display='block';
+      }
+      else{
+        this.showIRPOnlyToggle.nativeElement.style.display='none';
+      }
     }
   }
   isShowIRPOnly(arg:any){

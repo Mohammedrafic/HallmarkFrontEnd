@@ -19,6 +19,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '../../../../shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SpecilaProjectCategoryTableColumns } from '@organization-management/specialproject/enums/specialproject.enum';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 
 @Component({
   selector: 'app-special-projects',
@@ -29,6 +30,7 @@ import { SpecilaProjectCategoryTableColumns } from '@organization-management/spe
 export class SpecialProjectsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
   @Input() showSelectSystem: boolean;
+  @Input() selectedSystem: SelectedSystemsFlag;
   @Output() onEdit = new EventEmitter<SpecialProject>();
 
   @Select(SpecialProjectState.specialProjectPage)
@@ -55,7 +57,6 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
   public readonly columnDefinitions: ColumnDefinitionModel[] = SpecialProjectColumnsDefinition(this.actionCellrenderParams, this.datePipe);
 
   ngOnInit(): void {
-
     this.getSpecialProjects();
 
     this.columnDefinitions.forEach(element => {
@@ -159,7 +160,13 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
       }
       else {
         this.gridApi?.hideOverlay();
-        this.rowData = data.items;
+        if(this.selectedSystem.isIRP && this.selectedSystem.isVMS){
+          this.rowData = data.items;
+        }else if(this.selectedSystem.isVMS){
+          this.rowData = data.items.filter(f=>f.includeInVMS==true);
+        }else{
+          this.rowData = data.items.filter(f=>f.includeInIRP==true);
+        }
         this.gridApi?.setRowData(this.rowData);
       }
     });
