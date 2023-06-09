@@ -19,13 +19,15 @@ export class CandidateGridComponent extends DestroyableDirective implements OnIn
   @Input() set candidatesPage(page: CandidateDetailsPage) {
     if (page) {
       this.candidatePage = page;
-      this.candidatePage.totalCount = this.candidatePage.items.length
+      this.candidatePage.totalCount = this.candidatePage.totalCount
+       this.candidatePage.totalPages=this.candidatePage.totalPages;
     }
     if(this.CandidateStatus){
       if(page){
         this.candidatePage = page;
         this.candidatePage.items = (this.candidatePage.items || []).filter(f => f.status == this.CandidateStatus);
-        this.candidatePage.totalCount = this.candidatePage.items.length
+        this.candidatePage.totalCount =this.candidatePage.items.length;
+        this.candidatePage.totalPages=this.candidatePage.totalPages;
       }
     }
   }
