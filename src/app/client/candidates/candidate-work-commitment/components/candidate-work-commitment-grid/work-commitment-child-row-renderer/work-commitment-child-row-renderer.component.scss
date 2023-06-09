@@ -1,0 +1,48 @@
+@import "colors";
+
+:host {
+  ::ng-deep {
+    .app-grid {
+      .ag-row {
+        background-color: $secondary-dark-blue-50 !important;
+
+        .cell-value {
+          font-weight: 400 !important;
+          font-size: 14px !important;
+        }
+      }
+
+      .ag-row.ag-row-level-1 {
+        background-color: transparent !important;
+      }
+    }
+
+    .ag-header {
+      display: none;
+    }
+
+    .ag-header,
+    .ag-root-wrapper {
+      border: none;
+    }
+
+    .ag-body-viewport {
+      overflow-y: hidden;
+
+      .ag-center-cols-viewport {
+        .ag-center-cols-container {
+          width: unset !important;
+        }
+      }
+    }
+
+    .ag-theme-alpine .ag-layout-auto-height .ag-center-cols-clipper,
+    .ag-theme-alpine .ag-layout-auto-height .ag-center-cols-container {
+      min-height: unset !important;
+    }
+
+    .ag-row.ag-row-level-1 {
+      height: auto !important;
+    }
+  }
+}
