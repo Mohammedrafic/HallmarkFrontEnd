@@ -16,16 +16,12 @@ import { ColDef } from '@ag-grid-community/core';
 })
 export class CandidateGridComponent extends DestroyableDirective implements OnInit {
   @Input() public CandidateStatus: number;
-  @Input() set candidatesPage(page: CandidateDetailsPage) {
-
-    this.candidatePage = page;
-  }
-
+  @Input() public candidatesPage: CandidateDetailsPage;
   @Input() public pageNumber: number;
   @Input() public pageSize: number;
+
   @ViewChild('grid') grid: GridComponent;
 
-  public candidatePage: CandidateDetailsPage;
   public readonly statusEnum = CandidateStatus;
   public isAgency = false;
   public isLoading = false;
