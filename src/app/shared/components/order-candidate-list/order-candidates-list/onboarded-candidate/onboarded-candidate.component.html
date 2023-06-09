@@ -315,6 +315,12 @@
   (cancelReject)="resetStatusesFormControl()"
 ></app-reject-reason-dialog>
 
+<app-onboard-candidate-message-dialog
+  [openEvent]="openCandidateMessageDialog"
+  (sendMessage)="onSendCandidateMessage($event)"
+  (cancelMessage)="onNoCandidateMessage()"
+></app-onboard-candidate-message-dialog>
+
 <app-candidate-cancellation-dialog
   [openEvent]="openCandidateCancellationDialog"
   [orderType]="candidateJob?.order?.orderType"

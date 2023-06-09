@@ -136,6 +136,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public payRateSetting = CandidatePayRateSettings;
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
   public readonly reorderType: OrderType = OrderType.ReOrder;
+  public openCandidateMessageDialog = new Subject<boolean>();
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -584,9 +585,18 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.disableDatesForClosedPostition();
   }
 
+  onNoCandidateMessage(){
+    this.openCandidateMessageDialog.next(false);
+  }
+
+  onSendCandidateMessage($event :any){
+    console.log($event);
+  }
+
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded || event.itemData === null) {
-      this.onAccept();
+      this.openCandidateMessageDialog.next(true);
+      // this.onAccept();
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
       this.openCandidateCancellationDialog.next();
     } else {

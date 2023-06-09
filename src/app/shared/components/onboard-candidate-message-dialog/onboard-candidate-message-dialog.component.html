@@ -1,0 +1,51 @@
+<ejs-dialog
+  #onBoradCandidateMessageDialog
+  cssClass="onboard-candidate-dialog"
+  isModal="true"
+  [visible]="false"
+  showCloseIcon="true"
+  width="448px"
+>
+ <!--  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Confirmation</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template> -->
+
+  <ng-template #content>
+    <div class="sup-title">Would you like to send any notification to the candidate.</div>
+    <form [formGroup]="form">
+      <div class="dropdown-container bootstrap" [hidden]="!sendMessageFlag">
+        <label>Message<span class="required">*</span></label>
+        <div class="input-group dropdown">
+            <ejs-textbox class="e-input" type="text" maxlength="280" appValidateWithMessage name="message"
+            formControlName="message" [multiline]="true"></ejs-textbox>
+        </div>
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <button
+        ejs-button
+        cssClass="e-outline"
+        (click)="onCancel()"
+      > No </button>
+      <button *ngIf="!sendMessageFlag"
+        ejs-button
+        cssClass="e-danger" 
+        (click)="sendMessageFlag = true"
+        >Yes</button>
+      <button *ngIf="sendMessageFlag"
+        ejs-button
+        cssClass="e-danger" 
+        (click)="onSendMessage()"
+        >Send</button>
+    </div>
+  </ng-template>
+</ejs-dialog>
