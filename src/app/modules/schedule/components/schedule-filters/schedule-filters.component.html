@@ -7,11 +7,11 @@
   (closeDialogClicked)="closeFilterDialog()"
 >
   <form [formGroup]="scheduleFilterFormGroup" [class]="formConfig.formClass">
-    <div class="bootstrap">
+    <div class="formGroup">
       <ng-container *ngFor="let item of formConfig.formFields">
         <ng-container [ngSwitch]="item.type">
           <ng-template [ngSwitchCase]="fieldTypes.MultiSelectDropdown">
-            <div class="input-container">
+            <div class="input-container bootstrap">
               <label [for]="item.field">{{ item.title }} <span *ngIf="item.required" class="required">*</span></label>
               <div class="input-group multiselect">
                 <ejs-multiselect
@@ -32,6 +32,35 @@
                 >
                   {{ counter }}
                 </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template [ngSwitchCase]="fieldTypes.Time">
+            <div class="input-container">
+              <label [for]="item.field">
+                {{ item.title }} <span *ngIf="item.required" class="required">*</span>
+              </label>
+              <div class="input-group datepicker bootstrap">
+                <ejs-timepicker
+                  placeholder="HH:MM"
+                  [formControlName]="item.field"
+                  appValidateWithMessage
+                  format="HH:mm"
+                  [maskPlaceholder]="timeMask"
+                  [enableMask]="true"
+                >
+                </ejs-timepicker>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template [ngSwitchCase]="fieldTypes.Toggle">
+            <div class="input-container">
+              <div class="input-group wide">
+                <ejs-switch
+                  class="toggle"
+                  [formControlName]="item.field"
+                ></ejs-switch>
+                <label [for]="item.field">{{ item.title }}</label>
               </div>
             </div>
           </ng-template>

@@ -19,6 +19,8 @@ export class Skill {
   foreignKey?: string;
   skillCode?: string;
   name?: string;
+  assignedToVMS?: boolean;
+  assignedToIRP?: boolean;
 
   constructor(skill: Skill, assigned = false) {
     this.id = skill.id || 0;

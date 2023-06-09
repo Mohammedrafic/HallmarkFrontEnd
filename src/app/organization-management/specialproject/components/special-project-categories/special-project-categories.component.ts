@@ -18,6 +18,7 @@ import { SpecialProjectCategoryState } from '../../../store/special-project-cate
 import { DeletSpecialProjectCategory, GetSpecialProjectCategories } from '../../../store/special-project-category.actions';
 import { SpecialProjectCategory, SpecialProjectCategoryPage } from '@shared/models/special-project-category.model';
 import { SpecilaProjectCategoryTableColumns } from '@organization-management/specialproject/enums/specialproject.enum';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 
 @Component({
   selector: 'app-special-project-category',
@@ -28,6 +29,7 @@ import { SpecilaProjectCategoryTableColumns } from '@organization-management/spe
 export class SpecialProjectCategoryComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
   @Input() showSelectSystem:boolean;
+  @Input() selectedSystem: SelectedSystemsFlag;
   @Output() onEdit = new EventEmitter<DeletSpecialProjectCategory>();
 
   @Select(SpecialProjectCategoryState.specialProjectCategoryPage)
@@ -153,7 +155,13 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
         }
         else {
           this.gridApi?.hideOverlay();
-          this.rowData = data.items;
+          if(this.selectedSystem.isIRP && this.selectedSystem.isVMS){
+            this.rowData = data.items;
+          }else if(this.selectedSystem.isVMS){
+            this.rowData = data.items.filter(f=>f.includeInVMS==true);
+          }else{
+            this.rowData = data.items.filter(f=>f.includeInIRP==true);
+          }
           this.gridApi?.setRowData(this.rowData);
         }
     });

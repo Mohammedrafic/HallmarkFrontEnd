@@ -78,7 +78,6 @@
               <div
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
-                [class.btn-icon__disabled]="order?.isClosed || data.status === applicantStatus.Offboard"
                 (click)="onEdit(data, $event)"
               >
                 <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
@@ -351,6 +350,7 @@
       [candidateOrderIds]="deployedCandidateOrderIds"
       [isOrderOverlapped]="isOrderOverlapped"
       [order]="selectedOrder"
+      [canEditClosedBillRate]="canEditClosedBillRates"
       [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
       [isCandidatePayRateVisible]="isCandidatePayRateVisible"
     ></app-onboarded-candidate>

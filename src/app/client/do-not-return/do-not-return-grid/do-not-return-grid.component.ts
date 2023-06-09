@@ -318,6 +318,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
         this.doNotReturnFormGroup.get('lastName')?.setValue(null);
         this.doNotReturnFormGroup.get('middleName')?.setValue(null);
         this.maskSSNPattern = "000-00-0000";
+        this.maskedSSN = '';
         this.doNotReturnFormGroup.get('ssn')?.setValue(null); 
       }
     });
@@ -649,16 +650,17 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.doNotReturnFormGroup.reset();
       this.store.dispatch([new ShowSideDialog(false), new SetDirtyState(false)]);
       this.removeActiveCssClass();
+      this.isEdit=false;
+      this.isBlock=true;
+      this.maskSSNPattern = '000-00-0000';
+      this.maskedSSN = '';
       setTimeout(() => {
         this.getDoNotReturn();
       }, 5000)
     } else {
       this.doNotReturnFormGroup.markAllAsTouched();
     }
-    this.isEdit=false;
-    this.isBlock=true;
-    this.maskSSNPattern = '000-00-0000';
-    this.maskedSSN = '';
+
   }
 
   onFormCancelClick(): void {

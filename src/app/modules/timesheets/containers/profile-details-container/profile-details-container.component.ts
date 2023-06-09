@@ -11,7 +11,7 @@ import { FileForUpload, Permission } from '@core/interface';
 import { Actions, ofActionCompleted, Select, Store } from '@ngxs/store';
 import { Attachment, AttachmentsListConfig } from '@shared/components/attachments';
 import { UploadFileAreaComponent } from '@shared/components/upload-file-area/upload-file-area.component';
-import { GRID_CONFIG } from '@shared/constants';
+import { GRID_CONFIG, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { DatesRangeType } from '@shared/enums';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
@@ -27,6 +27,7 @@ import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popup
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { combineLatest, distinctUntilChanged, filter, map, Observable,
   switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
+import { SettingsViewService } from '../../../../shared/services/settings-view.service';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import {
   ConfirmApprovedTimesheetDeleteDialogContent,
@@ -94,6 +95,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public mileageTimesheetId: number;
 
   public organizationId: number | null = null;
+  public orgId: number | null = null;
 
   public costCenterId: number | null = null;
 
@@ -155,11 +157,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public isMobile = false;
 
   public isSmallTabletScreen = false;
+  public disableEditButton: boolean = false;
 
   private resizeObserver: ResizeObserverModel;
 
   private canRecalculate: boolean;
-
+  
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
@@ -174,6 +177,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     private breakpointObserver: BreakpointObserver,
     private cd: ChangeDetectorRef,
     private actions: Actions,
+    private settingsViewService: SettingsViewService
   ) {
     super(store);
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
@@ -534,6 +538,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId,
       candidateWorkPeriods, canEditTimesheet, allowDNWInTimesheets, agencyStatus }) => {
       this.organizationId = this.isAgency ? organizationId : null;
+      this.orgId =  organizationId;
       this.jobId = jobId;
       this.weekPeriod = [
         DateTimeHelper.convertDateToUtc(weekStartDate),
@@ -545,6 +550,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       }));
       this.setDNWBtnState(canEditTimesheet, !!allowDNWInTimesheets);
       this.checkForAllowActions(agencyStatus);
+      this.allowEditButtonEnabled();
       this.cd.markForCheck();
     });
   }
@@ -569,6 +575,29 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const allowResult = agencyStatus === AgencyStatus.Inactive || agencyStatus === AgencyStatus.Terminated;
 
     this.disableAnyAction = allowResult;
+    
+  }
+  private allowEditButtonEnabled(): void {
+    let organizationId = this.orgId;
+    this.settingsViewService.getViewSettingKey(
+      OrganizationSettingKeys.TimesheetSubmissionProcess,
+      OrganizationalHierarchy.Organization,
+      organizationId as number,
+      organizationId as number
+    ).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(({ TimesheetSubmissionProcess }) => {
+      let currentdate = new Date();
+      let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));
+      
+      if (TimesheetSubmissionProcess == "INT" &&dateDiff <= 30) {
+        this.disableEditButton = true;
+      }
+      else {
+        this.disableEditButton = false;
+      }
+
+    })
   }
 
   private watchForPermissions(): void {

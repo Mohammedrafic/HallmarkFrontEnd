@@ -20,7 +20,6 @@ import {
   isFormsValid,
   isFormTouched,
   showInvalidFormControl,
-  showMessageForInvalidCredentials,
 } from '@client/order-management/helpers';
 import { SaveIrpOrder, EditIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { CreateOrderDto, Order } from '@shared/models/order-management.model';
@@ -42,11 +41,10 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   @Input() public selectedOrder: Order;
   @Input() selectedSystem: SelectSystem;
 
-  public tabsConfig: TabsConfig[] = IrpTabConfig(true);
+  public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
   public orderCredentials: IOrderCredentialItem[] = [];
 
-  private selectedOrderType: OrderType;
   private isCredentialsChanged = false;
 
   constructor(
@@ -67,7 +65,6 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedOrder']?.currentValue) {
-      this.tabsConfig = IrpTabConfig(this.selectedOrder.orderType !== OrderType.ReOrder);
       this.orderCredentials = [...this.selectedOrder.credentials];
     }
   }
@@ -82,11 +79,6 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public deleteOrderCredential(credential: IOrderCredentialItem): void {
     this.isCredentialsChanged = true;
     this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
-  }
-
-  public changeTabConfig(orderType: OrderType): void {
-    this.tabsConfig = IrpTabConfig(orderType !== OrderType.ReOrder);
-    this.selectedOrderType = orderType;
   }
 
   public isOrderTouched(): boolean {
@@ -115,7 +107,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       const formGroupList = getFormsList(formState);
 
       if(isFormsValid(formGroupList)) {
-        this.saveValidOrder(saveType, formState);
+        this.saveOrder(formState, saveType);
       } else {
         showInvalidFormControl(getControlsList(formGroupList));
         formGroupList.forEach((form: FormGroup) => {
@@ -125,27 +117,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     });
   }
 
-  private saveValidOrder(saveType: MenuEventArgs | void, formState: ListOfKeyForms): void {
-    if(saveType) {
-      //Todo: add condition, when will be implement save for Template
-      this.saveOrder(formState, saveType);
-    } else {
-      this.checkIsCredentialsValid(formState);
-    }
-  }
-
-  private checkIsCredentialsValid(formState: ListOfKeyForms): void {
-    const credentialsValid = this.orderCredentials?.length || this.selectedOrder?.orderType === OrderType.ReOrder
-    || this.selectedOrderType === OrderType.ReOrder;
-
-    if(credentialsValid) {
-      this.saveOrder(formState);
-    } else {
-      showMessageForInvalidCredentials();
-    }
-  }
-
-  private saveOrder(formState: ListOfKeyForms, saveType?: MenuEventArgs): void {
+  private saveOrder(formState: ListOfKeyForms, saveType: MenuEventArgs | void): void {
     const createdOrder = {
       ...createOrderDTO(formState, this.orderCredentials),
       contactDetails: getValuesFromList(formState.contactDetailsList),

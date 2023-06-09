@@ -2,10 +2,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  EventEmitter,
   Input,
   OnInit,
-  Output,
   TrackByFunction,
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
@@ -132,8 +130,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     }
   }
 
-  @Output() orderTypeChanged: EventEmitter<OrderType> = new EventEmitter();
-
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
@@ -217,7 +213,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSelectOrder();
     this.watchForOrganizationStructure();
     this.watchForSpecialProjectCategory();
-    this.observeOrderType();
     this.setReasonAutopopulate();
   }
 
@@ -778,7 +773,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         shiftEndTime: selectedOrder.shiftEndTime
       }, { emitEvent: false })
     },1000)
-   
+
 
     // this.generalInformationForm.patchValue(selectedOrder);
     this.jobDistributionForm.patchValue(selectedOrder);
@@ -907,16 +902,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
       this.isTieringLogicLoad = false;
     }
-  }
-
-  private observeOrderType(): void {
-    this.orderTypeForm.get('orderType')?.valueChanges
-      .pipe(
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe((orderType) => {
-        this.orderTypeChanged.emit(orderType);
-      });
   }
 
   private setSkillFilters(skills: ListOfSkills[]): void {

@@ -123,7 +123,7 @@
 </ng-container>
 
 <ng-container *ngIf="isIRPFlagEnabled && activeSystem == OrderManagementIRPSystemId.IRP else vmsGridTemplate;">
-  <div class="grid-table-container table-wrapper">
+  <div class="grid-table-container table-wrapper IRPgrid">
     <div class="mobile-group-button" *ngIf="isMobile">
       <ng-container [ngTemplateOutlet]="smallMenuButton"></ng-container>
     </div>
