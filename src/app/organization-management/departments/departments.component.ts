@@ -448,8 +448,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   }
 
   private saveDepartment(department: Department, ignoreWarning: boolean): void {
-    console.log(this.replaceOrder);
-    //TODO: send to BE
+    //TODO: send to BE this.replaceOrder
     this.store.dispatch(new UpdateDepartment(department, this.filters, ignoreWarning));
   }
 
