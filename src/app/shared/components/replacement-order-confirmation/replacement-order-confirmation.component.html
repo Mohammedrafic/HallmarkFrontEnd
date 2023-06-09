@@ -23,6 +23,9 @@
     <div>
       {{ text }}
     </div>
+    <div class="bootstrap">
+      <ejs-checkbox label="Create replacement Order" [(checked)]="replaceChecked" (change)="updateReplaceValue()"></ejs-checkbox>
+    </div>
   </ng-template>
 
   <ng-template #footerTemplate>
