@@ -21,6 +21,14 @@ export type CandidateWorkCommitment = {
   comment: string;
   created?: string | Date;
   isActive: boolean;
+  wcSetupCount: number;
 }
 
 export type CandidateWorkCommitmentsPage = PageOfCollections<CandidateWorkCommitment>;
+
+export type WorkCommitmentSetup = {
+  startDate: string;
+  endDate: string | null;
+  region: string;
+  location: string;
+}
