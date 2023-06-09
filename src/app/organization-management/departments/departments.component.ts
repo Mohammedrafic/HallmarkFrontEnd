@@ -599,7 +599,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       });
   }
 
-  private listenIncludeInIRPToggleChanges(): Observable<boolean> {
+  private getIrpToggleStream(): Observable<boolean> {
     const includeInIRPControl$ = this.departmentsDetailsFormGroup.get('includeInIRP')?.valueChanges;
 
     if (this.isVMSEnabled && this.isIRPEnabled && includeInIRPControl$) {
@@ -669,7 +669,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
           this.isIRPEnabled = !!preferences?.isIRPEnabled;
           this.isVMSEnabled = !!preferences?.isVMCEnabled;
         }),
-        switchMap(() => this.listenIncludeInIRPToggleChanges()),
+        switchMap(() => this.getIrpToggleStream()),
         takeUntil(this.componentDestroy())
       )
       .subscribe((state) => {
