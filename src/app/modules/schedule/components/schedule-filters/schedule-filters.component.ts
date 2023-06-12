@@ -203,7 +203,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         }),
         filter((departmentsIds: number[]) => !!departmentsIds?.length),
         switchMap((departmentsIds: number[]) => {
-          const params = { SystemType: SystemType.IRP, DepartmentIds: departmentsIds };
+          const params = { SystemType: SystemType.IRP, DepartmentIds: departmentsIds, IsSchedulingContext: true };
 
           if (this.isHomeCostCenterFilters) {
             return this.scheduleApiService.getSkillsByEmployees(departmentsIds, this.selectedCandidateId);
@@ -218,18 +218,12 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
           const skillOption = this.isHomeCostCenterFilters
             ? ScheduleFilterHelper.adaptMasterSkillToOption(skills as Skill[])
             : ScheduleFilterHelper.adaptOrganizationSkillToOption(skills as AssignedSkillsByOrganization[]);
+
           this.filterColumns.skillIds.dataSource = skillOption;
           const skillIds = this.getSkillsIds(skillOption);
-          const selectedFilterSkills = this.scheduleFiltersService.getSelectedSkillFilterColumns(
-              this.filterColumns.skillIds.dataSource,
-              this.chipsSettings.preservedChipsSkills
-          );
-
-          const preservedChipSkills = this.chipsSettings.preservedChipsSkills.length ? selectedFilterSkills : skillIds;
           this.chipsSettings.preservedChipsSkills = [];
           this.chipsSettings.editedChips = false;
-
-          this.scheduleFilterFormGroup.get('skillIds')?.patchValue(preservedChipSkills);
+          this.scheduleFilterFormGroup.get('skillIds')?.patchValue(this.getSkillsPatchValue(skillIds));
         } else {
           this.resetSkillFilters();
         }
@@ -458,5 +452,24 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     }
 
     return [skillOption[0]?.value as number];
+  }
+
+  private getSkillsPatchValue(skillIds: number[]): number [] {
+    if (this.chipsSettings.preservedChipsSkills.length) {
+      const selectedFilterSkills = this.scheduleFiltersService.getSelectedSkillFilterColumns(
+        this.filterColumns.skillIds.dataSource,
+        this.chipsSettings.preservedChipsSkills
+      );
+
+      return selectedFilterSkills;
+    }
+
+    const departments: number[] = this.scheduleFilterFormGroup.get('departmentsIds')?.value;
+
+    if (departments.length < 2) {
+      return skillIds;
+    }
+
+    return [];
   }
 }
