@@ -188,11 +188,12 @@ export class AccumulationChartComponent
 
   private handleChartDataChanges(): void {
     this.chartDatachanges = this.chartData;
+    this.totalval=0;
     this.chartDatachanges?.chartData.forEach(obj => {
       this.totalval += obj.value;
     });
     this.chartDatachanges?.chartData.forEach(obj => {
-      obj.text = (Math.round(obj.value / this.totalval * 100)).toString();
+      obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString():"0";
     });
     
 
