@@ -87,7 +87,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   @Select(UserState.lastSelectedAgencyId)
   lastSelectedAgencyId$: Observable<number>;
 
-  
+
   @Select(UserState.lastSelectedOrganizationId)
   lastSelectedOrganizationId$: Observable<number>;
 
@@ -147,7 +147,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.watchForStructure();
     this.subscribeOnLocationChange();
     this.watchForRegionControl();
-   
+
 
     combineLatest([
       this.subscribeOnPageNumberChange(),
@@ -346,7 +346,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         valueField: 'skillDescription',
         valueId: 'masterSkillId',
       },
-      
+
       departmentIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -428,6 +428,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private handleFilterState(filters: PreservedFiltersByPage<FiltersModal>): void {
+    let dispatchPatch = false;
     const { isNotPreserved, state, dispatch } = filters;
     if (!isNotPreserved && dispatch) {
       this.filters = {
@@ -441,6 +442,18 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
       };
 
+      dispatchPatch = true;
+    }
+
+    if (this.CandidateStatus) {
+      this.filters = {
+        ...this.filters,
+        applicantStatuses: [this.CandidateStatus],
+      };
+      dispatchPatch = true;
+    }
+
+    if (dispatchPatch) {
       this.patchFormValue();
     }
   }
@@ -534,7 +547,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       });
   }
 
- 
+
   private watchForStructure(): void {
     this.organizationStructure$
       .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
@@ -544,6 +557,6 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         this.allRegions = [...this.orgRegions];
         this.filterColumns.regionsIds.dataSource = this.allRegions;
       });
-  }  
+  }
 
 }
