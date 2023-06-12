@@ -160,21 +160,12 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   updateScheduleFilter(data: ScheduleInt.ScheduleFiltersData): void {
-    console.log(data);
     this.scheduleFiltersService.setScheduleFiltersData(data);
     this.changeFilters(data.filters, data.skipDataUpdate);
     this.appliedFiltersAmount = data.filteredItems?.length;
     this.checkIsScheduleAvailabilityTurn();
 
     if (!this.store.selectSnapshot(UserState.user)?.isEmployee) {
-      for(let i=0;i < data.chipsData.length;i++){
-        if(data.chipsData[i].groupField == "startTime"){
-          data.chipsData[i].data = [data.filteredItems[i].value]
-        }
-        if(data.chipsData[i].groupField == "endTime"){
-          data.chipsData[i].data = [data.filteredItems[i].value]
-        }
-      }
       this.chipsData = data.chipsData;
     }
   }
@@ -254,16 +245,15 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private detectWhatDataNeeds(): void {
-    if (!this.detectIsRequiredFiltersExist()) {
-      this.scheduleData = null;
-
-      return;
-    }
-
     if (this.selectedCandidate) {
       this.initSelectedCandidateScheduleData();
     } else {
       this.initScheduleData();
+    }
+    if (!this.detectIsRequiredFiltersExist()) {
+      this.scheduleData = null;
+
+      return;
     }
   }
 

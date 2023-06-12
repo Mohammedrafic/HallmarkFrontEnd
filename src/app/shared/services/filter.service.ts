@@ -1,4 +1,4 @@
-import { DatePipe, formatDate } from '@angular/common';
+import { DatePipe, formatDate, getLocaleDateTimeFormat } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -108,8 +108,18 @@ export class FilterService {
             chips.push({ text: filterColumns[key].checkBoxTitle, column: key, value: val });
             break;
 
+          case ControlTypes.Toggle:
+            chips.push({ text: filterColumns[key].filterTitle, column: key, value: val });
+            break;
+
           case ControlTypes.Date:
               chips.push({ text: formatDate(val, 'MM/dd/yyyy', 'en-US'), column: key, value: val });
+            break;
+
+          case ControlTypes.Time:
+              const event = new Date(val);
+              const timeEvent = event.toLocaleTimeString('en-US')
+              chips.push({ text: timeEvent, column: key, value: timeEvent });
             break;
 
           case ControlTypes.Radio:

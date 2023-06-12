@@ -41,17 +41,16 @@ export class ScheduleFiltersService {
 
   createScheduleFilterForm(): FormGroup {
     return this.fb.group({
-      regionIds: ['', Validators.required],
-      locationIds: ['', Validators.required],
-      departmentsIds: [],
+      regionIds: [[], Validators.required],
+      locationIds: [[], Validators.required],
+      departmentsIds: [[], Validators.required],
       skillIds: [],
-      isAvailablity : [false],
-      isUnavailablity : [false],
+      isAvailablity : [true],
+      isUnavailablity : [true],
       isOnlySchedulatedCandidate : [false],
-      ShowGeneralnotes : [false],
-      isExcludeNotOrganized : [false],
-      startTime : [""],
-      endTime : [""]
+      isExcludeNotOrganized : [true],
+      startTime: [null],
+      endTime : [null]
     });
   }
 

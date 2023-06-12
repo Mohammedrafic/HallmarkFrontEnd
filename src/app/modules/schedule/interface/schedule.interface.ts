@@ -9,6 +9,7 @@ import { ChipItem } from '@shared/components/inline-chips';
 import { ScheduleFilterFormSourceKeys } from '../constants';
 import { ScheduleOrderType, ScheduleType } from '../enums';
 import { IrpOrderType } from '@shared/enums/order-type';
+import { Time } from '@angular/common';
 
 export interface ScheduleDay {
   id: number;
@@ -175,10 +176,9 @@ export interface ScheduleFilters {
   isAvailablity?: boolean;
   isUnavailablity?: boolean;
   isOnlySchedulatedCandidate?: boolean;
-  ShowGeneralnotes?: boolean;
   isExcludeNotOrganized?: boolean;
-  startTime? : any;
-  endTime? : any;
+  startTime? : string | Time | null;
+  endTime? : string | Time | null;
   pageNumber?: number;
   pageSize?: number;
 }
@@ -191,7 +191,6 @@ export interface ScheduleFiltersConfig {
   [ScheduleFilterFormSourceKeys.isAvailablity]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.isUnavailablity]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate]: ScheduleFilterItem;
-  [ScheduleFilterFormSourceKeys.ShowGeneralnotes]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.startTime]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.endTime]: ScheduleFilterItem;
@@ -231,8 +230,8 @@ export interface EmployeesFilters {
   isOnlySchedulatedCandidate: boolean;
   isAvailablity: boolean;
   isUnavailablity: boolean;
-  startTime: string;
-  endTime: string;
+  startTime: string | Time | null;
+  endTime: string | Time | null;
 }
 
 export interface DatesByWeekday {
