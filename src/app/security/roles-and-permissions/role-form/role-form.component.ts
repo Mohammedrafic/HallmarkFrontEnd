@@ -152,6 +152,9 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     else{
       this.showIRPOnlyToggle.nativeElement.style.display='none';
     }
+    if(this.form.status=='DISABLED'){
+      this.toggle=false;
+    }
     this.setTreeFilter(this.toggle);
     });
   }
