@@ -21,6 +21,7 @@ export class Department {
   secondarySkills?: number[];
   primarySkillNames?: string;
   secondarySkillNames?: string;
+  createReplacement?: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<Department>;
