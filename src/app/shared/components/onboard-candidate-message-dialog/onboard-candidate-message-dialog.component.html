@@ -1,51 +1,49 @@
-<ejs-dialog
-  #onBoradCandidateMessageDialog
-  cssClass="onboard-candidate-dialog"
-  isModal="true"
-  [visible]="false"
-  showCloseIcon="true"
-  width="448px"
->
- <!--  <ng-template #header>
-    <section class="header-container">
-      <div class="e-card-header">
-        <div class="e-card-header-caption">
-          <h3 class="e-card-title">Confirmation</h3>
-        </div>
-      </div>
-    </section>
-  </ng-template> -->
+<div [formGroup]="onBoardMessageEmailTemplateForm" id="onBoardMessageEmailTemplateForm" class="group-email-template-form">
+    <div class="section-container">
 
-  <ng-template #content>
-    <div class="sup-title">Would you like to send any notification to the candidate.</div>
-    <form [formGroup]="form">
-      <div class="dropdown-container bootstrap" [hidden]="!sendMessageFlag">
-        <label>Message<span class="required">*</span></label>
-        <div class="input-group dropdown">
-            <ejs-textbox class="e-input" type="text" maxlength="280" appValidateWithMessage name="message"
-            formControlName="message" [multiline]="true"></ejs-textbox>
-        </div>
-      </div>
-    </form>
-  </ng-template>
+        <div class="left-section">
+            <div class="input-container bootstrap top-container">
+              <label>Subject<span class="required">*</span></label>
+              <div class="input-group">
+                <input appValidateWithMessage formControlName="emailSubject" class="e-input" type="text"
+                      [(ngModel)]="emailSubject" />
+              </div>
+            </div>
 
-  <ng-template #footerTemplate>
-    <div class="e-card-content">
-      <button
-        ejs-button
-        cssClass="e-outline"
-        (click)="onCancel()"
-      > No </button>
-      <button *ngIf="!sendMessageFlag"
-        ejs-button
-        cssClass="e-danger" 
-        (click)="sendMessageFlag = true"
-        >Yes</button>
-      <button *ngIf="sendMessageFlag"
-        ejs-button
-        cssClass="e-danger" 
-        (click)="onSendMessage()"
-        >Send</button>
+            <div>
+              <div class="id-container">
+                <div class="input-container bootstrap">
+                  <label>Attachment {{isSend}}</label>
+                  <input *ngIf="!isSend" class="e-input" type="text" disabled [(ngModel)]="fileNameInput" 
+                        [ngModelOptions]="{standalone: true}" />
+                  <div id="group-attachment-files" *ngIf="isSend" [ngClass]="uploaderstatus ? 'enabled' : 'disabled'">
+                    <div id="droparea" class="droparea" (click)="browseGroupEmail()">
+                      <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+                    </div>
+                    <ejs-uploader #filesUploaderOnboardEmail formControlName="fileUpload"
+                                  [dropArea]="dropElement"
+                                  [allowedExtensions]="allowedExtensions"
+                                  [multiple]="false"
+                                  [maxFileSize]="maxFileSize"
+                                  [autoUpload]="false"
+                                  (selected)="onFileSelectedGroup($event)"
+                                  (removing)="onFileRemoving()">
+                    </ejs-uploader>
+                  </div>
+                  <label *ngIf="isSend">Attached file size should not exceed 2MB<span class="e-input"></span></label>
+                </div>
+              </div>
+            </div>
+           
+            <div class="rich-text-container">
+              <label>Mail Body<span class="required">*</span></label>
+              <div class="input-group" id="richTextEditorDiv">
+                <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
+                                    formControlName="emailBody" [toolbarSettings]='tools' [(ngModel)]='emailBody'
+                                    >
+                </ejs-richtexteditor>
+              </div>
+            </div>
+        </div>
     </div>
-  </ng-template>
-</ejs-dialog>
+</div>

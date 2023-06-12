@@ -173,6 +173,7 @@ import { OrderCloseReasonInfoModule } from './components/order-close-reason-info
 import { GeneralOrderPerDiemInfoModule } from './components/general-order-per-diem-info/general-order-per-diem-info.module';
 import { ChipsCssClassPipeModule } from './pipes/chip-css-class/chip-css-class-pipe.module';
 import { OnboardCandidateMessageDialogComponent } from './components/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor';
 
 const icons = {
   AlertCircle,
@@ -316,6 +317,7 @@ const COMPONENTS = [
     ChipsCssClassPipeModule,
     OrderCloseReasonInfoModule,
     GeneralOrderPerDiemInfoModule,
+    RichTextEditorAllModule,
   ],
   exports: [
     ...COMPONENTS,

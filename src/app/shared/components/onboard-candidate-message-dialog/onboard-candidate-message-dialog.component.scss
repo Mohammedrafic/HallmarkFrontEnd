@@ -1,39 +1,138 @@
 @import "colors";
 
-.onboard-candidate-dialog {
-  border-radius: 10px !important;
+.group-email-template-form {
+  padding-top: 24px;
 
-  & + .e-dlg-overlay {
-    background-color: $black;
-  }
-  .e-dlg-header-content {
-    border-bottom: 1px solid $secondary-dark-blue-45;
-  }
+  .section-container {
+    display: flex;
 
-  .e-footer-content {
-    border-top: 1px solid $secondary-dark-blue-45;
-    padding: 20px 10px;
-  }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: $secondary-dark-blue-15;
+    }
 
-  .e-card-header {
-    h3 {
-      font-size: 24px;
-      font-weight: 700;
-      color: $black;
+    .input-container {
+      margin-bottom: 15px;
+      margin-right: 10px;
+      flex: 1 1 0;
+    }
+
+    .active-toggle {
+      margin-top: 24px;
+
+      span {
+        font-size: 14px;
+      }
+    }
+
+    .left-section {
+      flex: 1 0 100%;
     }
   }
 
-  .sup-title {
-    font-size: 16px;
-    font-weight: 400;
-    color: $pure-black;
-    margin: 18px 0;
+  label {
+    display: block;
+    margin-bottom: 5px;
   }
 
-  .e-control.e-btn.e-outline.delete-button {
-    background-color: $supportive-red;
-    border-color: $supportive-red;
-    color: $white !important;
-    margin-right: 12px;
+  .input-container {
+    margin-bottom: 12px;
   }
+
+  .rich-text-container {
+    margin-bottom: 12px;
+  }
+
+
+  .top-container {
+    height: 70px;
+  }
+
+  #defaultGroupEmailRTE_toolbar {
+    height: 43px !important;
+  }
+
+
+  .button-cancel {
+    margin-top: 10px;
+  }
+
+  .icon validation-icon {
+    color: red !important;
+  }
+
+  .business-dropdowns {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+
+    .dropdown-container {
+      flex: 1 0 21%;
+      margin: 6px 12px 6px 0;
+      width: 100%;
+      max-width: 220px;
+    }
+  }
+
+  .rich-text-container-edit {
+    background-color: white;
+  }
+
+  .rich-text-container-disable {
+    background-color: #f7f8fc;
+  }
+
+  .rich-text-container {
+    margin-bottom: 30px;
+  }
+
+  .e-rte-content {
+    height: 258px !important;
+  }
+
+  .droparea {
+    border: 1px dashed #3e7fff;
+    border-radius: 4px;
+    background-color: #ecf2ff;
+    height: 118px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #3e7fff;
+    font-size: 12px;
+    cursor: pointer;
+
+    .browse-link {
+      text-decoration: underline;
+      font-weight: 700;
+    }
+  }
+
+  .e-file-select-wrap {
+    display: none !important;
+  }
+
+  .e-upload-actions {
+    display: none !important;
+  }
+
+  .alert.alert-danger div {
+    color: red;
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+}
+.disabled .droparea {
+  cursor: not-allowed !important;
+  opacity: 0.5;
+}
+h5{
+  color: rgb(62, 127, 255);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: normal
+}
+.attachmentdiv{
+  display: inline-flex;
 }

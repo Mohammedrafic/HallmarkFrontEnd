@@ -40,7 +40,7 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { ShowToast } from 'src/app/store/app.actions';
+import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
@@ -50,6 +50,8 @@ import {
   deployedCandidateMessage,
   DEPLOYED_CANDIDATE,
   SET_READONLY_STATUS,
+  onBoardCandidateMessage,
+  ONBOARD_CANDIDATE,
 } from '@shared/constants';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
@@ -174,7 +176,13 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     return this.candidateStatus === ApplicantStatusEnum.Accepted || this.candidateStatus === ApplicantStatusEnum.OnBoarded;
   }
 
+  get templateEmailTitle(): string {
+    return "Onboarding Email";
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
+  isSend:boolean = false;
+  public sendOnboardMessageEmailFormGroup: FormGroup;
 
   public comments: Comment[] = [];
 
@@ -189,6 +197,11 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   ) {
     super();
     this.createForm();
+    this.sendOnboardMessageEmailFormGroup = new FormGroup({
+      emailSubject: new FormControl('', [Validators.required]),
+      emailBody: new FormControl('', [Validators.required]),
+      fileUpload: new FormControl(null),
+    });
   }
 
   ngOnInit(): void {
@@ -201,6 +214,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.subscribeOnGetStatus();
     this.observeCandidateJob();
     this.observeStartDate();
+
   }
 
   ngOnDestroy(): void {
@@ -585,18 +599,33 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.disableDatesForClosedPostition();
   }
 
-  onNoCandidateMessage(){
-    this.openCandidateMessageDialog.next(false);
+  onGroupEmailAddCancel(){
+    this.isSend =  false;
+    this.store.dispatch(new ShowGroupEmailSideDialog(false));
   }
 
-  onSendCandidateMessage($event :any){
-    console.log($event);
+  onGroupEmailSend(){
+    // console.log($event);
   }
 
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded || event.itemData === null) {
-      this.openCandidateMessageDialog.next(true);
+      // this.openCandidateMessageDialog.next(true);
       // this.onAccept();
+      this.isSend =  true;
+      const options = {
+        title: ONBOARD_CANDIDATE,
+        okButtonLabel: 'Yes',
+        okButtonClass: 'ok-button',
+        cancelButtonLabel: 'No'
+      };
+      this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+      .subscribe((isConfirm) => {
+        if(isConfirm){
+          this.store.dispatch(new ShowGroupEmailSideDialog(true));
+        }
+      });
+     
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
       this.openCandidateCancellationDialog.next();
     } else {
