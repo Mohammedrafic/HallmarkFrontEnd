@@ -454,14 +454,14 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
 
   private showDepartmentChangeConfirmation(department: Department, ignoreWarning: boolean): void {
     this.showSkillConfirmDialog = true;
-      this.departmentChangeConfirm$
-        .pipe(
-          take(1),
-          tap(() => this.showSkillConfirmDialog = false),
-          filter(Boolean),
-      ).subscribe(() => {
-        this.saveDepartment(department, ignoreWarning);
-      });
+    this.departmentChangeConfirm$
+      .pipe(
+        take(1),
+        tap(() => this.showSkillConfirmDialog = false),
+        filter(Boolean),
+    ).subscribe(() => {
+      this.saveDepartment(department, ignoreWarning);
+    });
   }
 
   private updateDepartment(department: Department, ignoreWarning: boolean): void {
