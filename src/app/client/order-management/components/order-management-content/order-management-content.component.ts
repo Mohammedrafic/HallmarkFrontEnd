@@ -430,6 +430,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isCondidateTab: boolean = false;
   public OrderJourney: any[] = [];
   public canCreateOrderIRP:boolean;
+  public canEditOrderIRP:boolean;
   public canViewOrderIRP:boolean;
   public canCloseOrderIRP:boolean;
   public CanEditOrderBillRateIRP:boolean;
@@ -1236,14 +1237,21 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else {
       gridData = this.gridWithChildRow.dataSource as OrderManagement[];
     }
-
-    const first = gridData[0];
+    if(gridData) {
+       const first = gridData[0];
     const last = gridData[gridData.length - 1];
 
     return {
       previous: first.id !== selectedOrder.id,
       next: last.id !== selectedOrder.id,
     };
+    }else{
+      return {
+        previous: 0 !== selectedOrder.id,
+        next: 0 !== selectedOrder.id,
+      };
+    }
+  
   }
 
   public navigateToOrderForm(): void {
@@ -1823,7 +1831,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
-        }
+        }            
       }
       this.cd$.next(true);
     });
@@ -2223,8 +2231,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.hasCreateEditOrderPermission = permissions[this.userPermissions.CanCreateOrders]
         || permissions[this.userPermissions.CanOrganizationEditOrders];
       this.canViewOrderIRP=permissions[this.userPermissions.CanOrganizationViewOrdersIRP]
+      this.canEditOrderIRP=permissions[this.userPermissions.CanOrganizationEditOrdersIRP]
       this.cd$.next(true);
-    });
+    });  
   }
 
   private subscribeToCandidateJob(): void {
