@@ -156,7 +156,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   public applyFilter(): void {
-    console.log(this.scheduleFilterFormGroup);
     if (this.scheduleFilterFormGroup.valid) {
       this.setFilters();
       this.store.dispatch([
@@ -327,15 +326,15 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         for(let i=0; i<chips.length; i++){
           if(chips[i].groupField === 'startTime'){
             chips[i].data = [timeEvent];
-            if(timeEvent.split(" ")[0].length == 7){
-              this.filters.startTime = "0"+timeEvent.split(" ")[0];
-            } else if(timeEvent.split(" ")[0].length == 8) {
-              this.filters.startTime = timeEvent.split(" ")[0];
+            if(timeEvent.split(' ')[0].length == 7){
+              this.filters.startTime = '0'+timeEvent.split(' ')[0];
+            } else if(timeEvent.split(' ')[0].length == 8) {
+              this.filters.startTime = timeEvent.split(' ')[0];
             };
           }
         }
       } else {
-        this.filters.startTime = this.filters.startTime + ":00"
+        this.filters.startTime = this.filters.startTime + ':00';
       }
     }
     if(this.filters.endTime != null){
@@ -346,15 +345,15 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         for(let i=0; i<chips.length; i++){
           if(chips[i].groupField === 'endTime'){
             chips[i].data = [timeEvent];
-            if(timeEvent.split(" ")[0].length == 7){
-              this.filters.endTime = "0"+timeEvent.split(" ")[0];
-            } else if(timeEvent.split(" ")[0].length == 8){
-              this.filters.endTime = timeEvent.split(" ")[0];
+            if(timeEvent.split(' ')[0].length == 7){
+              this.filters.endTime = '0'+timeEvent.split(' ')[0];
+            } else if(timeEvent.split(' ')[0].length == 8){
+              this.filters.endTime = timeEvent.split(' ')[0];
             };
           }
         }
       } else {
-        this.filters.endTime = this.filters.endTime + ":00"
+        this.filters.endTime = this.filters.endTime + ':00';
       }
     }
       this.updateScheduleFilter.emit({

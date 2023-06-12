@@ -206,7 +206,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private initScheduleData(isLoadMore = false): void {
-    console.log(this.scheduleFilters);
     this.scheduleApiService.getScheduleEmployees(this.scheduleFilters)
     .pipe(
       take(1),

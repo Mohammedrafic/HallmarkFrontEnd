@@ -114,7 +114,7 @@ export class FilterService {
 
           case ControlTypes.Time:
               const event = new Date(val);
-              const timeEvent = event.toLocaleTimeString('en-US')
+              const timeEvent = typeof(val) === "string" ? val : event.toLocaleTimeString('en-US');
               chips.push({ text: timeEvent, column: key, value: timeEvent });
             break;
 
