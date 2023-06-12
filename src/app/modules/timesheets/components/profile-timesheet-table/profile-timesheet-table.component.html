@@ -134,7 +134,7 @@
       <button
         ejs-button
         [isPrimary]="true"
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions ||disableEditButton"
+        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions"
         cssClass="spinner-btn privilege"
         (click)="approve()"
       >
