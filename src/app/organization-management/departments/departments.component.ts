@@ -47,7 +47,6 @@ import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from 'src/app/store/user.state';
 import { FilterService } from '@shared/services/filter.service';
-import { OrganizationRegion } from '@shared/models/organization.model';
 import { FilterColumnsModel, FilteredItem } from '@shared/models/filter.model';
 import { DepartmentService } from '@organization-management/departments/services/department.service';
 import { TakeUntilDestroy } from '@core/decorators';
