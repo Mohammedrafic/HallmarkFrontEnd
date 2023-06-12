@@ -231,7 +231,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       if(ssnValue!= '' && ssnValue!= null && ssnValue.indexOf('XXX-XX') == -1){
         this.maskedSSN = ssnValue;
       }
-      if(ssnValue.trim() === ''){
+      if(ssnValue === ''){
         this.maskedSSN = '';
       }
     });
@@ -330,6 +330,10 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
         this.onChangeOfRegions(data,false);      
     });
 
+    this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      this.changeDetectorRef.markForCheck();
+    });
+
     this.doNotReturnFilterForm.get('regionBlocked')?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
         this.onChangeOfRegions(data,true);      
     });
@@ -339,6 +343,10 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
         this.pageSubject.next(1);
       }
     })
+  }
+
+  get formAltaControls(): any {
+    return this.doNotReturnFormGroup['controls'];
   }
 
   public onChangeOfRegions(data:any,isFilter:boolean){
