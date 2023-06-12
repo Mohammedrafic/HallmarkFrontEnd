@@ -50,6 +50,7 @@ import {
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { filter } from 'rxjs/operators';
+import { CreateOverlapErrorData } from '../../helpers';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -310,11 +311,23 @@ export class TimesheetsState {
         /**
          * TODO: make all messages for toast in one constant.
          */
-        ctx.dispatch(new ShowToast(MessageTypes.Success, PutSuccess.successMessage));
-        ctx.dispatch(new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency));
+        ctx.dispatch([
+          new ShowToast(MessageTypes.Success, PutSuccess.successMessage),
+          new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency),
+          new TimesheetDetails.ForceUpdateRecord(false),
+        ]);
+
         return ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
       catchError((err: HttpErrorResponse) => {
+        if (err.error.status === 403 && err.error && err.error['detail']) {
+          const errData = CreateOverlapErrorData(err);
+
+          ctx.dispatch(new TimesheetDetails.ForceUpdateRecord(true, errData.message, errData.title));
+          return of();
+        }
+
+        ctx.dispatch(new TimesheetDetails.ForceUpdateRecord(false));
         return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
@@ -560,7 +573,8 @@ export class TimesheetsState {
 
   @Action(Timesheets.GetFiltersDataSource)
   GetFiltersDataSource(
-    { setState, getState, dispatch, patchState }: StateContext<TimesheetsModel>): Observable<TimesheetsFilteringOptions | void> {
+    { setState, getState, dispatch, patchState }: StateContext<TimesheetsModel>
+    ): Observable<TimesheetsFilteringOptions | void> {
     const selectedOrganizationId = getState().selectedOrganizationId;
 
     return this.timesheetsApiService.getFiltersDataSource(selectedOrganizationId).pipe(
@@ -737,14 +751,21 @@ export class TimesheetsState {
       body.timesheetId = timesheetDetails.mileageTimesheetId;
     }
 
-    return (body.type === 2 && !timesheetDetails.mileageTimesheetId ?
-      this.timesheetDetailsApiService.createMilesEntity(creatBody)
+    let recordsApi: Observable<void>;
+
+    if (body.type === 2 && !timesheetDetails.mileageTimesheetId) {
+      recordsApi = this.timesheetDetailsApiService.createMilesEntity(creatBody)
       .pipe(
         switchMap((data) => {
           body.timesheetId = data.timesheetId;
           return this.timesheetsApiService.addTimesheetRecord(body);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         })
-      ) : this.timesheetsApiService.addTimesheetRecord(body))
+      );
+    } else {
+      recordsApi = this.timesheetsApiService.addTimesheetRecord(body)
       .pipe(
         tap(() => {
           const state = ctx.getState();
@@ -758,12 +779,23 @@ export class TimesheetsState {
             new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
             new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency),
             new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency),
+            new TimesheetDetails.ForceAddRecord(false),
           ]);
         }),
       catchError((err: HttpErrorResponse) => {
+        if (err.error.status === 403 && err.error && err.error['detail']) {
+          const errData = CreateOverlapErrorData(err);
+
+          ctx.dispatch(new TimesheetDetails.ForceAddRecord(true, errData.message, errData.title));
+          return of();
+        }
+
+        ctx.dispatch(new TimesheetDetails.ForceAddRecord(false));
         return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-      })
-    );
+      }));
+    }
+
+    return recordsApi;
   }
 
   @Action(TimesheetDetails.GetDetailsByDate)
@@ -786,7 +818,7 @@ export class TimesheetsState {
             ctx.patchState({
               timesheetDetails: {
                 ...ctx.getState().timesheetDetails as TimesheetDetailsModel,
-                status: 0,
+                status: 0 as TimesheetStatus, 
                 statusText: '',
                 rejectionReason: undefined,
                 noWorkPerformed: false,
@@ -857,4 +889,7 @@ export class TimesheetsState {
       }),
     );
   }
+
+  @Action(TimesheetDetails.ForceAddRecord)
+  ForceAddRecord(): void {}
 }
