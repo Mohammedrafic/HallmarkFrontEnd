@@ -604,7 +604,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     if (this.isVMSEnabled && this.isIRPEnabled && includeInIRPControl$) {
       return includeInIRPControl$;
     } else {
-      return of(false);
+      return of(this.isIRPFlagEnabled && this.isIRPEnabled);
     }
   }
 
