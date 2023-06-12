@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { CredentialSkillByOrganization, CredentialSkillGroup } from '@shared/models/skill-group.model';
+import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { Skill } from '@shared/models/skill.model';
 
 @Injectable()
@@ -61,34 +61,5 @@ export class GroupSetupService {
     }
 
     return filteredAssignedSkills;
-  }
-
-  createAllAssignedSkills(skillGroups: CredentialSkillGroup[], organizationSkills: Skill[]): Skill[] {
-    const assignedSkillGroup = new Map<number, CredentialSkillByOrganization>();
-
-    skillGroups?.forEach((group: CredentialSkillGroup) => {
-      group.skills?.forEach((skill: CredentialSkillByOrganization) => {
-        assignedSkillGroup.set(skill.id, {
-          ...skill,
-          assignedToVMS: group.includeInVMS ?? false,
-          assignedToIRP: group.includeInIRP ?? false,
-        });
-      });
-    });
-
-    return organizationSkills.map((skill: Skill) => {
-      if(assignedSkillGroup.has(skill.id)) {
-        const assignedSkill = assignedSkillGroup.get(skill.id);
-        return {
-          ...skill,
-          ...assignedSkill,
-        };
-      }
-
-      skill.assignedToVMS = false;
-      skill.assignedToIRP = false;
-
-      return skill;
-    });
   }
 }

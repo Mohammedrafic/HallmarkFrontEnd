@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, switchMap, takeUntil, throttleTime, of, tap, debounceTime } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DatePicker, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -47,7 +47,6 @@ import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from 'src/app/store/user.state';
 import { FilterService } from '@shared/services/filter.service';
-import { OrganizationRegion } from '@shared/models/organization.model';
 import { FilterColumnsModel, FilteredItem } from '@shared/models/filter.model';
 import { DepartmentService } from '@organization-management/departments/services/department.service';
 import { TakeUntilDestroy } from '@core/decorators';
@@ -129,8 +128,9 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     pageNumber: this.currentPage,
     pageSize: this.pageSizePager,
   };
-  private regions: OrganizationRegion[] = [];
   private pageSubject = new Subject<number>();
+  private isIRPEnabled: boolean;
+  private isVMSEnabled: boolean;
 
   public minReactivateDate: string | null;
   public maxInactivateDate: string | null;
@@ -165,7 +165,6 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     this.startOrgIdWatching();
     this.getSkills();
     this.listenPrimarySkill();
-    this.listenIncludeInIRPToggleChanges();
     this.getDepartmentSkillConfig();
   }
 
@@ -599,21 +598,13 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       });
   }
 
-  private listenIncludeInIRPToggleChanges(): void {
-    const { preferences } = this.store.selectSnapshot(OrganizationManagementState.organization) || {};
+  private getIrpToggleStream(): Observable<boolean> {
+    const includeInIRPControl$ = this.departmentsDetailsFormGroup.get('includeInIRP')?.valueChanges;
 
-    if (!!preferences?.isVMCEnabled && !!preferences?.isIRPEnabled) {
-      this.departmentsDetailsFormGroup.get('includeInIRP')?.valueChanges
-        .pipe(
-          takeUntil(this.componentDestroy())
-        )
-        .subscribe((state: boolean) => {
-          const isIncludedInIRP = !!(state && this.isIRPFlagEnabled && preferences?.isIRPEnabled);
-          this.areSkillsAvailable = isIncludedInIRP;
-          this.configureSkillDropdowns(isIncludedInIRP);
-        });
+    if (this.isVMSEnabled && this.isIRPEnabled && includeInIRPControl$) {
+      return includeInIRPControl$;
     } else {
-      this.areSkillsAvailable = this.isIRPFlagEnabled && !!preferences?.isIRPEnabled;
+      return of(false);
     }
   }
 
@@ -644,6 +635,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
 
     if (this.isPrimarySkillRequired && isIRP) {
       primarySkillsControl?.setValidators(Validators.required);
+      primarySkillsControl?.enable();
+      secondarySkillsControl?.enable();
     } else if (!this.isPrimarySkillRequired && isIRP) {
       primarySkillsControl?.removeValidators(Validators.required);
       primarySkillsControl?.disable();
@@ -655,24 +648,33 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   }
 
   private getDepartmentSkillConfig(): void {
-    const organizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
-    if (organizationId) {
-      this.settingsViewService.getViewSettingKey(
-        OrganizationSettingKeys.DepartmentSkillRequired,
-        OrganizationalHierarchy.Organization,
-        organizationId,
-        organizationId
-      )
-        .pipe(takeUntil(this.componentDestroy()))
-        .subscribe((data) => {
-          const { isVMCEnabled } = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences ?? {};
+    this.organizationId$
+      .pipe(
+        filter((id) => !!id),
+        debounceTime(100),
+        switchMap((id) => {
+          return this.settingsViewService.getViewSettingKey(
+            OrganizationSettingKeys.DepartmentSkillRequired,
+            OrganizationalHierarchy.Organization,
+            id,
+            id
+          );
+        }),
+        tap((data) => {
+          const { preferences } = this.store.selectSnapshot(OrganizationManagementState.organization) || {};
           const areSkillsRequired = data[OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired]];
+          
           this.isPrimarySkillRequired = areSkillsRequired === 'true';
-
-          if (!isVMCEnabled) {
-            this.configureSkillDropdowns(this.areSkillsAvailable);
-          }
-        });
-    }
+          this.isIRPEnabled = !!preferences?.isIRPEnabled;
+          this.isVMSEnabled = !!preferences?.isVMCEnabled;
+        }),
+        switchMap(() => this.getIrpToggleStream()),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((state) => {
+        const isIncludedInIRP = !!(state && this.isIRPFlagEnabled && this.isIRPEnabled);
+        this.areSkillsAvailable = isIncludedInIRP;
+        this.configureSkillDropdowns(isIncludedInIRP);
+      });
   }
 }

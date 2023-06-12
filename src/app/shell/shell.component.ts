@@ -54,7 +54,7 @@ import {
   SaveMainContentElement,
 } from '../store/app.actions';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
-import { MenuItemNames } from './shell.constant';
+import { GetProfileMenuItems } from './shell.constant';
 import { ProfileMenuItem, THEME } from './shell.enum';
 import { UserService } from '@shared/services/user.service';
 import { BreakpointObserverService } from '@core/services';
@@ -151,7 +151,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   public isToggleButtonDisable = false;
 
   private isClosingSearch = false;
-  private ProfileMenuItemNames = MenuItemNames;
   private isContactOpen = false;
   private profileData: MenuItemModel[] = [];
   private activeMenuItemData: MenuItem;
@@ -688,45 +687,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         this.profileData = [
           {
             text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
-            items: [
-              // TODO: edit profile
-              /*{ text: this.ProfileMenuItemNames[ProfileMenuItem.edit_profile], id: ProfileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },*/
-              {
-                text: this.ProfileMenuItemNames[ProfileMenuItem.manage_notifications],
-                id: ProfileMenuItem.manage_notifications.toString(),
-                iconCss: 'e-settings e-icons',
-              },
-              {
-                text: this.ProfileMenuItemNames[ProfileMenuItem.theme],
-                id: ProfileMenuItem.theme.toString(),
-                iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons',
-                items: [
-                  {
-                    text: this.ProfileMenuItemNames[ProfileMenuItem.light_theme],
-                    id: ProfileMenuItem.light_theme.toString(),
-                  },
-                  {
-                    text: this.ProfileMenuItemNames[ProfileMenuItem.dark_theme],
-                    id: ProfileMenuItem.dark_theme.toString(),
-                  },
-                ],
-              },
-              {
-                text: this.ProfileMenuItemNames[ProfileMenuItem.help],
-                id: ProfileMenuItem.help.toString(),
-                iconCss: 'e-circle-info e-icons',
-              },
-              {
-                text: this.ProfileMenuItemNames[ProfileMenuItem.contact_us],
-                id: ProfileMenuItem.contact_us.toString(),
-                iconCss: 'e-ddb-icons e-contactus',
-              },
-              {
-                text: this.ProfileMenuItemNames[ProfileMenuItem.log_out],
-                id: ProfileMenuItem.log_out.toString(),
-                iconCss: 'e-ddb-icons e-logout',
-              },
-            ],
+            items: GetProfileMenuItems(!!user.isEmployee, this.isDarkTheme),
           },
         ];
       }

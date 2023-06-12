@@ -157,6 +157,7 @@ export interface SkillParams {
     SystemType: OrderSystem | SystemType;
     SkillCategoryIds?: number[];
     DepartmentIds?: number[];
+    IsSchedulingContext?: boolean;
   }
 }
 
