@@ -141,6 +141,9 @@ import { OrientationModule } from './orientation/orientation.module';
 import { PayRateComponent } from './pay-rate/pay-rate.component';
 import { PayrateSetupComponent } from './pay-rate/payrate-setup/payrate-setup.component';
 import { PayRatesState } from './store/pay-rates.state';
+import {
+  ReplacementOrderConfirmationModule,
+} from '@shared/components/replacement-order-confirmation/replacement-order-confirmation.module';
 
 const sidebarIcons = {
   Download,
@@ -245,6 +248,7 @@ const sidebarIcons = {
     ButtonGroupModule,
     WorkCommitmentModule,
     ValidateDirectiveModule,
+    ReplacementOrderConfirmationModule,
 
     FeatherModule.pick(sidebarIcons),
 
@@ -265,7 +269,7 @@ const sidebarIcons = {
       TiersState,
       SkillsState,
       WorkCommitmentState,
-      PayRatesState
+      PayRatesState,
     ]),
     ImportDialogContentModule,
     TreeViewModule,
@@ -273,7 +277,7 @@ const sidebarIcons = {
     BoolValuePipeModule,
     ReasonsModule,
     OrientationModule,
-    JoinPipeModule
+    JoinPipeModule,
   ],
   exports: [BillRatesComponent],
   providers: [

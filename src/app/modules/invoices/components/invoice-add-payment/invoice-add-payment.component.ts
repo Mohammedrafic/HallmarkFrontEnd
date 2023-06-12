@@ -177,10 +177,6 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
     .subscribe();
   }
 
-  trackByField(index: number, item: PaymentFormConfig): string {
-    return item.field;
-  }
-
   setGridApi(params: GridReadyEvent): void {
     this.gridApi = params.api;
     this.gridApi.showLoadingOverlay();

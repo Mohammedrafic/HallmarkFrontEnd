@@ -35,4 +35,5 @@ export interface CandidateModel {
   professionalSummary: string,
   generalNotes: GeneralNotesModel[],
   isOnHoldSetManually: boolean,
+  createReplacement?: boolean,
 }
