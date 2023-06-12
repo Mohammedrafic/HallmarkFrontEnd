@@ -167,4 +167,10 @@ export class UsersService {
     return this.http.get<User[]>(`/api/Users/getemployeeusers/?BusinessUnitId=${businessUnitId}`)
       .pipe(map((data) => sortByField(data, 'name')));
   }
+
+  public getNonEmployeeUsers(businessUnitId:number): Observable<User[]>
+  {
+    return this.http.get<User[]>(`/api/Users/getnonemployeeusers/?BusinessUnitId=${businessUnitId}`)
+      .pipe(map((data) => sortByField(data, 'name')));
+  }
 }

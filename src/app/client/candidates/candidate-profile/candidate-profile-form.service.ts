@@ -102,7 +102,8 @@ export class CandidateProfileFormService {
 
   public populateHoldEndDate(candidate: CandidateModel): void {
     if (candidate && candidate.profileStatus === ProfileStatusesEnum.OnHold) {
-      this.candidateForm.get('holdEndDate')?.setValue(candidate.holdEndDate);
+      const holdEndDate = candidate.holdEndDate ? DateTimeHelper.convertDateToUtc(candidate.holdEndDate as string) : null;
+      this.candidateForm.get('holdEndDate')?.setValue(holdEndDate);
     }
   }
 
@@ -116,7 +117,12 @@ export class CandidateProfileFormService {
     this.candidateForm.updateValueAndValidity();
   }
 
-  private getPartialFormValueByControls(value: CandidateModel): any {
+  public isOnHoldDateSetManually(): boolean {
+    const isOnHoldSetManually = this.candidateService.getProfileData()?.isOnHoldSetManually;
+    return isOnHoldSetManually || !!this.candidateForm.get('holdEndDate')?.dirty;
+  }
+
+  private getPartialFormValueByControls(value: CandidateModel): Partial<CandidateModel> {
     return pick(Object.keys(this.candidateForm.controls), value);
   }
 

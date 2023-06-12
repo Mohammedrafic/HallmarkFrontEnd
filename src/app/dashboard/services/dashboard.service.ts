@@ -154,10 +154,11 @@ export class DashboardService {
       map((candidatesInfo: CandidateTypeInfoModel[]) => {
         return {
           id: WidgetTypeEnum.CANDIDATES,
-          title: 'Candidates',
+           title: 'Candidate Overall Status',
           chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
             label: status,
             value: count,
+            text:'',
             color:
               candidateLegendPalette[status as CandidateChartStatuses] ||
               candidateLegendPalette[CandidateChartStatuses.CUSTOM],

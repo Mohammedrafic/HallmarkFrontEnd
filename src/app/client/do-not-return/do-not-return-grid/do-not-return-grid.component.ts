@@ -231,6 +231,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       if(ssnValue!= '' && ssnValue!= null && ssnValue.indexOf('XXX-XX') == -1){
         this.maskedSSN = ssnValue;
       }
+      if(ssnValue === ''){
+        this.maskedSSN = '';
+      }
     });
 
     this.organizationRegionIds$.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((data: any) => {
@@ -318,12 +321,17 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
         this.doNotReturnFormGroup.get('lastName')?.setValue(null);
         this.doNotReturnFormGroup.get('middleName')?.setValue(null);
         this.maskSSNPattern = "000-00-0000";
+        this.maskedSSN = '';
         this.doNotReturnFormGroup.get('ssn')?.setValue(null); 
       }
     });
 
     this.doNotReturnFormGroup.get(FormControlNames.RegionIds)?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
         this.onChangeOfRegions(data,false);      
+    });
+
+    this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      this.changeDetectorRef.markForCheck();
     });
 
     this.doNotReturnFilterForm.get('regionBlocked')?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
@@ -335,6 +343,10 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
         this.pageSubject.next(1);
       }
     })
+  }
+
+  get formAltaControls(): any {
+    return this.doNotReturnFormGroup['controls'];
   }
 
   public onChangeOfRegions(data:any,isFilter:boolean){
@@ -649,16 +661,17 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.doNotReturnFormGroup.reset();
       this.store.dispatch([new ShowSideDialog(false), new SetDirtyState(false)]);
       this.removeActiveCssClass();
+      this.isEdit=false;
+      this.isBlock=true;
+      this.maskSSNPattern = '000-00-0000';
+      this.maskedSSN = '';
       setTimeout(() => {
         this.getDoNotReturn();
       }, 5000)
     } else {
       this.doNotReturnFormGroup.markAllAsTouched();
     }
-    this.isEdit=false;
-    this.isBlock=true;
-    this.maskSSNPattern = '000-00-0000';
-    this.maskedSSN = '';
+
   }
 
   onFormCancelClick(): void {

@@ -694,3 +694,6 @@ body.dark .schedule-wrapper span.e-chip-delete.e-dlt-btn {
 body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.chips-group-text, body.dark .schedule-wrapper span.chips-title, body.dark .schedule-items-container span.candidate-name {
   color: white;
 }
+.IRPgrid .app-grid__component .ag-body-horizontal-scroll, .app-grid__component span.ag-icon.ag-icon-menu {
+ display: flex;
+}

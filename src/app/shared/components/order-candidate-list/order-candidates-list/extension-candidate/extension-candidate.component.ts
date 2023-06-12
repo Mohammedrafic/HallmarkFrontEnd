@@ -1,37 +1,23 @@
+import { DatePipe, formatNumber } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
-import { RejectReason } from '@shared/models/reject-reason.model';
+import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { capitalize } from 'lodash';
 import {
   EMPTY,
+  Observable,
+  Subject,
+  combineLatest,
+  filter,
   map,
   merge,
   mergeMap,
-  Observable,
-  Subject,
   takeUntil,
-  filter,
-  combineLatest,
 } from 'rxjs';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { OrderManagementState } from '@agency/store/order-management.state';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import {
-  CancellationReasonsMap,
-  PenaltiesMap,
-} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
-import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
-import {
-  ApplicantStatus,
-  CandidateCancellationReason,
-  CandidateCancellationReasonFilter,
-  Order,
-  OrderCandidateJob,
-  OrderCandidatesList,
-  OrderCandidatesListPage,
-} from '@shared/models/order-management.model';
-import { BillRate } from '@shared/models/bill-rate.model';
+
 import {
   GetCandidateJob,
   GetRejectReasonsForAgency,
@@ -40,13 +26,7 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
-import { DatePipe } from '@angular/common';
-import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
-import PriceUtils from '@shared/utils/price.utils';
-import { CommentsService } from '@shared/services/comments.service';
-import { Comment } from '@shared/models/comment.model';
-import { WorkflowStepType } from '@shared/enums/workflow-step-type';
-import { Router } from '@angular/router';
+import { OrderManagementState } from '@agency/store/order-management.state';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
@@ -58,23 +38,49 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
-import { JobCancellation } from '@shared/models/candidate-cancellation.model';
-import { capitalize } from 'lodash';
-import { DurationService } from '@shared/services/duration.service';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
-import { UNSAVED_FORM_PROVIDERS, UnsavedFormComponentRef } from '@shared/directives/unsaved-form.directive';
-import { UserState } from 'src/app/store/user.state';
-import { CurrentUserPermission } from '@shared/models/permission.model';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
-import { GetOrderPermissions } from 'src/app/store/user.actions';
-import { ShowToast } from 'src/app/store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateADDRESSRequired, CandidateDOBRequired,CandidatePHONE1Required, CandidateSSNRequired, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
-import { SettingsViewService } from '@shared/services';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
+import {
+  CancellationReasonsMap,
+  PenaltiesMap,
+} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
+import {
+  CandidateADDRESSRequired, CandidateDOBRequired, CandidatePHONE1Required,
+  OrganizationSettingKeys, OrganizationalHierarchy,
+} from '@shared/constants';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
-import { DateTimeHelper } from '@core/helpers';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { UNSAVED_FORM_PROVIDERS, UnsavedFormComponentRef } from '@shared/directives/unsaved-form.directive';
+import {
+  ApplicantStatus as ApplicantStatusEnum, CandidatStatus,
+  ConfigurationValues
+} from '@shared/enums/applicant-status.enum';
+import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
+import { MessageTypes } from '@shared/enums/message-types';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { CommonHelper } from '@shared/helpers/common.helper';
+import { BillRate } from '@shared/models/bill-rate.model';
+import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { Comment } from '@shared/models/comment.model';
+import {
+  ApplicantStatus,
+  CandidateCancellationReason,
+  CandidateCancellationReasonFilter,
+  Order,
+  OrderCandidateJob,
+  OrderCandidatesList,
+  OrderCandidatesListPage,
+} from '@shared/models/order-management.model';
+import { CurrentUserPermission } from '@shared/models/permission.model';
+import { RejectReason } from '@shared/models/reject-reason.model';
+import { SettingsViewService } from '@shared/services';
+import { CommentsService } from '@shared/services/comments.service';
+import { DurationService } from '@shared/services/duration.service';
+import PriceUtils from '@shared/utils/price.utils';
+import { ShowToast } from 'src/app/store/app.actions';
+import { GetOrderPermissions } from 'src/app/store/user.actions';
+import { UserState } from 'src/app/store/user.state';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -128,9 +134,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public applicantStatuses: ApplicantStatus[] = [
     { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
   ];
-  public isAgency: boolean = false;
-  public showHoursControl: boolean = false;
-  public showPercentage: boolean = false;
+  public isAgency = false;
+  public showHoursControl = false;
+  public showPercentage = false;
   public candidate: OrderCandidatesList | undefined;
   public comments: Comment[] = [];
   public orderPermissions: CurrentUserPermission[];
@@ -147,8 +153,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public applicantStatusEnum = ApplicantStatusEnum;
   public candidateSSNRequired: boolean;
   public candidateDOBRequired: boolean;
-  public candidatePhone1RequiredValue : string = '';
-  public candidateAddressRequiredValue : string = '';
+  public candidatePhone1RequiredValue = '';
+  public candidateAddressRequiredValue = '';
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
@@ -174,7 +180,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   get canAccept(): boolean {
-    return this.candidateJob && this.isAgency && !this.isOnBoard && this.candidateJob?.applicantStatus?.applicantStatus !== this.candidatStatus.Offboard;
+    return this.candidateJob && this.isAgency && !this.isOnBoard
+    && this.candidateJob?.applicantStatus?.applicantStatus !== this.candidatStatus.Offboard;
   }
 
   get actualStartDateValue(): Date {
@@ -387,7 +394,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   public onStartDateChange(event: ChangedEventArgs): void {
     const actualStartDate = new Date(event.value!);
-    const actualEndDate = this.durationService.getEndDate(this.currentOrder.duration, actualStartDate, { jobStartDate: this.currentOrder.jobStartDate, jobEndDate: this.currentOrder.jobEndDate });
+    const actualEndDate = this.durationService.getEndDate(this.currentOrder.duration, actualStartDate,
+      { jobStartDate: this.currentOrder.jobStartDate, jobEndDate: this.currentOrder.jobEndDate });
     this.form.patchValue({
       actualEndDate,
     });
@@ -625,7 +633,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         actualEndDate: this.getDateString(this.candidateJob.actualEndDate),
         extensionStartDate: this.getDateString(this.candidateJob.actualStartDate),
         extensionEndDate: this.getDateString(this.candidateJob.actualEndDate),
-        offeredBillRate: PriceUtils.formatNumbers(this.candidateJob.offeredBillRate),
+        offeredBillRate: formatNumber(CheckNumberValue(this.candidateJob.offeredBillRate), 'en-US', '0.2-2'),
         comments: this.candidateJob.requestComment,
         guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
         clockId: this.candidateJob.clockId,

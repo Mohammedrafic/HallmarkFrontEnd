@@ -123,4 +123,4 @@ export const UpdateClosedPositionRate = 'Are you sure you want to update the Bil
 + 'for Closed Position? This may lead to recalculating values and generating new invoice records.';
 
 export const N_FAILED_RECORDS = (count: number) => `${count} failed to process.`;
-export const N_SUCCESS_RECORDS = (count: number) => `All ${count} records successfully processed.`;
+export const N_SUCCESS_RECORDS = (count: number) => `${count} records successfully processed.`;

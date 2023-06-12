@@ -48,11 +48,12 @@ import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
-import { DateTimeHelper } from '@core/helpers';
+import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { CommonHelper } from '@shared/helpers/common.helper';
+import { formatNumber } from '@angular/common';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -448,7 +449,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,
           expAsTravelers: value.expAsTravelers,
-          offeredBillRate: PriceUtils.formatNumbers(value.offeredBillRate),
+          offeredBillRate: formatNumber(CheckNumberValue(value.offeredBillRate), 'en-US', '0.2-2'),
           comments: value.requestComment,
           rejectReason: value.rejectReason,
           guaranteedWorkWeek: value.guaranteedWorkWeek,

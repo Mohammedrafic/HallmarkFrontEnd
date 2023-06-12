@@ -113,7 +113,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
-  InvoiceStatus: FieldSettingsModel = { text: 'name', value: 'id' };
+  invoiceStatusFields: FieldSettingsModel = { text: 'name', value: 'id' };
   @Select(UserState.lastSelectedAgencyId)
   private agencyId$: Observable<number>;
 
@@ -196,7 +196,6 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
                 this.filterColumns.businessIds.dataSource = this.organizations;
                 this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
                 this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
-                this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.InvoiceStatuses)?.setValue(this.defaultInvoiceStatus);
                 this.changeDetectorRef.detectChanges();
               }
             });
@@ -302,6 +301,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
               this.isAlive = true;
               this.filterOptionsData = data;
               this.isDefaultLoad = true;
+              this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.InvoiceStatuses)?.setValue(this.defaultInvoiceStatus);
               setTimeout(() => { this.SearchReport() }, 3000);
             }
           });

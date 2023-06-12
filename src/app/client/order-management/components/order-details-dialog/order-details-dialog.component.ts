@@ -83,6 +83,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   @Input() hasCreateEditOrderPermission: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
+  @Input() CanEditOrderBillRateIRP: boolean;
+  @Input() CanCloseOrdersIRP: boolean;
   @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() orderComments: Comment[] = [];
   @Input() isCondidateTab: boolean;
@@ -140,6 +142,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public reOrderToEdit: Order | null;
   public reOrderDialogTitle$ = this.addEditReorderService.reOrderDialogTitle$;
   public canCreateOrder: boolean;
+  public canCreateOrderIRP: boolean;
   public canCloseOrderPermission: boolean;
   public readonly systemType = OrderManagementIRPSystemId;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
@@ -168,7 +171,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   get showApproveAndCancel(): boolean {
-    return this.order?.canApprove && !this.order?.orderOpenDate && this.order?.status === this.orderStatus.PreOpen;
+    return this.order?.canApprove && this.order?.status === this.orderStatus.PreOpen && (!this.order?.orderOpenDate || this.order?.extensionFromId != null);
   }
 
   get showLockOrder(): boolean {
@@ -575,9 +578,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder }) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder,canCreateOrderIRP }) => {
       this.canCloseOrderPermission = canCloseOrder;
       this.canCreateOrder = canCreateOrder;
+      this.canCreateOrderIRP=canCreateOrderIRP;
     });
   }
 

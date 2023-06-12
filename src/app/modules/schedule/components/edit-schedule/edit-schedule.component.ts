@@ -76,6 +76,10 @@ import {
 import * as EditSchedule from './edit-schedule.interface';
 import { EditScheduleFormFieldConfig, ShiftTab } from './edit-schedule.interface';
 import { EditScheduleService } from './edit-schedule.service';
+import { SettingsViewService } from '@shared/services';
+import { OrganizationSettingKeys,OrganizationalHierarchy } from '@shared/constants';
+import { UserState } from 'src/app/store/user.state';
+ 
 
 @Component({
   selector: 'app-edit-schedule',
@@ -143,7 +147,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     meal: null,
     oncall: null,
   };
-
+ public isCreateReplacementPerDiemOrder:boolean=false;
   constructor(
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
     private readonly ngZone: NgZone,
@@ -156,6 +160,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     private scheduleFiltersService: ScheduleFiltersService,
     private openPositionService: OpenPositionService,
     private store: Store,
+    private settingsViewService: SettingsViewService
   ) {
     super();
   }
@@ -164,8 +169,23 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.setScheduleTypes();
     this.setInitData();
     this.resetOpenPositionsConfig();
+    this.getCreatePerDiemOrderConfig();
   }
-
+  private getCreatePerDiemOrderConfig(): void {
+    const organizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
+    if (organizationId) {
+      this.settingsViewService.getViewSettingKey(
+        OrganizationSettingKeys.CreateReplacementPerDiemOrder,
+        OrganizationalHierarchy.Organization,
+        organizationId
+      )
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((data) => {
+          const CreateReplacementPerDiemOrder = data[OrganizationSettingKeys[OrganizationSettingKeys.CreateReplacementPerDiemOrder]];
+          this.isCreateReplacementPerDiemOrder = CreateReplacementPerDiemOrder === 'true';
+        });
+    }
+  }
   closeSchedule(): void {
     if (this.scheduleForm?.touched) {
       this.confirmService.confirm(

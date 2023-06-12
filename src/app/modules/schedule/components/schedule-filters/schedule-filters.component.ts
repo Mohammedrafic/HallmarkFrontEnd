@@ -20,7 +20,7 @@ import {
 } from '@shared/models/organization.model';
 import { OrganizationStructureService } from '@shared/services';
 import { FilterService } from '@shared/services/filter.service';
-import { ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
+import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
   ChipsStructureState,
@@ -41,8 +41,6 @@ import {
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 import { TimeMask } from '@client/order-management/components/irp-tabs/order-details/constants';
-import { MessageTypes } from '@shared/enums/message-types';
-import { ERROR_START_LESS_END_DATE } from '@shared/constants/messages';
 import { AbstractControl } from '@angular/forms';
 
 @Component({
@@ -158,6 +156,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   public applyFilter(): void {
+    console.log(this.scheduleFilterFormGroup);
     if (this.scheduleFilterFormGroup.valid) {
       this.setFilters();
       this.store.dispatch([
@@ -236,7 +235,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         }),
         filter((departmentsIds: number[]) => !!departmentsIds?.length),
         switchMap((departmentsIds: number[]) => {
-          const params = { SystemType: SystemType.IRP, DepartmentIds: departmentsIds };
+          const params = { SystemType: SystemType.IRP, DepartmentIds: departmentsIds, IsSchedulingContext: true };
 
           if (this.isHomeCostCenterFilters) {
             return this.scheduleApiService.getSkillsByEmployees(departmentsIds, this.selectedCandidateId);
@@ -251,18 +250,12 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
           const skillOption = this.isHomeCostCenterFilters
             ? ScheduleFilterHelper.adaptMasterSkillToOption(skills as Skill[])
             : ScheduleFilterHelper.adaptOrganizationSkillToOption(skills as AssignedSkillsByOrganization[]);
+
           this.filterColumns.skillIds.dataSource = skillOption;
           const skillIds = this.getSkillsIds(skillOption);
-          const selectedFilterSkills = this.scheduleFiltersService.getSelectedSkillFilterColumns(
-              this.filterColumns.skillIds.dataSource,
-              this.chipsSettings.preservedChipsSkills
-          );
-
-          const preservedChipSkills = this.chipsSettings.preservedChipsSkills.length ? selectedFilterSkills : skillIds;
           this.chipsSettings.preservedChipsSkills = [];
           this.chipsSettings.editedChips = false;
-
-          this.scheduleFilterFormGroup.get('skillIds')?.patchValue(preservedChipSkills);
+          this.scheduleFilterFormGroup.get('skillIds')?.patchValue(this.getSkillsPatchValue(skillIds));
         } else {
           this.resetSkillFilters();
         }
@@ -420,7 +413,12 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     } else {
       initialState.departments = this.scheduleFiltersService.getDepartmentInitialChipsStructure(initialState.locations);
       const hasPreviousState = filterStructure.regionIds.length && filterStructure.locationIds.length;
-      filterStructure.departmentsIds = hasPreviousState ? departmentsIds : [];
+      const filteredDepartment = this.scheduleFiltersService.getFilteredDepartmentsIds(
+        initialState.departments,
+        departmentsIds
+      );
+
+      filterStructure.departmentsIds = hasPreviousState ? filteredDepartment : [];
     }
 
     if(event.field === ScheduleFilterFormSourceKeys.Skills) {
@@ -447,7 +445,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup.get('skillIds')?.setValue([]);
   }
 
-  private setFilteredItems(columnname? : string): void {
+  private setFilteredItems(): void {
     this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
     this.setUnfilteredItems(this.filteredItems);
     this.filteredItems = [...this.filteredItems];
@@ -545,5 +543,24 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     }
 
     return [skillOption[0]?.value as number];
+  }
+
+  private getSkillsPatchValue(skillIds: number[]): number [] {
+    if (this.chipsSettings.preservedChipsSkills.length) {
+      const selectedFilterSkills = this.scheduleFiltersService.getSelectedSkillFilterColumns(
+        this.filterColumns.skillIds.dataSource,
+        this.chipsSettings.preservedChipsSkills
+      );
+
+      return selectedFilterSkills;
+    }
+
+    const departments: number[] = this.scheduleFilterFormGroup.get('departmentsIds')?.value;
+
+    if (departments.length < 2) {
+      return skillIds;
+    }
+
+    return [];
   }
 }

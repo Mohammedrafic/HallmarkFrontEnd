@@ -80,7 +80,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.isAvailablity]: {
     type: ControlTypes.Toggle,
-    valueType: ValueType.Text,
+    valueType: ValueType.Id,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -88,7 +88,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.isUnavailablity]: {
     type: ControlTypes.Toggle,
-    valueType: ValueType.Text,
+    valueType: ValueType.Id,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -96,7 +96,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate]: {
     type: ControlTypes.Toggle,
-    valueType: ValueType.Text,
+    valueType: ValueType.Id,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -104,7 +104,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
   },
   [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: {
     type: ControlTypes.Toggle,
-    valueType: ValueType.Text,
+    valueType: ValueType.Id,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',

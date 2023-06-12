@@ -21,7 +21,7 @@ export interface CandidateModel {
   contractStartDate: Date,
   contractEndDate: Date,
   holdStartDate: Date,
-  holdEndDate: Date,
+  holdEndDate: Date | string,
   terminationDate: string,
   terminationReasonId: number,
   address1: string,
@@ -33,5 +33,6 @@ export interface CandidateModel {
   phone1: string,
   phone2: string,
   professionalSummary: string,
-  generalNotes: GeneralNotesModel[]
+  generalNotes: GeneralNotesModel[],
+  isOnHoldSetManually: boolean,
 }

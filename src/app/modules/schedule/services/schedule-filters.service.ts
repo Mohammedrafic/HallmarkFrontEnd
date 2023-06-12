@@ -233,6 +233,11 @@ export class ScheduleFiltersService {
     }).map((skills: DropdownOption) => Number(skills.value));
   }
 
+  getFilteredDepartmentsIds(departments: OrganizationDepartment[], departmentsIds: number[]): number[] {
+    const depIds = departments.map((department: OrganizationDepartment) => department.id);
+    return  departmentsIds.filter((id: number) => depIds.includes(id));
+  }
+
   private createChipValue(formValue: number[] | number | string | boolean, configIem: ScheduleFilterItem): string[] {
     if (Array.isArray(formValue)) {
       return configIem.dataSource.filter((source) => formValue.includes(source.value as number)).map((data) => data.text);

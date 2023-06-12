@@ -9,6 +9,11 @@ import { UserState } from '../../store/user.state';
 export interface PermissionsModel {
   canCreateOrder: boolean;
   canCloseOrder: boolean;
+  canCreateOrderIRP:boolean;
+  CanEditOrderBillRateIRP:boolean;
+  canCloseOrderIRP:boolean;
+  canOnboardCandidateIRP:boolean;
+  canRejectCandidateIRP:boolean;
   canManageOrganizationConfigurations: boolean;
   canOrderJourney:boolean;
 }
@@ -35,7 +40,12 @@ export class PermissionService extends DestroyableDirective {
           canCreateOrder: permissionIds.includes(PermissionTypes.CanCreateOrder),
           canCloseOrder: permissionIds.includes(PermissionTypes.CanCloseOrder),
           canManageOrganizationConfigurations: permissionIds.includes(PermissionTypes.ManageOrganizationConfigurations),
-          canOrderJourney: permissionIds.includes(PermissionTypes.ViewOrderJourney)
+          canOrderJourney: permissionIds.includes(PermissionTypes.ViewOrderJourney),
+          canCreateOrderIRP:permissionIds.includes(PermissionTypes.CanCreateOrdersIRP),
+          CanEditOrderBillRateIRP: permissionIds.includes(PermissionTypes.CanEditOrderBillRateIRP),
+          canCloseOrderIRP:permissionIds.includes(PermissionTypes.CanCloseOrdersIRP),
+          canOnboardCandidateIRP:permissionIds.includes(PermissionTypes.CanOnboardCandidateIRP),
+          canRejectCandidateIRP:permissionIds.includes(PermissionTypes.CanRejectCandidateIRP),
           };
       })
     );

@@ -4,7 +4,7 @@ import { ToastUtility } from '@syncfusion/ej2-notifications';
 
 import { FieldName, OrderSystem } from '@client/order-management/enums';
 import { FormArrayList } from '@client/order-management/containers/irp-container/irp-container.constant';
-import { ErrorContentMessageForCredential, OrderDetailsValidationMessage } from '@client/order-management/constants';
+import { OrderDetailsValidationMessage } from '@client/order-management/constants';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { JobDistributionList, ListControls, ListOfKeyForms, SelectSystem } from '@client/order-management/interfaces';
 import { Order } from '@shared/models/order-management.model';
@@ -57,15 +57,6 @@ export const showInvalidFormControl = (controls: ListControls[]): void => {
   ToastUtility.show({
     title: OrderDetailsValidationMessage.title,
     content: OrderDetailsValidationMessage.content + fields,
-    position: OrderDetailsValidationMessage.position,
-    cssClass: OrderDetailsValidationMessage.cssClass,
-  });
-};
-
-export const showMessageForInvalidCredentials = (): void => {
-  ToastUtility.show({
-    title: OrderDetailsValidationMessage.title,
-    content: ErrorContentMessageForCredential,
     position: OrderDetailsValidationMessage.position,
     cssClass: OrderDetailsValidationMessage.cssClass,
   });
