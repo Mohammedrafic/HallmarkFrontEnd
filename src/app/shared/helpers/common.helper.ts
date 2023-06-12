@@ -21,6 +21,9 @@ export class CommonHelper{
               data.maskedssn = data.maskedssn.substring(0,3) + "-" + data.maskedssn.substring(3,5)+ "-" + data.maskedssn.substring(5);
             } 
           }
+          if(data?.errorProperties.indexOf("SSN") > -1){
+            data?.errorProperties.push('maskedssn');
+          }
         })
       }
       if(payload.succesfullRecords.length > 0){          
