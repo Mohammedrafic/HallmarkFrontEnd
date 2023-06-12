@@ -634,9 +634,9 @@ export class OrganizationManagementState {
   @Action(UpdateDepartment)
   UpdateDepartments(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { department, filters, ignoreWarning }: UpdateDepartment
+    { department, filters, ignoreWarning, createReplacement }: UpdateDepartment
   ): Observable<void> {
-    return this.departmentService.updateDepartment(department, ignoreWarning as boolean).pipe(
+    return this.departmentService.updateDepartment(department, ignoreWarning, createReplacement).pipe(
       tap((payload) => {
         patchState({ isDepartmentLoading: false });
         dispatch([new GetDepartmentsByLocationId(department.locationId, filters), new SaveDepartmentSucceeded()]);

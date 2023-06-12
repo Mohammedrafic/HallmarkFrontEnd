@@ -216,12 +216,12 @@ export class HoursByDepartmentComponent implements OnInit {
             regionsList.push(...value.regions);
             locationsList = regionsList
               .map((obj) => {
-                return obj.locations.filter((location) => location.regionId === obj.id);
+                return obj.locations.filter((location) => location.regionId === obj.id && this.checkInactiveDate(location.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
             departmentsList = locationsList
               .map((obj) => {
-                return obj.departments.filter((department) => department.locationId === obj.id);
+                return obj.departments.filter((department) => department.locationId === obj.id && this.checkInactiveDate(department.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
           });
@@ -254,6 +254,16 @@ export class HoursByDepartmentComponent implements OnInit {
       }
       this.SearchReport();
     });
+  }
+
+  checkInactiveDate(dateStr?:string) : boolean {
+    if(dateStr == null || dateStr == undefined) return true;
+    
+    var date = new Date(dateStr);
+    var today = new Date();
+    if(date < today) return false;
+
+    return true;
   }
 
   public showToastMessage(regionsLength: number, locationsLength: number, departmentsLength: number) {
@@ -312,9 +322,8 @@ export class HoursByDepartmentComponent implements OnInit {
   private initForm(): void {
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.hoursByDeptReportForm = this.formBuilder.group({
@@ -335,9 +344,8 @@ export class HoursByDepartmentComponent implements OnInit {
     this.isClearAll = true;
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.hoursByDeptReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);

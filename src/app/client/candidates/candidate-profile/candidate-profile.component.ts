@@ -133,9 +133,8 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private saveCandidate(): Observable<void | CandidateModel> {
-    //TODO: send flag to the server this.replaceOrder
     return this.candidateProfileService
-      .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId)
+      .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId, this.replaceOrder)
       .pipe(takeUntil(this.destroy$));
   }
 
