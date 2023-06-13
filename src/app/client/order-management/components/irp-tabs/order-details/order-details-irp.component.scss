@@ -363,7 +363,9 @@ ejs-textbox.e-control {
 
 @media #{$max-mobile} {
 
+  .general-information-po-wrapper,
   .general-information-wrapper,
+  .job-description-po-wrapper,
   .job-distribution-wrapper,
   .special-project-wrapper,
   .job-description-wrapper {
@@ -371,10 +373,16 @@ ejs-textbox.e-control {
     flex-direction: column;
     width: 100%;
 
-    & .input-container,
-    & .checkbox-container {
+    .input-container,
+    .checkbox-container {
       margin: 0 !important;
       width: 100%;
+
+      ::ng-deep {
+        .multi-date {
+          width: 100%;
+        }
+      }
     }
   }
 
