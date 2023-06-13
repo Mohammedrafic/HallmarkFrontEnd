@@ -38,6 +38,7 @@ const AllOrdersIRPFilterFormConfig: CommonFormConfig[] = [
   { field: 'distributedOnFrom' },
   { field: 'distributedOnTo' },
   { field: 'irpOnly' },
+  { field: 'shiftIds' }
 ];
 
 const IncompleteIRPFilterFormConfig: CommonFormConfig[] = [

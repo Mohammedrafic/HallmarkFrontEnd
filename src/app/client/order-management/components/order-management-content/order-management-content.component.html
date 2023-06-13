@@ -975,6 +975,22 @@
           </ejs-multiselect>
         </div>
       </div>
+      <div class="input-container" *ngIf="isActiveSystemIRP">
+        <label>Shift Name</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            placeholder="All"
+            formControlName="shiftIds"
+            [allowFiltering]="true"
+            [dataSource]="filterColumns.shiftIds.dataSource"
+            [fields]="shiftNameFields"
+            [showDropDownIcon]="true"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
       <div class="input-container" *ngIf="!isActiveSystemIRP">
         <label>PO #</label>
         <div class="input-group multiselect">
