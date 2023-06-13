@@ -621,6 +621,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(() => true),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
+    this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
+    this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+      this.changeDetection.markForCheck();
       if (value) {
         let shiftDetails = this.allShifts.find(f => f.id == value)
         if (shiftDetails != null && shiftDetails.id != 0) {
@@ -644,8 +647,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('shiftStartTime')?.valueChanges.pipe(
       filter(() => true),
       takeUntil(this.componentDestroy())
-    ).subscribe((value: number) => {
-      if (value) {
+    ).subscribe((value: Date) => {     
+      if (value instanceof Date) {
         this.generalInformationForm.get('shift')?.setValue(0, { emitEvent: false });
       }
 
@@ -653,11 +656,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('shiftEndTime')?.valueChanges.pipe(
       filter(() => true),
       takeUntil(this.componentDestroy())
-    ).subscribe((value: number) => {
-      if (value) {
+    ).subscribe((value: Date) => {
+     if (value instanceof Date) {
         this.generalInformationForm.get('shift')?.setValue(0, { emitEvent: false });
       }
-
     });
 
   }
