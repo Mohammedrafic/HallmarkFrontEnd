@@ -847,7 +847,7 @@ export class OrderManagementContentState {
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: EditIrpOrder
-  ): Observable<void | Blob[] | Order> {
+  ): Observable<void | Blob[] | Order[]> {
     return this.orderManagementService.editIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
@@ -857,7 +857,7 @@ export class OrderManagementContentState {
         if (documents.length) {
           return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
         } else {
-          return order;
+          return of(order);
         }
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
