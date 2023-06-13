@@ -9,7 +9,7 @@ import { debounceTime, filter, Observable, Subject, take, takeUntil } from 'rxjs
 import { UserState } from 'src/app/store/user.state';
 import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments-irp.actions';
 import { CommentsState } from './store/comments-irp.state';
-import { faUnlock, faLock, faUserFriends, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faUserFriends, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 enum CommentsFilter {
   All = 'All',
@@ -26,8 +26,6 @@ enum CommentsFilter {
 })
 export class CommentsIrpComponent {
   
-  faUnlock = faUnlock as IconProp;
-  faLock = faLock as IconProp;
   faUserFriends = faUserFriends as IconProp;
   faEye = faEye as IconProp;
   faEyeSlash = faEyeSlash as IconProp;
@@ -87,7 +85,6 @@ export class CommentsIrpComponent {
   public scrolledToMessage$ = new Subject<void>();
   public markAsRead$ = new Subject<number[]>();
   public initView$ = new Subject<void>();
-  public lock = false;
 
   public readMessagesIds: number[] = [];
 
@@ -121,7 +118,7 @@ export class CommentsIrpComponent {
     const user = this.store.selectSnapshot(UserState).user;
     this.isAgencyUser = user.businessUnitType === BusinessUnitType.Agency;
     if (this.isAgencyUser || this.CommentConfiguration === true) {
-      this.isExternal = true;
+      this.isExternal = false;
     }
   }
 
@@ -159,11 +156,7 @@ export class CommentsIrpComponent {
   }
 
   public visibilityHandler(): void {
-    if (this.isAgencyUser) {
-      this.isExternal = true;
-    } else {
-      this.isExternal = !this.isExternal;
-    }
+    this.isExternal = false;
   }
 
   public privateHandler(): void {
@@ -174,13 +167,6 @@ export class CommentsIrpComponent {
     }
   }
 
-  public lockHandler(): void {
-    if (this.isAgencyUser) {
-      this.lock = true;
-    } else {
-      this.lock = !this.lock;
-    }
-  }
 
   public send(): void {
     if (!this.message) {

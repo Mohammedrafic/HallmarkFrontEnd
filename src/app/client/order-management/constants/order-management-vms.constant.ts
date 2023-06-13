@@ -167,6 +167,13 @@ export const initOrderManagementFilterColumns = () => ({
     valueField: 'poNumber',
     valueId: 'id',
   },
+  shift: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
+    valueId: 'id',
+  },
   irpOnly: {
     type: ControlTypes.Checkbox,
     valueType: ValueType.Text,

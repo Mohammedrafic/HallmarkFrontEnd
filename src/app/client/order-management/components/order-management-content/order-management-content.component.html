@@ -1008,14 +1008,29 @@
         </div>
       </div>
     </div>
-    <div class="bootstrap" *ngIf="!isActiveSystemIRP">
+    <div class="filter-row bootstrap" *ngIf="!isActiveSystemIRP">
       <div class="input-container">
-        <label>Job Title</label>
-        <div class="input-group">
-          <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
-        </div>
+      <label>Job Title</label>
+      <div class="input-group">
+      <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
       </div>
-    </div>
+      </div>
+      <div class="input-container">
+      <label>Shift Name</label>
+      <div class="input-group multiselect">
+      <ejs-multiselect
+                  mode="CheckBox"
+                  [allowFiltering]="true"
+                  [dataSource]="filterColumns.shift.dataSource"
+                  [fields]="shiftFields"
+                  [showDropDownIcon]="true"
+                  [changeOnBlur]="!(isMobile || isTablet)"
+                  formControlName="shift"
+      >
+      </ejs-multiselect>
+      </div>
+      </div>
+      </div>
     <div
       class="filter-row bootstrap"
       *ngIf="

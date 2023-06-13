@@ -49,9 +49,8 @@
     </div>
     <div>
     <ejs-tooltip
-        [content]="isExternal ? 'External' : 'Internal'">
+        content="Internal">
         <span class="control-wrapper visibility" (click)="visibilityHandler()">
-          <fa-icon *ngIf="isExternal" [icon]='faEye' class="pr-3"></fa-icon>
           <fa-icon *ngIf="!isExternal" [icon]='faEyeSlash' class="pr-3"></fa-icon>
 
         </span>
@@ -61,13 +60,6 @@
         <span class="control-wrapper visibility" (click)="privateHandler()">
             <fa-icon *ngIf="isPrivate" [icon]='faUserFriends' class="pr-3 privatecls"></fa-icon>
             <fa-icon *ngIf="!isPrivate" [icon]='faUserFriends' class="pr-3"></fa-icon>
-        </span>
-    </ejs-tooltip>
-    <ejs-tooltip
-        [content]="isExternal ? 'Unlock' : 'lock'">
-        <span class="control-wrapper visibility" (click)="lockHandler()">
-            <fa-icon  *ngIf="!lock" [icon]='faUnlock' class="pr-3"></fa-icon>
-            <fa-icon  *ngIf="lock" [icon]='faLock' class="pr-3"></fa-icon>
         </span>
     </ejs-tooltip>
     </div>

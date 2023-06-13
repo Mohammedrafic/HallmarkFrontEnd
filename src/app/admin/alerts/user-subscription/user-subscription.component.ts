@@ -406,8 +406,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           if (data != undefined) {
             this.userData = data;
             let userValue = data[0]?.id;
-            this.businessForm.controls['user'].setValue(userValue);                
-            this.businessControl.patchValue(userBusinessId, {emitEvent:false}); 
+            if(userBusinessType == BusinessUnitType.Organization)
+              this.businessControl.patchValue(userBusinessId, {emitEvent:false}); 
           }
         });
       } else if(this.businessUnitControl?.value == BusinessUnitType.Organization 
@@ -549,13 +549,14 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     }    
     this.businessControl.patchValue([]);
     this.filteredBusinessUnits = this.businessUnits;
-    if(this.activeSystem == OrderManagementIRPSystemId.IRP){
-      this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
-      if(user?.businessUnitType == BusinessUnitType.Hallmark){
+    if(this.activeSystem == OrderManagementIRPSystemId.IRP){      
+      if(user?.businessUnitType == BusinessUnitType.Hallmark){        
+        this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
         this.businessUnitControl.patchValue(this.filteredBusinessUnits[0].id);
       }
       if(user?.businessUnitType == BusinessUnitType.Organization){
-        this.businessUnitControl.enable();        
+        this.businessUnitControl.enable();       
+        this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency && x.id !== BusinessUnitType.Hallmark); 
       }
     }
         

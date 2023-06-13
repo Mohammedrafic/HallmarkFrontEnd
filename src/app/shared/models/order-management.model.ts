@@ -705,6 +705,7 @@ export class OrderFilter {
   irpOnly?: boolean | null;
   shiftIds?: number[];
   reorderStatuses?: (string | number)[];
+  shift?: string[] | string;
 }
 
 export class SortModel {

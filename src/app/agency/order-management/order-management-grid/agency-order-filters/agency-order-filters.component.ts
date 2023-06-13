@@ -24,6 +24,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
+import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 
 enum RLDLevel {
   Orginization,
@@ -59,10 +60,12 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
+  public readonly shiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public readonly formatDate = formatDate;
   public readonly placeholderDate = placeholderDate;
   public readonly datepickerMask = datepickerMask;
+  public shift = ORDER_MASTER_SHIFT_NAME_LIST;
 
   public optionFields = {
     text: 'name',
@@ -237,6 +240,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         this.filterColumns.projectTypeIds.dataSource = specialProjectCategories;
         this.filterColumns.projectNameIds.dataSource = projectNames;
         this.filterColumns.poNumberIds.dataSource = poNumbers;
+        this.filterColumns.shift.dataSource = this.shift;
         this.setDefaultFilter();
       });
   }
@@ -281,6 +285,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       projectTypeIds: new FormControl(null),
       projectNameIds: new FormControl(null),
       poNumberIds: new FormControl(null),
+      shift: new FormControl(null),
     });
   }
 
@@ -377,6 +382,13 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'poNumber',
+        valueId: 'id',
+      },
+      shift: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
         valueId: 'id',
       },
     };
