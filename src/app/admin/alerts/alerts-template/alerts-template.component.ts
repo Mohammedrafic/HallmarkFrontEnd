@@ -677,12 +677,13 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       this.businessControl.patchValue(0);
     this.filteredBusinessUnits = this.businessUnits;
     if(this.activeSystem == OrderManagementIRPSystemId.IRP){
-      this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
       if(user?.businessUnitType == BusinessUnitType.Hallmark){
         this.businessUnitControl.patchValue(this.filteredBusinessUnits[0].id);
+        this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
       }
       if(user?.businessUnitType == BusinessUnitType.Organization){
-        this.businessUnitControl.enable();
+        this.businessUnitControl.enable();       
+        this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency && x.id !== BusinessUnitType.Hallmark); 
       }
     }
         
