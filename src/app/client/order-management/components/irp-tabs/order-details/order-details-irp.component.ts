@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { filter, map, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
+import { combineLatest, filter, map, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -114,6 +114,7 @@ import { CommentsService } from '@shared/services/comments.service';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { Permission } from '@core/interface/permission.interface';
+import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -505,6 +506,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private watchForFormValueChanges(): void {
+    this.watchForCredentialsControls();
+
     this.generalInformationForm.get('regionId')?.valueChanges.pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy())
@@ -661,7 +664,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('shiftStartTime')?.valueChanges.pipe(
       filter(() => true),
       takeUntil(this.componentDestroy())
-    ).subscribe((value: Date) => {     
+    ).subscribe((value: Date) => {
       if (value instanceof Date) {
         this.generalInformationForm.get('shift')?.setValue(0, { emitEvent: false });
       }
@@ -972,5 +975,22 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       this.changeDetection.markForCheck();
     })
+  }
+
+  private watchForCredentialsControls(): void {
+    const departmentControl = this.generalInformationForm.get('departmentId');
+    const skillControl = this.generalInformationForm.get('skillId');
+
+    if (!departmentControl || !skillControl || this.selectedOrder) {
+      return;
+    }
+
+    combineLatest([departmentControl.valueChanges, skillControl.valueChanges])
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(([departmentId, skillId]) => {
+        if (departmentId && skillId && !this.selectedOrder) {
+          this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId, SystemType.IRP));
+        }
+      });
   }
 }
