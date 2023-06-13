@@ -704,6 +704,7 @@ export class OrderFilter {
   contactEmails?: string[] | string;
   irpOnly?: boolean | null;
   reorderStatuses?: (string | number)[];
+  shift?: string[] | string;
 }
 
 export class SortModel {
