@@ -69,7 +69,7 @@ export class LogiReportComponent implements OnInit {
    this.CustomizeSaveAs(options, this.CallbackSaveAs);  
   }
   private CustomizeSaveAs(options: any, callBack: any): void {
-    this.factoryReportSet?.saveAs(options, callBack);
+    this.factoryReportSet?.prototype.saveAs(options, callBack);
   }
   private CallbackSaveAs(status: any) {
     console.log(status);
