@@ -406,8 +406,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           if (data != undefined) {
             this.userData = data;
             let userValue = data[0]?.id;
-            this.businessForm.controls['user'].setValue(userValue);                
-            this.businessControl.patchValue(userBusinessId, {emitEvent:false}); 
+            if(userBusinessType == BusinessUnitType.Organization)
+              this.businessControl.patchValue(userBusinessId, {emitEvent:false}); 
           }
         });
       } else if(this.businessUnitControl?.value == BusinessUnitType.Organization 
