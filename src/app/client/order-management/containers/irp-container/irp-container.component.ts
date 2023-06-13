@@ -28,7 +28,6 @@ import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-irp-container',
@@ -65,7 +64,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedOrder']?.currentValue) {
-      this.orderCredentials = [...this.selectedOrder.credentials];
+      this.orderCredentials = [...this.selectedOrder.credentials ?? []];
     }
   }
 
