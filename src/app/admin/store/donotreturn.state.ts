@@ -165,7 +165,7 @@ export class DonotReturnState {
   ): Observable<any> {
     if(errorpayload.length > 0){          
       errorpayload.forEach((data:any)=>{
-        if(data.ssn != ''){
+        if(data.ssn != undefined && data.ssn != ''){
           data.ssn = data.ssn.replace(/\d/g, "X");
         }
       })
