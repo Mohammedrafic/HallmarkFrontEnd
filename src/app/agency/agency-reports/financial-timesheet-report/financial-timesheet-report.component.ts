@@ -443,10 +443,8 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
       "JobStatusesParamAFTS": jobStatuses.length == 0 ? "null" : jobStatuses.join(","),
       "JobIdParamAFTS": jobId == null || jobId == "" ? "null" : jobId,
       "BearerParamAFTS": auth,
-      "BusinessUnitIdParamAFTS": window.localStorage.getItem("lastSelectedOrganizationId") == null
-        ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
-          this.selectedOrganizations[0].organizationId.toString() : "1" :
-        window.localStorage.getItem("lastSelectedOrganizationId"),
+      "BusinessUnitIdParamAFTS": this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
+        this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
       "HostName": this.baseUrl,
       "AccrualReportFilterTypeAFTS": accrualReportTypes.toString(),
       "InvoiceIdParamAFTS": invoiceID == null || invoiceID == "" ? "null" : invoiceID
