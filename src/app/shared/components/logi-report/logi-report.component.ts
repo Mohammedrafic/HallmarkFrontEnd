@@ -63,6 +63,15 @@ export class LogiReportComponent implements OnInit {
     // this.pwd=pass==null?"":pass;
     //this.injectReportApiJs();
   }
+  public SaveAsReport(options: any): void {
+   this.SaveAs(options, this.CallbackSaveAs);  
+  }
+  private SaveAs(options: any, callBack: any): void {
+    this.factory?.saveAs(options, callBack);
+  }
+  private CallbackSaveAs(status: any) {
+    console.log(status);
+  }
   public RenderReport():void
   {
     if (GlobalConstants.reportBaseUrl == null || GlobalConstants.reportBaseUrl == undefined || GlobalConstants.reportBaseUrl.trim()=="") {
