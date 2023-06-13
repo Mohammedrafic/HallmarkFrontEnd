@@ -150,13 +150,18 @@ export const CardTitle = (scheduleItem: ScheduleItem): string => {
 };
 
 export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilters): ScheduleInt.EmployeesFilters => {
-  const { startDate, endDate, departmentsIds } = filters;
+  const { startDate, endDate, departmentsIds, isAvailablity, isUnavailablity, isOnlySchedulatedCandidate, startTime, endTime } = filters;
 
   return {
     startDate: startDate || '',
     endDate: endDate || '',
     departmentsIds: departmentsIds ?? [],
     userLocalTime: DateTimeHelper.toUtcFormat(new Date()),
+    isAvailablity : isAvailablity || false,
+    isUnavailablity : isUnavailablity || false, 
+    isOnlySchedulatedCandidate : isOnlySchedulatedCandidate || false,
+    startTime : startTime,
+    endTime : endTime
   };
 };
 

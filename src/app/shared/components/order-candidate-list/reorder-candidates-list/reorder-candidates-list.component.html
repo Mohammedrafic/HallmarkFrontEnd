@@ -60,7 +60,6 @@
             <div
               ejs-button
               cssClass="e-flat primary-icon-button custom-button"
-              [class.btn-icon__disabled]="order?.isClosed && data.statusName !== cancelledStatusName"
               (click)="onEdit(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </div>

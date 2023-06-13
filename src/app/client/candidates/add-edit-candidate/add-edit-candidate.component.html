@@ -1,7 +1,7 @@
 <app-page-toolbar>
   <ng-container left>
     <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
-    <h3>{{title}} Employee <span class="candidate-name-title">{{candidateName$ | async}}</span></h3>
+    <h3>{{titlevalue}}  <span class="candidate-name-title">{{candidateName$ | async}}</span></h3>
   </ng-container>
   <ng-container right *ngIf="showButtons">
     <button ejs-button cssClass="e-outline" [disabled]="isCandidateFormPristine" (click)="clearForm()">Clear</button>

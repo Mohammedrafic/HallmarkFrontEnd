@@ -274,6 +274,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
         this.activeSystem = OrderManagementIRPSystemId.VMS;
       }
       this.previousSelectedSystemId = null;
+      this.cdr.markForCheck();
     });
   }
 }

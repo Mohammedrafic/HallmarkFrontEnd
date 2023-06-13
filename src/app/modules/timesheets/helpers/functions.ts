@@ -1,5 +1,7 @@
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { HourOccupationType } from '../enums';
-import { TimesheetStatisticsDetails } from '../interface';
+import { OverlapErrorMessageDetails, TimesheetStatisticsDetails } from '../interface';
 
 export function getEmptyHoursOccupationData(name: string): TimesheetStatisticsDetails {
   return {
@@ -9,3 +11,10 @@ export function getEmptyHoursOccupationData(name: string): TimesheetStatisticsDe
     billRateConfigId: Math.random(),
   };
 }
+
+export const CreateOverlapErrorData = (err: HttpErrorResponse): OverlapErrorMessageDetails => {
+  return ({
+    title: err.error['detail'].split(':')[0],
+    message: err.error['detail'].split(':')[1].trim(),
+  });
+};

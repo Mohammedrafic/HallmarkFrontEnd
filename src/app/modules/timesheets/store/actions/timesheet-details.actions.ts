@@ -141,4 +141,16 @@ export namespace TimesheetDetails {
 
     constructor(public readonly jobId: number) {}
   }
+
+  export class ForceAddRecord {
+    static readonly type = TimesheetDetailsActions.ForceAddRecord;
+
+    constructor(public readonly force: boolean, public readonly message?: string, public readonly title?: string) {}
+  }
+
+  export class ForceUpdateRecord {
+    static readonly type = TimesheetDetailsActions.ForceUpdateRecords;
+
+    constructor(public readonly force: boolean, public readonly message?: string, public readonly title?: string) {}
+  }
 }

@@ -2,15 +2,13 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  EventEmitter,
   Input,
   OnInit,
-  Output,
   TrackByFunction,
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { filter, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { filter, map, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -52,7 +50,7 @@ import {
   WorkLocationConfig,
   WorkLocationFrom,
 } from '@client/order-management/components/irp-tabs/order-details/constants';
-import { FieldType } from '@core/enums';
+import { FieldType, UserPermissions } from '@core/enums';
 import PriceUtils from '@shared/utils/price.utils';
 import { Destroyable } from '@core/helpers';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -115,6 +113,7 @@ import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
+import { Permission } from '@core/interface/permission.interface';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -131,9 +130,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.setConfigDataSources();
     }
   }
-
-  @Output() orderTypeChanged: EventEmitter<OrderType> = new EventEmitter();
-
+  public userPermission: Permission = {};
+  public readonly userPermissions = UserPermissions;
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
@@ -209,6 +207,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getPermission();
     this.initOrderTypeForm();
     this.initForms(IrpOrderType.LongTermAssignment);
     this.watchForOrderTypeControl();
@@ -217,9 +216,19 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSelectOrder();
     this.watchForOrganizationStructure();
     this.watchForSpecialProjectCategory();
-    this.observeOrderType();
     this.setReasonAutopopulate();
   }
+
+  private getPermission(): void {
+    this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length),
+      take(1)
+    ).subscribe((permissions: Permission) => {
+      this.userPermission = permissions;
+    });
+  }
+
+
 
   public changeOrderType(): void {
     const { regionId, locationId, departmentId, skillId } = this.generalInformationForm.getRawValue();
@@ -626,6 +635,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(() => true),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
+    this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
+    this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+      this.changeDetection.markForCheck();
       if (value) {
         let shiftDetails = this.allShifts.find(f => f.id == value)
         if (shiftDetails != null && shiftDetails.id != 0) {
@@ -649,8 +661,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('shiftStartTime')?.valueChanges.pipe(
       filter(() => true),
       takeUntil(this.componentDestroy())
-    ).subscribe((value: number) => {
-      if (value) {
+    ).subscribe((value: Date) => {     
+      if (value instanceof Date) {
         this.generalInformationForm.get('shift')?.setValue(0, { emitEvent: false });
       }
 
@@ -658,11 +670,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('shiftEndTime')?.valueChanges.pipe(
       filter(() => true),
       takeUntil(this.componentDestroy())
-    ).subscribe((value: number) => {
-      if (value) {
+    ).subscribe((value: Date) => {
+     if (value instanceof Date) {
         this.generalInformationForm.get('shift')?.setValue(0, { emitEvent: false });
       }
-
     });
 
   }
@@ -778,7 +789,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         shiftEndTime: selectedOrder.shiftEndTime
       }, { emitEvent: false })
     },1000)
-   
+
 
     // this.generalInformationForm.patchValue(selectedOrder);
     this.jobDistributionForm.patchValue(selectedOrder);
@@ -907,16 +918,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
       this.isTieringLogicLoad = false;
     }
-  }
-
-  private observeOrderType(): void {
-    this.orderTypeForm.get('orderType')?.valueChanges
-      .pipe(
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe((orderType) => {
-        this.orderTypeChanged.emit(orderType);
-      });
   }
 
   private setSkillFilters(skills: ListOfSkills[]): void {

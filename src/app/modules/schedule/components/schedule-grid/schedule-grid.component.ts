@@ -74,13 +74,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
   @ViewChild('autoCompleteSearch') autoCompleteSearch: AutoCompleteComponent;
 
-  @Input() set initScheduleDate(scheduleData: ScheduleInt.ScheduleModelPage | null) {
-    this.scheduleData = scheduleData;
-    if(scheduleData) {
-      this.scheduleSlotsWithDate = this.scheduleGridService.getSlotsWithDate(scheduleData);
-    }
-
-    this.cdr.markForCheck();
+  @Input() set initScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null) {
+    this.setScheduleData(scheduleData);
   }
 
   @Input() selectedFilters: ScheduleInt.ScheduleFilters;
@@ -129,6 +124,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   replacementOrderDialogOpen = false;
 
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
+
+  employeesTitle = 'Employee';
 
   private filteredByEmployee = false;
 
@@ -513,5 +510,16 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   private successSaveBooking(): void {
     this.createScheduleService.closeSideBarEvent.next(false);
     this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+  }
+
+  private setScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null): void {
+    this.scheduleData = scheduleData;
+    this.employeesTitle = scheduleData?.totalCount && scheduleData.totalCount > 1 ? 'Employees' : 'Employee';
+
+    if(scheduleData) {
+      this.scheduleSlotsWithDate = this.scheduleGridService.getSlotsWithDate(scheduleData);
+    }
+
+    this.cdr.markForCheck();
   }
 }

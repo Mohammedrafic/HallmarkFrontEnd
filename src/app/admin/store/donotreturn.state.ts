@@ -161,9 +161,16 @@ export class DonotReturnState {
   @Action(DoNotReturn.GetDoNotReturnImportErrors)
   GetDoNotReturnImportErrors(
     { dispatch }: StateContext<DoNotReturnStateModel>,
-    { payload }: DoNotReturn.GetDoNotReturnImportErrors
+    { errorpayload }: DoNotReturn.GetDoNotReturnImportErrors
   ): Observable<any> {
-    return this.DonotreturnService.getDNRImportTemplate(payload).pipe(
+    if(errorpayload.length > 0){          
+      errorpayload.forEach((data:any)=>{
+        if(data.ssn != ''){
+          data.ssn = data.ssn.replace(/\d/g, "X");
+        }
+      })
+    }
+    return this.DonotreturnService.getDNRImportTemplate(errorpayload).pipe(
       tap((payload) => {
         dispatch(new DoNotReturn.GetDoNotReturnImportErrorsSucceeded(payload));
         return payload;

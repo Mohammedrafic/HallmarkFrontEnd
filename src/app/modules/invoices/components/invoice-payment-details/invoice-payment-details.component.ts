@@ -95,7 +95,7 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
       filter(Boolean),
       tap((invoice) => {
         this.invoiceData.invoiceNumber = invoice.meta.formattedInvoiceNumber;
-        this.invoiceData.amount = invoice.totals.amount;
+        this.invoiceData.amount = invoice.totals.calculatedTotal;
       }),
       switchMap((details) => {
         this.invoiceData.invoiceId = details.meta.invoiceId;

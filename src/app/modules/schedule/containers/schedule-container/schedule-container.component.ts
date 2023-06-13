@@ -160,6 +160,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   updateScheduleFilter(data: ScheduleInt.ScheduleFiltersData): void {
+    console.log(data);
     this.scheduleFiltersService.setScheduleFiltersData(data);
     this.changeFilters(data.filters, data.skipDataUpdate);
     this.appliedFiltersAmount = data.filteredItems?.length;
@@ -206,6 +207,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private initScheduleData(isLoadMore = false): void {
+    console.log(this.scheduleFilters);
     this.scheduleApiService.getScheduleEmployees(this.scheduleFilters)
     .pipe(
       take(1),

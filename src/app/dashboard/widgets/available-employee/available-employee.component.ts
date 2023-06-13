@@ -21,10 +21,11 @@ export class AvailableEmployeeComponent  implements OnInit {
 
   public rowData: AvailableEmployeeModel[] ;
   public columnDefs:ColDef[] = [
-    { field: 'fullName', headerName:"Name",width:180},
-    { field: 'startDate', headerName:"Start Date",width:160},
-    { field: 'shiftTime', headerName:"Shift Time",width:160},
+    { field: 'fullName', headerName:"Name of Employee",width:180},
+    { field: 'startDate', headerName:"Start Date",width:120},
+    { field: 'shiftTime', headerName:"Start Time-End Time",width:190},
   ];
+  
   
  
 }

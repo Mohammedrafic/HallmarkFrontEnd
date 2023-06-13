@@ -6,6 +6,8 @@ import { MultiSelectAllModule } from "@syncfusion/ej2-angular-dropdowns";
 
 import { FilterDialogModule } from "@shared/components/filter-dialog/filter-dialog.module";
 import { ScheduleFiltersComponent } from './schedule-filters.component';
+import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { TimePickerAllModule } from '@syncfusion/ej2-angular-calendars';
 
 @NgModule({
   declarations: [
@@ -16,6 +18,8 @@ import { ScheduleFiltersComponent } from './schedule-filters.component';
     MultiSelectAllModule,
     FilterDialogModule,
     ReactiveFormsModule,
+    TimePickerAllModule,
+    SwitchModule
   ],
   exports: [ScheduleFiltersComponent],
 })
