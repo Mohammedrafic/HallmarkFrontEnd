@@ -1,31 +1,34 @@
-import { catchError, filter, Observable, Subject, takeUntil } from 'rxjs';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy,
+  OnInit, Output, SimpleChanges,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { Order, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
-import { ShowCloseOrderDialog, ShowToast } from '../../../../store/app.actions';
-import { OrderType, OrderTypeTitlesMap } from '@shared/enums/order-type';
-import { RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { catchError, filter, Observable, Subject, takeUntil } from 'rxjs';
+
 import { CloseOrderService } from '@client/order-management/components/close-order/close-order.service';
-import { GetClosureReasonsByPage } from '@organization-management/store/reject-reason.actions';
-import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { CloseOrderPayload } from '@client/order-management/components/close-order/models/closeOrderPayload.model';
-import { CLOSE_ORDER_TITLE, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, MULTI_CLOSE_ORDER } from '@shared/constants';
-import { ConfirmService } from '@shared/services/confirm.service';
 import { ClosePositionPayload } from '@client/order-management/components/close-order/models/closePositionPayload.model';
-import { CommentsService } from '@shared/services/comments.service';
-import { Comment } from '@shared/models/comment.model';
-import { UserState } from 'src/app/store/user.state';
 import { SaveCloseOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { DateTimeHelper } from '@core/helpers';
-import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { OrderManagementService } from '../order-management-content/order-management.service';
+import { GetClosureReasonsByPage } from '@organization-management/store/reject-reason.actions';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
+import { CLOSE_ORDER_TITLE, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, MULTI_CLOSE_ORDER } from '@shared/constants';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { MessageTypes } from '@shared/enums/message-types';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { OrderType, OrderTypeTitlesMap } from '@shared/enums/order-type';
+import { Comment } from '@shared/models/comment.model';
+import { Order, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
+import { RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
+import { CommentsService } from '@shared/services/comments.service';
+import { ConfirmService } from '@shared/services/confirm.service';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { UserState } from 'src/app/store/user.state';
+import { ShowCloseOrderDialog, ShowToast } from '../../../../store/app.actions';
+import { OrderManagementService } from '../order-management-content/order-management.service';
 
 @Component({
   selector: 'app-close-order',
@@ -50,6 +53,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
   public readonly systemTypes = OrderManagementIRPSystemId;
   public maxDate: Date | null;
+  public minDate: Date | null;
 
   public dialogTitleType: string;
   public isPosition = false;
@@ -173,6 +177,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public setCloseDateAvailability(isPosition: boolean): void {
     this.isPosition = isPosition;
     this.setMaxDate();
+    // converting jobStartDate to string as it is not a Date object actually and interface is wrong.
+    this.minDate = DateTimeHelper.convertDateToUtc(this.order.jobStartDate as unknown as string);
     this.getComments();
   }
 
@@ -186,7 +192,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
     let formData = this.closeForm.getRawValue();
     const { closingDate } = formData;
-    formData = { ...formData, closingDate: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(closingDate)) };
+    formData = { ...formData, closingDate: DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(closingDate)) };
 
     if (this.isPosition) {
       this.closePosition(formData);

@@ -2,9 +2,9 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
   EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatest, Observable, of, Subject, takeUntil } from 'rxjs';
 import { debounceTime, filter, skip, switchMap, take, tap, throttleTime, map } from 'rxjs/operators';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { MenuEventArgs, SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { ComponentStateChangedEvent, GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
@@ -64,6 +64,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() disableAnyAction = false;
 
+  @Input() disableEditButton = false;
+
   @Input() hasEditTimesheetRecordsPermission: boolean;
 
   @Input() hasApproveRejectRecordsPermission: boolean;
@@ -71,8 +73,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   @Input() hasApproveRejectMileagesPermission: boolean;
 
   @Input() canRecalculateTimesheet: boolean;
-
-  @Input() disableEditButton: boolean = false;
 
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
@@ -190,6 +190,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     private cd: ChangeDetectorRef,
     private breakpointObserver: BreakpointObserver,
     private settingsViewService: SettingsViewService,
+    private actions$: Actions,
   ) {
     super();
     this.context = {
@@ -594,6 +595,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     if (diffs.length || this.idsToDelete.length) {
       this.loading = true;
       this.cd.detectChanges();
+      
       createSpinner({
         target: this.spinner.nativeElement,
       });
@@ -608,9 +610,38 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         this.idsToDelete,
       );
 
-      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency)).pipe(
-        takeUntil(this.componentDestroy()),
-      ).subscribe(() => {
+      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency));
+      this.actions$
+      .pipe(
+        take(1),
+        ofActionDispatched(TimesheetDetails.ForceUpdateRecord),
+        switchMap((payload: TimesheetDetails.ForceUpdateRecord) => {
+          if (payload.force) {
+            return this.confirmService.confirm(payload.message as string, {
+              title: payload.title as string,
+              okButtonLabel: 'Save',
+              okButtonClass: 'ok-button',
+              customStyleClass: 'wide-dialog',
+            })
+            .pipe(
+              tap((confirm) => {
+                if (!confirm) {
+                  this.loading = false;
+                  this.cd.markForCheck();
+                } 
+              }),
+              filter((confirm) => !!confirm),
+              switchMap(() => {
+                dto.forceUpdate = true;
+
+                return this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency));
+              }),
+            );
+          }
+          return of();
+        }),
+      )
+      .subscribe(() => {
         this.loading = false;
         this.changesSaved.emit(true);
         this.isChangesSaved = true;

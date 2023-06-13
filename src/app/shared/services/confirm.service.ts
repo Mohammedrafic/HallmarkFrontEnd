@@ -11,9 +11,13 @@ export class ConfirmService {
     title: string,
     okButtonLabel:string,
     okButtonClass: string,
-    cancelButtonLabel?: string }): Observable<boolean> {
+    cancelButtonLabel?: string,
+    customStyleClass?: string }): Observable<boolean> {
       
     const isAllowed$ = new Subject<boolean>();
+    const dialogClass = options?.customStyleClass
+    ? `unsaved-changes-dialog ${options?.customStyleClass}`: 'unsaved-changes-dialog';
+
     const dialog = DialogUtility.confirm({
       title: options?.title ? options.title : '',
       content,
@@ -33,7 +37,7 @@ export class ConfirmService {
           isAllowed$.next(false);
           dialog.close();
           isAllowed$.complete();
-        }
+        },
       },
       close: () => {
         isAllowed$.next(false);
@@ -43,7 +47,7 @@ export class ConfirmService {
       closeOnEscape: true,
       position: { X: 'center', Y: 'center' },
       animationSettings: { effect: 'Zoom' },
-      cssClass: 'unsaved-changes-dialog',
+      cssClass: dialogClass,
     });
 
     const [ok, cencel] = dialog.buttons;

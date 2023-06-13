@@ -1,10 +1,10 @@
 <app-grid
   [columnDefinitions]="columnDefinitions"
-  [rowData]="candidatePage?.items"
+  [rowData]="candidatesPage?.items"
   (navigateToPageEmitter)="onGoToClick($event)"
   (pageSizeChangeEmitter)="onRowsDropDownChanged($event)"
   [isLoading]="isLoading"
   [pageSize]="pageSize"
   [currentPage]="pageNumber"
-  [totalRecordsCount]="candidatePage?.totalCount || 0"
+  [totalRecordsCount]="candidatesPage?.totalCount || 0"
 ></app-grid>

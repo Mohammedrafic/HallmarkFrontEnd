@@ -87,7 +87,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   @Select(UserState.lastSelectedAgencyId)
   lastSelectedAgencyId$: Observable<number>;
 
-  
+
   @Select(UserState.lastSelectedOrganizationId)
   lastSelectedOrganizationId$: Observable<number>;
 
@@ -147,7 +147,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.watchForStructure();
     this.subscribeOnLocationChange();
     this.watchForRegionControl();
-   
+
 
     combineLatest([
       this.subscribeOnPageNumberChange(),
@@ -168,7 +168,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   public onFilterClearAll(): void {
-    this.clearFilters();
+    this.filterColumns.locationIds.dataSource=[];
+    this.filterColumns.departmentIds.dataSource=[];
+    this.clearFilters
     this.patchFormValue();
     this.store.dispatch(new ShowFilterDialog(true));
     this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
@@ -206,8 +208,12 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   public onFilterDelete(event: FilteredItem): void {
+    if(event.column =="regionsIds"){
+      this.filterColumns.departmentIds.dataSource = this.filterColumns.departmentIds.dataSource?.filter(f=>f.regionId!==event.regionId);
+      this.filterColumns.locationIds.dataSource = this.filterColumns.locationIds.dataSource?.filter(f=>f.regionId!==event.regionId);
+    }
     this.filterService.removeValue(event, this.filtersForm, this.filterColumns);
-    this.filtersForm.markAsDirty();
+    this.filtersForm.markAsDirty();    
   }
 
   public onFilterClose(): void {
@@ -340,7 +346,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         valueField: 'skillDescription',
         valueId: 'masterSkillId',
       },
-      
+
       departmentIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -422,6 +428,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private handleFilterState(filters: PreservedFiltersByPage<FiltersModal>): void {
+    let dispatchPatch = false;
     const { isNotPreserved, state, dispatch } = filters;
     if (!isNotPreserved && dispatch) {
       this.filters = {
@@ -435,6 +442,18 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
       };
 
+      dispatchPatch = true;
+    }
+
+    if (this.CandidateStatus) {
+      this.filters = {
+        ...this.filters,
+        applicantStatuses: [this.CandidateStatus],
+      };
+      dispatchPatch = true;
+    }
+
+    if (dispatchPatch) {
       this.patchFormValue();
     }
   }
@@ -528,7 +547,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       });
   }
 
- 
+
   private watchForStructure(): void {
     this.organizationStructure$
       .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
@@ -538,6 +557,6 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         this.allRegions = [...this.orgRegions];
         this.filterColumns.regionsIds.dataSource = this.allRegions;
       });
-  }  
+  }
 
 }

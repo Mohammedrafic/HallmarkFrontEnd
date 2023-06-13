@@ -47,6 +47,8 @@ export enum TimesheetDetailsActions {
   NoWorkPerformed = '[timesheet details] No work performed',
   GetDetailsByDate ='[timesheet details] Get timesheet details by date',
   RecalculateTimesheets = '[timesheet details] Recalculate timesheets by job id',
+  ForceAddRecord = '[timesheet details] Force add overlaping record',
+  ForceUpdateRecords = '[timesheet details] Force update overlaping records',
 }
 
 export enum TIMETHEETS_STATUSES {

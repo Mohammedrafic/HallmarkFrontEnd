@@ -211,14 +211,25 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
         skillGroup.includeInVMS = includeInVMS ?? false;
       }
 
-      this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup, this.currentPage, this.pageSize));
-      this.store.dispatch(new ShowSideDialog(false));
+      this.watchForSuccessesUpdateSkillGroup(skillGroup);
       this.removeActiveCssClass();
       this.clearFormDetails();
     } else {
       this.isGridStateInvalid = this.skillsId.size === 0;
       this.skillGroupsFormGroup.markAllAsTouched();
     }
+  }
+
+  private watchForSuccessesUpdateSkillGroup(skillGroup: CredentialSkillGroupPost): void {
+    this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup, this.currentPage, this.pageSize))
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+      this.store.dispatch([
+        new GetAssignedSkillsByOrganization(),
+        new ShowSideDialog(false),
+      ]);
+    });
   }
 
   onRowsDropDownChanged(): void {
@@ -338,7 +349,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       }
 
       if (allOrganizationSkills) {
-        this.allAssignedSkills = this.groupSetupService.createAllAssignedSkills(this.skillGroups, allOrganizationSkills);
+        this.allAssignedSkills = allOrganizationSkills;
         this.filterSkills();
       }
 

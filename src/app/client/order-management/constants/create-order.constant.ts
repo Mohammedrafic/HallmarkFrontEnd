@@ -39,8 +39,6 @@ export const OrderDetailsValidationMessage = {
   cssClass: 'error-toast',
 };
 
-export const ErrorContentMessageForCredential = 'Please add Credentials in Credentials tab';
-
 export const OrderTypeTooltipMessage: Record<number, string> = {
   [IrpOrderType.LongTermAssignment]: 'Long Term Assignment',
   [IrpOrderType.PerDiem]: 'Per Diem',

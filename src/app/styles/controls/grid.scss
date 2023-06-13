@@ -432,10 +432,7 @@ body.dark {
       }
 
       .e-detail-intent {
-        // width: 0 !important;
-        
-        // The style above was commented on because it caused the issue
-        // When clicking on the empty space under the grid rows the infinite loop started
+        width: 1px !important;
       }
 
       .e-virtualtable {

@@ -16,25 +16,12 @@ import { ColDef } from '@ag-grid-community/core';
 })
 export class CandidateGridComponent extends DestroyableDirective implements OnInit {
   @Input() public CandidateStatus: number;
-  @Input() set candidatesPage(page: CandidateDetailsPage) {
-    if (page) {
-      this.candidatePage = page;
-      this.candidatePage.totalCount = this.candidatePage.items.length
-    }
-    if(this.CandidateStatus){
-      if(page){
-        this.candidatePage = page;
-        this.candidatePage.items = (this.candidatePage.items || []).filter(f => f.status == this.CandidateStatus);
-        this.candidatePage.totalCount = this.candidatePage.items.length
-      }
-    }
-  }
-
+  @Input() public candidatesPage: CandidateDetailsPage;
   @Input() public pageNumber: number;
   @Input() public pageSize: number;
+
   @ViewChild('grid') grid: GridComponent;
 
-  public candidatePage: CandidateDetailsPage;
   public readonly statusEnum = CandidateStatus;
   public isAgency = false;
   public isLoading = false;

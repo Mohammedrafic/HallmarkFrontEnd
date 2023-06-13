@@ -28,6 +28,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   public $statusConfirmDialog = new Subject<boolean>();
   public showSkillConfirmDialog = false;
   public showStatusConfirmDialog = false;
+  public replaceOrder = false;
   public employeeTerminatedWaring = EMPLOYEE_TERMINATED_WARNING;
   public employeeSkillChangeWarning = EMPLOYEE_SKILL_CHANGE_WARNING;
 
@@ -83,8 +84,10 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private isSkillChanged(): boolean {
-    return !!(this.candidateService.employeeId &&
-      (this.candidateProfileFormService.candidateForm.get('primarySkillId')?.dirty || this.candidateProfileFormService.candidateForm.get('secondarySkills')?.dirty));
+    return !!(this.candidateService.employeeId && (
+      this.candidateProfileFormService.candidateForm.get('primarySkillId')?.dirty ||
+      this.candidateProfileFormService.candidateForm.get('secondarySkills')?.dirty
+    ));
   }
 
   private isEmployeeTerminated(): boolean {
@@ -131,7 +134,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
 
   private saveCandidate(): Observable<void | CandidateModel> {
     return this.candidateProfileService
-      .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId)
+      .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId, this.replaceOrder)
       .pipe(takeUntil(this.destroy$));
   }
 

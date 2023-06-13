@@ -56,9 +56,12 @@ export class DepartmentsService {
   /**
    * Update department
    */
-  public updateDepartment(department: Department, ignoreWarning: boolean): Observable<void> {
+  public updateDepartment(department: Department, ignoreWarning?: boolean, createReplacement?: boolean): Observable<void> {
     if (ignoreWarning) {
       department.ignoreValidationWarning = true;
+    }
+    if (createReplacement) {
+      department.createReplacement = true;
     }
     return this.http.put<void>(`/api/Departments/`, department);
   }
@@ -66,8 +69,8 @@ export class DepartmentsService {
   /**
    * Delete department
    */
-  public deleteDepartmentById(departmentId?: number): Observable<any> {
-    return this.http.delete<any>(`/api/Departments/${departmentId}`);
+  public deleteDepartmentById(departmentId?: number): Observable<void> {
+    return this.http.delete<void>(`/api/Departments/${departmentId}`);
   }
 
   /**

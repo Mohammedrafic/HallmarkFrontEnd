@@ -15,14 +15,16 @@
   </div>
 </div>
 
-<app-candidate-confirm-dialog
+<app-replacement-order-confirmation
   *ngIf="showSkillConfirmDialog"
   [text]="employeeSkillChangeWarning"
-  [$confirmDialog]="$skillsConfirmDialog"
-></app-candidate-confirm-dialog>
+  (confirm)="$skillsConfirmDialog.next($event)"
+  [(replaceChecked)]="replaceOrder"
+></app-replacement-order-confirmation>
 
-<app-candidate-confirm-dialog
+<app-replacement-order-confirmation
   *ngIf="showStatusConfirmDialog"
   [text]="employeeTerminatedWaring"
-  [$confirmDialog]="$statusConfirmDialog"
-></app-candidate-confirm-dialog>
+  (confirm)="$statusConfirmDialog.next($event)"
+  [(replaceChecked)]="replaceOrder"
+></app-replacement-order-confirmation>
