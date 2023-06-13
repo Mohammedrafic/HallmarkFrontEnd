@@ -550,9 +550,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.businessControl.patchValue([]);
     this.filteredBusinessUnits = this.businessUnits;
     if(this.activeSystem == OrderManagementIRPSystemId.IRP){      
-      if(user?.businessUnitType == BusinessUnitType.Hallmark){
-        this.businessUnitControl.patchValue(this.filteredBusinessUnits[0].id);
+      if(user?.businessUnitType == BusinessUnitType.Hallmark){        
         this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
+        this.businessUnitControl.patchValue(this.filteredBusinessUnits[0].id);
       }
       if(user?.businessUnitType == BusinessUnitType.Organization){
         this.businessUnitControl.enable();       
