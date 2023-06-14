@@ -1,5 +1,5 @@
 import { EmitType } from '@syncfusion/ej2-base';
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, Inject, ViewChild, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ClearLogiReportState } from '@organization-management/store/logi-report.action';
@@ -35,7 +35,7 @@ import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
   styleUrls: ['./unit-profile.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UnitProfileComponent implements OnInit {
+export class UnitProfileComponent implements OnInit, OnDestroy {
   public user: User | null;
   public filterColumns: any;
   private agencyOrganizationId: number;
@@ -416,5 +416,11 @@ export class UnitProfileComponent implements OnInit {
     var today = new Date(Date.now());
     var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
     return lastWeek;
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();  
+    this.isAlive = false;  
   }
 }
