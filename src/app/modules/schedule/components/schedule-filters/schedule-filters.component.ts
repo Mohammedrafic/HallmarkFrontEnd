@@ -41,7 +41,9 @@ import {
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 import { TimeMask } from '@client/order-management/components/irp-tabs/order-details/constants';
-import { AbstractControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
+import { getPreservedfilterTime, getPreservedTime, getTime } from '@shared/utils/date-time.utils';
+import { Time } from '@angular/common';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -73,28 +75,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   private filters: ScheduleFilters = {};
   private isPreservedFilters = false;
   public readonly timeMask = TimeMask;
-
-  private get ShowAvailability(): AbstractControl | null {
-    return this.scheduleFilterFormGroup.get('isAvailablity');
-  }
-  private get Skills(): AbstractControl | null {
-    return this.scheduleFilterFormGroup.get('skillIds');
-  }
-  private get ShowUnavailability(): AbstractControl | null {
-    return this.scheduleFilterFormGroup.get('isUnavailablity');
-  }
-  private get ShowScheduledCandidate(): AbstractControl | null {
-    return this.scheduleFilterFormGroup.get('isOnlySchedulatedCandidate');
-  }
-  private get ShowExcludedCandiate(): AbstractControl | null {
-    return this.scheduleFilterFormGroup.get('isExcludeNotOrganized');
-  }
-  private get ShowStartTime(): AbstractControl | null {
-    return this.scheduleFilterFormGroup.get('startTime');
-  }
-  private get ShowEndTime(): AbstractControl | null {
-    return this.scheduleFilterFormGroup.get('endTime');
-  }
 
   private filterStructure: ScheduleFilterStructure = {
     regions: [],
@@ -135,17 +115,18 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   public clearAllFilters(clearPreservedFilters = true): void {
-    this.scheduleFilterFormGroup.get('regionIds')?.patchValue([]);
-    this.scheduleFilterFormGroup.get('locationIds')?.patchValue([]);
-    this.scheduleFilterFormGroup.get('departmentsIds')?.patchValue([]);
-    this.scheduleFilterFormGroup.get('skillIds')?.patchValue([]);
-    this.scheduleFilterFormGroup.get('isAvailablity')?.patchValue(false);
-    this.scheduleFilterFormGroup.get('isUnavailablity')?.patchValue(false);
-    this.scheduleFilterFormGroup.get('isOnlySchedulatedCandidate')?.patchValue(false);
-    this.scheduleFilterFormGroup.get('isExcludeNotOrganized')?.patchValue(false);
-    this.scheduleFilterFormGroup.get('startTime')?.patchValue('');
-    this.scheduleFilterFormGroup.get('endTime')?.patchValue('');
-
+    this.scheduleFilterFormGroup.patchValue({
+      regionIds: [],
+      locationIds: [],
+      departmentsIds: [],
+      skillIds: [],
+      isAvailablity : false,
+      isUnavailablity : false,
+      isOnlySchedulatedCandidate : false,
+      isExcludeNotOrganized : false,
+      startTime: null,
+      endTime : null
+    });
     this.filters = this.scheduleFilterFormGroup.getRawValue();
     this.filteredItems = [];
     this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: [] });
@@ -268,15 +249,16 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       });
 
       merge(
-        (this.ShowAvailability as AbstractControl).valueChanges,
-        (this.ShowUnavailability as AbstractControl).valueChanges,
-        (this.ShowScheduledCandidate as AbstractControl).valueChanges,
-        (this.ShowExcludedCandiate as AbstractControl).valueChanges,
-        (this.ShowEndTime as AbstractControl).valueChanges,
-        (this.ShowStartTime as AbstractControl).valueChanges
+        this.scheduleFilterFormGroup.controls['isAvailablity'].valueChanges,
+        this.scheduleFilterFormGroup.controls['skillIds'].valueChanges,
+        this.scheduleFilterFormGroup.controls['isUnavailablity'].valueChanges,
+        this.scheduleFilterFormGroup.controls['isOnlySchedulatedCandidate'].valueChanges,
+        this.scheduleFilterFormGroup.controls['isExcludeNotOrganized'].valueChanges,
+        this.scheduleFilterFormGroup.controls['startTime'].valueChanges,
+        this.scheduleFilterFormGroup.controls['endTime'].valueChanges
       )
       .pipe(takeUntil(this.componentDestroy()))
-      .subscribe((x: any) => {this.setFilteredItems()});
+      .subscribe(() => {this.setFilteredItems()});
   }
 
   private observeInlineChipDeleteEvent(): void {
@@ -318,50 +300,27 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.setUnfilteredItems(this.filteredItems);
     const chips = this.scheduleFiltersService
       .createChipsData(this.scheduleFilterFormGroup.getRawValue(), this.filterColumns);
-    if(this.filters.startTime != null){
-      if(typeof(this.filters.startTime) !== 'string'){
-        const startDateTime : any = this.filters.startTime;
-        const event = new Date(startDateTime);
-        const timeEvent = event.toLocaleTimeString('en-US');
-        for(let i=0; i<chips.length; i++){
-          if(chips[i].groupField === 'startTime'){
-            chips[i].data = [timeEvent];
-            if(timeEvent.split(' ')[0].length == 7){
-              this.filters.startTime = '0'+timeEvent.split(' ')[0];
-            } else if(timeEvent.split(' ')[0].length == 8) {
-              this.filters.startTime = timeEvent.split(' ')[0];
-            };
-          }
-        }
+      //Conversion of Datetime stamp into HH:MM:SS format
+      if(typeof(this.filters.startTime) !== 'string' && this.filters.startTime !== null){
+        const start_Time : any = this.filters.startTime
+        this.filters.startTime = getTime(start_Time);
+        chips.filter(data => data.groupField === 'startTime' ? data.data = [getTime(start_Time)] : data.data);  
       } else {
-        this.filters.startTime = this.filters.startTime + ':00';
+        this.filters.startTime = getPreservedfilterTime(this.filters.startTime);
       }
-    }
-    if(this.filters.endTime != null){
-      if( typeof(this.filters.endTime) !== 'string'){
-        const endDateTime : any = this.filters.endTime;
-        const event = new Date(endDateTime);
-        const timeEvent = event.toLocaleTimeString('en-US');
-        for(let i=0; i<chips.length; i++){
-          if(chips[i].groupField === 'endTime'){
-            chips[i].data = [timeEvent];
-            if(timeEvent.split(' ')[0].length == 7){
-              this.filters.endTime = '0'+timeEvent.split(' ')[0];
-            } else if(timeEvent.split(' ')[0].length == 8){
-              this.filters.endTime = timeEvent.split(' ')[0];
-            };
-          }
-        }
+      if(typeof(this.filters.endTime) !== 'string' && this.filters.endTime !== null){
+        const end_Time : any = this.filters.endTime
+        this.filters.endTime = (getTime(end_Time));
+        chips.filter(data => data.groupField === 'endTime' ? data.data = [getTime(end_Time)] : data.data);  
       } else {
-        this.filters.endTime = this.filters.endTime + ':00';
+        this.filters.endTime = getPreservedfilterTime(this.filters.endTime);
       }
-    }
-      this.updateScheduleFilter.emit({
-        filters: this.filters,
-        filteredItems: this.filteredItems,
-        chipsData: chips,
-        skipDataUpdate,
-      });
+    this.updateScheduleFilter.emit({
+      filters: this.filters,
+      filteredItems: this.filteredItems,
+      chipsData: chips,
+      skipDataUpdate,
+    });
   }
 
   private updateFiltersStructure(event: ChipDeleteEvent): ChipsFilterStructure {
@@ -451,7 +410,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   private setUnfilteredItems(filteredItems : FilteredItem[]) : void {
-    filteredItems = filteredItems.filter((filter:{value: boolean}) => filter.value !== false);
+    filteredItems = filteredItems.filter((filter: {value: boolean}) => !!filter.value );
     this.filteredItems = [...filteredItems];
     this.cdr.markForCheck();
   }
@@ -511,19 +470,17 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       .subscribe((preservFilters) => {
         this.filters = preservFilters || {};
         this.isPreservedFilters = !!preservFilters;
-        const { regionIds, locationIds, departmentsIds, isAvailablity, isExcludeNotOrganized,
-          startTime, endTime, isOnlySchedulatedCandidate, isUnavailablity } = this.filters;
         if(preservFilters != null){
           this.scheduleFilterFormGroup.patchValue({
-            regionIds: regionIds ? [...regionIds] : [],
-            locationIds: locationIds ? [...locationIds] : [],
-            departmentsIds: departmentsIds ? [...departmentsIds] : [],
-            isAvailablity : isAvailablity,
-            isUnavailablity : isUnavailablity,
-            isExcludeNotOrganized : isExcludeNotOrganized,
-            isOnlySchedulatedCandidate : isOnlySchedulatedCandidate,
-            startTime : startTime ? (JSON.stringify(startTime).split(':')[0]+":"+JSON.stringify(startTime).split(':')[1]).split('"')[1] : null ,
-            endTime : endTime ? (JSON.stringify(endTime).split(':')[0]+":"+JSON.stringify(startTime).split(':')[1]).split('"')[1] : null
+            regionIds: this.filters.regionIds ? [...this.filters.regionIds] : [],
+            locationIds: this.filters.locationIds ? [...this.filters.locationIds] : [],
+            departmentsIds: this.filters.departmentsIds ? [...this.filters.departmentsIds] : [],
+            isAvailablity : this.filters.isAvailablity,
+            isUnavailablity : this.filters.isUnavailablity,
+            isExcludeNotOrganized : this.filters.isExcludeNotOrganized,
+            isOnlySchedulatedCandidate : this.filters.isOnlySchedulatedCandidate,
+            startTime : getPreservedTime(this.filters.startTime),
+            endTime : getPreservedTime(this.filters.endTime)
           });
         }
         if (!this.filters.skillIds?.length) {

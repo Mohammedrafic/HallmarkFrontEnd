@@ -177,8 +177,8 @@ export interface ScheduleFilters {
   isUnavailablity?: boolean;
   isOnlySchedulatedCandidate?: boolean;
   isExcludeNotOrganized?: boolean;
-  startTime? : string | Time | null;
-  endTime? : string | Time | null;
+  startTime? : Time | String | null;
+  endTime? : Time | String | null;
   pageNumber?: number;
   pageSize?: number;
 }
@@ -230,8 +230,8 @@ export interface EmployeesFilters {
   isOnlySchedulatedCandidate: boolean;
   isAvailablity: boolean;
   isUnavailablity: boolean;
-  startTime: string | Time | null;
-  endTime: string | Time | null;
+  startTime: Time | String | null;
+  endTime: Time | String | null;
 }
 
 export interface DatesByWeekday {
