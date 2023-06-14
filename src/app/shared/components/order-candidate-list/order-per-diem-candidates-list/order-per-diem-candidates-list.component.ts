@@ -77,7 +77,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     });
   }
 
-  public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
+  public onEdit(data: OrderCandidatesList): void {
     if (this.order?.isClosed) {
       return;
     }

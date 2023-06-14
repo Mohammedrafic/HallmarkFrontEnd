@@ -4,7 +4,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ONLY_NUMBER } from '@shared/constants';
 import { Duration } from '@shared/enums/durations';
 import { jobDistributionValidator } from '@client/order-management/components/irp-tabs/order-details/validators';
-import { IrpOrderType } from '@shared/enums/order-type';
+import { IrpOrderType, OrderType } from '@shared/enums/order-type';
+import { Order } from '@shared/models/order-management.model';
+import { EditablePerDiemFields } from '@client/order-management/components/irp-tabs/order-details/constants';
 
 @Injectable()
 export class OrderDetailsIrpService {
@@ -22,7 +24,7 @@ export class OrderDetailsIrpService {
       locationId: [null, Validators.required],
       departmentId: [null, Validators.required],
       skillId: [null ,Validators.required],
-      openPositions: [null, [Validators.required, Validators.max(9999999999), Validators.min(1),
+      openPositions: [null, [Validators.required, Validators.min(1), Validators.max(9999999999), Validators.min(1),
         Validators.pattern(ONLY_NUMBER)]],
       duration: [Duration.ThirteenWeeks, Validators.required],
       jobStartDate: [null, Validators.required],
@@ -39,7 +41,8 @@ export class OrderDetailsIrpService {
       locationId: [null, Validators.required],
       departmentId: [null, Validators.required],
       skillId: [null ,Validators.required],
-      openPositions: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(ONLY_NUMBER)]],
+      openPositions: [null, [Validators.required, Validators.min(1), Validators.maxLength(10),
+        Validators.pattern(ONLY_NUMBER)]],
       jobDates: [null, Validators.required],
       shift: [null, Validators.required],
       shiftStartTime: [null, Validators.required],
@@ -131,5 +134,19 @@ export class OrderDetailsIrpService {
       ]],
       isPrimaryContact: [!listLength ?? true],
     });
+  }
+
+  public hasEditablePerDiemOrder(selectedOrder: Order): boolean | undefined {
+    return selectedOrder?.isIrpPerDiemOrderEditable && selectedOrder?.orderType === OrderType.ReOrder;
+  }
+
+  public disableFieldsForNotEditableOrder(selectedOrder: Order, form: FormGroup): void {
+    const isPerDiemOrderEditable = this.hasEditablePerDiemOrder(selectedOrder);
+
+    if(isPerDiemOrderEditable && form) {
+      EditablePerDiemFields.forEach((field: string) => {
+        form.controls[field].disable();
+      });
+    }
   }
 }

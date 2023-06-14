@@ -105,7 +105,7 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
 
 
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   selectedDepartments: Department[];
@@ -381,7 +381,8 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
       "locationsISD": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentsISD": departmentIds.length == 0 ? "null" : departmentIds,
       "agencyISD": agencyIds.length == 0 ? "null" : agencyIds.join(","),
-      "candidateISD": candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+      "candidateISD": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
+//        candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
       "invoiceNumberISD": invoiceNumber == null ? "null" : invoiceNumber,
       "InvoiceStartDateISD": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "invoiceEndDateISD": formatDate(endDate, 'MM/dd/yyyy', 'en-US')

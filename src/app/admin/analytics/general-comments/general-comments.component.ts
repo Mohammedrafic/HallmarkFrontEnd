@@ -490,10 +490,10 @@ export class GeneralCommentsComponent implements OnInit {
   }
   public saveAsReport(): void {
     let options: any = {
-      savePath: "/JsonApiReports/" + this.user?.id ?? "Test User" + "/GeneralComments/GeneralComments.cls",
+      savePath: "/JsonApiReports/" + this.user?.id + "/GeneralComments/GeneralComments.cls" ?? "Test User" + "/GeneralComments/GeneralComments.cls",
       linkedCatalog: true,
       saveSort: false,
-      catalog: "/JsonApiReports/" + this.user?.id ?? "Test User" + "/GeneralComments/GeneralComments.cat"
+      catalog: "/JsonApiReports/" + this.user?.id + "/GeneralComments/GeneralComments.cat" ?? "Test User" + "/GeneralComments/GeneralComments.cat"
     };
     this.logiReportComponent.SaveAsReport(options);
   }

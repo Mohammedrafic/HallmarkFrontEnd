@@ -36,6 +36,7 @@
         </button>
       </div>
     </div>
+    <app-eligibility-message [message]="candidateJob?.notEligibilityMessage"></app-eligibility-message>
     <app-deploy-candidate-message *ngIf="isDeployedCandidate" [isAgency]="isAgency" [candidateBasicInfo]="deployedCandidateOrderInfo"></app-deploy-candidate-message>
   </section>
   <section class="content-container">

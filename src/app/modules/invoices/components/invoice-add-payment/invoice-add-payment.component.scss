@@ -140,6 +140,8 @@
 }
 
 .amount-text {
+  max-width: 150px;
+  overflow: hidden;
   font-weight: 700;
   color: $black;
 }

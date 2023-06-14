@@ -67,7 +67,7 @@
       [rowHeight]="rowHeight"
       [resizeSettings]="resizeSettings"
       [enableVirtualization]="false"
-      [allowPaging]="allowPaging"
+      [allowPaging]="false"
       [pageSettings]="pageSettings"
       [height]="300"
     >
@@ -78,7 +78,7 @@
               <div
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
-                (click)="onEdit(data, $event)"
+                (click)="onEdit(data)"
               >
                 <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
               </div>
@@ -148,51 +148,14 @@
           </ng-template>
         </e-column>
       </e-columns>
-      <ng-template #pagerTemplate let-data>
-        <div class="e-pagertemplate">
-          <div class="control-section">
-            <div class="content-wrapper">
-              <section class="left-side-pager-controls">
-                <ejs-dropdownlist
-                  id="rowsPerPage"
-                  class="dropdown-no-border"
-                  [allowFiltering]="true"
-                  [dataSource]="rowsPerPageDropDown"
-                  [(value)]="activeRowsPerPageDropDown"
-                  (change)="onRowsDropDownChanged()"
-                >
-                </ejs-dropdownlist>
-                <ejs-numerictextbox
-                  id="goToPage"
-                  class="numeric-input-no-border"
-                  format="#"
-                  placeholder="Go to:"
-                  min="1"
-                  [max]="candidatesList?.totalCount"
-                  [showSpinButton]="false"
-                  (change)="onGoToClick($event)"
-                >
-                </ejs-numerictextbox>
-                <div class="total-rows">Total Rows: {{ candidatesList?.totalCount }}</div>
-              </section>
-              <section class="right-side-pager-controls">
-                <ejs-pager
-                  id="gridPager"
-                  #gridPager
-                  [pageSize]="pageSize"
-                  [totalRecordsCount]="candidatesList?.totalCount"
-                  [enablePagerMessage]="false"
-                  [currentPage]="currentPage"
-                  (click)="onGoToClick($event)"
-                >
-                </ejs-pager>
-              </section>
-            </div>
-          </div>
-        </div>
-      </ng-template>
-
-  </ejs-grid>
+    </ejs-grid>
+    <app-grid-pagination
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalRecordsCount]="candidatesList?.totalCount || 0"
+      (navigateToPageEmitter)="gridPageChanged($event)"
+      (pageSizeChangeEmitter)="gridPerPageChanged($event)"
+    ></app-grid-pagination>
   </ng-container>
   <ng-container *ngIf="system === systemType.IRP && selectedOrder.orderType === orderTypes.Traveler
     && isFeatureIrpEnabled && !isAgency">
@@ -207,7 +170,7 @@
       [rowHeight]="rowHeight"
       [resizeSettings]="resizeSettings"
       [enableVirtualization]="false"
-      [allowPaging]="allowPaging"
+      [allowPaging]="false"
       [pageSettings]="pageSettings"
       [height]="300"
     >
@@ -274,50 +237,14 @@
         <e-column field="payRate" headerText="Pay Rate" textAlign="Left" width="116">
         </e-column>
       </e-columns>
-      <ng-template #pagerTemplate let-data>
-        <div class="e-pagertemplate">
-          <div class="control-section">
-            <div class="content-wrapper">
-              <section class="left-side-pager-controls">
-                <ejs-dropdownlist
-                  id="rowsPerPage"
-                  class="dropdown-no-border"
-                  [allowFiltering]="true"
-                  [dataSource]="rowsPerPageDropDown"
-                  [(value)]="activeRowsPerPageDropDown"
-                  (change)="onRowsDropDownChanged()"
-                >
-                </ejs-dropdownlist>
-                <ejs-numerictextbox
-                  id="goToPage"
-                  class="numeric-input-no-border"
-                  format="#"
-                  placeholder="Go to:"
-                  min="1"
-                  [max]="irpCandidates?.totalCount"
-                  [showSpinButton]="false"
-                  (change)="onGoToClick($event)"
-                >
-                </ejs-numerictextbox>
-                <div class="total-rows">Total Rows: {{ irpCandidates?.totalCount }}</div>
-              </section>
-              <section class="right-side-pager-controls">
-                <ejs-pager
-                  id="gridPager"
-                  #gridPager
-                  [pageSize]="pageSize"
-                  [totalRecordsCount]="irpCandidates?.totalCount"
-                  [enablePagerMessage]="false"
-                  [currentPage]="currentPage"
-                  (click)="onGoToClick($event)"
-                >
-                </ejs-pager>
-              </section>
-            </div>
-          </div>
-        </div>
-      </ng-template>
     </ejs-grid>
+    <app-grid-pagination
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalRecordsCount]="irpCandidates?.totalCount || 0"
+      (navigateToPageEmitter)="gridPageChanged($event)"
+      (pageSizeChangeEmitter)="gridPerPageChanged($event)"
+    ></app-grid-pagination>
   </ng-container>
 </section>
 

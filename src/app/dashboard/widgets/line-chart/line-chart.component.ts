@@ -43,6 +43,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   @Input() public timeSelection: TimeSelectionEnum;
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
+  @Input() public slideBar: any = false;
   
   public primaryYAxis: AxisModel = {
     minimum: 0,

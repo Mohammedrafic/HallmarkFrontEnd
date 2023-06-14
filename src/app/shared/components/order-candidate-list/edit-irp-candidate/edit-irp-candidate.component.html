@@ -20,7 +20,7 @@
         ejs-button
         [isPrimary]="true"
         class="save-button"
-        (click)="saveCandidate()"
+        (click)="save()"
         [disabled]="disableSaveButton"
       > Save
       </button>
@@ -86,3 +86,10 @@
       [externalCommentConfiguration]="externalCommentConfiguration"></app-comments-irp>
   </div>
 </ejs-dialog>
+
+<app-replacement-pd-orders-dialog
+  *ngIf="replacementPdOrdersDialogOpen"
+  [closingDate]="closingDate"
+  (createOrders)="setCreateReplacement($event)"
+  (destroyDialog)="showReplacementPdOrdersDialog(false)"
+></app-replacement-pd-orders-dialog>

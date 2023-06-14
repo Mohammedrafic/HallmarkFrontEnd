@@ -23,15 +23,17 @@
     <div>
       {{ text }}
     </div>
-    <div class="bootstrap">
-      <ejs-checkbox label="Create replacement Order" [(checked)]="replaceChecked" (change)="updateReplaceValue()"></ejs-checkbox>
-    </div>
   </ng-template>
 
   <ng-template #footerTemplate>
     <div class="e-card-content">
-      <button ejs-button cssClass="e-outline" (click)="cancel()">Cancel</button>
-      <button ejs-button cssClass="e-danger" [isPrimary]="true" (click)="submit()">Yes</button>
+      <div class="bootstrap replacement-checkbox">
+        <ejs-checkbox label="Create replacement Order" [(checked)]="replaceChecked" (change)="updateReplaceValue()"></ejs-checkbox>
+      </div>
+      <div>
+        <button ejs-button cssClass="e-outline" (click)="cancel()">Cancel</button>
+        <button ejs-button cssClass="e-danger" [isPrimary]="true" (click)="submit()">Yes</button>
+      </div>
     </div>
   </ng-template>
 </ejs-dialog>

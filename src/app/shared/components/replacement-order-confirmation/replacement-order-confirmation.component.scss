@@ -3,6 +3,22 @@
 .confirm-dialog {
   border-radius: 8px !important;
 
+  .e-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .bootstrap.replacement-checkbox {
+      ::ng-deep {
+        ejs-checkbox {
+          .e-label {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+  }
+
   & + .e-dlg-overlay {
     background-color: $black;
   }

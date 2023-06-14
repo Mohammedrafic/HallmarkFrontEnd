@@ -34,6 +34,7 @@ import {
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
+import { SystemType } from '@shared/enums/system-type.enum';
 import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { Department } from '@shared/models/department.model';
@@ -962,14 +963,14 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           this.projectNames = this.isSpecialProjectFieldsRequired
             ? data.projectNames.filter(f => f.includeInVMS == true && f.projectTypeId ==id)
             : [{ id: null, projectName: '' }, ...data.projectNames.filter(f => f.includeInVMS == true && f.projectTypeId ==id)];
-  
+
         })
         this.cd.markForCheck();
       }else{
         this.specialProject.controls['projectNameId'].reset();
         this.projectNames=[];
       }
-     
+
     })
   }
 
@@ -1151,7 +1152,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         return;
       }
 
-      this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId));
+      this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId, SystemType.VMS));
     });
 
     this.orderControlsConfig.durationControl.valueChanges.pipe(

@@ -21,6 +21,14 @@ export namespace Tiers {
     ) {}
   }
 
+  export class SaveTierIRP {
+    static readonly type = TIERS_ACTIONS.SAVE_TIER_IRP;
+    constructor(
+      public payload: TierDTO,
+      public isEdit: boolean
+    ) {}
+  }
+
   export class DeleteTier {
     static readonly type = TIERS_ACTIONS.DELETE_TIER;
     constructor(public id: number) {}

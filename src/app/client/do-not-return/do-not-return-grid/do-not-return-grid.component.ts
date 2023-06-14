@@ -340,6 +340,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
     this.refreshGrid$.subscribe((res)=>{
       if(res){
+        this.sortByField = 2;
         this.pageSubject.next(1);
       }
     })

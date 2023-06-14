@@ -26,75 +26,80 @@
 
   <ng-container *ngIf="system === systemType.VMS || !isFeatureIrpEnabled || isAgency;">
     <ejs-grid
-    #orderCandidatesGrid
-    id="users-grid"
-    class="users-grid e-gridwithheader"
-    [dataSource]="candidatesList?.items || []"
-    [allowSorting]="false"
-    [allowResizing]="true"
-    [allowSelection]="false"
-    [rowHeight]="rowHeight"
-    [resizeSettings]="resizeSettings"
-    [enableVirtualization]="false"
-    [allowPaging]="allowPaging"
-    [pageSettings]="pageSettings"
-    [height]="300"
-  >
-    <e-columns>
-      <e-column textAlign="Right" width="80">
-        <ng-template #template let-data>
-          <div class="row-tool-buttons">
-            <div ejs-button cssClass="e-flat primary-icon-button custom-button" (click)="onEdit(data, $event)">
-              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-            </div>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
-        <ng-template #template let-data>
-          <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}</div>
-        </ng-template>
-      </e-column>
-      <e-column field="statusName" headerText="Status" textAlign="Left" width="150">
-        <ng-template #template let-data>
-          <div class="status-cell">
-            <ejs-chiplist>
-              <e-chips>
-                <e-chip [text]="data.statusName" [cssClass]="data.statusName | chipsCssClass"></e-chip>
-              </e-chips>
-            </ejs-chiplist>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column field="skill" headerText="Skill" textAlign="Left" width="230" *ngIf="isAgency; else agencyColumn">
-      </e-column>
-      <ng-template #agencyColumn>
-        <e-column field="agency" textAlign="Left" headerText="Agency" width="200" *ngIf="!isAgency">
+      #orderCandidatesGrid
+      id="users-grid"
+      class="users-grid e-gridwithheader"
+      [dataSource]="candidatesList?.items || []"
+      [allowSorting]="false"
+      [allowResizing]="true"
+      [allowSelection]="false"
+      [rowHeight]="rowHeight"
+      [resizeSettings]="resizeSettings"
+      [enableVirtualization]="false"
+      [allowPaging]="false"
+      [pageSettings]="pageSettings"
+      [height]="300"
+    >
+      <e-columns>
+        <e-column textAlign="Right" width="80">
           <ng-template #template let-data>
-            {{data.agencyName}}
+            <div class="row-tool-buttons">
+              <div ejs-button cssClass="e-flat primary-icon-button custom-button" (click)="onEdit(data)">
+                <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+              </div>
+            </div>
           </ng-template>
         </e-column>
-      </ng-template>
-      <e-column field="submissionsPercentage" headerText="Submission %" textAlign="Left" width="130">
-        <ng-template #template let-data>
-          <div class="progress-bar">
-            <span>{{data.submissionsPercentage}}</span>
-            <app-custom-progress-bar [value]="data.submissionsPercentage"></app-custom-progress-bar>
-          </div>
+        <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
+          <ng-template #template let-data>
+            <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}</div>
+          </ng-template>
+        </e-column>
+        <e-column field="statusName" headerText="Status" textAlign="Left" width="150">
+          <ng-template #template let-data>
+            <div class="status-cell">
+              <ejs-chiplist>
+                <e-chips>
+                  <e-chip [text]="data.statusName" [cssClass]="data.statusName | chipsCssClass"></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+            </div>
+          </ng-template>
+        </e-column>
+        <e-column field="skill" headerText="Skill" textAlign="Left" width="230" *ngIf="isAgency; else agencyColumn">
+        </e-column>
+        <ng-template #agencyColumn>
+          <e-column field="agency" textAlign="Left" headerText="Agency" width="200" *ngIf="!isAgency">
+            <ng-template #template let-data>
+              {{data.agencyName}}
+            </ng-template>
+          </e-column>
         </ng-template>
-      </e-column>
-      <e-column field="onboardedPercentage" headerText="Onboard %" textAlign="Left" width="130">
-        <ng-template #template let-data>
-          <div class="progress-bar">
-            <span>{{data.onboardedPercentage}}</span>
-            <app-custom-progress-bar [value]="data.onboardedPercentage"></app-custom-progress-bar>
-          </div>
-        </ng-template>
-      </e-column>
-    </e-columns>
-
-
-  </ejs-grid>
+        <e-column field="submissionsPercentage" headerText="Submission %" textAlign="Left" width="130">
+          <ng-template #template let-data>
+            <div class="progress-bar">
+              <span>{{data.submissionsPercentage}}</span>
+              <app-custom-progress-bar [value]="data.submissionsPercentage"></app-custom-progress-bar>
+            </div>
+          </ng-template>
+        </e-column>
+        <e-column field="onboardedPercentage" headerText="Onboard %" textAlign="Left" width="130">
+          <ng-template #template let-data>
+            <div class="progress-bar">
+              <span>{{data.onboardedPercentage}}</span>
+              <app-custom-progress-bar [value]="data.onboardedPercentage"></app-custom-progress-bar>
+            </div>
+          </ng-template>
+        </e-column>
+      </e-columns>
+    </ejs-grid>
+    <app-grid-pagination
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalRecordsCount]="candidatesList?.totalCount || 0"
+      (navigateToPageEmitter)="gridPageChanged($event)"
+      (pageSizeChangeEmitter)="gridPerPageChanged($event)"
+    ></app-grid-pagination>
   </ng-container>
 </section>
 
