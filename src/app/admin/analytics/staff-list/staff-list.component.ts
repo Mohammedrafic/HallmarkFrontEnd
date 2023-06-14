@@ -8,6 +8,7 @@ import {
   ChangeDetectorRef,
   NgZone,
   Inject,
+  OnDestroy,
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -55,7 +56,7 @@ import { GlobalWindow } from '@core/tokens';
   styleUrls: ['./staff-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StaffListComponent implements OnInit {
+export class StaffListComponent implements OnInit, OnDestroy {
   public baseUrl: string = '';
   public user: User | null;
   public filterColumns: any;
@@ -555,6 +556,11 @@ export class StaffListComponent implements OnInit {
         e.updateData(this.candidateFilterData);
       });
     }
+  }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();  
+    this.isAlive = false;  
   }
 }
 
