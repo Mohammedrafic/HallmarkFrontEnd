@@ -1,11 +1,21 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges, TrackByFunction } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  TrackByFunction,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 
-import { filter, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
-import { Actions, ofActionDispatched, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
+import { OrderCandidatesCredentialsState } from '@order-credentials/store/credentials.state';
 import { IrpTabConfig } from '@client/order-management/containers/irp-container/irp-container.constant';
 import { IrpTabs } from '@client/order-management/enums';
 import { ListOfKeyForms, SelectSystem, TabsConfig } from '@client/order-management/interfaces';
@@ -28,7 +38,6 @@ import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-irp-container',
@@ -40,6 +49,9 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   @Input('handleSaveEvents') public handleSaveEvents$: Subject<void | MenuEventArgs>;
   @Input() public selectedOrder: Order;
   @Input() selectedSystem: SelectSystem;
+
+  @Select(OrderCandidatesCredentialsState.predefinedCredentials)
+  predefinedCredentials$: Observable<IOrderCredentialItem[]>;
 
   public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
@@ -53,6 +65,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private store: Store,
     private actions$: Actions,
     private router: Router,
+    private cdr: ChangeDetectorRef,
     private confirmService: ConfirmService,
   ) {
     super();
@@ -61,11 +74,12 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   ngOnInit(): void {
     this.watchForSaveEvents();
     this.watchForSucceededSaveOrder();
+    this.watchForPredefinedCredentials();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedOrder']?.currentValue) {
-      this.orderCredentials = [...this.selectedOrder.credentials];
+      this.orderCredentials = [...this.selectedOrder.credentials ?? []];
     }
   }
 
@@ -159,5 +173,16 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       id: this.selectedOrder.id,
       deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
     },this.irpStateService.getDocuments()));
+  }
+
+  private watchForPredefinedCredentials(): void {
+    this.predefinedCredentials$
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
+        this.orderCredentials = predefinedCredentials;
+        this.cdr.markForCheck();
+      });
   }
 }

@@ -703,7 +703,9 @@ export class OrderFilter {
   orderType?: number | null;
   contactEmails?: string[] | string;
   irpOnly?: boolean | null;
+  shiftIds?: number[];
   reorderStatuses?: (string | number)[];
+  shift?: string[] | string;
 }
 
 export class SortModel {

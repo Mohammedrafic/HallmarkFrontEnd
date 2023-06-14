@@ -488,6 +488,15 @@ export class GeneralCommentsComponent implements OnInit {
      }
     this.store.dispatch(new ShowFilterDialog(true));
   }
+  public saveAsReport(): void {
+    let options: any = {
+      savePath: "/JsonApiReports/" + this.user?.id + "/GeneralComments/GeneralComments.cls" ?? "Test User" + "/GeneralComments/GeneralComments.cls",
+      linkedCatalog: true,
+      saveSort: false,
+      catalog: "/JsonApiReports/" + this.user?.id + "/GeneralComments/GeneralComments.cat" ?? "Test User" + "/GeneralComments/GeneralComments.cat"
+    };
+    this.logiReportComponent.SaveAsReport(options);
+  }
 
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.generalcmntReportForm, this.filterColumns);

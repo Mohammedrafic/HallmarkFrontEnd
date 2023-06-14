@@ -215,14 +215,28 @@
       </div>
     </div>
   </div>
-  <div>
+  <div class="row">
     <div class="input-container">
-      <label>Job Title</label>
-      <div class="input-group">
-        <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
-      </div>
+    <label>Job Title</label>
+    <div class="input-group">
+    <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
     </div>
-  </div>
+    </div>
+    <div class="input-container">
+    <label>Shift Name</label>
+    <div class="input-group multiselect">
+    <ejs-multiselect
+                mode="CheckBox"
+                [allowFiltering]="true"
+                [dataSource]="shift"
+                [fields]="shiftFields"
+                [showDropDownIcon]="true"
+                formControlName="shift"
+    >
+    </ejs-multiselect>
+    </div>
+    </div>
+    </div>
   <div>
     <div class="input-container">
       <label>Candidate Name</label>

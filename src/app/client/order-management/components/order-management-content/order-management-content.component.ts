@@ -78,6 +78,7 @@ import {
   ExportOrdersJourney,
   GetAgencyOrderCandidatesList,
   GetAvailableSteps,
+  GetAllShifts,
   GetIrpOrderCandidates,
   GetIRPOrders,
   GetOrderById,
@@ -227,6 +228,8 @@ import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
 import { PreservedOrderService } from '@client/order-management/services/preserved-order.service';
 import { GetReOrdersByOrderId } from '@shared/components/order-reorders-container/store/re-order.actions';
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 
 @Component({
   selector: 'app-order-management-content',
@@ -285,13 +288,18 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @Select(OrderManagementContentState.ordersJourneyPage)
   ordersJourneyPage$: Observable<OrdersJourneyPage>;
 
+  @Select(OrderManagementContentState.getAllShifts)
+  private getAllShifts$: Observable<ScheduleShift[]>;
+
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly contactPersonFields: FieldSettingsModel = { text: 'fullName', value: 'email' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
+  public readonly shiftNameFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
+  public readonly shiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
@@ -435,6 +443,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public canCloseOrderIRP:boolean;
   public CanEditOrderBillRateIRP:boolean;
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
+  public shift = ORDER_MASTER_SHIFT_NAME_LIST;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -540,6 +549,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.onGridPageChangedHandler();
     this.onOrganizationChangedHandler();
     this.onOrdersDataLoadHandler();
+    this.getAllShifts();
 
     this.onOrderDetailsDialogOpenEventHandler();
     this.onOrderFilterControlValueChangedHandler();
@@ -879,6 +889,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.cd$.next(true);
   }
 
+  private getAllShifts(): void {
+    this.store.dispatch(new GetAllShifts());
+    this.getAllShifts$.pipe(takeUntil(this.unsubscribe$)).subscribe((state) => {
+      this.filterColumns.shiftIds.dataSource = state;
+    });
+  }
+
   public onFilterClose() {
     this.patchFilterForm();
   }
@@ -938,8 +955,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: this.contactEmails,
+      shiftIds: this.filters.shiftIds || [],
       irpOnly: this.filters.irpOnly || null,
       reorderStatuses: this.filters.reorderStatuses || null,
+      shift:this.filters.shift || null,
     });
 
     if (!prepopulate) {
@@ -2217,6 +2236,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filterColumns.projectTypeIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP? specialProjectCategories.filter(f=>f.includeInIRP == true) :  specialProjectCategories.filter(f=>f.includeInVMS == true);
       // this.filterColumns.projectNameIds.dataSource = projectNames;
       this.filterColumns.poNumberIds.dataSource = poNumbers;
+      this.filterColumns.shift.dataSource = this.shift;
       this.cd$.next(true);
     });
   }
