@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { ListOfKeyForms} from '@client/order-management/interfaces';
 import { CreateOrderDto } from '@shared/models/order-management.model';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
+import { HaveScheduleBooking } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Injectable()
 export class IrpContainerStateService {
@@ -13,6 +15,9 @@ export class IrpContainerStateService {
   private formState: ListOfKeyForms;
   private documents: Blob[];
   private deleteDocumentsGuids: string[] = [];
+
+  constructor(private confirmService: ConfirmService) {
+  }
 
   public setFormState(state: ListOfKeyForms): void {
     this.formState = state;
@@ -44,5 +49,15 @@ export class IrpContainerStateService {
       IrpOrderJobDistribution.SelectedExternal,
       IrpOrderJobDistribution.TieringLogicExternal,
     ].includes(distribution)) as boolean;
+  }
+
+  public showScheduleBookingModal(): Observable<boolean> {
+    return this.confirmService
+      .confirm(HaveScheduleBooking, {
+        title: 'Scheduled LTA Bookings',
+        cancelButtonLabel: 'Update',
+        okButtonClass: 'delete-button',
+        okButtonLabel: 'Remove',
+      });
   }
 }

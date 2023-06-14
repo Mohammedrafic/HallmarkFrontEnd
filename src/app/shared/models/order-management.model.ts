@@ -478,6 +478,7 @@ export class Order {
   allAgencies?: boolean;
   extensionInitialOrderPublicId?: number;
   regionName?: string;
+  isIrpPerDiemOrderEditable?: boolean;
   /**
    * Mispelling on BE, should be - contract.
    */
@@ -530,6 +531,7 @@ export class ReOrder {
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {
   billRates: OrderBillRateDto[];
   jobDistribution?: number[];
+  removeLinkedSchedulesFromLta?: boolean;
 }
 
 export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'statusText' | 'documents'> {
@@ -603,6 +605,7 @@ export type OrderCandidateJob = {
   requestComment: string;
   workflowStepId: number;
   yearsOfExperience: number;
+  notEligibilityMessage: string | null;
   applicantStatus: {
     applicantStatus: number;
     statusText: string;

@@ -28,7 +28,9 @@ import {
 } from '@client/order-management/components/irp-tabs/services/order-details-irp.service';
 import { MultiDatePickerModule } from '@shared/components/multi-date-picker/multi-date-picker.module';
 import { GridIcons } from '@client/order-management/constants';
-import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
+import {
+  IrpContainerStateService,
+} from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import { OrderCredentialsService } from "@client/order-management/services";
 import { OrganizationStructureService } from '@shared/services';
 import { PartialSearchService } from '@shared/services/partial-search.service';
@@ -39,6 +41,7 @@ import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
+import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
 
 
 @NgModule({
@@ -80,6 +83,7 @@ import { ValidateDirectiveModule } from '@shared/directives/validate-directive/v
     OrderCredentialsService,
     OrganizationStructureService,
     PartialSearchService,
+    IrpContainerApiService,
   ],
 })
 export class CreateEditOrderModule { }
