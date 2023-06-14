@@ -329,13 +329,16 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.generalInformationForm = this.orderDetailsService.createGeneralInformationPOForm();
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionPOForm();
       this.jobDescriptionForm = this.orderDetailsService.createJobDescriptionPOForm();
-    }
+   }
   }
 
   private watchForOrderTypeControl(): void {
     this.orderTypeForm.get('orderType')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
+      this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
+      this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+        this.changeDetection.markForCheck();
       this.clearFormLists();
       if (value === IrpOrderType.LongTermAssignment) {
         this.orderFormsArrayConfig =
@@ -638,9 +641,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(() => true),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-    this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
-    this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
-      this.changeDetection.markForCheck();
+      this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
+      this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+        this.changeDetection.markForCheck();
       if (value) {
         let shiftDetails = this.allShifts.find(f => f.id == value)
         if (shiftDetails != null && shiftDetails.id != 0) {
