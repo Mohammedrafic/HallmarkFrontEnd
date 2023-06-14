@@ -7,7 +7,7 @@ import { Observable, takeUntil } from 'rxjs';
 import { Tiers } from '@organization-management/store/tiers.actions';
 import { TiersState } from '@organization-management/store/tiers.state';
 import { TierFilters } from '@organization-management/tiers/interfaces';
-import { TiersColumnsDefinition } from "@organization-management/tiers/tiers-grid/tiers-grid.constant";
+import { TiersColumnsDefinition, TiersColumnsDefinitionIRP } from "@organization-management/tiers/tiers-grid/tiers-grid.constant";
 import { GridReadyEventModel } from '@shared/components/grid/models';
 import { TierDetails, TiersPage } from '@shared/components/tiers-dialog/interfaces';
 import { GRID_CONFIG } from '@shared/constants';
@@ -46,6 +46,10 @@ export class TiersGridComponent extends DestroyableDirective implements OnInit {
     this.watchForUpdatePage();
   }
 
+  ngOnChanges(): void {
+    this.setColumnDefinition();
+  }
+
   public gridReady(grid: GridReadyEventModel): void {
     grid.api.sizeColumnsToFit();
   }
@@ -80,9 +84,16 @@ export class TiersGridComponent extends DestroyableDirective implements OnInit {
   }
 
   public setColumnDefinition(): void {
-    this.columnDefinitions = TiersColumnsDefinition((tier: TierDetails) => {
-      this.editTier.emit(tier);
-    });
+    if(this.systemType == 0){
+      this.columnDefinitions = TiersColumnsDefinition((tier: TierDetails) => {
+        this.editTier.emit(tier);
+      });
+    } else {
+      this.columnDefinitions = TiersColumnsDefinitionIRP((tier: TierDetails) => {
+        this.editTier.emit(tier);
+      });
+    }
+    
   }
 
   private watchForUpdatePage(): void {

@@ -89,6 +89,15 @@
                       >
                       </ejs-multiselect>
                     </div>
+                    <div class="switch" *ngIf="field.showAllToggle">
+                      <ejs-switch
+                        [name]="'all' + field.field"
+                        [checked]="getToggleValue(field.field)"
+                        (change)="allRecordsChange($event, field.field)"
+                        label="All"
+                      ></ejs-switch>
+                      <label [for]="'all' + field.field" class="switch-text">All</label>
+                    </div>
                   </div>
                 </div>
               </ng-template>

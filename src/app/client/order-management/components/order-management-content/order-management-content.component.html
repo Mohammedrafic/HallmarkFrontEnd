@@ -566,9 +566,14 @@
             <span>{{ data.shiftName }}</span>
           </ng-template>
         </e-column>
-        <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
+        <e-column field="shiftStartTime" headerText="Shift Start Time" width="160" minWidth="80" maxWidth="200">
           <ng-template #template let-data>
-            <span>{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span>
+            <span>{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="shiftEndTime" headerText="Shift End Time" width="160" minWidth="80" maxWidth="200">
+          <ng-template #template let-data>
+            <span>{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span>
           </ng-template>
         </e-column>
         <e-column field="candidates" headerText="CAND." headerTextAlign="Right" width="90" minWidth="80" maxWidth="160">

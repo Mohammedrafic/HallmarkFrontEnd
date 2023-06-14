@@ -331,7 +331,10 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       headerName: 'Error Description',
       field: 'failureReason',
       minWidth: 150,
-      resizable: true
+      resizable: true,
+      cellRenderer: (params:any) => {
+        return params.data.status == 4 ? 'Record failed to process due to some internal error' :  params.data.failureReason;
+      }, 
     },
   ];
   public defaultFileName: string;

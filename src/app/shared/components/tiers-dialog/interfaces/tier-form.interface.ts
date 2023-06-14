@@ -2,9 +2,9 @@ import { SystemType } from "@shared/enums/system-type.enum";
 
 export interface TierDTO {
   organizationTierId: number;
-  regionIds: number[] | null;
-  locationIds: number[] | null;
-  departmentIds: number[] | null;
+  regionIds?: number[] | null;
+  locationIds?: number[] | null;
+  departmentIds?: number[] | null;
   name?: string;
   hours?: number;
   associateOrganizationId?: number;
@@ -13,9 +13,9 @@ export interface TierDTO {
   includeInIRP?: boolean;
   includeInVMS?: boolean;
   systemType?: SystemType;
-  WorkCommitmentIds: any;
-  workCommitments: any;
-  skills : any;
+  WorkCommitmentIds?: any;
+  workCommitments?: any;
+  skills? : any;
 }
 
 export interface TierConfig {

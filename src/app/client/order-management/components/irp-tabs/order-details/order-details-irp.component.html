@@ -29,7 +29,7 @@
   <div class="left-section">
     <div class="e-card">
       <div class="e-card-content">
-        <section *ngFor="let form of orderFormsConfig; trackBy:trackByTitle" class="form-wrapper">
+        <section *ngFor="let form of orderFormsConfig" class="form-wrapper">
           <div class="title">{{form.title}}</div>
           <form
             [formGroup]="listOfKeyForms[form.formName]"
@@ -215,7 +215,7 @@
 
         <section>
           <div class="form-array-section form-wrapper"
-               *ngFor="let config of orderFormsArrayConfig; trackBy:trackByTitle">
+               *ngFor="let config of orderFormsArrayConfig;">
             <div class="form-header">
               <div class="title">{{config.title}}</div>
               <div class="add-button" (click)="addFields(config)">
@@ -330,7 +330,7 @@
           [comments]="comments"
           [commentContainerId]="commentContainerId"
           [useBackground]="false"
-          [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanOrganizationEditOrdersIRP]"
+          [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanCreateOrdersIRP]"
           [externalCommentConfiguration]="externalCommentConfiguration"
         ></app-comments-irp>
       </div>
