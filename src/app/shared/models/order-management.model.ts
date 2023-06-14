@@ -709,6 +709,7 @@ export class OrderFilter {
   shiftIds?: number[];
   reorderStatuses?: (string | number)[];
   shift?: string[] | string;
+  isQuickLinkWidgetLTA?: boolean | null;
 }
 
 export class SortModel {

@@ -61,6 +61,7 @@ export class TabsListComponent implements AfterViewInit {
       let isIrpEnabled=  JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
       if(isIrpEnabled==true){
         this.globalWindow.localStorage.setItem("ISIrpEnabled", JSON.stringify(""));
+        this.globalWindow.localStorage.setItem("IsLTAOrders", JSON.stringify(true));
         this.changeTab.emit(OrderManagementIRPTabsIndex.Lta)
         this.tab.selectedItem = OrderManagementIRPTabsIndex.Lta;
       }
