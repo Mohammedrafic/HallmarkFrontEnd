@@ -51,14 +51,18 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   public candidateSearchPlaceholder = CandidateSearchPlaceholder;
   public employeeSearchPlaceholder = EmployeeSearchPlaceholder;
   public isAvailable = false;
+  public isMobileScreen = false;
 
   private readonly searchByCandidateName$: Subject<string> = new Subject();
   private searchTermByCandidateName: string;
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();
-  isMobileScreen:boolean=false;
-
-  constructor(protected override store: Store, protected router: Router, protected globalWindow : WindowProxy & typeof globalThis,) {
+  
+  constructor(
+    protected override store: Store,
+    protected router: Router,
+    protected globalWindow : WindowProxy & typeof globalThis,
+  ) {
     super(store);
   }
 
@@ -166,17 +170,6 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
     this.pageSubject.next(page);
   }
 
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-  }
-
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
-  }
-
   public searchByCandidateName(event: KeyboardEvent): void {
     const queryString = (event.target as HTMLInputElement).value;
     this.searchByCandidateName$.next(queryString.toLowerCase());
@@ -237,7 +230,6 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   protected onPageChanges(): Observable<unknown> {
     return this.pageSubject.pipe(
       debounceTime(1),
-      distinctUntilChanged(),
       tap((page) => {
         this.currentPage = page;
         this.emitGetCandidatesList();
