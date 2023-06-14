@@ -38,7 +38,7 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
   public isEdit = false;
   public showSystemButtons = false;
   public systemButtons: ButtonModel[] = SystemButtons;
-  public selectedSystemType: SystemType = SystemType.VMS;
+  public selectedSystemType: SystemType = SystemType.IRP;
   public pageSize : number = 30;
   public pageNumber : number = 1;
   private tierFormState: TierDTO;
@@ -66,10 +66,10 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.watchForOrganization();
     this.getWorkCommitment();
     this.watchForRegionStructure();
     this.watchForOverrideTier();
-    this.watchForOrganization();
   }
 
   public getWorkCommitment():void {
@@ -104,13 +104,24 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
       this.tierFormState.skills = 3
     } 
     this.tierFormState.WorkCommitmentIds = this.tierFormState.workCommitments;
-    this.store.dispatch(new Tiers.SaveTier({
-      ...this.tierFormState,
-      forceUpsert: false,
-      includeInIRP: this.selectedSystemType === SystemType.IRP,
-      includeInVMS: this.selectedSystemType === SystemType.VMS,
-      systemType: this.selectedSystemType,
-    }, this.isEdit));
+    if(this.selectedSystemType == SystemType.VMS){
+      this.store.dispatch(new Tiers.SaveTier({
+        ...this.tierFormState,
+        forceUpsert: false,
+        includeInIRP: false,
+        includeInVMS: true,
+        systemType: this.selectedSystemType,
+      }, this.isEdit));
+    } else {
+      this.store.dispatch(new Tiers.SaveTierIRP({
+        ...this.tierFormState,
+        forceUpsert: false,
+        includeInIRP: true,
+        includeInVMS: false,
+        systemType: this.selectedSystemType,
+      }, this.isEdit));
+    }
+    
   }
 
   public handleEditTier(tier: TierDetails): void {

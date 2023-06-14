@@ -16,7 +16,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { FieldType } from '@core/enums';
-import { OPTION_FIELDS, TIER_DIALOG_TYPE, TiersDialogConfig, FiledNamesSettings, FieldNames } from '@shared/components/tiers-dialog/constants';
+import { TIER_DIALOG_TYPE, TiersDialogConfig, FiledNamesSettings, FieldNames, OPTION_FIELDS } from '@shared/components/tiers-dialog/constants';
 import { TierDataSource, TierDetails, TierDialogConfig, TiersInputConfig } from '@shared/components/tiers-dialog/interfaces';
 import { Tiers } from '@shared/enums/tiers.enum';
 import { CustomFormGroup } from '@core/interface';
@@ -37,6 +37,7 @@ import { TierList } from '@shared/components/associate-list/interfaces';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Query } from "@syncfusion/ej2-data";
 import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
+import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-tiers-dialog',
@@ -49,11 +50,10 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
   @Output() saveTier = new EventEmitter<TierDTO>();
   @Input() workcommitments : any;
+  @Input() systemType: SystemType;
   @Input() set regionsStructure(regions: OrganizationRegion[]) {
     this.regions = regions;
-    this.dialogConfig = TiersDialogConfig(regions, this.workcommitments)[this.dialogType];
   };
-
   @Input() set selectedTier(tier: TierDetails) {
     if (tier) {
       this.selectedTierDetails = tier;
@@ -63,16 +63,16 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier, this.regions));
     }
   };
-
+  public title: string = '';
+  public isEdit : boolean;
   @Input() set isEditDialog(value: boolean) {
-    this.setDialogTitle(value);
+    this.isEdit = value;
   };
 
   @Input() public permission: boolean;
   @Input() public organizationId: number;
 
   public dialogConfig: TierDialogConfig;
-  public title: string = '';
   public regions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
   public tierForm: CustomFormGroup<TierDTO> | null;
@@ -98,7 +98,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   public tierList$: Observable<TierList[]>;
 
   constructor(
-    @Inject(TIER_DIALOG_TYPE) protected readonly dialogType: Tiers,
+    @Inject(TIER_DIALOG_TYPE) public dialogType: Tiers,
     private tierService: TierService,
     private changeDetection: ChangeDetectorRef,
     private confirmService: ConfirmService,
@@ -109,12 +109,24 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   ngOnInit(): void {
+    this.watchForSystemType();
     this.watchForShowDialog();
-    this.createForm();
     this.watchForRegions();
     this.watchForLocation();
-    this.watchForCloseDialog();
     this.watchForDepartments();
+    this.watchForCloseDialog();
+  }
+
+  public watchForSystemType() {
+    this.systemType === 0 ? this.dialogType = Tiers.tierSettings : this.dialogType = Tiers.tierSettingsIRP;
+    this.dialogConfig = TiersDialogConfig(this.regions, this.workcommitments)[this.dialogType];
+    this.createForm();
+    this.setDialogTitle(this.isEdit);
+  }
+
+  ngOnChanges(): void {
+    this.watchForSystemType();
+    this.watchForShowDialog();
   }
 
   public allRegionsChange(event: { checked: boolean }): void {
@@ -281,8 +293,11 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   private watchForShowDialog(): void {
-    this.isTierSettingsDialog = this.dialogType === Tiers.tierSettings;
-
+    if(this.systemType == 0){
+      this.isTierSettingsDialog = this.dialogType === Tiers.tierSettings
+    } else {
+      this.isTierSettingsDialog = this.dialogType === Tiers.tierSettingsIRP
+    }
     this.actions$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
         this.createForm();
