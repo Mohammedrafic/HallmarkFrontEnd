@@ -31,7 +31,8 @@ import {
 } from '@client/order-management/interfaces';
 import {
   ContactDetailsList,
-  DateFormat, DateMask,
+  DateFormat,
+  DateMask,
   GeneralInformationForm,
   Incomplete,
   JobDescriptionForm,
@@ -94,7 +95,9 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { Document } from '@shared/models/document.model';
-import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
+import {
+  IrpContainerStateService,
+} from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
 import { UserState } from '../../../../../store/user.state';
 import { Organization, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -277,10 +280,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     }
   }
 
-  public trackByTitle(index: number, config: OrderFormsArrayConfig | OrderFormsConfig): string {
-    return config.title;
-  }
-
   public trackByField(index: number, config: OrderFormInput): string {
     return config.field;
   }
@@ -329,13 +328,16 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.generalInformationForm = this.orderDetailsService.createGeneralInformationPOForm();
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionPOForm();
       this.jobDescriptionForm = this.orderDetailsService.createJobDescriptionPOForm();
-    }
+   }
   }
 
   private watchForOrderTypeControl(): void {
     this.orderTypeForm.get('orderType')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
+      this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
+      this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+        this.changeDetection.markForCheck();
       this.clearFormLists();
       if (value === IrpOrderType.LongTermAssignment) {
         this.orderFormsArrayConfig =
@@ -353,6 +355,11 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.setReasonAutopopulate();
       this.populateSelectedOrganizationStructure();
       this.watchForSpecialProjectCategory();
+      this.orderDetailsService.disableFieldsForNotEditableOrder(
+        this.selectedOrder,
+        this.generalInformationForm
+      );
+
       this.changeDetection.markForCheck();
     });
   }
@@ -638,9 +645,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(() => true),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-    this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
-    this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
-      this.changeDetection.markForCheck();
+      this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
+      this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+        this.changeDetection.markForCheck();
       if (value) {
         let shiftDetails = this.allShifts.find(f => f.id == value)
         if (shiftDetails != null && shiftDetails.id != 0) {
@@ -802,9 +809,15 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     if (selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
       this.generalInformationForm.patchValue({
         jobDates: selectedOrder.jobDates,
-      })
+      });
+
+      const isPerDiemOrderEditable = this.orderDetailsService.hasEditablePerDiemOrder(this.selectedOrder);
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
       changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
+
+      if(isPerDiemOrderEditable) {
+        this.generalInformationForm.controls['jobDates'].disable();
+      }
     }
   }
 
