@@ -1,0 +1,35 @@
+<ejs-dialog
+  #destroyableDialog
+  cssClass="override-shift-dialog"
+  isModal="true"
+  visible="false"
+  showCloseIcon="true"
+  width="470px"
+  height="242px"
+  closeOnEscape
+  (close)="closeOnEscape()"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Create Per Diem Orders</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <div>
+      Scheduled LTA Shifts after {{closingDate | date:'MM/dd/yyy'}} will be removed.
+      Do you like to create Replacement Per Diem Orders?
+    </div>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <button ejs-button cssClass="e-danger" (click)="remove()">Remove</button>
+      <button ejs-button [isPrimary]="true" (click)="create()">Create Per Diem Orders</button>
+    </div>
+  </ng-template>
+</ejs-dialog>

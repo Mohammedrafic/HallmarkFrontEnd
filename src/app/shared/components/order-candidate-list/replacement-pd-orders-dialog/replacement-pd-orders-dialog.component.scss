@@ -1,0 +1,34 @@
+@import 'colors';
+
+.override-shift-dialog {
+  border-radius: 10px !important;
+
+  & + .e-dlg-overlay {
+    background-color: $black;
+  }
+  .e-dlg-header-content {
+    border-bottom: 1px solid $secondary-dark-blue-45;
+  }
+
+  .e-dlg-content {
+    padding: 24px !important;
+    font-size: 16px;
+  }
+
+  .e-footer-content {
+    border-top: 1px solid $secondary-dark-blue-45;
+    padding: 16px 24px;
+  }
+
+  .e-card-header {
+    h3 {
+      font-size: 24px;
+      font-weight: 700;
+      color: $black;
+    }
+  }
+
+  button {
+    margin-left: 8px !important;
+  }
+}

@@ -79,6 +79,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public isOnboarded = false;
   public canOnboardCandidateIRP:boolean;
   public canRejectedCandidateIRP:boolean;
+  public replacementPdOrdersDialogOpen = false;
+  public closingDate: Date;
 
   public comments: Comment[] = [];
   @Input() public externalCommentConfiguration ?: boolean | null;
@@ -106,6 +108,53 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.observeCloseControl();
     this.watchForActualDateValues();
     this.getComments();
+  }
+
+  save(): void {
+    const { status, closeDate } = this.candidateForm.getRawValue();
+
+    if (!this.candidateForm.valid) {
+      this.candidateForm.markAllAsTouched();
+      return;
+    }
+
+    if (this.candidateForm.get('isClosed')?.value) {
+      this.confirmService.confirm(
+        CLOSE_IRP_POSITION,
+        {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Close',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(
+          filter((confirm) => confirm),
+          tap(() => {
+            this.closingDate = closeDate || new Date();
+            this.showReplacementPdOrdersDialog();
+          }),
+          take(1),
+        ).subscribe();
+
+      return;
+    }
+
+    if (status === CandidatStatus.Cancelled) {
+      this.closingDate = new Date();
+      this.showReplacementPdOrdersDialog();
+
+      return;
+    }
+
+    this.saveCandidate();
+  }
+
+  showReplacementPdOrdersDialog(show = true): void {
+    this.replacementPdOrdersDialogOpen = show;
+    this.cdr.markForCheck();
+  }
+
+  setCreateReplacement(createReplacement: boolean) {
+    this.saveCandidate(createReplacement);
   }
 
   private getComments(): void {
@@ -140,9 +189,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     return config.field;
   }
 
-  public saveCandidate(): void {
-    if(this.candidateForm.valid && !this.candidateForm.get('isClosed')?.value) {
-      this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState)
+  private saveCandidate(createReplacement = false): void {
+    if (!this.candidateForm.get('isClosed')?.value) {
+      this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState, createReplacement)
       .pipe(
         catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
         takeUntil(this.componentDestroy()),
@@ -152,36 +201,28 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.hideDialog();
         this.orderManagementService.setCandidate(true);
       });
-
-    } else if (this.candidateForm.valid && this.candidateForm.get('isClosed')?.value) {
-      this.confirmService.confirm(
-        CLOSE_IRP_POSITION,
-        {
-          title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Close',
-          okButtonClass: 'delete-button',
-        })
-        .pipe(
-          filter((confirm) => !!confirm),
-          switchMap(() => {
-            const closeDto: ClosePositionDto = {
-              jobId: this.candidateModelState.candidate.candidateJobId,
-              reasonId: this.candidateForm.get('reason')?.value,
-              closingDate: DateTimeHelper.toUtcFormat(this.candidateForm.get('closeDate')?.value as Date),
-            };
-
-            return this.orderCandidateApiService.closeIrpPosition(closeDto);
-
-          }),
-          take(1),
-        ).subscribe(() => {
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-          this.handleSuccessSaveCandidate.emit();
-          this.hideDialog();
-        });
     } else {
-      this.candidateForm.markAllAsTouched();
+      this.closeIrpPosition(createReplacement);
     }
+  }
+
+  private closeIrpPosition(createReplacement: boolean): void {
+    const closeDto: ClosePositionDto = {
+      jobId: this.candidateModelState.candidate.candidateJobId,
+      reasonId: this.candidateForm.get('reason')?.value,
+      closingDate: DateTimeHelper.toUtcFormat(this.candidateForm.get('closeDate')?.value as Date),
+      createReplacement,
+    };
+
+    this.orderCandidateApiService.closeIrpPosition(closeDto)
+      .pipe(
+        catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
+        takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      this.handleSuccessSaveCandidate.emit();
+      this.hideDialog();
+    });
   }
 
   private getCandidateDetails(): void {

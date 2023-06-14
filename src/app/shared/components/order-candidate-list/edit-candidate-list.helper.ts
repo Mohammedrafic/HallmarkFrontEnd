@@ -31,11 +31,6 @@ export const UpdateCandidateDto = (
   actualEndDate: DateTimeHelper.toUtcFormat(actualEndDate),
 });
 
-export const CancelCandidateDto = (organizationId: number,jobId: number) => ({
-  organizationId,
-  jobId,
-});
-
 export const GetConfigField = (config: ReadonlyArray<CandidateField>, field: string): CandidateField => {
   return config.find((item: CandidateField) => item.field === field) as CandidateField;
 };
