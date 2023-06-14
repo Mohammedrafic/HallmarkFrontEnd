@@ -39,6 +39,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public columnsToExport: ExportColumn[] = [
     { text: 'Agency Name', column: 'AgencyName' },
     { text: 'Agency Status', column: 'AgencyStatus' },
+    { text: 'Tax Id', column: 'TaxId' },
     { text: 'Contact Person', column: 'ContactPerson' },
     { text: 'Phone', column: 'Phone' },
   ];
