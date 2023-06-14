@@ -94,8 +94,10 @@ export const getFormsList = (list: ListOfKeyForms): FormGroup[] => {
 };
 
 export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCredentialItem[]) => {
-  const jobEndDate = new Date(new Date(formState.generalInformationForm.get('jobEndDate')?.value).setHours(0, 0, 0, 0));
-  const jobStartDate = new Date(new Date(formState.generalInformationForm.get('jobStartDate')?.value).setHours(0, 0, 0, 0));
+  const endDate = formState.generalInformationForm.get('jobEndDate')?.value;
+  const startDate = formState.generalInformationForm.get('jobStartDate')?.value;
+  const jobEndDate = endDate ? new Date(new Date(endDate)?.setHours(0, 0, 0, 0)) : endDate;
+  const jobStartDate = startDate ? new Date(new Date(startDate).setHours(0, 0, 0, 0)) : startDate;
   const jobDates = formState.generalInformationForm.get('jobDates')?.value;
 
   return {
