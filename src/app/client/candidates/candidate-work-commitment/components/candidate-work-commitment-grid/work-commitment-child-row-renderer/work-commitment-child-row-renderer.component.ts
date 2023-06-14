@@ -21,8 +21,6 @@ export class WorkCommitmentChildRowRendererComponent implements ICellRendererAng
   public colDefs: ColDef[] = getWorkCommitmentChildColumnDef();
   public rowData$: Observable<WorkCommitmentSetup[]>;
 
-  private employeeWorkCommitmentId: number;
-
   constructor(
     private candidateWorkCommitmentService: CandidateWorkCommitmentService,
     private candidateService: CandidatesService
@@ -33,7 +31,7 @@ export class WorkCommitmentChildRowRendererComponent implements ICellRendererAng
 
     if (employeeWorkCommitmentId) {
       this.rowData$ = this.candidateWorkCommitmentService
-        .getCandidateWorkCommitmentChildRecords(this.employeeWorkCommitmentId);
+        .getCandidateWorkCommitmentChildRecords(employeeWorkCommitmentId);
     }
   }
 

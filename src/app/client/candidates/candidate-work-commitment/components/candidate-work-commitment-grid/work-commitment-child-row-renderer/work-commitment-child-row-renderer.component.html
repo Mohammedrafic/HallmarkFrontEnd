@@ -1,5 +1,5 @@
 <app-grid
   [columnDefinitions]="colDefs"
-  [rowData]="rowData$ | async"
+  [rowData]="(rowData$ | async) ?? []"
   [paginationPanel]="false"
 ></app-grid>
