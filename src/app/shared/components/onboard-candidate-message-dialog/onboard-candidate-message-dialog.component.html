@@ -16,7 +16,7 @@
                   <label>Attachment {{isSend}}</label>
                   <input *ngIf="!isSend" class="e-input" type="text" disabled [(ngModel)]="fileNameInput" 
                         [ngModelOptions]="{standalone: true}" />
-                  <div id="group-attachment-files" *ngIf="isSend" [ngClass]="uploaderstatus ? 'enabled' : 'disabled'">
+                  <div id="onboard-attachment-files" *ngIf="isSend" [ngClass]="uploaderstatus ? 'enabled' : 'disabled'">
                     <div id="droparea" class="droparea" (click)="browseGroupEmail()">
                       <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
                     </div>
@@ -38,9 +38,9 @@
             <div class="rich-text-container">
               <label>Mail Body<span class="required">*</span></label>
               <div class="input-group" id="richTextEditorDiv">
-                <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
+                <ejs-richtexteditor #OnboardCandidateEmail id='OnboardCandidateEmailRTE' appValidateWithMessage
                                     formControlName="emailBody" [toolbarSettings]='tools' [(ngModel)]='emailBody'
-                                    >
+                                    [(value)]='emailBody'>
                 </ejs-richtexteditor>
               </div>
             </div>

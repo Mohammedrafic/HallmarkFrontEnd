@@ -19,7 +19,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class OnboardCandidateMessageDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   
   @Input() onBoardMessageEmailTemplateForm: FormGroup;
-  @ViewChild('RTEGroupEmail') public rteObj: RichTextEditorComponent;
+  @ViewChild('OnboardCandidateEmail') public rteObj: RichTextEditorComponent;
   @Input() title: string;
   @Input() isSend: boolean = true;
   @ViewChild('filesUploaderOnboardEmail') uploadObj: UploaderComponent;
@@ -49,12 +49,16 @@ export class OnboardCandidateMessageDialogComponent implements OnInit, AfterView
    
   }
 
-  static createForm(): FormGroup {
-    return new FormGroup({
-      emailSubject: new FormControl('', [Validators.required]),
-      emailBody: new FormControl('', [Validators.required]),
-      fileUpload: new FormControl(null),
-    });
+  rteCreated(): void {
+    this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
+    this.rteObj.toolbarSettings.enableFloating = true;
+    this.rteObj.height = '300px';
+  }
+
+  disableControls(isSend: boolean): void {
+    let ele = document.getElementById('richTextEditorDiv') as HTMLElement;
+    this.rteObj.enabled = true;
+    ele.className = 'rich-text-container-edit'; 
   }
 
   public ngOnDestroy(): void {
@@ -64,7 +68,7 @@ export class OnboardCandidateMessageDialogComponent implements OnInit, AfterView
 
   public browseGroupEmail(): void {
     document
-      .getElementById('group-attachment-files')
+      .getElementById('onboard-attachment-files')
       ?.getElementsByClassName('e-file-select-wrap')[0]
       ?.querySelector('button')
       ?.click();

@@ -68,6 +68,8 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { OrderType } from '@shared/enums/order-type';
+import { OnboardCandidateMessageDialogComponent } from '@shared/components/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -138,7 +140,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public payRateSetting = CandidatePayRateSettings;
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
   public readonly reorderType: OrderType = OrderType.ReOrder;
-  public openCandidateMessageDialog = new Subject<boolean>();
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -185,6 +186,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public sendOnboardMessageEmailFormGroup: FormGroup;
 
   public comments: Comment[] = [];
+
+  @ViewChild('RTE')
+  public rteEle: RichTextEditorComponent;
+  @ViewChild(OnboardCandidateMessageDialogComponent, { static: true }) onboardEmailTemplateForm: OnboardCandidateMessageDialogComponent;
 
   constructor(
     private store: Store,
@@ -602,16 +607,16 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   onGroupEmailAddCancel(){
     this.isSend =  false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
+    // this.onAccept();
   }
 
   onGroupEmailSend(){
-    // console.log($event);
+     console.log(this.sendOnboardMessageEmailFormGroup.value);
+     // this.onAccept();
   }
 
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded || event.itemData === null) {
-      // this.openCandidateMessageDialog.next(true);
-      // this.onAccept();
       this.isSend =  true;
       const options = {
         title: ONBOARD_CANDIDATE,
@@ -622,7 +627,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
       .subscribe((isConfirm) => {
         if(isConfirm){
+          this.onboardEmailTemplateForm.isSend=true;
+          this.onboardEmailTemplateForm.rteCreated();
+          this.onboardEmailTemplateForm.disableControls(true);
           this.store.dispatch(new ShowGroupEmailSideDialog(true));
+        }else{
+          // this.onAccept();
         }
       });
      
