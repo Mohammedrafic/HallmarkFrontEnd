@@ -903,7 +903,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private getAllShifts(): void {
     this.store.dispatch(new GetAllShifts());
     this.getAllShifts$.pipe(takeUntil(this.unsubscribe$)).subscribe((state) => {
-      this.filterColumns.shiftIds.dataSource = state;
+      this.filterColumns.shiftIds.dataSource = [{ name: 'Custom', id: 0 }, ...state];
     });
   }
 
