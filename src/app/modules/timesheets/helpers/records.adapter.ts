@@ -102,7 +102,7 @@ export class RecordsAdapter {
 
           return record;
         }),
-      }
+      },
     };
     return records;
   }
@@ -132,7 +132,7 @@ export class RecordsAdapter {
       description: record.description,
       timeOut: record.timeOut ? RecordsAdapter.checkTimeOutDate(timeIn, record.timeOut) : null,
       ...record.description && { description: record.description },
-      ...record.hasOwnProperty('hadLunchBreak') && { hadLunchBreak: record.hadLunchBreak },
+      ...Object.prototype.hasOwnProperty.call(record, 'hadLunchBreak') && { hadLunchBreak: record.hadLunchBreak },
     };
   }
 

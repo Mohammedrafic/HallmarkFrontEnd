@@ -1,17 +1,29 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges, TrackByFunction } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  TrackByFunction,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 
-import { filter, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
-import { Actions, ofActionDispatched, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
+import { OrderCandidatesCredentialsState } from '@order-credentials/store/credentials.state';
 import { IrpTabConfig } from '@client/order-management/containers/irp-container/irp-container.constant';
 import { IrpTabs } from '@client/order-management/enums';
 import { ListOfKeyForms, SelectSystem, TabsConfig } from '@client/order-management/interfaces';
 import { Destroyable } from '@core/helpers';
 import { OrderCredentialsService } from "@client/order-management/services";
-import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
+import {
+  IrpContainerStateService,
+} from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import {
   createOrderDTO,
   getControlsList,
@@ -29,6 +41,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrderType } from '@shared/enums/order-type';
+import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
 
 @Component({
   selector: 'app-irp-container',
@@ -40,6 +53,9 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   @Input('handleSaveEvents') public handleSaveEvents$: Subject<void | MenuEventArgs>;
   @Input() public selectedOrder: Order;
   @Input() selectedSystem: SelectSystem;
+
+  @Select(OrderCandidatesCredentialsState.predefinedCredentials)
+  predefinedCredentials$: Observable<IOrderCredentialItem[]>;
 
   public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
@@ -53,7 +69,9 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private store: Store,
     private actions$: Actions,
     private router: Router,
+    private cdr: ChangeDetectorRef,
     private confirmService: ConfirmService,
+    private irpContainerApiService: IrpContainerApiService,
   ) {
     super();
   }
@@ -61,11 +79,12 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   ngOnInit(): void {
     this.watchForSaveEvents();
     this.watchForSucceededSaveOrder();
+    this.watchForPredefinedCredentials();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedOrder']?.currentValue) {
-      this.orderCredentials = [...this.selectedOrder.credentials];
+      this.orderCredentials = [...this.selectedOrder.credentials ?? []];
     }
   }
 
@@ -106,7 +125,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       const formState = this.irpStateService.getFormState();
       const formGroupList = getFormsList(formState);
 
-      if(isFormsValid(formGroupList)) {
+      if (isFormsValid(formGroupList)) {
         this.saveOrder(formState, saveType);
       } else {
         showInvalidFormControl(getControlsList(formGroupList));
@@ -125,7 +144,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       isSubmit: !saveType,
     };
 
-   if(this.selectedOrder) {
+   if (this.selectedOrder) {
      this.showRevokeMessageForEditOrder(createdOrder);
     } else {
       this.store.dispatch(new SaveIrpOrder(createdOrder,this.irpStateService.getDocuments()));
@@ -134,7 +153,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   private showRevokeMessageForEditOrder(order: CreateOrderDto): void {
     const isExternalLogicInclude = this.irpStateService.getIncludedExternalLogic(order);
-    if(!isExternalLogicInclude && !this.selectedOrder.canRevoke) {
+    if (!isExternalLogicInclude && !this.selectedOrder.canRevoke) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_REVOKED));
     } else if(!isExternalLogicInclude && !this.selectedOrder.canProceedRevoke) {
       this.confirmService
@@ -144,9 +163,30 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           okButtonClass: '',
         }).pipe(
         filter(Boolean),
-        takeUntil(this.componentDestroy())
-      ).subscribe(() => {
-        this.saveEditedOrder(order);
+        switchMap(() => {
+          return this.irpContainerApiService.checkLinkedSchedules(this.selectedOrder.id);
+        }),
+        switchMap(({doesOrderHaveLinkedSchedules}) => {
+          return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
+        }),
+        take(1)
+      ).subscribe((value: boolean | null) => {
+        this.saveEditOrderWithLinkedSchedules(value, order);
+      });
+    } else {
+      this.saveEditOrderWithoutRevoke(order);
+    }
+  }
+
+  private saveEditOrderWithoutRevoke(order: CreateOrderDto): void {
+    if (this.selectedOrder.orderType === OrderType.Traveler) {
+      this.irpContainerApiService.checkLinkedSchedules(this.selectedOrder.id).pipe(
+        switchMap(({doesOrderHaveLinkedSchedules}) => {
+          return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
+        }),
+        take(1),
+      ).subscribe((value: boolean | null) => {
+        this.saveEditOrderWithLinkedSchedules(value, order);
       });
     } else {
       this.saveEditedOrder(order);
@@ -159,5 +199,32 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       id: this.selectedOrder.id,
       deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
     },this.irpStateService.getDocuments()));
+  }
+
+  private watchForPredefinedCredentials(): void {
+    this.predefinedCredentials$
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
+        this.orderCredentials = predefinedCredentials;
+        this.cdr.markForCheck();
+      });
+  }
+
+  private saveEditOrderWithLinkedSchedules(value: boolean | null, order: CreateOrderDto): void {
+    if (value !== null) {
+      order.removeLinkedSchedulesFromLta = value;
+    }
+
+    this.saveEditedOrder(order);
+  }
+
+  private checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules: boolean): Observable<boolean | null> {
+    if (doesOrderHaveLinkedSchedules) {
+      return this.irpStateService.showScheduleBookingModal();
+    }
+
+    return of(null);
   }
 }

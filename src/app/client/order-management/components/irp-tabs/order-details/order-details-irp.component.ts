@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { filter, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { combineLatest, filter, map, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -31,7 +31,8 @@ import {
 } from '@client/order-management/interfaces';
 import {
   ContactDetailsList,
-  DateFormat, DateMask,
+  DateFormat,
+  DateMask,
   GeneralInformationForm,
   Incomplete,
   JobDescriptionForm,
@@ -50,7 +51,7 @@ import {
   WorkLocationConfig,
   WorkLocationFrom,
 } from '@client/order-management/components/irp-tabs/order-details/constants';
-import { FieldType } from '@core/enums';
+import { FieldType, UserPermissions } from '@core/enums';
 import PriceUtils from '@shared/utils/price.utils';
 import { Destroyable } from '@core/helpers';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -94,7 +95,9 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { Document } from '@shared/models/document.model';
-import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
+import {
+  IrpContainerStateService,
+} from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
 import { UserState } from '../../../../../store/user.state';
 import { Organization, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -113,6 +116,8 @@ import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
+import { Permission } from '@core/interface/permission.interface';
+import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -129,7 +134,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.setConfigDataSources();
     }
   }
-
+  public userPermission: Permission = {};
+  public readonly userPermissions = UserPermissions;
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
@@ -205,6 +211,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getPermission();
     this.initOrderTypeForm();
     this.initForms(IrpOrderType.LongTermAssignment);
     this.watchForOrderTypeControl();
@@ -215,6 +222,17 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSpecialProjectCategory();
     this.setReasonAutopopulate();
   }
+
+  private getPermission(): void {
+    this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length),
+      take(1)
+    ).subscribe((permissions: Permission) => {
+      this.userPermission = permissions;
+    });
+  }
+
+
 
   public changeOrderType(): void {
     const { regionId, locationId, departmentId, skillId } = this.generalInformationForm.getRawValue();
@@ -260,10 +278,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         changeTypeEditButton(selectedConfig, index);
         break;
     }
-  }
-
-  public trackByTitle(index: number, config: OrderFormsArrayConfig | OrderFormsConfig): string {
-    return config.title;
   }
 
   public trackByField(index: number, config: OrderFormInput): string {
@@ -314,13 +328,16 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.generalInformationForm = this.orderDetailsService.createGeneralInformationPOForm();
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionPOForm();
       this.jobDescriptionForm = this.orderDetailsService.createJobDescriptionPOForm();
-    }
+   }
   }
 
   private watchForOrderTypeControl(): void {
     this.orderTypeForm.get('orderType')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
+      this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
+      this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+        this.changeDetection.markForCheck();
       this.clearFormLists();
       if (value === IrpOrderType.LongTermAssignment) {
         this.orderFormsArrayConfig =
@@ -338,6 +355,11 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.setReasonAutopopulate();
       this.populateSelectedOrganizationStructure();
       this.watchForSpecialProjectCategory();
+      this.orderDetailsService.disableFieldsForNotEditableOrder(
+        this.selectedOrder,
+        this.generalInformationForm
+      );
+
       this.changeDetection.markForCheck();
     });
   }
@@ -491,6 +513,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private watchForFormValueChanges(): void {
+    this.watchForCredentialsControls();
+
     this.generalInformationForm.get('regionId')?.valueChanges.pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy())
@@ -621,6 +645,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(() => true),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
+      this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
+      this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+        this.changeDetection.markForCheck();
       if (value) {
         let shiftDetails = this.allShifts.find(f => f.id == value)
         if (shiftDetails != null && shiftDetails.id != 0) {
@@ -644,8 +671,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('shiftStartTime')?.valueChanges.pipe(
       filter(() => true),
       takeUntil(this.componentDestroy())
-    ).subscribe((value: number) => {
-      if (value) {
+    ).subscribe((value: Date) => {
+      if (value instanceof Date) {
         this.generalInformationForm.get('shift')?.setValue(0, { emitEvent: false });
       }
 
@@ -653,11 +680,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('shiftEndTime')?.valueChanges.pipe(
       filter(() => true),
       takeUntil(this.componentDestroy())
-    ).subscribe((value: number) => {
-      if (value) {
+    ).subscribe((value: Date) => {
+     if (value instanceof Date) {
         this.generalInformationForm.get('shift')?.setValue(0, { emitEvent: false });
       }
-
     });
 
   }
@@ -783,9 +809,15 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     if (selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
       this.generalInformationForm.patchValue({
         jobDates: selectedOrder.jobDates,
-      })
+      });
+
+      const isPerDiemOrderEditable = this.orderDetailsService.hasEditablePerDiemOrder(this.selectedOrder);
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
       changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
+
+      if(isPerDiemOrderEditable) {
+        this.generalInformationForm.controls['jobDates'].disable();
+      }
     }
   }
 
@@ -956,5 +988,22 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       this.changeDetection.markForCheck();
     })
+  }
+
+  private watchForCredentialsControls(): void {
+    const departmentControl = this.generalInformationForm.get('departmentId');
+    const skillControl = this.generalInformationForm.get('skillId');
+
+    if (!departmentControl || !skillControl || this.selectedOrder) {
+      return;
+    }
+
+    combineLatest([departmentControl.valueChanges, skillControl.valueChanges])
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(([departmentId, skillId]) => {
+        if (departmentId && skillId && !this.selectedOrder) {
+          this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId, SystemType.IRP));
+        }
+      });
   }
 }

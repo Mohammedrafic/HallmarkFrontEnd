@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { map, Observable } from 'rxjs';
 
+import { SystemType } from '@shared/enums/system-type.enum';
 import { CredentialType } from '@shared/models/credential-type.model';
 import {
   AssignedCredentialTreeData,
@@ -108,8 +109,12 @@ export class CredentialsService {
     return this.http.get<CredentialFilterDataSources>(`/api/MasterCredentials/filteringOptions`);
   }
 
-  public getPredefinedCredentials(departmentId: number, skillId: number): Observable<IOrderCredentialItem[]> {
-    const params = { departmentId, skillId };
+  public getPredefinedCredentials(
+    departmentId: number,
+    skillId: number,
+    systemType: SystemType,
+  ): Observable<IOrderCredentialItem[]> {
+    const params = { departmentId, skillId, systemType };
     return this.http.get<IOrderCredentialItem[]>(`/api/credentialsetups/predefined/forOrder`, { params })
       .pipe(map((credentials: IOrderCredentialItem[]) => (credentials.map((credential: any) => ({
         credentialName: credential.name,

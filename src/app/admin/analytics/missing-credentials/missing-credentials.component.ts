@@ -93,7 +93,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
   credentialNameFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateWaterMark: string = 'e.g. Andrew Fuller';
   credentialWaterMark: string = 'BLS';

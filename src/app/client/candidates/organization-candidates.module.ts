@@ -13,7 +13,9 @@ import { CandidatesService } from './services/candidates.service';
 import { DepartmentsModule } from './departments/departments.module';
 import { CredentialsModule } from './credentials/credentials.module';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
-import { CandidateConfirmDialogModule } from './candidate-profile/candidate-confirm-dialog/candidate-confirm-dialog.module';
+import {
+  ReplacementOrderConfirmationModule,
+} from '@shared/components/replacement-order-confirmation/replacement-order-confirmation.module';
 
 @NgModule({
   declarations: [CandidateProfileComponent, AddEditCandidateComponent],
@@ -28,7 +30,7 @@ import { CandidateConfirmDialogModule } from './candidate-profile/candidate-conf
     SharedModule,
     DepartmentsModule,
     CredentialsModule,
-    CandidateConfirmDialogModule,
+    ReplacementOrderConfirmationModule,
   ],
   providers: [CandidatesService, ScrollRestorationService],
 })

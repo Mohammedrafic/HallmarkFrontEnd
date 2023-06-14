@@ -143,6 +143,7 @@ export interface AddRecordDto {
   value?: number;
   hadLunchBreak?: boolean;
   isTimeInNull?: boolean;
+  forceUpdate?: boolean;
 }
 
 export interface PutRecord {
@@ -162,6 +163,7 @@ export interface PutRecordDto {
   type: number;
   deleteIds?: number[];
   records?: PutRecord[];
+  forceUpdate?: boolean;
 }
 
 export interface AddMileageDto {
@@ -188,4 +190,9 @@ export interface UploadDialogState {
 export interface UploadDocumentsModel {
   fileForUpload: FileForUpload[];
   filesForDelete: Attachment[];
+}
+
+export interface OverlapErrorMessageDetails {
+  title: string;
+  message: string;
 }

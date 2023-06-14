@@ -12,6 +12,14 @@
     </section>
     <section class="toolbar-buttons">
       <button ejs-button
+              id="saveAsButton"
+              (click)="saveAsReport()"
+              cssClass="e-outline button-filter">
+        <div class="filter-button-content">
+          Save As <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
+      <button ejs-button
               id="filterButton"
               (click)="showFilters()"
               cssClass="e-outline button-filter">

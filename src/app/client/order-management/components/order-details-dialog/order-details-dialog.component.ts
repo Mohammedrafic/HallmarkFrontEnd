@@ -3,6 +3,7 @@ import isNil from 'lodash/fp/isNil';
 import {
   Component,
   EventEmitter,
+  Inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -69,6 +70,7 @@ import { ReOrderState } from '@shared/components/order-reorders-container/store/
 import { ReOrderPage } from '@shared/components/order-reorders-container/interfaces';
 import { CandidateModel } from '../add-edit-reorder/models/candidate.model';
 import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -246,7 +248,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     private orderManagementService: OrderManagementService,
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
-    private actions$: Actions
+    private actions$: Actions,
+    @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {}
 
   ngOnInit(): void {
@@ -254,6 +257,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.subscribeOnOrderCandidatePage();
     this.subsToTabChange();
     this.subscribeOnPermissions();
+
+   
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -269,6 +274,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         this.chipList.text = status.toUpperCase();
       }
     }
+  
   }
 
   ngOnDestroy(): void {
@@ -513,6 +519,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     if(this.isCondidateTab==true){
       this.tab.select(1);
     }
+    setTimeout(()=>{
+      let IsEmployeeTab=  JSON.parse(localStorage.getItem('IsEmployeeTab') || '"true"') as boolean;
+      if(IsEmployeeTab){
+        this.tab.select(1);
+        this.globalWindow.localStorage.setItem("IsEmployeeTab",JSON.stringify(""));
+      }
+    },1000)
   }
 
   public subsToTabChange(): void {

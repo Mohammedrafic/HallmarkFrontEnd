@@ -153,11 +153,25 @@ export const initOrderManagementFilterColumns = () => ({
     valueField: 'projectName',
     valueId: 'id',
   },
+  shiftIds: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
+    valueId: 'id',
+  },
   poNumberIds: {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
     dataSource: [],
     valueField: 'poNumber',
+    valueId: 'id',
+  },
+  shift: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
     valueId: 'id',
   },
   irpOnly: {

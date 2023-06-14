@@ -78,6 +78,7 @@ import {
   ExportOrdersJourney,
   GetAgencyOrderCandidatesList,
   GetAvailableSteps,
+  GetAllShifts,
   GetIrpOrderCandidates,
   GetIRPOrders,
   GetOrderById,
@@ -227,6 +228,8 @@ import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
 import { PreservedOrderService } from '@client/order-management/services/preserved-order.service';
 import { GetReOrdersByOrderId } from '@shared/components/order-reorders-container/store/re-order.actions';
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 
 @Component({
   selector: 'app-order-management-content',
@@ -285,13 +288,18 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @Select(OrderManagementContentState.ordersJourneyPage)
   ordersJourneyPage$: Observable<OrdersJourneyPage>;
 
+  @Select(OrderManagementContentState.getAllShifts)
+  private getAllShifts$: Observable<ScheduleShift[]>;
+
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly contactPersonFields: FieldSettingsModel = { text: 'fullName', value: 'email' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
+  public readonly shiftNameFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
+  public readonly shiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
@@ -430,10 +438,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public isCondidateTab: boolean = false;
   public OrderJourney: any[] = [];
   public canCreateOrderIRP:boolean;
+  public canEditOrderIRP:boolean;
   public canViewOrderIRP:boolean;
   public canCloseOrderIRP:boolean;
   public CanEditOrderBillRateIRP:boolean;
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
+  public shift = ORDER_MASTER_SHIFT_NAME_LIST;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -539,6 +549,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.onGridPageChangedHandler();
     this.onOrganizationChangedHandler();
     this.onOrdersDataLoadHandler();
+    this.getAllShifts();
 
     this.onOrderDetailsDialogOpenEventHandler();
     this.onOrderFilterControlValueChangedHandler();
@@ -792,6 +803,16 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.isIncomplete = false;
 
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      let IsLTAOrders=  JSON.parse(localStorage.getItem('IsLTAOrders') || '"false"') as boolean; 
+      if(IsLTAOrders==true){
+        this.filters.candidateStatuses =  []
+        this.filters.orderStatuses = []
+        this.filters.isQuickLinkWidgetLTA=true
+        this.OrderFilterFormGroup.controls['candidateStatuses'].setValue([])
+        this.OrderFilterFormGroup.controls['orderStatuses'].setValue([])
+        this.store.dispatch(new ShowFilterDialog(false));
+        this.onFilterClose()
+      }
       this.filters.orderBy = this.orderBy;
       this.filters.pageNumber = this.currentPage;
       this.filters.pageSize = this.pageSize;
@@ -816,8 +837,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       this.isIncomplete = (this.activeIRPTabIndex === OrderManagementIRPTabsIndex.Incomplete);
       this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.IRP);
-      cleared ? this.store.dispatch(new GetIRPOrders(this.filters)) : this.store.dispatch([new GetOrderFilterDataSources(true)]);
-
+      cleared ? this.store.dispatch(new GetIRPOrders(this.filters)).pipe().subscribe(()=>{
+        this.globalWindow.localStorage.setItem("IsLTAOrders", JSON.stringify(false));
+      }) : this.store.dispatch([new GetOrderFilterDataSources(true)]);
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
       switch (this.activeTab) {
         case OrganizationOrderManagementTabs.AllOrders:
@@ -876,6 +898,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
 
     this.cd$.next(true);
+  }
+
+  private getAllShifts(): void {
+    this.store.dispatch(new GetAllShifts());
+    this.getAllShifts$.pipe(takeUntil(this.unsubscribe$)).subscribe((state) => {
+      this.filterColumns.shiftIds.dataSource = [{ name: 'Custom', id: 0 }, ...state];
+    });
   }
 
   public onFilterClose() {
@@ -937,8 +966,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
       contactEmails: this.contactEmails,
+      shiftIds: this.filters.shiftIds || [],
       irpOnly: this.filters.irpOnly || null,
       reorderStatuses: this.filters.reorderStatuses || null,
+      shift:this.filters.shift || null,
     });
 
     if (!prepopulate) {
@@ -1236,14 +1267,21 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else {
       gridData = this.gridWithChildRow.dataSource as OrderManagement[];
     }
-
-    const first = gridData[0];
+    if(gridData) {
+       const first = gridData[0];
     const last = gridData[gridData.length - 1];
 
     return {
       previous: first.id !== selectedOrder.id,
       next: last.id !== selectedOrder.id,
     };
+    }else{
+      return {
+        previous: 0 !== selectedOrder.id,
+        next: 0 !== selectedOrder.id,
+      };
+    }
+  
   }
 
   public navigateToOrderForm(): void {
@@ -1823,7 +1861,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
-        }
+        }            
       }
       this.cd$.next(true);
     });
@@ -2209,6 +2247,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filterColumns.projectTypeIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP? specialProjectCategories.filter(f=>f.includeInIRP == true) :  specialProjectCategories.filter(f=>f.includeInVMS == true);
       // this.filterColumns.projectNameIds.dataSource = projectNames;
       this.filterColumns.poNumberIds.dataSource = poNumbers;
+      this.filterColumns.shift.dataSource = this.shift;
       this.cd$.next(true);
     });
   }
@@ -2223,8 +2262,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.hasCreateEditOrderPermission = permissions[this.userPermissions.CanCreateOrders]
         || permissions[this.userPermissions.CanOrganizationEditOrders];
       this.canViewOrderIRP=permissions[this.userPermissions.CanOrganizationViewOrdersIRP]
+      this.canEditOrderIRP=permissions[this.userPermissions.CanOrganizationEditOrdersIRP]
       this.cd$.next(true);
-    });
+    });  
   }
 
   private subscribeToCandidateJob(): void {

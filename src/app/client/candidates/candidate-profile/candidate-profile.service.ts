@@ -24,13 +24,17 @@ export class CandidateProfileService {
     private generalNotesService: GeneralNotesService
   ) {}
 
-  public saveCandidateProfile(candidateId: number): Observable<CandidateModel> {
+  public saveCandidateProfile(candidateId: number, createReplacement?: boolean): Observable<CandidateModel> {
     const { value } = this.candidateProfileForm.candidateForm;
     const isOnHoldSetManually = this.candidateProfileForm.isOnHoldDateSetManually();
     const candidate = candidateId ? { id: candidateId, ...value, isOnHoldSetManually } : value;
     const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) } as CandidateModel;
     const payload = { ...candidateDateInUTC, generalNotes: this.generalNotesService.notes$.getValue() };
     const endpoint = `/api/employee/${candidateId ? 'update' : 'create'}`;
+
+    if (createReplacement) {
+      payload.createReplacement = true;
+    }
 
     return this.http[candidateId ? 'put' : 'post']<CandidateModel>(endpoint, payload).pipe(
       distinctUntilChanged(),
@@ -50,17 +54,19 @@ export class CandidateProfileService {
     );
   }
 
-  public saveCandidate(file: Blob | null, candidateId: number): Observable<void | CandidateModel> {
-    return this.saveCandidateProfile(candidateId).pipe(
-      mergeMap((candidate) => {
-        this.candidateProfileForm.populateHoldEndDate(candidate);
-        this.candidateProfileForm.tabUpdate$.next(candidate.id);
-        if (file) {
-          return this.saveCandidatePhoto(file, candidate.id);
-        }
-        return file === null ? this.removeCandidatePhoto(candidate.id) : of(null);
-      })
-    );
+  public saveCandidate(
+      file: Blob | null, candidateId: number, createReplacement?: boolean
+    ): Observable<void | CandidateModel> {
+      return this.saveCandidateProfile(candidateId, createReplacement).pipe(
+        mergeMap((candidate) => {
+          this.candidateProfileForm.populateHoldEndDate(candidate);
+          this.candidateProfileForm.tabUpdate$.next(candidate.id);
+          if (file) {
+            return this.saveCandidatePhoto(file, candidate.id);
+          }
+          return file === null ? this.removeCandidatePhoto(candidate.id) : of(null);
+        })
+      );
   }
 
   public saveCandidatePhoto(file: Blob, id: number): Observable<any> {

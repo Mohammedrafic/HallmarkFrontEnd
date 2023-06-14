@@ -1,0 +1,56 @@
+@import 'colors';
+
+.confirm-dialog {
+  border-radius: 8px !important;
+
+  .e-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .bootstrap.replacement-checkbox {
+      ::ng-deep {
+        ejs-checkbox {
+          .e-label {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+  }
+
+  & + .e-dlg-overlay {
+    background-color: $black;
+  }
+
+  .e-dlg-header-content {
+    border-bottom: 1px solid $secondary-dark-blue-45;
+    border-radius: 8px 8px 0 0;
+    padding: 12px 18px;
+  }
+
+  .e-dlg-content {
+    padding: 24px !important;
+    font-size: 16px;
+  }
+
+  .e-footer-content {
+    border-top: 1px solid $secondary-dark-blue-45;
+    padding: 16px 24px;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .e-card-header {
+    line-height: 24px;
+    
+    h3 {
+      font-size: 24px;
+      font-weight: 700;
+      color: $black;
+    }
+  }
+
+  button {
+    margin-left: 8px !important;
+  }
+}

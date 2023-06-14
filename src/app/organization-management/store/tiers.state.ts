@@ -72,6 +72,29 @@ export class TiersState {
     );
   }
 
+  @Action(Tiers.SaveTierIRP)
+  SaveTierIRP(
+    { dispatch }: StateContext<TiersStateModel>,
+    { payload, isEdit }: Tiers.SaveTierIRP
+  ): Observable<TierDTO | void> {
+    return this.tiersApiService.saveTierIRP(payload).pipe(
+      tap(() => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
+          new ShowSideDialog(false),
+          new Tiers.UpdatePageAfterSuccessAction()
+        ]);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        if (error.error?.errors?.ForceUpsert) {
+          return dispatch(new Tiers.ShowOverrideTierDialog());
+        } else {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+        }
+      })
+    );
+  }
+
   @Action(Tiers.DeleteTier)
   DeleteTier(
     { dispatch }: StateContext<TiersStateModel>,

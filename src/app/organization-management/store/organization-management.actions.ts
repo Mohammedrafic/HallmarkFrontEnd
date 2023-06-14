@@ -81,7 +81,11 @@ export class GetDepartmentsByLocationId {
 
 export class UpdateDepartment {
   static readonly type = '[organizationManagement] Update Department';
-  constructor(public department: Department, public filters?: DepartmentFilter, public ignoreWarning?: boolean) {}
+  constructor(
+    public department: Department,
+    public filters?: DepartmentFilter,
+    public ignoreWarning?: boolean,
+    public createReplacement?: boolean) {}
 }
 
 export class DeleteDepartmentById {

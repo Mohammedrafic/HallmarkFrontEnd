@@ -149,7 +149,7 @@ export class AccrualReportComponent implements OnInit, OnDestroy {
   public defaultAgencyIds: (number | undefined)[] = [];
 
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   selectedDepartments: Department[];
@@ -492,7 +492,8 @@ export class AccrualReportComponent implements OnInit, OnDestroy {
       "SkillCategoryAC": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       "SkillAS": skillIds.length == 0 ? "null" : skillIds,
       "AgencyAS": agencyIds.length == 0 ? "null" : agencyIds.join(","),
-      "Candidate": candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+      "Candidate": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
+        //candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
       "OrderIdAS": orderId == null ? "null" : orderId,
       "TimesheetStartDate": byTimesheetOrInvoiceValue == '0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
       "TimesheetEndDate": byTimesheetOrInvoiceValue == '0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '12/31/9999', 'en-US'),
@@ -512,7 +513,8 @@ export class AccrualReportComponent implements OnInit, OnDestroy {
       "SkillCategoryAD": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       "SkillAD": skillIds.length == 0 ? "null" : skillIds,
       "AgencyAD": agencyIds.length == 0 ? "null" : agencyIds.join(","),
-      "CandidateAD": candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+        "CandidateAD": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
+//        candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
       "OrderIdAD": orderId == null ? "null" : orderId,
       "TimesheetStartDateAD": byTimesheetOrInvoiceValue == '0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
       "TimesheetEndDateAD": byTimesheetOrInvoiceValue == '0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '12/31/9999', 'en-US'),
@@ -533,7 +535,8 @@ export class AccrualReportComponent implements OnInit, OnDestroy {
       "SkillCategoryAF": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       "SkillAF": skillIds.length == 0 ? "null" : skillIds,
       "AgencyAF": agencyIds.length == 0 ? "null" : agencyIds.join(","),
-      "CandidateAF": candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+        "CandidateAF": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
+//        candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
       "OrderIdAF": orderId == null ? "null" : orderId,
       "TimesheetStartDateAF": byTimesheetOrInvoiceValue == '0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
       "TimesheetEndDateAF": byTimesheetOrInvoiceValue == '0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '12/31/9999', 'en-US'),

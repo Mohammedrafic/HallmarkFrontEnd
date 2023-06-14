@@ -86,7 +86,7 @@ export class AccumulationChartComponent
     }
     const user = this.store.selectSnapshot(UserState.user);
     let Enumvalues: number;
-    if (this.chartData?.title == "Candidates") {
+    if (this.chartData?.title == "Candidate Overall Status") {
       //if (this.chartData?.title)
       if (status.toLowerCase() == CandidatStatus[CandidatStatus['Not Applied']].toLowerCase()) {
         Enumvalues = CandidatStatus['Not Applied'];

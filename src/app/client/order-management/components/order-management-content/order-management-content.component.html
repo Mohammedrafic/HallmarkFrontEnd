@@ -566,9 +566,14 @@
             <span>{{ data.shiftName }}</span>
           </ng-template>
         </e-column>
-        <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
+        <e-column field="shiftStartTime" headerText="Shift Start Time" width="160" minWidth="80" maxWidth="200">
           <ng-template #template let-data>
-            <span>{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}-{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span>
+            <span>{{ data.shiftStartTime | date: 'HH:mm':'UTC' }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="shiftEndTime" headerText="Shift End Time" width="160" minWidth="80" maxWidth="200">
+          <ng-template #template let-data>
+            <span>{{ data.shiftEndTime | date: 'HH:mm':'UTC' }}</span>
           </ng-template>
         </e-column>
         <e-column field="candidates" headerText="CAND." headerTextAlign="Right" width="90" minWidth="80" maxWidth="160">
@@ -975,6 +980,22 @@
           </ejs-multiselect>
         </div>
       </div>
+      <div class="input-container" *ngIf="isActiveSystemIRP">
+        <label>Shift Name</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            placeholder="All"
+            formControlName="shiftIds"
+            [allowFiltering]="true"
+            [dataSource]="filterColumns.shiftIds.dataSource"
+            [fields]="shiftNameFields"
+            [showDropDownIcon]="true"
+            [changeOnBlur]="!(isMobile || isTablet)"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
       <div class="input-container" *ngIf="!isActiveSystemIRP">
         <label>PO #</label>
         <div class="input-group multiselect">
@@ -992,14 +1013,29 @@
         </div>
       </div>
     </div>
-    <div class="bootstrap" *ngIf="!isActiveSystemIRP">
+    <div class="filter-row bootstrap" *ngIf="!isActiveSystemIRP">
       <div class="input-container">
-        <label>Job Title</label>
-        <div class="input-group">
-          <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
-        </div>
+      <label>Job Title</label>
+      <div class="input-group">
+      <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
       </div>
-    </div>
+      </div>
+      <div class="input-container">
+      <label>Shift Name</label>
+      <div class="input-group multiselect">
+      <ejs-multiselect
+                  mode="CheckBox"
+                  [allowFiltering]="true"
+                  [dataSource]="filterColumns.shift.dataSource"
+                  [fields]="shiftFields"
+                  [showDropDownIcon]="true"
+                  [changeOnBlur]="!(isMobile || isTablet)"
+                  formControlName="shift"
+      >
+      </ejs-multiselect>
+      </div>
+      </div>
+      </div>
     <div
       class="filter-row bootstrap"
       *ngIf="

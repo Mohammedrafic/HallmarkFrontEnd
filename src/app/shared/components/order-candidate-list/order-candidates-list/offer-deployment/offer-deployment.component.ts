@@ -345,7 +345,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       clockId: new FormControl(null),
     });
   }
-  
+
   private setFormValue(data: OrderCandidateJob): void {
     this.formGroup.setValue({
       jobId: `${data.organizationPrefix}-${data.orderPublicId}`,
@@ -383,7 +383,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     .pipe(takeUntil(this.unsubscribe$))
     .subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
-
       if (data) {
         this.getComments();
         this.currentApplicantStatus = data.applicantStatus;

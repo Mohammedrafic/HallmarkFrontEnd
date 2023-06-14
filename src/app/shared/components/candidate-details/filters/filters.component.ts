@@ -18,8 +18,8 @@ export class FiltersComponent implements OnInit, AfterViewInit {
   @Input() public isClear: boolean;
 
   @ViewChild('regionDropdown') public regionDropdown: MultiSelectComponent;
-  @ViewChild('locationDropdown') public readonly locationDropdown: MultiSelectComponent;
-  @ViewChild('departmentDropdown') public readonly departmentDropdown: MultiSelectComponent;
+  @ViewChild('locationDropdown') public  locationDropdown: MultiSelectComponent;
+  @ViewChild('departmentDropdown') public  departmentDropdown: MultiSelectComponent;
 
   public typeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public skillFields: FieldSettingsModel = { text: 'skillDescription', value: 'masterSkillId' };
@@ -32,13 +32,21 @@ export class FiltersComponent implements OnInit, AfterViewInit {
       debounceTime(300)
     ).subscribe(() => {
       this.regionDropdown.refresh();
+      this.locationDropdown.refresh();
+      this.departmentDropdown.refresh();
     });
   }
 
   ngAfterViewInit() {
+    this.departmentDropdown.refresh();
+    this.locationDropdown.refresh();
     if (this.isClear) {
       this.regionDropdown.selectAll(false);
+      this.locationDropdown.selectAll(false);
+      this.departmentDropdown.selectAll(false);
+      this.locationDropdown.refresh();
       this.regionDropdown.refresh();
+      this.departmentDropdown.refresh();
     }
   }
 }

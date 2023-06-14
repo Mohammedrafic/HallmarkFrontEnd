@@ -4,16 +4,16 @@ import { NgModule } from '@angular/core';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { DialogModule } from "@syncfusion/ej2-angular-popups";
 
-import { CandidateConfirmDialogComponent } from './candidate-confirm-dialog.component';
+import { ReplacementPdOrdersDialogComponent } from './replacement-pd-orders-dialog.component';
 
 
 @NgModule({
-  declarations: [CandidateConfirmDialogComponent],
+  declarations: [ReplacementPdOrdersDialogComponent],
   imports: [
     CommonModule,
     ButtonModule,
     DialogModule,
   ],
-  exports: [CandidateConfirmDialogComponent],
+  exports: [ReplacementPdOrdersDialogComponent],
 })
-export class CandidateConfirmDialogModule { }
+export class ReplacementPdOrdersDialogModule { }
