@@ -85,6 +85,7 @@
 
   <ng-template #legend>
     <app-widget-legend
+      [slideBar]="slideBar"
       [isPositionTrend]="true"
       [legendData]="chartLegend"
       (changeCheckbox)="onClickLegend($event)"
