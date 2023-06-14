@@ -28,7 +28,7 @@ export class InvoiceAgencyResolver implements Resolve<void | CurrentUserPermissi
           .find((permission) => permission.permissionId === PermissionCodes.AgencyCanPay);
           this.store.dispatch(new Invoices.SetInvoicePermissions({ agencyCanPay: !!agCanPay }));
         }),
-      )
+      );
     }
   }
 }
