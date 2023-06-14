@@ -38,7 +38,7 @@
                           [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_POSITIONS]"
                           [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
                           [description]="widgetDescriptionEnum.APPLICANTS_BY_POSITIONS"></app-maps-chart>
-          <app-line-chart *ngSwitchCase="widgetTypeEnum.POSITIONS_BY_TYPES"
+          <app-line-chart *ngSwitchCase="widgetTypeEnum.POSITIONS_BY_TYPES" [slideBar]="isSideBarDocked$ | async"
                           [chartData]="widgetsData?.[widgetTypeEnum.POSITIONS_BY_TYPES]"
                           [isLoading]="isLoading"
                           [timeSelection]="timeSelection" [isDarkTheme]="isDarkTheme"

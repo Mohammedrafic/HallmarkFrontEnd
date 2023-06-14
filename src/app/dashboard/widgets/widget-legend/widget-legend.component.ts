@@ -15,6 +15,7 @@ export class WidgetLegendComponent {
   @Input() public legendPosition: LegendPositionEnum = LegendPositionEnum.Bottom;
   @Input() public isPositionTrend: boolean=false;
   @Input() public description: string;
+  @Input() public slideBar: any = false;
 
   @Output() onClickLegend: EventEmitter<string> = new EventEmitter();
   @Output() changeCheckbox: EventEmitter<string> = new EventEmitter();

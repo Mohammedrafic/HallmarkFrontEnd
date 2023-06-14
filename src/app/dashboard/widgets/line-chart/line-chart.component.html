@@ -1,7 +1,7 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
   <ng-template #header>
     <div class="widget-header">
-      <div class="app-line-chart__title">
+      <div class="app-line-chart__title" [ngClass]="slideBar ? 'slideBarWidth' : ''">
         <h3 class="widget-header__title">{{ 'Positions Trend' }}</h3>
       </div>
       <div class="app-line-chart__actions">
@@ -85,6 +85,7 @@
 
   <ng-template #legend>
     <app-widget-legend
+      [slideBar]="slideBar"
       [isPositionTrend]="true"
       [legendData]="chartLegend"
       (changeCheckbox)="onClickLegend($event)"
