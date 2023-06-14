@@ -29,6 +29,8 @@ export type CandidateWorkCommitmentsPage = PageOfCollections<CandidateWorkCommit
 export type WorkCommitmentSetup = {
   startDate: string;
   endDate: string | null;
-  region: string;
-  location: string;
+  regions: string[];
+  locations: string[];
+  workCommitmentId: number,
+  employeeWorkCommitmentId: number,
 }

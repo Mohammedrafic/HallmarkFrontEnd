@@ -147,12 +147,12 @@ export const getWorkCommitmentChildColumnDef = () => ([
     cellRendererSelector: titleValueCellRendererSelector,
   },
   {
-    field: 'region',
+    field: 'regions',
     width: 185,
     cellRendererSelector: titleValueCellRendererSelector,
   },
   {
-    field: 'location',
+    field: 'locations',
     width: 185,
     cellRendererSelector: titleValueCellRendererSelector,
   },

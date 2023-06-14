@@ -6,9 +6,19 @@
 
   ::ng-deep {
     .ag-cell {
-      .ag-cell-wrapper .ag-selection-checkbox {
+      .ag-cell-wrapper {
+       &.ag-selection-checkbox {
         margin-right: 20px;
       }
+      
+      &.ag-row-group {
+        justify-content: space-between;
+
+        .ag-group-value {
+          flex: 1;
+        }
+      }
+    }
   
       &.expansion-toggle-icons-order-1 {
         .ag-group-contracted,

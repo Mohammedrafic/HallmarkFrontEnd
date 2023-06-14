@@ -1,13 +1,14 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
+import { ColDef } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
 
 import { getWorkCommitmentChildColumnDef } from '../candidate-work-commitment-grid.constants';
 import { CandidateWorkCommitmentService } from
   '@client/candidates/candidate-work-commitment/services/candidate-work-commitment.service';
 import { WorkCommitmentSetup } from '@client/candidates/candidate-work-commitment/models/candidate-work-commitment.model';
+import { CandidatesService } from '@client/candidates/services/candidates.service';
 
 
 @Component({
@@ -20,10 +21,20 @@ export class WorkCommitmentChildRowRendererComponent implements ICellRendererAng
   public colDefs: ColDef[] = getWorkCommitmentChildColumnDef();
   public rowData$: Observable<WorkCommitmentSetup[]>;
 
-  constructor(private candidateWorkCommitmentService: CandidateWorkCommitmentService) { }
+  private employeeWorkCommitmentId: number;
 
-  public agInit(params: ICellRendererParams): void {
-    this.rowData$ = this.candidateWorkCommitmentService.getCandidateWorkCommitmentChildRecords(params.data.id);
+  constructor(
+    private candidateWorkCommitmentService: CandidateWorkCommitmentService,
+    private candidateService: CandidatesService
+  ) { }
+
+  public agInit(): void {
+    const employeeWorkCommitmentId = this.candidateService.getActiveWorkCommitment()?.id;
+
+    if (employeeWorkCommitmentId) {
+      this.rowData$ = this.candidateWorkCommitmentService
+        .getCandidateWorkCommitmentChildRecords(this.employeeWorkCommitmentId);
+    }
   }
 
   public refresh(): boolean {
