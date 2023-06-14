@@ -30,7 +30,8 @@ declare const com:any;
 })
 
 export class LogiReportComponent implements OnInit {
-  private factory:any;
+  private factory: any;
+  private factoryReportSet: any;
   private reportIframeName: string = "reportIframe";
   private uId: string = "";
   private pwd: string = "";
@@ -49,7 +50,8 @@ export class LogiReportComponent implements OnInit {
   
 
   ngOnInit(): void {
-    this.factory = com.jinfonet.api.AppFactory;    
+    this.factory = com.jinfonet.api.AppFactory;
+    this.factoryReportSet = com.jinfonet.api.ReportSet;
     
   }
   
@@ -62,6 +64,15 @@ export class LogiReportComponent implements OnInit {
     // this.uId=userId==null?"":userId;
     // this.pwd=pass==null?"":pass;
     //this.injectReportApiJs();
+  }
+  public SaveAsReport(options: any): void {
+   this.CustomizeSaveAs(options, this.CallbackSaveAs);  
+  }
+  private CustomizeSaveAs(options: any, callBack: any): void {
+    this.factoryReportSet?.prototype.saveAs(options, callBack);
+  }
+  private CallbackSaveAs(status: any) {
+    console.log(status);
   }
   public RenderReport():void
   {
@@ -182,7 +193,8 @@ export class LogiReportComponent implements OnInit {
           script.type = 'text/javascript';
           window.localStorage.setItem(LogiReportJsLoaded,"true");
           script.onload = (): void => {
-            this.factory = com.jinfonet.api.AppFactory;            
+            this.factory = com.jinfonet.api.AppFactory;
+            this.factoryReportSet = com.jinfonet.api.ReportSet;
             clearTimeout(this.scriptLoadTimeoutHandle);
             resolve();
           };

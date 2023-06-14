@@ -63,11 +63,13 @@ export class OrderCandidatesCredentialsState {
   @Action(GetPredefinedCredentials)
   GetPredefinedCredentials({ patchState }: StateContext<OrderCandidatesCredentialsStateModel>, {
     departmentId,
-    skillId
+    skillId,
+    systemType,
   }: GetPredefinedCredentials): Observable<IOrderCredentialItem[]> {
-    return this.credentialsService.getPredefinedCredentials(departmentId, skillId).pipe(tap((payload: IOrderCredentialItem[]) => {
-      patchState({ predefinedCredentials: payload });
-    }));
+    return this.credentialsService.getPredefinedCredentials(departmentId, skillId, systemType)
+      .pipe(tap((payload: IOrderCredentialItem[]) => {
+        patchState({ predefinedCredentials: payload });
+      }));
   }
 
   @Action(UpdatePredefinedCredentials)

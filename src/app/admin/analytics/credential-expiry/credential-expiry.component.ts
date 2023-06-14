@@ -131,7 +131,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5, 13];
+  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5,10,13];
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };

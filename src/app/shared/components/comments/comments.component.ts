@@ -19,11 +19,11 @@ enum CommentsFilter {
   selector: 'app-comments',
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentsComponent {
-  @Input() useBackground: boolean = true;
-  @Input() disabled: boolean = false;
+  @Input() useBackground = true;
+  @Input() disabled = false;
   @Input() orderId: number;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
@@ -48,7 +48,7 @@ export class CommentsComponent {
   public CommentConfiguration: boolean | null | undefined;
   public commentsList: Comment[] = [];
   @Input() commentContainerId: number;
-  @Input() isCreating: boolean = false;
+  @Input() isCreating = false;
 
   @ViewChild('textBox')
   public textBox: TextBoxComponent;
@@ -164,13 +164,13 @@ export class CommentsComponent {
       isExternal: this.isExternal,
       new: true,
       commentContainerId: this.commentContainerId,
-      isRead: true
+      isRead: true,
     };
     this.comments.push(comment);
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
-      this.store.dispatch(new SaveComment(comment))
+      this.store.dispatch(new SaveComment(comment));
     }
   }
 
