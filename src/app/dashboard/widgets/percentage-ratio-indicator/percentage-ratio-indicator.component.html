@@ -1,4 +1,4 @@
-<div class="percentage-ratio">
+<div class="percentage-ratio"  [ngClass]="slideBar ? 'percentage-ratio-mar' : ''">
   <span [ngClass]="['percentage-ratio__value', percentageRatio >= 0 ? 'percentage-ratio__value-increase' : '']"
     >{{ percentageRatio | number: '1.2-2' }} %
   </span>
