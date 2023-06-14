@@ -5,7 +5,7 @@ import { OrganizationRegion } from '@shared/models/organization.model';
 import { FieldNames } from './tiers.constant';
 
 export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitmentIds? : any): Record<Tiers, TierDialogConfig> => ({
-  [Tiers.tierSettings]: {
+  [Tiers.tierSettingsIRP]: {
     title: 'Add Tier',
     editTitle: 'Edit Tier',
     fields: [
@@ -57,6 +57,57 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitment
       },
     ]
   },
+  [Tiers.tierSettings]: {
+    title: 'Add Tier',
+    editTitle: 'Edit Tier',
+    fields: [
+      {
+        field: 'name',
+        title: 'Tier Name',
+        disabled: false,
+        required: true,
+        type: FieldType.Input,
+      },
+      {
+        field: 'hours',
+        title: 'Number of Hours',
+        disabled: false,
+        required: true,
+        type: FieldType.Number,
+      },
+      {
+        field: FieldNames.regionIds,
+        title: 'Region',
+        disabled: false,
+        required: true,
+        type: FieldType.MultiSelectDropdown,
+        dataSource: regions ?? [],
+        showAllToggle: true,
+        customFiltering: true
+      },
+      {
+        field: FieldNames.locationIds,
+        title: 'Location',
+        disabled: false,
+        required: true,
+        type: FieldType.MultiSelectDropdown,
+        dataSource: [],
+        showAllToggle: true,
+        customFiltering: true
+      },
+      {
+        field: FieldNames.departmentIds,
+        title: 'Department',
+        disabled: false,
+        required: true,
+        type: FieldType.MultiSelectDropdown,
+        dataSource: [],
+        showAllToggle: true,
+        customFiltering: true,
+      }
+    ]
+  },
+
   [Tiers.tierException]: {
     title: 'Add Tier Exception',
     editTitle: 'Edit Tier Exception',

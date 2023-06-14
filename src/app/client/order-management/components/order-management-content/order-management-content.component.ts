@@ -803,6 +803,16 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.isIncomplete = false;
 
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      let IsLTAOrders=  JSON.parse(localStorage.getItem('IsLTAOrders') || '"false"') as boolean; 
+      if(IsLTAOrders==true){
+        this.filters.candidateStatuses =  []
+        this.filters.orderStatuses = []
+        this.filters.isQuickLinkWidgetLTA=true
+        this.OrderFilterFormGroup.controls['candidateStatuses'].setValue([])
+        this.OrderFilterFormGroup.controls['orderStatuses'].setValue([])
+        this.store.dispatch(new ShowFilterDialog(false));
+        this.onFilterClose()
+      }
       this.filters.orderBy = this.orderBy;
       this.filters.pageNumber = this.currentPage;
       this.filters.pageSize = this.pageSize;
@@ -827,8 +837,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       this.isIncomplete = (this.activeIRPTabIndex === OrderManagementIRPTabsIndex.Incomplete);
       this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.IRP);
-      cleared ? this.store.dispatch(new GetIRPOrders(this.filters)) : this.store.dispatch([new GetOrderFilterDataSources(true)]);
-
+      cleared ? this.store.dispatch(new GetIRPOrders(this.filters)).pipe().subscribe(()=>{
+        this.globalWindow.localStorage.setItem("IsLTAOrders", JSON.stringify(false));
+      }) : this.store.dispatch([new GetOrderFilterDataSources(true)]);
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
       switch (this.activeTab) {
         case OrganizationOrderManagementTabs.AllOrders:
@@ -892,7 +903,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private getAllShifts(): void {
     this.store.dispatch(new GetAllShifts());
     this.getAllShifts$.pipe(takeUntil(this.unsubscribe$)).subscribe((state) => {
-      this.filterColumns.shiftIds.dataSource = state;
+      this.filterColumns.shiftIds.dataSource = [{ name: 'Custom', id: 0 }, ...state];
     });
   }
 

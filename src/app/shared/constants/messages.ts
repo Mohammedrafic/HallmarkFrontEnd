@@ -119,8 +119,10 @@ export const EMPLOYEE_TERMINATED_WARNING = 'Are you sure you want to terminate t
 export const addAvailabilityToStart = 'Add Availability to start Scheduling';
 
 export const RECORD_SAVED_SUCCESS = 'Record saved successfully';
-export const UpdateClosedPositionRate = 'Are you sure you want to update the Bill rate ' 
+export const UpdateClosedPositionRate = 'Are you sure you want to update the Bill rate '
 + 'for Closed Position? This may lead to recalculating values and generating new invoice records.';
+export const HaveScheduleBooking =
+  'Onboarded Candidate(s) have scheduled Bookings for this LTA Order. Do you like to remove or update them?';
 
 export const N_FAILED_RECORDS = (count: number) => `${count} failed to process.`;
 export const N_SUCCESS_RECORDS = (count: number) => `${count} records successfully processed.`;
