@@ -172,7 +172,7 @@ import { EditIrpCandidateComponent } from './components/order-candidate-list/edi
 import { OrderCloseReasonInfoModule } from './components/order-close-reason-info/order-close-reason-info.module';
 import { GeneralOrderPerDiemInfoModule } from './components/general-order-per-diem-info/general-order-per-diem-info.module';
 import { ChipsCssClassPipeModule } from './pipes/chip-css-class/chip-css-class-pipe.module';
-import { OnboardCandidateMessageDialogComponent } from './components/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import { OnboardCandidateMessageDialogComponent } from './components/order-candidate-list/order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor';
 import {
     EligibilityMessageModule

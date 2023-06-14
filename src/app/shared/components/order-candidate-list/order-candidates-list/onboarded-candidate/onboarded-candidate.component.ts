@@ -68,7 +68,7 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { OrderType } from '@shared/enums/order-type';
-import { OnboardCandidateMessageDialogComponent } from '@shared/components/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import { OnboardCandidateMessageDialogComponent } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 
 @Component({
@@ -632,7 +632,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           this.onboardEmailTemplateForm.disableControls(true);
           this.store.dispatch(new ShowGroupEmailSideDialog(true));
         }else{
-          // this.onAccept();
+          this.onAccept();
         }
       });
      
