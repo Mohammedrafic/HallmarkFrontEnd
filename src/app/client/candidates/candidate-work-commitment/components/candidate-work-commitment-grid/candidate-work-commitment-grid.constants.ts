@@ -164,11 +164,11 @@ export const getWorkCommitmentGridOptions = <T>(context: T): GridOptions => {
     animateRows: true,
     context: context,
     detailCellRenderer: WorkCommitmentChildRowRendererComponent,
-    isRowMaster: (dataItem: CandidateWorkCommitment) => !!dataItem.wcSetupCount,
+    isRowMaster: (dataItem: CandidateWorkCommitment) => !!dataItem.numberOfOrganizationWorkCommitments,
     getRowHeight: (params: RowHeightParams) => {
       if (params?.node?.detail) {
         const data = params.data as CandidateWorkCommitment;
-        return data.wcSetupCount * params.api.getSizesForCurrentTheme().rowHeight + 1;
+        return data.numberOfOrganizationWorkCommitments * params.api.getSizesForCurrentTheme().rowHeight + 1;
       }
 
       return null;
