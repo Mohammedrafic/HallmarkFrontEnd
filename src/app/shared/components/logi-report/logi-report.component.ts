@@ -65,11 +65,15 @@ export class LogiReportComponent implements OnInit {
     // this.pwd=pass==null?"":pass;
     //this.injectReportApiJs();
   }
-  public SaveAsReport(options: any): void {
-   this.CustomizeSaveAs(options, this.CallbackSaveAs);  
+  public SaveAsReport(options: any, entryId: any): void {
+    this.CustomizeSaveAs(options, entryId);  
   }
-  private CustomizeSaveAs(options: any, callBack: any): void {
-    this.factoryReportSet?.prototype.saveAs(options, callBack);
+  private CustomizeSaveAs(options: any,  entryId: any): void {
+    var app = this.factory.getApp(entryId), rptset;
+    if (!app) return;
+
+    rptset = app.getReportSet();
+    rptset.saveAs(options, this.CallbackSaveAs);
   }
   private CallbackSaveAs(status: any) {
     console.log(status);
