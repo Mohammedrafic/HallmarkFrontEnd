@@ -41,7 +41,7 @@ import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
   templateUrl: './vendor-activity.component.html',
   styleUrls: ['./vendor-activity.component.scss']
 })
-export class VendorActivityComponent implements OnInit {
+export class VendorActivityComponent implements OnInit, OnDestroy {
 
   public title: string = "Vendor Activity";
 
