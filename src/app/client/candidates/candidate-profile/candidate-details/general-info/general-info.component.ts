@@ -114,9 +114,13 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   }
 
   private handleOnHoldProfileStatus(): void {
-    const { holdStartDate, holdEndDate } = this.candidatesService.getProfileData() || {};
-    const startDate = holdStartDate ? DateTimeHelper.convertDateToUtc(holdStartDate as string) : this.today;
-    const endDate = holdEndDate ? DateTimeHelper.convertDateToUtc(holdEndDate as string) : holdEndDate;
+    const profileData = this.candidatesService.getProfileData();
+    const startDate = profileData?.holdStartDate
+      ? DateTimeHelper.convertDateToUtc(profileData.holdStartDate as string)
+      : this.today;
+    const endDate = profileData?.holdEndDate
+      ? DateTimeHelper.convertDateToUtc(profileData.holdEndDate as string)
+      : null;
 
     this.isOnHoldSelected = true;
     this.isTerminatedSelected = false;
@@ -132,8 +136,10 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   }
 
   private handleTerminatedProfileStatus(): void {
-    const { terminationDate, terminationReasonId } = this.candidatesService.getProfileData() || {};
-    const startDate = terminationDate ? DateTimeHelper.convertDateToUtc(terminationDate) : this.today;
+    const profileData = this.candidatesService.getProfileData();
+    const startDate = profileData?.terminationDate
+      ? DateTimeHelper.convertDateToUtc(profileData.terminationDate)
+      : this.today;
 
     this.isTerminatedSelected = true;
     this.isOnHoldSelected = false;
@@ -142,7 +148,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       Validators.required,
       endTimeValidator(this.candidateForm, 'hireDate'),
     ]);
-    this.candidateForm.get('terminationReasonId')?.setValue(terminationReasonId);
+    this.candidateForm.get('terminationReasonId')?.setValue(profileData?.terminationReasonId);
     this.candidateForm.get('terminationReasonId')?.setValidators(Validators.required);
     this.removeValidatorsAndReset(['holdStartDate', 'holdEndDate']);
   }
