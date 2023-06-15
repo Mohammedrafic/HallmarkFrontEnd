@@ -35,6 +35,7 @@ import { PayRateHistoryDialogComponent } from './components/pay-rate-history-dia
 import { PayRateService } from './services/pay-rate.service';
 import { PayRateApiService } from './services/pay-rate-api.service';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { ReplacementOrderConfirmationModule } from '@shared/components/replacement-order-confirmation/replacement-order-confirmation.module';
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
     DialogModule,
     ReactiveFormsModule,
     TooltipContainerModule,
+    ReplacementOrderConfirmationModule,
   ],
   providers: [
     CandidateWorkCommitmentService,

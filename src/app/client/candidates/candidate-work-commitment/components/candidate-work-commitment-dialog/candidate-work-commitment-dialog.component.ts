@@ -10,7 +10,7 @@ import {
   WorkCommitmentOrgHierarchies,
 } from '@organization-management/work-commitment/interfaces';
 import { DatepickerComponent } from '@shared/components/form-controls/datepicker/datepicker.component';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, EMPLOYEE_SKILL_CHANGE_WARNING, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -23,7 +23,7 @@ import { addDays } from '@shared/utils/date-time.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { uniq } from 'lodash';
-import { catchError, distinctUntilChanged, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, Observable, Subject, take, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CandidateWorkCommitment } from '../../models/candidate-work-commitment.model';
@@ -84,6 +84,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public maximumDate: Date | undefined;
   public startDate: Date;
   public showCommonRangesError = false;
+  public showOverrideDialog = false;
+  public replaceOrder = false;
+  public overrideCommitmentConfirm$ = new Subject<boolean>();
+  public replacementConfirmationMessage = EMPLOYEE_SKILL_CHANGE_WARNING;
 
 
   constructor(
@@ -121,7 +125,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         });
     }
   }
-
+ 
   private createForm(): void {
     this.candidateWorkCommitmentForm = this.fb.group({
       id: [0],
@@ -181,7 +185,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   private getDatesOverlap(selectedCommitments: WorkCommitmentDetails[]): Date[] | null {
     let start = new Date(selectedCommitments[0].startDate);
     let end = selectedCommitments[0].endDate ? new Date(selectedCommitments[0].endDate) : null;
-    let overlap: boolean = true;
+    let overlap = true;
 
     selectedCommitments.forEach(item => {
       const currentStart = new Date(item.startDate);
@@ -223,7 +227,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private generateGeneralCommitmentModel(workCommitmentIds: number[]): WorkCommitmentDetails {
     const selectedCommitments = this.workCommitmentGroup.items.filter(item => {
-      return workCommitmentIds.includes(item.workCommitmentId)
+      return workCommitmentIds.includes(item.workCommitmentId);
     });
     const commonRange = this.getDatesOverlap(selectedCommitments);
     if (!commonRange) {
@@ -233,7 +237,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       this.removeValidators();
     }
     const commitment: WorkCommitmentDetails = {
-      availabilityRequirement: this.isEveryValSame(selectedCommitments, 'availabilityRequirement') ? selectedCommitments[0].availabilityRequirement : null,
+      availabilityRequirement: this.isEveryValSame(selectedCommitments, 'availabilityRequirement') ?
+        selectedCommitments[0].availabilityRequirement : null,
       comments: this.isEveryValSame(selectedCommitments, 'comments') ? selectedCommitments[0].comments : '',
       criticalOrder: this.isEveryValSame(selectedCommitments, 'criticalOrder') ? selectedCommitments[0].criticalOrder : null,
       endDate: commonRange && commonRange[1] ? commonRange[1].toString() : null,
@@ -241,8 +246,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       jobCode: this.isEveryValSame(selectedCommitments, 'jobCode') ? selectedCommitments[0].jobCode : '',
       masterWorkCommitmentId: 0,
       masterWorkCommitmentName: '',
-      minimumWorkExperience: this.isEveryValSame(selectedCommitments, 'minimumWorkExperience') ? selectedCommitments[0].minimumWorkExperience : null,
-      schedulePeriod: this.isEveryValSame(selectedCommitments, 'schedulePeriod') ? selectedCommitments[0].schedulePeriod : null,
+      minimumWorkExperience: this.isEveryValSame(selectedCommitments, 'minimumWorkExperience') ?
+        selectedCommitments[0].minimumWorkExperience : null,
+      schedulePeriod: this.isEveryValSame(selectedCommitments, 'schedulePeriod') ?
+        selectedCommitments[0].schedulePeriod : null,
       skills: [],
       startDate: commonRange ? commonRange[0].toString() : '',
       workCommitmentId: 0,
@@ -250,8 +257,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       departmentId: 0,
       departmentName: '',
       allRegionsSelected: false,
-      allLocationsSelected: false
-    }
+      allLocationsSelected: false,
+    };
     return commitment;
   }
 
@@ -281,7 +288,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     } else if (selectedSettings.length === 1) {
       // single commitment is selected
       this.removeValidators();
-      const commitment = this.workCommitmentGroup.items.find(item => item.workCommitmentId === selectedSettings[0].workCommitmentId)!;
+      const commitment = this.workCommitmentGroup.items.find(
+        item => item.workCommitmentId === selectedSettings[0].workCommitmentId
+      )!;
       this.setDatesValidation(commitment);
       this.populateFormWithMasterCommitment(commitment);
       this.candidateWorkCommitmentForm.controls['workCommitmentIds'].setValue([commitment.workCommitmentId]);
@@ -357,7 +366,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         this.candidateWorkCommitmentForm.controls['regionIds'].setValue(candidateCommitment.regionIds);
         this.candidateWorkCommitmentForm.controls['locationIds'].setValue(candidateCommitment.locationIds);
         this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].setValue('' + id, { emitEvent: false });
-        this.candidateWorkCommitmentForm.patchValue(candidateCommitment as {}, { emitEvent: false });
+        this.candidateWorkCommitmentForm.patchValue(candidateCommitment, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
       }
       this.refreshDatepicker();
@@ -402,7 +411,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private controlsStateHandler(disable: boolean): void {
     for (const control in this.candidateWorkCommitmentForm.controls) {
-      if (control !== 'workCommitmentIds' && control !== 'masterWorkCommitmentId' && control !== 'regionIds' && control !== 'locationIds') {
+      if (
+        control !== 'workCommitmentIds' &&
+        control !== 'masterWorkCommitmentId' &&
+        control !== 'regionIds' &&
+        control !== 'locationIds'
+      ) {
         disable
           ? this.candidateWorkCommitmentForm.controls[control].disable()
           : this.candidateWorkCommitmentForm.controls[control].enable();
@@ -543,6 +557,57 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       });
   }
 
+  private isOverridingEndDate(): boolean {
+    return this.candidateService.hasWorkCommitments && this.title === DialogMode.Add;
+  }
+
+  private saveCommitment(): void {
+    const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
+    candidateWorkCommitment.startDate =
+      candidateWorkCommitment.startDate &&
+      DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(this.startDate));
+    candidateWorkCommitment.employeeId = this.employeeId;
+    candidateWorkCommitment.createReplacement = this.replaceOrder;
+    this.replaceOrder = false;
+    this.candidateWorkCommitmentService.saveCandidateWorkCommitment(candidateWorkCommitment).pipe(
+      tap(() => {
+        this.sideDialog.hide();
+        this.candidateWorkCommitmentForm.reset();
+        this.lastActiveDate = null;
+        this.store.dispatch(
+          new ShowToast(
+            MessageTypes.Success,
+            !candidateWorkCommitment.id ? RECORD_ADDED : RECORD_MODIFIED
+          )
+        );
+        this.refreshSubject$.next();
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    ).subscribe();
+  }
+
+  private handleCommitmentSaving(): void {
+    if (this.isOverridingEndDate()) {
+      this.showOverridingConfirmation();
+    } else {
+      this.saveCommitment();
+    }
+  }
+
+  private showOverridingConfirmation(): void {
+    this.showOverrideDialog = true;
+    this.overrideCommitmentConfirm$
+      .pipe(
+        take(1),
+        tap(() => this.showOverrideDialog = false),
+        filter(Boolean),
+    ).subscribe(() => {
+      this.saveCommitment();
+    });
+  }
+
   public closeDialog(): void {
     if (this.candidateWorkCommitmentForm.dirty) {
       this.confirmService
@@ -563,30 +628,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     }
   }
 
-  public saveCommitment(): void {
+  public validateCommitment(): void {
     if (this.candidateWorkCommitmentForm.valid) {
-      const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
-      candidateWorkCommitment.startDate =
-        candidateWorkCommitment.startDate &&
-        DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(this.startDate));
-      candidateWorkCommitment.employeeId = this.employeeId;
-      this.candidateWorkCommitmentService.saveCandidateWorkCommitment(candidateWorkCommitment).pipe(
-        tap(() => {
-          this.sideDialog.hide();
-          this.candidateWorkCommitmentForm.reset();
-          this.lastActiveDate = null;
-          this.store.dispatch(
-            new ShowToast(
-              MessageTypes.Success,
-              !candidateWorkCommitment.id ? RECORD_ADDED : RECORD_MODIFIED
-            )
-          );
-          this.refreshSubject$.next();
-        }),
-        catchError((error: HttpErrorResponse) => {
-          return this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
-        })
-      ).subscribe();
+      this.handleCommitmentSaving();
     } else {
       this.candidateWorkCommitmentForm.markAllAsTouched();
     }

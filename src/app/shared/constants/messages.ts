@@ -113,9 +113,9 @@ export const CLOSE_IRP_POSITION = 'Closing position will permanently close it wi
 export const ALL_DEPARTMENTS_SELECTED = 'You can`t assign Departments manually when "All" is selected';
 export const NO_ACTIVE_WORK_COMMITMET = 'No active Work Commitment';
 export const REASON_WARNING = 'Please select a System for Reason';
-export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Are you sure, you want to update Employee Skills? It may have impact on Schedule and Orders.';
-export const IRP_DEPARTMENT_CHANGE_WARNING = 'Are you sure, you want to provide that change? It may cause deleting future schedules and canceling Employee from orders.';
-export const EMPLOYEE_TERMINATED_WARNING = 'Are you sure you want to terminate the employee?';
+export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Do you want to update Employee Skills? It may have impact on Schedule and Orders.';
+export const IRP_DEPARTMENT_CHANGE_WARNING = 'Do you want to provide that change? It may cause deleting future schedules and canceling Employee from orders.';
+export const EMPLOYEE_TERMINATED_WARNING = 'Do you want to terminate the employee?';
 export const addAvailabilityToStart = 'Add Availability to start Scheduling';
 
 export const RECORD_SAVED_SUCCESS = 'Record saved successfully';

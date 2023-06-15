@@ -21,6 +21,7 @@ export type CandidateWorkCommitment = {
   comment: string;
   created?: string | Date;
   isActive: boolean;
+  createReplacement?: boolean;
 }
 
 export type CandidateWorkCommitmentsPage = PageOfCollections<CandidateWorkCommitment>;
