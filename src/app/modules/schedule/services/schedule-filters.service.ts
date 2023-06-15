@@ -21,7 +21,6 @@ import {
   LocationChipsStructureState,
   RegionChipsStructureState,
   ScheduleFilterItem,
-  ScheduleFilters,
   ScheduleFiltersConfig,
   ScheduleFiltersData,
   ScheduleFilterStructure,
@@ -32,8 +31,6 @@ export class ScheduleFiltersService {
   deletedInlineChip: Subject<ChipDeleteEventType> = new Subject();
 
   private readonly scheduleFiltersData: BaseObservable<ScheduleFiltersData> = new BaseObservable(InitScheduleFiltersData);
-  private readonly schedulePreservedFiltersData: BaseObservable<ScheduleFilters | null>
-    = new BaseObservable<ScheduleFilters | null>(null);
   private readonly employeeOrganizationStructure: BaseObservable<OrganizationStructure>
     = new BaseObservable(InitEmployeeOrganizationStructure);
 
@@ -129,14 +126,6 @@ export class ScheduleFiltersService {
 
   setEmployeeOrganizationStructure(employeeOrganizationStructure: OrganizationStructure): void {
     this.employeeOrganizationStructure.set(employeeOrganizationStructure);
-  }
-
-  setPreservedFiltersDataStream(scheduleFiltersData: ScheduleFilters): void {
-    this.schedulePreservedFiltersData.set(scheduleFiltersData);
-  }
-
-  getPreservedFiltersDataStream(): Observable<ScheduleFilters | null> {
-    return this.schedulePreservedFiltersData.getStream();
   }
 
   getSelectedSkillFilterColumns(sources: DropdownOption[], preservedSkills: number[]): number[] {
