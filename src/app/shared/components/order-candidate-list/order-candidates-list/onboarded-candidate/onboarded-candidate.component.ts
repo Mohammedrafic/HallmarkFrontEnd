@@ -379,7 +379,37 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         .pipe(take(1))
         .subscribe((isConfirm) => {
           if (isConfirm && this.candidateJob) {
-            const value = this.form.getRawValue();
+              this.isSend =  true;
+              const options = {
+                title: ONBOARD_CANDIDATE,
+                okButtonLabel: 'Yes',
+                okButtonClass: 'ok-button',
+                cancelButtonLabel: 'No'
+              };
+              this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+              .subscribe((isConfirm) => {
+                if(isConfirm){
+                  this.onboardEmailTemplateForm.isSend=true;
+                  this.onboardEmailTemplateForm.rteCreated();
+                  this.onboardEmailTemplateForm.disableControls(true);
+                  this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                }else{
+                  this.saveCandidateJob();
+                }
+              });
+            
+            this.closeDialog();
+          } else {
+            this.jobStatusControl.reset();
+            this.selectedApplicantStatus = null;
+          }
+        });
+    }
+  }
+
+  private saveCandidateJob(){
+      if(this.candidateJob){
+          const value = this.form.getRawValue();            
             this.store
               .dispatch(
                 new UpdateOrganisationCandidateJob({
@@ -403,13 +433,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
               .subscribe(() => {
                 this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
               });
-            this.closeDialog();
-          } else {
-            this.jobStatusControl.reset();
-            this.selectedApplicantStatus = null;
-          }
-        });
-    }
+      }            
   }
 
   private shouldChangeCandidateStatus(): Observable<boolean> {
@@ -607,35 +631,17 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   onGroupEmailAddCancel(){
     this.isSend =  false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
-    // this.onAccept();
+    // this.saveCandidateJob();
   }
 
   onGroupEmailSend(){
      console.log(this.sendOnboardMessageEmailFormGroup.value);
-     // this.onAccept();
+     // this.saveCandidateJob();
   }
 
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded || event.itemData === null) {
-      this.isSend =  true;
-      const options = {
-        title: ONBOARD_CANDIDATE,
-        okButtonLabel: 'Yes',
-        okButtonClass: 'ok-button',
-        cancelButtonLabel: 'No'
-      };
-      this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
-      .subscribe((isConfirm) => {
-        if(isConfirm){
-          this.onboardEmailTemplateForm.isSend=true;
-          this.onboardEmailTemplateForm.rteCreated();
-          this.onboardEmailTemplateForm.disableControls(true);
-          this.store.dispatch(new ShowGroupEmailSideDialog(true));
-        }else{
-          this.onAccept();
-        }
-      });
-     
+      this.onAccept();     
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
       this.openCandidateCancellationDialog.next();
     } else {
