@@ -156,16 +156,10 @@ export class CommentsIrpComponent {
   }
 
   public visibilityHandler(): void {
-    this.isExternal = false;
+    this.isPrivate = !this.isPrivate;
+    this.isExternal = !this.isExternal;
   }
 
-  public privateHandler(): void {
-    if (this.isAgencyUser) {
-      this.isPrivate = true;
-    } else {
-      this.isPrivate = !this.isPrivate;
-    }
-  }
 
 
   public send(): void {
@@ -183,7 +177,7 @@ export class CommentsIrpComponent {
       new: true,
       commentContainerId: this.commentContainerId,
       isRead: true,
-      IsPrivate: this.isPrivate
+      isPrivate: this.isPrivate
     };
     this.comments.push(comment);
     this.message = '';

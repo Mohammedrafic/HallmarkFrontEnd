@@ -51,13 +51,14 @@
     <ejs-tooltip
         content="Internal">
         <span class="control-wrapper visibility" (click)="visibilityHandler()">
-          <fa-icon *ngIf="!isExternal" [icon]='faEyeSlash' class="pr-3"></fa-icon>
+          <fa-icon *ngIf="!isExternal" [icon]='faEyeSlash' class="pr-3 privatecls"></fa-icon>
+          <fa-icon *ngIf="isExternal" [icon]='faEyeSlash' class="pr-3"></fa-icon>
 
         </span>
     </ejs-tooltip>
     <ejs-tooltip
         content="Private">
-        <span class="control-wrapper visibility" (click)="privateHandler()">
+        <span class="control-wrapper visibility" (click)="visibilityHandler()">
             <fa-icon *ngIf="isPrivate" [icon]='faUserFriends' class="pr-3 privatecls"></fa-icon>
             <fa-icon *ngIf="!isPrivate" [icon]='faUserFriends' class="pr-3"></fa-icon>
         </span>
