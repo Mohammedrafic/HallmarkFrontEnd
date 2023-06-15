@@ -20,13 +20,23 @@ export class CommentdataComponent {
 
   @ViewChild('message')
   public messageRef: ElementRef;
-
+  public ExternalIcon:boolean = false;
+  public InternalIcon:boolean = false;
+  public PrivateIcon:boolean = false;
+  
   private unreadObserverSubscription: Subscription;
   faUserFriends = faUserFriends as IconProp;
 
   constructor(private cd: ChangeDetectorRef) { }
 
   ngOnInit(): void {
+    if(this.comment.isPrivate === true){
+      this.PrivateIcon = true;
+    } else if(this.comment.isExternal === false) {
+      this.InternalIcon = true
+    } else if(this.comment.isExternal === true){
+      this.ExternalIcon = true;
+    }
     if (!this.comment.isRead) {
       this.unreadObserverSubscription = this.scrolledToMessage$.subscribe(() => {
         this.isScrolledIntoView();
