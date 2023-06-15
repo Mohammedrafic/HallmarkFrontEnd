@@ -10,7 +10,7 @@ import { SkillsService } from '@shared/services/skills.service';
 import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { FieldType, FilterPageName } from '@core/enums';
 import { ChipDeleteEvent } from '@shared/components/inline-chips';
-import { DropdownOption } from '@core/interface';
+import { DropdownOption, PreservedFiltersByPage } from '@core/interface';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
   OrganizationDepartment,
@@ -41,6 +41,7 @@ import {
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 import { TimeMask } from '@client/order-management/components/irp-tabs/order-details/constants';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -56,6 +57,9 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   @Select(UserState.organizationStructure)
   private readonly organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(PreservedFiltersState.preservedFiltersByPageName)
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<ScheduleFilters>>;
 
   public filteredItems: FilteredItem[] = [];
 
@@ -113,7 +117,9 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   }
 
   public clearAllFilters(clearPreservedFilters = true): void {
-    this.scheduleFilterFormGroup.reset();
+    this.scheduleFilterFormGroup.reset({
+      isExcludeNotOrganized: false,
+    });
     this.filters = this.scheduleFilterFormGroup.getRawValue();
     this.filteredItems = [];
     this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: [] });
@@ -419,9 +425,11 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private applyPreservedFilters(): void {
     this.organizationStructure$.pipe(
-      switchMap((structure) => this.scheduleFiltersService.getPreservedFiltersDataStream().pipe(
+      switchMap((structure) => this.preservedFiltersByPageName$.pipe(
         filter(() => !!structure),
       )),
+      filter(({ dispatch }) => dispatch),
+      map((filters) => filters.state),
       distinctUntilChanged((prev, next) => isObjectsEqual(prev as Record<string, unknown>, next as Record<string, unknown>)),
       takeUntil(this.componentDestroy())
     )
