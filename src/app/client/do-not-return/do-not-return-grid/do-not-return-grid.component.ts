@@ -350,6 +350,14 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     return this.doNotReturnFormGroup['controls'];
   }
 
+  public onDOBBlur(e:any){
+    if(e.model.inputWrapper.container.classList.contains('e-error')){
+      this.doNotReturnFormGroup.get('dob')?.setErrors({'incorrect': true});
+    }else{
+      this.doNotReturnFormGroup.get('dob')?.setErrors(null);
+    }
+  }
+
   public onChangeOfRegions(data:any,isFilter:boolean){
     if(this.selectedOrganization != null && this.selectedOrganization.id != null){
         this.requestAPIData = true;
