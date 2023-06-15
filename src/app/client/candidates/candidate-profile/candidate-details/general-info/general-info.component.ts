@@ -19,6 +19,8 @@ import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
 import { endDateValidator, endTimeValidator, startDateValidator } from '@shared/validators/date.validator';
+import { CandidatesService } from '@client/candidates/services/candidates.service';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-general-info',
@@ -48,7 +50,8 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   constructor(
     protected override cdr: ChangeDetectorRef,
     protected override candidateProfileFormService: CandidateProfileFormService,
-    private store: Store
+    private store: Store,
+    private candidatesService: CandidatesService,
   ) {
     super(cdr, candidateProfileFormService);
   }
@@ -111,26 +114,35 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   }
 
   private handleOnHoldProfileStatus(): void {
+    const { holdStartDate, holdEndDate } = this.candidatesService.getProfileData() || {};
+    const startDate = holdStartDate ? DateTimeHelper.convertDateToUtc(holdStartDate as string) : this.today;
+    const endDate = holdEndDate ? DateTimeHelper.convertDateToUtc(holdEndDate as string) : holdEndDate;
+
     this.isOnHoldSelected = true;
     this.isTerminatedSelected = false;
-    this.candidateForm.get('holdStartDate')?.setValue(this.today);
+    this.candidateForm.get('holdStartDate')?.setValue(startDate);
     this.candidateForm.get('holdStartDate')?.setValidators([
       Validators.required,
       startDateValidator(this.candidateForm, 'holdEndDate'),
       endTimeValidator(this.candidateForm, 'hireDate'),
     ]);
+    this.candidateForm.get('holdEndDate')?.setValue(endDate);
     this.candidateForm.get('holdEndDate')?.setValidators(endDateValidator(this.candidateForm, 'holdStartDate'));
     this.removeValidatorsAndReset(['terminationDate', 'terminationReasonId']);
   }
 
   private handleTerminatedProfileStatus(): void {
+    const { terminationDate, terminationReasonId } = this.candidatesService.getProfileData() || {};
+    const startDate = terminationDate ? DateTimeHelper.convertDateToUtc(terminationDate) : this.today;
+
     this.isTerminatedSelected = true;
     this.isOnHoldSelected = false;
-    this.candidateForm.get('terminationDate')?.setValue(this.today);
+    this.candidateForm.get('terminationDate')?.setValue(startDate);
     this.candidateForm.get('terminationDate')?.setValidators([
       Validators.required,
       endTimeValidator(this.candidateForm, 'hireDate'),
     ]);
+    this.candidateForm.get('terminationReasonId')?.setValue(terminationReasonId);
     this.candidateForm.get('terminationReasonId')?.setValidators(Validators.required);
     this.removeValidatorsAndReset(['holdStartDate', 'holdEndDate']);
   }
