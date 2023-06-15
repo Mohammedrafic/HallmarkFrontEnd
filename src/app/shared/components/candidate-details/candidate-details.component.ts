@@ -53,6 +53,9 @@ import { FilterPageName } from '@core/enums';
 import { GetMasterRegions } from '@organization-management/store/organization-management.actions';
 import { adaptToNameEntity } from '@shared/helpers/dropdown-options.helper';
 import { FiltersComponent } from './filters/filters.component';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { AssociateAgency } from '@shared/models/associate-agency.model';
+import { GetAssociateAgencies } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-candidate-details',
@@ -87,7 +90,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   @Select(UserState.lastSelectedAgencyId)
   lastSelectedAgencyId$: Observable<number>;
 
-
+  
   @Select(UserState.lastSelectedOrganizationId)
   lastSelectedOrganizationId$: Observable<number>;
 
@@ -97,6 +100,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
 
+  @Select(OrderManagementContentState.associateAgencies)
+  public associateAgencies$: Observable<AssociateAgency[]>;
+  
   @Select(CandidateDetailsState.candidateRegions)
   regions$: Observable<string[]>;
   @ViewChild(FiltersComponent, { static: false }) filterco: FiltersComponent;
@@ -136,6 +142,12 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   ngOnInit(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
+      let orgid=user?.businessUnitId|| parseInt(lastSelectedOrganizationId||'0')
+       this.store.dispatch([
+         new GetAssociateAgencies(orgid),
+       ]);
     this.store.dispatch([new GetCandidateRegions(), new GetCandidateSkills()]);
     this.setHeaderName();
     this.createFilterForm();
@@ -147,7 +159,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.watchForStructure();
     this.subscribeOnLocationChange();
     this.watchForRegionControl();
-
+   
 
     combineLatest([
       this.subscribeOnPageNumberChange(),
@@ -155,6 +167,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       this.subscribeOnTabChange(),
       this.subscribeOnSkills(),
       this.subscribeOnCandidatePage(),
+      this.subscribeOnAgency()
       ])
       .pipe(takeUntil(this.destroy$))
       .subscribe();
@@ -170,7 +183,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   public onFilterClearAll(): void {
     this.filterColumns.locationIds.dataSource=[];
     this.filterColumns.departmentIds.dataSource=[];
-    this.clearFilters
+    this.clearFilters();
     this.patchFormValue();
     this.store.dispatch(new ShowFilterDialog(true));
     this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
@@ -213,7 +226,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       this.filterColumns.locationIds.dataSource = this.filterColumns.locationIds.dataSource?.filter(f=>f.regionId!==event.regionId);
     }
     this.filterService.removeValue(event, this.filtersForm, this.filterColumns);
-    this.filtersForm.markAsDirty();    
+    this.filtersForm.markAsDirty();
   }
 
   public onFilterClose(): void {
@@ -294,6 +307,17 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     );
   }
 
+  private subscribeOnAgency(): Observable<AssociateAgency[]> {
+
+    return this.associateAgencies$.pipe(
+      tap((page: AssociateAgency[]) => {
+        this.filterColumns.agencyIds.dataSource = page;
+        this.filtersForm.controls["agencyIds"].setValue(page.map(m=>m.agencyId))
+        this.filtersForm.controls["agencyIds"].enable();
+      })
+    );  
+  }
+
   private createFilterForm(): void {
     this.filtersForm = this.formBuilder.group({
       orderTypes: [null],
@@ -304,6 +328,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       locationIds: [null],
       departmentIds: [null],
       applicantStatuses:[null],
+      candidateNames:[null],
+      agencyIds:[null],
+      orderID:[null]
     });
   }
 
@@ -315,6 +342,20 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         dataSource: [],
         valueField: 'name',
         valueId: 'id',
+      },
+      candidateNames: {
+        type: ControlTypes.Dropdown,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      agencyIds:{
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'agencyName',
+        valueId: 'agencyId',
       },
       applicantStatuses: {
         type: ControlTypes.Multiselect,
@@ -346,7 +387,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         valueField: 'skillDescription',
         valueId: 'masterSkillId',
       },
-
+      
       departmentIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -423,6 +464,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       applicantStatuses: this.filters?.applicantStatuses || [],
       locationIds: this.filters?.locationIds || [],
       departmentIds: this.filters?.departmentIds || [],
+      candidateNames:this.filters?.candidateNames ||null,
+      agencyIds: this.filters?.agencyIds||[]
     });
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
   }
@@ -500,6 +543,10 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
             );
 
             this.filterColumns.departmentIds.dataSource = getIRPOrgItems(locationDepartments);
+            if(selectedLocations.length==locationDataSource.length)
+            {
+              this.filtersForm.controls["departmentIds"].setValue(this.filterColumns.departmentIds.dataSource.map(m=>m.id))
+            }
           } else {
             this.filtersForm.get('departmentIds')?.setValue([]);
           }
@@ -539,6 +586,10 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
             locations.push(...(region.locations as []));
           });
           this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
+          if(selectedRegions.length==this.allRegions.length)
+          {
+            this.filtersForm.controls["locationIds"].setValue(this.filterColumns.locationIds.dataSource.map(m=>m.id))
+          }
         } else {
           this.filterColumns.locationIds.dataSource = [];
           this.filtersForm.get('locationIds')?.setValue([]);
@@ -547,7 +598,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       });
   }
 
-
+ 
   private watchForStructure(): void {
     this.organizationStructure$
       .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
@@ -556,7 +607,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         this.orgRegions = structure.regions;
         this.allRegions = [...this.orgRegions];
         this.filterColumns.regionsIds.dataSource = this.allRegions;
+        this.filtersForm.controls["regionsIds"].setValue(this.allRegions.map(m=>m.id))
       });
-  }
+  }  
 
 }
