@@ -10,7 +10,7 @@ import { SkillsService } from '@shared/services/skills.service';
 import { DateTimeHelper, Destroyable, isObjectsEqual } from '@core/helpers';
 import { FieldType, FilterPageName } from '@core/enums';
 import { ChipDeleteEvent, ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
-import { DropdownOption } from '@core/interface';
+import { DropdownOption, PreservedFiltersByPage } from '@core/interface';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
   OrganizationDepartment,
@@ -44,6 +44,7 @@ import { TimeMask } from '@client/order-management/components/irp-tabs/order-det
 import { FormControl, Validators } from '@angular/forms';
 import { getPreservedfilterTime, getPreservedTime, getTime } from '@shared/utils/date-time.utils';
 import { Time } from '@angular/common';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -60,6 +61,9 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   @Select(UserState.organizationStructure)
   private readonly organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(PreservedFiltersState.preservedFiltersByPageName)
+  private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<ScheduleFilters>>;
 
   public filteredItems: FilteredItem[] = [];
 
@@ -477,9 +481,11 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private applyPreservedFilters(): void {
     this.organizationStructure$.pipe(
-      switchMap((structure) => this.scheduleFiltersService.getPreservedFiltersDataStream().pipe(
+      switchMap((structure) => this.preservedFiltersByPageName$.pipe(
         filter(() => !!structure),
       )),
+      filter(({ dispatch }) => dispatch),
+      map((filters) => filters.state),
       distinctUntilChanged((prev, next) => isObjectsEqual(prev as Record<string, unknown>, next as Record<string, unknown>)),
       takeUntil(this.componentDestroy())
     )

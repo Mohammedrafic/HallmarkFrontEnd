@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, NgZone, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, NgZone, Inject, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ClearLogiReportState } from '@organization-management/store/logi-report.action';
@@ -34,7 +34,7 @@ import { analyticsConstants } from '../constants/analytics.constant';
   styleUrls: ['./hours-by-department.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HoursByDepartmentComponent implements OnInit {
+export class HoursByDepartmentComponent implements OnInit, OnDestroy {
   public user: User | null;
   public filterColumns: any;
   private agencyOrganizationId: number;
@@ -433,5 +433,11 @@ export class HoursByDepartmentComponent implements OnInit {
     var today = new Date(Date.now());
     var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
     return lastWeek;
+  }
+  
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+    this.isAlive = false;
   }
 }

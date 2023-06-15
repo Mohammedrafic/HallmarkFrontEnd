@@ -51,6 +51,8 @@ export class Organization {
   }
 }
 
+
+
 export class GeneralInformation {
   id?: number;
   organizationId?: number;
@@ -146,7 +148,17 @@ export class OrganizationLocation {
   inactiveDate?: string;
   reactivateDate?: string;
 }
+export class OrganizationLocationInactivate {
+  inActiveDate?: string;
+  reActiveDate?: string;
+  isInActivate?: boolean;
+}
 
+export class OrganizationDepartmentInactivate {
+  inActiveDate?: string;
+  reActiveDate?: string;
+  isInActivate?:boolean;
+}
 export class OrganizationRegion {
   id: number | null;
   name?: string;

@@ -260,10 +260,12 @@ ejs-textbox.e-control {
 
   .itm1 {
     grid-area: itm1;
+    align-self: end;
   }
 
   .itm2 {
     grid-area: itm2;
+    align-self: end;
   }
 
   .itm3 {
@@ -376,6 +378,7 @@ ejs-textbox.e-control {
 
   .special-project-wrapper {
     width: 100%;
+    align-items: end;
   }
 }
 

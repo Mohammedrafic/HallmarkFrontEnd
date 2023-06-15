@@ -773,12 +773,12 @@ export class OrderManagementContentState {
   @Action(SaveIrpOrder)
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: SaveIrpOrder
+    { order, documents,inActivedatestr }: SaveIrpOrder
   ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
-          new ShowToast(MessageTypes.Success,  order.length==1?'Order '+order[0].organizationPrefix?.toString()+'-'+order[0].publicId?.toString()+' has been added':RECORD_ADDED),
+          new ShowToast(MessageTypes.Success,  order.length==1?'Order '+order[0].organizationPrefix?.toString()+'-'+order[0].publicId?.toString()+' has been added': inActivedatestr?.toString()!="" ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr +' Dates orders not added.':RECORD_ADDED),
           new SaveIrpOrderSucceeded(),
         ]);
           if (documents.length) {

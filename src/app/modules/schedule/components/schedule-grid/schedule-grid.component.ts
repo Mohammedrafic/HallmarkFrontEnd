@@ -160,7 +160,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.watchForScroll();
     this.watchForCandidateSearch();
     this.watchForSideBarAction();
-    this.watchForPreservedFilters();
     this.watchForDragEvent();
   }
 
@@ -331,9 +330,24 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private startOrgIdWatching(): void {
+    let clearStructure = false;
+
     this.organizationId$.pipe(
       filter(Boolean),
       tap(() => {
+        if (clearStructure) {
+          this.store.dispatch([
+            new ClearOrganizationStructure(),
+            new ResetPageFilters(),
+          ]);
+        } else {
+          clearStructure = true;
+        }
+
+        this.store.dispatch([
+          new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
+        ]);
+
         if (!this.isEmployee) {
           this.autoCompleteSearch?.clear();
         }
@@ -466,34 +480,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
           this.autoSelectCandidate(page.items[0]);
         });
     }
-  }
-
-  private watchForPreservedFilters(): void {
-    let clearStructure = false;
-    this.organizationId$.pipe(
-      filter((id) => !!id),
-      tap(() => {
-        if (clearStructure) {
-          this.store.dispatch(new ClearOrganizationStructure());
-        } else {
-          clearStructure = true;
-        }
-
-        this.store.dispatch([
-          new ResetPageFilters(),
-          new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
-        ]);
-      }),
-      switchMap(() => this.preservedFiltersByPageName$),
-      filter(({ dispatch }) => dispatch),
-      takeUntil(this.componentDestroy()),
-    ).subscribe((filters) => {
-      this.setPreservedFiltersDataSource(filters.state);
-    });
-  }
-
-  private setPreservedFiltersDataSource(filters: ScheduleInt.ScheduleFilters): void {
-    this.scheduleFiltersService.setPreservedFiltersDataStream(filters);
   }
 
   private watchForDragEvent(): void {

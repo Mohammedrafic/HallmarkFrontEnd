@@ -111,7 +111,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   invoiceStatusFields: FieldSettingsModel = { text: 'name', value: 'id' };
   @Select(UserState.lastSelectedAgencyId)

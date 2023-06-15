@@ -1,4 +1,6 @@
 import { FiltersModal, FiltersPageModal } from '@shared/components/candidate-details/models/candidate.model';
+import { DoNotReturnActionsTypesEnum } from '@shared/enums/DoNotReturnActionsTypesEnum';
+import { DoNotReturnCandidateSearchFilter } from '@shared/models/donotreturn.model';
 
 export class GetCandidateDetailsPage {
   static readonly type = '[candidate details] Get Candidate Details by Page';
@@ -23,6 +25,10 @@ export class SetPageSize {
 export class GetCandidateRegions {
   static readonly type = '[candidate details] Get Candidate Regions';
   constructor() {}
+}
+export class Getcandidatesearchbytext {
+  static readonly type ='[candidate details] Get Candidate Search';
+  constructor(public filter: DoNotReturnCandidateSearchFilter) { }
 }
 
 export class SetNavigation {

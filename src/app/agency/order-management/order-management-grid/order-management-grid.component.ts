@@ -793,6 +793,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       projectTypeIds: this.filters.projectTypeIds || null,
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
+      shift:this.filters.shift || null,
+      
     });
 
     if(!prepopulate) {
