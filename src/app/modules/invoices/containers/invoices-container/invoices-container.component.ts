@@ -47,7 +47,6 @@ import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
-import { InvoicesFiltersDialogComponent } from '../../components/invoices-filters-dialog/invoices-filters-dialog.component';
 import * as Interfaces from '../../interfaces';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { GridReadyEventModel } from '@shared/components/grid/models';
@@ -57,6 +56,7 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
+import { InvoiceFiltersAdapter } from '../../adapters';
 
 @Component({
   selector: 'app-invoices-container',
@@ -67,9 +67,6 @@ import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 export class InvoicesContainerComponent extends InvoicesPermissionHelper implements OnInit, AfterViewInit {
   @ViewChild(InvoicesTableTabsComponent)
   public invoicesTableTabsComponent: InvoicesTableTabsComponent;
-
-  @ViewChild(InvoicesFiltersDialogComponent)
-  public invoicesFiltersDialogComponent: InvoicesFiltersDialogComponent;
 
   @ViewChild(RejectReasonInputDialogComponent)
   public rejectReasonInputDialogComponent: RejectReasonInputDialogComponent;
@@ -724,8 +721,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       filter((filters) => filters.dispatch),
       takeUntil(this.componentDestroy())
     )
-    .subscribe((filters) => {
-      this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters.state }));
+    .subscribe((filterState) => {
+      this.store.dispatch(new Invoices.UpdateFiltersState({ ...filterState.state }));
     });
   }
 
