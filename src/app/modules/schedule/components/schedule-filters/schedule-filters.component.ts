@@ -9,7 +9,7 @@ import { AssignedSkillsByOrganization, Skill } from '@shared/models/skill.model'
 import { SkillsService } from '@shared/services/skills.service';
 import { DateTimeHelper, Destroyable, isObjectsEqual } from '@core/helpers';
 import { FieldType, FilterPageName } from '@core/enums';
-import { ChipDeleteEvent } from '@shared/components/inline-chips';
+import { ChipDeleteEvent, ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { DropdownOption } from '@core/interface';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
@@ -54,7 +54,8 @@ import { Time } from '@angular/common';
 export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   @Input() public selectedCandidateId: number | undefined;
   @Input() public count: number;
-
+  public useGroupingFilters: boolean = true;
+  @Input() public chipsData: ChipItem[];
   @Output() public updateScheduleFilter: EventEmitter<ScheduleFiltersData> = new EventEmitter<ScheduleFiltersData>();
 
   @Select(UserState.organizationStructure)
@@ -92,6 +93,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   constructor(
     private store: Store,
     private filterService: FilterService,
+    private scheduleFilterService: ScheduleFiltersService,
     private cdr: ChangeDetectorRef,
     private scheduleFiltersService: ScheduleFiltersService,
     private scheduleApiService: ScheduleApiService,
@@ -273,9 +275,9 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       }
 
       const itemToDelete = this.filteredItems.find((item) => item.column === event.field && item.text === event.value);
+      const itemToggleDelete = this.filteredItems.find((item) => item.column === event.field);
       const controlValue = this.scheduleFilterFormGroup.get(event.field)?.value;
-
-      if (controlValue && itemToDelete) {
+      if (controlValue && (itemToDelete || itemToggleDelete)) {
         const updatedStructure = this.updateFiltersStructure(event);
         const hasEmptyState = !updatedStructure.regionIds.length ||
           !updatedStructure.locationIds.length ||
@@ -393,6 +395,20 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       filterStructure.skillIds =  hasPreviousState ? skillIds : [];
     }
 
+    if((event.field === ScheduleFilterFormSourceKeys.isAvailablity ) || 
+       (event.field === ScheduleFilterFormSourceKeys.isUnavailablity ) ||
+       (event.field === ScheduleFilterFormSourceKeys.isExcludeNotOrganized) ||
+       (event.field === ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate)) {
+        this.scheduleFilterFormGroup.get(event.field)?.patchValue(false);
+        this.setFilters();
+    } 
+
+    if((event.field === ScheduleFilterFormSourceKeys.startTime ) || 
+       (event.field === ScheduleFilterFormSourceKeys.endTime )) {
+        this.scheduleFilterFormGroup.get(event.field)?.patchValue(null);
+        this.setFilters();
+       }
+
     this.chipsSettings.preservedChipsSkills = [...filterStructure.skillIds];
 
    return filterStructure;
@@ -499,6 +515,10 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     }
 
     return [skillOption[0]?.value as number];
+  }
+
+  deleteFilterItem(event: ChipDeleteEventType): void {
+    this.scheduleFilterService.deleteInlineChip(event);
   }
 
   private getSkillsPatchValue(skillIds: number[]): number [] {

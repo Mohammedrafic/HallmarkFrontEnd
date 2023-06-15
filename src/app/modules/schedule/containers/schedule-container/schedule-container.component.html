@@ -78,6 +78,7 @@
 
 <app-schedule-filters
   #filters
+  [chipsData]="chipsData"
   [selectedCandidateId]="selectedCandidate?.id"
   [count]="totalCount"
   (updateScheduleFilter)="updateScheduleFilter($event)"
