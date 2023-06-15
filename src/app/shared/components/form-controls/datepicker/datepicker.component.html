@@ -15,7 +15,7 @@
       [strictMode]="strictMode"
       (change)="change.emit($event)"
       (valueChange)="valueChange.emit($event)"
-      (blur)="blur.emit($event)"
+      (blur)="onBlur();blur.emit($event)"
     >
     </ejs-datepicker>
     <app-error-message [control]="getControl()"></app-error-message>
