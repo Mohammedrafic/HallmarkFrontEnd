@@ -649,7 +649,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
       this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
         this.changeDetection.markForCheck();
-      if (value) {
+      if (value!=null) {
         let shiftDetails = this.allShifts.find(f => f.id == value)
         if (shiftDetails != null && shiftDetails.id != 0) {
           const [startH, startM, startS] = getHoursMinutesSeconds(shiftDetails.startTime);
@@ -662,8 +662,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           this.generalInformationForm.controls['shiftEndTime'].setValue(endDate, { emitEvent: false });
           this.changeDetection.markForCheck();
         } else {
-          this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
-          this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+          this.generalInformationForm.get('shiftStartTime')?.reset();
+          this.generalInformationForm.get('shiftEndTime')?.reset();
+          this.changeDetection.markForCheck();
         }
 
       }

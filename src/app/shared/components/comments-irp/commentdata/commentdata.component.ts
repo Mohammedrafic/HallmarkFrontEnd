@@ -3,6 +3,7 @@ import { Comment } from '@shared/models/comment.model';
 import { Subject, Subscription } from 'rxjs';
 import { faUserFriends } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { CommentsFilter } from '@core/enums/common.enum';
 
 @Component({
   selector: 'app-commentdata',
@@ -14,13 +15,16 @@ export class CommentdataComponent {
 
   @Input() comment: Comment;
   @Input() scrolledToMessage$: Subject<void>;
-
+  @Input() commentType: string | undefined;
   @Output() onCommentAdded = new EventEmitter<Comment>();
   @Output() onRead = new EventEmitter<Comment>();
 
   @ViewChild('message')
   public messageRef: ElementRef;
-
+  public ExternalIcon:boolean = false;
+  public InternalIcon:boolean = false;
+  public PrivateIcon:boolean = false;
+  
   private unreadObserverSubscription: Subscription;
   faUserFriends = faUserFriends as IconProp;
 
@@ -39,6 +43,24 @@ export class CommentdataComponent {
         this.cd.detectChanges();
       }, 500);
     }
+  }
+
+  ngOnChanges():void {
+    this.watchForCommentTypes();
+  }
+
+  private watchForCommentTypes() : void{
+    if(this.comment.isPrivate === true){
+      (this.commentType === CommentsFilter.Private || this.commentType === CommentsFilter.All) ? this.PrivateIcon = true : this.PrivateIcon = false;
+    } 
+    if(this.comment.isExternal === true){
+      this.commentType === CommentsFilter.All ? (this.comment.isPrivate === false ? this.ExternalIcon = true : this.ExternalIcon = false) : this.commentType === CommentsFilter.External ? this.ExternalIcon = true : this.ExternalIcon = false;
+      console.log(this.ExternalIcon, this.comment);
+    } 
+    if(this.comment.isExternal === false) {
+      this.InternalIcon = true
+    } 
+    this.cd.markForCheck();
   }
 
   ngAfterViewInit(): void {

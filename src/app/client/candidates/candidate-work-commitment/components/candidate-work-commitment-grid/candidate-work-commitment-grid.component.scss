@@ -1,4 +1,43 @@
+@import "colors";
+
 :host {
   display: flex;
   height: 100%;
+
+  ::ng-deep {
+    .ag-cell {
+      .ag-cell-wrapper {
+       &.ag-selection-checkbox {
+        margin-right: 20px;
+      }
+      
+      &.ag-row-group {
+        justify-content: space-between;
+
+        .ag-group-value {
+          flex: 1;
+        }
+      }
+    }
+  
+      &.expansion-toggle-icons-order-1 {
+        .ag-group-contracted,
+        .ag-group-expanded {
+          order: 1;
+          margin-left: 25px;
+  
+          .ag-icon {
+            color: $primary-active-blue-10 !important;
+            font-size: 14px;
+            font-weight: 700 !important;
+          }
+        }
+      }
+    }
+
+    &.ag-row.ag-row-level-1.ag-full-width-row {
+      background: $secondary-dark-blue-50 !important;
+    }
+  }
 }
+
