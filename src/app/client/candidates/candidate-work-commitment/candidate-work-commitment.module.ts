@@ -35,6 +35,8 @@ import { PayRateHistoryDialogComponent } from './components/pay-rate-history-dia
 import { PayRateService } from './services/pay-rate.service';
 import { PayRateApiService } from './services/pay-rate-api.service';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { WorkCommitmentChildRowRendererComponent } from
+'./components/candidate-work-commitment-grid/work-commitment-child-row-renderer/work-commitment-child-row-renderer.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +48,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
     AvailabilityRestrictionDialogComponent,
     PayRateHistoryComponent,
     PayRateHistoryDialogComponent,
+    WorkCommitmentChildRowRendererComponent,
   ],
   exports: [],
   imports: [
