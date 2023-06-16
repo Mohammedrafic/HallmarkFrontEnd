@@ -20,7 +20,7 @@ export interface CandidateModel {
   isContract: boolean,
   contractStartDate: Date,
   contractEndDate: Date,
-  holdStartDate: Date,
+  holdStartDate: Date | string,
   holdEndDate: Date | string,
   terminationDate: string,
   terminationReasonId: number,

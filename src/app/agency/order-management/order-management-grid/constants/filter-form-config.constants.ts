@@ -36,6 +36,7 @@ const CommonFields: CommonFormConfig[] = [
   { field: 'projectTypeIds' },
   { field: 'projectNameIds' },
   { field: 'poNumberIds' },
+  { field: 'shift' },
 ];
 
 const AllOrdersFilterFormConfig: CommonFormConfig[] = [

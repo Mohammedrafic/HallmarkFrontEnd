@@ -25,7 +25,7 @@ export interface PreservedFiltersStateModel {
 })
 @Injectable()
 export class PreservedFiltersState {
-  constructor(private preservedFIltersService: PreservedFiltersService) {}
+  constructor(private preservedFIltersService: PreservedFiltersService) { }
 
   @Selector()
   static preservedFiltersByPageName(
@@ -39,7 +39,7 @@ export class PreservedFiltersState {
     return state.preservedFiltersByPageName.state;
   }
 
-  @Action(GetPreservedFiltersByPage)
+  @Action(GetPreservedFiltersByPage, { cancelUncompleted: true })
   GetPreservedPageFilters(
     { patchState }: StateContext<PreservedFiltersStateModel>,
     { pageName }: GetPreservedFiltersByPage
@@ -64,7 +64,9 @@ export class PreservedFiltersState {
   }
 
   @Action(ClearPageFilters)
-  ClearPageFilters({ patchState }: StateContext<PreservedFiltersStateModel>, { pageName }: ClearPageFilters) {
+  ClearPageFilters(
+    { patchState }: StateContext<PreservedFiltersStateModel>,
+    { pageName }: ClearPageFilters): Observable<unknown> {
     return this.preservedFIltersService.clearPageFilters(pageName).pipe(
       tap(() => {
         patchState({ preservedFiltersByPageName: { state: null, isNotPreserved: true, dispatch: false } });
@@ -73,7 +75,7 @@ export class PreservedFiltersState {
   }
 
   @Action(ResetPageFilters)
-  ResetPageFilters({ patchState }: StateContext<PreservedFiltersStateModel>) {
+  ResetPageFilters({ patchState }: StateContext<PreservedFiltersStateModel>): void {
     patchState({ preservedFiltersByPageName: { state: null, isNotPreserved: true, dispatch: false } });
   }
 }

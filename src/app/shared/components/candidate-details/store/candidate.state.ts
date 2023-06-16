@@ -3,6 +3,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
   GetCandidateDetailsPage,
   GetCandidateRegions,
+  Getcandidatesearchbytext,
   GetCandidateSkills,
   SelectNavigation,
   SetNavigation,
@@ -21,6 +22,8 @@ import {
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
 import { CandidateDetailsApiService } from '../services/candidate-details-api.service';
+import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
+import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
 
 interface CandidateDetailsStateModel {
   candidateDetailsPage: CandidateDetailsPage | null;
@@ -32,6 +35,7 @@ interface CandidateDetailsStateModel {
   isNavigate: boolean | null;
   candidateLocations: CandidatesDetailsLocations[] | null;
   candidateDepartments: CandidatesDetailsDepartments[] | null;
+  searchCandidates:DoNotReturnSearchCandidate[]|null
 }
 
 @State<CandidateDetailsStateModel>({
@@ -50,6 +54,7 @@ interface CandidateDetailsStateModel {
     isNavigate: null,
     candidateLocations:null,
     candidateDepartments:null,
+    searchCandidates:null
   },
 })
 @Injectable()
@@ -148,7 +153,14 @@ export class CandidateDetailsState {
       })
     );
   }
-
+  @Action(Getcandidatesearchbytext)
+  getDoNotCandidateListSearch({ patchState }: StateContext<CandidateDetailsStateModel>, { filter }:Getcandidatesearchbytext): Observable<DoNotReturnSearchCandidate[]> {
+    return this.candidateDetailsApiService.getcandidatesearchbytext(filter).pipe(tap((payload: DoNotReturnSearchCandidate[]) => {
+      patchState({ searchCandidates: payload });
+      return payload
+    }));
+  }
+  
   @Action(GetCandidateSkills)
   GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization[]> {
     return this.skillsService.getSortedAssignedSkillsByOrganization().pipe(

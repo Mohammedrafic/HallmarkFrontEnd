@@ -206,6 +206,7 @@ export class SaveIrpOrder {
   constructor(
     public order: CreateOrderDto,
     public documents: Blob[],
+    public inActivedatestr?:string,
   ) {}
 }
 

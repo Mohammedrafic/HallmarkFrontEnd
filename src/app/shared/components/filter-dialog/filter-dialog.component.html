@@ -26,7 +26,7 @@
       <section class="container">
         <ng-content></ng-content>
       </section>
-      <section class="applied-filters" *ngIf="items?.length && !groupedChips">
+      <section class="applied-filters" *ngIf="items?.length && !groupedChips && !useGroupingFilters">
         <div class="chips-container">
           <ejs-chiplist (delete)="onChipDelete($event)" [chips]="items" enableDelete="true"></ejs-chiplist>
         </div>
@@ -38,6 +38,14 @@
         <div class="chips-container">
           <ng-container *ngIf="groupedChips" [ngTemplateOutlet]="groupedChips"></ng-container>
         </div>
+      </section>
+      <section class="applied-filters bg_grey" *ngIf="items?.length && useGroupingFilters">
+        <div class="chips-container pt_20" *ngFor="let group of chipsData">
+          <span class="chips-group-text">{{group.groupTitle}}</span>
+          <div class="display_inlineblk" *ngFor="let chipText of group.data">
+              <ejs-chiplist [chips]="[chipText]" (delete)="deleteFilterChip($event, group.groupField)" enableDelete="true"></ejs-chiplist>
+          </div>
+        </div>  
       </section>
     </section>
   </ng-template>

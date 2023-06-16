@@ -43,6 +43,10 @@ export class CandidatesService {
     return this.activeEmployeeWorkCommitment$.getStream();
   }
 
+  public getActiveWorkCommitment(): CandidateWorkCommitmentShort | null {
+    return this.activeEmployeeWorkCommitment$.get();
+  }
+
   public setProfileData(candidate: CandidateModel): void {
     this.profileData$.set(candidate);
   }
