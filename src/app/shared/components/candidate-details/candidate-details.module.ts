@@ -17,7 +17,7 @@ import { CandidateDetailsService } from '@shared/components/candidate-details/se
 import { GridNameRendererComponent } from './candidate-grid/grid-name-renderer/grid-name-renderer.component';
 import { GridPositionRendererComponent } from './candidate-grid/grid-position-renderer/grid-position-renderer.component';
 import { FiltersComponent } from './filters/filters.component';
-import { MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { AutoCompleteAllModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { GridClassificationRendererComponent } from './candidate-grid/grid-classification-renderer/grid-classification-renderer.component';
@@ -48,7 +48,7 @@ import { CandidateDetailsApiService } from './services/candidate-details-api.ser
     ReactiveFormsModule,
     DatePickerModule,
     MultiSelectAllModule,
-
+    AutoCompleteAllModule,
     //STORE
     NgxsModule.forFeature([CandidateDetailsState]),
   ],

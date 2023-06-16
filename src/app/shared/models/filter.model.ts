@@ -1,7 +1,7 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
 export interface FilteredItem {
-  text: string;
+  text: any;
   value: any;
   column: string;
   organizationId?: number;
