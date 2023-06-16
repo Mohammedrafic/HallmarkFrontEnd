@@ -21,6 +21,10 @@ export class TiersApiService {
     return this.http.post<TierDTO>('/api/OrganizationTiers', payload);
   }
 
+  public saveTierIRP(payload: TierDTO): Observable<TierDTO> {
+    return this.http.post<TierDTO>('/api/OrganizationTiers/irp', payload);
+  }
+
   public deleteTier(id: number): Observable<void> {
     return this.http.delete<void>(`/api/OrganizationTiers/${id}`);
   }

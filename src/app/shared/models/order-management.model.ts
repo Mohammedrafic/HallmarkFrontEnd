@@ -336,6 +336,7 @@ export type AgencyOrderFilters = {
   projectTypeIds?: number | null;
   projectNameIds?: number | null;
   poNumberIds?: number | null;
+  shift?: string | string[];
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -478,6 +479,7 @@ export class Order {
   allAgencies?: boolean;
   extensionInitialOrderPublicId?: number;
   regionName?: string;
+  isIrpPerDiemOrderEditable?: boolean;
   /**
    * Mispelling on BE, should be - contract.
    */
@@ -530,6 +532,7 @@ export class ReOrder {
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {
   billRates: OrderBillRateDto[];
   jobDistribution?: number[];
+  removeLinkedSchedulesFromLta?: boolean;
 }
 
 export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'statusText' | 'documents'> {
@@ -603,6 +606,7 @@ export type OrderCandidateJob = {
   requestComment: string;
   workflowStepId: number;
   yearsOfExperience: number;
+  notEligibilityMessage: string | null;
   applicantStatus: {
     applicantStatus: number;
     statusText: string;
@@ -706,6 +710,7 @@ export class OrderFilter {
   shiftIds?: number[];
   reorderStatuses?: (string | number)[];
   shift?: string[] | string;
+  isQuickLinkWidgetLTA?: boolean | null;
 }
 
 export class SortModel {

@@ -155,10 +155,11 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
     }
+
     this.cdr.markForCheck();
   }
 
-  initFiltersDataSources(): void {
+  private initFiltersDataSources(): void {
     const orgIdStream = this.orgId$
     .pipe(
       filter((id) => !!id),
@@ -351,17 +352,25 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       this.regions,
       this.isAgency
     );
-
-    const filterState = this.filterService.composeFilterState(
+    
+    const filterState: Partial<InvoicesFilterState> = this.filterService.composeFilterState(
       this.filtersFormConfig,
       filteredStructure as Record<string, unknown>
     );
 
     this.formGroup.reset();
     this.invoicesFiltersService.setCurrentTimezone(filterState);
+
     this.formGroup.patchValue({
       ...JSON.parse(JSON.stringify(filterState)),
     });
+
+    if (filterState.formattedInvoiceIds && Array.isArray(filterState.formattedInvoiceIds)) {
+      this.formGroup.patchValue({
+        formattedInvoiceIds: InvoiceFiltersAdapter.adaptFormatedIds(filterState.formattedInvoiceIds),
+      });
+    }
+
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
   }

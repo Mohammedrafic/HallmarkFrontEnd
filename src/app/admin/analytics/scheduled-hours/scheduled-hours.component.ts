@@ -1,6 +1,6 @@
 import { EmitType } from '@syncfusion/ej2-base';
 import { CommonCandidateSearchFilter, CommonReportFilter } from './../models/common-report.model';
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, NgZone, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, NgZone, Inject, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ClearLogiReportState, GetStaffListReportCandidateSearch, GetStaffScheduleReportFilterOptions } from '@organization-management/store/logi-report.action';
@@ -37,7 +37,7 @@ import { formatDate } from '@angular/common';
   styleUrls: ['./scheduled-hours.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScheduledHoursComponent implements OnInit {
+export class ScheduledHoursComponent implements OnInit, OnDestroy {
   public baseUrl: string = '';
   public user: User | null;
   public filterColumns: any;
@@ -535,5 +535,10 @@ export class ScheduledHoursComponent implements OnInit {
         e.updateData(this.candidateFilterData);
       });
     }
+  }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();  
+    this.isAlive = false;  
   }
 }

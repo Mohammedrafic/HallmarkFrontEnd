@@ -442,7 +442,7 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'shiftStartTime',
-    visible: false,
+    visible: true,
   },
   {
     fieldName: 'agencies',

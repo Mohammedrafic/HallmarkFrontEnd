@@ -89,6 +89,7 @@ export const DisabledSettingsByDefault = [
   'OnHoldDefault',
   'LockIRPCandidateAvailability',
   'DepartmentSkillRequired',
+  'SetDefaultCommentsScopeToExternal'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

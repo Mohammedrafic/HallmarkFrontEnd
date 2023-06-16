@@ -11,7 +11,7 @@ import {
 import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
@@ -21,7 +21,9 @@ import { IrpTabs } from '@client/order-management/enums';
 import { ListOfKeyForms, SelectSystem, TabsConfig } from '@client/order-management/interfaces';
 import { Destroyable } from '@core/helpers';
 import { OrderCredentialsService } from "@client/order-management/services";
-import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
+import {
+  IrpContainerStateService,
+} from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import {
   createOrderDTO,
   getControlsList,
@@ -36,8 +38,12 @@ import { CreateOrderDto, Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from "@order-credentials/types";
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED } from '@shared/constants';
+import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED, INACTIVE_MESSAGE, INACTIVEDATE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { OrderType } from '@shared/enums/order-type';
+import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
+import { DatePipe } from '@angular/common';
+import { OrganizationStructureService } from '@shared/services/organization-structure.service';
 
 @Component({
   selector: 'app-irp-container',
@@ -56,7 +62,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
   public orderCredentials: IOrderCredentialItem[] = [];
-
+  public dates : string;
   private isCredentialsChanged = false;
 
   constructor(
@@ -67,6 +73,9 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private router: Router,
     private cdr: ChangeDetectorRef,
     private confirmService: ConfirmService,
+    private irpContainerApiService: IrpContainerApiService,
+    private organizationStructureService: OrganizationStructureService,
+    private datePipe: DatePipe,
   ) {
     super();
   }
@@ -120,7 +129,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       const formState = this.irpStateService.getFormState();
       const formGroupList = getFormsList(formState);
 
-      if(isFormsValid(formGroupList)) {
+      if (isFormsValid(formGroupList)) {
         this.saveOrder(formState, saveType);
       } else {
         showInvalidFormControl(getControlsList(formGroupList));
@@ -132,23 +141,61 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   }
 
   private saveOrder(formState: ListOfKeyForms, saveType: MenuEventArgs | void): void {
-    const createdOrder = {
+    let createdOrder = {
       ...createOrderDTO(formState, this.orderCredentials),
       contactDetails: getValuesFromList(formState.contactDetailsList),
       workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
       isSubmit: !saveType,
     };
 
-   if(this.selectedOrder) {
+   if (this.selectedOrder) {
      this.showRevokeMessageForEditOrder(createdOrder);
     } else {
-      this.store.dispatch(new SaveIrpOrder(createdOrder,this.irpStateService.getDocuments()));
+      let regionid = createdOrder.regionId;
+      let locationid = createdOrder.locationId;
+      let jobstartdate = createdOrder.jobStartDate
+        ? createdOrder.jobStartDate
+        : createdOrder.jobDates[createdOrder.jobDates.length - 1];
+      let departmentID = createdOrder.departmentId;
+      const location = this.organizationStructureService.getLocation(regionid,locationid)
+      const locations = this.organizationStructureService.getLocationsByInactive(regionid, jobstartdate, locationid);
+      const departments = this.organizationStructureService.getDepartmentByInactive(locationid,jobstartdate,departmentID);
+      let reactivateDate = createdOrder.jobDates ? createdOrder.jobDates : null;
+ 
+      if (locations.isInActivate || location.isInActivate || departments.isInActivate) {
+        if (createdOrder.jobDates) {
+    
+     createdOrder.jobDates= createdOrder.jobDates.filter((f: Date) =>
+       (new Date(f).toLocaleDateString() < new Date(location.inActiveDate??'').toLocaleDateString()
+         || new Date(f).toLocaleDateString()>= new Date(location.reActiveDate??'').toLocaleDateString()));
+ 
+         reactivateDate = reactivateDate.filter((f: any) => {
+            return new Date(f).toLocaleDateString() >= new Date(location.inActiveDate ?? '').toLocaleDateString() && location.reActiveDate ? new Date(f).toLocaleDateString()<= new Date(location.reActiveDate??'').toLocaleDateString() : location.reActiveDate==null
+          });
+          this.dates = reactivateDate
+            .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
+            .join(', ');
+        }
+        let dates = createdOrder.jobDates ? this.datePipe.transform(location.inActiveDate,'MM/dd/yyyy') : this.datePipe.transform(locations.inActiveDate, 'MM/dd/yyyy');
+        this.confirmService
+          .confirm(INACTIVEDATE + dates + INACTIVE_MESSAGE, {
+            title: 'Confirm',
+            okButtonLabel: 'Yes',
+            okButtonClass: '',
+          })
+          .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+          .subscribe(() => {
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+          });
+      } else {
+        this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments()));
+      }
     }
   }
 
   private showRevokeMessageForEditOrder(order: CreateOrderDto): void {
     const isExternalLogicInclude = this.irpStateService.getIncludedExternalLogic(order);
-    if(!isExternalLogicInclude && !this.selectedOrder.canRevoke) {
+    if (!isExternalLogicInclude && !this.selectedOrder.canRevoke) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_REVOKED));
     } else if(!isExternalLogicInclude && !this.selectedOrder.canProceedRevoke) {
       this.confirmService
@@ -158,9 +205,30 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           okButtonClass: '',
         }).pipe(
         filter(Boolean),
-        takeUntil(this.componentDestroy())
-      ).subscribe(() => {
-        this.saveEditedOrder(order);
+        switchMap(() => {
+          return this.irpContainerApiService.checkLinkedSchedules(this.selectedOrder.id);
+        }),
+        switchMap(({doesOrderHaveLinkedSchedules}) => {
+          return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
+        }),
+        take(1)
+      ).subscribe((value: boolean | null) => {
+        this.saveEditOrderWithLinkedSchedules(value, order);
+      });
+    } else {
+      this.saveEditOrderWithoutRevoke(order);
+    }
+  }
+
+  private saveEditOrderWithoutRevoke(order: CreateOrderDto): void {
+    if (this.selectedOrder.orderType === OrderType.Traveler) {
+      this.irpContainerApiService.checkLinkedSchedules(this.selectedOrder.id).pipe(
+        switchMap(({doesOrderHaveLinkedSchedules}) => {
+          return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
+        }),
+        take(1),
+      ).subscribe((value: boolean | null) => {
+        this.saveEditOrderWithLinkedSchedules(value, order);
       });
     } else {
       this.saveEditedOrder(order);
@@ -184,5 +252,21 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
         this.orderCredentials = predefinedCredentials;
         this.cdr.markForCheck();
       });
+  }
+
+  private saveEditOrderWithLinkedSchedules(value: boolean | null, order: CreateOrderDto): void {
+    if (value !== null) {
+      order.removeLinkedSchedulesFromLta = value;
+    }
+
+    this.saveEditedOrder(order);
+  }
+
+  private checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules: boolean): Observable<boolean | null> {
+    if (doesOrderHaveLinkedSchedules) {
+      return this.irpStateService.showScheduleBookingModal();
+    }
+
+    return of(null);
   }
 }

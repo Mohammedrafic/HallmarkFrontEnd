@@ -2,9 +2,9 @@
   <div *ngFor="let legend of legendData; trackBy: trackByHandler">
     <div class="widget-legend__item-content">
       <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
-      <div class="widget-legend__row-container" (click)="onClickLegendRow($event,legend.label)" (mousedown)="defineMousePosition($event)">
+      <div class="widget-legend__row-container"  [ngClass]="slideBar ? 'container-mar' : ''" (click)="onClickLegendRow($event,legend.label)" (mousedown)="defineMousePosition($event)">
         <div class="widget-legend__row">
-          <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
+          <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"  [ngClass]="slideBar ? 'trend-marright' : ''"></div>
           <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
       
         <div *ngIf="!showPercentRatio" class="widget-legend__score">{{ legend.value }}</div>
@@ -21,9 +21,9 @@
     <div class="widget-legend__item-content">
       <div id="widget_left" class="widget_left">
         <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
-        <div class="widget-legend__row-container" (click)="onClickLegendRow($event,legend.label)" (mousedown)="defineMousePosition($event)">
+        <div class="widget-legend__row-container" [ngClass]="slideBar ? 'container-mar' : ''"  (click)="onClickLegendRow($event,legend.label)" (mousedown)="defineMousePosition($event)">
           <div class="widget-legend__row">
-            <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__pointPositionTrend"></div>
+            <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__pointPositionTrend" [ngClass]="slideBar ? 'trend-marright' : ''"></div>
             <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
           </div>
         </div>
@@ -34,6 +34,7 @@
       <div id="right" class="widget_right">
         <div *ngIf="!showPercentRatio" class="widget-legend__score">{{ legend.value }}</div>
         <app-percentage-ratio-indicator *ngIf="showPercentRatio"
+                                        [slideBar]="slideBar"
                                         [percentageRatio]="legend.value"
                                         class="widget-legend__percentage-ratio"></app-percentage-ratio-indicator>
       </div>

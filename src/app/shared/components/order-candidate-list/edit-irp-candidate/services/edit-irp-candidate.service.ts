@@ -5,11 +5,7 @@ import { Observable } from 'rxjs';
 
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { CandidateForm } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
-import {
-  CancelCandidateDto,
-  CreateCandidateDto,
-  UpdateCandidateDto,
-} from '@shared/components/order-candidate-list/edit-candidate-list.helper';
+import { CreateCandidateDto, UpdateCandidateDto } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -37,12 +33,13 @@ constructor(
 
   getCandidateAction(
     candidateForm: FormGroup,
-    state: EditCandidateDialogState
-    ): Observable<void> {
+    state: EditCandidateDialogState,
+    createReplacement: boolean,
+  ): Observable<void> {
     const { status, actualStartDate, actualEndDate } = candidateForm.getRawValue();
 
     if (status) {
-      return this.getActionForStatus(status, state, actualStartDate, actualEndDate);
+      return this.getActionForStatus(status, state, actualStartDate, actualEndDate, createReplacement);
     } else {
       return this.orderCandidateApiService.updateIrpCandidate(
         UpdateCandidateDto(
@@ -87,7 +84,8 @@ constructor(
     status: CandidatStatus,
     state: EditCandidateDialogState,
     actualStartDate: string,
-    actualEndDate: string
+    actualEndDate: string,
+    createReplacement: boolean,
   ): Observable<void> {
     if(status === CandidatStatus.OnBoard && state.candidate.status !== status) {
       return this.orderCandidateApiService.createIrpCandidate(
@@ -106,11 +104,11 @@ constructor(
           actualEndDate
         ));
     } else if(status === CandidatStatus.Cancelled) {
-      return this.orderCandidateApiService.cancelIrpCandidate(
-        CancelCandidateDto(
-          state.order.organizationId as number,
-          state.candidate.candidateJobId,
-        ));
+      return this.orderCandidateApiService.cancelIrpCandidate( {
+        organizationId: state.order.organizationId as number,
+        jobId: state.candidate.candidateJobId,
+        createReplacement,
+      });
     } else {
       return this.orderCandidateApiService.createIrpCandidate(
         CreateCandidateDto(

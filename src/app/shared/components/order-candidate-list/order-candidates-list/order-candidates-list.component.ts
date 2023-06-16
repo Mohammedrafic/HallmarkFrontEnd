@@ -30,12 +30,13 @@ import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/consta
 import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
 import { OrderStatus } from '@shared/enums/order-management';
 import { GlobalWindow } from '@core/tokens';
-import { Organization } from '@shared/models/organization.model';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
-import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
 import { UserPermissions } from '@core/enums';
 
 @Component({
@@ -144,7 +145,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
   }
 
-  public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
+  public onEdit(data: OrderCandidatesList): void {
     this.candidate = { ...data };
     this.getDeployedCandidateOrders();
     this.getCandidatePayRateSetting();

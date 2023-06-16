@@ -43,7 +43,7 @@ import { DatePipe } from '@angular/common'
   templateUrl: './vendor-scorecard.component.html',
   styleUrls: ['./vendor-scorecard.component.scss']
 })
-export class VendorScorecardComponent implements OnInit {
+export class VendorScorecardComponent implements OnInit, OnDestroy {
 
   public title: string = "Vendor Scorecard";
 
