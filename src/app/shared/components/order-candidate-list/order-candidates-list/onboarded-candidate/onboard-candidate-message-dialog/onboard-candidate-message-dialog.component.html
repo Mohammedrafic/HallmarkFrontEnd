@@ -3,7 +3,7 @@
 
         <div class="left-section">
             <div class="input-container bootstrap top-container">
-              <label>Subject<span class="required">*</span></label>
+              <label>Subject {{emailTo}}<span class="required">*</span></label>
               <div class="input-group">
                 <input appValidateWithMessage formControlName="emailSubject" class="e-input" type="text"
                       [(ngModel)]="emailSubject" />

@@ -841,3 +841,14 @@ export class OrderJourneyFilter {
   includeInIRP?:boolean;
   includeInVMS?:boolean;
 }
+
+export class OnboardCandidateEmail {
+  subjectMail ?: string;
+  bodyMail ?: string;
+  toList ?: string;
+  status ?: number;
+  fromMail ?: string;
+  stream ?: Blob | null;
+  extension ?: string;
+  documentName ?: string;
+}

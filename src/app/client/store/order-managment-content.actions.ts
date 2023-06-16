@@ -5,6 +5,7 @@ import {
   CandidateCancellationReasonFilter,
   CreateOrderDto,
   EditOrderDto,
+  OnboardCandidateEmail,
   Order,
   OrderFilter,
   OrderManagement,
@@ -421,4 +422,15 @@ export class GetCandidateCancellationReason {
 export class GetAllShifts{
   static readonly type ='[order management] Get All Shifts';
   constructor(){}
+}
+
+
+export class sendOnboardCandidateEmailMessage {
+  static readonly type = '[order management] Send message to Onboard Candidate Job';
+  constructor(public onboardCandidateEmailData : OnboardCandidateEmail) {}
+}
+
+export class sendOnboardCandidateEmailMessageSucceed {
+  static readonly type = '[order management] Send message to Onboard Candidate Job Succeed';
+  constructor() {}
 }

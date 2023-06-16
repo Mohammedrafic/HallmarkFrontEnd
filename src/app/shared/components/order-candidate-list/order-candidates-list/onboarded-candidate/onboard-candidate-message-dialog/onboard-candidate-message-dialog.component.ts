@@ -41,7 +41,7 @@ export class OnboardCandidateMessageDialogComponent implements OnInit, AfterView
   public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
   public dropElement: HTMLElement;
   public uploaderstatus:boolean = true;
-
+  @Input() emailTo: any = '';
 
   constructor() { }
 
@@ -53,6 +53,7 @@ export class OnboardCandidateMessageDialogComponent implements OnInit, AfterView
     this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
     this.rteObj.toolbarSettings.enableFloating = true;
     this.rteObj.height = '300px';
+    this.onBoardMessageEmailTemplateForm.get('emailTo')?.setValue(this.emailTo);
   }
 
   disableControls(isSend: boolean): void {

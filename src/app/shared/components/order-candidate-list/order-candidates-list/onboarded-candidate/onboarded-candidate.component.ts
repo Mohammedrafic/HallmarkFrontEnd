@@ -38,6 +38,7 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
+  sendOnboardCandidateEmailMessage
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
@@ -186,6 +187,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public sendOnboardMessageEmailFormGroup: FormGroup;
 
   public comments: Comment[] = [];
+  emailTo:any = '';
 
   @ViewChild('RTE')
   public rteEle: RichTextEditorComponent;
@@ -206,6 +208,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       emailSubject: new FormControl('', [Validators.required]),
       emailBody: new FormControl('', [Validators.required]),
       fileUpload: new FormControl(null),
+      emailTo: new FormControl('', [Validators.required]),
     });
   }
 
@@ -380,6 +383,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         .subscribe((isConfirm) => {
           if (isConfirm && this.candidateJob) {
               this.isSend =  true;
+              this.emailTo = this.candidateJob?.candidateProfile.email; 
               const options = {
                 title: ONBOARD_CANDIDATE,
                 okButtonLabel: 'Yes',
@@ -389,15 +393,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
               this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
               .subscribe((isConfirm) => {
                 if(isConfirm){
-                  this.onboardEmailTemplateForm.isSend=true;
                   this.onboardEmailTemplateForm.rteCreated();
                   this.onboardEmailTemplateForm.disableControls(true);
                   this.store.dispatch(new ShowGroupEmailSideDialog(true));
-                }else{
-                  this.saveCandidateJob();
                 }
               });
-            
+            //this.saveCandidateJob();
             this.closeDialog();
           } else {
             this.jobStatusControl.reset();
@@ -631,12 +632,27 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   onGroupEmailAddCancel(){
     this.isSend =  false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
-    // this.saveCandidateJob();
   }
 
   onGroupEmailSend(){
-     console.log(this.sendOnboardMessageEmailFormGroup.value);
-     // this.saveCandidateJob();
+      const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();   
+     // console.log('emailvalue',emailvalue);         
+            this.store
+              .dispatch(
+                new sendOnboardCandidateEmailMessage({
+                  subjectMail : emailvalue.emailSubject,
+                  bodyMail : emailvalue.emailBody,
+                  toList : emailvalue.emailTo,
+                  status : 1,
+                  stream : emailvalue.fileUpload,
+                  extension : emailvalue.fileUpload?.type,
+                  documentName : emailvalue.fileUpload?.name,
+                })
+              )
+              .subscribe(() => {
+                this.isSend =  false;
+                this.store.dispatch(new ShowGroupEmailSideDialog(false));
+              });
   }
 
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {

@@ -67,6 +67,7 @@ import {
   GetOrdersJourney,
   ExportOrdersJourney,
   GetAllShifts,
+  sendOnboardCandidateEmailMessage,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -75,6 +76,7 @@ import {
   GetPredefinedBillRatesData,
   IrpCandidatesParams,
   IrpOrderCandidate,
+  OnboardCandidateEmail,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -129,6 +131,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { UpdateRegRateService } from '@client/order-management/components/update-reg-rate/update-reg-rate.service';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -161,6 +164,7 @@ export interface OrderManagementContentStateModel {
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
   candidateCancellationReasons:CandidateCancellationReason[]|null;
   allShifts:ScheduleShift[]|null;
+  sendOnboardCandidateEmail:OnboardCandidateEmail | null;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -199,7 +203,8 @@ export interface OrderManagementContentStateModel {
     extensions: null,
     irpCandidates: null,
     candidateCancellationReasons:null,
-    allShifts:null
+    allShifts:null,
+    sendOnboardCandidateEmail:null,
 
   },
 })
@@ -1159,5 +1164,21 @@ export class OrderManagementContentState {
           patchState({ allShifts: payload });
           return payload
         }));
+      }
+
+      @Action(sendOnboardCandidateEmailMessage)
+      sendOnboardCandidateEmailMessage(
+        { dispatch, patchState }: StateContext<OrderManagementContentStateModel>,
+        { onboardCandidateEmailData }: sendOnboardCandidateEmailMessage
+      ): Observable<any | void> {
+        return this.orderManagementService.sendCandidateOnboardEmail(onboardCandidateEmailData).pipe(
+          tap((payload) => {
+            patchState({ sendOnboardCandidateEmail: payload });
+            return payload;
+          }),
+          catchError((error: HttpErrorResponse) => {
+            return dispatch(new ShowToast(MessageTypes.Error, error.error));
+          })
+        );
       }
 }
