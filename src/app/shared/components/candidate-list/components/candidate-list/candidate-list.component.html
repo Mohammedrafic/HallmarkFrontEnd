@@ -41,7 +41,7 @@
               [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
-            <ejs-tooltip *ngIf="data.hasRedFlag" [content]="data.redFlagDescription" position="TopCenter">
+            <ejs-tooltip *ngIf="data.hasRedFlag" [content]="data.redFlagDescription ?? ''" position="TopCenter">
               <button ejs-button cssClass="e-flat secondary-icon-button enabled-button">
                 <span><i-feather name="flag" class="icon"></i-feather></span>
               </button>

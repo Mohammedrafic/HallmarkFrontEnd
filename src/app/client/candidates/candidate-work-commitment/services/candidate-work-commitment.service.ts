@@ -6,14 +6,15 @@ import { map, Observable } from 'rxjs';
 import {
   CandidateWorkCommitment,
   CandidateWorkCommitmentsPage,
+  WorkCommitmentSetup,
 } from '../models/candidate-work-commitment.model';
 
 @Injectable()
 export class CandidateWorkCommitmentService {
-  public constructor(private readonly httpClient: HttpClient) {}
+  public constructor(private readonly httpClient: HttpClient) { }
 
   public getAvailableWorkCommitments(employeeId: number): Observable<WorkCommitmentDetails[]> {
-    return this.httpClient.get<WorkCommitmentDetails[]>('/api/WorkCommitment/all', { params: { EmployeeId: employeeId }});
+    return this.httpClient.get<WorkCommitmentDetails[]>('/api/WorkCommitment/all', { params: { EmployeeId: employeeId } });
   }
   public getPayRateById(workcommitmentId: number): Observable<number> {
     return this.httpClient.get<number>('/api/EmployeeWorkCommitments/getPayRateById/' + workcommitmentId);
@@ -21,7 +22,10 @@ export class CandidateWorkCommitmentService {
 
   public saveCandidateWorkCommitment(workCommitment: CandidateWorkCommitment): Observable<CandidateWorkCommitment> {
     if (workCommitment.id) {
-      return this.httpClient.put<CandidateWorkCommitment>('/api/EmployeeWorkCommitments/' + workCommitment.id, workCommitment);
+      return this.httpClient.put<CandidateWorkCommitment>(
+        '/api/EmployeeWorkCommitments/' + workCommitment.id,
+        workCommitment
+      );
     }
     return this.httpClient.post<CandidateWorkCommitment>('/api/EmployeeWorkCommitments', workCommitment);
   }
@@ -37,15 +41,28 @@ export class CandidateWorkCommitmentService {
       pageSize: 1,
     }}).pipe(map((workCommitmentsPage: CandidateWorkCommitmentsPage) => {
       return workCommitmentsPage.items[0] || null;
-    }));
+    }),
+    );
   }
 
-  public getCandidateWorkCommitmentByPage(pageNumber: number, pageSize: number, employeeId: number): Observable<CandidateWorkCommitmentsPage> {
-    return this.httpClient.get<CandidateWorkCommitmentsPage>('/api/EmployeeWorkCommitments/all/' + employeeId, { params: {
-      id: employeeId,
-      pageNumber,
-      pageSize,
-    }});
+  public getCandidateWorkCommitmentByPage(
+    pageNumber: number,
+    pageSize: number,
+    employeeId: number
+  ): Observable<CandidateWorkCommitmentsPage> {
+    return this.httpClient.get<CandidateWorkCommitmentsPage>('/api/EmployeeWorkCommitments/all/' + employeeId, {
+      params: {
+        id: employeeId,
+        pageNumber,
+        pageSize,
+      },
+    });
+  }
+
+  public getCandidateWorkCommitmentChildRecords(employeeWorkCommitmentId: number): Observable<WorkCommitmentSetup[]> {
+    return this.httpClient.get<WorkCommitmentSetup[]>('/api/EmployeeWorkCommitments/children',
+      { params: { employeeWorkCommitmentId } }
+    );
   }
 
   public deleteCandidateWorkCommitmentById(id: number): Observable<void> {

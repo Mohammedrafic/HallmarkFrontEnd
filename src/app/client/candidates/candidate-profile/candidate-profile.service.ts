@@ -38,13 +38,13 @@ export class CandidateProfileService {
 
     return this.http[candidateId ? 'put' : 'post']<CandidateModel>(endpoint, payload).pipe(
       distinctUntilChanged(),
-      tap(() => {
+      tap((profileData) => {
         if (candidateId) {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         } else {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
-        this.candidateService.setProfileData(candidateDateInUTC);
+        this.candidateService.setProfileData(profileData);
         this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
       }),
       catchError((errorResponse: HttpErrorResponse) => {

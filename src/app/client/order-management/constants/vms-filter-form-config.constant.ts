@@ -26,6 +26,7 @@ const CommonFields: CommonFormConfig[] = [
   { field: 'locationIds' },
   { field: 'departmentsIds' },
   { field: 'skillIds' },
+  { field: 'shift' },
 ];
 
 const AllOrdersFilterFormConfig: CommonFormConfig[] = [

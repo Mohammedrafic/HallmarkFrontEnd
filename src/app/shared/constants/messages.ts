@@ -98,7 +98,7 @@ export const UpdateRegularRatesucceedcount = (count: number) =>
 export const DOCUMENT_DOWNLOAD_SUCCESS = 'Document downloaded successfully';
 export const SubmissionsLimitReached = 'The order has reached its submission limit';
 export const EDIT_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to edit multiple records? It may affect existing schedules and orders.';
-export const EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT = 'Are you sure you want to change those dates? It may affect existing schedules and orders.';
+export const EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT = 'Do you want to change those dates? It may affect existing schedules and orders.';
 export const ORIENTED_SHIFT_CHANGE_CONFIRM_TEXT = 'Provided changes may have impact on changing Orientation Date, it won’t be automatically updated.';
 export const DELETE_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to delete multiple records?';
 export const BLOCK_RECORD_TEXT = 'Are you sure you want to block?';
@@ -115,12 +115,14 @@ export const CLOSE_IRP_POSITION = 'Closing position will permanently close it wi
 export const ALL_DEPARTMENTS_SELECTED = 'You can`t assign Departments manually when "All" is selected';
 export const NO_ACTIVE_WORK_COMMITMET = 'No active Work Commitment';
 export const REASON_WARNING = 'Please select a System for Reason';
-export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Are you sure, you want to update Employee Skills? It may have impact on Schedule and Orders.';
-export const IRP_DEPARTMENT_CHANGE_WARNING = 'Are you sure, you want to provide that change? It may cause deleting future schedules and canceling Employee from orders.';
-export const EMPLOYEE_TERMINATED_WARNING = 'Are you sure you want to terminate the employee?';
+export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Do you want to update Employee Skills? It may have impact on Schedule and Orders.';
+export const IRP_DEPARTMENT_CHANGE_WARNING = 'Do you want to provide that change? It may cause deleting future schedules and canceling Employee from orders.';
+export const EMPLOYEE_TERMINATED_WARNING = 'Do you want to terminate the employee?';
 export const addAvailabilityToStart = 'Add Availability to start Scheduling';
 
 export const RECORD_SAVED_SUCCESS = 'Record saved successfully';
+export const INACTIVEDATE = 'Location will be inactivated at '
+export const INACTIVE_MESSAGE = '. Are you sure you want to proceed?'
 export const UpdateClosedPositionRate = 'Are you sure you want to update the Bill rate '
 + 'for Closed Position? This may lead to recalculating values and generating new invoice records.';
 export const HaveScheduleBooking =

@@ -336,6 +336,7 @@ export type AgencyOrderFilters = {
   projectTypeIds?: number | null;
   projectNameIds?: number | null;
   poNumberIds?: number | null;
+  shift?: string | string[];
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
