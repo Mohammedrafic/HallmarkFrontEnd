@@ -221,6 +221,7 @@ ejs-textbox.e-control {
     grid-area: itm3;
     margin-top: 15px;
     display: flex;
+    max-width: 62px;
   }
 
   .itm4 {
@@ -232,7 +233,7 @@ ejs-textbox.e-control {
   }
 
   .order-box {
-    margin-left: 17%;
+    margin-left: 21%;
   }
 
   .order-box1 {
@@ -240,7 +241,7 @@ ejs-textbox.e-control {
   }
 
   .order-box2 {
-    margin-left: 64%;
+    margin-left: 61%;
   }
 
   .order-box3 {
@@ -369,6 +370,18 @@ ejs-textbox.e-control {
       "itm1 itm1 itm2 itm2"
       "itm3 itm3 itm3 itm3"
       "itm4 itm4 itm5 itm5";
+
+    .itm3 {
+      max-width: unset;
+    }
+
+    .order-box {
+      margin-left: 17%;
+    }
+
+    .order-box2 {
+      margin-left: 64%;
+    }
   }
 
   .job-distribution-wrapper {
