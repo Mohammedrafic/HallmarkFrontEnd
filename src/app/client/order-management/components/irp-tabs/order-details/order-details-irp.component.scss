@@ -1,6 +1,28 @@
 @import "colors";
 @import 'adaptive-response';
 
+@mixin description_responsive {
+  gap: 12px !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-rows: 1fr 1fr !important;
+  grid-template-areas:
+    "itm1 itm1 itm2 itm2"
+    "itm3 itm3 itm3 itm3"
+    "itm4 itm4 itm5 itm5" !important;
+
+  .itm3 {
+    max-width: unset !important;
+  }
+
+  .order-box {
+    margin-left: 17% !important;
+  }
+
+  .order-box2 {
+    margin-left: 64% !important;
+  }
+}
+
 .order-container {
   display: flex;
 
@@ -49,6 +71,8 @@ ejs-textbox.e-control {
 
 .order-form-container {
   display: flex;
+  container-type: inline-size;
+  resize: horizontal;
 
   .left-section {
     width: 70%;
@@ -186,6 +210,7 @@ ejs-textbox.e-control {
 .special-project-wrapper {
   width: 70%;
   display: grid;
+  align-items: end;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 1fr;
   gap: 16px
@@ -211,10 +236,12 @@ ejs-textbox.e-control {
 
   .itm1 {
     grid-area: itm1;
+    align-self: end;
   }
 
   .itm2 {
     grid-area: itm2;
+    align-self: end;
   }
 
   .itm3 {
@@ -251,7 +278,7 @@ ejs-textbox.e-control {
 
 .job-description-po-wrapper {
   display: grid;
-  align-items: center;
+  align-items: start;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: 1fr 4fr;
   gap: 16px;
@@ -311,6 +338,14 @@ ejs-textbox.e-control {
   }
 }
 
+@media #{$min-desktop-large} {
+  @container (max-width: 1230px) {
+    .job-description-wrapper {
+      @include description_responsive;
+    }
+  }
+}
+
 @media #{$max-desktop-small} {
   .order-form-container {
     flex-direction: column;
@@ -322,6 +357,12 @@ ejs-textbox.e-control {
 
     .right-section {
       width: 100%;
+    }
+  }
+
+  @container (max-width: 846px) {
+    .job-description-wrapper {
+      @include description_responsive;
     }
   }
 }
@@ -363,25 +404,7 @@ ejs-textbox.e-control {
   }
 
   .job-description-wrapper {
-    gap: 12px;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: 1fr 1fr;
-    grid-template-areas:
-      "itm1 itm1 itm2 itm2"
-      "itm3 itm3 itm3 itm3"
-      "itm4 itm4 itm5 itm5";
-
-    .itm3 {
-      max-width: unset;
-    }
-
-    .order-box {
-      margin-left: 17%;
-    }
-
-    .order-box2 {
-      margin-left: 64%;
-    }
+    @include description_responsive;
   }
 
   .job-distribution-wrapper {
@@ -391,7 +414,6 @@ ejs-textbox.e-control {
 
   .special-project-wrapper {
     width: 100%;
-    align-items: end;
   }
 }
 
