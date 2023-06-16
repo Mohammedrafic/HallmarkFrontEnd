@@ -127,6 +127,17 @@
         </section>
       </section>
 
+      <section class="help-container" *ngIf="showHelpIButton">
+        <section class="help">
+          <button
+            class="icon-container help__button"
+            (click)="onGetHelp()" >
+            <i-feather name="help-circle" class="icon"></i-feather>
+            <span class="e-text">Help</span>
+          </button>
+        </section>
+      </section>
+
       <aside class="secondary-container">
         <section class="misc">
           <!--section class="edu-faq"> TODO: hidden until implemented
@@ -157,9 +168,8 @@
             </ng-container>
           </div>
         </section>
-        <section class="collapse" *ngIf="!(isMobile$ | async)">
+        <section class="collapse" *ngIf="!(isMobile$ | async) && showCollapseButton">
           <button
-            [disabled]="isToggleButtonDisable"
             class="icon-container collapse-button"
             (click)="toggleSidebar()" >
             <i-feather name="sidebar" class="icon"></i-feather>

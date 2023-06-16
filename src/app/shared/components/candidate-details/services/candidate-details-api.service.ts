@@ -8,6 +8,7 @@ import {
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
 
 @Injectable()
 export class CandidateDetailsApiService {
@@ -22,5 +23,8 @@ export class CandidateDetailsApiService {
 
   public getRegions(): Observable<CandidatesDetailsRegions[]> {
     return this.http.get<CandidatesDetailsRegions[]>('/api/Regions/listByActiveBusinessUnit').pipe(map((data) => sortByField(data, 'name')));
+  }
+  public getcandidatesearchbytext(filter: any): Observable<DoNotReturnSearchCandidate[]> {
+    return this.http.post<DoNotReturnSearchCandidate[]>(`/api/CandidateProfile/candidatesearchbytext`, filter);
   }
 }

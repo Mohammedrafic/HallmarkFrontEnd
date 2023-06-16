@@ -24,7 +24,6 @@ export enum ScheduleFilterFormSourceKeys {
   isAvailablity = 'isAvailablity',
   isUnavailablity = 'isUnavailablity',
   isOnlySchedulatedCandidate = 'isOnlySchedulatedCandidate',
-  ShowGeneralnotes = 'ShowGeneralnotes',
   startTime = 'startTime',
   endTime = 'endTime',
   isExcludeNotOrganized = "isExcludeNotOrganized"
@@ -64,16 +63,16 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     filterTitle: 'Skill',
   },
   [ScheduleFilterFormSourceKeys.startTime]: {
-    type: ControlTypes.Dropdown,
-    valueType: ValueType.Id,
+    type: ControlTypes.Time,
+    valueType: ValueType.Text,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
     filterTitle: 'Shift Start Time',
   },
   [ScheduleFilterFormSourceKeys.endTime]: {
-    type: ControlTypes.Dropdown,
-    valueType: ValueType.Id,
+    type: ControlTypes.Time,
+    valueType: ValueType.Text,
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
@@ -102,14 +101,6 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueField: 'text',
     valueId: 'value',
     filterTitle: 'Show Only Scheduled Candidates',
-  },
-  [ScheduleFilterFormSourceKeys.ShowGeneralnotes]: {
-    type: ControlTypes.Toggle,
-    valueType: ValueType.Id,
-    dataSource: [],
-    valueField: 'text',
-    valueId: 'value',
-    filterTitle: 'Show General Notes',
   },
   [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: {
     type: ControlTypes.Toggle,
@@ -196,13 +187,6 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     type: FieldType.Toggle,
     required: false,
     sourceKey: ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate,
-  },
-  {
-    field: 'ShowGeneralnotes',
-    title: 'Show General Notes',
-    type: FieldType.Toggle,
-    required: false,
-    sourceKey: ScheduleFilterFormSourceKeys.ShowGeneralnotes,
   },
   {
     field: 'isExcludeNotOrganized',

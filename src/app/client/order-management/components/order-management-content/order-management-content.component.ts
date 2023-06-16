@@ -903,7 +903,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private getAllShifts(): void {
     this.store.dispatch(new GetAllShifts());
     this.getAllShifts$.pipe(takeUntil(this.unsubscribe$)).subscribe((state) => {
-      this.filterColumns.shiftIds.dataSource = [{ name: 'Custom', id: 0 }, ...state];
+      if(state){
+        this.filterColumns.shiftIds.dataSource = [{ name: 'Custom', id: 0 }, ...state];
+      }
     });
   }
 
@@ -1983,7 +1985,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onDeleteOrderSucceededHandler(): void {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(DeleteOrderSucceeded)).subscribe(() => {
       this.gridWithChildRow?.clearRowSelection();
-      this.getOrders();
+      this.getOrders(true);
       this.openDetails.next(false);
     });
   }

@@ -304,16 +304,43 @@
       color: $white;
       font-size: 14px;
       padding: 0;
-
-      &:disabled {
-        cursor: default;
-      }
     }
 
     .icon-container {
       cursor: pointer;
     }
   }
+
+  .help-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+
+    .help {
+      &__button {
+        width: 100%;
+        background: none;
+        border: none;
+        color: $white;
+        font-size: 14px;
+        padding: 0;
+      }
+
+      .icon-container {
+        cursor: pointer;
+
+        &:hover {
+          background-color: $secondary-dark-blue-10-1;
+
+          .icon {
+            color: $primary-active-blue-15;
+          }
+        }
+      }
+    }
+  }
+
   // Sidebar closed styles
   .e-close i-feather.icon {
     padding-right: 0;
@@ -664,7 +691,7 @@
 
   #listcontainer {
     padding: 10px;
-    max-height: 88vh;  
+    max-height: 88vh;
     overflow: auto;
 
     .item-clear {

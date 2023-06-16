@@ -14,9 +14,10 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CandidateWorkCommitment, CandidateWorkCommitmentsPage } from '../../models/candidate-work-commitment.model';
 import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
-import { CandidateWorkCommitmentColumnDef } from './candidate-work-commitment-grid.constants';
+import { CandidateWorkCommitmentColumnDef, getWorkCommitmentGridOptions } from './candidate-work-commitment-grid.constants';
 import { PagerConfig } from '../../constants/pager-grid-config.constants';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
+import { GridOptions } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-candidate-work-commitment-grid',
@@ -44,6 +45,8 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
   public pageNumber = 1;
   public pageSize = 5;
   public candidateWorkCommitmentsPage: CandidateWorkCommitmentsPage;
+  public context: { componentParent: CandidateWorkCommitmentGridComponent };
+  public gridOptions: GridOptions;
 
   public readonly userPermissions = UserPermissions;
 
@@ -66,6 +69,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
 
   public ngOnInit(): void {
     this.subscribeOnPageRefreshing();
+    this.getGridOption();
   }
 
   private dispatchNewPage(): void {
@@ -76,6 +80,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
     ).pipe(
       tap((page) => {
         this.candidateWorkCommitmentsPage = page;
+        this.candidateService.hasWorkCommitments = page.totalCount > 0;
       }),
       switchMap(() => this.candidateService.getEmployeeWorkCommitments())
     ).subscribe(() => {
@@ -132,5 +137,10 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
       .subscribe(() => {
         this.deleteCommitmentHandler(commitment);
       });
+  }
+
+  private getGridOption(): void {
+    this.context = { componentParent: this };
+    this.gridOptions = getWorkCommitmentGridOptions(this.context);
   }
 }

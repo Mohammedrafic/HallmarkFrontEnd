@@ -4,7 +4,6 @@ export const MenuItemNames = {
   // TODO: edit profile
   /* [profileMenuItem.edit_profile]: 'Edit Profile',*/
   [ProfileMenuItem.theme]: 'Theme',
-  [ProfileMenuItem.help]: 'Help',
   [ProfileMenuItem.log_out]: 'LogOut',
   [ProfileMenuItem.light_theme]: 'Light',
   [ProfileMenuItem.dark_theme]: 'Dark',
@@ -12,8 +11,8 @@ export const MenuItemNames = {
   [ProfileMenuItem.contact_us]: 'Contact Us',
 };
 
-export const GetProfileMenuItems = (isEmployee: boolean, isDarkTheme: boolean) => {
-  const profileMenuItems = [
+export const GetProfileMenuItems = (isDarkTheme: boolean) => {
+  return [
     // TODO: edit profile
     /*{ text: this.ProfileMenuItemNames[ProfileMenuItem.edit_profile], id: ProfileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },*/
     {
@@ -37,11 +36,6 @@ export const GetProfileMenuItems = (isEmployee: boolean, isDarkTheme: boolean) =
       ],
     },
     {
-      text: MenuItemNames[ProfileMenuItem.help],
-      id: ProfileMenuItem.help.toString(),
-      iconCss: 'e-circle-info e-icons',
-    },
-    {
       text: MenuItemNames[ProfileMenuItem.contact_us],
       id: ProfileMenuItem.contact_us.toString(),
       iconCss: 'e-ddb-icons e-contactus',
@@ -52,10 +46,4 @@ export const GetProfileMenuItems = (isEmployee: boolean, isDarkTheme: boolean) =
       iconCss: 'e-ddb-icons e-logout',
     },
   ];
-
-  if (isEmployee) {
-    return profileMenuItems.filter((item) => item.id !== ProfileMenuItem.help.toString());
-  } else {
-    return profileMenuItems;
-  }
 };
