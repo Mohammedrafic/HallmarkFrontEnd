@@ -38,10 +38,12 @@ import { CreateOrderDto, Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from "@order-credentials/types";
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED } from '@shared/constants';
+import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED, INACTIVE_MESSAGE, INACTIVEDATE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrderType } from '@shared/enums/order-type';
 import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
+import { DatePipe } from '@angular/common';
+import { OrganizationStructureService } from '@shared/services/organization-structure.service';
 
 @Component({
   selector: 'app-irp-container',
@@ -60,7 +62,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
   public orderCredentials: IOrderCredentialItem[] = [];
-
+  public dates : string;
   private isCredentialsChanged = false;
 
   constructor(
@@ -72,6 +74,8 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private cdr: ChangeDetectorRef,
     private confirmService: ConfirmService,
     private irpContainerApiService: IrpContainerApiService,
+    private organizationStructureService: OrganizationStructureService,
+    private datePipe: DatePipe,
   ) {
     super();
   }
@@ -137,7 +141,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   }
 
   private saveOrder(formState: ListOfKeyForms, saveType: MenuEventArgs | void): void {
-    const createdOrder = {
+    let createdOrder = {
       ...createOrderDTO(formState, this.orderCredentials),
       contactDetails: getValuesFromList(formState.contactDetailsList),
       workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
@@ -147,7 +151,45 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
    if (this.selectedOrder) {
      this.showRevokeMessageForEditOrder(createdOrder);
     } else {
-      this.store.dispatch(new SaveIrpOrder(createdOrder,this.irpStateService.getDocuments()));
+      let regionid = createdOrder.regionId;
+      let locationid = createdOrder.locationId;
+      let jobstartdate = createdOrder.jobStartDate
+        ? createdOrder.jobStartDate
+        : createdOrder.jobDates[createdOrder.jobDates.length - 1];
+      let departmentID = createdOrder.departmentId;
+      const location = this.organizationStructureService.getLocation(regionid,locationid)
+      const locations = this.organizationStructureService.getLocationsByInactive(regionid, jobstartdate, locationid);
+      const departments = this.organizationStructureService.getDepartmentByInactive(locationid,jobstartdate,departmentID);
+      let reactivateDate = createdOrder.jobDates ? createdOrder.jobDates : null;
+ 
+      if (locations.isInActivate || location.isInActivate || departments.isInActivate) {
+        if (createdOrder.jobDates) {
+    
+     createdOrder.jobDates= createdOrder.jobDates.filter((f: Date) =>
+       (new Date(f).toLocaleDateString() < new Date(location.inActiveDate??'').toLocaleDateString()
+         || new Date(f).toLocaleDateString()>= new Date(location.reActiveDate??'').toLocaleDateString()));
+ 
+         reactivateDate = reactivateDate.filter((f: any) => {
+            return new Date(f).toLocaleDateString() >= new Date(location.inActiveDate ?? '').toLocaleDateString() && location.reActiveDate ? new Date(f).toLocaleDateString()<= new Date(location.reActiveDate??'').toLocaleDateString() : location.reActiveDate==null
+          });
+          this.dates = reactivateDate
+            .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
+            .join(', ');
+        }
+        let dates = createdOrder.jobDates ? this.datePipe.transform(location.inActiveDate,'MM/dd/yyyy') : this.datePipe.transform(locations.inActiveDate, 'MM/dd/yyyy');
+        this.confirmService
+          .confirm(INACTIVEDATE + dates + INACTIVE_MESSAGE, {
+            title: 'Confirm',
+            okButtonLabel: 'Yes',
+            okButtonClass: '',
+          })
+          .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+          .subscribe(() => {
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+          });
+      } else {
+        this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments()));
+      }
     }
   }
 

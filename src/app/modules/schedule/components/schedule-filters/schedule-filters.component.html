@@ -1,7 +1,10 @@
 <app-filter-dialog
   [items]="filteredItems"
   [count]="count"
+  [useGroupingFilters]="useGroupingFilters"
+  [chipsData]="chipsData"
   (deleteFilter)="deleteFilter($event)"
+  (filterChipDelted)="deleteFilterItem($event)"
   (clearAllFiltersClicked)="clearAllFilters()"
   (applyFilterClicked)="applyFilter()"
   (closeDialogClicked)="closeFilterDialog()"

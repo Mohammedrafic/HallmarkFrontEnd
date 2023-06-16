@@ -5,8 +5,9 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 import { ShowFilterDialog } from '../../../store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
-import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
+import { ChipDeletedEventArgs, DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { ChipDeleteEventType, ChipItem } from '../inline-chips/inline-chips.interface';
 
 @Component({
   selector: 'app-filter-dialog',
@@ -16,16 +17,20 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 export class FilterDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('filterDialog') filterDialog: DialogComponent;
   @ContentChild('groupedChips') public groupedChips:TemplateRef<HTMLElement>;
+  @ContentChild('scheduleChips') public scheduleChips:TemplateRef<HTMLElement>;
 
   @Input() targetElement: HTMLElement | null = document.body;
   @Input() width: string = '532px';
   @Input() items: FilteredItem[] | null = [];
   @Input() count: number | undefined | null = 0;
+  @Input() useGroupingFilters:boolean;
+  @Input() chipsData: ChipItem[];
+
   @Output() clearAllFiltersClicked: EventEmitter<void> = new EventEmitter();
   @Output() applyFilterClicked: EventEmitter<void> = new EventEmitter();
   @Output() deleteFilter: EventEmitter<FilteredItem> = new EventEmitter();
   @Output() closeDialogClicked: EventEmitter<void> = new EventEmitter();
-
+  @Output() filterChipDelted: EventEmitter<ChipDeleteEventType> = new EventEmitter();
   public constructor(private action$: Actions) {
     super();
   }
@@ -62,4 +67,12 @@ export class FilterDialogComponent extends DestroyableDirective implements OnIni
         }
       });
   }
+
+  deleteFilterChip(event: ChipDeletedEventArgs, groupField: string): void {
+    this.filterChipDelted.emit({
+      field: groupField,
+      value: event.data as string,
+    });
+  }
+
 }
