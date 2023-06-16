@@ -115,6 +115,10 @@ const routes: Routes = [
         },
       },
       {
+        path: 'invoices/notification/:notificationId',
+        resolve: [NotificationResolver],
+      },
+      {
         path: 'order-management',
         component: OrderManagementComponent,
         data: {
@@ -123,7 +127,6 @@ const routes: Routes = [
       },
       {
         path: 'order-management/notification/:notificationId',
-        component: OrderManagementComponent,
         resolve: [NotificationResolver],
       },
       {

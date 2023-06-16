@@ -52,3 +52,10 @@ export enum PeriodType {
   Decade = 'Decade',
   Month = 'Month',
 }
+
+export enum CommentsFilter {
+  All = 'All',
+  Internal = 'Internal',
+  External = 'External',
+  Private = 'Private',
+}

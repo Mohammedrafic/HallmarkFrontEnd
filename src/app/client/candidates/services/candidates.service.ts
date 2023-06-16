@@ -19,6 +19,7 @@ export class CandidatesService {
   private profileData$: BaseObservable<CandidateModel | null> = new BaseObservable<CandidateModel | null>(null);
 
   public employeeId: number | null;
+  public hasWorkCommitments = false;
   
   public constructor(private httpClient: HttpClient) { }
 
@@ -42,12 +43,12 @@ export class CandidatesService {
     return this.activeEmployeeWorkCommitment$.getStream();
   }
 
-  public setProfileData(candidate: CandidateModel): void {
-    this.profileData$.set(candidate);
+  public getActiveWorkCommitment(): CandidateWorkCommitmentShort | null {
+    return this.activeEmployeeWorkCommitment$.get();
   }
 
-  public getProfileDSataStream(): Observable<CandidateModel | null> {
-    return this.profileData$.getStream();
+  public setProfileData(candidate: CandidateModel): void {
+    this.profileData$.set(candidate);
   }
 
   public getProfileData(): CandidateModel | null {
