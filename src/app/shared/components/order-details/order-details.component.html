@@ -23,6 +23,7 @@
     <div class="comments" *ngIf="!isPosition && activeSystem !== systemTypes.IRP">
       <app-comments
         [comments]="comments"
+        [canVmsCreateOrders]="canCreateOrder"
         [orderId]="order.id"
         [commentContainerId]="order.commentContainerId || 0"
         [externalCommentConfiguration]="order.externalCommentsConfiguration"
