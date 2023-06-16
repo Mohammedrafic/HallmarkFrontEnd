@@ -16,7 +16,8 @@ export class AvailableEmployeeComponent  implements OnInit {
   @Input() public isLoading: boolean;
   @ViewChild('availableEmployees') availableEmployees:AgGridAngular
 
-  ngOnInit(): void { 
+  ngOnInit(): void {  
+     this.columnDefs.forEach(c => (c.menuTabs = []));
   }
 
   public rowData: AvailableEmployeeModel[] ;
