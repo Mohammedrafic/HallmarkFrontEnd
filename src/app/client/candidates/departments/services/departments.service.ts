@@ -68,16 +68,18 @@ export class DepartmentsService {
 
   public editAssignedDepartments(
     formData: DepartmentPayload,
-    departmentIds: number[] | null
+    departmentIds: number[] | null,
+    createReplacement?: boolean
   ): Observable<DepartmentPayload> {
     const payload = DepartmentHelper.editDepartmentPayload(
       formData,
       departmentIds,
       this.employeeWorkCommitmentId,
       this.candidatesService.employeeId as number,
-      this.showAllDepartments
+      this.showAllDepartments,
+      createReplacement,
     );
-    return this.editDepartmnet(payload).pipe(handleHttpError(this.store));
+    return this.editDepartment(payload).pipe(handleHttpError(this.store));
   }
 
   public assignNewDepartment(formData: DepartmentPayload): Observable<DepartmentPayload> {
@@ -100,7 +102,7 @@ export class DepartmentsService {
       .pipe(switchMap(() => source));
   }
 
-  private editDepartmnet(payload: DepartmentPayload): Observable<DepartmentPayload> {
+  private editDepartment(payload: DepartmentPayload): Observable<DepartmentPayload> {
     return this.http.put<DepartmentPayload>(`${this.baseUrl}`, payload).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         const forceUpdate = errorResponse.error['errors'].ForceUpdate && errorResponse.error.status === 400;

@@ -106,6 +106,7 @@ export interface DepartmentPayload {
   locationIds?: number;
   regionIds?: number;
   employeeId?: number;
+  createReplacement?: boolean;
 }
 
 export interface DepartmentConditions {

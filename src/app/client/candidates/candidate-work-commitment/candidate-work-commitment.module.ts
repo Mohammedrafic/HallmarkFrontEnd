@@ -35,6 +35,9 @@ import { PayRateHistoryDialogComponent } from './components/pay-rate-history-dia
 import { PayRateService } from './services/pay-rate.service';
 import { PayRateApiService } from './services/pay-rate-api.service';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { 
+  ReplacementOrderConfirmationModule,
+} from '@shared/components/replacement-order-confirmation/replacement-order-confirmation.module';
 import { WorkCommitmentChildRowRendererComponent } from
 './components/candidate-work-commitment-grid/work-commitment-child-row-renderer/work-commitment-child-row-renderer.component';
 
@@ -69,6 +72,7 @@ import { WorkCommitmentChildRowRendererComponent } from
     DialogModule,
     ReactiveFormsModule,
     TooltipContainerModule,
+    ReplacementOrderConfirmationModule,
   ],
   providers: [
     CandidateWorkCommitmentService,

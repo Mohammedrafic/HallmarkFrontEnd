@@ -21,6 +21,8 @@ import {
   switchMap,
   Observable,
   of,
+  tap,
+  take,
 } from 'rxjs';
 
 import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
@@ -38,13 +40,12 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DepartmentFormService } from '../services/department-form.service';
 import { OptionFields } from '@client/order-management/constants';
 import { MessageTypes } from '@shared/enums/message-types';
-import { EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT, RECORD_ADDED, RECORD_MODIFIED, WARNING_TITLE } from '@shared/constants';
+import { EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CustomFormGroup } from '@core/interface';
 import { departmentName } from '../helpers/department.helper';
 import { DateTimeHelper, findSelectedItems } from '@core/helpers';
 import { mapperSelectedItems } from '@shared/components/tiers-dialog/helper';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
-import { ConfirmService } from '@shared/services/confirm.service';
 import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 
 @Component({
@@ -69,6 +70,10 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     departments: [],
   };
 
+  public endDateConfirmDialog$ = new Subject<boolean>();
+  public showEndDateConfirmDialog = false;
+  public replaceOrder = false;
+  public editDepartmentWaring = EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT;
   public minDate: Date | undefined;
   public maxDate: Date | undefined;
   public readonly departmentFields = OptionFields;
@@ -88,7 +93,6 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     private readonly departmentService: DepartmentsService,
     private readonly departmentFormService: DepartmentFormService,
     private readonly store: Store,
-    private readonly confirmService: ConfirmService,
   ) {
     super();
   }
@@ -236,11 +240,13 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   }
 
   private editDepartmentHandler(): Observable<boolean> {
-    return this.confirmService.confirm(EDIT_ASSIGNED_DEPARTMENTS_DATES_TEXT, {
-      title: WARNING_TITLE,
-      okButtonLabel: 'Yes',
-      okButtonClass: 'ok-button',
-    });
+    this.showEndDateConfirmDialog = true;
+    this.replaceOrder = false;
+    this.cdr.markForCheck();
+    return this.endDateConfirmDialog$.pipe(
+      tap(() => this.showEndDateConfirmDialog = false),
+      take(1)
+    );
   }
 
   private saveAssignedDepartment(): Observable<DepartmentPayload> {
@@ -256,7 +262,10 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
               return this.editDepartmentHandler().pipe(
                 filter(Boolean),
                 switchMap(() => {
-                  return this.departmentService.editAssignedDepartments(formData, [this.departmentId as number]);
+                  return this.departmentService.editAssignedDepartments(
+                    formData, [this.departmentId as number], 
+                    this.replaceOrder
+                  );
                 }));
            } else {
             return this.departmentService.editAssignedDepartments(formData, [this.departmentId]);
