@@ -8,12 +8,14 @@ export class DepartmentHelper {
     employeeWorkCommitmentId: number,
     employeeId: number,
     toggleAllOn: boolean,
+    createReplacement?: boolean,
   ): DepartmentPayload {
     return {
       ...createDepartmentPayload(formData),
       ids: departmentIds,
       employeeId: employeeId,
       employeeWorkCommitmentId: toggleAllOn ? null : employeeWorkCommitmentId,
+      createReplacement,
     };
   }
 

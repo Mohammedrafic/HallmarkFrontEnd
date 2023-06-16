@@ -119,3 +119,10 @@
     ></app-datepicker>
   </div>
 </form>
+
+<app-replacement-order-confirmation
+  *ngIf="showEndDateConfirmDialog"
+  [text]="editDepartmentWaring"
+  (confirm)="endDateConfirmDialog$.next($event)"
+  [(replaceChecked)]="replaceOrder"
+></app-replacement-order-confirmation>

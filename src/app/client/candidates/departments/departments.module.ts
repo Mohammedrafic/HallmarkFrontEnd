@@ -23,6 +23,9 @@ import { EditDepartmentsComponent } from './edit-departments/edit-departments.co
 import { DepartmentNameComponent } from './grid/cell-renderers/department-name/department-name.component';
 import { HomeCostCenterPipe } from './pipes/home-cost-center.pipe';
 import { RadioButtonModule } from '@shared/components/form-controls/radio-button/radio-button.module';
+import {
+  ReplacementOrderConfirmationModule,
+} from '@shared/components/replacement-order-confirmation/replacement-order-confirmation.module';
 
 @NgModule({
   declarations: [
@@ -49,6 +52,7 @@ import { RadioButtonModule } from '@shared/components/form-controls/radio-button
     JoinPipeModule,
     DropdownModule,
     RadioButtonModule,
+    ReplacementOrderConfirmationModule,
   ],
   providers: [DepartmentsService, DepartmentFormService],
 })
