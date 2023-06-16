@@ -19,6 +19,7 @@
         <app-commentdata
           [scrolledToMessage$]="scrolledToMessage$"
           [comment]="comment"
+          [commentType]="commentType"
           (onRead)="onRead(comment)"></app-commentdata>
       </ng-container>
       <div class="no-comments" *ngIf="!comments.length">

@@ -10,13 +10,7 @@ import { UserState } from 'src/app/store/user.state';
 import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments-irp.actions';
 import { CommentsState } from './store/comments-irp.state';
 import { faUserFriends, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-
-enum CommentsFilter {
-  All = 'All',
-  Internal = 'Internal',
-  External = 'External',
-  Private = 'Private',
-}
+import { CommentsFilter } from '@core/enums/common.enum';
 
 @Component({
   selector: 'app-comments-irp',
@@ -48,7 +42,7 @@ export class CommentsIrpComponent {
   @Input() set externalCommentConfiguration(value: boolean | null | undefined) {
     this.CommentConfiguration = value;
     if (this.isAgencyUser || this.CommentConfiguration === true) {
-      this.isExternal = true;
+      this.isExternal = false;
     }
   }
   get externalCommentConfiguration(): boolean | null | undefined {
@@ -85,12 +79,12 @@ export class CommentsIrpComponent {
   public scrolledToMessage$ = new Subject<void>();
   public markAsRead$ = new Subject<number[]>();
   public initView$ = new Subject<void>();
-
   public readMessagesIds: number[] = [];
-
+  public commentType: string | undefined;
   private hasUnreadMessages = false;
 
   constructor(private store: Store, private cd: ChangeDetectorRef) {
+    this.commentType = CommentsFilter.All;
     this.scroll$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((messageEl: HTMLElement | null) => {
       if (messageEl) {
         this.scrollToSpecificMessage(messageEl);
@@ -189,9 +183,11 @@ export class CommentsIrpComponent {
 
   public onFilterChange(event: SelectEventArgs): void {
     this.commentdata = this.commentsList;
-    event.itemData.value === CommentsFilter.External ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; }) => x.isExternal === true) : this.commentdata;
-    event.itemData.value === CommentsFilter.Internal ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; }) => x.isExternal === false) : this.commentdata;
+    event.itemData.value === CommentsFilter.External ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; isPrivate: boolean; }) => x.isExternal === true && x.isPrivate === false) : this.commentdata;
+    event.itemData.value === CommentsFilter.Internal ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; isPrivate: boolean; }) => x.isExternal === false && x.isPrivate === false) : this.commentdata;
     event.itemData.value === CommentsFilter.Private ? this.commentdata = this.commentdata.filter((x: { isPrivate: boolean; }) => x.isPrivate === true) : this.commentdata;
+    event.itemData.value === CommentsFilter.All ? this.commentdata : this.commentdata
+    this.commentType = event.itemData.value;
     this.scroll$.next(null);
   }
 }
