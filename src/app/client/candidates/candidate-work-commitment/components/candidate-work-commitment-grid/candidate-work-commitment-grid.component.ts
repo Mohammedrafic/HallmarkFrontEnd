@@ -80,6 +80,7 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
     ).pipe(
       tap((page) => {
         this.candidateWorkCommitmentsPage = page;
+        this.candidateService.hasWorkCommitments = page.totalCount > 0;
       }),
       switchMap(() => this.candidateService.getEmployeeWorkCommitments())
     ).subscribe(() => {

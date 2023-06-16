@@ -148,7 +148,8 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   public alerts: any;
   public alerts$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   public alertsCount: number;
-  public isToggleButtonDisable = false;
+  public showCollapseButton = true;
+  public showHelpIButton = false;
 
   private isClosingSearch = false;
   private isContactOpen = false;
@@ -226,7 +227,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
             this.alerts =  [...this.alerts,...alertdata];
             this.alerts$.next(this.alerts);
             this.showAlertSidebar = true;
-            this.alertSidebar?.show();      
+            this.alertSidebar?.show();
           }else{
             this.scrollData = false;
             this.loadMoreCotent = "No more data found!";
@@ -256,9 +257,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       case ProfileMenuItem.dark_theme:
         this.isDarkTheme = false;
         this.toggleTheme();
-        break;
-      case ProfileMenuItem.help:
-        this.onGetHelp();
         break;
       case ProfileMenuItem.log_out:
         this.logout();
@@ -674,6 +672,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   private getAlertsPoolling(): void {
     this.user$.pipe(takeUntil(this.componentDestroy())).subscribe((user: User) => {
       if (user) {
+        this.showHelpIButton = !user.isEmployee;
         this.userLogin = user;
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
         this.store.dispatch(new GetAlertsCountForCurrentUser({}));
@@ -687,7 +686,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         this.profileData = [
           {
             text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
-            items: GetProfileMenuItems(!!user.isEmployee, this.isDarkTheme),
+            items: GetProfileMenuItems(this.isDarkTheme),
           },
         ];
       }
@@ -754,7 +753,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     const scheduleUrl = '/client/scheduling';
 
     if (this.router.url === scheduleUrl) {
-      this.isToggleButtonDisable = true;
+      this.showCollapseButton = false;
     }
 
     this.router.events.pipe(
@@ -764,10 +763,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       if(routeEvent.url === scheduleUrl) {
         this.tree.collapseAll();
         this.store.dispatch(new ToggleSidebarState(false));
-        
-        this.isToggleButtonDisable = true;
+
+        this.showCollapseButton = false;
       } else {
-        this.isToggleButtonDisable = false;
+        this.showCollapseButton = true;
       }
     });
   }
@@ -782,7 +781,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   public onScrollLoadData(){
-    const nativeElement= this.uiElement.nativeElement;    
+    const nativeElement= this.uiElement.nativeElement;
     if(nativeElement.clientHeight + Math.round(nativeElement.scrollTop) === nativeElement.scrollHeight && this.scrollData){
       this.scrollData = false;
       this.loadMoreCotent = "loading..";

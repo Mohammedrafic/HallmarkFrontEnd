@@ -22,6 +22,7 @@ export type CandidateWorkCommitment = {
   created?: string | Date;
   isActive: boolean;
   numberOfOrganizationWorkCommitments: number;
+  createReplacement?: boolean;
 }
 
 export type CandidateWorkCommitmentsPage = PageOfCollections<CandidateWorkCommitment>;
