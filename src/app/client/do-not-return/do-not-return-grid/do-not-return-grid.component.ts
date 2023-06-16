@@ -194,13 +194,13 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
           };
           this.store.dispatch(new GetLocationsByRegions(locationFilter));
           if(!this.isEdit){
-            this.doNotReturnFormGroup.get('isExternal')?.setValue('false');
+            this.doNotReturnFormGroup.get(FormControlNames.IsExternal)?.setValue('false');
           }
 
         }
         if(this.fliterFlag){
             this.doNotReturnFilterForm.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
-            if(this.doNotReturnFilterForm.value.currentStatus == "Blocked"){
+            if(this.doNotReturnFilterForm.value.currentStatus == Candidatests.Block){
               this.isFilterBlock = true;
             }
             else{
@@ -227,7 +227,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetOrganizationDataSources());
     this.getOrganizationList();
     this.subscribeOnBusinessUnitChange();
-    this.doNotReturnFormGroup.get('ssn')?.valueChanges.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((ssnValue: any) => {
+    this.doNotReturnFormGroup.get(FormControlNames.Ssn)?.valueChanges.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((ssnValue: any) => {
       if(ssnValue!= '' && ssnValue!= null && ssnValue.indexOf('XXX-XX') == -1){
         this.maskedSSN = ssnValue;
       }
@@ -284,24 +284,24 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
         this.maskedFilterSSN = ssnValue;
       }
     });    
-    this.doNotReturnFormGroup.get('isExternal')?.valueChanges.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((isExternalValue: any) => {
+    this.doNotReturnFormGroup.get(FormControlNames.IsExternal)?.valueChanges.pipe(delay(500),distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((isExternalValue: any) => {
       
           if(isExternalValue == "true"){
-            this.doNotReturnFormGroup.get('candidateProfileId')?.setValue(0);
+            this.doNotReturnFormGroup.get(FormControlNames.CandidateProfileId)?.setValue(0);
           }else if(!this.isEdit){
-            this.doNotReturnFormGroup.get('candidateProfileId')?.setValue(null);
+            this.doNotReturnFormGroup.get(FormControlNames.CandidateProfileId)?.setValue(null);
           }
           this.doNotReturnFormGroup.markAsUntouched();  
           this.doNotReturnFormGroup.controls['isExternal']?.markAsTouched();  
           this.changeDetectorRef.markForCheck();              
     });
 
-    this.doNotReturnFormGroup.get('candidateProfileId')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((CandidateProfileId: any) => {
+    this.doNotReturnFormGroup.get(FormControlNames.CandidateProfileId)?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((CandidateProfileId: any) => {
       if(CandidateProfileId!= '' && CandidateProfileId!= null ){
         if(this.CandidateNames.length > 0 && !this.isEdit){
             let selectedCandidate : DoNotReturnSearchCandidate | undefined = this.CandidateNames.find(data=> data.id == CandidateProfileId || data.fullName == CandidateProfileId)
-            this.doNotReturnFormGroup.get('candidateEmail')?.setValue(selectedCandidate?.email);
-            this.doNotReturnFormGroup.get('dob')?.setValue(selectedCandidate?.dob);
+            this.doNotReturnFormGroup.get(FormControlNames.CandidateEmail)?.setValue(selectedCandidate?.email);
+            this.doNotReturnFormGroup.get(FormControlNames.DOB)?.setValue(selectedCandidate?.dob);
             this.doNotReturnFormGroup.get('firstName')?.setValue(selectedCandidate?.firstName);
             this.doNotReturnFormGroup.get('lastName')?.setValue(selectedCandidate?.lastName);
             this.doNotReturnFormGroup.get('middleName')?.setValue(selectedCandidate?.middleName);
@@ -311,18 +311,18 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
           }
           else {
             this.maskSSNPattern = "000-00-0000";
-            this.doNotReturnFormGroup.get('ssn')?.setValue(null); 
+            this.doNotReturnFormGroup.get(FormControlNames.Ssn)?.setValue(null); 
           }
         }        
       }else if(!this.isEdit){
-        this.doNotReturnFormGroup.get('candidateEmail')?.setValue(null);
-        this.doNotReturnFormGroup.get('dob')?.setValue(null);
+        this.doNotReturnFormGroup.get(FormControlNames.CandidateEmail)?.setValue(null);
+        this.doNotReturnFormGroup.get(FormControlNames.DOB)?.setValue(null);
         this.doNotReturnFormGroup.get('firstName')?.setValue(null);
         this.doNotReturnFormGroup.get('lastName')?.setValue(null);
         this.doNotReturnFormGroup.get('middleName')?.setValue(null);
         this.maskSSNPattern = "000-00-0000";
         this.maskedSSN = '';
-        this.doNotReturnFormGroup.get('ssn')?.setValue(null); 
+        this.doNotReturnFormGroup.get(FormControlNames.Ssn)?.setValue(null); 
       }
     });
 
@@ -348,6 +348,14 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   get formAltaControls(): any {
     return this.doNotReturnFormGroup['controls'];
+  }
+
+  public onDOBBlur(e:any){
+    if(e.model.inputWrapper.container.classList.contains('e-error')){
+      this.doNotReturnFormGroup.get(FormControlNames.DOB)?.setErrors({'incorrect': true});
+    }else{
+      this.doNotReturnFormGroup.get(FormControlNames.DOB)?.setErrors(null);
+    }
   }
 
   public onChangeOfRegions(data:any,isFilter:boolean){
@@ -394,14 +402,14 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public onSSNBlur(): void {
     if(this.maskedSSN != null && this.maskedSSN.length > 0 && this.maskedSSN.length >= 9){
       this.maskSSNPattern = "AAA-AA-0000";
-      this.doNotReturnFormGroup.get('ssn')?.setValue("XXX-XX-" + this.maskedSSN.slice(-4)); 
+      this.doNotReturnFormGroup.get(FormControlNames.Ssn)?.setValue("XXX-XX-" + this.maskedSSN.slice(-4)); 
     }
    
   }
 
   public onSSNFocus(): void {
       this.maskSSNPattern = "000-00-0000";
-      this.doNotReturnFormGroup.get('ssn')?.setValue(this.maskedSSN); 
+      this.doNotReturnFormGroup.get(FormControlNames.Ssn)?.setValue(this.maskedSSN); 
   }
 
   private getOrganizationList(): void {
@@ -522,9 +530,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public onFilterSwitcher(event: { checked: boolean }): void {
     this.isFilterBlock = event.checked;
     if(event.checked){
-      this.doNotReturnFilterForm.get('currentStatus')?.setValue('Blocked');
+      this.doNotReturnFilterForm.get('currentStatus')?.setValue(Candidatests.Block);
     }else{
-      this.doNotReturnFilterForm.get('currentStatus')?.setValue('Unblocked');
+      this.doNotReturnFilterForm.get('currentStatus')?.setValue(Candidatests.UnBlock);
     }
   }
   
@@ -748,7 +756,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   public onFilterDelete(data:any){
     if(data.column == 'currentStatus'){
-      this.doNotReturnFilterForm.get(data.column)?.setValue('Unblocked');
+      this.doNotReturnFilterForm.get(data.column)?.setValue(Candidatests.UnBlock);
       this.isFilterBlock = false;
     }else if(data.column == 'ssn'){
       this.maskedFilterSSN = '';
