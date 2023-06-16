@@ -165,7 +165,7 @@ export class OrganizationStructureService {
             ? new Date(department.reactivateDate) >= new Date(jobStartDate)
             : department.reactivateDate == null)
       ),
-      inActiveDate: (this.getSources(this.irpOrgStructure, id, 'departments') as OrganizationDepartment[]).find(
+      inActiveDate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
         (department) =>
           department.id == departmentid &&
           department.inactiveDate != null &&
@@ -174,7 +174,7 @@ export class OrganizationStructureService {
             ? new Date(department.reactivateDate) >= new Date(jobStartDate)
             : department.reactivateDate == null)
       )?.inactiveDate,
-      reActiveDate: (this.getSources(this.irpOrgStructure, id, 'departments') as OrganizationDepartment[]).find(
+      reActiveDate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
         (department) =>
           department.id == departmentid &&
           department.inactiveDate != null &&

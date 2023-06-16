@@ -37,7 +37,6 @@ const routes: Routes = [
       },
       {
         path: 'order-management/notification/:notificationId',
-        component: OrderManagementContentComponent,
         resolve: [NotificationResolver],
       },
       {
@@ -85,6 +84,10 @@ const routes: Routes = [
           isOrganizationArea: true,
           isAgencyArea: false,
         },
+      },
+      {
+        path: 'invoices/notification/:notificationId',
+        resolve: [NotificationResolver],
       },
       {
         path: 'candidates',
