@@ -135,8 +135,9 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   public onChangeUnitId(event: boolean): void {
     this.agencyActionsAllowed = event;
   }
-
+  
   public saveRole(): void {
+    this.roleForm.updatePermissionValue();
     this.roleFormGroup.markAllAsTouched();
     if (this.roleFormGroup.valid && !this.roleForm.showActiveError) {
       const value = this.roleFormGroup.getRawValue();
