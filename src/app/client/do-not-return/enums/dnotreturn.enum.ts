@@ -4,7 +4,10 @@ export enum FormControlNames {
     LocationIds = 'locationIds',
     CandidateProfileId = 'candidateProfileId',
     Ssn = 'ssn',
-    DnrComment = 'dnrComment'
+    DnrComment = 'dnrComment',
+    IsExternal = 'isExternal',
+    CandidateEmail = 'candidateEmail',
+    DOB = 'dob'
   }
 
 export enum Candidatests {

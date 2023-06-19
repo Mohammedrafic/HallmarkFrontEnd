@@ -29,6 +29,9 @@ export const analyticsConstants = {
 
     BeginStartDate: 'beginStartDate',
     EndStartDate: 'endStartDate',
+    jobId: 'jobId',
+    jobStatuses: 'jobStatuses'
+
   }
 }
 

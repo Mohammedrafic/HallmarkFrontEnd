@@ -30,4 +30,12 @@ export const JobDistributionIrpVms = [
   { id: IrpOrderJobDistribution.SelectedExternal, name: 'Selected External' },
 ];
 
-export const EditablePerDiemFields = ['regionId', 'locationId', 'departmentId', 'skillId', 'shift'];
+export const EditablePerDiemFields = [
+  'regionId',
+  'locationId',
+  'departmentId',
+  'skillId',
+  'shift',
+  'shiftStartTime',
+  'shiftEndTime',
+];
