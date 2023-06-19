@@ -157,5 +157,7 @@
   overflow: auto;
 }
 .pt_20{
-  padding: 20px 20px 0px 20px;
+  padding: 20px 20px 0px 20px !important;
+  overflow: hidden !important;
+  max-height: fit-content !important;
 }
