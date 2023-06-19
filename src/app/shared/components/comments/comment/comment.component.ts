@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
+import { CommentsFilter } from '@core/enums/common.enum';
 import { Comment } from '@shared/models/comment.model';
 import { Subject, Subscription } from 'rxjs';
 
@@ -11,9 +12,11 @@ import { Subject, Subscription } from 'rxjs';
 export class CommentComponent {
   @Input() comment: Comment;
   @Input() scrolledToMessage$: Subject<void>;
-
+  @Input() commentType: string | undefined;
   @Output() onCommentAdded = new EventEmitter<Comment>();
   @Output() onRead = new EventEmitter<Comment>();
+  public ExternalIcon:boolean = false;
+  public InternalIcon:boolean = false;
 
   @ViewChild('message')
   public messageRef: ElementRef;
@@ -35,6 +38,19 @@ export class CommentComponent {
         this.cd.detectChanges();
       }, 500);
     }
+  }
+
+  ngOnChanges():void {
+    this.watchForCommentTypes();
+  }
+
+  private watchForCommentTypes() : void{
+    if(this.comment.isExternal === true){
+      this.commentType === CommentsFilter.All ? (this.comment.isPrivate === false ? this.ExternalIcon = true : this.ExternalIcon = false) : this.commentType === CommentsFilter.External ? this.ExternalIcon = true : this.ExternalIcon = false;
+    } else if(this.comment.isExternal === false) {
+      this.InternalIcon = true
+    } 
+    this.cd.markForCheck();
   }
 
   ngAfterViewInit(): void {

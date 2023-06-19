@@ -55,7 +55,6 @@ export class CommentdataComponent {
     } 
     if(this.comment.isExternal === true){
       this.commentType === CommentsFilter.All ? (this.comment.isPrivate === false ? this.ExternalIcon = true : this.ExternalIcon = false) : this.commentType === CommentsFilter.External ? this.ExternalIcon = true : this.ExternalIcon = false;
-      console.log(this.ExternalIcon, this.comment);
     } 
     if(this.comment.isExternal === false) {
       this.InternalIcon = true

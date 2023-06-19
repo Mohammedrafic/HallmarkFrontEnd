@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
@@ -25,9 +25,11 @@ export class CommentsComponent {
   @Input() useBackground = true;
   @Input() disabled = false;
   @Input() orderId: number;
+  public commentData: any;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
     if (value.length) {
+      this.commentData = value.filter(comments => !comments.isPrivate);
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
     }
@@ -72,12 +74,14 @@ export class CommentsComponent {
   public scrolledToMessage$ = new Subject<void>();
   public markAsRead$ = new Subject<number[]>();
   public initView$ = new Subject<void>();
+  public commentType: string | undefined;
 
   public readMessagesIds: number[] = [];
 
   private hasUnreadMessages = false;
 
   constructor(private store: Store, private cd: ChangeDetectorRef) {
+    this.commentType = CommentsFilter.All;
     this.scroll$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((messageEl: HTMLElement | null) => {
       if (messageEl) {
         this.scrollToSpecificMessage(messageEl);
@@ -167,6 +171,7 @@ export class CommentsComponent {
       isRead: true,
     };
     this.comments.push(comment);
+    this.commentData.push(comment);
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
@@ -175,7 +180,11 @@ export class CommentsComponent {
   }
 
   public onFilterChange(event: SelectEventArgs): void {
-    this.showExternal = event.itemData.value === CommentsFilter.External;
+    this.commentData = this.commentsList;
+    event.itemData.value === CommentsFilter.External ? this.commentData = this.commentData.filter((comments: { isExternal: boolean; isPrivate: boolean; }) => comments.isExternal === true && comments.isPrivate === false) : this.commentData;
+    event.itemData.value === CommentsFilter.Internal ? this.commentData = this.commentData.filter((comments: { isExternal: boolean; isPrivate: boolean; }) => comments.isExternal === false && comments.isPrivate === false) : this.commentData;
+    event.itemData.value === CommentsFilter.All ?  this.commentData = this.commentData.filter((comments: { isPrivate: boolean; }) => comments.isPrivate === false) : this.commentData;
+    this.commentType = event.itemData.value;
     this.scroll$.next(null);
   }
 }

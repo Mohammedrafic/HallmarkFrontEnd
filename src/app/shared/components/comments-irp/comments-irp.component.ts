@@ -183,9 +183,9 @@ export class CommentsIrpComponent {
 
   public onFilterChange(event: SelectEventArgs): void {
     this.commentdata = this.commentsList;
-    event.itemData.value === CommentsFilter.External ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; isPrivate: boolean; }) => x.isExternal === true && x.isPrivate === false) : this.commentdata;
-    event.itemData.value === CommentsFilter.Internal ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; isPrivate: boolean; }) => x.isExternal === false && x.isPrivate === false) : this.commentdata;
-    event.itemData.value === CommentsFilter.Private ? this.commentdata = this.commentdata.filter((x: { isPrivate: boolean; }) => x.isPrivate === true) : this.commentdata;
+    event.itemData.value === CommentsFilter.External ? this.commentdata = this.commentdata.filter((comment : { isExternal: boolean; isPrivate: boolean; }) => comment.isExternal === true && comment.isPrivate === false) : this.commentdata;
+    event.itemData.value === CommentsFilter.Internal ? this.commentdata = this.commentdata.filter((comment : { isExternal: boolean; isPrivate: boolean; }) => comment.isExternal === false && comment.isPrivate === false) : this.commentdata;
+    event.itemData.value === CommentsFilter.Private ? this.commentdata = this.commentdata.filter((comment : { isPrivate: boolean; }) => comment.isPrivate === true) : this.commentdata;
     event.itemData.value === CommentsFilter.All ? this.commentdata : this.commentdata
     this.commentType = event.itemData.value;
     this.scroll$.next(null);

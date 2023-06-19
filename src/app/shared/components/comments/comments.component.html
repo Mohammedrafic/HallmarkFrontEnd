@@ -15,11 +15,11 @@
     </div>
   </div>
   <div #body class="comments-body" (scroll)="onScroll()">
-    <ng-container *ngFor="let comment of comments">
+    <ng-container *ngFor="let comment of commentData">
       <app-comment 
-        *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === showExternal"
         [scrolledToMessage$]="scrolledToMessage$"
         [comment]="comment"
+        [commentType]="commentType"
         (onRead)="onRead(comment)"></app-comment>
     </ng-container>
     <div class="no-comments" *ngIf="!comments.length">
