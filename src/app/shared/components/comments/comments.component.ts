@@ -25,6 +25,7 @@ export class CommentsComponent {
   @Input() useBackground = true;
   @Input() disabled = false;
   @Input() orderId: number;
+  @Input() canVmsCreateOrders: boolean;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
     if (value.length) {
