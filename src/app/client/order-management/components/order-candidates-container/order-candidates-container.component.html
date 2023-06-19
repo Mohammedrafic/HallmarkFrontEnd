@@ -16,6 +16,7 @@
     [candidatesList]="orderCandidatePage$ | async"
     [irpCandidates]="irpCandidates$ | async"
     (getCandidatesList)="onGetCandidatesList($event)"
+    [activeIRPtabs]="activeIRPtabs"
     [includeDeployedCandidates]="!excludeDeployed"
     [order]="orderCandidates"
     [system]="activeSystem"
@@ -27,6 +28,7 @@
     [candidatesList]="orderCandidatePage$ | async"
     [irpCandidates]="irpCandidates$ | async"
     (getCandidatesList)="onGetCandidatesList($event)"
+    [activeIRPtabs]="activeIRPtabs"
     [includeDeployedCandidates]="!excludeDeployed"
     [order]="orderCandidates"
     [system]="activeSystem"
@@ -41,6 +43,7 @@
     (getCandidatesList)="onGetCandidatesList($event)"
     [system]="activeSystem"
     [order]="orderCandidates"
+    [activeIRPtabs]="activeIRPtabs"
     [orderDetails] = "order" 
     [orderManagementPagerState]="orderManagementPagerState$ | async"
     >
