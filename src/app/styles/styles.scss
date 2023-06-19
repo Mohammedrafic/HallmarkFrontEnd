@@ -697,3 +697,6 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 .IRPgrid .app-grid__component .ag-body-horizontal-scroll, .app-grid__component span.ag-icon.ag-icon-menu {
  display: flex;
 }
+#Available_Employee_body .ag-center-cols-container {
+  width: 100% !important; min-width: 600px;
+}
