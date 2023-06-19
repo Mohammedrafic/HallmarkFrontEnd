@@ -287,7 +287,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private updatePermissionValue(): void {
+  public updatePermissionValue(): void {
     const roleDataControl = this.form.get('permissions');
     const checkeNodes = this.tree.getAllCheckedNodes();
     const value = this.getAssignableValues(checkeNodes);
