@@ -11,7 +11,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { OrderManagementService } from '../order-management-content/order-management.service';
 import { OrderStatus } from '@shared/enums/order-management';
 import { PageOfCollections } from '@shared/models/page.model';
-import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { OrderManagementIRPSystemId, OrderManagementIRPTabsIndex } from '@shared/enums/order-management-tabs.enum';
 import { CandidateState } from '@agency/store/candidate.state';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
 
@@ -27,7 +27,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
   }
 
   @Input() activeSystem: OrderManagementIRPSystemId;
-
+  @Input() activeIRPtabs: OrderManagementIRPTabsIndex;
   public orderCandidatePage: OrderCandidatesListPage;
   public orderCandidates: any;
   public orderType = OrderType;
