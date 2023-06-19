@@ -94,6 +94,7 @@ import {
   SelectNavigationTab,
   SetLock,
   UpdateRegRateSucceeded,
+  GetOrderComments,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -290,6 +291,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   @Select(OrderManagementContentState.getAllShifts)
   private getAllShifts$: Observable<ScheduleShift[]>;
+
+  @Select(OrderManagementContentState.orderComments)
+  private orderComments$: Observable<Comment[]>;
 
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
@@ -1873,13 +1877,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private getOrderComments(): void {
-    this.commentsService
-      .getComments(this.selectedOrder.commentContainerId as number, null)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((comments: Comment[]) => {
-        this.orderComments = comments;
-        this.cd$.next(true);
-      });
+    this.store.dispatch(new GetOrderComments(this.selectedOrder.commentContainerId as number));
+    this.orderComments$.subscribe((comments: Comment[]) => {
+      this.orderComments = comments;
+      this.cd.markForCheck();
+    });
   }
 
   private onSelectedOrderDataLoadHandler(): void {
