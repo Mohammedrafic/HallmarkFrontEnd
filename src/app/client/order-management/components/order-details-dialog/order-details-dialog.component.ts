@@ -63,7 +63,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { UserState } from '../../../../store/user.state';
-import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { OrderManagementIRPSystemId, OrderManagementIRPTabsIndex } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
@@ -98,7 +98,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Output() selectReOrder = new EventEmitter<any>();
   @Output() updateOrders = new EventEmitter();
   @Output() editOrderPressed = new EventEmitter<number>();
-
+  @Input() activeIRPtabs: OrderManagementIRPTabsIndex;
+  
   // TODO: Delete it when we will have re-open sidebar
   @Output() private reOpenOrderSuccess: EventEmitter<Order> = new EventEmitter<Order>();
 
@@ -271,7 +272,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       if (this.chipList) {
         const status = this.order.irpOrderMetadata ? this.order.irpOrderMetadata.statusText : this.order.statusText;
         this.chipList.cssClass = this.chipsCssClass.transform(status);
-        this.chipList.text = status.toUpperCase();
+        this.chipList.text = status?(status).toUpperCase():"";
       }
     }
   

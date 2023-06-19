@@ -482,7 +482,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.gridOptions = OrderManagementIrpSubrowHelper.configureOrderGridSubRowOptions(this.context);
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
-
+    if(routerState!=null &&routerState?.['irpActiveTab']!=null){  
+      this.globalWindow.localStorage.setItem("IRPActiveTab", JSON.stringify(routerState?.['irpActiveTab']));
+      this.activeIRPTabIndex =parseInt(routerState?.['irpActiveTab'])
+    }
     this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
     this.orderStaus = routerState?.['orderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
