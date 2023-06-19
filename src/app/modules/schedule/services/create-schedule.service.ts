@@ -114,14 +114,14 @@ export class CreateScheduleService {
   }
 
   handleErrorMessage(error: HttpErrorResponse): Observable<ScheduleBookingErrors[]>{
-    const bookErrors = error.error.errors.CreateBookingsCommand;
+    const parsedBookErrors: ScheduleBookingErrors[] | null = this.getParsedBookErrors(error);
 
-    if(bookErrors) {
-      return of(JSON.parse(bookErrors));
-    } else {
-      this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
-      return EMPTY;
+    if (parsedBookErrors) {
+      return of(parsedBookErrors);
     }
+
+    this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+    return EMPTY;
   }
 
   createAvailabilityUnavailability(
@@ -451,5 +451,22 @@ export class CreateScheduleService {
 
   private getScheduleTypeColumnsTemplate(types: ScheduleTypeRadioButton[]): string {
     return types.length > 3 ? 'auto auto auto auto' : `repeat(${types.length},1fr)`;
+  }
+
+  private getParsedBookErrors(error: HttpErrorResponse): ScheduleBookingErrors[] | null {
+    const bookErrors = error.error.errors.CreateBookingsCommand;
+    let parsedErrors: ScheduleBookingErrors[] | null;
+
+    if (!bookErrors) {
+      return null;
+    }
+
+    try {
+      parsedErrors = JSON.parse(bookErrors);
+    } catch {
+      parsedErrors = null;
+    }
+
+    return parsedErrors;
   }
 }
