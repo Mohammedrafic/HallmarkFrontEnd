@@ -1300,6 +1300,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.createForm();
       this.isShowSharedWith=false;
       this.shareDocumentIds = [data.id];
+      if(this.user?.businessUnitType === this.businessUnitTypes.Organization)
+      {
+        this.onAgencyChanges();
+      }
       this.store.dispatch(new ShowSideDialog(true));
     }
   }
@@ -1326,9 +1330,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
     this.changeDetectorRef.markForCheck();
   }
-
-  public onAgencySwitcher(event: any) {
-    this.agencySwitch = !this.agencySwitch;
+public onAgencyChanges()
+{
+  this.agencySwitch = !this.agencySwitch;
     this.allAgencies = false;
     this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
     if (this.agencySwitch) {
@@ -1347,6 +1351,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.sharedWith?.gridOptions?.api?.setRowData([]);
       this.isShowSharedWith=false;
     }
+}
+  public onAgencySwitcher(event: any) {
+    this.onAgencyChanges();
     this.changeDetectorRef.markForCheck();
   }
 
