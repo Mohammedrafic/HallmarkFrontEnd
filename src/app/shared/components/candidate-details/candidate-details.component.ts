@@ -181,6 +181,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   public onFilterClearAll(): void {
+    this.isClear=true
     this.filterColumns.locationIds.dataSource=[];
     this.filterColumns.departmentIds.dataSource=[];
     this.clearFilters();
@@ -224,8 +225,20 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     if(event.column =="regionsIds"){
       this.filterColumns.departmentIds.dataSource = this.filterColumns.departmentIds.dataSource?.filter(f=>f.regionId!==event.regionId);
       this.filterColumns.locationIds.dataSource = this.filterColumns.locationIds.dataSource?.filter(f=>f.regionId!==event.regionId);
+      this.filterco.locationDropdown.refresh();
+      this.filterco.departmentDropdown.refresh();
+    }
+    if(event.column =="locationIds")
+    {
+      this.filterColumns.locationIds.dataSource = this.filterColumns.locationIds.dataSource?.filter(f=>f.locationIds!==event.locationId);
+      this.filterColumns.departmentIds.dataSource = this.filterColumns.departmentIds.dataSource?.filter(f=>f.locationIds!==event.locationId);
+    }
+    if(event.column =="departmentIds")
+    {
+      this.filterColumns.departmentIds.dataSource = this.filterColumns.departmentIds.dataSource?.filter(f=>f.departmentIds!==event.value);
     }
     this.filterService.removeValue(event, this.filtersForm, this.filterColumns);
+    this.filterco.regionDropdown.refresh();
     this.filtersForm.markAsDirty();
   }
 
@@ -465,7 +478,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       locationIds: this.filters?.locationIds || [],
       departmentIds: this.filters?.departmentIds || [],
       candidateNames:this.filters?.candidateNames ||null,
-      agencyIds: this.filters?.agencyIds||[]
+      agencyIds: this.filters?.agencyIds||[],
+      orderID:this.filters?.orderID||null,
     });
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
   }

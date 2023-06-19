@@ -72,6 +72,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'OnHoldDefault',
   'DepartmentSkillRequired',
   'CreatePartialOrder',
+  'CreateUserWhenEmployeeCreated',
+  'CreateEmployeeWhenUserCreated',
 ];
 
 export const DisabledSettingsByDefault = [
@@ -89,7 +91,9 @@ export const DisabledSettingsByDefault = [
   'OnHoldDefault',
   'LockIRPCandidateAvailability',
   'DepartmentSkillRequired',
-  'SetDefaultCommentsScopeToExternal'
+  'SetDefaultCommentsScopeToExternal',
+  'CreateUserWhenEmployeeCreated',
+  'CreateEmployeeWhenUserCreated',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

@@ -26,6 +26,7 @@ export class CommentsComponent {
   @Input() disabled = false;
   @Input() orderId: number;
   public commentData: any;
+  @Input() canVmsCreateOrders: boolean;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
     if (value.length) {

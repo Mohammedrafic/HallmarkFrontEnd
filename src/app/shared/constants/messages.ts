@@ -120,6 +120,7 @@ export const addAvailabilityToStart = 'Add Availability to start Scheduling';
 
 export const RECORD_SAVED_SUCCESS = 'Record saved successfully';
 export const INACTIVEDATE = 'Location will be inactivated at '
+export const INACTIVEDATE_DEPARTMENT = 'Department will be inactivated at '
 export const INACTIVE_MESSAGE = '. Are you sure you want to proceed?'
 export const UpdateClosedPositionRate = 'Are you sure you want to update the Bill rate '
 + 'for Closed Position? This may lead to recalculating values and generating new invoice records.';

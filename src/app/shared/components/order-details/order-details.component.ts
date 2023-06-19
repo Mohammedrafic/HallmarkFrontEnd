@@ -17,6 +17,7 @@ import { UserState } from '../../../store/user.state';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '../../constants/organization-settings';
 import { BusinessUnitType } from '../../enums/business-unit-type';
 import { SettingsViewService } from '../../services/settings-view.service';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 @Component({
@@ -45,7 +46,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   public events: OrderHistoricalEvent[];
   public isHideContactDetailsOfOrderInAgencyLogin: boolean;
   public readonly systemTypes = OrderManagementIRPSystemId;
-
+  public canCreateOrder: boolean;
   private unsubscribe$: Subject<void> = new Subject();
   private eventsHandler: Subject<void> = new Subject();
   
@@ -54,13 +55,14 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     private commentsService: CommentsService,
     private cdr: ChangeDetectorRef,
     private historicalEventsService: HistoricalEventsService,
-    private settingsViewService: SettingsViewService
+    private settingsViewService: SettingsViewService,
+    private permissionService : PermissionService
   ) {
     this.eventsHandler.pipe(takeUntil(this.unsubscribe$), throttleTime(500))
       .subscribe(() => {
         this.getHistoricalEvents();
       });
-
+    this.subscribeOnPermissions();
   }
 
   private subscribeForSettings(): void {
@@ -106,6 +108,12 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     if (event.isExpanded) {
       this.eventsHandler.next();
     }
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 
   private getHistoricalEvents(): void {

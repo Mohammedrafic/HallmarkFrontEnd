@@ -48,7 +48,7 @@
         </span>
       </ejs-tooltip>
       <ejs-tooltip
-        [content]="'Send'">
+        [content]="'Send'" *ngIf="canVmsCreateOrders">
         <span class="control-wrapper send" (click)="send()">
           <i-feather name="send" class="icon"></i-feather>
         </span>

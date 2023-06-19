@@ -23,6 +23,7 @@ import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { PageOfCollections } from '@shared/models/page.model';
 import { CandidateSearchPlaceholder, EmployeeSearchPlaceholder } from '@shared/constants/candidate-search-placeholder';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
+import { OrderManagementIRPTabsIndex } from '@shared/enums/order-management-tabs.enum';
 
 @Directive()
 export abstract class AbstractOrderCandidateListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
@@ -35,7 +36,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   @Input() orderManagementPagerState: OrderManagementPagerState | null;
 
   @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
-
+  @Input() activeIRPtabs: OrderManagementIRPTabsIndex;
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobOrganisationState$: Observable<OrderCandidateJob>;
 
@@ -152,6 +153,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
             readonly: !this.isAgency,
             isRedirectFromOrder: true,
             isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
+            irpActiveTab:this.activeIRPtabs
           };
     this.globalWindow.localStorage.setItem('navigationState', JSON.stringify(state));
     this.router.navigate([url, data.candidateProfileId], {
