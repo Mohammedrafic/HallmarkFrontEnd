@@ -1485,6 +1485,24 @@
         </div>
       </div>
     </div>
+    <div class="bootstrap">
+    <div class="input-container">
+      <label>Shift Name</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          placeholder="All"
+          formControlName="shiftIds"
+          [allowFiltering]="true"
+          [dataSource]="filterColumns.shift.dataSource"
+          [fields]="shiftNameFields"
+          [showDropDownIcon]="true"
+          [changeOnBlur]="!(isMobile || isTablet)"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+  </div>
   </form>
 </app-filter-dialog>
 
