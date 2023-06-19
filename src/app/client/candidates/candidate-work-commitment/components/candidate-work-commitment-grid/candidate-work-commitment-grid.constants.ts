@@ -164,7 +164,7 @@ export const getWorkCommitmentGridOptions = <T>(context: T): GridOptions => {
     animateRows: true,
     context: context,
     detailCellRenderer: WorkCommitmentChildRowRendererComponent,
-    isRowMaster: (dataItem: CandidateWorkCommitment) => !!dataItem.numberOfOrganizationWorkCommitments,
+    isRowMaster: (dataItem: CandidateWorkCommitment) => (dataItem.numberOfOrganizationWorkCommitments - 1) > 0,
     getRowHeight: (params: RowHeightParams) => {
       if (params?.node?.detail) {
         const data = params.data as CandidateWorkCommitment;

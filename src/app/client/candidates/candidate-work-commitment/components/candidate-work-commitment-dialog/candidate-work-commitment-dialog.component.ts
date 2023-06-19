@@ -647,7 +647,11 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private setMinimumDate(): Date {
-    let minimumDate = this.selectWorkCommitmentStartDate;
+    const employeeHireDate = this.candidateService.getEmployeeHireDate();
+    const startDate = DateTimeHelper.convertDateToUtc(employeeHireDate as string);
+    const isHireDateLessWCStartDate = startDate.getTime() < this.selectWorkCommitmentStartDate.getTime();
+    let minimumDate = isHireDateLessWCStartDate ? this.selectWorkCommitmentStartDate : startDate;
+
     if (this.lastActiveDate) {
       minimumDate =
         DateTimeHelper.isDateBefore(this.lastActiveDate, this.selectWorkCommitmentStartDate)
