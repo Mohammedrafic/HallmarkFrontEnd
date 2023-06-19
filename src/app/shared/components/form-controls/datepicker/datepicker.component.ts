@@ -29,4 +29,7 @@ export class DatepickerComponent extends BaseFormControlDirective {
 
   @Output() valueChange: EventEmitter<Date> = new EventEmitter();
   @Output() change: EventEmitter<ChangedEventArgs> = new EventEmitter();
+  @Output() blur: EventEmitter<ChangedEventArgs> = new EventEmitter();
+
+  public emitBlurEvent(event: ChangedEventArgs): void { this.onBlur(); this.blur.emit(event); }
 }

@@ -57,7 +57,9 @@ export class CandidateStatusComponent implements OnInit {
     "BeginStartDateCS": "",
     "EndStartDateCS": "",
     "candidateStatusesParamCS": "",
-    "skillCS": ""
+    "skillCS": "",
+    "OrderIdParam": "",
+    "OrderStatusParam": ""
   };
 
 
@@ -68,6 +70,8 @@ export class CandidateStatusComponent implements OnInit {
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
 
   public allOption: string = "All";
+
+  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'statusText' };
 
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
@@ -144,13 +148,15 @@ export class CandidateStatusComponent implements OnInit {
   private previousOrgId: number = 0;
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   private fixedCandidateStatusesIncluded: number[] = [6, 7, 11];
+  private fixedJobStatusesIncluded: number[] = [3, 4, 7, 8, 1, 9];
+  private joinString = ",";
 
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
 
   public candidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
-
+  public defaultjobStatuses: (string | undefined)[] = ['Open', 'In progress', 'Filled'];
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -185,6 +191,7 @@ export class CandidateStatusComponent implements OnInit {
           this.selectedSkillCategories = data.skillCategories?.filter((object) => object.id);
           let skills = masterSkills.filter((i) => i.skillCategoryId);
           this.filterColumns.skillIds.dataSource = skills;
+          this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons.filter(i => this.fixedJobStatusesIncluded.includes(i.status));
         }
       });
 
@@ -234,10 +241,11 @@ export class CandidateStatusComponent implements OnInit {
         departmentIds: new FormControl([]),
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
-
         beginStartDate: new FormControl(startDate, [Validators.required]),
         endStartDate: new FormControl(endDate, [Validators.required]),
-        candidateStatuses: new FormControl([])
+        candidateStatuses: new FormControl([]),
+        jobId: new FormControl(null),
+        jobStatuses: new FormControl([])
       }
     );
   }
@@ -407,7 +415,8 @@ export class CandidateStatusComponent implements OnInit {
       }
     }
     let { departmentIds, locationIds, candidateStatuses,
-      regionIds, skillCategoryIds, skillIds, beginStartDate, endStartDate } = this.candidateStatusReportForm.getRawValue();
+      regionIds, skillCategoryIds, skillIds, beginStartDate, endStartDate, jobId,
+      jobStatuses } = this.candidateStatusReportForm.getRawValue();
 
     if (!this.candidateStatusReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for next week";
@@ -443,6 +452,8 @@ export class CandidateStatusComponent implements OnInit {
       "EndStartDateCS": formatDate(endStartDate, 'MM/dd/yyyy', 'en-US'),
       "candidateStatusesParamCS": candidateStatuses.length == 0 ? "null" : candidateStatuses,
       "skillCS": skillIds.length == 0 ? "null" : skillIds,
+      "OrderIdParam": jobId == null || jobId == "" ? '' : jobId,
+      "OrderStatusParam": jobStatuses.length == 0 ? '' : jobStatuses.join(this.joinString),
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -497,6 +508,17 @@ export class CandidateStatusComponent implements OnInit {
       endStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
 
       candidateStatuses: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Text,
+        dataSource: [],
+        valueField: 'statusText',
+        valueId: 'status',
+      },      
+      jobId: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Text
+      },
+      jobStatuses: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
         dataSource: [],
@@ -563,6 +585,8 @@ export class CandidateStatusComponent implements OnInit {
 
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.BeginStartDate)?.setValue(startDate);
     this.candidateStatusReportForm.get(analyticsConstants.formControlNames.EndStartDate)?.setValue(endDate);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.jobId)?.setValue([]);
+    this.candidateStatusReportForm.get(analyticsConstants.formControlNames.jobStatuses)?.setValue([]);
 
     this.filteredItems = [];
     this.locations = [];
