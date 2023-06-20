@@ -79,7 +79,7 @@
                         selectAllText="Select All"
                         mode="CheckBox"
                         [dataSource]="field.dataSource"
-                        [fields]="optionFields"
+                        [fields]="field.showAllToggle ? optionFieldsIRP : optionFields"
                         [showSelectAll]="!field.showAllToggle"
                         [allowFiltering]="true"
                         [showDropDownIcon]="true"

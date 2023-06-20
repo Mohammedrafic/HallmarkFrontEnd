@@ -519,7 +519,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-      const locations = this.organizationStructureService.getLocationsById(value);
+      let startDate = this.generalInformationForm.get('jobStartDate')?.value ?this.generalInformationForm.get('jobStartDate')?.value :this.generalInformationForm.get('jobDates')?.value;
+      const locations = this.organizationStructureService.getLocationsById(value,startDate);
       this.generalInformationForm.get('locationId')?.reset();
       this.generalInformationForm.get('departmentId')?.reset();
 
@@ -649,7 +650,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
       this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
         this.changeDetection.markForCheck();
-      if (value) {
+      if (value!=null) {
         let shiftDetails = this.allShifts.find(f => f.id == value)
         if (shiftDetails != null && shiftDetails.id != 0) {
           const [startH, startM, startS] = getHoursMinutesSeconds(shiftDetails.startTime);
@@ -662,8 +663,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           this.generalInformationForm.controls['shiftEndTime'].setValue(endDate, { emitEvent: false });
           this.changeDetection.markForCheck();
         } else {
-          this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
-          this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+          this.generalInformationForm.get('shiftStartTime')?.reset();
+          this.generalInformationForm.get('shiftEndTime')?.reset();
+          this.changeDetection.markForCheck();
         }
 
       }
@@ -817,14 +819,15 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private patchFormValues(selectedOrder: Order): void {
     this.orderTypeForm.patchValue(selectedOrder);
     this.generalInformationForm.patchValue({
+      jobStartDate: selectedOrder.jobStartDate,
+      jobEndDate: selectedOrder.jobEndDate,
       regionId: selectedOrder.regionId,
       locationId: selectedOrder.locationId,
       departmentId: selectedOrder.departmentId,
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
       duration: selectedOrder.duration,
-      jobStartDate: selectedOrder.jobStartDate,
-      jobEndDate: selectedOrder.jobEndDate,
+      
     })
     setTimeout(()=>{
       this.generalInformationForm.patchValue({

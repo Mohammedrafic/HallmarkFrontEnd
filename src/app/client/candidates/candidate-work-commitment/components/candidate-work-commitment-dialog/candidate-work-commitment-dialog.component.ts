@@ -125,7 +125,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         });
     }
   }
- 
+
   private createForm(): void {
     this.candidateWorkCommitmentForm = this.fb.group({
       id: [0],
@@ -264,7 +264,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private setDatesValidation(commitment: WorkCommitmentDetails): void {
     const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
-    this.selectWorkCommitmentStartDate = DateTimeHelper.convertDateToUtc(commitment.startDate as string);
+    this.selectWorkCommitmentStartDate = this.setWorkCommitmentStartDate();
     this.minimumDate = this.setMinimumDate();
 
     const terminationDate = this.candidateService.getTerminationDate();
@@ -640,17 +640,18 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     if (!this.lastActiveDate) {
       const employeeHireDate = this.candidateService.getEmployeeHireDate();
       const startDate = DateTimeHelper.convertDateToUtc(employeeHireDate as string);
-      const isHireDateLessWCStartDate = DateTimeHelper.isDateBefore(
-        startDate,
-        this.selectWorkCommitmentStartDate
-      );
+      const isHireDateLessWCStartDate = startDate.getTime() < this.selectWorkCommitmentStartDate.getTime();
 
       this.startDate = isHireDateLessWCStartDate ? this.todayDate : startDate;
     }
   }
 
   private setMinimumDate(): Date {
-    let minimumDate = this.selectWorkCommitmentStartDate;
+    const employeeHireDate = this.candidateService.getEmployeeHireDate();
+    const startDate = DateTimeHelper.convertDateToUtc(employeeHireDate as string);
+    const isHireDateLessWCStartDate = startDate.getTime() < this.selectWorkCommitmentStartDate.getTime();
+    let minimumDate = isHireDateLessWCStartDate ? this.selectWorkCommitmentStartDate : startDate;
+
     if (this.lastActiveDate) {
       minimumDate =
         DateTimeHelper.isDateBefore(this.lastActiveDate, this.selectWorkCommitmentStartDate)
@@ -658,5 +659,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           : this.lastActiveDate;
     }
     return minimumDate;
+  }
+
+  private setWorkCommitmentStartDate(): Date {
+    const workCommitmentsDates = this.workCommitmentGroup.items.map((item) => {
+      return DateTimeHelper.convertDateToUtc(item.startDate).getTime();
+    });
+    const theLeastDate = Math.min(...workCommitmentsDates);
+
+    return new Date(theLeastDate);
   }
 }

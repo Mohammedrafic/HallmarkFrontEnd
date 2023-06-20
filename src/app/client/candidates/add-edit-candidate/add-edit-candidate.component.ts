@@ -123,7 +123,10 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
       this.router.navigate([location.pageToBack]);
       break;
       case location.orderId && !location.isNavigateFromCandidateDetails:
-        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderManagementPagerState: location.orderManagementPagerState } });
+        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderManagementPagerState: location.orderManagementPagerState,irpActiveTab:location.irpActiveTab
+
+
+        } });
         this.globalWindow.localStorage.setItem("IsEmployeeTab", JSON.stringify(true));
         const selectedNavigation = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
         this.store.dispatch(new SelectNavigationTab(selectedNavigation?.current));

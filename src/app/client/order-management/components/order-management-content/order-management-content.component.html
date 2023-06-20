@@ -83,7 +83,7 @@
         <app-tooltip-container
           *ngIf="!isMobile && isActiveSystemIRP"
           [message]="toolTipMessage"
-          [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
+          [showToolTip]="!userPermission[userPermissions.CanCreateOrdersIRP]"
         >
           <button
             [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]"
@@ -1491,6 +1491,7 @@
 <app-order-details-dialog
   #detailsDialog
   [order]="selectedOrder"
+  [activeIRPtabs]="activeIRPTabIndex"
   [children]="selectedDataRow?.children"
   [settings]="settings"
   [openEvent]="openDetails"

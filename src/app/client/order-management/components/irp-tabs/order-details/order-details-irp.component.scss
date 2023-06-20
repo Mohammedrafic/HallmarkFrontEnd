@@ -278,7 +278,7 @@ ejs-textbox.e-control {
 
 .job-description-po-wrapper {
   display: grid;
-  align-items: start;
+  align-items: center;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: 1fr 4fr;
   gap: 16px;
@@ -336,9 +336,10 @@ ejs-textbox.e-control {
   .itm8 {
     margin-top: 15px;
 
-    @media (min-width: $tablet-max) and (max-width: 1040px),
-    (min-width: $desktop-sm-max) and (max-width: 1455px) {
-      margin-top: 32px;
+    @media
+      (min-width: $tablet-max) and (max-width: 1040px),
+      (min-width: $desktop-sm-max) and (max-width: 1455px) {
+        margin-top: 32px;
     }
   }
 }

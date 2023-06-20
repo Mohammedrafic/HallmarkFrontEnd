@@ -18,7 +18,7 @@ export class PayRateComponent extends AbstractPermissionGrid implements OnInit {
 
   public exportMap = new Subject<ExportedFileType>()
 
-  addPayRateBtnText: string = 'Add Record';
+  addPayRateBtnText: string = 'Add Pay Rate';
 
   searchQuery: string = '';
   public filteredItems$ = new Subject<number>();

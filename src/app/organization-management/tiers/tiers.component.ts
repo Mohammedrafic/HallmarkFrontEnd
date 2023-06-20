@@ -126,7 +126,7 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   public handleEditTier(tier: TierDetails): void {
     this.isEdit = true;
-    tier.workCommitments = tier.workCommitments.map((m: { workCommitmentId: any; }) => m.workCommitmentId);
+    tier.workCommitments = tier.workCommitments.map((data : { workCommitmentId: number; }) => data.workCommitmentId ? data.workCommitmentId : tier.workCommitments.join(","));
     tier.skills == 1 ? tier.skills = "1" : (tier.skills == 2 ? tier.skills = "2" : (tier.skills == 3 ? tier.skills = "3" : ""));
     this.selectedTier = {...tier};
     this.store.dispatch(new ShowSideDialog(true));
