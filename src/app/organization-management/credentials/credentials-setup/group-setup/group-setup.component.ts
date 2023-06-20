@@ -73,6 +73,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   isEdit: boolean;
   editedSkillGroupId?: number;
   isIRPAndVMSEnabled = false;
+  selectedIdsForCreatedGroup: number[];
 
   protected componentDestroy: () => Observable<unknown>;
 
@@ -111,7 +112,6 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
 
     const updatedAssignedSkills = this.allAssignedSkills.filter(s => !savedSkillIdsWithoutCurrentRow.includes(s.id));
 
-    // reassign search grid data in Edit mode
     this.searchDataSource = updatedAssignedSkills;
 
     this.isGridStateInvalid = false;
@@ -127,6 +127,8 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
         savedSkillIdsIndexes.push(updatedAssignedSkills.indexOf(foundAssignedSkill));
       }
     });
+
+    this.selectedIdsForCreatedGroup = savedSkillIds;
 
     this.groupSetupService.populateFormGroup(
       this.skillGroupsFormGroup,
@@ -310,12 +312,18 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
         const { includeInIRP, includeInVMS } = this.skillGroupsFormGroup.getRawValue();
+
         this.searchDataSource = this.groupSetupService.getSearchDataSources(
           includeInIRP,
           includeInVMS,
           this.allAssignedSkills,
           this.filteredAssignedSkills
         );
+
+        if(this.isEdit) {
+          const filteredSkills = this.getSelectedAssignedSkills();
+          this.searchDataSource = [...this.searchDataSource, ...filteredSkills];
+        }
       });
     }
   }
@@ -327,6 +335,12 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       this.currentPage = 1;
       this.dispatchNewPage();
       this.store.dispatch(new GetAssignedSkillsByOrganization());
+    });
+  }
+
+  private getSelectedAssignedSkills(): Skill[] {
+    return this.allAssignedSkills.filter((skill: Skill) => {
+      return this.selectedIdsForCreatedGroup?.includes(skill.id);
     });
   }
 
