@@ -364,14 +364,12 @@ export class CandidateState {
       return this.candidateService.getIRPMasterCredentials(searchTerm, credentialTypeId, orderId).pipe(
         tap((payload) => {
           patchState({ isCandidateLoading: false, masterCredentials: payload });
-          return payload;
         })
       );
     }
     return this.candidateService.getMasterCredentials(searchTerm, credentialTypeId, orderId).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false, masterCredentials: payload });
-        return payload;
       })
     );
   }
