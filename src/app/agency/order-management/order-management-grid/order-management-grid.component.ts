@@ -95,7 +95,8 @@ import {
 } from 'src/app/store/preserved-filters.actions';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { GetAgencyFilterFormConfig } from './constants';
-import { GetReOrdersByOrderId } from '@shared/components/order-reorders-container/store/re-order.actions';
+import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
+  '@shared/components/order-reorders-container/store/re-order.actions';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -605,9 +606,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.rowSelected(event, this.gridWithChildRow);
 
     if (rowData.orderType === this.orderTypes.OpenPerDiem) {
-      this.store.dispatch(
-        new GetReOrdersByOrderId(rowData.orderId, this.currentPage, this.pageSize, rowData.organizationId)
-      );
+      this.getReOrdersByOrderId(rowData.orderId, rowData.organizationId);
     }
 
     if (!event.isInteracted && rowData.orderId) {
@@ -1060,5 +1059,16 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private getPreservedFiltersByPageName(): void {
     this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
+  }
+
+  private getReOrdersByOrderId(orderId: number, organizationId: number): void {
+    const pageNumber = GRID_CONFIG.initialPage;
+    const pageSize = GRID_CONFIG.initialRowsPerPage;
+
+    this.store.dispatch(new GetReOrdersByOrderId(orderId, pageNumber, pageSize, organizationId))
+      .pipe(take(1))
+      .subscribe(() => {
+        this.store.dispatch(new SaveReOrderPageSettings(pageNumber, pageSize, true));
+      });
   }
 }
