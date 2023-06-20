@@ -7,3 +7,8 @@ export class GetReOrdersByOrderId {
     public organizationId?: number,
   ) { }
 }
+
+export class SaveReOrderPageSettings {
+  static readonly type = '[re-order] Set ReOrder Page Settings';
+  constructor(public pageNumber: number, public pageSize: number, public refreshPager = false) { }
+}

@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnDestroy } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
-import { debounceTime, Observable, Subject } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 
 import { AgencyOrderManagement, Order, OrderManagement, ReOrder } from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -12,20 +12,21 @@ import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enu
 import { AppState } from 'src/app/store/app.state';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementService } from
-'@client/order-management/components/order-management-content/order-management.service';
-import { UserState } from '../../../../../store/user.state';
+  '@client/order-management/components/order-management-content/order-management.service';
 import { PermissionService } from '../../../../../security/services/permission.service';
-import { CurrentUserPermission } from '@shared/models/permission.model';
-import { GetReOrdersByOrderId } from '../../store/re-order.actions';
-import { ReOrderPage } from '../../interfaces';
+import { GetReOrdersByOrderId, SaveReOrderPageSettings } from '../../store/re-order.actions';
+import { PageSettings, ReOrderPage } from '../../interfaces';
+import { TakeUntilDestroy } from '@core/decorators';
+import { ReOrderState } from '../../store/re-order.state';
 
 
+@TakeUntilDestroy
 @Component({
   selector: 'app-order-reorders-list',
   templateUrl: './order-re-orders-list.component.html',
   styleUrls: ['./order-re-orders-list.component.scss'],
 })
-export class OrderReOrdersListComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class OrderReOrdersListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() public isAgency = false;
   @Input() public order: Order | OrderManagement | AgencyOrderManagement;
   @Input() public set reOrders(value: ReOrderPage | null) {
@@ -39,14 +40,14 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
     order: Order | OrderManagement | AgencyOrderManagement;
   }>();
 
+  @Select(ReOrderState.GetReOrderPageSettings) private reorderPageSettings$: Observable<PageSettings>;
+
   public reOrdersList: ReOrder[];
   public totalCountRecords: number;
   public canCreateOrder: boolean;
 
-  @Select(UserState.currentUserPermissions)
-  public readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
-
   private pageSubject = new Subject<number>();
+  protected componentDestroy: () => Observable<unknown>;
 
   constructor(
     private store: Store,
@@ -62,14 +63,10 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
   ngOnInit() {
     this.subscribeOnPageChanges();
     this.subscribeOnPermissions();
+    this.subscribeOnPagerState();
   }
 
-  private subscribeOnPageChanges(): void {
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
-      this.currentPage = page;
-      this.getReOrdersByPageSettings();
-    });
-  }
+  ngOnDestroy(): void { /**@TakeUntilDestro**/ }
 
   public onRowsDropDownChanged(event: number): void {
     this.pageSize = event;
@@ -104,18 +101,47 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
     this.orderManagementService.getOrderById(order.id).subscribe((order) => this.editReorder.emit(order));
   }
 
+  public gridPageChanged(page: number): void {
+    this.pageSubject.next(page);
+  }
+
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions().subscribe(({ canCreateOrder }) => {
       this.canCreateOrder = canCreateOrder;
     });
   }
 
-  public gridPageChanged(page: number): void  {
-    this.pageSubject.next(page);  
+  private subscribeOnPageChanges(): void {
+    this.pageSubject
+      .pipe(
+        debounceTime(1),
+        takeUntil(this.componentDestroy())
+      ).subscribe((page) => {
+        this.currentPage = page;
+        this.saveReorderGridPageSettings();
+        this.getReOrdersByPageSettings();
+      });
   }
 
   private getReOrdersByPageSettings(): void {
     const organizationId = this.isAgency ? this.order.organizationId : undefined;
     this.store.dispatch(new GetReOrdersByOrderId(this.order.id as number, this.currentPage, this.pageSize, organizationId));
+  }
+
+  private saveReorderGridPageSettings(): void {
+    this.store.dispatch(new SaveReOrderPageSettings(this.currentPage, this.pageSize));
+  }
+
+  private subscribeOnPagerState(): void {
+    this.reorderPageSettings$
+      .pipe(
+        filter(({ refreshPager }) => refreshPager),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(({ pageNumber, pageSize }) => {
+        this.currentPage = pageNumber;
+        this.pageSize = pageSize;
+        this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+      });
   }
 }
