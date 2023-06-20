@@ -103,6 +103,7 @@ import {
   UpdateRegularRatesucceedcount,
   PerDiemReOrdersErrorMessage,
   TravelerContracttoPermOrdersSucceedMessage,
+  RECORD_DELETE,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -898,6 +899,7 @@ export class OrderManagementContentState {
   DeleteOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { id }: DeleteOrder): Observable<any> {
     return this.orderManagementService.deleteOrder(id).pipe(
       tap(() => {
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_DELETE), new DeleteOrderSucceeded()]);
         dispatch(new DeleteOrderSucceeded());
       }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Order cannot be deleted'))))
