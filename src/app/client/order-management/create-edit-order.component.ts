@@ -42,6 +42,7 @@ import {
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { createSystem, updateSystemConfig } from '@client/order-management/helpers';
 import { GetOrganizationStructure } from '../../store/user.actions';
+import { PreservedOrderService } from '@client/order-management/services/preserved-order.service';
 
 @Component({
   selector: 'app-create-edit-order',
@@ -84,6 +85,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     private changeDetection: ChangeDetectorRef,
     private confirmService: ConfirmService,
     private orderManagementService: OrderManagementService,
+    private preservedOrderService: PreservedOrderService
   ) {
     super();
     this.setPageHeader();
@@ -138,6 +140,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
       this.orderSystemConfig = [...this.orderSystemConfig];
     }
 
+    this.preservedOrderService.saveSelectedOrderSystem(this.activeSystem);
     this.changeDetection.markForCheck();
   }
 
@@ -225,14 +228,10 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
         this.selectedSystem.isIRPFlag;
 
       if( this.orderManagementSystem ) {
-        this.activeSystem =
-          this.orderManagementSystem === OrderManagementIRPSystemId.IRP ? OrderSystem.IRP : OrderSystem.VMS;
         this.orderManagementSystem = null;
-      } else {
-        this.activeSystem =
-          this.selectedSystem.isIRP && this.activeSystem === OrderSystem.IRP ? OrderSystem.IRP : OrderSystem.VMS;
       }
-
+      
+      this.activeSystem = this.route.snapshot.data['system'] ?? OrderSystem.VMS;
       this.setSubmitButtonConfig();
       this.getSkillsByActiveSystem();
       updateSystemConfig(this.orderSystemConfig, this.activeSystem);
