@@ -4,6 +4,7 @@ import {
   RowHeightParams,
   ValueFormatterParams,
   GridOptions,
+  RowClassParams,
 } from '@ag-grid-community/core';
 
 import { CandidateCommitmentGridActionRendererComponent } from './grid-action-renderer/grid-action-renderer.component';
@@ -172,6 +173,9 @@ export const getWorkCommitmentGridOptions = <T>(context: T): GridOptions => {
       }
 
       return null;
+    },
+    getRowClass: (params: RowClassParams) => {
+      return (params.data.numberOfOrganizationWorkCommitments - 1) > 0 ? '' : 'no-child-row';
     },
   };
 };
