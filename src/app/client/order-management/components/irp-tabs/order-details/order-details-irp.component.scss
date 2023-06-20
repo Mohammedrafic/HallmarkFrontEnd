@@ -2,7 +2,7 @@
 @import 'adaptive-response';
 
 @mixin description_responsive {
-  gap: 12px !important;
+  gap: 16px !important;
   grid-template-columns: repeat(4, 1fr) !important;
   grid-template-rows: 1fr 1fr !important;
   grid-template-areas:
@@ -15,11 +15,11 @@
   }
 
   .order-box {
-    margin-left: 17% !important;
+    margin-left: 17%;
   }
 
   .order-box2 {
-    margin-left: 64% !important;
+    margin-left: 64%;
   }
 }
 
@@ -411,6 +411,49 @@ ejs-textbox.e-control {
 
   .job-description-wrapper {
     @include description_responsive;
+  }
+
+  @container (max-width: 540px) {
+    .job-description-wrapper {
+      .itm3 {
+        margin-top: -32px !important;
+      }
+
+      .order-box {
+        margin-left: 30% !important;
+      }
+    
+      .order-box1 {
+        margin-left: 65% !important;
+      }
+    
+      .order-box2 {
+        margin-left: 0 !important;
+        margin-top: 60px !important;
+      }
+    
+      .order-box3 {
+        margin-left: 30% !important;
+        margin-top: 60px !important;
+      }
+    }
+
+    .job-description-po-wrapper {
+      grid-template-areas:
+      "itm1 itm1 itm2 itm2"
+      "itm3 itm4 itm5 auto"
+      "itm6 itm7 itm8 auto"
+      "itm9 itm9 itm10 itm10" !important;
+
+      .itm3,
+      .itm4,
+      .itm5,
+      .itm6,
+      .itm7,
+      .itm8 {
+        margin-top: 0px !important;
+      }
+    }
   }
 
   .job-distribution-wrapper {
