@@ -47,8 +47,17 @@
           <i-feather *ngIf="isExternal" name="eye" class="icon"></i-feather>
         </span>
       </ejs-tooltip>
-      <ejs-tooltip
+      <div *ngIf="!isAgencyUser">
+        <ejs-tooltip
         [content]="'Send'" *ngIf="canVmsCreateOrders">
+        <span class="control-wrapper send" (click)="send()">
+          <i-feather name="send" class="icon"></i-feather>
+        </span>
+      </ejs-tooltip>
+      </div>
+      
+      <ejs-tooltip
+        [content]="'Send'" *ngIf="isAgencyUser">
         <span class="control-wrapper send" (click)="send()">
           <i-feather name="send" class="icon"></i-feather>
         </span>
