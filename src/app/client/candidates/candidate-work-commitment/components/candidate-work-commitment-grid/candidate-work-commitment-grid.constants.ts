@@ -4,7 +4,7 @@ import {
   RowHeightParams,
   ValueFormatterParams,
   GridOptions,
-  RowClassParams,
+  CellClassParams,
 } from '@ag-grid-community/core';
 
 import { CandidateCommitmentGridActionRendererComponent } from './grid-action-renderer/grid-action-renderer.component';
@@ -55,7 +55,14 @@ export const CandidateWorkCommitmentColumnDef = (
     flex: 1,
     minWidth: 185,
     cellRenderer: 'agGroupCellRenderer',
-    cellClass: 'expansion-toggle-icons-order-1 color-primary-active-blue-10 font-weight-bold',
+    cellClass: (params: CellClassParams) => {
+      const hasChildRows = (params.data.numberOfOrganizationWorkCommitments - 1) > 0;
+      const expansionToggleClass = 'expansion-toggle-icons-order-1';
+      const usePrimaryColor = hasChildRows ? 'color-primary-active-blue-10' : '';
+      const boldClass = hasChildRows ? 'font-weight-bold' : '';
+
+      return `${expansionToggleClass} ${usePrimaryColor} ${boldClass}`;
+    },
   },
   {
     field: 'regions',
@@ -173,9 +180,6 @@ export const getWorkCommitmentGridOptions = <T>(context: T): GridOptions => {
       }
 
       return null;
-    },
-    getRowClass: (params: RowClassParams) => {
-      return (params.data.numberOfOrganizationWorkCommitments - 1) > 0 ? '' : 'no-child-row';
     },
   };
 };
