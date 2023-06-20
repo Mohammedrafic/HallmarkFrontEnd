@@ -25,7 +25,7 @@ export class CommentsComponent {
   @Input() useBackground = true;
   @Input() disabled = false;
   @Input() orderId: number;
-  public commentData: any;
+  public commentData: Comment[] = [];
   @Input() canVmsCreateOrders: boolean;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
@@ -182,9 +182,9 @@ export class CommentsComponent {
 
   public onFilterChange(event: SelectEventArgs): void {
     this.commentData = this.commentsList;
-    event.itemData.value === CommentsFilter.External ? this.commentData = this.commentData.filter((comments: { isExternal: boolean; isPrivate: boolean; }) => comments.isExternal === true && comments.isPrivate === false) : this.commentData;
-    event.itemData.value === CommentsFilter.Internal ? this.commentData = this.commentData.filter((comments: { isExternal: boolean; isPrivate: boolean; }) => comments.isExternal === false && comments.isPrivate === false) : this.commentData;
-    event.itemData.value === CommentsFilter.All ?  this.commentData = this.commentData.filter((comments: { isPrivate: boolean; }) => comments.isPrivate === false) : this.commentData;
+    event.itemData.value === CommentsFilter.External ? this.commentData = this.commentData.filter((comments) => comments.isExternal === true && comments.isPrivate === false) : this.commentData;
+    event.itemData.value === CommentsFilter.Internal ? this.commentData = this.commentData.filter((comments) => comments.isExternal === false && comments.isPrivate === false) : this.commentData;
+    event.itemData.value === CommentsFilter.All ?  this.commentData = this.commentData.filter((comments) => comments.isPrivate === false) : this.commentData;
     this.commentType = event.itemData.value;
     this.scroll$.next(null);
   }
