@@ -477,7 +477,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private commentsService: CommentsService,
     private readonly ngZone: NgZone,
     private preservedOrderService: PreservedOrderService,
-    
+
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -810,7 +810,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.isIncomplete = false;
 
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      let IsLTAOrders=  JSON.parse(localStorage.getItem('IsLTAOrders') || '"false"') as boolean; 
+      let IsLTAOrders=  JSON.parse(localStorage.getItem('IsLTAOrders') || '"false"') as boolean;
       if(IsLTAOrders==true){
         this.filters.candidateStatuses =  []
         this.filters.orderStatuses = []
@@ -1290,7 +1290,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         next: 0 !== selectedOrder.id,
       };
     }
-  
+
   }
 
   public navigateToOrderForm(): void {
@@ -1418,6 +1418,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   changeSystem(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
+    this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);
     this.clearFilters();
     this.store.dispatch([new PreservedFilters.ResetPageFilters(), new ClearOrders()]);
     this.getPreservedFiltersByPage();
@@ -1429,7 +1430,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.initGridColumns();
     this.getOrders();
     this.clearOrderJourneyFilters();
-    this.getProjectSpecialData()
+    this.getProjectSpecialData();
   }
 
   gridSortHandler(sortEvent: SortChangedEvent): void {
@@ -1843,11 +1844,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       this.cd$.next(true);
     });
-    
+
     this.OrderFilterFormGroup.get('projectTypeIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ProjectSpecialData) => {
-            this.filterColumns.projectNameIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP?  data.projectNames.filter((f)=>val.includes(f.projectTypeId??0) && f.includeInIRP==true):data.projectNames.filter((f)=>val.includes(f.projectTypeId??0) && f.includeInVMS==true) ;  
+            this.filterColumns.projectNameIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP?  data.projectNames.filter((f)=>val.includes(f.projectTypeId??0) && f.includeInIRP==true):data.projectNames.filter((f)=>val.includes(f.projectTypeId??0) && f.includeInVMS==true) ;
         })
 
       }else{
@@ -1870,7 +1871,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
-        }            
+        }
       }
       this.cd$.next(true);
     });
@@ -2043,8 +2044,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           ? this.threeDotsMenuOptions['moreMenuWithCloseButton']
           : this.threeDotsMenuOptions['moreMenu'];
         }
-       
-          
+
+
       } else if (this.activeSystem === OrderManagementIRPSystemId.IRP
         && order.activeCandidatesCount && order.activeCandidatesCount > 0) {
         return this.threeDotsMenuOptionsIRP['moreMenu'];
@@ -2271,7 +2272,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.canViewOrderIRP=permissions[this.userPermissions.CanOrganizationViewOrdersIRP]
       this.canEditOrderIRP=permissions[this.userPermissions.CanOrganizationEditOrdersIRP]
       this.cd$.next(true);
-    });  
+    });
   }
 
   private subscribeToCandidateJob(): void {
@@ -2340,6 +2341,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.getProjectSpecialData();
 
       this.previousSelectedSystemId = null;
+      this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);
     });
   }
 

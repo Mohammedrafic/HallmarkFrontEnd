@@ -18,7 +18,7 @@
           Weekly
         </button>
       </div>
-      <div class="app-line-chart__tooltip" *ngIf="description.length>0">
+      <div class="app-line-chart__tooltip" [ngClass]="slideBar ? 'slideTooltipMar' : ''" *ngIf="description.length>0">
         <ejs-tooltip [content]="description" position='TopCenter'>
           <span class="mytooltip">
             <i-feather name="info" id="info"

@@ -21,7 +21,7 @@
     <div class="id-container">
       <div class="dropdown-container bootstrap">
         <label>Topic<span class="required">*</span></label>
-        <ejs-dropdownlist formControlName="topic" [dataSource]="topics" [allowFiltering]="true"></ejs-dropdownlist>
+        <ejs-dropdownlist formControlName="topic" [dataSource]="topics" [allowFiltering]="true" (select)="onTopicsChange($event)"></ejs-dropdownlist>
       </div>
     </div>
   </div>

@@ -13,6 +13,7 @@ import { OrderManagementContentComponent,
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { NotificationResolver } from '@core/resolvers/notification.resolver';
+import { CreateEditOrderResolver } from '@client/order-management/resolvers/create-edit-order.resolver';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -49,6 +50,9 @@ const routes: Routes = [
       {
         path: 'order-management/add',
         component: CreateEditOrderComponent,
+        resolve: {
+          system: CreateEditOrderResolver,
+        },
         data: {
           isOrganizationArea: true,
           isEditing: false,
@@ -58,6 +62,9 @@ const routes: Routes = [
       {
         path: 'order-management/edit/:orderId',
         component: CreateEditOrderComponent,
+        resolve: {
+          system: CreateEditOrderResolver,
+        },
         data: {
           isOrganizationArea: true,
           isEditing: true,

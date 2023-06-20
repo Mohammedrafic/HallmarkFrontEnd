@@ -140,7 +140,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     ).subscribe((id) => {
       this.getOrganization(id);
     });
-    if(this.orderDetails.commentContainerId != undefined){
+    if(this.orderDetails?.commentContainerId != undefined){
     this.commentContainerId = this.orderDetails.commentContainerId;
     }
   }
