@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { map, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SpecialProjectMessages } from '../../../../../organization-management/specialproject/constants/specialprojects.constant';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { SetHeaderState, ShowDocPreviewSideDialog, ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
@@ -89,6 +89,7 @@ import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchSer
 import { User } from '../../../../../shared/models/user-managment-page.model';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 import { AgGridAngular } from '@ag-grid-community/angular';
+import { SearchComponent } from '@shared/components/search/search.component';
 
 @Component({
   selector: 'app-document-library',
@@ -164,7 +165,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public isSharedFolderClick: boolean = false;
   public totalRecordsCount: number = 0;
   @ViewChild('sharedWith') sharedWith:AgGridAngular
-
+  @ViewChild('searchDocument') search: SearchComponent;
   public gridApi!: GridApi;
   public rowData: DocumentLibraryDto[] = [];
   public rowSelection: 'single' | 'multiple' = 'multiple';
@@ -387,6 +388,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   ngAfterViewInit(): void {
     this.documentHeight = window.outerHeight - 180;
     this.documentWidth = '100%';
+    this.keywordToSearchDocument();
   }
 
   ngOnDestroy(): void {
@@ -424,6 +426,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.filterBusinessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       value && this.store.dispatch(new GetBusinessByUnitType(value));
       if (value) {
+        this.search?.clear();
         this.filterSelecetdBusinesType = value;
         if (this.filterSelecetdBusinesType == BusinessUnitType.Hallmark) {
           this.isHalmarkSelected = true;
@@ -449,6 +452,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.loadRegionsAndLocations(value);
         this.getDocumentTypes(value);
         this.getFolderTree(value);
+        this.search?.clear();
       }
     });
   }
@@ -1420,15 +1424,33 @@ public onAgencyChanges()
       });
   }
 
-  doCognitiveSearch(event: any) {
-    this.IsSearchDone = false;
-    const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
-    const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
-    const keyword = event.target.value;    
-    if (keyword.trim() != '' && (event.code == 'Enter' || event.code == 'NumpadEnter') && keyword.length >= 3) {      
-      this.IsSearchDone = true;
-      let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
-      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId, folderId));      
-    }
+  keywordToSearchDocument() {
+    this.search?.inputKeyUpEnter
+      .pipe(
+        map((event: KeyboardEvent) => (event.target as HTMLInputElement).value),
+        map((q) => q.trim()),
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((q) => {
+        this.IsSearchDone = false;
+        const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
+        const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
+        if (q.length >= 2) {
+          this.IsSearchDone = true;
+          let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
+          this.store.dispatch(new GetDocumentsByCognitiveSearch(q, businessUnitType, businessUnitId, folderId));  
+        }
+        if(q.length === 0){
+          if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
+            this.getDocuments(this.filterSelectedBusinesUnitId);
+          else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID == -1) {
+            this.isSharedFolderClick = true;
+            this.store.dispatch(new IsDeleteEmptyFolder(false));
+            this.getSharedDocuments(this.filterSelectedBusinesUnitId);
+          }
+        }
+      });
   }
 }
