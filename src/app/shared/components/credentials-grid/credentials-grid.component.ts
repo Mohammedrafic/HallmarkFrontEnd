@@ -256,7 +256,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public openAddCredentialDialog(): void {
     this.store.dispatch(new GetCredentialStatuses(this.isOrganizationSide, this.orderId || null));
-    this.store.dispatch(new GetMasterCredentials('', '', this.orderId));
+    this.store.dispatch(new GetMasterCredentials('', '', this.orderId, this.isIRP));
 
     this.store
       .dispatch(new ShowSideDialog(true))
@@ -584,7 +584,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       )
       .subscribe(() => {
         this.store.dispatch(
-          new GetMasterCredentials(this.searchTermControl?.value || '', this.credentialTypeIdControl?.value || '', this.orderId)
+          new GetMasterCredentials(
+            this.searchTermControl?.value || '',
+            this.credentialTypeIdControl?.value || '',
+            this.orderId,
+            this.isIRP,
+          )
         );
       });
   }

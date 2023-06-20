@@ -131,6 +131,19 @@ export class CandidateService {
     });
   }
 
+  public getIRPMasterCredentials(searchTerm: string, credentialTypeId: number | string,
+    orderId: number | null): Observable<Credential[]> {
+      const params = {
+        ...searchTerm ? { SearchTerm: searchTerm } : {},
+        ...credentialTypeId ? { CredentialTypeId: credentialTypeId } : {},
+        ...orderId ? { OrderId: orderId } : {},
+      };
+
+      return this.http.get<Credential[]>('/api/MasterCredentials/forIrp', {
+        params: GetQueryParams(params),
+      }); 
+    }
+
   public saveCredential(credential: CandidateCredential): Observable<CandidateCredential> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const endpoint = new Map<boolean, string>([

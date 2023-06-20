@@ -356,9 +356,18 @@ export class CandidateState {
   @Action(GetMasterCredentials)
   GetMasterCredentials(
     { patchState }: StateContext<CandidateStateModel>,
-    { searchTerm, credentialTypeId, orderId }: GetMasterCredentials
+    { searchTerm, credentialTypeId, orderId, isIRP }: GetMasterCredentials
   ): Observable<Credential[]> {
     patchState({ isCandidateLoading: true });
+
+    if (isIRP) {
+      return this.candidateService.getIRPMasterCredentials(searchTerm, credentialTypeId, orderId).pipe(
+        tap((payload) => {
+          patchState({ isCandidateLoading: false, masterCredentials: payload });
+          return payload;
+        })
+      );
+    }
     return this.candidateService.getMasterCredentials(searchTerm, credentialTypeId, orderId).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false, masterCredentials: payload });
