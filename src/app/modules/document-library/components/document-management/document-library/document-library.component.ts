@@ -1425,10 +1425,21 @@ public onAgencyChanges()
     const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
     const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
     const keyword = event.target.value;    
-    if (keyword.trim() != '' && (event.code == 'Enter' || event.code == 'NumpadEnter') && keyword.length >= 3) {      
-      this.IsSearchDone = true;
-      let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
-      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId, folderId));      
+    if (event.code == 'Enter' || event.code == 'NumpadEnter') {      
+      if(keyword.trim() != '' &&  keyword.length >= 3){
+        this.IsSearchDone = true;
+        let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
+        this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId, folderId));   
+      }
+      if(keyword.trim()  === ''){
+        if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
+          this.getDocuments(this.filterSelectedBusinesUnitId);
+        else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID == -1) {
+          this.isSharedFolderClick = true;
+          this.store.dispatch(new IsDeleteEmptyFolder(false));
+          this.getSharedDocuments(this.filterSelectedBusinesUnitId);
+        }
+      }
     }
   }
 }
