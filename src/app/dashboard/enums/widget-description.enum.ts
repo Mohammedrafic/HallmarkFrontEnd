@@ -1,5 +1,5 @@
 export enum WidgetDescriptionEnum {
-  CANDIDATES = 'Count of Active Candidates by Status',
+  CANDIDATES = 'Count of overall candidate by status',
   AGENCY_CANDIDATES = "Count of overall candidate by status",
   APPLICANTS_BY_REGION = 'Statewise Applicant Density',
   AGENCY_APPLICANTS_BY_REGION = "State wise count of the applicant's home state",
