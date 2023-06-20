@@ -194,7 +194,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup.get('regionIds')?.valueChanges
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((selectedRegionIds: number[]) => {
-        this.scheduleFilterFormGroup.get('locationIds')?.patchValue([]);
         this.filterColumns.locationIds.dataSource = selectedRegionIds?.length
           ? this.scheduleFiltersService.getSelectedLocatinOptions(this.filterStructure, selectedRegionIds)
           : [];
@@ -204,7 +203,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup.get('locationIds')?.valueChanges
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((selectedLocationIds: number[]) => {
-        this.scheduleFilterFormGroup.get('departmentsIds')?.patchValue([]);
         this.filterColumns.departmentsIds.dataSource = selectedLocationIds?.length
           ? this.scheduleFiltersService.getSelectedDepartmentOptions(this.filterStructure, selectedLocationIds)
           : [];
