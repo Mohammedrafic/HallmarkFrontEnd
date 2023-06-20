@@ -427,6 +427,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private getIRPOrderRequisition(orderRequisition: RejectReasonwithSystem[]): OrderRequisitionReason[] {
+    this.reason=[];
     if (orderRequisition.length > 0) {
       orderRequisition.forEach(element => {
         if (element.includeInIRP === true) {
