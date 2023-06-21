@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { CandidateForm } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
 import { CreateCandidateDto, UpdateCandidateDto } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
@@ -10,14 +12,16 @@ import { OrderCandidateApiService } from '@shared/components/order-candidate-lis
 import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { ApplicantStatus } from '@shared/models/order-management.model';
-import { RejectReason } from '@shared/models/reject-reason.model';
+import { RejectReason, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
+import { OrderClosureReasonType } from '@shared/enums/order-closure-reason-type.enum';
 
 @Injectable()
 export class EditIrpCandidateService {
 
 constructor(
     private formBuilder: FormBuilder,
-    private orderCandidateApiService: OrderCandidateApiService
+    private orderCandidateApiService: OrderCandidateApiService,
+    private store: Store,
   ) {}
 
   createCandidateForm(): CustomFormGroup<CandidateForm> {
@@ -78,6 +82,18 @@ constructor(
     form.get('status')?.updateValueAndValidity();
     form.get('reason')?.removeValidators(Validators.required);
     form.get('closeDate')?.removeValidators(Validators.required);
+  }
+
+  getClosureReasons(onlyCustom = false): RejectReasonwithSystem[] {
+    const reasons = this.store.selectSnapshot(RejectReasonState.closureReasonsPage)?.items || [];
+
+    if (onlyCustom) {
+      return reasons.filter((reason: RejectReasonwithSystem) => {
+        return reason.orderClosureReasonType === OrderClosureReasonType.Custom;
+      });
+    }
+
+    return reasons;
   }
 
   private getActionForStatus(
