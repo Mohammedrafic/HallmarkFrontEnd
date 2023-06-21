@@ -137,8 +137,7 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
       .pipe(
         filter(({ refreshPager }) => refreshPager),
         takeUntil(this.componentDestroy())
-      )
-      .subscribe(({ pageNumber, pageSize }) => {
+      ).subscribe(({ pageNumber, pageSize }) => {
         this.currentPage = pageNumber;
         this.pageSize = pageSize;
         this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };

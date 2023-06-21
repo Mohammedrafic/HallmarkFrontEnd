@@ -2680,11 +2680,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const pageSize = resetReOrderPager ? GRID_CONFIG.initialRowsPerPage : pageSettings.pageSize;
 
     this.store.dispatch(new GetReOrdersByOrderId(orderId, pageNumber, pageSize))
-      .pipe(take(1))
-      .subscribe(() => {
-        if (resetReOrderPager) {
-          this.store.dispatch(new SaveReOrderPageSettings(pageNumber, pageSize, true));
-        }
+      .pipe(
+        take(1),
+        filter(() => resetReOrderPager)
+      ).subscribe(() => {
+        this.store.dispatch(new SaveReOrderPageSettings(pageNumber, pageSize, true));
       });
   }
 }
