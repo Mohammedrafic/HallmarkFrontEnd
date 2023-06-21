@@ -18,7 +18,7 @@ import { CreatedCandidateStatus } from '@shared/enums/status';
 import { CredentialStorageFacadeService } from "@agency/services/credential-storage-facade.service";
 import { CandidateCredentialResponse } from "@shared/models/candidate-credential.model";
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, takeUntil, switchMap, take } from 'rxjs';
 import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
@@ -89,6 +89,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   @Select(CandidateState.candidateCredential)
   private candidateCredentialResponse$: Observable<CandidateCredentialResponse>;
+
+  @Select(CandidateState.candidateProfile)
+  private candidateProfile$: Observable<Candidate>;
 
   constructor(
     protected override store: Store,
@@ -231,7 +234,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       if(this.maskedSSN != ""){
         candidate.ssn = parseInt(this.maskedSSN);
       }
-      this.store.dispatch(new SaveCandidate(candidate));
+      this.saveCandidateProfile(candidate);
+
     } else {
       this.candidateForm.markAllAsTouched();
     }
@@ -479,5 +483,18 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   updatedSSNValue(val:string): void {
     this.maskedSSN = val;
+  }
+
+  private saveCandidateProfile(candidate: Candidate): void {
+    this.store.dispatch(new SaveCandidate(candidate))
+      .pipe(
+        take(1),
+        filter(() => !candidate.id),
+        switchMap(() => this.candidateProfile$),
+        filter((candidateProfile) => !!candidateProfile?.id)
+      )
+      .subscribe((candidateProfile) => {
+        this.getCandidateLoginSetting(candidateProfile.id as number);
+      });
   }
 }

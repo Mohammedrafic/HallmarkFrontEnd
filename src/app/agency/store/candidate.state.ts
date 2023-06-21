@@ -142,6 +142,11 @@ export class CandidateState {
     return state.orderManagementPagerState;
   }
 
+  @Selector()
+  static candidateProfile(state: CandidateStateModel): Candidate | null {
+    return state.candidate;
+  }
+
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
 
   @Action(GetCandidateById)
