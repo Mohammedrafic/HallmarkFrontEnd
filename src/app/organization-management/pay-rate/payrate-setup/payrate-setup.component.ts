@@ -153,6 +153,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   public regionSelected:any = [];
   public skillSelected:any = [];
   public locationSelected:any = [];
+  public editedData: PayRateSetup;
 
   constructor(
     private store: Store,
@@ -349,7 +350,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
             this.filterColumns.skillIds.dataSource = [];
             this.payRateFilterFormGroup.get("skillIds")?.setValue(null);
           }
-          this.store.dispatch(new GetWorkCommitmentByPage(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected));
           this.cd.markForCheck();
         });
       }
@@ -453,13 +453,13 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           this.skills = [];
           this.PayRatesFormGroup.get("skillIds")?.setValue(null);
         }
+        this.getSkills();
         this.cd.markForCheck();
       });
 
     } else {
       departmentsControl.enable();
     }
-    this.store.dispatch(new GetWorkCommitmentByPage(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected))
   }
 
   public loadData(): void {
@@ -568,11 +568,12 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.addActiveCssClass(event);
     this.isEdit = true;
     this.editRecordId = data.payRateSettingId;
+    this.editedData = data;
     this.skillsEdit = [];
-    if(!data.departmentId){
+    if(!data.departmentId && data.departmentId != null){
       this.skillsEdit = data.skills.map((x: { skillId: any; }) => x.skillId);
     } else {
-      this.skillsEdit = [data.departmentId];
+      this.skillsEdit = [];
     }
     this.store.dispatch(new GetWorkCommitmentByPage(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected))
     .subscribe((x) => {
@@ -778,6 +779,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
               this.skills = [];
               this.PayRatesFormGroup.get("skillIds")?.setValue(null);
             }
+            this.getSkills();
             this.cd.markForCheck();
           });  
         }
@@ -827,13 +829,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     } else {
       this.PayRatesFormGroup.controls['departmentIds'].setValue([data.departmentId]);
     }
-    if (data.skills.length === 0) {
-      this.PayRatesFormGroup.controls['skillIds'].setValue(null);
-    } else {
-      this.skillsEdit = [];
-      this.skillsEdit = data.skills.map((x: { skillId: any; }) => x.skillId);
-      this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
-    }
     if (data.workCommitments.length === 0) {
       this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(null);
     } else {
@@ -850,22 +845,19 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.PayRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
     this.PayRatesFormGroup.controls['payType'].setValue(data.payType);
     this.PayRatesFormGroup.controls['payRateConfigId'].setValue(data.payRateConfigId);
-
-    if(!data.locationId){
-      this.getdepartments(data);
-    }
+    this.cd.markForCheck();
   }
 
-  @OutsideZone
-  public getdepartments(data : any){
-    setTimeout(() => {
-      this.allLocationsChange({ checked: !data.locationId });
-      if (!data.departmentId) {
-        this.allDepartmentsSelected = true;
-        this.PayRatesFormGroup.controls['departmentIds'].setValue(null);
-      } else {
-        this.PayRatesFormGroup.controls['departmentIds'].setValue([data.departmentId]);
+  public getSkills(){
+      if(this.isEdit === true){
+        if (this.editedData?.skills.length === 0) {
+          this.PayRatesFormGroup.controls['skillIds'].setValue(null);
+        } else {
+          this.skillsEdit = [];
+          console.log(this.skills);
+          this.skillsEdit = this.editedData?.skills.map((x: { skillId: any; }) => x.skillId);
+          this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
+        }
       }
-    },1000);
-  }
+    }
 }
