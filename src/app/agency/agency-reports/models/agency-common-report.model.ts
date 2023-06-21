@@ -61,9 +61,10 @@ export class timesheetStatusesDto {
 export class CommonReportFilter {
   businessUnitIds: number[];
 }
-export class CommonCandidateSearchFilter {
+export class CommonAgencyCandidateSearchFilter {
   searchText: string;
   businessUnitIds: number[] | null;
+  agencyId: number;
 }
 export class SearchCandidate {
   id: number;
