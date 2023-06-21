@@ -325,7 +325,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     return this.associateAgencies$.pipe(
       tap((page: AssociateAgency[]) => {
         this.filterColumns.agencyIds.dataSource = page;
-        this.filtersForm.controls["agencyIds"].setValue(page.map(m=>m.agencyId))
+        this.filtersForm.controls["agencyIds"].setValue((page??[]).map(m=>m.agencyId))
         this.filtersForm.controls["agencyIds"].enable();
       })
     );  
