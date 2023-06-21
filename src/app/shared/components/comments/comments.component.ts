@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { GetOrderComments } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
@@ -61,6 +63,9 @@ export class CommentsComponent {
 
   @Select(CommentsState.comments)
   comments$: Observable<Comment[]>;
+
+  @Select(OrderManagementContentState.orderComments)
+  private orderComments$: Observable<Comment[]>;
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -172,13 +177,22 @@ export class CommentsComponent {
       isRead: true,
     };
     this.comments.push(comment);
-    this.commentData.push(comment);
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment));
+      this.getOrderComments();
     }
   }
+
+  private getOrderComments(): void {
+    this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
+    this.orderComments$.subscribe((comments: Comment[]) => {
+      this.comments = comments;
+      this.cd.markForCheck();
+    });
+  }
+
 
   public onFilterChange(event: SelectEventArgs): void {
     this.commentData = this.commentsList;
