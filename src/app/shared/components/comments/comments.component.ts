@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
@@ -81,7 +82,7 @@ export class CommentsComponent {
 
   private hasUnreadMessages = false;
 
-  constructor(private store: Store, private cd: ChangeDetectorRef) {
+  constructor(private store: Store, private router : Router) {
     this.commentType = CommentsFilter.All;
     this.scroll$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((messageEl: HTMLElement | null) => {
       if (messageEl) {
@@ -107,8 +108,7 @@ export class CommentsComponent {
         this.scroll$.next(null);
       }
     });
-    const user = this.store.selectSnapshot(UserState).user;
-    this.isAgencyUser = user.businessUnitType === BusinessUnitType.Agency;
+    this.isAgencyUser = this.router.url.includes('agency'); 
     if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
