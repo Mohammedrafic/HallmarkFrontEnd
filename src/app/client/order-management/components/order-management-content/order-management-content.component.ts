@@ -228,9 +228,11 @@ import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { OutsideZone } from '@core/decorators';
 import { PreservedOrderService } from '@client/order-management/services/preserved-order.service';
-import { GetReOrdersByOrderId } from '@shared/components/order-reorders-container/store/re-order.actions';
+import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
+  '@shared/components/order-reorders-container/store/re-order.actions';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
+import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
 
 @Component({
   selector: 'app-order-management-content',
@@ -1212,8 +1214,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     this.rowSelected(event, this.gridWithChildRow);
 
-    if (rowData.orderType === this.orderTypes.OpenPerDiem) {
-      this.store.dispatch(new GetReOrdersByOrderId(rowData.id, this.currentPage, this.pageSize));
+    if (rowData.orderType === this.orderTypes.OpenPerDiem ?? !!event.target) {
+      this.getReOrdersByOrderId(rowData.id, true);
     }
 
     if (!event.isInteracted) {
@@ -1679,7 +1681,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.ordersPage.items = this.ordersPage.items.filter(x => x.id == this.eliteOrderId);
           const data = this.ordersPage.items;
           this.gridWithChildRow.dataSource = data;
-          this.onRowClick({ data })
+          this.onRowClick({ data });
         }
       }
       super.setHeightForMobileGrid(this.ordersPage?.items?.length);
@@ -2015,10 +2017,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public updateGrid(reorderDialog?: boolean): void {
     this.getOrders(true);
 
-    if (reorderDialog) {
+    if (reorderDialog && this.selectedReOrder) {
       this.dispatchAgencyOrderCandidatesList(this.selectedReOrder.id, this.selectedReOrder.organizationId,
         this.selectedReOrder.irpOrderMetadata);
       this.store.dispatch(new GetOrderById(this.selectedReOrder.id, this.selectedReOrder.organizationId));
+
+      if (this.selectedOrder.orderType === this.orderTypes.OpenPerDiem) {
+        this.getReOrdersByOrderId(this.selectedOrder.id);
+      }
     }
 
     this.actions$.pipe(ofActionSuccessful(GetOrders), take(1))
@@ -2672,4 +2678,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.getOrders();
   }
 
+  private getReOrdersByOrderId(orderId: number, resetReOrderPager = false): void {
+    const pageSettings = this.store.selectSnapshot(ReOrderState.GetReOrderPageSettings);
+    const pageNumber = resetReOrderPager ? GRID_CONFIG.initialPage : pageSettings.pageNumber;
+    const pageSize = resetReOrderPager ? GRID_CONFIG.initialRowsPerPage : pageSettings.pageSize;
+
+    this.store.dispatch(new GetReOrdersByOrderId(orderId, pageNumber, pageSize))
+      .pipe(
+        take(1),
+        filter(() => resetReOrderPager)
+      ).subscribe(() => {
+        this.store.dispatch(new SaveReOrderPageSettings(pageNumber, pageSize, true));
+      });
+  }
 }
