@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, filter, forkJoin, merge, Observable, switchMap, takeUntil, tap } from 'rxjs';
-import { distinctUntilChanged, map, mergeAll, skip } from 'rxjs/operators';
+import { filter, merge, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, map, skip } from 'rxjs/operators';
 
 import { SystemType } from '@shared/enums/system-type.enum';
 import { AssignedSkillsByOrganization, Skill } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
-import { DateTimeHelper, Destroyable, isObjectsEqual } from '@core/helpers';
+import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { FieldType, FilterPageName } from '@core/enums';
 import { ChipDeleteEvent, ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { DropdownOption, PreservedFiltersByPage } from '@core/interface';
@@ -41,9 +41,7 @@ import {
 import { ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved-filters.actions';
 import { TimeMask } from '@client/order-management/components/irp-tabs/order-details/constants';
-import { FormControl, Validators } from '@angular/forms';
 import { getPreservedfilterTime, getPreservedTime, getTime } from '@shared/utils/date-time.utils';
-import { Time } from '@angular/common';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 
 @Component({
@@ -55,7 +53,6 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   @Input() public selectedCandidateId: number | undefined;
   @Input() public count: number;
-  public useGroupingFilters: boolean = true;
   @Input() public chipsData: ChipItem[];
   @Output() public updateScheduleFilter: EventEmitter<ScheduleFiltersData> = new EventEmitter<ScheduleFiltersData>();
 
@@ -64,6 +61,8 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<ScheduleFilters>>;
+
+  public useGroupingFilters = true;
 
   public filteredItems: FilteredItem[] = [];
 
@@ -314,14 +313,14 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       if(typeof(this.filters.startTime) !== 'string' && this.filters.startTime !== null){
         const start_Time : any = this.filters.startTime
         this.filters.startTime = getTime(start_Time);
-        chips.filter(data => data.groupField === 'startTime' ? data.data = [getTime(start_Time)] : data.data);  
+        chips.filter(data => data.groupField === 'startTime' ? data.data = [getTime(start_Time)] : data.data);
       } else {
         this.filters.startTime = getPreservedfilterTime(this.filters.startTime);
       }
       if(typeof(this.filters.endTime) !== 'string' && this.filters.endTime !== null){
         const end_Time : any = this.filters.endTime
         this.filters.endTime = (getTime(end_Time));
-        chips.filter(data => data.groupField === 'endTime' ? data.data = [getTime(end_Time)] : data.data);  
+        chips.filter(data => data.groupField === 'endTime' ? data.data = [getTime(end_Time)] : data.data);
       } else {
         this.filters.endTime = getPreservedfilterTime(this.filters.endTime);
       }
@@ -403,15 +402,15 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       filterStructure.skillIds =  hasPreviousState ? skillIds : [];
     }
 
-    if((event.field === ScheduleFilterFormSourceKeys.isAvailablity ) || 
+    if((event.field === ScheduleFilterFormSourceKeys.isAvailablity ) ||
        (event.field === ScheduleFilterFormSourceKeys.isUnavailablity ) ||
        (event.field === ScheduleFilterFormSourceKeys.isExcludeNotOrganized) ||
        (event.field === ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate)) {
         this.scheduleFilterFormGroup.get(event.field)?.patchValue(false);
         this.setFilters();
-    } 
+    }
 
-    if((event.field === ScheduleFilterFormSourceKeys.startTime ) || 
+    if((event.field === ScheduleFilterFormSourceKeys.startTime ) ||
        (event.field === ScheduleFilterFormSourceKeys.endTime )) {
         this.scheduleFilterFormGroup.get(event.field)?.patchValue(null);
         this.setFilters();

@@ -1,11 +1,11 @@
-import { GetDocumentsByCognitiveSearch, GetSharedDocumentInformation } from './../../../store/actions/document-library.actions';
+import { GetDocumentsByCognitiveSearch, GetSharedDocumentInformation } from '../../../store/actions/document-library.actions';
 import { CellClickedEvent, ColDef, FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { debounceTime, distinctUntilChanged, map, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
-import { SpecialProjectMessages } from '../../../../../organization-management/specialproject/constants/specialprojects.constant';
+import { debounceTime, distinctUntilChanged, map, Observable, Subject, take, takeUntil, takeWhile } from 'rxjs';
+import { SpecialProjectMessages } from '@organization-management/specialproject/constants/specialprojects.constant';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { SetHeaderState, ShowDocPreviewSideDialog, ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
 import {
@@ -71,7 +71,6 @@ import { SecurityState } from '../../../../../security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
-import { datesValidator } from '@shared/validators/date.validator';
 import { GetBusinessByUnitType } from '../../../../../security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
@@ -85,8 +84,8 @@ import {
   TextSelectionService,
   ToolbarService
 } from '@syncfusion/ej2-angular-pdfviewer';
-import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchService, TableHistoryInfo } from '@syncfusion/ej2-angular-documenteditor';
-import { User } from '../../../../../shared/models/user-managment-page.model';
+import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchService} from '@syncfusion/ej2-angular-documenteditor';
+import { User } from '@shared/models/user-managment-page.model';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 import { AgGridAngular } from '@ag-grid-community/angular';
 import { SearchComponent } from '@shared/components/search/search.component';
@@ -305,14 +304,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         }
       }
     });
-    
+
     this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe((locations: any) => {
       if(locations != null && locations.length > 0){
         const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
         if (selectedLoactions != null && selectedLoactions.length > 0) {
           let difference = locations.filter((x:any) => selectedLoactions.includes(x.id));
           if(difference.length === 0){
-            this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(null); 
+            this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(null);
           }
         }
       }else{
@@ -508,7 +507,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
         };
         this.store.dispatch(new GetLocationsByRegions(locationFilter));
-        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]); 
+        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
       }
     });
   }
@@ -534,9 +533,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       businessUnitType: busniessUnitType,
       documentId: documentId
     }
-    
+
     this.store.dispatch(new GetSharedDocumentInformation(sharedDocumentInformation));
-   
+
   }
 
   public createForm(): void {
@@ -586,25 +585,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.documentLibraryform.addControl(FormControlNames.Orgnizations, new FormControl(null, []));
     this.documentLibraryform.addControl(FormControlNames.AllOrgnizations, new FormControl(false, []));
 
-  }
-
-  private applyDateValidations() {
-    this.startDateField = this.documentLibraryform.get(FormControlNames.StartDate) as AbstractControl;
-    this.endDateField = this.documentLibraryform.get(FormControlNames.EndDate) as AbstractControl;
-    this.startDateField.valueChanges.subscribe(() => {
-      if (this.endDateField?.value != null) {
-        this.startDate = new Date(this.startDateField?.value?.toString());
-        this.endDateField.addValidators(datesValidator(this.documentLibraryform, FormControlNames.StartDate, FormControlNames.EndDate));
-        this.endDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-      }
-    });
-    this.endDateField.valueChanges.subscribe(() => {
-      if (this.startDateField?.value != null) {
-        this.startDateField.addValidators(datesValidator(this.documentLibraryform, FormControlNames.StartDate, FormControlNames.EndDate));
-        this.startDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-      }
-    });
-    this.changeDetectorRef.markForCheck();
   }
 
   public uploadToFile(file: Blob | null) {
@@ -778,7 +758,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
       if (!dataFilter || !dataFilter?.items.length) {
         this.gridApi?.showNoRowsOverlay();
-        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && dataFilter != null && !this.IsSearchDone) {          
+        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && dataFilter != null && !this.IsSearchDone) {
           this.store.dispatch(new IsDeleteEmptyFolder(true));
         }
         this.totalRecordsCount = 0;
@@ -844,7 +824,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       businessUnitType: this.filterSelecetdBusinesType,
       businessUnitId: this.filterSelectedBusinesUnitId
     }
-    
+
     this.store.dispatch(new GetDocumentPreviewDeatils(downloadFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
       if (val) {
         var data = val?.documentLibrary?.documentPreviewDetail;
@@ -1050,7 +1030,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public setRegionsOnEdit(editRegionIds: any) {
 
     if (editRegionIds.length > 0) {
-      this.regions$.subscribe((data) => {
+      this.regions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
       });
     } else {
@@ -1060,7 +1040,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public setLocationsOnEdit(editLocationIds: any) {
     if (editLocationIds.length > 0) {
-      this.locations$.subscribe((data) => {
+      this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
       });
     } else {
@@ -1075,8 +1055,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && data.id) {
           const deletedocumentFilter: DeleteDocumentsFilter = {
             documentIds: [data.id],
@@ -1102,7 +1083,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           title: DELETE_RECORD_TITLE,
           okButtonLabel: 'Delete',
           okButtonClass: 'delete-button'
-        })
+        }).pipe(take(1))
         .subscribe((confirm) => {
           if (confirm) {
             let selectedIds = selectedRows.map((item: any) => {
@@ -1148,7 +1129,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       selectedRegions.forEach((regionItem: any) => {
         let mappingLocItems: number[] = [];
         const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
-        let x = this.locations$.subscribe((data: any) => {
+        let x = this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
           if (selectedLoactions.length > 0) {
             selectedLoactions.forEach((selLocItem: any) => {
               let selectedLocation = data.filter((locItem: any) => { return locItem.id == selLocItem && locItem.regionId == regionItem });
@@ -1375,7 +1356,7 @@ public onAgencyChanges()
   public allOrgnizationsChange(event: any) {
     this.allOrgnizations=!this.allOrgnizations;
     this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
-    if (this.allOrgnizations && !this.organizationSwitch){    
+    if (this.allOrgnizations && !this.organizationSwitch){
       this.isShowSharedWith=false;
     } else if (!this.allOrgnizations && !this.organizationSwitch){
       this.isShowSharedWith=true;
@@ -1440,7 +1421,7 @@ public onAgencyChanges()
         if (q.length >= 2) {
           this.IsSearchDone = true;
           let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
-          this.store.dispatch(new GetDocumentsByCognitiveSearch(q, businessUnitType, businessUnitId, folderId));  
+          this.store.dispatch(new GetDocumentsByCognitiveSearch(q, businessUnitType, businessUnitId, folderId));
         }
         if(q.length === 0){
           if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
