@@ -177,18 +177,21 @@ export class CommentsComponent {
       isRead: true,
     };
     this.comments.push(comment);
+    this.commentData.push(comment);
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
-      this.store.dispatch(new SaveComment(comment));
-      this.getOrderComments();
+      this.store.dispatch(new SaveComment(comment)).subscribe(data => {
+        if(data.orderManagement?.orderComments){
+          this.getOrderComments();
+        }
+      });
     }
   }
 
   private getOrderComments(): void {
     this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
     this.orderComments$.subscribe((comments: Comment[]) => {
-      this.comments = comments;
       this.cd.markForCheck();
     });
   }
