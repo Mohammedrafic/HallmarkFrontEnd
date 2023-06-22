@@ -3,7 +3,7 @@ import { FormBuilder } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
-import { debounceTime, filter, Observable, Subject, takeUntil,throttleTime } from "rxjs";
+import { debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from "rxjs";
 
 import { User } from "@shared/models/user-managment-page.model";
 import { UserVisibilitySetting, UserVisibilitySettingsPage, UserVisibilityFilter } from "@shared/models/visibility-settings.model";
@@ -93,8 +93,10 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
       })
-      .pipe(filter((confirm) => !!confirm))
-      .subscribe(() => {
+      .pipe(
+        filter((confirm) => !!confirm),
+        take(1)
+        ).subscribe(() => {
         this.store.dispatch(new RemoveUserVisibilitySetting(data.id, this.userId));
       });
   }
