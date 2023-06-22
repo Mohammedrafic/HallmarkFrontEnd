@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, Inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { Actions, Select, Store } from '@ngxs/store';
 import { OrgDetailsInfoModel } from '../../models/org-details-info.model';
 import { DashboardService } from '../../services/dashboard.service';
@@ -7,16 +7,16 @@ import { LocalStorageStatus } from '@shared/enums/status';
 import { UserState } from '../../../store/user.state';
 import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
-import { Timesheets } from 'src/app/modules/timesheets/store/actions/timesheets.actions';
 import { AppState } from 'src/app/store/app.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { Observable, filter } from 'rxjs';
+import { Observable, filter, takeUntil } from 'rxjs';
 import { Organization } from '@shared/models/organization.model';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { DASHBOARD_FILTER_STATE } from '@shared/constants';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
+import { TakeUntilDestroy } from '@core/decorators';
 
 @Component({
   selector: 'app-org-widget',
@@ -24,7 +24,8 @@ import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions'
   styleUrls: ['./org-widget.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OrgWidgetComponent extends AbstractPermissionGrid  {
+@TakeUntilDestroy
+export class OrgWidgetComponent extends AbstractPermissionGrid implements OnDestroy {
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
@@ -35,12 +36,13 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
   public countzero = "Ordercountzero";
   public isAgencyUser: boolean = false;
   public isOrgUser: boolean = false;
-  public isIRPEnabledOrg: boolean = this.store.selectSnapshot(AppState.isIrpFlagEnabled);;
+  public isIRPEnabledOrg: boolean = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   private mousePosition = {
     x: 0,
     y: 0,
   };
   filterservice: any;
+  protected componentDestroy: () => Observable<unknown>;
 
   constructor(private readonly dashboardService: DashboardService,
     private actions$: Actions,
@@ -57,11 +59,10 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
       this.getOrganizagionData();
       this.isOrgUser =true
     }
- 
-
   }
 
-  
+  ngOnDestroy(): void {}
+
   public defineMousePosition($event: MouseEvent): void {
     this.mousePosition.x = $event.screenX;
     this.mousePosition.y = $event.screenY;
@@ -115,9 +116,9 @@ export class OrgWidgetComponent extends AbstractPermissionGrid  {
   private getOrganizagionData(): void {
     this.organization$
       .pipe(
-        filter(Boolean)
-      )
-      .subscribe((organization: Organization) => {
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe((organization: Organization) => {
         const isOrgUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
         this.selectedSystem = {
           isIRP: !!organization.preferences.isIRPEnabled,

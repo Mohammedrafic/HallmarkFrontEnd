@@ -3,7 +3,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -66,8 +66,10 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => confirm),
+          take(1),
+        ).subscribe(() => {
           this.closeDialog();
         });
     } else {
