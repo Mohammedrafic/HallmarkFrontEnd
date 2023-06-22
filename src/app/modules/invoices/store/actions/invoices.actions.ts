@@ -338,6 +338,7 @@ export namespace Invoices {
     constructor(
       public readonly payload: ExportPayload,
       public readonly isAgency: boolean,
+      public readonly selectedTabIndex:number
     ) {
     }
   }
