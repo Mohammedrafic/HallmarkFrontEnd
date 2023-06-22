@@ -585,7 +585,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
               candidateEmail:data.email,
               dnrComment: data.comment,
               ssn: data.ssn != null && data.ssn!=0 ?  "XXX-XX-" + this.maskedSSN.slice(-4): "",
-              dob: data.dob,
+              dob: data?.dob ? new Date(data?.dob.toString().split('T')[0]) : data.dob,
               dnrStatus: data.currentStatus == Candidatests.Block ? true : false,
             }) 
           });
