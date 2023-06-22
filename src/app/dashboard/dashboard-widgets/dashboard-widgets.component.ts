@@ -8,8 +8,10 @@ import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-com
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { WidgetDescriptionEnum } from '../enums/widget-description.enum';
 import { UserState } from 'src/app/store/user.state';
-import { Store } from '@ngxs/store';
+import { Select,Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { Observable } from 'rxjs';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-dashboard-widgets',
@@ -17,7 +19,11 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
   styleUrls: ['./dashboard-widgets.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardWidgetsComponent extends AbstractSFComponentDirective<DashboardLayoutComponent> {
+export class DashboardWidgetsComponent extends AbstractSFComponentDirective<DashboardLayoutComponent>{
+
+  @Select(AppState.isSidebarOpened)
+  isSideBarDocked$: Observable<boolean>;
+
   @Input() public isLoading: boolean;
   @Input() public panels: PanelModel[];
   @Input() public widgetsData: WidgetsDataModel | null;

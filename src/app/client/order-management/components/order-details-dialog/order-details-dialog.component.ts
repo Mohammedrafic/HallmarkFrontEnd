@@ -3,6 +3,7 @@ import isNil from 'lodash/fp/isNil';
 import {
   Component,
   EventEmitter,
+  Inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -62,13 +63,14 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { UserState } from '../../../../store/user.state';
-import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { OrderManagementIRPSystemId, OrderManagementIRPTabsIndex } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
 import { ReOrderPage } from '@shared/components/order-reorders-container/interfaces';
 import { CandidateModel } from '../add-edit-reorder/models/candidate.model';
 import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -83,6 +85,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   @Input() hasCreateEditOrderPermission: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
+  @Input() CanEditOrderBillRateIRP: boolean;
+  @Input() CanCloseOrdersIRP: boolean;
   @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() orderComments: Comment[] = [];
   @Input() isCondidateTab: boolean;
@@ -94,6 +98,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Output() selectReOrder = new EventEmitter<any>();
   @Output() updateOrders = new EventEmitter();
   @Output() editOrderPressed = new EventEmitter<number>();
+  @Input() activeIRPtabs: OrderManagementIRPTabsIndex;
 
   // TODO: Delete it when we will have re-open sidebar
   @Output() private reOpenOrderSuccess: EventEmitter<Order> = new EventEmitter<Order>();
@@ -140,6 +145,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public reOrderToEdit: Order | null;
   public reOrderDialogTitle$ = this.addEditReorderService.reOrderDialogTitle$;
   public canCreateOrder: boolean;
+  public canCreateOrderIRP: boolean;
   public canCloseOrderPermission: boolean;
   public readonly systemType = OrderManagementIRPSystemId;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
@@ -168,7 +174,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   get showApproveAndCancel(): boolean {
-    return this.order?.canApprove && !this.order?.orderOpenDate && this.order?.status === this.orderStatus.PreOpen;
+    return this.order?.canApprove && this.order?.status === this.orderStatus.PreOpen && (!this.order?.orderOpenDate || this.order?.extensionFromId != null);
   }
 
   get showLockOrder(): boolean {
@@ -243,7 +249,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     private orderManagementService: OrderManagementService,
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
-    private actions$: Actions
+    private actions$: Actions,
+    @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {}
 
   ngOnInit(): void {
@@ -263,9 +270,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       if (this.chipList) {
         const status = this.order.irpOrderMetadata ? this.order.irpOrderMetadata.statusText : this.order.statusText;
         this.chipList.cssClass = this.chipsCssClass.transform(status);
-        this.chipList.text = status.toUpperCase();
+        this.chipList.text = status?(status).toUpperCase():"";
       }
     }
+
   }
 
   ngOnDestroy(): void {
@@ -334,8 +342,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      })
-      .subscribe((isConfirm: boolean) => {
+      }).pipe(
+      takeUntil(this.unsubscribe$)
+      ).subscribe((isConfirm: boolean) => {
         if (isConfirm) {
           this.store.dispatch(new DeleteOrder(id));
         }
@@ -351,7 +360,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       cancelButtonLabel: 'No',
     };
 
-    this.confirmService.confirm(CANCEL_ORDER_CONFIRM_TEXT, options).subscribe((isConfirm: boolean) => {
+    this.confirmService.confirm(CANCEL_ORDER_CONFIRM_TEXT, options).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((isConfirm: boolean) => {
       if (isConfirm) {
         this.store.dispatch(new DeleteOrder(id));
       }
@@ -402,8 +413,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          takeUntil(this.unsubscribe$)
+        ).subscribe(() => {
           this.closeReOrderEmitter.emit();
           this.reOrderToEdit = null;
           this.store.dispatch(new ShowSideDialog(false));
@@ -437,7 +450,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public onClose(): void {
     if (this.extensionCandidateComponent?.form.dirty) {
-      this.saveExtensionChanges().subscribe(() => {
+      this.saveExtensionChanges().pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {
         this.closeSideDialog();
       });
     } else {
@@ -510,6 +525,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     if(this.isCondidateTab==true){
       this.tab.select(1);
     }
+    setTimeout(()=>{
+      let IsEmployeeTab=  JSON.parse(localStorage.getItem('IsEmployeeTab') || '"true"') as boolean;
+      if(IsEmployeeTab){
+        this.tab.select(1);
+        this.globalWindow.localStorage.setItem("IsEmployeeTab",JSON.stringify(""));
+      }
+    },1000)
   }
 
   public subsToTabChange(): void {
@@ -575,9 +597,12 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder }) => {
+    this.permissionService.getPermissions().pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(({ canCreateOrder, canCloseOrder,canCreateOrderIRP }) => {
       this.canCloseOrderPermission = canCloseOrder;
       this.canCreateOrder = canCreateOrder;
+      this.canCreateOrderIRP=canCreateOrderIRP;
     });
   }
 

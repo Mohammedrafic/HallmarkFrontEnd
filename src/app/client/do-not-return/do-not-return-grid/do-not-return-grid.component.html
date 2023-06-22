@@ -143,7 +143,7 @@
 
     <div class="input-container">      
       <app-datepicker
-          [formGroupInstance]="doNotReturnFormGroup" [max]="today"  id="dob" controlName="dob" label="Date of Birth" 
+          [formGroupInstance]="doNotReturnFormGroup" [max]="today"  id="dob" controlName="dob" label="Date of Birth"  (blur)='onDOBBlur($event)'
           [enabled]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? true : false : (isEdit && isBlock) ? true : false"></app-datepicker>
     </div>
     <div class="d-flex">

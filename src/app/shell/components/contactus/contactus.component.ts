@@ -66,7 +66,14 @@ export class ContactusComponent implements OnInit,AfterViewInit {
     this.getDropElement();
   }
 
+  onTopicsChange(event:any){
+    if(event != null && event != undefined){
+      this.ContactFormGroup.controls['topic'].markAsTouched();
+    }
+  }
+
   public browse(): void {
+    this.ContactFormGroup.markAsUntouched();
     document
       .getElementById('contact-attachment-files')
       ?.getElementsByClassName('e-file-select-wrap')[0]
@@ -82,6 +89,7 @@ export class ContactusComponent implements OnInit,AfterViewInit {
       this.files = [];
       this.file = event.filesData[0];
       this.files.push(this.file.rawFile);
+      this.ContactFormGroup.controls['file']?.setErrors(null);
     }
   }
 
@@ -90,10 +98,11 @@ export class ContactusComponent implements OnInit,AfterViewInit {
     this.uploadObj.clearAll();
     this.file = null;
     this.files = [];
+    this.ContactFormGroup.controls['file']?.setErrors(null);
   }
 
   public saveContactUsForm() {
-    if (this.ContactFormGroup.controls['topic'].valid) {
+    if (this.ContactFormGroup.valid) {
       const contactUs: ContactUs =
       {
         fromMail: this.ContactFormGroup.controls['email'].value,
@@ -108,6 +117,8 @@ export class ContactusComponent implements OnInit,AfterViewInit {
         this.resetForm();
         this.store.dispatch(new ShowCustomSideDialog(false));
       });
+    }else{
+      this.ContactFormGroup.markAllAsTouched();
     }
   }
 
@@ -125,6 +136,7 @@ export class ContactusComponent implements OnInit,AfterViewInit {
             ? 'The file exceeds the limitation, max allowed 2 MB.'
             : 'The file should be in pdf, doc, docx, jpg, jpeg, png format.';
       }
+      this.ContactFormGroup.controls['file']?.setErrors({'incorrect': true});
       this.cd.markForCheck();
     });
   }
@@ -134,6 +146,7 @@ export class ContactusComponent implements OnInit,AfterViewInit {
     this.ContactFormGroup.controls['topic'].setValue(null);
     this.ContactFormGroup.controls['file'].setValue(null);
     this.clearFiles();
+    this.ContactFormGroup.markAsUntouched();
     this.cd.markForCheck();
   }
 

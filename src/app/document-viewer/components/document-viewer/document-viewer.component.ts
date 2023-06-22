@@ -89,7 +89,9 @@ export class DocumentViewerComponent implements OnInit, OnDestroy, AfterContentI
     this.subscribeOnFileLoaded();
     this.subscribeOnGroupedCandidateCredentialsFiles();
 
-    this.pageSelection.valueChanges.subscribe((x) => {
+    this.pageSelection.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((x) => {
       this.page = x;
     });
 

@@ -87,7 +87,7 @@ export namespace DoNotReturn {
 
   export class GetDoNotReturnImportErrors {
     static readonly type = '[donotreturn] Get DNR Import Errors';
-    constructor(public payload: any) {}
+    constructor(public errorpayload: any) {}
   }
   
   export class GetDoNotReturnImportErrorsSucceeded {

@@ -119,6 +119,7 @@ import { PreservedOrderService } from './order-management/services/preserved-ord
 import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
 import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
 import { ImportDnrComponent } from './do-not-return/import-dnr/import-dnr.component';
+import { CreateEditOrderResolver } from '@client/order-management/resolvers/create-edit-order.resolver';
 
 
 const gridIcons = {
@@ -262,6 +263,7 @@ const gridIcons = {
     DonotreturnService,
     DoNotReturnFormService,
     PreservedOrderService,
+    CreateEditOrderResolver,
   ],
 })
 export class ClientModule {}

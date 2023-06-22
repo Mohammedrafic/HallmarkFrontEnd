@@ -9,6 +9,7 @@ import { ChipItem } from '@shared/components/inline-chips';
 import { ScheduleFilterFormSourceKeys } from '../constants';
 import { ScheduleOrderType, ScheduleType } from '../enums';
 import { IrpOrderType } from '@shared/enums/order-type';
+import { Time } from '@angular/common';
 
 export interface ScheduleDay {
   id: number;
@@ -172,6 +173,12 @@ export interface ScheduleFilters {
   locationIds?: number[];
   departmentsIds?: number[];
   skillIds?: number[];
+  isAvailablity?: boolean;
+  isUnavailablity?: boolean;
+  isOnlySchedulatedCandidate?: boolean;
+  isExcludeNotOrganized?: boolean;
+  startTime? : Time | String | null;
+  endTime? : Time | String | null;
   pageNumber?: number;
   pageSize?: number;
 }
@@ -181,6 +188,12 @@ export interface ScheduleFiltersConfig {
   [ScheduleFilterFormSourceKeys.Locations]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.Departments]: ScheduleFilterItem;
   [ScheduleFilterFormSourceKeys.Skills]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isAvailablity]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isUnavailablity]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.startTime]: ScheduleFilterItem;
+  [ScheduleFilterFormSourceKeys.endTime]: ScheduleFilterItem;
 }
 
 export interface ScheduleFilterFormFieldConfig {
@@ -214,6 +227,11 @@ export interface EmployeesFilters {
   endDate: string | Date;
   departmentsIds: number[];
   userLocalTime: string;
+  isOnlySchedulatedCandidate: boolean;
+  isAvailablity: boolean;
+  isUnavailablity: boolean;
+  startTime: Time | String | null;
+  endTime: Time | String | null;
 }
 
 export interface DatesByWeekday {
@@ -264,8 +282,40 @@ export interface RemovedSlot {
   candidate: ScheduleCandidate;
 }
 
-
 export interface DateRangeOption {
   dateText: string;
   noBorder: boolean;
+}
+
+export interface ChipsFilterStructure {
+  regionIds: number[];
+  locationIds: number[];
+  departmentsIds: number[];
+  skillIds: number[];
+}
+
+export interface ChipsInitialState {
+  regions: OrganizationLocation[];
+  locations: OrganizationDepartment[];
+  departments: OrganizationDepartment[];
+}
+
+export interface ChipSettings {
+  editedChips: boolean;
+  preservedChipsSkills: number[];
+}
+
+export interface RegionChipsStructureState {
+  regionIds: number[];
+  regions: OrganizationLocation[];
+}
+
+export interface LocationChipsStructureState {
+  locationIds: number[];
+  locations: OrganizationDepartment[];
+}
+
+export interface DepartmentChipsStructureState {
+  departmentIds: number[];
+  departments: OrganizationDepartment[];
 }

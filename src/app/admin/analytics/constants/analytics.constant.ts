@@ -29,6 +29,9 @@ export const analyticsConstants = {
 
     BeginStartDate: 'beginStartDate',
     EndStartDate: 'endStartDate',
+    jobId: 'jobId',
+    jobStatuses: 'jobStatuses'
+
   }
 }
 
@@ -169,6 +172,18 @@ export const GeneralCommentReportConstants = {
   }
 }
 
+export const predictedcontractlaborspentConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    SkillCategoryIds: 'skillCategoryIds',
+    SkillIds: 'skillIds',
+    StartDate: 'startDate',
+    EndDate: 'endDate'
+  }
+}
 export const grantReportConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',

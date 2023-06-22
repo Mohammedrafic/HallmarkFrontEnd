@@ -38,6 +38,8 @@ export type FilterColumnsModel = {
   applicantStatuses : FilterColumn;
   locationIds:FilterColumn;
   departmentIds:FilterColumn;
+  candidateNames:FilterColumn
+  agencyIds:FilterColumn
 };
 
 export type FiltersModal = {
@@ -50,6 +52,9 @@ export type FiltersModal = {
   locationIds?: Array<number>;
   departmentIds?: Array<number>;
   applicantStatuses?: Array<number>;
+  candidateNames?:number
+  agencyIds?: Array<number>;
+  orderID?:string;
 };
 
 export interface FiltersPageModal extends FiltersModal {

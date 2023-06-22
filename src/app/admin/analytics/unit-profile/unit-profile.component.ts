@@ -1,5 +1,5 @@
 import { EmitType } from '@syncfusion/ej2-base';
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, Inject, ViewChild, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ClearLogiReportState } from '@organization-management/store/logi-report.action';
@@ -35,7 +35,7 @@ import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
   styleUrls: ['./unit-profile.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UnitProfileComponent implements OnInit {
+export class UnitProfileComponent implements OnInit, OnDestroy {
   public user: User | null;
   public filterColumns: any;
   private agencyOrganizationId: number;
@@ -205,12 +205,12 @@ export class UnitProfileComponent implements OnInit {
             regionsList.push(...value.regions);
             locationsList = regionsList
               .map((obj) => {
-                return obj.locations.filter((location) => location.regionId === obj.id);
+                return obj.locations.filter((location) => location.regionId === obj.id && this.checkInactiveDate(location.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
             departmentsList = locationsList
               .map((obj) => {
-                return obj.departments.filter((department) => department.locationId === obj.id);
+                return obj.departments.filter((department) => department.locationId === obj.id && this.checkInactiveDate(department.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
           });
@@ -243,6 +243,16 @@ export class UnitProfileComponent implements OnInit {
       }
       this.SearchReport();
     });
+  }
+
+  checkInactiveDate(dateStr?:string) : boolean {
+    if(dateStr == null || dateStr == undefined) return true;
+    
+    var date = new Date(dateStr);
+    var today = new Date();
+    if(date < today) return false;
+
+    return true;
   }
 
   public showToastMessage(regionsLength: number, locationsLength: number, departmentsLength: number) {
@@ -301,9 +311,8 @@ export class UnitProfileComponent implements OnInit {
   private initForm(): void {
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.unitProfileReportForm = this.formBuilder.group({
@@ -322,9 +331,8 @@ export class UnitProfileComponent implements OnInit {
     this.isClearAll = true;
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.unitProfileReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
@@ -408,5 +416,11 @@ export class UnitProfileComponent implements OnInit {
     var today = new Date(Date.now());
     var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
     return lastWeek;
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();  
+    this.isAlive = false;  
   }
 }

@@ -95,7 +95,8 @@ import {
 } from 'src/app/store/preserved-filters.actions';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { GetAgencyFilterFormConfig } from './constants';
-import { GetReOrdersByOrderId } from '@shared/components/order-reorders-container/store/re-order.actions';
+import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
+  '@shared/components/order-reorders-container/store/re-order.actions';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -408,7 +409,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     const preservedFiltes = this.store.selectSnapshot(
       PreservedFiltersState.preservedFiltersByPageName
     ) as PreservedFiltersByPage<AgencyOrderFilters>;
-      
+
     if (!preservedFiltes.isNotPreserved) {
       const { state } = preservedFiltes;
       const orderStatuses = Array.isArray(state.orderStatuses) ? [...state.orderStatuses] : [];
@@ -467,7 +468,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     if(this.Organizations.length > 0){
       this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
       this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
-    } 
+    }
     if (setDefaultFilters) {
       let Status = [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
@@ -605,9 +606,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.rowSelected(event, this.gridWithChildRow);
 
     if (rowData.orderType === this.orderTypes.OpenPerDiem) {
-      this.store.dispatch(
-        new GetReOrdersByOrderId(rowData.orderId, this.currentPage, this.pageSize, rowData.organizationId)
-      );
+      this.getReOrdersByOrderId(rowData.orderId, rowData.organizationId);
     }
 
     if (!event.isInteracted && rowData.orderId) {
@@ -793,6 +792,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       projectTypeIds: this.filters.projectTypeIds || null,
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
+      shift:this.filters.shift || null,
+
     });
 
     if(!prepopulate) {
@@ -974,8 +975,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       )
       .subscribe(() => {
         this.store
-          .dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters))
-          .subscribe((data) => {
+          .dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters)).pipe(
+          takeWhile(() => this.isAlive)
+        ).subscribe((data) => {
             const order = data.agencyOrders.ordersPage.items.find(
               (item: AgencyOrderManagement) => item.orderId === this.selectedOrder.orderId
             );
@@ -1004,7 +1006,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private subscribeOnPageChanges(): void {
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
+    this.pageSubject.pipe(debounceTime(1),takeUntil(this.unsubscribe$)).subscribe((page: number) => {
       this.currentPage = page;
       this.dispatchNewPage();
     });
@@ -1058,5 +1060,16 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private getPreservedFiltersByPageName(): void {
     this.store.dispatch(new GetPreservedFiltersByPage(this.getPageName()));
+  }
+
+  private getReOrdersByOrderId(orderId: number, organizationId: number): void {
+    const pageNumber = GRID_CONFIG.initialPage;
+    const pageSize = GRID_CONFIG.initialRowsPerPage;
+
+    this.store.dispatch(new GetReOrdersByOrderId(orderId, pageNumber, pageSize, organizationId))
+      .pipe(take(1))
+      .subscribe(() => {
+        this.store.dispatch(new SaveReOrderPageSettings(pageNumber, pageSize, true));
+      });
   }
 }

@@ -9,6 +9,7 @@ import {
   NgZone,
   Inject,
   ViewChild,
+  OnDestroy,
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -55,7 +56,7 @@ import {
   styleUrls: ['./staff-schedule-by-shift.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StaffScheduleByShiftComponent implements OnInit {
+export class StaffScheduleByShiftComponent implements OnInit, OnDestroy {
   public baseUrl: string = '';
   public user: User | null;
   public filterColumns: any;
@@ -256,9 +257,8 @@ export class StaffScheduleByShiftComponent implements OnInit {
   private initForm(): void {
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.staffScheduleReportForm = this.formBuilder.group({
@@ -457,9 +457,8 @@ export class StaffScheduleByShiftComponent implements OnInit {
     this.isClearAll = true;
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.staffScheduleReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
@@ -589,6 +588,11 @@ export class StaffScheduleByShiftComponent implements OnInit {
         e.updateData(this.candidateFilterData);
       });
     }
+  }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();  
+    this.isAlive = false;  
   }
 }
 

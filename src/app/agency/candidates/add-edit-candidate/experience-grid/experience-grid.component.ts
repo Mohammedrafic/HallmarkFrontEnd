@@ -1,9 +1,9 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ChangedEventArgs, DatePickerComponent, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { delay, filter, Observable } from 'rxjs';
+import { delay, filter, Observable, takeUntil } from 'rxjs';
 
 import {
   GetExperienceByCandidateId,
@@ -26,6 +26,7 @@ import { ShowSideDialog } from 'src/app/store/app.actions';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { DateTimeHelper } from '@core/helpers';
+import { TakeUntilDestroy } from '@core/decorators';
 
 @Component({
   selector: 'app-experience-grid',
@@ -33,7 +34,8 @@ import { DateTimeHelper } from '@core/helpers';
   styleUrls: ['./experience-grid.component.scss'],
   providers: [MaskedDateTimeService],
 })
-export class ExperienceGridComponent extends AbstractGridConfigurationComponent implements OnInit {
+@TakeUntilDestroy
+export class ExperienceGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() readonlyMode = false;
   @Input() areAgencyActionsAllowed: boolean;
   @Input() userPermission: Permission;
@@ -50,6 +52,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
   public readonly userPermissions = UserPermissions;
 
   private today = new Date();
+  protected componentDestroy: () => Observable<unknown>;
 
   constructor(
     private store: Store,
@@ -64,15 +67,23 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     this.store.dispatch(new GetExperienceByCandidateId());
     this.createExperienceForm();
 
-    this.actions$.pipe(ofActionSuccessful(SaveExperienceSucceeded)).subscribe(() => {
+    this.actions$.pipe(
+      ofActionSuccessful(SaveExperienceSucceeded),
+      takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
       this.store.dispatch(new GetExperienceByCandidateId());
       this.experienceForm.markAsPristine();
       this.closeDialog();
     });
-    this.actions$.pipe(ofActionSuccessful(RemoveExperienceSucceeded)).subscribe(() => {
+    this.actions$.pipe(
+      ofActionSuccessful(RemoveExperienceSucceeded),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
       this.store.dispatch(new GetExperienceByCandidateId());
     });
   }
+
+  ngOnDestroy(): void {}
 
   public dataBound(): void {
     this.grid.autoFitColumns();
@@ -111,8 +122,10 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm) => !!confirm))
-      .subscribe(() => {
+      .pipe(
+        filter((confirm) => !!confirm),
+        takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
         this.store.dispatch(new RemoveExperience(data));
       });
   }
@@ -132,8 +145,10 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          takeUntil(this.componentDestroy())
+        ).subscribe(() => {
           this.closeSideDialog();
         });
     } else {
@@ -167,7 +182,9 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
   private closeSideDialog(): void {
     this.store
       .dispatch(new ShowSideDialog(false))
-      .pipe(delay(500))
+      .pipe(
+        delay(500),
+        takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.experienceForm.reset();
         this.experienceForm.enable();

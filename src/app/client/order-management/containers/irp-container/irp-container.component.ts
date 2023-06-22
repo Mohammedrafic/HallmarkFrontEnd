@@ -1,17 +1,29 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges, TrackByFunction } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  TrackByFunction,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 
-import { filter, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
-import { Actions, ofActionDispatched, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
+import { OrderCandidatesCredentialsState } from '@order-credentials/store/credentials.state';
 import { IrpTabConfig } from '@client/order-management/containers/irp-container/irp-container.constant';
 import { IrpTabs } from '@client/order-management/enums';
 import { ListOfKeyForms, SelectSystem, TabsConfig } from '@client/order-management/interfaces';
 import { Destroyable } from '@core/helpers';
 import { OrderCredentialsService } from "@client/order-management/services";
-import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
+import {
+  IrpContainerStateService,
+} from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import {
   createOrderDTO,
   getControlsList,
@@ -20,16 +32,18 @@ import {
   isFormsValid,
   isFormTouched,
   showInvalidFormControl,
-  showMessageForInvalidCredentials,
 } from '@client/order-management/helpers';
 import { SaveIrpOrder, EditIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { CreateOrderDto, Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from "@order-credentials/types";
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED } from '@shared/constants';
+import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED, INACTIVE_MESSAGE, INACTIVEDATE, INACTIVEDATE_DEPARTMENT } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrderType } from '@shared/enums/order-type';
+import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
+import { DatePipe } from '@angular/common';
+import { OrganizationStructureService } from '@shared/services/organization-structure.service';
 
 @Component({
   selector: 'app-irp-container',
@@ -42,11 +56,13 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   @Input() public selectedOrder: Order;
   @Input() selectedSystem: SelectSystem;
 
-  public tabsConfig: TabsConfig[] = IrpTabConfig(true);
+  @Select(OrderCandidatesCredentialsState.predefinedCredentials)
+  predefinedCredentials$: Observable<IOrderCredentialItem[]>;
+
+  public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
   public orderCredentials: IOrderCredentialItem[] = [];
-
-  private selectedOrderType: OrderType;
+  public dates : string;
   private isCredentialsChanged = false;
 
   constructor(
@@ -55,7 +71,11 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private store: Store,
     private actions$: Actions,
     private router: Router,
+    private cdr: ChangeDetectorRef,
     private confirmService: ConfirmService,
+    private irpContainerApiService: IrpContainerApiService,
+    private organizationStructureService: OrganizationStructureService,
+    private datePipe: DatePipe,
   ) {
     super();
   }
@@ -63,12 +83,12 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   ngOnInit(): void {
     this.watchForSaveEvents();
     this.watchForSucceededSaveOrder();
+    this.watchForPredefinedCredentials();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedOrder']?.currentValue) {
-      this.tabsConfig = IrpTabConfig(this.selectedOrder.orderType !== OrderType.ReOrder);
-      this.orderCredentials = [...this.selectedOrder.credentials];
+      this.orderCredentials = [...this.selectedOrder.credentials ?? []];
     }
   }
 
@@ -82,11 +102,6 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public deleteOrderCredential(credential: IOrderCredentialItem): void {
     this.isCredentialsChanged = true;
     this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
-  }
-
-  public changeTabConfig(orderType: OrderType): void {
-    this.tabsConfig = IrpTabConfig(orderType !== OrderType.ReOrder);
-    this.selectedOrderType = orderType;
   }
 
   public isOrderTouched(): boolean {
@@ -114,8 +129,8 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       const formState = this.irpStateService.getFormState();
       const formGroupList = getFormsList(formState);
 
-      if(isFormsValid(formGroupList)) {
-        this.saveValidOrder(saveType, formState);
+      if (isFormsValid(formGroupList)) {
+        this.saveOrder(formState, saveType);
       } else {
         showInvalidFormControl(getControlsList(formGroupList));
         formGroupList.forEach((form: FormGroup) => {
@@ -125,44 +140,62 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     });
   }
 
-  private saveValidOrder(saveType: MenuEventArgs | void, formState: ListOfKeyForms): void {
-    if(saveType) {
-      //Todo: add condition, when will be implement save for Template
-      this.saveOrder(formState, saveType);
-    } else {
-      this.checkIsCredentialsValid(formState);
-    }
-  }
-
-  private checkIsCredentialsValid(formState: ListOfKeyForms): void {
-    const credentialsValid = this.orderCredentials?.length || this.selectedOrder?.orderType === OrderType.ReOrder
-    || this.selectedOrderType === OrderType.ReOrder;
-
-    if(credentialsValid) {
-      this.saveOrder(formState);
-    } else {
-      showMessageForInvalidCredentials();
-    }
-  }
-
-  private saveOrder(formState: ListOfKeyForms, saveType?: MenuEventArgs): void {
-    const createdOrder = {
+  private saveOrder(formState: ListOfKeyForms, saveType: MenuEventArgs | void): void {
+    let createdOrder = {
       ...createOrderDTO(formState, this.orderCredentials),
       contactDetails: getValuesFromList(formState.contactDetailsList),
       workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
       isSubmit: !saveType,
     };
 
-   if(this.selectedOrder) {
+   if (this.selectedOrder) {
      this.showRevokeMessageForEditOrder(createdOrder);
     } else {
-      this.store.dispatch(new SaveIrpOrder(createdOrder,this.irpStateService.getDocuments()));
+      let regionid = createdOrder.regionId;
+      let locationid = createdOrder.locationId;
+      let jobstartdate = createdOrder.jobStartDate
+        ? createdOrder.jobStartDate
+        : createdOrder.jobDates[createdOrder.jobDates.length - 1];
+      let departmentID = createdOrder.departmentId;
+      const location = this.organizationStructureService.getLocation(regionid,locationid)
+      const locations = this.organizationStructureService.getLocationsByInactive(regionid, jobstartdate, locationid);
+      const departments = this.organizationStructureService.getDepartmentByInactive(locationid,jobstartdate,departmentID);
+      let reactivateDate = createdOrder.jobDates ? createdOrder.jobDates : null;
+ 
+      if (locations.isInActivate || location.isInActivate || departments.isInActivate) {
+        if (createdOrder.jobDates) {
+    
+     createdOrder.jobDates= createdOrder.jobDates.filter((f: Date) =>
+       (new Date(f).toLocaleDateString() < new Date(location.inActiveDate??'').toLocaleDateString()
+         || new Date(f).toLocaleDateString()>= new Date(location.reActiveDate??'').toLocaleDateString()));
+ 
+         reactivateDate = reactivateDate.filter((f: any) => {
+            return new Date(f).toLocaleDateString() >= new Date(location.inActiveDate ?? '').toLocaleDateString() && location.reActiveDate ? new Date(f).toLocaleDateString()<= new Date(location.reActiveDate??'').toLocaleDateString() : location.reActiveDate==null
+          });
+          this.dates = reactivateDate
+            .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
+            .join(', ');
+        }
+        let dates = createdOrder.jobDates ? this.datePipe.transform(location.inActiveDate,'MM/dd/yyyy') : this.datePipe.transform(locations.inActiveDate, 'MM/dd/yyyy');
+        this.confirmService
+          .confirm(departments.isInActivate? INACTIVEDATE_DEPARTMENT : INACTIVEDATE + dates + INACTIVE_MESSAGE, {
+            title: 'Confirm',
+            okButtonLabel: 'Yes',
+            okButtonClass: '',
+          })
+          .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+          .subscribe(() => {
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+          });
+      } else {
+        this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments()));
+      }
     }
   }
 
   private showRevokeMessageForEditOrder(order: CreateOrderDto): void {
     const isExternalLogicInclude = this.irpStateService.getIncludedExternalLogic(order);
-    if(!isExternalLogicInclude && !this.selectedOrder.canRevoke) {
+    if (!isExternalLogicInclude && !this.selectedOrder.canRevoke) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_REVOKED));
     } else if(!isExternalLogicInclude && !this.selectedOrder.canProceedRevoke) {
       this.confirmService
@@ -172,9 +205,30 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           okButtonClass: '',
         }).pipe(
         filter(Boolean),
-        takeUntil(this.componentDestroy())
-      ).subscribe(() => {
-        this.saveEditedOrder(order);
+        switchMap(() => {
+          return this.irpContainerApiService.checkLinkedSchedules(this.selectedOrder.id);
+        }),
+        switchMap(({doesOrderHaveLinkedSchedules}) => {
+          return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
+        }),
+        take(1)
+      ).subscribe((value: boolean | null) => {
+        this.saveEditOrderWithLinkedSchedules(value, order);
+      });
+    } else {
+      this.saveEditOrderWithoutRevoke(order);
+    }
+  }
+
+  private saveEditOrderWithoutRevoke(order: CreateOrderDto): void {
+    if (this.selectedOrder.orderType === OrderType.Traveler) {
+      this.irpContainerApiService.checkLinkedSchedules(this.selectedOrder.id).pipe(
+        switchMap(({doesOrderHaveLinkedSchedules}) => {
+          return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
+        }),
+        take(1),
+      ).subscribe((value: boolean | null) => {
+        this.saveEditOrderWithLinkedSchedules(value, order);
       });
     } else {
       this.saveEditedOrder(order);
@@ -187,5 +241,32 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       id: this.selectedOrder.id,
       deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
     },this.irpStateService.getDocuments()));
+  }
+
+  private watchForPredefinedCredentials(): void {
+    this.predefinedCredentials$
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
+        this.orderCredentials = predefinedCredentials;
+        this.cdr.markForCheck();
+      });
+  }
+
+  private saveEditOrderWithLinkedSchedules(value: boolean | null, order: CreateOrderDto): void {
+    if (value !== null) {
+      order.removeLinkedSchedulesFromLta = value;
+    }
+
+    this.saveEditedOrder(order);
+  }
+
+  private checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules: boolean): Observable<boolean | null> {
+    if (doesOrderHaveLinkedSchedules) {
+      return this.irpStateService.showScheduleBookingModal();
+    }
+
+    return of(null);
   }
 }

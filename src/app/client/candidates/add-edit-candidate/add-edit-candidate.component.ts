@@ -1,8 +1,9 @@
-import { 
+import {
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  Inject,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -21,7 +22,15 @@ import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { UserState } from 'src/app/store/user.state';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
+import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
+import { SelectNavigation } from '@shared/components/candidate-details/store/candidate.actions';
+import { OrderManagementPagerState } from '@shared/models/candidate.model';
 
+import { Location } from "@angular/common";
+
+import { GlobalWindow } from "@core/tokens";
 @Component({
   selector: 'app-add-edit-candidate',
   templateUrl: './add-edit-candidate.component.html',
@@ -38,6 +47,7 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   public readonly userPermissions = UserPermissions;
   public showButtons = true;
   public title: DialogMode;
+  public titlevalue: string;
   public candidateName$ = this.candidatesService.getCandidateName();
 
   constructor(
@@ -47,6 +57,8 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private store: Store,
+     private location:Location,
+    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Employees', iconName: 'users' }));
@@ -60,8 +72,23 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
     if (this.route.snapshot.paramMap.get('id')) {
       this.candidateProfileFormService.tabUpdate$.next(parseInt(this.route.snapshot.paramMap.get('id') as string));
       this.title = DialogMode.Edit;
+      this.titlevalue=this.title + '  Employee';
     } else {
-      this.title = DialogMode.Add;
+      this.title = DialogMode.Add ;
+      this.titlevalue=this.title + '  Employee';
+    }
+    const locationState = this.location.getState() as {
+      orderId: number;
+      pageToBack: string;
+      isNavigateFromCandidateDetails: boolean;
+      orderManagementPagerState?: OrderManagementPagerState | null;
+    };
+    const navigationStateString = this.globalWindow.localStorage.getItem('navigationState');
+    const navigationState = navigationStateString ? JSON.parse(navigationStateString) : null;
+    const location = navigationState ? Object.assign(locationState, navigationState) : locationState;
+    if((location!=null&&  location.pageToBack=='/client/scheduling')||(location!=null && location.pageToBack=='/client/order-management') )
+    {
+      this.titlevalue='';
     }
   }
 
@@ -78,7 +105,38 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   }
 
   public navigateBack(): void {
-    this.router.navigate(['/client/candidates']);
+    const locationState = this.location.getState() as {
+      orderId: number;
+      pageToBack: string;
+      isNavigateFromCandidateDetails: boolean;
+      orderManagementPagerState?: OrderManagementPagerState | null;
+    };
+    const navigationStateString = this.globalWindow.localStorage.getItem('navigationState');
+    const navigationState = navigationStateString ? JSON.parse(navigationStateString) : null;
+    const location = navigationState ? Object.assign(locationState, navigationState) : locationState;
+    this.globalWindow.localStorage.removeItem('navigationState');
+
+    switch (true) {
+      case location!=null&&  location.pageToBack=='/client/scheduling':
+      this.router.navigate([location.pageToBack]);
+      break;
+      case location.orderId && !location.isNavigateFromCandidateDetails:
+        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderManagementPagerState: location.orderManagementPagerState,irpActiveTab:location.irpActiveTab
+
+
+        } });
+        this.globalWindow.localStorage.setItem("IsEmployeeTab", JSON.stringify(true));
+        const selectedNavigation = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
+        this.store.dispatch(new SelectNavigationTab(selectedNavigation?.current));
+        break;
+      case location.orderId && location.isNavigateFromCandidateDetails:
+        this.router.navigate([location.pageToBack]);
+        const selectedTab = this.store.selectSnapshot(CandidateDetailsState.navigationTab);
+        this.store.dispatch(new SelectNavigation(selectedTab.active, null, true));
+        break;
+      default:
+        this.router.navigate(['/client/candidates']);
+    }
   }
 
   public saveCandidate(): void {

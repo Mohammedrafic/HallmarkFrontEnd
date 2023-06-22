@@ -6,7 +6,7 @@ import {
   DrawNodeEventArgs, FieldsSettingsModel, NodeCheckEventArgs, TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { filter, map, Observable, Subject, take, takeUntil, tap } from 'rxjs';
 
 import { GetAssignedSkillTree, SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -71,8 +71,10 @@ export class AssignSkillComponent extends DestroyableDirective implements OnInit
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter(Boolean))
-        .subscribe(() => {
+        .pipe(
+          filter(Boolean),
+          take(1)
+        ).subscribe(() => {
           this.clearAndClose();
         });
     } else {

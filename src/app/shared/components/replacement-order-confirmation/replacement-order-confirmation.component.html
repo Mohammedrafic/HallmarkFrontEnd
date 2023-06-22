@@ -1,0 +1,39 @@
+<ejs-dialog
+  #destroyableDialog
+  cssClass="confirm-dialog"
+  [animationSettings]='animationSettings'
+  isModal="true"
+  visible="false"
+  showCloseIcon="true"
+  width="448px"
+  closeOnEscape
+  (close)="cancel()"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">{{ warningTitle }}</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <div>
+      {{ text }}
+    </div>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <div class="bootstrap replacement-checkbox">
+        <ejs-checkbox label="Create replacement Order" [(checked)]="replaceChecked" (change)="updateReplaceValue()"></ejs-checkbox>
+      </div>
+      <div>
+        <button ejs-button cssClass="e-outline" (click)="cancel()">Cancel</button>
+        <button ejs-button cssClass="e-danger" [isPrimary]="true" (click)="submit()">Yes</button>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>

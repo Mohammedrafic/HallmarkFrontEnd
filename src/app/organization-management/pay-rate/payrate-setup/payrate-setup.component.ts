@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../store/user.state';
@@ -126,7 +126,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
   private workcommitmentsedit: any[] = [];
-  private skillsEdit: any[] = [];
+  private skillsEdit: number[] = [];
   public columnsToExport: ExportColumn[] = [
     { text: 'Region', column: 'Region' },
     { text: 'Location', column: 'Location' },
@@ -153,6 +153,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   public regionSelected:any = [];
   public skillSelected:any = [];
   public locationSelected:any = [];
+  public editedData: PayRateSetup;
 
   constructor(
     private store: Store,
@@ -297,7 +298,9 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.departmentChangedHandler();
     this.skillChangeHandler();
 
-    this.payRateFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+    this.payRateFilterFormGroup.get('regionIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
         val.forEach((id) =>
@@ -319,7 +322,9 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       this.cd.markForCheck();
     });
 
-    this.payRateFilterFormGroup.get('locationIds')?.valueChanges.subscribe((locationIds: number[]) => {
+    this.payRateFilterFormGroup.get('locationIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
         this.filterColumns.departmentIds.dataSource = [];
         const departments: OrganizationDepartment[] = [];
@@ -339,9 +344,11 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       this.cd.markForCheck();
     });
 
-    this.payRateFilterFormGroup.get('departmentIds')?.valueChanges.subscribe((departmentIds: number[]) => {
+    this.payRateFilterFormGroup.get('departmentIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((departmentIds: number[]) => {
       if (departmentIds && departmentIds.length > 0) {
-        this.store.dispatch(new GetSkillsbyDepartment(departmentIds));
+        this.store.dispatch(new GetSkillsbyDepartment(departmentIds))
         this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
           if(skills && skills.length > 0){
             this.filterColumns.skillIds.dataSource = sortByField(skills, "name");
@@ -356,6 +363,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdatePayRateSucceed)).subscribe(() => {
       this.store.dispatch(new ShowSideDialog(false));
+      this.workcommitments = [];
       this.clearFormDetails();
     });
 
@@ -366,8 +374,10 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           okButtonLabel: 'Confirm',
           okButtonClass: '',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           if (this.billRateToPost) {
             const filters = {
               pageNumber: this.currentPage,
@@ -378,20 +388,15 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
             this.store.dispatch(new SaveUpdatePayRate(this.billRateToPost, filters));
           } else {
             this.store.dispatch(new ShowSideDialog(false));
+            this.workcommitments = [];
             this.clearFormDetails();
           }
         });
     });
-    this.getWorkCommitment();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
       this.loadData();
-  }
-
-  public getWorkCommitment():void {
-    this.store.dispatch(new GetWorkCommitmentByPage(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected));
-    
   }
 
   ngOnDestroy(): void {
@@ -433,6 +438,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     } else {
       locationsControl.enable({emitEvent: false});
     }
+    this.cd.detectChanges();
     this.locationSelected = [];
     this.locationSelected = this.locations.map(x => x.locationId);
   }
@@ -447,7 +453,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       for(let i=0; i<this.departments.length; i++){
         this.deptId.push(this.departments[i].id);
       }
-      this.store.dispatch(new GetSkillsbyDepartment(this.deptId));
+      this.store.dispatch(new GetSkillsbyDepartment(this.deptId))
       this.skillbydepartment$.pipe(takeUntil(this.componentDestroy())).subscribe((skills) => {
         if(skills && skills.length > 0){
           this.skills = sortByField(skills, "name");
@@ -455,6 +461,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           this.skills = [];
           this.PayRatesFormGroup.get("skillIds")?.setValue(null);
         }
+        this.getSkills();
         this.cd.markForCheck();
       });
 
@@ -465,10 +472,9 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
 
   public loadData(): void {
     this.store.dispatch(new GetAssignedSkillsByOrganization());
-    this.getWorkCommitment();
     this.filters = this.PayRatesFormGroup.getRawValue();
-    this.store.dispatch(new GetPayRates({  
-      pageNumber: this.currentPage, 
+    this.store.dispatch(new GetPayRates({
+      pageNumber: this.currentPage,
       pageSize: this.pageSize,
       ...this.filters }));
   }
@@ -510,14 +516,18 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
+          this.workcommitments = [];
           this.clearFormDetails();
           this.removeActiveCssClass();
         });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
+      this.workcommitments = [];
       this.clearFormDetails();
       this.removeActiveCssClass();
     }
@@ -543,7 +553,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         skillIds: this.PayRatesFormGroup.controls['skillIds'].value,
         payRateConfigId: this.PayRatesFormGroup.controls['payRateConfigId'].value,
         orderTypes: this.PayRatesFormGroup.controls['orderTypes'].value.length === this.orderTypes.length
-          ? [] 
+          ? []
           : this.PayRatesFormGroup.controls['orderTypes'].value,
         amountMultiplier: this.PayRatesFormGroup.controls['amountMultiplier'].value,
         effectiveDate: effectiveDate,
@@ -568,9 +578,31 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     this.addActiveCssClass(event);
     this.isEdit = true;
     this.editRecordId = data.payRateSettingId;
-
-    setTimeout(() => this.setupFormValues(data));
-
+    this.editedData = data;
+    this.skillsEdit = [];
+    if(!data.departmentId && data.departmentId != null){
+      this.skillsEdit = data.skills.map((x: { skillId: any; }) => x.skillId);
+    } else {
+      this.skillsEdit = [];
+    }
+    this.store.dispatch(new GetWorkCommitmentByPage(
+      this.orgId,
+      this.regionSelected,
+      this.locationSelected,
+      this.skillSelected
+    )).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((x) => {
+      this.workcommitments = [];
+        this.workcommitments = x.payrates.commitmentsPage;
+        this.store.dispatch(new GetSkillsbyDepartment(this.skillsEdit)).pipe(
+          takeUntil(this.unsubscribe$)
+        ).subscribe(y => {
+          this.skills = [];
+            this.skills = y.payrates.skillbydepartment;
+            setTimeout(() => this.setupFormValues(data));
+        });
+    });
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -581,8 +613,9 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm) {
           const filters = {
             pageNumber: this.currentPage,
@@ -678,7 +711,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         payRateConfigId: new FormControl([], [Validators.required]),
         amountMultiplier: new FormControl("", [Validators.required, Validators.maxLength(11)]),
         effectiveDate: new FormControl(null, [Validators.required]),
-        WorkCommitmentIds : new FormControl([], [Validators.required]), 
+        WorkCommitmentIds : new FormControl([], [Validators.required]),
         payType : new FormControl([], [Validators.required]),
       });
 
@@ -724,7 +757,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         }
 
         this.PayRatesFormGroup.controls['locationIds'].setValue(null);
-        this.PayRatesFormGroup.controls['departmentIds'].setValue(null);        
+        this.PayRatesFormGroup.controls['departmentIds'].setValue(null);
         this.cd.markForCheck();
       });
   }
@@ -765,8 +798,9 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
               this.skills = [];
               this.PayRatesFormGroup.get("skillIds")?.setValue(null);
             }
+            this.getSkills();
             this.cd.markForCheck();
-          });  
+          });
         }
       });
   }
@@ -778,7 +812,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       .subscribe((skillIds: number[]) => {
         this.skillSelected = [];
         this.skillSelected = skillIds;
-        this.getWorkCommitment();
+        this.store.dispatch(new GetWorkCommitmentByPage(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected))
       });
   }
 
@@ -814,44 +848,34 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     } else {
       this.PayRatesFormGroup.controls['departmentIds'].setValue([data.departmentId]);
     }
-    this.getSkillData(data);
-
-    
+    if (data.workCommitments.length === 0) {
+      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(null);
+    } else {
+      this.workcommitmentsedit = [];
+      this.workcommitmentsedit = data.workCommitments.map((x: { workCommitmentId: any; }) => x.workCommitmentId)
+      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(this.workcommitmentsedit);
+    }
     if (data.orderTypes.length === 0) {
       this.PayRatesFormGroup.controls['orderTypes'].setValue(this.orderTypes.map((type) => type.id));
     } else {
       this.PayRatesFormGroup.controls['orderTypes'].setValue(data.orderTypes);
     }
-
-    if (data.workCommitments.length === 0) {
-      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(null);
-    } else {
-      this.workcommitmentsedit = [];
-      for(let i=0; i < data.workCommitments.length; i++){
-        this.workcommitmentsedit.push(data.workCommitments[i].workCommitmentId);
-      }
-      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(this.workcommitmentsedit);
-    }
-    
     this.PayRatesFormGroup.controls['amountMultiplier'].setValue(data.amountMultiplier);
     this.PayRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
     this.PayRatesFormGroup.controls['payType'].setValue(data.payType);
     this.PayRatesFormGroup.controls['payRateConfigId'].setValue(data.payRateConfigId);
+    this.cd.markForCheck();
   }
 
-  @OutsideZone
-  private getSkillData(data: PayRateSetup) {
-    setTimeout(() => {
-      if (data.skills.length === 0) {
-        this.PayRatesFormGroup.controls['skillIds'].setValue(null);
-      } else {
-        this.skillsEdit = [];
-        for(let i=0; i < data.skills.length; i++){
-          this.skillsEdit.push(data.skills[i].skillId);
+  public getSkills(){
+      if(this.isEdit === true){
+        if (this.editedData?.skills.length === 0) {
+          this.PayRatesFormGroup.controls['skillIds'].setValue(null);
+        } else {
+          this.skillsEdit = [];
+          this.skillsEdit = this.editedData?.skills.map((x: { skillId: any; }) => x.skillId);
+          this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
         }
-        this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
       }
-    },1000)
-  }
-
+    }
 }

@@ -118,7 +118,9 @@ export class MultiDatePickerComponent extends Destroyable implements OnInit, Aft
     this.appliedDatesValues = this.datesValues;
     this.appliedDates.emit(this.datesValues);
     this.datesControl.setValue(this.datesValues);
-    this.lastdatevalue = new Date(this.datesValues[this.datesValues.length - 1]);
+    if (this.datesValues?.length) {
+      this.lastdatevalue = new Date(this.datesValues[this.datesValues.length - 1]);
+    }
     this.isCalendarShow = false;
     this.cdr.detectChanges();
   }

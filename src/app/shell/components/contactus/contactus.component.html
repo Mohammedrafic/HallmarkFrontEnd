@@ -21,7 +21,7 @@
     <div class="id-container">
       <div class="dropdown-container bootstrap">
         <label>Topic<span class="required">*</span></label>
-        <ejs-dropdownlist formControlName="topic" [dataSource]="topics" [allowFiltering]="true"></ejs-dropdownlist>
+        <ejs-dropdownlist formControlName="topic" [dataSource]="topics" [allowFiltering]="true" (select)="onTopicsChange($event)"></ejs-dropdownlist>
       </div>
     </div>
   </div>
@@ -51,7 +51,7 @@
   <div class="input-container bootstrap">
     <label>Message</label>
     <div class="input-group">
-      <ejs-textbox name="message" formControlName="message" [multiline]="true" maxlength="100"></ejs-textbox>
+      <ejs-textbox name="message" formControlName="message" [multiline]="true" ></ejs-textbox>
     </div>
   </div>
 

@@ -1,6 +1,28 @@
 @import "colors";
 @import 'adaptive-response';
 
+@mixin description_responsive {
+  gap: 16px !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-rows: 1fr 1fr !important;
+  grid-template-areas:
+    "itm1 itm1 itm2 itm2"
+    "itm3 itm3 itm3 itm3"
+    "itm4 itm4 itm5 itm5" !important;
+
+  .itm3 {
+    max-width: unset !important;
+  }
+
+  .order-box {
+    margin-left: 17%;
+  }
+
+  .order-box2 {
+    margin-left: 64%;
+  }
+}
+
 .order-container {
   display: flex;
 
@@ -49,6 +71,8 @@ ejs-textbox.e-control {
 
 .order-form-container {
   display: flex;
+  container-type: inline-size;
+  resize: horizontal;
 
   .left-section {
     width: 70%;
@@ -163,6 +187,7 @@ ejs-textbox.e-control {
 
 .general-information-po-wrapper {
   display: grid;
+  align-items: end;
   grid-auto-columns: 1fr;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr auto 1fr;
@@ -185,6 +210,7 @@ ejs-textbox.e-control {
 .special-project-wrapper {
   width: 70%;
   display: grid;
+  align-items: end;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 1fr;
   gap: 16px
@@ -210,16 +236,19 @@ ejs-textbox.e-control {
 
   .itm1 {
     grid-area: itm1;
+    align-self: end;
   }
 
   .itm2 {
     grid-area: itm2;
+    align-self: end;
   }
 
   .itm3 {
     grid-area: itm3;
     margin-top: 15px;
     display: flex;
+    max-width: 62px;
   }
 
   .itm4 {
@@ -231,7 +260,7 @@ ejs-textbox.e-control {
   }
 
   .order-box {
-    margin-left: 17%;
+    margin-left: 21%;
   }
 
   .order-box1 {
@@ -239,7 +268,7 @@ ejs-textbox.e-control {
   }
 
   .order-box2 {
-    margin-left: 64%;
+    margin-left: 61%;
   }
 
   .order-box3 {
@@ -249,7 +278,8 @@ ejs-textbox.e-control {
 
 .job-description-po-wrapper {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  align-items: center;
+  grid-template-columns: repeat(10, 1fr);
   grid-template-rows: 1fr 4fr;
   gap: 16px;
   grid-template-areas:
@@ -258,10 +288,12 @@ ejs-textbox.e-control {
 
   .itm1 {
     grid-area: itm1;
+    align-self: end;
   }
 
   .itm2 {
     grid-area: itm2;
+    align-self: end;
   }
 
   .itm3 {
@@ -302,7 +334,21 @@ ejs-textbox.e-control {
   .itm6,
   .itm7,
   .itm8 {
-    margin-top: 30px;
+    margin-top: 15px;
+
+    @media
+      (min-width: $tablet-max) and (max-width: 1040px),
+      (min-width: $desktop-sm-max) and (max-width: 1455px) {
+        margin-top: 32px;
+    }
+  }
+}
+
+@media #{$min-desktop-large} {
+  @container (max-width: 1230px) {
+    .job-description-wrapper {
+      @include description_responsive;
+    }
   }
 }
 
@@ -317,6 +363,12 @@ ejs-textbox.e-control {
 
     .right-section {
       width: 100%;
+    }
+  }
+
+  @container (max-width: 846px) {
+    .job-description-wrapper {
+      @include description_responsive;
     }
   }
 }
@@ -346,14 +398,67 @@ ejs-textbox.e-control {
     padding-right: 16px;
   }
 
-  .job-description-wrapper {
-    gap: 12;
+  .job-description-po-wrapper {
+    gap: 12px;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: 1fr 1fr;
     grid-template-areas:
       "itm1 itm1 itm2 itm2"
-      "itm3 itm3 itm3 itm3"
-      "itm4 itm4 itm5 itm5";
+      "itm3 itm4 itm5 itm6"
+      "itm7 itm8 auto auto"
+      "itm9 itm9 itm10 itm10";
+  }
+
+  .job-description-wrapper {
+    @include description_responsive;
+  }
+
+  @container (max-width: 540px) {
+    .job-description-wrapper {
+      .itm3 {
+        margin-top: -32px !important;
+      }
+
+      .order-box {
+        margin-left: 30% !important;
+      }
+    
+      .order-box1 {
+        margin-left: 65% !important;
+      }
+    
+      .order-box2 {
+        margin-left: 0 !important;
+        margin-top: 60px !important;
+      }
+    
+      .order-box3 {
+        margin-left: 30% !important;
+        margin-top: 60px !important;
+      }
+    }
+
+    .job-description-po-wrapper {
+      grid-template-areas:
+      "itm1 itm1 itm2 itm2"
+      "itm3 itm4 itm5 auto"
+      "itm6 itm7 itm8 auto"
+      "itm9 itm9 itm10 itm10" !important;
+
+      .itm3,
+      .itm4,
+      .itm5,
+      .itm6,
+      .itm7,
+      .itm8 {
+        margin-top: 0px !important;
+      }
+    }
+  }
+
+  .job-distribution-wrapper {
+    grid-template-columns: 1fr 1fr;
+    width: 100%
   }
 
   .special-project-wrapper {
@@ -363,7 +468,9 @@ ejs-textbox.e-control {
 
 @media #{$max-mobile} {
 
+  .general-information-po-wrapper,
   .general-information-wrapper,
+  .job-description-po-wrapper,
   .job-distribution-wrapper,
   .special-project-wrapper,
   .job-description-wrapper {
@@ -371,10 +478,16 @@ ejs-textbox.e-control {
     flex-direction: column;
     width: 100%;
 
-    & .input-container,
-    & .checkbox-container {
+    .input-container,
+    .checkbox-container {
       margin: 0 !important;
       width: 100%;
+
+      ::ng-deep {
+        .multi-date {
+          width: 100%;
+        }
+      }
     }
   }
 

@@ -62,9 +62,12 @@
     </div>
 
     <div class="input-container bootstrap" *ngIf="!hideFilds.has('rateHour')">
-      <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier">Multiplier <span class="required">*</span></label>
-      <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency">Amount <span class="required">*</span></label>
-      <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span class="required">*</span></label>
+      <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier">Multiplier <span
+        *ngIf="billRateForm.get('rateHour')?.enabled" class="required">*</span></label>
+      <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency">Amount <span
+        *ngIf="billRateForm.get('rateHour')?.enabled" class="required">*</span></label>
+      <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span
+        *ngIf="billRateForm.get('rateHour')?.enabled" class="required">*</span></label>
       <div class="input-group">
         <ejs-numerictextbox
           class="numeric-input"

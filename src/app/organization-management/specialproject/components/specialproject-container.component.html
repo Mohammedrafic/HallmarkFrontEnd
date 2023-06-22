@@ -12,19 +12,19 @@
         <e-tabitem >
           <ng-template #headerText><div>Special Project Categories</div></ng-template>
           <ng-template #content>
-            <app-special-project-category [showSelectSystem]="showSelectSystem" [form]="form" (onEdit)="onEditClick($event)"></app-special-project-category>
+            <app-special-project-category [showSelectSystem]="showSelectSystem" [selectedSystem]="selectedSystem" [form]="form" (onEdit)="onEditClick($event)"></app-special-project-category>
           </ng-template>
         </e-tabitem>
         <e-tabitem >
           <ng-template #headerText><div>Special Projects</div></ng-template>
           <ng-template #content>
-            <app-special-projects [showSelectSystem]="showSelectSystem" [form]="form" (onEdit)="onEditClick($event)"></app-special-projects>
+            <app-special-projects [showSelectSystem]="showSelectSystem" [selectedSystem]="selectedSystem" [form]="form" (onEdit)="onEditClick($event)"></app-special-projects>
           </ng-template>
         </e-tabitem>
         <e-tabitem >
           <ng-template #headerText><div>Special Project Mapping</div></ng-template>
           <ng-template #content>
-            <app-project-mapping [showSelectSystem]="showSelectSystem" [form]="form" (onEdit)="onEditClick($event)"></app-project-mapping>
+            <app-project-mapping [showSelectSystem]="showSelectSystem" [selectedSystem]="selectedSystem" [form]="form" (onEdit)="onEditClick($event)"></app-project-mapping>
           </ng-template>
         </e-tabitem>
         <e-tabitem *ngIf="selectedSystem.isVMS">

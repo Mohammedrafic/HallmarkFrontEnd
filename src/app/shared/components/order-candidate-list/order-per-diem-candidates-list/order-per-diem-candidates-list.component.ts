@@ -2,24 +2,26 @@ import { Component, Inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, filter, merge, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, distinctUntilChanged, filter, merge, takeUntil } from 'rxjs';
 
-import { Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
-import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
-import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
-import { UserState } from 'src/app/store/user.state';
-import { AppState } from 'src/app/store/app.state';
-import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { SettingsViewService } from '@shared/services';
-import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
+import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { GlobalWindow } from '@core/tokens';
-import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { OrganizationSettingKeys, OrganizationalHierarchy } from '@shared/constants';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { SettingsViewService } from '@shared/services';
+import { AppState } from 'src/app/store/app.state';
+import { UserState } from 'src/app/store/user.state';
+import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
@@ -49,7 +51,6 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public activeSystem: OrderManagementIRPSystemId;
 
-
   constructor(
     protected override store: Store,
     protected override router: Router,
@@ -76,7 +77,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     });
   }
 
-  public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
+  public onEdit(data: OrderCandidatesList): void {
     if (this.order?.isClosed) {
       return;
     }
@@ -162,7 +163,6 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   private setPreviousSelectedSystem(): void {
     this.previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
   }
-
 
   private getOrganization(businessUnitId: number) {
 

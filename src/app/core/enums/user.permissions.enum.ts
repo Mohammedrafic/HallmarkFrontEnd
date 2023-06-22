@@ -208,11 +208,11 @@ export enum UserPermissions {
   //View Order Journey
   ViewOrderJourney = 8001,
 
+  //Order Management IRP
+  OrganizationOrderManagementIRP = 6405,
   //DoNotReturn
   CanViewDoNotReturnList = 6003,
   CanAddEditDoNotReturn = 6004,
-
-
   CanOrganizationViewOrdersIRP = 6406,
   CanOrganizationEditOrdersIRP = 6407,
   CanCreateOrdersIRP = 6408,

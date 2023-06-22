@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import { delay, Observable, Subject, takeUntil } from 'rxjs';
@@ -6,12 +6,22 @@ import { debounceTime, filter, throttleTime } from 'rxjs/operators';
 
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CredentialSetupFilterGet, CredentialSetupFilterDto, CredentialSetupPage } from '@shared/models/credential-setup.model';
+import {
+  AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import {
+  CredentialSetupFilterGet,
+  CredentialSetupFilterDto,
+  CredentialSetupPage,
+} from '@shared/models/credential-setup.model';
 import { Permission } from "@core/interface";
 import { UserPermissions } from "@core/enums";
 import { TakeUntilDestroy } from '@core/decorators';
-import { GetFilteredCredentialSetupData, RemoveCredentialSetupByMappingId } from '@organization-management/store/credentials.actions';
+import {
+  ClearFilteredCredentialSetup,
+  GetFilteredCredentialSetupData,
+  RemoveCredentialSetupByMappingId,
+} from '@organization-management/store/credentials.actions';
 import { CredentialsState } from '@organization-management/store/credentials.state';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -23,9 +33,9 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 @Component({
   selector: 'app-filtered-credentials',
   templateUrl: './filtered-credentials.component.html',
-  styleUrls: ['./filtered-credentials.component.scss']
+  styleUrls: ['./filtered-credentials.component.scss'],
 })
-export class FilteredCredentialsComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class FilteredCredentialsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('filterGrid') grid: GridComponent;
 
   @Select(UserState.lastSelectedOrganizationId)
@@ -39,7 +49,7 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
 
   @Input() credentialSetupFilter$: Subject<CredentialSetupFilterDto>;
   @Input() userPermission: Permission;
-  @Input() isIRPFlagEnabled: boolean = false;
+  @Input() isIRPFlagEnabled = false;
 
   @Output() selectedRow: EventEmitter<CredentialSetupFilterGet> = new EventEmitter();
 
@@ -49,7 +59,7 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
 
   public credentialSetupFilter: CredentialSetupFilterDto = {
     pageNumber: this.currentPage,
-    pageSize: this.pageSize
+    pageSize: this.pageSize,
   };
   private pageSubject$ = new Subject<number>();
 
@@ -65,6 +75,10 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
     this.organizationChangedHandler();
     this.headerFilterChangedHandler();
     this.watchForPageChange();
+  }
+
+  ngOnDestroy(): void {
+    this.store.dispatch(new ClearFilteredCredentialSetup());
   }
 
   private watchForPageChange(): void {
@@ -83,13 +97,13 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
     this.store.dispatch(new GetFilteredCredentialSetupData(this.credentialSetupFilter));
   }
 
-  public onRemoveButtonClick(data: CredentialSetupFilterGet, event: any): void {
+  public onRemoveButtonClick(data: CredentialSetupFilterGet, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(
         takeUntil(this.componentDestroy())
     ).subscribe((confirm) => {

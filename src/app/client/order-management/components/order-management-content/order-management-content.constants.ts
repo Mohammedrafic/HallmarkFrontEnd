@@ -28,9 +28,11 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Start Date', column: 'JobStartDate' },
   { text: 'Agency', column: 'Agency' },
   { text: 'End Date', column: 'EndDate' },
+  { text: 'ShiftName', column: 'ShiftName' },
+  { text: 'Shift Start Time', column: 'ShiftStartTime' },
+  { text: 'Shift End Time', column: 'ShiftEndTime' },
   { text: 'Actual Start date', column: 'ActualStartdate' },
   { text: 'Actual End date', column: 'ActualEnddate' },
-  { text: 'Shift', column: 'Shift' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Job Distribution', column: 'JobDistribution' },
@@ -52,6 +54,9 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Department', column: 'Department' },
   { text: 'Candidates', column: 'Candidates' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
+  { text: 'Shift Name', column: 'ShiftName' },
+  { text: 'Shift Start Time', column: 'ShiftStartTime' },
+  { text: 'Shift End Time', column: 'ShiftEndTime' },
   { text: 'Agency', column: 'Agency' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
@@ -78,8 +83,10 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Candidates', column: 'Candidates' },
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Re-Order Date', column: 'ReOrderDate' },
-  { text: 'Shift', column: 'Shift' },
   { text: 'Agency', column: 'Agency' },
+  { text: 'ShiftName', column: 'ShiftName' },
+  { text: 'Shift Start Time', column: 'ShiftStartTime' },
+  { text: 'Shift End Time', column: 'ShiftEndTime' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Distributed To', column: 'DistributedTo' },
@@ -135,8 +142,7 @@ export const permPlacementColumnsToExport: ExportColumn[] = [
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
   { text: 'Candidates', column: 'CandidatesCount' },
-  { text: 'Start Date', column: 'JobStartDate' },
-  { text: 'Shift', column: 'Shift' },
+  { text: 'Shift End Time', column: 'ShiftEndTime' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Actual Start date', column: 'ActualStartdate' },
@@ -150,6 +156,9 @@ export const permPlacementColumnsToExport: ExportColumn[] = [
   { text: 'Candidate Agency', column: 'CandidateAgency' },
   { text: 'Annual Salary From', column: 'AnnualSalaryFrom' },
   { text: 'Annual Salary To', column: 'AnnualSalaryTo' },
+  { text: 'ShiftName', column: 'ShiftName' },
+  { text: 'Start Date', column: 'JobStartDate' },
+  { text: 'Shift Start Time', column: 'ShiftStartTime' },
   { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
@@ -256,6 +265,10 @@ export const orderJourneyColumnsToExport: ExportColumn[] = [
 export const ReOrdersColumnsConfig = [
   {
     fieldName: 'reOrderFromId',
+    visible: true,
+  },
+  {
+    fieldName: 'shiftName',
     visible: true,
   },
   {
@@ -426,7 +439,7 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'shiftStartTime',
-    visible: false,
+    visible: true,
   },
   {
     fieldName: 'agencies',

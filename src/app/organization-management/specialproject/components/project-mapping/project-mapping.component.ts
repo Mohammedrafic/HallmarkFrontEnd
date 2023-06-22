@@ -12,12 +12,13 @@ import {
 } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { SpecialProjectMappingColumnsDefinition, SpecialProjectMessages } from '../../constants/specialprojects.constant';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { FormGroup } from '@angular/forms';
 import { SpecialProjectMappingState } from '../../../store/special-project-mapping.state';
 import { DeletSpecialProjectMapping, GetSpecialProjectMappings } from '../../../store/special-project-mapping.actions';
 import { SpecilaProjectCategoryTableColumns } from '@organization-management/specialproject/enums/specialproject.enum';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 
 @Component({
   selector: 'app-project-mapping',
@@ -27,6 +28,7 @@ import { SpecilaProjectCategoryTableColumns } from '@organization-management/spe
 export class ProjectMappingComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() form: FormGroup;
   @Input() showSelectSystem:boolean;
+  @Input() selectedSystem: SelectedSystemsFlag;
   @Output() onEdit = new EventEmitter<SpecialProjectMapping>();
   @Select(SpecialProjectMappingState.specialProjectMappingPage)
   specialProjectMappingPage$: Observable<SpecialProjectMappingPage>;
@@ -147,7 +149,13 @@ export class ProjectMappingComponent extends AbstractGridConfigurationComponent 
       }
       else {
         this.gridApi?.hideOverlay();
-        this.rowData = data.items;
+        if(this.selectedSystem.isIRP && this.selectedSystem.isVMS){
+          this.rowData = data.items;
+        }else if(this.selectedSystem.isVMS){
+          this.rowData = data.items.filter(f=>f.includeInVMS==true);
+        }else{
+          this.rowData = data.items.filter(f=>f.includeInIRP==true);
+        }
         this.gridApi?.setRowData(this.rowData);
       }
     });
@@ -160,10 +168,13 @@ export class ProjectMappingComponent extends AbstractGridConfigurationComponent 
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && params.id) {
-          this.store.dispatch(new DeletSpecialProjectMapping(params.id)).subscribe(val => {
+          this.store.dispatch(new DeletSpecialProjectMapping(params.id)).pipe(
+            takeUntil(this.unsubscribe$)
+          ).subscribe(val => {
             this.getSpecialProjectMappings();
           });
         }

@@ -1,6 +1,6 @@
 import { EmitType } from '@syncfusion/ej2-base';
 import { CommonCandidateSearchFilter, CommonReportFilter } from './../models/common-report.model';
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, NgZone, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, NgZone, Inject, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ClearLogiReportState, GetStaffListReportCandidateSearch, GetStaffScheduleReportFilterOptions } from '@organization-management/store/logi-report.action';
@@ -37,7 +37,7 @@ import { formatDate } from '@angular/common';
   styleUrls: ['./scheduled-hours.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScheduledHoursComponent implements OnInit {
+export class ScheduledHoursComponent implements OnInit, OnDestroy {
   public baseUrl: string = '';
   public user: User | null;
   public filterColumns: any;
@@ -382,9 +382,8 @@ export class ScheduledHoursComponent implements OnInit {
   private initForm(): void {
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.scheduledHoursReportForm = this.formBuilder.group({
@@ -410,9 +409,8 @@ export class ScheduledHoursComponent implements OnInit {
     this.isClearAll = true;
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.scheduledHoursReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
@@ -537,5 +535,10 @@ export class ScheduledHoursComponent implements OnInit {
         e.updateData(this.candidateFilterData);
       });
     }
+  }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();  
+    this.isAlive = false;  
   }
 }

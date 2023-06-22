@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { CandidateDetailsTabs } from '@shared/enums/candidate-tabs.enum';
 import { Actions, Select, Store } from '@ngxs/store';
@@ -7,6 +7,7 @@ import { filter, Observable, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
 import { NavigationTabModel } from '@shared/components/candidate-details/models/candidate.model';
+import { CandidateDetailsFilterTab } from '@shared/enums/candidate-assignment.enum';
 
 @Component({
   selector: 'app-tab-navigation',
@@ -16,7 +17,8 @@ import { NavigationTabModel } from '@shared/components/candidate-details/models/
 export class TabNavigationComponent extends DestroyableDirective {
   @Select(CandidateDetailsState.navigationTab)
   candidateTab$: Observable<NavigationTabModel>;
-
+  @Output() selectedTab = new EventEmitter<CandidateDetailsFilterTab>();
+  private tabsArray = Object.values(CandidateDetailsFilterTab);
   @ViewChild('tabNavigation') tabNavigation: TabComponent;
 
   public tabTitle = CandidateDetailsTabs;
@@ -39,5 +41,6 @@ export class TabNavigationComponent extends DestroyableDirective {
 
   public onSelect(selectedTab: SelectingEventArgs): void {
     this.store.dispatch(new SelectNavigation(null, selectedTab.selectingIndex, false));
+    this.selectedTab.emit(selectedTab.selectingIndex);
   }
 }

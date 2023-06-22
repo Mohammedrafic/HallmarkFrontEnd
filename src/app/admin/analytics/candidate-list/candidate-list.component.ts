@@ -102,7 +102,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
   public defaultAgencyIds: (number | undefined)[] = [];
 
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   selectedDepartments: Department[];

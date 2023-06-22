@@ -206,6 +206,7 @@ export class SaveIrpOrder {
   constructor(
     public order: CreateOrderDto,
     public documents: Blob[],
+    public inActivedatestr?:string,
   ) {}
 }
 
@@ -420,4 +421,9 @@ export class GetCandidateCancellationReason {
 export class GetAllShifts{
   static readonly type ='[order management] Get All Shifts';
   constructor(){}
+}
+
+export class GetOrderComments {
+  static readonly type = '[agency order management] Get Order Comments';
+  constructor(public commentContainerId: number) {}
 }

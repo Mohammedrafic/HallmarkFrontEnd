@@ -67,6 +67,7 @@ import {
   GetOrdersJourney,
   ExportOrdersJourney,
   GetAllShifts,
+  GetOrderComments,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -102,6 +103,7 @@ import {
   UpdateRegularRatesucceedcount,
   PerDiemReOrdersErrorMessage,
   TravelerContracttoPermOrdersSucceedMessage,
+  RECORD_DELETE,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -129,6 +131,8 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { UpdateRegRateService } from '@client/order-management/components/update-reg-rate/update-reg-rate.service';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -161,6 +165,7 @@ export interface OrderManagementContentStateModel {
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
   candidateCancellationReasons:CandidateCancellationReason[]|null;
   allShifts:ScheduleShift[]|null;
+  orderComments: Comment[]
 }
 
 @State<OrderManagementContentStateModel>({
@@ -199,9 +204,10 @@ export interface OrderManagementContentStateModel {
     extensions: null,
     irpCandidates: null,
     candidateCancellationReasons:null,
-    allShifts:null
-
+    allShifts:null,
+    orderComments : []
   },
+  
 })
 @Injectable()
 export class OrderManagementContentState {
@@ -383,6 +389,11 @@ export class OrderManagementContentState {
     return state.allShifts || null;
   }
 
+  @Selector()
+  static orderComments(state: OrderManagementContentStateModel): Comment[] {
+    return state.orderComments;
+  }
+
   constructor(
     private orderManagementService: OrderManagementContentService,
     private orderManagementIrpApiService: OrderManagementIrpApiService,
@@ -391,7 +402,8 @@ export class OrderManagementContentState {
     private rejectReasonService: RejectReasonService,
     private extensionSidebarService: ExtensionSidebarService,
     private orderImportService: OrderImportService,
-    private UpdateRegRateService : UpdateRegRateService
+    private UpdateRegRateService : UpdateRegRateService,
+    private commentService : CommentsService
   ) {}
 
   @Action(GetOrders, { cancelUncompleted: true })
@@ -773,12 +785,12 @@ export class OrderManagementContentState {
   @Action(SaveIrpOrder)
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: SaveIrpOrder
+    { order, documents,inActivedatestr }: SaveIrpOrder
   ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
-          new ShowToast(MessageTypes.Success,  order.length==1?'Order '+order[0].organizationPrefix?.toString()+'-'+order[0].publicId?.toString()+' has been added':RECORD_ADDED),
+          new ShowToast(MessageTypes.Success,  order.length==1?'Order '+order[0].organizationPrefix?.toString()+'-'+order[0].publicId?.toString()+' has been added': inActivedatestr?.toString()!="" && inActivedatestr?.toString()!=undefined  ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr +' Dates orders not added.':RECORD_ADDED),
           new SaveIrpOrderSucceeded(),
         ]);
           if (documents.length) {
@@ -847,7 +859,7 @@ export class OrderManagementContentState {
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: EditIrpOrder
-  ): Observable<void | Blob[] | Order> {
+  ): Observable<void | Blob[] | Order[]> {
     return this.orderManagementService.editIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
@@ -857,7 +869,7 @@ export class OrderManagementContentState {
         if (documents.length) {
           return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
         } else {
-          return order;
+          return of(order);
         }
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
@@ -887,6 +899,7 @@ export class OrderManagementContentState {
   DeleteOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { id }: DeleteOrder): Observable<any> {
     return this.orderManagementService.deleteOrder(id).pipe(
       tap(() => {
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_DELETE), new DeleteOrderSucceeded()]);
         dispatch(new DeleteOrderSucceeded());
       }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Order cannot be deleted'))))
@@ -1150,6 +1163,15 @@ export class OrderManagementContentState {
         return payload;
       }));
     }
+
+    @Action(GetOrderComments)
+    GetOrderComments(
+      { patchState }: StateContext<OrderManagementContentStateModel>,
+      { commentContainerId }: GetOrderComments
+    ): Observable<Comment[]> {
+      return this.commentService.getComments(commentContainerId, null)
+        .pipe(tap((payload) => patchState({ orderComments: payload })));
+    }  
 
     @Action(GetAllShifts)
     GetAllShifts(

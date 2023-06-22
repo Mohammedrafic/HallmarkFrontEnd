@@ -112,8 +112,10 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => confirm),
+          takeUntil(this.destroy$)
+        ).subscribe(() => {
           this.closeDialog();
         });
     } else {
@@ -265,8 +267,10 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
           okButtonLabel: 'Import',
           okButtonClass: '',
         })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => confirm),
+          takeUntil(this.destroy$)
+        ).subscribe(() => {
           this.store.dispatch(new SaveCandidateImportResult(this.candidateImportResult?.succesfullRecords || []));
         });
     } else {

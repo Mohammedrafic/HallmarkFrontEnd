@@ -35,5 +35,10 @@
   display: flex;
   justify-content: space-between;
   width:100%;
-
+  .slideBarWidth{
+    width: 35% !important;
+  }
+  .slideTooltipMar{
+    margin-left:30px !important;
+  }
 }

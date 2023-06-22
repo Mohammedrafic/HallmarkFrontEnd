@@ -4,7 +4,7 @@ import { Store } from '@ngxs/store';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { Credential } from "@shared/models/credential.model";
 import { ConfirmService } from '@shared/services/confirm.service';
-import { filter } from 'rxjs';
+import { filter, take } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { AddOrderCredentialFormComponent } from './components/add-order-credential-form/add-order-credential-form.component';
 import { EditOrderCredentialFormComponent } from './components/edit-order-credential-form/edit-order-credential-form.component';
@@ -88,8 +88,10 @@ export class OrderCredentialsComponent {
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1),
+        ).subscribe(() => {
           this.handleOnCancel();
         });
     } else {

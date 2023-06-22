@@ -79,7 +79,7 @@
                         selectAllText="Select All"
                         mode="CheckBox"
                         [dataSource]="field.dataSource"
-                        [fields]="optionFields"
+                        [fields]="field.showAllToggle ? optionFieldsIRP : optionFields"
                         [showSelectAll]="!field.showAllToggle"
                         [allowFiltering]="true"
                         [showDropDownIcon]="true"
@@ -88,6 +88,15 @@
                         (filtering)="field.customFiltering ? onDepartmentsFiltering($event) : noValue"
                       >
                       </ejs-multiselect>
+                    </div>
+                    <div class="switch" *ngIf="field.showAllToggle">
+                      <ejs-switch
+                        [name]="'all' + field.field"
+                        [checked]="getToggleValue(field.field)"
+                        (change)="allRecordsChange($event, field.field)"
+                        label="All"
+                      ></ejs-switch>
+                      <label [for]="'all' + field.field" class="switch-text">All</label>
                     </div>
                   </div>
                 </div>

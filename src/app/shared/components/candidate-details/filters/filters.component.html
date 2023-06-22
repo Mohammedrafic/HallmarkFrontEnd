@@ -9,7 +9,8 @@
                        [fields]="typeFields"
                        [allowFiltering]="true"
                        [showDropDownIcon]="true"
-                       [dataSource]="filterColumns.regionsIds.dataSource">
+                       [dataSource]="filterColumns.regionsIds.dataSource"
+                       [selectAllText]='allOption' showSelectAll=true placeholder="All" >
 
         <ng-template #itemTemplate let-data>
           <div class="region-option-container" [class.admin]="isAgency">
@@ -25,13 +26,15 @@
   <div class="input-container">
     <label>Location</label>
     <div class="input-group multiselect bootstrap">
-      <ejs-multiselect mode="CheckBox"
+      <ejs-multiselect mode="CheckBox"   
+      #locationDropdown
                        formControlName="locationIds"
                        placeholder="All"
                        [fields]="typeFields"
                        [allowFiltering]="true"
                        [showDropDownIcon]="true"
-                       [dataSource]="filterColumns.locationIds.dataSource">
+                       [dataSource]="filterColumns.locationIds.dataSource"
+                       [selectAllText]='allOption' showSelectAll=true placeholder="All" >
 
         <ng-template #itemTemplate let-data>
           <div class="region-option-container" [class.admin]="isAgency">
@@ -50,12 +53,14 @@
     <label>Department</label>
     <div class="input-group multiselect bootstrap">
       <ejs-multiselect mode="CheckBox"
+       #departmentDropdown
                        formControlName="departmentIds"
                        placeholder="All"
                        [fields]="typeFields"
                        [allowFiltering]="true"
                        [showDropDownIcon]="true"
-                       [dataSource]="filterColumns.departmentIds.dataSource">
+                       [dataSource]="filterColumns.departmentIds.dataSource"
+                       [selectAllText]='allOption' showSelectAll=true placeholder="All" >
 
         <ng-template #itemTemplate let-data>
           <div class="region-option-container" [class.admin]="isAgency">
@@ -110,6 +115,33 @@
       </ejs-multiselect>
     </div>
   </div>
+ 
+      <div class="input-container bootstrap">
+        <label>Candidate Name</label>
+        <div class="input-group dropdown">          
+          <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
+           filterType='StartsWith' [fields]='candidateNameFields'
+                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
+        </div>
+      </div>
+      
+      <div class="input-container bootstrap">
+        <label>Position ID</label>
+        <div class="input-group dropdown">
+          <input class="e-input" type="text" appValidateWithMessage maxlength="50"  formControlName="orderID" />
+        </div>
+      </div>
+
+      <div class="input-container bootstrap">
+        <label>Agency</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  appValidateWithMessage
+                           [allowFiltering]="true" [showDropDownIcon]="true" 
+                           [dataSource]="filterColumns.agencyIds.dataSource"
+                           [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true placeholder="All" >
+          </ejs-multiselect>
+        </div>
+      </div>
 
   <div class="input-container calendar">
     <label>Start Date</label>

@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
+  ExportCandidateAssignment,
   GetCandidateDetailsPage,
   GetCandidateRegions,
+  Getcandidatesearchbytext,
   GetCandidateSkills,
   SelectNavigation,
   SetNavigation,
@@ -21,6 +23,9 @@ import {
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
 import { CandidateDetailsApiService } from '../services/candidate-details-api.service';
+import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
+import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 interface CandidateDetailsStateModel {
   candidateDetailsPage: CandidateDetailsPage | null;
@@ -32,6 +37,7 @@ interface CandidateDetailsStateModel {
   isNavigate: boolean | null;
   candidateLocations: CandidatesDetailsLocations[] | null;
   candidateDepartments: CandidatesDetailsDepartments[] | null;
+  searchCandidates:DoNotReturnSearchCandidate[]|null
 }
 
 @State<CandidateDetailsStateModel>({
@@ -50,6 +56,7 @@ interface CandidateDetailsStateModel {
     isNavigate: null,
     candidateLocations:null,
     candidateDepartments:null,
+    searchCandidates:null
   },
 })
 @Injectable()
@@ -148,7 +155,14 @@ export class CandidateDetailsState {
       })
     );
   }
-
+  @Action(Getcandidatesearchbytext)
+  getDoNotCandidateListSearch({ patchState }: StateContext<CandidateDetailsStateModel>, { filter }:Getcandidatesearchbytext): Observable<DoNotReturnSearchCandidate[]> {
+    return this.candidateDetailsApiService.getcandidatesearchbytext(filter).pipe(tap((payload: DoNotReturnSearchCandidate[]) => {
+      patchState({ searchCandidates: payload });
+      return payload
+    }));
+  }
+  
   @Action(GetCandidateSkills)
   GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization[]> {
     return this.skillsService.getSortedAssignedSkillsByOrganization().pipe(
@@ -158,4 +172,12 @@ export class CandidateDetailsState {
       })
     );
   }
+
+  @Action(ExportCandidateAssignment)
+  ExportCandidateAssignment({ }: StateContext<CandidateDetailsStateModel>, { payload }: ExportCandidateAssignment): Observable<Blob> {
+    return this.candidateDetailsApiService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'CandidateAssignment', payload.exportFileType);
+    }));
+  };
 }

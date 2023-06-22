@@ -21,6 +21,8 @@ export class TierService {
     switch (type) {
       case Tiers.tierSettings:
         return this.getTierSettingsForm();
+      case Tiers.tierSettingsIRP:
+        return this.getTierSettingsFormIRP();
       case Tiers.tierException:
         return this.getTierExceptionForm();
       default:
@@ -34,8 +36,20 @@ export class TierService {
       name: ['', Validators.required],
       hours: [null, Validators.required],
       forceUpsert: [false],
+      regionIds: [null, Validators.required],
+      locationIds: [null, Validators.required],
+      departmentIds: [null, Validators.required],
+    }) as CustomFormGroup<TierDTO>;
+  }
+
+  private getTierSettingsFormIRP(): CustomFormGroup<TierDTO> {
+    return this.formBuilder.group({
+      organizationTierId: [null],
+      name: ['', Validators.required],
+      hours: [null, Validators.required],
+      forceUpsert: [false],
       workCommitments : [null],
-      skills : ["1", Validators.required],
+      skills : ["1", Validators.required]
     }) as CustomFormGroup<TierDTO>;
   }
 
@@ -53,6 +67,8 @@ export class TierService {
     switch (dialogType) {
       case Tiers.tierSettings:
         return this.getStructureForTierSettings(tier, regions);
+      case Tiers.tierSettingsIRP:
+        return this.getStructureForTierSettingsIRP(tier);
       case Tiers.tierException:
         return this.getStructureForTierException(tier);
       default:
@@ -70,6 +86,15 @@ export class TierService {
       regionIds: tier.regionId ? [tier.regionId] : null,
       locationIds: tier.locationId ? [tier.locationId] : null,
       departmentIds:  tier.departmentId ? [tier.departmentId] : null,
+      forceUpsert: false,
+    };
+  }
+
+  private getStructureForTierSettingsIRP(tier: TierDetails): TierDTO {
+    return {
+      organizationTierId: tier.id,
+      name: tier.name,
+      hours: tier.hours,
       WorkCommitmentIds : tier.WorkCommitmentIds,
       forceUpsert: false,
       workCommitments: tier.workCommitments,
@@ -99,9 +124,6 @@ export class TierService {
       locationIds: tier.locationId ? [tier.locationId] : null,
       departmentIds: tier.departmentId ? [tier.departmentId] : null,
       organizationTierId: tier.organizationTierId,
-      WorkCommitmentIds : tier.WorkCommitmentIds,
-      workCommitments : tier.workCommitments,
-      skills : tier.skills
     }
   }
 }

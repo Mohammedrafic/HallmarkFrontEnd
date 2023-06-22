@@ -17,7 +17,7 @@ import {
   FilteringInvoicesOptionsFields,
   InvoicesOrgTabId,
   InvoicesAgencyTabId,
-  FilteringPendingInvoiceRecordsOptionsFields, FilteringManualPendingInvoiceRecordsOptionsFields
+  FilteringPendingInvoiceRecordsOptionsFields, FilteringManualPendingInvoiceRecordsOptionsFields,
 } from '../enums';
 import { PendingInvoiceStatus } from '../enums/invoice-status.enum';
 import { InvoiceDetail } from './invoice-detail.interface';
@@ -333,4 +333,4 @@ export interface InvoiceFilterFieldConfig {
 
 export type InvoiceFilterValue = string | string[] | number | number[];
 
-export type TypedKey = keyof InvoicesFilterState;
+export type TypedInvoiceKey = keyof InvoicesFilterState;

@@ -45,7 +45,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   public readonly optionFields = DefaultOptionFields;
   public readonly skillsFields = SkillFields;
   public readonly classifications = Classifications;
-  
+
   @Input() maskSSNPattern: string = '000-00-0000';
   @Input() maskedSSN: string = '';
 
@@ -56,14 +56,18 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
 
   ngOnInit(): void {
     this.getCandidateSkills();
-    this.formGroup.get('ssn')?.valueChanges.pipe(delay(500),distinctUntilChanged()).subscribe((ssnValue: any) => {
+    this.formGroup.get('ssn')?.valueChanges.pipe(
+      delay(500),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe((ssnValue: any) => {
       if(ssnValue != null &&  ssnValue.indexOf('XXX-XX') == -1){
         this.maskedSSN = ssnValue;
       }
     });
   }
 
-  
+
   public onSSNBlur(): void {
     if(this.maskedSSN != null &&  this.maskedSSN.trim().length > 0 && this.maskedSSN.trim().length >= 9){
       this.maskSSNPattern = "AAA-AA-0000";
@@ -71,21 +75,21 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
         this.formGroup.controls['ssn'].clearValidators();
         this.formGroup.controls['ssn'].updateValueAndValidity({emitEvent : false});
         this.formGroup.controls['ssn'].markAsTouched();
-        this.formGroup.get('ssn')?.setValue("XXX-XX-" + this.maskedSSN.slice(-4)); 
+        this.formGroup.get('ssn')?.setValue("XXX-XX-" + this.maskedSSN.slice(-4));
         this.changedSSN.emit(this.maskedSSN);
       }
     }else{
       this.changedSSN.emit('');
     }
-   
+
   }
 
   public onSSNFocus(): void {
       this.maskSSNPattern = "000-00-0000";
-      this.formGroup.get('ssn')?.setValue(this.maskedSSN); 
+      this.formGroup.get('ssn')?.setValue(this.maskedSSN);
       this.formGroup.controls['ssn'].addValidators([ssnValidator()]);
       this.formGroup.controls['ssn'].updateValueAndValidity({emitEvent : false});
-      this.formGroup.controls['ssn']?.markAsTouched();     
+      this.formGroup.controls['ssn']?.markAsTouched();
   }
 
   static createFormGroup(): FormGroup {

@@ -8,6 +8,7 @@ import {
   ChangeDetectorRef,
   NgZone,
   Inject,
+  OnDestroy,
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -55,7 +56,7 @@ import { GlobalWindow } from '@core/tokens';
   styleUrls: ['./staff-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StaffListComponent implements OnInit {
+export class StaffListComponent implements OnInit, OnDestroy {
   public baseUrl: string = '';
   public user: User | null;
   public filterColumns: any;
@@ -402,9 +403,8 @@ export class StaffListComponent implements OnInit {
   private initForm(): void {
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.staffListReportForm = this.formBuilder.group({
@@ -427,9 +427,8 @@ export class StaffListComponent implements OnInit {
     this.isClearAll = true;
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
-    let last = first + 6;
     let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(last));
+    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     startDate = firstday;
     let endDate = lastday;
     this.staffListReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
@@ -557,6 +556,11 @@ export class StaffListComponent implements OnInit {
         e.updateData(this.candidateFilterData);
       });
     }
+  }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();  
+    this.isAlive = false;  
   }
 }
 

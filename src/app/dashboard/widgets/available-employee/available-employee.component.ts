@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectionStrategy,Input, ChangeDetectorRef, Inject, ViewChild, ViewChildren, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy,Input, ViewChild } from '@angular/core';
 import { AvailableEmployeeModel } from '../../models/available-employee.model';
-import { ColDef, GridOptions } from '@ag-grid-community/core';
+import { ColDef } from '@ag-grid-community/core';
 import { AgGridAngular } from '@ag-grid-community/angular';
 
 @Component({
@@ -16,14 +16,17 @@ export class AvailableEmployeeComponent  implements OnInit {
   @Input() public isLoading: boolean;
   @ViewChild('availableEmployees') availableEmployees:AgGridAngular
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
+     this.columnDefs.forEach(c => (c.menuTabs = []));
   }
+
   public rowData: AvailableEmployeeModel[] ;
   public columnDefs:ColDef[] = [
-    { field: 'fullName', headerName:"Name",width:180},
-    { field: 'startDateTime', headerName:"Start Date Time",width:160},
-    { field: 'endDateTime', headerName:"End Date Time",width:160},
+    { field: 'fullName', headerName:"Name of Employee",width:180},
+    { field: 'startDate', headerName:"Start Date",width:120},
+    { field: 'shiftTime', headerName:"Start Time-End Time",width:190},
   ];
-  
- 
+
+
+
 }

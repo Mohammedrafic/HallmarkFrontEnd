@@ -20,7 +20,7 @@
 
       <div class="form-container">
         <form [formGroup]="checkForm" autocomplete="off" class="bootstrap grid">
-          <ng-container *ngFor="let field of addPaymentFormConfig; trackBy: trackByField">
+          <ng-container *ngFor="let field of addPaymentFormConfig">
 
             <ng-container [ngSwitch]="field.type">
 

@@ -43,6 +43,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   @Input() public timeSelection: TimeSelectionEnum;
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
+  @Input() public slideBar: any = false;
   
   public primaryYAxis: AxisModel = {
     minimum: 0,
@@ -192,6 +193,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
       return {
         label: key,
         value: ((currentValue.value - previousValue.value) / coefficient) * 100,
+        text: " ",
         color: paletteColor,
         totalCount:  value.reduce((count, current) => {return count + current.value;}, 0)
       };

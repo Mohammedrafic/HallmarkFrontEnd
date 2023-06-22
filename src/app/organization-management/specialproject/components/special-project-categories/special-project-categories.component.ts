@@ -11,13 +11,14 @@ import {
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { SpecialProjectCategoryColumnsDefinition, SpecialProjectMessages } from '../../constants/specialprojects.constant';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SpecialProjectCategoryState } from '../../../store/special-project-category.state';
 import { DeletSpecialProjectCategory, GetSpecialProjectCategories } from '../../../store/special-project-category.actions';
 import { SpecialProjectCategory, SpecialProjectCategoryPage } from '@shared/models/special-project-category.model';
 import { SpecilaProjectCategoryTableColumns } from '@organization-management/specialproject/enums/specialproject.enum';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 
 @Component({
   selector: 'app-special-project-category',
@@ -28,6 +29,7 @@ import { SpecilaProjectCategoryTableColumns } from '@organization-management/spe
 export class SpecialProjectCategoryComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
   @Input() showSelectSystem:boolean;
+  @Input() selectedSystem: SelectedSystemsFlag;
   @Output() onEdit = new EventEmitter<DeletSpecialProjectCategory>();
 
   @Select(SpecialProjectCategoryState.specialProjectCategoryPage)
@@ -51,7 +53,7 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
   }
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = SpecialProjectCategoryColumnsDefinition(this.actionCellrenderParams);
-  
+
   ngOnInit(): void {
     this.columnDefinitions.forEach(element => {
       if(element.field==SpecilaProjectCategoryTableColumns.System){
@@ -153,7 +155,13 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
         }
         else {
           this.gridApi?.hideOverlay();
-          this.rowData = data.items;
+          if(this.selectedSystem.isIRP && this.selectedSystem.isVMS){
+            this.rowData = data.items;
+          }else if(this.selectedSystem.isVMS){
+            this.rowData = data.items.filter(f=>f.includeInVMS==true);
+          }else{
+            this.rowData = data.items.filter(f=>f.includeInIRP==true);
+          }
           this.gridApi?.setRowData(this.rowData);
         }
     });
@@ -166,10 +174,13 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && params.id) {
-          this.store.dispatch(new DeletSpecialProjectCategory(params.id)).subscribe(val => {
+          this.store.dispatch(new DeletSpecialProjectCategory(params.id)).pipe(
+            takeUntil(this.unsubscribe$)
+          ).subscribe(val => {
             this.getSpecialProjectCategories();
           });
         }

@@ -3,6 +3,10 @@ export const addLeadingZero = (val: number) => (val < 10 ? '0' + val : val);
 export const getTime = (val: Date) =>
   addLeadingZero(val.getHours()) + ':' + addLeadingZero(val.getMinutes()) + ':' + addLeadingZero(val.getSeconds());
 
+export const getPreservedTime = (val: any) => (val !== null && val !== "") ? (val.split(":")[0]) + ':' + (val.split(":")[1]) : val;
+
+export const getPreservedfilterTime = (val: any) => (val !== null && val !== "") ? (val + ':00'): val;
+
 export const getHoursMinutesSeconds = (val: string /** HH:mm:ss */) => val.split(':').map((val) => parseInt(val));
 
 export const militaryToStandard = (val: string /** HH:mm:ss */) => {

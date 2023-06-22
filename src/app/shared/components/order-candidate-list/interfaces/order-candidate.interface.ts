@@ -18,6 +18,7 @@ export interface UpdateIrpCandidateDto {
 export interface CancelIrpCandidateDto {
   organizationId: number;
   jobId: number;
+  createReplacement: boolean;
 }
 
 export interface CandidateDetails {
@@ -36,6 +37,7 @@ export interface ClosePositionDto {
   jobId: number;
   reasonId: number;
   closingDate: string;
+  createReplacement: boolean;
 }
 
 export interface JobDetailsDto {

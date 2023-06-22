@@ -81,7 +81,11 @@ export class GetDepartmentsByLocationId {
 
 export class UpdateDepartment {
   static readonly type = '[organizationManagement] Update Department';
-  constructor(public department: Department, public filters?: DepartmentFilter, public ignoreWarning?: boolean) {}
+  constructor(
+    public department: Department,
+    public filters?: DepartmentFilter,
+    public ignoreWarning?: boolean,
+    public createReplacement?: boolean) {}
 }
 
 export class DeleteDepartmentById {
@@ -302,6 +306,11 @@ export class UpdateCredentialType {
 export class GetCredential {
   static readonly type = '[organizationManagement] Get Credential list';
   constructor(public payload?: CredentialFilter) {}
+}
+
+export class ClearCredentialsAndTypes {
+  static readonly type = '[organizationManagement] Clear Credentials nad Types list';
+  constructor() {}
 }
 
 export class GetCredentialForSettings {

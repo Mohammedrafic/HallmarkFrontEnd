@@ -39,6 +39,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public columnsToExport: ExportColumn[] = [
     { text: 'Agency Name', column: 'AgencyName' },
     { text: 'Agency Status', column: 'AgencyStatus' },
+    { text: 'Tax ID', column: 'TaxID' },
     { text: 'Contact Person', column: 'ContactPerson' },
     { text: 'Phone', column: 'Phone' },
   ];
@@ -122,8 +123,10 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
         okButtonClass: 'delete-button',
         title: 'Inactivate the Agency',
       })
-      .pipe(filter((confirm) => !!confirm))
-      .subscribe(() => {
+      .pipe(
+        filter((confirm) => !!confirm),
+        takeUntil(this.unsubscribe$),
+      ).subscribe(() => {
         this.inactivateAgency(data);
       });
   }

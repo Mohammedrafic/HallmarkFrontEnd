@@ -47,7 +47,6 @@ import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
-import { InvoicesFiltersDialogComponent } from '../../components/invoices-filters-dialog/invoices-filters-dialog.component';
 import * as Interfaces from '../../interfaces';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { GridReadyEventModel } from '@shared/components/grid/models';
@@ -57,6 +56,7 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
+import { InvoiceFiltersAdapter } from '../../adapters';
 
 @Component({
   selector: 'app-invoices-container',
@@ -67,9 +67,6 @@ import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 export class InvoicesContainerComponent extends InvoicesPermissionHelper implements OnInit, AfterViewInit {
   @ViewChild(InvoicesTableTabsComponent)
   public invoicesTableTabsComponent: InvoicesTableTabsComponent;
-
-  @ViewChild(InvoicesFiltersDialogComponent)
-  public invoicesFiltersDialogComponent: InvoicesFiltersDialogComponent;
 
   @ViewChild(RejectReasonInputDialogComponent)
   public rejectReasonInputDialogComponent: RejectReasonInputDialogComponent;
@@ -372,7 +369,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public openAddDialog(): void {
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
-    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value||this.store.selectSnapshot(UserState.lastSelectedOrganizationId)));
+    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value 
+      || this.store.selectSnapshot(UserState.lastSelectedOrganizationId)));
   }
 
   public changeFiltersAmount(amount: number): void {
@@ -387,7 +385,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       const preservedFilters = this.store.selectSnapshot(
         PreservedFiltersState.preservedFiltersByPageName) as
         PreservedFiltersByPage<Interfaces.InvoicesFilterState>;
-      this.populateFilterForm(preservedFilters);
+
+      const filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
+      this.filterState = this.filterService.composeFilterState(
+        filtersFormConfig,
+        preservedFilters.state as Record<string, unknown>
+      );
+
       filters = this.filterState;
     }
 
@@ -464,6 +468,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public changePageSize(pageSize: number): void {
     const useFilterState = !!this.navigatedInvoiceId;
+
     this.store.dispatch(new Invoices.UpdateFiltersState({
       ...this.filterState,
       pageSize,
@@ -713,24 +718,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   private watchForPreservedFilters(): void {
     this.preservedFiltersByPageName$.pipe(
+      filter((filters) => filters.dispatch),
       takeUntil(this.componentDestroy())
     )
-      .subscribe((filters) => {
-        if (filters.dispatch) {
-          this.store.dispatch(new Invoices.UpdateFiltersState({ ...filters.state }));
-        }
-
-        this.populateFilterForm(filters);
-      });
-  }
-
-  private populateFilterForm(filters: PreservedFiltersByPage<Interfaces.InvoicesFilterState>): void {
-    const filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
-    this.filterState = this.filterService.composeFilterState(
-      filtersFormConfig,
-      filters.state as Record<string, unknown>
-    );
-    this.populateFilterForm$.next({ ...filters, state: { ...this.filterState } });
+    .subscribe((filterState) => {
+      this.store.dispatch(new Invoices.UpdateFiltersState({ ...filterState.state }));
+    });
   }
 
   public clearStructure(): void {

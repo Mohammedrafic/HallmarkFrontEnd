@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -7,6 +7,7 @@ import { BaseObservable } from '@core/helpers';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { GlobalWindow } from '@core/tokens';
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +36,8 @@ export class OrderManagementService extends DestroyableDirective {
   private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super();
     this.selectedOrderAfterRedirect$
@@ -85,6 +87,8 @@ export class OrderManagementService extends DestroyableDirective {
       contactEmails: new FormControl(null),
       irpOnly: new FormControl(false),
       reorderStatuses: new FormControl([]),
+      shiftIds: new FormControl([]),
+      shift: new FormControl([]),
     });
   }
 
@@ -136,5 +140,9 @@ export class OrderManagementService extends DestroyableDirective {
 
   getCandidate(): Observable<boolean> {
     return this.updatedCandidate.getStream();
+  }
+
+  saveSelectedOrderManagementSystem(activeSystem: OrderManagementIRPSystemId): void {
+    this.globalWindow.localStorage.setItem('selectedOrderManagementSystem', activeSystem.toString());
   }
 }

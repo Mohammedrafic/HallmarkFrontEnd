@@ -3,6 +3,8 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationStructure } from '@shared/models/organization.model';
 
 import {
+  ChipsFilterStructure,
+  ChipsInitialState,
   ScheduleFilterFormConfig,
   ScheduleFilterFormFieldConfig,
   ScheduleFiltersConfig,
@@ -19,6 +21,12 @@ export enum ScheduleFilterFormSourceKeys {
   Locations = 'locationIds',
   Departments = 'departmentsIds',
   Skills = 'skillIds',
+  isAvailablity = 'isAvailablity',
+  isUnavailablity = 'isUnavailablity',
+  isOnlySchedulatedCandidate = 'isOnlySchedulatedCandidate',
+  startTime = 'startTime',
+  endTime = 'endTime',
+  isExcludeNotOrganized = "isExcludeNotOrganized"
 }
 
 export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
@@ -53,6 +61,54 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueField: 'text',
     valueId: 'value',
     filterTitle: 'Skill',
+  },
+  [ScheduleFilterFormSourceKeys.startTime]: {
+    type: ControlTypes.Time,
+    valueType: ValueType.Text,
+    dataSource: [],
+    valueField: 'text',
+    valueId: 'value',
+    filterTitle: 'Shift Start Time',
+  },
+  [ScheduleFilterFormSourceKeys.endTime]: {
+    type: ControlTypes.Time,
+    valueType: ValueType.Text,
+    dataSource: [],
+    valueField: 'text',
+    valueId: 'value',
+    filterTitle: 'Shift End Time',
+  },
+  [ScheduleFilterFormSourceKeys.isAvailablity]: {
+    type: ControlTypes.Toggle,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'text',
+    valueId: 'value',
+    filterTitle: 'Show Availability',
+  },
+  [ScheduleFilterFormSourceKeys.isUnavailablity]: {
+    type: ControlTypes.Toggle,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'text',
+    valueId: 'value',
+    filterTitle: 'Show Unavailability',
+  },
+  [ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate]: {
+    type: ControlTypes.Toggle,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'text',
+    valueId: 'value',
+    filterTitle: 'Show Only Scheduled Candidates',
+  },
+  [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: {
+    type: ControlTypes.Toggle,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'text',
+    valueId: 'value',
+    filterTitle: 'Show Exclude not Oriented',
   },
 };
 
@@ -97,9 +153,64 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     required: false,
     sourceKey: ScheduleFilterFormSourceKeys.Skills,
   },
+  {
+    field: 'startTime',
+    title: 'Shift Start Time',
+    required: true,
+    type: FieldType.Time,
+    sourceKey: ScheduleFilterFormSourceKeys.startTime,
+  },
+  {
+    field: 'endTime',
+    title: 'Shift End Time',
+    required: true,
+    type: FieldType.Time,
+    sourceKey: ScheduleFilterFormSourceKeys.endTime,
+  },
+  {
+    field: 'isAvailablity',
+    title: 'Show Availability',
+    type: FieldType.Toggle,
+    required: false,
+    sourceKey: ScheduleFilterFormSourceKeys.isAvailablity,
+  },
+  {
+    field: 'isUnavailablity',
+    title: 'Show Unavailability',
+    type: FieldType.Toggle,
+    required: false,
+    sourceKey: ScheduleFilterFormSourceKeys.isUnavailablity,
+  },
+  {
+    field: 'isOnlySchedulatedCandidate',
+    title: 'Show Only Scheduled Candidates',
+    type: FieldType.Toggle,
+    required: false,
+    sourceKey: ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate,
+  },
+  {
+    field: 'isExcludeNotOrganized',
+    title: 'Show Exclude not Oriented',
+    type: FieldType.Toggle,
+    required: false,
+    sourceKey: ScheduleFilterFormSourceKeys.isExcludeNotOrganized,
+  },
 ];
 
 export const ScheduleFilterFormGroupConfig: ScheduleFilterFormConfig = {
   formClass: 'schedule-filter-form',
   formFields: scheduleFilterFormFields,
+};
+
+export const ChipsStructureState: ChipsInitialState = {
+  regions: [],
+  locations: [],
+  departments: [],
+};
+
+export const FilterChipsStructure: ChipsFilterStructure = {
+  regionIds: [],
+  locationIds: [],
+  departmentsIds: [],
+  skillIds: [],
 };

@@ -96,7 +96,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
@@ -152,6 +152,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
   public isResetFilter: boolean = false;
+  private fixedCandidateStatusesIncluded: number[] = [50, 60, 100, 90, 110];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -288,7 +289,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
               this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
-              this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
+              this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
               this.filterColumns.agencyIds.dataSource = data.agencies;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
@@ -401,12 +402,10 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       this.isResetFilter = false;
       this.message = ""
     }
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
-
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+   
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") :  "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     this.paramsData =
     {
       "OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),

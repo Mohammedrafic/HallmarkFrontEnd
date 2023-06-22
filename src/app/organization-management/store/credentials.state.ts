@@ -16,7 +16,8 @@ import {
   SaveUpdateCredentialSetupMappingSucceeded,
   ClearCredentialSetup,
   GetAssignedCredentialTree,
-  SaveAssignedCredentialValue
+  SaveAssignedCredentialValue,
+  ClearFilteredCredentialSetup,
 } from './credentials.actions';
 import { catchError, Observable, tap } from 'rxjs';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
@@ -168,8 +169,13 @@ export class CredentialsState {
   }
 
   @Action(ClearCredentialSetup)
-  ClearCredentialSetup({ patchState }: StateContext<CredentialsStateModel>, { }: GetCredentialSetupByMappingId): CredentialsStateModel {
+  ClearCredentialSetup({ patchState }: StateContext<CredentialsStateModel>): CredentialsStateModel {
     return patchState({ credentialSetupList: [] });
+  }
+
+  @Action(ClearFilteredCredentialSetup)
+  ClearFilteredCredentialSetup({ patchState }: StateContext<CredentialsStateModel>): CredentialsStateModel {
+    return patchState({ filteredCredentialSetupData: null });
   }
 
   @Action(RemoveCredentialSetupByMappingId)

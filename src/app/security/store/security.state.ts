@@ -40,6 +40,7 @@ import {
   GetEmployeeUsers,
   ExportTimeSheetList,
   GetLogFileDownload,
+  GetNonEmployeeUsers,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -47,7 +48,7 @@ import { PermissionsTree } from '@shared/models/permission.model';
 import { RoleTreeField } from '../roles-and-permissions/role-form/role-form.component';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
+import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
 import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
@@ -84,6 +85,7 @@ interface SecurityStateModel {
   logDialogOptions: DialogNextPreviousOption;
   logTimeSheetHistoryPage: LogTimeSheetHistoryPage | null;
   userData: User[];
+  nonEmployeeUserData: User[];
   logFileDownloadDetail:any;
 }
 
@@ -111,6 +113,7 @@ interface SecurityStateModel {
     },
     logTimeSheetHistoryPage:null,
     userData: [],
+    nonEmployeeUserData: [],
     logFileDownloadDetail:null
   },
 })
@@ -264,6 +267,11 @@ export class SecurityState {
   @Selector()
   static userData(state: SecurityStateModel): User[] {
     return state.userData;
+  }
+
+  @Selector()
+  static nonEmployeeUserData(state: SecurityStateModel): User[] {
+    return state.nonEmployeeUserData;
   }
 
   @Selector()
@@ -492,6 +500,7 @@ export class SecurityState {
           const items = state.rolesPage?.items.filter((item) => item.id !== id);
           const rolesPage = { ...state.rolesPage, items };
           patchState({ rolesPage });
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         }
       }),
       catchError((error: HttpErrorResponse) => {
@@ -740,6 +749,22 @@ export class SecurityState {
     return this.userService.getEmployeeUsers(businessUnitId).pipe(
       tap((payload) => {
         patchState({ userData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetNonEmployeeUsers)
+  GetNonEmployeeUsers(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { businessUnitId }: GetNonEmployeeUsers
+  ): Observable<User[] | void> {
+    return this.userService.getNonEmployeeUsers(businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ nonEmployeeUserData: payload });
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {

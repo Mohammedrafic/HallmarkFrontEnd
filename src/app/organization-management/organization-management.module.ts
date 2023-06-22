@@ -55,7 +55,6 @@ import { AgGridModule } from '@ag-grid-community/angular';
 import { ShiftsState } from './store/shifts.state';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { OrganizationManagementRoutingModule } from './organization-management-routing.module';
-import { DepartmentsComponent } from './departments/departments.component';
 import { LocationsComponent } from './locations/locations.component';
 import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
 import { SkillsComponent } from './skills/skills.component';
@@ -100,7 +99,6 @@ import { BusinessLinesComponent } from './business-lines/business-lines.componen
 import { BusinessLinesState } from './store/business-lines.state';
 import { ImportLocationsComponent } from './locations/import-locations/import-locations.component';
 import { GridModule as AppGridModule } from '@shared/components/grid/grid.module';
-import { ImportDepartmentsComponent } from './departments/import-departments/import-departments.component';
 import { ImportBillRatesComponent } from './bill-rates/import-bill-rates/import-bill-rates.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
 import { ImportRegionsComponent } from './regions/import-regions/import-regions.component';
@@ -120,7 +118,6 @@ import { ButtonGroupModule } from '@shared/components/button-group/button-group.
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { AssignSkillComponent } from './skills/assign-skill/assign-skill.component';
 import { SkillsState } from '@organization-management/store/skills.state';
-import { DepartmentService } from '@organization-management/departments/services/department.service';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';
 import { CredentialsSetupService } from '@organization-management/credentials/services/credentials-setup.service';
@@ -134,13 +131,15 @@ import { WorkCommitmentModule } from './work-commitment/work-commitment.module';
 import { WorkCommitmentApiService } from '@shared/services/work-commitment-api.service';
 import { WorkCommitmentState } from './store/work-commitment.state';
 import { ReasonsModule } from './reasons/reasons.module';
-import { SingleMultipleSkillPipe } from './departments/single-multiple-skill.pipe';
 import { JoinPipeModule } from '@shared/pipes/join.pipe';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { OrientationModule } from './orientation/orientation.module';
 import { PayRateComponent } from './pay-rate/pay-rate.component';
 import { PayrateSetupComponent } from './pay-rate/payrate-setup/payrate-setup.component';
 import { PayRatesState } from './store/pay-rates.state';
+import {
+  ReplacementOrderConfirmationModule,
+} from '@shared/components/replacement-order-confirmation/replacement-order-confirmation.module';
 
 const sidebarIcons = {
   Download,
@@ -164,7 +163,6 @@ const sidebarIcons = {
 @NgModule({
   declarations: [
     OrganizationManagementComponent,
-    DepartmentsComponent,
     LocationsComponent,
     CredentialsSetupComponent,
     CredentialsComponent,
@@ -193,7 +191,6 @@ const sidebarIcons = {
     PurchaseOrderMappingComponent,
     BusinessLinesComponent,
     ImportLocationsComponent,
-    ImportDepartmentsComponent,
     ImportBillRatesComponent,
     ImportRegionsComponent,
     RegionsGridComponent,
@@ -202,7 +199,6 @@ const sidebarIcons = {
     TiersGridComponent,
     GridActionRendererComponent,
     AssignSkillComponent,
-    SingleMultipleSkillPipe,
     PayRateComponent,
     PayrateSetupComponent,
   ],
@@ -245,6 +241,7 @@ const sidebarIcons = {
     ButtonGroupModule,
     WorkCommitmentModule,
     ValidateDirectiveModule,
+    ReplacementOrderConfirmationModule,
 
     FeatherModule.pick(sidebarIcons),
 
@@ -265,7 +262,7 @@ const sidebarIcons = {
       TiersState,
       SkillsState,
       WorkCommitmentState,
-      PayRatesState
+      PayRatesState,
     ]),
     ImportDialogContentModule,
     TreeViewModule,
@@ -273,7 +270,7 @@ const sidebarIcons = {
     BoolValuePipeModule,
     ReasonsModule,
     OrientationModule,
-    JoinPipeModule
+    JoinPipeModule,
   ],
   exports: [BillRatesComponent],
   providers: [
@@ -290,7 +287,6 @@ const sidebarIcons = {
       provide: TIER_DIALOG_TYPE,
       useValue: Tiers.tierSettings,
     },
-    DepartmentService,
     CredentialsSetupService,
     GroupSetupService,
     MapCredentialsService,

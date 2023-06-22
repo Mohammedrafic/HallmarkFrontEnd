@@ -138,6 +138,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public maxDepartmentsLength = 1000;
   public query: Query = new Query().take(this.maxDepartmentsLength);
   public otInputsEnabled = true;
+  public amountDisabled = false;
 
   private billRateToPost?: BillRateSetupPost;
   private filters: BillRateFilters = {};
@@ -169,7 +170,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     if (this.isEdit) {
       return 'Edit';
     }
-    
+
     return 'Add New';
   }
 
@@ -618,11 +619,13 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       });
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private billRatesTitleChangedHandler(): void {
     this.billRatesFormGroup
       .get('billRateTitleId')
       ?.valueChanges
       .pipe(takeUntil(this.unsubscribe$))
+      // eslint-disable-next-line max-lines-per-function
       .subscribe((typeId: number) => {
         this.isMileageTitleType = typeId !== BillRateTitleId.Mileage;
         const foundBillRateOption = this.billRatesOptions.find((option) => option.id === typeId);
@@ -674,9 +677,22 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           this.billRatesFormGroup.get('billRateValueRateTimes')?.patchValue(1);
         }
 
+        if (typeId === BillRateTitleId.FacilityCalledOff || typeId === BillRateTitleId.ResourceCalledOff) {
+          this.amountDisabled = true;
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.patchValue(0);
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.removeValidators(Validators.required);
+        } else {
+          this.amountDisabled = false;
+          this.billRatesFormGroup.get('billRateValueRateTimes')?.addValidators(Validators.required);
+        }
+
         if (typeId === BillRateTitleId.MissedMeal
           || typeId === BillRateTitleId.FacilityCalledOff || typeId === BillRateTitleId.ResourceCalledOff) {
             this.otInputsEnabled = false;
+            this.billRatesFormGroup.get('considerForWeeklyOt')?.patchValue(false);
+            this.billRatesFormGroup.get('considerForDailyOt')?.patchValue(false);
+            this.billRatesFormGroup.get('considerFor7thDayOt')?.patchValue(false);
+
         } else if (!this.otInputsEnabled) {
           this.otInputsEnabled = true;
         }
@@ -983,7 +999,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         okButtonLabel: 'Confirm',
         okButtonClass: '',
       })),
-      filter((confirm) => confirm)
+      filter((confirm) => confirm),
+      take(1)
     ).subscribe(() => {
       if (this.billRateToPost) {
         const filters = {

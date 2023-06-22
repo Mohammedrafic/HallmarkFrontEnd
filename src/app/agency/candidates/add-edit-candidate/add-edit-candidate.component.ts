@@ -18,7 +18,7 @@ import { CreatedCandidateStatus } from '@shared/enums/status';
 import { CredentialStorageFacadeService } from "@agency/services/credential-storage-facade.service";
 import { CandidateCredentialResponse } from "@shared/models/candidate-credential.model";
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, takeUntil, switchMap, take } from 'rxjs';
 import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
@@ -89,6 +89,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   @Select(CandidateState.candidateCredential)
   private candidateCredentialResponse$: Observable<CandidateCredentialResponse>;
+
+  @Select(CandidateState.candidateProfile)
+  private candidateProfile$: Observable<Candidate>;
 
   constructor(
     protected override store: Store,
@@ -202,8 +205,10 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          takeUntil(this.componentDestroy())
+        ).subscribe(() => {
           this.navigateToCandidates();
         });
     } else {
@@ -231,7 +236,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       if(this.maskedSSN != ""){
         candidate.ssn = parseInt(this.maskedSSN);
       }
-      this.store.dispatch(new SaveCandidate(candidate));
+      this.saveCandidateProfile(candidate);
+
     } else {
       this.candidateForm.markAllAsTouched();
     }
@@ -329,8 +335,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       ssn: ssn ? this.getStringSsn(ssn) : null,
       candidateProfileSkills: candidateProfileSkills.map((skill) => skill.id),
     });
-    if(candidateProfileContactDetail?.country === Country.Canada){ 
-      this.customMaskChar = '>L0L >0L0';     
+    if(candidateProfileContactDetail?.country === Country.Canada){
+      this.customMaskChar = '>L0L >0L0';
     }else{
       this.customMaskChar = '00000';
     }
@@ -402,7 +408,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       pageToBack: string;
       isNavigateFromCandidateDetails: boolean;
       orderManagementPagerState?: OrderManagementPagerState | null;
-    }; 
+    };
     const navigationStateString = this.globalWindow.localStorage.getItem('navigationState');
     const navigationState = navigationStateString ? JSON.parse(navigationStateString) : null;
     const location = navigationState ? Object.assign(locationState, navigationState) : locationState;
@@ -479,5 +485,19 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   updatedSSNValue(val:string): void {
     this.maskedSSN = val;
+  }
+
+  private saveCandidateProfile(candidate: Candidate): void {
+    this.store.dispatch(new SaveCandidate(candidate))
+      .pipe(
+        take(1),
+        filter(() => !candidate.id),
+        switchMap(() => this.candidateProfile$),
+        filter((candidateProfile) => !!candidateProfile?.id),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((candidateProfile) => {
+        this.getCandidateLoginSetting(candidateProfile.id as number);
+      });
   }
 }

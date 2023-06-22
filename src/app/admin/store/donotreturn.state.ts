@@ -13,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
 import { BLOCK_RECORD_SUCCESS, RECORD_SAVED_SUCCESS, RECORD_ALREADY_EXISTS,CANDIDATE_UNBLOCK,CANDIDATE_BLOCK } from '@shared/constants';
 import { ImportResult } from '@shared/models/import.model';
+import { CommonHelper } from '@shared/helpers/common.helper';
 
 @State<DoNotReturnStateModel>({
   name: 'donotreturn',
@@ -160,9 +161,16 @@ export class DonotReturnState {
   @Action(DoNotReturn.GetDoNotReturnImportErrors)
   GetDoNotReturnImportErrors(
     { dispatch }: StateContext<DoNotReturnStateModel>,
-    { payload }: DoNotReturn.GetDoNotReturnImportErrors
+    { errorpayload }: DoNotReturn.GetDoNotReturnImportErrors
   ): Observable<any> {
-    return this.DonotreturnService.getDNRImportTemplate(payload).pipe(
+    if(errorpayload.length > 0){          
+      errorpayload.forEach((data:any)=>{
+        if(data.ssn != undefined && data.ssn != ''){
+          data.ssn = data.ssn.replace(/\d/g, "X");
+        }
+      })
+    }
+    return this.DonotreturnService.getDNRImportTemplate(errorpayload).pipe(
       tap((payload) => {
         dispatch(new DoNotReturn.GetDoNotReturnImportErrorsSucceeded(payload));
         return payload;
@@ -178,6 +186,7 @@ export class DonotReturnState {
   ): Observable<ImportResult<any> | Observable<void>> {
     return this.DonotreturnService.uploadDNRFile(payload).pipe(
       tap((payload) => {
+        payload = CommonHelper.formatTheSSN(payload);
         dispatch(new DoNotReturn.UploadDoNotReturnFileSucceeded(payload));
         return payload;
       }),
@@ -201,10 +210,11 @@ export class DonotReturnState {
   ): Observable<ImportResult<any> | Observable<void>> {
     return this.DonotreturnService.saveDNRImportResult(payload).pipe(
       tap((payload) => {
-        if(payload.errorRecords.length > 0){
-          dispatch(new DoNotReturn.UploadDoNotReturnFileSucceeded(payload));
+        payload = CommonHelper.formatTheSSN(payload,true);
+        if(payload.errorRecords.length > 0){          
+          dispatch(new DoNotReturn.UploadDoNotReturnFileSucceeded(payload));          
         }
-        dispatch(new DoNotReturn.SaveDoNotReturnImportResultFailAndSucceeded(payload));
+        dispatch(new DoNotReturn.SaveDoNotReturnImportResultFailAndSucceeded(payload));  
         return payload;
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'DoNotReturn list were not imported'))))

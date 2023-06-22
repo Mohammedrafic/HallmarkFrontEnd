@@ -37,7 +37,7 @@
         <app-schedule-grid
           [hasViewPermission]="hasViewPermission"
           [hasSchedulePermission]="hasSchedulePermission"
-          [initScheduleDate]="scheduleData"
+          [initScheduleData]="scheduleData"
           [selectedFilters]="scheduleFilters"
           (changeFilter)="changeFilters($event)"
           (loadMoreData)="loadMoreData($event)"
@@ -78,6 +78,7 @@
 
 <app-schedule-filters
   #filters
+  [chipsData]="chipsData"
   [selectedCandidateId]="selectedCandidate?.id"
   [count]="totalCount"
   (updateScheduleFilter)="updateScheduleFilter($event)"

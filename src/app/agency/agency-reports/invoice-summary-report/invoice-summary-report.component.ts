@@ -15,7 +15,7 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportAgencyCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -29,7 +29,7 @@ import { uniqBy } from 'lodash';
 import { FilterService } from '@shared/services/filter.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
-  CommonCandidateSearchFilter, CommonReportFilter,
+  CommonAgencyCandidateSearchFilter, CommonReportFilter,
    SearchCandidate,  OrderTypeOptionsForReport, AgencyCommonFilterReportOptions
 } from '../models/agency-common-report.model';
 import { OutsideZone } from "@core/decorators";
@@ -111,9 +111,9 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
-  InvoiceStatus: FieldSettingsModel = { text: 'name', value: 'id' };
+  invoiceStatusFields: FieldSettingsModel = { text: 'name', value: 'id' };
   @Select(UserState.lastSelectedAgencyId)
   private agencyId$: Observable<number>;
 
@@ -196,7 +196,6 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
                 this.filterColumns.businessIds.dataSource = this.organizations;
                 this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
                 this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
-                this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.InvoiceStatuses)?.setValue(this.defaultInvoiceStatus);
                 this.changeDetectorRef.detectChanges();
               }
             });
@@ -302,6 +301,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
               this.isAlive = true;
               this.filterOptionsData = data;
               this.isDefaultLoad = true;
+              this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.InvoiceStatuses)?.setValue(this.defaultInvoiceStatus);
               setTimeout(() => { this.SearchReport() }, 3000);
             }
           });
@@ -518,12 +518,13 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
     if (e.text != '') {
       let ids = [];
       ids.push(this.bussinessControl.value);
-      let filter: CommonCandidateSearchFilter = {
+      let filter: CommonAgencyCandidateSearchFilter = {
         searchText: e.text,
-        businessUnitIds: ids
+        businessUnitIds: ids,
+        agencyId: Number(this.defaultAgency)
       };
       this.filterColumns.dataSource = [];
-      this.store.dispatch(new GetCommonReportCandidateSearch(filter))
+      this.store.dispatch(new GetCommonReportAgencyCandidateSearch(filter))
         .subscribe((result) => {
           this.candidateFilterData = result.LogiReport.searchCandidates;
           this.candidateSearchData = result.LogiReport.searchCandidates;

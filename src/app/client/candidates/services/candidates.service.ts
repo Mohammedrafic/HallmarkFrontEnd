@@ -6,6 +6,7 @@ import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 import { CandidateTabsEnum } from '@client/candidates/enums/candidate-tabs.enum';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
 import { BaseObservable } from '@core/helpers';
+import { CandidateModel } from '../candidate-profile/candidate.model';
 
 @Injectable()
 export class CandidatesService {
@@ -15,10 +16,10 @@ export class CandidatesService {
   private candidateName$: Subject<string> = new Subject<string>();
   private activeEmployeeWorkCommitment$: 
   BaseObservable<CandidateWorkCommitmentShort | null> = new BaseObservable<CandidateWorkCommitmentShort | null>(null);
-  private employeeHireDate: string;
-  private terminationDate: string;
+  private profileData$: BaseObservable<CandidateModel | null> = new BaseObservable<CandidateModel | null>(null);
 
   public employeeId: number | null;
+  public hasWorkCommitments = false;
   
   public constructor(private httpClient: HttpClient) { }
 
@@ -42,6 +43,18 @@ export class CandidatesService {
     return this.activeEmployeeWorkCommitment$.getStream();
   }
 
+  public getActiveWorkCommitment(): CandidateWorkCommitmentShort | null {
+    return this.activeEmployeeWorkCommitment$.get();
+  }
+
+  public setProfileData(candidate: CandidateModel): void {
+    this.profileData$.set(candidate);
+  }
+
+  public getProfileData(): CandidateModel | null {
+    return this.profileData$.get();
+  }
+
   public changeTab(tab: CandidateTabsEnum): void {
     this.selectedTab$.next(tab);
   }
@@ -60,20 +73,12 @@ export class CandidatesService {
       );
   }
 
-  public setEmployeeHireDate(hireDate: string): void {
-    this.employeeHireDate = hireDate;
-  }
-
-  public getEmployeeHireDate(): string {
-    return this.employeeHireDate;
-  }
-
-  public setTerminationDate(terminationDate: string): void {
-    this.terminationDate = terminationDate;
+  public getEmployeeHireDate(): string | Date {
+    return this.getProfileData()?.hireDate ?? '';
   }
 
   public getTerminationDate(): string {
-    return this.terminationDate;
+    return this.getProfileData()?.terminationDate ?? '';
   }
 
   public getGridPageNumber(items: number, pageNumber: number): number {

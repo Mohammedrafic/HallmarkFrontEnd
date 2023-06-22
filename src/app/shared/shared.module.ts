@@ -172,6 +172,13 @@ import { EditIrpCandidateComponent } from './components/order-candidate-list/edi
 import { OrderCloseReasonInfoModule } from './components/order-close-reason-info/order-close-reason-info.module';
 import { GeneralOrderPerDiemInfoModule } from './components/general-order-per-diem-info/general-order-per-diem-info.module';
 import { ChipsCssClassPipeModule } from './pipes/chip-css-class/chip-css-class-pipe.module';
+import {
+  ReplacementPdOrdersDialogModule,
+} from './components/order-candidate-list/replacement-pd-orders-dialog/replacement-pd-orders-dialog.module';
+
+import {
+    EligibilityMessageModule
+} from '@shared/components/order-candidate-list/components/eligibility-message/eligibility-message.module';
 
 const icons = {
   AlertCircle,
@@ -315,6 +322,8 @@ const COMPONENTS = [
     ChipsCssClassPipeModule,
     OrderCloseReasonInfoModule,
     GeneralOrderPerDiemInfoModule,
+    ReplacementPdOrdersDialogModule,
+    EligibilityMessageModule,
   ],
   exports: [
     ...COMPONENTS,

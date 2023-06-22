@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
+import { Skill } from '@shared/models/skill.model';
 
 @Injectable()
 export class GroupSetupService {
@@ -14,7 +16,7 @@ export class GroupSetupService {
       ...(useIRPAndVms && {
         includeInIRP: [false],
         includeInVMS: [false],
-      })
+      }),
     });
   }
 
@@ -32,5 +34,35 @@ export class GroupSetupService {
         includeInVMS: group.includeInVMS,
       }),
     });
+  }
+
+  getSearchDataSources(
+    includeInIRP: boolean,
+    includeInVMS: boolean,
+    allAssignedSkills: Skill[],
+    filteredAssignedSkills: Skill[],
+  ): Skill[] {
+    if (includeInIRP && includeInVMS) {
+      return allAssignedSkills.filter((skill: Skill) => {
+        return !skill.assignedToVMS &&
+          !skill.assignedToIRP &&
+          skill.includeInVMS &&
+          skill.includeInIRP;
+      });
+    }
+
+    if (includeInIRP) {
+      return allAssignedSkills.filter((skill: Skill) => {
+        return !skill.assignedToIRP && skill.includeInIRP;
+      });
+    }
+
+    if (includeInVMS) {
+      return  allAssignedSkills.filter((skill: Skill) => {
+        return !skill.assignedToVMS && skill.includeInVMS;
+      });
+    }
+
+    return filteredAssignedSkills;
   }
 }

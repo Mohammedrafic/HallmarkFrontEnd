@@ -74,13 +74,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
   @ViewChild('autoCompleteSearch') autoCompleteSearch: AutoCompleteComponent;
 
-  @Input() set initScheduleDate(scheduleData: ScheduleInt.ScheduleModelPage | null) {
-    this.scheduleData = scheduleData;
-    if(scheduleData) {
-      this.scheduleSlotsWithDate = this.scheduleGridService.getSlotsWithDate(scheduleData);
-    }
-
-    this.cdr.markForCheck();
+  @Input() set initScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null) {
+    this.setScheduleData(scheduleData);
   }
 
   @Input() selectedFilters: ScheduleInt.ScheduleFilters;
@@ -130,6 +125,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
 
+  employeesTitle = 'Employee';
+
   private filteredByEmployee = false;
 
   private scheduleToBook: ScheduleBook | null;
@@ -163,7 +160,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.watchForScroll();
     this.watchForCandidateSearch();
     this.watchForSideBarAction();
-    this.watchForPreservedFilters();
     this.watchForDragEvent();
   }
 
@@ -334,9 +330,24 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private startOrgIdWatching(): void {
+    let clearStructure = false;
+
     this.organizationId$.pipe(
       filter(Boolean),
       tap(() => {
+        if (clearStructure) {
+          this.store.dispatch([
+            new ClearOrganizationStructure(),
+            new ResetPageFilters(),
+          ]);
+        } else {
+          clearStructure = true;
+        }
+
+        this.store.dispatch([
+          new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
+        ]);
+
         if (!this.isEmployee) {
           this.autoCompleteSearch?.clear();
         }
@@ -471,34 +482,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }
   }
 
-  private watchForPreservedFilters(): void {
-    let clearStructure = false;
-    this.organizationId$.pipe(
-      filter((id) => !!id),
-      tap(() => {
-        if (clearStructure) {
-          this.store.dispatch(new ClearOrganizationStructure());
-        } else {
-          clearStructure = true;
-        }
-
-        this.store.dispatch([
-          new ResetPageFilters(),
-          new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
-        ]);
-      }),
-      switchMap(() => this.preservedFiltersByPageName$),
-      filter(({ dispatch }) => dispatch),
-      takeUntil(this.componentDestroy()),
-    ).subscribe((filters) => {
-      this.setPreservedFiltersDataSource(filters.state);
-    });
-  }
-
-  private setPreservedFiltersDataSource(filters: ScheduleInt.ScheduleFilters): void {
-    this.scheduleFiltersService.setPreservedFiltersDataStream(filters);
-  }
-
   private watchForDragEvent(): void {
     this.openPositionService.getDragEventStream().pipe(
       takeUntil(this.componentDestroy()),
@@ -513,5 +496,16 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   private successSaveBooking(): void {
     this.createScheduleService.closeSideBarEvent.next(false);
     this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+  }
+
+  private setScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null): void {
+    this.scheduleData = scheduleData;
+    this.employeesTitle = scheduleData?.totalCount && scheduleData.totalCount > 1 ? 'Employees' : 'Employee';
+
+    if(scheduleData) {
+      this.scheduleSlotsWithDate = this.scheduleGridService.getSlotsWithDate(scheduleData);
+    }
+
+    this.cdr.markForCheck();
   }
 }

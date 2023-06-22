@@ -3,7 +3,6 @@ import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/
 import { Store } from '@ngxs/store';
 import { UserState } from '../../store/user.state';
 import { Subject } from 'rxjs';
-import { SearchComponent } from '@shared/components/search/search.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
@@ -18,11 +17,11 @@ export class PayRateComponent extends AbstractPermissionGrid implements OnInit {
 
   public exportMap = new Subject<ExportedFileType>()
 
-  addPayRateBtnText: string = 'Add Record';
+  addPayRateBtnText: string = 'Add Pay Rate';
 
   searchQuery: string = '';
   public filteredItems$ = new Subject<number>();
-  
+
   constructor(protected override store: Store) {
     super(store);
   }
@@ -34,7 +33,7 @@ export class PayRateComponent extends AbstractPermissionGrid implements OnInit {
 
   public override defaultExport(fileType: ExportedFileType): void {
     this.exportMap.next(fileType);
-  } 
+  }
 
 
   public override customExport(): void {

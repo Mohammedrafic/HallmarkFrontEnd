@@ -4,7 +4,7 @@ import { ToastUtility } from '@syncfusion/ej2-notifications';
 
 import { FieldName, OrderSystem } from '@client/order-management/enums';
 import { FormArrayList } from '@client/order-management/containers/irp-container/irp-container.constant';
-import { ErrorContentMessageForCredential, OrderDetailsValidationMessage } from '@client/order-management/constants';
+import { OrderDetailsValidationMessage } from '@client/order-management/constants';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { JobDistributionList, ListControls, ListOfKeyForms, SelectSystem } from '@client/order-management/interfaces';
 import { Order } from '@shared/models/order-management.model';
@@ -62,15 +62,6 @@ export const showInvalidFormControl = (controls: ListControls[]): void => {
   });
 };
 
-export const showMessageForInvalidCredentials = (): void => {
-  ToastUtility.show({
-    title: OrderDetailsValidationMessage.title,
-    content: ErrorContentMessageForCredential,
-    position: OrderDetailsValidationMessage.position,
-    cssClass: OrderDetailsValidationMessage.cssClass,
-  });
-};
-
 export const collectInvalidFields = (formControlList: ListControls[]): string[] => {
   const fields: string[] = [];
   formControlList.forEach((form: ListControls) => collectInvalidFieldsFromForm(form, fields));
@@ -103,8 +94,10 @@ export const getFormsList = (list: ListOfKeyForms): FormGroup[] => {
 };
 
 export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCredentialItem[]) => {
-  const jobEndDate = formState.generalInformationForm.get('jobEndDate')?.value;
-  const jobStartDate = formState.generalInformationForm.get('jobStartDate')?.value;
+  const endDate = formState.generalInformationForm.get('jobEndDate')?.value;
+  const startDate = formState.generalInformationForm.get('jobStartDate')?.value;
+  const jobEndDate = endDate ? new Date(new Date(endDate)?.setHours(0, 0, 0, 0)) : endDate;
+  const jobStartDate = startDate ? new Date(new Date(startDate).setHours(0, 0, 0, 0)) : startDate;
   const jobDates = formState.generalInformationForm.get('jobDates')?.value;
 
   return {

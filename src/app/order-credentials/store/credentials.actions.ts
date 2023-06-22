@@ -1,4 +1,5 @@
 import { IOrderCredentialItem } from '@order-credentials/types';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 export class GetAllCredentials {
   static readonly type = '[order candidates credentials] Get All Credentials';
@@ -14,8 +15,9 @@ export class GetAllCredentialTypes {
 export class GetPredefinedCredentials {
   static readonly type = '[order candidates credentials] Get Predefined Credentials';
 
-  constructor(public departmentId: number, public skillId: number) {
-  }
+  constructor(public departmentId: number,
+              public skillId: number,
+              public systemType: SystemType) {}
 }
 
 export class UpdatePredefinedCredentials {

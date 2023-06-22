@@ -245,16 +245,15 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private detectWhatDataNeeds(): void {
-    if (!this.detectIsRequiredFiltersExist()) {
-      this.scheduleData = null;
-
-      return;
-    }
-
     if (this.selectedCandidate) {
       this.initSelectedCandidateScheduleData();
     } else {
       this.initScheduleData();
+    }
+    if (!this.detectIsRequiredFiltersExist()) {
+      this.scheduleData = null;
+
+      return;
     }
   }
 

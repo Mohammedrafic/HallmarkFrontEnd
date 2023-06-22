@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { OrderStatus } from '@shared/enums/order-management';
 import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 import { UserState } from '../../../store/user.state';
@@ -24,7 +23,7 @@ export class CandidateChartComponent  {
   @Input() public isLTAOrderEnding: boolean = false;
   @Input() public isCandidateApplied: boolean = false;
 
-  
+
 
   private mousePosition = {
     x: 0,
@@ -43,8 +42,8 @@ export class CandidateChartComponent  {
       const user = this.store.selectSnapshot(UserState.user);
       if (user?.businessUnitType != null && (user?.businessUnitType != BusinessUnitType.Agency)) {
                 this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/',this.chartData === undefined ? 0 : OrderStatus.InProgress, this.chartData === undefined ? '' : 'In Progress',this.chartData === undefined ? 0 : this.chartData.candidateStatus,this.chartData?.statusName);
-        
-      } 
+
+      }
     }
   }
 

@@ -1,4 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { GetOrderComments } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
@@ -19,17 +22,24 @@ enum CommentsFilter {
   selector: 'app-comments',
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentsComponent {
-  @Input() useBackground: boolean = true;
-  @Input() disabled: boolean = false;
+  @Input() useBackground = true;
+  @Input() disabled = false;
   @Input() orderId: number;
+  public commentData: Comment[] = [];
+  @Input() canVmsCreateOrders: boolean;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
     if (value.length) {
+      this.commentData = value.filter(comments => !comments.isPrivate);
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
+    }
+    else
+    {
+      this.commentData = [];
     }
   }
   get comments(): Comment[] {
@@ -48,7 +58,7 @@ export class CommentsComponent {
   public CommentConfiguration: boolean | null | undefined;
   public commentsList: Comment[] = [];
   @Input() commentContainerId: number;
-  @Input() isCreating: boolean = false;
+  @Input() isCreating = false;
 
   @ViewChild('textBox')
   public textBox: TextBoxComponent;
@@ -58,6 +68,9 @@ export class CommentsComponent {
 
   @Select(CommentsState.comments)
   comments$: Observable<Comment[]>;
+
+  @Select(OrderManagementContentState.orderComments)
+  private orderComments$: Observable<Comment[]>;
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -72,12 +85,14 @@ export class CommentsComponent {
   public scrolledToMessage$ = new Subject<void>();
   public markAsRead$ = new Subject<number[]>();
   public initView$ = new Subject<void>();
+  public commentType: string | undefined;
 
   public readMessagesIds: number[] = [];
 
   private hasUnreadMessages = false;
 
-  constructor(private store: Store, private cd: ChangeDetectorRef) {
+  constructor(private store: Store, private router : Router, private cd : ChangeDetectorRef) {
+    this.commentType = CommentsFilter.All;
     this.scroll$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((messageEl: HTMLElement | null) => {
       if (messageEl) {
         this.scrollToSpecificMessage(messageEl);
@@ -102,8 +117,7 @@ export class CommentsComponent {
         this.scroll$.next(null);
       }
     });
-    const user = this.store.selectSnapshot(UserState).user;
-    this.isAgencyUser = user.businessUnitType === BusinessUnitType.Agency;
+    this.isAgencyUser = this.router.url.includes('agency'); 
     if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
@@ -164,18 +178,32 @@ export class CommentsComponent {
       isExternal: this.isExternal,
       new: true,
       commentContainerId: this.commentContainerId,
-      isRead: true
+      isRead: true,
     };
     this.comments.push(comment);
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
-      this.store.dispatch(new SaveComment(comment))
+      this.store.dispatch(new SaveComment(comment));
+      this.getOrderComments();
     }
   }
 
+  private getOrderComments(): void {
+    this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
+    this.orderComments$.subscribe((comments: Comment[]) => {
+      this.comments = comments;
+      this.cd.markForCheck();
+    });
+  }
+
+
   public onFilterChange(event: SelectEventArgs): void {
-    this.showExternal = event.itemData.value === CommentsFilter.External;
+    this.commentData = this.commentsList;
+    event.itemData.value === CommentsFilter.External ? this.commentData = this.commentData.filter((comments) => comments.isExternal === true && comments.isPrivate === false) : this.commentData;
+    event.itemData.value === CommentsFilter.Internal ? this.commentData = this.commentData.filter((comments) => comments.isExternal === false && comments.isPrivate === false) : this.commentData;
+    event.itemData.value === CommentsFilter.All ?  this.commentData = this.commentData.filter((comments) => comments.isPrivate === false) : this.commentData;
+    this.commentType = event.itemData.value;
     this.scroll$.next(null);
   }
 }

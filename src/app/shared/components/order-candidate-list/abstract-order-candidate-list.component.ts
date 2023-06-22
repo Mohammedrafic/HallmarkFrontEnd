@@ -23,6 +23,7 @@ import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { PageOfCollections } from '@shared/models/page.model';
 import { CandidateSearchPlaceholder, EmployeeSearchPlaceholder } from '@shared/constants/candidate-search-placeholder';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
+import { OrderManagementIRPTabsIndex } from '@shared/enums/order-management-tabs.enum';
 
 @Directive()
 export abstract class AbstractOrderCandidateListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
@@ -35,7 +36,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   @Input() orderManagementPagerState: OrderManagementPagerState | null;
 
   @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
-
+  @Input() activeIRPtabs: OrderManagementIRPTabsIndex;
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobOrganisationState$: Observable<OrderCandidateJob>;
 
@@ -51,14 +52,18 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   public candidateSearchPlaceholder = CandidateSearchPlaceholder;
   public employeeSearchPlaceholder = EmployeeSearchPlaceholder;
   public isAvailable = false;
+  public isMobileScreen = false;
 
   private readonly searchByCandidateName$: Subject<string> = new Subject();
   private searchTermByCandidateName: string;
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();
-  isMobileScreen:boolean=false;
-
-  constructor(protected override store: Store, protected router: Router, protected globalWindow : WindowProxy & typeof globalThis,) {
+  
+  constructor(
+    protected override store: Store,
+    protected router: Router,
+    protected globalWindow : WindowProxy & typeof globalThis,
+  ) {
     super(store);
   }
 
@@ -84,6 +89,11 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   }
 
   public onViewNavigation(data: any): void {
+    if(data.candidateId!=undefined)
+    {
+
+    
+
     if(this.isMobileScreen){
       return;
     }
@@ -91,29 +101,66 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
     const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
-    if (user?.businessUnitType === BusinessUnitType.Hallmark) {
-      this.store.dispatch(
-        new SetLastSelectedOrganizationAgencyId({
-          lastSelectedAgencyId: data.agencyId,
-          lastSelectedOrganizationId: null,
-        })
-      );
-    }
+        if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+          this.store.dispatch(
+            new SetLastSelectedOrganizationAgencyId({
+              lastSelectedAgencyId: data.agencyId,
+              lastSelectedOrganizationId: null,
+            })
+          );
+        }
     const pageToBack = this.router.url;
     const state = {
-      orderId: this.order.orderId,
-      candidateStatus: data.status,
-      pageToBack,
-      orderManagementPagerState: this.orderManagementPagerState,
-      readonly: !this.isAgency,
-      isRedirectFromOrder: true,
-      isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
-    };
+            orderId: this.order.orderId,
+            candidateStatus: data.status,
+            pageToBack,
+            orderManagementPagerState: this.orderManagementPagerState,
+            readonly: !this.isAgency,
+            isRedirectFromOrder: true,
+            isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
+          };
     this.globalWindow.localStorage.setItem('navigationState', JSON.stringify(state));
     this.router.navigate([url, data.candidateId], {
       state: state,
     });
     disabledBodyOverflow(false);
+  }
+  else {
+
+    
+   
+    if(this.isMobileScreen){
+      return;
+    }
+    const user = this.store.selectSnapshot(UserState.user);
+    const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const url =
+      user?.businessUnitType === BusinessUnitType.Organization ? 'client/candidates/edit' : 'client/candidates/edit';
+        if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+          this.store.dispatch(
+            new SetLastSelectedOrganizationAgencyId({
+              lastSelectedAgencyId: data.agencyId,
+              lastSelectedOrganizationId: null,
+            })
+          );
+        }
+    const pageToBack = this.router.url;
+    const state = {
+            orderId: this.order.orderId,
+            candidateStatus: data.status,
+            pageToBack,
+            orderManagementPagerState: this.orderManagementPagerState,
+            readonly: !this.isAgency,
+            isRedirectFromOrder: true,
+            isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
+            irpActiveTab:this.activeIRPtabs
+          };
+    this.globalWindow.localStorage.setItem('navigationState', JSON.stringify(state));
+    this.router.navigate([url, data.candidateProfileId], {
+      state: state,
+    });
+    disabledBodyOverflow(false);
+  }
   }
 
   public gridPerPageChanged(perPage: number): void {
@@ -123,17 +170,6 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
 
   public gridPageChanged(page: number): void {
     this.pageSubject.next(page);
-  }
-
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-  }
-
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
   }
 
   public searchByCandidateName(event: KeyboardEvent): void {
@@ -196,7 +232,6 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   protected onPageChanges(): Observable<unknown> {
     return this.pageSubject.pipe(
       debounceTime(1),
-      distinctUntilChanged(),
       tap((page) => {
         this.currentPage = page;
         this.emitGetCandidatesList();

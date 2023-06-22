@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
-import { Select } from '@ngxs/store';
-import { Observable, filter, merge, takeUntil } from 'rxjs';
-import { switchMap, take, tap } from 'rxjs/operators';
+import { Select, ofActionDispatched } from '@ngxs/store';
+import { Observable, filter, merge, of, takeUntil } from 'rxjs';
+import { concatMap, switchMap, take, tap } from 'rxjs/operators';
 
 import { DialogAction } from '@core/enums';
 import { AddDialogHelper, DateTimeHelper } from '@core/helpers';
@@ -11,8 +11,7 @@ import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
 import {
-  BillRateTimeConfirm, MealBreakeName, RecordAddDialogConfig, TimeInName, TimeOutName,
-  TimesheetConfirmMessages,
+  MealBreakeName, RecordAddDialogConfig, TimeInName, TimeOutName, TimesheetConfirmMessages,
 } from '../../constants';
 import { RecordFields } from '../../enums';
 import { RecordsAdapter } from '../../helpers';
@@ -66,9 +65,36 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
         return;
       }
 
-      this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency, ));
-      this.closeDialog();
+      this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
 
+      this.actions$
+      .pipe(
+        take(1),
+        ofActionDispatched(TimesheetDetails.ForceAddRecord),
+        switchMap((payload: TimesheetDetails.ForceAddRecord) => {
+          if (payload.force) {
+            return this.confirmService.confirm(payload.message as string, {
+              title: payload.title as string,
+              okButtonLabel: 'Save',
+              okButtonClass: 'ok-button',
+              customStyleClass: 'wide-dialog',
+            })
+            .pipe(
+              filter((confirm) => !!confirm),
+              switchMap(() => {
+                body.forceUpdate = true;
+
+                return this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
+              }),
+            );
+          }
+          return of(null);
+        }),
+      )
+      .subscribe(() => {
+        this.closeDialog();
+      });
+      
     } else {
       this.form?.updateValueAndValidity();
       this.cd.detectChanges();

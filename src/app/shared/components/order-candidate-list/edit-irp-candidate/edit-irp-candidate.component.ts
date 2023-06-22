@@ -5,16 +5,17 @@ import {
   ViewChild,
   Input,
   Output,
-  EventEmitter, ChangeDetectorRef,
+  EventEmitter,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Comment } from '@shared/models/comment.model';
-import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of, map, Observable } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 
+import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import {
   CandidateDialogConfig,
@@ -40,12 +41,10 @@ import { CustomFormGroup } from '@core/interface';
 import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
-import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { DurationService } from '@shared/services/duration.service';
 import { OrderType } from '@shared/enums/order-type';
-import { Order, OrderCandidateJob } from '@shared/models/order-management.model';
-import { adaptOrder } from '@client/order-management/components/irp-tabs/order-details/helpers';
-import { UserState } from 'src/app/store/user.state';
+import { PermissionService } from 'src/app/security/services/permission.service';
+import { OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
 
 @Component({
@@ -60,6 +59,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   @Input() set handleOpenModal(modalState: EditCandidateDialogState) {
     if(modalState.isOpen) {
       this.candidateModelState = {...modalState};
+      this.subscribeOnPermissions();
       this.isOnboarded = modalState.candidate.status === CandidatStatus.OnBoard;
       this.getCandidateDetails();
     }
@@ -75,6 +75,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public disableSaveButton = false;
   public dialogConfig: ReadonlyArray<CandidateField>;
   public isOnboarded = false;
+  public canOnboardCandidateIRP:boolean;
+  public canRejectedCandidateIRP:boolean;
+  public replacementPdOrdersDialogOpen = false;
+  public closingDate: Date;
+
   public comments: Comment[] = [];
   @Input() public externalCommentConfiguration ?: boolean | null;
   @Input() CanOrganizationViewOrdersIRP: boolean;
@@ -87,6 +92,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     private orderCandidateApiService: OrderCandidateApiService,
     private cdr: ChangeDetectorRef,
     private store: Store,
+    private permissionService: PermissionService,
     private orderManagementService: OrderManagementService,
     private durationService: DurationService,
     private commentsService: CommentsService,
@@ -100,6 +106,53 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.observeCloseControl();
     this.watchForActualDateValues();
     this.getComments();
+  }
+
+  save(): void {
+    const { status, closeDate } = this.candidateForm.getRawValue();
+
+    if (!this.candidateForm.valid) {
+      this.candidateForm.markAllAsTouched();
+      return;
+    }
+
+    if (this.candidateForm.get('isClosed')?.value) {
+      this.confirmService.confirm(
+        CLOSE_IRP_POSITION,
+        {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Close',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(
+          filter((confirm) => confirm),
+          tap(() => {
+            this.closingDate = closeDate || new Date();
+            this.showReplacementPdOrdersDialog();
+          }),
+          take(1),
+        ).subscribe();
+
+      return;
+    }
+
+    if (status === CandidatStatus.Cancelled) {
+      this.closingDate = new Date();
+      this.showReplacementPdOrdersDialog();
+
+      return;
+    }
+
+    this.saveCandidate();
+  }
+
+  showReplacementPdOrdersDialog(show = true): void {
+    this.replacementPdOrdersDialogOpen = show;
+    this.cdr.markForCheck();
+  }
+
+  setCreateReplacement(createReplacement: boolean) {
+    this.saveCandidate(createReplacement);
   }
 
   private getComments(): void {
@@ -134,9 +187,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     return config.field;
   }
 
-  public saveCandidate(): void {
-    if(this.candidateForm.valid && !this.candidateForm.get('isClosed')?.value) {
-      this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState)
+  private saveCandidate(createReplacement = false): void {
+    if (!this.candidateForm.get('isClosed')?.value) {
+      this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState, createReplacement)
       .pipe(
         catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
         takeUntil(this.componentDestroy()),
@@ -146,36 +199,28 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.hideDialog();
         this.orderManagementService.setCandidate(true);
       });
-
-    } else if (this.candidateForm.valid && this.candidateForm.get('isClosed')?.value) {
-      this.confirmService.confirm(
-        CLOSE_IRP_POSITION,
-        {
-          title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Close',
-          okButtonClass: 'delete-button',
-        })
-        .pipe(
-          filter((confirm) => !!confirm),
-          switchMap(() => {
-            const closeDto: ClosePositionDto = {
-              jobId: this.candidateModelState.candidate.candidateJobId,
-              reasonId: this.candidateForm.get('reason')?.value,
-              closingDate: DateTimeHelper.toUtcFormat(this.candidateForm.get('closeDate')?.value as Date),
-            };
-
-            return this.orderCandidateApiService.closeIrpPosition(closeDto);
-
-          }),
-          take(1),
-        ).subscribe(() => {
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-          this.handleSuccessSaveCandidate.emit();
-          this.hideDialog();
-        });
     } else {
-      this.candidateForm.markAllAsTouched();
+      this.closeIrpPosition(createReplacement);
     }
+  }
+
+  private closeIrpPosition(createReplacement: boolean): void {
+    const closeDto: ClosePositionDto = {
+      jobId: this.candidateModelState.candidate.candidateJobId,
+      reasonId: this.candidateForm.get('reason')?.value,
+      closingDate: DateTimeHelper.toUtcFormat(this.candidateForm.get('closeDate')?.value as Date),
+      createReplacement,
+    };
+
+    this.orderCandidateApiService.closeIrpPosition(closeDto)
+      .pipe(
+        catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
+        takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      this.handleSuccessSaveCandidate.emit();
+      this.hideDialog();
+    });
   }
 
   private getCandidateDetails(): void {
@@ -185,24 +230,39 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         filter(Boolean),
         tap((candidateDetails: CandidateDetails) => {
           const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
-          const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
-          const reasons = this.store.selectSnapshot(RejectReasonState.closureReasonsPage)?.items;
 
           statusConfigField.dataSource = this.editIrpCandidateService
           .createStatusOptions([...candidateDetails.availableStatuses ?? []]);
-          reasonConfigField.dataSource = this.editIrpCandidateService.createReasonsOptions(reasons || []);
+          if(!this.canOnboardCandidateIRP){
+            const objWithIdIndex = statusConfigField.dataSource.findIndex((obj:any) => obj.text === "Onboard");
+            if (objWithIdIndex > -1) {
+              statusConfigField.dataSource.splice(objWithIdIndex, 1);
+            }
+          }
+          if(!this.canRejectedCandidateIRP){
+            const objWithIdIndex = statusConfigField.dataSource.findIndex((obj:any) => obj.text === "Reject");
+            if (objWithIdIndex > -1) {
+              statusConfigField.dataSource.splice(objWithIdIndex, 1);
+            }
+          }
+
           this.candidateForm.patchValue({
             actualStartDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualStartDate as string),
             actualEndDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualEndDate as string),
           }, { emitEvent: false, onlySelf: true });
         }),
         switchMap(() => {
+          const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
+
           if (this.candidateModelState.candidate.status === CandidatStatus.Cancelled
             || this.candidateModelState.candidate.status === CandidatStatus.Offboard) {
-              const jobDto: JobDetailsDto = {
-                OrganizationId: this.candidateModelState.order.organizationId as number,
-                JobId: this.candidateModelState.candidate.candidateJobId,
-              };
+            const jobDto: JobDetailsDto = {
+              OrganizationId: this.candidateModelState.order.organizationId as number,
+              JobId: this.candidateModelState.candidate.candidateJobId,
+            };
+
+            reasonConfigField.dataSource = this.editIrpCandidateService
+              .createReasonsOptions(this.editIrpCandidateService.getClosureReasons());
 
             return this.orderCandidateApiService.getPositionDetails(jobDto)
             .pipe(
@@ -213,6 +273,10 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
               })
             );
           }
+
+          this.candidateForm.enable();
+          reasonConfigField.dataSource = this.editIrpCandidateService
+            .createReasonsOptions(this.editIrpCandidateService.getClosureReasons(true));
 
           return of(null);
         }),
@@ -283,6 +347,24 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       text: jobStatus.statusText,
       value: jobStatus.applicantStatus,
     }];
+    if(!this.canOnboardCandidateIRP){
+      const objWithIdIndex = statusConfig.dataSource.findIndex((obj:any) => obj.text === "Onboard");
+      if (objWithIdIndex > -1) {
+        statusConfig.dataSource.splice(objWithIdIndex, 1);
+      }
+    }
+    if(!this.canRejectedCandidateIRP){
+      const objWithIdIndex = statusConfig.dataSource.findIndex((obj:any) => obj.text === "Reject");
+      if (objWithIdIndex > -1) {
+        statusConfig.dataSource.splice(objWithIdIndex, 1);
+      }
+    }
+  }
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canOnboardCandidateIRP,canRejectCandidateIRP }) => {
+      this.canOnboardCandidateIRP=canOnboardCandidateIRP;
+      this.canRejectedCandidateIRP=canRejectCandidateIRP;
+    });
   }
 
   private setCloseData(job: OrderCandidateJob): void {

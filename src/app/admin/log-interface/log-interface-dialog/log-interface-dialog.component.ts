@@ -37,7 +37,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
-  
+
   @Select(SecurityState.logDialogOptions)
   public logDialogOptions$: Observable<DialogNextPreviousOption>;
 
@@ -49,12 +49,12 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
 
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
-  
+
 
   private isAlive = true;
   private unsubscribe$: Subject<void> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
-    
+
   public totalRecordsCount$: BehaviorSubject<number> =new BehaviorSubject<number>(0);
   public gridApi: any;
   private gridColumnApi: any;
@@ -85,7 +85,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       filter: false,
     },
     {
-      headerName: 'Timesheet ID',
+      headerName: 'Timesheet Id',
       field: 'timesheetitemid',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -98,7 +98,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'Employee ID',
+      headerName: 'Employee Id',
       field: 'employeeid',
       minWidth: 100,
       filter: 'agTextColumnFilter',
@@ -157,7 +157,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       },
       sortable: true,
       resizable: true
-    },    
+    },
     {
       headerName: 'Location Id',
       field: 'locationId',
@@ -171,14 +171,14 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       minWidth: 125,
       sortable: false,
       resizable: true
-    }, 
+    },
     {
       headerName: 'Worked DeptId',
       field: 'workedccid',
       minWidth: 100,
       sortable: false,
       resizable: true
-    },  
+    },
     {
       headerName: 'Shift Type',
       field: 'shiftType',
@@ -191,7 +191,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       },
       sortable: true,
       resizable: true
-    }, 
+    },
     {
       headerName: 'PunchIn Date',
       field: 'punchIndate',
@@ -311,7 +311,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       field: 'totalHours',
       minWidth: 50,
       resizable: true
-    },    
+    },
     {
       headerName: 'Job Code',
       field: 'jobcode',
@@ -325,48 +325,51 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true,
       cellRenderer: (params:any) => {
         return params.data.deleted == "0" ? 'No' :  params.data.deleted == "1" ? 'Yes' : params.data.deleted;
-      },      
+      },
     },
     {
       headerName: 'Error Description',
       field: 'failureReason',
       minWidth: 150,
-      resizable: true
+      resizable: true,
+      cellRenderer: (params:any) => {
+        return params.data.status == 4 ? 'Record failed to process due to some internal error' :  params.data.failureReason;
+      },
     },
   ];
   public defaultFileName: string;
   public fileName: string;
   public columnsToExport: ExportColumn[] = [
-    { text: 'Timesheet ID', column: 'timesheetitemid' },
-    { text: 'Employee ID', column: 'employeeid' },
-    { text: 'First Name', column: 'fname' },
-    { text: 'Middle Name', column: 'mname' },
-    { text: 'Last Name', column: 'lname' },
-    { text: 'Location Id', column: 'locationId' },
-    { text: 'Worked LocationId', column: 'workedlocationid' },
-    { text: 'Worked DeptId', column: 'workedccid'},
-    { text: 'Shift Type', column: 'shiftType' },
-    { text: 'PunchIn Date', column: 'punchIndate' },
-    { text: 'PunchIn Time', column: 'punchIntime' },
-    { text: 'PunchOut Date', column: 'punchOutdate' },
-    { text: 'PunchOut Time', column: 'punchOuttime' },
-    { text: 'Lunch', column: 'lunch' },
-    { text: 'Total Hours', column: 'totalHours' },
-    { text: 'Job Code', column: 'jobcode' },
-    { text: 'Deleted', column: 'deleted' },
-    { text: 'Error Description', column: 'failureReason' },
+    { text: 'Timesheet ID', column: 'TimesheetId' },
+    { text: 'Employee ID', column: 'EmployeeId' },
+    { text: 'First Name', column: 'FirstName' },
+    { text: 'Middle Name', column: 'MiddleName' },
+    { text: 'Last Name', column: 'LastName' },
+    { text: 'Location Id', column: 'LocationId' },
+    { text: 'Worked LocationId', column: 'WorkedLocationId' },
+    { text: 'Worked DeptId', column: 'WorkedDeptId'},
+    { text: 'Shift Type', column: 'ShiftType' },
+    { text: 'PunchIn Date', column: 'PunchInDate' },
+    { text: 'PunchIn Time', column: 'PunchInTime' },
+    { text: 'PunchOut Date', column: 'PunchOutDate' },
+    { text: 'PunchOut Time', column: 'PunchOutTime' },
+    { text: 'Lunch', column: 'Lunch' },
+    { text: 'Total Hours', column: 'TotalHours' },
+    { text: 'Job Code', column: 'JobCode' },
+    { text: 'Deleted', column: 'Deleted' },
+    { text: 'Error Description', column: 'ErrorDescription' },
   ];
-  
+
   constructor(
     private store: Store,private datePipe: DatePipe,
-  ) { 
+  ) {
     super();
-    var self = this;   
+    var self = this;
   }
 
   ngOnInit(): void {
     this.openDialogue.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
-      if (isOpen) { 
+      if (isOpen) {
         windowScrollTop();
         this.sideDialog.show();
         disabledBodyOverflow(true);
@@ -379,7 +382,7 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
     if(this.selectedLog != undefined){
       this.dispatchNewPageRequest({currentPage:this.currentPage,pageSize:this.pageSize});
     }
-    this.logTimeSheetHistoryPage$.pipe().subscribe((data: any) => {
+    this.logTimeSheetHistoryPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
       this.timeSheetHistoryItemList = data?.items;
       this.totalRecordsCount$.next(data?.totalCount);
       if (!this.timeSheetHistoryItemList || !this.timeSheetHistoryItemList.length) {

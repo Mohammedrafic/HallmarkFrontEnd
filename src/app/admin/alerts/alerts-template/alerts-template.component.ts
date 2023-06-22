@@ -251,20 +251,20 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       filter(Boolean),
       takeUntil(this.unsubscribe$),
     ).subscribe((id) => {
-      this.organizationId = id;      
+      this.organizationId = id;
       this.loadSystemButtons(id);
     });
   }
 
-  loadSystemButtons(businessId?:number){      
+  loadSystemButtons(businessId?:number){
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
     if(businessUnitType == BusinessUnitType.Hallmark || businessUnitType == BusinessUnitType.Organization) {
       const id = businessId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
       this.store.dispatch(new GetOrganizationById(id)).pipe(
         takeUntil(this.unsubscribe$)
-      ).subscribe(() => {        
-        const { isIRPEnabled, isVMCEnabled } = 
+      ).subscribe(() => {
+        const { isIRPEnabled, isVMCEnabled } =
             this.store.selectSnapshot(AlertsState.getOrganizationData)?.preferences || {};
 
         this.isOrgIRPEnabled = !!isIRPEnabled;
@@ -273,7 +273,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
           this.activeSystem = OrderManagementIRPSystemId.VMS;
         } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
-          this.activeSystem = OrderManagementIRPSystemId.IRP;        
+          this.activeSystem = OrderManagementIRPSystemId.IRP;
         }
 
         if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
@@ -284,7 +284,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
 
         if (!this.previousSelectedSystemId) {
           this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
-        }  
+        }
         this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
         this.adjustBusinessUnitTypeBasedActiveSystem();
       });
@@ -308,7 +308,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.onOrganizationChangedHandler();
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
-    this.userBusinessType = user?.businessUnitType;   
+    this.userBusinessType = user?.businessUnitType;
     this.filteredBusinessUnits = this.businessUnits;
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
@@ -466,7 +466,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public onEdit({ index, column, foreignKeyData, alertId, ...alertsTemplate }: AlertsTemplate & { index: string; column: unknown; foreignKeyData: unknown }): void {
     this.subTitle = alertsTemplate.alertTitle;
     this.alertTemplate={alertId, ...alertsTemplate };
-    let businessUnitId=this.businessControl.value==0?null:this.businessControl.value;    
+    let businessUnitId=this.businessControl.value==0?null:this.businessControl.value;
     if (this.alertTemplateType === AlertChannel[AlertChannel.Email]) {
       this.emailTemplateForm.addEditEmailTemplateForm.reset();
       this.SetEditData(alertId, AlertChannel.Email,businessUnitId);
@@ -607,7 +607,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private onScreenTemplateCloseDialog(): void {
     this.store.dispatch(new ShowOnScreenSideDialog(false));
   }
-  private SetEditData(alertId: number, alertChannel: AlertChannel,businessUnitId:number |null): void {    
+  private SetEditData(alertId: number, alertChannel: AlertChannel,businessUnitId:number |null): void {
     this.dispatchEditAlertTemplate(alertId, alertChannel,businessUnitId);
   }
   private generateBusinessForm(): FormGroup {
@@ -653,7 +653,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   @OutsideZone
   getErrorAlert(){
     setTimeout(()=> {
-      this.getdata.subscribe((data:any)=> {
+      this.getdata.pipe(takeUntil(this.unsubscribe$)).subscribe((data:any)=> {
         if(data.null.alertsTemplatePage == undefined && this.showtoast == true){
           this.store.dispatch(new ShowToast(MessageTypes.Error, USER_ALERTS_PERMISSION));
           this.showtoast = false;
@@ -664,22 +664,29 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
 
   changeSystem(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
-    this.adjustBusinessUnitTypeBasedActiveSystem();    
+    this.adjustBusinessUnitTypeBasedActiveSystem();
     this.dispatchNewPage();
   }
 
   adjustBusinessUnitTypeBasedActiveSystem(){
-    const user = this.store.selectSnapshot(UserState.user);    
+    const user = this.store.selectSnapshot(UserState.user);
+    if(user?.businessUnitType == BusinessUnitType.Organization){
+      this.businessUnitControl.disable();
+    }
     if(this.userBusinessType == BusinessUnitType.Hallmark)
       this.businessControl.patchValue(0);
     this.filteredBusinessUnits = this.businessUnits;
     if(this.activeSystem == OrderManagementIRPSystemId.IRP){
-      this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
       if(user?.businessUnitType == BusinessUnitType.Hallmark){
+        this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
         this.businessUnitControl.patchValue(this.filteredBusinessUnits[0].id);
       }
+      if(user?.businessUnitType == BusinessUnitType.Organization){
+        this.businessUnitControl.enable();
+        this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency && x.id !== BusinessUnitType.Hallmark);
+      }
     }
-        
+
     if(this.activeSystem == OrderManagementIRPSystemId.VMS){
       this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.Candidates);
       this.businessUnitControl.patchValue(user?.businessUnitType);

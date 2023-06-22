@@ -61,8 +61,15 @@ export class TabsListComponent implements AfterViewInit {
       let isIrpEnabled=  JSON.parse(localStorage.getItem('ISIrpEnabled') || '"false"') as boolean; 
       if(isIrpEnabled==true){
         this.globalWindow.localStorage.setItem("ISIrpEnabled", JSON.stringify(""));
+        this.globalWindow.localStorage.setItem("IsLTAOrders", JSON.stringify(true));
         this.changeTab.emit(OrderManagementIRPTabsIndex.Lta)
         this.tab.selectedItem = OrderManagementIRPTabsIndex.Lta;
+      }
+      let IRPActiveTab=  JSON.parse(localStorage.getItem('IRPActiveTab') || '"4"') as number; 
+      if(IRPActiveTab<4){
+        this.globalWindow.localStorage.setItem("IRPActiveTab", JSON.stringify("4"));
+        this.changeTab.emit(IRPActiveTab)
+        this.tab.selectedItem =IRPActiveTab;
       }
     }, 1000);
   }

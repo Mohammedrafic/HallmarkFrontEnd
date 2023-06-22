@@ -1,7 +1,7 @@
 import { ExportRoleList, GetBusinessByUnitType, GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { filter, Observable, Subject, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, take, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
@@ -158,7 +158,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         filterParams: {
           values: (params: { success: (arg0: any) => void }) => {
             setTimeout(() => {
-              this.bussinesData$.subscribe((data) => {
+              this.bussinesData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
                 params.success(
                   data.map(function (item) {
                     return item.name;
@@ -292,7 +292,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
 
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.dispatchNewPage(sort, filter);
-          self.rolesPage$.pipe().subscribe((data: any) => {
+          self.rolesPage$.pipe(takeWhile(() => self.isAlive)).subscribe((data: any) => {
             self.itemList = data?.items;
             self.totalRecordsCount = data?.totalCount;
             if (!self.itemList || !self.itemList.length) {
@@ -328,8 +328,9 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && data.rowData.id) {
           this.store.dispatch(new RemoveRole(data.rowData.id));
           var datasource = this.createServerSideDatasource();

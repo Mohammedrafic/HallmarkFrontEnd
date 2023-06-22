@@ -142,6 +142,11 @@ export class CandidateState {
     return state.orderManagementPagerState;
   }
 
+  @Selector()
+  static candidateProfile(state: CandidateStateModel): Candidate | null {
+    return state.candidate;
+  }
+
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
 
   @Action(GetCandidateById)
@@ -356,13 +361,20 @@ export class CandidateState {
   @Action(GetMasterCredentials)
   GetMasterCredentials(
     { patchState }: StateContext<CandidateStateModel>,
-    { searchTerm, credentialTypeId, orderId }: GetMasterCredentials
+    { searchTerm, credentialTypeId, orderId, isIRP }: GetMasterCredentials
   ): Observable<Credential[]> {
     patchState({ isCandidateLoading: true });
+
+    if (isIRP) {
+      return this.candidateService.getIRPMasterCredentials(searchTerm, credentialTypeId, orderId).pipe(
+        tap((payload) => {
+          patchState({ isCandidateLoading: false, masterCredentials: payload });
+        })
+      );
+    }
     return this.candidateService.getMasterCredentials(searchTerm, credentialTypeId, orderId).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false, masterCredentials: payload });
-        return payload;
       })
     );
   }

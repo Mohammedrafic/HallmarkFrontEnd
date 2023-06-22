@@ -29,3 +29,13 @@ export const JobDistributionIrpVms = [
   { id: IrpOrderJobDistribution.AllExternal, name: 'All External' },
   { id: IrpOrderJobDistribution.SelectedExternal, name: 'Selected External' },
 ];
+
+export const EditablePerDiemFields = [
+  'regionId',
+  'locationId',
+  'departmentId',
+  'skillId',
+  'shift',
+  'shiftStartTime',
+  'shiftEndTime',
+];

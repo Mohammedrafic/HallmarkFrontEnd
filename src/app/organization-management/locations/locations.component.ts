@@ -11,7 +11,7 @@ import { combineLatest, delay, filter, map, Observable, Subject, take, takeUntil
 import { concatMap, tap } from 'rxjs/operators';
 
 import { TakeUntilDestroy } from '@core/decorators';
-import { FieldType, UserPermissions } from '@core/enums';
+import { FieldType } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { GetAllBusinessLines } from '@organization-management/store/business-lines.action';
 import { BusinessLinesState } from '@organization-management/store/business-lines.state';
@@ -165,9 +165,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.watchForOrgChange();
     this.watchForOrganizations();
     this.populateFormOptions();
-    if (this.isFeatureIrpEnabled) {
-      this.setPermissions();
-    }
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
     this.store.dispatch(new GetAllBusinessLines());
@@ -506,10 +503,10 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     const reactivateDate = this.locationDetailsFormGroup.controls['reactivateDate'];
     inactiveDate.addValidators(startDateValidator(this.locationDetailsFormGroup, 'reactivateDate'));
     reactivateDate.addValidators(endDateValidator(this.locationDetailsFormGroup, 'inactiveDate'));
-    inactiveDate.valueChanges.subscribe(() =>
+    inactiveDate.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
       reactivateDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
-    reactivateDate.valueChanges.subscribe(() =>
+    reactivateDate.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
       inactiveDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
   }
@@ -628,7 +625,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       tap((data) => {
         this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
         this.selectedRegion = data.organizationManagement.regions[0];
-        
+
       }),
       filter(() => !!this.selectedRegion),
       tap(() => { this.getLocations(); }),
@@ -686,17 +683,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       }
 
       return column;
-    });
-  }
-
-  private setPermissions(): void {
-    this.getPermissionStream()
-    .pipe(
-      filter((permissions) => !permissions[UserPermissions.CanEditOrganizationalHierarchy]),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(() => {
-      this.locationDetailsFormGroup.get('includeInIRP')?.disable();
     });
   }
 

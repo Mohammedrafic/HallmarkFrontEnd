@@ -1,4 +1,4 @@
-<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme" [isLTAOrderEnding]="isLTAOrderEnding" >
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme" [isLTAOrderEnding]="isLTAOrderEnding && !slideBar" >
   <ng-template #header>
     <div [ngClass]="isLTAOrderEnding ? 'app-header padt-10' : 'app-header padt-5' ">
       <div class="app-accumulation-chart__title">
