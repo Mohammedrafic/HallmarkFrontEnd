@@ -94,10 +94,10 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
         filter: false,
         sortable: false,
         menuTabs: []
-      }, 
+      },
       sortable: true,
-      resizable: true    
-    },   
+      resizable: true
+    },
     {
       headerName: 'configurationId',
       field: 'configurationId',
@@ -121,7 +121,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       cellRendererParams: {
         onClick: this.onFileDownload.bind(this),
         label: 'NameLink',
-      }, 
+      },
       filterParams: {
         buttons: ['reset'],
         debounceMs: 1000,
@@ -221,7 +221,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
             }
           });
 
-          this.logInterfacePage$.pipe().subscribe((data: any) => {
+          this.logInterfacePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
               this.itemList = data?.items?.sort(function(a:any,b:any){
                 return b.processDate.localeCompare(a.processDate);
               });
@@ -230,9 +230,9 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
                 this.gridApi?.showNoRowsOverlay();
               }
               else {
-                this.gridApi?.hideOverlay();              
+                this.gridApi?.hideOverlay();
               }
-              this.gridApi?.setRowData(this.itemList);   
+              this.gridApi?.setRowData(this.itemList);
           });
 
           this.dispatchNewPage({currentPage:this.currentPage,pageSize:this.pageSize});
@@ -242,7 +242,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
                 this.dispatchNewPage({currentPage:this.currentPage,pageSize:this.pageSize});
                 this.openLogDetailsDialogue.next(false);
               });
-          
+
     }
 
     public gridOptions: GridOptions = {
@@ -263,7 +263,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
         }
       }
     };
-  
+
       public onEdit(data: any): void {
         this.selectedLogItem = data.rowData;
         this.openLogDetailsDialogue.next(true);
@@ -313,7 +313,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
 
   public onNextPreviousLogEvent(next: any): void {
     if(this.itemList != null && this.itemList?.length > 0){
-      const index =  this.itemList.findIndex(ele=> ele.runId === this.selectedLogItem.runId) 
+      const index =  this.itemList.findIndex(ele=> ele.runId === this.selectedLogItem.runId)
       const nextIndex = next ? index + 1 : index - 1;
       this.selectedLogItem = this.itemList[nextIndex];
       this.openLogDetailsDialogue.next(true);
@@ -327,7 +327,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
     this.gridApi.setRowData(this.itemList);
   }
 
- 
+
   public dispatchNewPage(postData:any): void {
     if(localStorage.getItem('lastSelectedOrganizationId') === null){
       this.store.dispatch(new GetLogInterfacePage(this.organizations[0]?.organizationId,postData.currentPage,postData.pageSize));
@@ -344,7 +344,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
       this.gridApi.setRowData(this.itemList);
     }
   }
-  
+
   ngOnDestroy(): void {
     this.isAlive = false;
     this.unsubscribe$.next();

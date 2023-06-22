@@ -123,8 +123,10 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
         okButtonClass: 'delete-button',
         title: 'Inactivate the Agency',
       })
-      .pipe(filter((confirm) => !!confirm))
-      .subscribe(() => {
+      .pipe(
+        filter((confirm) => !!confirm),
+        takeUntil(this.unsubscribe$),
+      ).subscribe(() => {
         this.inactivateAgency(data);
       });
   }
