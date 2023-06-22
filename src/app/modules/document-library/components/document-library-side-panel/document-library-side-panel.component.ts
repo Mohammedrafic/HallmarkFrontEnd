@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { DeleteDocumentFolderFilter, DocumentFolder, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
@@ -84,7 +84,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
             if (this.sidePanelDocumentField.dataSource[0].id != -1) {
               if (this.isNewFolderInAction)
               {
-                this.savedDocumentFolder$.subscribe((x:DocumentFolder)=>
+                this.savedDocumentFolder$.pipe(takeUntil(this.unsubscribe$)).subscribe((x:DocumentFolder)=>
                 {
                   this.tree.selectedNodes = [x.id.toString()];
                   this.tree.expandAll();
@@ -180,18 +180,19 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.tree.expandAll();
     },1000)
-    
+
     this.changeDetectorRef.markForCheck();
   }
-     
+
   public handleOnDeleteFolder(event: any) {
     this.confirmService
       .confirm(DELETE_FOLDER_TEXT, {
         title: DELETE_FOLDER_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && this.selectedNode.id && this.selectedNode.parentID != -1 && this.selectedNode.id != -1) {
           const deleteFolderFilter: DeleteDocumentFolderFilter = {
             folderId: this.selectedNode.id,

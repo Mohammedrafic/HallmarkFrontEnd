@@ -9,6 +9,7 @@ import {
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable()
 export class CandidateDetailsApiService {
@@ -27,4 +28,12 @@ export class CandidateDetailsApiService {
   public getcandidatesearchbytext(filter: any): Observable<DoNotReturnSearchCandidate[]> {
     return this.http.post<DoNotReturnSearchCandidate[]>(`/api/CandidateProfile/candidatesearchbytext`, filter);
   }
+  
+  public export(payload: ExportPayload): Observable<Blob> {
+    if (payload.ids) {
+      return this.http.post(`/api/CandidateProfile/profiles/export`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/CandidateProfile/profiles/export`, payload, { responseType: 'blob' });
+  }
+
 }

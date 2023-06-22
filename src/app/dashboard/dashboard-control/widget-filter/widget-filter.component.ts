@@ -202,8 +202,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     if (this.userIsAdmin) {
       this.widgetFilterFormGroup
         .get(FilterColumnTypeEnum.ORGANIZATION)
-        ?.valueChanges.pipe(throttleTime(100))
-        .subscribe((val: number[]) => {
+        ?.valueChanges.pipe(
+          throttleTime(100),
+          takeUntil(this.destroy$)
+      ).subscribe((val: number[]) => {
           if (val?.length) {
             const selectedOrganizations: Organisation[] = val.map((id) => this.allOrganizations.find((org) => org.organizationId === id) as Organisation);
 
@@ -240,7 +242,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   public onFilterControlValueChangedHandler(): void {
     this.subscribeToOrganizationChanges();
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.valueChanges.pipe(throttleTime(100)).subscribe((val: number[]) => {
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.valueChanges.pipe(
+      throttleTime(100),
+      takeUntil(this.destroy$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = val.map((id) => {
           return this.userIsAdmin
@@ -263,7 +268,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
       this.cdr.markForCheck();
     });
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.valueChanges.pipe(throttleTime(100)).subscribe((val: number[]) => {
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.valueChanges.pipe(
+      throttleTime(100),
+      takeUntil(this.destroy$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = val.map((id) => (this.filterColumns.locationIds.dataSource as any[]).find((location: OrganizationLocation) => location.id === id));
        const locationDepartments: OrganizationDepartment[] = [];
@@ -282,10 +290,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
       });
 
     this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.valueChanges
-      .pipe(throttleTime(100)).subscribe(() => this.cdr.markForCheck());
+      .pipe(throttleTime(100),takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
 
     this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.valueChanges
-      .pipe(throttleTime(100)).subscribe(() => this.cdr.markForCheck());
+      .pipe(throttleTime(100),takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
   }
 
   private onOrganizationStructureDataLoadHandler(): void {

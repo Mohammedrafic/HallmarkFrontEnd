@@ -49,7 +49,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   public canCreateOrder: boolean;
   private unsubscribe$: Subject<void> = new Subject();
   private eventsHandler: Subject<void> = new Subject();
-  
+
     constructor(
     private store: Store,
     private commentsService: CommentsService,
@@ -82,7 +82,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
           this.cdr.markForCheck();
         })
       }
-    
+
     } else {
       this.isHideContactDetailsOfOrderInAgencyLogin = false;
       this.cdr.markForCheck();
@@ -119,7 +119,9 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   private getHistoricalEvents(): void {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const organizationId = isAgencyArea ? this.order.organizationId : null;
-    this.historicalEventsService.getEvents(this.order.id, organizationId, this.jobId).subscribe(data => {
+    this.historicalEventsService.getEvents(this.order.id, organizationId, this.jobId).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(data => {
       this.events = data;
       this.cdr.markForCheck();
     });

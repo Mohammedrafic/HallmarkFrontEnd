@@ -205,8 +205,10 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          takeUntil(this.componentDestroy())
+        ).subscribe(() => {
           this.navigateToCandidates();
         });
     } else {
@@ -333,8 +335,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       ssn: ssn ? this.getStringSsn(ssn) : null,
       candidateProfileSkills: candidateProfileSkills.map((skill) => skill.id),
     });
-    if(candidateProfileContactDetail?.country === Country.Canada){ 
-      this.customMaskChar = '>L0L >0L0';     
+    if(candidateProfileContactDetail?.country === Country.Canada){
+      this.customMaskChar = '>L0L >0L0';
     }else{
       this.customMaskChar = '00000';
     }
@@ -406,7 +408,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       pageToBack: string;
       isNavigateFromCandidateDetails: boolean;
       orderManagementPagerState?: OrderManagementPagerState | null;
-    }; 
+    };
     const navigationStateString = this.globalWindow.localStorage.getItem('navigationState');
     const navigationState = navigationStateString ? JSON.parse(navigationStateString) : null;
     const location = navigationState ? Object.assign(locationState, navigationState) : locationState;
@@ -491,7 +493,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         take(1),
         filter(() => !candidate.id),
         switchMap(() => this.candidateProfile$),
-        filter((candidateProfile) => !!candidateProfile?.id)
+        filter((candidateProfile) => !!candidateProfile?.id),
+        takeUntil(this.componentDestroy())
       )
       .subscribe((candidateProfile) => {
         this.getCandidateLoginSetting(candidateProfile.id as number);

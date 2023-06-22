@@ -106,8 +106,9 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         }),
         catchError((error) =>
           this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)))
-        ))
-      .subscribe();
+        ),
+        takeUntil(this.componentDestroy())
+      ).subscribe();
   }
 
   private subsToBillRateControlChange(): void {
@@ -150,7 +151,9 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   }
 
   private listenPrimaryDuration(): void {
-    this.extensionForm.get('durationPrimary')?.valueChanges.subscribe((duration: Duration) => {
+    this.extensionForm.get('durationPrimary')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((duration: Duration) => {
       const durationSecondary = this.extensionForm.get('durationSecondary');
       const durationTertiary = this.extensionForm.get('durationTertiary');
 
@@ -177,6 +180,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     combineLatest([durationSecondary$, durationTertiary$])
       .pipe(
         filter(([durationSecondary$, durationTertiary$]) => !isNil(durationSecondary$) && !isNil(durationTertiary$)),
+        takeUntil(this.componentDestroy())
       )
       .subscribe(([durationSecondary, durationTertiary]: number[]) => {
         const { value: startDate } = this.extensionForm.get('startDate')!;
@@ -193,7 +197,10 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       startDateControl?.valueChanges.pipe(startWith(null))!,
       endDateControl?.valueChanges.pipe(startWith(null))!
     ])
-      .pipe(filter(() => startDateControl?.dirty! || endDateControl?.dirty!))
+      .pipe(
+        filter(() => startDateControl?.dirty! || endDateControl?.dirty!),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe(([startDate, endDate]) => {
         this.startDate = startDate;
         if (startDate > endDate) {

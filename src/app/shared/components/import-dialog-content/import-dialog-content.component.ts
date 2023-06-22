@@ -13,7 +13,7 @@ import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-in
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FileInfo } from '@syncfusion/ej2-inputs/src/uploader/uploader';
-import { filter, Subject, takeUntil } from 'rxjs';
+import { filter, Subject, take, takeUntil } from 'rxjs';
 
 import {
   DELETE_CONFIRM_TEXT,
@@ -115,8 +115,10 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => confirm),
+          take(1)
+        ).subscribe(() => {
           this.closeDialog();
         });
     } else {
@@ -216,8 +218,10 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
             okButtonLabel: 'Import',
             okButtonClass: '',
           })
-          .pipe(filter((confirm) => confirm))
-          .subscribe(() => {
+          .pipe(
+            filter((confirm) => confirm),
+            take(1)
+          ).subscribe(() => {
             this.saveImportResult.next(this.importResult?.succesfullRecords || []);
           });
       } else {

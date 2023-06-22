@@ -81,10 +81,14 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
 
     this.startTimeField = this.HolidayFormGroup.get('startDateTime') as AbstractControl;
     this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime'));
-    this.startTimeField.valueChanges.subscribe(() => this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+    this.startTimeField.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
     this.endTimeField = this.HolidayFormGroup.get('endDateTime') as AbstractControl;
     this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime'));
-    this.endTimeField.valueChanges.subscribe(() => this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+    this.endTimeField.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
   }
 
   override ngOnInit(): void {
@@ -205,8 +209,10 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
         okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
+      }).pipe(
+        filter(confirm => !!confirm),
+        takeUntil(this.unsubscribe$),
+      ).subscribe(() => {
         this.store.dispatch(new ShowSideDialog(false));
         this.showForm = false;
         this.HolidayFormGroup.reset();

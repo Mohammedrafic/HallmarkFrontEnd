@@ -2,7 +2,7 @@ import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable } from 'rxjs';
+import { filter, Observable, takeUntil } from 'rxjs';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 
 import { ShowExportDialog, ShowSideDialog, ShowToast } from '../../../../store/app.actions';
@@ -30,12 +30,14 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { TakeUntilDestroy } from '@core/decorators';
 
 @Component({
   selector: 'app-master-credentials-types',
   templateUrl: './master-credentials-types.component.html',
   styleUrls: ['./master-credentials-types.component.scss']
 })
+@TakeUntilDestroy
 export class MasterCredentialsTypesComponent extends AbstractPermissionGrid implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
@@ -55,6 +57,8 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
   public columnsToExport: ExportColumn[] = [
     { text:'Types', column: 'Name'}
   ];
+
+  protected componentDestroy: () => Observable<unknown>;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -125,8 +129,9 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        takeUntil(this.componentDestroy())
+      ).subscribe((confirm) => {
         if (confirm && credentialType.id) {
           this.store.dispatch(new RemoveCredentialType(credentialType));
         }
@@ -140,7 +145,7 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
 
   onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.credentialType$.subscribe(data => {
+      this.credentialType$.pipe(takeUntil(this.componentDestroy())).subscribe(data => {
         this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
         this.currentPagerPage = event.currentPage || event.value;
       });
@@ -154,8 +159,10 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
-        .subscribe(() => {
+        }).pipe(
+          filter(confirm => !!confirm),
+          takeUntil(this.componentDestroy()),
+        ).subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
           this.credentialTypeFormGroup.reset();
           this.isEdit = false;
@@ -194,7 +201,7 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
   }
 
   mapGridData(): void {
-    this.credentialType$.subscribe(data => {
+    this.credentialType$.pipe(takeUntil(this.componentDestroy())).subscribe(data => {
       if (data) {
         this.lastAvailablePage = this.getLastPage(data);
         this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);

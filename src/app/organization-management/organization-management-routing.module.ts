@@ -8,7 +8,6 @@ import { BusinessLinesComponent } from './business-lines/business-lines.componen
 import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { CredentialsComponent } from './credentials/credentials.component';
-import { DepartmentsComponent } from './departments/departments.component';
 import { HolidaysComponent } from './holidays/holidays.component';
 import { LocationsComponent } from './locations/locations.component';
 import { OrganizationManagementComponent } from './organization-management.component';
@@ -30,7 +29,7 @@ const routes: Routes = [
     children: [
       {
         path: 'departments',
-        component: DepartmentsComponent,
+        loadChildren: () => import('./departments/departments.module').then((m) => m.DepartmentsModule),
         data: {
           isOrganizationArea: true,
         },

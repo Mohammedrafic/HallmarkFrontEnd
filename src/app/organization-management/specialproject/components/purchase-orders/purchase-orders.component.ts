@@ -13,7 +13,7 @@ import {
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { PurchaseOrdderColumnsDefinition, SpecialProjectMessages } from '../../constants/specialprojects.constant';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { PurchaseOrderState } from '../../../store/purchase-order.state';
@@ -50,7 +50,7 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
   }
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = PurchaseOrdderColumnsDefinition(this.actionCellrenderParams,this.datePipe);
-  
+
   ngOnInit(): void {
     this.getPurchaseOrders();
   }
@@ -156,10 +156,11 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && params.id) {
-          this.store.dispatch(new DeletPurchaseOrder(params.id)).subscribe(val => {
+          this.store.dispatch(new DeletPurchaseOrder(params.id)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
             this.getPurchaseOrders();
           });
         }

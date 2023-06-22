@@ -6,7 +6,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ShowSideDialog, ShowToast } from '../../../store/app.actions';
 import { Organization, OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { UserState } from '../../../store/user.state';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
@@ -174,7 +174,9 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
           .subscribe(() => {
             if (this.specialProjectMappingToPost) {
               this.specialProjectMappingToPost.forceUpsert = true;
-              this.store.dispatch(new SaveSpecialProjectMapping(this.specialProjectMappingToPost)).subscribe(val => {
+              this.store.dispatch(new SaveSpecialProjectMapping(this.specialProjectMappingToPost)).pipe(
+                takeUntil(this.unsubscribe$)
+              ).subscribe(val => {
                 this.form.reset();
                 this.childSpecialProjectMappingComponent.getSpecialProjectMappings();
                 this.closeDialog();
@@ -194,11 +196,15 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
             title: DATA_OVERRIDE_TITLE,
             okButtonLabel: 'Confirm',
             okButtonClass: ''
-          }).pipe(filter(confirm => !!confirm))
-          .subscribe(() => {
+          }).pipe(
+            filter(confirm => !!confirm),
+            take(1)
+          ).subscribe(() => {
             if (this.purchaseOrderMappingToPost) {
               this.purchaseOrderMappingToPost.forceUpsert = true;
-              this.store.dispatch(new SavePurchaseOrderMapping(this.purchaseOrderMappingToPost)).subscribe(val => {
+              this.store.dispatch(new SavePurchaseOrderMapping(this.purchaseOrderMappingToPost)).pipe(
+                takeUntil(this.unsubscribe$)
+              ).subscribe(val => {
                 this.form.reset();
                 this.childPurchaseOrderMappingComponent.getPurchaseOrderMappings();
                 this.closeDialog();
@@ -300,13 +306,13 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
   private applyDateValidations() {
     this.startDateField = this.form.get(FormControlNames.StartDate) as AbstractControl;
     this.endDateField = this.form.get(FormControlNames.EndDate) as AbstractControl;
-    this.startDateField.valueChanges.subscribe(() => {
+    this.startDateField.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       if (this.endDateField?.value != null) {
         this.endDateField.addValidators(datesValidator(this.form, FormControlNames.StartDate, FormControlNames.EndDate));
         this.endDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
       }
     });
-    this.endDateField.valueChanges.subscribe(() => {
+    this.endDateField.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       if (this.startDateField?.value != null) {
         this.startDateField.addValidators(datesValidator(this.form, FormControlNames.StartDate, FormControlNames.EndDate));
         this.startDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
@@ -523,7 +529,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
 
   private onOrgStructureControlValueChangedHandler(): void {
 
-    this.form.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+    this.form.get('regionIds')?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val: number[]) => {
       if (val?.length) {
         this.form.get('locationIds')?.setValue([]);
         const selectedRegions: OrganizationRegion[] = [];
@@ -543,7 +549,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       }
       this.changeDetectorRef.detectChanges();
     });
-    this.form.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
+    this.form.get('locationIds')?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val: number[]) => {
       if (val?.length) {
         this.form.get('departmentsIds')?.setValue([]);
         const selectedLocations: OrganizationLocation[] = [];
@@ -639,7 +645,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       includeInIRP: this.showSelectSystem ? this.form.value.includeInIRP ?? false : this.selectedSystem.isIRP,
       includeInVMS: this.showSelectSystem ? this.form.value.includeInVMS ?? false : this.selectedSystem.isVMS
     };
-    this.store.dispatch(new SaveSpecialProject(specialProject)).subscribe(val => {
+    this.store.dispatch(new SaveSpecialProject(specialProject)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
       this.form.reset();
       this.childC.getSpecialProjects();
       this.closeDialog();
@@ -658,7 +664,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       organizationId: this.organizationId,
       projectBudget: this.form.value.projectBudget,
     };
-    this.store.dispatch(new SavePurchaseOrder(purchaseOrder)).subscribe(val => {
+    this.store.dispatch(new SavePurchaseOrder(purchaseOrder)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
       this.form.reset();
       this.childPurchaseComponent.getPurchaseOrders();
       this.closeDialog();
@@ -680,7 +686,9 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       includeInIRP: this.showSelectSystem ? this.form.value.includeInIRP ?? false : this.selectedSystem.isIRP,
       includeInVMS: this.showSelectSystem ? this.form.value.includeInVMS ?? false : this.selectedSystem.isVMS
     };
-    this.store.dispatch(new SaveSpecialProjectCategory(specialProjectCategory)).subscribe(val => {
+    this.store.dispatch(new SaveSpecialProjectCategory(specialProjectCategory)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(val => {
       this.form.reset();
       this.childSpecialProjectCategoryComponent.getSpecialProjectCategories();
       this.closeDialog();
@@ -713,7 +721,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       };
 
       this.specialProjectMappingToPost = specialProjectMapping;
-      this.store.dispatch(new SaveSpecialProjectMapping(specialProjectMapping)).subscribe(val => {
+      this.store.dispatch(new SaveSpecialProjectMapping(specialProjectMapping)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
         this.form.reset();
         this.childSpecialProjectMappingComponent.getSpecialProjectMappings();
         this.closeDialog();
@@ -732,7 +740,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       };
 
       this.purchaseOrderMappingToPost = purchaseOrderMapping;
-      this.store.dispatch(new SavePurchaseOrderMapping(purchaseOrderMapping)).subscribe(val => {
+      this.store.dispatch(new SavePurchaseOrderMapping(purchaseOrderMapping)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
         this.form.reset();
         this.childPurchaseOrderMappingComponent.getPurchaseOrderMappings();
         this.closeDialog();

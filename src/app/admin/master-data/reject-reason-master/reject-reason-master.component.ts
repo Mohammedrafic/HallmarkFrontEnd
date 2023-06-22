@@ -87,8 +87,10 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm:boolean) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm:boolean) => !!confirm),
+          takeWhile(() => this.isAlive)
+        ).subscribe(() => {
           this.closeSideDialog()
         });
     } else {
@@ -112,8 +114,9 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm: boolean) => {
+      }).pipe(
+        takeWhile(() => this.isAlive)
+      ).subscribe((confirm: boolean) => {
         if (confirm) {
           this.store.dispatch(new RemoveRejectMaterReasons(id));
         }

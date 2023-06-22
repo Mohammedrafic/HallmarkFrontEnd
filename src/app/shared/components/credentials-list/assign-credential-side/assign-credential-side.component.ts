@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { filter, map, Observable, Subject, take, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -7,7 +7,6 @@ import {
   DrawNodeEventArgs,
   FieldsSettingsModel,
   NodeCheckEventArgs,
-  NodeClickEventArgs,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
 
@@ -84,8 +83,10 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.clearAndClose();
         });
     } else {
