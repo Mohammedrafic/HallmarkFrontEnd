@@ -116,6 +116,7 @@
                        maxlength="50"
                        tabindex="1"
                        formControlName="documentName"/>
+                       <span *ngIf="formAltaControls['documentName']?.touched && formAltaControls['documentName']?.errors?.pattern" class="error">Special characters !&()^*$#@+ not allowed</span>
               </div>
             </div>
             <div class="input-container"></div>
