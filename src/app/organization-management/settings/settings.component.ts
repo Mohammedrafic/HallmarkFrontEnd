@@ -5,7 +5,7 @@ import { Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { distinctUntilChanged, filter, Observable, skip, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, skip, Subject, take, takeUntil } from 'rxjs';
 
 import { OutsideZone } from '@core/decorators';
 import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
@@ -377,8 +377,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm: boolean) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm: boolean) => confirm),
+          take(1)
+        ).subscribe(() => {
           this.closeSettingDialog();
         });
     } else {
@@ -456,10 +458,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
         this.store.dispatch(new ShowToast(MessageTypes.Error, "Please select a Department"));
         return;
-       
-      }     
+
+      }
     }
-   
+
     if (this.RegionLocationSettingsMultiFormGroup.valid) {
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
@@ -475,7 +477,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.sendForm();
       } else {
         this.switchedValueForm.markAllAsTouched();
-      }   
+      }
     }
 
     this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();

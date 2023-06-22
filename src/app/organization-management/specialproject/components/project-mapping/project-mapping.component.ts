@@ -12,7 +12,7 @@ import {
 } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { SpecialProjectMappingColumnsDefinition, SpecialProjectMessages } from '../../constants/specialprojects.constant';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { FormGroup } from '@angular/forms';
 import { SpecialProjectMappingState } from '../../../store/special-project-mapping.state';
@@ -168,10 +168,13 @@ export class ProjectMappingComponent extends AbstractGridConfigurationComponent 
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && params.id) {
-          this.store.dispatch(new DeletSpecialProjectMapping(params.id)).subscribe(val => {
+          this.store.dispatch(new DeletSpecialProjectMapping(params.id)).pipe(
+            takeUntil(this.unsubscribe$)
+          ).subscribe(val => {
             this.getSpecialProjectMappings();
           });
         }

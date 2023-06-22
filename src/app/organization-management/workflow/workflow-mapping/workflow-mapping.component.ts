@@ -1,6 +1,6 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, filter, first, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { combineLatest, filter, first, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
@@ -261,7 +261,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       this.filterColumns.names.dataSource = workflows.payload.map((item: WorkflowWithDetails) => item.name);
     });
 
-    this.workflowMappingFormGroup.get('regions')?.valueChanges.subscribe((regionIds: number[]) => {
+    this.workflowMappingFormGroup.get('regions')?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((regionIds: number[]) => {
       if (regionIds && regionIds.length > 0) {
         const locations: OrganizationLocation[] = [];
         regionIds.forEach((id) => {
@@ -284,7 +284,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
         this.filterColumns.regionIds.dataSource = this.allRegions;
       });
 
-    this.WorkflowFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+    this.WorkflowFilterFormGroup.get('regionIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
         const locations: OrganizationLocation[] = [];
@@ -303,7 +305,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       }
     });
 
-    this.WorkflowFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
+    this.WorkflowFilterFormGroup.get('locationIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
         const departments: OrganizationDepartment[] = [];
@@ -331,7 +335,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       }
     });
 
-    this.workflowMappingFormGroup.get('locations')?.valueChanges.subscribe((locationIds: number[]) => {
+    this.workflowMappingFormGroup.get('locations')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
         const departments: OrganizationDepartment[] = [];
         locationIds.forEach((id) => {
@@ -344,7 +350,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       this.workflowMappingFormGroup.controls['departments'].setValue(null);
     });
 
-    this.workflowMappingFormGroup.get('workflowName')?.valueChanges.subscribe((id: number) => {
+    this.workflowMappingFormGroup.get('workflowName')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((id: number) => {
       if (this.orderRoleUserFormArray.length > 0) {
         this.orderRoleUserFormArray.clear();
       }
@@ -632,8 +640,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm) {
           this.store.dispatch(new RemoveWorkflowMapping(data.mappingId, this.filters));
         }
@@ -649,8 +658,10 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
           this.showForm = false;
           this.clearFormDetails();

@@ -39,7 +39,7 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
 
   @Select(UserState.lastSelectedOrganizationId)
   private lastSelectedOrganizationId$: Observable<number>;
-  
+
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
 
@@ -141,8 +141,8 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
         cellRendererParams: {
           label: 'hasHeader'
         },
-        valueGetter: (params: { data: { hasHeader: boolean } }) => { 
-          return params.data.hasHeader 
+        valueGetter: (params: { data: { hasHeader: boolean } }) => {
+          return params.data.hasHeader
         },
         suppressMovable: true,
         minWidth: 150,
@@ -163,8 +163,8 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
         cellRendererParams: {
           label: 'importAllFilesIntheFolder'
         },
-        valueGetter: (params: { data: { importAllFilesIntheFolder: boolean } }) => { 
-          return params.data.importAllFilesIntheFolder 
+        valueGetter: (params: { data: { importAllFilesIntheFolder: boolean } }) => {
+          return params.data.importAllFilesIntheFolder
         },
         suppressMovable: true,
         minWidth: 250,
@@ -178,8 +178,8 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
         cellRendererParams: {
           label: 'processSameFileAgain'
         },
-        valueGetter: (params: { data: { processSameFileAgain: boolean } }) => { 
-          return params.data.processSameFileAgain 
+        valueGetter: (params: { data: { processSameFileAgain: boolean } }) => {
+          return params.data.processSameFileAgain
         },
         suppressMovable: true,
         minWidth: 200,
@@ -199,8 +199,8 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
         cellRendererParams: {
           label: 'emailNotification'
         },
-        valueGetter: (params: { data: { emailNotification: boolean } }) => { 
-          return params.data.emailNotification 
+        valueGetter: (params: { data: { emailNotification: boolean } }) => {
+          return params.data.emailNotification
         },
         suppressMovable: true,
         minWidth: 200,
@@ -330,7 +330,7 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
           };
 
           self.dispatchNewPage(postData);
-          self.orgInterfacePage$.pipe().subscribe((data: any) => {
+          self.orgInterfacePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
             self.itemList = data?.items;
             self.totalRecordsCount = data?.totalCount;
 
@@ -345,7 +345,7 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
       },
     };
   }
-  
+
   public dispatchNewPage(postData:any): void {
     if(localStorage.getItem('lastSelectedOrganizationId') === null)
     {

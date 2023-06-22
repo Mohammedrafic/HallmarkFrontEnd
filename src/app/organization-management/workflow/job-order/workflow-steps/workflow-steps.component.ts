@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, Input, OnInit, OnDestroy, Output } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Step, Workflow } from '@shared/models/workflow.model';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, take, takeUntil } from 'rxjs';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { filter } from 'rxjs/operators';
@@ -118,8 +118,10 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
+      }).pipe(
+        filter(confirm => !!confirm),
+        take(1)
+      ).subscribe(() => {
         const notCustomSteps = this.steps.filter(s => s.type !== WorkflowStepType.Custom); // preserve all non-custom steps
         this.steps = this.steps.filter(s => s.type === WorkflowStepType.Custom);
         this.steps.splice(index, 1); // remove custom step by its index

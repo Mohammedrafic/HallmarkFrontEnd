@@ -5,7 +5,7 @@ import { Select, Store } from '@ngxs/store';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 
 import { MessageTypes } from '@shared/enums/message-types';
 import { Region, regionFilter, regionsPage } from '@shared/models/region.model';
@@ -330,10 +330,13 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && region.id ) {
-          this.store.dispatch(new DeleteRegionById(region.id)).subscribe(() => {
+          this.store.dispatch(new DeleteRegionById(region.id)).pipe(
+            takeUntil(this.unsubscribe$)
+          ).subscribe(() => {
             this.getRegions();
             this.getMasterRegionData();
           });
@@ -350,8 +353,10 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
-        }).pipe(filter(confirm => !!confirm))
-        .subscribe(() => {
+        }).pipe(
+          filter(confirm => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
           this.isEdit = false;
           this.editedRegionId = undefined;
@@ -402,7 +407,9 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
       this.editedRegionId = undefined;
       return;
     }
-    this.store.dispatch(new SaveRegion(Region)).subscribe((res) => {
+    this.store.dispatch(new SaveRegion(Region)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((res) => {
       if (selectedIndex == (selectedRegionsLength - 1)) {
         this.store.dispatch(new GetRegionsPage(this.filters));
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));

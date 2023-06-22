@@ -908,16 +908,16 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
         this.getComments();
-        this.subscribeForSettings().subscribe(() => {
+        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe(() => {
           this.populateForms(order);
         });
       } else if (order?.isTemplate) {
         this.order = order;
-        this.subscribeForSettings().subscribe(() => {
+        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe(() => {
           this.populateForms(order);
         });
       } else if (!isEditMode) {
-        this.subscribeForSettings().subscribe();
+        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe();
         this.isEditMode = false;
         this.order = null;
         this.populateNewOrderForm();
@@ -1298,7 +1298,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+    this.permissionService.getPermissions().pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
     });
   }
