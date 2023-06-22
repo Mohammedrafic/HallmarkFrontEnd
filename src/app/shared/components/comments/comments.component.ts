@@ -37,6 +37,10 @@ export class CommentsComponent {
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
     }
+    else
+    {
+      this.commentData = [];
+    }
   }
   get comments(): Comment[] {
     return this.commentsList;
