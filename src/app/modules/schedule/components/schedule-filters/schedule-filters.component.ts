@@ -242,7 +242,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
           this.filterColumns.skillIds.dataSource = skillOption;
           const skillIds = this.getSkillsIds(skillOption);
-          this.chipsSettings.preservedChipsSkills = [];
           this.chipsSettings.editedChips = false;
           this.scheduleFilterFormGroup.get('skillIds')?.patchValue(this.getSkillsPatchValue(skillIds));
         } else {
@@ -500,6 +499,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
             regionIds: this.filters.regionIds ? [...this.filters.regionIds] : [],
             locationIds: this.filters.locationIds ? [...this.filters.locationIds] : [],
             departmentsIds: this.filters.departmentsIds ? [...this.filters.departmentsIds] : [],
+            skillIds : this.filters.skillIds ? [...this.filters.skillIds] : [],
             isAvailablity : this.filters.isAvailablity,
             isUnavailablity : this.filters.isUnavailablity,
             isExcludeNotOrganized : this.filters.isExcludeNotOrganized,
@@ -508,6 +508,14 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
             endTime : getPreservedTime(this.filters.endTime)
           });
         }
+         //Get only valid numeric values
+         const skillIds = this.filters?.skillIds?.filter((skillId) => !isNaN(skillId as number)) as number[];
+         if(skillIds){
+           this.chipsSettings = {
+             ...this.chipsSettings,
+             preservedChipsSkills: [...skillIds],
+           };
+         }
         if (!this.filters.skillIds?.length) {
           this.setFilters();
         }
