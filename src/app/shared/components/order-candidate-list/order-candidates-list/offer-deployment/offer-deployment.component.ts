@@ -207,8 +207,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => confirm),
+          take(1)
+        ).subscribe(() => {
           this.closeDialog();
         });
     } else {
@@ -287,8 +289,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   billRatesUpdated: this.checkForBillRateUpdate(rates),
                   candidatePayRate: value.candidatePayRate,
                 })
-              )
-              .subscribe(() => {
+              ).pipe(
+                takeUntil(this.unsubscribe$)
+              ).subscribe(() => {
                 this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
                 if (reloadJob) {
                   this.store.dispatch(

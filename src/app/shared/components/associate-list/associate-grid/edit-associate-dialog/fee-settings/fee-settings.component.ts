@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, Subject } from 'rxjs';
+import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import {
   AssociateOrganizationsAgency,
   FeeExceptions,
@@ -18,13 +18,15 @@ import { TiersException } from '@shared/components/associate-list/store/associat
 import { AgencyStatus } from '@shared/enums/status';
 import { Permission } from "@core/interface";
 import { UserPermissions } from "@core/enums";
+import { TakeUntilDestroy } from '@core/decorators';
 
 @Component({
   selector: 'app-fee-settings',
   templateUrl: './fee-settings.component.html',
   styleUrls: ['./fee-settings.component.scss'],
 })
-export class FeeSettingsComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit {
+@TakeUntilDestroy
+export class FeeSettingsComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
   @Input() form: FormGroup;
@@ -50,6 +52,8 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
 
   private organizationAgencyId: number;
 
+  protected componentDestroy: () => Observable<unknown>;
+
   constructor(private store: Store, private confirmService: ConfirmService) {
     super();
   }
@@ -61,7 +65,11 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   ngAfterViewInit(): void {
     this.grid.rowHeight = GRID_CONFIG.initialRowHeight;
   }
-  
+
+  ngOnDestroy(): void {
+    //@TakeUntilDestroy
+  }
+
   public addNew(Id:number): void {
     this.openAddNewFeeDialog.next(Id);
   }
@@ -79,8 +87,10 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter(Boolean))
-      .subscribe(() => {
+      .pipe(
+        filter(Boolean),
+        take(1)
+      ).subscribe(() => {
         this.store.dispatch(new TiersException.RemoveFeeExceptionsById(data.id))
       });
   }
@@ -119,9 +129,13 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private subscribeOnIdChanges(): void {
-    this.form.get('id')?.valueChanges.subscribe((organizationAgencyId) => {
+    this.form.get('id')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((organizationAgencyId) => {
       this.organizationAgencyId = organizationAgencyId;
-      this.store.dispatch(new TiersException.GetFeeSettingByOrganizationId(organizationAgencyId, this.currentPage, this.pageSize));
+      this.store.dispatch(
+        new TiersException.GetFeeSettingByOrganizationId(organizationAgencyId, this.currentPage, this.pageSize)
+      );
     });
   }
 }

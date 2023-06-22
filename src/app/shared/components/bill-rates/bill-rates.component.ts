@@ -69,13 +69,13 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
 
     this.intervalMinField = this.billRateForm.get('intervalMin') as AbstractControl;
     this.intervalMinField.addValidators(intervalMinValidator(this.billRateForm, 'intervalMax'));
-    this.intervalMinField.valueChanges.subscribe(() =>
+    this.intervalMinField.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
       this.intervalMaxField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
 
     this.intervalMaxField = this.billRateForm.get('intervalMax') as AbstractControl;
     this.intervalMaxField.addValidators(intervalMaxValidator(this.billRateForm, 'intervalMin'));
-    this.intervalMaxField.valueChanges.subscribe(() =>
+    this.intervalMaxField.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
       this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
   }
@@ -175,8 +175,10 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.billRateForm.reset();
           this.billRateForm.enable();
           this.store.dispatch(new ShowSideDialog(false));
@@ -231,7 +233,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       const isCandidateCanceled = applicantStatus === CandidatStatus.Cancelled
       || applicantStatus === CandidatStatus.Offboard;
       const showWarnMessage = (applicantStatus === CandidatStatus.OnBoard && !this.isOrderPage) || isCandidateCanceled;
-      
+
       if (showWarnMessage) {
         const confirmText = this.editBillRateIndex ? EDIT_CONFIRM_TEXT : ADD_CONFIRM_TEXT;
         const messageToShow = isCandidateCanceled ? UpdateClosedPositionRate : confirmText;

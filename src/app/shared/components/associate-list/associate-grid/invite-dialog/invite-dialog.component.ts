@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FormControl, Validators } from '@angular/forms';
@@ -68,8 +68,10 @@ export class InviteDialogComponent extends DestroyableDirective implements OnIni
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.control.reset();
           this.sideDialog.hide();
         });
@@ -94,7 +96,10 @@ export class InviteDialogComponent extends DestroyableDirective implements OnIni
   }
 
   private subscribeOnSuccessInviteOrgAgency(): void {
-    this.actions$.pipe(ofActionSuccessful(TiersException.InviteOrganizationsSucceeded), takeUntil(this.destroy$)).subscribe(() => {
+    this.actions$.pipe(
+      ofActionSuccessful(TiersException.InviteOrganizationsSucceeded),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
       this.sideDialog.hide();
     });
   }
