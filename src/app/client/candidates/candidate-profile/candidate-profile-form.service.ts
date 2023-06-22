@@ -101,10 +101,8 @@ export class CandidateProfileFormService {
   }
 
   public populateHoldEndDate(candidate: CandidateModel): void {
-    if (candidate && candidate.profileStatus === ProfileStatusesEnum.OnHold) {
-      const holdEndDate = candidate.holdEndDate ? DateTimeHelper.convertDateToUtc(candidate.holdEndDate as string) : null;
-      this.candidateForm.get('holdEndDate')?.setValue(holdEndDate);
-    }
+    const holdEndDate = candidate.holdEndDate ? DateTimeHelper.convertDateToUtc(candidate.holdEndDate as string) : null;
+    this.candidateForm.get('holdEndDate')?.setValue(holdEndDate);
   }
 
   public removeValidators(): void {

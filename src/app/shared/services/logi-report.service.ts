@@ -76,8 +76,15 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
    * @return SearchCandidate
    */
  public getCommonCandidateSearch(filter:any): Observable<SearchCandidate[]> {
-  return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`,filter);
-}
+   return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`,filter);
+  }
+  /**
+   * Get the Common Candidate Search For Agency
+   * @return SearchCandidateAgency
+   */
+  public getCommonAgencyCandidateSearch(filter: any): Observable<SearchCandidate[]> {
+    return this.http.post<SearchCandidate[]>(`/api/LogiReport/common/candidatesearch`, filter);
+  }
 /**
    * Get the Common Credential Search
    * @return SearchCredential

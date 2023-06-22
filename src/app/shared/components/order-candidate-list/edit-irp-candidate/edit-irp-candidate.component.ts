@@ -5,16 +5,17 @@ import {
   ViewChild,
   Input,
   Output,
-  EventEmitter, ChangeDetectorRef,
+  EventEmitter,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Comment } from '@shared/models/comment.model';
-import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of, map, Observable } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 
+import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import {
   CandidateDialogConfig,
@@ -40,13 +41,10 @@ import { CustomFormGroup } from '@core/interface';
 import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
-import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { DurationService } from '@shared/services/duration.service';
 import { OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
-import { Order, OrderCandidateJob } from '@shared/models/order-management.model';
-import { adaptOrder } from '@client/order-management/components/irp-tabs/order-details/helpers';
-import { UserState } from 'src/app/store/user.state';
+import { OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
 
 @Component({
@@ -232,8 +230,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         filter(Boolean),
         tap((candidateDetails: CandidateDetails) => {
           const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
-          const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
-          const reasons = this.store.selectSnapshot(RejectReasonState.closureReasonsPage)?.items;
 
           statusConfigField.dataSource = this.editIrpCandidateService
           .createStatusOptions([...candidateDetails.availableStatuses ?? []]);
@@ -249,19 +245,24 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
               statusConfigField.dataSource.splice(objWithIdIndex, 1);
             }
           }
-          reasonConfigField.dataSource = this.editIrpCandidateService.createReasonsOptions(reasons || []);
+
           this.candidateForm.patchValue({
             actualStartDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualStartDate as string),
             actualEndDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualEndDate as string),
           }, { emitEvent: false, onlySelf: true });
         }),
         switchMap(() => {
+          const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
+
           if (this.candidateModelState.candidate.status === CandidatStatus.Cancelled
             || this.candidateModelState.candidate.status === CandidatStatus.Offboard) {
-              const jobDto: JobDetailsDto = {
-                OrganizationId: this.candidateModelState.order.organizationId as number,
-                JobId: this.candidateModelState.candidate.candidateJobId,
-              };
+            const jobDto: JobDetailsDto = {
+              OrganizationId: this.candidateModelState.order.organizationId as number,
+              JobId: this.candidateModelState.candidate.candidateJobId,
+            };
+
+            reasonConfigField.dataSource = this.editIrpCandidateService
+              .createReasonsOptions(this.editIrpCandidateService.getClosureReasons());
 
             return this.orderCandidateApiService.getPositionDetails(jobDto)
             .pipe(
@@ -272,6 +273,10 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
               })
             );
           }
+
+          this.candidateForm.enable();
+          reasonConfigField.dataSource = this.editIrpCandidateService
+            .createReasonsOptions(this.editIrpCandidateService.getClosureReasons(true));
 
           return of(null);
         }),
