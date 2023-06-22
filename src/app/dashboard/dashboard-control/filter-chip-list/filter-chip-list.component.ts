@@ -21,6 +21,7 @@ import { ResizeObserverModel, ResizeObserverService } from '@shared/services/res
 import {  FilterName } from 'src/app/dashboard/models/dashboard-filters.model';
 import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
+import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-filter-chip-list',
@@ -48,7 +49,9 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
 
   public ngAfterViewInit(): void {
     this.resizeObserver = ResizeObserverService.init(this.resizeContainer.nativeElement);
-    this.resizeObserver.resize$.subscribe((data) => {
+    this.resizeObserver.resize$.pipe(
+      takeUntil(this.destroy$),
+    ).subscribe((data) => {
       const lastElementPosition = data[0].target.lastElementChild?.getBoundingClientRect().top;
       this.cdr.markForCheck();
       if (lastElementPosition && lastElementPosition > 100) {

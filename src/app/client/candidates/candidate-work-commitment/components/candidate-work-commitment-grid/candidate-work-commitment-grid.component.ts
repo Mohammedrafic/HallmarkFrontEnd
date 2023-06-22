@@ -82,7 +82,8 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
         this.candidateWorkCommitmentsPage = page;
         this.candidateService.hasWorkCommitments = page.totalCount > 0;
       }),
-      switchMap(() => this.candidateService.getEmployeeWorkCommitments())
+      switchMap(() => this.candidateService.getEmployeeWorkCommitments()),
+      takeUntil(this.destroy$),
     ).subscribe(() => {
       this.cd.markForCheck();
     });
@@ -120,7 +121,8 @@ export class CandidateWorkCommitmentGridComponent extends DestroyableDirective i
       }),
       catchError((error: HttpErrorResponse) => {
         return this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
-      })
+      }),
+      takeUntil(this.destroy$)
     ).subscribe();
   }
 

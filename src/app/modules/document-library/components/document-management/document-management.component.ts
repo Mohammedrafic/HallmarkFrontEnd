@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 
 @Component({

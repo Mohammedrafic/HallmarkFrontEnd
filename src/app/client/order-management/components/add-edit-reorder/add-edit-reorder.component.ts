@@ -64,7 +64,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   @ViewChild('candidatesSelector') candidatesSelector: MultiselectDropdownComponent;
 
   @Input() public order: Order;
-  
+
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   public readonly agenciesOptionFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
@@ -204,7 +204,9 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private getComments(): void {
-    this.commentsService.getComments(this.order.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+    this.commentsService.getComments(this.order.commentContainerId as number, null).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((comments: Comment[]) => {
       this.comments = comments;
     });
   }

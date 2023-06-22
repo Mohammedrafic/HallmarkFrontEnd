@@ -5,7 +5,7 @@ import { FormGroup } from '@angular/forms';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
-import { filter, map, Observable, Subject, takeWhile } from 'rxjs';
+import { filter, map, Observable, Subject, take, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -191,7 +191,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
              * TODO: remove setTimeout.
              */
             setTimeout(() => {
-              this.rolesPage$.subscribe((data) => {
+              this.rolesPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
                 params.success(
                   data.items.map(function (item) {
                     return item.name;
@@ -351,8 +351,10 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         okButtonLabel: 'Send',
         okButtonClass: 'send-button',
       })
-      .pipe(filter(Boolean))
-      .subscribe(() => {
+      .pipe(
+        filter(Boolean),
+        take(1)
+      ).subscribe(() => {
         this.store.dispatch(new ResendWelcomeEmail(data.rowData.id!));
       });
   }
@@ -434,7 +436,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
               filter
             )
           );
-          self.usersPage$.pipe().subscribe((data: any) => {
+          self.usersPage$.pipe(takeWhile(() => self.isAlive)).subscribe((data: any) => {
             self.itemList = data?.items;
             self.totalRecordsCount = data?.totalCount;
 
@@ -474,7 +476,8 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   private watchForImport(): void {
     this.actions$
     .pipe(
-      ofActionSuccessful(ImportUsers)
+      ofActionSuccessful(ImportUsers),
+      takeWhile(() => this.isAlive)
     )
     .subscribe(() => {
       this.dispatchNewPage();

@@ -1,7 +1,5 @@
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { Component, OnInit } from '@angular/core';
-import { ItemModel } from '@syncfusion/ej2-angular-navigations';
-import { MoreMenuType } from '../../../enums/documents.enum';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-action-cellrender',

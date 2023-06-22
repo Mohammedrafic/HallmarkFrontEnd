@@ -15,7 +15,7 @@ import { SpecialProjectColumnsDefinition, SpecialProjectMessages } from '../../c
 import { Select, Store } from '@ngxs/store';
 import { DeletSpecialProject, GetSpecialProjects } from '../../../store/special-project.actions';
 import { SpecialProjectState } from '../../../store/special-project.state';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '../../../../shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SpecilaProjectCategoryTableColumns } from '@organization-management/specialproject/enums/specialproject.enum';
@@ -180,10 +180,11 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && params.id) {
-          this.store.dispatch(new DeletSpecialProject(params.id)).subscribe(val => {
+          this.store.dispatch(new DeletSpecialProject(params.id)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
             this.getSpecialProjects();
           });
         }

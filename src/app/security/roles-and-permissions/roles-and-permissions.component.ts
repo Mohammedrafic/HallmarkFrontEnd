@@ -7,7 +7,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { Role, RoleDTO } from '@shared/models/roles.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { filter, Observable, Subject, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, take, takeWhile } from 'rxjs';
 
 import { SetHeaderState, ShowFilterDialog, ShowSideDialog, ShowExportDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -123,8 +123,10 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.closeDialog();
         });
     } else {
@@ -135,7 +137,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   public onChangeUnitId(event: boolean): void {
     this.agencyActionsAllowed = event;
   }
-  
+
   public saveRole(): void {
     this.roleForm.updatePermissionValue();
     this.roleFormGroup.markAllAsTouched();
@@ -147,8 +149,9 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
         businessUnitId: value.businessUnitId || null,
         permissions: value.permissions.map((stringValue: string) => Number(stringValue)),
       };
-      this.store.dispatch(new SaveRole(roleDTO))
-      .subscribe(() => {
+      this.store.dispatch(new SaveRole(roleDTO)).pipe(
+        takeWhile(() => this.isAlive)
+      ).subscribe(() => {
         if (this.childC.gridApi) {
           this.childC.dispatchNewPage();
         }
@@ -177,7 +180,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     this.roleFormGroup.patchValue({
       ...editedValue,
     });
-    
+
     if (role.isDefault) {
       this.roleFormGroup.disable();
     }
@@ -208,7 +211,9 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     this.businessUnitControl.valueChanges
     .pipe(takeWhile(() => this.isAlive)).
     subscribe((value) => {
-     this.store.dispatch(new GetBusinessByUnitType(value)).subscribe(() => {
+     this.store.dispatch(new GetBusinessByUnitType(value)).pipe(
+       takeWhile(() => this.isAlive)
+     ).subscribe(() => {
         this.businessControl?.setValue(null);
         if (this.isBusinessDisabledForNewRole) {
           this.businessControl.patchValue([this.userbusinessUnitId]);

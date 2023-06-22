@@ -4,9 +4,10 @@ import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 
 import { SetHeaderState } from '../store/app.actions';
 import { UserState } from '../store/user.state';
-import { Observable } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
 import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-reports',
@@ -14,7 +15,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
   styleUrls: ['./reports.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReportsComponent implements OnInit{
+export class ReportsComponent extends DestroyableDirective implements OnInit{
   @Select(UserState.user)
   user$: Observable<User>;
 
@@ -26,12 +27,15 @@ export class ReportsComponent implements OnInit{
   ];
 
   public constructor(private readonly store: Store) {
+    super();
     this.setHeader();
   }
 
   ngOnInit(): void {
     // TODO: Remove it after reports for agency will be done;
-    this.user$.subscribe((user) => {
+    this.user$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((user) => {
       if (user.businessUnitType  === BusinessUnitType.Agency) {
         this.isAgency = true;
       }
