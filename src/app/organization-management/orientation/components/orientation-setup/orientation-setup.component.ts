@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TakeUntilDestroy } from '@core/decorators';
 import { Select, Store } from '@ngxs/store';
 import { OrientationTab, OrientationTypeDataSource } from '@organization-management/orientation/enums/orientation-type.enum';
-import { 
+import {
   OrientationConfiguration,
   OrientationConfigurationFilters,
   OrientationConfigurationPage } from '@organization-management/orientation/models/orientation.model';
@@ -11,7 +11,7 @@ import { OrientationService } from '@organization-management/orientation/service
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { 
+import {
   OrganizationDepartment,
   OrganizationLocation, OrganizationRegion,
   OrganizationStructure } from '@shared/models/organization.model';
@@ -51,7 +51,7 @@ import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 @TakeUntilDestroy
 export class OrientationSetupComponent extends AbstractPermissionGrid implements OnInit {
   @ViewChild('orientationGrid') private orientationGrid: OrientationGridComponent;
-  
+
   @Input('isActive') set isActive(value: boolean) {
     if (value) {
       this.filters = { pageNumber: 1, pageSize: this.pageSize };
@@ -111,7 +111,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   public readonly skills$: Observable<Skill[]>;
-  
+
   constructor(
     protected override store: Store,
     private cd: ChangeDetectorRef,
@@ -217,7 +217,9 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   }
 
   private getOrientationConfigs(): void {
-    this.orientationService.getOrientationConfigs(this.filters).subscribe(data => {
+    this.orientationService.getOrientationConfigs(this.filters).pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe(data => {
       this.dataSource = data;
       this.cd.markForCheck();
     });
@@ -229,7 +231,9 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   }
 
   private getOrientationSettings(): void {
-    this.orientationService.getOrientationSetting().subscribe(setting => {
+    this.orientationService.getOrientationSetting().pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe(setting => {
       if (setting) {
         this.settingIsOff = !setting.isEnabled;
         this.orientationService.setSettingState(this.settingIsOff);
@@ -249,7 +253,9 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
 
   private saveOrientationSettings(): void {
     const { isEnabled, type } = this.orientationTypeSettingsForm.getRawValue();
-    this.orientationService.saveOrientationSetting({ isEnabled, type }).subscribe(() => {
+    this.orientationService.saveOrientationSetting({ isEnabled, type }).pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => {
       this.orientationTypeSettingsForm.markAsPristine();
       this.selectedOrientationSettings = type;
       this.orientationGrid.filtersForm.reset();
@@ -279,7 +285,9 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   }
 
   public deleteRecord(data: OrientationConfiguration): void {
-    this.orientationService.removeOrientationConfiguration(data).subscribe({
+    this.orientationService.removeOrientationConfiguration(data).pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe({
       next: () => {
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         this.getOrientationConfigs();
@@ -333,7 +341,9 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       const data = this.orientationForm.getRawValue();
       data.startDate = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.startDate));
       data.endDate = data.endDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.endDate)) : data.endDate;
-      this.orientationService.saveOrientationConfiguration(data).subscribe({
+      this.orientationService.saveOrientationConfiguration(data).pipe(
+        takeUntil(this.componentDestroy()),
+      ).subscribe({
         next: () => {
           this.store.dispatch(
             new ShowToast(MessageTypes.Success, data.orientationConfigurationId ? RECORD_MODIFIED : RECORD_ADDED)
@@ -391,7 +401,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       )
       .subscribe(() => {
         this.populateForm(event.data);
-      });  
+      });
     } else {
       this.title = DialogMode.Add;
       this.isEdit = false;
@@ -408,8 +418,10 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm: boolean) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm: boolean) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.closeHandler();
         });
     } else {
@@ -442,8 +454,10 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
           okButtonLabel: 'Yes',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm: boolean) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm: boolean) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.saveOrientationSettings();
         });
       } else {
@@ -451,7 +465,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       }
     }
   }
-  
+
   public allRegionsChange(event: { checked: boolean }): void {
     this.allRecords['regionIds'] = event.checked;
     const regionsControl = this.orientationForm?.controls['regionIds'];

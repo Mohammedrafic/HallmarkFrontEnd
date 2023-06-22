@@ -11,7 +11,7 @@ import {
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { SpecialProjectCategoryColumnsDefinition, SpecialProjectMessages } from '../../constants/specialprojects.constant';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SpecialProjectCategoryState } from '../../../store/special-project-category.state';
@@ -53,7 +53,7 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
   }
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = SpecialProjectCategoryColumnsDefinition(this.actionCellrenderParams);
-  
+
   ngOnInit(): void {
     this.columnDefinitions.forEach(element => {
       if(element.field==SpecilaProjectCategoryTableColumns.System){
@@ -174,10 +174,13 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && params.id) {
-          this.store.dispatch(new DeletSpecialProjectCategory(params.id)).subscribe(val => {
+          this.store.dispatch(new DeletSpecialProjectCategory(params.id)).pipe(
+            takeUntil(this.unsubscribe$)
+          ).subscribe(val => {
             this.getSpecialProjectCategories();
           });
         }

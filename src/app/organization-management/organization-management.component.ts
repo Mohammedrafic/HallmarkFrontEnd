@@ -5,14 +5,12 @@ import { SetHeaderState } from '../store/app.actions';
 import { ORG_SETTINGS } from './organization-management-menu.config';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { MenuSettings } from '@shared/models';
-import { Permission } from '@core/interface';
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { UserState } from '../store/user.state';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { AppState } from '../store/app.state';
 import { Organization } from '@shared/models/organization.model';
-import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-organization-management',

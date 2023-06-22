@@ -6,7 +6,7 @@ import { ShiftExportColumns } from "@organization-management/shifts/shifts.const
 import { ShiftsService } from "@organization-management/shifts/shifts.service";
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import { SetDirtyState } from '../store/organization-management.actions';
 import { DeleteShift, DeleteShiftSucceeded, ExportShifts, GetShiftsByPage,
   SaveShift, SaveShiftSucceeded } from '../store/shifts.actions';
@@ -139,8 +139,9 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm) {
           this.store.dispatch(new DeleteShift(data));
         }
@@ -155,8 +156,10 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
         okButtonClass: 'delete-button',
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
+      }).pipe(
+        filter(confirm => !!confirm),
+        take(1)
+      ).subscribe(() => {
         this.showForm = false;
         this.store.dispatch(new ShowSideDialog(false));
         this.ShiftFormGroup.reset();

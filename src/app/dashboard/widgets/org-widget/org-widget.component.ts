@@ -61,7 +61,9 @@ export class OrgWidgetComponent extends AbstractPermissionGrid implements OnDest
     }
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    //@TakeUntilDestroy
+  }
 
   public defineMousePosition($event: MouseEvent): void {
     this.mousePosition.x = $event.screenX;
