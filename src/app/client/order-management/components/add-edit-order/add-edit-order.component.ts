@@ -349,7 +349,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         cancelButtonLabel: 'No',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm) => !!confirm))
+      .pipe(filter((confirm) => !!confirm),takeUntil(this.unsubscribe$))
       .subscribe((res) => {
         this.checkInactiveLocationDepartmentOverlap(order, documents);
       });
@@ -363,7 +363,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         cancelButtonLabel: 'Cancel',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm) => !!confirm))
+      .pipe(filter((confirm) => !!confirm),takeUntil(this.unsubscribe$))
       .subscribe((res) => {
         this.proceedWithSaving(order, documents);
       });
@@ -839,7 +839,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
                   okButtonLabel: 'Proceed',
                   okButtonClass: 'primary'
           }).pipe(
-            filter(Boolean)
+            filter(Boolean),
+            takeUntil(this.unsubscribe$)
           ).subscribe(() => {
             this.saveOrder();
           });
