@@ -6,7 +6,7 @@
   </ng-container>
   <ng-container right>
    
-   <button *ngIf="isOrganization"
+   <button
               ejs-dropdownbutton
               appHideBeforeSyncfusionLoad
               [items]="exportOptions"
@@ -14,7 +14,7 @@
               id="exportButton"
               cssClass="e-outline button-export"
             > 
-              <div class="button-export-container" *ngIf="isOrganization">
+              <div class="button-export-container">
                 Export <i-feather name="upload" class="icon"></i-feather>
               </div>
    </button>
