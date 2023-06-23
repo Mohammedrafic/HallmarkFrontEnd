@@ -75,7 +75,7 @@ export class DateTimeHelper {
     return new Date(new Date(date).setHours(0, 0, 0));
   }
 
-  public static geFirstDayofWeek(date: Date): Date {
+  public static getFirstDayofWeek(date: Date): Date {
     return new Date(date.setDate(date.getDate() - date.getDay()));
   }
 
@@ -100,10 +100,10 @@ export class DateTimeHelper {
     return new Date(new Date().toLocaleString('en-US', { timeZone: timeZone }));
   }
 
-  public static getWeekDate(date: string | Date, isStart = false,
+  public static getWeekDate(date: string | Date, isStart: boolean,
     rangeOption: DatesRangeType, firstWeekDay: number | null = null, maxDateExist = true): Date {
     const curr = new Date(date);
-    const startDayNum = firstWeekDay !== null && firstWeekDay !== undefined ? firstWeekDay : curr.getDay();
+    const startDayNum = firstWeekDay ?? curr.getDay();
     const currDayNum = curr.getDay();
     let firstDay = curr.getTime() - CalcDaysMs(curr.getDay());
     let dayDiff: number;
@@ -136,10 +136,10 @@ export class DateTimeHelper {
   }
 
   public static getDynamicWeekDate(
-    date: string | Date, isStart = false, weekStartDay: Date, rangeOption: DatesRangeType,
+    date: string | Date, isStart: boolean, weekStartDay: Date, rangeOption: DatesRangeType,
     firstWeekDay: number | null = null, maxDateExist = true): Date {
     const curr = new Date(date);
-    const startDayNum = firstWeekDay !== null && firstWeekDay !== undefined ? firstWeekDay : weekStartDay.getDay();
+    const startDayNum = firstWeekDay ?? weekStartDay.getDay();
     const currDayNum = curr.getDay();
     let dayDiff: number;
 
