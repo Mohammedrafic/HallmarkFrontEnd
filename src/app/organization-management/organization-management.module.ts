@@ -59,17 +59,8 @@ import { GroupSetupComponent } from './credentials/credentials-setup/group-setup
 import { CredentialsComponent } from './credentials/credentials.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { HolidaysState } from './store/holidays.state';
-import { HolidaysComponent } from './holidays/holidays.component';
-import { JobOrderComponent } from './workflow/job-order/job-order.component';
-import { WorkflowMappingComponent } from './workflow/workflow-mapping/workflow-mapping.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
-import { CardMenuComponent } from './workflow/job-order/card-menu/card-menu.component';
-import { WorkflowStepsComponent } from './workflow/job-order/workflow-steps/workflow-steps.component';
 import { WorkflowState } from './store/workflow.state';
-import { BillRatesComponent } from './bill-rates/bill-rates.component';
-import { BillRateSetupComponent } from './bill-rates/bill-rate-setup/bill-rate-setup.component';
-import { ExternalBillRateComponent } from './bill-rates/external-bill-rate/external-bill-rate.component';
-import { BillRateTypeMappingComponent } from './bill-rates/bill-rate-type-mapping/bill-rate-type-mapping.component';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import { FilteredCredentialsComponent,
 } from './credentials/credentials-setup/filtered-credentials/filtered-credentials.component';
@@ -93,7 +84,6 @@ import { PurchaseOrderMappingState } from './store/purchase-order-mapping.state'
 import { BusinessLinesComponent } from './business-lines/business-lines.component';
 import { BusinessLinesState } from './store/business-lines.state';
 import { GridModule as AppGridModule } from '@shared/components/grid/grid.module';
-import { ImportBillRatesComponent } from './bill-rates/import-bill-rates/import-bill-rates.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
 import { PenaltiesGridActionsRendererComponent,
 } from './reasons/components/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
@@ -156,15 +146,6 @@ const sidebarIcons = {
     CredentialsComponent,
     GroupSetupComponent,
     GroupComponent,
-    HolidaysComponent,
-    JobOrderComponent,
-    WorkflowMappingComponent,
-    CardMenuComponent,
-    WorkflowStepsComponent,
-    BillRatesComponent,
-    BillRateSetupComponent,
-    ExternalBillRateComponent,
-    BillRateTypeMappingComponent,
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
     SpecialProjectContainerComponent,
@@ -175,7 +156,6 @@ const sidebarIcons = {
     SpecialProjectTableComponent,
     PurchaseOrderMappingComponent,
     BusinessLinesComponent,
-    ImportBillRatesComponent,
     PenaltiesGridActionsRendererComponent,
     TiersComponent,
     TiersGridComponent,
@@ -253,7 +233,6 @@ const sidebarIcons = {
     OrientationModule,
     JoinPipeModule,
   ],
-  exports: [BillRatesComponent],
   providers: [
     ResizeService,
     PageService,
