@@ -261,9 +261,13 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         (f) => f.departmentIds !== event.value
       );
     }
-    this.filterService.removeValue(event, this.filtersForm, this.filterColumns);
-    this.filterco.regionDropdown.refresh();
+    this.filterService.removeValue(event, this.filtersForm, this.filterColumns); 
     this.filtersForm.markAsDirty();
+    this.filterco.regionDropdown.refresh();
+       if(!this.filtersForm.value.regionsIds.length)
+       {
+         this.filterco.regionDropdown.selectAll(false)
+       }
   }
 
   public onFilterClose(): void {
