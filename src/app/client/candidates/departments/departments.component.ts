@@ -13,6 +13,7 @@ import {
   distinctUntilChanged,
   map,
 } from 'rxjs';
+import { RowNode } from '@ag-grid-community/core';
 
 import { CandidateTabsEnum } from '@client/candidates/enums';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
@@ -51,7 +52,6 @@ import { EditDepartmentsComponent } from './edit-departments/edit-departments.co
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
 import { DateTimeHelper, allAreEqual } from '@core/helpers';
-import { RowNode } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-departments',
