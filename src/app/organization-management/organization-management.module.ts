@@ -66,22 +66,11 @@ import { FilteredCredentialsComponent,
 } from './credentials/credentials-setup/filtered-credentials/filtered-credentials.component';
 import { MapCredentialsFormComponent,
 } from './credentials/credentials-setup/map-credentials-form/map-credentials-form.component';
-import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
-import { PurchaseOrdersComponent } from './specialproject/components/purchase-orders/purchase-orders.component';
-import { SpecialProjectsComponent } from './specialproject/components/special-projects/special-projects.component';
 import { SpecialProjectState } from './store/special-project.state';
 import { PurchaseOrderState } from './store/purchase-order.state';
 import { SpecialProjectCategoryState } from './store/special-project-category.state';
-import { SpecialProjectCategoryComponent,
-} from './specialproject/components/special-project-categories/special-project-categories.component';
-import { ProjectMappingComponent } from './specialproject/components/project-mapping/project-mapping.component';
-import { SpecialProjectTableComponent,
-} from './specialproject/components/special-project-table/special-project-table.component';
 import { SpecialProjectMappingState } from './store/special-project-mapping.state';
-import { PurchaseOrderMappingComponent,
-} from './specialproject/components/purchase-order-mapping/purchase-order-mapping.component';
 import { PurchaseOrderMappingState } from './store/purchase-order-mapping.state';
-import { BusinessLinesComponent } from './business-lines/business-lines.component';
 import { BusinessLinesState } from './store/business-lines.state';
 import { GridModule as AppGridModule } from '@shared/components/grid/grid.module';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
@@ -148,14 +137,6 @@ const sidebarIcons = {
     GroupComponent,
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
-    SpecialProjectContainerComponent,
-    PurchaseOrdersComponent,
-    SpecialProjectsComponent,
-    SpecialProjectCategoryComponent,
-    ProjectMappingComponent,
-    SpecialProjectTableComponent,
-    PurchaseOrderMappingComponent,
-    BusinessLinesComponent,
     PenaltiesGridActionsRendererComponent,
     TiersComponent,
     TiersGridComponent,

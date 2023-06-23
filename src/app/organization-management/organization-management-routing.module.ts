@@ -3,13 +3,11 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { TiersComponent } from '@organization-management/tiers/tiers.component';
 import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
-import { BusinessLinesComponent } from './business-lines/business-lines.component';
 import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { CredentialsComponent } from './credentials/credentials.component';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { PayRateComponent } from './pay-rate/pay-rate.component';
-import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
 import { WorkCommitmentComponent } from './work-commitment/containers/work-commitment-container/work-commitment.component';
 
 /**
@@ -128,14 +126,14 @@ const routes: Routes = [
       },
       {
         path: 'specialproject',
-        component: SpecialProjectContainerComponent,
+        loadChildren: () => import('./specialproject/specialproject.module').then((m) => m.SpecialprojectModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'businesslines',
-        component: BusinessLinesComponent,
+        loadChildren: () => import('./business-lines/business-lines.module').then((m) => m.BusinessLinesModule),
         data: {
           isOrganizationArea: true,
         },
