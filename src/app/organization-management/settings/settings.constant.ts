@@ -74,6 +74,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'CreatePartialOrder',
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
+  'OvertimeCalculation',
 ];
 
 export const DisabledSettingsByDefault = [
@@ -94,6 +95,7 @@ export const DisabledSettingsByDefault = [
   'SetDefaultCommentsScopeToExternal',
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
+  'OvertimeCalculation',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

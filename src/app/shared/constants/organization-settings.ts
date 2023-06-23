@@ -54,7 +54,8 @@ export enum OrganizationSettingKeys {
   OnHoldDefault,
   CreatePartialOrder,
   DepartmentSkillRequired,  
-  TimesheetSubmissionProcess
+  TimesheetSubmissionProcess,
+  OvertimeCalculation
 }
 
 export enum OrganizationalHierarchy {
