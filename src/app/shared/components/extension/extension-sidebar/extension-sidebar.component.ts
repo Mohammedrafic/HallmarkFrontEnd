@@ -13,12 +13,13 @@ import { Comment } from '@shared/models/comment.model';
 import { Store } from '@ngxs/store';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED } from '@shared/constants';
+import { ExtensionStartDateValidation, RECORD_ADDED } from '@shared/constants';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { BillRate } from '@shared/models';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -43,6 +44,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public comments: Comment[] = [];
   public startDate: Date;
   public maxEndDate: Date;
+  extensionStartDateValidation:boolean = false;
 
   private get billRateControl(): FormControl {
     return this.extensionForm?.get('billRate') as FormControl;
@@ -84,6 +86,10 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public saveExtension(positionDialog: DialogComponent, ignoreMissingCredentials: boolean): void {
     if (this.extensionForm.invalid) {
       this.extensionForm.markAllAsTouched();
+      return;
+    }
+    if (this.extensionStartDateValidation) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
       return;
     }
     const { value: billRate } = this.billRatesComponent.billRatesControl;
@@ -203,6 +209,12 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       )
       .subscribe(([startDate, endDate]) => {
         this.startDate = startDate;
+        this.extensionStartDateValidation = false;
+        let actualEndDate = new Date(this.candidateJob?.actualEndDate);
+        let twoWeekDate = new Date(actualEndDate.setDate(actualEndDate.getDate() + 14));
+        if(formatDate(twoWeekDate, 'MM/dd/yyyy', 'en-US') < formatDate(startDate, 'MM/dd/yyyy', 'en-US')){
+           this.extensionStartDateValidation = true;
+        }
         if (startDate > endDate) {
           this.extensionForm.get('endDate')?.setErrors({incorrect: true});
         }
