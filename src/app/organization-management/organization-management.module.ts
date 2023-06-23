@@ -47,7 +47,6 @@ import {
 } from 'angular-feather/icons';
 import { NgxsModule } from '@ngxs/store';
 
-import { ShiftsService } from '@organization-management/shifts/shifts.service';
 import { OrganizationManagementState } from './store/organization-management.state';
 import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '@shared/shared.module';
@@ -55,10 +54,7 @@ import { AgGridModule } from '@ag-grid-community/angular';
 import { ShiftsState } from './store/shifts.state';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { OrganizationManagementRoutingModule } from './organization-management-routing.module';
-import { LocationsComponent } from './locations/locations.component';
 import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
-import { SkillsComponent } from './skills/skills.component';
-import { ShiftsComponent } from './shifts/shifts.component';
 import { GroupSetupComponent } from './credentials/credentials-setup/group-setup/group-setup.component';
 import { CredentialsComponent } from './credentials/credentials.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
@@ -79,7 +75,6 @@ import { FilteredCredentialsComponent,
 } from './credentials/credentials-setup/filtered-credentials/filtered-credentials.component';
 import { MapCredentialsFormComponent,
 } from './credentials/credentials-setup/map-credentials-form/map-credentials-form.component';
-import { RegionsComponent } from './regions/regions.component';
 import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
 import { PurchaseOrdersComponent } from './specialproject/components/purchase-orders/purchase-orders.component';
 import { SpecialProjectsComponent } from './specialproject/components/special-projects/special-projects.component';
@@ -97,15 +92,11 @@ import { PurchaseOrderMappingComponent,
 import { PurchaseOrderMappingState } from './store/purchase-order-mapping.state';
 import { BusinessLinesComponent } from './business-lines/business-lines.component';
 import { BusinessLinesState } from './store/business-lines.state';
-import { ImportLocationsComponent } from './locations/import-locations/import-locations.component';
 import { GridModule as AppGridModule } from '@shared/components/grid/grid.module';
 import { ImportBillRatesComponent } from './bill-rates/import-bill-rates/import-bill-rates.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
-import { ImportRegionsComponent } from './regions/import-regions/import-regions.component';
-import { RegionsGridComponent } from './regions/import-regions/regions-grid/regions-grid.component';
 import { PenaltiesGridActionsRendererComponent,
 } from './reasons/components/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
-import { LocationsService } from './locations/locations.service';
 import { TiersComponent } from './tiers/tiers.component';
 import { TiersGridComponent } from './tiers/tiers-grid/tiers-grid.component';
 import { GridActionRendererComponent } from './tiers/tiers-grid/grid-action-renderer/grid-action-renderer.component';
@@ -116,7 +107,6 @@ import { TiersState } from '@organization-management/store/tiers.state';
 import { SettingsViewService, TiersApiService } from '@shared/services';
 import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
-import { AssignSkillComponent } from './skills/assign-skill/assign-skill.component';
 import { SkillsState } from '@organization-management/store/skills.state';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';
@@ -124,7 +114,6 @@ import { CredentialsSetupService } from '@organization-management/credentials/se
 import { GroupSetupService } from '@organization-management/credentials/services/group-setup.service';
 import { IrpSystemGridTextPipeModule } from '@shared/pipes/irp-system-grid-text/irp-system-grid-text.module';
 import { MapCredentialsService } from '@organization-management/credentials/services/map-credentials.service';
-import { SkillsService } from './skills/skills.service';
 import { TiersService } from '@organization-management/tiers/services/tiers.service';
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 import { WorkCommitmentModule } from './work-commitment/work-commitment.module';
@@ -163,11 +152,8 @@ const sidebarIcons = {
 @NgModule({
   declarations: [
     OrganizationManagementComponent,
-    LocationsComponent,
     CredentialsSetupComponent,
     CredentialsComponent,
-    SkillsComponent,
-    ShiftsComponent,
     GroupSetupComponent,
     GroupComponent,
     HolidaysComponent,
@@ -181,7 +167,6 @@ const sidebarIcons = {
     BillRateTypeMappingComponent,
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
-    RegionsComponent,
     SpecialProjectContainerComponent,
     PurchaseOrdersComponent,
     SpecialProjectsComponent,
@@ -190,15 +175,11 @@ const sidebarIcons = {
     SpecialProjectTableComponent,
     PurchaseOrderMappingComponent,
     BusinessLinesComponent,
-    ImportLocationsComponent,
     ImportBillRatesComponent,
-    ImportRegionsComponent,
-    RegionsGridComponent,
     PenaltiesGridActionsRendererComponent,
     TiersComponent,
     TiersGridComponent,
     GridActionRendererComponent,
-    AssignSkillComponent,
     PayRateComponent,
     PayrateSetupComponent,
   ],
@@ -279,8 +260,6 @@ const sidebarIcons = {
     TiersApiService,
     TiersService,
     WorkCommitmentApiService,
-    LocationsService,
-    ShiftsService,
     SideMenuService,
     SettingsViewService,
     {
@@ -290,7 +269,6 @@ const sidebarIcons = {
     CredentialsSetupService,
     GroupSetupService,
     MapCredentialsService,
-    SkillsService,
   ],
 })
 export class OrganizationManagementModule {}
