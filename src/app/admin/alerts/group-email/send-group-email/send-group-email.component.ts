@@ -580,7 +580,6 @@ export class SendGroupEmailComponent
               }
               if (this.userBusinessUnitType === BusinessUnitType.Agency){
                 var defaultAgencies = data.map((list) => list.id);
-                console.log(defaultAgencies);
                 this.businessesControl.setValue(defaultAgencies);
               }
             });
@@ -1360,7 +1359,6 @@ export class SendGroupEmailComponent
 
 export function emailsValidator(): ValidatorFn {
   function validateEmails(emails: string) {
-    console.log(emails);
     return (emails.split(',')
       .map(email => Validators.email(<AbstractControl>{ value: email.trim() }))
       .find(_ => _ !== null) === undefined);

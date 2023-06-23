@@ -42,7 +42,6 @@ export class OrgInterfaceConfigurationComponent  implements OnInit {
 
     this.onSaveClick$.pipe(takeUntil(this.unsubscribe$)).subscribe((saveFlag)=>{
       if(saveFlag){
-        console.log(this.orgConfigurationFormGroup?.value);
       }
     });
 

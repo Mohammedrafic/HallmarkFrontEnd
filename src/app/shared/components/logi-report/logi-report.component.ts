@@ -76,7 +76,6 @@ export class LogiReportComponent implements OnInit {
     rptset.saveAs(options, this.CallbackSaveAs);
   }
   private CallbackSaveAs(status: any) {
-    console.log(status);
   }
   public RenderReport():void
   {
@@ -135,7 +134,6 @@ export class LogiReportComponent implements OnInit {
         reslst: this.resultList,
         active: 1
       };
-      console.log(this.reportUrl);
     let task = this.factory?.runDashboard(server, resExt, entryId);
   }
 
