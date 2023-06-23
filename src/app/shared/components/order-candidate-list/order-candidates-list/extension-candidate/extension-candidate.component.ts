@@ -329,10 +329,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         return;
       }
     }
-    
+
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){ 
-          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+      if(this.candidateJob?.candidateProfileContactDetails != null){
+          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null
               || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
                 return;
@@ -349,7 +349,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+      if(this.candidateJob?.candidateProfileContactDetails != null){
           if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
@@ -546,8 +546,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.store
         .dispatch(
           this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
-        )
-        .subscribe(() => {
+        ).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe(() => {
           this.store.dispatch(
             this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
           );
@@ -765,7 +766,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     return rates.some((rate) => !!rate.isUpdated);
   }
 
-  
+
   private subscribeCandidateCancellationReasons() {
     if (this.candidateJob) {
       let payload: CandidateCancellationReasonFilter = {
@@ -774,7 +775,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
-        .pipe().subscribe((value) => {
+        .pipe(takeUntil(this.destroy$)).subscribe((value) => {
           this.candidateCancellationReasons =value;
         });
 

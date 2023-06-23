@@ -361,7 +361,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
   }
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canOnboardCandidateIRP,canRejectCandidateIRP }) => {
+    this.permissionService.getPermissions().pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe(({ canOnboardCandidateIRP,canRejectCandidateIRP }) => {
       this.canOnboardCandidateIRP=canOnboardCandidateIRP;
       this.canRejectedCandidateIRP=canRejectCandidateIRP;
     });

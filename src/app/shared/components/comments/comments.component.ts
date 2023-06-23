@@ -37,6 +37,10 @@ export class CommentsComponent {
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
     }
+    else
+    {
+      this.commentData = [];
+    }
   }
   get comments(): Comment[] {
     return this.commentsList;
@@ -113,7 +117,7 @@ export class CommentsComponent {
         this.scroll$.next(null);
       }
     });
-    this.isAgencyUser = this.router.url.includes('agency'); 
+    this.isAgencyUser = this.router.url.includes('agency');
     if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
@@ -187,7 +191,9 @@ export class CommentsComponent {
 
   private getOrderComments(): void {
     this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
-    this.orderComments$.subscribe((comments: Comment[]) => {
+    this.orderComments$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((comments: Comment[]) => {
       this.comments = comments;
       this.cd.markForCheck();
     });

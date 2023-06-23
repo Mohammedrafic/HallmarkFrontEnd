@@ -225,7 +225,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
       if(this.orderCandidateJob?.candidateProfileContactDetails != null){
-        if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null 
+        if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null
             || this.orderCandidateJob?.candidateProfileContactDetails.phone1 === ''){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
               return;
@@ -237,7 +237,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.orderCandidateJob?.candidateProfileContactDetails != null){ 
+      if(this.orderCandidateJob?.candidateProfileContactDetails != null){
           if(CommonHelper.candidateAddressCheck(this.orderCandidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
@@ -370,7 +370,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.orderCandidateJob.candidatePayRate,
           })
-        )
+        ).pipe(takeUntil(this.destroy$))
         .subscribe(() => {
           this.deleteUpdateFieldInRate();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
@@ -521,7 +521,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
               statusText: status.statusText,
             },
           })
-        )
+        ).pipe(takeUntil(this.destroy$))
         .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
     }
   }
@@ -708,7 +708,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
-        .pipe().subscribe((value) => {
+        .pipe(takeUntil(this.destroy$)).subscribe((value) => {
           this.candidateCancellationReasons =value;
         });
 

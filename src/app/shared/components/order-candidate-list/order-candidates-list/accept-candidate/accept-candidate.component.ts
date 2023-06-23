@@ -205,8 +205,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => confirm),
+          take(1)
+        ).subscribe(() => {
           this.closeDialog();
         });
     } else {
@@ -222,8 +224,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){ 
-          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+      if(this.candidateJob?.candidateProfileContactDetails != null){
+          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null
               || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
             this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
             return;
@@ -235,7 +237,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+      if(this.candidateJob?.candidateProfileContactDetails != null){
           if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
@@ -269,8 +271,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
       if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
-        if(this.candidateJob?.candidateProfileContactDetails != null){ 
-          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+        if(this.candidateJob?.candidateProfileContactDetails != null){
+          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null
             || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
             this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
             return;
@@ -282,7 +284,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
 
       if(this.candidateAddressRequiredValue === ConfigurationValues.Apply){
-        if(this.candidateJob?.candidateProfileContactDetails != null){ 
+        if(this.candidateJob?.candidateProfileContactDetails != null){
             if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
                 return;
@@ -339,7 +341,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload)).subscribe(() => {
+      this.store.dispatch(new RejectCandidateJob(payload)).pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
       });
 
@@ -371,8 +375,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           offeredStartDate: this.candidateJob.offeredStartDate,
           candidatePayRate: value.candidatePayRate
         })
-      )
-      .subscribe(() => {
+      ).pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
       });
     this.closeDialog();

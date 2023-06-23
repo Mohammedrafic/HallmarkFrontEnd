@@ -20,7 +20,27 @@
     }
   }
 }
+.table-tabs {
+  margin-bottom: 0;
+  display: inline-block;
 
+  &.irp {
+    max-width: 300px;
+    overflow: hidden;
+  }
+
+  &.vms {
+    &::ng-deep .e-tab-header {
+      .e-items.e-toolbar-items {
+        padding: 0;
+
+        .e-scroll-nav {
+          display: none;
+        }
+      }
+    }
+  }
+}
 .candidates-grid {
   margin-top: 24px;
   height: calc(100% - 135px);

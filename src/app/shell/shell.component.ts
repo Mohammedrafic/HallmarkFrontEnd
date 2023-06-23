@@ -192,7 +192,11 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   ) {
     super();
 
-    router.events.pipe(filter((event) => event instanceof NavigationEnd), debounceTime(50)).subscribe((data: any) => {
+    router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      debounceTime(50),
+      takeUntil(this.componentDestroy())
+    ).subscribe((data: any) => {
       if (this.tree) {
         const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
         if (menuItem) {
@@ -360,7 +364,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       this.setSideBarForFirstLoad(selectedMenuItem.route);
       this.router.navigate([selectedMenuItem.route]);
 
-      this.analyticsApiService.predefinedMenuClickAction(selectedMenuItem.route, selectedMenuItem.title).subscribe();
+      this.analyticsApiService.predefinedMenuClickAction(selectedMenuItem.route, selectedMenuItem.title).pipe(
+        takeUntil(this.componentDestroy())
+      ).subscribe();
     }
   }
 
@@ -477,13 +483,17 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       Id: id,
     };
 
-    this.store.dispatch(new DismissAlert(model)).subscribe((x) => {
+    this.store.dispatch(new DismissAlert(model)).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((x) => {
       if (x) {
         this.getAlertsForUser();
       }
     });
     this.store.dispatch(new GetAlertsCountForCurrentUser({}));
-    this.alertCountStateModel$.subscribe((alertCountdata) => {
+    this.alertCountStateModel$.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((alertCountdata) => {
       this.alertsCount = alertCountdata;
     });
   }
@@ -516,13 +526,15 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   private allAlertDismiss(): void {
-    this.store.dispatch(new DismissAllAlerts()).subscribe((x) => {
+    this.store.dispatch(new DismissAllAlerts()).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((x) => {
       if (x) {
         this.getAlertsForUser();
       }
     });
     this.store.dispatch(new GetAlertsCountForCurrentUser({}));
-    this.alertCountStateModel$.subscribe((alertCountdata) => {
+    this.alertCountStateModel$.pipe(takeUntil(this.componentDestroy())).subscribe((alertCountdata) => {
       this.alertsCount = alertCountdata;
     });
   }
@@ -697,7 +709,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   private getAlertsPoollingTime(): void {
     setInterval(() => {
       this.store.dispatch(new GetAlertsCountForCurrentUser({}));
-      this.alertCountStateModel$.subscribe((alertCountdata) => {
+      this.alertCountStateModel$.pipe(takeUntil(this.componentDestroy())).subscribe((alertCountdata) => {
         this.alertsCount = alertCountdata;
       });
     }, 200000

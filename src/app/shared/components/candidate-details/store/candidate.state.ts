@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
+  ExportCandidateAssignment,
   GetCandidateDetailsPage,
   GetCandidateRegions,
   Getcandidatesearchbytext,
@@ -24,6 +25,7 @@ import { SkillsService } from '@shared/services/skills.service';
 import { CandidateDetailsApiService } from '../services/candidate-details-api.service';
 import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
 import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 interface CandidateDetailsStateModel {
   candidateDetailsPage: CandidateDetailsPage | null;
@@ -170,4 +172,12 @@ export class CandidateDetailsState {
       })
     );
   }
+
+  @Action(ExportCandidateAssignment)
+  ExportCandidateAssignment({ }: StateContext<CandidateDetailsStateModel>, { payload }: ExportCandidateAssignment): Observable<Blob> {
+    return this.candidateDetailsApiService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'CandidateAssignment', payload.exportFileType);
+    }));
+  };
 }
