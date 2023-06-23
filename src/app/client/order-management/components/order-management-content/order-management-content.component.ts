@@ -488,7 +488,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.gridOptions = OrderManagementIrpSubrowHelper.configureOrderGridSubRowOptions(this.context);
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
-    if(routerState!=null &&routerState?.['irpActiveTab']!=null){  
+    if(routerState!=null &&routerState?.['irpActiveTab']!=null){
       this.globalWindow.localStorage.setItem("IRPActiveTab", JSON.stringify(routerState?.['irpActiveTab']));
       this.activeIRPTabIndex =parseInt(routerState?.['irpActiveTab'])
     }
@@ -635,7 +635,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder,canOrderJourney,canCreateOrderIRP,canCloseOrderIRP, CanEditOrderBillRateIRP}) => {
+    this.permissionService.getPermissions().pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((
+      { canCreateOrder, canCloseOrder,canOrderJourney,canCreateOrderIRP,canCloseOrderIRP, CanEditOrderBillRateIRP}
+    ) => {
       this.canCreateOrder = canCreateOrder;
       this.canCloseOrder = canCloseOrder;
       this.canOrderJourney = canOrderJourney;
@@ -652,7 +656,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       tap((data) => {
         args.updateData(data);
       }),
-      delay(300)).subscribe(data => {
+      delay(300),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(data => {
         this.filteredUsers = this.filterColumns.contactEmails.dataSource = data;
       }
       );
@@ -846,7 +852,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       this.isIncomplete = (this.activeIRPTabIndex === OrderManagementIRPTabsIndex.Incomplete);
       this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.IRP);
-      cleared ? this.store.dispatch(new GetIRPOrders(this.filters)).pipe().subscribe(()=>{
+      cleared ? this.store.dispatch(new GetIRPOrders(this.filters)).pipe(takeUntil(this.unsubscribe$)).subscribe(()=>{
         this.globalWindow.localStorage.setItem("IsLTAOrders", JSON.stringify(false));
       }) : this.store.dispatch([new GetOrderFilterDataSources(true)]);
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
@@ -901,7 +907,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filtersOrderJourney.pageSize = this.pageSize;
       this.isIncomplete = false;
       this.columnsToExport = orderJourneyColumnsToExport;
-      this.store.dispatch([new GetOrdersJourney(this.filtersOrderJourney)]).pipe().subscribe((data) => {
+      this.store.dispatch([new GetOrdersJourney(this.filtersOrderJourney)]).pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe((data) => {
         this.OrderJourney = data;
       })
     }
@@ -1518,8 +1526,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe((confirm) => {
         if (confirm) {
           this.store.dispatch(new DeleteOrder(id));
         }
@@ -1535,7 +1544,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.store.dispatch(new DuplicateOrder(data.id, this.activeSystem));
         break;
       case MoreMenuType['Close']:
-        this.orderManagementContentService.getOrderById(data.id).subscribe((order) => {
+        this.orderManagementContentService.getOrderById(data.id).pipe(
+          takeUntil(this.unsubscribe$)
+        ).subscribe((order) => {
           this.selectedOrder = { ...order };
           this.store.dispatch(new ShowCloseOrderDialog(true));
         });
@@ -1759,7 +1770,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onOrderFilterControlValueChangedHandler(): void {
-    this.OrderFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+    this.OrderFilterFormGroup.get('regionIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
         const locations: OrganizationLocation[] = [];
@@ -1780,7 +1793,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       this.cd$.next(true);
     });
-    this.OrderFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
+    this.OrderFilterFormGroup.get('locationIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
         const departments: OrganizationDepartment[] = [];
@@ -1803,7 +1818,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.cd$.next(true);
     });
 
-    this.OrderJourneyFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+    this.OrderJourneyFilterFormGroup.get('regionIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
         const locations: OrganizationLocation[] = [];
@@ -1824,7 +1841,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       this.cd$.next(true);
     });
-    this.OrderJourneyFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
+    this.OrderJourneyFilterFormGroup.get('locationIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
         const departments: OrganizationDepartment[] = [];
@@ -1847,7 +1866,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.cd$.next(true);
     });
 
-    this.OrderFilterFormGroup.get('projectTypeIds')?.valueChanges.subscribe((val: number[]) => {
+    this.OrderFilterFormGroup.get('projectTypeIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ProjectSpecialData) => {
             this.filterColumns.projectNameIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP?  data.projectNames.filter((f)=>val.includes(f.projectTypeId??0) && f.includeInIRP==true):data.projectNames.filter((f)=>val.includes(f.projectTypeId??0) && f.includeInVMS==true) ;
@@ -1881,7 +1902,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private getOrderComments(): void {
     this.store.dispatch(new GetOrderComments(this.selectedOrder.commentContainerId as number));
-    this.orderComments$.subscribe((comments: Comment[]) => {
+    this.orderComments$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((comments: Comment[]) => {
       this.orderComments = comments;
       this.cd.markForCheck();
     });

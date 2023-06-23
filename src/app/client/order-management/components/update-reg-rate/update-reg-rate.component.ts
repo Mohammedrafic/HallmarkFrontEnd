@@ -1,12 +1,10 @@
-import { Component, ChangeDetectionStrategy, Input, Output,ViewChild, EventEmitter, OnInit, SimpleChanges } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Component, Input, Output, EventEmitter, OnInit, SimpleChanges } from '@angular/core';
+import { FormGroup, FormBuilder} from '@angular/forms';
 import { UpdateRegRateService } from '@client/order-management/components/update-reg-rate/update-reg-rate.service';
-import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 import { Store } from '@ngxs/store';
-import { UpdateRegRateorder, UpdateRegRateSucceeded } from '@client/store/order-managment-content.actions';
-import { ShowToast } from '../../../../store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
-import { delay } from 'rxjs';
+import { UpdateRegRateorder } from '@client/store/order-managment-content.actions';
+import { delay, takeUntil } from 'rxjs';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 
 @Component({
@@ -14,7 +12,7 @@ import { delay } from 'rxjs';
   templateUrl: './update-reg-rate.component.html',
   styleUrls: ['./update-reg-rate.component.scss']
 })
-export class UpdateRegRateComponent implements OnInit {
+export class UpdateRegRateComponent extends DestroyableDirective implements OnInit {
   public showcontent:Boolean = false;
   public updateform: FormGroup;
   public getorderdatas:any;
@@ -26,11 +24,19 @@ export class UpdateRegRateComponent implements OnInit {
   constructor(
         private formBuilder: FormBuilder,
         private updateregrateservice : UpdateRegRateService,
-        private store: Store) { }
+        private store: Store
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.initform();
     this.onOpenEvent();
+  }
+
+  ngOnChanges(orderdatas : SimpleChanges):void{
+    this.getorderdatas = orderdatas['orderdatas'].currentValue;
+    this.getperdiemorderdatas=orderdatas['perdiemOrderData'].currentValue;
   }
 
   public initform(): void{
@@ -53,14 +59,12 @@ export class UpdateRegRateComponent implements OnInit {
       "hourlyRate": this.updateform.value.updaterate,
       "perDiemIds": this.getperdiemorderdatas
     };
-    this.store.dispatch(new UpdateRegRateorder(payload)).pipe(delay(500)).subscribe(() => {
+    this.store.dispatch(new UpdateRegRateorder(payload)).pipe(
+      delay(500),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
       this.reloadItemsListforupdate.next();
     });
-  }
-
-  ngOnChanges(orderdatas : SimpleChanges):void{
-    this.getorderdatas = orderdatas['orderdatas'].currentValue;
-    this.getperdiemorderdatas=orderdatas['perdiemOrderData'].currentValue;
   }
 
 }

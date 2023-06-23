@@ -2,15 +2,13 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit, V
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
 import { Select, Store } from '@ngxs/store';
 import { UserState } from '../../store/user.state';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { debounceTime, distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { map } from 'rxjs/operators';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { SecurityState } from '../../security/store/security.state';
 import { RoleTreeField } from '../../security/roles-and-permissions/role-form/role-form.component';
-import { ExternalBillRatePermissions } from '@organization-management/bill-rates/models/external-bill-rate-permissions.enum';
-import { GetPermissionsTree } from 'src/app/security/store/security.actions';
+import { ExternalBillRatePermissions } from '@organization-management/bill-rates/models/external-bill-rate-permissions.enum';;
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 

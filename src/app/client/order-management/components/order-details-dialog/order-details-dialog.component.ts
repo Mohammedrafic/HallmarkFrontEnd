@@ -99,7 +99,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Output() updateOrders = new EventEmitter();
   @Output() editOrderPressed = new EventEmitter<number>();
   @Input() activeIRPtabs: OrderManagementIRPTabsIndex;
-  
+
   // TODO: Delete it when we will have re-open sidebar
   @Output() private reOpenOrderSuccess: EventEmitter<Order> = new EventEmitter<Order>();
 
@@ -258,8 +258,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.subscribeOnOrderCandidatePage();
     this.subsToTabChange();
     this.subscribeOnPermissions();
-
-   
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -275,7 +273,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         this.chipList.text = status?(status).toUpperCase():"";
       }
     }
-  
+
   }
 
   ngOnDestroy(): void {
@@ -344,8 +342,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      })
-      .subscribe((isConfirm: boolean) => {
+      }).pipe(
+      takeUntil(this.unsubscribe$)
+      ).subscribe((isConfirm: boolean) => {
         if (isConfirm) {
           this.store.dispatch(new DeleteOrder(id));
         }
@@ -361,7 +360,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       cancelButtonLabel: 'No',
     };
 
-    this.confirmService.confirm(CANCEL_ORDER_CONFIRM_TEXT, options).subscribe((isConfirm: boolean) => {
+    this.confirmService.confirm(CANCEL_ORDER_CONFIRM_TEXT, options).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((isConfirm: boolean) => {
       if (isConfirm) {
         this.store.dispatch(new DeleteOrder(id));
       }
@@ -412,8 +413,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          takeUntil(this.unsubscribe$)
+        ).subscribe(() => {
           this.closeReOrderEmitter.emit();
           this.reOrderToEdit = null;
           this.store.dispatch(new ShowSideDialog(false));
@@ -447,7 +450,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public onClose(): void {
     if (this.extensionCandidateComponent?.form.dirty) {
-      this.saveExtensionChanges().subscribe(() => {
+      this.saveExtensionChanges().pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {
         this.closeSideDialog();
       });
     } else {
@@ -592,7 +597,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder,canCreateOrderIRP }) => {
+    this.permissionService.getPermissions().pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(({ canCreateOrder, canCloseOrder,canCreateOrderIRP }) => {
       this.canCloseOrderPermission = canCloseOrder;
       this.canCreateOrder = canCreateOrder;
       this.canCreateOrderIRP=canCreateOrderIRP;

@@ -1,3 +1,4 @@
+import { OrderClosureReasonType } from '@shared/enums/order-closure-reason-type.enum';
 import { PageOfCollections } from "@shared/models/page.model";
 
 export type OrderRequisitionReason = {
@@ -20,6 +21,7 @@ export type RejectReasonwithSystem = {
   includeInIRP?: boolean;
   isVMSIRP?:boolean;
   isAutoPopulate? : boolean;
+  orderClosureReasonType?: OrderClosureReasonType;
 }
 
 export type RejectReasonWithRedflag = {

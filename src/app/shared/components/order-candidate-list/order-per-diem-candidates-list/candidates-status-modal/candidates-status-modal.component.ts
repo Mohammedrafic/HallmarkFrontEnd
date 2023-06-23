@@ -184,8 +184,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
 
   private getComments(): void {
     this.commentsService
-      .getComments(this.orderCandidateJob?.commentContainerId as number, null)
-      .subscribe((comments: Comment[]) => {
+      .getComments(this.orderCandidateJob?.commentContainerId as number, null).pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe((comments: Comment[]) => {
         this.comments = comments;
         this.cd.detectChanges();
       });
@@ -242,7 +243,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       }
       if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
         if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){
-            if(this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null 
+            if(this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null
                 || this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === ''){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
               return;
@@ -254,7 +255,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       }
 
       if(this.candidateAddressRequiredValue === ConfigurationValues.Apply){
-        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){ 
+        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){
             if(CommonHelper.candidateAddressCheck(this.orderApplicantsInitialData?.candidateProfileContactDetails)){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
                 return;
@@ -272,7 +273,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             candidateId: this.orderApplicantsInitialData.candidateId,
             candidatePayRate: this.orderApplicantsInitialData.candidatePayRate,
           })
-        )
+        ).pipe(takeUntil(this.unsubscribe$))
         .subscribe(() => {
           this.store.dispatch(new ReloadOrderCandidatesLists());
         });
@@ -289,7 +290,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     }
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
       if(this.orderCandidateJob?.candidateProfileContactDetails != null){
-          if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null 
+          if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null
               || this.orderCandidateJob?.candidateProfileContactDetails.phone1 === ''){
             this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
             return;
@@ -299,15 +300,15 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
           return;
         }
     }
-   
-    
+
+
     if (this.candidatePayRateRequired && this.form.get('candidatePayRate')?.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.orderCandidateJob?.candidateProfileContactDetails != null){ 
+      if(this.orderCandidateJob?.candidateProfileContactDetails != null){
           if(CommonHelper.candidateAddressCheck(this.orderCandidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
@@ -340,7 +341,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             nextApplicantStatus: this.selectedApplicantStatus || this.orderCandidateJob.applicantStatus,
             candidatePayRate: value.candidatePayRate,
           })
-        )
+        ).pipe(takeUntil(this.unsubscribe$))
         .subscribe({
           next: () => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()),
           error: () => this.closeDialog(),
@@ -361,7 +362,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             nextApplicantStatus: applicantStatus,
             candidatePayRate: value.candidatePayRate,
           })
-        )
+        ).pipe(takeUntil(this.unsubscribe$))
         .subscribe(() => {
           this.store.dispatch(new ReloadOrderCandidatesLists());
         });
@@ -431,7 +432,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       ssn:orderCandidateJob.candidateProfile.ssn,
     });
     this.candidateDOBRequired=orderCandidateJob.candidateDOBRequired;
-    this.candidateSSNRequired=orderCandidateJob.candidateSSNRequired; 
+    this.candidateSSNRequired=orderCandidateJob.candidateSSNRequired;
     if(orderCandidateJob.candidatePhone1Required != null){
       let phone1Configuration = JSON.parse(orderCandidateJob.candidatePhone1Required);
       if(phone1Configuration.isEnabled){
@@ -500,7 +501,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       });
   }
 
-  
+
   private adjustCandidatePayRateControl(): void {
     const candidatePayRateControl = this.form?.get('candidatePayRate');
 

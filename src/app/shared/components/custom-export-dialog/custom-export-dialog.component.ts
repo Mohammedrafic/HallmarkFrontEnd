@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
-import { ShowCustomExportDialog, ShowExportDialog } from '../../../store/app.actions';
+import { ShowCustomExportDialog } from '../../../store/app.actions';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { Subject, takeUntil } from 'rxjs';
 import { ExportColumn } from '@shared/models/export.model';

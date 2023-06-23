@@ -195,7 +195,8 @@ export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComp
 
   private closeSideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false)).pipe(
-      delay(500)
+      delay(500),
+      takeWhile(() => this.isAlive)
     ).subscribe(() => {
       this.form.reset();
     });

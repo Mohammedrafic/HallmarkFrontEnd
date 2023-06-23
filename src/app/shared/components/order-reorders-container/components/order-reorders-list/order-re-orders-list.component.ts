@@ -98,7 +98,7 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
       return;
     }
     this.addEditReOrderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.EditReOrder);
-    this.orderManagementService.getOrderById(order.id).subscribe((order) => this.editReorder.emit(order));
+    this.orderManagementService.getOrderById(order.id).pipe(takeUntil(this.componentDestroy())).subscribe((order) => this.editReorder.emit(order));
   }
 
   public gridPageChanged(page: number): void {

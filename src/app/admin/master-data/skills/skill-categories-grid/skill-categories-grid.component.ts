@@ -125,8 +125,9 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
        title: DELETE_RECORD_TITLE,
        okButtonLabel: 'Delete',
        okButtonClass: 'delete-button'
-    })
-    .subscribe((confirm) => {
+    }).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((confirm) => {
       if (confirm) {
         this.store.dispatch(new RemoveSkillsCategory(data));
       }
@@ -141,16 +142,18 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
         okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
+      }).pipe(
+        filter(confirm => !!confirm),
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500),takeUntil(this.unsubscribe$)).subscribe(() => {
           this.CategoryFormGroup.reset();
           this.CategoryFormGroup.get('id')?.setValue(0);
         });
         this.removeActiveCssClass();
       });
     } else {
-      this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
+      this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500),takeUntil(this.unsubscribe$)).subscribe(() => {
         this.CategoryFormGroup.reset();
         this.CategoryFormGroup.get('id')?.setValue(0);
       });

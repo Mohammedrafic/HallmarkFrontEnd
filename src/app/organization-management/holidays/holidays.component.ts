@@ -79,7 +79,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
   @Select(OrganizationManagementState.organization)
   public readonly organization$: Observable<Organization>;
-  
+
   public selectedSystem: SelectedSystemsFlag = SelectedSystems;
   protected componentDestroy: () => Observable<unknown>;
   public HolidayFormGroup: FormGroup;
@@ -156,15 +156,17 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
     this.startTimeField = this.HolidayFormGroup.get('startDateTime') as AbstractControl;
     this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime'));
-    this.startTimeField.valueChanges.subscribe(() =>
+    this.startTimeField.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(() =>
       this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
     this.endTimeField = this.HolidayFormGroup.get('endDateTime') as AbstractControl;
     this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime'));
-    this.endTimeField.valueChanges.subscribe(() =>
+    this.endTimeField.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(() =>
       this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
-    this.HolidayFormGroup.get('regionId')?.valueChanges.subscribe((val: number) => {
+    this.HolidayFormGroup.get('regionId')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number) => {
       if (this.title === DialogMode.Edit) {
         this.selectedRegions = [];
         if (val !== null) {
@@ -191,7 +193,9 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
         }
       }
     });
-    this.HolidayFormGroup.get('regions')?.valueChanges.subscribe((val: number[]) => {
+    this.HolidayFormGroup.get('regions')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (this.title === DialogMode.Assign) {
         this.selectedRegions = [];
         if (val) {
@@ -212,7 +216,9 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
         this.HolidayFormGroup.get('locations')?.setValue(null);
       }
     });
-    this.HolidayFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+    this.HolidayFilterFormGroup.get('regionIds')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
         val.forEach((id) =>
@@ -231,7 +237,9 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
         this.filteredItems = this.filterService.generateChips(this.HolidayFilterFormGroup, this.filterColumns);
       }
     });
-    this.HolidayFormGroup.get('locations')?.valueChanges.subscribe((val: number[]) => {
+    this.HolidayFormGroup.get('locations')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: number[]) => {
       if (this.title === DialogMode.Assign) {
         if (val && val.length === this.locations.length) {
           this.isAllLocationsSelected = true;
@@ -240,7 +248,9 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
         }
       }
     });
-    this.HolidayFormGroup.get('holidayName')?.valueChanges.subscribe((val: string) => {
+    this.HolidayFormGroup.get('holidayName')?.valueChanges.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val: string) => {
       const selectedHoliday = this.masterHolidays.find((holiday) => holiday.holidayName === val);
       if (selectedHoliday) {
         this.HolidayFormGroup.get('masterHolidayId')?.setValue(selectedHoliday.id);
@@ -321,7 +331,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
     this.holidayDataSource$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
       this.filterColumns.holidayNames.dataSource = dataSource;
     });
-    
+
   }
 
   ngOnDestroy(): void {
@@ -529,8 +539,9 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
                     this.isAllRegionsSelected, this.isAllLocationsSelected
                   )
                 )
-              )
-              .subscribe((val) => {
+              ).pipe(
+                  takeUntil(this.unsubscribe$)
+              ).subscribe((val) => {
                 if (val.orgHolidays.isExist) {
                   this.confirmService
                     .confirm(DATA_OVERRIDE_TEXT, {
@@ -568,7 +579,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
                   this.isAllRegionsSelected, this.isAllLocationsSelected
                 )
               )
-            )
+            ).pipe(takeUntil(this.unsubscribe$))
             .subscribe((val) => {
               if (val.orgHolidays.isExist) {
                 this.confirmService
@@ -692,7 +703,9 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
   private getOrganizagionData(): void {
     this.organization$
     .pipe(
-      filter(Boolean)    )
+      filter(Boolean),
+      takeUntil(this.unsubscribe$)
+    )
     .subscribe((organization : Organization) => {
       const isOrgUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
       this.selectedSystem = {

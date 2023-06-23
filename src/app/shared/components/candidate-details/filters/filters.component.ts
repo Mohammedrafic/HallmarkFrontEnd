@@ -6,19 +6,18 @@ import { Actions, Store, ofActionDispatched } from '@ngxs/store';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { debounceTime, delay, distinctUntilChanged, takeUntil } from 'rxjs';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OutsideZone } from '@core/decorators';
 import { UserState } from 'src/app/store/user.state';
 import { DoNotReturnCandidateSearchFilter } from '@shared/models/donotreturn.model';
-import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { Getcandidatesearchbytext } from '../store/candidate.actions';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-filters',
   templateUrl: './filters.component.html',
   styleUrls: ['./filters.component.scss'],
 })
-export class FiltersComponent implements OnInit, AfterViewInit {
+export class FiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @Input() public filterColumns: FilterColumnsModel;
   @Input() public filtersForm: FormGroup;
   @Input() public isAgency: boolean;
@@ -40,7 +39,8 @@ export class FiltersComponent implements OnInit, AfterViewInit {
     text: 'agencyName',
     value: 'agencyId',
   };
-  constructor(private actions$: Actions, protected  store: Store, private readonly ngZone: NgZone,) { 
+  constructor(private actions$: Actions, protected  store: Store, private readonly ngZone: NgZone,) {
+    super();
     const user = this.store.selectSnapshot(UserState.user);
     this.orgid=user?.businessUnitId
   }
@@ -51,7 +51,8 @@ export class FiltersComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.actions$.pipe(
       ofActionDispatched(ShowFilterDialog),
-      debounceTime(300)
+      debounceTime(300),
+      takeUntil(this.destroy$)
     ).subscribe(() => {
       this.regionDropdown.refresh();
       this.locationDropdown.refresh();
@@ -71,16 +72,19 @@ export class FiltersComponent implements OnInit, AfterViewInit {
  const user = this.store.selectSnapshot(UserState.user);
  let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
     this.orgid=user?.businessUnitId|| parseInt(lastSelectedOrganizationId||'0')
-    
+
          let filter: DoNotReturnCandidateSearchFilter = {
         searchText: e.text,
         businessUnitId: this.orgid
       };
       this.CandidateNames = [];
       this.store.dispatch(new Getcandidatesearchbytext(filter))
-        .pipe(delay(500),distinctUntilChanged())
-        .subscribe((result) => {
-      
+        .pipe(
+          delay(500),
+          distinctUntilChanged(),
+          takeUntil(this.destroy$)
+        ).subscribe((result) => {
+
           this.CandidateNames = result.candidateDetails.searchCandidates
           e.updateData(result.candidateDetails.searchCandidates);
         });

@@ -14,7 +14,7 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions, GetCommonReportAgencyCandidateSearch } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -28,7 +28,7 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
-  CommonCandidateSearchFilter, CommonReportFilter,
+  CommonAgencyCandidateSearchFilter, CommonReportFilter,
   MasterSkillDto, SearchCandidate, SkillCategoryDto, OrderTypeOptionsForReport, AgencyCommonFilterReportOptions
 } from '../models/agency-common-report.model';
 import { OutsideZone } from "@core/decorators";
@@ -620,12 +620,13 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
     if (e.text != '') {
       let ids = [];
       ids.push(this.bussinessControl.value);
-      let filter: CommonCandidateSearchFilter = {
+      let filter: CommonAgencyCandidateSearchFilter = {
         searchText: e.text,
-        businessUnitIds: ids
+        businessUnitIds: ids,
+        agencyId: Number(this.defaultAgency)
       };
       this.filterColumns.dataSource = [];
-      this.store.dispatch(new GetCommonReportCandidateSearch(filter))
+      this.store.dispatch(new GetCommonReportAgencyCandidateSearch(filter))
         .subscribe((result) => {
           this.candidateFilterData = result.LogiReport.searchCandidates;
           this.candidateSearchData = result.LogiReport.searchCandidates;

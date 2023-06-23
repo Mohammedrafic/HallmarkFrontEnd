@@ -23,7 +23,7 @@ import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import { ShowExportDialog, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { MasterOrientationExportCols } from '../orientation-grid/orientation-grid.constants';
@@ -75,7 +75,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   public readonly skills$: Observable<Skill[]>;
-  
+
   constructor(
     protected override store: Store,
     private cd: ChangeDetectorRef,
@@ -116,7 +116,9 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
   }
 
   private getOrientationHistoricalData(): void {
-    this.orientationService.getHistoricalOrientationConfigs(this.filters).subscribe(data => {
+    this.orientationService.getHistoricalOrientationConfigs(this.filters).pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe(data => {
       this.dataSource = data;
       this.cd.markForCheck();
     });
@@ -154,8 +156,10 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm: boolean) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm: boolean) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.closeHandler();
         });
     } else {
@@ -186,7 +190,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
       nodes.forEach(element => {
         this.selectedRowDatas.push(element.data);
       });
-    } 
+    }
   }
   public closeExport(): void {
     this.fileName = '';
@@ -201,8 +205,8 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
       this.defaultExport(event);
     });
   }
-  
- 
+
+
   private watchForExportDialog(): void {
     this.actions$.pipe(
       ofActionDispatched(ShowExportDialog),
@@ -221,7 +225,9 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
     } else {
       const data = this.orientationForm.getRawValue();
       data.endDate = data.endDate ? DateTimeHelper.toUtcFormat(data.endDate) : data.endDate;
-      this.orientationService.reactivateOrientationConfiguration(data).subscribe({
+      this.orientationService.reactivateOrientationConfiguration(data).pipe(
+        takeUntil(this.componentDestroy()),
+      ).subscribe({
         next: () => {
           this.store.dispatch(new ShowToast(MessageTypes.Success, SETUPS_ACTIVATED));
           this.closeHandler();
@@ -242,7 +248,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
     data: OrientationConfiguration | BulkActionDataModel
   }): void {
     if (!event.isBulk) {
-      this.populateForm([(event.data as OrientationConfiguration).id]);    
+      this.populateForm([(event.data as OrientationConfiguration).id]);
     } else {
       const ids = (event.data as BulkActionDataModel).items.map(item => item.data.id);
       this.populateForm(ids);

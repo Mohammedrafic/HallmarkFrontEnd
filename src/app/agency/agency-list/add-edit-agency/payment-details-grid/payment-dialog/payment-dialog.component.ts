@@ -71,8 +71,10 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm: boolean) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm: boolean) => !!confirm),
+          takeUntil(this.destroy$)
+        ).subscribe(() => {
           this.modalClose.emit(false);
           this.clearPaymentContainer();
         });
@@ -127,8 +129,7 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
       .pipe(
         filter((event: boolean) => event!!),
         takeUntil(this.destroy$)
-      )
-      .subscribe(() => {
+      ).subscribe(() => {
         this.dialogTitle = ADD_PAYMENT;
         this.paymentModeControl.enable();
         this.paymentModeControl.patchValue(PaymentDetailMode.Electronic);

@@ -116,8 +116,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   public getPayRateById(event: any) {
     if (event.itemData.id > 0) {
-      this.candidateWorkCommitmentService.getPayRateById(event.itemData.id)
-        .subscribe((payrate: number) => {
+      this.candidateWorkCommitmentService.getPayRateById(event.itemData.id).pipe(
+        takeUntil(this.destroy$),
+      ).subscribe((payrate: number) => {
           if (payrate) {
             this.candidateWorkCommitmentForm.controls['payRate'].setValue(payrate);
           }
@@ -396,7 +397,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private getActiveWorkCommitment(): void {
     if (this.employeeId) {
-      this.candidateWorkCommitmentService.getActiveCandidateWorkCommitment(this.employeeId).subscribe((activeCommitment) => {
+      this.candidateWorkCommitmentService.getActiveCandidateWorkCommitment(this.employeeId).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe((activeCommitment) => {
         if (activeCommitment) {
           this.lastActiveDate = DateTimeHelper.convertDateToUtc(activeCommitment.startDate as string);
           this.lastActiveDate = addDays(this.lastActiveDate, 1) as Date;
@@ -443,8 +446,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private getCandidateWorkCommitmentById(commitment: CandidateWorkCommitment): void {
-    this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number)
-      .subscribe((commitment: CandidateWorkCommitment) => {
+    this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number).pipe(
+      takeUntil(this.destroy$),
+    ).subscribe((commitment: CandidateWorkCommitment) => {
         if (commitment.workCommitmentIds) {
           commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
           const masterId = this.allWorkCommitments.find(item => item.workCommitmentId === commitment.workCommitmentIds[0]);
@@ -538,7 +542,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private setHolidayDataSource(): void {
-    this.candidateWorkCommitmentService.getHolidays().subscribe((holidays) => {
+    this.candidateWorkCommitmentService.getHolidays().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((holidays) => {
       this.holidays = convertHolidaysToDataSource(holidays);
       this.cd.detectChanges();
     });
@@ -546,6 +552,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private setWorkCommitmentDataSource(commitment?: CandidateWorkCommitment): void {
     this.candidateWorkCommitmentService.getAvailableWorkCommitments(this.employeeId)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((commitments: WorkCommitmentDetails[]) => {
         const commitmentGroups = groupBy(commitments, ['masterWorkCommitmentId'], ['masterWorkCommitmentName']);
         this.workCommitments = Object.keys(commitmentGroups).map(key => commitmentGroups[key]);
@@ -615,8 +622,10 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
-        }).pipe(filter(confirm => !!confirm))
-        .subscribe(() => {
+        }).pipe(
+          filter(confirm => !!confirm),
+          takeUntil(this.destroy$)
+        ).subscribe(() => {
           this.sideDialog.hide();
           this.candidateWorkCommitmentForm.reset();
           this.lastActiveDate = null;

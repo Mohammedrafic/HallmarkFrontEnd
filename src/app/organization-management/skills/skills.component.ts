@@ -6,7 +6,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, delay, filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, delay, filter, map, Observable, Subject, take, takeUntil } from 'rxjs';
 
 import { TakeUntilDestroy } from '@core/decorators';
 import { FieldType } from '@core/enums';
@@ -86,7 +86,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   defaultFileName: string;
 
   filters: SkillFilters = {};
-  
+
   openAssignSidebarSubject = new Subject<boolean>();
 
   skillDialogConfig = VmsSkillsDialogConfig;
@@ -107,7 +107,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   };
 
   private pageSubject = new Subject<number>();
-  
+
   private componentDestroy: () => Observable<unknown>;
 
   constructor(
@@ -137,7 +137,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   }
 
   /**
-   * Needed for TakeUntilDestroy decorator 
+   * Needed for TakeUntilDestroy decorator
    */
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   ngOnDestroy(): void {}
@@ -272,8 +272,9 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm) {
           this.store.dispatch(new RemoveAssignedSkill(data));
         }
@@ -288,8 +289,10 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
         okButtonClass: 'delete-button',
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
+      }).pipe(
+        filter(confirm => !!confirm),
+        take(1)
+      ).subscribe(() => {
         this.store.dispatch(new ShowSideDialog(false));
         this.skillForm.reset();
         this.removeActiveCssClass();
