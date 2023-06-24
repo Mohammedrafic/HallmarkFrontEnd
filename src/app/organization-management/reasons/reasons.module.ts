@@ -17,6 +17,8 @@ import { Edit, Trash2 } from 'angular-feather/icons';
 import { ClosureReasonComponent } from './components/closure-reason/closure-reason.component';
 import { ManualInvoiceRejectReasonComponent,
 } from './components/manual-invoice-reject-reason/manual-invoice-reject-reason.component';
+import { PenaltiesGridActionsRendererComponent,
+} from './components/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
 import { OrderRequisitionComponent } from './components/order-requisition/order-requisition.component';
 import { PenaltiesComponent } from './components/penalties/penalties.component';
 import { ReasonsRoutingModule } from './reasons-routing.module';
@@ -70,6 +72,7 @@ const icons = {
         InternalTransferComponent,
         EmpTerminationComponent,
         CategoryNoteComponent,
+        PenaltiesGridActionsRendererComponent,
     ],
     providers: [ReasonsFormsService, ReasonsService],
     exports: [ReasonsComponent],

@@ -1,18 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { TiersComponent } from '@organization-management/tiers/tiers.component';
-import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
-import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
-import { GroupComponent } from './credentials/credentials-setup/group/group.component';
-import { CredentialsComponent } from './credentials/credentials.component';
 import { OrganizationManagementComponent } from './organization-management.component';
-import { PayRateComponent } from './pay-rate/pay-rate.component';
-import { WorkCommitmentComponent } from './work-commitment/containers/work-commitment-container/work-commitment.component';
 
-/**
- * TODO: refactor component to modules and make them lazy.
- */
 const routes: Routes = [
   {
     path: '',
@@ -41,29 +31,14 @@ const routes: Routes = [
       },
       {
         path: 'credentials',
-        component: CredentialsComponent,
+        loadChildren: () => import('./credentials/credentials.module').then((m) => m.CredentialsModule),
         data: {
           isOrganizationArea: true,
         },
-        children: [
-          {
-            path: 'list',
-            component: CredentialsListComponent,
-            data: {
-              isOrganizationArea: true,
-              isCredentialSettings: true,
-            },
-          },
-          {
-            path: 'setup',
-            component: CredentialsSetupComponent,
-            data: { isOrganizationArea: true },
-          },
-        ],
       },
       {
         path: 'credentials/groups-setup',
-        component: GroupComponent,
+        loadChildren: () => import('./credential-groups/credential-groups.module').then((m) => m.CredentialGroupsModule),
         data: {
           isOrganizationArea: true,
         },
@@ -140,21 +115,21 @@ const routes: Routes = [
       },
       {
         path: 'tiers',
-        component: TiersComponent,
+        loadChildren: () => import('./tiers/tiers.module').then((m) => m.TiersModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'workcommitment',
-        component: WorkCommitmentComponent,
+        loadChildren: () => import('./work-commitment/work-commitment.module').then((m) => m.WorkCommitmentModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'pay-rate',
-        component: PayRateComponent,
+        loadChildren: () => import('./pay-rate/pay-rate.module').then((m) => m.PayRateModule),
         data: {
           isOrganizationArea: true,
         },

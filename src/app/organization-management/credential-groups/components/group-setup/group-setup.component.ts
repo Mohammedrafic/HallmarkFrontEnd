@@ -32,10 +32,12 @@ import { Skill } from '@shared/models/skill.model';
 import { AppState } from '../../../../store/app.state';
 import { TakeUntilDestroy } from '@core/decorators';
 import { Organization } from '@shared/models/organization.model';
-import { GroupSetupService } from '@organization-management/credentials/services/group-setup.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { RowSelectedEvent } from '@ag-grid-community/core';
+
+import { GroupSetupService } from '../../services/group-setup.service';
+
 
 @TakeUntilDestroy
 @Component({

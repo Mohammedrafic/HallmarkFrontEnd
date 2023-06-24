@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { WorkCommitmentRoutingModule } from './work-commitment-routing.module';
 import { WorkCommitmentComponent } from './containers/work-commitment-container/work-commitment.component';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { ButtonModule } from '@shared/components/button/button.module';
@@ -13,6 +14,7 @@ import { MultipleRecordsRendererComponent } from './components/multiple-records-
   declarations: [WorkCommitmentComponent, MultipleRecordsRendererComponent],
   imports: [
     CommonModule,
+    WorkCommitmentRoutingModule,
     WorkCommitmentGridModule,
     WorkCommitmentDialogModule,
     WorkCommitmentButtonRendererModule,
