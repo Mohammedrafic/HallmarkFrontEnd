@@ -65,7 +65,10 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.filters.tab = this.activeTab;
+    if(!this.filters){
+      this.filters ={}
+    }
+     this.filters.tab = this.activeTab;
     this.defaultFileName = 'Candidate Assignment ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(
       new ExportCandidateAssignment(
