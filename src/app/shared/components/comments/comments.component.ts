@@ -187,6 +187,7 @@ export class CommentsComponent {
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment)).subscribe(data => {
         if(data.orderManagement?.orderComments){
+          this.comments = [];
           this.getOrderComments();
         }
       });
@@ -196,6 +197,7 @@ export class CommentsComponent {
   private getOrderComments(): void {
     this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
     this.orderComments$.subscribe((comments: Comment[]) => {
+      this.comments = comments;
       this.cd.markForCheck();
     });
   }
