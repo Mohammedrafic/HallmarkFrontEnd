@@ -54,7 +54,7 @@ import { OrganizationSettingsGet } from '@shared/models/organization-settings.mo
 import { GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { SettingsKeys } from '@shared/enums/settings';
-import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { GetOrderRequisitionByPage } from '@organization-management/store/reject-reason.actions';
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
@@ -139,6 +139,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public locationDataSource: OrganizationLocation[] = [];
   public departmentDataSource: OrganizationDepartment[] = [];
   public jobDistributions = ORDER_JOB_DISTRIBUTION;
+  public reasons: RejectReasonwithSystem[] = [];
 
   private selectedOrganizationId: number;
   private selectedLocation: OrganizationLocation;
@@ -205,6 +206,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   public ngOnInit(): void {
+    this.getVMSOrderRequisition();
     this.handleOrderTypeControlValueChanges();
     this.orderTypeDepartmentSkillListener();
     this.handleJobStartDateValueChanges();
@@ -341,6 +343,28 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private getActiveDepartments(arr: OrganizationDepartment[]): OrganizationDepartment[] {
     return arr.filter((department: OrganizationDepartment) => !department.isDeactivated);
   }
+
+  public getVMSOrderRequisition() {
+    this.reasons = [];
+    this.reasons$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        data.items.forEach(item => {
+          if (item.includeInVMS === true) {
+            this.reasons.push({
+              id: item.id,
+              reason: item.reason,
+              businessUnitId: item.businessUnitId,
+              isAutoPopulate: item.isAutoPopulate
+            });
+          }
+          if (item.isAutoPopulate === true) {
+            this.jobDistributionDescriptionForm.controls['orderRequisitionReasonId'].setValue(item.id);
+          }
+        });
+      });
+  }
+
 
   private populateRegLocDepFields(region: OrganizationRegion): void {
     if (region) {
