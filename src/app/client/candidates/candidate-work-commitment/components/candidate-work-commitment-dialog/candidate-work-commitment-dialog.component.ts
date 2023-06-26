@@ -10,7 +10,12 @@ import {
   WorkCommitmentOrgHierarchies,
 } from '@organization-management/work-commitment/interfaces';
 import { DatepickerComponent } from '@shared/components/form-controls/datepicker/datepicker.component';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, EMPLOYEE_SKILL_CHANGE_WARNING, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  EMPLOYEE_SKILL_CHANGE_WARNING,
+  RECORD_ADDED, RECORD_MODIFIED,
+} from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -369,6 +374,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].setValue('' + id, { emitEvent: false });
         this.candidateWorkCommitmentForm.patchValue(candidateCommitment, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
+        this.minimumDate = candidateCommitment.startDate as Date;
       }
       this.refreshDatepicker();
       this.cd.detectChanges();
