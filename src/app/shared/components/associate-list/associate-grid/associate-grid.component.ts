@@ -11,7 +11,7 @@ import {
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
-import { combineLatest, debounceTime, filter, Observable, Subject, takeWhile } from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, Subject, take, takeWhile } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { TiersException } from '@shared/components/associate-list/store/associate.actions';
@@ -93,8 +93,10 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm) => !!confirm))
-      .subscribe(() => {
+      .pipe(
+        filter((confirm) => !!confirm),
+        take(1)
+      ).subscribe(() => {
         if (row.id) {
           this.store.dispatch(new TiersException.DeleteAssociateOrganizationsAgencyById(row.id));
         }
@@ -146,7 +148,10 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   }
 
   private subscribeOnPageChanges(): void {
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
+    this.pageSubject.pipe(
+      debounceTime(1),
+      takeWhile(() => this.isAlive)
+    ).subscribe((page: number) => {
       this.currentPage = page;
       this.dispatchNewPage();
     });

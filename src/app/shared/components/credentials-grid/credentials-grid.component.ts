@@ -8,7 +8,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FileInfo, FilesPropModel, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest } from 'rxjs';
+import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest, EMPTY } from 'rxjs';
 
 import { CustomFormGroup, Permission } from '@core/interface';
 import { FileSize, UserPermissions } from '@core/enums';
@@ -34,12 +34,14 @@ import {
   UploadCredentialFilesSucceeded,
   VerifyCandidatesCredentials,
   VerifyCandidatesCredentialsFailed,
-  VerifyCandidatesCredentialsSucceeded
+  VerifyCandidatesCredentialsSucceeded,
 } from '@agency/store/candidate.actions';
 import { CandidateState } from '@agency/store/candidate.state';
 import { CredentialGridService } from '@agency/services/credential-grid.service';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants/messages';
+import { AbstractGridConfigurationComponent } from
+  '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from
+  '@shared/constants/messages';
 import { optionFields } from '@shared/constants';
 import { FileStatusCode } from '@shared/enums/file.enum';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -50,7 +52,7 @@ import {
   CandidateCredentialGridItem,
   CandidateCredentialResponse,
   CredentialFile,
-  CredentialRequestParams
+  CredentialRequestParams,
 } from '@shared/models/candidate-credential.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
@@ -62,7 +64,7 @@ import {
   AllowedCredentialFileExtensions,
   CredentialSelectionSettingsModel,
   DisableEditMessage,
-  StatusFieldSettingsModel
+  StatusFieldSettingsModel,
 } from './credentials-grid.constants';
 import { AddCredentialForm, SearchCredentialForm } from './credentials-grid.interface';
 import { AppState } from '../../../store/app.state';
@@ -256,7 +258,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public openAddCredentialDialog(): void {
     this.store.dispatch(new GetCredentialStatuses(this.isOrganizationSide, this.orderId || null));
-    this.store.dispatch(new GetMasterCredentials('', '', this.orderId));
+    this.store.dispatch(new GetMasterCredentials('', '', this.orderId, this.isIRP));
 
     this.store
       .dispatch(new ShowSideDialog(true))
@@ -584,7 +586,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       )
       .subscribe(() => {
         this.store.dispatch(
-          new GetMasterCredentials(this.searchTermControl?.value || '', this.credentialTypeIdControl?.value || '', this.orderId)
+          new GetMasterCredentials(
+            this.searchTermControl?.value || '',
+            this.credentialTypeIdControl?.value || '',
+            this.orderId,
+            this.isIRP,
+          )
         );
       });
   }
@@ -607,7 +614,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   private watchForCandidateCredential(): void {
-    this.candidateCredential$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((response: CandidateCredentialResponse) => {
+    this.candidateCredential$
+    .pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$)
+    )
+    .subscribe((response: CandidateCredentialResponse) => {
       this.candidateCredentialResponse = response;
       this.setDisableAddCredentialButton();
       this.setGridItems(response);
@@ -686,13 +698,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           this.file = null;
         }
       });
-      this.actions$
+    this.actions$
       .pipe(ofActionSuccessful(VerifyCandidatesCredentialsSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((credential: { payload: CandidateCredential[] }) => {
         this.selectedItems = [];
         this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
       });
-      this.actions$
+    this.actions$
       .pipe(ofActionSuccessful(VerifyCandidatesCredentialsFailed), takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.disabledCopy = false;
@@ -710,9 +722,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private setDisableAddCredentialButton(): void {
     this.disableAddCredentialButton =
-      !this.areAgencyActionsAllowed ||
-      !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP);
+      !this.areAgencyActionsAllowed
+      || !this.hasPermissions()
+      || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
+      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile]);
   }
 
   private setGridItems(response: CandidateCredentialResponse): void {
@@ -736,31 +749,32 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
  }
   private disableCopy(item: CandidateCredential): boolean {
     return (
-      !this.areAgencyActionsAllowed ||
-      this.disabledCopy ||
-      item.id === this.orderCredentialId ||
-      !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
+      !this.areAgencyActionsAllowed
+      || this.disabledCopy
+      || item.id === this.orderCredentialId
+      || !this.hasPermissions()
+      || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
+      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
     );
   }
 
   private disableEdit(item: CandidateCredential): boolean {
     return (
-      !this.areAgencyActionsAllowed ||
-      item.id === this.orderCredentialId ||
-      ((item.status === this.statusEnum.Reviewed) &&
-        !this.isOrganizationSide) ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
-    );
+      !this.areAgencyActionsAllowed
+      || item.id === this.orderCredentialId
+      || ((item.status === this.statusEnum.Reviewed) && !this.isOrganizationSide)
+      || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
+      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
+      );
   }
 
   private disableDelete(item: CandidateCredential): boolean {
     return (
-      !this.areAgencyActionsAllowed ||
-      item.id === this.orderCredentialId ||
-      !this.hasPermissions() ||
-      (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP) ||
-      (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
+      !this.areAgencyActionsAllowed
+      || item.id === this.orderCredentialId
+      || !this.hasPermissions()
+      || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
+      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
     );
   }
 
@@ -802,8 +816,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   private watchForCertifiedOnUntilControls(): void {
-    combineLatest([this.createdOnControl?.valueChanges, this.createdUntilControl?.valueChanges])
-      .pipe(takeUntil(this.unsubscribe$))
+    combineLatest([
+      this.createdOnControl?.valueChanges || EMPTY,
+      this.createdUntilControl?.valueChanges || EMPTY,
+    ])
+.pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => this.cdr.markForCheck());
   }
 }

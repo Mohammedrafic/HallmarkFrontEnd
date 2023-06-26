@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, filter, Observable, Subject, take, takeUntil } from 'rxjs';
+import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { UserState } from 'src/app/store/user.state';
 import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments-irp.actions';
 import { CommentsState } from './store/comments-irp.state';
@@ -19,7 +19,7 @@ import { CommentsFilter } from '@core/enums/common.enum';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommentsIrpComponent {
-  
+
   faUserFriends = faUserFriends as IconProp;
   faEye = faEye as IconProp;
   faEyeSlash = faEyeSlash as IconProp;
@@ -171,7 +171,8 @@ export class CommentsIrpComponent {
       new: true,
       commentContainerId: this.commentContainerId,
       isRead: true,
-      isPrivate: this.isPrivate
+      isPrivate: this.isPrivate,
+      isIRP:true
     };
     this.comments.push(comment);
     this.message = '';
@@ -183,9 +184,9 @@ export class CommentsIrpComponent {
 
   public onFilterChange(event: SelectEventArgs): void {
     this.commentdata = this.commentsList;
-    event.itemData.value === CommentsFilter.External ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; isPrivate: boolean; }) => x.isExternal === true && x.isPrivate === false) : this.commentdata;
-    event.itemData.value === CommentsFilter.Internal ? this.commentdata = this.commentdata.filter((x: { isExternal: boolean; isPrivate: boolean; }) => x.isExternal === false && x.isPrivate === false) : this.commentdata;
-    event.itemData.value === CommentsFilter.Private ? this.commentdata = this.commentdata.filter((x: { isPrivate: boolean; }) => x.isPrivate === true) : this.commentdata;
+    event.itemData.value === CommentsFilter.External ? this.commentdata = this.commentdata.filter((comment : { isExternal: boolean; isPrivate: boolean; }) => comment.isExternal === true && comment.isPrivate === false) : this.commentdata;
+    event.itemData.value === CommentsFilter.Internal ? this.commentdata = this.commentdata.filter((comment : { isExternal: boolean; isPrivate: boolean; }) => comment.isExternal === false && comment.isPrivate === false) : this.commentdata;
+    event.itemData.value === CommentsFilter.Private ? this.commentdata = this.commentdata.filter((comment : { isPrivate: boolean; }) => comment.isPrivate === true) : this.commentdata;
     event.itemData.value === CommentsFilter.All ? this.commentdata : this.commentdata
     this.commentType = event.itemData.value;
     this.scroll$.next(null);

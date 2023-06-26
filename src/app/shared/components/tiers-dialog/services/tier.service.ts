@@ -68,7 +68,7 @@ export class TierService {
       case Tiers.tierSettings:
         return this.getStructureForTierSettings(tier, regions);
       case Tiers.tierSettingsIRP:
-        return this.getStructureForTierSettingsIRP(tier, regions);
+        return this.getStructureForTierSettingsIRP(tier);
       case Tiers.tierException:
         return this.getStructureForTierException(tier);
       default:
@@ -90,9 +90,7 @@ export class TierService {
     };
   }
 
-  private getStructureForTierSettingsIRP(tier: TierDetails, regions: OrganizationRegion[]): TierDTO {
-    this.getTierConfig(regions);
-
+  private getStructureForTierSettingsIRP(tier: TierDetails): TierDTO {
     return {
       organizationTierId: tier.id,
       name: tier.name,

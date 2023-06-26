@@ -427,6 +427,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private getIRPOrderRequisition(orderRequisition: RejectReasonwithSystem[]): OrderRequisitionReason[] {
+    this.reason=[];
     if (orderRequisition.length > 0) {
       orderRequisition.forEach(element => {
         if (element.includeInIRP === true) {
@@ -519,7 +520,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-      const locations = this.organizationStructureService.getLocationsById(value);
+      let startDate = this.generalInformationForm.get('jobStartDate')?.value ?this.generalInformationForm.get('jobStartDate')?.value :this.generalInformationForm.get('jobDates')?.value;
+      const locations = this.organizationStructureService.getLocationsById(value,startDate);
       this.generalInformationForm.get('locationId')?.reset();
       this.generalInformationForm.get('departmentId')?.reset();
 
@@ -818,14 +820,15 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private patchFormValues(selectedOrder: Order): void {
     this.orderTypeForm.patchValue(selectedOrder);
     this.generalInformationForm.patchValue({
+      jobStartDate: selectedOrder.jobStartDate,
+      jobEndDate: selectedOrder.jobEndDate,
       regionId: selectedOrder.regionId,
       locationId: selectedOrder.locationId,
       departmentId: selectedOrder.departmentId,
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
       duration: selectedOrder.duration,
-      jobStartDate: selectedOrder.jobStartDate,
-      jobEndDate: selectedOrder.jobEndDate,
+      
     })
     setTimeout(()=>{
       this.generalInformationForm.patchValue({

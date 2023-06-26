@@ -13,6 +13,7 @@ import {
   distinctUntilChanged,
   map,
 } from 'rxjs';
+import { RowNode } from '@ag-grid-community/core';
 
 import { CandidateTabsEnum } from '@client/candidates/enums';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
@@ -50,7 +51,7 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 import { EditDepartmentsComponent } from './edit-departments/edit-departments.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
-import { DateTimeHelper } from '@core/helpers';
+import { DateTimeHelper, allAreEqual } from '@core/helpers';
 
 @Component({
   selector: 'app-departments',
@@ -75,6 +76,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
 
   public columnDef: ColumnDefinitionModel[];
   public dateRanges: DateRanges = {};
+  public bulkDateRanges: DateRanges = {};
 
   public departmentsAssigned: DepartmentsPage;
   public selectedTab$: Observable<CandidateTabsEnum>;
@@ -162,6 +164,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
 
   public handleBulkEvent(event: BulkActionDataModel): void {
     const selectedAll = this.departmentsAssigned.totalCount === event.items.length;
+    this.setBulkDateRanges(event.items);
     this.selectedDepartments = selectedAll ? null : event.items.map((item) => item.data.id);
 
     if (event.type === BulkTypeAction.EDIT) {
@@ -319,5 +322,24 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private clearFilterState(): void {
     this.filtersAmount = 0;
     this.filters = null;
+  }
+
+  private setBulkDateRanges(selectedRows: RowNode[]): void {
+    const startDates: string[] = [];
+    const endDates: string[] = [];
+
+    selectedRows.forEach((item) => {
+      startDates.push(item.data.startDate);
+      endDates.push(item.data.endDate);
+    });
+
+    if (allAreEqual(startDates) && allAreEqual(endDates)) {
+      this.bulkDateRanges = {
+        min: startDates[0] ? new Date(startDates[0]) : undefined,
+        max: endDates[0] ? new Date(endDates[0]) : undefined,
+      };
+    } else {
+      this.bulkDateRanges = this.dateRanges;
+    }
   }
 }

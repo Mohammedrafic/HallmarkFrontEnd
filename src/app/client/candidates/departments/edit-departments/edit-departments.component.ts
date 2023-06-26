@@ -23,6 +23,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { EDIT_MULTIPLE_RECORDS_TEXT, RECORD_MODIFIED, WARNING_TITLE } from '@shared/constants';
 import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-edit-departments',
@@ -56,6 +57,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   public ngOnInit(): void {
     this.initFormConfig(false);
     this.saveFormData();
+    this.setValidators();
   }
 
   public resetEditDepartmentForm(): void {
@@ -120,5 +122,10 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   private resetOrientationDateControl(isOriented: boolean): void {
     const orientationDateControl = this.formGroup.get(EditDepartmentFields.ORIENTATION_DATE);
     this.departmentFormService.addRemoveValidator(orientationDateControl, isOriented);
+  }
+
+  private setValidators(): void {
+    this.formGroup.get('startDate')?.setValidators(startDateValidator(this.formGroup, 'endDate'));
+    this.formGroup.get('endDate')?.setValidators(endDateValidator(this.formGroup, 'startDate'));
   }
 }

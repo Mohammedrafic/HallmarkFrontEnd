@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { Subject, filter, takeUntil } from 'rxjs';
 import { CandidatesService } from '../services/candidates.service';
 import { CandidateWorkCommitment } from './models/candidate-work-commitment.model';
-import { CandidateTabsEnum } from '../enums/candidate-tabs.enum';
+import { CandidateTabsEnum } from '@client/candidates/enums';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({

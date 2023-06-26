@@ -9,13 +9,13 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
-import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { IrpOrderCandidate, Order, OrderCandidatesList } from '@shared/models/order-management.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
-import { UserState } from 'src/app/store/user.state'; 
+import { UserState } from 'src/app/store/user.state';
 import { Duration } from '@shared/enums/durations';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
@@ -71,7 +71,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
   public applicantStatus = ApplicantStatus;
-  private defaultDuration: Duration = Duration.Other;
+  public offboardCandidate: CandidatStatus = CandidatStatus.Offboard;
+  public cancelledCandidate: CandidatStatus = CandidatStatus.Cancelled;
   public selectedOrder: Order;
   public agencyActionsAllowed = true;
   public deployedCandidateOrderIds: string[] = [];
@@ -140,7 +141,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     ).subscribe((id) => {
       this.getOrganization(id);
     });
-    if(this.orderDetails.commentContainerId != undefined){
+    if(this.orderDetails?.commentContainerId != undefined){
     this.commentContainerId = this.orderDetails.commentContainerId;
     }
   }
@@ -177,7 +178,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           this.openDialog(this.accept);
         }
       } else if (this.isOrganization) {
-        
+
         const allowedOfferDeploymentStatuses = [
           ApplicantStatus.Withdraw,
           ApplicantStatus.Rejected,

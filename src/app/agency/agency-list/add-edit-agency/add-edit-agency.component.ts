@@ -170,7 +170,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
         this.agencyConfig.agencyIsMsp = !!agency.payload.isMsp;
         this.patchAgencyFormValue(this.fetchedAgency);
       });
-  
+
     this.actions$
       .pipe(
         takeWhile(() => this.isAlive),
@@ -240,7 +240,9 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   public onDelete(): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT)
-      .pipe(filter((confirm) => !!confirm))
+      .pipe(
+        filter((confirm) => !!confirm),
+        takeWhile(() => this.isAlive))
       .subscribe(() => {});
   }
 

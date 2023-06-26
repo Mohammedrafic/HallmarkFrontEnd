@@ -700,3 +700,9 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 #Available_Employee_body .ag-center-cols-container {
   width: 100% !important; min-width: 600px;
 }
+.shared-with-grid .ag-root-wrapper.ag-layout-auto-height.ag-ltr {
+  max-height: inherit;
+}
+.shared-with-grid .ag-root-wrapper-body, .shared-with-grid .ag-body-viewport {
+  overflow: scroll;
+}

@@ -152,6 +152,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
   public isResetFilter: boolean = false;
+  private fixedCandidateStatusesIncluded: number[] = [50, 60, 100, 90, 110];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -288,7 +289,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
               this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
-              this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
+              this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
               this.filterColumns.agencyIds.dataSource = data.agencies;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);

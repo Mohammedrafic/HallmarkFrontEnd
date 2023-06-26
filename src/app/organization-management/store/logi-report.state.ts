@@ -11,7 +11,7 @@ import { LogiReportService } from "@shared/services/logi-report.service";
 import { catchError, filter, Observable, tap } from "rxjs";
 import { JobDetailSummaryReportFilterOptions } from "../../admin/analytics/models/jobdetail-summary.model";
 import { AssociateAgencyDto } from "../../shared/models/logi-report-file";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch, GetCommonReportCandidateStatusOptions, GetStaffScheduleReportFilterOptions, GetCandidateSearchFromScheduling, GetStaffListReportCandidateSearch, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions} from "./logi-report.action";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch, GetCommonReportCandidateStatusOptions, GetStaffScheduleReportFilterOptions, GetCandidateSearchFromScheduling, GetStaffListReportCandidateSearch, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions, GetCommonReportAgencyCandidateSearch} from "./logi-report.action";
 import { ScheduleCandidate, ScheduleCandidatesPage } from 'src/app/modules/schedule/interface/schedule.interface';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { ShowToast } from '../../store/app.actions';
@@ -180,6 +180,15 @@ export class LogiReportState {
                 return payload
            
         }));
+  }
+
+  @Action(GetCommonReportAgencyCandidateSearch)
+  GetCommonReportAgencyCandidateSearch({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<SearchCandidate[]> {
+    return this.logiReportService.getCommonAgencyCandidateSearch(filter).pipe(tap((payload: any) => {
+      patchState({ searchCandidates: payload });
+      return payload
+
+    }));
   }
 
   @Action(GetJobDetailSummaryReportFilterOptions)

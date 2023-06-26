@@ -123,6 +123,7 @@ import {
 import { JobClassifications, OptionFields } from '@client/order-management/constants';
 import { PartialSearchService } from '@shared/services/partial-search.service';
 import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
+import { PermissionService } from '../../../../security/services/permission.service';
 
 @Component({
   selector: 'app-order-details-form',
@@ -154,7 +155,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public workLocationsFormArray: FormArray;
   public locationIdControl: AbstractControl;
   public departmentIdControl: AbstractControl;
-
+  public canCreateOrder:boolean;
   public isEditContactTitle: boolean[] = [];
   public contactDetailTitles = ORDER_CONTACT_DETAIL_TITLES;
   public isJobEndDateControlEnabled = false;
@@ -248,6 +249,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     private orderDetailsService: OrderDetailsService,
     private cd: ChangeDetectorRef,
     private partialSearchService: PartialSearchService,
+    private permissionService: PermissionService,
   ) {
     super(store);
     this.initOrderForms();
@@ -258,6 +260,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.initControls();
     this.watchForControlsChanges();
     this.setShiftsValidation(this.orderControlsConfig.shiftStartTimeControl, this.orderControlsConfig.shiftEndTimeControl);
+    this.subscribeOnPermissions();
   }
 
   public override ngOnInit(): void {
@@ -905,16 +908,16 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
         this.getComments();
-        this.subscribeForSettings().subscribe(() => {
+        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe(() => {
           this.populateForms(order);
         });
       } else if (order?.isTemplate) {
         this.order = order;
-        this.subscribeForSettings().subscribe(() => {
+        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe(() => {
           this.populateForms(order);
         });
       } else if (!isEditMode) {
-        this.subscribeForSettings().subscribe();
+        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe();
         this.isEditMode = false;
         this.order = null;
         this.populateNewOrderForm();
@@ -1292,6 +1295,14 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         this.filterQueryString = queryString;
         event.updateData(data as PartialSearchDataType[]);
       });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 
   public closeDropdown(): void {

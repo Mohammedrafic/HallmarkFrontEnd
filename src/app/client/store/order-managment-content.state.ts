@@ -68,6 +68,7 @@ import {
   ExportOrdersJourney,
   GetAllShifts,
   sendOnboardCandidateEmailMessage,
+  GetOrderComments,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -104,6 +105,7 @@ import {
   UpdateRegularRatesucceedcount,
   PerDiemReOrdersErrorMessage,
   TravelerContracttoPermOrdersSucceedMessage,
+  RECORD_DELETE,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -132,6 +134,8 @@ import { UpdateRegRateService } from '@client/order-management/components/update
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -165,6 +169,7 @@ export interface OrderManagementContentStateModel {
   candidateCancellationReasons:CandidateCancellationReason[]|null;
   allShifts:ScheduleShift[]|null;
   sendOnboardCandidateEmail:OnboardCandidateEmail | null;
+  orderComments: Comment[]
 }
 
 @State<OrderManagementContentStateModel>({
@@ -204,9 +209,10 @@ export interface OrderManagementContentStateModel {
     irpCandidates: null,
     candidateCancellationReasons:null,
     allShifts:null,
-    sendOnboardCandidateEmail:null,
-
+    sendOnboardCandidateEmail:null,,
+    orderComments : []
   },
+  
 })
 @Injectable()
 export class OrderManagementContentState {
@@ -388,6 +394,11 @@ export class OrderManagementContentState {
     return state.allShifts || null;
   }
 
+  @Selector()
+  static orderComments(state: OrderManagementContentStateModel): Comment[] {
+    return state.orderComments;
+  }
+
   constructor(
     private orderManagementService: OrderManagementContentService,
     private orderManagementIrpApiService: OrderManagementIrpApiService,
@@ -396,7 +407,8 @@ export class OrderManagementContentState {
     private rejectReasonService: RejectReasonService,
     private extensionSidebarService: ExtensionSidebarService,
     private orderImportService: OrderImportService,
-    private UpdateRegRateService : UpdateRegRateService
+    private UpdateRegRateService : UpdateRegRateService,
+    private commentService : CommentsService
   ) {}
 
   @Action(GetOrders, { cancelUncompleted: true })
@@ -892,6 +904,7 @@ export class OrderManagementContentState {
   DeleteOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { id }: DeleteOrder): Observable<any> {
     return this.orderManagementService.deleteOrder(id).pipe(
       tap(() => {
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_DELETE), new DeleteOrderSucceeded()]);
         dispatch(new DeleteOrderSucceeded());
       }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Order cannot be deleted'))))
@@ -1155,6 +1168,15 @@ export class OrderManagementContentState {
         return payload;
       }));
     }
+
+    @Action(GetOrderComments)
+    GetOrderComments(
+      { patchState }: StateContext<OrderManagementContentStateModel>,
+      { commentContainerId }: GetOrderComments
+    ): Observable<Comment[]> {
+      return this.commentService.getComments(commentContainerId, null)
+        .pipe(tap((payload) => patchState({ orderComments: payload })));
+    }  
 
     @Action(GetAllShifts)
     GetAllShifts(

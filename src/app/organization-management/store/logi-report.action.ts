@@ -4,7 +4,7 @@ import { DepartmentsByLocationsFilter } from "@shared/models/department.model";
 import { LocationsByRegionsFilter } from "@shared/models/location.model";
 import { regionFilter } from "@shared/models/region.model";
 import { JobDetailSummaryFilter } from "../../admin/analytics/models/jobdetail-summary.model";
-import { AgencyCommonReportFilter } from '../../agency/agency-reports/models/agency-common-report.model';
+import { AgencyCommonReportFilter, CommonAgencyCandidateSearchFilter } from '../../agency/agency-reports/models/agency-common-report.model';
 
 export class GetRegionsByOrganizations {
   static readonly type = '[LogiReport] Get The List Of Regions By Organizations';
@@ -32,6 +32,10 @@ export class GetCommonReportFilterOptions{
 export class GetCommonReportCandidateSearch{
   static readonly type = '[LogiReport] Get Common Candidate Search';
   constructor(public filter: CommonCandidateSearchFilter) { }
+}
+export class GetCommonReportAgencyCandidateSearch {
+  static readonly type = '[LogiReport] Get Common Agency Candidate Search';
+  constructor(public filter: CommonAgencyCandidateSearchFilter) { }
 }
 export class GetJobDetailSummaryReportFilterOptions {
   static readonly type = '[LogiReport] Get Job Detail Summary Report Filter Options';

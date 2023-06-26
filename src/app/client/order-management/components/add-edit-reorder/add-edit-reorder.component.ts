@@ -58,13 +58,13 @@ import { MultiselectDropdownComponent,
   templateUrl: './add-edit-reorder.component.html',
   styleUrls: ['./add-edit-reorder.component.scss'],
 })
-export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('agencySelector') agencySelector: MultiselectDropdownComponent;
 
   @ViewChild('candidatesSelector') candidatesSelector: MultiselectDropdownComponent;
 
   @Input() public order: Order;
-  
+
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   public readonly agenciesOptionFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
@@ -88,8 +88,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private unsubscribe$: Subject<void> = new Subject();
   private numberOfAgencies: number;
   private multipleReorderDates: Date[] = [];
-  private disabledCandidatesIds: number[];
-  private disabledAgencyIds: number[];
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -145,12 +143,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     });
   }
 
-  ngOnChanges(): void {
-    if (this.order) {
-      this.getComments();
-    }
-  }
-
   ngAfterViewInit(): void {
     this.initAgenciesAndCandidates();
   }
@@ -201,12 +193,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       !this.areDatesEquals(shiftEndTime, shiftEndTimeInitial) ||
       !this.areDatesEquals(shiftStartTime, shiftStartTimeInitial)
     );
-  }
-
-  private getComments(): void {
-    this.commentsService.getComments(this.order.commentContainerId as number, null).subscribe((comments: Comment[]) => {
-      this.comments = comments;
-    });
   }
 
   private initAgenciesAndCandidates(): void {

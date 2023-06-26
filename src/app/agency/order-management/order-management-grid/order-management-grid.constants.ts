@@ -24,7 +24,6 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'ShiftName', column: 'ShiftName' },
   { text: 'Shift Start Time', column: 'ShiftStartTime' },
   { text: 'Shift End Time', column: 'ShiftEndTime' },
-  { text: 'Shift', column: 'Shift' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Special Project Category', column: 'SpecialProjectCategory' },
@@ -59,7 +58,6 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'ShiftName', column: 'ShiftName' },
   { text: 'Shift Start Time', column: 'ShiftStartTime' },
   { text: 'Shift End Time', column: 'ShiftEndTime' },
-  { text: 'Shift', column: 'Shift' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Special Project Category', column: 'SpecialProjectCategory' },
@@ -89,6 +87,9 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Location', column: 'LocationName' },
   { text: 'Department', column: 'DepartmentName' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
+  { text: 'ShiftName', column: 'ShiftName' },
+  { text: 'Shift Start Time', column: 'ShiftStartTime' },
+  { text: 'Shift End Time', column: 'ShiftEndTime' },
   { text: 'End Date', column: 'EndDate' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
@@ -96,9 +97,6 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
-  { text: 'ShiftName', column: 'ShiftName' },
-  { text: 'Shift Start Time', column: 'ShiftStartTime' },
-  { text: 'Shift End Time', column: 'ShiftEndTime' },
 ];
 
 export const perDiemChildColumnsToExport: ExportColumn[] = [

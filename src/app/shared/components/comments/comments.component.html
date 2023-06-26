@@ -15,11 +15,11 @@
     </div>
   </div>
   <div #body class="comments-body" (scroll)="onScroll()">
-    <ng-container *ngFor="let comment of comments">
+    <ng-container *ngFor="let comment of commentData">
       <app-comment 
-        *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === showExternal"
         [scrolledToMessage$]="scrolledToMessage$"
         [comment]="comment"
+        [commentType]="commentType"
         (onRead)="onRead(comment)"></app-comment>
     </ng-container>
     <div class="no-comments" *ngIf="!comments.length">
@@ -47,8 +47,17 @@
           <i-feather *ngIf="isExternal" name="eye" class="icon"></i-feather>
         </span>
       </ejs-tooltip>
+      <div *ngIf="!isAgencyUser">
+        <ejs-tooltip
+        [content]="'Send'" *ngIf="canVmsCreateOrders">
+        <span class="control-wrapper send" (click)="send()">
+          <i-feather name="send" class="icon"></i-feather>
+        </span>
+      </ejs-tooltip>
+      </div>
+      
       <ejs-tooltip
-        [content]="'Send'">
+        [content]="'Send'" *ngIf="isAgencyUser">
         <span class="control-wrapper send" (click)="send()">
           <i-feather name="send" class="icon"></i-feather>
         </span>

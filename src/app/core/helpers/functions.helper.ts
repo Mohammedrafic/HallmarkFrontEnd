@@ -155,3 +155,7 @@ export const distinctByKey = <T>(arr: T[], key: (keyof T)): T[] => {
 export const CheckNumberValue = (value: number | null | undefined): number => {
   return value ?? 0;
 };
+
+export const allAreEqual = <T>(array: T[]): boolean => {
+  return array.every((item) => item === array[0]);
+};

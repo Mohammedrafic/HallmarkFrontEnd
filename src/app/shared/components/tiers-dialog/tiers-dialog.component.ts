@@ -16,7 +16,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { FieldType } from '@core/enums';
-import { TIER_DIALOG_TYPE, TiersDialogConfig, FiledNamesSettings, FieldNames, OPTION_FIELDS } from '@shared/components/tiers-dialog/constants';
+import { TIER_DIALOG_TYPE, TiersDialogConfig, FiledNamesSettings, FieldNames, OPTION_FIELDS, OPTION_FIELDS_IRP } from '@shared/components/tiers-dialog/constants';
 import { TierDataSource, TierDetails, TierDialogConfig, TiersInputConfig } from '@shared/components/tiers-dialog/interfaces';
 import { Tiers } from '@shared/enums/tiers.enum';
 import { CustomFormGroup } from '@core/interface';
@@ -75,10 +75,12 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   public dialogConfig: TierDialogConfig;
   public regions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
+  public departments: OrganizationDepartment[] = [];
   public tierForm: CustomFormGroup<TierDTO> | null;
   public workcommitmentIds : any;
   public readonly FieldTypes = FieldType;
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
+  public optionFieldsIRP: FieldSettingsModel = OPTION_FIELDS_IRP;
   public isTierSettingsDialog: boolean;
 
   private selectedRegions: number[] = [];
@@ -111,9 +113,6 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   ngOnInit(): void {
     this.watchForSystemType();
     this.watchForShowDialog();
-    this.watchForRegions();
-    this.watchForLocation();
-    this.watchForDepartments();
     this.watchForCloseDialog();
   }
 
@@ -122,11 +121,20 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     this.dialogConfig = TiersDialogConfig(this.regions, this.workcommitments)[this.dialogType];
     this.createForm();
     this.setDialogTitle(this.isEdit);
+    this.watchForRegions();
+    this.watchForLocation();
+    this.watchForDepartments();
+  }
+
+  public watchForEdit():void {
+    this.isEdit ? this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, this.selectedTierDetails, this.regions)) : "";
+    this.changeDetection.markForCheck();
   }
 
   ngOnChanges(): void {
     this.watchForSystemType();
     this.watchForShowDialog();
+    this.watchForEdit();
   }
 
   public allRegionsChange(event: { checked: boolean }): void {

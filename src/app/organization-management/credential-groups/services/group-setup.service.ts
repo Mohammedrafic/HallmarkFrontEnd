@@ -44,19 +44,22 @@ export class GroupSetupService {
   ): Skill[] {
     if (includeInIRP && includeInVMS) {
       return allAssignedSkills.filter((skill: Skill) => {
-        return !skill.assignedToVMS && !skill.assignedToIRP;
+        return !skill.assignedToVMS &&
+          !skill.assignedToIRP &&
+          skill.includeInVMS &&
+          skill.includeInIRP;
       });
     }
 
     if (includeInIRP) {
       return allAssignedSkills.filter((skill: Skill) => {
-        return !skill.assignedToIRP;
+        return !skill.assignedToIRP && skill.includeInIRP;
       });
     }
 
     if (includeInVMS) {
       return  allAssignedSkills.filter((skill: Skill) => {
-        return !skill.assignedToVMS;
+        return !skill.assignedToVMS && skill.includeInVMS;
       });
     }
 

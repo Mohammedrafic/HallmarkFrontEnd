@@ -58,8 +58,10 @@ export class CredentialsComponent extends AbstractPermissionGrid implements OnIn
   ) {
     super(store);
     actions$
-      .pipe(ofActionDispatched(SetCredentialsFilterCount))
-      .subscribe((count) => (this.filteredItemsCount = count.payload));
+      .pipe(
+        ofActionDispatched(SetCredentialsFilterCount),
+        takeUntil(this.unsubscribe$)
+      ).subscribe((count) => (this.filteredItemsCount = count.payload));
   }
 
   override ngOnInit(): void {

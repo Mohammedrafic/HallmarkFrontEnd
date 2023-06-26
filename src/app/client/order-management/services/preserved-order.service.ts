@@ -1,8 +1,12 @@
-import { Injectable } from '@angular/core';
-import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
-import { OrderManagementPagerState } from '@shared/models/candidate.model';
+import { Inject, Injectable } from '@angular/core';
+
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { Observable, Subject } from 'rxjs';
+
+import { OrderManagementIRPSystemId, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { OrderManagementPagerState } from '@shared/models/candidate.model';
+import { OrderSystem } from '@client/order-management/enums';
+import { GlobalWindow } from '@core/tokens';
 
 @Injectable()
 export class PreservedOrderService {
@@ -10,6 +14,8 @@ export class PreservedOrderService {
   private preservedOrderId: number | null = null;
   private activeTab: OrganizationOrderManagementTabs | null;
   private preservedOrder$ = new Subject<boolean>();
+
+  constructor(@Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis) {}
 
   public getPreserveOrder(): Observable<boolean> {
     return this.preservedOrder$.asObservable();
@@ -52,5 +58,14 @@ export class PreservedOrderService {
 
   public isOrderPreserved(): boolean {
     return !!this.preservedOrderId;
+  }
+
+  public saveSelectedOrderSystem(system: OrderSystem): void {
+    if(system === OrderSystem.VMS) {
+      this.globalWindow.localStorage.setItem('selectedOrderManagementSystem', OrderManagementIRPSystemId.VMS.toString());
+      return;
+    }
+
+    this.globalWindow.localStorage.setItem('selectedOrderManagementSystem', OrderManagementIRPSystemId.IRP.toString());
   }
 }

@@ -15,7 +15,7 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportAgencyCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -29,7 +29,7 @@ import { uniqBy } from 'lodash';
 import { FilterService } from '@shared/services/filter.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
-  CommonCandidateSearchFilter, CommonReportFilter,
+  CommonAgencyCandidateSearchFilter, CommonReportFilter,
    SearchCandidate,  OrderTypeOptionsForReport, AgencyCommonFilterReportOptions
 } from '../models/agency-common-report.model';
 import { OutsideZone } from "@core/decorators";
@@ -54,7 +54,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
     this.invoiceStatusListwithreject.push({ id: 1, name: 'Submitted pend appr' });
     this.invoiceStatusListwithreject.push({ id: 2, name: 'Pending Payment' });
     this.invoiceStatusListwithreject.push({ id: 3, name: 'Paid' });
-    this.invoiceStatusListwithreject.push({ id: 4, name: 'Rejected' });
+    //this.invoiceStatusListwithreject.push({ id: 4, name: 'Rejected' });
   }
   public paramsData: any = {
     "AgenciesParamAIS": "",
@@ -138,7 +138,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
-  public defaultInvoiceStatus: (number | undefined)[] = [1, 2, 3, 4];
+  public defaultInvoiceStatus: (number | undefined)[] = [1, 2, 3];
   
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
@@ -518,12 +518,13 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
     if (e.text != '') {
       let ids = [];
       ids.push(this.bussinessControl.value);
-      let filter: CommonCandidateSearchFilter = {
+      let filter: CommonAgencyCandidateSearchFilter = {
         searchText: e.text,
-        businessUnitIds: ids
+        businessUnitIds: ids,
+        agencyId: Number(this.defaultAgency)
       };
       this.filterColumns.dataSource = [];
-      this.store.dispatch(new GetCommonReportCandidateSearch(filter))
+      this.store.dispatch(new GetCommonReportAgencyCandidateSearch(filter))
         .subscribe((result) => {
           this.candidateFilterData = result.LogiReport.searchCandidates;
           this.candidateSearchData = result.LogiReport.searchCandidates;

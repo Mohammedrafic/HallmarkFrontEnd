@@ -265,7 +265,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload)).subscribe(() => {
+      this.store.dispatch(new RejectCandidateJob(payload)).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
         this.form.disable();
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
@@ -298,8 +298,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => confirm),
+          take(1)
+        ).subscribe(() => {
           this.closeDialog();
         });
     } else {
@@ -331,8 +333,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.candidateJob.candidatePayRate,
           })
-        )
-        .subscribe(() => {
+        ).pipe(
+          takeUntil(this.unsubscribe$)
+        ).subscribe(() => {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
           this.closeDialog();
           this.deleteUpdateFieldInRate();
@@ -430,8 +433,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   offeredStartDate: this.candidateJob.offeredStartDate,
                   candidatePayRate: this.candidateJob.candidatePayRate,
                 })
-              )
-              .subscribe(() => {
+              ).pipe(
+                takeUntil(this.unsubscribe$)
+              ).subscribe(() => {
                 this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
               });
       }            
@@ -734,7 +738,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
-        .pipe().subscribe((value) => {
+        .pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
           this.candidateCancellationReasons =value;
         });
 

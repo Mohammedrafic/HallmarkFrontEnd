@@ -1,4 +1,4 @@
-import { 
+import {
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -56,7 +56,7 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
     public candidatesService: CandidatesService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private store: Store, 
+    private store: Store,
      private location:Location,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
@@ -66,8 +66,6 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
 
   public ngOnInit(): void {
     this.subscribeOnTabUpdate();
-   
-    
   }
 
   public ngAfterViewInit(): void {
@@ -84,10 +82,10 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
       pageToBack: string;
       isNavigateFromCandidateDetails: boolean;
       orderManagementPagerState?: OrderManagementPagerState | null;
-    }; 
+    };
     const navigationStateString = this.globalWindow.localStorage.getItem('navigationState');
     const navigationState = navigationStateString ? JSON.parse(navigationStateString) : null;
-    const location = navigationState ? Object.assign(locationState, navigationState) : locationState; 
+    const location = navigationState ? Object.assign(locationState, navigationState) : locationState;
     if((location!=null&&  location.pageToBack=='/client/scheduling')||(location!=null && location.pageToBack=='/client/order-management') )
     {
       this.titlevalue='';
@@ -112,7 +110,7 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
       pageToBack: string;
       isNavigateFromCandidateDetails: boolean;
       orderManagementPagerState?: OrderManagementPagerState | null;
-    }; 
+    };
     const navigationStateString = this.globalWindow.localStorage.getItem('navigationState');
     const navigationState = navigationStateString ? JSON.parse(navigationStateString) : null;
     const location = navigationState ? Object.assign(locationState, navigationState) : locationState;
@@ -123,7 +121,10 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
       this.router.navigate([location.pageToBack]);
       break;
       case location.orderId && !location.isNavigateFromCandidateDetails:
-        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderManagementPagerState: location.orderManagementPagerState } });
+        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderManagementPagerState: location.orderManagementPagerState,irpActiveTab:location.irpActiveTab
+
+
+        } });
         this.globalWindow.localStorage.setItem("IsEmployeeTab", JSON.stringify(true));
         const selectedNavigation = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
         this.store.dispatch(new SelectNavigationTab(selectedNavigation?.current));

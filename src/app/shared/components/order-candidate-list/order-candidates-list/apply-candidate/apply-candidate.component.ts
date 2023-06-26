@@ -129,8 +129,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
 
       if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
-        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){ 
-            if(this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null 
+        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){
+            if(this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null
                   || this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === ''){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
                 return;
@@ -142,7 +142,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
 
       if(this.candidateAddressRequiredValue === ConfigurationValues.Apply){
-        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){ 
+        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){
             if(CommonHelper.candidateAddressCheck(this.orderApplicantsInitialData?.candidateProfileContactDetails)){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
                 return;
@@ -179,8 +179,9 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
                   requestComment: value.requestComment,
                   candidatePayRate: value.candidatePayRate,
                 })
-              )
-              .subscribe(() => {
+              ).pipe(
+                takeUntil(this.unsubscribe$)
+              ).subscribe(() => {
                 this.store.dispatch(new ReloadOrderCandidatesLists());
               });
             this.closeDialog();

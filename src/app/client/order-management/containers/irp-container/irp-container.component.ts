@@ -38,7 +38,7 @@ import { CreateOrderDto, Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from "@order-credentials/types";
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED, INACTIVE_MESSAGE, INACTIVEDATE } from '@shared/constants';
+import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED, INACTIVE_MESSAGE, INACTIVEDATE, INACTIVEDATE_DEPARTMENT } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrderType } from '@shared/enums/order-type';
 import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
@@ -178,7 +178,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
         }
         let dates = createdOrder.jobDates ? this.datePipe.transform(location.inActiveDate,'MM/dd/yyyy') : this.datePipe.transform(locations.inActiveDate, 'MM/dd/yyyy');
         this.confirmService
-          .confirm(INACTIVEDATE + dates + INACTIVE_MESSAGE, {
+          .confirm(departments.isInActivate? INACTIVEDATE_DEPARTMENT : INACTIVEDATE + dates + INACTIVE_MESSAGE, {
             title: 'Confirm',
             okButtonLabel: 'Yes',
             okButtonClass: '',

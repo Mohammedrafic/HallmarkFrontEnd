@@ -4,7 +4,7 @@ import { ICellRendererParams } from '@ag-grid-community/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppState } from '../../../../../store/app.state';
 import { Select } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import {
@@ -12,13 +12,14 @@ import {
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { PermissionService } from '../../../../../security/services/permission.service';
+import { Destroyable } from '@core/helpers';
 
 @Component({
   selector: 'app-extension-edit-icon',
   templateUrl: './extension-grid-actions-renderer.component.html',
   styleUrls: ['./extension-grid-actions-renderer.component.scss'],
 })
-export class ExtensionGridActionsRendererComponent implements ICellRendererAngularComp, OnInit {
+export class ExtensionGridActionsRendererComponent extends Destroyable implements ICellRendererAngularComp, OnInit {
   @Select(AppState.isOrganizationAgencyArea)
   public isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
 
@@ -32,7 +33,9 @@ export class ExtensionGridActionsRendererComponent implements ICellRendererAngul
     private orderManagementService: OrderManagementService,
     private orderManagementAgencyService: OrderManagementAgencyService,
     private permissionService: PermissionService
-  ) {}
+  ) {
+    super();
+  }
 
   public agInit(params: ICellRendererParams): void {
     this.params = params;
@@ -68,7 +71,9 @@ export class ExtensionGridActionsRendererComponent implements ICellRendererAngul
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder }) => {
+    this.permissionService.getPermissions().pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(({ canCreateOrder }) => {
       this.canCreateOrder = canCreateOrder;
     });
   }

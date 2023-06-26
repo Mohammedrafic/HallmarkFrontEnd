@@ -122,6 +122,7 @@ export const addAvailabilityToStart = 'Add Availability to start Scheduling';
 
 export const RECORD_SAVED_SUCCESS = 'Record saved successfully';
 export const INACTIVEDATE = 'Location will be inactivated at '
+export const INACTIVEDATE_DEPARTMENT = 'Department will be inactivated at '
 export const INACTIVE_MESSAGE = '. Are you sure you want to proceed?'
 export const UpdateClosedPositionRate = 'Are you sure you want to update the Bill rate '
 + 'for Closed Position? This may lead to recalculating values and generating new invoice records.';
@@ -130,3 +131,4 @@ export const HaveScheduleBooking =
 
 export const N_FAILED_RECORDS = (count: number) => `${count} failed to process.`;
 export const N_SUCCESS_RECORDS = (count: number) => `${count} records successfully processed.`;
+export const ExtensionStartDateValidation = 'Extension may not be created with more than a 14 day gap from initial order to extension order.';

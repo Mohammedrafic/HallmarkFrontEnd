@@ -129,8 +129,10 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => this.closeDialog());
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => this.closeDialog());
     } else {
       this.closeDialog();
     }
@@ -175,7 +177,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
         }
       } catch(e){
       }
-      
+
     }
   }
 
@@ -300,7 +302,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
           user.businessUnitType ? user.businessUnitType : 0,
           user.businessUnitId ? [user.businessUnitId] : []
         )
-      )
+      ).pipe(takeWhile(() => this.isAlive))
       .subscribe(() => {
         this.userSettingForm.get('roles')?.setValue(user.roles?.map((role: any) => role.id));
       });
