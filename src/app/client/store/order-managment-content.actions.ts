@@ -207,6 +207,7 @@ export class SaveIrpOrder {
     public order: CreateOrderDto,
     public documents: Blob[],
     public inActivedatestr?:string,
+    public isLocation? :boolean | undefined
   ) {}
 }
 
