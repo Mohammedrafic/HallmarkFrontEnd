@@ -11,6 +11,7 @@ import {
   DepartmentFiltersColumns,
   EditDepartmentFormState,
 } from '../departments.model';
+import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
 @Injectable()
 export class DepartmentFormService {
@@ -119,5 +120,13 @@ export class DepartmentFormService {
       control?.setValidators([]);
       control?.reset();
     }
+  }
+
+  public setStartEndDateValidators(form: FormGroup): void {
+    form.get('startDate')?.setValidators([
+      startDateValidator(form, 'endDate'),
+      Validators.required,
+    ]);
+    form.get('endDate')?.setValidators(endDateValidator(form, 'startDate'));
   }
 }

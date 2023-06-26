@@ -47,7 +47,6 @@ import { DateTimeHelper, findSelectedItems } from '@core/helpers';
 import { mapperSelectedItems } from '@shared/components/tiers-dialog/helper';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
-import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-assign-department',
@@ -374,7 +373,6 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   }
 
   private setValidators(): void {
-    this.assignDepartmentForm.get('startDate')?.setValidators(startDateValidator(this.assignDepartmentForm, 'endDate'));
-    this.assignDepartmentForm.get('endDate')?.setValidators(endDateValidator(this.assignDepartmentForm, 'startDate'));
+    this.departmentFormService.setStartEndDateValidators(this.assignDepartmentForm);
   }
 }
