@@ -62,6 +62,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { GridApi, RowNode } from '@ag-grid-community/core';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-candidate-details',
@@ -468,6 +469,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   }
 
   private setApplicantStatuses(): void {
+    let candidateStatus = [ApplicantStatus.Accepted,ApplicantStatus.OnBoarded,ApplicantStatus.Offboard,ApplicantStatus.Cancelled];
+    this.applicantStatuses= this.applicantStatuses.filter(x=>candidateStatus.includes(x.id));
     this.filterColumns.applicantStatuses.dataSource = this.applicantStatuses;
   }
 
