@@ -187,12 +187,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       this.clearFilters();
       this.loadData();
     });
-    this.commitmentsPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
-      if(id){
-        this.workcommitments = id;
-        this.cd.markForCheck();
-      }
-    });
 
     this.filterColumns = {
       regionIds: {
@@ -420,6 +414,8 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       regionsControl.enable({emitEvent: false});
     }
     this.regionSelected = [];
+    this.PayRatesFormGroup.controls['locationIds'].setValue([]);
+
     this.regionSelected = this.orgRegions.map(x => x.regionId);
   }
 
@@ -438,6 +434,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     } else {
       locationsControl.enable({emitEvent: false});
     }
+    this.PayRatesFormGroup.controls['departmentIds'].setValue([]);
     this.cd.detectChanges();
     this.locationSelected = [];
     this.locationSelected = this.locations.map(x => x.locationId);
@@ -464,7 +461,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
         this.getSkills();
         this.cd.markForCheck();
       });
-
+      this.PayRatesFormGroup.controls['skillIds'].setValue([]);
     } else {
       departmentsControl.enable();
     }
@@ -754,6 +751,8 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
             locations.push(...(selectedRegion?.locations as any));
           });
           this.locations = sortByField(locations, 'name');
+        } else {
+          this.locations = [];
         }
 
         this.PayRatesFormGroup.controls['locationIds'].setValue(null);
@@ -776,6 +775,8 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
             departments.push(...(selectedLocation?.departments as []));
           });
           this.departments = sortByField(departments, 'name');
+        } else {
+          this.departments = [];
         }
 
         this.PayRatesFormGroup.controls['departmentIds'].setValue(null);
@@ -801,6 +802,8 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
             this.getSkills();
             this.cd.markForCheck();
           });
+        } else {
+          this.skills = [];
         }
       });
   }
@@ -812,7 +815,18 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
       .subscribe((skillIds: number[]) => {
         this.skillSelected = [];
         this.skillSelected = skillIds;
-        this.store.dispatch(new GetWorkCommitmentByPage(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected))
+          if(skillIds?.length > 0){
+            this.store.dispatch(new GetWorkCommitmentByPage(this.orgId,this.regionSelected,this.locationSelected,this.skillSelected));
+            this.commitmentsPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
+              if(id){
+                this.workcommitments = id;
+                  this.cd.markForCheck();  
+              }
+            });
+          } else {
+            this.PayRatesFormGroup.controls["WorkCommitmentIds"].setValue(null);
+            this.workcommitments = [];
+          }    
       });
   }
 
@@ -848,13 +862,6 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
     } else {
       this.PayRatesFormGroup.controls['departmentIds'].setValue([data.departmentId]);
     }
-    if (data.workCommitments.length === 0) {
-      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(null);
-    } else {
-      this.workcommitmentsedit = [];
-      this.workcommitmentsedit = data.workCommitments.map((x: { workCommitmentId: any; }) => x.workCommitmentId)
-      this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(this.workcommitmentsedit);
-    }
     if (data.orderTypes.length === 0) {
       this.PayRatesFormGroup.controls['orderTypes'].setValue(this.orderTypes.map((type) => type.id));
     } else {
@@ -876,6 +883,15 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
           this.skillsEdit = this.editedData?.skills.map((x: { skillId: any; }) => x.skillId);
           this.PayRatesFormGroup.controls['skillIds'].setValue(this.skillsEdit);
         }
+
+        if (this.editedData.workCommitments.length === 0) {
+          this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(null);
+        } else {
+          this.workcommitmentsedit = [];
+          this.workcommitmentsedit = this.editedData.workCommitments.map((x: { workCommitmentId: any; }) => x.workCommitmentId)
+          this.PayRatesFormGroup.controls['WorkCommitmentIds'].setValue(this.workcommitmentsedit);
+        }
       }
     }
+
 }
