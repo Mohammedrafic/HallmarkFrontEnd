@@ -122,11 +122,8 @@ export class DepartmentFormService {
     }
   }
 
-  public setStartEndDateValidators(form: FormGroup): void {
-    form.get('startDate')?.setValidators([
-      startDateValidator(form, 'endDate'),
-      Validators.required,
-    ]);
-    form.get('endDate')?.setValidators(endDateValidator(form, 'startDate'));
+  public addStartEndDateValidators(form: FormGroup): void {
+    form.get('startDate')?.addValidators(startDateValidator(form, 'endDate'));
+    form.get('endDate')?.addValidators(endDateValidator(form, 'startDate'));
   }
 }

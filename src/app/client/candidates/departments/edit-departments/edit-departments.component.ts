@@ -124,6 +124,6 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   }
 
   private setValidators(): void {
-    this.departmentFormService.setStartEndDateValidators(this.formGroup);
+    this.departmentFormService.addStartEndDateValidators(this.formGroup);
   }
 }

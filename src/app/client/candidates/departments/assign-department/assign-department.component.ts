@@ -373,6 +373,6 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   }
 
   private setValidators(): void {
-    this.departmentFormService.setStartEndDateValidators(this.assignDepartmentForm);
+    this.departmentFormService.addStartEndDateValidators(this.assignDepartmentForm);
   }
 }
