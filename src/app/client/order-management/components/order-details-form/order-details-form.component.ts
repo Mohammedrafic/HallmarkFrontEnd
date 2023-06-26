@@ -1145,18 +1145,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       }
     });
 
-    combineLatest([
-      this.orderControlsConfig.departmentIdControl.valueChanges,
-      this.orderControlsConfig.skillIdControl.valueChanges,
-    ]).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(([departmentId, skillId]) => {
-      if (!departmentId || !skillId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) {
-        return;
-      }
-
-      this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId, SystemType.VMS));
-    });
+    this.subscribeOnPredefinedCredentialsUpdate();
 
     this.orderControlsConfig.durationControl.valueChanges.pipe(
       takeUntil(this.componentDestroy())
@@ -1280,6 +1269,20 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   private setOrderId(): void {
     this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
+  }
+
+  private subscribeOnPredefinedCredentialsUpdate(): void {
+    combineLatest([
+      this.orderControlsConfig.departmentIdControl.valueChanges,
+      this.orderControlsConfig.skillIdControl.valueChanges,
+    ]).pipe(
+      filter(([departmentId, skillId]) => {
+        return departmentId && skillId;
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(([departmentId, skillId]) => {
+      this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId, SystemType.VMS));
+    });
   }
 
   public filterItemsBySubString<T>(
