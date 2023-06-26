@@ -531,7 +531,7 @@
                   formControlName="orderRequisitionReasonId"
                   appValidateWithMessage
                   [allowFiltering]="true"
-                  [dataSource]="(reasons$ | async)?.items"
+                  [dataSource]="reasons"
                   [fields]="reasonForRequisitionFields"
                   (change)="onRequisitionChange($event)"
                 >
