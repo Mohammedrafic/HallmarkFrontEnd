@@ -405,9 +405,3 @@
 
 <app-export-dialog [columns]="isIRP ? columnsToExportIrp : columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
   (export)="export($event)"></app-export-dialog>
-
-  <ng-template #redFlagBtn let-hasRedFlag="hasRedFlag">
-    <button *ngIf="hasRedFlag" ejs-button cssClass="e-flat secondary-icon-button enabled-button">
-      <span><i-feather name="flag" class="icon"></i-feather></span>
-    </button>
-  </ng-template>
