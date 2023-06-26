@@ -41,11 +41,16 @@
               [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
-            <ejs-tooltip *ngIf="data.hasRedFlag" [content]="data.redFlagDescription ?? ''" position="TopCenter">
-              <button ejs-button cssClass="e-flat secondary-icon-button enabled-button">
-                <span><i-feather name="flag" class="icon"></i-feather></span>
-              </button>
-            </ejs-tooltip>
+            <ng-container *ngIf="data.hasRedFlag">
+              <ejs-tooltip *ngIf="data.redFlagDescription; else redFlag" [content]="data.redFlagDescription ?? ''" position="TopCenter">
+                <ng-container *ngTemplateOutlet="redFlag"></ng-container>
+              </ejs-tooltip>
+              <ng-template #redFlag>
+                <button ejs-button cssClass="e-flat secondary-icon-button enabled-button">
+                  <span><i-feather name="flag" class="icon"></i-feather></span>
+                </button>
+              </ng-template>
+            </ng-container>
           </div>
         </ng-template>
       </e-column>
@@ -400,3 +405,9 @@
 
 <app-export-dialog [columns]="isIRP ? columnsToExportIrp : columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
   (export)="export($event)"></app-export-dialog>
+
+  <ng-template #redFlagBtn let-hasRedFlag="hasRedFlag">
+    <button *ngIf="hasRedFlag" ejs-button cssClass="e-flat secondary-icon-button enabled-button">
+      <span><i-feather name="flag" class="icon"></i-feather></span>
+    </button>
+  </ng-template>
