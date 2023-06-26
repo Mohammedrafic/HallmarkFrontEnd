@@ -209,7 +209,7 @@ export interface OrderManagementContentStateModel {
     irpCandidates: null,
     candidateCancellationReasons:null,
     allShifts:null,
-    sendOnboardCandidateEmail:null,,
+    sendOnboardCandidateEmail:null,
     orderComments : []
   },
   
