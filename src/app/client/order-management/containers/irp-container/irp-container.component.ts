@@ -20,10 +20,8 @@ import { IrpTabConfig } from '@client/order-management/containers/irp-container/
 import { IrpTabs } from '@client/order-management/enums';
 import { ListOfKeyForms, SelectSystem, TabsConfig } from '@client/order-management/interfaces';
 import { Destroyable } from '@core/helpers';
-import { OrderCredentialsService } from "@client/order-management/services";
-import {
-  IrpContainerStateService,
-} from '@client/order-management/containers/irp-container/services/irp-container-state.service';
+import { OrderCredentialsService } from '@client/order-management/services';
+import { IrpContainerStateService } from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import {
   createOrderDTO,
   getControlsList,
@@ -35,10 +33,16 @@ import {
 } from '@client/order-management/helpers';
 import { SaveIrpOrder, EditIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { CreateOrderDto, Order } from '@shared/models/order-management.model';
-import { IOrderCredentialItem } from "@order-credentials/types";
+import { IOrderCredentialItem } from '@order-credentials/types';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CONFIRM_REVOKE_ORDER, ERROR_CAN_NOT_REVOKED, INACTIVE_MESSAGE, INACTIVEDATE, INACTIVEDATE_DEPARTMENT } from '@shared/constants';
+import {
+  CONFIRM_REVOKE_ORDER,
+  ERROR_CAN_NOT_REVOKED,
+  INACTIVE_MESSAGE,
+  INACTIVEDATE,
+  INACTIVEDATE_DEPARTMENT,
+} from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrderType } from '@shared/enums/order-type';
 import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
@@ -62,8 +66,10 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
   public orderCredentials: IOrderCredentialItem[] = [];
-  public dates : string;
+  public dates: string;
+  public isLocation : boolean=false;
   private isCredentialsChanged = false;
+
 
   constructor(
     private orderCredentialsService: OrderCredentialsService,
@@ -75,7 +81,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private confirmService: ConfirmService,
     private irpContainerApiService: IrpContainerApiService,
     private organizationStructureService: OrganizationStructureService,
-    private datePipe: DatePipe,
+    private datePipe: DatePipe
   ) {
     super();
   }
@@ -88,7 +94,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedOrder']?.currentValue) {
-      this.orderCredentials = [...this.selectedOrder.credentials ?? []];
+      this.orderCredentials = [...(this.selectedOrder.credentials ?? [])];
     }
   }
 
@@ -113,18 +119,13 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   }
 
   private watchForSucceededSaveOrder(): void {
-    this.actions$.pipe(
-      ofActionDispatched(SaveIrpOrderSucceeded),
-      takeUntil(this.componentDestroy()),
-      ).subscribe(() => {
+    this.actions$.pipe(ofActionDispatched(SaveIrpOrderSucceeded), takeUntil(this.componentDestroy())).subscribe(() => {
       this.router.navigate(['/client/order-management']);
     });
   }
 
   private watchForSaveEvents(): void {
-    this.handleSaveEvents$.pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe((saveType: MenuEventArgs | void) => {
+    this.handleSaveEvents$.pipe(takeUntil(this.componentDestroy())).subscribe((saveType: MenuEventArgs | void) => {
       this.irpStateService.saveEvents.next();
       const formState = this.irpStateService.getFormState();
       const formGroupList = getFormsList(formState);
@@ -148,37 +149,58 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       isSubmit: !saveType,
     };
 
-   if (this.selectedOrder) {
-     this.showRevokeMessageForEditOrder(createdOrder);
+    if (this.selectedOrder) {
+      this.showRevokeMessageForEditOrder(createdOrder);
     } else {
       let regionid = createdOrder.regionId;
       let locationid = createdOrder.locationId;
-      let jobstartdate = createdOrder.jobStartDate
-        ? createdOrder.jobStartDate
-        : createdOrder.jobDates[createdOrder.jobDates.length - 1];
+      let jobEndate = createdOrder.jobEndDate ? createdOrder.jobEndDate : null;
+      let jobstartdate = createdOrder.jobStartDate ? createdOrder.jobStartDate : createdOrder.jobDates;
       let departmentID = createdOrder.departmentId;
-      const location = this.organizationStructureService.getLocation(regionid,locationid)
-      const locations = this.organizationStructureService.getLocationsByInactive(regionid, jobstartdate, locationid);
-      const departments = this.organizationStructureService.getDepartmentByInactive(locationid,jobstartdate,departmentID);
+
+      const location = this.organizationStructureService.getLocation(regionid, locationid);
+      const department = this.organizationStructureService.getDepartment(locationid, departmentID);
+      const ltaInactiveAndDweactivatelocations =
+        location.isInActivate && location.inActiveDate && location.reActiveDate && createdOrder.jobStartDate
+          ? this.organizationStructureService.getLocationsByStartandEnddate(
+              regionid,
+              jobstartdate,
+              jobEndate,
+              locationid
+            )
+          : null;
+      const ltaInActivelocations =
+        location.isInActivate && location.inActiveDate && !location.reActiveDate && createdOrder.jobStartDate
+          ? this.organizationStructureService.getLocationsByStartdate(regionid, jobstartdate, locationid)
+          : null;
+
+
+      const ltaInactiveAndReactivatedepartment =
+      department.isInActivate && department.inActiveDate && department.reActiveDate && createdOrder.jobStartDate
+        ? this.organizationStructureService.getDepartmentByStartandEnddate(
+            locationid,
+            jobstartdate,
+            jobEndate,
+            departmentID
+          )
+        : null;
+
+        const ltaInActiveDeparment =
+        department.isInActivate && department.inActiveDate && !department.reActiveDate && createdOrder.jobStartDate
+          ? this.organizationStructureService.getDepartmentByStartdate(locationid, jobstartdate, departmentID)
+          : null;
+
       let reactivateDate = createdOrder.jobDates ? createdOrder.jobDates : null;
- 
-      if (locations.isInActivate || location.isInActivate || departments.isInActivate) {
-        if (createdOrder.jobDates) {
-    
-     createdOrder.jobDates= createdOrder.jobDates.filter((f: Date) =>
-       (new Date(f).toLocaleDateString() < new Date(location.inActiveDate??'').toLocaleDateString()
-         || new Date(f).toLocaleDateString()>= new Date(location.reActiveDate??'').toLocaleDateString()));
- 
-         reactivateDate = reactivateDate.filter((f: any) => {
-            return new Date(f).toLocaleDateString() >= new Date(location.inActiveDate ?? '').toLocaleDateString() && location.reActiveDate ? new Date(f).toLocaleDateString()<= new Date(location.reActiveDate??'').toLocaleDateString() : location.reActiveDate==null
-          });
-          this.dates = reactivateDate
-            .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
-            .join(', ');
-        }
-        let dates = createdOrder.jobDates ? this.datePipe.transform(location.inActiveDate,'MM/dd/yyyy') : this.datePipe.transform(locations.inActiveDate, 'MM/dd/yyyy');
+      let isPerDiem =
+        createdOrder.jobDates &&
+        (location?.isInActivate ||
+          department?.isInActivate);
+      if ((ltaInActivelocations!=null && ltaInActivelocations.isInActivate) ||(ltaInactiveAndDweactivatelocations!=null && (ltaInactiveAndDweactivatelocations.isFInActivate || ltaInactiveAndDweactivatelocations.isCInActivate))) 
+      {
+       
+        let dates = ltaInActivelocations!=null ? this.datePipe.transform(ltaInActivelocations.inActiveDate,"MM/dd/yyyy"):this.datePipe.transform(ltaInactiveAndDweactivatelocations?.inActiveDate,"MM/dd/yyyy");
         this.confirmService
-          .confirm(departments.isInActivate? INACTIVEDATE_DEPARTMENT : INACTIVEDATE + dates + INACTIVE_MESSAGE, {
+          .confirm(INACTIVEDATE + dates + INACTIVE_MESSAGE, {
             title: 'Confirm',
             okButtonLabel: 'Yes',
             okButtonClass: '',
@@ -187,7 +209,77 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           .subscribe(() => {
             this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
           });
+      } 
+      else if((ltaInActiveDeparment!=null && ltaInActiveDeparment.isInActivate) ||(ltaInactiveAndReactivatedepartment!=null && (ltaInactiveAndReactivatedepartment.isFInActivate || ltaInactiveAndReactivatedepartment.isCInActivate)))
+      {
+        let dates = ltaInActiveDeparment!=null ? this.datePipe.transform(ltaInActiveDeparment.inActiveDate,"MM/dd/yyyy"):this.datePipe.transform(ltaInactiveAndReactivatedepartment?.inActiveDate,"MM/dd/yyyy");
+        this.confirmService
+          .confirm(INACTIVEDATE_DEPARTMENT + dates + INACTIVE_MESSAGE, {
+            title: 'Confirm',
+            okButtonLabel: 'Yes',
+            okButtonClass: '',
+          })
+          .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+          .subscribe(() => {
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+          });
+      }
+      else if (isPerDiem && location.isInActivate) {
+        this.isLocation=true;
+        if (location.isInActivate && location.reActiveDate) {
+          createdOrder.jobDates = createdOrder.jobDates.filter(
+            (f: Date) =>
+              new Date(f) < new Date(location.inActiveDate ?? '') || new Date(f) >= new Date(location.reActiveDate ?? '')
+          );
+          
+         reactivateDate = reactivateDate.filter((f: Date) => 
+             new Date(f) >=  new Date(location.inActiveDate ?? '') &&
+               new Date(f) < new Date(location.reActiveDate ?? ''));
+          this.dates = reactivateDate
+            .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
+            .join(', ');
+        } else {
+          createdOrder.jobDates = createdOrder.jobDates.filter(
+            (f: Date) => new Date(f) < new Date(location.inActiveDate ?? '')
+          );
+          reactivateDate = reactivateDate.filter((f: Date) => 
+             new Date(f) >= new Date(location.inActiveDate ?? ''));
+          
+          this.dates = reactivateDate
+            .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
+            .join(', ');
+        }
+        
+        this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates,this.isLocation));
+      }
+      else if (isPerDiem && department.isInActivate)
+      {
+        if (department.isInActivate && department.reActiveDate) {
+        createdOrder.jobDates = createdOrder.jobDates.filter(
+          (f: Date) =>
+            new Date(f) < new Date(department.inActiveDate ?? '') || new Date(f) >= new Date(department.reActiveDate ?? '')
+        );
+        
+       reactivateDate = reactivateDate.filter((f: Date) => 
+           new Date(f) >=  new Date(department.inActiveDate ?? '') &&
+             new Date(f) < new Date(department.reActiveDate ?? ''));
+        this.dates = reactivateDate
+          .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
+          .join(', ');
       } else {
+        createdOrder.jobDates = createdOrder.jobDates.filter(
+          (f: Date) => new Date(f) < new Date(department.inActiveDate ?? '')
+        );
+        reactivateDate = reactivateDate.filter((f: Date) => 
+           new Date(f) >= new Date(department.inActiveDate ?? ''));
+        
+        this.dates = reactivateDate
+          .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
+          .join(', ');
+      }
+      this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+      }
+      else {
         this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments()));
       }
     }
@@ -197,24 +289,26 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     const isExternalLogicInclude = this.irpStateService.getIncludedExternalLogic(order);
     if (!isExternalLogicInclude && !this.selectedOrder.canRevoke) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_REVOKED));
-    } else if(!isExternalLogicInclude && !this.selectedOrder.canProceedRevoke) {
+    } else if (!isExternalLogicInclude && !this.selectedOrder.canProceedRevoke) {
       this.confirmService
         .confirm(CONFIRM_REVOKE_ORDER, {
           title: 'Confirm',
           okButtonLabel: 'Revoke',
           okButtonClass: '',
-        }).pipe(
-        filter(Boolean),
-        switchMap(() => {
-          return this.irpContainerApiService.checkLinkedSchedules(this.selectedOrder.id);
-        }),
-        switchMap(({doesOrderHaveLinkedSchedules}) => {
-          return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
-        }),
-        take(1)
-      ).subscribe((value: boolean | null) => {
-        this.saveEditOrderWithLinkedSchedules(value, order);
-      });
+        })
+        .pipe(
+          filter(Boolean),
+          switchMap(() => {
+            return this.irpContainerApiService.checkLinkedSchedules(this.selectedOrder.id);
+          }),
+          switchMap(({ doesOrderHaveLinkedSchedules }) => {
+            return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
+          }),
+          take(1)
+        )
+        .subscribe((value: boolean | null) => {
+          this.saveEditOrderWithLinkedSchedules(value, order);
+        });
     } else {
       this.saveEditOrderWithoutRevoke(order);
     }
@@ -222,32 +316,38 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   private saveEditOrderWithoutRevoke(order: CreateOrderDto): void {
     if (this.selectedOrder.orderType === OrderType.Traveler) {
-      this.irpContainerApiService.checkLinkedSchedules(this.selectedOrder.id).pipe(
-        switchMap(({doesOrderHaveLinkedSchedules}) => {
-          return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
-        }),
-        take(1),
-      ).subscribe((value: boolean | null) => {
-        this.saveEditOrderWithLinkedSchedules(value, order);
-      });
+      this.irpContainerApiService
+        .checkLinkedSchedules(this.selectedOrder.id)
+        .pipe(
+          switchMap(({ doesOrderHaveLinkedSchedules }) => {
+            return this.checkIsLtaOrderHasSchedules(doesOrderHaveLinkedSchedules);
+          }),
+          take(1)
+        )
+        .subscribe((value: boolean | null) => {
+          this.saveEditOrderWithLinkedSchedules(value, order);
+        });
     } else {
       this.saveEditedOrder(order);
     }
   }
 
   private saveEditedOrder(order: CreateOrderDto): void {
-    this.store.dispatch(new EditIrpOrder({
-      ...order,
-      id: this.selectedOrder.id,
-      deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
-    },this.irpStateService.getDocuments()));
+    this.store.dispatch(
+      new EditIrpOrder(
+        {
+          ...order,
+          id: this.selectedOrder.id,
+          deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
+        },
+        this.irpStateService.getDocuments()
+      )
+    );
   }
 
   private watchForPredefinedCredentials(): void {
     this.predefinedCredentials$
-      .pipe(
-        takeUntil(this.componentDestroy())
-      )
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
         this.orderCredentials = predefinedCredentials;
         this.cdr.markForCheck();
