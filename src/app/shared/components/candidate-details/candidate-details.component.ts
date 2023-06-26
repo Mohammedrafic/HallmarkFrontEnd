@@ -620,11 +620,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
             );
 
             this.filterColumns.departmentIds.dataSource = getIRPOrgItems(locationDepartments);
-            if (selectedLocations.length == locationDataSource.length) {
-              this.filtersForm.controls['departmentIds'].setValue(
-                this.filterColumns.departmentIds.dataSource.map((m) => m.id)
-              );
-            }
+         
           } else {
             this.filtersForm.get('departmentIds')?.setValue([]);
           }
@@ -663,11 +659,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
             locations.push(...(region.locations as []));
           });
           this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
-          if (selectedRegions.length == this.allRegions.length) {
-            this.filtersForm.controls['locationIds'].setValue(
-              this.filterColumns.locationIds.dataSource.map((m) => m.id)
-            );
-          }
+       
         } else {
           this.filterColumns.locationIds.dataSource = [];
           this.filtersForm.get('locationIds')?.setValue([]);
