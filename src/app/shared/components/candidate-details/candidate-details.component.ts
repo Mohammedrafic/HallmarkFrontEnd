@@ -62,6 +62,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { GridApi, RowNode } from '@ag-grid-community/core';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-candidate-details',
@@ -379,8 +380,6 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     return this.associateAgencies$.pipe(
       tap((page: AssociateAgency[]) => {
         this.filterColumns.agencyIds.dataSource = page;
-        this.filtersForm.controls['agencyIds'].setValue(page.map((m) => m.agencyId));
-        this.filtersForm.controls['agencyIds'].enable();
       })
     );
   }
@@ -470,6 +469,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   }
 
   private setApplicantStatuses(): void {
+    let candidateStatus = [ApplicantStatus.Accepted,ApplicantStatus.OnBoarded,ApplicantStatus.Offboard,ApplicantStatus.Cancelled];
+    this.applicantStatuses= this.applicantStatuses.filter(x=>candidateStatus.includes(x.id));
     this.filterColumns.applicantStatuses.dataSource = this.applicantStatuses;
   }
 
@@ -619,11 +620,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
             );
 
             this.filterColumns.departmentIds.dataSource = getIRPOrgItems(locationDepartments);
-            if (selectedLocations.length == locationDataSource.length) {
-              this.filtersForm.controls['departmentIds'].setValue(
-                this.filterColumns.departmentIds.dataSource.map((m) => m.id)
-              );
-            }
+         
           } else {
             this.filtersForm.get('departmentIds')?.setValue([]);
           }
@@ -662,11 +659,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
             locations.push(...(region.locations as []));
           });
           this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
-          if (selectedRegions.length == this.allRegions.length) {
-            this.filtersForm.controls['locationIds'].setValue(
-              this.filterColumns.locationIds.dataSource.map((m) => m.id)
-            );
-          }
+       
         } else {
           this.filterColumns.locationIds.dataSource = [];
           this.filtersForm.get('locationIds')?.setValue([]);
@@ -682,8 +675,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         this.orgStructure = structure;
         this.orgRegions = structure.regions;
         this.allRegions = [...this.orgRegions];
-        this.filterColumns.regionsIds.dataSource = this.allRegions;
-        this.filtersForm.controls['regionsIds'].setValue(this.allRegions.map((m) => m.id));
+        this.filterColumns.regionsIds.dataSource = this.allRegions;    
       });
   }
 }
