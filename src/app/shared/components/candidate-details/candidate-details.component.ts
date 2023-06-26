@@ -379,8 +379,6 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     return this.associateAgencies$.pipe(
       tap((page: AssociateAgency[]) => {
         this.filterColumns.agencyIds.dataSource = page;
-        this.filtersForm.controls['agencyIds'].setValue(page.map((m) => m.agencyId));
-        this.filtersForm.controls['agencyIds'].enable();
       })
     );
   }
@@ -682,8 +680,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         this.orgStructure = structure;
         this.orgRegions = structure.regions;
         this.allRegions = [...this.orgRegions];
-        this.filterColumns.regionsIds.dataSource = this.allRegions;
-        this.filtersForm.controls['regionsIds'].setValue(this.allRegions.map((m) => m.id));
+        this.filterColumns.regionsIds.dataSource = this.allRegions;    
       });
   }
 }
