@@ -54,7 +54,7 @@ export const UnavaliabilityGridConfig: ColDef[] = [
   },
   {
     field: 'visibleForIRPCandidates',
-    headerName: 'Visible For irp candidate',
+    headerName: 'Visible For irp Employee',
     width: 280,
     type: 'leftAligned',
     cellRenderer: ToggleIconRendererComponent,
@@ -121,7 +121,7 @@ export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
   },
   {
     field: 'visibleForIRPCandidates',
-    title: 'Visible For IRP Candidate',
+    title: 'Visible For IRP Employee',
     required: false,
     fieldType: FieldType.Toggle,
   },
