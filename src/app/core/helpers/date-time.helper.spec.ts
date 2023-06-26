@@ -411,13 +411,13 @@ describe('DateTimeHelper', () => {
       expect(result).toEqual(expectedResult);
     });
 
-    it('should return period (month) range which starts from Suturday', () => {
+    it('should return period (month) range which starts from Monday', () => {
       const expectedResult = { from: '2023-05-29T00:00:00.000Z', to: '2023-07-02T00:00:00.000Z' };
       const result = DateTimeHelper.calculateMonthBoundDays(inputDate2, firstWeekDay1);
       expect(result).toEqual(expectedResult);
     });
 
-    it('should return period (month) range which starts from Sunday', () => {
+    it('should return period (month) range which starts from Saturday', () => {
       const expectedResult = { from: '2023-05-27T00:00:00.000Z', to: '2023-07-01T00:00:00.000Z' };
       const result = DateTimeHelper.calculateMonthBoundDays(inputDate2, firstWeekDay2);
       expect(result).toEqual(expectedResult);
