@@ -386,7 +386,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         .subscribe((isConfirm) => {
           if (isConfirm && this.candidateJob) {
               this.isSend =  true;
-              this.emailTo = this.candidateJob?.candidateProfile.email; 
+              this.emailTo = 'amarendra.gottumukkala@hallmarkhcs.com'; //this.candidateJob?.candidateProfile.email; 
               const options = {
                 title: ONBOARD_CANDIDATE,
                 okButtonLabel: 'Yes',
@@ -401,8 +401,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   this.store.dispatch(new ShowGroupEmailSideDialog(true));
                 }
               });
-            //this.saveCandidateJob();
-            this.closeDialog();
+            // this.saveCandidateJob();
+            // this.closeDialog();
           } else {
             this.jobStatusControl.reset();
             this.selectedApplicantStatus = null;
@@ -634,11 +634,13 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   onGroupEmailAddCancel(){
+    this.closeDialog();
     this.isSend =  false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
   }
 
   onGroupEmailSend(){
+      this.closeDialog();
       const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();   
      // console.log('emailvalue',emailvalue);         
             this.store
