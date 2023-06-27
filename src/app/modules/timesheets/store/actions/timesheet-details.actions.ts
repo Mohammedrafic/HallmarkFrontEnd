@@ -114,6 +114,12 @@ export namespace TimesheetDetails {
       public readonly isAgency: boolean,
     ) {}
   }
+  
+  export class AddTimesheetRecordSucceed {
+    static readonly type = TimesheetDetailsActions.AddTimesheetRecordSucceed;
+
+    constructor() {}
+  }
 
   export class NoWorkPerformed {
     static readonly type = TimesheetDetailsActions.NoWorkPerformed;

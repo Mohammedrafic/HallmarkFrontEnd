@@ -44,6 +44,7 @@ export enum TimesheetDetailsActions {
   DeleteFile = '[timesheet details] Delete file',
   DownloadAttachment = '[timesheet details] download attachment',
   AddTimesheetRecord = '[timesheet details] Add timesheet record',
+  AddTimesheetRecordSucceed = '[timesheet details] Add timesheet record succeed',
   NoWorkPerformed = '[timesheet details] No work performed',
   GetDetailsByDate ='[timesheet details] Get timesheet details by date',
   RecalculateTimesheets = '[timesheet details] Recalculate timesheets by job id',
