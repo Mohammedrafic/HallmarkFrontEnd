@@ -103,6 +103,7 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     this.saveFormData();
     this.watchForControlsValueChanges();
     this.adjustOrientationDateField();
+    this.setValidators();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -369,5 +370,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
         id: data.departmentId,
       } as OrganizationDepartment,
     ];
+  }
+
+  private setValidators(): void {
+    this.departmentFormService.addStartEndDateValidators(this.assignDepartmentForm);
   }
 }
