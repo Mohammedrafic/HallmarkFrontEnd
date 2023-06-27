@@ -50,6 +50,7 @@ import {
   tap,
   switchMap,
   skip,
+  combineLatest,
 } from 'rxjs';
 
 import { ORDERS_GRID_CONFIG } from '@client/client.config';
@@ -150,6 +151,7 @@ import {
 } from '@shared/models/order-management.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import {
+  Organization,
   OrganizationDepartment,
   OrganizationLocation,
   OrganizationRegion,
@@ -278,6 +280,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
+
+  @Select(OrganizationManagementState.organization)
+  organization$: Observable<Organization | null>;
 
   @Select(UserState.currentUserPermissions)
   currentUserPermissions$: Observable<any[]>;
@@ -1658,9 +1663,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onOrganizationChangedHandler(): void {
     this.organizationId$.pipe(
       filter(Boolean),
+      tap((id) => {
+        this.organizationId = id;
+        this.store.dispatch(new GetOrganizationById(id));
+      }),
+      switchMap(() => this.organization$),
+      filter(Boolean),
       takeUntil(this.unsubscribe$),
-    ).subscribe((id) => {
-      this.organizationId = id;
+    ).subscribe((organization: Organization) => {
       this.getSettings();
       if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast && !this.preservedOrderService.isOrderPreserved()) {
         this.clearFilters();
@@ -1668,8 +1678,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
-      this.orderManagementService.setPreviousOrganizationId(id);
-      this.getOrganization(id);
+      this.orderManagementService.setPreviousOrganizationId(this.organizationId);
+      this.getOrganization(organization);
     });
   }
 
@@ -1931,11 +1941,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onOrganizationStructureDataLoadHandler(): void {
-    this.organizationStructure$
+    combineLatest([this.organizationStructure$, this.organization$])
       .pipe(
         debounceTime(50),
-        filter((structure) => !!structure),
-        tap((structure: OrganizationStructure) => {
+        filter(([structure, organization]) => !!structure && !!organization),
+        tap(([structure, org]: [structure: OrganizationStructure, org: Organization | null]) => {
           if (this.organizationId === structure.organizationId) {
             this.orgStructure = structure;
             this.regions = structure.regions;
@@ -2332,46 +2342,45 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     );
   }
 
-  private getOrganization(businessUnitId: number) {
-    const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+  private getOrganization(organization: Organization) {
+    const { isIRPEnabled, isVMCEnabled } = organization.preferences;
 
-    this.store.dispatch(new GetOrganizationById(id)).pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe(() => {
-      const { isIRPEnabled, isVMCEnabled } =
-        this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+    this.isOrgIRPEnabled = !!isIRPEnabled;
+    this.isOrgVMSEnabled = !!isVMCEnabled;
 
-      this.isOrgIRPEnabled = !!isIRPEnabled;
-      this.isOrgVMSEnabled = !!isVMCEnabled;
+    this.setPreviousSelectedSystem();
 
-      this.setPreviousSelectedSystem();
+    if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
+      this.activeSystem = OrderManagementIRPSystemId.VMS;
+    } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
+      this.activeSystem = OrderManagementIRPSystemId.IRP;
+      this.getPreservedFiltersByPage();
+    }
 
-      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
-        this.activeSystem = OrderManagementIRPSystemId.VMS;
-      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
-        this.activeSystem = OrderManagementIRPSystemId.IRP;
-        this.getPreservedFiltersByPage();
-      }
+    if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
+      this.activeSystem = OrderManagementIRPSystemId.IRP;
+    } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
+      this.activeSystem = OrderManagementIRPSystemId.VMS;
+    }
 
-      if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && !this.isOrgVMSEnabled) {
-        this.activeSystem = OrderManagementIRPSystemId.IRP;
-      } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.VMS && this.isOrgVMSEnabled) {
-        this.activeSystem = OrderManagementIRPSystemId.VMS;
-      }
+    if (!this.previousSelectedSystemId) {
+      this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
+    }
+    this.systemGroupConfig = SystemGroupConfig(
+      this.isOrgIRPEnabled,
+      this.isOrgVMSEnabled,
+      this.activeSystem,
+      this.canOrderJourney,
+    );
 
-      if (!this.previousSelectedSystemId) {
-        this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
-      }
-      this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
-      this.setOrderTypesFilterDataSource();
-      this.initMenuItems();
-      this.initGridColumns();
-      this.getOrders();
-      this.getProjectSpecialData();
+    this.setOrderTypesFilterDataSource();
+    this.initMenuItems();
+    this.initGridColumns();
+    this.getOrders();
+    this.getProjectSpecialData();
 
-      this.previousSelectedSystemId = null;
-      this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);
-    });
+    this.previousSelectedSystemId = null;
+    this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);
   }
 
   private firstInitGridColumns(): void {
