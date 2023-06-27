@@ -459,6 +459,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/hours-by-department',
     },
+    99: {
+      // Unit profile Report
+      icon: 'trending-up',
+      route: '/reporting/custom-report',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -1112,6 +1117,11 @@ export const MENU_CONFIG: any = {
       // Unit profile Report
       icon: '',
       route: '/analytics/hours-by-department',
+    },
+    99: {
+      // Unit profile Report
+      icon: 'trending-up',
+      route: '/reporting/custom-report',
     },
   },
 
