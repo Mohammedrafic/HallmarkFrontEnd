@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 
 import { Select, ofActionDispatched } from '@ngxs/store';
 import { Observable, filter, merge, of, takeUntil } from 'rxjs';
-import { catchError, concatMap, switchMap, take, tap } from 'rxjs/operators';
+import { switchMap, take, tap } from 'rxjs/operators';
 
 import { DialogAction } from '@core/enums';
 import { AddDialogHelper, DateTimeHelper } from '@core/helpers';
