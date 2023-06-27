@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 
 import { Select, ofActionDispatched } from '@ngxs/store';
 import { Observable, filter, merge, of, takeUntil } from 'rxjs';
-import { concatMap, switchMap, take, tap } from 'rxjs/operators';
+import { switchMap, take, tap } from 'rxjs/operators';
 
 import { DialogAction } from '@core/enums';
 import { AddDialogHelper, DateTimeHelper } from '@core/helpers';
@@ -48,6 +48,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   ngOnInit(): void {
     this.getDialogState();
     this.confirmMessages = TimesheetConfirmMessages;
+    this.subscribeOnAddRecordSucceed();
   }
 
   public saveRecord(): void {
@@ -68,37 +69,43 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
 
       this.actions$
-      .pipe(
-        take(1),
-        ofActionDispatched(TimesheetDetails.ForceAddRecord),
-        switchMap((payload: TimesheetDetails.ForceAddRecord) => {
-          if (payload.force) {
-            return this.confirmService.confirm(payload.message as string, {
-              title: payload.title as string,
-              okButtonLabel: 'Save',
-              okButtonClass: 'ok-button',
-              customStyleClass: 'wide-dialog',
-            })
-            .pipe(
-              filter((confirm) => !!confirm),
-              switchMap(() => {
-                body.forceUpdate = true;
+        .pipe(
+          take(1),
+          ofActionDispatched(TimesheetDetails.ForceAddRecord),
+          switchMap((payload: TimesheetDetails.ForceAddRecord) => {
+            if (payload.force) {
+              return this.confirmService.confirm(payload.message as string, {
+                title: payload.title as string,
+                okButtonLabel: 'Save',
+                okButtonClass: 'ok-button',
+                customStyleClass: 'wide-dialog',
+              })
+              .pipe(
+                filter((confirm) => !!confirm),
+                switchMap(() => {
+                  body.forceUpdate = true;
 
-                return this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
-              }),
-            );
-          }
-          return of(null);
-        }),
-      )
-      .subscribe(() => {
-        this.closeDialog();
-      });
-      
+                  return this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
+                }),
+              );
+            }
+            return of(null);
+          }),
+        )
+        .subscribe();
     } else {
       this.form?.updateValueAndValidity();
       this.cd.detectChanges();
     }
+  }
+
+  private subscribeOnAddRecordSucceed(): void {
+    this.actions$
+      .pipe(
+        takeUntil(this.componentDestroy()),
+        ofActionDispatched(TimesheetDetails.AddTimesheetRecordSucceed),
+      )
+      .subscribe(() => this.closeDialog());
   }
 
   private getDialogState(): void {
