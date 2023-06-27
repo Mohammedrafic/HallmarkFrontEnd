@@ -42,7 +42,7 @@
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
             <ng-container *ngIf="data.hasRedFlag">
-              <ejs-tooltip *ngIf="data.redFlagDescription; else redFlag" [content]="data.redFlagDescription ?? ''" position="TopCenter">
+              <ejs-tooltip *ngIf="data.redFlagDescription; else redFlag" [content]="data.redFlagDescription" position="TopCenter">
                 <ng-container *ngTemplateOutlet="redFlag"></ng-container>
               </ejs-tooltip>
               <ng-template #redFlag>
