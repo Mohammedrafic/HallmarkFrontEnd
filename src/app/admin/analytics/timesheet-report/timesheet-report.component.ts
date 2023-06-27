@@ -280,15 +280,20 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
               this.filterOptionsData = data;
               this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
               let timesheetStatusData = data.timesheetStatuses;
-              timesheetStatusData.push({ id: -1, name: "DNW" }); //Include static "DNW" as a status to status dropdown with id -1
+              if (timesheetStatusData.filter((item) => item.name == "DNW")[0] == undefined) {
+                timesheetStatusData.push({ id: -1, name: "DNW" }); //Include static "DNW" as a status to status dropdown with id -1
+              }
               let archived = timesheetStatusData.filter((item) => item.name == "Archived")[0];
               let archivedIndex = timesheetStatusData.indexOf(archived, 0);
-              timesheetStatusData.splice(archivedIndex, 1);
+              if (archivedIndex >= 0) {
+                timesheetStatusData.splice(archivedIndex, 1);
+              }
 
               let noMileageExist = timesheetStatusData.filter((item) => item.name == "No mileages exist")[0];
               let noMileageExistIndex = timesheetStatusData.indexOf(noMileageExist, 0);
-              timesheetStatusData.splice(noMileageExistIndex, 1);
-
+              if (noMileageExistIndex >= 0) {
+                timesheetStatusData.splice(noMileageExistIndex, 1);
+              }
               this.filterColumns.timesheetStatusIds.dataSource = timesheetStatusData;
               this.filterColumns.agencyIds.dataSource = data.agencies;
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
