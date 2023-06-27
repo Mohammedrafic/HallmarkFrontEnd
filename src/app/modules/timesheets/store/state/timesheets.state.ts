@@ -738,7 +738,7 @@ export class TimesheetsState {
   AddTimesheetRecord(ctx: StateContext<TimesheetsModel>,
     { body, isAgency }: TimesheetDetails.AddTimesheetRecord
   ): Observable<void> {
-      const timesheetDetails = ctx.getState().timesheetDetails as TimesheetDetailsModel;
+    const timesheetDetails = ctx.getState().timesheetDetails as TimesheetDetailsModel;
 
     const { organizationId, jobId, weekStartDate } = timesheetDetails;
     const creatBody: AddMileageDto = {
@@ -760,6 +760,11 @@ export class TimesheetsState {
           body.timesheetId = data.timesheetId;
           return this.timesheetsApiService.addTimesheetRecord(body);
         }),
+        tap(() => {
+          ctx.dispatch([
+            new TimesheetDetails.AddTimesheetRecordSucceed(),
+          ]);
+        }),
         catchError((err: HttpErrorResponse) => {
           return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         })
@@ -776,6 +781,7 @@ export class TimesheetsState {
           }
 
           ctx.dispatch([
+            new TimesheetDetails.AddTimesheetRecordSucceed(),
             new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
             new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency),
             new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency),
