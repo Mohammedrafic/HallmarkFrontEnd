@@ -758,9 +758,9 @@ export class InvoicesState {
   @Action(Invoices.GetPrintData)
   GetPrintingData(
     { patchState, dispatch }: StateContext<InvoicesModel>,
-    { body, isAgency }: Invoices.GetPrintData,
+    { body, isAgency, selectedTabIndex }: Invoices.GetPrintData,
   ): Observable<PrintInvoiceData[] | void> {
-    return this.invoicesAPIService.getPrintData(body, isAgency)
+    return this.invoicesAPIService.getPrintData(body, isAgency, selectedTabIndex)
     .pipe(
       tap((res) => {
         patchState({

@@ -175,8 +175,8 @@ export class InvoicesApiService {
     );
   }
 
-  public getPrintData(body: PrintingPostDto, isAgency: boolean): Observable<PrintInvoiceData[]> {
-    const endpoint = isAgency ? '/api/Invoices/agency/printing' : '/api/Invoices/printing';
+  public getPrintData(body: PrintingPostDto, isAgency: boolean, selectedTabIndex?:number): Observable<PrintInvoiceData[]> {
+    const endpoint = isAgency ? '/api/Invoices/agency/printing' :  selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords ?  '/api/PendingInvoices/printing' : '/api/Invoices/printing';
     return this.http.post<PrintInvoiceData[]>(endpoint, body);
   }
 

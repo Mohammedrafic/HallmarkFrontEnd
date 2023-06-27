@@ -298,6 +298,7 @@ export namespace Invoices {
     constructor (
       public readonly body: PrintingPostDto,
       public readonly isAgency: boolean,
+      public readonly selectedTabIndex?:number
       ) {}
   }
 
