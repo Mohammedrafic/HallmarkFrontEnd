@@ -17,6 +17,7 @@ $cell-height: 125px;
   .table-cell{
     margin: 0;
     padding: 0;
+    vertical-align: top;
 
     .date-cell {
       position: relative;

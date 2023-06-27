@@ -170,7 +170,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     if (this.isEdit) {
       return 'Edit';
     }
-    
+
     return 'Add New';
   }
 
@@ -692,7 +692,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
             this.billRatesFormGroup.get('considerForWeeklyOt')?.patchValue(false);
             this.billRatesFormGroup.get('considerForDailyOt')?.patchValue(false);
             this.billRatesFormGroup.get('considerFor7thDayOt')?.patchValue(false);
-            
+
         } else if (!this.otInputsEnabled) {
           this.otInputsEnabled = true;
         }
@@ -999,7 +999,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         okButtonLabel: 'Confirm',
         okButtonClass: '',
       })),
-      filter((confirm) => confirm)
+      filter((confirm) => confirm),
+      take(1)
     ).subscribe(() => {
       if (this.billRateToPost) {
         const filters = {

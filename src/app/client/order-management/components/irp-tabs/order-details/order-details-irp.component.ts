@@ -144,6 +144,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public workLocationForm: FormGroup;
   public specialProjectForm: FormGroup;
   public isShow : boolean | undefined;
+  public isDeptShow : boolean | undefined;
   public readonly optionFields: FieldSettingsModel = OptionFields;
   public readonly orderTypesDataSource: OrderTypes[] = OrderTypeList;
   public readonly FieldTypes = FieldType;
@@ -696,14 +697,22 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       let regionID = this.generalInformationForm.get('regionId')?.value;
       const locations = this.organizationStructureService.getLocationsById(regionID, value);
       let locID = this.generalInformationForm.get('locationId')?.value;
+      const deparment = this.organizationStructureService.getDepartmentsById(locID,value)
+      let deptID = this.generalInformationForm.get('departmentId')?.value;
+      this.isDeptShow = deparment.some((deparment) => deparment.id == deptID);
         this.isShow = locations.some((location) => location.id == locID);
         if (!this.isShow) {
           this.generalInformationForm.get('locationId')?.reset();
           this.generalInformationForm.get('departmentId')?.reset();
         }
+        if (!this.isDeptShow) {
+          this.generalInformationForm.get('departmentId')?.reset();
+        }
       this.updateDataSourceFormList('locations', locations);
+      this.updateDataSourceFormList('departments', deparment);
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
       setDataSource(selectedForm.fields, 'locationId', locations);
+      setDataSource(selectedForm.fields, 'departmentId', locations);
       this.changeDetection.markForCheck();
     });
     this.generalInformationForm
@@ -713,14 +722,22 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         let regionID = this.generalInformationForm.get('regionId')?.value;
         const locations = this.organizationStructureService.getLocationsByIdSet(regionID, value);
           let locID = this.generalInformationForm.get('locationId')?.value;
+          const deparment = this.organizationStructureService.getDepartmentByIdSet(locID,value)
+          let deptID = this.generalInformationForm.get('departmentId')?.value;
+          this.isDeptShow = deparment.some((deparment) => deparment.id == deptID);
           this.isShow = locations.some((location) => location.id == locID);
           if (!this.isShow) {
             this.generalInformationForm.get('locationId')?.reset();
             this.generalInformationForm.get('departmentId')?.reset();
           }
+          if (!this.isDeptShow) {
+            this.generalInformationForm.get('departmentId')?.reset();
+          }
           this.updateDataSourceFormList('locations', locations);
+          this.updateDataSourceFormList('departments', deparment);
           const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
           setDataSource(selectedForm.fields, 'locationId', locations);
+          setDataSource(selectedForm.fields, 'departmentId', deparment);
           this.changeDetection.markForCheck();
       });
   }

@@ -59,7 +59,6 @@ export function MSALInstanceFactory(config: B2CClientConfig): () => IPublicClien
     system: {
       loggerOptions: {
         loggerCallback(logLevel: LogLevel, message: string) {
-          console.log(message);
         },
         logLevel: LogLevel.Warning,
         piiLoggingEnabled: false,

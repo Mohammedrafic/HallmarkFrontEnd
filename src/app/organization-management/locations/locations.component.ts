@@ -503,10 +503,10 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     const reactivateDate = this.locationDetailsFormGroup.controls['reactivateDate'];
     inactiveDate.addValidators(startDateValidator(this.locationDetailsFormGroup, 'reactivateDate'));
     reactivateDate.addValidators(endDateValidator(this.locationDetailsFormGroup, 'inactiveDate'));
-    inactiveDate.valueChanges.subscribe(() =>
+    inactiveDate.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
       reactivateDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
-    reactivateDate.valueChanges.subscribe(() =>
+    reactivateDate.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
       inactiveDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
   }
@@ -625,7 +625,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       tap((data) => {
         this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
         this.selectedRegion = data.organizationManagement.regions[0];
-        
+
       }),
       filter(() => !!this.selectedRegion),
       tap(() => { this.getLocations(); }),

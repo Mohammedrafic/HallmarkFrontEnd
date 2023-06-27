@@ -1,28 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { TiersComponent } from '@organization-management/tiers/tiers.component';
-import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
-import { BillRatesComponent } from './bill-rates/bill-rates.component';
-import { BusinessLinesComponent } from './business-lines/business-lines.component';
-import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
-import { GroupComponent } from './credentials/credentials-setup/group/group.component';
-import { CredentialsComponent } from './credentials/credentials.component';
-import { DepartmentsComponent } from './departments/departments.component';
-import { HolidaysComponent } from './holidays/holidays.component';
-import { LocationsComponent } from './locations/locations.component';
 import { OrganizationManagementComponent } from './organization-management.component';
-import { PayRateComponent } from './pay-rate/pay-rate.component';
-import { RegionsComponent } from './regions/regions.component';
-import { ShiftsComponent } from './shifts/shifts.component';
-import { SkillsComponent } from './skills/skills.component';
-import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
-import { WorkCommitmentComponent } from './work-commitment/containers/work-commitment-container/work-commitment.component';
-import { JobOrderComponent } from './workflow/job-order/job-order.component';
 
-/**
- * TODO: refactor component to modules and make them lazy.
- */
 const routes: Routes = [
   {
     path: '',
@@ -30,64 +10,49 @@ const routes: Routes = [
     children: [
       {
         path: 'departments',
-        component: DepartmentsComponent,
+        loadChildren: () => import('./departments/departments.module').then((m) => m.DepartmentsModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'locations',
-        component: LocationsComponent,
+        loadChildren: () => import('./locations/locations.module').then((m) => m.LocationsModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'regions',
-        component: RegionsComponent,
+        loadChildren: () => import('./regions/regions.module').then((m) => m.RegionsModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'credentials',
-        component: CredentialsComponent,
+        loadChildren: () => import('./credentials/credentials.module').then((m) => m.CredentialsModule),
         data: {
           isOrganizationArea: true,
         },
-        children: [
-          {
-            path: 'list',
-            component: CredentialsListComponent,
-            data: {
-              isOrganizationArea: true,
-              isCredentialSettings: true,
-            },
-          },
-          {
-            path: 'setup',
-            component: CredentialsSetupComponent,
-            data: { isOrganizationArea: true },
-          },
-        ],
       },
       {
         path: 'credentials/groups-setup',
-        component: GroupComponent,
+        loadChildren: () => import('./credential-groups/credential-groups.module').then((m) => m.CredentialGroupsModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'skills',
-        component: SkillsComponent,
+        loadChildren: () => import('./skills/skills.module').then((m) => m.SkillsModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'shifts',
-        component: ShiftsComponent,
+        loadChildren: () => import('./shifts/shifts.module').then((m) => m.ShiftsModule),
         data: {
           isOrganizationArea: true,
         },
@@ -101,21 +66,21 @@ const routes: Routes = [
       },
       {
         path: 'holidays',
-        component: HolidaysComponent,
+        loadChildren: () => import('./holidays/holidays.module').then((m) => m.HolidaysModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'workflow',
-        component: JobOrderComponent,
+        loadChildren: () => import('./workflow/workflow.module').then((m) => m.WorkflowModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'bill-rates',
-        component: BillRatesComponent,
+        loadChildren: () => import('./bill-rates/bill-rates.module').then((m) => m.BillRatesModule),
         data: {
           isOrganizationArea: true,
         },
@@ -136,35 +101,35 @@ const routes: Routes = [
       },
       {
         path: 'specialproject',
-        component: SpecialProjectContainerComponent,
+        loadChildren: () => import('./specialproject/specialproject.module').then((m) => m.SpecialprojectModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'businesslines',
-        component: BusinessLinesComponent,
+        loadChildren: () => import('./business-lines/business-lines.module').then((m) => m.BusinessLinesModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'tiers',
-        component: TiersComponent,
+        loadChildren: () => import('./tiers/tiers.module').then((m) => m.TiersModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'workcommitment',
-        component: WorkCommitmentComponent,
+        loadChildren: () => import('./work-commitment/work-commitment.module').then((m) => m.WorkCommitmentModule),
         data: {
           isOrganizationArea: true,
         },
       },
       {
         path: 'pay-rate',
-        component: PayRateComponent,
+        loadChildren: () => import('./pay-rate/pay-rate.module').then((m) => m.PayRateModule),
         data: {
           isOrganizationArea: true,
         },

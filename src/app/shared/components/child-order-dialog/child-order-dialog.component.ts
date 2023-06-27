@@ -391,7 +391,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   public onClose(): void {
     if (this.unsavedForm?.hasChanges) {
-      this.saveExtensionChanges().subscribe(() => this.closeSideDialog());
+      this.saveExtensionChanges().pipe(takeWhile(() => this.isAlive)).subscribe(() => this.closeSideDialog());
     } else {
       this.closeSideDialog();
     }
@@ -424,6 +424,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
             candidatePayRate: this.candidateJob.candidatePayRate,
           })
         )
+        .pipe(takeWhile(() => this.isAlive))
         .subscribe(() => {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
           this.deleteUpdateFieldInRate();
@@ -483,8 +484,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter(Boolean))
-        .subscribe(() => {
+        .pipe(
+          filter(Boolean),
+          take(1)
+        ).subscribe(() => {
           this.isExtensionSidebarShown = false;
           this.changeDetectorRef.markForCheck();
         });
@@ -867,8 +870,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         okButtonLabel: 'Yes',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter(Boolean))
-      .subscribe(() => {
+      .pipe(
+        filter(Boolean),
+        take(1)
+      ).subscribe(() => {
         this.isExtensionSidebarShown = true;
         this.ignoreMissingCredentials = true;
         this.changeDetectorRef.markForCheck();
@@ -943,7 +948,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
-        .pipe().subscribe((value) => {
+        .pipe(
+          takeUntil(this.componentDestroy())
+        ).subscribe((value) => {
           this.candidateCancellationReasons =value;
         });
 

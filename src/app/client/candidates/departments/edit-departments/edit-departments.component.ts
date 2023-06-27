@@ -56,6 +56,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   public ngOnInit(): void {
     this.initFormConfig(false);
     this.saveFormData();
+    this.setValidators();
   }
 
   public resetEditDepartmentForm(): void {
@@ -120,5 +121,9 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   private resetOrientationDateControl(isOriented: boolean): void {
     const orientationDateControl = this.formGroup.get(EditDepartmentFields.ORIENTATION_DATE);
     this.departmentFormService.addRemoveValidator(orientationDateControl, isOriented);
+  }
+
+  private setValidators(): void {
+    this.departmentFormService.addStartEndDateValidators(this.formGroup);
   }
 }

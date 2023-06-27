@@ -161,8 +161,9 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       if (isOrganizationArea || isAgencyArea) {
         const currentArea = isOrganizationArea ? 'Organization' : 'Agency';
 
-        this.store.dispatch(new LastSelectedOrganisationAgency(currentArea))
-        .subscribe(() => {
+        this.store.dispatch(new LastSelectedOrganisationAgency(currentArea)).pipe(
+          takeUntil(this.unsubscribe$),
+        ).subscribe(() => {
           this.applyOrganizationsAgencies(isOrganizationArea, isAgencyArea);
         });
       }

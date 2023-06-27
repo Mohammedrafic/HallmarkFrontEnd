@@ -171,7 +171,6 @@ export class StaffScheduleByShiftComponent implements OnInit, OnDestroy {
       //this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
-          console.log(data);
           this.logiReportComponent.SetReportData(data);
         }
       });

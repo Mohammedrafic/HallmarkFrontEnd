@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 
-import { ShowEmailSideDialog, ShowGroupEmailSideDialog } from '../../../store/app.actions';
+import { ShowGroupEmailSideDialog } from '../../../store/app.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { takeUntil } from 'rxjs';
 

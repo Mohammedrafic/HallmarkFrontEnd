@@ -276,7 +276,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
-              this.isAlive = false;
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
               let timesheetStatusData = data.timesheetStatuses;
@@ -504,7 +504,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
     this.filterService.removeValue(event, this.timesheetReportForm, this.filterColumns);
   }
   public onFilterClearAll(): void {
-    this.isClearAll = true;
+    //this.isClearAll = true;
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
     //let last = first + 6;
@@ -521,7 +521,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
     this.timesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.timesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(endDate);
     this.timesheetReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
-    this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
+    this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

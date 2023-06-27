@@ -142,7 +142,9 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngAfterViewInit():void{
-    this.roleTreeField$.subscribe((roleTreeField) => {
+    this.roleTreeField$.pipe(
+      takeWhile(() => this.isAlive)
+    ).subscribe((roleTreeField) => {
     this.treeData=roleTreeField.dataSource;
     if(this.newRoleBussinesData !=null && this.newRoleBussinesData!=undefined){
       var data=this.businessUnitIdControl?.value;
@@ -167,7 +169,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.tree.fields = {
       dataSource: data, id: 'id', text: 'name',parentID: 'parentId', hasChildren: 'hasChild'
     }
-    
+
   }
   private setTreeFilter(val:boolean){
     let filteredList:any=[];
@@ -220,7 +222,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       this.changeDataSource(this.treeData);
     }
   }
-  
+
   public toggleActive(): void {
     const activeControl = this.form.get('isActive');
     activeControl?.patchValue(!activeControl.value);
@@ -272,7 +274,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   private onBusinessUnitOrIdChange(): void {
     const businessUnitTypeControl = this.form.get('businessUnitType');
     const businessUnitIdControl = this.form.get('businessUnitId');
-    
+
     if (businessUnitTypeControl && businessUnitIdControl) {
       combineLatest([businessUnitTypeControl.valueChanges, businessUnitIdControl.valueChanges])
         .pipe(
@@ -343,7 +345,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       this.defaultBusinessValue = this.newRoleBussinesData.filter(x=>x.id==this.businessUnitIdControl?.value);
       this.IsIrp=this.defaultBusinessValue[0].isIRPEnabled;
       this.defaultBusinessValue=this.defaultBusinessValue[0].id;
-     
+
     });
   }
 
@@ -393,7 +395,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.setTreeFilter(arg.checked)
     this.changeDetectorRef.detectChanges();
   }
- 
+
   static createForm(): FormGroup {
     return new FormGroup({
       id: new FormControl(),

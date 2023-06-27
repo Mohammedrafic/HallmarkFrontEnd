@@ -59,7 +59,6 @@ export class LogiWebReportComponent implements OnInit {
         reslst: this.resultList,
         active: 1
       };
-      console.log(this.reportUrl);
     let task = this.factory.runDashboard(server, resExt, entryId);
   }
 

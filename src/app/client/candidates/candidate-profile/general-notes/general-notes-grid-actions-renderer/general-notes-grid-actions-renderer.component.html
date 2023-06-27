@@ -1,8 +1,10 @@
 <div class="content">
-  <!-- <button ejs-button cssClass="e-flat primary-icon-button edit-action" (click)="onEdit()">
-    <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-  </button> -->
-  <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onDelete()">
+  <button
+    ejs-button
+    cssClass="e-flat secondary-icon-button"
+    [disabled]="!this.userPermission[this.userPermissions.ManageIrpCandidateProfile]"
+    (click)="onDelete()"
+  >
     <span><i-feather name="trash-2" class="icon"></i-feather></span>
   </button>
 </div>

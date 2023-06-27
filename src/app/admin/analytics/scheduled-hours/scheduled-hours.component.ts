@@ -503,7 +503,6 @@ export class ScheduledHoursComponent implements OnInit, OnDestroy {
       IncludeOnCallParam: includeOnCallHours,
       ShowAllParam: showAll
     };
-    console.log(this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }

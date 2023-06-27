@@ -21,7 +21,7 @@ import { TierDataSource, TierDetails, TierDialogConfig, TiersInputConfig } from 
 import { Tiers } from '@shared/enums/tiers.enum';
 import { CustomFormGroup } from '@core/interface';
 import { TierService } from '@shared/components/tiers-dialog/services';
-import { Organization, OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { findSelectedItems } from '@core/helpers/functions.helper';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -128,7 +128,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
   public watchForEdit():void {
     this.isEdit ? this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, this.selectedTierDetails, this.regions)) : "";
-    this.changeDetection.markForCheck(); 
+    this.changeDetection.markForCheck();
   }
 
   ngOnChanges(): void {

@@ -8,3 +8,7 @@
   [currentPage]="pageNumber"
   [totalRecordsCount]="candidatesPage?.totalCount || 0"
 ></app-grid>
+
+<app-export-dialog  [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
+  (export)="export($event)"></app-export-dialog>
+

@@ -108,8 +108,10 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          takeUntil(this.destroy$)
+        ).subscribe(() => {
           this.closeDialog();
         });
     } else {
@@ -168,7 +170,9 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
       this.commentContainerId = this.order.commentContainerId as number;
       entity = this.order;
     }
-    this.commentsService.getComments(entity.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+    this.commentsService.getComments(entity.commentContainerId as number, null).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((comments: Comment[]) => {
       this.comments = comments;
       this.cd.markForCheck();
     });

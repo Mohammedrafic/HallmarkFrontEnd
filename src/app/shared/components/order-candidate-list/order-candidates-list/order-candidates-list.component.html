@@ -179,7 +179,10 @@
           <ng-template #template let-data>
             <div class="row-tool-buttons">
               <div
-                [class.btn-icon__disabled]="!data.isOriented"
+                [class.btn-icon__disabled]="
+                !data.isOriented &&
+                data.status !== offboardCandidate &&
+                data.status !== cancelledCandidate"
                 ejs-button
                 (click)="openEditCandidateModal(data)"
                 cssClass="e-flat primary-icon-button custom-button"

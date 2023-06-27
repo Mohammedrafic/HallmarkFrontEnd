@@ -1,8 +1,23 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tab-navigation></app-tab-navigation>
+    <app-tab-navigation 
+    #tabNavigation 
+    class="table-tabs" (selectedTab)="tabSelected($event)"></app-tab-navigation>
   </ng-container>
   <ng-container right>
+   
+   <button
+              ejs-dropdownbutton
+              appHideBeforeSyncfusionLoad
+              [items]="exportOptions"
+              (select)="exportSelected($event)"
+              id="exportButton"
+              cssClass="e-outline button-export"
+            > 
+              <div class="button-export-container">
+                Export <i-feather name="upload" class="icon"></i-feather>
+              </div>
+   </button>
     <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="showFilters()">
       <div class="filter-button-content">
         <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
@@ -26,7 +41,7 @@
   </div>
 </section>
 <section class="candidates-grid">
-  <app-candidate-grid [candidatesPage]="candidatesPage" [pageNumber]="pageNumber" [pageSize]="pageSize" [CandidateStatus]="CandidateStatus"></app-candidate-grid>
+  <app-candidate-grid [candidatesPage]="candidatesPage" [filters]="filters" [activeTab]="activeTab" [export$]="exportCandidate$" [pageNumber]="pageNumber" [pageSize]="pageSize" [CandidateStatus]="CandidateStatus"></app-candidate-grid>
 </section>
 
 <app-filter-dialog
@@ -37,6 +52,7 @@
   [items]="filteredItems"
   [count]="(candidates$ | async)?.totalCount"
 >
+
   <app-filters
   #filterco
     [filtersForm]="filtersForm"

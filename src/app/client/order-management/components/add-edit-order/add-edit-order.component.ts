@@ -349,7 +349,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         cancelButtonLabel: 'No',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm) => !!confirm))
+      .pipe(filter((confirm) => !!confirm),takeUntil(this.unsubscribe$))
       .subscribe((res) => {
         this.checkInactiveLocationDepartmentOverlap(order, documents);
       });
@@ -363,7 +363,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         cancelButtonLabel: 'Cancel',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm) => !!confirm))
+      .pipe(filter((confirm) => !!confirm),takeUntil(this.unsubscribe$))
       .subscribe((res) => {
         this.proceedWithSaving(order, documents);
       });
@@ -716,7 +716,12 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
-        this.orderCredentials = unionBy('credentialId', this.orderCredentials, predefinedCredentials);
+        if (this.orderDetailsFormComponent.isEditMode) {
+          const credentials = this.orderCredentials.filter(cred => !cred.isPredefined);
+          this.orderCredentials = unionBy('credentialId', credentials, predefinedCredentials);
+        } else {
+          this.orderCredentials = predefinedCredentials;
+        }
         this.cd.detectChanges();
       });
   }
@@ -726,7 +731,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       if (!this.billRatesComponent?.billRatesControl && this.order) {
         this.orderBillRates = predefinedBillRates;
         return;
-      };
+      }
       if (this.billRatesComponent?.billRatesControl) {
         this.manuallyAddedBillRates = this.billRatesComponent.billRatesControl
           .getRawValue()
@@ -837,9 +842,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           {
                   title: JOB_DISTRIBUTION_TITLE,
                   okButtonLabel: 'Proceed',
-                  okButtonClass: 'primary'
+                  okButtonClass: 'primary',
           }).pipe(
-            filter(Boolean)
+            filter(Boolean),
+            takeUntil(this.unsubscribe$)
           ).subscribe(() => {
             this.saveOrder();
           });

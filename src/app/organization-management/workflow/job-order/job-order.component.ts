@@ -2,7 +2,7 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import {
@@ -147,8 +147,10 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
-        .subscribe(() => {
+        }).pipe(
+          filter(confirm => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
           this.workflowFormGroup.reset();
         });
@@ -179,8 +181,9 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm) {
           this.store.dispatch(new RemoveWorkflow(this.selectedCard as WorkflowWithDetails));
         }

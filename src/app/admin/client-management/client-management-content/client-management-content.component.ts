@@ -119,7 +119,7 @@ export class ClientManagementContentComponent
     });
     this.store.dispatch(new GetOrganizationDataSources());
     this.getOrganizationList();
-    this.pageSubject.pipe(throttleTime(1)).subscribe((page) => {
+    this.pageSubject.pipe(throttleTime(1),takeUntil(this.unsubscribe$)).subscribe((page) => {
       this.currentPage = page;
       this.getOrganizationList();
     });

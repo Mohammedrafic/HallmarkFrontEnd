@@ -18,7 +18,7 @@ import {
 import { MessageTypes } from '@shared/enums/message-types';
 import { BusinessLines } from '@shared/models/business-line.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { filter, Observable, Subject, takeWhile, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, take, takeWhile, throttleTime } from 'rxjs';
 import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 
@@ -77,8 +77,9 @@ export class BusinessLinesComponent extends AbstractGridConfigurationComponent i
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      })
-      .subscribe((confirm) => {
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
         if (confirm && id) {
           this.store.dispatch(new DeleteBusinessLine(id));
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
@@ -100,8 +101,10 @@ export class BusinessLinesComponent extends AbstractGridConfigurationComponent i
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
           this.isEdit = false;
           this.editedBusinessLineId = null;

@@ -908,16 +908,16 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
         this.getComments();
-        this.subscribeForSettings().subscribe(() => {
+        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe(() => {
           this.populateForms(order);
         });
       } else if (order?.isTemplate) {
         this.order = order;
-        this.subscribeForSettings().subscribe(() => {
+        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe(() => {
           this.populateForms(order);
         });
       } else if (!isEditMode) {
-        this.subscribeForSettings().subscribe();
+        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe();
         this.isEditMode = false;
         this.order = null;
         this.populateNewOrderForm();
@@ -1145,18 +1145,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       }
     });
 
-    combineLatest([
-      this.orderControlsConfig.departmentIdControl.valueChanges,
-      this.orderControlsConfig.skillIdControl.valueChanges,
-    ]).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(([departmentId, skillId]) => {
-      if (!departmentId || !skillId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) {
-        return;
-      }
-
-      this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId, SystemType.VMS));
-    });
+    this.subscribeOnPredefinedCredentialsUpdate();
 
     this.orderControlsConfig.durationControl.valueChanges.pipe(
       takeUntil(this.componentDestroy())
@@ -1282,6 +1271,20 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
   }
 
+  private subscribeOnPredefinedCredentialsUpdate(): void {
+    combineLatest([
+      this.orderControlsConfig.departmentIdControl.valueChanges,
+      this.orderControlsConfig.skillIdControl.valueChanges,
+    ]).pipe(
+      filter(([departmentId, skillId]) => {
+        return departmentId && skillId;
+      }),
+      takeUntil(this.componentDestroy())
+    ).subscribe(([departmentId, skillId]) => {
+      this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId, SystemType.VMS));
+    });
+  }
+
   public filterItemsBySubString<T>(
     event: FilteringEventArgs,
     dataSource: T[],
@@ -1298,7 +1301,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+    this.permissionService.getPermissions().pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
     });
   }

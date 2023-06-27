@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { GetOrderComments } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -35,6 +37,10 @@ export class CommentsComponent {
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
     }
+    else
+    {
+      this.commentData = [];
+    }
   }
   get comments(): Comment[] {
     return this.commentsList;
@@ -63,6 +69,9 @@ export class CommentsComponent {
   @Select(CommentsState.comments)
   comments$: Observable<Comment[]>;
 
+  @Select(OrderManagementContentState.orderComments)
+  private orderComments$: Observable<Comment[]>;
+
   private unsubscribe$: Subject<void> = new Subject();
 
   public selectedFilter = CommentsFilter.All;
@@ -82,7 +91,7 @@ export class CommentsComponent {
 
   private hasUnreadMessages = false;
 
-  constructor(private store: Store, private router : Router) {
+  constructor(private store: Store, private router : Router, private cd : ChangeDetectorRef) {
     this.commentType = CommentsFilter.All;
     this.scroll$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((messageEl: HTMLElement | null) => {
       if (messageEl) {
@@ -108,7 +117,7 @@ export class CommentsComponent {
         this.scroll$.next(null);
       }
     });
-    this.isAgencyUser = this.router.url.includes('agency'); 
+    this.isAgencyUser = this.router.url.includes('agency');
     if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
@@ -176,9 +185,23 @@ export class CommentsComponent {
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
-      this.store.dispatch(new SaveComment(comment));
+      this.store.dispatch(new SaveComment(comment)).subscribe(data => {
+        if(data.orderManagement?.orderComments){
+          this.comments = [];
+          this.getOrderComments();
+        }
+      });
     }
   }
+
+  private getOrderComments(): void {
+    this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
+    this.orderComments$.subscribe((comments: Comment[]) => {
+      this.comments = comments;
+      this.cd.markForCheck();
+    });
+  }
+
 
   public onFilterChange(event: SelectEventArgs): void {
     this.commentData = this.commentsList;

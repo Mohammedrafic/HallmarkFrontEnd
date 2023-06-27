@@ -54,7 +54,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
     this.invoiceStatusListwithreject.push({ id: 1, name: 'Submitted pend appr' });
     this.invoiceStatusListwithreject.push({ id: 2, name: 'Pending Payment' });
     this.invoiceStatusListwithreject.push({ id: 3, name: 'Paid' });
-    this.invoiceStatusListwithreject.push({ id: 4, name: 'Rejected' });
+    //this.invoiceStatusListwithreject.push({ id: 4, name: 'Rejected' });
   }
   public paramsData: any = {
     "AgenciesParamAIS": "",
@@ -138,7 +138,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
-  public defaultInvoiceStatus: (number | undefined)[] = [1, 2, 3, 4];
+  public defaultInvoiceStatus: (number | undefined)[] = [1, 2, 3];
   
   public today = new Date();
   public filteredItems: FilteredItem[] = [];

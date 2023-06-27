@@ -56,7 +56,7 @@ export class AlreadyExpiredCredsComponent  {
     var startDate = new Date(d.setMonth(d.getMonth() - 1));
 
     const timeStamp = new Date().getTime();
-    const yesterdayTimeStamp = timeStamp - 24*60*60*1000;
+    const yesterdayTimeStamp = timeStamp;
     const yesterdayDate = new Date(yesterdayTimeStamp);
 
     var type;

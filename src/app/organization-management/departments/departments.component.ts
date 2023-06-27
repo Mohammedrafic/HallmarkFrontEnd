@@ -521,10 +521,10 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     const reactivateDate = this.departmentsDetailsFormGroup.controls['reactivateDate'];
     inactiveDate.addValidators(startDateValidator(this.departmentsDetailsFormGroup, 'reactivateDate'));
     reactivateDate.addValidators(endDateValidator(this.departmentsDetailsFormGroup, 'inactiveDate'));
-    inactiveDate.valueChanges.subscribe(() =>
+    inactiveDate.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
       reactivateDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
-    reactivateDate.valueChanges.subscribe(() =>
+    reactivateDate.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
       inactiveDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
   }
@@ -674,7 +674,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         tap((data) => {
           const { preferences } = this.store.selectSnapshot(OrganizationManagementState.organization) || {};
           const areSkillsRequired = data[OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired]];
-          
+
           this.isPrimarySkillRequired = areSkillsRequired === 'true';
           this.isIRPEnabled = !!preferences?.isIRPEnabled;
           this.isVMSEnabled = !!preferences?.isVMCEnabled;

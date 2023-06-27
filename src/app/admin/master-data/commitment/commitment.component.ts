@@ -100,8 +100,10 @@ export class CommitmentComponent extends AbstractPermission implements OnInit {
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm: boolean) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm: boolean) => !!confirm),
+          takeUntil(this.componentDestroy())
+        ).subscribe(() => {
           this.closeSideDialog();
         });
     } else {
@@ -126,7 +128,8 @@ export class CommitmentComponent extends AbstractPermission implements OnInit {
 
   private closeSideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false)).pipe(
-      delay(500)
+      delay(500),
+      takeUntil(this.componentDestroy())
     ).subscribe(() => {
       this.form.reset();
     });

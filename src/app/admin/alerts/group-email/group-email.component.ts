@@ -185,7 +185,6 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     });
     this.getGroupEmails();
     this.getPermission();
-    console.log(this.userPermission);
   }
   public onViewGroupEmail(data: any): void {
     this.onView(data.rowData);
@@ -248,7 +247,6 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     }
     if (this.groupEmailTemplateForm.emailBody!=''&&this.groupEmailTemplateForm.emailTo!=''&&this.groupEmailTemplateForm.emailSubject!='') {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
-      console.log(formValues)
       let businessUnitId: number | null = null;
       if(formValues.businessUnit == 4)
         businessUnitId = formValues.businesses[0]
@@ -389,7 +387,6 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       filter((permissions: Permission) => !!Object.keys(permissions).length),
       take(1)
     ).subscribe((permissions: Permission) => {
-      console.log(permissions);
       this.userPermission = permissions;
     });
   }

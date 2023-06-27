@@ -3,7 +3,7 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { Actions, Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, filter, Observable, Subject, takeWhile } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, take, takeWhile } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 
@@ -103,8 +103,10 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.feeSettingsForm.reset();
           this.partnershipForm.reset();
           this.sideDialog.hide();
@@ -262,8 +264,10 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => confirm),
+          take(1)
+        ).subscribe(() => {
           tabForm.markAsPristine();
           this.editOrgTab.select(tab.selectingIndex);
           this.activeTab = this.switchTab(tab?.selectingItem?.innerText);
