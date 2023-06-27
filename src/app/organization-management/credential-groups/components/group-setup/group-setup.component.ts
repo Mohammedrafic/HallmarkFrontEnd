@@ -4,7 +4,7 @@ import { GridComponent, SearchService } from '@syncfusion/ej2-angular-grids';
 import { combineLatest, delay, filter, merge, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import {
-  AbstractGridConfigurationComponent ,
+  AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrganizationManagementState } from '../../../store/organization-management.state';
 import { ShowSideDialog, ShowToast } from '../../../../store/app.actions';
@@ -83,6 +83,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   private reservedMasterSkillIds = new Set<number>();
   private pageSubject = new Subject<number>();
   private previouslySavedMappingsNumber: number;
+  private selectedSkillIndexes: number[] = [];
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -105,6 +106,12 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.startPageChageWatching();
   }
 
+  override gridDataBound(): void {
+    if (this.isEdit && this.selectedSkillIndexes.length) {
+      this.searchGrid.selectRows(this.selectedSkillIndexes);
+    }
+  }
+
   editRow(saveSkillGroup: CredentialSkillGroup, event: MouseEvent): void {
     this.addActiveCssClass(event);
     const currentRowSkillGroupIds = saveSkillGroup.skills?.map(s => s.id);
@@ -121,12 +128,11 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.editedSkillGroupId = saveSkillGroup.id;
 
     const savedSkillIds: number[] = [];
-    const savedSkillIdsIndexes: number[] = [];
     saveSkillGroup.skills?.forEach(savedSkill => {
       const foundAssignedSkill = updatedAssignedSkills.find(skill => skill.id === savedSkill.id);
       if (foundAssignedSkill) {
         savedSkillIds.push(foundAssignedSkill.id);
-        savedSkillIdsIndexes.push(updatedAssignedSkills.indexOf(foundAssignedSkill));
+        ;
       }
     });
 
@@ -145,7 +151,29 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       delay(100),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      this.searchGrid.selectRows(savedSkillIdsIndexes);
+      this.setSelectedIndexSkills(saveSkillGroup,savedSkillIds);
+    });
+  }
+
+  private setSelectedIndexSkills(saveSkillGroup: CredentialSkillGroup, savedSkillIds: number[]): void {
+    const { includeInIRP, includeInVMS } = saveSkillGroup;
+
+    this.searchDataSource = this.groupSetupService.getSearchDataSources(
+      includeInIRP ?? false,
+      includeInVMS ?? true,
+      this.allAssignedSkills,
+      this.filteredAssignedSkills
+    );
+
+    const filteredSkills = this.getSelectedAssignedSkills();
+    this.searchDataSource = [...this.searchDataSource, ...filteredSkills];
+
+    this.selectedSkillIndexes = [];
+
+    this.searchDataSource.forEach((skill: Skill) => {
+      if (savedSkillIds.includes(skill.masterSkillId as number)) {
+        this.selectedSkillIndexes.push(this.searchDataSource.indexOf(skill));
+      }
     });
   }
 
@@ -157,7 +185,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       }).pipe(
-       takeUntil(this.componentDestroy())
+      takeUntil(this.componentDestroy())
     ).subscribe((confirm) => {
       if (confirm) {
         skillGroup.skills?.forEach(skill => {
@@ -322,7 +350,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
           this.filteredAssignedSkills
         );
 
-        if(this.isEdit) {
+        if (this.isEdit) {
           const filteredSkills = this.getSelectedAssignedSkills();
           this.searchDataSource = [...this.searchDataSource, ...filteredSkills];
         }
