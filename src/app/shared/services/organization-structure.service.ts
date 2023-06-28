@@ -23,7 +23,7 @@ export class OrganizationStructureService {
       });
     });
 
-    return  this.irpOrgStructure = structure;
+    return (this.irpOrgStructure = structure);
   }
 
   public getLocationsById(id: number, jobStartDate?: any | undefined): OrganizationLocation[] {
@@ -31,30 +31,26 @@ export class OrganizationStructureService {
       this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]
     ).filter(
       (location) =>
-        location.inactiveDate == null ||
-       (jobStartDate!=null ? (new Date(location.inactiveDate!)).toLocaleDateString() > (new Date(jobStartDate)).toLocaleDateString() :location.inactiveDate==null) ||
-        (location.reactivateDate != null && jobStartDate!=null 
-          ? (new Date(location.reactivateDate)).toLocaleDateString() <= (new Date(jobStartDate)).toLocaleDateString()
-          : location.reactivateDate == null)
+        location.inactiveDate == null || (jobStartDate != null && location.inactiveDate && location.reactivateDate)
+          ? new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() ||
+            new Date(location.reactivateDate!).toLocaleDateString() <= new Date(jobStartDate).toLocaleDateString()
+          : location.inactiveDate == null || (jobStartDate != null && location.inactiveDate && !location.reactivateDate)
+          ? new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString()
+          : location.inactiveDate == null
     ));
   }
 
-  public getLocation(id: number, locationID?: number): OrganizationLocationInactivate{
+  public getLocation(id: number, locationID?: number): OrganizationLocationInactivate {
     let OrganizationLocationInactivate: OrganizationLocationInactivate = {
       isInActivate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).some(
-        (location) =>
-          location.id == locationID &&
-          location.inactiveDate != null
+        (location) => location.id == locationID && location.inactiveDate != null
       ),
       inActiveDate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).find(
-        (location) =>
-          location.id == locationID &&
-          location.inactiveDate != null 
+        (location) => location.id == locationID && location.inactiveDate != null
       )?.inactiveDate,
       reActiveDate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).find(
-        (location) =>
-          location.id == locationID &&
-          location.reactivateDate != null)?.reactivateDate,
+        (location) => location.id == locationID && location.reactivateDate != null
+      )?.reactivateDate,
     };
     return OrganizationLocationInactivate;
   }
@@ -62,28 +58,24 @@ export class OrganizationStructureService {
   public getLocationsByIdSet(id: number, jobStartDates: string[]): OrganizationLocation[] {
     let resultSet: OrganizationLocation[] = [];
     this.selectedLocations = this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[];
-    jobStartDates.forEach((element ) => {
+    jobStartDates.forEach((element) => {
       let filteredlist: OrganizationLocation[] = [];
       filteredlist = this.selectedLocations.filter(
         (location) =>
           location.inactiveDate == null ||
-          ((new Date(location.inactiveDate)).toLocaleDateString() > (new Date(element)).toLocaleDateString())
-          ||
-         (location.reactivateDate != null
-           ? (new Date(location.reactivateDate)).toLocaleDateString() <= (new Date(element)).toLocaleDateString()
-           : location.reactivateDate == null)
+          new Date(location.inactiveDate).toLocaleDateString() > new Date(element).toLocaleDateString() ||
+          (location.reactivateDate != null
+            ? new Date(location.reactivateDate).toLocaleDateString() <= new Date(element).toLocaleDateString()
+            : location.reactivateDate == null)
       );
       if (filteredlist || filteredlist != null) {
         resultSet = resultSet.concat(filteredlist);
-       filteredlist=[]
+        filteredlist = [];
       }
     });
     resultSet = [...new Map(resultSet.map((m) => [m.id, m])).values()];
     return resultSet;
   }
-
-
-
 
   public getLocationsByInactive(
     id: number,
@@ -122,8 +114,6 @@ export class OrganizationStructureService {
     return OrganizationLocationInactivate;
   }
 
-
-
   public getLocationsByStartandEnddate(
     id: number,
     jobStartDate?: any | undefined,
@@ -134,26 +124,24 @@ export class OrganizationStructureService {
       isFInActivate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).some(
         (location) =>
           location.id == locationID &&
-          (new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          (new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
-          (new Date(location.reactivateDate!).toLocaleDateString() >= new Date(jobEndDate).toLocaleDateString()&&
-         new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString())))
+          new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
+          new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
+          new Date(location.reactivateDate!).toLocaleDateString() >= new Date(jobEndDate).toLocaleDateString() &&
+          new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
       ),
-      isCInActivate:(this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).some(
+      isCInActivate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).some(
         (location) =>
           location.id == locationID &&
-          (new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          (new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
-          (new Date(location.reactivateDate!).toLocaleDateString() < new Date(jobEndDate).toLocaleDateString()&&
-          new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString())))
+          new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
+          new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
+          new Date(location.reactivateDate!).toLocaleDateString() < new Date(jobEndDate).toLocaleDateString() &&
+          new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
       ),
       inActiveDate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).find(
-        (location) =>
-          location.id == locationID 
+        (location) => location.id == locationID
       )?.inactiveDate,
       reActiveDate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).find(
-        (location) =>
-          location.id == locationID 
+        (location) => location.id == locationID
       )?.reactivateDate,
     };
     return OrganizationLocationInactivate;
@@ -171,15 +159,13 @@ export class OrganizationStructureService {
           location.id == locationID &&
           location.inactiveDate != null &&
           new Date(location.inactiveDate).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          new Date(location.inactiveDate).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() 
+          new Date(location.inactiveDate).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
       ),
       inActiveDate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).find(
-        (location) =>
-          location.id == locationID 
+        (location) => location.id == locationID
       )?.inactiveDate,
       reActiveDate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).find(
-        (location) =>
-          location.id == locationID 
+        (location) => location.id == locationID
       )?.reactivateDate,
     };
     return OrganizationLocationInactivate;
@@ -188,38 +174,36 @@ export class OrganizationStructureService {
   public getDepartmentsById(id: number, startDate?: any | undefined): OrganizationDepartment[] {
     return (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).filter(
       (department) =>
-        department.inactiveDate == null 
-        ||
-        new Date(department.inactiveDate).toLocaleDateString() > new Date(startDate).toLocaleDateString() ||
-        (department.reactivateDate != null
-          ? new Date(department.reactivateDate).toLocaleDateString() <= new Date(startDate).toLocaleDateString()
-          : department.reactivateDate == null)
+      department.inactiveDate == null || (startDate != null && department.inactiveDate && department.reactivateDate)
+      ? new Date(department.inactiveDate!).toLocaleDateString() > new Date(startDate).toLocaleDateString() ||
+        new Date(department.reactivateDate!).toLocaleDateString() <= new Date(startDate).toLocaleDateString()
+      : department.inactiveDate == null || (startDate != null && department.inactiveDate && !department.reactivateDate)
+      ? new Date(department.inactiveDate!).toLocaleDateString() > new Date(startDate).toLocaleDateString()
+      : department.inactiveDate == null
     );
   }
 
   public getDepartmentByIdSet(id: number, jobStartDates: string[]): OrganizationDepartment[] {
     let resultSet: OrganizationDepartment[] = [];
     this.selectedDepartments = this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[];
-    jobStartDates.forEach((element ) => {
+    jobStartDates.forEach((element) => {
       let filteredlist: OrganizationDepartment[] = [];
       filteredlist = this.selectedDepartments.filter(
         (department) =>
-        department.inactiveDate == null ||
-          ((new Date(department.inactiveDate)).toLocaleDateString() > (new Date(element)).toLocaleDateString())
-          ||
-         (department.reactivateDate != null
-           ? (new Date(department.reactivateDate)).toLocaleDateString() <= (new Date(element)).toLocaleDateString()
-           : department.reactivateDate == null)
+          department.inactiveDate == null ||
+          new Date(department.inactiveDate).toLocaleDateString() > new Date(element).toLocaleDateString() ||
+          (department.reactivateDate != null
+            ? new Date(department.reactivateDate).toLocaleDateString() <= new Date(element).toLocaleDateString()
+            : department.reactivateDate == null)
       );
       if (filteredlist || filteredlist != null) {
         resultSet = resultSet.concat(filteredlist);
-       filteredlist=[]
+        filteredlist = [];
       }
     });
     resultSet = [...new Map(resultSet.map((m) => [m.id, m])).values()];
     return resultSet;
   }
-
 
   public getDepartmentByStartandEnddate(
     id: number,
@@ -230,27 +214,25 @@ export class OrganizationStructureService {
     let OrganizationDepartmentInactivate: OrganizationLTADepartmentInactivate = {
       isFInActivate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).some(
         (department) =>
-        department.id == departmentID &&
-          (new Date(department.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          (new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
-          (new Date(department.reactivateDate!).toLocaleDateString() >= new Date(jobEndDate).toLocaleDateString()&&
-         new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString())))
+          department.id == departmentID &&
+          new Date(department.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
+          new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
+          new Date(department.reactivateDate!).toLocaleDateString() >= new Date(jobEndDate).toLocaleDateString() &&
+          new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
       ),
-      isCInActivate:(this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).some(
+      isCInActivate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).some(
         (department) =>
-        department.id == departmentID &&
-          (new Date(department.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          (new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
-          (new Date(department.reactivateDate!).toLocaleDateString() < new Date(jobEndDate).toLocaleDateString()&&
-          new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString())))
+          department.id == departmentID &&
+          new Date(department.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
+          new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
+          new Date(department.reactivateDate!).toLocaleDateString() < new Date(jobEndDate).toLocaleDateString() &&
+          new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
       ),
       inActiveDate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
-        (department) =>
-        department.id == departmentID 
+        (department) => department.id == departmentID
       )?.inactiveDate,
       reActiveDate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
-        (department) =>
-        department.id == departmentID 
+        (department) => department.id == departmentID
       )?.reactivateDate,
     };
     return OrganizationDepartmentInactivate;
@@ -265,39 +247,31 @@ export class OrganizationStructureService {
     let OrganizationDepartmentInactivate: OrganizationDepartmentInactivate = {
       isInActivate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).some(
         (department) =>
-        department.id == departmentID &&
-        department.inactiveDate != null &&
+          department.id == departmentID &&
+          department.inactiveDate != null &&
           new Date(department.inactiveDate).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          new Date(department.inactiveDate).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() 
+          new Date(department.inactiveDate).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
       ),
       inActiveDate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
-        (department) =>
-        department.id == departmentID 
+        (department) => department.id == departmentID
       )?.inactiveDate,
       reActiveDate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
-        (department) =>
-        department.id == departmentID 
+        (department) => department.id == departmentID
       )?.reactivateDate,
     };
     return OrganizationDepartmentInactivate;
   }
 
-  public getDepartment(id: number,  departmentid?: number): OrganizationDepartmentInactivate {
+  public getDepartment(id: number, departmentid?: number): OrganizationDepartmentInactivate {
     let OrganizationDepartmentInactivate: OrganizationDepartmentInactivate = {
       isInActivate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).some(
-        (department: OrganizationDepartment) =>
-          department.inactiveDate != null &&
-          department.id == departmentid 
+        (department: OrganizationDepartment) => department.inactiveDate != null && department.id == departmentid
       ),
-      inActiveDate: (this.getSources(this.irpOrgStructure, id, 'departments') as OrganizationDepartment[]).find(
-        (department) =>
-          department.id == departmentid &&
-          department.inactiveDate != null 
+      inActiveDate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
+        (department) => department.id == departmentid && department.inactiveDate != null
       )?.inactiveDate,
-      reActiveDate: (this.getSources(this.irpOrgStructure, id, 'departments') as OrganizationDepartment[]).find(
-        (department) =>
-          department.id == departmentid &&
-          department.inactiveDate != null 
+      reActiveDate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
+        (department) => department.id == departmentid && department.inactiveDate != null
       )?.reactivateDate,
     };
     return OrganizationDepartmentInactivate;
@@ -341,7 +315,9 @@ export class OrganizationStructureService {
 
   //TODO: add correct model, and enum for type param
   private getSources(
-    structure: OrganizationLocation[] | OrganizationRegion[], id: number, type: string
+    structure: OrganizationLocation[] | OrganizationRegion[],
+    id: number,
+    type: string
   ): OrganizationLocation[] | OrganizationDepartment[] {
     const containers: OrganizationLocation[] | OrganizationDepartment[] = [];
     structure?.forEach((value: any) => {
