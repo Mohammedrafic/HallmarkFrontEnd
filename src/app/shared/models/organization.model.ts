@@ -148,16 +148,32 @@ export class OrganizationLocation {
   inactiveDate?: string;
   reactivateDate?: string;
 }
+
+
+
 export class OrganizationLocationInactivate {
   inActiveDate?: string;
   reActiveDate?: string;
   isInActivate?: boolean;
 }
 
+export class OrganizationLTALocationInactivate {
+  inActiveDate?: string;
+  reActiveDate?: string;
+  isFInActivate?: boolean;
+  isCInActivate?:boolean;
+}
 export class OrganizationDepartmentInactivate {
   inActiveDate?: string;
   reActiveDate?: string;
   isInActivate?:boolean;
+}
+
+export class OrganizationLTADepartmentInactivate {
+  inActiveDate?: string;
+  reActiveDate?: string;
+  isFInActivate?: boolean;
+  isCInActivate?:boolean;
 }
 export class OrganizationRegion {
   id: number | null;

@@ -44,6 +44,7 @@ export class GeneralNotesService {
   public deleteNote(index: number): void {
     const notes = this.notes$.getValue();
     this.notes$.next(notes.filter((_, i: number) => index !== i));
+    this.candidateProfileFormService.triggerSaveEvent();
   }
 
   public editNote(note: EditGeneralNoteModel): void {
