@@ -205,7 +205,7 @@
                    (keyup.enter)="onJobIdStatusValueChanged()"/>
             </div>
           </div>
-          <div *ngIf="isOrgInternalUserType" class="dropdown-container">
+          <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="dropdown-container">
             <div class="input-group dropdown">
               <label>Role<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox"
