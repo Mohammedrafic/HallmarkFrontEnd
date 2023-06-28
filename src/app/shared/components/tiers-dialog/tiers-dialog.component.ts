@@ -16,7 +16,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { FieldType } from '@core/enums';
-import { TIER_DIALOG_TYPE, TiersDialogConfig, FiledNamesSettings, FieldNames, OPTION_FIELDS, OPTION_FIELDS_IRP } from '@shared/components/tiers-dialog/constants';
+import { OPTION_FIELDS, TIER_DIALOG_TYPE, TiersDialogConfig, FiledNamesSettings, FieldNames, OPTION_FIELDS_IRP } from '@shared/components/tiers-dialog/constants';
 import { TierDataSource, TierDetails, TierDialogConfig, TiersInputConfig } from '@shared/components/tiers-dialog/interfaces';
 import { Tiers } from '@shared/enums/tiers.enum';
 import { CustomFormGroup } from '@core/interface';
@@ -53,35 +53,42 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   @Input() systemType: SystemType;
   @Input() set regionsStructure(regions: OrganizationRegion[]) {
     this.regions = regions;
+    this.dialogConfig = TiersDialogConfig(regions)[this.dialogType];
   };
   @Input() set selectedTier(tier: TierDetails) {
     if (tier) {
       this.selectedTierDetails = tier;
-      this.allRecords.regionIds = !tier.regionId;
-      this.allRecords.locationIds = !tier.locationId;
-      this.allRecords.departmentIds = !tier.departmentId;
       this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier, this.regions));
+      if(this.systemType === 0){
+        this.allRecords.regionIds = !tier.regionId;
+        this.allRecords.locationIds = !tier.locationId;
+        this.allRecords.departmentIds = !tier.departmentId;
+        this.allRegionsChange({ checked: this.allRecords.regionIds });
+        this.allLocationsChange({ checked: this.allRecords.locationIds });
+        this.allDepartmentsChange({ checked: this.allRecords.departmentIds }, false);  
+      }
+      this.createForm();
     }
   };
-  public title: string = '';
-  public isEdit : boolean;
+
   @Input() set isEditDialog(value: boolean) {
-    this.isEdit = value;
+    this.setDialogTitle(value);
+      this.isEdit = value;  
   };
 
   @Input() public permission: boolean;
   @Input() public organizationId: number;
 
   public dialogConfig: TierDialogConfig;
+  public title: string = '';
   public regions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
-  public departments: OrganizationDepartment[] = [];
   public tierForm: CustomFormGroup<TierDTO> | null;
-  public workcommitmentIds : any;
   public readonly FieldTypes = FieldType;
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
   public optionFieldsIRP: FieldSettingsModel = OPTION_FIELDS_IRP;
   public isTierSettingsDialog: boolean;
+  public isEdit : boolean;
 
   private selectedRegions: number[] = [];
   private selectedLocations: number[] = [];
@@ -100,7 +107,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   public tierList$: Observable<TierList[]>;
 
   constructor(
-    @Inject(TIER_DIALOG_TYPE) public dialogType: Tiers,
+    @Inject(TIER_DIALOG_TYPE) protected dialogType: Tiers,
     private tierService: TierService,
     private changeDetection: ChangeDetectorRef,
     private confirmService: ConfirmService,
@@ -111,30 +118,27 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   ngOnInit(): void {
-    this.watchForSystemType();
     this.watchForShowDialog();
+    this.createForm();
+    this.watchForRegions();
+    this.watchForLocation();
     this.watchForCloseDialog();
+    this.watchForDepartments();
   }
 
   public watchForSystemType() {
     this.systemType === 0 ? this.dialogType = Tiers.tierSettings : this.dialogType = Tiers.tierSettingsIRP;
     this.dialogConfig = TiersDialogConfig(this.regions, this.workcommitments)[this.dialogType];
     this.createForm();
-    this.setDialogTitle(this.isEdit);
-    this.watchForRegions();
-    this.watchForLocation();
-    this.watchForDepartments();
+    if(this.systemType === 0){
+      this.watchForRegions();
+      this.watchForLocation();
+      this.watchForDepartments();  
+    }
   }
 
-  public watchForEdit():void {
-    this.isEdit ? this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, this.selectedTierDetails, this.regions)) : "";
-    this.changeDetection.markForCheck();
-  }
-
-  ngOnChanges(): void {
+  ngOnChanges() : void {
     this.watchForSystemType();
-    this.watchForShowDialog();
-    this.watchForEdit();
   }
 
   public allRegionsChange(event: { checked: boolean }): void {
@@ -238,9 +242,11 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   private resetToggles(): void {
-    this.allRegionsChange({ checked: false });
-    this.allLocationsChange({ checked: false });
-    this.allDepartmentsChange({ checked: false });
+    if(this.systemType === 0){
+      this.allRegionsChange({ checked: false });
+      this.allLocationsChange({ checked: false });
+      this.allDepartmentsChange({ checked: false });  
+    }
   }
 
   private hideDialog(): void {
@@ -248,11 +254,19 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     this.isTierSettingsDialog || setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', []);
     this.resetToggles();
     this.tierForm?.reset({}, {emitEvent: false});
+    this.tierForm?.patchValue({
+      skills: "1"
+    });
     this.changeDetection.markForCheck();
   }
 
   private createForm(): void {
     this.tierForm = this.tierService.createTierForm(this.dialogType);
+    if(this.isEdit){
+      setTimeout(() => {
+        this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, this.selectedTierDetails, this.regions));
+      },100)
+    }
   }
 
   private watchForRegions(): void {
@@ -308,13 +322,14 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     }
     this.actions$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
-        this.createForm();
-        this.allRecords.regionIds = false;
-        this.allRecords.locationIds = false;
-        this.allRecords.departmentIds = false;
-        this.allRegionsChange({ checked: false });
-        this.allLocationsChange({ checked: false });
-        this.allDepartmentsChange({ checked: false });
+        if(this.systemType == 0){
+          this.allRecords.regionIds = false;
+          this.allRecords.locationIds = false;
+          this.allRecords.departmentIds = false;
+          this.allRegionsChange({ checked: false });
+          this.allLocationsChange({ checked: false });
+          this.allDepartmentsChange({ checked: false });
+        }
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();
