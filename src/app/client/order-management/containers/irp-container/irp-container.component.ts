@@ -241,7 +241,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           this.dates = locationreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
             .join(', ');
-        } else {
+        } else if (location.isInActivate && !location.reActiveDate){
           createdOrder.jobDates = createdOrder.jobDates.filter(
             (f: Date) => new Date(f) < new Date(location.inActiveDate ?? '')
           );
@@ -258,17 +258,28 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
               new Date(f) < new Date(department.inActiveDate ?? '') || new Date(f) >= new Date(department.reActiveDate ?? '')
           );
           
-          departmentreactivateDate = departmentreactivateDate.filter((f: Date) => 
+          departmentreactivateDate = 
+          locationreactivateDate ? 
+          locationreactivateDate.filter((f: Date) => 
+             new Date(f) >=  new Date(department.inActiveDate ?? '') &&
+               new Date(f) < new Date(department.reActiveDate ?? ''))
+               :
+          departmentreactivateDate.filter((f: Date) => 
              new Date(f) >=  new Date(department.inActiveDate ?? '') &&
                new Date(f) < new Date(department.reActiveDate ?? ''));
           this.dates = departmentreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
             .join(', ');
-        } else {
+        } else if(department.isInActivate && !department.reActiveDate){
           createdOrder.jobDates = createdOrder.jobDates.filter(
             (f: Date) => new Date(f) < new Date(department.inActiveDate ?? '')
           );
-          departmentreactivateDate = departmentreactivateDate.filter((f: Date) => 
+          departmentreactivateDate =
+          locationreactivateDate ?
+          locationreactivateDate.filter((f: Date) => 
+             new Date(f) >= new Date(department.inActiveDate ?? ''))
+             : 
+          departmentreactivateDate.filter((f: Date) => 
              new Date(f) >= new Date(department.inActiveDate ?? ''));
           
           this.departmentdates = departmentreactivateDate
