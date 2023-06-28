@@ -464,6 +464,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       ...this.filterState,
       pageNumber,
     }, true));
+    this.changeMultiSelection([]);
+    this.clearGroupedInvoices();
   }
 
   public changePageSize(pageSize: number): void {
@@ -474,6 +476,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       pageSize,
     }, useFilterState));
     this.previousSelectedTabIdx = this.selectedTabIdx;
+    this.changeMultiSelection([]);
+    this.clearGroupedInvoices();
   }
 
   public changeSorting(event: string): void {
