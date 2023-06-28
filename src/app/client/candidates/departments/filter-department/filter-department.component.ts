@@ -80,7 +80,7 @@ export class FilterDepartmentComponent extends DestroyableDirective implements O
   public applyFilters(): void {
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     const formState = this.formGroup.getRawValue();
-    const filterState = { ...formState, isOriented: OrientedFilterPayload[formState.isOriented] };
+    const filterState = { ...formState, isOrientedFilter: OrientedFilterPayload[formState.isOrientedFilter] };
     this.applyFilters$.next(filterState);
   }
 
