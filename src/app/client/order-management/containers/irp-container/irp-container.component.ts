@@ -67,7 +67,10 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public tabs = IrpTabs;
   public orderCredentials: IOrderCredentialItem[] = [];
   public dates: string;
+  public locationdates: string;
+  public departmentdates: string;
   public isLocation : boolean=false;
+  public isLocationAndDepartment : boolean=false;
   private isCredentialsChanged = false;
 
 
@@ -171,7 +174,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           : null;
       const ltaInActivelocations =
         location.isInActivate && location.inActiveDate && !location.reActiveDate && createdOrder.jobStartDate
-          ? this.organizationStructureService.getLocationsByStartdate(regionid, jobstartdate, locationid)
+          ? this.organizationStructureService.getLocationsByStartdate(regionid, jobstartdate,jobEndate, locationid)
           : null;
 
 
@@ -187,10 +190,11 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
         const ltaInActiveDeparment =
         department.isInActivate && department.inActiveDate && !department.reActiveDate && createdOrder.jobStartDate
-          ? this.organizationStructureService.getDepartmentByStartdate(locationid, jobstartdate, departmentID)
+          ? this.organizationStructureService.getDepartmentByStartdate(locationid, jobstartdate,jobEndate, departmentID)
           : null;
 
-      let reactivateDate = createdOrder.jobDates ? createdOrder.jobDates : null;
+      let locationreactivateDate = createdOrder.jobDates ? createdOrder.jobDates : null;
+      let departmentreactivateDate = createdOrder.jobDates ? createdOrder.jobDates : null;
       let isPerDiem =
         createdOrder.jobDates &&
         (location?.isInActivate ||
@@ -224,60 +228,57 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
             this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
           });
       }
-      else if (isPerDiem && location.isInActivate) {
-        this.isLocation=true;
+      else if (isPerDiem && (location.isInActivate || department.inActiveDate)) {
         if (location.isInActivate && location.reActiveDate) {
           createdOrder.jobDates = createdOrder.jobDates.filter(
             (f: Date) =>
               new Date(f) < new Date(location.inActiveDate ?? '') || new Date(f) >= new Date(location.reActiveDate ?? '')
           );
           
-         reactivateDate = reactivateDate.filter((f: Date) => 
+          locationreactivateDate = locationreactivateDate.filter((f: Date) => 
              new Date(f) >=  new Date(location.inActiveDate ?? '') &&
                new Date(f) < new Date(location.reActiveDate ?? ''));
-          this.dates = reactivateDate
+          this.dates = locationreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
             .join(', ');
         } else {
           createdOrder.jobDates = createdOrder.jobDates.filter(
             (f: Date) => new Date(f) < new Date(location.inActiveDate ?? '')
           );
-          reactivateDate = reactivateDate.filter((f: Date) => 
+          locationreactivateDate = locationreactivateDate.filter((f: Date) => 
              new Date(f) >= new Date(location.inActiveDate ?? ''));
           
-          this.dates = reactivateDate
+          this.locationdates = locationreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
             .join(', ');
         }
-        
-        this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates,this.isLocation));
-      }
-      else if (isPerDiem && department.isInActivate)
-      {
         if (department.isInActivate && department.reActiveDate) {
-        createdOrder.jobDates = createdOrder.jobDates.filter(
-          (f: Date) =>
-            new Date(f) < new Date(department.inActiveDate ?? '') || new Date(f) >= new Date(department.reActiveDate ?? '')
-        );
-        
-       reactivateDate = reactivateDate.filter((f: Date) => 
-           new Date(f) >=  new Date(department.inActiveDate ?? '') &&
-             new Date(f) < new Date(department.reActiveDate ?? ''));
-        this.dates = reactivateDate
-          .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
-          .join(', ');
-      } else {
-        createdOrder.jobDates = createdOrder.jobDates.filter(
-          (f: Date) => new Date(f) < new Date(department.inActiveDate ?? '')
-        );
-        reactivateDate = reactivateDate.filter((f: Date) => 
-           new Date(f) >= new Date(department.inActiveDate ?? ''));
-        
-        this.dates = reactivateDate
-          .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
-          .join(', ');
-      }
-      this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+          createdOrder.jobDates = createdOrder.jobDates.filter(
+            (f: Date) =>
+              new Date(f) < new Date(department.inActiveDate ?? '') || new Date(f) >= new Date(department.reActiveDate ?? '')
+          );
+          
+          departmentreactivateDate = departmentreactivateDate.filter((f: Date) => 
+             new Date(f) >=  new Date(department.inActiveDate ?? '') &&
+               new Date(f) < new Date(department.reActiveDate ?? ''));
+          this.dates = departmentreactivateDate
+            .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
+            .join(', ');
+        } else {
+          createdOrder.jobDates = createdOrder.jobDates.filter(
+            (f: Date) => new Date(f) < new Date(department.inActiveDate ?? '')
+          );
+          departmentreactivateDate = departmentreactivateDate.filter((f: Date) => 
+             new Date(f) >= new Date(department.inActiveDate ?? ''));
+          
+          this.departmentdates = departmentreactivateDate
+            .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
+            .join(', ');
+        }
+        this.isLocationAndDepartment = this.locationdates && this.departmentdates ? true : false
+        this.isLocation = this.locationdates ? true : false
+        this.dates= this.locationdates +' '+ this.departmentdates;
+        this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates,this.isLocation,this.isLocationAndDepartment));
       }
       else {
         this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments()));
