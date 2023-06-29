@@ -8,6 +8,7 @@ import autoTable, { CellDef, RowInput } from 'jspdf-autotable';
 import { GridValuesHelper } from '../../timesheets/helpers';
 import { PrintInvoiceData, PrintInvoiceMeta } from '../interfaces';
 import { OrganizationInvoicesGridTab } from '../enums/organization-invoices-grid-tab.enum';
+import { GetExportFileName } from '../components/invoice-grid-export/invoice-export.constant';
 
 @Injectable()
 export class InvoicePrintingService {
@@ -19,17 +20,27 @@ export class InvoicePrintingService {
       if (index !== 0) {
         doc.addPage();
       }
-      if(selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords)
+      if(selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords){
         this.addPendingRecordInvoiceHeader(doc, invoice.meta);
-      else
+        this.addPendingRecordInvoiceBody(doc, invoice, logo);
+      }        
+      else{
         this.addInvoiceHeader(doc, invoice.meta);
-      this.addOrgInvoiceBody(doc, invoice, logo);
+        this.addOrgInvoiceBody(doc, invoice, logo);
+      }
+
     });
 
     this.addPageFooter(doc);
-    doc.save();
-  }
+    if(selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords){
+      let defaultFileName = GetExportFileName(false,0);
+      doc.save(defaultFileName);
+    }else{
+      doc.save();
+    }
 
+  }
+  
   printAgencyInvoice(data: PrintInvoiceData[]): void {
     const doc = this.createDoc();
     const logo = this.createImage();
@@ -518,6 +529,482 @@ Hauppauge, NY 11788`,
       },
       {
         content: GridValuesHelper.formatAbsCurrency(data.totals.amount),
+        styles: {
+          fontStyle: 'bold',
+          halign: 'right',
+          lineColor: '#181919',
+        },
+      },
+      {
+        content: '',
+        colSpan: 4,
+        styles: {
+          lineColor: '#181919',
+        },
+      },
+    ]);
+
+    summaryRows.push([
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+    ]);
+
+    const footer: RowInput[] = [];
+
+    footer.push([
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: 'Remit Adress:',
+        colSpan: 2,
+        styles: {
+          halign: 'center',
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: data.meta.remitAddress,
+        colSpan: 2,
+        styles: {
+          halign: 'left',
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          halign: 'left',
+          fillColor: '#F5F5F5',
+        },
+      }, 
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
+    ]);
+
+    autoTable(doc, {
+      margin: { top: 50, left: 20, right: 20 },
+      tableLineColor: '#181919',
+      tableLineWidth: 1,
+      head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
+      'Agency', 'Skill', 'Hours/Miles', 'Bill Rate', 'Total']],
+      headStyles: {
+        fillColor: '#CFCFCF',
+        fontStyle: 'bold',
+        fontSize: 10,
+        overflow: 'linebreak',
+        halign: 'center',
+        valign: 'middle',
+        lineColor: '#181919',
+        lineWidth: 1,
+        cellPadding: 2,
+      },
+      body: bodyRows,
+      bodyStyles: {
+        lineColor: '#181919',
+        lineWidth: 1,
+        fontSize: 10,
+        overflow: 'linebreak',
+        cellPadding: 2,
+      },
+      theme: 'plain',
+      didDrawPage: ()=> {
+        doc.addImage(img, 'png', 20, 15, 80, 20);
+      },
+    });
+
+    autoTable(doc, {
+      margin: { top: 50, left: 20, right: 20 },
+      tableLineColor: '#181919',
+      tableLineWidth: 1,
+      rowPageBreak: 'avoid',
+      head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
+      'Agency', 'Skill', 'Hours/Miles', 'Bill Rate', 'Total']],
+      showHead: 'never',
+      body: summaryRows,
+      foot: footer,
+      showFoot: 'lastPage',
+      footStyles: {
+        lineColor: '#D9D9D9',
+        lineWidth: 0.8,
+        fontSize: 10,
+        fontStyle: 'bold',
+        cellPadding: 2,
+        overflow: 'linebreak',
+      },
+      bodyStyles: {
+        lineColor: '#D9D9D9',
+        lineWidth: 0.8,
+        fontSize: 10,
+        fontStyle: 'bold',
+        cellPadding: 2,
+        overflow: 'linebreak',
+      },
+      theme: 'plain',
+      didDrawPage: ()=> {
+        doc.addImage(img, 'png', 20, 15, 80, 20);
+      },
+    });
+  }
+
+  private addPendingRecordInvoiceBody(doc: jsPDF, data: PrintInvoiceData, img: HTMLImageElement): void {
+    const bodyRows: RowInput[] = data.invoiceRecords.map((record) => {
+      const formatedValue = record.total > 0 ? GridValuesHelper.formatAbsNumber(record.value, '1.2-2')
+      : `(${GridValuesHelper.formatAbsNumber(record.value, '1.2-2')})`;
+
+      return [
+        {
+          content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
+          styles: {
+            halign: 'left',
+          },
+        },
+        {
+          content: formatDate(record.timeIn, 'MM/dd/YYYY HH:mm', 'en-US'), 
+          styles: {
+            halign: 'left',
+          },
+        },
+        formatDate(record.timeOut, 'MM/dd/YYYY HH:mm', 'en-US'),
+        record.billRateConfigName,
+        record.costCenterFormattedName,
+        record.formattedJobId,
+        `${record.candidateLastName}, ${record.candidateFirstName}`,
+        record.agencyName,
+        record.skillName,
+        {
+          content: formatedValue,
+          styles: {
+            halign: 'right',
+          },
+        },
+        {
+          content: GridValuesHelper.formatCurrencyValue(record.rate.toString()),
+          styles: {
+            halign: 'right',
+          },
+        },
+        {
+          content: GridValuesHelper.formatCurrencyValue(record.total.toString()),
+          styles: {
+            halign: 'right',
+          },
+        },
+      ];
+    });
+
+    const totalRows: RowInput[] = [
+      [
+        {
+          content: '',
+          colSpan: 12,
+        },
+      ],
+      [
+        {
+          content: 'Invoice Amount:',
+          colSpan: 11,
+          styles: { halign: 'right', fontStyle: 'bold' },
+        },
+        {
+          content: GridValuesHelper.formatCurrencyValue(data.totals.amount.toString()),
+          styles: { halign: 'right', fontStyle: 'normal' },
+        },
+      ],
+    ];
+
+    const summaryRows: RowInput[] = [
+      [
+        {
+          content: 'Summary',
+          colSpan: 12,
+          styles: {
+            fillColor: '#CFCFCF',
+            fontStyle: 'bold',
+            halign: 'center',
+          },
+        },
+      ],
+      [
+        {
+          content: 'Location',
+          colSpan: 3,
+          styles: {
+            fillColor: '#CFCFCF',
+            lineColor: '#181919',
+            halign: 'left',
+            minCellWidth: 80,
+          },
+        },
+        {
+          content: 'Department',
+          colSpan: 3,
+          styles: {
+            fillColor: '#CFCFCF',
+            lineColor: '#181919',
+            halign: 'left',
+            minCellWidth: 80,
+          },
+        },
+        {
+          content: 'Skill',
+          styles: {
+            fillColor: '#CFCFCF',
+            lineColor: '#181919',
+            halign: 'left',
+          },
+        },
+        { 
+          content: 'Hours/Miles',
+          styles: {
+            fillColor: '#CFCFCF',
+            lineColor: '#181919',
+            halign: 'left',
+          },
+        },
+        { 
+          content: 'Total Amount',
+          styles: {
+            fillColor: '#CFCFCF',
+            lineColor: '#181919',
+            halign: 'right',
+          },
+        },
+        {
+          content: 'Addl. Details',
+          colSpan: 3,
+          styles: {
+            fillColor: '#CFCFCF',
+            lineColor: '#181919',
+            halign: 'left',
+            minCellWidth: 150,
+          },
+        },
+      ],
+    ];
+
+    bodyRows.push(...totalRows);
+
+    data.summary.forEach((summary) => {
+      summary.items.forEach((detail, idx: number) => {
+        const loactionIdText = detail.locationIExternalId  ? `${detail.locationIExternalId}-` : '';
+        const departmentIdText = detail.invoiceDepartmentId ? `-${detail.invoiceDepartmentId}` : '';
+        const skillGlText = detail.skillGLNumber ? `-${detail.skillGLNumber}` : '';
+        const additionalDetails = `${loactionIdText}${detail.departmentName}${departmentIdText}${skillGlText}`;
+        const formatedValue = detail.total > 0 ? GridValuesHelper.formatAbsNumber(detail.value, '1.2-2')
+        : `(${GridValuesHelper.formatAbsNumber(detail.value, '1.2-2')})`;
+
+        const sum: CellDef[] = [
+          idx === 0 ? {
+            content: summary.locationName, 
+            colSpan: 3,
+            styles: {
+              halign: 'left',
+              fontStyle: 'normal',
+              lineColor: '#181919',
+            },
+          } :  {
+            content: ' ', 
+            colSpan: 3,
+            styles: {
+              halign: 'left',
+              fontStyle: 'normal',
+              lineColor: '#00000000',
+              lineWidth: 0,
+            },
+          },
+          {
+            content: detail.departmentName,
+            colSpan: 3,
+            styles: {
+              halign: 'left',
+              fontStyle: 'normal',
+              lineColor: '#181919',
+            },
+          },
+          {
+            content: detail.skillName,
+            styles: {
+              halign: 'left',
+              fontStyle: 'normal',
+              lineColor: '#181919',
+            },
+          },
+          {
+            content: formatedValue,
+            styles: {
+              halign: 'right',
+              fontStyle: 'normal',
+              lineColor: '#181919',
+            },
+          },
+          {
+            content: GridValuesHelper.formatCurrencyValue(detail.total.toString()),
+            styles: {
+              halign: 'right',
+              fontStyle: 'normal',
+              lineColor: '#181919',
+            },
+          },
+          {
+            content: additionalDetails,
+            colSpan: 3,
+            styles: {
+              halign: 'left',
+              fontStyle: 'normal',
+              lineColor: '#181919',
+            },
+          },
+        ];
+
+        if (!sum[0]?.content) {
+          sum.splice(0, 1);
+        }
+
+        summaryRows.push(sum);
+      });
+    });
+
+    summaryRows.push([
+      {
+        content: 'Total',
+        colSpan: 3,
+        styles: {
+          halign: 'left',
+          fontStyle: 'bold',
+          lineColor: '#181919',
+        },
+      },
+      {
+        content: '',
+        colSpan: 3,
+        styles: {
+          lineColor: '#181919',
+        },
+      },
+      {
+        content: '',
+        styles: {
+          lineColor: '#181919',
+        },
+      },
+      {
+        content: GridValuesHelper.formatAbsNumber(data.totals.total, '1.2-2'),
+        styles: {
+          fontStyle: 'bold',
+          halign: 'right',
+          lineColor: '#181919',
+        },
+      },
+      {
+        content: GridValuesHelper.formatCurrencyValue(data.totals.amount.toString()),
         styles: {
           fontStyle: 'bold',
           halign: 'right',

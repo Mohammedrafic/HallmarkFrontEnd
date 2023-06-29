@@ -42,6 +42,6 @@ export class GetWorkCommitmentByPage {
   constructor(  public businessUnitId: number,
     public regions: string,
     public locations: string,
-    public skills: string,
+    public skills: any,
     ) { }
 }

@@ -102,9 +102,9 @@ export interface DepartmentPayload {
   isHomeCostCenter?: boolean;
   orientationDate?: string;
   ids?: number[] | null;
-  departmentIds?: number;
-  locationIds?: number;
-  regionIds?: number;
+  departmentIds?: number[];
+  locationIds?: number[];
+  regionIds?: number[];
   employeeId?: number;
   createReplacement?: boolean;
 }

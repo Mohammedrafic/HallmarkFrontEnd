@@ -446,7 +446,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     const billRates = this.billRatesComponent?.billRatesControl.value;
-    const regularBillRate = this.billRatesSyncService.getBillRateForSync(billRates);
+    const regularBillRate = this.billRatesSyncService.getBillRateForSync(
+      billRates, this.orderDetailsFormComponent.generalInformationForm.value.jobStartDate
+    );
 
     if (!regularBillRate) {
       return;
@@ -468,7 +470,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       return;
     }
     const billRates = this.billRatesComponent?.billRatesControl.value;
-    const billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
+    const billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+      billRates, this.orderDetailsFormComponent.generalInformationForm.value.jobStartDate
+    );
 
     if (billRateToUpdate?.id !== billRate?.id) {
       return;
@@ -506,7 +510,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     } else {
       orderBillRates = this.billRatesComponent?.billRatesControl.value || this.orderBillRates;
 
-      const billRateToUpdate = this.billRatesSyncService.getBillRateForSync(orderBillRates as BillRate[]);
+      const billRateToUpdate = this.billRatesSyncService.getBillRateForSync(
+        orderBillRates as BillRate[], this.orderDetailsFormComponent.generalInformationForm.value.jobStartDate
+      );
       const index = orderBillRates?.indexOf(billRateToUpdate as BillRate) as number;
       if (index > -1) {
         const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;

@@ -3,5 +3,5 @@ export enum DepartmentFiltersColumnsEnum {
   LOCATION = 'locationIds',
   DEPARTMENT = 'departmentsIds',
   SKILLS = 'skillIds',
-  ORIENTED = 'isOriented',
+  ORIENTED = 'isOrientedFilter',
 }
