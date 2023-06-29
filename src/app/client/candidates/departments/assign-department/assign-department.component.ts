@@ -264,8 +264,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
                 filter(Boolean),
                 switchMap(() => {
                   return this.departmentService.editAssignedDepartments(
-                    formData, [this.departmentId as number], 
-                    this.replaceOrder
+                    formData, [this.departmentId as number],
+                    null,
+                    this.replaceOrder,
                   );
                 }));
            } else {

@@ -583,7 +583,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       if (!(jobStartDate instanceof Date)) {
         return;
       }
-
+      
       this.autoSetupJobEndDateControl(value, jobStartDate);
       this.changeDetection.markForCheck();
     });
@@ -844,14 +844,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       departmentId: selectedOrder.departmentId,
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
-      duration: selectedOrder.duration,
-      
+
     })
     setTimeout(()=>{
       this.generalInformationForm.patchValue({
         shift: selectedOrder.shift,
         shiftStartTime: selectedOrder.shiftStartTime,
-        shiftEndTime: selectedOrder.shiftEndTime
+        shiftEndTime: selectedOrder.shiftEndTime,
+        duration: selectedOrder.duration,
       }, { emitEvent: false })
     },1000)
 

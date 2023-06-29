@@ -44,7 +44,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public comments: Comment[] = [];
   public startDate: Date;
   public maxEndDate: Date;
-  extensionStartDateValidation:boolean = false;
+  public extensionStartDateValidation = false;
 
   private get billRateControl(): FormControl {
     return this.extensionForm?.get('billRate') as FormControl;
@@ -75,7 +75,9 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       return;
     }
     const billRates = this.billRatesComponent?.billRatesControl.value;
-    let billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
+    const billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+      billRates, this.extensionForm.get('startDate')?.value
+    );
     if (billRateToUpdate?.id !== billRate?.id && billRate?.id !== 0) {
       return;
     }
@@ -124,7 +126,9 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       }
 
       const billRates = this.billRatesComponent?.billRatesControl.value;
-      let billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
+      const billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+        billRates, this.extensionForm.get('startDate')?.value
+      );
 
       if (!billRateToUpdate) {
         return;
