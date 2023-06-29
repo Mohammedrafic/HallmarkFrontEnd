@@ -15,6 +15,7 @@ export interface CandidateForm {
   status: number;
   actualStartDate: string;
   actualEndDate: string;
+  availableStartDate:string;
   isClosed: boolean;
   reason: number;
   closeDate: Date;

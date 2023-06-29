@@ -29,6 +29,7 @@ constructor(
       status: [null, Validators.required],
       actualStartDate: [null],
       actualEndDate: [null],
+      availableStartDate: [null],
       isClosed: [false],
       reason: [null],
       closeDate: [null],
@@ -39,11 +40,12 @@ constructor(
     candidateForm: FormGroup,
     state: EditCandidateDialogState,
     createReplacement: boolean,
+    isIRPLTAOrder:boolean
   ): Observable<void> {
-    const { status, actualStartDate, actualEndDate } = candidateForm.getRawValue();
+    const { status, actualStartDate, actualEndDate,availableStartDate } = candidateForm.getRawValue();
 
     if (status) {
-      return this.getActionForStatus(status, state, actualStartDate, actualEndDate, createReplacement);
+      return this.getActionForStatus(status, state, actualStartDate, actualEndDate, availableStartDate,createReplacement,isIRPLTAOrder);
     } else {
       return this.orderCandidateApiService.updateIrpCandidate(
         UpdateCandidateDto(
@@ -101,8 +103,40 @@ constructor(
     state: EditCandidateDialogState,
     actualStartDate: string,
     actualEndDate: string,
+    availableStartDate:string,
     createReplacement: boolean,
+    isIRPLTAOrder:boolean
   ): Observable<void> {
+
+    if(isIRPLTAOrder)
+    {
+      console.log(state.candidate.status);
+      if(state.candidate.status === CandidatStatus['Not Applied']) {
+        return this.orderCandidateApiService.createIrpCandidate(
+          CreateCandidateDto(
+            state.candidate,
+            state.order.id,
+            actualStartDate,
+            actualEndDate,
+            availableStartDate,
+            status
+          ));
+      }
+      else{
+       
+        return this.orderCandidateApiService.updateIrpCandidate(
+          UpdateCandidateDto(
+            state.order.organizationId as number,
+            state.candidate.candidateJobId,
+            actualStartDate,
+            actualEndDate,
+            availableStartDate!,
+            status,
+            state.order.id
+          ));
+      }
+    }
+    else{
     if(status === CandidatStatus.OnBoard && state.candidate.status !== status) {
       return this.orderCandidateApiService.createIrpCandidate(
         CreateCandidateDto(
@@ -135,4 +169,5 @@ constructor(
         ));
     }
   }
+}
 }
