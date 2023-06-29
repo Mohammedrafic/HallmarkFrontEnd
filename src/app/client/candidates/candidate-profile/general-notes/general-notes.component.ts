@@ -132,22 +132,27 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   }
 
   public onSave() {
-    this.addEditNoteComponent.saveNote();
-    if (this.route.snapshot.paramMap.get('id')||this.candidatesService.employeeId||0) {
-      this.candidateProfileFormService.triggerSaveEvent();
-      this.candidatesService.changeTab(CandidateTabsEnum.CandidateProfile);
-        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).pipe(takeUntil(this.destroy$)).subscribe(() => {
-          this.candidateProfileService
-            .getCandidateById(parseInt(this.route.snapshot.paramMap.get('id') || '0')||this.candidatesService.employeeId||0)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((candidate) => {
-              this.candidateProfileFormService.populateCandidateForm(candidate);
-              this.candidatesService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
-              this.candidatesService.setProfileData(candidate);
-              this.generalNotesService.notes$.next(candidate.generalNotes);
+    if(this.addEditNoteComponent.noteForm.valid){
+      this.addEditNoteComponent.saveNote();
+      if (this.route.snapshot.paramMap.get('id')||this.candidatesService.employeeId||0) {
+        this.candidateProfileFormService.triggerSaveEvent();
+        this.candidatesService.changeTab(CandidateTabsEnum.CandidateProfile);
+          this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).pipe(takeUntil(this.destroy$)).subscribe(() => {
+            this.candidateProfileService
+              .getCandidateById(parseInt(this.route.snapshot.paramMap.get('id') || '0')||this.candidatesService.employeeId||0)
+              .pipe(takeUntil(this.destroy$))
+              .subscribe((candidate) => {
+                this.candidateProfileFormService.populateCandidateForm(candidate);
+                this.candidatesService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
+                this.candidatesService.setProfileData(candidate);
+                this.generalNotesService.notes$.next(candidate.generalNotes);
+              });
             });
-          });
-     }
+       }
+    }else{
+      this.addEditNoteComponent.noteForm.markAllAsTouched();
+    }
+   
   }
 
   private getFormattedDateWithFormat(date: string, format: string): string {

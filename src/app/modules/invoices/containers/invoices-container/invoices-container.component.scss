@@ -58,6 +58,13 @@
     }
   }
 }
+.invoices-page-toolbar{
+  ::ng-deep{
+    .left-content{
+      max-width: 40% !important;
+    }
+  }
+}
 
 .tab-navigation {
   &.e-badge {

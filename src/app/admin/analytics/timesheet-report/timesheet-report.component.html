@@ -101,13 +101,10 @@
         <div class="input-container bootstrap">
           <label>Status</label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist appValidateWithMessage
-                              formControlName="timesheetStatuses"
-                              [fields]="commonFields"
-                              [dataSource]="filterColumns.timesheetStatusIds.dataSource"
-                              [allowFiltering]="true"
-                              placeholder="Status">
-            </ejs-dropdownlist>
+          <ejs-multiselect mode="CheckBox" formControlName="timesheetStatuses" appValidateWithMessage placeholder="All"
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.timesheetStatusIds.dataSource"
+                             [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
           </div>
         </div>
       </div>

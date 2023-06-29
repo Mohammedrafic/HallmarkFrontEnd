@@ -9,9 +9,9 @@ import { ShowExportDialog } from '../../../../store/app.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { InvoiceGridSelections } from '../../interfaces';
-import { AgencyInvoiceExportCols, GetExportFileName, GetInvoiceState, GetTabsToExport, InvoiceExportCols } from './invoice-export.constant';
+import { AgencyInvoiceExportCols, GetExportFileName, GetInvoiceState, GetTabsToExport, InvoiceExportCols, PendingInvoiceExportCols } from './invoice-export.constant';
 import { InvoicesState } from '../../store/state/invoices.state';
-import { InvoiceState } from '../../enums';
+import { InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
 import { Invoices } from '../../store/actions/invoices.actions';
 
 @Component({
@@ -42,6 +42,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
     private cdr: ChangeDetectorRef,
   ) {
     super();
+    this.exportColumns();
   }
 
   public override customExport(): void {
@@ -59,22 +60,26 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
     this.closeExport();
     this.defaultExport(event.fileType, event);
   }
-public exportColumns():void{
-  if (this.isAgency)
-  {
-this.columnsToExport=AgencyInvoiceExportCols
-  }
-  else
-  {
-    this.columnsToExport=InvoiceExportCols
-  }
 
-}
+  public exportColumns():void{    
+    if (this.isAgency)
+    {
+      this.columnsToExport=AgencyInvoiceExportCols;
+    }
+    else
+    {
+      if(this.selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords)
+        this.columnsToExport=PendingInvoiceExportCols;
+      else
+        this.columnsToExport=InvoiceExportCols;
+    }
+  }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     
-    this.exportColumns();
+    
     const filters = this.store.selectSnapshot(InvoicesState.invoicesFilters);
+
     const ids = this.selectedRows.selectedInvoiceIds.length ? this.selectedRows.selectedInvoiceIds : null;
     const filterQuery = {
       ...filters,
@@ -94,7 +99,7 @@ this.columnsToExport=AgencyInvoiceExportCols
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       ids,
       options?.fileName || this.defaultFileName,
-    ), this.isAgency));
+    ), this.isAgency,this.selectedTabIndex)); 
 
     this.resetTableSelection.emit();
   }
@@ -103,8 +108,9 @@ this.columnsToExport=AgencyInvoiceExportCols
     const tabsToExport = GetTabsToExport(this.isAgency);
     this.selectedTabIndex = selectedTabIdx;
     this.showExport = tabsToExport.includes(selectedTabIdx);
-    this.invoiceState = GetInvoiceState(this.isAgency, selectedTabIdx);
+    this.invoiceState = GetInvoiceState(this.isAgency, selectedTabIdx);    
     this.cdr.markForCheck();
+    this.exportColumns();
   }
 
   private getDefaultFileName(): void {

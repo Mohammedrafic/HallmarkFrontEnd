@@ -522,7 +522,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       let startDate = this.generalInformationForm.get('jobStartDate')?.value ?this.generalInformationForm.get('jobStartDate')?.value :this.generalInformationForm.get('jobDates')?.value;
-      const locations = this.organizationStructureService.getLocationsById(value,startDate);
+      const locations = this.organizationStructureService.getLocationsById(value,startDate??new Date);
       this.generalInformationForm.get('locationId')?.reset();
       this.generalInformationForm.get('departmentId')?.reset();
 
@@ -538,7 +538,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       let startDate = this.generalInformationForm.get('jobStartDate')?.value ?this.generalInformationForm.get('jobStartDate')?.value :this.generalInformationForm.get('jobDates')?.value;
-      const departments = this.organizationStructureService.getDepartmentsById(value,startDate);
+      const departments = this.organizationStructureService.getDepartmentsById(value,startDate?? new Date);
       this.generalInformationForm.get('departmentId')?.reset();
 
       this.updateDataSourceFormList('departments', departments);
@@ -712,7 +712,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.updateDataSourceFormList('departments', deparment);
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
       setDataSource(selectedForm.fields, 'locationId', locations);
-      setDataSource(selectedForm.fields, 'departmentId', locations);
+      setDataSource(selectedForm.fields, 'departmentId', deparment);
       this.changeDetection.markForCheck();
     });
     this.generalInformationForm

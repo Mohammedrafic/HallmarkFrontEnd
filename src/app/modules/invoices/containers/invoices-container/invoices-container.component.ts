@@ -464,6 +464,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       ...this.filterState,
       pageNumber,
     }, true));
+    this.changeMultiSelection([]);
+    this.clearGroupedInvoices();
   }
 
   public changePageSize(pageSize: number): void {
@@ -474,6 +476,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       pageSize,
     }, useFilterState));
     this.previousSelectedTabIdx = this.selectedTabIdx;
+    this.changeMultiSelection([]);
+    this.clearGroupedInvoices();
   }
 
   public changeSorting(event: string): void {
@@ -521,7 +525,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public changeMultiSelection(nodes: RowNode[]): void {
     if (nodes.length) {
-      this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
+      if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords)
+      this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.id);
+      else
+        this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
       this.gridSelections.rowNodes = nodes;
     } else {
       this.gridSelections.selectedInvoiceIds = [];
@@ -538,9 +545,14 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       } : {
         organizationId: this.organizationId as number,
       }),
-    };
+    };    
+    if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords)
+    {
+      dto.ids = this.gridSelections.selectedInvoiceIds;
+      delete dto.invoiceIds;
+    }
 
-    this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency))
+    this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency,this.selectedTabIdx))
       .pipe(
         filter((state) => !!state.invoices.printData),
         map((state) => state.invoices.printData),
@@ -550,7 +562,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         if (this.isAgency) {
           this.printingService.printAgencyInvoice(data);
         } else {
-          this.printingService.printInvoice(data);
+          this.printingService.printInvoice(data,this.selectedTabIdx);
         }
       });
   }

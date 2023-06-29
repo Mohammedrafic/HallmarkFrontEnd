@@ -758,9 +758,9 @@ export class InvoicesState {
   @Action(Invoices.GetPrintData)
   GetPrintingData(
     { patchState, dispatch }: StateContext<InvoicesModel>,
-    { body, isAgency }: Invoices.GetPrintData,
+    { body, isAgency, selectedTabIndex }: Invoices.GetPrintData,
   ): Observable<PrintInvoiceData[] | void> {
-    return this.invoicesAPIService.getPrintData(body, isAgency)
+    return this.invoicesAPIService.getPrintData(body, isAgency, selectedTabIndex)
     .pipe(
       tap((res) => {
         patchState({
@@ -835,9 +835,9 @@ export class InvoicesState {
   @Action(Invoices.ExportInvoices)
   ExportInvoices(
     { dispatch }: StateContext<InvoicesModel>,
-    { payload, isAgency}: Invoices.ExportInvoices
+    { payload, isAgency,selectedTabIndex}: Invoices.ExportInvoices
   ): Observable<void | Blob> {
-    return this.invoicesAPIService.exportInvoices(payload, isAgency).pipe(
+    return this.invoicesAPIService.exportInvoices(payload, isAgency,selectedTabIndex).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);

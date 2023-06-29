@@ -14,6 +14,7 @@ export class User {
   isDeleted?: boolean;
   isEmployee?: boolean;
   roleNames?: string;
+  roles?: any;
 }
 
 export class UsersPage {

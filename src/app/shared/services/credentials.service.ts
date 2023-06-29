@@ -18,10 +18,10 @@ import {
   CredentialSetupMappingPost,
   CredentialSetupPage,
   CredentialSetupPost,
-  SaveUpdatedCredentialSetupDetailIds
+  SaveUpdatedCredentialSetupDetailIds,
 } from '@shared/models/credential-setup.model';
 import { ExportPayload } from '@shared/models/export.model';
-import { IOrderCredentialItem } from '@order-credentials/types';
+import { IOrderCredential, IOrderCredentialItem } from '@order-credentials/types';
 
 @Injectable({ providedIn: 'root' })
 export class CredentialsService {
@@ -101,7 +101,9 @@ export class CredentialsService {
     );
   }
 
-  public saveUpdateCredentialSetupMapping(credentialSetupMapping: CredentialSetupMappingPost): Observable<SaveUpdatedCredentialSetupDetailIds> {
+  public saveUpdateCredentialSetupMapping(
+    credentialSetupMapping: CredentialSetupMappingPost
+  ): Observable<SaveUpdatedCredentialSetupDetailIds> {
     return this.http.post<SaveUpdatedCredentialSetupDetailIds>(`/api/CredentialSetups/mappings`, credentialSetupMapping);
   }
 
@@ -115,15 +117,16 @@ export class CredentialsService {
     systemType: SystemType,
   ): Observable<IOrderCredentialItem[]> {
     const params = { departmentId, skillId, systemType };
-    return this.http.get<IOrderCredentialItem[]>(`/api/credentialsetups/predefined/forOrder`, { params })
-      .pipe(map((credentials: IOrderCredentialItem[]) => (credentials.map((credential: any) => ({
+    return this.http.get<IOrderCredential[]>(`/api/credentialsetups/predefined/forOrder`, { params })
+      .pipe(map((credentials: IOrderCredential[]) => (credentials.map((credential: IOrderCredential) => ({
         credentialName: credential.name,
         credentialId: credential.masterCredentialId,
         credentialType: credential.credentialType,
         comment: credential.comments,
         reqForSubmission: credential.reqSubmission,
         reqForOnboard: credential.reqOnboard,
-        optional: credential.isActive
+        optional: credential.isActive,
+        isPredefined: credential.isPredefined,
       })))));
   }
 

@@ -5,7 +5,7 @@ import { Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { distinctUntilChanged, filter, Observable, skip, Subject, take, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 
 import { OutsideZone } from '@core/decorators';
 import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
@@ -57,6 +57,7 @@ import {
   ClearLocationList,
   GetDepartmentsByLocationId,
   GetLocationsByRegionId,
+  GetOrganizationById,
   GetOrganizationSettings,
   GetOrganizationSettingsFilterOptions,
   GetRegions,
@@ -939,13 +940,16 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private watchForOrgId(): void {
     this.organizationId$.pipe(
       distinctUntilChanged(),
+      tap((id: number) => {
+        this.organizationId = id || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+        this.clearFilters();
+        this.store.dispatch(new GetOrganizationSettingsFilterOptions());
+        this.getSettings();
+      }),
+      switchMap((id: number) => this.store.dispatch(new GetOrganizationById(id))),
       takeUntil(this.unsubscribe$),
-    ).subscribe((id) => {
-      this.organizationId = id || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+    ).subscribe(() => {
       this.setOrgSystems();
-      this.clearFilters();
-      this.store.dispatch(new GetOrganizationSettingsFilterOptions());
-      this.getSettings();
     });
   }
 

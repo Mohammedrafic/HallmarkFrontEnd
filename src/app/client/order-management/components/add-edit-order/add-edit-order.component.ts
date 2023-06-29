@@ -716,7 +716,12 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
-        this.orderCredentials = unionBy('credentialId', this.orderCredentials, predefinedCredentials);
+        if (this.orderDetailsFormComponent.isEditMode) {
+          const credentials = this.orderCredentials.filter(cred => !cred.isPredefined);
+          this.orderCredentials = unionBy('credentialId', credentials, predefinedCredentials);
+        } else {
+          this.orderCredentials = predefinedCredentials;
+        }
         this.cd.detectChanges();
       });
   }
@@ -726,7 +731,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       if (!this.billRatesComponent?.billRatesControl && this.order) {
         this.orderBillRates = predefinedBillRates;
         return;
-      };
+      }
       if (this.billRatesComponent?.billRatesControl) {
         this.manuallyAddedBillRates = this.billRatesComponent.billRatesControl
           .getRawValue()
@@ -837,7 +842,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           {
                   title: JOB_DISTRIBUTION_TITLE,
                   okButtonLabel: 'Proceed',
-                  okButtonClass: 'primary'
+                  okButtonClass: 'primary',
           }).pipe(
             filter(Boolean),
             takeUntil(this.unsubscribe$)

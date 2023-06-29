@@ -145,7 +145,6 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public user: User | null;
   public filterOptionsData: CommonReportFilterOptions;
   public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
-  public isLoadNewFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
   public masterRegionsList: Region[] = [];
@@ -264,7 +263,6 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
           }
           else {
-            this.isLoadNewFilter = true;
             this.isResetFilter = true;
           }
           let businessIdData = [];
@@ -284,7 +282,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
                   return item;
                 }
               });
-              this.isAlive = false;
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
@@ -519,7 +517,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   }
 
   public showFilters(): void {
-    if (this.isLoadNewFilter) {
+    if (this.isResetFilter) {
       this.onFilterControlValueChangedHandler();
     }
     this.store.dispatch(new ShowFilterDialog(true));

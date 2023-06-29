@@ -44,7 +44,7 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
       date: [note?.date ?? null, [Validators.required]],
       categoryId: [note?.categoryId ?? null, [Validators.required]],
       note: [note?.note ?? null, [Validators.maxLength(250)]],
-      createdByName:[]
+      createdByName:[],
     });
   }
 

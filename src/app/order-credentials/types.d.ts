@@ -6,6 +6,19 @@ export interface IOrderCredentialItem {
   reqForOnboard: boolean;
   optional: boolean;
   comment: string;
+  isPredefined: boolean;
+}
+
+export interface IOrderCredential {
+  comments: string;
+  credentialType: string;
+  credentialTypeId: number;
+  isActive: boolean;
+  isPredefined: boolean;
+  masterCredentialId: number;
+  name: string;
+  reqOnboard: boolean;
+  reqSubmission: boolean;
 }
 
 export interface IOrderCredential {

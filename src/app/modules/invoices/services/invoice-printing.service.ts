@@ -7,10 +7,11 @@ import autoTable, { CellDef, RowInput } from 'jspdf-autotable';
 
 import { GridValuesHelper } from '../../timesheets/helpers';
 import { PrintInvoiceData, PrintInvoiceMeta } from '../interfaces';
+import { OrganizationInvoicesGridTab } from '../enums/organization-invoices-grid-tab.enum';
 
 @Injectable()
 export class InvoicePrintingService {
-  printInvoice(data: PrintInvoiceData[]): void {
+  printInvoice(data: PrintInvoiceData[],selectedTabIndex?:number): void {
     const doc = this.createDoc();
     const logo = this.createImage();
 
@@ -18,8 +19,10 @@ export class InvoicePrintingService {
       if (index !== 0) {
         doc.addPage();
       }
-
-      this.addInvoiceHeader(doc, invoice.meta);
+      if(selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords)
+        this.addPendingRecordInvoiceHeader(doc, invoice.meta);
+      else
+        this.addInvoiceHeader(doc, invoice.meta);
       this.addOrgInvoiceBody(doc, invoice, logo);
     });
 
@@ -43,6 +46,71 @@ export class InvoicePrintingService {
     
     this.addPageFooter(doc);
     doc.save();
+  }
+
+  private addPendingRecordInvoiceHeader(doc: jsPDF, metaData: PrintInvoiceMeta): void {
+    autoTable(doc, {
+      margin: { top: 45, left: 20, right: 20, bottom: 0 },
+      body: [
+        [
+          {
+            content: `Hallmark Healthcare Solutions, Inc
+200 Motor Parkway, Suite D#26
+Hauppauge, NY 11788`,
+            styles: {
+              fontSize: 10,
+              halign: 'left',
+              fontStyle: 'bold',
+              cellWidth: 300,
+            },
+          }
+        ],
+      ],
+      theme: 'plain',
+    });
+
+    autoTable(doc, {
+      margin: { top: 5, left: 50, right: 4 },
+      body: [
+        [
+          {
+            content: 'To,',
+            styles: {
+              fontSize: 10,
+              halign: 'left',
+              fontStyle: 'bold',
+              overflow: 'linebreak',
+            },
+          },
+        ],
+        [
+          {
+            content: metaData.unitName,
+            styles: {
+              fontSize: 10,
+              halign: 'left',
+              fontStyle: 'bold',
+              overflow: 'linebreak',
+              cellPadding: { left: 10 },
+            },
+          },
+        ],
+        [
+          {
+            content: metaData.unitAddress,
+            styles: {
+              fontSize: 10,
+              halign: 'left',
+              fontStyle: 'normal',
+              cellWidth: 'wrap',
+              overflow: 'linebreak',
+              cellPadding: { left: 10, top: 5, right: 15 },
+            }, 
+          },
+        ],
+      ],
+      theme: 'plain',
+    });
   }
 
   private addInvoiceHeader(doc: jsPDF, metaData: PrintInvoiceMeta): void {

@@ -6,6 +6,7 @@ import { AGENCY_INVOICE_TABS, ORGANIZATION_INVOICE_TABS } from '../../constants'
 import { InvoicesTabItem } from '../../interfaces';
 
 export const OrganizationTabsToExport: OrganizationInvoicesGridTab[] = [
+  OrganizationInvoicesGridTab.PendingRecords,
   OrganizationInvoicesGridTab.PendingApproval,
   OrganizationInvoicesGridTab.PendingPayment,
   OrganizationInvoicesGridTab.Paid,
@@ -31,6 +32,27 @@ export const InvoiceExportCols : ExportColumn[] = [
   { text:'Total', column: 'total' },
   { text:'Status', column: 'Status' },
   { text:'LocationID', column: 'LocationID' },
+  { text:'Comment', column: 'Comment' },
+];
+
+export const PendingInvoiceExportCols : ExportColumn[] = [
+  { text:'Invoice ID', column: 'invoiceId' },
+  { text:'Status', column: 'Status' },
+  { text:'Location Name', column: 'locationName' },
+  { text:'LocationID', column: 'LocationID' },
+  { text:'Week', column: 'week' },
+  { text:'Service Day', column: 'serviceDay' },
+  { text:'Time In', column: 'timeIn' },
+  { text:'Time Out', column: 'timeOut' },
+  { text:'Cost Centre', column: 'costCenter' },
+  { text:'Job ID', column: 'jobId' },
+  { text:'Candidate Name', column: 'candidateName' },
+  { text:'Agency', column: 'agency' },
+  { text:'Skill', column: 'skill' },
+  { text:'Hours / Miles', column: 'hoursMiles' },  
+  { text:'Bill Rate Type / Expenses Code Reason', column: 'billRateTypeCodeReason' },
+  { text:'Bill Rate', column: 'billRate' },
+  { text:'Amount', column: 'amount' },   
   { text:'Comment', column: 'Comment' },
 ];
 
@@ -74,6 +96,8 @@ export const GetInvoiceState = (isAgency: boolean, tab: OrganizationInvoicesGrid
 
 export const getOrgInvoiceState = (tab: OrganizationInvoicesGridTab): InvoiceState | null  => {
   switch (tab) {
+    case OrganizationInvoicesGridTab.PendingRecords:
+      return InvoiceState.PendingRecords;
     case OrganizationInvoicesGridTab.PendingApproval:
       return InvoiceState.SubmittedPendingApproval;
     case OrganizationInvoicesGridTab.PendingPayment:
