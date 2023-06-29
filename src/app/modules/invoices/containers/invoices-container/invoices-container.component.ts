@@ -563,6 +563,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           this.printingService.printAgencyInvoice(data);
         } else {
           this.printingService.printInvoice(data,this.selectedTabIdx);
+          if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords){
+            this.resetTableSelection();
+          }
         }
       });
   }
