@@ -180,7 +180,7 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/financial-time-sheet-report',
+      route: '/analytics',
     },
     41: {
       // Accrual Report
@@ -639,6 +639,11 @@ export const MENU_CONFIG: any = {
       // New Accrual Report
       icon: '',
       route: '/analytics/accrual-report',
+    },    
+    83: {
+      // New Accrual Report
+      icon: '',
+      route: '/analytics/daily-order',
     },
     84: {
       // Candidate Status Report
@@ -844,7 +849,7 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/financial-time-sheet-report',
+      route: '/analytics',
     },
     41: {
       // Accrual Report
@@ -1042,6 +1047,11 @@ export const MENU_CONFIG: any = {
       // New Accrual Report
       icon: '',
       route: '/analytics/accrual-report',
+    },
+    83: {
+      // New Accrual Report
+      icon: '',
+      route: '/analytics/daily-order',
     },
     84: {
       // Candidate Status Report
@@ -1268,7 +1278,7 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/invoice-summary',
+      route: '/analytics',
     },
     42: {
       // Invoice Summary
