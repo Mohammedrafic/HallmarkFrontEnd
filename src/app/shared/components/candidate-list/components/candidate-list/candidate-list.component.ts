@@ -568,7 +568,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       switchMap(() => this.getStructure()),
       filter((structure) => !!structure),
       switchMap(() => this.skills$),
-      filter((skills) => !!skills),
+      filter((skills) => !!skills.length),
+      switchMap(() => this.assignedSkills$),
+      filter((assignedSkills) => !!assignedSkills.length),
       takeUntil(this.unsubscribe$)
     )
       .subscribe(() => {
@@ -620,7 +622,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private subscribeOnSkills(): void {
     this.skills$
       .pipe(
-        filter(Boolean),
+        filter((skills) => !!skills.length),
         takeUntil(this.unsubscribe$)
       )
       .subscribe((skills) => {
