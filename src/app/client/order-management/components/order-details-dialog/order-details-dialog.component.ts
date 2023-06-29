@@ -174,7 +174,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   get showApproveAndCancel(): boolean {
-    return this.order?.canApprove && this.order?.status === this.orderStatus.PreOpen && (!this.order?.orderOpenDate || this.order?.extensionFromId != null);
+    const status = this.activeSystem === OrderManagementIRPSystemId.IRP ?
+      this.order?.irpOrderMetadata?.status : this.order?.status;
+    return this.order?.canApprove &&
+      status === this.orderStatus.PreOpen &&
+      (!this.order?.orderOpenDate || this.order?.extensionFromId != null);
   }
 
   get showLockOrder(): boolean {
