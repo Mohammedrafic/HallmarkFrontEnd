@@ -318,11 +318,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   selectMenuItem(menuItem: MenuItem): void {
-    /** Preventing the page navigation  which are not responsive*/
-    if(this.isMobile){
-      if(this.nonResponsiveMenuItesm.includes(menuItem.id))
-        return;
-    }
+
     this.setSideBarForFirstLoad(menuItem.route as string);
 
     if (menuItem.id == AnalyticsMenuId) {

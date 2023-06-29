@@ -43,9 +43,6 @@ export class GridNameRendererComponent extends DestroyableDirective implements I
   }
 
   public onViewNavigation(): void {
-    if(this.isMobileScreen){
-      return;
-    }
     const user = this.store.selectSnapshot(UserState.user);
     const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =
