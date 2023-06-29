@@ -718,7 +718,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private subscribeOnPredefinedCredentials(): void {
     this.predefinedCredentials$
       .pipe(
-        filter((predefinedCredentials: IOrderCredentialItem[]) => !!predefinedCredentials.length),
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
