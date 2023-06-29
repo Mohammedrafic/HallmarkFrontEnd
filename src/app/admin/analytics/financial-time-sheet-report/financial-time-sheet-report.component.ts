@@ -124,6 +124,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public skillCategoryIdControl: AbstractControl;
   public skillIdControl: AbstractControl;
   public candidateNameControl: AbstractControl;
+  public accrualReportTypesControl: AbstractControl;
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -149,7 +150,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
-  private fixedTimesheetStatusesIncluded: number[] = [1, 2, 3, 4, 5,6];
+  private fixedTimesheetStatusesIncluded: number[] = [1, 2, 3, 4, 5, 6];
+  private defaultTimesheetStatuses: number[] = [1, 2, 3, 4, 6];
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
@@ -188,6 +190,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
       this.onFilterSkillCategoryChangedHandler();
+      this.onFilterTimesheetStatusesChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
@@ -289,6 +292,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
               this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
               this.filterColumns.timesheetStatuses.dataSource = data.timesheetStatuses.filter(i => this.fixedTimesheetStatusesIncluded.includes(i.id));
+              this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue(this.defaultTimesheetStatuses); 
               this.isDefaultLoad = true;
               setTimeout(() => { this.SearchReport() }, 3000);
             }
@@ -370,6 +374,17 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       }
     });
   }
+  public onFilterTimesheetStatusesChangedHandler(): void {
+    this.accrualReportTypesControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes) as AbstractControl;
+    this.accrualReportTypesControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (data ==1) {
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue(this.defaultTimesheetStatuses);
+      }
+      else {
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue([]);
+      }
+    });
+  }
 
   public SearchReport(): void {
 
@@ -423,7 +438,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       "HostName": this.baseUrl,
       "AccrualReportFilterTypeFTS": accrualReportTypes.toString(),
       "InvoiceIdParamFTS": invoiceID == null || invoiceID == "" ? "null" : invoiceID,
-      "TimesheetStatusesFTS": timesheetStatuses.length == 0 ? "null" : timesheetStatuses.join(",")
+      "TimesheetStatusesFTS": accrualReportTypes==1?(timesheetStatuses.length == 0 ? "null" : timesheetStatuses.join(",")):"null"
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -563,9 +578,9 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue(null);
-    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(0);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.InvoiceID)?.setValue(null);
-    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue([]);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue(this.defaultTimesheetStatuses);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
