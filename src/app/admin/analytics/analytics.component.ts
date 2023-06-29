@@ -1,28 +1,26 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Select } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, filter, forkJoin, takeUntil } from 'rxjs';
 import { AnalyticsMenuId } from '../../shared/constants/menu-config';
 import { Menu, MenuItem } from '../../shared/models/menu.model';
 import { UserState } from '../../store/user.state';
 import { MenuSettings } from '@shared/models';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-analytics',
   templateUrl: './analytics.component.html',
 })
-export class AnalyticsComponent implements OnInit, OnDestroy  {
+export class AnalyticsComponent implements OnInit, OnDestroy {
   public sideMenuConfig: MenuSettings[] = [];
   @Select(UserState.menu)
   menu$: Observable<Menu>;
-  private isRedirectedFromDashboard: boolean;
   private unsubscribe$: Subject<void> = new Subject();
   public isLoad: boolean = false;
+  navigateTo: string;
 
-  constructor(private router: Router) {
-    const routerState = this.router.getCurrentNavigation()?.extras?.state;
-    this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
-  }
+  constructor(private router: Router) {}
+
   ngOnInit(): void {
     this.isLoad = false;
     this.initAnalyticsSubMenu();
@@ -34,23 +32,28 @@ export class AnalyticsComponent implements OnInit, OnDestroy  {
   }
 
   initAnalyticsSubMenu(): void {
-    if(!this.isRedirectedFromDashboard)
-    {
-    this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
+    this.menu$
+    .pipe(
+      filter((menu: Menu) => menu?.menuItems?.length > 0),
+      takeUntil(this.unsubscribe$))
+    .subscribe((menu: Menu) => {
       this.sideMenuConfig = [];
       if (menu.menuItems.length) {
         let analyticsMenuItem = menu.menuItems.filter((item: MenuItem) => item.id == AnalyticsMenuId);
         if (analyticsMenuItem && analyticsMenuItem.length) {
           analyticsMenuItem[0].children.forEach((x, index) => {
-            this.sideMenuConfig.push({ text: x.title, id: (index + 1), route: x.route ? x.route : '' });
-          })
+            this.sideMenuConfig.push({ text: x.title, id: index + 1, route: x.route ? x.route : '' });
+          });
           this.isLoad = true;
         }
       }
-      if (this.sideMenuConfig.length == 0) {
+      if (this.router.url == '/analytics') {
+        this.router.navigate([this.sideMenuConfig[0].route]);
+      } else if (this.sideMenuConfig.length == 0) {
         this.router.navigate(['/']);
+      } else {
+        this.navigateTo = this.router.url;
       }
     });
   }
-}
 }
