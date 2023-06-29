@@ -8,7 +8,7 @@ import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
 import {
   alertsFilterColumns,
@@ -326,19 +326,18 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         }
       }
     });
-    this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-      if (data != undefined) {
-          this.userData = data.items;
-         let userValue = data.items[0]?.id;
-        if (userValue != this.userData.find(x => x.id == user?.id)?.id) {
-          if (this.userData.find(x => x.id == user?.id) != null) {
-            this.businessForm.controls['user'].setValue(this.userData.find(x => x.id == user?.id)?.id);
-          } else {
-            this.businessForm.controls['user'].setValue(userValue);
-          }
+    this.userData$.pipe(filter(x => x !== null && x !== undefined), takeWhile(() => this.isAlive)).subscribe((data) => {
+      console.log('userData', data)
+      this.userData = data.items;
+      let userValue = data.items[0]?.id;
+      if (userValue != this.userData.find(x => x.id == user?.id)?.id) {
+        if (this.userData.find(x => x.id == user?.id) != null) {
+          this.businessForm.controls['user'].setValue(this.userData.find(x => x.id == user?.id)?.id);
         } else {
           this.businessForm.controls['user'].setValue(userValue);
         }
+      } else {
+        this.businessForm.controls['user'].setValue(userValue);
       }
     });
 
@@ -367,9 +366,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     });
   }
   private onBusinessUnitValueChanged(): void {
-    this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+    this.businessUnitControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
+      console.log('businessUnitControl', value)
       this.userData = [];
-      this.dispatchNewPage(null);
       const userBusinessType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
       if(userBusinessType == BusinessUnitType.Organization)
         this.usersControl.disable();
@@ -389,7 +388,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   private onBusinessValueChanged(): void {
     this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       this.userData = [];
-      this.dispatchNewPage(null);
       let businessUnitIds = [];
       if (value != 0 && value != null) {
         businessUnitIds.push(this.businessControl.value);
@@ -429,9 +427,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     });
   }
   private onUserValueChanged(): void {
-    this.usersControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+    this.usersControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       this.dispatchNewPage(value);
-
+      console.log('onUserValueChanged');
     });
   }
   createServerSideDatasource() {
@@ -539,7 +537,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   changeSystem(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
     this.adjustBusinessUnitTypeBasedActiveSystem();
-    this.dispatchNewPage(this.businessForm.controls['user']?.value);
   }
 
   adjustBusinessUnitTypeBasedActiveSystem(){
