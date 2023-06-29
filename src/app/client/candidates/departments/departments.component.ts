@@ -92,8 +92,8 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     noActiveWC: false,
     disableBulkButton: false,
   };
+  public filters: DepartmentFilterState | null;
 
-  private filters: DepartmentFilterState | null;
 
   public constructor(
     protected override store: Store,
@@ -334,10 +334,12 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     });
 
     if (allAreEqual(startDates) && allAreEqual(endDates)) {
-      this.bulkDateRanges = {
-        min: startDates[0] ? new Date(startDates[0]) : undefined,
-        max: endDates[0] ? new Date(endDates[0]) : undefined,
-      };
+      const startDate = new Date(startDates[0]);
+      const wcStartDate = this.dateRanges.min ?? startDate;
+      const min = wcStartDate < startDate ? wcStartDate : startDate;
+      const max = endDates[0] ? new Date(endDates[0]) : undefined;
+      
+      this.bulkDateRanges = { min, max };
     } else {
       this.bulkDateRanges = this.dateRanges;
     }

@@ -69,7 +69,8 @@ export class DepartmentsService {
   public editAssignedDepartments(
     formData: DepartmentPayload,
     departmentIds: number[] | null,
-    createReplacement?: boolean
+    filters?: DepartmentFilterState | null,
+    createReplacement?: boolean,
   ): Observable<DepartmentPayload> {
     const payload = DepartmentHelper.editDepartmentPayload(
       formData,
@@ -77,6 +78,7 @@ export class DepartmentsService {
       this.employeeWorkCommitmentId,
       this.candidatesService.employeeId as number,
       this.showAllDepartments,
+      filters,
       createReplacement,
     );
     return this.editDepartment(payload).pipe(handleHttpError(this.store));

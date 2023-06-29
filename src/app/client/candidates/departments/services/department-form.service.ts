@@ -36,7 +36,7 @@ export class DepartmentFormService {
       locationIds: [null],
       departmentsIds: [null],
       skillIds: [null],
-      isOriented: [0],
+      isOrientedFilter: [0],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
   }
 
