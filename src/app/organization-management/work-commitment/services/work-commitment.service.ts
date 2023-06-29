@@ -7,7 +7,6 @@ import { CustomFormGroup } from '@core/interface';
 import { BaseObservable, DateTimeHelper } from '@core/helpers';
 import {
   HolidaysPage,
-  MasterCommitmentNames,
   Option,
   WorkCommitmentForm,
   WorkCommitmentGrid,
@@ -77,10 +76,6 @@ export class WorkCommitmentService {
       .getMasterCommitmentNames()
       .pipe(filter(Boolean), take(1))
       .subscribe((names) => {
-        const correctItems: Option[] = names.items.map((item: MasterCommitmentNames) => ({
-          name: item.name,
-          id: item.id,
-        }));
         this.masterCommitmentNames.set(mapDataSource(names.items, 'name', 'id'));
       });
   }
