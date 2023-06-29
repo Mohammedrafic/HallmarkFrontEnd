@@ -21,7 +21,7 @@ import { AutoCompleteComponent } from '@syncfusion/ej2-angular-dropdowns/src/aut
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { catchError, debounceTime, EMPTY, fromEvent, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, EMPTY, fromEvent, Observable, scheduled, switchMap, take, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { DatesRangeType, WeekDays } from '@shared/enums';
@@ -499,6 +499,9 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private setScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null): void {
+    if(scheduleData != null && this.selectedFilters?.isOnlySchedulatedCandidate === true){
+      scheduleData.items = scheduleData.items.filter(filledSchedule => filledSchedule.schedule.length !== 0);
+    }
     this.scheduleData = scheduleData;
     this.employeesTitle = scheduleData?.totalCount && scheduleData.totalCount > 1 ? 'Employees' : 'Employee';
 
