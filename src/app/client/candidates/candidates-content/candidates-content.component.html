@@ -53,7 +53,6 @@
           <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <ng-container *ngIf="!isMobile">
         <button
           *ngIf="(currentUserPermissions$ | async) as userPermission"
           ejs-button
@@ -65,7 +64,6 @@
         >
           Add Employee
         </button>
-      </ng-container>
 
     </div>
   </ng-container>
