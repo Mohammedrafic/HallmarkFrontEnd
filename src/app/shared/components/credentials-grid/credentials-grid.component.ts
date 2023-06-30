@@ -740,6 +740,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           (item.status === this.statusEnum.Reviewed) &&
           !this.isOrganizationSide,
         disableDelete: this.disableDelete(item),
+        credentialTypeName: item.credentialType?.name,
       };
     });
   }
