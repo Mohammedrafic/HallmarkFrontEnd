@@ -20,6 +20,7 @@ import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { formatDate } from '@angular/common';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -38,7 +39,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
   public readonly numericInputAttributes = { maxLength: '2' };
   public readonly billRateAttributes = { maxLength: '10' };
-
+  public canCreateOrder: boolean;
   public minDate: Date;
   public extensionForm: FormGroup;
   public comments: Comment[] = [];
@@ -54,12 +55,14 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     private formBuilder: FormBuilder,
     private extensionSidebarService: ExtensionSidebarService,
     private store: Store,
-    private billRatesSyncService: BillRatesSyncService
+    private billRatesSyncService: BillRatesSyncService,
+    private permissionService: PermissionService
   ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.subscribeOnPermissions();
     const minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
     this.minDate = DateTimeHelper.convertDateToUtc(minDate.toString());
     this.initExtensionForm();
@@ -224,5 +227,11 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         }
         this.extensionForm.get('durationPrimary')?.setValue(Duration.Other);
       });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

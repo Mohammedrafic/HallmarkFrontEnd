@@ -29,6 +29,7 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { UserState } from 'src/app/store/user.state';
 import { ShowCloseOrderDialog, ShowToast } from '../../../../store/app.actions';
 import { OrderManagementService } from '../order-management-content/order-management.service';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-close-order',
@@ -62,6 +63,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public comments: Comment[] = [];
   public closureReasons: RejectReasonwithSystem[];
   private unsubscribe$: Subject<void> = new Subject();
+  public canCreateOrder: boolean;
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -72,6 +74,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private commentsService: CommentsService,
     private cd: ChangeDetectorRef,
     private orderManagementService: OrderManagementService,
+    private permissionService: PermissionService
   ) {
     super();
   }
@@ -91,6 +94,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   public ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.onOrganizationChangedClosureReasons();
     this.initForm();
     this.subscribeOnCloseSideBar();
@@ -253,6 +257,12 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
       if (!res.isDialogShown) {
         this.closeForm.reset();
       }
+    });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
     });
   }
 }
