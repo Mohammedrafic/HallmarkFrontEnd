@@ -3,19 +3,22 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { delay, filter, Observable, takeUntil } from 'rxjs';
+import { ColDef } from '@ag-grid-community/core';
 
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE } from '@shared/constants';
-
+import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ShowSideDialog } from '../../../store/app.actions';
-import { GRID_CONFIG } from '@shared/constants';
 import { MasterCommitmentState } from '@admin/store/commitment.state';
 import { MasterCommitment, MasterCommitmentsPage } from '@shared/models/commitment.model';
 import { GridReadyEventModel } from '@shared/components/grid/models';
-import { ColDef } from '@ag-grid-community/core';
 import { CommitmentColumnsDefinition } from './commitment.constants';
-import { GetCommitmentByPage, SaveCommitment, SaveCommitmentSuccess, UpdateCommitmentSuccess } from '@admin/store/commitment.actions';
+import {
+  GetCommitmentByPage,
+  SaveCommitment,
+  SaveCommitmentSuccess,
+  UpdateCommitmentSuccess,
+} from '@admin/store/commitment.actions';
 import { AbstractPermission } from '@shared/helpers/permissions';
 
 @Component({
@@ -32,7 +35,7 @@ export class CommitmentComponent extends AbstractPermission implements OnInit {
   public form: FormGroup;
   public pageNumber = GRID_CONFIG.initialPage;
   public pageSize = GRID_CONFIG.initialRowsPerPage;
-  public title: string = '';
+  public title = '';
   public columnDefinitions: ColDef[];
 
   constructor(private confirmService: ConfirmService, protected override store: Store, private actions$: Actions) {
@@ -73,7 +76,7 @@ export class CommitmentComponent extends AbstractPermission implements OnInit {
     this.title = DialogMode.Edit;
     this.form.patchValue({
       id: data.id,
-      name: data.name
+      name: data.name,
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -114,8 +117,8 @@ export class CommitmentComponent extends AbstractPermission implements OnInit {
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(0),
-      name: new FormControl('', [Validators.required, Validators.maxLength(50), Validators.minLength(3)])
-    })
+      name: new FormControl('', [Validators.required, Validators.maxLength(50), Validators.minLength(3)]),
+    });
   }
 
   private initGrid(): void {

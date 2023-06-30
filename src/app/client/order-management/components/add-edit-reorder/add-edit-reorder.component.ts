@@ -52,6 +52,7 @@ import { AlertTrigger } from '@admin/store/alerts.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { MultiselectDropdownComponent,
 } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.component';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -88,6 +89,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private unsubscribe$: Subject<void> = new Subject();
   private numberOfAgencies: number;
   private multipleReorderDates: Date[] = [];
+  public canCreateOrder: boolean;
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -97,6 +99,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     private actions$: Actions,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private permissionService: PermissionService
   ) {
     super();
     this.createForm();
@@ -107,6 +110,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.listenCandidateChanges();
     this.listenAginciesChanges();
     this.commentContainerId = this.order.commentContainerId as number;
@@ -428,6 +432,12 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       });
 
       return this.commentsService.saveCommentsBulk(reOrderComments);
+    });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
     });
   }
 }

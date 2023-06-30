@@ -29,6 +29,7 @@ export interface CandidateCredential {
   certifiedOn?: string;
   certifiedUntil?: string;
   departmentMatch?: DepartmentMatchStatus;
+  credentialType?: CredentialType;
 }
 
 export interface CandidateCredentialGridItem extends CandidateCredential {
@@ -76,4 +77,9 @@ export interface CredentialParams {
 }
 export interface BulkVerifyCandidateCredential{
   candidateCredentials:CandidateCredential[];
+}
+
+export interface CredentialType {
+  id: number,
+  name: string,
 }

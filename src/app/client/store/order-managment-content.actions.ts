@@ -169,7 +169,8 @@ export class SetPredefinedBillRatesData {
     public departmentId: number,
     public skillId: number,
     public jobStartDate: string,
-    public jobEndDate?: string
+    public jobEndDate?: string,
+    public ignoreUpdateBillRate?: boolean
   ) {}
 }
 

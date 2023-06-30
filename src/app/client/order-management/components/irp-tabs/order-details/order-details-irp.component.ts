@@ -583,7 +583,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       if (!(jobStartDate instanceof Date)) {
         return;
       }
-
+      
       this.autoSetupJobEndDateControl(value, jobStartDate);
       this.changeDetection.markForCheck();
     });
@@ -719,6 +719,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       .get('jobDates')
       ?.valueChanges.pipe(filter(()=> true), takeUntil(this.componentDestroy()))
       .subscribe((value: any | undefined) => {
+        if (value.length>0)
+        {
         let regionID = this.generalInformationForm.get('regionId')?.value;
         const locations = this.organizationStructureService.getLocationsByIdSet(regionID, value);
           let locID = this.generalInformationForm.get('locationId')?.value;
@@ -739,6 +741,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           setDataSource(selectedForm.fields, 'locationId', locations);
           setDataSource(selectedForm.fields, 'departmentId', deparment);
           this.changeDetection.markForCheck();
+        }
       });
   }
 
@@ -844,14 +847,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       departmentId: selectedOrder.departmentId,
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
-      duration: selectedOrder.duration,
-      
+
     })
     setTimeout(()=>{
       this.generalInformationForm.patchValue({
         shift: selectedOrder.shift,
         shiftStartTime: selectedOrder.shiftStartTime,
-        shiftEndTime: selectedOrder.shiftEndTime
+        shiftEndTime: selectedOrder.shiftEndTime,
+        duration: selectedOrder.duration,
       }, { emitEvent: false })
     },1000)
 

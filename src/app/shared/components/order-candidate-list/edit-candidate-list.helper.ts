@@ -5,18 +5,23 @@ import { DateTimeHelper } from '@core/helpers';
 import { CreateIrpCandidateDto, UpdateIrpCandidateDto } from '@shared/components/order-candidate-list/interfaces';
 import { CandidateField } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
 import { IrpOrderCandidate, OrderCandidatesList } from '@shared/models/order-management.model';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 export const CreateCandidateDto = (
   candidate: IrpOrderCandidate | OrderCandidatesList,
   orderId: number,
   actualStartDate?: string,
-  actualEndDate?: string
+  actualEndDate?: string,
+  availableStartDate?:string,
+  status?:CandidatStatus
 ): CreateIrpCandidateDto => ({
   employeeId: candidate.candidateProfileId,
   orderId,
   actualStartDate: actualStartDate ?? null,
   actualEndDate: actualEndDate ?? null,
   availabilityOverlap: candidate.availabilityOverlap ?? null,
+  availableStartDate:availableStartDate ?? null,
+  workflowStepType:status!
 });
 
 export const UpdateCandidateDto = (
@@ -24,11 +29,17 @@ export const UpdateCandidateDto = (
   jobId: number,
   actualStartDate: string,
   actualEndDate: string,
+  availableStartDate?:string,
+  status?:CandidatStatus,
+  orderId?:number
 ): UpdateIrpCandidateDto => ({
   organizationId,
   jobId,
-  actualStartDate: DateTimeHelper.toUtcFormat(actualStartDate),
-  actualEndDate: DateTimeHelper.toUtcFormat(actualEndDate),
+  actualStartDate: actualStartDate ? DateTimeHelper.toUtcFormat(actualStartDate) : null,
+  actualEndDate: actualEndDate ? DateTimeHelper.toUtcFormat(actualEndDate) : null,
+  availableStartDate:availableStartDate ? DateTimeHelper.toUtcFormat(availableStartDate) : null ,
+  workflowStepType:status!,
+  orderId:orderId ?? null
 });
 
 export const GetConfigField = (config: ReadonlyArray<CandidateField>, field: string): CandidateField => {

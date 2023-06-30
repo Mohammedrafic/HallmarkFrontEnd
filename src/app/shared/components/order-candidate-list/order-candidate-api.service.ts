@@ -34,11 +34,12 @@ export class OrderCandidateApiService {
     );
   }
 
-  getIrpCandidateDetails(orderId: number, employeeId: number): Observable<CandidateDetails> {
+  getIrpCandidateDetails(orderId: number, employeeId: number,isirpLTA:boolean): Observable<CandidateDetails> {
     return this.http.get<CandidateDetails>(`/api/IRPApplicants/applicantInitData`, {
       params: {
         orderId: orderId,
         employeeId: employeeId,
+        isirpLTA:isirpLTA
       },
     });
   }

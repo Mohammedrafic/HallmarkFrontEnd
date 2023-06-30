@@ -54,6 +54,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { formatNumber } from '@angular/common';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -100,6 +101,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public payRateSetting = CandidatePayRateSettings;
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
+  public canCreateOrder : boolean;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -176,6 +178,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private changeDetectionRef: ChangeDetectorRef,
+    private permissionService: PermissionService
   ) {
     this.createForm();
   }
@@ -187,6 +190,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.patchForm();
     this.subscribeOnReasonsList();
     this.subscribeOnSuccessRejection();
@@ -539,5 +543,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

@@ -15,6 +15,8 @@ import { Destroyable } from '@core/helpers';
 })
 export class SideMenuComponent extends Destroyable implements AfterViewInit, OnInit {
   @Input() config: MenuSettings[];
+  // If the menu is loaded with a default selection (selecting a specific sub-menu item on load)
+  @Input() navigateTo: string;
   selectionSettings: SelectionSettingsModel = { mode: 'Single' };
 
   @ViewChild('listBox')
@@ -36,9 +38,15 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
 
   ngAfterViewInit(): void {
     if (this.config.length > 0) {
-      const menuItem = this.config[0];
-      this.listBox.selectItems([menuItem['text'] as string]);
-      this.router.navigate([(menuItem as any).route], { relativeTo: this.route });
+      let selection = this.config[0];
+      if (this.navigateTo) {
+        const navigateToSubMenu = this.config.find((item) => item.route === this.navigateTo);
+        if (navigateToSubMenu) {
+          selection = navigateToSubMenu;
+        } 
+      }
+      this.listBox.selectItems([selection['text'] as string]);
+      this.router.navigate([(selection as any).route], { relativeTo: this.route });
     }
   }
 

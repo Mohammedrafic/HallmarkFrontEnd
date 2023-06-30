@@ -5,15 +5,15 @@ import { BillRate } from '@shared/models';
   providedIn: 'root',
 })
 export class BillRatesSyncService {
-  getBillRateForSync(billRates: BillRate[]): BillRate | null {
-    const todayTimeStamp = new Date().getTime();
+  getBillRateForSync(billRates: BillRate[], jobStartDate?: Date): BillRate | null {
+    const jobStartDateTimeStamp = jobStartDate ? jobStartDate.getTime() : new Date().getTime();
     let billRateForSync: BillRate | null = null;
     const sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
       (billRate) => billRate.billRateConfig.id === 1
     );
     for (let billRate of sortedBillRates) {
       const timeStamp = new Date(billRate.effectiveDate).getTime();
-      if (timeStamp < todayTimeStamp) {
+      if (timeStamp < jobStartDateTimeStamp) {
         billRateForSync = billRate;
         break;
       }
