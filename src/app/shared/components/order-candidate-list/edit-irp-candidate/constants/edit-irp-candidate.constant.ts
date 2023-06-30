@@ -9,7 +9,7 @@ export const Icon = {
 };
 
 export const OptionField: FieldSettingsModel = { text: 'text', value: 'value' };
-export const CandidateTitle = 'Edit Candidate';
+export const CandidateTitle = 'Edit Employee';
 export const StatusField = 'status';
 export const CloseReasonField = 'reason';
 
