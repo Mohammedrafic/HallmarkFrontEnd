@@ -263,14 +263,14 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         candidateSelectedSlot.dates.add(date);
 
         if(schedule) {
+          const days = candidateSelectedSlot.candidate?.days ?? candidate.days;
           candidateSelectedSlot.candidate.days =
-            this.scheduleGridService.createDaysForSelectedSlots(candidate.days, schedule.daySchedules);
+            this.scheduleGridService.createDaysForSelectedSlots(days, schedule.daySchedules);
         }
       }
     } else {
       const selectedCandidateSlots =
         this.scheduleGridService.createSelectedCandidateSlotsWithDays(candidate, date, schedule);
-
       this.selectedCandidatesSlot.set(candidate.id, selectedCandidateSlots);
     }
   }
