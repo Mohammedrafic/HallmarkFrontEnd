@@ -64,4 +64,12 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     type: FieldType.Date,
     cssClass: 'close-date',
   },
+  {
+    field: 'availableStartDate',
+    title: 'Available Start Date',
+    disabled: false,
+    required: false,
+    type: FieldType.Date,
+    cssClass: 'date-field',
+  },
 ];

@@ -1,4 +1,5 @@
 import { ApplicantStatus, IrpOrderCandidate, Order, OrderAvailabilityOverlap } from '@shared/models/order-management.model';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 export interface CreateIrpCandidateDto {
   employeeId: number;
@@ -6,13 +7,18 @@ export interface CreateIrpCandidateDto {
   actualStartDate: string | null;
   actualEndDate: string | null;
   availabilityOverlap: OrderAvailabilityOverlap | null;
-}
+  availableStartDate:string | null;
+  workflowStepType:CandidatStatus | null;
+ }
 
 export interface UpdateIrpCandidateDto {
   organizationId: number;
   jobId: number;
-  actualStartDate: string;
-  actualEndDate: string;
+  actualStartDate: string | null;
+  actualEndDate: string | null;
+  availableStartDate:string | null;
+  workflowStepType:CandidatStatus | null;
+  orderId:number | null;
 }
 
 export interface CancelIrpCandidateDto {
@@ -24,7 +30,8 @@ export interface CancelIrpCandidateDto {
 export interface CandidateDetails {
   actualStartDate: string | Date;
   actualEndDate: string | Date;
-  availableStatuses: ApplicantStatus[]
+  availableStatuses: ApplicantStatus[];
+  commentContainerId : number;
 }
 
 export interface EditCandidateDialogState {
