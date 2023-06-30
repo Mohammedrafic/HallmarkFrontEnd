@@ -318,7 +318,6 @@ export class OrderManagementContentService {
     if (jobStartDate && jobEndDate) {
       params = params.append('jobStartDate', jobStartDate).append('jobEndDate', jobEndDate);
     }
-
     return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params }).pipe(
       map((items) =>
         items.map((rate) => {
