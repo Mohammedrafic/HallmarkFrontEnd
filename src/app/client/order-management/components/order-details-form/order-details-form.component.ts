@@ -638,38 +638,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     );
 
     this.populatePermPlacementControls(order);
-
-    this.projectSpecialData$.pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
-      this.specialProject.controls['projectNameId'].patchValue(order.projectNameId);
-      this.specialProject.controls['poNumberId'].patchValue(order.poNumberId);
-    });
-
-    if (order.regionId) {
-      this.store
-        .dispatch(new GetLocationsByRegionId(order.regionId, undefined, true, order.locationId))
-        .pipe(
-          take(1),
-          takeUntil(this.componentDestroy())
-        ).subscribe((data) => {
-          this.selectedLocation = data.organizationManagement.locations?.find((location: Location) => location.id === order.locationId);
-          this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
-        });
-    }
-
-    if (order.locationId) {
-      this.store
-        .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
-        .pipe(
-          take(1),
-          takeUntil(this.componentDestroy())
-        ).subscribe((data) => {
-          this.selectedDepartment = data.organizationManagement.departments?.find((department: Department) => department.departmentId === order.departmentId);
-          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
-        });
-    }
+    this.populateProjectSpecialData(order);
+    this.populateRegionLocation(order);
 
     if (order.jobStartDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobStartDate'].patchValue(
@@ -738,6 +708,46 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.disableFormControls(order);
     this.handlePerDiemOrder();
     this.handlePermPlacementOrder();
+  }
+
+  private populateProjectSpecialData(order: Order): void {
+    this.projectSpecialData$.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
+      this.specialProject.controls['projectNameId'].patchValue(order.projectNameId);
+      this.specialProject.controls['poNumberId'].patchValue(order.poNumberId);
+    });
+  }
+
+  private populateRegionLocation(order: Order): void {
+    if (order.regionId) {
+      this.store
+        .dispatch(new GetLocationsByRegionId(order.regionId, undefined, true, order.locationId))
+        .pipe(
+          take(1),
+          takeUntil(this.componentDestroy())
+        ).subscribe((data) => {
+          this.selectedLocation = data.organizationManagement.locations?.find(
+            (location: Location) => location.id === order.locationId
+          );
+          this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
+        });
+    }
+
+    if (order.locationId) {
+      this.store
+        .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
+        .pipe(
+          take(1),
+          takeUntil(this.componentDestroy())
+        ).subscribe((data) => {
+          this.selectedDepartment = data.organizationManagement.departments?.find(
+            (department: Department) => department.departmentId === order.departmentId
+          );
+          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId, { emitEvent: false });
+        });
+    }
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
@@ -830,7 +840,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       .pipe(
         filter(Boolean),
         switchMap((d) => {
-          unitDescriptionValue = unitDescriptionValue === null ? unitDescriptionValue : this.jobDescriptionForm.get('unitDescription')?.value;
+          unitDescriptionValue = unitDescriptionValue === null ?
+            unitDescriptionValue : this.jobDescriptionForm.get('unitDescription')?.value;
           return this.contactDetails$;
         }),
         filter(Boolean),
@@ -839,7 +850,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       .subscribe((contactDetails) => {
         const { facilityContact, facilityPhoneNo, facilityEmail, unitDescription } = contactDetails;
         this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
-        this.jobDescriptionForm.get('unitDescription')?.setValue(unitDescriptionValue ? unitDescriptionValue : unitDescription);
+        this.jobDescriptionForm.get('unitDescription')?.setValue(
+          unitDescriptionValue ? unitDescriptionValue : unitDescription
+        );
         unitDescriptionValue = null;
       });
   }
@@ -1109,7 +1122,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       debounceTime(50),
       takeUntil(this.componentDestroy())
     ).subscribe(([orderType, departmentId, skillId, jobStartDate]) => {
-      const departmentIdValue = departmentId || this.generalInformationForm.controls['departmentId'].value;
+      const departmentIdValue = departmentId;
       if (this.isPermPlacementOrder || isNaN(parseInt(orderType)) || !departmentIdValue || !skillId || !jobStartDate) {
         return;
       }
