@@ -726,7 +726,6 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         .dispatch(new GetLocationsByRegionId(order.regionId, undefined, true, order.locationId))
         .pipe(
           take(1),
-          takeUntil(this.componentDestroy())
         ).subscribe((data) => {
           this.selectedLocation = data.organizationManagement.locations?.find(
             (location: Location) => location.id === order.locationId
@@ -740,7 +739,6 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
         .pipe(
           take(1),
-          takeUntil(this.componentDestroy())
         ).subscribe((data) => {
           this.selectedDepartment = data.organizationManagement.departments?.find(
             (department: Department) => department.departmentId === order.departmentId
