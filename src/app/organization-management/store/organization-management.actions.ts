@@ -431,7 +431,7 @@ export class GetDepartmentFilterOptions {
 
 export class GetOrganizationSettingsFilterOptions {
   static readonly type = '[organizationManagement] Get Organization Settings Filter Options';
-  constructor() {}
+  constructor(public includeInIRP?: boolean, public includeInVMS?: boolean) {}
 }
 
 export class GetLocationTypes {

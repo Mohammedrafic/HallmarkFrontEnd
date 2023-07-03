@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+
 import { map, Observable } from 'rxjs';
+
+import { GetQueryParams } from '@core/helpers';
 import { OrganizationSettingFilter, OrganizationSettingsGet, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 import { sortBy } from '@shared/helpers/sort-array.helper';
 
@@ -36,7 +39,13 @@ export class OrganizationSettingsService {
   /**
    * Get organization settings filtering options
    */
-  public getOrganizationSettingsFilteringOptions(): Observable<string[]> {
-    return this.http.get<string[]>(`/api/OrganizationSettings/filteringOptions`).pipe(map((data) => sortBy(data)));
+  public getOrganizationSettingsFilteringOptions(includeInIRP?: boolean, includeInVMS?: boolean): Observable<string[]> {
+    const params = includeInIRP && includeInVMS || !includeInIRP && !includeInVMS
+      ? {} : { includeInIRP, includeInVMS };
+
+    return this.http.get<string[]>(
+      `/api/OrganizationSettings/filteringOptions`,
+      { params: GetQueryParams(params) }
+    ).pipe(map((data) => sortBy(data)));
   }
 }
