@@ -298,7 +298,9 @@ export class DateTimeHelper {
   }
 
   static getEarliestDate(dates: string[]): string | null {
-    const timeStamp: number[] = dates.map(date => DateTimeHelper.convertDateToUtc(date).getTime());
+    const timeStamp: number[] = dates.map(date => {
+      return DateTimeHelper.convertDateToUtc(date).getTime();
+    });
   
     if (timeStamp.length) {
       return DateTimeHelper.toUtcFormat(new Date(Math.min(...timeStamp)));
@@ -308,7 +310,9 @@ export class DateTimeHelper {
   }
   
   static getLatestDate(dates: string[]): string | null {
-    const timeStamp: number[] = dates.map(date => DateTimeHelper.convertDateToUtc(date).getTime());
+    const timeStamp: number[] = dates.map(date => {
+      return DateTimeHelper.convertDateToUtc(date).getTime();
+    });
   
     if (timeStamp.length) {
       return DateTimeHelper.toUtcFormat(new Date(Math.max(...timeStamp)));
