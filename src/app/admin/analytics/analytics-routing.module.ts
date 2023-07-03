@@ -1,3 +1,4 @@
+import { StaffAvailabilityComponent } from './staff-availability/staff-availability.component';
 import { HoursByDepartmentComponent } from './hours-by-department/hours-by-department.component';
 import { UnitProfileComponent } from './unit-profile/unit-profile.component';
 import { ScheduledHoursComponent } from './scheduled-hours/scheduled-hours.component';
@@ -381,6 +382,13 @@ const routes: Routes = [
       {
         path: 'hours-by-department',
         component: HoursByDepartmentComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'staff-availability',
+        component: StaffAvailabilityComponent,
         data: {
           isOrganizationArea: true,
         }
