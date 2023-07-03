@@ -1937,8 +1937,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private onOrganizationStructureDataLoadHandler(): void {
     combineLatest([
-      this.organizationStructure$.pipe(filter(Boolean)),
-      this.organization$.pipe(filter(Boolean), take(1)),
+      this.organizationStructure$.pipe(filter((structure) => !!structure)),
+      this.organization$.pipe(filter((organization) => !!organization), take(1)),
     ])
       .pipe(
         debounceTime(50),
