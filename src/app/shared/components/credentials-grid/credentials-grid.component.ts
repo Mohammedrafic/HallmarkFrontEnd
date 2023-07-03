@@ -128,7 +128,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private removeExistingFiles = false;
   private file: CredentialFile | null;
   private candidateProfileId: number;
-  private cretentialType: CredentialType;
+  private credentialType: CredentialType;
 
   @Select(CandidateState.candidateCredential)
   candidateCredential$: Observable<CandidateCredentialResponse>;
@@ -404,7 +404,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.credentialId = id as number;
     this.credentialStatus = status as CredentialStatus;
     this.masterCredentialId = masterCredentialId;
-    this.cretentialType = { id: credentialTypeId, name: credentialTypeName as string };
+    this.credentialType = { id: credentialTypeId, name: credentialTypeName as string };
     this.setExistingFiles(credentialFiles);
 
     this.store.dispatch(
@@ -489,7 +489,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     const { id, credentialTypeId, credentialTypeName } = event.data;
     
     this.masterCredentialId = id as number;
-    this.cretentialType = { id: credentialTypeId, name: credentialTypeName as string };
+    this.credentialType = { id: credentialTypeId, name: credentialTypeName as string };
     this.checkCertifiedFields(event.data.expireDateApplicable);
   }
 
@@ -521,7 +521,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         this.credentialStatus = CredentialStatus.Pending;
         this.masterCredentialId = null;
         this.removeExistingFiles = false;
-        this.cretentialType = {} as CredentialType;
+        this.credentialType = {} as CredentialType;
         this.existingFiles = [];
         this.uploadObj.clearAll();
       });
@@ -575,7 +575,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
             certifiedOn: createdOn,
             certifiedUntil: createdUntil,
             completedDate,
-            credentialType: this.cretentialType,
+            credentialType: this.credentialType,
           })
         );
       }
