@@ -50,6 +50,7 @@ import {
   tap,
   switchMap,
   skip,
+  combineLatest,
 } from 'rxjs';
 
 import { ORDERS_GRID_CONFIG } from '@client/client.config';
@@ -151,6 +152,7 @@ import {
 } from '@shared/models/order-management.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import {
+  Organization,
   OrganizationDepartment,
   OrganizationLocation,
   OrganizationRegion,
@@ -297,6 +299,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   @Select(OrderManagementContentState.orderComments)
   private orderComments$: Observable<Comment[]>;
+
+  @Select(OrganizationManagementState.organization)
+  private organization$: Observable<Organization | null>;
 
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
@@ -1935,11 +1940,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onOrganizationStructureDataLoadHandler(): void {
-    this.organizationStructure$
+    combineLatest([
+      this.organizationStructure$.pipe(filter((structure) => !!structure)),
+      this.organization$.pipe(filter((organization) => !!organization), take(1)),
+    ])
       .pipe(
-        debounceTime(50),
-        filter((structure) => !!structure),
-        tap((structure: OrganizationStructure) => {
+        debounceTime(100),
+        tap(([structure]) => {
           if (this.organizationId === structure.organizationId) {
             this.orgStructure = structure;
             this.regions = structure.regions;
