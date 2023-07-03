@@ -1,29 +1,26 @@
 import { Injectable } from '@angular/core';
 
-import { IOrderCredentialItem } from "@order-credentials/types";
+import { IOrderCredentialItem } from '@order-credentials/types';
 
 @Injectable()
 export class OrderCredentialsService {
-  public updateOrderCredentials(orderCredentials: IOrderCredentialItem[], cred: IOrderCredentialItem): void {
-    const isExist = orderCredentials.find(({ credentialId }: IOrderCredentialItem) => {
-      return cred.credentialId === credentialId;
+  public updateOrderCredentials(
+    orderCredentials: IOrderCredentialItem[], credData: IOrderCredentialItem): IOrderCredentialItem[] {
+    const credToUpdate = orderCredentials.find(({ credentialId }: IOrderCredentialItem) => {
+      return credData.credentialId === credentialId;
     });
 
-    if (isExist) {
-      Object.assign(isExist, cred);
+    if (credToUpdate) {
+      Object.assign(credToUpdate, credData);
     } else {
-      orderCredentials.push(cred);
+      orderCredentials.push(credData);
     }
+
+    return [...orderCredentials];
   }
 
-  public deleteOrderCredential(orderCredentials: IOrderCredentialItem[], cred: IOrderCredentialItem): void {
-    const credToDelete = orderCredentials.find(({ credentialId }: IOrderCredentialItem) => {
-      return cred.credentialId === credentialId;
-    }) as IOrderCredentialItem;
-
-    if (credToDelete) {
-      const index = orderCredentials.indexOf(credToDelete);
-      orderCredentials.splice(index, 1);
-    }
+  public deleteOrderCredential(orderCredentials: IOrderCredentialItem[],
+    cred: IOrderCredentialItem): IOrderCredentialItem[] {    
+    return orderCredentials.filter((credential) => credential.credentialId !== cred.credentialId);
   }
 }

@@ -402,6 +402,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((reasons: RejectReason[]) => {
         this.rejectReasons = reasons;
+        this.cd.markForCheck();
       });
   }
 

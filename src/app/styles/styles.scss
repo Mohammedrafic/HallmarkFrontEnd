@@ -708,9 +708,9 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 }
 @media screen and (min-width: 0px) and (max-width: 400px) {
   [data-uid="Master Data"],[data-uid="Communication/Document Library"],[data-uid="Administration/Organization Interface "],[data-uid="Administration/Interface Logs"],[data-uid="Organization/Candidate Assignment"],[data-uid="Organization/Settings"],
-  [data-uid="Agency/Reports"],[data-uid="Agency/Timesheets"],[data-uid="Agency/Candidate Assignment"],[data-uid="Organization/Scheduling"],[data-uid="Organization/Timesheets"],
-  [data-uid="Organization Profile"],[data-uid="Analytics"],[data-uid="Candidate Assignment"],[data-uid="Order Management"],[data-uid="Scheduling"],[data-uid="Settings"],[data-uid="Timesheets"]
-  ,body.light ejs-grid.e-control.e-grid .e-templatecell .row-tool-buttons .primary-icon-button
+  [data-uid="Agency/Reports"],[data-uid="Agency/Timesheets"],[data-uid="Agency/Candidate Assignment"],[data-uid="Organization/Scheduling"],[data-uid="Organization/Timesheets"],[data-uid="Organization Profile"],[data-uid="Profile"],[data-uid="Reports"],
+  [data-uid="Organization Profile"],[data-uid="Analytics"],[data-uid="Candidate Assignment"],[data-uid="Order Management"],[data-uid="Scheduling"],[data-uid="Settings"],[data-uid="Timesheets"],[data-uid="Administration/User List"],[data-uid="Administration/Roles & Permissions"]
+  ,body.light .e-btn.noResponsive
   {
     display: none;
   }

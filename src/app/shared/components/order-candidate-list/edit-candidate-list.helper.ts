@@ -17,8 +17,8 @@ export const CreateCandidateDto = (
 ): CreateIrpCandidateDto => ({
   employeeId: candidate.candidateProfileId,
   orderId,
-  actualStartDate: actualStartDate ?? null,
-  actualEndDate: actualEndDate ?? null,
+  actualStartDate: actualStartDate ? DateTimeHelper.toUtcFormat(actualStartDate) : null,
+  actualEndDate: actualEndDate ? DateTimeHelper.toUtcFormat(actualEndDate) : null,
   availabilityOverlap: candidate.availabilityOverlap ?? null,
   availableStartDate:availableStartDate ?? null,
   workflowStepType:status!

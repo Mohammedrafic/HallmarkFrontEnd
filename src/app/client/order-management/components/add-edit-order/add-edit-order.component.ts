@@ -238,13 +238,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public updateOrderCredentials(credential: IOrderCredentialItem): void {
     this.isCredentialsChanged = true;
-    this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
+    this.orderCredentials = this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public deleteOrderCredential(credential: IOrderCredentialItem): void {
     this.isCredentialsChanged = true;
-    this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
+    this.orderCredentials = this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 

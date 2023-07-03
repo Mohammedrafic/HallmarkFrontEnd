@@ -5,7 +5,7 @@ import { Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { distinctUntilChanged, filter, Observable, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, filter, merge, Observable, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 
 import { OutsideZone } from '@core/decorators';
 import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
@@ -222,6 +222,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.watchForLocationControl();
     this.setPermissionsToManageSettings();
     this.watchRegionControlChanges();
+    this.watchForSystemControls();
   }
 
   ngOnDestroy(): void {
@@ -1500,5 +1501,21 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private setNumericValueLabel(settingKey: string): void {
     const isOnHold = OrganizationSettingKeys[OrganizationSettingKeys['OnHoldDefault']].toString() === settingKey;
     this.numericValueLabel = isOnHold ? 'Value (Weeks)' : 'Value';
+  }
+
+  private watchForSystemControls(): void {
+    const includeInIRPControl = this.SettingsFilterFormGroup.get('includeInIRP');
+    const includeInVMSControl = this.SettingsFilterFormGroup.get('includeInVMS');
+
+    if (includeInIRPControl && includeInVMSControl) {
+      merge(includeInIRPControl.valueChanges, includeInVMSControl.valueChanges)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe(() => {
+          this.store.dispatch(new GetOrganizationSettingsFilterOptions(
+            includeInIRPControl.value ?? false,
+            includeInVMSControl.value ?? false
+          ));
+        });
+    }
   }
 }

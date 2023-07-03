@@ -108,9 +108,7 @@ constructor(
     isIRPLTAOrder:boolean
   ): Observable<void> {
 
-    if(isIRPLTAOrder)
-    {
-      console.log(state.candidate.status);
+    if(isIRPLTAOrder) {
       if(state.candidate.status === CandidatStatus['Not Applied']) {
         return this.orderCandidateApiService.createIrpCandidate(
           CreateCandidateDto(
@@ -121,6 +119,13 @@ constructor(
             availableStartDate,
             status
           ));
+      }
+      else if(status === CandidatStatus.Cancelled) {
+        return this.orderCandidateApiService.cancelIrpCandidate( {
+          organizationId: state.order.organizationId as number,
+          jobId: state.candidate.candidateJobId,
+          createReplacement,
+        });
       }
       else{
        
@@ -135,8 +140,7 @@ constructor(
             state.order.id
           ));
       }
-    }
-    else{
+    } else {
     if(status === CandidatStatus.OnBoard && state.candidate.status !== status) {
       return this.orderCandidateApiService.createIrpCandidate(
         CreateCandidateDto(
