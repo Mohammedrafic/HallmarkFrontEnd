@@ -116,8 +116,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.watchForActualDateValues();
     this.getComments();
     this.showactualStartEndDate=this.isIRPLTAOrder ? false : true;
-    
-   
+
+
   }
 
   save(): void {
@@ -361,8 +361,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.cdr.markForCheck();
   });
   }
-  
-  
+
+
 
   private setStatusSourceForDisabled(jobStatus: {
     applicantStatus: number;

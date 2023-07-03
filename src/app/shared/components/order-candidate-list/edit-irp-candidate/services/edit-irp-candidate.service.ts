@@ -108,9 +108,7 @@ constructor(
     isIRPLTAOrder:boolean
   ): Observable<void> {
 
-    if(isIRPLTAOrder)
-    {
-      console.log(state.candidate.status);
+    if(isIRPLTAOrder) {
       if(state.candidate.status === CandidatStatus['Not Applied']) {
         return this.orderCandidateApiService.createIrpCandidate(
           CreateCandidateDto(
@@ -121,9 +119,7 @@ constructor(
             availableStartDate,
             status
           ));
-      }
-      else{
-       
+      } else {
         return this.orderCandidateApiService.updateIrpCandidate(
           UpdateCandidateDto(
             state.order.organizationId as number,
@@ -135,8 +131,7 @@ constructor(
             state.order.id
           ));
       }
-    }
-    else{
+    } else {
     if(status === CandidatStatus.OnBoard && state.candidate.status !== status) {
       return this.orderCandidateApiService.createIrpCandidate(
         CreateCandidateDto(
