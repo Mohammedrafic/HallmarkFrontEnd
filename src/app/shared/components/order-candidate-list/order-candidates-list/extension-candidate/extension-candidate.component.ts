@@ -81,6 +81,7 @@ import PriceUtils from '@shared/utils/price.utils';
 import { ShowToast } from 'src/app/store/app.actions';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -149,6 +150,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public payRateSetting = CandidatePayRateSettings;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public isCandidatePayRateVisible: boolean;
+  public canCreateOrder : boolean;
 
   public applicantStatusEnum = ApplicantStatusEnum;
   public candidateSSNRequired: boolean;
@@ -209,12 +211,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef,
     private settingService: SettingsViewService,
+    private permissionService : PermissionService
   ) {
     super();
     this.isAgency = this.router.url.includes('agency');
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
     this.createForm();
@@ -780,5 +784,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         });
 
     }
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

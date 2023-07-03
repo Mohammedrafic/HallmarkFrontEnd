@@ -273,7 +273,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  static createForm(billRates?: BillRate[]): FormGroup {
+  static createForm(): FormGroup {
     return new FormGroup({
       id: new FormControl(),
       billRateConfigId: new FormControl(null, [Validators.required]),
@@ -305,7 +305,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     const isBillRateUnitHours = this.selectedBillRateUnit === this.BillRateUnitList.Hours;
     this.format = isBillRateUnitHours ? '#' : this.isMileageTitleType ? '###.00' : '###.000';
     this.decimals = isBillRateUnitHours ? 0 : this.isMileageTitleType ? 2 : 3;
-    this.cdr.markForCheck()
+    this.cdr.markForCheck();
   }
 }
 

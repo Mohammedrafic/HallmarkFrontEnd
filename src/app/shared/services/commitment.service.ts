@@ -9,8 +9,8 @@ import { MasterCommitment, MasterCommitmentsPage } from '@shared/models/commitme
 export class CommitmentService {
   public constructor(private readonly httpClient: HttpClient) {}
 
-  public getMasterCommitments(currentPage: number, pageSize: number): Observable<MasterCommitmentsPage> {
-    return this.httpClient.post<MasterCommitmentsPage>('/api/MasterWorkCommitment/getAll', { currentPage, pageSize });
+  public getMasterCommitments(pageNumber: number, pageSize: number): Observable<MasterCommitmentsPage> {
+    return this.httpClient.post<MasterCommitmentsPage>('/api/MasterWorkCommitment/getAll', { pageNumber, pageSize });
   }
 
   public saveMasterCommitment(commitment: MasterCommitment): Observable<MasterCommitment> {

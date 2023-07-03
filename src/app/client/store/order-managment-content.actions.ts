@@ -169,7 +169,8 @@ export class SetPredefinedBillRatesData {
     public departmentId: number,
     public skillId: number,
     public jobStartDate: string,
-    public jobEndDate?: string
+    public jobEndDate?: string,
+    public ignoreUpdateBillRate?: boolean
   ) {}
 }
 
@@ -207,7 +208,8 @@ export class SaveIrpOrder {
     public order: CreateOrderDto,
     public documents: Blob[],
     public inActivedatestr?:string,
-    public isLocation? :boolean | undefined
+    public isLocation? :boolean | undefined,
+    public isLocationAndDepartment? :boolean | undefined,
   ) {}
 }
 

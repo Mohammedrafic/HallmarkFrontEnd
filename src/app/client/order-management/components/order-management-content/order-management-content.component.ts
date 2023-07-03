@@ -96,6 +96,7 @@ import {
   SetLock,
   UpdateRegRateSucceeded,
   GetOrderComments,
+  ClearPredefinedBillRates,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -601,8 +602,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   ngOnDestroy(): void {
     this.orderManagementService.selectedOrderAfterRedirect = null;
-    this.store.dispatch(new PreservedFilters.ResetPageFilters());
-    this.store.dispatch(new ClearSelectedOrder());
+    this.store.dispatch([
+      new PreservedFilters.ResetPageFilters(),
+      new ClearPredefinedBillRates(),
+      new ClearSelectedOrder(),
+    ]);
     this.resizeObserver.detach();
     this.unsubscribe$.next();
     this.unsubscribe$.complete();

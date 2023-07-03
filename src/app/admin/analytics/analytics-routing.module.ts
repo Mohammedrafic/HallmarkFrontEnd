@@ -51,7 +51,6 @@ import { GrantReportComponent } from './grant-report/grant-report.component';
 import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-invoice-report-beta.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '', pathMatch: 'full' },
   {
     path: '',
     component: AnalyticsComponent,

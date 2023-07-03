@@ -1,5 +1,5 @@
 import { DateTimeHelper } from '@core/helpers';
-import { DepartmentPayload } from '../departments.model';
+import { DepartmentFilterState, DepartmentPayload } from '../departments.model';
 
 export class DepartmentHelper {
   static editDepartmentPayload(
@@ -8,10 +8,12 @@ export class DepartmentHelper {
     employeeWorkCommitmentId: number,
     employeeId: number,
     toggleAllOn: boolean,
+    filters?: DepartmentFilterState | null,
     createReplacement?: boolean,
   ): DepartmentPayload {
     return {
       ...createDepartmentPayload(formData),
+      ...(filters ?? {}),
       ids: departmentIds,
       employeeId: employeeId,
       employeeWorkCommitmentId: toggleAllOn ? null : employeeWorkCommitmentId,

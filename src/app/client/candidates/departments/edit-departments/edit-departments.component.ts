@@ -16,7 +16,13 @@ import { CustomFormGroup } from '@core/interface';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { EditDepartmentsFormConfig } from '../constants/edit-departments.constant';
-import { DateRanges, DepartmentFormFieldConfig, DepartmentPayload, EditDepartmentFormState } from '../departments.model';
+import {
+  DateRanges,
+  DepartmentFilterState,
+  DepartmentFormFieldConfig,
+  DepartmentPayload,
+  EditDepartmentFormState,
+} from '../departments.model';
 import { DepartmentFormService } from '../services/department-form.service';
 import { DepartmentsService } from '../services/departments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -34,6 +40,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
   @Input() public saveForm$: Subject<boolean>;
   @Input() public selectedDepartments: number[] | null;
   @Input() public dateRanges: DateRanges;
+  @Input() public filters: DepartmentFilterState | null;
 
   @Output() public refreshGrid: EventEmitter<void> = new EventEmitter();
 
@@ -107,7 +114,7 @@ export class EditDepartmentsComponent extends DestroyableDirective implements On
 
   private editDepartments(): Observable<DepartmentPayload> {
     const formData = this.formGroup.getRawValue();
-    return this.departmentService.editAssignedDepartments(formData, this.selectedDepartments);
+    return this.departmentService.editAssignedDepartments(formData, this.selectedDepartments, this.filters);
   }
 
   private confirmAction(): Observable<boolean> {

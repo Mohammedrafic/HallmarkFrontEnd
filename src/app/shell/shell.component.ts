@@ -318,11 +318,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   selectMenuItem(menuItem: MenuItem): void {
-    /** Preventing the page navigation  which are not responsive*/
-    if(this.isMobile){
-      if(this.nonResponsiveMenuItesm.includes(menuItem.id))
-        return;
-    }
+
     this.setSideBarForFirstLoad(menuItem.route as string);
 
     if (menuItem.id == AnalyticsMenuId) {
@@ -600,7 +596,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .subscribe((menu: Menu) => {
       if (menu.menuItems.length) {
         const menuItems = menu.menuItems
-          .find((element) => element.id == 6)
+          .find((element) => element.id == 96)
           ?.children.find((e) => e.route == '/alerts/user-subscription');
         if (menuItems) {
           this.router.navigate([menuItems.route]);

@@ -8,11 +8,12 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { CustomFormGroup } from '@core/interface';
+import { AbstractControl } from '@angular/forms';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -29,7 +30,6 @@ import {
 } from '../../interfaces';
 import { CommitmentsDialogConfig, OPTION_FIELDS } from '../../constants/work-commitment-dialog.constant';
 import { FieldType } from '@core/enums';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { mapperSelectedItems, setDataSourceValue } from '../../helpers';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -37,9 +37,9 @@ import { UserState } from '../../../../store/user.state';
 import { findSelectedItems } from '@core/helpers/functions.helper';
 import { GetOrganizationStructure } from '../../../../store/user.actions';
 import { WorkCommitmentAdapter } from '../../adapters/work-commitment.adapter';
-import { AbstractControl } from '@angular/forms';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
+import { CustomFormGroup } from '@core/interface';
 
 @Component({
   selector: 'app-work-commitment-dialog',
@@ -63,7 +63,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
 
   @Output() saveCommitment = new EventEmitter<WorkCommitmentDTO>();
 
-  public title: string = '';
+  public title = '';
   public commitmentForm: CustomFormGroup<WorkCommitmentForm> | null;
   public dialogConfig: CommitmentDialogConfig;
   public readonly FieldTypes = FieldType;
@@ -71,7 +71,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
   public buttonType = ButtonTypeEnum;
   public datepickerMask = datepickerMask;
   public allSkillsLength: number;
-  public isEdit: boolean = false;
+  public isEdit = false;
 
   @Select(UserState.organizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;

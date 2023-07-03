@@ -11,16 +11,19 @@ import { OutsideZone } from "@core/decorators";
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { SelectNavigation } from '@shared/components/candidate-details/store/candidate.actions';
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
-import { getCandidatePositionId, getOrderPublicId } from "@shared/components/order-candidate-list/order-candidate-list.utils";
+import { getCandidatePositionId, getOrderPublicId } from
+  "@shared/components/order-candidate-list/order-candidate-list.utils";
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { CreatedCandidateStatus } from '@shared/enums/status';
 import { CredentialStorageFacadeService } from "@agency/services/credential-storage-facade.service";
 import { CandidateCredentialResponse } from "@shared/models/candidate-credential.model";
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { distinctUntilChanged, filter, Observable, takeUntil, switchMap, take } from 'rxjs';
-import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
-import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
+import { distinctUntilChanged, filter, Observable, takeUntil, switchMap, take, map } from 'rxjs';
+import { CandidateGeneralInfoComponent } from
+  'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
+import { CandidateProfessionalSummaryComponent } from
+  'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
 import { Candidate, OrderManagementPagerState } from 'src/app/shared/models/candidate.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
@@ -45,6 +48,7 @@ import { DateTimeHelper } from '@core/helpers';
 import { GlobalWindow } from "@core/tokens";
 import { Country } from "@shared/enums/states";
 import { GetRegionList } from "@shared/components/candidate-list/store/candidate-list.actions";
+import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -321,7 +325,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     candidateProfileContactDetail,
     professionalSummary,
     candidateProfileSkills,
-    candidateProfileRegions
+    candidateProfileRegions,
   }: Candidate) {
     this.candidateForm.get('generalInfo')?.patchValue({
       firstName,
@@ -489,14 +493,22 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   private saveCandidateProfile(candidate: Candidate): void {
     this.store.dispatch(new SaveCandidate(candidate))
-      .pipe(
-        take(1),
+    .pipe(
         filter(() => !candidate.id),
         switchMap(() => this.candidateProfile$),
         filter((candidateProfile) => !!candidateProfile?.id),
-        takeUntil(this.componentDestroy())
+        take(1),
+        map((candidateProfile) => {
+          return ({
+            ...candidateProfile,
+            candidateProfileSkills: candidateProfile.candidateProfileSkills.map(
+              (id) => ({ id } as unknown as JobDistributionMasterSkills) 
+            ),
+          });
+        }),
       )
       .subscribe((candidateProfile) => {
+        this.patchAgencyFormValue(candidateProfile);
         this.getCandidateLoginSetting(candidateProfile.id as number);
       });
   }

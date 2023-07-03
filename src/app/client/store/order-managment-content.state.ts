@@ -569,7 +569,8 @@ export class OrderManagementContentState {
               departmentId,
               skill,
               jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-              jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+              jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate,
+              true
             )
           );
         }
@@ -726,18 +727,12 @@ export class OrderManagementContentState {
 
   @Action(SetPredefinedBillRatesData)
   SetPredefinedBillRatesData(
-    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
-    { orderType, departmentId, skillId, jobStartDate, jobEndDate }: SetPredefinedBillRatesData
-  ): Observable<void> {
-    patchState({ getPredefinedBillRatesData: null });
-
-    return of(null).pipe(
-      debounceTime(100),
-      tap(() =>
-        patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId, jobStartDate, jobEndDate } })
-      ),
-      switchMap(() => dispatch(new GetPredefinedBillRates())),
-    );
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate }: SetPredefinedBillRatesData
+  ): OrderManagementContentStateModel {
+    return patchState({ getPredefinedBillRatesData: { 
+      orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate,
+    } });
   }
 
   @Action(GetPredefinedBillRates)
@@ -748,7 +743,7 @@ export class OrderManagementContentState {
     const state = getState();
     const getPredefinedBillRatesData = state.getPredefinedBillRatesData;
 
-    if (getPredefinedBillRatesData) {
+    if (getPredefinedBillRatesData && !getPredefinedBillRatesData.ignoreUpdateBillRate) {
       const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = getPredefinedBillRatesData;
 
       if (!isNaN(orderType) && !isNaN(departmentId) && !isNaN(skillId)) {
@@ -762,7 +757,6 @@ export class OrderManagementContentState {
       }
     }
 
-    patchState({ predefinedBillRates: [] });
     return of([]);
   }
 
@@ -785,7 +779,7 @@ export class OrderManagementContentState {
   @Action(SaveIrpOrder)
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents,inActivedatestr,isLocation }: SaveIrpOrder
+    { order, documents,inActivedatestr,isLocation,isLocationAndDepartment }: SaveIrpOrder
   ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
@@ -799,7 +793,8 @@ export class OrderManagementContentState {
                 order[0].publicId?.toString() +
                 ' has been added'
               : inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined
-              ?  isLocation
+              ?  isLocationAndDepartment ?  RECORD_ADDED +' Due to location and Department Expiry ' + inActivedatestr + ' Dates orders not added.' 
+              : isLocation
                 ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr + ' Dates orders not added.'
                 : RECORD_ADDED + ' Due to Department Expiry ' + inActivedatestr + ' Dates orders not added.'
               : RECORD_ADDED
