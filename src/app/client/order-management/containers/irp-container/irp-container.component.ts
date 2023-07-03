@@ -8,20 +8,20 @@ import {
   SimpleChanges,
   TrackByFunction,
 } from '@angular/core';
-import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
-import { filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
-import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
+import { filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 
-import { OrderCandidatesCredentialsState } from '@order-credentials/store/credentials.state';
 import { IrpTabConfig } from '@client/order-management/containers/irp-container/irp-container.constant';
+import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
+import {
+  IrpContainerStateService,
+} from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import { IrpTabs } from '@client/order-management/enums';
-import { ListOfKeyForms, SelectSystem, TabsConfig } from '@client/order-management/interfaces';
-import { Destroyable } from '@core/helpers';
-import { OrderCredentialsService } from '@client/order-management/services';
-import { IrpContainerStateService } from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import {
   createOrderDTO,
   getControlsList,
@@ -31,11 +31,12 @@ import {
   isFormTouched,
   showInvalidFormControl,
 } from '@client/order-management/helpers';
-import { SaveIrpOrder, EditIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
-import { CreateOrderDto, Order } from '@shared/models/order-management.model';
+import { ListOfKeyForms, SelectSystem, TabsConfig } from '@client/order-management/interfaces';
+import { OrderCredentialsService } from '@client/order-management/services';
+import { EditIrpOrder, SaveIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
+import { Destroyable } from '@core/helpers';
+import { OrderCandidatesCredentialsState } from '@order-credentials/store/credentials.state';
 import { IOrderCredentialItem } from '@order-credentials/types';
-import { ShowToast } from '../../../../store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
 import {
   CONFIRM_REVOKE_ORDER,
   ERROR_CAN_NOT_REVOKED,
@@ -43,11 +44,12 @@ import {
   INACTIVEDATE,
   INACTIVEDATE_DEPARTMENT,
 } from '@shared/constants';
-import { ConfirmService } from '@shared/services/confirm.service';
+import { MessageTypes } from '@shared/enums/message-types';
 import { OrderType } from '@shared/enums/order-type';
-import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
-import { DatePipe } from '@angular/common';
+import { CreateOrderDto, Order } from '@shared/models/order-management.model';
+import { ConfirmService } from '@shared/services/confirm.service';
 import { OrganizationStructureService } from '@shared/services/organization-structure.service';
+import { ShowToast } from '../../../../store/app.actions';
 
 @Component({
   selector: 'app-irp-container',
@@ -69,8 +71,8 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public dates: string;
   public locationdates: string;
   public departmentdates: string;
-  public isLocation : boolean=false;
-  public isLocationAndDepartment : boolean=false;
+  public isLocation = false;
+  public isLocationAndDepartment = false;
   private isCredentialsChanged = false;
 
 
@@ -105,12 +107,14 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   public updateOrderCredentials(credential: IOrderCredentialItem): void {
     this.isCredentialsChanged = true;
-    this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
+    this.orderCredentials = this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
+    this.cdr.markForCheck();
   }
 
   public deleteOrderCredential(credential: IOrderCredentialItem): void {
     this.isCredentialsChanged = true;
-    this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
+    this.orderCredentials = this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
+    this.cdr.markForCheck();
   }
 
   public isOrderTouched(): boolean {
