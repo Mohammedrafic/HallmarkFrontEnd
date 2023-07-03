@@ -30,12 +30,13 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   public preferencesLoaded = false;
   public readonly tabConfig: TabConfig[] = TAB_CANDIDATES;
   public readonly userPermissions = UserPermissions;
-  public credEndDate : any;
-  public credStartDate :  any;
-  public credType : any;
+  public credEndDate: any;
+  public credStartDate: any;
+  public credType: any;
   public isMobile = false;
   public isSmallDesktop = false;
-  
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
+
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
@@ -114,7 +115,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
 
   private checkOrgPreferences(): void {
     const { isIRPEnabled } =
-    this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+      this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
 
     this.isIRP = !!isIRPEnabled && this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     this.preferencesLoaded = true;
@@ -133,5 +134,12 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
         this.isMobile = screen.isMobile;
         this.isSmallDesktop = screen.isDesktopSmall;
       });
+  }
+
+  public openImportDialog(): void {
+    this.importDialogEvent.next(true);
+  }
+  public override updatePage(clearedFilters?: boolean): void {
+    // this.getOrders(clearedFilters);
   }
 }

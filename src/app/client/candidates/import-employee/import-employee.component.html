@@ -1,0 +1,78 @@
+<app-import-dialog-content
+  [importResponse]="importResponse"
+  [dialogEvent]="dialogEvent"
+  [selectErrorsTab]="selectErrorsTab"
+  (downloadErrorsEvent)="downloadErrors($event)"
+  (downloadTemplateEvent)="downloadTemplate()"
+  (saveImportResult)="saveImportResult($event)"
+  (uploadImportFile)="uploadImportFile($event)"
+  [title]="titleImport"
+  [isOrderImport]="true"
+  [zIndex]="3"
+>
+  <!-- <section successful class="records" *ngIf="successGridList">
+    <ejs-listbox
+      id="success-record-list"
+      class="records-list"
+      *ngIf="successListBox"
+      [dataSource]="successListBox"
+      [fields]="recordsListField"
+      [selectionSettings]="selectionSettings"
+      (created)="selectFirstItemFactory()"
+      (change)="selectItem($event)"
+    >
+      <ng-template #itemTemplate let-data>
+        <ng-container [ngTemplateOutlet]="recordItem" [ngTemplateOutletContext]="{ $implicit: data }"></ng-container>
+      </ng-template>
+    </ejs-listbox>
+    <div class="records-grids">
+      <app-import-grid
+        *ngFor="let grid of successGridList[selectedIndex]?.grids; trackBy: trackBySuccessHandler"
+        [gridName]="grid?.gridName"
+        class="records-grid"
+        [class.title]="grid?.gridName"
+        [importedItems]="grid.rowData"
+        [columnDefs]="grid.columnDefs"
+      ></app-import-grid>
+    </div>
+  </section>
+
+  <section errors class="records" *ngIf="errorGridList">
+    <ejs-listbox
+      id="error-record-list"
+      class="records-list"
+      *ngIf="errorListBox"
+      [dataSource]="errorListBox"
+      [fields]="recordsListField"
+      [selectionSettings]="selectionSettings"
+      (created)="selectFirstItemFactory()"
+      (change)="selectItem($event)"
+    >
+      <ng-template #itemTemplate let-data>
+        <ng-container [ngTemplateOutlet]="recordItem" [ngTemplateOutletContext]="{ $implicit: data }"></ng-container>
+      </ng-template>
+    </ejs-listbox>
+    <div class="records-grids">
+      <app-import-grid
+        *ngFor="let grid of errorGridList[selectedIndex]?.grids; trackBy: trackByErrorHandler"
+        [gridName]="grid?.gridName"
+        class="records-grid"
+        [class.title]="grid?.gridName"
+        [importedItems]="grid.rowData"
+        [columnDefs]="grid.columnDefs"
+      ></app-import-grid>
+    </div>
+  </section> -->
+</app-import-dialog-content>
+
+<!-- <ng-template #recordItem let-data>
+  <div class="records-list__item">
+    <app-tooltip-container [message]="data?.name" [showToolTip]="true">
+      <div *ngIf="data?.name as jobTitle" class="job-title">
+        <i-feather *ngIf="jobTitle?.length > 50" name="alert-circle" class="alert-icon"></i-feather>
+        <span class="job-title__text">{{ jobTitle }}</span>
+      </div>
+    </app-tooltip-container>
+    <i-feather *ngIf="!data?.name" name="alert-circle" class="alert-icon"></i-feather>
+  </div>
+</ng-template> -->

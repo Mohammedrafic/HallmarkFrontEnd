@@ -1,3 +1,4 @@
+import { ImportResult } from '@shared/models/import.model';
 import { CandidateListExport, CandidateListRequest, CandidateListTableState } from '../types/candidate-list.model';
 import { CandidateStatus } from '@shared/enums/status';
 
@@ -48,4 +49,50 @@ export class SetTableState {
 
 export class ClearTableState {
   static readonly type = '[candidate list] Clear candidates table state';
+}
+
+
+export class GetEmployeeImportTemplate {
+  static readonly type = '[candidate list] Get Employee Import Template';
+  constructor(public payload: any) {}
+}
+
+export class GetEmployeeImportTemplateSucceeded {
+  static readonly type = '[candidate list] Get Employee Import Template Succeeded';
+  constructor(public payload: Blob) {}
+}
+
+export class GetEmployeeImportErrors {
+  static readonly type = '[candidate list] Get Employee Import Errors';
+  constructor(public errorpayload: any) {}
+}
+
+export class GetEmployeeImportErrorsSucceeded {
+  static readonly type = '[candidate list] Get Employee Import Errors Succeeded';
+  constructor(public payload: Blob) {}
+}
+
+export class UploadEmployeeFile {
+  static readonly type = '[candidate list] Upload Employee File';
+  constructor(public payload: Blob) {}
+}
+
+export class UploadEmployeeFileSucceeded {
+  static readonly type = '[candidate list] Upload Employee File Succeeded';
+  constructor(public payload: ImportResult<any>) {}
+}
+
+export class SaveEmployeeImportResult {
+  static readonly type = '[candidate list] Save Employee Import Result';
+  constructor(public payload: any) {}
+}
+
+export class SaveEmployeeImportResultSucceeded {
+  static readonly type = '[candidate list] Save Employee Import Result Succeeded';
+  constructor(public payload: ImportResult<any>) {}
+}
+
+export class SaveEmployeeImportResultFailAndSucceeded {
+  static readonly type = '[candidate list] Upload Employee Import Result Fail And Success';
+  constructor(public payload: ImportResult<any>) {}
 }
