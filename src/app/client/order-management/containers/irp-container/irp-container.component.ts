@@ -242,7 +242,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           locationreactivateDate = locationreactivateDate.filter((f: Date) => 
              new Date(f) >=  new Date(location.inActiveDate ?? '') &&
                new Date(f) < new Date(location.reActiveDate ?? ''));
-          this.dates = locationreactivateDate
+          this.locationdates = locationreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
             .join(', ');
         } else if (location.isInActivate && !location.reActiveDate){
@@ -271,7 +271,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           departmentreactivateDate.filter((f: Date) => 
              new Date(f) >=  new Date(department.inActiveDate ?? '') &&
                new Date(f) < new Date(department.reActiveDate ?? ''));
-          this.dates = departmentreactivateDate
+          this.departmentdates = departmentreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
             .join(', ');
         } else if(department.isInActivate && !department.reActiveDate){
@@ -292,7 +292,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
         }
         this.isLocationAndDepartment = this.locationdates && this.departmentdates ? true : false
         this.isLocation = this.locationdates ? true : false
-        this.dates= this.locationdates +' '+ this.departmentdates;
+        this.dates= this.locationdates ? this.locationdates : '' +' '+ this.departmentdates ? this.departmentdates : '';
         this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates,this.isLocation,this.isLocationAndDepartment));
       }
       else {
