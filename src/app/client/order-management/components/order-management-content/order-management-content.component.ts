@@ -1941,7 +1941,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.organization$.pipe(filter((organization) => !!organization), take(1)),
     ])
       .pipe(
-        debounceTime(50),
+        debounceTime(100),
         tap(([structure]) => {
           if (this.organizationId === structure.organizationId) {
             this.orgStructure = structure;
