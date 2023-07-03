@@ -119,7 +119,16 @@ constructor(
             availableStartDate,
             status
           ));
-      } else {
+      }
+      else if(status === CandidatStatus.Cancelled) {
+        return this.orderCandidateApiService.cancelIrpCandidate( {
+          organizationId: state.order.organizationId as number,
+          jobId: state.candidate.candidateJobId,
+          createReplacement,
+        });
+      }
+      else{
+       
         return this.orderCandidateApiService.updateIrpCandidate(
           UpdateCandidateDto(
             state.order.organizationId as number,

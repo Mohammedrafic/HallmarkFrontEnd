@@ -108,6 +108,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     super();
     this.dialogConfig = CandidateDialogConfig();
     this.candidateForm = this.editIrpCandidateService.createCandidateForm();
+  
   }
 
   ngOnInit(): void {
@@ -115,9 +116,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.observeStatusControl();
     this.watchForActualDateValues();
     this.getComments();
-    this.showactualStartEndDate=this.isIRPLTAOrder ? false : true;
-
-
   }
 
   save(): void {
@@ -356,7 +354,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     )
     .subscribe((value) => {
      this.isAppliedorShortlisted = value === CandidatStatus.Applied || value === CandidatStatus.Shortlisted ? true : false;
-     this.showactualStartEndDate=this.isIRPLTAOrder && value === CandidatStatus.OnBoard ? true : false;
+     this.showactualStartEndDate=value === CandidatStatus.OnBoard ? true : false;
      this.candidateForm.get('availableStartDate')?.patchValue(DateTimeHelper.convertDateToUtc(this.availableStartDate as string), { emitEvent: false, onlySelf: true });
       this.cdr.markForCheck();
   });

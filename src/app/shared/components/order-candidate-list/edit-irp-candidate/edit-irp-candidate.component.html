@@ -52,7 +52,7 @@
 
             <ng-template [ngSwitchCase]="FieldTypes.Date">
               <div
-              *ngIf="field.field === 'closeDate' ? candidateForm.get('isClosed')?.value :  field.field === 'availableStartDate' ? isAppliedorShortlisted :  field.field === 'actualStartDate' || field.field === 'actualEndDate' ? showactualStartEndDate :true"
+              *ngIf="field.field === 'closeDate' ? candidateForm.get('isClosed')?.value :  field.field === 'availableStartDate' ? isAppliedorShortlisted :  field.field === 'actualStartDate' || field.field === 'actualEndDate' ? (isOnboarded || showactualStartEndDate)  :true"
               class="input-container calendar {{field?.cssClass}}">
                 <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
                 <ejs-datepicker
