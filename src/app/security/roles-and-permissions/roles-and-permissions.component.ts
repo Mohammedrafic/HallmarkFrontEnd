@@ -107,7 +107,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     this.roleFormGroup.enable();
     this.roleFormGroup.patchValue({
       businessUnitType: this.businessUnitControl.value,
-      businessUnitId: this.roleForm.defaultBusinessValue,
+      businessUnitId: this.businessControl.value?.length > 0 ? this.businessControl.value[0] : null ,
       isActive: true,
       isShowIRPOnly: false
     });
