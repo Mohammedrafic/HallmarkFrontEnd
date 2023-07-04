@@ -324,6 +324,9 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       } else {
         this.filters.endTime = getPreservedfilterTime(this.filters.endTime);
       }
+      if(this.filters.departmentsIds?.length){
+        skipDataUpdate = false;
+      }
     this.updateScheduleFilter.emit({
       filters: this.filters,
       filteredItems: this.filteredItems,
