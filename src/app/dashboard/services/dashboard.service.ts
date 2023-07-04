@@ -73,6 +73,7 @@ export class DashboardService {
     [WidgetTypeEnum.APPLICANTS_BY_POSITIONS]: (filters: DashboartFilterDto) => this.getApplicantsByPositionsWidgetData(filters),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getActivePositionWidgetData(filters),
       [WidgetTypeEnum.CANDIDATES]: (filters: DashboartFilterDto) => this.getCandidatesWidgetData(filters),
+      [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivePositionsWidgetData(filters),
       [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getFilledPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboartFilterDto) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
@@ -156,6 +157,25 @@ export class DashboardService {
           id: WidgetTypeEnum.CANDIDATES,
            title: 'Candidate Overall Status',
           chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
+            label: status,
+            value: count,
+            text:'',
+            color:
+              candidateLegendPalette[status as CandidateChartStatuses] ||
+              candidateLegendPalette[CandidateChartStatuses.CUSTOM],
+          })),
+        };
+      })
+    );
+  }
+
+  private getAvergaeDayActivePositionsWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
+    return this.httpClient.post<CandidateTypeInfoModel[]>(`${this.baseUrl}/GetCandidatesByStatuses`, { ...filter }).pipe(
+      map((candidatesInfo: CandidateTypeInfoModel[]) => {
+        return {
+          id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS,
+           title: 'Average Days of Active Positions ',
+            chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
             label: status,
             value: count,
             text:'',

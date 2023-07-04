@@ -1,4 +1,14 @@
 <div class="widget-legend" *ngIf="!isPositionTrend">
+  <div class="widget-legend__item-content">
+    <div class="widget-legend__row-container">
+      <div class="widget-legend__row">
+        <div class="widget-legend__head"></div>
+        <div class="widget-legend__head"></div>
+        <div class="widget-legend__head">Total<br>Positions</div>
+        <div class="widget-legend__head">Average<br>Days</div>
+      </div>
+    </div>
+  </div>
   <div *ngFor="let legend of legendData; trackBy: trackByHandler">
     <div class="widget-legend__item-content">
       <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
@@ -7,6 +17,7 @@
           <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"  [ngClass]="slideBar ? 'trend-marright' : ''"></div>
           <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
       
+        <div *ngIf="!showPercentRatio" class="widget-legend__score">{{ legend.value }}</div>
         <div *ngIf="!showPercentRatio" class="widget-legend__score">{{ legend.value }}</div>
         <app-percentage-ratio-indicator *ngIf="showPercentRatio"
                                         [percentageRatio]="legend.value"
