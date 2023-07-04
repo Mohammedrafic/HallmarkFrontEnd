@@ -355,6 +355,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     event.stopPropagation();
     this.disabledCopy = true;
     this.masterCredentialId = data.masterCredentialId;
+    this.credentialType = data.credentialType as CredentialType;
     this.saveCredential({
       ...data,
       status: CredentialStatus.Pending,
