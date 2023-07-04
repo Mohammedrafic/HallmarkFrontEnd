@@ -50,6 +50,7 @@ import { CreateOrderDto, Order } from '@shared/models/order-management.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrganizationStructureService } from '@shared/services/organization-structure.service';
 import { ShowToast } from '../../../../store/app.actions';
+import { set } from 'lodash';
 
 @Component({
   selector: 'app-irp-container',
@@ -244,7 +245,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
                new Date(f) < new Date(location.reActiveDate ?? ''));
           this.locationdates = locationreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
-            .join(', ');
+            .join(',');
         } else if (location.isInActivate && !location.reActiveDate){
           createdOrder.jobDates = createdOrder.jobDates.filter(
             (f: Date) => new Date(f) < new Date(location.inActiveDate ?? '')
@@ -254,7 +255,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           
           this.locationdates = locationreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
-            .join(', ');
+            .join(',');
         }
         if (department.isInActivate && department.reActiveDate) {
           createdOrder.jobDates = createdOrder.jobDates.filter(
@@ -264,7 +265,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           
           departmentreactivateDate = 
           locationreactivateDate ? 
-          locationreactivateDate.filter((f: Date) => 
+          departmentreactivateDate.filter((f: Date) => 
              new Date(f) >=  new Date(department.inActiveDate ?? '') &&
                new Date(f) < new Date(department.reActiveDate ?? ''))
                :
@@ -273,14 +274,14 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
                new Date(f) < new Date(department.reActiveDate ?? ''));
           this.departmentdates = departmentreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
-            .join(', ');
+            .join(',');
         } else if(department.isInActivate && !department.reActiveDate){
           createdOrder.jobDates = createdOrder.jobDates.filter(
             (f: Date) => new Date(f) < new Date(department.inActiveDate ?? '')
           );
           departmentreactivateDate =
           locationreactivateDate ?
-          locationreactivateDate.filter((f: Date) => 
+          departmentreactivateDate.filter((f: Date) => 
              new Date(f) >= new Date(department.inActiveDate ?? ''))
              : 
           departmentreactivateDate.filter((f: Date) => 
@@ -288,11 +289,21 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           
           this.departmentdates = departmentreactivateDate
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
-            .join(', ');
+            .join(',');
         }
         this.isLocationAndDepartment = this.locationdates && this.departmentdates ? true : false
         this.isLocation = this.locationdates ? true : false
-        this.dates= this.locationdates ? this.locationdates : '' +' '+ this.departmentdates ? this.departmentdates : '';
+        if (this.locationdates && this.departmentdates) {
+          this.dates = this.locationdates.trim() + ',' + this.departmentdates.trim();
+          let cancatDates= this.dates.split(",");
+          cancatDates=[...new Set(cancatDates)];
+          let caoncatDates= cancatDates.map((m: string|number|Date) => m.toString()).join(', ')
+          this.dates= caoncatDates.toString();
+        } else if (this.locationdates && !this.departmentdates) {
+          this.dates = this.locationdates;
+        } else if (!this.locationdates && this.departmentdates) {
+          this.dates = this.departmentdates;
+        }
         this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates,this.isLocation,this.isLocationAndDepartment));
       }
       else {
