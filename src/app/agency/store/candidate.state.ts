@@ -205,13 +205,12 @@ export class CandidateState {
   @Action(UploadCandidatePhoto)
   UploadCandidatePhoto(
     { patchState }: StateContext<CandidateStateModel>,
-    { file, candidateProfileId }: UploadCandidatePhoto
-  ): Observable<any> {
+    { file, candidateProfileId, isInitialUpload }: UploadCandidatePhoto
+  ): Observable<null> {
     patchState({ isCandidateLoading: true });
-    return this.candidateService.saveCandidatePhoto(file, candidateProfileId).pipe(
-      tap((payload) => {
+    return this.candidateService.saveCandidatePhoto(file, candidateProfileId, isInitialUpload).pipe(
+      tap(() => {
         patchState({ isCandidateLoading: false });
-        return payload;
       })
     );
   }
@@ -221,7 +220,6 @@ export class CandidateState {
     return this.candidateService.getCandidatePhoto(payload).pipe(
       tap((payload) => {
         dispatch(new GetCandidatePhotoSucceeded(payload));
-        return payload;
       })
     );
   }
