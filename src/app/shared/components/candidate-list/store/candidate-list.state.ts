@@ -57,7 +57,6 @@ export class CandidateListState {
     return this.candidateListService.getCandidates(payload).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false, candidateList: payload });
-        return payload;
       }),
       catchError((error: HttpErrorResponse) => {
         patchState({ isCandidateLoading: false, candidateList: null });

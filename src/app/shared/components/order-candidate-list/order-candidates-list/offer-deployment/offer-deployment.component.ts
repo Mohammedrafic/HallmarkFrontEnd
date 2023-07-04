@@ -53,6 +53,7 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { formatNumber } from '@angular/common';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -101,6 +102,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public hasEditOrderBillRatesPermission: boolean;
   public showCandidatePayRate: boolean;
   public payRateSetting = CandidatePayRateSettings;
+  public canCreateOrder : boolean;
 
   get showYearsOfExperience(): boolean {
     return (
@@ -170,7 +172,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     private actions$: Actions,
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private permissionService : PermissionService
   ) { }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -186,6 +189,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.today.setHours(0);
     this.createForm();
     this.subscribeOnInitialData();
@@ -502,5 +506,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
     return rates.some((rate) => !!rate.isUpdated);
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

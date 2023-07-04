@@ -327,18 +327,28 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private setBulkDateRanges(selectedRows: RowNode[]): void {
     const startDates: string[] = [];
     const endDates: string[] = [];
+    const employeeWorkCommitmentIds: number[] = [];
+    const activeEmployeeWorkCommitmentId = this.departmentsService.employeeWorkCommitmentId;
 
     selectedRows.forEach((item) => {
-      startDates.push(item.data.startDate);
-      endDates.push(item.data.endDate);
+      const { startDate, endDate, employeeWorkCommitmentId } = item.data;
+
+      if (startDate) {
+        startDates.push(startDate);
+      }
+      if (endDate) {
+        endDates.push(endDate);
+      }
+      if (employeeWorkCommitmentId) {
+        employeeWorkCommitmentIds.push(employeeWorkCommitmentId);
+      }
     });
 
-    if (allAreEqual(startDates) && allAreEqual(endDates)) {
-      const startDate = new Date(startDates[0]);
-      const wcStartDate = this.dateRanges.min ?? startDate;
-      const min = wcStartDate < startDate ? wcStartDate : startDate;
-      const max = endDates[0] ? new Date(endDates[0]) : undefined;
-      
+    if (allAreEqual(employeeWorkCommitmentIds) && employeeWorkCommitmentIds[0] !== activeEmployeeWorkCommitmentId) {
+      const startDate = DateTimeHelper.getEarliestDate(startDates);
+      const endDate = DateTimeHelper.getLatestDate(endDates);
+      const min = startDate ? DateTimeHelper.convertDateToUtc(startDate) : undefined;
+      const max = endDate ? DateTimeHelper.convertDateToUtc(endDate) : undefined;
       this.bulkDateRanges = { min, max };
     } else {
       this.bulkDateRanges = this.dateRanges;

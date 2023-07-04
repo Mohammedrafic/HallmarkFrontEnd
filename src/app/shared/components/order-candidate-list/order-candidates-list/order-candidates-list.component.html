@@ -255,8 +255,10 @@
   [handleOpenModal]="editCandidateDialogState"
   (handleCloseModal)="closeEditCandidateModal($event)"
   (handleSuccessSaveCandidate)="saveIrpCandidate()"
+  [isIRPLTAOrder]="isIRPLTAorder"
   [commentContainerId] = "commentContainerId"
   [CanOrganizationViewOrdersIRP]="userPermission[userPermissions.CanOrganizationViewOrdersIRP]"
+  [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanCreateOrdersIRP]"
 ></app-edit-irp-candidate>
 
 <ejs-dialog

@@ -296,4 +296,28 @@ export class DateTimeHelper {
     //get timezone from ISO string. example: "2023-01-30T09:43:32.2300926-05:00" => "-0500"
     return date.slice(-6).split(':').join('');
   }
+
+  static getEarliestDate(dates: string[]): string | null {
+    const timeStamp: number[] = dates.map(date => {
+      return DateTimeHelper.convertDateToUtc(date).getTime();
+    });
+  
+    if (timeStamp.length) {
+      return DateTimeHelper.toUtcFormat(new Date(Math.min(...timeStamp)));
+    }
+  
+    return null;
+  }
+  
+  static getLatestDate(dates: string[]): string | null {
+    const timeStamp: number[] = dates.map(date => {
+      return DateTimeHelper.convertDateToUtc(date).getTime();
+    });
+  
+    if (timeStamp.length) {
+      return DateTimeHelper.toUtcFormat(new Date(Math.max(...timeStamp)));
+    }
+  
+    return null;
+  }
 }

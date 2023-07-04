@@ -53,19 +53,17 @@
           <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <ng-container *ngIf="!isMobile">
         <button
           *ngIf="(currentUserPermissions$ | async) as userPermission"
           ejs-button
           appHideBeforeSyncfusionLoad
           id="addIRPCandidate"
-          cssClass="e-primary"
+          cssClass="e-primary" class="noResponsive"
           [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
           (click)="addIRPCandidate()"
         >
           Add Employee
         </button>
-      </ng-container>
 
     </div>
   </ng-container>

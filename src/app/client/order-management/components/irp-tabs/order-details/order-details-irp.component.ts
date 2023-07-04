@@ -719,6 +719,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       .get('jobDates')
       ?.valueChanges.pipe(filter(()=> true), takeUntil(this.componentDestroy()))
       .subscribe((value: any | undefined) => {
+        if (value.length>0)
+        {
         let regionID = this.generalInformationForm.get('regionId')?.value;
         const locations = this.organizationStructureService.getLocationsByIdSet(regionID, value);
           let locID = this.generalInformationForm.get('locationId')?.value;
@@ -739,6 +741,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           setDataSource(selectedForm.fields, 'locationId', locations);
           setDataSource(selectedForm.fields, 'departmentId', deparment);
           this.changeDetection.markForCheck();
+        }
       });
   }
 

@@ -46,6 +46,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
+import { DateTime } from '@syncfusion/ej2-angular-charts';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -61,6 +62,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.candidateModelState = {...modalState};
       this.subscribeOnPermissions();
       this.isOnboarded = modalState.candidate.status === CandidatStatus.OnBoard;
+      this.candidateJobId=this.candidateModelState.candidate.candidateJobId;
       this.getCandidateDetails();
     }
   }
@@ -68,6 +70,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   @Output() handleCloseModal: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() handleSuccessSaveCandidate: EventEmitter<void> = new EventEmitter<void>();
   @Input() public commentContainerId:number;
+  @Input() public isIRPLTAOrder:boolean;
   public readonly optionFields: FieldSettingsModel = OptionField;
   public readonly title: string = CandidateTitle;
   public readonly FieldTypes = FieldType;
@@ -79,10 +82,15 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public canRejectedCandidateIRP:boolean;
   public replacementPdOrdersDialogOpen = false;
   public closingDate: Date;
+  public isAppliedorShortlisted:boolean=false;
+  public showactualStartEndDate:boolean;
+  public availableStartDate:string | Date;
+  public candidateJobId:number;
 
   public comments: Comment[] = [];
   @Input() public externalCommentConfiguration ?: boolean | null;
   @Input() CanOrganizationViewOrdersIRP: boolean;
+  @Input() CanOrganizationEditOrdersIRP: boolean;
 
   private candidateModelState: EditCandidateDialogState;
 
@@ -100,10 +108,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     super();
     this.dialogConfig = CandidateDialogConfig();
     this.candidateForm = this.editIrpCandidateService.createCandidateForm();
+  
   }
 
   ngOnInit(): void {
     this.observeCloseControl();
+    this.observeStatusControl();
     this.watchForActualDateValues();
     this.getComments();
   }
@@ -189,7 +199,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private saveCandidate(createReplacement = false): void {
     if (!this.candidateForm.get('isClosed')?.value) {
-      this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState, createReplacement)
+      this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState, createReplacement,this.isIRPLTAOrder)
       .pipe(
         catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
         takeUntil(this.componentDestroy()),
@@ -225,7 +235,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private getCandidateDetails(): void {
     this.orderCandidateApiService.getIrpCandidateDetails(
-      this.candidateModelState.order.id, this.candidateModelState.candidate.candidateProfileId)
+      this.candidateModelState.order.id, this.candidateModelState.candidate.candidateProfileId,this.isIRPLTAOrder)
     .pipe(
         filter(Boolean),
         tap((candidateDetails: CandidateDetails) => {
@@ -245,7 +255,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
               statusConfigField.dataSource.splice(objWithIdIndex, 1);
             }
           }
-
+          this.availableStartDate = candidateDetails.actualStartDate;
           this.candidateForm.patchValue({
             actualStartDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualStartDate as string),
             actualEndDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualEndDate as string),
@@ -336,6 +346,21 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.cdr.markForCheck();
     });
   }
+  private observeStatusControl(): void {
+    this.candidateForm.get('status')?.valueChanges
+    .pipe(
+      distinctUntilChanged(),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((value) => {
+     this.isAppliedorShortlisted = value === CandidatStatus.Applied || value === CandidatStatus.Shortlisted ? true : false;
+     this.showactualStartEndDate=value === CandidatStatus.OnBoard ? true : false;
+     this.candidateForm.get('availableStartDate')?.patchValue(DateTimeHelper.convertDateToUtc(this.availableStartDate as string), { emitEvent: false, onlySelf: true });
+      this.cdr.markForCheck();
+  });
+  }
+
+
 
   private setStatusSourceForDisabled(jobStatus: {
     applicantStatus: number;

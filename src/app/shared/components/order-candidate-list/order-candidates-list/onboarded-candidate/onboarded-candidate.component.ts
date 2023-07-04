@@ -71,6 +71,7 @@ import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-s
 import { OrderType } from '@shared/enums/order-type';
 import { OnboardCandidateMessageDialogComponent } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -141,6 +142,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public payRateSetting = CandidatePayRateSettings;
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
   public readonly reorderType: OrderType = OrderType.ReOrder;
+  public canCreateOrder:boolean;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -200,7 +202,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private durationService: DurationService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private permissionService: PermissionService
   ) {
     super();
     this.createForm();
@@ -214,7 +217,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   ngOnInit(): void {
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
-
+    this.subscribeOnPermissions();
     this.subscribeOnReasonsList();
     this.checkRejectReason();
     this.subscribeOnUpdateOrganizationCandidateJobError();
@@ -791,6 +794,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     )
     .subscribe((date: Date) => {
       this.changeActualEndDate(date);
+    });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
     });
   }
 }

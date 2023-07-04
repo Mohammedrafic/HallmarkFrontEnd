@@ -118,6 +118,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public credentialStatusOptions: FieldSettingsModel[] = [];
   public existingFiles: FilesPropModel[] = [];
   public hideFileSize = false;
+  public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -127,7 +128,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private removeExistingFiles = false;
   private file: CredentialFile | null;
   private candidateProfileId: number;
-  public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
+  private credentialType: CredentialType;
 
   @Select(CandidateState.candidateCredential)
   candidateCredential$: Observable<CandidateCredentialResponse>;
@@ -392,6 +393,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       id,
       credentialFiles,
       expireDateApplicable,
+      credentialTypeId,
       credentialTypeName,
       masterName,
       rejectReason,
@@ -402,6 +404,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.credentialId = id as number;
     this.credentialStatus = status as CredentialStatus;
     this.masterCredentialId = masterCredentialId;
+    this.credentialType = { id: credentialTypeId, name: credentialTypeName as string };
     this.setExistingFiles(credentialFiles);
 
     this.store.dispatch(
@@ -483,7 +486,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public selectMasterCredentialId(event: { data: Credential }): void {
-    this.masterCredentialId = event.data.id as number;
+    const { id, credentialTypeId, credentialTypeName } = event.data;
+    
+    this.masterCredentialId = id as number;
+    this.credentialType = { id: credentialTypeId, name: credentialTypeName as string };
     this.checkCertifiedFields(event.data.expireDateApplicable);
   }
 
@@ -515,6 +521,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         this.credentialStatus = CredentialStatus.Pending;
         this.masterCredentialId = null;
         this.removeExistingFiles = false;
+        this.credentialType = {} as CredentialType;
         this.existingFiles = [];
         this.uploadObj.clearAll();
       });
@@ -568,6 +575,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
             certifiedOn: createdOn,
             certifiedUntil: createdUntil,
             completedDate,
+            credentialType: this.credentialType,
           })
         );
       }
@@ -740,6 +748,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           (item.status === this.statusEnum.Reviewed) &&
           !this.isOrganizationSide,
         disableDelete: this.disableDelete(item),
+        credentialTypeName: item.credentialType?.name,
+        credentialTypeId: item.credentialType?.id,
       };
     });
   }

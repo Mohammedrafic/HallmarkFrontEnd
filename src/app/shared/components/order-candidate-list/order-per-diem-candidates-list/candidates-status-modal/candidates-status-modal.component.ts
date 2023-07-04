@@ -36,6 +36,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired } from '@shared/constants';
 import { CommonHelper } from '@shared/helpers/common.helper';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -145,7 +146,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public orderCandidateJob: OrderCandidateJob | null;
   public comments: Comment[] = [];
   public selectedApplicantStatus: ApplicantStatus | null = null;
-
+  public canCreateOrder: boolean;
   private unsubscribe$: Subject<void> = new Subject();
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
   public candidateSSNRequired :boolean=false;
@@ -153,9 +154,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
 
-  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef) {}
+  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef, private permissionService : PermissionService) {}
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.subscribeOnGetStatus();
     this.onOpenEvent();
     this.createForm();
@@ -400,6 +402,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((reasons: RejectReason[]) => {
         this.rejectReasons = reasons;
+        this.cd.markForCheck();
       });
   }
 
@@ -511,4 +514,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       candidatePayRateControl?.disable();
     }
   }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
+  }
+
 }

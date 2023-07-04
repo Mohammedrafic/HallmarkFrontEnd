@@ -189,21 +189,30 @@
     </div>
     <div class="form-elemet">
       <div class="group">
-      <div class="input-container dropdown">
-        <label>Invoice Id</label>
-        <div class="input-group">
-          <input class="e-input"
-                 type="text"
-                 appValidateWithMessage
-                 maxlength="50"
-                 formControlName="invoiceID" />
+        <div class="input-container dropdown">
+          <label>Invoice Id</label>
+          <div class="input-group">
+            <input class="e-input"
+                   type="text"
+                   appValidateWithMessage
+                   maxlength="50"
+                   formControlName="invoiceID" />
+          </div>
         </div>
-      </div>
-      <div class="input-container bootstrap">        
-        <div class="input-group dropdown">
-         
+        <div class="input-container bootstrap"  *ngIf="financialTimesheetReportForm.controls['accrualReportTypes'].value==0">
+          <div class="input-group dropdown">
+
+          </div>
         </div>
-      </div>
+        <div class="input-container bootstrap" *ngIf="financialTimesheetReportForm.controls['accrualReportTypes'].value==1">
+          <label>Timesheet Status</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" formControlName="timesheetStatuses" appValidateWithMessage placeholder="All"
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.timesheetStatuses.dataSource"
+                             [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
       </div>
     </div>
 

@@ -386,6 +386,7 @@ export class GetPredefinedBillRatesData {
   skillId: number;
   jobStartDate?: string;
   jobEndDate?: string;
+  ignoreUpdateBillRate?: boolean;
 }
 
 export interface IRPMetaData {

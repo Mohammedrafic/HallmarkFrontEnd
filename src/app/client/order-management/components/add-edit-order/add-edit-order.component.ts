@@ -1,5 +1,5 @@
 import unionBy from 'lodash/fp/unionBy';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, skip, Subject, takeUntil } from 'rxjs';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -168,7 +168,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     this.getPredefinedBillRatesData$.pipe(takeUntil(this.unsubscribe$)).subscribe((getPredefinedBillRatesData) => {
-      if (getPredefinedBillRatesData) {
+      if (getPredefinedBillRatesData && !getPredefinedBillRatesData.ignoreUpdateBillRate) {
         this.store.dispatch(new GetPredefinedBillRates());
       }
     });
@@ -191,7 +191,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderCredentials = [...order.credentials];
     }
     if (order?.billRates && !order.isTemplate) {
-
       this.orderBillRates = [...order.billRates];
     }
   }
@@ -239,13 +238,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public updateOrderCredentials(credential: IOrderCredentialItem): void {
     this.isCredentialsChanged = true;
-    this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
+    this.orderCredentials = this.orderCredentialsService.updateOrderCredentials(this.orderCredentials, credential);
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public deleteOrderCredential(credential: IOrderCredentialItem): void {
     this.isCredentialsChanged = true;
-    this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
+    this.orderCredentials = this.orderCredentialsService.deleteOrderCredential(this.orderCredentials, credential);
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
@@ -718,7 +717,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private subscribeOnPredefinedCredentials(): void {
     this.predefinedCredentials$
       .pipe(
-        filter((predefinedCredentials: IOrderCredentialItem[]) => !!predefinedCredentials.length),
+        skip(1),
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
@@ -733,19 +732,24 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private subscribeOnPredefinedBillRates(): void {
-    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe((predefinedBillRates) => {
-      if (!this.billRatesComponent?.billRatesControl && this.order) {
-        this.orderBillRates = predefinedBillRates;
-        return;
-      }
-      if (this.billRatesComponent?.billRatesControl) {
-        this.manuallyAddedBillRates = this.billRatesComponent.billRatesControl
-          .getRawValue()
-          .filter((billrate) => !billrate.isPredefined);
-      }
-      this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
-      this.cd.detectChanges();
-    });
+    this.predefinedBillRates$
+      .pipe(
+        skip(1),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((predefinedBillRates) => {
+        if (!this.billRatesComponent?.billRatesControl && this.order) {
+          this.orderBillRates = predefinedBillRates;
+          return;
+        }
+        if (this.billRatesComponent?.billRatesControl) {
+          this.manuallyAddedBillRates = this.billRatesComponent.billRatesControl
+            .getRawValue()
+            .filter((billrate) => !billrate.isPredefined);
+        }
+        this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
+        this.cd.detectChanges();
+      });
   }
 
   private getOrderDetailsControl(name: string): AbstractControl {

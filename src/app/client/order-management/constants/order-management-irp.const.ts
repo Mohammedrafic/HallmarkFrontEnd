@@ -243,7 +243,7 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
   {
     field: 'skill',
     headerName: 'Primary Skill',
-    width: 160,
+    width: 200,
   },
   {
     field: 'workCommitment',

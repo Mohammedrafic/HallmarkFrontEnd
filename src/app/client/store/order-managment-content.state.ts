@@ -574,7 +574,8 @@ export class OrderManagementContentState {
               departmentId,
               skill,
               jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-              jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+              jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate,
+              true
             )
           );
         }
@@ -731,18 +732,12 @@ export class OrderManagementContentState {
 
   @Action(SetPredefinedBillRatesData)
   SetPredefinedBillRatesData(
-    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
-    { orderType, departmentId, skillId, jobStartDate, jobEndDate }: SetPredefinedBillRatesData
-  ): Observable<void> {
-    patchState({ getPredefinedBillRatesData: null });
-
-    return of(null).pipe(
-      debounceTime(100),
-      tap(() =>
-        patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId, jobStartDate, jobEndDate } })
-      ),
-      switchMap(() => dispatch(new GetPredefinedBillRates())),
-    );
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate }: SetPredefinedBillRatesData
+  ): OrderManagementContentStateModel {
+    return patchState({ getPredefinedBillRatesData: { 
+      orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate,
+    } });
   }
 
   @Action(GetPredefinedBillRates)
@@ -753,7 +748,7 @@ export class OrderManagementContentState {
     const state = getState();
     const getPredefinedBillRatesData = state.getPredefinedBillRatesData;
 
-    if (getPredefinedBillRatesData) {
+    if (getPredefinedBillRatesData && !getPredefinedBillRatesData.ignoreUpdateBillRate) {
       const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = getPredefinedBillRatesData;
 
       if (!isNaN(orderType) && !isNaN(departmentId) && !isNaN(skillId)) {
@@ -767,7 +762,6 @@ export class OrderManagementContentState {
       }
     }
 
-    patchState({ predefinedBillRates: [] });
     return of([]);
   }
 

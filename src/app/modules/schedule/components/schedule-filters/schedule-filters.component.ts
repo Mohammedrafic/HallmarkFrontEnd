@@ -125,17 +125,18 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       locationIds: [],
       departmentsIds: [],
       skillIds: [],
-      isAvailablity : false,
-      isUnavailablity : false,
+      isAvailablity : true,
+      isUnavailablity : true,
       isOnlySchedulatedCandidate : false,
-      isExcludeNotOrganized : false,
+      isExcludeNotOrganized : true,
       startTime: null,
       endTime : null
     });
     this.filters = this.scheduleFilterFormGroup.getRawValue();
-    this.filteredItems = [];
-    this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: [] });
-
+    this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
+    this.filteredItems = this.filteredItems.filter(filterdata => filterdata.value === true);
+    const chips = this.scheduleFiltersService.createChipsData(this.scheduleFilterFormGroup.getRawValue(), this.filterColumns);
+    this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: chips });
     if (clearPreservedFilters) {
       this.store.dispatch(new ClearPageFilters(FilterPageName.SchedullerOrganization));
     }

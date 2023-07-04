@@ -8,10 +8,10 @@
     <ng-container right>
       <section class="org-controls-container">
         <div>
-          <app-tooltip-container [hidden]="isMobile"
+          <app-tooltip-container
             [message]="toolTipMessage"
             [showToolTip]="!userPermission[userPermissions.CanCreateDeleteOrganization]">
-           <button
+           <button class="noResponsive"
               ejs-button
               appHideBeforeSyncfusionLoad
               [isPrimary]="true"
@@ -77,7 +77,7 @@
               <button ejs-button cssClass="e-flat default-icon-button">
                 <span><i-feather name="map-pin" class="icon"></i-feather></span>
               </button>
-              <button ejs-button cssClass="e-flat primary-icon-button" (click)="editOrganization(data)" *ngIf="!isMobile">
+              <button ejs-button cssClass="e-flat primary-icon-button" (click)="editOrganization(data)">
                 <span><i-feather name="edit" class="icon"></i-feather></span>
               </button>
             </div>

@@ -9,7 +9,7 @@ export const Icon = {
 };
 
 export const OptionField: FieldSettingsModel = { text: 'text', value: 'value' };
-export const CandidateTitle = 'Edit Candidate';
+export const CandidateTitle = 'Edit Employee';
 export const StatusField = 'status';
 export const CloseReasonField = 'reason';
 
@@ -63,5 +63,13 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     required: true,
     type: FieldType.Date,
     cssClass: 'close-date',
+  },
+  {
+    field: 'availableStartDate',
+    title: 'Available Start Date',
+    disabled: false,
+    required: false,
+    type: FieldType.Date,
+    cssClass: 'date-field',
   },
 ];
