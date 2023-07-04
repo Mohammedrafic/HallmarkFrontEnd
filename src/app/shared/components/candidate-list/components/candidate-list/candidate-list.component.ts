@@ -9,12 +9,14 @@ import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { SelectionSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { isNil } from 'lodash';
 import {
+  combineLatest,
   debounceTime,
   distinctUntilChanged,
   filter,
   fromEvent,
   map,
   Observable,
+  of,
   Subject,
   Subscription,
   switchMap,
@@ -56,7 +58,7 @@ import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowToast } from '../../../../../store/app.actions';
 import { UserState } from '../../../../../store/user.state';
-import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
+import { adaptToNameEntity } from '@shared/helpers/dropdown-options.helper';
 import {
   AbstractGridConfigurationComponent,
 } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
@@ -75,8 +77,10 @@ import {
   CandidatePagingState,
   CandidateListStateModel,
 } from '../../types/candidate-list.model';
-import { CandidatesExportCols, CandidatesTableFilters, filterColumns,
-  IrpCandidateExportCols, IRPCandidates, IRPFilterColumns, VMSCandidates } from './candidate-list.constants';
+import {
+  CandidatesExportCols, CandidatesTableFilters, filterColumns,
+  IrpCandidateExportCols, IRPCandidates, IRPFilterColumns, VMSCandidates,
+} from './candidate-list.constants';
 import { CandidateListScroll } from './candidate-list.enum';
 
 @Component({
@@ -129,12 +133,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() public agencyActionsAllowed: boolean;
   @Input() public userPermission: Permission;
   @Input() public isIRP: boolean;
-  @Input() public set tab(tabIndex: number) {
+
+  @Input()
+  public set tab(tabIndex: number) {
     if (!isNil(tabIndex)) {
       this.activeTab = tabIndex;
       this.dispatchNewPage();
     }
   }
+
   @Input() public isMobileScreen = false;
   public filters: CandidateListFilters = CandidatesTableFilters;
   public CandidateFilterFormGroup: FormGroup;
@@ -178,10 +185,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     private candidateListService: CandidateListService,
     private scrollService: ScrollRestorationService,
     private readonly ngZone: NgZone,
-    @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis
+    @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super();
-    this.unassignedworkCommitment = JSON.parse(localStorage.getItem('unassignedworkcommitment') || 'false') as boolean; 
+    this.unassignedworkCommitment = JSON.parse(localStorage.getItem('unassignedworkcommitment') || 'false') as boolean;
   }
 
   ngOnInit(): void {
@@ -249,7 +256,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         }
         else {
           this.store.dispatch(new ShowToast(MessageTypes.Error, END_DATE_REQUIRED));
-      } 
+      }
     } else {
       if (this.CandidateFilterFormGroup.dirty) {
         this.filters = this.CandidateFilterFormGroup.getRawValue();
@@ -372,7 +379,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       pageSize: this.pageSize,
       orderBy: this.orderBy,
     };
-    
+
     this.store.dispatch(
       this.isIRP
         ? new CandidateListActions.GetIRPCandidatesByPage(candidateListRequest)
@@ -520,12 +527,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private subscribeOnSaveState(): void {
+    const assignedSkillsStream: Observable<ListOfSkills[] | null> = this.isAgency ? of(null) : this.assignedSkills$
+      .pipe(filter((assignedSkills) => !!assignedSkills.length));
+
     this.getLastSelectedBusinessUnitId().pipe(
       tap(() => {
-        this.store.dispatch([
-          new GetAllSkills(),
-          new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }),
-        ]);
         this.getPreservedFiltersByPage();
       }),
       switchMap(() => this.preservedFiltersByPageName$),
@@ -536,7 +542,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.currentPage = tableState?.pageNumber || this.currentPage;
         this.pageSize = tableState?.pageSize || this.pageSettings.pageSize;
         this.pageSettings.pageSize = tableState?.pageSize || this.pageSettings.pageSize;
-  
+
         if (!filters.isNotPreserved) {
           this.filters = { ...filters.state };
         }
@@ -545,15 +551,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
           this.filters = { ...tableState };
         }
 
-        if(this.credStartDate != undefined){
+        if (this.credStartDate != undefined) {
           this.filters.startDate = DateTimeHelper.toUtcFormat(this.credStartDate);
         }
 
-        if(this.credEndDate != undefined){
+        if (this.credEndDate != undefined) {
           this.filters.endDate = DateTimeHelper.toUtcFormat(this.credEndDate);
         }
 
-        if(this.credType != null){
+        if (this.credType != null) {
           this.filters.credType = [this.credType];
         }
 
@@ -564,20 +570,22 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
         this.dispatchNewPage(true);
       }),
-
-      switchMap(() => this.getStructure()),
-      filter((structure) => !!structure),
-      switchMap(() => this.skills$),
-      filter((skills) => !!skills.length),
-      switchMap(() => this.assignedSkills$),
-      filter((assignedSkills) => !!assignedSkills.length),
+      switchMap(() => {
+        return combineLatest([
+          this.getStructure(),
+          this.skills$,
+          assignedSkillsStream,
+        ]);
+      }),
+      filter(([structure, skills]) => {
+        return !!structure && !!skills.length;
+      }),
       takeUntil(this.unsubscribe$)
-    )
-      .subscribe(() => {
-        !this.isAgency && this.IRPVMSGridHandler();
-        this.updateCandidates();
-        this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
-      });
+    ).subscribe(() => {
+      !this.isAgency && this.IRPVMSGridHandler();
+      this.updateCandidates();
+      this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
+    });
   }
 
   private subscribeOnPageSubject(): void {
@@ -730,7 +738,14 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private getPreservedFiltersByPage(): void {
-    this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
+    this.store.dispatch([
+      new GetAllSkills(),
+      new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()),
+    ]);
+
+    if (!this.isAgency) {
+      this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
+    }
   }
 
   private saveFiltersByPageName(filters: CandidateListFilters): void {
@@ -753,7 +768,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return businessUnitId$;
   }
 
-  private getStructure(): Observable<OrganizationStructure> | Observable<string[]> {
+  private getStructure(): Observable<OrganizationStructure | string[]> {
     const structure$ = this.isAgency ? this.regions$ : this.organizationStructure$;
     return structure$;
   }
@@ -784,7 +799,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     }
   }
 
-  private checkScrollPosition(): void {  
+  private checkScrollPosition(): void {
     const scrollValue = this.scrollService.getScrollPosition(CandidateListScroll.CandidateList);
 
     if (scrollValue === undefined) {
