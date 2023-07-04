@@ -43,6 +43,7 @@ import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved
 import { TimeMask } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { getPreservedfilterTime, getPreservedTime, getTime } from '@shared/utils/date-time.utils';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -327,6 +328,11 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       if(this.filters.departmentsIds?.length){
         skipDataUpdate = false;
       }
+
+    const user = this.store.selectSnapshot(UserState.user);
+    if(user?.isEmployee){
+      this.filters.isOnlySchedulatedCandidate = true;
+    }     
     this.updateScheduleFilter.emit({
       filters: this.filters,
       filteredItems: this.filteredItems,
