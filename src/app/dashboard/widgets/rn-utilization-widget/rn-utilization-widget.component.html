@@ -25,7 +25,7 @@
             <label>Work Commitment</label>
             <div class="input-group dropdown">
               <app-multiselect-dropdown [formGroupInstance]="rnUtilizationForm" [fields]="optionFields"
-                [dataSource]="commitmentsPage$ | async" [showSelectAll]="true" [popupWidth]="popupWidth" controlName="workCommitment"
+                [dataSource]="commitmentsPage$ | async" [showSelectAll]="true" controlName="workCommitment"
                 selectAllText="All"></app-multiselect-dropdown>
             </div>
           </div>
@@ -35,7 +35,7 @@
             <label>Skills</label>
             <div class="input-group dropdown">
               <app-multiselect-dropdown [formGroupInstance]="rnUtilizationForm" [fields]="optionFields"
-                [dataSource]="nursingSkill$ | async" [showSelectAll]="true" [popupWidth]="popupWidth" controlName="skills" placeholder="Skills"
+                [dataSource]="nursingSkill$ | async" [showSelectAll]="true" [popupWidth]="'auto'" controlName="skills" placeholder="Skills"
                 selectAllText="All"></app-multiselect-dropdown>
             </div>
           </div>
