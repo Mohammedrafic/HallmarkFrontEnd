@@ -110,6 +110,10 @@
       display: none !important;
     }
   }
+
+  @media (max-width: 380px) {
+    margin-left: -25%;
+  }
 }
 
 .vertical-divider {
