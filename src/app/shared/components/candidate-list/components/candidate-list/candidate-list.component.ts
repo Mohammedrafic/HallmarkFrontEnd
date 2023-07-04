@@ -37,7 +37,7 @@ import { ScrollRestorationService } from '@core/services/scroll-restoration.serv
 import { GlobalWindow } from '@core/tokens';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { END_DATE_REQUIRED, ERROR_START_LESS_END_DATE, optionFields, regionFields } from '@shared/constants';
+import { END_DATE_REQUIRED, ERROR_START_LESS_END_DATE, GRID_CONFIG, optionFields, regionFields } from '@shared/constants';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -272,7 +272,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.store.dispatch(new ShowFilterDialog(false));
       }
     }
-    this.setTableState();
   }
 
   public onFilterClose(): void {
@@ -293,7 +292,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public changePageSize(event: number): void {
     this.pageSize = event;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-    this.setTableState();
   }
 
   public changePageNumber(page: number): void {
@@ -311,6 +309,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       candidateStatus: null,
       orderId: null,
     };
+    this.setTableState();
     this.router.navigate(
       ['./edit', (data as CandidateRow).candidateProfileId || (data as IRPCandidate).id],
       { relativeTo: this.route, state: credentialParams }
@@ -532,10 +531,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       filter(({ dispatch }) => dispatch),
       tap((filters) => {
         const tableState = (this.store.snapshot().candidateList as CandidateListStateModel).tableState;
-
+        
         this.currentPage = tableState?.pageNumber || this.currentPage;
-        this.pageSize = tableState?.pageSize || this.pageSettings.pageSize;
-        this.pageSettings.pageSize = tableState?.pageSize || this.pageSettings.pageSize;
+        this.pageSize = tableState?.pageSize || GRID_CONFIG.initialRowsPerPage;
+        this.pageSettings.pageSize = tableState?.pageSize || GRID_CONFIG.initialRowsPerPage;
   
         if (!filters.isNotPreserved) {
           this.filters = { ...filters.state };
@@ -563,6 +562,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         }
 
         this.dispatchNewPage(true);
+        this.store.dispatch(new CandidateListActions.ClearTableState());
       }),
 
       switchMap(() => this.getStructure()),
@@ -587,7 +587,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       takeUntil(this.unsubscribe$)
     ).subscribe((page) => {
       this.currentPage = page;
-      this.setTableState();
       this.dispatchNewPage();
     });
   }
@@ -614,7 +613,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       takeUntil(this.unsubscribe$)
     ).subscribe((isInclude: boolean) => {
       this.includeDeployedCandidates = isInclude;
-      this.setTableState();
       this.dispatchNewPage();
     });
   }
