@@ -67,7 +67,7 @@ import {
   GetOrdersJourney,
   ExportOrdersJourney,
   GetAllShifts,
-  GetOrderComments,
+  GetOrderComments, 
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -133,6 +133,7 @@ import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -168,7 +169,7 @@ export interface OrderManagementContentStateModel {
   orderComments: Comment[]
 }
 
-@State<OrderManagementContentStateModel>({
+@State<OrderManagementContentStateModel>( {
   name: 'orderManagement',
   defaults: {
     ordersPage: null,
@@ -205,7 +206,7 @@ export interface OrderManagementContentStateModel {
     irpCandidates: null,
     candidateCancellationReasons:null,
     allShifts:null,
-    orderComments : []
+    orderComments : [],
   },
   
 })
@@ -405,7 +406,7 @@ export class OrderManagementContentState {
     private UpdateRegRateService : UpdateRegRateService,
     private commentService : CommentsService
   ) {}
-
+  
   @Action(GetOrders, { cancelUncompleted: true })
   GetOrders(
     { patchState }: StateContext<OrderManagementContentStateModel>,
