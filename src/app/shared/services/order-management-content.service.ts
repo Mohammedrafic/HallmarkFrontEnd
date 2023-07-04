@@ -16,6 +16,7 @@ import {
   IrpCandidatesParams,
   IrpOrderCandidate,
   IrpOrderCandidateDto,
+  OnboardCandidateEmail,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -577,5 +578,13 @@ export class OrderManagementContentService {
 
   public getAllShifts(): Observable<ScheduleShift[]> {
     return this.http.get<ScheduleShift[]>(`/api/MasterShifts/all`);
+  }
+
+  public sendCandidateOnboardEmail(payload: OnboardCandidateEmail): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', payload?.stream != null ? payload?.stream : '');
+    delete payload.stream;
+    formData.append('content', JSON.stringify(payload))
+    return this.http.post<any>(`/api/AppliedCandidates/candidateOnboardemail`, formData);
   }
 }
