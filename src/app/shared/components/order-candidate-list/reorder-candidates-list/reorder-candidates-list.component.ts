@@ -61,6 +61,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public readonly cancelledStatusName = ReorderCandidateStatuses[ReorderCandidateStatuses.Cancelled];
   public readonly systemType = OrderManagementIRPSystemId;
   public readonly onboardedCandidate: CandidateStatus = CandidateStatus.OnBoarded;
+  public readonly cancelledCandidate: CandidateStatus = CandidateStatus.Cancelled;
   public readonly notAppliedCandidate: CandidateStatus = CandidateStatus.NotApplied;
 
   private selectedIndex: number;
