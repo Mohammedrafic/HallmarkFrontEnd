@@ -172,6 +172,7 @@
                 ejs-button
                 cssClass="e-flat primary-icon-button custom-button"
                 [class.btn-icon__disabled]="selectedOrder.irpOrderMetadata?.status === orderStatus.Closed
+                || data?.status === cancelledCandidate
                 || data?.status === onboardedCandidate
                 || !data.isOriented
                 || (data?.status === notAppliedCandidate && scheduleAvailabilitySetting)"

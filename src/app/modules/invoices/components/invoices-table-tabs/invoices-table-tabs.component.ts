@@ -179,8 +179,8 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
     }
     if ((AlertIdEnum[AlertIdEnum['Manual Invoice: Pending Approval']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
       if (user?.businessUnitType === BusinessUnitType.Organization) {
-        this.changeTab.emit(InvoicesOrgTabId.ManualInvoicePending);
-        this.tabComponent.selectedItem = InvoicesOrgTabId.ManualInvoicePending;
+        this.changeTab.emit(InvoicesOrgTabId.PendingApproval);
+        this.tabComponent.selectedItem = InvoicesOrgTabId.PendingApproval;
       }
       this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
