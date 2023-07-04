@@ -226,7 +226,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       let candidate = this.getCandidateRequestObj(this.candidateForm.getRawValue());
       candidate = {
         ...candidate,
-        dob: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(candidate.dob)),
+        dob: DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(candidate.dob)),
         ssn: candidate.ssn ? +candidate.ssn : null,
       };
 
@@ -332,7 +332,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       firstName,
       middleName,
       lastName,
-      dob: DateTimeHelper.convertDateToUtc(dob),
+      dob: DateTimeHelper.setCurrentUtcDate(dob),
       classification,
       profileStatus,
       candidateAgencyStatus,
@@ -504,7 +504,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           return ({
             ...candidateProfile,
             candidateProfileSkills: candidateProfile.candidateProfileSkills.map(
-              (id) => ({ id } as unknown as JobDistributionMasterSkills) 
+              (id) => ({ id } as unknown as JobDistributionMasterSkills)
             ),
           });
         }),

@@ -116,10 +116,10 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   private handleOnHoldProfileStatus(): void {
     const profileData = this.candidatesService.getProfileData();
     const startDate = profileData?.holdStartDate
-      ? DateTimeHelper.convertDateToUtc(profileData.holdStartDate as string)
+      ? DateTimeHelper.setCurrentUtcDate(profileData.holdStartDate as string)
       : this.today;
     const endDate = profileData?.holdEndDate
-      ? DateTimeHelper.convertDateToUtc(profileData.holdEndDate as string)
+      ? DateTimeHelper.setCurrentUtcDate(profileData.holdEndDate as string)
       : null;
 
     this.isOnHoldSelected = true;
@@ -138,7 +138,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   private handleTerminatedProfileStatus(): void {
     const profileData = this.candidatesService.getProfileData();
     const startDate = profileData?.terminationDate
-      ? DateTimeHelper.convertDateToUtc(profileData.terminationDate)
+      ? DateTimeHelper.setCurrentUtcDate(profileData.terminationDate)
       : this.today;
 
     this.isTerminatedSelected = true;

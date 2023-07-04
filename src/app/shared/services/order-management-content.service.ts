@@ -456,7 +456,7 @@ export class OrderManagementContentService {
 
         return Object.fromEntries(
           Object.entries(data)
-            .map(([key, value]) => 
+            .map(([key, value]) =>
               [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]
             ));
       }),
@@ -556,10 +556,10 @@ export class OrderManagementContentService {
 
     return <CreateOrderDto>{
       ...order,
-      jobStartDate: jobStartDate ? new Date(DateTimeHelper.toUtcFormat(jobStartDate)) : null,
-      jobEndDate: jobEndDate ? new Date(DateTimeHelper.toUtcFormat(jobEndDate)) : null,
-      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.toUtcFormat(shiftStartTime)) : null,
-      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.toUtcFormat(shiftEndTime)) : null,
+      jobStartDate: jobStartDate ? new Date(DateTimeHelper.setUtcTimeZone(jobStartDate)) : null,
+      jobEndDate: jobEndDate ? new Date(DateTimeHelper.setUtcTimeZone(jobEndDate)) : null,
+      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.setUtcTimeZone(shiftStartTime)) : null,
+      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.setUtcTimeZone(shiftEndTime)) : null,
     };
   }
 

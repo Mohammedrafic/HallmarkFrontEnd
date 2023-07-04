@@ -326,9 +326,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             organizationId: this.candidateJob?.organizationId as number,
             jobId: this.candidateJob?.jobId as number,
             nextApplicantStatus: this.candidateJob?.applicantStatus,
-            actualStartDate: DateTimeHelper.toUtcFormat(this.candidateJob?.actualStartDate),
-            actualEndDate: DateTimeHelper.toUtcFormat(this.candidateJob?.actualEndDate) as string,
-            offeredStartDate: DateTimeHelper.toUtcFormat(this.candidateJob?.availableStartDate as string),
+            actualStartDate: DateTimeHelper.setUtcTimeZone(this.candidateJob?.actualStartDate),
+            actualEndDate: DateTimeHelper.setUtcTimeZone(this.candidateJob?.actualEndDate) as string,
+            offeredStartDate: DateTimeHelper.setUtcTimeZone(this.candidateJob?.availableStartDate as string),
             candidateBillRate: this.candidateJob?.candidateBillRate as number,
             offeredBillRate: this.candidateJob?.offeredBillRate,
             requestComment: this.candidateJob?.requestComment as string,
@@ -357,9 +357,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobStartDate,
         this.order.jobEndDate
       );
-      const dateWithoutZone = DateTimeHelper.toUtcFormat(endDate);
+      const dateWithoutZone = DateTimeHelper.setUtcTimeZone(endDate);
 
-      this.form.patchValue({ endDate: DateTimeHelper.convertDateToUtc(dateWithoutZone) });
+      this.form.patchValue({ endDate: DateTimeHelper.setCurrentUtcDate(dateWithoutZone) });
     }
   }
 
@@ -404,8 +404,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   candidateBillRate: value.candidateBillRate,
                   offeredBillRate: value.offeredBillRate,
                   requestComment: value.comments,
-                  actualStartDate: DateTimeHelper.toUtcFormat(value.startDate),
-                  actualEndDate: DateTimeHelper.toUtcFormat(value.endDate),
+                  actualStartDate: DateTimeHelper.setUtcTimeZone(value.startDate),
+                  actualEndDate: DateTimeHelper.setUtcTimeZone(value.endDate),
                   clockId: value.clockId,
                   guaranteedWorkWeek: value.workWeek,
                   allowDeployWoCredentials: value.allow,
@@ -482,8 +482,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-            date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate?.toString()),
-              DateTimeHelper.convertDateToUtc(value.order.jobEndDate?.toString())],
+            date: [DateTimeHelper.setCurrentUtcDate(value.order.jobStartDate?.toString()),
+              DateTimeHelper.setCurrentUtcDate(value.order.jobEndDate?.toString())],
             billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
@@ -496,10 +496,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             clockId: value.clockId ? value.clockId : '',
             offeredBillRate: formatNumber(CheckNumberValue(value.offeredBillRate), 'en', '0.2-2'),
             allow: value.allowDeployCredentials,
-            startDate: DateTimeHelper.convertDateToUtc(actualStart),
-            endDate: DateTimeHelper.convertDateToUtc(actualEnd),
+            startDate: DateTimeHelper.setCurrentUtcDate(actualStart),
+            endDate: DateTimeHelper.setCurrentUtcDate(actualEnd),
             rejectReason: value.rejectReason,
-            offeredStartDate: formatDate(DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(),
+            offeredStartDate: formatDate(DateTimeHelper.setCurrentUtcDate(value.offeredStartDate).toString(),
             'MM/dd/YYYY', 'en-US'),
             jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
             penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],

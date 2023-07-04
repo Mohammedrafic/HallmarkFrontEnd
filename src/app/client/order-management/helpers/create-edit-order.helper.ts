@@ -107,8 +107,8 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
     ...formState.jobDistributionForm.getRawValue(),
     ...formState.specialProjectForm.getRawValue(),
     ...getBillRateValue(formState),
-    jobEndDate: jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : null,
-    jobStartDate: jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : null,
+    jobEndDate: jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : null,
+    jobStartDate: jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : null,
     jobDistributions: createJobDistributionList(formState.jobDistributionForm),
     jobDates: jobDates ? formatJobDates(jobDates) : null,
     contactDetails: [],
@@ -121,10 +121,10 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
 
 export const formatJobDates = (dates: Date[] | Date): string[] | string => {
   if (Array.isArray(dates)) {
-    return dates.map((date: Date) => DateTimeHelper.toUtcFormat(date));
+    return dates.map((date: Date) => DateTimeHelper.setUtcTimeZone(date));
   }
 
-  return DateTimeHelper.toUtcFormat(dates);
+  return DateTimeHelper.setUtcTimeZone(dates);
 };
 
 export const getValuesFromList = (formList: FormGroup[]): FormGroup[] => {

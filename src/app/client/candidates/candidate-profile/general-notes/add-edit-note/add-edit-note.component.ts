@@ -55,9 +55,9 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
       const user= this.store.selectSnapshot(UserState.user);
       if(!this.route.snapshot.paramMap.get('id')||this.candidatesService.employeeId||0){
         this.noteForm.get("createdByName")?.setValue(user?.lastName+", "+user?.firstName);
-      }       
+      }
       const value = this.noteForm.value;
-      value.date = value.date ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(value.date)) : value.date;
+      value.date = value.date ? DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(value.date)) : value.date;
       this.generalNotesService.addNote(value);
       this.toggleSideDialog(false);
     }

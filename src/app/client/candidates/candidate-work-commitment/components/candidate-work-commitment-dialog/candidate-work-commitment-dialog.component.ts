@@ -269,13 +269,13 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private setDatesValidation(commitment: WorkCommitmentDetails): void {
-    const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
+    const commitmentEndDate = DateTimeHelper.setCurrentUtcDate(commitment.endDate as string);
     this.selectWorkCommitmentStartDate = this.setWorkCommitmentStartDate();
     this.minimumDate = this.setMinimumDate();
 
     const terminationDate = this.candidateService.getTerminationDate();
     if (terminationDate) {
-      this.maximumDate = DateTimeHelper.convertDateToUtc(terminationDate);
+      this.maximumDate = DateTimeHelper.setCurrentUtcDate(terminationDate);
     } else {
       this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
     }
@@ -407,7 +407,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         takeUntil(this.destroy$)
       ).subscribe((activeCommitment) => {
         if (activeCommitment) {
-          this.lastActiveDate = DateTimeHelper.convertDateToUtc(activeCommitment.startDate as string);
+          this.lastActiveDate = DateTimeHelper.setCurrentUtcDate(activeCommitment.startDate as string);
           this.lastActiveDate = addDays(this.lastActiveDate, 1) as Date;
         } else {
           this.minimumDate = undefined;
@@ -456,7 +456,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       takeUntil(this.destroy$),
     ).subscribe((commitment: CandidateWorkCommitment) => {
         if (commitment.workCommitmentIds) {
-          commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
+          commitment.startDate = commitment.startDate && DateTimeHelper.setCurrentUtcDate(commitment.startDate as string);
           const masterId = this.allWorkCommitments.find(item => item.workCommitmentId === commitment.workCommitmentIds[0]);
           masterId && this.getWorkCommitmentById(masterId.masterWorkCommitmentId, commitment, false);
         }
@@ -578,7 +578,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
     candidateWorkCommitment.startDate =
       candidateWorkCommitment.startDate &&
-      DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(this.startDate));
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.startDate));
     candidateWorkCommitment.employeeId = this.employeeId;
     candidateWorkCommitment.createReplacement = this.replaceOrder;
     this.replaceOrder = false;
@@ -654,7 +654,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   private setWCStartDate(): void {
     if (!this.lastActiveDate) {
       const employeeHireDate = this.candidateService.getEmployeeHireDate();
-      const startDate = DateTimeHelper.convertDateToUtc(employeeHireDate as string);
+      const startDate = DateTimeHelper.setCurrentUtcDate(employeeHireDate as string);
       const isHireDateLessWCStartDate = startDate.getTime() < this.selectWorkCommitmentStartDate.getTime();
 
       this.startDate = isHireDateLessWCStartDate ? this.todayDate : startDate;
@@ -663,7 +663,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private setMinimumDate(): Date {
     const employeeHireDate = this.candidateService.getEmployeeHireDate();
-    const startDate = DateTimeHelper.convertDateToUtc(employeeHireDate as string);
+    const startDate = DateTimeHelper.setCurrentUtcDate(employeeHireDate as string);
     const isHireDateLessWCStartDate = startDate.getTime() < this.selectWorkCommitmentStartDate.getTime();
     let minimumDate = isHireDateLessWCStartDate ? this.selectWorkCommitmentStartDate : startDate;
 
@@ -678,7 +678,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private setWorkCommitmentStartDate(): Date {
     const workCommitmentsDates = this.workCommitmentGroup.items.map((item) => {
-      return DateTimeHelper.convertDateToUtc(item.startDate).getTime();
+      return DateTimeHelper.setCurrentUtcDate(item.startDate).getTime();
     });
     const theLeastDate = Math.min(...workCommitmentsDates);
 

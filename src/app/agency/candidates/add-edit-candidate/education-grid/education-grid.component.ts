@@ -91,7 +91,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
       candidateProfileId: education.candidateProfileId,
       degree: education.degree,
       schoolName: education.schoolName,
-      graduationDate: DateTimeHelper.convertDateToUtc(education.graduationDate),
+      graduationDate: DateTimeHelper.setCurrentUtcDate(education.graduationDate),
       fieldOfStudy: education.fieldOfStudy,
     });
     this.store.dispatch(new ShowSideDialog(true));
@@ -141,10 +141,10 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     this.educationForm.markAllAsTouched();
     if (this.educationForm.valid) {
       const educationValue = this.educationForm.getRawValue();
-      
+
       this.store.dispatch(new SaveEducation({
           ...educationValue,
-          graduationDate: DateTimeHelper.toUtcFormat(educationValue.graduationDate),
+          graduationDate: DateTimeHelper.setUtcTimeZone(educationValue.graduationDate),
         }));
     } else {
       this.educationForm.markAllAsTouched();

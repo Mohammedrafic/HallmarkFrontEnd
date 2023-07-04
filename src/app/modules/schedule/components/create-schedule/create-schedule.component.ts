@@ -405,7 +405,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     ]).pipe(
       takeUntil(this.componentDestroy()),
     ).subscribe(([startTime, endTime]: [Date, Date]) => {
-      const shiftTime = `${DateTimeHelper.toUtcFormat(startTime)}/${DateTimeHelper.toUtcFormat(endTime)}`;
+      const shiftTime = `${DateTimeHelper.setUtcTimeZone(startTime)}/${DateTimeHelper.setUtcTimeZone(endTime)}`;
       this.openPositionService.setOpenPosition('shiftTime', shiftTime);
     });
   }

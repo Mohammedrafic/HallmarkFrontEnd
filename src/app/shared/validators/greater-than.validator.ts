@@ -37,7 +37,7 @@ export function greaterThanValidator(primaryControlName: string, secondaryContro
 
 function adaptValue(value: Date | string): number {
   if (value instanceof Date) {
-    return DateTimeHelper.convertDateToUtc(value.toString()).getTime();
+    return DateTimeHelper.setCurrentUtcDate(value.toString()).getTime();
   }
   return parseFloat(value);
 }

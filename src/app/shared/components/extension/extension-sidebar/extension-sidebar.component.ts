@@ -64,7 +64,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public ngOnInit(): void {
     this.subscribeOnPermissions();
     const minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
-    this.minDate = DateTimeHelper.convertDateToUtc(minDate.toString());
+    this.minDate = DateTimeHelper.setCurrentUtcDate(minDate.toString());
     this.initExtensionForm();
     this.listenPrimaryDuration();
     this.listenDurationChanges();
@@ -156,7 +156,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       durationPrimary: [Duration.Other],
       durationSecondary: [],
       durationTertiary: [],
-      startDate: [startDate ? DateTimeHelper.convertDateToUtc(startDate.toString()) : null, [Validators.required]],
+      startDate: [startDate ? DateTimeHelper.setCurrentUtcDate(startDate.toString()) : null, [Validators.required]],
       endDate: ['', [Validators.required]],
       billRate: [candidateBillRate, [Validators.required]],
       comments: [null],

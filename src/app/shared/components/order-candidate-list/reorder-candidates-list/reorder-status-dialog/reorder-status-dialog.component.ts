@@ -428,9 +428,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: DateTimeHelper.convertDateToUtc(reOrderDate as string),
-      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
-      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
+      orderOpenDate: DateTimeHelper.setCurrentUtcDate(reOrderDate as string),
+      shiftStartTime: shiftStartTime ? DateTimeHelper.setCurrentUtcDate(shiftStartTime.toString()) : '',
+      shiftEndTime: shiftEndTime ? DateTimeHelper.setCurrentUtcDate(shiftEndTime.toString()) : '',
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
       rejectReason,
@@ -673,19 +673,19 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private setCorrectActualDates(initDate: string, shiftStartTime: Date, shiftEndTime: Date) {
     if (shiftStartTime > shiftEndTime) {
-      const formatedInitDate = DateTimeHelper.toUtcFormat(initDate);
+      const formatedInitDate = DateTimeHelper.setUtcTimeZone(initDate);
       const endDate = new Date(new Date(new Date(formatedInitDate).setDate(new Date(formatedInitDate)
       .getDate() + 1)).setHours(0, 0, 0));
 
       return {
-        actualStartDate: DateTimeHelper.toUtcFormat(initDate),
-        actualEndDate: DateTimeHelper.toUtcFormat(endDate),
+        actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+        actualEndDate: DateTimeHelper.setUtcTimeZone(endDate),
       };
     }
 
     return {
-      actualStartDate: DateTimeHelper.toUtcFormat(initDate),
-      actualEndDate: DateTimeHelper.toUtcFormat(initDate),
+      actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+      actualEndDate: DateTimeHelper.setUtcTimeZone(initDate),
     };
   }
 

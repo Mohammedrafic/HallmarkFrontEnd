@@ -69,7 +69,7 @@ export class PayRatesState {
 
    @Action(SaveUpdatePayRate)
   SaveUpdatePayRate({ dispatch }: StateContext<PayRateStateModel>, { payload, filters }: SaveUpdatePayRate): Observable<PayRateSetup[] | void> {
-    payload.effectiveDate = DateTimeHelper.toUtcFormat(payload.effectiveDate);
+    payload.effectiveDate = DateTimeHelper.setUtcTimeZone(payload.effectiveDate);
     return this.payRateService.saveUpdatePayRate(payload)
       .pipe(tap((payloadResponse) => {
           if (payload.payRateSettingId) {
@@ -129,7 +129,7 @@ export class PayRatesState {
   @Action(GetWorkCommitmentByPage)
   GetWorkCommitmentByPage(
     { patchState }: StateContext<CommitmentStateModel>,
-    { businessUnitId,    
+    { businessUnitId,
       regions,
       locations,
       skills }: GetWorkCommitmentByPage
@@ -143,5 +143,5 @@ export class PayRatesState {
       })
     );
   }
- 
+
 }

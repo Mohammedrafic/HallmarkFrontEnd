@@ -212,7 +212,7 @@ export interface OrderManagementContentStateModel {
     sendOnboardCandidateEmail:null,
     orderComments : []
   },
-  
+
 })
 @Injectable()
 export class OrderManagementContentState {
@@ -486,8 +486,8 @@ export class OrderManagementContentState {
             orderType,
             departmentId,
             skill,
-            jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-            jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+            jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : jobStartDate,
+            jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : jobEndDate
           )
         );
 
@@ -573,8 +573,8 @@ export class OrderManagementContentState {
               orderType,
               departmentId,
               skill,
-              jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-              jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate,
+              jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : jobStartDate,
+              jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : jobEndDate,
               true
             )
           );
@@ -735,7 +735,7 @@ export class OrderManagementContentState {
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate }: SetPredefinedBillRatesData
   ): OrderManagementContentStateModel {
-    return patchState({ getPredefinedBillRatesData: { 
+    return patchState({ getPredefinedBillRatesData: {
       orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate,
     } });
   }
@@ -798,7 +798,7 @@ export class OrderManagementContentState {
                 order[0].publicId?.toString() +
                 ' has been added'
               : inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined
-              ?  isLocationAndDepartment ?  RECORD_ADDED +' Due to location and Department Expiry ' + inActivedatestr + ' Dates orders not added.' 
+              ?  isLocationAndDepartment ?  RECORD_ADDED +' Due to location and Department Expiry ' + inActivedatestr + ' Dates orders not added.'
               : isLocation
                 ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr + ' Dates orders not added.'
                 : RECORD_ADDED + ' Due to Department Expiry ' + inActivedatestr + ' Dates orders not added.'
@@ -1184,7 +1184,7 @@ export class OrderManagementContentState {
     ): Observable<Comment[]> {
       return this.commentService.getComments(commentContainerId, null)
         .pipe(tap((payload) => patchState({ orderComments: payload })));
-    }  
+    }
 
     @Action(GetAllShifts)
     GetAllShifts(
