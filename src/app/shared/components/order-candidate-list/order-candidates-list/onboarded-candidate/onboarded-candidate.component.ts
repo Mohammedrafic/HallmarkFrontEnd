@@ -38,6 +38,7 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
+  UpdateOrganisationCandidateJobSucceed,
   sendOnboardCandidateEmailMessage
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
@@ -53,6 +54,7 @@ import {
   SET_READONLY_STATUS,
   onBoardCandidateMessage,
   ONBOARD_CANDIDATE,
+  SEND_EMAIL,
 } from '@shared/constants';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
@@ -190,7 +192,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   public comments: Comment[] = [];
   emailTo:any = '';
-
+  isSendOnboardFormInvalid:boolean = false;
   @ViewChild('RTE')
   public rteEle: RichTextEditorComponent;
   @ViewChild(OnboardCandidateMessageDialogComponent, { static: true }) onboardEmailTemplateForm: OnboardCandidateMessageDialogComponent;
@@ -388,35 +390,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         .pipe(take(1))
         .subscribe((isConfirm) => {
           if (isConfirm && this.candidateJob) {
-              this.isSend =  true;
-              this.emailTo = 'amarendra.gottumukkala@hallmarkhcs.com'; //this.candidateJob?.candidateProfile.email; 
-              const options = {
-                title: ONBOARD_CANDIDATE,
-                okButtonLabel: 'Yes',
-                okButtonClass: 'ok-button',
-                cancelButtonLabel: 'No'
-              };
-              this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
-              .subscribe((isConfirm) => {
-                if(isConfirm){
-                  this.onboardEmailTemplateForm.rteCreated();
-                  this.onboardEmailTemplateForm.disableControls(true);
-                  this.store.dispatch(new ShowGroupEmailSideDialog(true));
-                }
-              });
-            // this.saveCandidateJob();
-            // this.closeDialog();
-          } else {
-            this.jobStatusControl.reset();
-            this.selectedApplicantStatus = null;
-          }
-        });
-    }
-  }
-
-  private saveCandidateJob(){
-      if(this.candidateJob){
-          const value = this.form.getRawValue();            
+            const value = this.form.getRawValue();   
+            this.isSend =  true;
+            this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.candidateJob?.candidateProfile.email);
+            this.emailTo = this.candidateJob?.candidateProfile.email;          
             this.store
               .dispatch(
                 new UpdateOrganisationCandidateJob({
@@ -436,12 +413,37 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   offeredStartDate: this.candidateJob.offeredStartDate,
                   candidatePayRate: this.candidateJob.candidatePayRate,
                 })
-              ).pipe(
+              );
+              this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).pipe(
                 takeUntil(this.unsubscribe$)
               ).subscribe(() => {
-                this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-              });
-      }            
+                  const options = {
+                      title: ONBOARD_CANDIDATE,
+                      okButtonLabel: 'Yes',
+                      okButtonClass: 'ok-button',
+                      cancelButtonLabel: 'No'
+                  };
+                  this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+                      .subscribe((isConfirm) => {
+                        if(isConfirm){
+                          this.onboardEmailTemplateForm.rteCreated();
+                          this.onboardEmailTemplateForm.disableControls(true);
+                          this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                        }
+                      });
+                
+              });              
+              // this.closeDialog();
+            } else {
+              this.jobStatusControl.reset();
+              this.selectedApplicantStatus = null;
+            }
+      });
+    }
+  }
+
+  private saveCandidateJob(){    
+       this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());           
   }
 
   private shouldChangeCandidateStatus(): Observable<boolean> {
@@ -637,31 +639,38 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   onGroupEmailAddCancel(){
-    this.closeDialog();
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    // console.log('this.candidateJob at cancel',this.candidateJob);
+    this.saveCandidateJob();
     this.isSend =  false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
+    this.closeDialog();
   }
 
   onGroupEmailSend(){
-      this.closeDialog();
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    if(this.sendOnboardMessageEmailFormGroup.valid){
       const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();   
-     // console.log('emailvalue',emailvalue);         
-            this.store
-              .dispatch(
-                new sendOnboardCandidateEmailMessage({
-                  subjectMail : emailvalue.emailSubject,
-                  bodyMail : emailvalue.emailBody,
-                  toList : emailvalue.emailTo,
-                  status : 1,
-                  stream : emailvalue.fileUpload,
-                  extension : emailvalue.fileUpload?.type,
-                  documentName : emailvalue.fileUpload?.name,
-                })
-              )
-              .subscribe(() => {
-                this.isSend =  false;
-                this.store.dispatch(new ShowGroupEmailSideDialog(false));
-              });
+      // console.log('emailvalue',emailvalue);         
+      this.saveCandidateJob();
+      this.store.dispatch(new sendOnboardCandidateEmailMessage({
+            subjectMail : emailvalue.emailSubject,
+            bodyMail : emailvalue.emailBody,
+            toList : emailvalue.emailTo,
+            status : 1,
+            stream : emailvalue.fileUpload,
+            extension : emailvalue.fileUpload?.type,
+            documentName : emailvalue.fileUpload?.name,
+          })
+        )
+        .subscribe(() => {
+          this.isSend =  false;
+          this.store.dispatch(new ShowGroupEmailSideDialog(false));
+          this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
+          this.closeDialog();
+        });
+    }
+   /*   */
   }
 
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {

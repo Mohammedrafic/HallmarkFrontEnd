@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ViewChild, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { HtmlEditorService,
@@ -19,6 +19,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class OnboardCandidateMessageDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   
   @Input() onBoardMessageEmailTemplateForm: FormGroup;
+  @Input() isFormInvalid: boolean = false;
   @ViewChild('OnboardCandidateEmail') public rteObj: RichTextEditorComponent;
   @Input() title: string;
   @Input() isSend: boolean = true;
@@ -42,6 +43,18 @@ export class OnboardCandidateMessageDialogComponent implements OnInit, AfterView
   public dropElement: HTMLElement;
   public uploaderstatus:boolean = true;
   @Input() emailTo: any = '';
+
+  get subjectControl(): AbstractControl {
+    return this.onBoardMessageEmailTemplateForm.get('emailSubject') as AbstractControl;
+  }
+
+  get emailBodyControl(): AbstractControl {
+    return this.onBoardMessageEmailTemplateForm.get('emailBody') as AbstractControl;
+  }
+
+  get emailToControl(): AbstractControl {
+    return this.onBoardMessageEmailTemplateForm.get('emailTo') as AbstractControl;
+  }
 
   constructor() { }
 
