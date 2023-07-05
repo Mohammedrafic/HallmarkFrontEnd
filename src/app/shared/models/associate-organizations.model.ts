@@ -111,3 +111,9 @@ export interface DepartmentsTierDTO {
   locationIds: number[] | null,
   departmentIds: number[] | null,
 }
+
+
+export type AssociateOrganizations = {
+    id: number;
+    name: string;
+}

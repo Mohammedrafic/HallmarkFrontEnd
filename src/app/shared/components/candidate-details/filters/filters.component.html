@@ -1,4 +1,23 @@
 <form [formGroup]="filtersForm">
+  <div class="input-container" *ngIf="isAgency">
+    <label>Organization</label>
+    <div class="input-group multiselect bootstrap">
+      <ejs-multiselect
+        #organizationMultiselect
+        mode="CheckBox"
+        selectAllText="All"
+        [showSelectAll]="true"
+        formControlName="organizationIds"
+        placeholder="All"
+        [fields]="optionFields"
+        [allowFiltering]="true"
+        [showDropDownIcon]="true"
+        [changeOnBlur]="false"
+        [dataSource]="filterColumns.organizationIds.dataSource"
+      >
+      </ejs-multiselect>
+    </div>
+  </div>
   <div class="input-container">
     <label>Region</label>
     <div class="input-group multiselect bootstrap">
@@ -88,17 +107,13 @@
       </ejs-multiselect>
     </div>
   </div>
-
-  <div class="input-container">
-    <label>Order Type</label>
-    <div class="input-group multiselect bootstrap">
-      <ejs-multiselect mode="CheckBox"
-                       formControlName="orderTypes"
-                       placeholder="All"
-                       [fields]="typeFields"
-                       [allowFiltering]="true"
-                       [showDropDownIcon]="true"
-                       [dataSource]="filterColumns.orderTypes.dataSource">
+  <div class="input-container bootstrap" *ngIf="!isAgency">
+    <label>Agency</label>
+    <div class="input-group dropdown">
+      <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  appValidateWithMessage
+                       [allowFiltering]="true" [showDropDownIcon]="true" 
+                       [dataSource]="filterColumns.agencyIds.dataSource"
+                       [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true placeholder="All" >
       </ejs-multiselect>
     </div>
   </div>
@@ -115,31 +130,33 @@
       </ejs-multiselect>
     </div>
   </div>
+  <div class="input-container">
+    <label>Order Type</label>
+    <div class="input-group multiselect bootstrap">
+      <ejs-multiselect mode="CheckBox"
+                       formControlName="orderTypes"
+                       placeholder="All"
+                       [fields]="typeFields"
+                       [allowFiltering]="true"
+                       [showDropDownIcon]="true"
+                       [dataSource]="filterColumns.orderTypes.dataSource">
+      </ejs-multiselect>
+    </div>
+  </div>
  
+  <div class="input-container bootstrap">
+    <label>Position ID</label>
+    <div class="input-group dropdown">
+      <input class="e-input" type="text" appValidateWithMessage maxlength="50"  formControlName="orderID" />
+    </div>
+  </div>
+
       <div class="input-container bootstrap">
         <label>Candidate Name</label>
         <div class="input-group dropdown">          
           <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
            filterType='StartsWith' [fields]='candidateNameFields'
                   [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
-        </div>
-      </div>
-      
-      <div class="input-container bootstrap">
-        <label>Position ID</label>
-        <div class="input-group dropdown">
-          <input class="e-input" type="text" appValidateWithMessage maxlength="50"  formControlName="orderID" />
-        </div>
-      </div>
-
-      <div class="input-container bootstrap">
-        <label>Agency</label>
-        <div class="input-group dropdown">
-          <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  appValidateWithMessage
-                           [allowFiltering]="true" [showDropDownIcon]="true" 
-                           [dataSource]="filterColumns.agencyIds.dataSource"
-                           [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true placeholder="All" >
-          </ejs-multiselect>
         </div>
       </div>
 

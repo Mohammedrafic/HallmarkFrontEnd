@@ -136,6 +136,7 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -172,7 +173,7 @@ export interface OrderManagementContentStateModel {
   orderComments: Comment[]
 }
 
-@State<OrderManagementContentStateModel>({
+@State<OrderManagementContentStateModel>( {
   name: 'orderManagement',
   defaults: {
     ordersPage: null,
@@ -209,7 +210,6 @@ export interface OrderManagementContentStateModel {
     irpCandidates: null,
     candidateCancellationReasons:null,
     allShifts:null,
-    sendOnboardCandidateEmail:null,
     orderComments : []
   },
 
@@ -410,7 +410,7 @@ export class OrderManagementContentState {
     private UpdateRegRateService : UpdateRegRateService,
     private commentService : CommentsService
   ) {}
-
+  
   @Action(GetOrders, { cancelUncompleted: true })
   GetOrders(
     { patchState }: StateContext<OrderManagementContentStateModel>,
