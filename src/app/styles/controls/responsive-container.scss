@@ -3,6 +3,7 @@
 @media #{$min-desktop-large} {
   #main {
     container-type: inline-size;
+    overflow: auto;
   }
 
   .order-details-dialog {
