@@ -45,8 +45,6 @@ export class TimesheetsFilterDialogComponent
 
   private activeTab$: Subject<void> = new Subject();
 
-  public targetElement: HTMLElement | null = null;
-
   ngOnInit(): void {
     this.initFormGroup();
     this.initFiltersColumns(TimesheetsState.timesheetsFiltersColumns);
@@ -55,7 +53,6 @@ export class TimesheetsFilterDialogComponent
     this.subscribeOnUserSearch();
     this.watchForPreservedFilters();
     this.watchForSwitchTabs();
-    this.getFilterTargetElement();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -135,17 +132,5 @@ export class TimesheetsFilterDialogComponent
     this.getPreservedContactPerson(contactEmails);
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
-  }
-
-  private getFilterTargetElement(): void {
-    this.targetElement$
-      .pipe(
-        filter((el) => !!el),
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe((el: HTMLElement | null) => {
-        this.targetElement = el;
-        this.cdr.detectChanges();
-      });
   }
 }
