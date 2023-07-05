@@ -26,7 +26,7 @@ export class MultiselectDropdownComponent extends BaseFormControlDirective {
   @Input() public sortOrder: SortOrder = SortOrder.NONE;
   @Input() showClearAll = true;
   @Input() allowFilter = true;
-  public popupWidth : string | undefined;
+  @Input() public popupWidth : string | undefined;
 
 
   @Output() public selectAllEmitter: EventEmitter<ISelectAllEventArgs> = new EventEmitter<ISelectAllEventArgs>();
