@@ -46,7 +46,6 @@ import { OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
-import { DateTime } from '@syncfusion/ej2-angular-charts';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -108,7 +107,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     super();
     this.dialogConfig = CandidateDialogConfig();
     this.candidateForm = this.editIrpCandidateService.createCandidateForm();
-  
+
   }
 
   ngOnInit(): void {
@@ -218,7 +217,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     const closeDto: ClosePositionDto = {
       jobId: this.candidateModelState.candidate.candidateJobId,
       reasonId: this.candidateForm.get('reason')?.value,
-      closingDate: DateTimeHelper.toUtcFormat(this.candidateForm.get('closeDate')?.value as Date),
+      closingDate: DateTimeHelper.setUtcTimeZone(this.candidateForm.get('closeDate')?.value as Date),
       createReplacement,
     };
 
@@ -257,8 +256,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           }
           this.availableStartDate = candidateDetails.actualStartDate;
           this.candidateForm.patchValue({
-            actualStartDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualStartDate as string),
-            actualEndDate: DateTimeHelper.convertDateToUtc(candidateDetails.actualEndDate as string),
+            actualStartDate: DateTimeHelper.setCurrentTimeZone(candidateDetails.actualStartDate as string),
+            actualEndDate: DateTimeHelper.setCurrentTimeZone(candidateDetails.actualEndDate as string),
           }, { emitEvent: false, onlySelf: true });
         }),
         switchMap(() => {
@@ -353,9 +352,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy()),
     )
     .subscribe((value) => {
-     this.isAppliedorShortlisted = value === CandidatStatus.Applied || value === CandidatStatus.Shortlisted ? true : false;
-     this.showactualStartEndDate=value === CandidatStatus.OnBoard ? true : false;
-     this.candidateForm.get('availableStartDate')?.patchValue(DateTimeHelper.convertDateToUtc(this.availableStartDate as string), { emitEvent: false, onlySelf: true });
+     this.isAppliedorShortlisted = value === CandidatStatus.Applied || value === CandidatStatus.Shortlisted;
+     this.showactualStartEndDate= value === CandidatStatus.OnBoard;
+     this.candidateForm.get('availableStartDate')?.patchValue(
+       DateTimeHelper.setCurrentTimeZone(this.availableStartDate as string), { emitEvent: false, onlySelf: true }
+     );
       this.cdr.markForCheck();
   });
   }
@@ -399,7 +400,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       status: job.applicantStatus.applicantStatus,
       isClosed: true,
       reason: job.positionClosureReasonId,
-      closeDate: DateTimeHelper.convertDateToUtc(job.closeDate as string),
+      closeDate: DateTimeHelper.setCurrentTimeZone(job.closeDate as string),
     });
   }
 

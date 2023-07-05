@@ -181,7 +181,7 @@ export class CreateScheduleService {
   getEmployeeScheduledDays(scheduleItems: CreateScheduleItem[]): ScheduleInt.EmployeeScheduledDay[] {
     return scheduleItems.map((item: CreateScheduleItem) => {
       const dates: string[] = item.selectedDates
-        .map((date: Date) => DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(date)));
+        .map((date: Date) => DateTimeHelper.setUtcTimeZone(DateTimeHelper.setInitDateHours(date)));
 
       return {
         employeeId: item.candidateId,
@@ -195,7 +195,7 @@ export class CreateScheduleService {
       const bookedDays = item.selectedDates.map((date: Date) => {
         const initDate = new Date(date.setHours(0, 0, 0));
 
-        return DateTimeHelper.toUtcFormat(initDate);
+        return DateTimeHelper.setUtcTimeZone(initDate);
       });
 
       return {
@@ -350,7 +350,7 @@ export class CreateScheduleService {
   getCandidateOrientation(candidate: ScheduleCandidate): boolean {
     return candidate.dates.every((date: string) => {
       if(candidate.orientationDate) {
-        return DateTimeHelper.convertDateToUtc(date) >= DateTimeHelper.convertDateToUtc(candidate.orientationDate);
+        return DateTimeHelper.setCurrentTimeZone(date) >= DateTimeHelper.setCurrentTimeZone(candidate.orientationDate);
       } else {
         return false;
       }

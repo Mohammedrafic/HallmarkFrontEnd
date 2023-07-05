@@ -106,7 +106,7 @@ export class CandidateProfileService {
 
     return Object.fromEntries(
       Object.entries(dates).map(([key, value]: [string, any]) => {
-        return [key, value ? DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(value)) : value];
+        return [key, value ? DateTimeHelper.setUtcTimeZone(DateTimeHelper.setInitDateHours(value)) : value];
       })
     );
   }

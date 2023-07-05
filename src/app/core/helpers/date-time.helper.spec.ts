@@ -7,12 +7,12 @@ describe('DateTimeHelper', () => {
   const arrayDates = ['2023-06-16', '2023-06-17', '2023-06-18', '2023-06-19', '2023-06-20', '2023-06-21'];
   const inputDate = '2023-06-16T00:00:00';
 
-  describe('DateTimeHelper.convertDateToUtc', () => {
+  describe('DateTimeHelper.setCurrentTimeZone', () => {
     it('should convert the date to UTC -0500', () => {
       const timezoneOffset = -300;
       spyOn(Date.prototype, 'getTimezoneOffset').and.returnValue(timezoneOffset);
       const expectedDate = new Date('2023-06-15T19:00:00');
-      const result = DateTimeHelper.convertDateToUtc('2023-06-16T00:00:00');
+      const result = DateTimeHelper.setCurrentTimeZone('2023-06-16T00:00:00');
 
       expect(result).toEqual(expectedDate);
       expect(result.getTimezoneOffset()).toEqual(timezoneOffset);
@@ -23,7 +23,7 @@ describe('DateTimeHelper', () => {
       spyOn(Date.prototype, 'getTimezoneOffset').and.returnValue(timezoneOffset);
 
       const expectedDate = new Date('2023-06-16T05:00:00');
-      const result = DateTimeHelper.convertDateToUtc('2023-06-16T00:00:00');
+      const result = DateTimeHelper.setCurrentTimeZone('2023-06-16T00:00:00');
 
       expect(result).toEqual(expectedDate);
       expect(result.getTimezoneOffset()).toEqual(timezoneOffset);
@@ -35,33 +35,33 @@ describe('DateTimeHelper', () => {
 
       const init = new Date('2023-06-16T00:00:00.000Z');
       const expectedDate = new Date(init.setUTCDate(init.getUTCDate()) + timezoneOffset * 60 * 1000);
-      const result = DateTimeHelper.convertDateToUtc('2023-06-16T00:00:00.000Z');
+      const result = DateTimeHelper.setCurrentTimeZone('2023-06-16T00:00:00.000Z');
 
       expect(result).toEqual(expectedDate);
       expect(result.getTimezoneOffset()).toEqual(timezoneOffset);
     });
   });
 
-  describe('DateTimeHelper.toUtcFormat', () => {
+  describe('DateTimeHelper.setUtcTimeZone', () => {
     const input = new Date('2023-06-16T04:00:45');
 
     it('should convert date to ISO string in 0 timezone with saved hours', () => {
       const expectedDate = '2023-06-16T04:00:00.000Z';
-      const result = DateTimeHelper.toUtcFormat(input);
+      const result = DateTimeHelper.setUtcTimeZone(input);
 
       expect(result).toEqual(expectedDate);
     });
 
     it('should convert date to ISO string in 0 timezone with zeroed hours', () => {
       const expectedDate = '2023-06-16T00:00:00.000Z';
-      const result = DateTimeHelper.toUtcFormat(input, true);
+      const result = DateTimeHelper.setUtcTimeZone(input, true);
 
       expect(result).toEqual(expectedDate);
     });
 
     it('should convert date to ISO string in 0 timezone with offset', () => {
       const expectedDate = '2023-06-16T00:00:00.000Z';
-      const result = DateTimeHelper.toUtcFormat('2023-06-16T00:00:00.000-0500', true);
+      const result = DateTimeHelper.setUtcTimeZone('2023-06-16T00:00:00.000-0500', true);
 
       expect(result).toEqual(expectedDate);
     });
@@ -70,7 +70,7 @@ describe('DateTimeHelper', () => {
       spyOn(Date.prototype, 'getTimezoneOffset').and.returnValue(-180);
 
       const expectedDate = '2023-06-15T21:00:00.000Z';
-      const result = DateTimeHelper.toUtcFormat(inputDate);
+      const result = DateTimeHelper.setUtcTimeZone(inputDate);
 
       expect(result).toEqual(expectedDate);
     });
@@ -79,7 +79,7 @@ describe('DateTimeHelper', () => {
       spyOn(Date.prototype, 'getTimezoneOffset').and.returnValue(-180);
 
       const expectedDate = '2023-06-15T00:00:00.000Z';
-      const result = DateTimeHelper.toUtcFormat(inputDate, true);
+      const result = DateTimeHelper.setUtcTimeZone(inputDate, true);
 
       expect(result).toEqual(expectedDate);
     });
@@ -103,11 +103,11 @@ describe('DateTimeHelper', () => {
     });
   });
 
-  describe('DateTimeHelper.getFirstDayofWeek:', () => {
+  describe('DateTimeHelper.getFirstDayOfWeek:', () => {
     it('should return first day of week', () => {
       const input = new Date('2023-06-16T04:22:45');
       const expectedDate = new Date('Sun Jun 11 2023 04:22:45');
-      const result = DateTimeHelper.getFirstDayofWeek(input);
+      const result = DateTimeHelper.getFirstDayOfWeek(input);
 
       expect(result).toEqual(expectedDate);
       expect(result.getDay()).toEqual(0);
@@ -115,7 +115,7 @@ describe('DateTimeHelper', () => {
 
     it('should return Date', () => {
       const input = new Date('2023-12-12T08:00:45');
-      const result = DateTimeHelper.getFirstDayofWeek(input);
+      const result = DateTimeHelper.getFirstDayOfWeek(input);
 
       expect(result instanceof Date).toBe(true);
     });
@@ -139,52 +139,52 @@ describe('DateTimeHelper', () => {
     });
   });
 
-  describe('DateTimeHelper.isDateBetween:', () => {
+  describe('DateTimeHelper.hasDateBetween:', () => {
     const input1 = new Date('2023-06-16T02:22:22');
     const input2 = new Date('2023-06-15T02:22:22');
     const fromDate = new Date('2023-06-16T00:00:00');
     const toDate = new Date('2023-06-16T04:22:45');
 
     it('should return true if the date is fit in the time range', () => {
-      const result1 = DateTimeHelper.isDateBetween(input1, fromDate, toDate);
+      const result1 = DateTimeHelper.hasDateBetween(input1, fromDate, toDate);
       expect(result1).toBeTrue();
     });
 
     it('should return false if the date is out off the time range', () => {
-      const result2 = DateTimeHelper.isDateBetween(input2, fromDate, toDate);
+      const result2 = DateTimeHelper.hasDateBetween(input2, fromDate, toDate);
       expect(result2).toBeFalse();
     });
 
     it('should return false if the input date is undefined', () => {
-      const result = DateTimeHelper.isDateBetween(undefined, fromDate, toDate);
+      const result = DateTimeHelper.hasDateBetween(undefined, fromDate, toDate);
       expect(result).toBeFalse();
     });
   });
 
-  describe('DateTimeHelper.isDateBefore:', () => {
+  describe('DateTimeHelper.hasDateBefore:', () => {
     const input1 = new Date('2023-06-16T02:22:22');
     const input2 = new Date('2023-06-18T02:22:22');
     const toDate = new Date('2023-06-16T02:22:22');
 
     it('should return true if Date1 is less than Date2', () => {
-      const result = DateTimeHelper.isDateBefore(input1, toDate);
+      const result = DateTimeHelper.hasDateBefore(input1, toDate);
       expect(result).toBeTrue();
     });
 
     it('should return true if Date1 is equal to Date2', () => {
-      const result = DateTimeHelper.isDateBefore(input1, toDate);
+      const result = DateTimeHelper.hasDateBefore(input1, toDate);
       expect(result).toBeTrue();
     });
 
     it('should return false if Date1 is bigger than Date2', () => {
-      const result2 = DateTimeHelper.isDateBefore(input2, toDate);
+      const result2 = DateTimeHelper.hasDateBefore(input2, toDate);
       expect(result2).toBeFalse();
     });
   });
 
-  it('DateTimeHelper.newDateInTimeZone: should return date in specific timeZone', () => {
+  it('DateTimeHelper.getCurrentDateInTimeZone: should return date in specific timeZone', () => {
     const input = 'America/New_York';
-    const result = DateTimeHelper.newDateInTimeZone(input);
+    const result = DateTimeHelper.getCurrentDateInTimeZone(input);
 
     expect(result instanceof Date).toBe(true);
   });
@@ -369,29 +369,6 @@ describe('DateTimeHelper', () => {
 
     expect(result).toEqual(expectedResult);
     expect(result.getDay()).toEqual(6);
-  });
-
-
-  it('DateTimeHelper.getLastDayOfWeekFromFirstDay should return the last day of week', () => {
-    const expectedResult = new Date('2023-06-11T23:59:59.999');
-    const result = DateTimeHelper.getLastDayOfWeekFromFirstDay(inputDate, 0);
-
-    expect(result).toEqual(expectedResult);
-    expect(result.getDay()).toEqual(0);
-  });
-
-  describe('DateTimeHelper.getFirstDayOfWeekUtc:', () => {
-    it('should return date in current timeZone', () => {
-      const date = new Date();
-      const result = DateTimeHelper.getFirstDayOfWeekUtc(inputDate);
-      expect(result.getTimezoneOffset()).toEqual(date.getTimezoneOffset());
-    });
-
-    it('should return date in -180 timeZone', () => {
-      spyOn(Date.prototype, 'getTimezoneOffset').and.returnValue(-180);
-      const result2 = DateTimeHelper.getFirstDayOfWeekUtc(inputDate);
-      expect(result2.getTimezoneOffset()).toEqual(-180);
-    });
   });
 
   describe('DateTimeHelper.calculateMonthBoundDays:', () => {

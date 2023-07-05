@@ -20,7 +20,7 @@
       (selectedAll)="selectAllEmitter.emit($event)"
       [sortOrder]="sortOrder"
       [showClearButton]="showClearAll"
-      [popupWidth]='popupWidth ? popupWidth : defaultWidth'
+      [popupWidth]="popupWidth"
       (blur)="onBlur()"
       mode="CheckBox"
     ></ejs-multiselect>

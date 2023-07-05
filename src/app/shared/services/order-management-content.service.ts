@@ -16,6 +16,7 @@ import {
   IrpCandidatesParams,
   IrpOrderCandidate,
   IrpOrderCandidateDto,
+  OnboardCandidateEmail,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -455,7 +456,7 @@ export class OrderManagementContentService {
 
         return Object.fromEntries(
           Object.entries(data)
-            .map(([key, value]) => 
+            .map(([key, value]) =>
               [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]
             ));
       }),
@@ -555,10 +556,10 @@ export class OrderManagementContentService {
 
     return <CreateOrderDto>{
       ...order,
-      jobStartDate: jobStartDate ? new Date(DateTimeHelper.toUtcFormat(jobStartDate)) : null,
-      jobEndDate: jobEndDate ? new Date(DateTimeHelper.toUtcFormat(jobEndDate)) : null,
-      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.toUtcFormat(shiftStartTime)) : null,
-      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.toUtcFormat(shiftEndTime)) : null,
+      jobStartDate: jobStartDate ? new Date(DateTimeHelper.setUtcTimeZone(jobStartDate)) : null,
+      jobEndDate: jobEndDate ? new Date(DateTimeHelper.setUtcTimeZone(jobEndDate)) : null,
+      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.setUtcTimeZone(shiftStartTime)) : null,
+      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.setUtcTimeZone(shiftEndTime)) : null,
     };
   }
 
@@ -577,5 +578,13 @@ export class OrderManagementContentService {
 
   public getAllShifts(): Observable<ScheduleShift[]> {
     return this.http.get<ScheduleShift[]>(`/api/MasterShifts/all`);
+  }
+
+  public sendCandidateOnboardEmail(payload: OnboardCandidateEmail): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', payload?.stream != null ? payload?.stream : '');
+    delete payload.stream;
+    formData.append('content', JSON.stringify(payload))
+    return this.http.post<any>(`/api/AppliedCandidates/candidateOnboardemail`, formData);
   }
 }

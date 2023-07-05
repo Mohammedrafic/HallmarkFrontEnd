@@ -314,8 +314,8 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private setDateRanges(employeeWorkCommitment: CandidateWorkCommitmentShort): void {
     const { startDate, endDate } = employeeWorkCommitment;
 
-    this.dateRanges.max = endDate ? DateTimeHelper.convertDateToUtc(endDate) : undefined;
-    this.dateRanges.min = startDate ? DateTimeHelper.convertDateToUtc(startDate) : undefined;
+    this.dateRanges.max = endDate ? DateTimeHelper.setCurrentTimeZone(endDate) : undefined;
+    this.dateRanges.min = startDate ? DateTimeHelper.setCurrentTimeZone(startDate) : undefined;
     this.cdr.markForCheck();
   }
 
@@ -347,8 +347,8 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     if (allAreEqual(employeeWorkCommitmentIds) && employeeWorkCommitmentIds[0] !== activeEmployeeWorkCommitmentId) {
       const startDate = DateTimeHelper.getEarliestDate(startDates);
       const endDate = DateTimeHelper.getLatestDate(endDates);
-      const min = startDate ? DateTimeHelper.convertDateToUtc(startDate) : undefined;
-      const max = endDate ? DateTimeHelper.convertDateToUtc(endDate) : undefined;
+      const min = startDate ? DateTimeHelper.setCurrentTimeZone(startDate) : undefined;
+      const max = endDate ? DateTimeHelper.setCurrentTimeZone(endDate) : undefined;
       this.bulkDateRanges = { min, max };
     } else {
       this.bulkDateRanges = this.dateRanges;

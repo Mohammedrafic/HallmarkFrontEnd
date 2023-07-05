@@ -7,15 +7,15 @@ import {
 export const adaptOrder = (selectedOrder: Order): Order => {
   const startJobDate = selectedOrder.jobStartDate ? selectedOrder.jobStartDate.toString() : new Date().toString();
   const endJobDate = selectedOrder.jobEndDate ? selectedOrder.jobEndDate.toString() : new Date().toString();
-  
+
   return {
     ...selectedOrder,
     ...modifyJobDistribution(selectedOrder),
     ...selectedOrder.irpOrderMetadata,
-    jobDates: DateTimeHelper.convertDateToUtc(selectedOrder.jobStartDate.toString()),
-    shiftStartTime: DateTimeHelper.convertDateToUtc(selectedOrder.shiftStartTime.toString()),
-    shiftEndTime: DateTimeHelper.convertDateToUtc(selectedOrder.shiftEndTime.toString()),
-    jobStartDate: DateTimeHelper.convertDateToUtc(startJobDate),
-    jobEndDate: DateTimeHelper.convertDateToUtc(endJobDate),
+    jobDates: DateTimeHelper.setCurrentTimeZone(selectedOrder.jobStartDate.toString()),
+    shiftStartTime: DateTimeHelper.setCurrentTimeZone(selectedOrder.shiftStartTime.toString()),
+    shiftEndTime: DateTimeHelper.setCurrentTimeZone(selectedOrder.shiftEndTime.toString()),
+    jobStartDate: DateTimeHelper.setCurrentTimeZone(startJobDate),
+    jobEndDate: DateTimeHelper.setCurrentTimeZone(endJobDate),
   };
 };
