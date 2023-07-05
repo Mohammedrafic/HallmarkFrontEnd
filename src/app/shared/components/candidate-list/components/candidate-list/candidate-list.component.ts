@@ -37,7 +37,10 @@ import { Permission } from '@core/interface';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 import { GlobalWindow } from '@core/tokens';
-import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
+import {
+  ClearAssignedSkillsByOrganization,
+  GetAssignedSkillsByOrganization,
+} from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { END_DATE_REQUIRED, ERROR_START_LESS_END_DATE, GRID_CONFIG, optionFields, regionFields } from '@shared/constants';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
@@ -531,7 +534,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
     this.getLastSelectedBusinessUnitId().pipe(
       tap(() => {
-        this.getPreservedFiltersByPage();
+        this.getFilterDataSource();
       }),
       switchMap(() => this.preservedFiltersByPageName$),
       filter(({ dispatch }) => dispatch),
@@ -735,14 +738,17 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       });
   }
 
-  private getPreservedFiltersByPage(): void {
+  private getFilterDataSource(): void {
     this.store.dispatch([
       new GetAllSkills(),
       new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()),
     ]);
 
     if (!this.isAgency) {
-      this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }));
+      this.store.dispatch([
+        new ClearAssignedSkillsByOrganization(),
+        new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } }),
+      ]);
     }
   }
 
