@@ -67,6 +67,7 @@ export class OnboardCandidateMessageDialogComponent implements OnInit, AfterView
     this.rteObj.toolbarSettings.enableFloating = true;
     this.rteObj.height = '300px';
     this.onBoardMessageEmailTemplateForm.get('emailTo')?.setValue(this.emailTo);
+    this.onBoardMessageEmailTemplateForm.controls['fileUpload']?.setErrors(null);
   }
 
   disableControls(isSend: boolean): void {
@@ -90,6 +91,7 @@ export class OnboardCandidateMessageDialogComponent implements OnInit, AfterView
 
   onFileRemoving(){
     this.uploadObj.clearAll();
+    this.onBoardMessageEmailTemplateForm.controls['fileUpload']?.setErrors(null);
   }
 
   public onFileSelectedGroup(event: SelectedEventArgs): void {
@@ -100,6 +102,7 @@ export class OnboardCandidateMessageDialogComponent implements OnInit, AfterView
       this.file = event.filesData[0];
       this.files.push(this.file.rawFile);
       this.onBoardMessageEmailTemplateForm.controls['fileUpload'].setValue(this.file.rawFile);
+      this.onBoardMessageEmailTemplateForm.controls['fileUpload']?.setErrors(null);
     }
   }
 
@@ -112,6 +115,7 @@ export class OnboardCandidateMessageDialogComponent implements OnInit, AfterView
             ? 'The file exceeds the limitation, max allowed 2 MB.'
             : 'The file should be in pdf, doc, docx, jpg, jpeg, png format.';
       }
+      this.onBoardMessageEmailTemplateForm.controls['fileUpload']?.setErrors({'incorrect': true});
     });
   }
 
