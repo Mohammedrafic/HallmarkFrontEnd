@@ -1,10 +1,10 @@
 import { WORK_COMMITMENT_ACTIONS } from '../enums/work-commitment.enum';
-import { WorkCommitmentDTO } from '../work-commitment/interfaces';
+import { WorkCommitmentDTO, WorkCommitmentFilters } from '../work-commitment/interfaces';
 
 export namespace WorkCommitment {
   export class GetCommitmentsByPage {
     static readonly type = WORK_COMMITMENT_ACTIONS.GET_COMMITMENTS_BY_PAGE;
-    constructor(public pageNumber: number, public pageSize: number) {}
+    constructor(public filters: WorkCommitmentFilters) {}
   }
 
   export class SaveCommitment {
