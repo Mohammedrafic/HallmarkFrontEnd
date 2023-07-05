@@ -1,10 +1,10 @@
 @import 'adaptive-response';
 
-#main {
-  container-type: inline-size;
-}
-
 @media #{$min-desktop-large} {
+  #main {
+    container-type: inline-size;
+  }
+
   .order-details-dialog {
     .open-per-diem-order {
 

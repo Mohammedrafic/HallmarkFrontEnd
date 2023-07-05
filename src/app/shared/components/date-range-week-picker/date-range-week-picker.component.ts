@@ -2,9 +2,11 @@ import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from
 import { DatePipe } from '@angular/common';
 import { FormControl } from '@angular/forms';
 
-import { takeUntil } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
+import { Select } from '@ngxs/store';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-date-range-week-picker',
@@ -18,6 +20,12 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit {
   public dateControl: FormControl = new FormControl('');
 
   public readonly maxDate = new Date(new Date().setHours(23, 59, 59));
+
+  public placeholder = 'From: MM/DD/YYYY - To: MM/DD/YYYY';
+  public mobilePlaceholder = 'From - To';
+
+  @Select(AppState.isMobileScreen)
+  readonly isMobile$: Observable<boolean>;
 
   constructor(
     private datePipe: DatePipe,
@@ -44,7 +52,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit {
         this.dateControl.setValue([correctedStart, correctedEnd], { onlySelf: true, emitEvent: false });
         this.range.emit([
           DateTimeHelper.setUtcTimeZone(correctedStart),
-          DateTimeHelper.setUtcTimeZone(correctedEnd)
+          DateTimeHelper.setUtcTimeZone(correctedEnd),
         ]);
       } else {
         this.dateControl.reset(null, { onlySelf: true, emitEvent: false });
