@@ -41,4 +41,5 @@ export interface ElectronicPaymentDetails extends PaymentDetails {
   fee: string;
   routingNumber: string;
   swiftCode: string;
+  netSuiteId?: number;
 }

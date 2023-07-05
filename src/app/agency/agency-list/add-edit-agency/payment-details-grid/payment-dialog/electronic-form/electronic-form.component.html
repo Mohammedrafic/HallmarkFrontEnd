@@ -1,38 +1,42 @@
 <form [formGroup]="paymentDetailsForm">
   <div class="form-container bootstrap">
-   <div class="column colum-fl">
-     <div class="input-container">
-       <label for="startDate">Start Date<span class="required">*</span></label>
-       <div class="input-group datepicker">
-         <ejs-datepicker id="startDate"
-                         class="datepicker"
-                         format="{{formatInput}}"
-                         placeholder="{{placeholderInput}}"
-                         appValidateWithMessage
-                         formControlName="startDate"
-                         [enableMask]="true"
-                         [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-         >
-         </ejs-datepicker>
-         <span class="error" *ngIf="!startDateControl?.untouched">{{ startDateControl?.errors | validationError }}</span>
-       </div>
-     </div>
-     <div class="input-container">
-       <label for="endDate">End Date</label>
-       <div class="input-group datepicker">
-         <ejs-datepicker id="endDate"
-                         class="datepicker"
-                         format="{{formatInput}}"
-                         placeholder="{{placeholderInput}}"
-                         appValidateWithMessage
-                         formControlName="endDate"
-                         [enableMask]="true"
-                         [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-         >
-         </ejs-datepicker>
-       </div>
-     </div>
-   </div>
+    <div class="column colum-fl">
+      <div class="input-container">
+        <label for="startDate">Start Date<span class="required">*</span></label>
+        <div class="input-group datepicker">
+          <ejs-datepicker id="startDate"
+                          class="datepicker"
+                          format="{{formatInput}}"
+                          placeholder="{{placeholderInput}}"
+                          appValidateWithMessage
+                          formControlName="startDate"
+                          [enableMask]="true"
+                          [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }">
+          </ejs-datepicker>
+          <span class="error" *ngIf="!startDateControl?.untouched">{{ startDateControl?.errors | validationError }}</span>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="endDate">End Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker id="endDate"
+                          class="datepicker"
+                          format="{{formatInput}}"
+                          placeholder="{{placeholderInput}}"
+                          appValidateWithMessage
+                          formControlName="endDate"
+                          [enableMask]="true"
+                          [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }">
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="netSuiteId">NS Payment ID</label>
+        <div class="input-group">
+          <input id="netSuiteId" maxlength="20" [readonly]="true" class="e-input" type="text" appValidateWithMessage formControlName="netSuiteId" />
+        </div>
+      </div>
+    </div>
   </div>
   <div class="form-container bootstrap">
     <div class="column">

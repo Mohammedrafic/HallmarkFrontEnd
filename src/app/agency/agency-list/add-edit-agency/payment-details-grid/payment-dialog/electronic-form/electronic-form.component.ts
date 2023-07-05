@@ -67,6 +67,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         mode: [''],
         startDate: [null, [Validators.required]],
         endDate: [null],
+        nsPaymentId:[''],
         bankName: ['', [Validators.required]],
         routingNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
         bankAddress1: ['', [Validators.required]],
@@ -86,6 +87,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         accountHolderZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
         fee: [''],
         swiftCode: ['', [Validators.pattern(/^[0-9]+$/)]],
+        netSuiteId: ['']
       },
       {
         validators: startDateDuplicationValidator('startDate', this.paymentsList, this.formValue?.startDate, this.mode),

@@ -167,6 +167,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       .subscribe((agency: { payload: Agency }) => {
         this.agencyId = agency.payload.agencyDetails.id as number;
         this.fetchedAgency = agency.payload;
+        this.fetchedAgency.agencyDetails.netSuiteId = this.fetchedAgency.netSuiteId; 
         this.agencyConfig.agencyIsMsp = !!agency.payload.isMsp;
         this.patchAgencyFormValue(this.fetchedAgency);
       });
@@ -355,7 +356,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     agencyContactDetails,
     agencyPaymentDetails,
     agencyJobDistribution,
-    createUnder,
+    createUnder
   }: Agency) {
     const paymentDetailsForms = this.createPaymentDetails(agencyPaymentDetails);
 
