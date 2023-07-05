@@ -791,7 +791,7 @@ export class OrderManagementContentState {
         dispatch([
           new ShowToast(
             MessageTypes.Success,
-            order.length == 1
+            order.length == 1 && !(inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined)
               ? 'Order ' +
                 order[0].organizationPrefix?.toString() +
                 '-' +
