@@ -360,10 +360,10 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   private setupDialogState(data: DepartmentAssigned): void {
     const { workCommitmentStartDate, workCommitmentEndDate } = data;
     const minDate = workCommitmentStartDate
-      ? DateTimeHelper.setCurrentUtcDate(workCommitmentStartDate)
+      ? DateTimeHelper.setCurrentTimeZone(workCommitmentStartDate)
       : undefined;
     const maxDate = workCommitmentEndDate
-      ? DateTimeHelper.setCurrentUtcDate(workCommitmentEndDate)
+      ? DateTimeHelper.setCurrentTimeZone(workCommitmentEndDate)
       : undefined;
     this.setMinMaxDateRange({ min: minDate, max: maxDate });
   }

@@ -264,7 +264,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.watchForShiftControl();
     this.watchForDateControl();
 
-    patchData.date = DateTimeHelper.setCurrentUtcDate(this.scheduledItem.schedule.date);
+    patchData.date = DateTimeHelper.setCurrentTimeZone(this.scheduledItem.schedule.date);
 
     this.scheduleForm.patchValue(patchData);
     this.cdr.markForCheck();
@@ -610,8 +610,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private setTimeForCustomShift(): void {
     this.scheduleForm.patchValue({
-      startTime: DateTimeHelper.setCurrentUtcDate(this.selectedDaySchedule.startDate),
-      endTime: DateTimeHelper.setCurrentUtcDate(this.selectedDaySchedule.endDate),
+      startTime: DateTimeHelper.setCurrentTimeZone(this.selectedDaySchedule.startDate),
+      endTime: DateTimeHelper.setCurrentTimeZone(this.selectedDaySchedule.endDate),
     });
     this.setHours();
   }
@@ -679,7 +679,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
     this.watchForShiftControl();
     this.watchForDateControl();
-    patchData.date = DateTimeHelper.setCurrentUtcDate(this.scheduledItem.schedule.date);
+    patchData.date = DateTimeHelper.setCurrentTimeZone(this.scheduledItem.schedule.date);
     patchData.shiftId = this.selectedDaySchedule.shiftId || this.customShiftId;
 
     if (!this.selectedDaySchedule.shiftId) {

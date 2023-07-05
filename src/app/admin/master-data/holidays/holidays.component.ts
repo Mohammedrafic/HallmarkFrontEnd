@@ -155,8 +155,8 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
     this.HolidayFormGroup.setValue({
       id: 0,
       holidayName: data.holidayName,
-      startDateTime: DateTimeHelper.setCurrentUtcDate(data.startDateTime),
-      endDateTime: DateTimeHelper.setCurrentUtcDate(data.endDateTime),
+      startDateTime: DateTimeHelper.setCurrentTimeZone(data.startDateTime),
+      endDateTime: DateTimeHelper.setCurrentTimeZone(data.endDateTime),
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -180,8 +180,8 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
     this.HolidayFormGroup.setValue({
       id: data.id,
       holidayName: data.holidayName,
-      startDateTime: DateTimeHelper.setCurrentUtcDate(data.startDateTime),
-      endDateTime: DateTimeHelper.setCurrentUtcDate(data.endDateTime),
+      startDateTime: DateTimeHelper.setCurrentTimeZone(data.startDateTime),
+      endDateTime: DateTimeHelper.setCurrentTimeZone(data.endDateTime),
     });
     this.store.dispatch(new ShowSideDialog(true));
   }

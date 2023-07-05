@@ -113,7 +113,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       {
         billRateConfig: value.billRateConfig,
         billRateConfigId: value.billRateConfigId,
-        effectiveDate: DateTimeHelper.setCurrentUtcDate(value.effectiveDate),
+        effectiveDate: DateTimeHelper.setCurrentTimeZone(value.effectiveDate),
         id: value.id,
         intervalMax: value.intervalMax && String(value.intervalMax),
         intervalMin: value.intervalMin && String(value.intervalMin),

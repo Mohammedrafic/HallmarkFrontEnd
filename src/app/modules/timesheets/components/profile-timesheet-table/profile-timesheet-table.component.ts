@@ -263,9 +263,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public openAddDialog(): void {
     const { weekStartDate, weekEndDate, jobEndDate, jobStartDate } = this.store.snapshot().timesheets.timesheetDetails;
-    const startDate = DateTimeHelper.setCurrentUtcDate(jobStartDate) > DateTimeHelper.setCurrentUtcDate(weekStartDate)
+    const startDate = DateTimeHelper.setCurrentTimeZone(jobStartDate) > DateTimeHelper.setCurrentTimeZone(weekStartDate)
       ? jobStartDate : weekStartDate;
-    const endDate = DateTimeHelper.setCurrentUtcDate(jobEndDate) < DateTimeHelper.setCurrentUtcDate(weekEndDate)
+    const endDate = DateTimeHelper.setCurrentTimeZone(jobEndDate) < DateTimeHelper.setCurrentTimeZone(weekEndDate)
       ? jobEndDate : weekEndDate;
 
     this.openAddSideDialog.emit({

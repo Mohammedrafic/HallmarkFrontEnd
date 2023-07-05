@@ -7,12 +7,12 @@ describe('DateTimeHelper', () => {
   const arrayDates = ['2023-06-16', '2023-06-17', '2023-06-18', '2023-06-19', '2023-06-20', '2023-06-21'];
   const inputDate = '2023-06-16T00:00:00';
 
-  describe('DateTimeHelper.setCurrentUtcDate', () => {
+  describe('DateTimeHelper.setCurrentTimeZone', () => {
     it('should convert the date to UTC -0500', () => {
       const timezoneOffset = -300;
       spyOn(Date.prototype, 'getTimezoneOffset').and.returnValue(timezoneOffset);
       const expectedDate = new Date('2023-06-15T19:00:00');
-      const result = DateTimeHelper.setCurrentUtcDate('2023-06-16T00:00:00');
+      const result = DateTimeHelper.setCurrentTimeZone('2023-06-16T00:00:00');
 
       expect(result).toEqual(expectedDate);
       expect(result.getTimezoneOffset()).toEqual(timezoneOffset);
@@ -23,7 +23,7 @@ describe('DateTimeHelper', () => {
       spyOn(Date.prototype, 'getTimezoneOffset').and.returnValue(timezoneOffset);
 
       const expectedDate = new Date('2023-06-16T05:00:00');
-      const result = DateTimeHelper.setCurrentUtcDate('2023-06-16T00:00:00');
+      const result = DateTimeHelper.setCurrentTimeZone('2023-06-16T00:00:00');
 
       expect(result).toEqual(expectedDate);
       expect(result.getTimezoneOffset()).toEqual(timezoneOffset);
@@ -35,7 +35,7 @@ describe('DateTimeHelper', () => {
 
       const init = new Date('2023-06-16T00:00:00.000Z');
       const expectedDate = new Date(init.setUTCDate(init.getUTCDate()) + timezoneOffset * 60 * 1000);
-      const result = DateTimeHelper.setCurrentUtcDate('2023-06-16T00:00:00.000Z');
+      const result = DateTimeHelper.setCurrentTimeZone('2023-06-16T00:00:00.000Z');
 
       expect(result).toEqual(expectedDate);
       expect(result.getTimezoneOffset()).toEqual(timezoneOffset);

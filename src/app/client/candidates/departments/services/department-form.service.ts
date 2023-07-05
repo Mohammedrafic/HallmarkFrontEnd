@@ -105,11 +105,11 @@ export class DepartmentFormService {
       regionIds: [regionId],
       locationIds: [locationId],
       departmentIds: [departmentId],
-      startDate: DateTimeHelper.setCurrentUtcDate(startDate),
-      endDate: endDate && DateTimeHelper.setCurrentUtcDate(endDate),
+      startDate: DateTimeHelper.setCurrentTimeZone(startDate),
+      endDate: endDate && DateTimeHelper.setCurrentTimeZone(endDate),
       isOriented: isOriented,
       isHomeCostCenter: isHomeCostCenter,
-      orientationDate: orientationDate && DateTimeHelper.setCurrentUtcDate(orientationDate),
+      orientationDate: orientationDate && DateTimeHelper.setCurrentTimeZone(orientationDate),
     });
   }
 

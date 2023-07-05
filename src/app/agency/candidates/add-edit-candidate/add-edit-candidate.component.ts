@@ -332,7 +332,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       firstName,
       middleName,
       lastName,
-      dob: DateTimeHelper.setCurrentUtcDate(dob),
+      dob: DateTimeHelper.setCurrentTimeZone(dob),
       classification,
       profileStatus,
       candidateAgencyStatus,

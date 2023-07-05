@@ -104,8 +104,8 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
       candidateProfileId: experience.candidateProfileId,
       employer: experience.employer,
       jobTitle: experience.jobTitle,
-      startDate: DateTimeHelper.setCurrentUtcDate(experience.startDate),
-      endDate: DateTimeHelper.setCurrentUtcDate(experience.endDate),
+      startDate: DateTimeHelper.setCurrentTimeZone(experience.startDate),
+      endDate: DateTimeHelper.setCurrentTimeZone(experience.endDate),
       comments: experience.comments,
     });
     if (this.readonlyMode) {

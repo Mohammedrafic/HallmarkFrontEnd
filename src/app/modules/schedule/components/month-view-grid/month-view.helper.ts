@@ -7,7 +7,7 @@ export const GetGroupedDatesByWeekday = (dates: string[], currentMonth: Date): D
   const weekdays = new Map<string, DatesByWeekday[]>();
 
   dates.forEach((dateStr: string) => {
-    const date = DateTimeHelper.setCurrentUtcDate(dateStr);
+    const date = DateTimeHelper.setCurrentTimeZone(dateStr);
     const weekday = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
     const active = date.getMonth() === currentMonth.getMonth();
     const dateByWeekday = { dateSlot: dateStr, active };

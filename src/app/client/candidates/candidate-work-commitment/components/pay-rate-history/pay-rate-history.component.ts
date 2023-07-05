@@ -179,8 +179,8 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
   private setDateRanges(employeeWorkCommitment: CandidateWorkCommitmentShort): void {
     const { startDate, endDate } = employeeWorkCommitment;
 
-    this.dateRanges.max = endDate ? DateTimeHelper.setCurrentUtcDate(endDate) : undefined;
-    this.dateRanges.min = startDate ? DateTimeHelper.setCurrentUtcDate(startDate) : undefined;
+    this.dateRanges.max = endDate ? DateTimeHelper.setCurrentTimeZone(endDate) : undefined;
+    this.dateRanges.min = startDate ? DateTimeHelper.setCurrentTimeZone(startDate) : undefined;
     this.cdr.markForCheck();
   }
 

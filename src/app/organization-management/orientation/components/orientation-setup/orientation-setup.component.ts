@@ -377,8 +377,8 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       skillIds: data.orientationConfigurationSkills.map(v => v.skillId),
       completedOrientation: data.completedOrientation,
       removeOrientation: data.removeOrientation,
-      startDate: DateTimeHelper.setCurrentUtcDate(data.startDate.toString()),
-      endDate: data.endDate ? DateTimeHelper.setCurrentUtcDate(data.endDate.toString()) : null,
+      startDate: DateTimeHelper.setCurrentTimeZone(data.startDate.toString()),
+      endDate: data.endDate ? DateTimeHelper.setCurrentTimeZone(data.endDate.toString()) : null,
     });
     this.cd.markForCheck();
   }

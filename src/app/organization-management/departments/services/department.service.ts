@@ -66,8 +66,8 @@ export class DepartmentService {
       facilityContact: department.facilityContact,
       facilityEmail: department.facilityEmail,
       facilityPhoneNo: department.facilityPhoneNo,
-      inactiveDate: department.inactiveDate ? DateTimeHelper.setCurrentUtcDate(department.inactiveDate) : null,
-      reactivateDate: department.reactivateDate ? DateTimeHelper.setCurrentUtcDate(department.reactivateDate) : null,
+      inactiveDate: department.inactiveDate ? DateTimeHelper.setCurrentTimeZone(department.inactiveDate) : null,
+      reactivateDate: department.reactivateDate ? DateTimeHelper.setCurrentTimeZone(department.reactivateDate) : null,
       ...(isIRPFlagEnabled && {
         includeInIRP: !!department.includeInIRP,
         unitDescription: department.unitDescription,

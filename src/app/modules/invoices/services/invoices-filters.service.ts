@@ -188,7 +188,7 @@ export class InvoicesFiltersService {
 
   setCurrentTimezone(filters: Record<string, unknown>): void {
     FiltersDateFields.filter((key) => !!filters[key]).forEach((key) => {
-      filters[key] = DateTimeHelper.setCurrentUtcDate(filters[key] as string);
+      filters[key] = DateTimeHelper.setCurrentTimeZone(filters[key] as string);
     });
   }
 }

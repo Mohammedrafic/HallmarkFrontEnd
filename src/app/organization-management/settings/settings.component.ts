@@ -1454,7 +1454,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       if (dynamicValue?.isInvoice) {
         this.invoiceGeneratingFormGroup.setValue({
-          time: dynamicValue.time ? DateTimeHelper.setCurrentUtcDate(dynamicValue.time) : '',
+          time: dynamicValue.time ? DateTimeHelper.setCurrentTimeZone(dynamicValue.time) : '',
           dayOfWeek: dynamicValue.dayOfWeek,
           groupingBy: dynamicValue.groupingBy,
         });

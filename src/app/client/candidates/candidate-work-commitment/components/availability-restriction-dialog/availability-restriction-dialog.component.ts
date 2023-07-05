@@ -109,8 +109,8 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
 
       this.formGroup.patchValue({
         ...data,
-        startTime: DateTimeHelper.setCurrentUtcDate(data.startTime),
-        endTime: DateTimeHelper.setCurrentUtcDate(data.endTime),
+        startTime: DateTimeHelper.setCurrentTimeZone(data.startTime),
+        endTime: DateTimeHelper.setCurrentTimeZone(data.endTime),
       });
     } else {
       this.title = 'Add';

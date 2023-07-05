@@ -631,10 +631,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.generalInformationForm.controls['compBonus'].patchValue(compBonus);
     this.generalInformationForm.controls['duration'].patchValue(order.duration);
     this.generalInformationForm.controls['shiftStartTime'].patchValue(
-      order.shiftStartTime ? DateTimeHelper.setCurrentUtcDate(order.shiftStartTime.toString()) : null
+      order.shiftStartTime ? DateTimeHelper.setCurrentTimeZone(order.shiftStartTime.toString()) : null
     );
     this.generalInformationForm.controls['shiftEndTime'].patchValue(
-      order.shiftEndTime ? DateTimeHelper.setCurrentUtcDate(order.shiftEndTime.toString()) : null
+      order.shiftEndTime ? DateTimeHelper.setCurrentTimeZone(order.shiftEndTime.toString()) : null
     );
 
     this.populatePermPlacementControls(order);
@@ -643,12 +643,12 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
     if (order.jobStartDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobStartDate'].patchValue(
-        DateTimeHelper.setCurrentUtcDate(order.jobStartDate.toString()));
+        DateTimeHelper.setCurrentTimeZone(order.jobStartDate.toString()));
     }
 
     if (order.jobEndDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobEndDate'].patchValue(
-        DateTimeHelper.setCurrentUtcDate(order.jobEndDate.toString())
+        DateTimeHelper.setCurrentTimeZone(order.jobEndDate.toString())
       );
     }
 

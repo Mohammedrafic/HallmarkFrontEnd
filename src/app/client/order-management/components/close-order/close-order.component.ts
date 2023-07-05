@@ -186,7 +186,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.isPosition = isPosition;
     this.setMaxDate();
     // converting jobStartDate to string as it is not a Date object actually and interface is wrong.
-    this.minDate = DateTimeHelper.setCurrentUtcDate(this.order.jobStartDate as unknown as string);
+    this.minDate = DateTimeHelper.setCurrentTimeZone(this.order.jobStartDate as unknown as string);
     this.getComments();
   }
 

@@ -449,8 +449,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate ? DateTimeHelper.setCurrentUtcDate(value.order.jobStartDate.toString()) : "",
-          value.order.jobEndDate ? DateTimeHelper.setCurrentUtcDate(value.order.jobEndDate.toString()) : ""],
+          date: [value.order.jobStartDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobStartDate.toString()) : "",
+          value.order.jobEndDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobEndDate.toString()) : ""],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
           availableStartDate: value.availableStartDate ?
             DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',

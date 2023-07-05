@@ -130,8 +130,8 @@ export class OpenPositionService {
       departmentId: scheduleFiltersData?.filters?.departmentsIds ? scheduleFiltersData?.filters?.departmentsIds[0] : '',
       skillId: scheduleFiltersData?.filters?.skillIds ? scheduleFiltersData?.filters?.skillIds[0] : null,
       shiftId: event.item.data.shiftId,
-      startTime: getTime(DateTimeHelper.setCurrentUtcDate(event.item.data.shiftStartTime)),
-      endTime: getTime(DateTimeHelper.setCurrentUtcDate(event.item.data.shiftEndTime)),
+      startTime: getTime(DateTimeHelper.setCurrentTimeZone(event.item.data.shiftStartTime)),
+      endTime: getTime(DateTimeHelper.setCurrentTimeZone(event.item.data.shiftEndTime)),
       createOrder: false,
       orientated: event.item.data.attributes?.orientated ?? false,
       critical: event.item.data.attributes?.critical ?? false,
@@ -176,8 +176,8 @@ export class OpenPositionService {
         },
       ],
       shiftId: event.item.data.shiftId,
-      startTime: getTime(DateTimeHelper.setCurrentUtcDate(event.item.data.shiftStartTime)),
-      endTime: getTime(DateTimeHelper.setCurrentUtcDate(event.item.data.shiftEndTime)),
+      startTime: getTime(DateTimeHelper.setCurrentTimeZone(event.item.data.shiftStartTime)),
+      endTime: getTime(DateTimeHelper.setCurrentTimeZone(event.item.data.shiftEndTime)),
     };
   }
 

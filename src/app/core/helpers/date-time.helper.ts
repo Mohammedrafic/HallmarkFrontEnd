@@ -30,7 +30,7 @@ export class DateTimeHelper {
     return new Date(day);
   }
 
-  public static setCurrentUtcDate(date: string): Date {
+  public static setCurrentTimeZone(date: string): Date {
     const init = new Date(date);
     const offset = init.getTimezoneOffset() * 60 * 1000;
     const day = new Date(init.setUTCDate(init.getUTCDate()) + offset);
@@ -40,7 +40,7 @@ export class DateTimeHelper {
 
   public static setUtcTimeZone(date: string | Date, zeroTime = false): string {
     if (typeof date === 'string') {
-      const gmt = new Date(this.setCurrentUtcDate(date));
+      const gmt = new Date(this.setCurrentTimeZone(date));
       const hours = zeroTime ? 0 : gmt.getHours();
       const minuets = zeroTime ? 0 : gmt.getMinutes();
 
@@ -61,7 +61,7 @@ export class DateTimeHelper {
    * Use this function with cautions. it needs to be removed.
    */
   public static setInitHours(data: string): string {
-    const date = new Date(this.setCurrentUtcDate(data));
+    const date = new Date(this.setCurrentTimeZone(data));
     date.setHours(0, 0, 0);
 
     return this.setUtcTimeZone(date);
@@ -193,7 +193,7 @@ export class DateTimeHelper {
     let result = null;
 
     datesArray.forEach((el: string, idx: number) => {
-      const dateCheck: number = DateTimeHelper.setCurrentUtcDate(el).getTime();
+      const dateCheck: number = DateTimeHelper.setCurrentTimeZone(el).getTime();
       const diffTime = existDate - dateCheck;
 
       if (diffTime < closedToDate && dateCheck <= existDate) {
@@ -208,12 +208,12 @@ export class DateTimeHelper {
   public static getDatesBetween(sDate: Date | string | null = null, eDate: Date | string | null = null): string[] {
     const startDate = sDate || new Date();
     const endDate = eDate || new Date().setDate(new Date().getDate() + 14); // default 14 days - 2 week view
-    const formattedEndDate = DateTimeHelper.setCurrentUtcDate(endDate as string);
+    const formattedEndDate = DateTimeHelper.setCurrentTimeZone(endDate as string);
 
     const result = [];
 
     for(
-      let curDate = DateTimeHelper.setCurrentUtcDate(startDate as string);
+      let curDate = DateTimeHelper.setCurrentTimeZone(startDate as string);
       curDate <= formattedEndDate;
       curDate.setDate(curDate.getDate() + 1)
     ) {
@@ -299,7 +299,7 @@ export class DateTimeHelper {
 
   static getEarliestDate(dates: string[]): string | null {
     const timeStamp: number[] = dates.map(date => {
-      return DateTimeHelper.setCurrentUtcDate(date).getTime();
+      return DateTimeHelper.setCurrentTimeZone(date).getTime();
     });
 
     if (timeStamp.length) {
@@ -311,7 +311,7 @@ export class DateTimeHelper {
 
   static getLatestDate(dates: string[]): string | null {
     const timeStamp: number[] = dates.map(date => {
-      return DateTimeHelper.setCurrentUtcDate(date).getTime();
+      return DateTimeHelper.setCurrentTimeZone(date).getTime();
     });
 
     if (timeStamp.length) {

@@ -231,9 +231,9 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.reorderForm.patchValue({
       agencies: this.getAgencyIds(this.order.jobDistributions),
       candidates: candidatesInOrder ? this.getCandidateIds(candidatesInOrder) : [],
-      reorderDate: reorder.jobStartDate ? DateTimeHelper.setCurrentUtcDate(reorder.jobStartDate.toString()) : '',
-      shiftStartTime: reorder.shiftStartTime ? DateTimeHelper.setCurrentUtcDate(reorder.shiftStartTime.toString()) : '',
-      shiftEndTime: reorder.shiftEndTime ? DateTimeHelper.setCurrentUtcDate(reorder.shiftEndTime.toString()) : '',
+      reorderDate: reorder.jobStartDate ? DateTimeHelper.setCurrentTimeZone(reorder.jobStartDate.toString()) : '',
+      shiftStartTime: reorder.shiftStartTime ? DateTimeHelper.setCurrentTimeZone(reorder.shiftStartTime.toString()) : '',
+      shiftEndTime: reorder.shiftEndTime ? DateTimeHelper.setCurrentTimeZone(reorder.shiftEndTime.toString()) : '',
       billRate: reorder.hourlyRate ?? '',
       openPosition: reorder.openPositions ?? '',
     }, { emitEvent: false });

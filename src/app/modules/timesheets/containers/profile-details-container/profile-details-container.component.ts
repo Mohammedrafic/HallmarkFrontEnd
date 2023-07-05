@@ -541,12 +541,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       this.orgId =  organizationId;
       this.jobId = jobId;
       this.weekPeriod = [
-        DateTimeHelper.setCurrentUtcDate(weekStartDate),
-        DateTimeHelper.setCurrentUtcDate(weekEndDate),
+        DateTimeHelper.setCurrentTimeZone(weekStartDate),
+        DateTimeHelper.setCurrentTimeZone(weekEndDate),
       ];
       this.workWeeks = candidateWorkPeriods.map((el: TimesheetInt.WorkWeek<string>): TimesheetInt.WorkWeek<Date> => ({
-        weekStartDate: new Date(DateTimeHelper.setCurrentUtcDate(el.weekStartDate)),
-        weekEndDate: new Date(DateTimeHelper.setCurrentUtcDate(el.weekEndDate)),
+        weekStartDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekStartDate)),
+        weekEndDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekEndDate)),
       }));
       this.setDNWBtnState(canEditTimesheet, !!allowDNWInTimesheets);
       this.checkForAllowActions(agencyStatus);

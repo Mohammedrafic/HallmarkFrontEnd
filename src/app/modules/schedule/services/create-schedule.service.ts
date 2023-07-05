@@ -350,7 +350,7 @@ export class CreateScheduleService {
   getCandidateOrientation(candidate: ScheduleCandidate): boolean {
     return candidate.dates.every((date: string) => {
       if(candidate.orientationDate) {
-        return DateTimeHelper.setCurrentUtcDate(date) >= DateTimeHelper.setCurrentUtcDate(candidate.orientationDate);
+        return DateTimeHelper.setCurrentTimeZone(date) >= DateTimeHelper.setCurrentTimeZone(candidate.orientationDate);
       } else {
         return false;
       }

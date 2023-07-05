@@ -256,8 +256,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           }
           this.availableStartDate = candidateDetails.actualStartDate;
           this.candidateForm.patchValue({
-            actualStartDate: DateTimeHelper.setCurrentUtcDate(candidateDetails.actualStartDate as string),
-            actualEndDate: DateTimeHelper.setCurrentUtcDate(candidateDetails.actualEndDate as string),
+            actualStartDate: DateTimeHelper.setCurrentTimeZone(candidateDetails.actualStartDate as string),
+            actualEndDate: DateTimeHelper.setCurrentTimeZone(candidateDetails.actualEndDate as string),
           }, { emitEvent: false, onlySelf: true });
         }),
         switchMap(() => {
@@ -355,7 +355,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
      this.isAppliedorShortlisted = value === CandidatStatus.Applied || value === CandidatStatus.Shortlisted;
      this.showactualStartEndDate= value === CandidatStatus.OnBoard;
      this.candidateForm.get('availableStartDate')?.patchValue(
-       DateTimeHelper.setCurrentUtcDate(this.availableStartDate as string), { emitEvent: false, onlySelf: true }
+       DateTimeHelper.setCurrentTimeZone(this.availableStartDate as string), { emitEvent: false, onlySelf: true }
      );
       this.cdr.markForCheck();
   });
@@ -400,7 +400,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       status: job.applicantStatus.applicantStatus,
       isClosed: true,
       reason: job.positionClosureReasonId,
-      closeDate: DateTimeHelper.setCurrentUtcDate(job.closeDate as string),
+      closeDate: DateTimeHelper.setCurrentTimeZone(job.closeDate as string),
     });
   }
 
