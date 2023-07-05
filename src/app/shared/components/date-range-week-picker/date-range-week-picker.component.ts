@@ -37,14 +37,14 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit {
       if (value) {
         const from = value[0] as Date;
         const to = value[1] as Date;
-        const correctedStart = DateTimeHelper.getFirstDayofWeek(from);
+        const correctedStart = DateTimeHelper.getFirstDayOfWeek(from);
         const correctedEnd = this.datePipe.transform(to, 'MM/dd/yyyy') === this.datePipe
         .transform(this.maxDate, 'MM/dd/yyyy') ? to : DateTimeHelper.getLastDayOfWeek(to);
 
         this.dateControl.setValue([correctedStart, correctedEnd], { onlySelf: true, emitEvent: false });
         this.range.emit([
-          DateTimeHelper.toUtcFormat(correctedStart),
-          DateTimeHelper.toUtcFormat(correctedEnd)
+          DateTimeHelper.setUtcTimeZone(correctedStart),
+          DateTimeHelper.setUtcTimeZone(correctedEnd)
         ]);
       } else {
         this.dateControl.reset(null, { onlySelf: true, emitEvent: false });

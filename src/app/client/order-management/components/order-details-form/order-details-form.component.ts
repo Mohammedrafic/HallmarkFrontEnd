@@ -355,8 +355,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     if (orderType === OrderType.PermPlacement) {
       return;
     }
-    const startDate = DateTimeHelper.toUtcFormat(jobStartDate);
-    const endDate = DateTimeHelper.toUtcFormat(jobEndDate);
+    const startDate = DateTimeHelper.setUtcTimeZone(jobStartDate);
+    const endDate = DateTimeHelper.setUtcTimeZone(jobEndDate);
 
     this.orderManagementService
       .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate)
@@ -631,10 +631,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.generalInformationForm.controls['compBonus'].patchValue(compBonus);
     this.generalInformationForm.controls['duration'].patchValue(order.duration);
     this.generalInformationForm.controls['shiftStartTime'].patchValue(
-      order.shiftStartTime ? DateTimeHelper.convertDateToUtc(order.shiftStartTime.toString()) : null
+      order.shiftStartTime ? DateTimeHelper.setCurrentTimeZone(order.shiftStartTime.toString()) : null
     );
     this.generalInformationForm.controls['shiftEndTime'].patchValue(
-      order.shiftEndTime ? DateTimeHelper.convertDateToUtc(order.shiftEndTime.toString()) : null
+      order.shiftEndTime ? DateTimeHelper.setCurrentTimeZone(order.shiftEndTime.toString()) : null
     );
 
     this.populatePermPlacementControls(order);
@@ -643,12 +643,12 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
     if (order.jobStartDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobStartDate'].patchValue(
-        DateTimeHelper.convertDateToUtc(order.jobStartDate.toString()));
+        DateTimeHelper.setCurrentTimeZone(order.jobStartDate.toString()));
     }
 
     if (order.jobEndDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobEndDate'].patchValue(
-        DateTimeHelper.convertDateToUtc(order.jobEndDate.toString())
+        DateTimeHelper.setCurrentTimeZone(order.jobEndDate.toString())
       );
     }
 
@@ -1130,8 +1130,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           orderType,
           departmentIdValue,
           skillId,
-          DateTimeHelper.toUtcFormat(jobStartDate),
-          DateTimeHelper.toUtcFormat(this.orderControlsConfig.jobEndDateControl.value)
+          DateTimeHelper.setUtcTimeZone(jobStartDate),
+          DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value)
         )
       );
     });

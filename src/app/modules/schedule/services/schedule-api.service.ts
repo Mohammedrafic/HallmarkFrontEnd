@@ -49,7 +49,7 @@ export class ScheduleApiService {
   }
 
   createSchedule(employeeScheduledDays: Schedule): Observable<void> {
-    const userLocalTime = DateTimeHelper.toUtcFormat(new Date());
+    const userLocalTime = DateTimeHelper.setUtcTimeZone(new Date());
     return this.http.post<void>('/api/Schedules/create', {...employeeScheduledDays, userLocalTime });
   }
 
@@ -74,7 +74,7 @@ export class ScheduleApiService {
   }
 
   updateScheduledShift(scheduledShift: ScheduledShift, type: ScheduleType):Observable<void> {
-    const userLocalTime = DateTimeHelper.toUtcFormat(new Date());
+    const userLocalTime = DateTimeHelper.setUtcTimeZone(new Date());
     return this.http.post<void>(
       type === ScheduleType.Book ? '/api/Schedules/booking/update' : '/api/Schedules/schedule/update',
       { ...scheduledShift, userLocalTime },

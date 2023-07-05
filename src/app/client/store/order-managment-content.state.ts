@@ -67,6 +67,7 @@ import {
   GetOrdersJourney,
   ExportOrdersJourney,
   GetAllShifts,
+  sendOnboardCandidateEmailMessage,
   GetOrderComments,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -76,6 +77,7 @@ import {
   GetPredefinedBillRatesData,
   IrpCandidatesParams,
   IrpOrderCandidate,
+  OnboardCandidateEmail,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -131,6 +133,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { UpdateRegRateService } from '@client/order-management/components/update-reg-rate/update-reg-rate.service';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { HttpErrorResponse } from '@angular/common/http';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 
@@ -165,6 +168,7 @@ export interface OrderManagementContentStateModel {
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
   candidateCancellationReasons:CandidateCancellationReason[]|null;
   allShifts:ScheduleShift[]|null;
+  sendOnboardCandidateEmail:OnboardCandidateEmail | null;
   orderComments: Comment[]
 }
 
@@ -205,9 +209,10 @@ export interface OrderManagementContentStateModel {
     irpCandidates: null,
     candidateCancellationReasons:null,
     allShifts:null,
+    sendOnboardCandidateEmail:null,
     orderComments : []
   },
-  
+
 })
 @Injectable()
 export class OrderManagementContentState {
@@ -481,8 +486,8 @@ export class OrderManagementContentState {
             orderType,
             departmentId,
             skill,
-            jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-            jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+            jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : jobStartDate,
+            jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : jobEndDate
           )
         );
 
@@ -568,8 +573,8 @@ export class OrderManagementContentState {
               orderType,
               departmentId,
               skill,
-              jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-              jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate,
+              jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : jobStartDate,
+              jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : jobEndDate,
               true
             )
           );
@@ -730,7 +735,7 @@ export class OrderManagementContentState {
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate }: SetPredefinedBillRatesData
   ): OrderManagementContentStateModel {
-    return patchState({ getPredefinedBillRatesData: { 
+    return patchState({ getPredefinedBillRatesData: {
       orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate,
     } });
   }
@@ -786,14 +791,14 @@ export class OrderManagementContentState {
         dispatch([
           new ShowToast(
             MessageTypes.Success,
-            order.length == 1
+            order.length == 1 && !(inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined)
               ? 'Order ' +
                 order[0].organizationPrefix?.toString() +
                 '-' +
                 order[0].publicId?.toString() +
                 ' has been added'
               : inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined
-              ?  isLocationAndDepartment ?  RECORD_ADDED +' Due to location and Department Expiry ' + inActivedatestr + ' Dates orders not added.' 
+              ?  isLocationAndDepartment ?  RECORD_ADDED +' Due to location and Department Expiry ' + inActivedatestr + ' Dates orders not added.'
               : isLocation
                 ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr + ' Dates orders not added.'
                 : RECORD_ADDED + ' Due to Department Expiry ' + inActivedatestr + ' Dates orders not added.'
@@ -1179,7 +1184,7 @@ export class OrderManagementContentState {
     ): Observable<Comment[]> {
       return this.commentService.getComments(commentContainerId, null)
         .pipe(tap((payload) => patchState({ orderComments: payload })));
-    }  
+    }
 
     @Action(GetAllShifts)
     GetAllShifts(
@@ -1189,5 +1194,21 @@ export class OrderManagementContentState {
           patchState({ allShifts: payload });
           return payload
         }));
+      }
+
+      @Action(sendOnboardCandidateEmailMessage)
+      sendOnboardCandidateEmailMessage(
+        { dispatch, patchState }: StateContext<OrderManagementContentStateModel>,
+        { onboardCandidateEmailData }: sendOnboardCandidateEmailMessage
+      ): Observable<any | void> {
+        return this.orderManagementService.sendCandidateOnboardEmail(onboardCandidateEmailData).pipe(
+          tap((payload) => {
+            patchState({ sendOnboardCandidateEmail: payload });
+            return payload;
+          }),
+          catchError((error: HttpErrorResponse) => {
+            return dispatch(new ShowToast(MessageTypes.Error, error.error));
+          })
+        );
       }
 }

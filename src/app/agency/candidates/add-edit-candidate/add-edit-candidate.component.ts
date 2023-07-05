@@ -77,12 +77,13 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   public candidateName: string | null;
   public isMobileLoginOn: boolean;
 
-  private filesDetails: Blob[] = [];
   private isRemoveLogo: boolean = false;
   public customMaskChar : string = '';
   public maskSSNPattern: string = '000-00-0000';
   public maskedSSN: string = '';
 
+  private filesDetails: Blob[] = [];
+  private isInitialUpload = false;
 
   public get isCandidateAssigned(): boolean {
     return !!this.orderId && !!this.candidateStatus;
@@ -225,7 +226,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       let candidate = this.getCandidateRequestObj(this.candidateForm.getRawValue());
       candidate = {
         ...candidate,
-        dob: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(candidate.dob)),
+        dob: DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(candidate.dob)),
         ssn: candidate.ssn ? +candidate.ssn : null,
       };
 
@@ -304,7 +305,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   private uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
-      this.store.dispatch(new UploadCandidatePhoto(this.filesDetails[0] as Blob, businessUnitId));
+      this.store.dispatch(new UploadCandidatePhoto(this.filesDetails[0] as Blob, businessUnitId, this.isInitialUpload));
     } else if (this.photo && this.isRemoveLogo) {
       this.store.dispatch(new RemoveCandidatePhoto(businessUnitId));
     }
@@ -331,7 +332,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       firstName,
       middleName,
       lastName,
-      dob: DateTimeHelper.convertDateToUtc(dob),
+      dob: DateTimeHelper.setCurrentTimeZone(dob),
       classification,
       profileStatus,
       candidateAgencyStatus,
@@ -492,6 +493,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   }
 
   private saveCandidateProfile(candidate: Candidate): void {
+    this.isInitialUpload = !candidate.id;
     this.store.dispatch(new SaveCandidate(candidate))
     .pipe(
         filter(() => !candidate.id),
@@ -502,7 +504,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           return ({
             ...candidateProfile,
             candidateProfileSkills: candidateProfile.candidateProfileSkills.map(
-              (id) => ({ id } as unknown as JobDistributionMasterSkills) 
+              (id) => ({ id } as unknown as JobDistributionMasterSkills)
             ),
           });
         }),

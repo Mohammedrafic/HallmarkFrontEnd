@@ -254,8 +254,8 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       const selectedHoliday = this.masterHolidays.find((holiday) => holiday.holidayName === val);
       if (selectedHoliday) {
         this.HolidayFormGroup.get('masterHolidayId')?.setValue(selectedHoliday.id);
-        this.HolidayFormGroup.get('startDateTime')?.setValue(DateTimeHelper.convertDateToUtc(selectedHoliday.startDateTime));
-        this.HolidayFormGroup.get('endDateTime')?.setValue(DateTimeHelper.convertDateToUtc(selectedHoliday.endDateTime));
+        this.HolidayFormGroup.get('startDateTime')?.setValue(DateTimeHelper.setCurrentTimeZone(selectedHoliday.startDateTime));
+        this.HolidayFormGroup.get('endDateTime')?.setValue(DateTimeHelper.setCurrentTimeZone(selectedHoliday.endDateTime));
       } else {
         this.HolidayFormGroup.get('masterHolidayId')?.setValue(0);
       }
@@ -479,8 +479,8 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       locations: [0],
       regions: [0],
       holidayName: holiday.holidayName,
-      startDateTime: DateTimeHelper.convertDateToUtc(holiday.startDateTime),
-      endDateTime: DateTimeHelper.convertDateToUtc(holiday.endDateTime),
+      startDateTime: DateTimeHelper.setCurrentTimeZone(holiday.startDateTime),
+      endDateTime: DateTimeHelper.setCurrentTimeZone(holiday.endDateTime),
       includeInIRP : holiday.includeInIRP,
       includeInVMS : holiday.includeInVMS
     });

@@ -162,7 +162,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private resizeObserver: ResizeObserverModel;
 
   private canRecalculate: boolean;
-  
+
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
@@ -541,12 +541,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       this.orgId =  organizationId;
       this.jobId = jobId;
       this.weekPeriod = [
-        DateTimeHelper.convertDateToUtc(weekStartDate),
-        DateTimeHelper.convertDateToUtc(weekEndDate),
+        DateTimeHelper.setCurrentTimeZone(weekStartDate),
+        DateTimeHelper.setCurrentTimeZone(weekEndDate),
       ];
       this.workWeeks = candidateWorkPeriods.map((el: TimesheetInt.WorkWeek<string>): TimesheetInt.WorkWeek<Date> => ({
-        weekStartDate: new Date(DateTimeHelper.convertDateToUtc(el.weekStartDate)),
-        weekEndDate: new Date(DateTimeHelper.convertDateToUtc(el.weekEndDate)),
+        weekStartDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekStartDate)),
+        weekEndDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekEndDate)),
       }));
       this.setDNWBtnState(canEditTimesheet, !!allowDNWInTimesheets);
       this.checkForAllowActions(agencyStatus);
@@ -575,7 +575,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const allowResult = agencyStatus === AgencyStatus.Inactive || agencyStatus === AgencyStatus.Terminated;
 
     this.disableAnyAction = allowResult;
-    
+
   }
   private allowEditButtonEnabled(): void {
     let organizationId = this.orgId;
@@ -589,7 +589,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     ).subscribe(({ TimesheetSubmissionProcess }) => {
       let currentdate = new Date();
       let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));
-      
+
       if (TimesheetSubmissionProcess == "INT" &&dateDiff <= 30) {
         this.disableEditButton = true;
       }

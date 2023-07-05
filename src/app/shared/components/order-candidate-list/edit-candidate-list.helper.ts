@@ -17,8 +17,8 @@ export const CreateCandidateDto = (
 ): CreateIrpCandidateDto => ({
   employeeId: candidate.candidateProfileId,
   orderId,
-  actualStartDate: actualStartDate ? DateTimeHelper.toUtcFormat(actualStartDate) : null,
-  actualEndDate: actualEndDate ? DateTimeHelper.toUtcFormat(actualEndDate) : null,
+  actualStartDate: actualStartDate ? DateTimeHelper.setUtcTimeZone(actualStartDate) : null,
+  actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
   availabilityOverlap: candidate.availabilityOverlap ?? null,
   availableStartDate:availableStartDate ?? null,
   workflowStepType:status!
@@ -35,9 +35,9 @@ export const UpdateCandidateDto = (
 ): UpdateIrpCandidateDto => ({
   organizationId,
   jobId,
-  actualStartDate: actualStartDate ? DateTimeHelper.toUtcFormat(actualStartDate) : null,
-  actualEndDate: actualEndDate ? DateTimeHelper.toUtcFormat(actualEndDate) : null,
-  availableStartDate:availableStartDate ? DateTimeHelper.toUtcFormat(availableStartDate) : null ,
+  actualStartDate: actualStartDate ? DateTimeHelper.setUtcTimeZone(actualStartDate) : null,
+  actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
+  availableStartDate:availableStartDate ? DateTimeHelper.setUtcTimeZone(availableStartDate) : null ,
   workflowStepType:status!,
   orderId:orderId ?? null
 });

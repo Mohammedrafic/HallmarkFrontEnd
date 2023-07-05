@@ -223,6 +223,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.attachElementToResizeObserver();
     this.watchForRouterEvents();
     this.getSiteHelpUrl();
+    this.saveMainContentElement();
     this.alertStateModel$
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe((alertdata) => {
@@ -243,7 +244,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   ngAfterViewInit(): void {
     this.hideAnalyticsSubMenuItems();
     this.getAlertsPoollingTime();
-    this.saveMainContentElement();
   }
 
   onSelectProfileMenu(event: any): void {

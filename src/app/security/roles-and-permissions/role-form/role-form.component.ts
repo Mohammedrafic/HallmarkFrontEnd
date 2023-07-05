@@ -148,7 +148,8 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.treeData=roleTreeField.dataSource;
     if(this.newRoleBussinesData !=null && this.newRoleBussinesData!=undefined){
       var data=this.businessUnitIdControl?.value;
-      var selectedBussinessUnit=this.newRoleBussinesData.filter(x=>x.id==data);
+      var selectedBussinessUnit = this.newRoleBussinesData.filter(x => x.id == data);
+      this.IsIrp = selectedBussinessUnit[0]?.isIRPEnabled;  
       this.ShowIsIRPToggle(selectedBussinessUnit)
     }
     else{

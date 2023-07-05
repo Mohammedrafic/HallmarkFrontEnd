@@ -85,7 +85,7 @@ export class DashboardService {
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
     [WidgetTypeEnum.OPEN_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getOpenPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getInProgressPositionTrendWidgetData(filters),
-    [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),   
+    [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
     [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
     [WidgetTypeEnum.AGENCY_POSITION_COUNT]: (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
       [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
@@ -318,15 +318,15 @@ export class DashboardService {
 
   private getFirstLastWeekDay(startDate: Date): ITimeSlice {
     const today = new Date();
-    const dateFrom = DateTimeHelper.toUtcFormat(new Date(startDate.setDate(startDate.getDate() - startDate.getDay())));
-    const dateTo = DateTimeHelper.toUtcFormat(new Date(today.setDate(today.getDate() - today.getDay() + 6)));
+    const dateFrom = DateTimeHelper.setUtcTimeZone(new Date(startDate.setDate(startDate.getDate() - startDate.getDay())));
+    const dateTo = DateTimeHelper.setUtcTimeZone(new Date(today.setDate(today.getDate() - today.getDay() + 6)));
     return { dateFrom, dateTo };
   }
 
   private getFirstLastMonthDay(startDate: Date): ITimeSlice {
     const today = new Date();
-    const dateFrom = DateTimeHelper.toUtcFormat(new Date(new Date(startDate.getFullYear(), startDate.getMonth(), 1)));
-    const dateTo =  DateTimeHelper.toUtcFormat(new Date(new Date(today.getFullYear(), today.getMonth() + 1, 0)));
+    const dateFrom = DateTimeHelper.setUtcTimeZone(new Date(new Date(startDate.getFullYear(), startDate.getMonth(), 1)));
+    const dateTo =  DateTimeHelper.setUtcTimeZone(new Date(new Date(today.getFullYear(), today.getMonth() + 1, 0)));
     return { dateFrom, dateTo };
   }
 

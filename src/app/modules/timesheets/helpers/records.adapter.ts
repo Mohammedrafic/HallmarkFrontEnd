@@ -26,13 +26,13 @@ export class RecordsAdapter {
     ): AddRecordDto {
 
     if (type === RecordFields.Time) {
-      data.timeIn = data.timeIn ? DateTimeHelper.toUtcFormat(data.timeIn) : DateTimeHelper.toUtcFormat(data.day as Date);
-      data.timeOut =  data.timeOut ?  data.timeOut : DateTimeHelper.toUtcFormat(data.day as Date);
-      data.day = DateTimeHelper.toUtcFormat(data.day as Date);
+      data.timeIn = data.timeIn ? DateTimeHelper.setUtcTimeZone(data.timeIn) : DateTimeHelper.setUtcTimeZone(data.day as Date);
+      data.timeOut =  data.timeOut ?  data.timeOut : DateTimeHelper.setUtcTimeZone(data.day as Date);
+      data.day = DateTimeHelper.setUtcTimeZone(data.day as Date);
     }
 
     if (data.day && data.timeIn) {
-      data.timeIn = this.getDateFromParts(DateTimeHelper.toUtcFormat(data.day), data.timeIn);
+      data.timeIn = this.getDateFromParts(DateTimeHelper.setUtcTimeZone(data.day), data.timeIn);
     }
 
     if (data.timeOut) {
@@ -40,7 +40,7 @@ export class RecordsAdapter {
     }
 
     if (type === RecordFields.Miles) {
-      data.timeIn = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.timeIn));
+      data.timeIn = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(data.timeIn));
     }
 
     if (type === RecordFields.Time) {
@@ -124,7 +124,7 @@ export class RecordsAdapter {
 
     return {
       id: record.id,
-      timeIn: DateTimeHelper.toUtcFormat(timeIn),
+      timeIn: DateTimeHelper.setUtcTimeZone(timeIn),
       isTimeInNull: !record.timeIn,
       billRateConfigId: record.billRateConfigId,
       departmentId: record.departmentId,
@@ -137,8 +137,8 @@ export class RecordsAdapter {
   }
 
   private static checkTimeOutDate(timeIn: string, timeOut: string): string {
-    const dtaIn = DateTimeHelper.toUtcFormat(timeIn);
-    let dateOut = DateTimeHelper.toUtcFormat(timeOut);
+    const dtaIn = DateTimeHelper.setUtcTimeZone(timeIn);
+    let dateOut = DateTimeHelper.setUtcTimeZone(timeOut);
     dateOut = this.getDateFromParts(dtaIn, dateOut);
 
     if (dtaIn >= dateOut) {

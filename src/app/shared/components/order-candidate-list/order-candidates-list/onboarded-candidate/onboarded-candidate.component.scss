@@ -167,3 +167,8 @@
   }
 }
 
+::ng-deep{
+  .e-confirm-dialog.e-control.e-dialog.e-popup.unsaved-changes-dialog {
+    width: 465px !important;
+  }
+}

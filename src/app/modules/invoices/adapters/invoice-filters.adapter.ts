@@ -9,10 +9,10 @@ import { FiltersDateFields } from '../constants';
 export class InvoiceFiltersAdapter {
   static prepareFilters(formGroup: FormGroup): InvoicesFilterState {
     const filters: InvoicesFilterState = LeftOnlyValidValues(formGroup);
-    
+
     FiltersDateFields.forEach((key: TypedInvoiceKey) => {
       if (filters[key]) {
-        (filters[key] as string) = DateTimeHelper.toUtcFormat(filters[key] as string, true);
+        (filters[key] as string) = DateTimeHelper.setUtcTimeZone(filters[key] as string, true);
       }
     });
 

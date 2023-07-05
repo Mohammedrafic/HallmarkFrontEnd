@@ -2,7 +2,7 @@
   id="dialog"
   #sideDialog
   cssClass="dialog order-details-dialog"
-  [target]="targetElement"
+  [target]="targetElement$ | async"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
@@ -32,7 +32,10 @@
               </div>
             </div>
           </div>
-          <div class="e-card-content dialog-controls">
+          <div
+            class="e-card-content dialog-controls"
+            [ngClass]="{'open-per-diem-order': order?.orderType === orderType.OpenPerDiem}"
+          >
             <div class="order-actions" *ngIf="showApproveAndCancel">
               <button ejs-button cssClass="e-outline" (click)="cancelOrder(order.id)">Cancel</button>
               <button ejs-button cssClass="e-primary" (click)="approveOrder(order.id)">Approve</button>

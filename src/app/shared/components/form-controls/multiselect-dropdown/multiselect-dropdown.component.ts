@@ -18,7 +18,6 @@ import { inputs } from '@syncfusion/ej2-angular-popups/src/dialog/dialog.compone
   ],
 })
 export class MultiselectDropdownComponent extends BaseFormControlDirective {
-  public defaultWidth:string ='200px';
   @ViewChild('selector') selector: MultiSelectComponent;
   @Input() public dataSource: unknown | null | undefined;
   @Input() public fields: FieldSettingsModel;
@@ -27,7 +26,8 @@ export class MultiselectDropdownComponent extends BaseFormControlDirective {
   @Input() public sortOrder: SortOrder = SortOrder.NONE;
   @Input() showClearAll = true;
   @Input() allowFilter = true;
-  @Input() public popupWidth : string | undefined;
+  public popupWidth : string | undefined;
+
 
   @Output() public selectAllEmitter: EventEmitter<ISelectAllEventArgs> = new EventEmitter<ISelectAllEventArgs>();
 }

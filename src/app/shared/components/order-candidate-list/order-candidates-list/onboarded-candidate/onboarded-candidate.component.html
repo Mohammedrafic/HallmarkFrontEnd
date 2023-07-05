@@ -316,6 +316,13 @@
   (cancelReject)="resetStatusesFormControl()"
 ></app-reject-reason-dialog>
 
+<!--  -->
+<app-send-email-side-dialog [header]="templateEmailTitle" [isSend]="isSend" (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()" [width]="'1000px'">
+    <app-onboard-candidate-message-dialog [isFormInvalid]="isSendOnboardFormInvalid" 
+      [onBoardMessageEmailTemplateForm]="$any(sendOnboardMessageEmailFormGroup)" [title]="templateEmailTitle" [isSend]="isSend" [emailTo]="emailTo" 
+    ></app-onboard-candidate-message-dialog>
+</app-send-email-side-dialog>
+
 <app-candidate-cancellation-dialog
   [openEvent]="openCandidateCancellationDialog"
   [orderType]="candidateJob?.order?.orderType"

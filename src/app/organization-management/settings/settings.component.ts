@@ -1047,7 +1047,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       isEnabled: !!this.organizationSettingsFormGroup.controls['value'].value,
       dayOfWeek: this.invoiceGeneratingFormGroup.controls['dayOfWeek'].value,
       groupingBy: this.invoiceGeneratingFormGroup.controls['groupingBy'].value,
-      time: DateTimeHelper.toUtcFormat(this.invoiceGeneratingFormGroup.controls['time'].value),
+      time: DateTimeHelper.setUtcTimeZone(this.invoiceGeneratingFormGroup.controls['time'].value),
     });
   }
 
@@ -1454,7 +1454,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       if (dynamicValue?.isInvoice) {
         this.invoiceGeneratingFormGroup.setValue({
-          time: dynamicValue.time ? DateTimeHelper.convertDateToUtc(dynamicValue.time) : '',
+          time: dynamicValue.time ? DateTimeHelper.setCurrentTimeZone(dynamicValue.time) : '',
           dayOfWeek: dynamicValue.dayOfWeek,
           groupingBy: dynamicValue.groupingBy,
         });

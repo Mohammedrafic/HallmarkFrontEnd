@@ -114,7 +114,7 @@ export class BillRatesState {
 
   @Action(SaveUpdateBillRate)
   SaveUpdateBillRate({ dispatch }: StateContext<BillRatesStateModel>, { payload, filters }: SaveUpdateBillRate): Observable<BillRateSetup[] | void> {
-    payload.effectiveDate = DateTimeHelper.toUtcFormat(payload.effectiveDate);
+    payload.effectiveDate = DateTimeHelper.setUtcTimeZone(payload.effectiveDate);
     return this.billRatesService.saveUpdateBillRate(payload)
       .pipe(tap((payloadResponse) => {
           if (payload.billRateSettingId) {

@@ -298,8 +298,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       ext: location.ext,
       contactEmail: location.contactEmail,
       contactPerson: location.contactPerson,
-      inactiveDate: location.inactiveDate ? DateTimeHelper.convertDateToUtc(location.inactiveDate) : null,
-      reactivateDate: location.reactivateDate ? DateTimeHelper.convertDateToUtc(location.reactivateDate) : null,
+      inactiveDate: location.inactiveDate ? DateTimeHelper.setCurrentTimeZone(location.inactiveDate) : null,
+      reactivateDate: location.reactivateDate ? DateTimeHelper.setCurrentTimeZone(location.reactivateDate) : null,
       phoneNumber: location.phoneNumber,
       phoneType: PhoneTypes[location.phoneType] || null,
       timeZone: location.timeZone,
@@ -383,8 +383,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         ext: this.locationDetailsFormGroup.controls['ext'].value,
         contactEmail: this.locationDetailsFormGroup.controls['contactEmail'].value,
         contactPerson: this.locationDetailsFormGroup.controls['contactPerson'].value,
-        inactiveDate: inactiveDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(inactiveDate)) : undefined,
-        reactivateDate: reactivateDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(reactivateDate)) : undefined,
+        inactiveDate: inactiveDate ? DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(inactiveDate)) : undefined,
+        reactivateDate: reactivateDate ? DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(reactivateDate)) : undefined,
         phoneNumber: this.locationDetailsFormGroup.controls['phoneNumber'].value,
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
         timeZone: this.locationDetailsFormGroup.controls['timeZone'].value,
@@ -437,9 +437,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
       const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
       inactiveDate.setHours(0, 0, 0, 0);
-      const nowPerTimeZone = DateTimeHelper.newDateInTimeZone(timeZone || this.DEFAULT_LOCATION_TIMEZONE);
-      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, nowPerTimeZone))
-      && DateTimeHelper.isDateBefore(inactiveDate, nowPerTimeZone)) {
+      const nowPerTimeZone = DateTimeHelper.getCurrentDateInTimeZone(timeZone || this.DEFAULT_LOCATION_TIMEZONE);
+      if (!(reactivateDate && DateTimeHelper.hasDateBefore(reactivateDate, nowPerTimeZone))
+      && DateTimeHelper.hasDateBefore(inactiveDate, nowPerTimeZone)) {
         field.disable();
       } else {
         field.enable();

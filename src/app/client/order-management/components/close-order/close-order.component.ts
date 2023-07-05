@@ -186,7 +186,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.isPosition = isPosition;
     this.setMaxDate();
     // converting jobStartDate to string as it is not a Date object actually and interface is wrong.
-    this.minDate = DateTimeHelper.convertDateToUtc(this.order.jobStartDate as unknown as string);
+    this.minDate = DateTimeHelper.setCurrentTimeZone(this.order.jobStartDate as unknown as string);
     this.getComments();
   }
 
@@ -200,7 +200,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
     let formData = this.closeForm.getRawValue();
     const { closingDate } = formData;
-    formData = { ...formData, closingDate: DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(closingDate)) };
+    formData = { ...formData, closingDate: DateTimeHelper.setUtcTimeZone(DateTimeHelper.setInitDateHours(closingDate)) };
 
     if (this.isPosition) {
       this.closePosition(formData);

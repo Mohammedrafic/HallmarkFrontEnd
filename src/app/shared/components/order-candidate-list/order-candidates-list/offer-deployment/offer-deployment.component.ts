@@ -287,7 +287,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   actualEndDate: this.candidateJob.actualEndDate,
                   clockId: value.clockId,
                   guaranteedWorkWeek: value.guaranteedWorkWeek,
-                  offeredStartDate: DateTimeHelper.toUtcFormat(new Date(value.offeredStartDate)),
+                  offeredStartDate: DateTimeHelper.setUtcTimeZone(new Date(value.offeredStartDate)),
                   allowDeployWoCredentials: true,
                   billRates: rates,
                   billRatesUpdated: this.checkForBillRateUpdate(rates),
