@@ -510,10 +510,10 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
             locationIds: this.filters.locationIds ? [...this.filters.locationIds] : [],
             departmentsIds: this.filters.departmentsIds ? [...this.filters.departmentsIds] : [],
             skillIds : this.filters.skillIds ? [...this.filters.skillIds] : [],
-            isAvailablity : this.filters.isAvailablity,
-            isUnavailablity : this.filters.isUnavailablity,
-            isExcludeNotOrganized : this.filters.isExcludeNotOrganized,
-            isOnlySchedulatedCandidate : this.filters.isOnlySchedulatedCandidate,
+            isAvailablity : !!this.filters.isAvailablity,
+            isUnavailablity : !!this.filters.isUnavailablity,
+            isExcludeNotOrganized : !!this.filters.isExcludeNotOrganized,
+            isOnlySchedulatedCandidate : !!this.filters.isOnlySchedulatedCandidate,
             startTime : getPreservedTime(this.filters.startTime),
             endTime : getPreservedTime(this.filters.endTime)
           });
