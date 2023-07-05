@@ -81,7 +81,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     if (this.dateControl.value && typeof this.dateControl.value === 'string') {
       const [from, to] = DateTimeHelper.getWeekStartEnd(this.dateControl.value);
 
-      if (DateTimeHelper.isDateBetween(args.date, from, to)) {
+      if (DateTimeHelper.hasDateBetween(args.date, from, to)) {
         this.renderer2.addClass(args.element, 'e-highlightselectedrange');
       }
     } else {

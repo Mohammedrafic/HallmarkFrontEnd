@@ -437,9 +437,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
       const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
       inactiveDate.setHours(0, 0, 0, 0);
-      const nowPerTimeZone = DateTimeHelper.newDateInTimeZone(timeZone || this.DEFAULT_LOCATION_TIMEZONE);
-      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, nowPerTimeZone))
-      && DateTimeHelper.isDateBefore(inactiveDate, nowPerTimeZone)) {
+      const nowPerTimeZone = DateTimeHelper.getCurrentDateInTimeZone(timeZone || this.DEFAULT_LOCATION_TIMEZONE);
+      if (!(reactivateDate && DateTimeHelper.hasDateBefore(reactivateDate, nowPerTimeZone))
+      && DateTimeHelper.hasDateBefore(inactiveDate, nowPerTimeZone)) {
         field.disable();
       } else {
         field.enable();

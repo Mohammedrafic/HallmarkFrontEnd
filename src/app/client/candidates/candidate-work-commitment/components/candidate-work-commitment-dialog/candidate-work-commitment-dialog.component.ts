@@ -277,7 +277,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     if (terminationDate) {
       this.maximumDate = DateTimeHelper.setCurrentTimeZone(terminationDate);
     } else {
-      this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
+      this.maximumDate = DateTimeHelper.hasDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
     }
 
     this.setWCStartDate();
@@ -669,7 +669,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
     if (this.lastActiveDate) {
       minimumDate =
-        DateTimeHelper.isDateBefore(this.lastActiveDate, this.selectWorkCommitmentStartDate)
+        DateTimeHelper.hasDateBefore(this.lastActiveDate, this.selectWorkCommitmentStartDate)
           ? this.selectWorkCommitmentStartDate
           : this.lastActiveDate;
     }

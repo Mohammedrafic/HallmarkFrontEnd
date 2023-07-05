@@ -9,27 +9,6 @@ import { CalcDaysMs } from './functions.helper';
  * TODO: need to refactor, cleanup, change naming, params etc.
  */
 export class DateTimeHelper {
-  public static getLastDayOfWeekFromFirstDay(startDate: string, days: number): Date {
-    const start = new Date(startDate);
-    const offset = new Date().getTimezoneOffset() * 60 * 1000;
-    const utcDate = new Date(start.getTime() + offset);
-
-    const initDate = new Date(utcDate.setUTCDate(utcDate.getDate() - utcDate.getDay() + days));
-    const dayToSet = initDate > new Date() ? new Date() : initDate;
-
-    const lastDay = dayToSet.setUTCHours(23, 59, 59, 999) + offset;
-
-    return new Date(lastDay);
-  }
-
-  public static getFirstDayOfWeekUtc(date: string): Date {
-    const start = new Date(date);
-    const offset = new Date().getTimezoneOffset() * 60 * 1000;
-    const day = new Date(start.setUTCDate(start.getDate())).setUTCHours(0, 0, 0, 0) + offset;
-
-    return new Date(day);
-  }
-
   public static setCurrentTimeZone(date: string): Date {
     const init = new Date(date);
     const offset = init.getTimezoneOffset() * 60 * 1000;
@@ -75,7 +54,7 @@ export class DateTimeHelper {
     return new Date(new Date(date).setHours(0, 0, 0));
   }
 
-  public static getFirstDayofWeek(date: Date): Date {
+  public static getFirstDayOfWeek(date: Date): Date {
     return new Date(date.setDate(date.getDate() - date.getDay()));
   }
 
@@ -88,15 +67,15 @@ export class DateTimeHelper {
     return endWeek;
   }
 
-  public static isDateBetween(date: Date | undefined, fromDate: Date, toDate: Date): boolean {
+  public static hasDateBetween(date: Date | undefined, fromDate: Date, toDate: Date): boolean {
     return (date?.getTime() || 0) <= toDate.getTime() && (date?.getTime() || 0) >= fromDate.getTime();
   }
 
-  public static isDateBefore(date: Date, toDate: Date): boolean {
+  public static hasDateBefore(date: Date, toDate: Date): boolean {
     return date.getTime() <= toDate.getTime();
   }
 
-  public static newDateInTimeZone(timeZone: string): Date {
+  public static getCurrentDateInTimeZone(timeZone: string): Date {
     return new Date(new Date().toLocaleString('en-US', { timeZone: timeZone }));
   }
 

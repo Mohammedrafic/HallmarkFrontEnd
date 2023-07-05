@@ -344,8 +344,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       inactiveDate.setHours(0, 0, 0, 0);
       const now = new Date();
       now.setHours(0, 0, 0, 0);
-      const areDatesInThePast = (reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, now)) &&
-        DateTimeHelper.isDateBefore(inactiveDate, now);
+      const areDatesInThePast = (reactivateDate && DateTimeHelper.hasDateBefore(reactivateDate, now)) &&
+        DateTimeHelper.hasDateBefore(inactiveDate, now);
       if (!areDatesInThePast) {
         field.disable();
       } else {
