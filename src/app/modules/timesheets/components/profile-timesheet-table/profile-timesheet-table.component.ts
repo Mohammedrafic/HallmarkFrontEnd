@@ -263,9 +263,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public openAddDialog(): void {
     const { weekStartDate, weekEndDate, jobEndDate, jobStartDate } = this.store.snapshot().timesheets.timesheetDetails;
-    const startDate = DateTimeHelper.convertDateToUtc(jobStartDate) > DateTimeHelper.convertDateToUtc(weekStartDate)
+    const startDate = DateTimeHelper.setCurrentUtcDate(jobStartDate) > DateTimeHelper.setCurrentUtcDate(weekStartDate)
       ? jobStartDate : weekStartDate;
-    const endDate = DateTimeHelper.convertDateToUtc(jobEndDate) < DateTimeHelper.convertDateToUtc(weekEndDate)
+    const endDate = DateTimeHelper.setCurrentUtcDate(jobEndDate) < DateTimeHelper.setCurrentUtcDate(weekEndDate)
       ? jobEndDate : weekEndDate;
 
     this.openAddSideDialog.emit({
@@ -595,7 +595,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     if (diffs.length || this.idsToDelete.length) {
       this.loading = true;
       this.cd.detectChanges();
-      
+
       createSpinner({
         target: this.spinner.nativeElement,
       });
@@ -628,7 +628,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
                 if (!confirm) {
                   this.loading = false;
                   this.cd.markForCheck();
-                } 
+                }
               }),
               filter((confirm) => !!confirm),
               switchMap(() => {

@@ -23,7 +23,7 @@ export class InvoicePrintingService {
       if(selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords){
         this.addPendingRecordInvoiceHeader(doc, invoice.meta);
         this.addPendingRecordInvoiceBody(doc, invoice, logo);
-      }        
+      }
       else{
         this.addInvoiceHeader(doc, invoice.meta);
         this.addOrgInvoiceBody(doc, invoice, logo);
@@ -40,7 +40,7 @@ export class InvoicePrintingService {
     }
 
   }
-  
+
   printAgencyInvoice(data: PrintInvoiceData[]): void {
     const doc = this.createDoc();
     const logo = this.createImage();
@@ -54,7 +54,7 @@ export class InvoicePrintingService {
       this.addAgencyInvoiceHeader(doc, invoice.meta);
       this.addAgencyInvoiceBody(doc, invoice, logo);
     });
-    
+
     this.addPageFooter(doc);
     doc.save();
   }
@@ -116,7 +116,7 @@ Hauppauge, NY 11788`,
               cellWidth: 'wrap',
               overflow: 'linebreak',
               cellPadding: { left: 10, top: 5, right: 15 },
-            }, 
+            },
           },
         ],
       ],
@@ -139,7 +139,7 @@ Hauppauge, NY 11788`,
               fontStyle: 'bold',
               cellWidth: 300,
             },
-          }, 
+          },
           {
             content: `Invoice No: ${metaData.formattedInvoiceNumber}
 Invoice Date: ${GridValuesHelper.formatDate(metaData.invoiceDate, 'MM/dd/yyyy')}
@@ -193,7 +193,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
               cellWidth: 'wrap',
               overflow: 'linebreak',
               cellPadding: { left: 10, top: 5, right: 15 },
-            }, 
+            },
           },
         ],
       ],
@@ -215,7 +215,7 @@ ${metaData.unitAddress}`,
               fontStyle: 'bold',
               cellWidth: 300,
             },
-          }, 
+          },
           {
             content: `Invoice No: ${metaData.formattedInvoiceNumber}
 Invoice Date: ${GridValuesHelper.formatDate(metaData.invoiceDate, 'MM/dd/yyyy')}
@@ -270,7 +270,7 @@ Hauppauge, NY 11788`,
               cellWidth: 'wrap',
               overflow: 'linebreak',
               cellPadding: { left: 10, top: 5, right: 15 },
-            }, 
+            },
           },
         ],
       ],
@@ -285,7 +285,7 @@ Hauppauge, NY 11788`,
 
       return [
         {
-          content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
+          content: formatDate(DateTimeHelper.setUtcTimeZone(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
           styles: {
             halign: 'left',
           },
@@ -385,7 +385,7 @@ Hauppauge, NY 11788`,
             halign: 'left',
           },
         },
-        { 
+        {
           content: 'Hours/Miles',
           styles: {
             fillColor: '#CFCFCF',
@@ -393,7 +393,7 @@ Hauppauge, NY 11788`,
             halign: 'left',
           },
         },
-        { 
+        {
           content: 'Total Amount',
           styles: {
             fillColor: '#CFCFCF',
@@ -427,7 +427,7 @@ Hauppauge, NY 11788`,
 
         const sum: CellDef[] = [
           idx === 0 ? {
-            content: summary.locationName, 
+            content: summary.locationName,
             colSpan: 3,
             styles: {
               halign: 'left',
@@ -435,7 +435,7 @@ Hauppauge, NY 11788`,
               lineColor: '#181919',
             },
           } :  {
-            content: ' ', 
+            content: ' ',
             colSpan: 3,
             styles: {
               halign: 'left',
@@ -662,7 +662,7 @@ Hauppauge, NY 11788`,
           halign: 'left',
           fillColor: '#F5F5F5',
         },
-      }, 
+      },
       {
         content: '',
         styles: {
@@ -761,13 +761,13 @@ Hauppauge, NY 11788`,
 
       return [
         {
-          content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
+          content: formatDate(DateTimeHelper.setUtcTimeZone(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
           styles: {
             halign: 'left',
           },
         },
         {
-          content: formatDate(record.timeIn, 'MM/dd/YYYY HH:mm', 'en-US'), 
+          content: formatDate(record.timeIn, 'MM/dd/YYYY HH:mm', 'en-US'),
           styles: {
             halign: 'left',
           },
@@ -861,7 +861,7 @@ Hauppauge, NY 11788`,
             halign: 'left',
           },
         },
-        { 
+        {
           content: 'Hours/Miles',
           styles: {
             fillColor: '#CFCFCF',
@@ -869,7 +869,7 @@ Hauppauge, NY 11788`,
             halign: 'left',
           },
         },
-        { 
+        {
           content: 'Total Amount',
           styles: {
             fillColor: '#CFCFCF',
@@ -903,7 +903,7 @@ Hauppauge, NY 11788`,
 
         const sum: CellDef[] = [
           idx === 0 ? {
-            content: summary.locationName, 
+            content: summary.locationName,
             colSpan: 3,
             styles: {
               halign: 'left',
@@ -911,7 +911,7 @@ Hauppauge, NY 11788`,
               lineColor: '#181919',
             },
           } :  {
-            content: ' ', 
+            content: ' ',
             colSpan: 3,
             styles: {
               halign: 'left',
@@ -1138,7 +1138,7 @@ Hauppauge, NY 11788`,
           halign: 'left',
           fillColor: '#F5F5F5',
         },
-      }, 
+      },
       {
         content: '',
         styles: {
@@ -1237,7 +1237,7 @@ Hauppauge, NY 11788`,
 
       return [
         {
-          content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
+          content: formatDate(DateTimeHelper.setUtcTimeZone(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
           styles: {
             halign: 'left',
           },
@@ -1360,7 +1360,7 @@ Hauppauge, NY 11788`,
             halign: 'left',
           },
         },
-        { 
+        {
           content: 'Hours/Miles',
           styles: {
             fillColor: '#CFCFCF',
@@ -1376,7 +1376,7 @@ Hauppauge, NY 11788`,
             halign: 'right',
           },
         },
-        { 
+        {
           content: 'Total Amount',
           styles: {
             fillColor: '#CFCFCF',
@@ -1405,10 +1405,10 @@ Hauppauge, NY 11788`,
         const formatedValue = detail.total > 0 ? GridValuesHelper.formatAbsNumber(detail.value, '1.2-2')
         : `(${GridValuesHelper.formatAbsNumber(detail.value, '1.2-2')})`;
 
-        
+
         const sum: CellDef[] = [
           idx === 0 ? {
-            content: summary.locationName, 
+            content: summary.locationName,
             colSpan: 3,
             styles: {
               halign: 'left',
@@ -1416,7 +1416,7 @@ Hauppauge, NY 11788`,
               lineColor: '#181919',
             },
           } :  {
-            content: ' ', 
+            content: ' ',
             colSpan: 3,
             styles: {
               halign: 'left',
@@ -1665,7 +1665,7 @@ Hauppauge, NY 11788`,
           halign: 'left',
           fillColor: '#F5F5F5',
         },
-      }, 
+      },
       {
         content: '',
         styles: {

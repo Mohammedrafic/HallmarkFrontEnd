@@ -38,9 +38,11 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
+  UpdateOrganisationCandidateJobSucceed,
+  sendOnboardCandidateEmailMessage
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { ShowToast } from 'src/app/store/app.actions';
+import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
@@ -50,6 +52,9 @@ import {
   deployedCandidateMessage,
   DEPLOYED_CANDIDATE,
   SET_READONLY_STATUS,
+  onBoardCandidateMessage,
+  ONBOARD_CANDIDATE,
+  SEND_EMAIL,
 } from '@shared/constants';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
@@ -66,6 +71,8 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { OrderType } from '@shared/enums/order-type';
+import { OnboardCandidateMessageDialogComponent } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
@@ -175,9 +182,20 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     return this.candidateStatus === ApplicantStatusEnum.Accepted || this.candidateStatus === ApplicantStatusEnum.OnBoarded;
   }
 
+  get templateEmailTitle(): string {
+    return "Onboarding Email";
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
+  isSend:boolean = false;
+  public sendOnboardMessageEmailFormGroup: FormGroup;
 
   public comments: Comment[] = [];
+  emailTo:any = '';
+  isSendOnboardFormInvalid:boolean = false;
+  @ViewChild('RTE')
+  public rteEle: RichTextEditorComponent;
+  @ViewChild(OnboardCandidateMessageDialogComponent, { static: true }) onboardEmailTemplateForm: OnboardCandidateMessageDialogComponent;
 
   constructor(
     private store: Store,
@@ -191,6 +209,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   ) {
     super();
     this.createForm();
+    this.sendOnboardMessageEmailFormGroup = new FormGroup({
+      emailSubject: new FormControl('', [Validators.required]),
+      emailBody: new FormControl('', [Validators.required]),
+      fileUpload: new FormControl(null),
+      emailTo: new FormControl('', [Validators.required]),
+    });
   }
 
   ngOnInit(): void {
@@ -203,6 +227,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.subscribeOnGetStatus();
     this.observeCandidateJob();
     this.observeStartDate();
+
   }
 
   ngOnDestroy(): void {
@@ -301,9 +326,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             organizationId: this.candidateJob?.organizationId as number,
             jobId: this.candidateJob?.jobId as number,
             nextApplicantStatus: this.candidateJob?.applicantStatus,
-            actualStartDate: DateTimeHelper.toUtcFormat(this.candidateJob?.actualStartDate),
-            actualEndDate: DateTimeHelper.toUtcFormat(this.candidateJob?.actualEndDate) as string,
-            offeredStartDate: DateTimeHelper.toUtcFormat(this.candidateJob?.availableStartDate as string),
+            actualStartDate: DateTimeHelper.setUtcTimeZone(this.candidateJob?.actualStartDate),
+            actualEndDate: DateTimeHelper.setUtcTimeZone(this.candidateJob?.actualEndDate) as string,
+            offeredStartDate: DateTimeHelper.setUtcTimeZone(this.candidateJob?.availableStartDate as string),
             candidateBillRate: this.candidateJob?.candidateBillRate as number,
             offeredBillRate: this.candidateJob?.offeredBillRate,
             requestComment: this.candidateJob?.requestComment as string,
@@ -332,9 +357,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobStartDate,
         this.order.jobEndDate
       );
-      const dateWithoutZone = DateTimeHelper.toUtcFormat(endDate);
+      const dateWithoutZone = DateTimeHelper.setUtcTimeZone(endDate);
 
-      this.form.patchValue({ endDate: DateTimeHelper.convertDateToUtc(dateWithoutZone) });
+      this.form.patchValue({ endDate: DateTimeHelper.setCurrentUtcDate(dateWithoutZone) });
     }
   }
 
@@ -365,7 +390,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         .pipe(take(1))
         .subscribe((isConfirm) => {
           if (isConfirm && this.candidateJob) {
-            const value = this.form.getRawValue();
+            const value = this.form.getRawValue();   
+            this.isSend =  true;
+            this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.candidateJob?.candidateProfile.email);
+            this.emailTo = this.candidateJob?.candidateProfile.email;          
             this.store
               .dispatch(
                 new UpdateOrganisationCandidateJob({
@@ -376,8 +404,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   candidateBillRate: value.candidateBillRate,
                   offeredBillRate: value.offeredBillRate,
                   requestComment: value.comments,
-                  actualStartDate: DateTimeHelper.toUtcFormat(value.startDate),
-                  actualEndDate: DateTimeHelper.toUtcFormat(value.endDate),
+                  actualStartDate: DateTimeHelper.setUtcTimeZone(value.startDate),
+                  actualEndDate: DateTimeHelper.setUtcTimeZone(value.endDate),
                   clockId: value.clockId,
                   guaranteedWorkWeek: value.workWeek,
                   allowDeployWoCredentials: value.allow,
@@ -385,18 +413,37 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   offeredStartDate: this.candidateJob.offeredStartDate,
                   candidatePayRate: this.candidateJob.candidatePayRate,
                 })
-              ).pipe(
+              );
+              this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).pipe(
                 takeUntil(this.unsubscribe$)
               ).subscribe(() => {
-                this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-              });
-            this.closeDialog();
-          } else {
-            this.jobStatusControl.reset();
-            this.selectedApplicantStatus = null;
-          }
-        });
+                  const options = {
+                      title: ONBOARD_CANDIDATE,
+                      okButtonLabel: 'Yes',
+                      okButtonClass: 'ok-button',
+                      cancelButtonLabel: 'No'
+                  };
+                  this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+                      .subscribe((isConfirm) => {
+                        if(isConfirm){
+                          this.onboardEmailTemplateForm.rteCreated();
+                          this.onboardEmailTemplateForm.disableControls(true);
+                          this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                        }
+                      });
+                
+              });              
+              // this.closeDialog();
+            } else {
+              this.jobStatusControl.reset();
+              this.selectedApplicantStatus = null;
+            }
+      });
     }
+  }
+
+  private saveCandidateJob(){    
+       this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());           
   }
 
   private shouldChangeCandidateStatus(): Observable<boolean> {
@@ -435,8 +482,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-            date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate?.toString()),
-              DateTimeHelper.convertDateToUtc(value.order.jobEndDate?.toString())],
+            date: [DateTimeHelper.setCurrentUtcDate(value.order.jobStartDate?.toString()),
+              DateTimeHelper.setCurrentUtcDate(value.order.jobEndDate?.toString())],
             billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
@@ -449,10 +496,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             clockId: value.clockId ? value.clockId : '',
             offeredBillRate: formatNumber(CheckNumberValue(value.offeredBillRate), 'en', '0.2-2'),
             allow: value.allowDeployCredentials,
-            startDate: DateTimeHelper.convertDateToUtc(actualStart),
-            endDate: DateTimeHelper.convertDateToUtc(actualEnd),
+            startDate: DateTimeHelper.setCurrentUtcDate(actualStart),
+            endDate: DateTimeHelper.setCurrentUtcDate(actualEnd),
             rejectReason: value.rejectReason,
-            offeredStartDate: formatDate(DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(),
+            offeredStartDate: formatDate(DateTimeHelper.setCurrentUtcDate(value.offeredStartDate).toString(),
             'MM/dd/YYYY', 'en-US'),
             jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
             penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
@@ -591,9 +638,44 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.disableDatesForClosedPostition();
   }
 
+  onGroupEmailAddCancel(){
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    // console.log('this.candidateJob at cancel',this.candidateJob);
+    this.saveCandidateJob();
+    this.isSend =  false;
+    this.store.dispatch(new ShowGroupEmailSideDialog(false));
+    this.closeDialog();
+  }
+
+  onGroupEmailSend(){
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    if(this.sendOnboardMessageEmailFormGroup.valid){
+      const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();   
+      // console.log('emailvalue',emailvalue);         
+      this.saveCandidateJob();
+      this.store.dispatch(new sendOnboardCandidateEmailMessage({
+            subjectMail : emailvalue.emailSubject,
+            bodyMail : emailvalue.emailBody,
+            toList : emailvalue.emailTo,
+            status : 1,
+            stream : emailvalue.fileUpload,
+            extension : emailvalue.fileUpload?.type,
+            documentName : emailvalue.fileUpload?.name,
+          })
+        )
+        .subscribe(() => {
+          this.isSend =  false;
+          this.store.dispatch(new ShowGroupEmailSideDialog(false));
+          this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
+          this.closeDialog();
+        });
+    }
+   /*   */
+  }
+
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded || event.itemData === null) {
-      this.onAccept();
+      this.onAccept();     
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
       this.openCandidateCancellationDialog.next();
     } else {

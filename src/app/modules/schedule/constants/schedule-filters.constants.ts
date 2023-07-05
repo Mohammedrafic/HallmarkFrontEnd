@@ -183,14 +183,14 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
   },
   {
     field: 'isOnlySchedulatedCandidate',
-    title: 'Show Only Scheduled Candidates',
+    title: 'Show Only Scheduled Employees',
     type: FieldType.Toggle,
     required: false,
     sourceKey: ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate,
   },
   {
     field: 'isExcludeNotOrganized',
-    title: 'Show Exclude not Oriented',
+    title: 'Exclude not Oriented Employees',
     type: FieldType.Toggle,
     required: false,
     sourceKey: ScheduleFilterFormSourceKeys.isExcludeNotOrganized,

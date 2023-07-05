@@ -11,8 +11,8 @@ export class Holiday {
   constructor(holiday: Holiday) {
     this.id = holiday.id;
     this.holidayName = holiday.holidayName;
-    this.startDateTime = DateTimeHelper.toUtcFormat(holiday.startDateTime);
-    this.endDateTime = DateTimeHelper.toUtcFormat(holiday.endDateTime);
+    this.startDateTime = DateTimeHelper.setUtcTimeZone(holiday.startDateTime);
+    this.endDateTime = DateTimeHelper.setUtcTimeZone(holiday.endDateTime);
   }
 }
 
@@ -39,8 +39,8 @@ export class OrganizationHoliday {
     this.id = holiday.id;
     this.masterHolidayId = holiday.masterHolidayId;
     this.holidayName = holiday.holidayName;
-    this.startDateTime = DateTimeHelper.toUtcFormat(holiday.startDateTime);
-    this.endDateTime = DateTimeHelper.toUtcFormat(holiday.endDateTime);
+    this.startDateTime = DateTimeHelper.setUtcTimeZone(holiday.startDateTime);
+    this.endDateTime = DateTimeHelper.setUtcTimeZone(holiday.endDateTime);
     this.regionId = holiday.regionId || null;
     this.locationId = holiday.locationId || null;
     this.includeInIRP = holiday.includeInIRP || false;

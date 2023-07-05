@@ -101,7 +101,7 @@ export class CandidateProfileFormService {
   }
 
   public populateHoldEndDate(candidate: CandidateModel): void {
-    const holdEndDate = candidate.holdEndDate ? DateTimeHelper.convertDateToUtc(candidate.holdEndDate as string) : null;
+    const holdEndDate = candidate.holdEndDate ? DateTimeHelper.setCurrentUtcDate(candidate.holdEndDate as string) : null;
     this.candidateForm.get('holdEndDate')?.setValue(holdEndDate);
   }
 
@@ -127,7 +127,7 @@ export class CandidateProfileFormService {
   private convertDateFildsToUtc(candidate: CandidateModel): CandidateModel {
     const datesWithUtc = Object.fromEntries(candidateDateFields.map((dateName) => {
       const date = candidate[dateName as keyof CandidateModel];
-      const dateUtc = date ? DateTimeHelper.convertDateToUtc(date as string) : null;
+      const dateUtc = date ? DateTimeHelper.setCurrentUtcDate(date as string) : null;
 
       return [dateName, dateUtc];
     }));

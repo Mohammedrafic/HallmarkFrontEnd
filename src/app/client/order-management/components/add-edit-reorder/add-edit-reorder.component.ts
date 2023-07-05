@@ -231,9 +231,9 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.reorderForm.patchValue({
       agencies: this.getAgencyIds(this.order.jobDistributions),
       candidates: candidatesInOrder ? this.getCandidateIds(candidatesInOrder) : [],
-      reorderDate: reorder.jobStartDate ? DateTimeHelper.convertDateToUtc(reorder.jobStartDate.toString()) : '',
-      shiftStartTime: reorder.shiftStartTime ? DateTimeHelper.convertDateToUtc(reorder.shiftStartTime.toString()) : '',
-      shiftEndTime: reorder.shiftEndTime ? DateTimeHelper.convertDateToUtc(reorder.shiftEndTime.toString()) : '',
+      reorderDate: reorder.jobStartDate ? DateTimeHelper.setCurrentUtcDate(reorder.jobStartDate.toString()) : '',
+      shiftStartTime: reorder.shiftStartTime ? DateTimeHelper.setCurrentUtcDate(reorder.shiftStartTime.toString()) : '',
+      shiftEndTime: reorder.shiftEndTime ? DateTimeHelper.setCurrentUtcDate(reorder.shiftEndTime.toString()) : '',
       billRate: reorder.hourlyRate ?? '',
       openPosition: reorder.openPositions ?? '',
     }, { emitEvent: false });
@@ -337,13 +337,13 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private areDatesEquals(date1: Date, date2: Date): boolean {
-    return DateTimeHelper.toUtcFormat(date1) === DateTimeHelper.toUtcFormat(date2);
+    return DateTimeHelper.setUtcTimeZone(date1) === DateTimeHelper.setUtcTimeZone(date2);
   }
 
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
-    reorder.shiftStartTime = DateTimeHelper.toUtcFormat(reorder.shiftStartTime);
-    reorder.shiftEndTime = DateTimeHelper.toUtcFormat(reorder.shiftEndTime);
+    reorder.shiftStartTime = DateTimeHelper.setUtcTimeZone(reorder.shiftStartTime);
+    reorder.shiftEndTime = DateTimeHelper.setUtcTimeZone(reorder.shiftEndTime);
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
     const reOrderId = this.isEditMode ? this.order.id : null;
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;

@@ -113,7 +113,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       {
         billRateConfig: value.billRateConfig,
         billRateConfigId: value.billRateConfigId,
-        effectiveDate: DateTimeHelper.convertDateToUtc(value.effectiveDate),
+        effectiveDate: DateTimeHelper.setCurrentUtcDate(value.effectiveDate),
         id: value.id,
         intervalMax: value.intervalMax && String(value.intervalMax),
         intervalMin: value.intervalMin && String(value.intervalMin),
@@ -224,7 +224,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       }
 
       if (value.effectiveDate) {
-        value.effectiveDate = DateTimeHelper.toUtcFormat(value.effectiveDate);
+        value.effectiveDate = DateTimeHelper.setUtcTimeZone(value.effectiveDate);
         this.billRateForm.get('effectiveDate')?.patchValue(value.effectiveDate);
       }
 

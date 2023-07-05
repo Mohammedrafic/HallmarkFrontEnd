@@ -239,8 +239,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
             this.filters.candidateName = this.filters.candidateName || null;
             this.filters.expiry = {
               type: this.filters.credType || [],
-              startDate: this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
-              endDate: this.filters.endDate ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
+              startDate: this.filters.startDate ? DateTimeHelper.setUtcTimeZone(this.filters.startDate) : null,
+              endDate: this.filters.endDate ? DateTimeHelper.setUtcTimeZone(this.filters.endDate) : null,
             };
             this.saveFiltersByPageName(this.filters);
             this.dispatchNewPage();
@@ -264,11 +264,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.filters.regionsNames = this.filters.regionsNames || [];
         this.filters.skillsIds = this.filters.skillsIds || [];
         this.filters.candidateName = this.filters.candidateName || null;
-        this.filters.hireDate = this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
+        this.filters.hireDate = this.filters.hireDate ? DateTimeHelper.setUtcTimeZone(this.filters.hireDate) : null,
           this.filters.expiry = {
             type: this.filters.credType || [],
-            startDate: this.filters.startDate ? DateTimeHelper.toUtcFormat(this.filters.startDate) : null,
-            endDate: this.filters.endDate ? DateTimeHelper.toUtcFormat(this.filters.endDate) : null,
+            startDate: this.filters.startDate ? DateTimeHelper.setUtcTimeZone(this.filters.startDate) : null,
+            endDate: this.filters.endDate ? DateTimeHelper.setUtcTimeZone(this.filters.endDate) : null,
           };
 
         this.saveFiltersByPageName(this.filters);
@@ -434,13 +434,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       departmentIds: this.filters.departmentIds!,
       primarySkillIds: this.filters.primarySkillIds!,
       secondarySkillIds: this.filters.secondarySkillIds!,
-      hireDate: this.filters.hireDate ? DateTimeHelper.toUtcFormat(this.filters.hireDate) : null,
+      hireDate: this.filters.hireDate ? DateTimeHelper.setUtcTimeZone(this.filters.hireDate) : null,
       includeDeployedCandidates: this.includeDeployedCandidates,
       ids: this.selecteditmesids,
       expiry : {
         type : this.filters.credType! ? this.filters.credType! : [],
-        startDate : this.filters.startDate! ? DateTimeHelper.toUtcFormat(this.filters.startDate!) : null,
-        endDate : this.filters.endDate! ? DateTimeHelper.toUtcFormat(this.filters.endDate!) : null,
+        startDate : this.filters.startDate! ? DateTimeHelper.setUtcTimeZone(this.filters.startDate!) : null,
+        endDate : this.filters.endDate! ? DateTimeHelper.setUtcTimeZone(this.filters.endDate!) : null,
       },
       orderBy: this.orderBy,
       ShowNoWorkCommitmentOnly : this.unassignedworkCommitment
@@ -551,11 +551,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         }
 
         if (this.credStartDate != undefined) {
-          this.filters.startDate = DateTimeHelper.toUtcFormat(this.credStartDate);
+          this.filters.startDate = DateTimeHelper.setUtcTimeZone(this.credStartDate);
         }
 
         if (this.credEndDate != undefined) {
-          this.filters.endDate = DateTimeHelper.toUtcFormat(this.credEndDate);
+          this.filters.endDate = DateTimeHelper.setUtcTimeZone(this.credEndDate);
         }
 
         if (this.credType != null) {

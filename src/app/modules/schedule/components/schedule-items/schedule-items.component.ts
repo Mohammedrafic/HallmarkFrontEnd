@@ -125,7 +125,7 @@ export class ScheduleItemsComponent extends Destroyable implements OnInit {
 
     scheduleItem.selectedDates = dates;
     scheduleItem.dateItems = this.scheduleItemsService.getScheduleDateItems(
-      dates.map((date: Date) => DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date))),
+      dates.map((date: Date) => DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(date))),
       candidateId
     );
   }*/

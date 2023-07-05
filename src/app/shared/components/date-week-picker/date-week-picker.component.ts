@@ -188,8 +188,8 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
         !!this.maxDate,
       ).setHours(0, 0, 0);
 
-      const utcStartDate = DateTimeHelper.toUtcFormat(new Date(firstDay));
-      const utcLastDate = DateTimeHelper.toUtcFormat(new Date(lastDay));
+      const utcStartDate = DateTimeHelper.setUtcTimeZone(new Date(firstDay));
+      const utcLastDate = DateTimeHelper.setUtcTimeZone(new Date(lastDay));
 
       this.weekService.setRange([
         utcStartDate,
@@ -244,8 +244,8 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
       this.firstDayOfWeek, !!this.maxDate);
 
     this.weekService.setRange([
-      DateTimeHelper.toUtcFormat(new Date(startRangeDate.setHours(0, 0, 0))),
-      DateTimeHelper.toUtcFormat(new Date(DateTimeHelper.getDynamicWeekDate(value, false, this.startDate, this.rangeType,
+      DateTimeHelper.setUtcTimeZone(new Date(startRangeDate.setHours(0, 0, 0))),
+      DateTimeHelper.setUtcTimeZone(new Date(DateTimeHelper.getDynamicWeekDate(value, false, this.startDate, this.rangeType,
         this.firstDayOfWeek, !!this.maxDate).setHours(0, 0, 0))),
     ]);
 

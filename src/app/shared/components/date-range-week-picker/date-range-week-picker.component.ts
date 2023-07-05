@@ -43,8 +43,8 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit {
 
         this.dateControl.setValue([correctedStart, correctedEnd], { onlySelf: true, emitEvent: false });
         this.range.emit([
-          DateTimeHelper.toUtcFormat(correctedStart),
-          DateTimeHelper.toUtcFormat(correctedEnd)
+          DateTimeHelper.setUtcTimeZone(correctedStart),
+          DateTimeHelper.setUtcTimeZone(correctedEnd)
         ]);
       } else {
         this.dateControl.reset(null, { onlySelf: true, emitEvent: false });

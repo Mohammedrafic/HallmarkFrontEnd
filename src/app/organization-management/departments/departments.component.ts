@@ -205,7 +205,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     const { inactiveDate, ...formValue } = this.DepartmentFilterFormGroup.getRawValue();
 
     this.filters = formValue;
-    this.filters.inactiveDate = inactiveDate ? DateTimeHelper.toUtcFormat(inactiveDate) : '';
+    this.filters.inactiveDate = inactiveDate ? DateTimeHelper.setUtcTimeZone(inactiveDate) : '';
     this.filteredItems = this.filterService.generateChips(this.DepartmentFilterFormGroup, this.filterColumns, this.datePipe);
 
     this.getDepartments();

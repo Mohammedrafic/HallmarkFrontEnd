@@ -767,9 +767,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: DateTimeHelper.convertDateToUtc(orderDate as string),
-      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
-      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
+      orderOpenDate: DateTimeHelper.setCurrentUtcDate(orderDate as string),
+      shiftStartTime: shiftStartTime ? DateTimeHelper.setCurrentUtcDate(shiftStartTime.toString()) : '',
+      shiftEndTime: shiftEndTime ? DateTimeHelper.setCurrentUtcDate(shiftEndTime.toString()) : '',
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
       jobCancellationReason: CancellationReasonsMap[jobCancellation?.jobCancellationReason || 0],
@@ -885,7 +885,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       orderId: this.order.orderId || this.order.id,
       candidateProfileId: this.candidate.candidateId,
       validateForDate: DateTimeHelper.setInitHours(
-        DateTimeHelper.toUtcFormat(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
+        DateTimeHelper.setUtcTimeZone(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
       ),
     };
   }
