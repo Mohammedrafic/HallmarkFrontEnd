@@ -48,7 +48,7 @@ import { AbstractControl } from '@angular/forms';
   styleUrls: ['./rn-utilization-widget.component.scss'],
 })
 export class RnUtilizationWidgetComponent implements OnInit {
-  public popupWidth:string = "auto !important";
+  
   @Input() isLoading: boolean;
   @Input() isDarkTheme: boolean | false;
   @Input() description: string;
