@@ -24,6 +24,7 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
   isAnalytics: boolean;
   private currentItem: MenuSettings;
   tooltipData: string | undefined;
+  content: string;
 
   constructor(
     private router: Router,
@@ -48,6 +49,7 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
       this.tooltip = new Tooltip({
         target: '.list-box .e-list-item',
         position: 'RightCenter',
+        content: this.content,
         beforeRender: this.onBeforeRender
     });  
     this.tooltip.appendTo('body');   
@@ -57,8 +59,7 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
     onBeforeRender(args: TooltipEventArgs): void {
       if(args.target.dataset["value"]?.length){
         if(args.target.dataset["value"].length > 15){
-          (this as any).content = args.target.dataset['value'];
-          (this as any).dataBind();  
+          this.content = args.target.dataset['value'];
         } else {
           args.cancel = true;
         }
