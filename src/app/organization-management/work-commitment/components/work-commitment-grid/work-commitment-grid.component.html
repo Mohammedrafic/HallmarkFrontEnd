@@ -2,6 +2,7 @@
   (navigateToPageEmitter)="handleChangePage($event)"
   (pageSizeChangeEmitter)="handleChangePageSize($event)"
   (gridReadyEmitter)="gridReady($event)"
+  (sortChanged)="sortByColumn($event)"
   [columnDefinitions]="columnDefinitions"
   [rowData]="workCommitmentsGrid"
   [isLoading]="isLoading"

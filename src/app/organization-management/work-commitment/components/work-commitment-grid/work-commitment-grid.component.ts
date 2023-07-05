@@ -56,8 +56,13 @@ export class WorkCommitmentGridComponent extends DestroyableDirective implements
     });
   }
 
+  public sortByColumn(order: string): void {
+    this.filters.orderBy = order;
+    this.getNewPage();
+  }
+
   public getNewPage(): void {
-    this.store.dispatch(new WorkCommitment.GetCommitmentsByPage(this.filters.pageNumber, this.filters.pageSize));
+    this.store.dispatch(new WorkCommitment.GetCommitmentsByPage(this.filters));
   }
 
   public handleChangePage(pageNumber: number): void {
