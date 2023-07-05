@@ -37,7 +37,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
-  @Input() billRatesData: BillRate[] = [];
   @Input() order: any;
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
@@ -57,6 +56,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public canApplyCandidate = true;
   public applyRestrictionMessage = REQUIRED_PERMISSIONS;
   public candidateSSNRequired: boolean;
+  public billRatesData: BillRate[] = [];
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
@@ -256,6 +256,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
       this.changeDetectorRef.markForCheck();
     });
+
     this.orderApplicantsInitialData$
       .pipe(
         filter((data) => !!data),
@@ -275,6 +276,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
             }
           }
         this.orderApplicantsInitialData = data;
+        this.billRatesData = data.billRates;
         this.candidateSSNRequired = data.candidateSSNRequired;
         this.organizationId = data.organizationId;
         this.candidateId = data.candidateId;

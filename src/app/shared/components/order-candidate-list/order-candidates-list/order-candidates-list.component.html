@@ -305,7 +305,6 @@
   <ng-template #apply>
     <app-apply-candidate
       (closeDialogEmitter)="onCloseDialog()"
-      [billRatesData]="$any((selectedAgOrder$ | async)?.billRates)"
       [candidate]="candidate"
       [isAgency]="isAgency"
       [order]="$any(selectedAgOrder$ | async)"
