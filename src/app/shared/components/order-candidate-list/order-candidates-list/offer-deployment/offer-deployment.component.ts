@@ -281,7 +281,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   jobId: this.candidateJob.jobId,
                   nextApplicantStatus: this.selectedApplicantStatus || this.candidateJob.applicantStatus,
                   candidateBillRate: this.candidateJob.candidateBillRate,
-                  offeredBillRate: value.offeredBillRate,
+                  offeredBillRate: parseFloat(value.offeredBillRate.replace(/,/g, '')),
                   requestComment: this.candidateJob.requestComment,
                   actualStartDate: this.candidateJob.actualStartDate,
                   actualEndDate: this.candidateJob.actualEndDate,
