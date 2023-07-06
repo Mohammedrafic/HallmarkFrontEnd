@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'adaptive-response';
 
 .e-file-select-wrap, .e-upload-actions {
   display: none;
@@ -30,5 +31,11 @@
         content: url('../../../../assets/icons/trash-2-icon.svg') !important;
       }
     }
+  }
+}
+
+@media #{$max-mobile} {
+  .droparea {
+    display: none;
   }
 }

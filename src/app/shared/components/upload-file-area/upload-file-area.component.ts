@@ -4,6 +4,7 @@ import { TooltipComponent } from '@syncfusion/ej2-angular-popups';
 
 import { FileSize } from '@core/enums';
 import { FileForUpload } from '@core/interface';
+import { FileUploaderComponent } from '../file-uploader/file-uploader.component';
 
 @Component({
   selector: 'app-upload-file-area',
@@ -16,14 +17,22 @@ export class UploadFileAreaComponent {
   @Input() public excludeElement: HTMLElement | HTMLElement[];
   @Input() public maxFileSize: FileSize;
   @Input() public allowedFileExtensions: string;
-  @Input() public maxFiles: number = 5;
+  @Input() public maxFiles = 5;
+  @Input() public isMobile = false;
+
 
   @Output() private readonly filesSelected: EventEmitter<FileForUpload[]> = new EventEmitter<FileForUpload[]>();
   
   @ViewChild('uploadTooltip') private readonly uploadTooltip: TooltipComponent;
+  @ViewChild('fileUploader') private readonly fileUploader: FileUploaderComponent;
+
 
   public open(): void {
-    this.uploadTooltip.open();
+    if (this.isMobile) {
+      this.fileUploader.browseFiles();
+    } else {
+      this.uploadTooltip.open();
+    }
   }
 
   public close(): void {

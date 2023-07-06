@@ -12,7 +12,7 @@
   <ng-template #content>
     <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate" #resize>
       <div class="profile-details">
-        <div class="profile-details__wraper" #uploadMobileContainer>
+        <div class="profile-details__wraper">
           <div class="profile-details__info-container">
             <div class="profile-details__info">
               <img
@@ -81,10 +81,11 @@
               </app-tooltip-container>
 
               <app-upload-file-area
-                [container]="isMobile ? uploadMobileContainer : uploadContainer"
+                [container]="uploadContainer"
                 [excludeElement]="uploadBtn.element"
                 [maxFileSize]="maxFileSize"
                 [allowedFileExtensions]="allowedFileExtensions"
+                [isMobile]="isMobile"
                 (filesSelected)="onFilesSelected($event)"
               >
               </app-upload-file-area>
