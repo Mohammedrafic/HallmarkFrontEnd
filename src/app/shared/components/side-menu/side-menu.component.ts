@@ -7,6 +7,8 @@ import { ListBox, ListBoxChangeEventArgs, SelectionSettingsModel } from '@syncfu
 import { MenuSettings } from '@shared/models';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { Destroyable } from '@core/helpers';
+import { Tooltip, TooltipEventArgs } from '@syncfusion/ej2-angular-popups';
+import { charLength } from '@core/enums';
 
 @Component({
   selector: 'app-side-menu',
@@ -18,11 +20,14 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
   // If the menu is loaded with a default selection (selecting a specific sub-menu item on load)
   @Input() navigateTo: string;
   selectionSettings: SelectionSettingsModel = { mode: 'Single' };
+  public tooltip ?: Tooltip| any;
 
   @ViewChild('listBox')
   public listBox: ListBox;
-
+  isAnalytics: boolean;
   private currentItem: MenuSettings;
+  tooltipData: string | undefined;
+  content: string;
 
   constructor(
     private router: Router,
@@ -30,6 +35,7 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
     private sideMenuService: SideMenuService
   ) {
     super();
+    this.isAnalytics = this.router.url.includes('analytics');
   }
 
   ngOnInit(): void {
@@ -48,7 +54,27 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
       this.listBox.selectItems([selection['text'] as string]);
       this.router.navigate([(selection as any).route], { relativeTo: this.route });
     }
+    if(this.isAnalytics === true){
+      this.tooltip = new Tooltip({
+        target: '.list-box .e-list-item',
+        position: 'RightCenter',
+        content: this.content,
+        beforeRender: this.onBeforeRender
+    });  
+    this.tooltip.appendTo('body');   
+    }  
   }
+
+    onBeforeRender(args: TooltipEventArgs): void {
+      if(args.target.dataset["value"]?.length){
+        if(args.target.dataset["value"].length > charLength.SideMenuTooltipSize){
+          this.content = args.target.dataset['value'];
+        } else {
+          args.cancel = true;
+        }
+      }
+    }
+
 
   public selectMenuItem(event: ListBoxChangeEventArgs | null, mnuItem?: MenuSettings): void {
     const menuItem = mnuItem ?? event?.items[0];
