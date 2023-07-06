@@ -44,6 +44,7 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -114,6 +115,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public rangeType = DatesRangeType.OneWeek;
 
   private jobId: number;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobileScreen$: Observable<boolean>;
 
   @Select(TimesheetsState.isTimesheetOpen)
   public readonly isTimesheetOpen$: Observable<TimesheetInt.DialogActionPayload>;

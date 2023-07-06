@@ -85,7 +85,7 @@
                 [excludeElement]="uploadBtn.element"
                 [maxFileSize]="maxFileSize"
                 [allowedFileExtensions]="allowedFileExtensions"
-                [isMobile]="isMobile"
+                [isMobile]="!!(isMobileScreen$ | async)"
                 (filesSelected)="onFilesSelected($event)"
               >
               </app-upload-file-area>
