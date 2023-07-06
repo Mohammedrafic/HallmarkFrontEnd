@@ -25,6 +25,7 @@
     }
   }
 }
+
 .dropdown-filter {
   width: 50%;
   display: flex;
@@ -38,15 +39,6 @@
 
 .datepicker-mobile {
   display: none;
-}
-@media #{$max-mobile} {
-  .datepicker-desktop {
-    display: none;
-  }
-  .datepicker-mobile {
-    display: inline-block;
-    margin-top: 7px;
-  }
 }
 
 .input-container {
@@ -71,7 +63,20 @@
   white-space: nowrap !important;
 }
 
+.top-margin {
+  margin-left: 0;
+}
+
 @media #{$max-mobile} {
+  .datepicker-desktop {
+    display: none;
+  }
+
+  .datepicker-mobile {
+    display: inline-block;
+    margin-top: 7px;
+  }
+
   .filter-button-text {
     display: none !important;
   }
@@ -79,6 +84,7 @@
   button.e-control.e-btn i-feather {
     margin-left: 0 !important;
   }
+
   .tabs {
     position: fixed;
     background: #f6f6f6;
@@ -88,20 +94,19 @@
     width: 100vw !important;
     margin-left: -25px;
   }
+
   .bootstrap,
   .top-margin {
     margin-top: 42px;
+
     .bootstrap {
       margin-top: 0;
     }
   }
+
   .bootstrap {
     margin-bottom: 12px;
   }
-}
-
-.top-margin {
-  margin-left: 0;
 }
 
 @media (max-width: 480px) {

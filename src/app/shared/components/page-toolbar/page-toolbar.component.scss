@@ -7,10 +7,6 @@ $gap: 12px;
   display: flex;
   justify-content: space-between;
 
-  @media #{$max-desktop-small} {
-    flex-direction: column;
-  }
-
   .left-content {
     max-width: 50%;
     display: flex;
@@ -29,21 +25,6 @@ $gap: 12px;
     justify-content: flex-end;
     flex-grow: 1;
 
-    @media #{$max-mobile} {
-      flex-direction: column;
-
-      .buttons-group {
-        align-items: flex-start;
-        margin-left: 0;
-      }
-    }
-
-    @media #{$max-desktop-small} {
-      justify-content: flex-start;
-      margin-top: 21px;
-      width: 100%;
-    }
-
     & > *:not(:first-child, .buttons-group) {
       margin-left: $gap;
     }
@@ -56,6 +37,18 @@ $gap: 12px;
       .e-scroll-nav {
         display: none;
       }
+    }
+  }
+}
+
+@media #{$max-desktop-small} {
+  .controls-container {
+    flex-direction: column;
+
+    .right-content {
+      justify-content: flex-start;
+      margin-top: 21px;
+      width: 100%;
     }
   }
 }
@@ -89,6 +82,15 @@ $gap: 12px;
     .left-content {
       max-width: unset;
       padding-top: 1px;
+    }
+
+    .right-content {
+      flex-direction: column;
+
+      .buttons-group {
+        align-items: flex-start;
+        margin-left: 0;
+      }
     }
   }
 }

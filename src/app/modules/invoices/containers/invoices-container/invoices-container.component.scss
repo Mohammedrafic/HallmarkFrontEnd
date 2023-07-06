@@ -230,20 +230,6 @@
   margin-left: 0;
 }
 
-@media #{$max-desktop-small} {
-  .invoices-page-toolbar {
-    ::ng-deep {
-        .controls-container {
-          flex-direction: column;
-      
-          .right-content {
-            justify-content: flex-start;
-            margin-top:12px;
-          }
-        }
-    }
-  }
-}
 
 @media (max-width: 480px) {
   .bootstrap,
