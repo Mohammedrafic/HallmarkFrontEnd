@@ -121,7 +121,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
   public datesValidationMessage = ERROR_START_LESS_END_DATE;
   public showSystem:boolean = false;
   public holidayItems: any[] = [];
-
+  public filterType: string = 'Contains';
   constructor(
     protected override store: Store,
     private actions$: Actions,

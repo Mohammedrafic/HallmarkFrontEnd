@@ -80,6 +80,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   private filters: ScheduleFilters = {};
   private isPreservedFilters = false;
   public readonly timeMask = TimeMask;
+  public filterType: string = 'Contains';
 
   private filterStructure: ScheduleFilterStructure = {
     regions: [],

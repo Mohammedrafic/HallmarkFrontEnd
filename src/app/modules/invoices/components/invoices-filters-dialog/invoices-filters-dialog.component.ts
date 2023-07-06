@@ -93,6 +93,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   public filterOptionFields = filterOptionFields;
   public skillOptionFields = SkillFilterOptionFields;
   public isAgency = false;
+  public filterType: string = 'Contains';
 
   private regions: OrganizationRegion[] = [];
 

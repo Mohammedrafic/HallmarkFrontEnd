@@ -89,7 +89,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
     value: 'id',
   };
   public orgStructure: OrganizationStructure;
-
+  public filterType: string = 'Contains';
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
   private unsubscribe$: Subject<void> = new Subject();

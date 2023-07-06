@@ -101,7 +101,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
 
   private lastSelectedCredential: CredentialSetupFilterGet | null;
   private systemIdSubscription: Subscription;
-
+  public filterType: string = 'Contains';
   constructor(
     protected override store: Store,
     private actions$: Actions,

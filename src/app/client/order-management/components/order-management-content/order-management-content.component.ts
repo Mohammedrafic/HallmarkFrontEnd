@@ -464,6 +464,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       return this.filters?.contactEmails || null;
     }
   }
+  public filterType: string = 'Contains';
 
   constructor(
     protected override store: Store,

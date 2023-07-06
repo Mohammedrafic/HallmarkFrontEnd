@@ -133,7 +133,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public organizationId: number;
   public previousSelectedOrderId: number | null;
   private pageSubject = new Subject<number>();
-  public filterType: any = 'Contains';
+  public filterType: string = 'Contains';
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;

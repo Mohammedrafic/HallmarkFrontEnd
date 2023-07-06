@@ -115,7 +115,7 @@
     <div class="input-container">
       <label>Location</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox" formControlName="locationIds" placeholder="All" [fields]="optionFields"
+        <ejs-multiselect mode="CheckBox" [filterType]="filterType" formControlName="locationIds" placeholder="All" [fields]="optionFields"
           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.locationIds.dataSource">
         </ejs-multiselect>
       </div>
@@ -123,7 +123,7 @@
     <div class="input-container">
       <label>Department</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox" formControlName="departmentIds" placeholder="All" [fields]="optionFields"
+        <ejs-multiselect mode="CheckBox" [filterType]="filterType" formControlName="departmentIds" placeholder="All" [fields]="optionFields"
           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource">
         </ejs-multiselect>
       </div>
@@ -224,7 +224,7 @@
         <label>Location<span class="required">*</span></label>
         <div class="dropdown-wrapper">
           <div class="input-group bootstrap">
-            <ejs-multiselect mode="CheckBox" appValidateWithMessage formControlName="locationId" placeholder="All" [fields]="optionFields"
+            <ejs-multiselect mode="CheckBox" [filterType]="filterType" appValidateWithMessage formControlName="locationId" placeholder="All" [fields]="optionFields"
               [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="regionBasedLocations" >
             </ejs-multiselect>
           </div>
@@ -239,7 +239,7 @@
         <label>Department<span class="required">*</span></label>
         <div class="dropdown-wrapper">
           <div class="input-group bootstrap">
-            <ejs-multiselect mode="CheckBox" formControlName="departmentId" placeholder="All" [fields]="optionFields"
+            <ejs-multiselect mode="CheckBox" [filterType]="filterType" formControlName="departmentId" placeholder="All" [fields]="optionFields"
             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="regionBasedDepartment">
           </ejs-multiselect>
           </div>
