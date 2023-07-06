@@ -22,6 +22,7 @@ import {
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -34,21 +35,27 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   @Input() public container: HTMLElement | null = null;
 
-  public dialogConfig: DialogConfig = JSON.parse(JSON.stringify(RecordAddDialogConfig));
+  public dialogConfig = {} as DialogConfig;
 
   public formType: RecordFields = RecordFields.Time;
 
   public onCallId: number;
+
+  public isMobile = false;
 
   private initialCostCenterId: number | null = null;
 
   @Select(TimesheetsState.addDialogOpen)
   public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>;
 
+  @Select(AppState.isMobileScreen)
+  private readonly isMobile$: Observable<boolean>;
+
   ngOnInit(): void {
     this.getDialogState();
     this.confirmMessages = TimesheetConfirmMessages;
     this.subscribeOnAddRecordSucceed();
+    this.watchForDeviceScreen();
   }
 
   public saveRecord(): void {
@@ -113,7 +120,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     .pipe(
       filter((value) => value.state),
       tap((value) => {
-        this.dialogConfig = JSON.parse(JSON.stringify(RecordAddDialogConfig));
+        this.dialogConfig = RecordAddDialogConfig(this.isMobile);
 
         if (this.form) {
           this.form = null;
@@ -288,5 +295,15 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
           }
         })
       ) as Observable<Date | null>;
+  }
+
+  private watchForDeviceScreen(): void {
+    this.isMobile$
+    .pipe(takeUntil(this.componentDestroy()))
+    .subscribe((isMobile) => {
+      this.isMobile = isMobile;
+      this.dialogConfig = RecordAddDialogConfig(isMobile);
+      this.cd.markForCheck();
+    });
   }
 }
