@@ -8,6 +8,7 @@ import { MenuSettings } from '@shared/models';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { Destroyable } from '@core/helpers';
 import { Tooltip, TooltipEventArgs } from '@syncfusion/ej2-angular-popups';
+import { charLength } from '@core/enums';
 
 @Component({
   selector: 'app-side-menu',
@@ -58,7 +59,7 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
 
     onBeforeRender(args: TooltipEventArgs): void {
       if(args.target.dataset["value"]?.length){
-        if(args.target.dataset["value"].length > 15){
+        if(args.target.dataset["value"].length > charLength.SideMenuTooltipSize){
           this.content = args.target.dataset['value'];
         } else {
           args.cancel = true;
