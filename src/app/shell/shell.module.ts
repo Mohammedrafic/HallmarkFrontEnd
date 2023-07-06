@@ -35,7 +35,8 @@ import {
   File,
   UserX,
   Server,
-  Twitch
+  Twitch,
+  TrendingUp
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -79,7 +80,8 @@ const sidebarIcons = {
   File,
   UserX,
   Server,
-  Twitch
+  Twitch,
+  TrendingUp
 };
 
 @NgModule({

@@ -57,6 +57,13 @@ const shellRoutes: Routes = [
         loadChildren: () =>
           import('../modules/document-library/document-library.module').then((m) => m.DocumentLibraryModule)
       }
+      ,
+      {
+        path: 'reporting',
+        loadChildren: () =>
+          import('../modules/logi-custom-report/logi-custom-report.module').then((m) => m.LogiCustomReportModule),
+        data: { isOrganizationArea: true },
+      }
     ],
   },
 ];
