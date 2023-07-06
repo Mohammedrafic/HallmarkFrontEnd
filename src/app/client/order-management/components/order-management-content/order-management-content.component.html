@@ -926,26 +926,11 @@
     <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Contact Person</label>
-        <div class="input-group multiselect">
-          <ejs-autocomplete
-            mode="CheckBox"
-            formControlName="contactEmails"
-            [dataSource]="filteredUsers"
-            [autofill]="true"
-            [minLength]="3"
-            [allowCustom]="false"
-            (filtering)="contactPersonFiltering($event)"
-            [fields]="contactPersonFields"
-          >
-            <ng-template #itemTemplate="" let-data="">
-              <div class="contact-option-container">
-                <span class="contact-name">{{ data.fullName }}</span>
-                <span class="contact-email">{{ data.email }}</span>
-              </div>
-            </ng-template>
-          </ejs-autocomplete>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="contactEmails" />
         </div>
       </div>
+      
       <div class="input-container">
         <label>Special Project Category</label>
         <div class="input-group multiselect">

@@ -715,7 +715,7 @@ export class OrderFilter {
   projectNameIds?: number | null;
   poNumberIds?: number | null;
   orderType?: number | null;
-  contactEmails?: string[] | string;
+  contactEmails?: string | null;
   irpOnly?: boolean | null;
   shiftIds?: number[];
   reorderStatuses?: (string | number)[];
