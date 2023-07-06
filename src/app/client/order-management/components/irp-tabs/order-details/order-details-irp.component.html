@@ -51,6 +51,7 @@
                         [fields]="optionFields"
                         [dataSource]="item.dataSource"
                         [enabled]="item.enabled"
+                        [filterType]="filterType"
                       ></ejs-dropdownlist>
                     </div>
                   </div>
@@ -137,6 +138,7 @@
                         [showSelectAll]="true"
                         [allowFiltering]="true"
                         [showDropDownIcon]="true"
+                        [filterType]="filterType"
                         [formControlName]="item.field"
                       >
                       </ejs-multiselect>

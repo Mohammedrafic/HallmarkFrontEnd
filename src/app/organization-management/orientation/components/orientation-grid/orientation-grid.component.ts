@@ -106,6 +106,7 @@ export class OrientationGridComponent extends AbstractPermissionGrid implements 
     disableControls: false,
   };
 
+  public filterType: string = 'Contains';
   private skills: Skill[] = [];
 
   protected componentDestroy: () => Observable<unknown>;

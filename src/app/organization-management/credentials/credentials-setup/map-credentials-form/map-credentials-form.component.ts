@@ -103,7 +103,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   public allDepartments = false;
   public maxDepartmentsLength = 1000;
   public query: Query = new Query().take(this.maxDepartmentsLength);
-
+  public filterType: string = 'Contains';
   constructor(
     private store: Store,
     private actions$: Actions,

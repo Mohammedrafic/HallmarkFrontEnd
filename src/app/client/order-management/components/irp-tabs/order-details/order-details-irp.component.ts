@@ -175,6 +175,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private reason: OrderRequisitionReason[] = [];
   public allShifts: any[];
   private selectedStructureState: SelectedStructureState;
+  public filterType: string = 'Contains';
 
   @Select(RejectReasonState.sortedOrderRequisition)
   private reasons$: Observable<RejectReasonPage>;

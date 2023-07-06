@@ -124,6 +124,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
+  public filterType: string = 'Contains';
 
   @Input() public credEndDate: string;
   @Input() public credStartDate: string;

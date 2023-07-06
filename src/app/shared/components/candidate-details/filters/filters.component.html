@@ -53,6 +53,7 @@
                        [allowFiltering]="true"
                        [showDropDownIcon]="true"
                        [dataSource]="filterColumns.locationIds.dataSource"
+                       [filterType]="filterType"
                        [selectAllText]='allOption' showSelectAll=true placeholder="All" >
 
         <ng-template #itemTemplate let-data>
@@ -79,6 +80,7 @@
                        [allowFiltering]="true"
                        [showDropDownIcon]="true"
                        [dataSource]="filterColumns.departmentIds.dataSource"
+                       [filterType]="filterType"
                        [selectAllText]='allOption' showSelectAll=true placeholder="All" >
 
         <ng-template #itemTemplate let-data>

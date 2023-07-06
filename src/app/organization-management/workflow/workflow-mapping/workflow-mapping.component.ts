@@ -115,7 +115,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   public isMappingSectionShown: boolean = false;
   public workflowTypes = WorkflowType;
   public showForm: boolean;
-
+  public filterType: string = 'Contains';
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }

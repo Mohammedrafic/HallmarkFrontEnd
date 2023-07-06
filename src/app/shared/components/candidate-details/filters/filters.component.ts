@@ -39,6 +39,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
     text: 'agencyName',
     value: 'agencyId',
   };
+  public filterType: string = 'Contains';
   constructor(private actions$: Actions, protected  store: Store, private readonly ngZone: NgZone,) {
     super();
     const user = this.store.selectSnapshot(UserState.user);

@@ -141,6 +141,7 @@
                             [showSelectAll]="true"
                             [allowFiltering]="true"
                             [showDropDownIcon]="true"
+                            [filterType]="filterType"
                             [dataSource]="locations">
             <ng-template #itemTemplate="" let-data="">
                 <div *ngIf="data.id" class="location-option-container">

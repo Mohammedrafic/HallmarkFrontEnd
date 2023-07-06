@@ -27,6 +27,7 @@ export class MultiselectDropdownComponent extends BaseFormControlDirective {
   @Input() showClearAll = true;
   @Input() allowFilter = true;
   @Input() public popupWidth : string | undefined;
+  @Input() public filterType ='Contains';
 
 
   @Output() public selectAllEmitter: EventEmitter<ISelectAllEventArgs> = new EventEmitter<ISelectAllEventArgs>();
