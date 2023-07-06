@@ -58,13 +58,6 @@
     }
   }
 }
-.invoices-page-toolbar{
-  ::ng-deep{
-    .left-content{
-      max-width: 40% !important;
-    }
-  }
-}
 
 .tab-navigation {
   &.e-badge {
@@ -207,6 +200,24 @@
   column-gap: 12px;
 }
 
+.menu-mobile {
+  display: none !important;
+}
+
+.top-margin {
+  margin-left: 0;
+}
+
+@media #{$min-desktop-large} {
+  .invoices-page-toolbar{
+    ::ng-deep{
+      .left-content{
+        max-width: 40% !important;
+      }
+    }
+  }
+}
+
 @media #{$max-mobile} {
   .tabs {
     position: fixed;
@@ -226,21 +237,6 @@
   }
 }
 
-.top-margin {
-  margin-left: 0;
-}
-
-
-@media (max-width: 480px) {
-  .bootstrap,
-  .top-margin {
-    margin-top: 54px;
-  }
-}
-
-.menu-mobile {
-  display: none !important;
-}
 
 @media (max-width: 670px) {
   .buttons-group {
@@ -249,5 +245,12 @@
       margin-top: 12px;
       margin-left: 0;
     }
+  }
+}
+
+@media (max-width: 480px) {
+  .bootstrap,
+  .top-margin {
+    margin-top: 54px;
   }
 }
