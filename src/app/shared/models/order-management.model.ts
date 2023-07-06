@@ -144,6 +144,8 @@ export interface IRPOrderPosition {
   nextShiftScheduledEndTime: string;
   scheduledWeeklyHours: number;
   overtime: number;
+  skillToolTip: boolean;
+  fullSkillName: string;
   system: number | string;
   positionId: string;
   organizationPrefix: string;
@@ -151,6 +153,12 @@ export interface IRPOrderPosition {
   billRate?: number | string | null;
   actualStartDate?: Date | string | null;
   actualEndDate?: Date | string | null;
+}
+
+export interface IrpPositionSkillName {
+  skillToolTip: boolean;
+  skill: string;
+  fullSkillName: string,
 }
 
 export interface IRPOrderPositionDisplay {
