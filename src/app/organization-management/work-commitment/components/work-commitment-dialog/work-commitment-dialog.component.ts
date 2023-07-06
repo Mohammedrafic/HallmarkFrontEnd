@@ -11,14 +11,14 @@ import {
 import { AbstractControl } from '@angular/forms';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, take, takeUntil, tap } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CANCEL_CONFIRM_TEXT, datepickerMask, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, datepickerMask, DELETE_CONFIRM_TITLE, IRP_DEPARTMENT_CHANGE_WARNING } from '@shared/constants';
 import { WorkCommitmentService } from '../../services/work-commitment.service';
 import {
   CommitmentDialogConfig,
@@ -72,6 +72,10 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
   public datepickerMask = datepickerMask;
   public allSkillsLength: number;
   public isEdit = false;
+  public showOverrideDialog = false;
+  public replaceOrder = false;
+  public replacementConfirmationMessage = IRP_DEPARTMENT_CHANGE_WARNING;
+  public overrideCommitmentConfirm$ = new Subject<boolean>();
 
   @Select(UserState.organizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
@@ -117,16 +121,46 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
 
   public saveWorkCommitment(): void {
     if (this.commitmentForm?.valid) {
-      this.saveCommitment.emit(
-        WorkCommitmentAdapter.prepareToSave(this.regionsDTO, this.allSkillsLength, this.commitmentForm!)
-      );
+      this.checkForChanges();
     } else {
       this.commitmentForm?.markAllAsTouched();
     }
   }
 
+  private checkForChanges(): void {
+    if (this.commitmentForm?.get('regions')?.dirty || this.commitmentForm?.get('locations')?.dirty) {
+      this.showOverridingConfirmation();
+    } else {
+      this.emitSaving();
+    }
+  }
+
   public trackByIndex(index: number, config: CommitmentsInputConfig): string {
     return index + config.field;
+  }
+
+  private emitSaving(): void {
+    this.saveCommitment.emit(
+      WorkCommitmentAdapter.prepareToSave(
+        this.regionsDTO,
+        this.allSkillsLength,
+        this.commitmentForm!,
+        this.replaceOrder,
+      )
+    );
+  }
+
+  private showOverridingConfirmation(): void {
+    this.replaceOrder = false;
+    this.showOverrideDialog = true;
+    this.overrideCommitmentConfirm$
+      .pipe(
+        take(1),
+        tap(() => this.showOverrideDialog = false),
+        filter(Boolean),
+    ).subscribe(() => {
+      this.emitSaving();
+    });
   }
 
   private watchForShowDialog(): void {
@@ -237,7 +271,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
         this.selectedRegions.map((item) => {
           const locationArr = new Set<number>();
           value.forEach((locationId) => {
-            item.locations!.filter((location: any) => {
+            item.locations!.filter((location: OrganizationLocation) => {
               if (location.id === locationId) {
                 locationArr.add(location.id);
               }
