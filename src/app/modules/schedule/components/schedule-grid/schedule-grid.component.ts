@@ -57,6 +57,7 @@ import { GetPreservedFiltersByPage, ResetPageFilters } from 'src/app/store/prese
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 import { BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
+import { ScheduleType } from '../../enums';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -500,7 +501,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   private setScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null): void {
     if(scheduleData != null && this.selectedFilters?.isOnlySchedulatedCandidate === true){
-      scheduleData.items = scheduleData.items.filter(filledSchedule => filledSchedule.schedule.length !== 0);
+      scheduleData.items = scheduleData?.items?.filter(schedule_Data => schedule_Data.schedule?.find(day_Schedule => day_Schedule.daySchedules?.find(schedule_Type => schedule_Type.scheduleType === ScheduleType.Book)));
     }
     this.scheduleData = scheduleData;
     this.employeesTitle = scheduleData?.totalCount && scheduleData.totalCount > 1 ? 'Employees' : 'Employee';
