@@ -33,8 +33,8 @@ export class CustomReportDialogComponent implements OnInit {
     LocationsParam: '',
     DepartmentsParam: '',
   };
-  public catelogName: LogiReportFileDetails = { name: '/IRPReports/UnitProfile/UnitProfile.cat' };
-  public RegularReportName: string = '/IRPReports/UnitProfile/UnitProfileReport.cls';
+  public catelogName: LogiReportFileDetails = { name: '/CustomReport/CustomReport.cat' };
+  public RegularReportName: string = '/CustomReport/FinanaceReport.cls';
   public reportName: LogiReportFileDetails = {
     name: this.RegularReportName,
   };
@@ -76,24 +76,15 @@ export class CustomReportDialogComponent implements OnInit {
 
   public saveAsReport(): void {
     let options: any = {
-      savePath: "/IRPReports/Hallmark/UnitProfile1.cls",
+      savePath: "/IRPReports/Hallmark/CustomReport1.cls",
       linkedCatalog: true,
       saveSort: false,
-      catalog: "/IRPReports/UnitProfile/UnitProfile.cat"
+      catalog: "/CustomReport/CustomReport.cat"
     };
     this.logiReportComponent.SaveAsReport(options, "reportIframe");
   }
 
   public SearchReport(): void {
-    
-
-    this.paramsData = {
-      OrganizationParam: 16,
-      RegionsParam: '25,26',
-      LocationsParam: '23,24',
-      DepartmentsParam: '24,25', 
-    };
-    this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
 
