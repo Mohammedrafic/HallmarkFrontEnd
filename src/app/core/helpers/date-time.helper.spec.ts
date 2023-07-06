@@ -400,46 +400,6 @@ describe('DateTimeHelper', () => {
       expect(result).toEqual(expectedResult);
     });
   });
-
-  describe('DateTimeHelper.getEarliestDate', () => {
-    const input = [
-      '2023-06-01T00:00:00+00:00',
-      '2024-06-09T00:00:00+00:00',
-      '2023-07-01T00:00:00+00:00',
-      '2023-06-01T16:22:00+00:00',
-      '2023-06-14T00:00:00+00:00',
-    ];
-
-    it('should return the erliest date from string array', () => {
-      const result = DateTimeHelper.getEarliestDate(input);
-      expect(result).toEqual('2023-06-01T00:00:00.000Z');
-    });
-
-    it('should return the null if input is empty array', () => {
-      const result = DateTimeHelper.getEarliestDate([]);
-      expect(result).toEqual(null);
-    });
-  });
-
-  describe('DateTimeHelper.getLatestDate', () => {
-    const input = [
-      '2024-06-09T18:22:00+00:00',
-      '2023-09-01T00:00:00+00:00',
-      '2023-06-05T16:22:00+00:00',
-      '2022-06-11T00:00:00+00:00',
-      '2023-06-01T00:00:00+00:00',
-    ];
-
-    it('should return the latest date from string array', () => {
-      const result = DateTimeHelper.getLatestDate(input);
-      expect(result).toEqual('2024-06-09T18:22:00.000Z');
-    });
-
-    it('should return the null if input is empty array', () => {
-      const result = DateTimeHelper.getLatestDate([]);
-      expect(result).toEqual(null);
-    });
-  });
 });
 
 function getDateDiff(date: string, weekStartDay: Date, firstWeekDay: number): number {
