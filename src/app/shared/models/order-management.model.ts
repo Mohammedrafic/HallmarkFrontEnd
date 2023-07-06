@@ -461,6 +461,7 @@ export class Order {
   reOrderFrom?: Order;
   reOrderId?: number;
   orderId?: number;
+  contract?: boolean;
   candidates?: CandidateModel[];
   orderCloseDate?: string;
   orderClosureReason?: string;
