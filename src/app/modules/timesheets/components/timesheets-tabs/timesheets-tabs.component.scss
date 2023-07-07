@@ -14,9 +14,10 @@
   }
 
   .tabs {
-    max-width: calc(100% - 12px) !important;
+    max-width: 100% !important;
     overflow: hidden !important;
-    @media #{$max-mobile} {
+
+    @media #{$max-tablet} {
       max-width: calc(100vw - 32px) !important;
     }
 

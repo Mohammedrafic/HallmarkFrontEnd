@@ -42,14 +42,16 @@
 }
 
 @media #{$max-desktop-small} {
-  ::ng-deep {
-    app-page-toolbar {
-      .controls-container {
-        flex-direction: row;
+  :host {
+    ::ng-deep {
+      app-page-toolbar {
+        .controls-container {
+          flex-direction: row;
 
-        .right-content {
-          margin-top: 0;
-          justify-content: flex-end;
+          .right-content {
+            margin-top: 0;
+            justify-content: flex-end;
+          }
         }
       }
     }
@@ -61,13 +63,15 @@
     padding: 8px 12px;
   }
 
-  ::ng-deep {
-    app-page-toolbar {
-      .controls-container {
-        padding: 16px 0 0;
+  :host {
+    ::ng-deep {
+      app-page-toolbar {
+        .controls-container {
+          padding: 16px 0 0;
 
-        .right-content {
-          flex-direction: row;
+          .right-content {
+            flex-direction: row;
+          }
         }
       }
     }
