@@ -14,7 +14,8 @@ export class WorkCommitmentAdapter {
   public static prepareToSave(
     correctRegions: RegionsDTO[],
     allSkillsLength: number,
-    formGroup: CustomFormGroup<WorkCommitmentForm>
+    formGroup: CustomFormGroup<WorkCommitmentForm>,
+    replaceOrder: boolean
   ): WorkCommitmentDTO {
     const {
       masterWorkCommitmentId,
@@ -30,7 +31,6 @@ export class WorkCommitmentAdapter {
       comments,
       workCommitmentId,
     } = formGroup.getRawValue();
-
     const commitmentId: { workCommitmentId?: number } = {};
     if (workCommitmentId) {
       commitmentId.workCommitmentId = workCommitmentId;
@@ -50,6 +50,7 @@ export class WorkCommitmentAdapter {
       jobCode,
       comments,
       regions: correctRegions,
+      createReplacement: replaceOrder,
     };
   }
 
