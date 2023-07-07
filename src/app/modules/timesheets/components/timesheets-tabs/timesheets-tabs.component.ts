@@ -1,6 +1,13 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter,
-  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild,Inject
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild,Inject,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
@@ -9,11 +16,13 @@ import { Observable, takeUntil } from 'rxjs';
 
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { OutsideZone } from '@core/decorators';
-import { TabConfig } from '../../interface';
+import { TabConfig, TabCountConfig } from '../../interface';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { GlobalWindow } from '@core/tokens';
 import { Destroyable } from '@core/helpers';
 import { ResizeContentService } from '@shared/services/resize-main-content.service';
+import { TimesheetsState } from '../../store/state/timesheets.state';
+import { Select } from '@ngxs/store';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -28,8 +37,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
   @Input()
   public tabConfig: TabConfig[];
 
-  @Input()
-  public isDisabled: boolean = false;
+  @Input() public isDisabled = false;
 
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
@@ -38,17 +46,20 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
   public missingtimesheet: string;
   public tabsWidth$: Observable<string>;
 
+  @Select(TimesheetsState.tabCounts)
+  readonly tabCounts$: Observable<TabCountConfig>;
+
   constructor(
     @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis,
     private readonly ngZone: NgZone,
     @Inject(DOCUMENT) private document: Document,
-    private ResizeContentService: ResizeContentService
+    private ResizeContentService: ResizeContentService,
   ) {
     super();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    if (this.tabConfig) {
+    if (changes['tabConfig']) {
       this.asyncRefresh();
       this.navigatingTab();
       this.navigatetopendingtimesheet();  
@@ -73,7 +84,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
   }
 
   public programSelection(idx = 0): void {
-    this.tabComponent.select(idx);
+    this.tabComponent?.select(idx);
   }
 
   public onSelect(selectEvent: SelectingEventArgs): void {
@@ -83,7 +94,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
   @OutsideZone
   private asyncRefresh(): void {
     setTimeout(() => {
-      this.tabComponent.refreshActiveTabBorder();
+      this.tabComponent?.refreshActiveTabBorder();
     });
   }
   @OutsideZone
