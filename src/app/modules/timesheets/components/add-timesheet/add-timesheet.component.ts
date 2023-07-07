@@ -10,6 +10,7 @@ import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
+import { AppState } from 'src/app/store/app.state';
 import {
   MealBreakeName, RecordAddDialogConfig, TimeInName, TimeOutName, TimesheetConfirmMessages,
 } from '../../constants';
@@ -22,7 +23,6 @@ import {
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-add-timesheet',

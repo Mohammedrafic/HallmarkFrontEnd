@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
+import { Select } from '@ngxs/store';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { Observable, takeUntil, filter, take } from 'rxjs';
 
@@ -23,7 +24,6 @@ import { GlobalWindow } from '@core/tokens';
 import { Destroyable } from '@core/helpers';
 import { ResizeContentService } from '@shared/services/resize-main-content.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { Select } from '@ngxs/store';
 
 @Component({
   selector: 'app-timesheets-tabs',
