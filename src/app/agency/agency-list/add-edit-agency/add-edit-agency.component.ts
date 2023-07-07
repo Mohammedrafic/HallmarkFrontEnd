@@ -127,7 +127,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService 
   ) {
     super(store);
     this.store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'briefcase' }));
@@ -167,7 +167,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       .subscribe((agency: { payload: Agency }) => {
         this.agencyId = agency.payload.agencyDetails.id as number;
         this.fetchedAgency = agency.payload;
-        this.fetchedAgency.agencyDetails.netSuiteId = this.fetchedAgency.netSuiteId; 
+        this.fetchedAgency.agencyDetails.netSuiteId = this.fetchedAgency.netSuiteId;
         this.agencyConfig.agencyIsMsp = !!agency.payload.isMsp;
         this.patchAgencyFormValue(this.fetchedAgency);
       });
@@ -244,7 +244,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       .pipe(
         filter((confirm) => !!confirm),
         takeWhile(() => this.isAlive))
-      .subscribe(() => {});
+      .subscribe(() => { });
   }
 
   public onBack(): void {
@@ -405,7 +405,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   public onMspCheckboxChecked(event: boolean): void {
     this.agencyConfig.agencyIsMsp = event;
     const parentBusinessUnitControl = this.agencyForm.get('parentBusinessUnitId');
-    if(this.agencyConfig.agencyIsMsp) {
+    if (this.agencyConfig.agencyIsMsp) {
       parentBusinessUnitControl?.setValue(0);
       parentBusinessUnitControl?.disable();
     } else {

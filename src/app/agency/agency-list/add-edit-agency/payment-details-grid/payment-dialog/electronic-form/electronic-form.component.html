@@ -33,7 +33,7 @@
       <div class="input-container">
         <label for="netSuiteId">NS Payment ID</label>
         <div class="input-group">
-          <input id="netSuiteId" maxlength="20" [readonly]="true" class="e-input" type="text" appValidateWithMessage formControlName="netSuiteId" />
+          <input id="netSuiteId" [readonly]="isControlDisabled" maxlength="20" class="e-input" type="text" appValidateWithMessage formControlName="netSuiteId" />
         </div>
       </div>
     </div>
