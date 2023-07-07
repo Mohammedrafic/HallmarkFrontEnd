@@ -33,8 +33,8 @@
 
         <ng-template #itemTemplate let-data>
           <div class="region-option-container" [class.admin]="isAgency">
-            <span class="region-name">{{ data.name }}</span>
-            <span *ngIf="isAgency" class="org-name">{{ data.organizationName }}</span>
+            <span class="region-name">{{ data?.name }}</span>
+            <span *ngIf="isAgency" class="org-name">{{ data?.orgName }}</span>
           </div>
         </ng-template>
 
@@ -58,8 +58,8 @@
 
         <ng-template #itemTemplate let-data>
           <div class="region-option-container" [class.admin]="isAgency">
-            <span class="region-name">{{ data.name }}</span>
-            <span *ngIf="isAgency" class="org-name">{{ data.organizationName }}</span>
+            <span class="region-name">{{ data?.name }}</span>
+            <span *ngIf="isAgency" class="org-name">{{ data?.regionName }}</span>
           </div>
         </ng-template>
 
@@ -85,8 +85,8 @@
 
         <ng-template #itemTemplate let-data>
           <div class="region-option-container" [class.admin]="isAgency">
-            <span class="region-name">{{ data.name }}</span>
-            <span *ngIf="isAgency" class="org-name">{{ data.organizationName }}</span>
+            <span class="region-name">{{ data?.name }}</span>
+            <span *ngIf="isAgency" class="org-name">{{ data?.locationName }}</span>
           </div>
         </ng-template>
 
