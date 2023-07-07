@@ -8,11 +8,12 @@ import {
   Output,
   SimpleChanges,
   ViewChild,Inject,
+  OnInit,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { Observable, takeUntil } from 'rxjs';
+import { Observable, takeUntil, filter, take } from 'rxjs';
 
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { OutsideZone } from '@core/decorators';
@@ -30,7 +31,7 @@ import { Select } from '@ngxs/store';
   styleUrls: ['./timesheets-tabs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
+export class TimesheetsTabsComponent extends Destroyable implements OnChanges, OnInit {
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
 
@@ -70,8 +71,8 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string; 
   }
 
-  public ngAfterViewInit(): void {
-    this.getTabsWidth();
+  public ngOnInit(): void {
+    this.subscribeOnTabSource();
   }
 
   public override ngOnDestroy(): void {
@@ -135,6 +136,16 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges{
     }
     },10000);
 
+  }
+
+  private subscribeOnTabSource(): void {
+    this.tabCounts$.pipe(
+      filter((tabs) => !!tabs),
+      take(1),
+    )
+      .subscribe(() => {
+        this.getTabsWidth();
+      });
   }
 
   private getTabsWidth(): void {
