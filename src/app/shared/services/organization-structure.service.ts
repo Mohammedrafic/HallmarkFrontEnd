@@ -124,18 +124,18 @@ export class OrganizationStructureService {
       isFInActivate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).some(
         (location) =>
           location.id == locationID &&
-          new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
-          new Date(location.reactivateDate!).toLocaleDateString() >= new Date(jobEndDate).toLocaleDateString() &&
-          new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
+          new Date(location.inactiveDate!) > new Date(jobStartDate) &&
+          new Date(location.inactiveDate!) <= new Date(jobEndDate) &&
+          new Date(location.reactivateDate!) >= new Date(jobEndDate) &&
+          new Date(location.inactiveDate!) <= new Date(jobEndDate)
       ),
       isCInActivate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).some(
         (location) =>
           location.id == locationID &&
-          new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
-          new Date(location.reactivateDate!).toLocaleDateString() < new Date(jobEndDate).toLocaleDateString() &&
-          new Date(location.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
+          new Date(location.inactiveDate!) > new Date(jobStartDate) &&
+          new Date(location.inactiveDate!) <= new Date(jobEndDate)&&
+          new Date(location.reactivateDate!) < new Date(jobEndDate) &&
+          new Date(location.inactiveDate!) <= new Date(jobEndDate)
       ),
       inActiveDate: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).find(
         (location) => location.id == locationID
@@ -215,18 +215,18 @@ export class OrganizationStructureService {
       isFInActivate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).some(
         (department) =>
           department.id == departmentID &&
-          new Date(department.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
-          new Date(department.reactivateDate!).toLocaleDateString() >= new Date(jobEndDate).toLocaleDateString() &&
-          new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
+          new Date(department.inactiveDate!)> new Date(jobStartDate) &&
+          new Date(department.inactiveDate!) <= new Date(jobEndDate) &&
+          new Date(department.reactivateDate!) >= new Date(jobEndDate) &&
+          new Date(department.inactiveDate!) <= new Date(jobEndDate)
       ),
       isCInActivate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).some(
         (department) =>
           department.id == departmentID &&
-          new Date(department.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() &&
-          new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString() &&
-          new Date(department.reactivateDate!).toLocaleDateString() < new Date(jobEndDate).toLocaleDateString() &&
-          new Date(department.inactiveDate!).toLocaleDateString() <= new Date(jobEndDate).toLocaleDateString()
+          new Date(department.inactiveDate!) > new Date(jobStartDate) &&
+          new Date(department.inactiveDate!) <= new Date(jobEndDate) &&
+          new Date(department.reactivateDate!) < new Date(jobEndDate) &&
+          new Date(department.inactiveDate!) <= new Date(jobEndDate)
       ),
       inActiveDate: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
         (department) => department.id == departmentID
