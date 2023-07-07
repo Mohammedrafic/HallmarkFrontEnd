@@ -7,7 +7,7 @@ export const MealBreakeName = 'hadLunchBreak';
 export const TimeInName = 'timeIn';
 export const TimeOutName = 'timeOut';
 
-export const RecordAddDialogConfig = (isMobile: boolean): DialogConfig => {
+export const GetRecordAddDialogConfig = (isMobile: boolean): DialogConfig => {
   return {
     timesheets: {
       title: 'Add Timesheet Record',

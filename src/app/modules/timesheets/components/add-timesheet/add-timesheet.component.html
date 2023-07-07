@@ -12,7 +12,7 @@ cssClass="dialog short"
     <div class="dialog-container">
       <div class="dialog-header">
         <h3 class="title">{{ dialogConfig[formType].title | titlecase }}</h3>
-        <ng-container *ngIf="!isMobile" [ngTemplateOutlet]="actionButtons"></ng-container>
+        <ng-container *ngIf="!(isMobile$ | async)" [ngTemplateOutlet]="actionButtons"></ng-container>
       </div>
 
       <div class="form" *ngIf="form">
@@ -152,7 +152,7 @@ cssClass="dialog short"
 
   <ng-template #footerTemplate>
     <section class="footer">
-      <ng-container [ngTemplateOutlet]="actionButtons" *ngIf="isMobile"></ng-container>
+      <ng-container [ngTemplateOutlet]="actionButtons" *ngIf="isMobile$ | async"></ng-container>
     </section>
   </ng-template>
 </ejs-dialog>
