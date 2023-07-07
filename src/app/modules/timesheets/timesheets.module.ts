@@ -44,6 +44,7 @@ import {
   X,
   XCircle,
   AlertTriangle,
+  RefreshCw,
 } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
@@ -126,6 +127,7 @@ const gridIcons = {
   Folder,
   CheckCircle,
   AlertTriangle,
+  RefreshCw,
 };
 
 @NgModule({
