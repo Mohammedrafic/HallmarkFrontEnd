@@ -31,7 +31,7 @@
         <div class="column links">
           <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
         </div>
-        <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>   
+        <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
       </ng-container>
     </div>
   </section>
@@ -137,8 +137,8 @@
         <div class="title">{{ orderInformation.criticalOrder | boolValueToText }}</div>
         <div class="sup-title">Critical Order</div>
       </div>
-      <div class="column">
-        <div class="title">{{ orderInformation.contact || false | boolValueToText }}</div>
+      <div class="column" *ngIf="orderInformation.orderType !== ltaOrderType">
+        <div class="title">{{ orderInformation?.contract || false | boolValueToText }}</div>
         <div class="sup-title">Contract</div>
       </div>
 

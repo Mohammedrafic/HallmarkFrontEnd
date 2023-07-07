@@ -40,6 +40,7 @@ export type FilterColumnsModel = {
   departmentIds:FilterColumn;
   candidateNames:FilterColumn
   agencyIds:FilterColumn
+  organizationIds:FilterColumn
 };
 
 export type FiltersModal = {

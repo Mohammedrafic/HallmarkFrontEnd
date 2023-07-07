@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 import { Store, Select, ofActionDispatched, Actions } from '@ngxs/store';
-import { ColDef, RowDragEvent } from '@ag-grid-community/core';
-import { filter, Observable, of, takeUntil } from 'rxjs';
+import { ColDef } from '@ag-grid-community/core';
+import { filter, Observable, takeUntil } from 'rxjs';
 
 import { GridReadyEventModel } from '@shared/components/grid/models';
 import { GRID_CONFIG } from '@shared/constants';
 import {
-  WorkCommitmentDetails,
   WorkCommitmentFilters,
   WorkCommitmentGrid,
   WorkCommitmentsPage,
@@ -15,9 +14,9 @@ import {
 import { WorkCommitmentColumnsDefinition } from '../../constants/work-commitment.constant';
 import { WorkCommitmentState } from '../../../store/work-commitment.state';
 import { WorkCommitment } from '../../../store/work-commitment.actions';
-import { Tiers } from '../../../store/tiers.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { WorkCommitmentAdapter } from '../../adapters/work-commitment.adapter';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-work-commitment-grid',
@@ -39,30 +38,23 @@ export class WorkCommitmentGridComponent extends DestroyableDirective implements
   @Select(WorkCommitmentState.workCommitmentsPage)
   public workCommitmentsPage$: Observable<WorkCommitmentsPage>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  public organizationId$: Observable<number>;
+
   constructor(private store: Store, private actions$: Actions, private changeDetection: ChangeDetectorRef) {
     super();
   }
 
   ngOnInit(): void {
     this.setColumnDefinition();
-    this.getNewPage();
+    this.watchForOrgChange();
     this.watchForUpdatePage();
     this.watchForWorkCommitments();
-  }
-
-  public setColumnDefinition(): void {
-    this.columnDefinitions = WorkCommitmentColumnsDefinition((commitment: WorkCommitmentGrid) => {
-      this.editCommitment.emit(commitment);
-    });
   }
 
   public sortByColumn(order: string): void {
     this.filters.orderBy = order;
     this.getNewPage();
-  }
-
-  public getNewPage(): void {
-    this.store.dispatch(new WorkCommitment.GetCommitmentsByPage(this.filters));
   }
 
   public handleChangePage(pageNumber: number): void {
@@ -81,6 +73,25 @@ export class WorkCommitmentGridComponent extends DestroyableDirective implements
 
   public gridReady(grid: GridReadyEventModel): void {
     grid.api.sizeColumnsToFit();
+  }
+
+  private watchForOrgChange(): void {
+    this.organizationId$.pipe(
+      filter(Boolean),
+      takeUntil(this.destroy$),
+    ).subscribe(() => {
+      this.getNewPage();
+    });
+  }
+
+  private setColumnDefinition(): void {
+    this.columnDefinitions = WorkCommitmentColumnsDefinition((commitment: WorkCommitmentGrid) => {
+      this.editCommitment.emit(commitment);
+    });
+  }
+
+  private getNewPage(): void {
+    this.store.dispatch(new WorkCommitment.GetCommitmentsByPage(this.filters));
   }
 
   private watchForUpdatePage(): void {

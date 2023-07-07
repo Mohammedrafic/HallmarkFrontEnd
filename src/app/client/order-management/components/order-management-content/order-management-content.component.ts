@@ -464,6 +464,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       return this.filters?.contactEmails || null;
     }
   }
+  public filterType: string = 'Contains';
 
   constructor(
     protected override store: Store,
@@ -2230,9 +2231,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (selectedOrderAfterRedirect) {
       this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
-      if (!Array.isArray(this.filters.contactEmails)) {
-        this.filters.contactEmails = this.filters.contactEmails ? [this.filters.contactEmails] : this.filters.contactEmails;
-      }
+      this.filters.contactEmails = this.filters.contactEmails ;
+     
       this.filters.orderPublicId = selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId;
       this.filters.agencyType = null;
       this.filters.includeReOrders = false;
@@ -2508,11 +2508,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private refreshFilterState(): void {
     this.filterApplied = true;
     this.filters = this.OrderFilterFormGroup.getRawValue();
-    if (!Array.isArray(this.filters.contactEmails)) {
-      this.filters.contactEmails = this.filters.contactEmails
-        ? [this.filters.contactEmails]
-        : this.filters.contactEmails;
-    }
+ 
+    this.filters.contactEmails = this.filters.contactEmails || null;
     this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;

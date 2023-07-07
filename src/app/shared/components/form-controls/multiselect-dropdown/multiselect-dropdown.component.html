@@ -20,8 +20,9 @@
       (selectedAll)="selectAllEmitter.emit($event)"
       [sortOrder]="sortOrder"
       [showClearButton]="showClearAll"
-      [popupWidth]="'auto'"
+      [popupWidth]="popupWidth"
       (blur)="onBlur()"
+      [filterType]="filterType"
       mode="CheckBox"
     ></ejs-multiselect>
     <app-error-message [control]="getControl()"></app-error-message>

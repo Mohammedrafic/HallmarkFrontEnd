@@ -1,4 +1,5 @@
 import { CandidateProfileContactDetail } from "./candidate.model";
+import {BillRate} from '@shared/models/bill-rate.model';
 
 export type OrderApplicantsInitialData = {
   candidateId: number;
@@ -23,6 +24,7 @@ export type OrderApplicantsInitialData = {
   candidateProfileContactDetails:CandidateProfileContactDetail;
   candidatePhone1Required:any;
   candidateAddressRequired:any;
+  billRates: BillRate[]
 }
 
 export type OrderApplicantsApplyData = {

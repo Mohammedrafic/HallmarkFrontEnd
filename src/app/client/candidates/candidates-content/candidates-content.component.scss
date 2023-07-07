@@ -55,3 +55,21 @@
     }
   }
 }
+
+@media #{$max-mobile} {
+  button.e-control.e-btn {
+    padding: 8px 12px;
+  }
+
+  ::ng-deep {
+    app-page-toolbar {
+      .controls-container {
+        padding: 16px 0 0;
+
+        .right-content {
+          flex-direction: row;
+        }
+      }
+    }
+  }
+}

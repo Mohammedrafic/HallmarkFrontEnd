@@ -39,6 +39,7 @@ export interface WorkCommitmentDTO {
   comments: string;
   regions: RegionsDTO[];
   workCommitmentId?: number | null;
+  createReplacement?: boolean;
 }
 
 export type CommitmentDataSource = OrganizationRegion[] | OrganizationLocation[] | OrganizationDepartment[] | Option[];

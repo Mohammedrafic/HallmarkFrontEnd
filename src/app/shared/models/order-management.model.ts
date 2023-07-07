@@ -144,6 +144,8 @@ export interface IRPOrderPosition {
   nextShiftScheduledEndTime: string;
   scheduledWeeklyHours: number;
   overtime: number;
+  skillToolTip: boolean;
+  fullSkillName: string;
   system: number | string;
   positionId: string;
   organizationPrefix: string;
@@ -151,6 +153,12 @@ export interface IRPOrderPosition {
   billRate?: number | string | null;
   actualStartDate?: Date | string | null;
   actualEndDate?: Date | string | null;
+}
+
+export interface IrpPositionSkillName {
+  skillToolTip: boolean;
+  skill: string;
+  fullSkillName: string,
 }
 
 export interface IRPOrderPositionDisplay {
@@ -461,6 +469,7 @@ export class Order {
   reOrderFrom?: Order;
   reOrderId?: number;
   orderId?: number;
+  contract?: boolean;
   candidates?: CandidateModel[];
   orderCloseDate?: string;
   orderClosureReason?: string;
@@ -706,7 +715,7 @@ export class OrderFilter {
   projectNameIds?: number | null;
   poNumberIds?: number | null;
   orderType?: number | null;
-  contactEmails?: string[] | string;
+  contactEmails?: string | null;
   irpOnly?: boolean | null;
   shiftIds?: number[];
   reorderStatuses?: (string | number)[];

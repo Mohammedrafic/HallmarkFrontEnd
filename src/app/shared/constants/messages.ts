@@ -73,7 +73,7 @@ export const deployedCandidateMessage = (orderIds: string[]) =>
     ', '
   )}</span>. Do you wish to proceed?</span>`;
 export const ONBOARD_CANDIDATE = 'Message to Onboard Candidate';
-export const onBoardCandidateMessage =  `<span class="deployed-candidate__message">Would you like to send any notification to the candidate.</span>`;
+export const onBoardCandidateMessage =  `<span class="deployed-candidate__message">Would you like to send any notification to the candidate?</span>`;
 export const CHANGES_SAVED = 'Changes have been saved';
 export const SEND_EMAIL = 'Sent email';
 export const SEND_EMAIL_REQUIRED = 'Required';

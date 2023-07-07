@@ -12,23 +12,39 @@
            'max-width': cell.maxWidth + 'px'
          }"
           class="custom-cell">
-          <ng-container
-            *ngIf="cell.field !== 'candidateStatus' && cell.field !== 'orderStatus'; else statusCell"
-          >
-            <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
-            <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
-          </ng-container>
-          <ng-template #statusCell>
-            <ng-container *ngIf="data[cell?.field || ''] as cellValue">
-              <div [class]="cell?.cellClass">
-                <ejs-chiplist>
-                  <e-chips>
-                    <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>
-                  </e-chips>
-                </ejs-chiplist>
-              </div>
+          <ng-container [ngSwitch]="cell.field">
+
+            <ng-container *ngSwitchCase="'skill'">
+              <ng-container *ngIf="!data?.skillToolTip; else skillToolTip">
+                <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
+              </ng-container>
+
+              <ng-template #skillToolTip>
+                <app-tooltip-container [showToolTip]="data?.skillToolTip" [message]="data?.fullSkillName">
+                  <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
+                </app-tooltip-container>
+              </ng-template>
+
+              <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
             </ng-container>
-          </ng-template>
+
+            <ng-container *ngSwitchCase="'candidateStatus' || 'orderStatus'">
+              <ng-container *ngIf="data[cell?.field || ''] as cellValue">
+                <div [class]="cell?.cellClass">
+                  <ejs-chiplist>
+                    <e-chips>
+                      <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>
+                    </e-chips>
+                  </ejs-chiplist>
+                </div>
+              </ng-container>
+            </ng-container>
+
+            <ng-container *ngSwitchDefault>
+              <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
+              <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
+            </ng-container>
+          </ng-container>
         </div>
       </ng-container>
     </div>

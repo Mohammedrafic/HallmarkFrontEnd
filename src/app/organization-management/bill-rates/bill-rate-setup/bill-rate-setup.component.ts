@@ -152,7 +152,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
-
+  public filterType: string = 'Contains';
   constructor(
     private store: Store,
     private actions$: Actions,

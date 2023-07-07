@@ -746,7 +746,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleApiService.checkBookingsOverlaps(request).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
       switchMap((response: BookingsOverlapsResponse[]) => {
-        if (!response.length && this.scheduleToBook) {
+        if ((!response.length && this.scheduleToBook) || this.isEmployee) {
           return this.createBookSchedule();
         } else {
           this.openReplacementOrderDialog(response);
@@ -785,7 +785,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleApiService.checkBookingsOverlaps(request).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
       switchMap((response: BookingsOverlapsResponse[]) => {
-        if (!response.length && this.unavailabilityToSave) {
+        if ((!response.length && this.unavailabilityToSave) || this.isEmployee) {
           return this.createUnavailability();
         } else {
           this.openReplacementOrderDialog(response);

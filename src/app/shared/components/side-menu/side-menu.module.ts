@@ -5,9 +5,10 @@ import { NgModule } from '@angular/core';
 
 import { SideMenuComponent } from './side-menu.component';
 import { SideMenuService } from '@shared/components/side-menu/services';
+import { TooltipAllModule } from '@syncfusion/ej2-angular-popups';
 
 @NgModule({
-  imports: [CommonModule, ListBoxModule],
+  imports: [CommonModule, ListBoxModule, TooltipAllModule],
   exports: [SideMenuComponent],
   declarations: [SideMenuComponent],
   providers: [SideMenuService]

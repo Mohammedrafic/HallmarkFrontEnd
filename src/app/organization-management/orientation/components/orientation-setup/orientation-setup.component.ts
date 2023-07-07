@@ -99,6 +99,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   public readonly orientationTab = OrientationTab;
 
   protected componentDestroy: () => Observable<unknown>;
+  public filterType: string = 'Contains';
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;

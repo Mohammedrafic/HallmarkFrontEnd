@@ -67,6 +67,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   private isAllLocationsSelected = false;
   private isEdit = false;
   private formType;
+  public filterType: string = 'Contains';
   protected componentDestroy: () => Observable<unknown>;
 
   @Select(UserState.organizationStructure)

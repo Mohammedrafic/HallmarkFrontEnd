@@ -1,0 +1,39 @@
+<ejs-dialog id="dialog"
+            #customReportSideDialog
+            cssClass="dialog order-details-dialog"
+            [target]="targetElement"
+            [visible]="false"
+            [animationSettings]="{ effect: 'SlideRight' }">
+  <section class="container preview-dialog">
+    <section class="header-container">
+      <div class="e-card-header preview-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title preview-title">{{ selectedLog?.customReportName }}</h3>
+        </div>
+        <div class="e-card-content">
+          <button ejs-button
+                  id="saveAsButton"
+                  (click)="saveAsReport()"
+                  cssClass="e-outline button-filter">
+            <div class="filter-button-content">
+              Save As <i-feather name="sliders" class="icon"></i-feather>
+            </div>
+          </button>
+          <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
+        </div>
+      </div>
+     
+      <section class="app-grid table-wrapper" >
+        
+          <app-logi-report [paramsData]="paramsData"
+                           [reportName]="reportName"
+                           [catelogName]="catelogName"
+                           [reportType]="reportType"></app-logi-report>
+       
+      </section>
+    </section>
+  </section>
+  
+</ejs-dialog>

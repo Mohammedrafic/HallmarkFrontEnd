@@ -193,7 +193,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private configurationSystemType: SystemType = SystemType.VMS;
   private organizationSettingKey: OrganizationSettingKeys;
   regionBasedDepartment: any;
-
+  public filterType: string = 'Contains';
   get switcherValue(): string {
     return this.organizationSettingsFormGroup.controls['value'].value ? 'on' : 'off';
   }

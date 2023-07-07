@@ -140,7 +140,6 @@
 
                     <ng-container *ngSwitchCase="candidateTemplate.apply">
                       <app-apply-candidate
-                        [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
                         [candidate]="$any(candidate)"
                         [order]="$any(selectedOrder$ | async)"
                         [isTab]="true"
