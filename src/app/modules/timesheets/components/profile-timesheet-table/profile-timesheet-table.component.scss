@@ -202,4 +202,11 @@ button.privilege {
   .desktop-tablet-btn-group {
     display: none;
   }
+
+  .middle-tablet {
+    button.e-btn.e-control.e-action-button {
+      width: 40px;
+      padding: 8px 8px 8px 3px;
+    }
+  }
 }
