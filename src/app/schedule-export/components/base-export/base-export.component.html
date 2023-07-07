@@ -1,4 +1,4 @@
-<div class="pt_30">
+<div class="pt_30" id="baseExport">
   <div class="header">
     <div class="row pb-3 d-flex align-items-center">
       <div class="col">
@@ -83,144 +83,105 @@
     </div>
   </div>
   
-  <div class="table-container f-14">
+  <div #scrollArea class="table-container grid-body f-14">
     <table class="w-100">
       <thead>
-        <th>Employee</th>
-        <th>Skill</th>
-        <th>Hrs Week 1/2</th>
-        <th>Work Commitment</th>
-        <th>Sun 01/29</th>
-        <th>Sun 01/29</th>
-        <th>Mon 01/30</th>
-        <th>Tue 01/31</th>
-        <th>Mon 01/30</th>
-        <th>Tue 01/31</th>
-        <th>Sun 01/29</th>
-        <th>Sun 01/29</th>
-        <th>Sun 01/29</th>
-        <th>Sun 01/29</th>
-        <th>Tue 01/31</th>
-        <th>Sun 01/29</th>
-        <th>Sun 01/29</th>
-        <th>Sun 01/29</th>
+        <ng-container *ngIf="activePeriod !== monthPeriod; else monthRange">
+          <th class="table-title candidates-head-cell fixed fixed--left fixed--top">
+            <span>{{ employeesTitle }}</span>
+          </th>
+  
+          <th>Skill</th>
+          <th>Hrs Week 1/2</th>
+          <th>Work Commitment</th>
+          <th
+            *ngFor="let dateHead of datesRanges; trackBy: trackByDatesRange"
+            class="table-title date left-border fixed fixed--top"
+            weeksEnd [date]="dateHead.dateText"
+            [weekStartDay]="orgFirstDayOfWeek"
+            [selectedPeriod]="activePeriod"
+            [noBorder]="dateHead.noBorder"
+          >
+            <span>{{ dateHead.dateText | date: 'E MM/dd' }}</span>
+          </th>
+        </ng-container>
+        <ng-template #monthRange>
+          <th
+            *ngFor="let day of monthRangeDays; trackBy: trackByweekDays"
+            class="table-title date left-border month-date fixed fixed--top">
+            <span>{{day}}</span>
+          </th>
+        </ng-template>
+
       </thead>
       <tbody>
-        <tr>
+        <ng-container *ngIf="activePeriod !== monthPeriod; else monthView">
+
+        <tr *ngFor="let scheduleItem of scheduleData" class="table-row">
           <td>
-            <span>Sandars Paul</span>
-            <span>ID : 3456790</span>
+            <span>{{scheduleItem.lastName}} {{scheduleItem.firstName}}</span>
+            <span>ID : {{scheduleItem.employeeId}}</span>
           </td>
-          <td>Cardiologist</td>
-          <td>12/24</td>
-          <td>Work Name</td>
+          <td>{{scheduleItem.skill}}</td>
+          <td>{{scheduleItem.employeeSchedules.workHours}}</td>
           <td>
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-            <span>CRT</span>
+            <span *ngFor="let schedule_workcommit of scheduleItem.workCommitments">{{schedule_workcommit}}</span>
           </td>
-          <td>
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-            <span>CRT</span>
-          </td>
-          <td class="text-other-dept">
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-            <span>CRT</span>
-          </td>
-          <td class="text-unavailable">
-            <span>08:00 - 12:00</span>
-            <span>Unavailable</span>
-          </td>
-          <td>
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-            <span>CRT, PRE</span>
-          </td>
-          <td class="text-unavailable">
-            <span>08:00 - 12:00</span>
-            <span>Unavailable</span>
-          </td>
-          <td class="text-available">
-            <span>08:00 - 12:00</span>
-            <span>Available</span>
-          </td>
-          <td>
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-          </td>
-          <td>
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-          </td>
-          <td class="text-available">
-            <span>08:00 - 12:00</span>
-            <span>Available</span>
-          </td>
-          <td class="text-unavailable">
-            <span>08:00 - 12:00</span>
-            <span>Unavailable</span>
-          </td>
-          <td class="text-available">
-            <span>08:00 - 12:00</span>
-            <span>Available</span>
-          </td>
-          <td>
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-          </td>
-          <td>
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td class="text-available">
-            <span>08:00 - 12:00</span>
-            <span>Available</span>
-          </td>
-          <td>
-          </td>
-          <td>
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-            <span>CRT</span>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-            <span>08:00 - 12:00</span>
-            <span>LOC-DEP</span>
-            <span>CRT</span>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-        </tr>
+            <ng-container 
+              *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">
+              <td
+                *ngIf="dateSlot.dateText| calendarDateSlotExport: scheduleItem.employeeSchedules.schedules as dateSchedule; else emptyCell"
+                
+                weeksEnd [date]="dateSlot.dateText"
+                [weekStartDay]="orgFirstDayOfWeek"
+                [noBorder]="dateSlot.noBorder"
+                cdkDropList
+                class="cdk-drop-list"
+              >
+                <div
+                  class="table-cell date-slot"
+                  canSchedule
+                  [dragDate]="dateSchedule.date"
+                  [candidateId]="scheduleItem?.employeeId"
+                >
+                  <ng-container>
+                    <app-export-schedule-card
+                      [dateSchedule]="dateSchedule"
+                      [activePeriod]="activePeriod"
+                    ></app-export-schedule-card>
+                  </ng-container>
+
+                </div>
+              </td>
+
+              <ng-template #emptyCell>
+                <td weeksEnd [date]="dateSlot.dateText"
+                  [weekStartDay]="orgFirstDayOfWeek"
+                  [selectedPeriod]="activePeriod"
+                    cdkDropList
+                    class="cdk-drop-list"
+                  [noBorder]="dateSlot.noBorder">
+                  <div
+                    class="table-cell date-slot empty-cell"
+                    canSchedule
+                    [dragDate]="dateSlot.dateText"
+                    [candidateId]="scheduleItem?.employeeId"
+                  >
+                  </div>
+                </td>
+              </ng-template>
+            </ng-container>
+          </tr>
+        </ng-container>
+
+
+        <ng-template #monthView>
+          <app-export-month-view
+            [scheduleData]="scheduleData"
+            [datesRange]="datesRanges"
+          ></app-export-month-view>
+        </ng-template>
+
       </tbody>
     </table>
   </div> 

@@ -18,6 +18,7 @@ import {
   ScheduleItemAttributes,
   ScheduleModel,
   ScheduleModelPage,
+  DaySchedules
 } from '../interface';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
 import { AboutSixHoursMs, AboutTwentyHoursMs, DayMs, HalfHourTimeMealMs, HourTimeMealMs, WeekList } from '../constants';
@@ -142,6 +143,14 @@ export const GetCandidateTooltip = (errors: string[]): string => {
 };
 
 export const CardTitle = (scheduleItem: ScheduleItem): string => {
+  if(scheduleItem.orderMetadata?.location && scheduleItem.orderMetadata?.department) {
+    return `${scheduleItem?.orderMetadata.location.slice(0, 3)}-${scheduleItem?.orderMetadata.department.slice(0, 3)}`;
+  } else {
+    return '';
+  }
+};
+
+export const CardTitleforExport = (scheduleItem: DaySchedules): string => {
   if(scheduleItem.orderMetadata?.location && scheduleItem.orderMetadata?.department) {
     return `${scheduleItem?.orderMetadata.location.slice(0, 3)}-${scheduleItem?.orderMetadata.department.slice(0, 3)}`;
   } else {

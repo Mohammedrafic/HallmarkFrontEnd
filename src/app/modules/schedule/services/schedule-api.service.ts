@@ -92,4 +92,9 @@ export class ScheduleApiService {
   getOpenPositions(openPositionsParams: OpenPositionParams): Observable<OpenPositionsList[]> {
     return this.http.post<OpenPositionsList[]>('/api/schedules/openPositions', openPositionsParams);
   }
+
+  exportSchedule( employeeIds: number[], filters: EmployeesFilters): Observable<CandidateSchedules[]> {
+    return this.http.post<CandidateSchedules[]>('/api/Schedules/exportschedules', { employeeIds, ...filters });
+  }
+
 }

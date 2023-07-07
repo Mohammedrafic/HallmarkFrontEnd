@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { filter, Observable, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, scheduled, switchMap, takeUntil } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
 import { DateTimeHelper } from '@core/helpers';
@@ -23,6 +23,8 @@ import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } fro
 import { ScheduledItem, SelectedCells, SideBarSettings } from '../../interface';
 import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters, GetScheduledShift } from '../../helpers';
 import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DatesRangeType } from '@shared/enums';
 
 @Component({
   selector: 'app-schedule-container',
@@ -62,6 +64,9 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   };
 
   selectedCandidate: ScheduleInt.ScheduleCandidate | null;
+  candidateDetails: ScheduleInt.ScheduleCandidatesPage;
+  DateRange: any;
+  activeTimePeriod = DatesRangeType.TwoWeeks;
 
   constructor(
     protected override store: Store,
@@ -71,6 +76,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     private scheduleFiltersService: ScheduleFiltersService,
     private createScheduleService: CreateScheduleService,
     private settingService: SettingsViewService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     super(store);
 
@@ -185,6 +192,10 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.detectWhatDataNeeds();
   }
 
+  datesRanges(date : any): void {
+    this.DateRange = date;
+  }
+
   deleteFilterItem(event: ChipDeleteEventType): void {
     this.filterService.deleteInlineChip(event);
   }
@@ -214,6 +225,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       ),
       takeUntil(this.componentDestroy()),
     ).subscribe((scheduleData: ScheduleInt.ScheduleModelPage) => {
+      scheduleData.items = scheduleData.items.filter(filledSchedules => filledSchedules.schedule.length !== 0);
       if (isLoadMore) {
         this.scheduleData = {
           ...scheduleData,
@@ -283,6 +295,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   private getSchedulesByEmployeesIds(
     candidates: ScheduleInt.ScheduleCandidatesPage,
   ): Observable<ScheduleInt.ScheduleModelPage> {
+    this.candidateDetails = candidates;
     return this.scheduleApiService.getSchedulesByEmployeesIds(
       candidates.items.map(candidate => candidate.id),
       GetScheduleFilterByEmployees(this.scheduleFilters),
@@ -356,5 +369,34 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       && !!cells.dates.length);
 
     return !this.isEmployee && !!filterError;
+  }
+
+  activePeriod(activePeriod: any) : void {
+    this.activeTimePeriod = activePeriod;
+  }
+
+  public exportTable(){
+    this.scheduleApiService.exportSchedule(
+      this.candidateDetails.items.map(candidate => candidate.id),
+      GetScheduleFilterByEmployees(this.scheduleFilters),
+    ).pipe(
+      take(1),
+      takeUntil(this.componentDestroy()),
+    ).subscribe((data: any) => {
+      data.sort((Emp1: { lastName: string; } , Emp2: { lastName: string; } ) => {
+        const nameA = Emp1.lastName.toLowerCase();
+        const nameB = Emp2.lastName.toLowerCase();
+      
+        if (nameA < nameB) {
+          return -1;
+        } else if (nameA > nameB) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+      const state = { redirectFromSchedule: true, data : data, dateRange : this.DateRange, scheduleFilters : this.scheduleFilters, activePeriod : this.activeTimePeriod};
+      this.router.navigate(['/schedule-export'], { state: state }).then(() => console.log("state transformed"));
+    }) ;
   }
 }
