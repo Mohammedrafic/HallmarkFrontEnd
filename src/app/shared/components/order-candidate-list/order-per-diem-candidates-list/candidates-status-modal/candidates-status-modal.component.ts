@@ -496,6 +496,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
                   this.onboardEmailTemplateForm.disableControls(true);
                   this.store.dispatch(new ShowGroupEmailSideDialog(true));
                 }
+                else{
+                  this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+                  this.closeDialog();
+                }
               });
         }else{
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
