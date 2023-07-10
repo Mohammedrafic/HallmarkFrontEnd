@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Inject, ChangeDetectorRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -6,6 +7,7 @@ import { Observable, Subject, takeWhile } from 'rxjs';
 import { AppSettings, APP_SETTINGS } from '../../../../../../app.settings';
 import { LogiReportComponent } from '../../../../../shared/components/logi-report/logi-report.component';
 import { LogiReportTypes } from '../../../../../shared/enums/logi-report-type.enum';
+import { AbstractPermissionGrid } from '../../../../../shared/helpers/permissions/abstract-permission-grid';
 import { LogiReportFileDetails } from '../../../../../shared/models/logi-report-file';
 import { User } from '../../../../../shared/models/user.model';
 import { disabledBodyOverflow, windowScrollTop } from '../../../../../shared/utils/styles.utils';
@@ -21,7 +23,7 @@ import { LogiCustomReportState } from '../../../store/state/logi-custom-report.s
   styleUrls: ['./custom-report-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CustomReportDialogComponent implements OnInit {
+export class CustomReportDialogComponent extends AbstractPermissionGrid implements OnInit {
   public user: User | null;
   @Input() selectedLog: LogiCustomReport;
   @Input() openDialogue: Subject<boolean>;
@@ -48,14 +50,16 @@ export class CustomReportDialogComponent implements OnInit {
   public saveCustomReport$: Observable<LogiCustomReport>;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
+    private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef,
     @Inject(APP_SETTINGS) private appSettings: AppSettings
   ) {
+    super(store);
     this.user = this.store.selectSnapshot(UserState.user);
    
   }
-  ngOnInit(): void {
+  override ngOnInit(): void {
 
     this.openDialogue.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (isOpen) {
@@ -101,7 +105,7 @@ export class CustomReportDialogComponent implements OnInit {
     this.reportFormGroup.markAllAsTouched();
     if (this.reportFormGroup.valid && this.reportFormGroup.errors == null) {
       const formValues = this.reportFormGroup.getRawValue();
-      var path = "/IRPReports/Hallmark/" + formValues.reportName + "";
+      var path = "/IRPReports/Hallmark/" + formValues.reportName.replace(/ /g, '_')+ this.datePipe.transform(Date.now(), 'MMddyyyy_HH_mm') as string + ".wls";
       const addLogiCustomReportRequestDto: AddLogiCustomReportRequest = {
         customReportName: formValues.reportName,
         isSystem: false,
@@ -120,6 +124,9 @@ export class CustomReportDialogComponent implements OnInit {
         catalog: "/CustomReport/CustomReport.cat"
       };
       this.logiReportComponent.SaveAsReport(options, "reportIframe");
+      this.isAddCustomReportSidebarShown = false;
+      this.sideDialog.hide();
+      this.openDialogue.next(false);
     }
   }
   public saveAsPopUp(): void {
