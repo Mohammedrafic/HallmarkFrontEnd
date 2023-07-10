@@ -3,7 +3,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Inject, C
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { AppSettings, APP_SETTINGS } from '../../../../../../app.settings';
 import { LogiReportComponent } from '../../../../../shared/components/logi-report/logi-report.component';
 import { LogiReportTypes } from '../../../../../shared/enums/logi-report-type.enum';
@@ -39,11 +39,9 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
     LocationsParam: '',
     DepartmentsParam: '',
   };
-  public catelogName: LogiReportFileDetails = { name: '/CustomReport/CustomReport.cat' };
-  public RegularReportName: string = '/CustomReport/FinanaceReport.wls';
-  public reportName: LogiReportFileDetails = {
-    name: this.RegularReportName,
-  };
+  public catelogName: LogiReportFileDetails;
+  public reportName: LogiReportFileDetails;
+  
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public reportFormGroup: FormGroup;
   public isAddCustomReportSidebarShown: boolean;
@@ -62,13 +60,18 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
   }
   override ngOnInit(): void {
 
-    this.openDialogue.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
+    this.openDialogue.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (isOpen) {
         windowScrollTop();
-        this.catelogName = { name: this.selectedLog?.catalogPath }
-        this.reportName = { name: this.selectedLog?.path }
-        this.SearchReport();
-        this.sideDialog.show();
+        if (this.selectedLog) {
+          this.sideDialog.show();
+          this.catelogName = { name: this.selectedLog?.catalogPath };
+          this.reportName = { name: this.selectedLog?.path };
+          this.logiReportComponent.catelogName = { name: this.selectedLog?.catalogPath };
+          this.logiReportComponent.reportName = { name: this.selectedLog?.path };
+          this.SearchReport();
+        }
+        
         disabledBodyOverflow(true);
       } else {
         this.sideDialog.hide();
