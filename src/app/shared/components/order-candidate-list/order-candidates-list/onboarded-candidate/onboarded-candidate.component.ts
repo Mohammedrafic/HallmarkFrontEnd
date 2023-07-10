@@ -429,6 +429,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                           this.onboardEmailTemplateForm.rteCreated();
                           this.onboardEmailTemplateForm.disableControls(true);
                           this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                        }else{
+                          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+                          this.closeDialog();
                         }
                       });
 
