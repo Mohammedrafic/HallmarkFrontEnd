@@ -103,7 +103,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   public allDepartments = false;
   public maxDepartmentsLength = 1000;
   public query: Query = new Query().take(this.maxDepartmentsLength);
-  public filterType: string = 'Contains';
+  public filterType = 'Contains';
   constructor(
     private store: Store,
     private actions$: Actions,
@@ -344,12 +344,13 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
       takeUntil(this.componentDestroy()),
       filter(([credentials, credentialTypes]) => credentials?.length > 0 && credentialTypes.length > 0)
     ).subscribe(([credentials, credentialTypes]) => {
+      this.selectedItems = [];
       this.updateGridColumns();
       this.lastAvailablePage = this.getLastPage(credentials);
       this.credentialSetupList = this.allCredentialSetupList = [];
 
       if (credentialTypes) {
-        credentials.map(item => {
+        credentials.forEach(item => {
           const foundCredentialType = credentialTypes.find(type => type.id === item.credentialTypeId);
           this.credentialSetupList.push(MapCredentialsAdapter.prepareCredentialGet(item, foundCredentialType));
         });
@@ -413,7 +414,6 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     }
     this.gridDataSource = this.getRowsPerPage(this.currentPage);
     this.totalDataRecords = this.credentialSetupList.length;
-
     credentialSetupMapping.credentials.forEach(savedMapping => {
       (this.gridDataSource as CredentialSetupGet[]).map((credential, index) => {
         if (credential.masterCredentialId === savedMapping.masterCredentialId) {
