@@ -128,7 +128,11 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
   }
 
   private checkForChanges(): void {
-    if (this.commitmentForm?.get('regions')?.dirty || this.commitmentForm?.get('locations')?.dirty) {
+    const isRequiredFieldModified = 
+      this.commitmentForm?.get('regions')?.dirty || 
+      this.commitmentForm?.get('locations')?.dirty || 
+      this.commitmentForm?.get('endDate')?.dirty;
+    if (this.isEdit && isRequiredFieldModified) {
       this.showOverridingConfirmation();
     } else {
       this.emitSaving();

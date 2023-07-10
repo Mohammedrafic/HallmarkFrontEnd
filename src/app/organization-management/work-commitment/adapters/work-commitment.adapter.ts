@@ -76,7 +76,7 @@ export class WorkCommitmentAdapter {
         workCommitmentId,
         workCommitmentOrgHierarchies,
         allLocationsSelected,
-        allRegionsSelected
+        allRegionsSelected,
       } = item;
       itemsForGrid.push({
         availabilityRequirement,
