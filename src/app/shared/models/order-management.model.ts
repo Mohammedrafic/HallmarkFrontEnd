@@ -503,6 +503,7 @@ export class Order {
   externalCommentsConfiguration?:boolean | null;
   activeCandidatesCount?: number;
   isLockedIRP?: boolean;
+  linkedId?: string;
 }
 
 export class ReOrder {
