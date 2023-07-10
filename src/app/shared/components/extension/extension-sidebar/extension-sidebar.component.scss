@@ -1,4 +1,4 @@
-@import "../../../../styles/variables/colors";
+@import 'colors';
 
 .extension {
   display: flex;
@@ -26,17 +26,9 @@
           column-gap: 12px;
         }
 
-        .extension-dates {
+        .row {
           display: flex;
           column-gap: 12px;
-
-          &__control {
-            width: 50%;
-          }
-        }
-
-        .bill-rate__control {
-          width: 50%;
         }
       }
     }
@@ -45,4 +37,8 @@
   &__comments {
     width: 40%;
   }
+}
+
+.form-line-item-50 {
+  width: 50%;
 }
