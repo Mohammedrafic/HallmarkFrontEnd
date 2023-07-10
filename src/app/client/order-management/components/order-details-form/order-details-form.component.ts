@@ -305,17 +305,17 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
   }
   public getVMSOrderRequisition() {
-    this.reasons = [];
     this.reasons$
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(data => {
+        this.reasons = [];
         data.items.forEach(item => {
           if (item.includeInVMS === true) {
             this.reasons.push({
               id: item.id,
               reason: item.reason,
               businessUnitId: item.businessUnitId,
-              isAutoPopulate: item.isAutoPopulate
+              isAutoPopulate: item.isAutoPopulate,
             });
           }
           if (item.isAutoPopulate === true) {
