@@ -137,7 +137,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() public agencyActionsAllowed: boolean;
   @Input() public userPermission: Permission;
   @Input() public isIRP: boolean;
-
+  @Input() public redirectedFromDashboard: boolean;
+ 
   @Input()
   public set tab(tabIndex: number) {
     if (!isNil(tabIndex)) {
@@ -177,7 +178,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private isAlive = true;
   private activeTab: number;
   private scrollSubscription: Subscription;
-
+  private redirectfromDashboard : boolean
   constructor(
     private store: Store,
     private router: Router,
@@ -427,6 +428,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private getFilterValues(): CandidateListRequest {
+    if (this.redirectfromDashboard) {
+      this.CandidateFilterFormGroup.reset();
+    }
     const filter: CandidateListRequest = {
       profileStatuses: this.filters.profileStatuses!,
       skillsIds: this.filters.skillsIds!,
@@ -565,7 +569,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         if (this.credType != null) {
           this.filters.credType = [this.credType];
         }
-
+        if (this.redirectedFromDashboard != null) {
+          this.redirectfromDashboard = this.redirectedFromDashboard;
+        }
         if (tableState) {
           this.includeDeployedCandidates = tableState.includeDeployedCandidates;
           this.includeDeployedCandidates$.next(tableState.includeDeployedCandidates);
