@@ -836,10 +836,10 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   setShiftsValidation(): void {
     this.shiftStartTimeField.addValidators([
-      Validators.required
+      Validators.required,
     ]);
     this.shiftEndTimeField.addValidators([
-      Validators.required
+      Validators.required,
     ]);
   }
 
@@ -863,7 +863,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
             OrganizationalHierarchy.Department,
             id,
             this.selectedOrganizationId
-          )
+          );
         }),
         takeUntil(this.destroy$)
       ).subscribe(({ TieringLogic }) => {

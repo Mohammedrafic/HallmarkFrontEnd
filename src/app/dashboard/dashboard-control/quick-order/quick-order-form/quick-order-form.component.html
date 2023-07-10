@@ -189,7 +189,7 @@
 
             <!-- Skill -->
             <div
-              class="input-container bootstrap form-line-item-50"
+              class="input-container bootstrap {{quickOrderConditions.isOpenPerDiem ? 'form-line-item-30' :'form-line-item-50'}}"
               *ngIf="organizationSkills$ | async as skillsDataSource"
             >
               <label>Skill<span class="required">*</span></label>
@@ -205,6 +205,20 @@
                   (close)="closeDropdown()"
                 >
                 </ejs-dropdownlist>
+              </div>
+            </div>
+
+            <!-- Linked ID -->
+            <div *ngIf="quickOrderConditions.isOpenPerDiem" class="input-container bootstrap form-line-item-20">
+              <label>Linked ID</label>
+              <div class="input-group">
+                <input
+                  class="e-input"
+                  formControlName="linkedId"
+                  maxlength="20"
+                  appValidateWithMessage
+                  type="text"
+                />
               </div>
             </div>
           </div>
@@ -430,8 +444,7 @@
 
           <!-- Shift Start Time -->
           <div
-            [ngClass]="quickOrderConditions.isPermPlacementOrder ? 'form-line-item-20' : 'form-line-item-17'"
-            class="input-container calendar"
+            class="input-container calendar form-line-item-17"
           >
             <label for="startTime"
               >Shift Start Time<span class="required" *ngIf="quickOrderConditions.isShiftTimeRequired">*</span></label
@@ -452,8 +465,7 @@
 
           <!-- Shift End Time -->
           <div
-            [ngClass]="quickOrderConditions.isPermPlacementOrder ? 'form-line-item-20' : 'form-line-item-17'"
-            class="input-container calendar"
+            class="input-container calendar form-line-item-17"
           >
             <label for="startTime"
               >Shift End Time<span class="required" *ngIf="quickOrderConditions.isShiftTimeRequired">*</span></label
@@ -469,6 +481,23 @@
                 maskPlaceholder="HH:MM"
               >
               </ejs-timepicker>
+            </div>
+          </div>
+
+          <!-- Linked ID -->
+          <div 
+            *ngIf="!quickOrderConditions.isOpenPerDiem"
+            class="input-container bootstrap form-line-item-17"
+          >
+            <label>Linked ID</label>
+            <div class="input-group">
+              <input
+                class="e-input"
+                formControlName="linkedId"
+                maxlength="20"
+                appValidateWithMessage
+                type="text"
+              />
             </div>
           </div>
         </div>
