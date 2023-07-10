@@ -222,7 +222,9 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
     this.gridApi.setRowData(this.itemList);
   }
 
-
+  public refreshParentComponent() {
+    this.dispatchNewPage({ currentPage: this.currentPage, pageSize: this.pageSize });
+  }
   public dispatchNewPage(postData: any): void {
    
     if (localStorage.getItem('lastSelectedOrganizationId') === null) {

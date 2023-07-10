@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Inject, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -29,6 +29,7 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
   @Input() openDialogue: Subject<boolean>;
   @ViewChild('customReportSideDialog') sideDialog: DialogComponent;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
+  @Output() refreshParent: EventEmitter<any> = new EventEmitter<any>();
   private isAlive = true;
   private unsubscribe$: Subject<void> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -64,8 +65,8 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
     this.openDialogue.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (isOpen) {
         windowScrollTop();
-        this.catelogName = { name: this.selectedLog.catalogPath }
-        this.reportName = { name: this.selectedLog.path }
+        this.catelogName = { name: this.selectedLog?.catalogPath }
+        this.reportName = { name: this.selectedLog?.path }
         this.SearchReport();
         this.sideDialog.show();
         disabledBodyOverflow(true);
@@ -127,6 +128,7 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
       this.isAddCustomReportSidebarShown = false;
       this.sideDialog.hide();
       this.openDialogue.next(false);
+      this.refreshParent.emit();
     }
   }
   public saveAsPopUp(): void {
