@@ -10,8 +10,9 @@ import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
+import { AppState } from 'src/app/store/app.state';
 import {
-  MealBreakeName, RecordAddDialogConfig, TimeInName, TimeOutName, TimesheetConfirmMessages,
+  MealBreakeName, GetRecordAddDialogConfig, TimeInName, TimeOutName, TimesheetConfirmMessages,
 } from '../../constants';
 import { RecordFields } from '../../enums';
 import { RecordsAdapter } from '../../helpers';
@@ -34,7 +35,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   @Input() public container: HTMLElement | null = null;
 
-  public dialogConfig: DialogConfig = JSON.parse(JSON.stringify(RecordAddDialogConfig));
+  public dialogConfig: DialogConfig = GetRecordAddDialogConfig(false);
 
   public formType: RecordFields = RecordFields.Time;
 
@@ -44,6 +45,9 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   @Select(TimesheetsState.addDialogOpen)
   public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   ngOnInit(): void {
     this.getDialogState();
@@ -113,7 +117,8 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     .pipe(
       filter((value) => value.state),
       tap((value) => {
-        this.dialogConfig = JSON.parse(JSON.stringify(RecordAddDialogConfig));
+        const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
+        this.dialogConfig = GetRecordAddDialogConfig(isMobile);
 
         if (this.form) {
           this.form = null;

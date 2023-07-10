@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { LogiCustomReportPage } from "../store/model/logi-custom-report.model";
+import { AddLogiCustomReportRequest, LogiCustomReport, LogiCustomReportPage } from "../store/model/logi-custom-report.model";
 
 @Injectable({
   providedIn: 'root'
@@ -27,5 +27,17 @@ export class LogiCustomReportService {
     return this.http.post<LogiCustomReportPage>(`/api/Reporting/getCustomReportsList`, { OrganizationId, PageNumber, PageSize });
   }
 
+  /**
+ * Save Template By AlertId
+ * @param AddAlertsTemplateRequest
+ *
+ * @return EditAlertsTemplate
+ */
+  public createCustomReport(
+    AddLogiCustomRequest: AddLogiCustomReportRequest
+  ): Observable<LogiCustomReport> {
+    return this.http.post<LogiCustomReport>(`/api/Reporting/CreateCustomReport`, AddLogiCustomRequest);
+
+  }
 
 }

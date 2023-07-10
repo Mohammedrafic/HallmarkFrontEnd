@@ -13,19 +13,7 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title">Export</h3>
           </div>
-          <div class="e-card-content">
-            <button ejs-button
-                    cssClass="e-outline button-cancel"
-                    (click)="onCancel()">
-              Cancel
-            </button>
-            <button ejs-button
-                    type="submit"
-                    [isPrimary]="true"
-                    (click)="onExport()">
-              Export
-            </button>
-          </div>
+          <ng-container [ngTemplateOutlet]="actionButtons" *ngIf="!(isMobile$ | async)"></ng-container>
         </div>
       </section>
     </section>
@@ -55,5 +43,28 @@
       </div>
     </section>
   </ng-template>
-  <ng-template #footerTemplate></ng-template>
+  <ng-template #footerTemplate>
+    <section class="footer">
+      <ng-container [ngTemplateOutlet]="actionButtons" *ngIf="(isMobile$ | async)"></ng-container>
+    </section>
+  </ng-template>
 </ejs-dialog>
+
+<ng-template #actionButtons>
+  <div class="e-card-content">
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      cssClass="e-outline button-cancel action-btn"
+      (click)="onCancel()"
+    >Cancel</button>
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      type="submit"
+      cssClass="action-btn"
+      [isPrimary]="true"
+      (click)="onExport()"
+    >Export</button>
+  </div>
+</ng-template>

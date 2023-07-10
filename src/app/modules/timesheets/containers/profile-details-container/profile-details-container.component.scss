@@ -87,7 +87,11 @@ $chip-margin: 8px;
   }
 
   .menu-mobile {
-    margin-left: 12px;
+    margin: -2px 0 0 12px;
+    border: 1px solid $primary-active-blue-40;
+    border-radius: 8px;
+    width: 40px;
+    padding-top: 3px;
   }
 
   .e-chip-list:not(.e-chip) {
@@ -303,6 +307,14 @@ app-navigation-panel {
     .controls-wrapper{
       width: 100%;
       justify-content: space-between;
+    }
+  }
+  
+  .profile-details {
+    .menu-mobile {
+      margin: 0 0 0 12px;
+      border: none;
+      padding-top: 6px;
     }
   }
 }
