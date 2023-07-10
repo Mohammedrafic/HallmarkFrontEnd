@@ -49,20 +49,18 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
   public readonly placeholderInput = PLACEHOLDER;
   public readonly zipCodeMask = ZIP_CODE_MASK;
   public readonly holderPhoneMask = PHONE_MASK;
-  public isControlDisabled: boolean;
+  public isControlDisabled: boolean = true;
   constructor(private formBuilder: FormBuilder, private changeDetectorRef: ChangeDetectorRef, private store: Store) {
     super();
-
   }
 
-  public ngOnInit(): void { 
+  public ngOnInit(): void {
     this.createPaymentDetailsForm();
     this.onCountryChange('bankCountry');
     this.onCountryChange('accountHolderCountry');
     this.subscribeOnSaveEvent();
     this.setFormValue();
-    this.isControlDisabled = ((this.paymentDetailsForm?.get('netSuiteId')?.value !== '' && this.paymentDetailsForm?.get('Id')?.value !== 0) || (this.paymentDetailsForm?.get('netSuiteId')?.value === '' && this.paymentDetailsForm?.get('Id')?.value === 0) );
-  }
+   }
 
   public createPaymentDetailsForm(): void {
     this.paymentDetailsForm = this.formBuilder.group(
@@ -94,7 +92,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
       },
       {
         validators: startDateDuplicationValidator('startDate', this.paymentsList, this.formValue?.startDate, this.mode),
-      }, 
+      },
     );
   }
 
@@ -129,6 +127,12 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
   private setFormValue(): void {
     if (this.formValue) {
       this.paymentDetailsForm.patchValue({ ...this.formValue });
+      if (this.formValue?.id) {
+        if (this.paymentDetailsForm?.get("netSuiteId")?.value) {
+          this.isControlDisabled = true;
+        } else
+          this.isControlDisabled = false;
+      } 
     }
   }
 }
