@@ -83,6 +83,10 @@
           <div class="title">{{ orderInformation.minYrsRequired }}</div>
           <div class="sup-title">Exp. Req.</div>
         </div>
+        <div class="column">
+          <div class="title">{{ orderInformation.linkedId ?? '-' }}</div>
+          <div class="sup-title">Linked ID</div>
+        </div>
       </ng-container>
     </div>
   </section>
@@ -164,6 +168,10 @@
       <div class="column" *ngIf="orderInformation.minYrsRequired">
         <div class="title">{{ orderInformation.minYrsRequired }}</div>
         <div class="sup-title">Exp. Req.</div>
+      </div>
+      <div class="column">
+        <div class="title">{{ orderInformation.linkedId ?? '-' }}</div>
+        <div class="sup-title">Linked ID</div>
       </div>
     </div>
   </section>
