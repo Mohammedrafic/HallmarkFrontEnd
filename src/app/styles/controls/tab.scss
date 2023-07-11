@@ -18,6 +18,11 @@ body.dark {
         }
 
         &.e-active {
+          .e-tab-wrap,
+          .e-text-wrap {
+            height: 36px;
+          }
+
           .e-tab-text {
             font-weight: 700;
             color: $black;
@@ -34,6 +39,12 @@ body.dark {
             color: $primary-active-blue-10;
           }
         }
+
+        .e-tab-wrap,
+        .e-text-wrap {
+          height: 36px;
+        }
+
         .e-tab-text {
           display: flex;
           align-items: center;
