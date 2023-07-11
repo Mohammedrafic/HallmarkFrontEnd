@@ -149,6 +149,8 @@ export class AccumulationChartComponent
       } else {
         this.dashboardService.redirectToUrl('client/order-management', undefined, status);
       }
+    }else if(this.chartData?.title == "Candidates for Active Positions"){
+
     }
 
   }
