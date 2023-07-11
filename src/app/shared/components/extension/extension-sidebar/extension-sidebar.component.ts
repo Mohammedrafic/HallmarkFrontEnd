@@ -160,7 +160,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       endDate: ['', [Validators.required]],
       billRate: [candidateBillRate, [Validators.required]],
       comments: [null],
-      linkedId: [null],
+      linkedId: [null],//TODO provide order value after BE implementation
     });
   }
 
