@@ -861,4 +861,8 @@ export class OnboardCandidateEmail {
   stream ?: Blob | null;
   extension ?: string;
   documentName ?: string;
+  orderId ?: number;
+  candidateId ?: number;
+  businessUnitId ?: number;
+
 }
