@@ -25,5 +25,5 @@ export enum WidgetDescriptionEnum {
   ALREADY_EXPIRED_CREDS = 'Already Expired Credentials',
   UPCOMING_EXP_CREDS = 'Upcoming Expiring Credentials',
   AVAILABLE_EMPLOYEE='Available Employees in next 24 hrs.',
-  CANDIDATES_ACTIVE_POSITIONS="Candidates for Active Positions.",
+  CANDIDATES_ACTIVE_POSITIONS="Count of Candidate statuses in Active Orders/Positions.",
 }

@@ -424,6 +424,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private isRedirectedFromDashboard: boolean;
   private orderStaus: number;
+  private xtraOrderStatus: number;
   private numberArr: number[] = [];
 
   private previousSelectedSystemId: OrderManagementIRPSystemId | null;
@@ -446,6 +447,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private alertTitle: string;
   private orderManagementPagerState: OrderManagementPagerState | null;
   private orderPositionStatus: string | null;
+  private orderPositionXtraStatus: string | null;
   private organizationId: number;
   public isCondidateTab: boolean = false;
   public OrderJourney: any[] = [];
@@ -501,10 +503,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
     this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
     this.orderStaus = routerState?.['orderStatus'] || 0;
+    this.xtraOrderStatus= routerState?.['xtraOrderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
     this.prefix = routerState?.['prefix'];
     this.orderPositionStatus = routerState?.['status'];
+    this.orderPositionXtraStatus = routerState?.['xtraStatus'];
     (routerState?.['status'] == "In Progress (Pending)" || routerState?.['status'] == "In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] == "In Progress" ? this.SelectedStatus.push("InProgress") : routerState?.['status'] ? this.SelectedStatus.push(routerState?.['status']) : "";
     this.candidateStatusId = routerState?.['candidateStatusId'] || 0;
     routerState?.['candidateStatus'] != undefined && routerState?.['candidateStatus'] != '' ? this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']) : "";
@@ -2144,6 +2148,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const filters = {} as OrderFilter;
 
     this.orderStaus > 0 ? this.numberArr.push(this.orderStaus) : [];
+    this.xtraOrderStatus > 0 ? this.numberArr.push(this.xtraOrderStatus) : [];
     filters.orderStatuses = this.numberArr;
     this.candidateStatusId > 0 ? this.candidateStatusIds.push(this.candidateStatusId) : [];
     filters.candidateStatuses = this.candidateStatusIds;
@@ -2151,6 +2156,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
       : [];
 
+      if(this.orderPositionXtraStatus){
+        this.orderPositionXtraStatus = this.orderPositionXtraStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')
+        filters.orderStatuses.push(this.orderPositionXtraStatus);
+        this.SelectedStatus.push(this.orderPositionXtraStatus)
+      }
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
     const items = JSON.parse(dashboardFilterState) as FilteredItem[] || [];
     let pendingApprovalOrders = this.globalWindow.localStorage.getItem('pendingApprovalOrders') || 'null';
@@ -2172,6 +2182,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
 
     this.orderPositionStatus = null;
+    this.orderPositionXtraStatus = null;
     this.isRedirectedFromDashboard = false;
 
     return filters;

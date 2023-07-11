@@ -27,6 +27,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CANDIDATE_STATUS, DASHBOARD_FILTER_STATE } from '@shared/constants';
 import { AlertService } from '@shared/services/alert.service';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
+import { OrderStatus } from '@shared/enums/order-management';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -150,7 +151,16 @@ export class AccumulationChartComponent
         this.dashboardService.redirectToUrl('client/order-management', undefined, status);
       }
     }else if(this.chartData?.title == "Candidates for Active Positions"){
-
+        let dataset:any = [];
+        this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
+          dataset = data;
+        });        
+        let chartInfo = dataset.find((ele:any)=>ele.status == status);
+        if(chartInfo.applicantStatus === OrderStatus.Onboard){
+          this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.applicantStatus,chartInfo.status, OrderStatus.Filled,'Filled');
+        }else{
+          this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.applicantStatus,chartInfo.status);
+        }
     }
 
   }
