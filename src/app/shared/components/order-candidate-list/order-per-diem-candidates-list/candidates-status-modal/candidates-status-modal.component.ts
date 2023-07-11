@@ -176,6 +176,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       emailBody: new FormControl('', [Validators.required]),
       fileUpload: new FormControl(null),
       emailTo: new FormControl('', [Validators.required]),
+      orderId: new FormControl('', [Validators.required]),
+      candidateId  : new FormControl('', [Validators.required]),
+      businessUnitId: new FormControl('', [Validators.required]),
     });
   }
 
@@ -357,7 +360,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       this.isSend =  true;
       this.emailTo = this.orderCandidateJob?.candidateProfile.email; 
       this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.orderCandidateJob?.candidateProfile.email);
-      
+      this.sendOnboardMessageEmailFormGroup.get('orderId')?.setValue(this.orderCandidateJob?.orderId);
+      this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.orderCandidateJob?.candidateProfileId);
+      this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.orderCandidateJob?.organizationId);
+            
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -528,6 +534,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             stream : emailvalue.fileUpload,
             extension : emailvalue.fileUpload?.type,
             documentName : emailvalue.fileUpload?.name,
+            orderId : emailvalue.orderId,
+            candidateId : emailvalue.candidateId,
+            businessUnitId : emailvalue.businessUnitId,
           })
         )
         .subscribe(() => {
