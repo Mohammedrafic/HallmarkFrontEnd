@@ -46,6 +46,7 @@ import { DetectActiveSystem, SystemGroupConfig } from '@client/order-management/
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { GetOrganizationById } from '@admin/store/alerts.actions';
 import { Organization } from '@shared/models/organization.model';
+import { isNumber } from 'lodash';
 
 @Component({
   selector: 'app-user-subscription',
@@ -327,7 +328,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       }
     });
     this.userData$.pipe(filter(x => x !== null && x !== undefined), takeWhile(() => this.isAlive)).subscribe((data) => {
-      console.log('userData', data)
       this.userData = data.items;
       let userValue = data.items[0]?.id;
       if (userValue != this.userData.find(x => x.id == user?.id)?.id) {
@@ -366,17 +366,32 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     });
   }
   private onBusinessUnitValueChanged(): void {
+    const userBusinessType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    let userBusinessId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+    let userId = this.store.selectSnapshot(UserState.user)?.id as string; 
     this.businessUnitControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
-      console.log('businessUnitControl', value)
       this.userData = [];
-      const userBusinessType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
-      if(userBusinessType == BusinessUnitType.Organization)
+      if(userBusinessType == BusinessUnitType.Organization){
         this.usersControl.disable();
-
+      }
+      if(value ==BusinessUnitType.Organization){
+        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+          if (data != undefined) {
+            this.userData = data.items;
+            if(userBusinessType == BusinessUnitType.Organization){
+              this.businessControl.patchValue(userBusinessId, {emitEvent:false});
+              this.usersControl.patchValue(userId);
+            }
+          }
+        });
+      }
+       
       if(value == BusinessUnitType.Candidates){
+        this.usersControl.reset();
+        this.businessControl.patchValue(userBusinessId);
         this.store.dispatch(new GetBusinessForEmployeeType());
         if(userBusinessType == BusinessUnitType.Organization)
-          this.usersControl.enable();
+        this.usersControl.enable();
       } else {
         this.store.dispatch(new GetBusinessByUnitType(value));
       }
@@ -386,7 +401,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     });
   }
   private onBusinessValueChanged(): void {
-    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+    this.businessControl.valueChanges.pipe( distinctUntilChanged(),takeWhile(() => this.isAlive)).subscribe((value) => {
       this.userData = [];
       let businessUnitIds = [];
       if (value != 0 && value != null) {
@@ -399,19 +414,22 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         if(userBusinessId !=null && userBusinessId !=undefined)
           value = userBusinessId;
         }
-        this.store.dispatch(new GetEmployeeUsers(value));
-        this.employeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-          if (data != undefined) {
-            this.userData = data;
-            let userValue = data[0]?.id;
-            if(userBusinessType == BusinessUnitType.Organization)
-              this.businessControl.patchValue(userBusinessId, {emitEvent:false});
-          }
-        });
+        if(isNumber(value)){
+          this.store.dispatch(new GetEmployeeUsers(value));
+          this.employeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+            if (data != undefined) {
+              this.userData = data;
+              let userValue = data[0]?.id;
+              if(userBusinessType == BusinessUnitType.Organization)
+                this.businessControl.patchValue(userBusinessId, {emitEvent:false});
+            }
+          });
+        }
+       
       } else if(this.businessUnitControl?.value == BusinessUnitType.Organization
           && userBusinessType == BusinessUnitType.Hallmark
           && this.activeSystem == OrderManagementIRPSystemId.IRP) {
-            if(value){
+            if(isNumber(value)){
               this.store.dispatch(new GetNonEmployeeUsers(value));
               this.nonEmployeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
                 if (data != undefined) {
@@ -429,7 +447,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   private onUserValueChanged(): void {
     this.usersControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       this.dispatchNewPage(value);
-      console.log('onUserValueChanged');
     });
   }
   createServerSideDatasource() {
@@ -545,6 +562,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       this.businessUnitControl.disable();
     }
     this.businessControl.patchValue([]);
+    this.filteredBusinessUnits=[];
     this.filteredBusinessUnits = this.businessUnits;
     if(this.activeSystem == OrderManagementIRPSystemId.IRP){
       if(user?.businessUnitType == BusinessUnitType.Hallmark){
