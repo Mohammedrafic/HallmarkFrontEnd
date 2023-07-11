@@ -13,6 +13,7 @@
               (select)="exportSelected($event)"
               id="exportButton"
               cssClass="e-outline button-export"
+              [disabled]="!canViewCandidateAssignment"
             > 
               <div class="button-export-container">
                 Export <i-feather name="upload" class="icon"></i-feather>
