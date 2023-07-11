@@ -9,6 +9,7 @@ export class Comment {
   new?: boolean;
   isRead?: boolean;
   isPrivate? : boolean;
-  isIRP?:boolean
+  isIRP?:boolean;
+  candidateJobId?:number;
 }
   

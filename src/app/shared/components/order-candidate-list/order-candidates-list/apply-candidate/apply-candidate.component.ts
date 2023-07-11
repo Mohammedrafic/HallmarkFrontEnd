@@ -22,6 +22,7 @@ import { DateTimeHelper } from '@core/helpers';
 import { MessageTypes } from '../../../../enums/message-types';
 import { ShowToast } from '../../../../../store/app.actions';
 import { CommonHelper } from '@shared/helpers/common.helper';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -36,7 +37,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
-  @Input() billRatesData: BillRate[] = [];
   @Input() order: any;
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
@@ -56,6 +56,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public canApplyCandidate = true;
   public applyRestrictionMessage = REQUIRED_PERMISSIONS;
   public candidateSSNRequired: boolean;
+  public billRatesData: BillRate[] = [];
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
@@ -72,6 +73,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
+  public canCreateOrder : boolean;
 
   get candidateStatus(): ApplicantStatus {
     return this.candidate.status || (this.candidate.candidateStatus as any);
@@ -94,6 +96,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private commentsService: CommentsService,
     private changeDetectorRef: ChangeDetectorRef,
     private confirmService: ConfirmService,
+    private permissionService : PermissionService
   ) {}
 
   ngOnChanges(): void {
@@ -102,6 +105,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.today.setHours(0);
     this.today.setMinutes(0);
     this.createForm();
@@ -160,12 +164,12 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
             const value = this.formGroup.getRawValue();
             let availableStartDate = value.availableStartDate;
             if (value.availableStartDate && value.availableStartDate.setHours) {
-              availableStartDate = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(value.availableStartDate));
+              availableStartDate = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(value.availableStartDate));
             }
             if (typeof value.availableStartDate === 'string') {
               const date = new Date(value.availableStartDate);
               date.setHours(0, 0, 0, 0);
-              availableStartDate = DateTimeHelper.toUtcFormat(date);
+              availableStartDate = DateTimeHelper.setUtcTimeZone(date);
             }
             this.store
               .dispatch(
@@ -252,6 +256,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
       this.changeDetectorRef.markForCheck();
     });
+
     this.orderApplicantsInitialData$
       .pipe(
         filter((data) => !!data),
@@ -271,6 +276,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
             }
           }
         this.orderApplicantsInitialData = data;
+        this.billRatesData = data.billRates;
         this.candidateSSNRequired = data.candidateSSNRequired;
         this.organizationId = data.organizationId;
         this.candidateId = data.candidateId;
@@ -280,5 +286,11 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         this.setFormValue(data);
         this.changeDetectorRef.detectChanges();
       });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

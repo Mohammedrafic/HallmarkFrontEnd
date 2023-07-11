@@ -62,14 +62,14 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   }
 
   private setData(params: ICellRendererParams): void {
-    this.dateValue = params.value && new Date(DateTimeHelper.convertDateToUtc(params.value));
+    this.dateValue = params.value && new Date(DateTimeHelper.setCurrentTimeZone(params.value));
     this.value = params.value;
 
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
     this.type = (params.colDef as ColDef).cellRendererParams.type;
     this.fieldVisible = !params.data.disableTime;
-    
-    this.setdateBoundsForDay(DateTimeHelper.convertDateToUtc(params.value).toISOString());
+
+    this.setdateBoundsForDay(DateTimeHelper.setCurrentTimeZone(params.value).toISOString());
     this.setFormControl(params);
   }
 
@@ -99,7 +99,7 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   private calculateDateValue(date: string): string | null {
     const today = new Date().toISOString();
     const splitStartDate = (this.value || today).split('T')[0];
-    const dateStr = date && DateTimeHelper.toUtcFormat(date as string);
+    const dateStr = date && DateTimeHelper.setUtcTimeZone(date as string);
     const splitValue = (dateStr as string)?.split('T')[1];
 
     return dateStr && splitStartDate ? `${splitStartDate}T${splitValue}` : null;

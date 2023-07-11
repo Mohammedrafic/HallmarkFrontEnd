@@ -10,7 +10,7 @@
         (change)="onSwitcher($event);"
         [checked]="true"
       ></ejs-switch>
-      <label for="switcher" class="switch-text">Include Deployed Employees</label>
+      <label for="switcher" class="switch-text">Include Deployed Candidates</label>
       <button
         ejs-dropdownbutton
         appHideBeforeSyncfusionLoad
@@ -58,7 +58,7 @@
           ejs-button
           appHideBeforeSyncfusionLoad
           id="addIRPCandidate"
-          cssClass="e-primary"
+          cssClass="e-primary" class="noResponsive"
           [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
           (click)="addIRPCandidate()"
         >
@@ -88,6 +88,7 @@
     [credStartDate] = "credStartDate"
     [credEndDate] = "credEndDate"
     [credType] = "credType"
+    [redirectedFromDashboard] = "redirectedFromDashboard"
     [isMobileScreen] = "isMobile"
   ></app-candidate-list>
 </section>

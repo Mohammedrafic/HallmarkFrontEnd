@@ -86,7 +86,7 @@ export class RemoveEducationSucceeded {
 
 export class UploadCandidatePhoto {
   static readonly type = '[candidate] Upload Candidate Photo';
-  constructor(public file: Blob, public candidateProfileId: number) {}
+  constructor(public file: Blob, public candidateProfileId: number, public isInitialUpload: boolean) {}
 }
 
 export class GetCandidatePhoto {

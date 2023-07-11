@@ -345,17 +345,17 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   public getVMSOrderRequisition() {
-    this.reasons = [];
     this.reasons$
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
+        this.reasons = [];
         data.items.forEach(item => {
           if (item.includeInVMS === true) {
             this.reasons.push({
               id: item.id,
               reason: item.reason,
               businessUnitId: item.businessUnitId,
-              isAutoPopulate: item.isAutoPopulate
+              isAutoPopulate: item.isAutoPopulate,
             });
           }
           if (item.isAutoPopulate === true) {
@@ -570,8 +570,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     organizationId?: number
   ): void {
     if (this.quickOrderConditions.isTravelerOrder || this.quickOrderConditions.isContactToPermOrder) {
-      const startDate = DateTimeHelper.toUtcFormat(jobStartDate);
-      const endDate = DateTimeHelper.toUtcFormat(jobEndDate);
+      const startDate = DateTimeHelper.setUtcTimeZone(jobStartDate);
+      const endDate = DateTimeHelper.setUtcTimeZone(jobEndDate);
       this.orderManagementService
         .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate, organizationId)
         .pipe(take(1))
@@ -748,7 +748,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         new Date(DateTimeHelper.formatDateUTC(this.selectedDepartment.reactivateDate, 'MM/dd/yyyy')) : null;
         locationInactiveDate && locationInactiveDate.setHours(0, 0, 0, 0);
         departmentInactiveDate && departmentInactiveDate.setHours(0, 0, 0, 0);
-        const isLocationOverlaps = IsStartEndDateOverlapWithInactivePeriod(locationInactiveDate, locationReactivateDate, jobStartDate, jobEndDate); 
+        const isLocationOverlaps = IsStartEndDateOverlapWithInactivePeriod(locationInactiveDate, locationReactivateDate, jobStartDate, jobEndDate);
         const isDepartmentOverlaps = IsStartEndDateOverlapWithInactivePeriod(departmentInactiveDate, departmentReactivateDate, jobStartDate, jobEndDate);
       const isLocationDepartmentDateSame = this.selectedLocation.inactiveDate === this.selectedDepartment.inactiveDate;
       if (isLocationOverlaps || isDepartmentOverlaps) {

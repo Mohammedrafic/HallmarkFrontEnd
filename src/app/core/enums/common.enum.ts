@@ -59,3 +59,7 @@ export enum CommentsFilter {
   External = 'External',
   Private = 'Private',
 }
+
+export enum charLength {
+  SideMenuTooltipSize = 15
+} 

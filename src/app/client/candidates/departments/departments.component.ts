@@ -314,8 +314,8 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private setDateRanges(employeeWorkCommitment: CandidateWorkCommitmentShort): void {
     const { startDate, endDate } = employeeWorkCommitment;
 
-    this.dateRanges.max = endDate ? DateTimeHelper.convertDateToUtc(endDate) : undefined;
-    this.dateRanges.min = startDate ? DateTimeHelper.convertDateToUtc(startDate) : undefined;
+    this.dateRanges.max = endDate ? DateTimeHelper.setCurrentTimeZone(endDate) : undefined;
+    this.dateRanges.min = startDate ? DateTimeHelper.setCurrentTimeZone(startDate) : undefined;
     this.cdr.markForCheck();
   }
 
@@ -327,18 +327,26 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private setBulkDateRanges(selectedRows: RowNode[]): void {
     const startDates: string[] = [];
     const endDates: string[] = [];
+    const employeeWorkCommitmentIds: number[] = [];
+    const activeEmployeeWorkCommitmentId = this.departmentsService.employeeWorkCommitmentId;
 
     selectedRows.forEach((item) => {
-      startDates.push(item.data.startDate);
-      endDates.push(item.data.endDate);
+      const { workCommitmentStartDate, workCommitmentEndDate, employeeWorkCommitmentId } = item.data;
+
+      if (workCommitmentStartDate) {
+        startDates.push(workCommitmentStartDate);
+      }
+      if (workCommitmentEndDate) {
+        endDates.push(workCommitmentEndDate);
+      }
+      if (employeeWorkCommitmentId) {
+        employeeWorkCommitmentIds.push(employeeWorkCommitmentId);
+      }
     });
 
-    if (allAreEqual(startDates) && allAreEqual(endDates)) {
-      const startDate = new Date(startDates[0]);
-      const wcStartDate = this.dateRanges.min ?? startDate;
-      const min = wcStartDate < startDate ? wcStartDate : startDate;
-      const max = endDates[0] ? new Date(endDates[0]) : undefined;
-      
+    if (allAreEqual(employeeWorkCommitmentIds) && employeeWorkCommitmentIds[0] !== activeEmployeeWorkCommitmentId) {
+      const min = startDates[0] ? DateTimeHelper.setCurrentTimeZone(startDates[0]) : undefined;
+      const max = endDates[0] ? DateTimeHelper.setCurrentTimeZone(endDates[0]) : undefined;
       this.bulkDateRanges = { min, max };
     } else {
       this.bulkDateRanges = this.dateRanges;

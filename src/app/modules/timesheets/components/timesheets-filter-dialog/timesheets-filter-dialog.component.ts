@@ -45,8 +45,6 @@ export class TimesheetsFilterDialogComponent
 
   private activeTab$: Subject<void> = new Subject();
 
-  public targetElement: HTMLElement | null = null;
-
   ngOnInit(): void {
     this.initFormGroup();
     this.initFiltersColumns(TimesheetsState.timesheetsFiltersColumns);
@@ -55,7 +53,6 @@ export class TimesheetsFilterDialogComponent
     this.subscribeOnUserSearch();
     this.watchForPreservedFilters();
     this.watchForSwitchTabs();
-    this.getFilterTargetElement();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -100,8 +97,8 @@ export class TimesheetsFilterDialogComponent
         takeUntil(this.componentDestroy())
       )
       .subscribe(({ state }) => {
-        let timeSheetMissing = JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string
-        let orgpendingwidget = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
+        const timeSheetMissing = JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string;
+        const orgpendingwidget = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
         this.applyPreservedFilters(state);
         if(timeSheetMissing != '' || orgpendingwidget != ''){
           this.clearAllFilters();
@@ -130,22 +127,13 @@ export class TimesheetsFilterDialogComponent
   }
 
   private applyPreservedFilters(filters: TimesheetsFilterState): void {
+    if (filters.orderIds) {
+      filters.orderIds = filters.orderIds[0];
+    }
     this.patchFilterForm({ ...filters });
     const contactEmails = Array.isArray(filters?.contactEmails) ? filters.contactEmails[0] : null;
     this.getPreservedContactPerson(contactEmails);
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
-  }
-
-  private getFilterTargetElement(): void {
-    this.targetElement$
-      .pipe(
-        filter((el) => !!el),
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe((el: HTMLElement | null) => {
-        this.targetElement = el;
-        this.cdr.detectChanges();
-      });
   }
 }

@@ -459,6 +459,16 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/hours-by-department',
     },
+    99: {
+      // staff availability Report
+      icon: '',
+      route: '/analytics/staff-availability',
+    },
+    100: {
+      // custom-report
+      icon: 'trending-up',
+      route: '/reporting/custom-report',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -699,6 +709,11 @@ export const MENU_CONFIG: any = {
       // Unit profile Report
       icon: '',
       route: '/analytics/hours-by-department',
+    },
+    99: {
+      // staff availability Report
+      icon: '',
+      route: '/analytics/staff-availability',
     },
   },
 
@@ -1122,6 +1137,16 @@ export const MENU_CONFIG: any = {
       // Unit profile Report
       icon: '',
       route: '/analytics/hours-by-department',
+    },
+    99: {
+      // staff availability Report
+      icon: '',
+      route: '/analytics/staff-availability',
+    },
+    100: {
+    // custom-report
+      icon: 'trending-up',
+      route: '/reporting/custom-report',
     },
   },
 

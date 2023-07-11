@@ -20,7 +20,7 @@
       <e-column textAlign="Right" width="80" *ngIf="isAgency">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+            <button ejs-button cssClass="e-flat primary-icon-button noResponsive" (click)="onEdit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button
@@ -295,6 +295,7 @@
               [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.locationIds?.dataSource"
+              [filterType]="filterType"
               [changeOnBlur]="!isMobileScreen"
             >
             </ejs-multiselect>
@@ -311,6 +312,7 @@
               [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.departmentIds?.dataSource"
+              [filterType]="filterType"
               [changeOnBlur]="!isMobileScreen"
             >
             </ejs-multiselect>

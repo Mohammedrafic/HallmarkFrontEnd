@@ -140,7 +140,6 @@
 
                     <ng-container *ngSwitchCase="candidateTemplate.apply">
                       <app-apply-candidate
-                        [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
                         [candidate]="$any(candidate)"
                         [order]="$any(selectedOrder$ | async)"
                         [isTab]="true"
@@ -317,6 +316,7 @@
       <div class="comments">
         <app-comments
           *ngIf="candidateJob"
+          [canVmsCreateOrders]="canCreateOrder"
           [comments]="comments"
           [commentContainerId]="candidateJob.commentContainerId || 0"
         ></app-comments>

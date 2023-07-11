@@ -69,8 +69,10 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
 import { ReOrderPage } from '@shared/components/order-reorders-container/interfaces';
 import { CandidateModel } from '../add-edit-reorder/models/candidate.model';
-import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { ONBOARDED_STATUS } from
+  '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { GlobalWindow } from '@core/tokens';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -129,6 +131,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
+
   @Select(ReOrderState.GetReOrdersByOrderId)
   public readonly reOrderList$: Observable<ReOrderPage | null>;
 
@@ -139,7 +144,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public SettingsKeys = SettingsKeys;
   public firstActive = true;
-  public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
   public orderStatus = OrderStatus;
   public reOrderToEdit: Order | null;
@@ -268,7 +272,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     if (changes['order']?.currentValue) {
       this.setCloseOrderButtonState();
       const order = changes['order']?.currentValue;
-      const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase());
+      const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText?.toLowerCase());
       this.showCloseButton = hasStatus || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate));
 
       if (this.chipList) {

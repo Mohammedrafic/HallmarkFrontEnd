@@ -50,6 +50,7 @@ import {
   tap,
   switchMap,
   skip,
+  combineLatest,
 } from 'rxjs';
 
 import { ORDERS_GRID_CONFIG } from '@client/client.config';
@@ -95,6 +96,7 @@ import {
   SetLock,
   UpdateRegRateSucceeded,
   GetOrderComments,
+  ClearPredefinedBillRates,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -150,6 +152,7 @@ import {
 } from '@shared/models/order-management.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import {
+  Organization,
   OrganizationDepartment,
   OrganizationLocation,
   OrganizationRegion,
@@ -296,6 +299,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   @Select(OrderManagementContentState.orderComments)
   private orderComments$: Observable<Comment[]>;
+
+  @Select(OrganizationManagementState.organization)
+  private organization$: Observable<Organization | null>;
 
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
@@ -458,6 +464,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       return this.filters?.contactEmails || null;
     }
   }
+  public filterType: string = 'Contains';
 
   constructor(
     protected override store: Store,
@@ -596,8 +603,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   ngOnDestroy(): void {
     this.orderManagementService.selectedOrderAfterRedirect = null;
-    this.store.dispatch(new PreservedFilters.ResetPageFilters());
-    this.store.dispatch(new ClearSelectedOrder());
+    this.store.dispatch([
+      new PreservedFilters.ResetPageFilters(),
+      new ClearPredefinedBillRates(),
+      new ClearSelectedOrder(),
+    ]);
     this.resizeObserver.detach();
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -1931,11 +1941,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onOrganizationStructureDataLoadHandler(): void {
-    this.organizationStructure$
+    combineLatest([
+      this.organizationStructure$.pipe(filter((structure) => !!structure)),
+      this.organization$.pipe(filter((organization) => !!organization), take(1)),
+    ])
       .pipe(
-        debounceTime(50),
-        filter((structure) => !!structure),
-        tap((structure: OrganizationStructure) => {
+        debounceTime(100),
+        tap(([structure]) => {
           if (this.organizationId === structure.organizationId) {
             this.orgStructure = structure;
             this.regions = structure.regions;
@@ -2219,9 +2231,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (selectedOrderAfterRedirect) {
       this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
-      if (!Array.isArray(this.filters.contactEmails)) {
-        this.filters.contactEmails = this.filters.contactEmails ? [this.filters.contactEmails] : this.filters.contactEmails;
-      }
+      this.filters.contactEmails = this.filters.contactEmails ;
+     
       this.filters.orderPublicId = selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId;
       this.filters.agencyType = null;
       this.filters.includeReOrders = false;
@@ -2497,11 +2508,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private refreshFilterState(): void {
     this.filterApplied = true;
     this.filters = this.OrderFilterFormGroup.getRawValue();
-    if (!Array.isArray(this.filters.contactEmails)) {
-      this.filters.contactEmails = this.filters.contactEmails
-        ? [this.filters.contactEmails]
-        : this.filters.contactEmails;
-    }
+ 
+    this.filters.contactEmails = this.filters.contactEmails || null;
     this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;

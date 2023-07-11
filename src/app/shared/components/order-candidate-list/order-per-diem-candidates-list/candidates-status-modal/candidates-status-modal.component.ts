@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { merge, Observable, Subject, takeUntil } from 'rxjs';
+import { merge, Observable, Subject, take, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -14,6 +14,7 @@ import {
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
+  sendOnboardCandidateEmailMessage,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
 } from '@client/store/order-managment-content.actions';
@@ -32,10 +33,14 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
-import { ShowToast } from 'src/app/store/app.actions';
+import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired } from '@shared/constants';
+import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired, ONBOARD_CANDIDATE, onBoardCandidateMessage, SEND_EMAIL } from '@shared/constants';
 import { CommonHelper } from '@shared/helpers/common.helper';
+import { PermissionService } from 'src/app/security/services/permission.service';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
+import { OnboardCandidateMessageDialogComponent } from '../../order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -145,7 +150,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public orderCandidateJob: OrderCandidateJob | null;
   public comments: Comment[] = [];
   public selectedApplicantStatus: ApplicantStatus | null = null;
-
+  public canCreateOrder: boolean;
   private unsubscribe$: Subject<void> = new Subject();
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
   public candidateSSNRequired :boolean=false;
@@ -153,9 +158,29 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
 
-  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef) {}
+  get templateEmailTitle(): string {
+    return "Onboarding Email";
+  }
+  isSend:boolean = false;
+  public sendOnboardMessageEmailFormGroup: FormGroup;
+  emailTo:any = '';
+  isSendOnboardFormInvalid:boolean = false;
+  @ViewChild('RTE')
+  public rteEle: RichTextEditorComponent;
+  @ViewChild(OnboardCandidateMessageDialogComponent, { static: true }) onboardEmailTemplateForm: OnboardCandidateMessageDialogComponent;
+  
+
+  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef, private permissionService : PermissionService,private confirmService: ConfirmService,) {
+    this.sendOnboardMessageEmailFormGroup = new FormGroup({
+      emailSubject: new FormControl('', [Validators.required]),
+      emailBody: new FormControl('', [Validators.required]),
+      fileUpload: new FormControl(null),
+      emailTo: new FormControl('', [Validators.required]),
+    });
+  }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.subscribeOnGetStatus();
     this.onOpenEvent();
     this.createForm();
@@ -329,7 +354,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   private updateOrganizationCandidateJob(status: { applicantStatus: ApplicantStatusEnum; statusText: string } | null): void {
     if (this.form.valid && this.orderCandidateJob) {
       const value = this.form.getRawValue();
-
+      this.isSend =  true;
+      this.emailTo = this.orderCandidateJob?.candidateProfile.email; 
+      this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.orderCandidateJob?.candidateProfile.email);
+      
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -343,9 +371,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
           })
         ).pipe(takeUntil(this.unsubscribe$))
         .subscribe({
-          next: () => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()),
-          error: () => this.closeDialog(),
-          complete: () => this.closeDialog(),
+          // next: () => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()),
+            error: () => this.closeDialog(),
+          //  complete: () => this.closeDialog(),
         });
     }
   }
@@ -400,6 +428,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((reasons: RejectReason[]) => {
         this.rejectReasons = reasons;
+        this.cd.markForCheck();
       });
   }
 
@@ -451,7 +480,64 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   private subscribeOnUpdateCandidateJobSucceed(): void {
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed))
-      .subscribe(() => this.closeDialog());
+      .subscribe(() => 
+      {
+        if(this.selectedApplicantStatus?.applicantStatus === ApplicantStatusEnum.OnBoarded){
+          const options = {
+              title: ONBOARD_CANDIDATE,
+              okButtonLabel: 'Yes',
+              okButtonClass: 'ok-button',
+              cancelButtonLabel: 'No'
+          };
+          this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+              .subscribe((isConfirm) => {
+                if(isConfirm){
+                  this.onboardEmailTemplateForm.rteCreated();
+                  this.onboardEmailTemplateForm.disableControls(true);
+                  this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                }
+                else{
+                  this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+                  this.closeDialog();
+                }
+              });
+        }else{
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+          this.closeDialog();
+        }
+      });
+  }
+
+  onGroupEmailAddCancel(){
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    this.isSend =  false;
+    this.store.dispatch(new ShowGroupEmailSideDialog(false));
+    this.closeDialog();
+    this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+  }
+
+  onGroupEmailSend(){
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    if(this.sendOnboardMessageEmailFormGroup.valid){
+      const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();  
+      this.store.dispatch(new sendOnboardCandidateEmailMessage({
+            subjectMail : emailvalue.emailSubject,
+            bodyMail : emailvalue.emailBody,
+            toList : emailvalue.emailTo,
+            status : 1,
+            stream : emailvalue.fileUpload,
+            extension : emailvalue.fileUpload?.type,
+            documentName : emailvalue.fileUpload?.name,
+          })
+        )
+        .subscribe(() => {
+          this.isSend =  false;
+          this.closeDialog();
+          this.store.dispatch(new ShowGroupEmailSideDialog(false));  
+          this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+        });
+    }
   }
 
   private subscribeOnGetStatus(): void {
@@ -511,4 +597,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       candidatePayRateControl?.disable();
     }
   }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
+  }
+
 }

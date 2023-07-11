@@ -1,17 +1,20 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges,
+  ViewChild } from '@angular/core';
 
 import { GridComponent, GroupSettingsModel, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
 
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 
 import { IOrderCredentialItem } from '@order-credentials/types';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import {
+  AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-order-credentials-grid',
   templateUrl: './order-credentials-grid.component.html',
-  styleUrls: ['./order-credentials-grid.component.scss']
+  styleUrls: ['./order-credentials-grid.component.scss'],
 })
 export class OrderCredentialsGridComponent extends AbstractGridConfigurationComponent implements OnChanges, OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
@@ -27,8 +30,8 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
   public pageMaxCount:number;
   public gridPageSettings: PageSettingsModel;
   public pageSizes: any;
-  public totalItemCount:number=0;
-  public totalPageCount: number=1;
+  public totalItemCount = 0;
+  public totalPageCount = 1;
 
   constructor(private confirmService: ConfirmService) {
     super();
@@ -41,7 +44,6 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
       this.totalItemCount = credential.currentValue.length;
     }
   }
-
 
   ngOnInit(): void {
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {

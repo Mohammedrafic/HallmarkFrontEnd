@@ -5,7 +5,7 @@ import { Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { distinctUntilChanged, filter, Observable, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, filter, merge, Observable, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 
 import { OutsideZone } from '@core/decorators';
 import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
@@ -193,7 +193,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private configurationSystemType: SystemType = SystemType.VMS;
   private organizationSettingKey: OrganizationSettingKeys;
   regionBasedDepartment: any;
-
+  public filterType: string = 'Contains';
   get switcherValue(): string {
     return this.organizationSettingsFormGroup.controls['value'].value ? 'on' : 'off';
   }
@@ -222,6 +222,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.watchForLocationControl();
     this.setPermissionsToManageSettings();
     this.watchRegionControlChanges();
+    this.watchForSystemControls();
   }
 
   ngOnDestroy(): void {
@@ -1046,7 +1047,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       isEnabled: !!this.organizationSettingsFormGroup.controls['value'].value,
       dayOfWeek: this.invoiceGeneratingFormGroup.controls['dayOfWeek'].value,
       groupingBy: this.invoiceGeneratingFormGroup.controls['groupingBy'].value,
-      time: DateTimeHelper.toUtcFormat(this.invoiceGeneratingFormGroup.controls['time'].value),
+      time: DateTimeHelper.setUtcTimeZone(this.invoiceGeneratingFormGroup.controls['time'].value),
     });
   }
 
@@ -1453,7 +1454,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       if (dynamicValue?.isInvoice) {
         this.invoiceGeneratingFormGroup.setValue({
-          time: dynamicValue.time ? DateTimeHelper.convertDateToUtc(dynamicValue.time) : '',
+          time: dynamicValue.time ? DateTimeHelper.setCurrentTimeZone(dynamicValue.time) : '',
           dayOfWeek: dynamicValue.dayOfWeek,
           groupingBy: dynamicValue.groupingBy,
         });
@@ -1500,5 +1501,21 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private setNumericValueLabel(settingKey: string): void {
     const isOnHold = OrganizationSettingKeys[OrganizationSettingKeys['OnHoldDefault']].toString() === settingKey;
     this.numericValueLabel = isOnHold ? 'Value (Weeks)' : 'Value';
+  }
+
+  private watchForSystemControls(): void {
+    const includeInIRPControl = this.SettingsFilterFormGroup.get('includeInIRP');
+    const includeInVMSControl = this.SettingsFilterFormGroup.get('includeInVMS');
+
+    if (includeInIRPControl && includeInVMSControl) {
+      merge(includeInIRPControl.valueChanges, includeInVMSControl.valueChanges)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe(() => {
+          this.store.dispatch(new GetOrganizationSettingsFilterOptions(
+            includeInIRPControl.value ?? false,
+            includeInVMSControl.value ?? false
+          ));
+        });
+    }
   }
 }

@@ -366,7 +366,8 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
-    candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : this.filterOptionsData.candidateStatuses?.length > 0 ? this.filterOptionsData.candidateStatuses.map(x => x.status).join(",") : "null";
+    //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : this.filterOptionsData.candidateStatuses?.length > 0 ? this.filterOptionsData.candidateStatuses.map(x => x.status).join(",") : "null";
+    candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : "null";
 
       this.paramsData =
       {

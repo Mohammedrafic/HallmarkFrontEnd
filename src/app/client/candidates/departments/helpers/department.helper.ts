@@ -48,9 +48,9 @@ function createDepartmentPayload(formData: DepartmentPayload): DepartmentPayload
   return {
     forceUpdate: false,
     isOriented: !!isOriented,
-    startDate: startDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(startDate)),
-    endDate: endDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(endDate)),
-    orientationDate: orientationDate && DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(orientationDate)),
+    startDate: startDate && DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(startDate)),
+    endDate: endDate && DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(endDate)),
+    orientationDate: orientationDate && DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(orientationDate)),
     ...(departmentIds && { departmentIds, locationIds, regionIds }),
     ...(isHomeCostCenter && { isHomeCostCenter }),
   };

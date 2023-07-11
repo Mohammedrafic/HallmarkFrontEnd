@@ -255,8 +255,10 @@
   [handleOpenModal]="editCandidateDialogState"
   (handleCloseModal)="closeEditCandidateModal($event)"
   (handleSuccessSaveCandidate)="saveIrpCandidate()"
+  [isIRPLTAOrder]="isIRPLTAorder"
   [commentContainerId] = "commentContainerId"
   [CanOrganizationViewOrdersIRP]="userPermission[userPermissions.CanOrganizationViewOrdersIRP]"
+  [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanCreateOrdersIRP]"
 ></app-edit-irp-candidate>
 
 <ejs-dialog
@@ -303,7 +305,6 @@
   <ng-template #apply>
     <app-apply-candidate
       (closeDialogEmitter)="onCloseDialog()"
-      [billRatesData]="$any((selectedAgOrder$ | async)?.billRates)"
       [candidate]="candidate"
       [isAgency]="isAgency"
       [order]="$any(selectedAgOrder$ | async)"

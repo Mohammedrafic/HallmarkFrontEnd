@@ -18,11 +18,11 @@ export class TimesheetDateHelper extends Destroyable {
 
     const endDate = new Date(weekEndDate) < new Date(today) ? weekEndDate : today;
 
-    this.dateSettings.timeIn.min = DateTimeHelper.convertDateToUtc(startDate);
-    this.dateSettings.timeIn.max = DateTimeHelper.convertDateToUtc(endDate);
+    this.dateSettings.timeIn.min = DateTimeHelper.setCurrentTimeZone(startDate);
+    this.dateSettings.timeIn.max = DateTimeHelper.setCurrentTimeZone(endDate);
 
-    this.dateSettings.timeOut.min = DateTimeHelper.convertDateToUtc(startDate);
-    this.dateSettings.timeOut.max = DateTimeHelper.convertDateToUtc(endDate);
+    this.dateSettings.timeOut.min = DateTimeHelper.setCurrentTimeZone(startDate);
+    this.dateSettings.timeOut.max = DateTimeHelper.setCurrentTimeZone(endDate);
   }
 
   protected setdateBoundsForDay(initValue: string): void {

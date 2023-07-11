@@ -54,6 +54,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { formatNumber } from '@angular/common';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -100,6 +101,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public payRateSetting = CandidatePayRateSettings;
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
+  public canCreateOrder : boolean;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -176,6 +178,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private changeDetectionRef: ChangeDetectorRef,
+    private permissionService: PermissionService
   ) {
     this.createForm();
   }
@@ -187,6 +190,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.patchForm();
     this.subscribeOnReasonsList();
     this.subscribeOnSuccessRejection();
@@ -365,7 +369,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           offeredBillRate: value.offeredBillRate || null,
           requestComment: value.comments,
           expAsTravelers: value.expAsTravelers,
-          availableStartDate: DateTimeHelper.toUtcFormat(new Date(value.availableStartDate)),
+          availableStartDate: DateTimeHelper.setUtcTimeZone(new Date(value.availableStartDate)),
           actualStartDate: this.candidateJob.actualStartDate,
           actualEndDate: this.candidateJob.actualEndDate,
           clockId: this.candidateJob.clockId,
@@ -445,8 +449,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate ? DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()) : "",
-          value.order.jobEndDate ? DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()) : ""],
+          date: [value.order.jobStartDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobStartDate.toString()) : "",
+          value.order.jobEndDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobEndDate.toString()) : ""],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
           availableStartDate: value.availableStartDate ?
             DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
@@ -459,12 +463,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           rejectReason: value.rejectReason,
           guaranteedWorkWeek: value.guaranteedWorkWeek,
           offeredStartDate: value.offeredStartDate ? DateTimeHelper.formatDateUTC(
-            DateTimeHelper.toUtcFormat(value.offeredStartDate).toString(), 'MM/dd/yyyy') : '',
+            DateTimeHelper.setUtcTimeZone(value.offeredStartDate).toString(), 'MM/dd/yyyy') : '',
           clockId: value.clockId,
           actualStartDate: value.actualStartDate ? DateTimeHelper.formatDateUTC(
-            DateTimeHelper.toUtcFormat(value.actualStartDate).toString(), 'MM/dd/yyyy') : '',
+            DateTimeHelper.setUtcTimeZone(value.actualStartDate).toString(), 'MM/dd/yyyy') : '',
           actualEndDate: value.actualEndDate ? DateTimeHelper.formatDateUTC(
-            DateTimeHelper.toUtcFormat(value.actualEndDate).toString(), 'MM/dd/yyyy') : '',
+            DateTimeHelper.setUtcTimeZone(value.actualEndDate).toString(), 'MM/dd/yyyy') : '',
           jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
           penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
           rate: value.jobCancellation?.rate,
@@ -539,5 +543,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

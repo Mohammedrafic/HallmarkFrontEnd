@@ -43,6 +43,7 @@ import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved
 import { TimeMask } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { getPreservedfilterTime, getPreservedTime, getTime } from '@shared/utils/date-time.utils';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -79,6 +80,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   private filters: ScheduleFilters = {};
   private isPreservedFilters = false;
   public readonly timeMask = TimeMask;
+  public filterType: string = 'Contains';
 
   private filterStructure: ScheduleFilterStructure = {
     regions: [],
@@ -125,17 +127,18 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       locationIds: [],
       departmentsIds: [],
       skillIds: [],
-      isAvailablity : false,
-      isUnavailablity : false,
+      isAvailablity : true,
+      isUnavailablity : true,
       isOnlySchedulatedCandidate : false,
-      isExcludeNotOrganized : false,
+      isExcludeNotOrganized : true,
       startTime: null,
       endTime : null
     });
     this.filters = this.scheduleFilterFormGroup.getRawValue();
-    this.filteredItems = [];
-    this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: [] });
-
+    this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
+    this.filteredItems = this.filteredItems.filter(filterdata => filterdata.value === true);
+    const chips = this.scheduleFiltersService.createChipsData(this.scheduleFilterFormGroup.getRawValue(), this.filterColumns);
+    this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: chips });
     if (clearPreservedFilters) {
       this.store.dispatch(new ClearPageFilters(FilterPageName.SchedullerOrganization));
     }
@@ -323,6 +326,14 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       } else {
         this.filters.endTime = getPreservedfilterTime(this.filters.endTime);
       }
+      if(this.filters.departmentsIds?.length){
+        skipDataUpdate = false;
+      }
+
+    const user = this.store.selectSnapshot(UserState.user);
+    if(user?.isEmployee){
+      this.filters.isOnlySchedulatedCandidate = true;
+    }     
     this.updateScheduleFilter.emit({
       filters: this.filters,
       filteredItems: this.filteredItems,
@@ -500,10 +511,10 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
             locationIds: this.filters.locationIds ? [...this.filters.locationIds] : [],
             departmentsIds: this.filters.departmentsIds ? [...this.filters.departmentsIds] : [],
             skillIds : this.filters.skillIds ? [...this.filters.skillIds] : [],
-            isAvailablity : this.filters.isAvailablity,
-            isUnavailablity : this.filters.isUnavailablity,
-            isExcludeNotOrganized : this.filters.isExcludeNotOrganized,
-            isOnlySchedulatedCandidate : this.filters.isOnlySchedulatedCandidate,
+            isAvailablity : !!this.filters.isAvailablity,
+            isUnavailablity : !!this.filters.isUnavailablity,
+            isExcludeNotOrganized : !!this.filters.isExcludeNotOrganized,
+            isOnlySchedulatedCandidate : !!this.filters.isOnlySchedulatedCandidate,
             startTime : getPreservedTime(this.filters.startTime),
             endTime : getPreservedTime(this.filters.endTime)
           });

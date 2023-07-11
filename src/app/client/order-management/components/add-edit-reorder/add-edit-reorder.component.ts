@@ -52,6 +52,7 @@ import { AlertTrigger } from '@admin/store/alerts.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { MultiselectDropdownComponent,
 } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.component';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -88,6 +89,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private unsubscribe$: Subject<void> = new Subject();
   private numberOfAgencies: number;
   private multipleReorderDates: Date[] = [];
+  public canCreateOrder: boolean;
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -97,6 +99,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     private actions$: Actions,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private permissionService: PermissionService
   ) {
     super();
     this.createForm();
@@ -107,6 +110,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.listenCandidateChanges();
     this.listenAginciesChanges();
     this.commentContainerId = this.order.commentContainerId as number;
@@ -227,9 +231,9 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.reorderForm.patchValue({
       agencies: this.getAgencyIds(this.order.jobDistributions),
       candidates: candidatesInOrder ? this.getCandidateIds(candidatesInOrder) : [],
-      reorderDate: reorder.jobStartDate ? DateTimeHelper.convertDateToUtc(reorder.jobStartDate.toString()) : '',
-      shiftStartTime: reorder.shiftStartTime ? DateTimeHelper.convertDateToUtc(reorder.shiftStartTime.toString()) : '',
-      shiftEndTime: reorder.shiftEndTime ? DateTimeHelper.convertDateToUtc(reorder.shiftEndTime.toString()) : '',
+      reorderDate: reorder.jobStartDate ? DateTimeHelper.setCurrentTimeZone(reorder.jobStartDate.toString()) : '',
+      shiftStartTime: reorder.shiftStartTime ? DateTimeHelper.setCurrentTimeZone(reorder.shiftStartTime.toString()) : '',
+      shiftEndTime: reorder.shiftEndTime ? DateTimeHelper.setCurrentTimeZone(reorder.shiftEndTime.toString()) : '',
       billRate: reorder.hourlyRate ?? '',
       openPosition: reorder.openPositions ?? '',
     }, { emitEvent: false });
@@ -333,13 +337,13 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private areDatesEquals(date1: Date, date2: Date): boolean {
-    return DateTimeHelper.toUtcFormat(date1) === DateTimeHelper.toUtcFormat(date2);
+    return DateTimeHelper.setUtcTimeZone(date1) === DateTimeHelper.setUtcTimeZone(date2);
   }
 
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
-    reorder.shiftStartTime = DateTimeHelper.toUtcFormat(reorder.shiftStartTime);
-    reorder.shiftEndTime = DateTimeHelper.toUtcFormat(reorder.shiftEndTime);
+    reorder.shiftStartTime = DateTimeHelper.setUtcTimeZone(reorder.shiftStartTime);
+    reorder.shiftEndTime = DateTimeHelper.setUtcTimeZone(reorder.shiftEndTime);
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
     const reOrderId = this.isEditMode ? this.order.id : null;
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
@@ -428,6 +432,12 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       });
 
       return this.commentsService.saveCommentsBulk(reOrderComments);
+    });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
     });
   }
 }

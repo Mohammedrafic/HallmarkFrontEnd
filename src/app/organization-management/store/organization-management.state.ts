@@ -1445,9 +1445,9 @@ export class OrganizationManagementState {
   @Action(GetOrganizationSettingsFilterOptions)
   GetOrganizationSettingsFilterOptions(
     { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetOrganizationSettingsFilterOptions
+    { includeInIRP, includeInVMS }: GetOrganizationSettingsFilterOptions
   ): Observable<string[]> {
-    return this.organizationSettingsService.getOrganizationSettingsFilteringOptions().pipe(
+    return this.organizationSettingsService.getOrganizationSettingsFilteringOptions(includeInIRP, includeInVMS).pipe(
       tap((options) => {
         patchState({ organizationSettingsFilterOptions: options });
         return options;

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
   ExportCandidateAssignment,
+  GetAssociateOrganizations,
   GetCandidateDetailsPage,
   GetCandidateRegions,
   Getcandidatesearchbytext,
@@ -26,6 +27,7 @@ import { CandidateDetailsApiService } from '../services/candidate-details-api.se
 import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
 import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
 interface CandidateDetailsStateModel {
   candidateDetailsPage: CandidateDetailsPage | null;
@@ -38,6 +40,7 @@ interface CandidateDetailsStateModel {
   candidateLocations: CandidatesDetailsLocations[] | null;
   candidateDepartments: CandidatesDetailsDepartments[] | null;
   searchCandidates:DoNotReturnSearchCandidate[]|null
+  associateOrganizations: AgencyOrderFilteringOptions|null;
 }
 
 @State<CandidateDetailsStateModel>({
@@ -56,7 +59,8 @@ interface CandidateDetailsStateModel {
     isNavigate: null,
     candidateLocations:null,
     candidateDepartments:null,
-    searchCandidates:null
+    searchCandidates:null,
+    associateOrganizations:null,
   },
 })
 @Injectable()
@@ -104,6 +108,10 @@ export class CandidateDetailsState {
    @Selector()
    static candidateDepartments(state: CandidateDetailsStateModel): CandidatesDetailsDepartments[] | null {
      return state.candidateDepartments;
+   }
+   @Selector()
+   static associateOrganizations(state: CandidateDetailsStateModel): AgencyOrderFilteringOptions | null{
+     return state.associateOrganizations  ;
    }
 
   constructor(private candidateDetailsApiService: CandidateDetailsApiService, private skillsService: SkillsService) {}
@@ -180,4 +188,16 @@ export class CandidateDetailsState {
       saveSpreadSheetDocument(url, payload.filename || 'CandidateAssignment', payload.exportFileType);
     }));
   };
+
+  @Action(GetAssociateOrganizations)
+  GetAssociateOrganizations(
+    { patchState }: StateContext<CandidateDetailsStateModel>,
+    { lastSelectedBusinessUnitId }: GetAssociateOrganizations
+  ): Observable<AgencyOrderFilteringOptions> {
+    return this.candidateDetailsApiService.getAssociateOrganizations(lastSelectedBusinessUnitId).pipe(
+      tap((payload) => {
+        patchState({ associateOrganizations:payload });
+      })
+    );
+  }
 }

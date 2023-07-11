@@ -305,17 +305,17 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
   }
   public getVMSOrderRequisition() {
-    this.reasons = [];
     this.reasons$
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(data => {
+        this.reasons = [];
         data.items.forEach(item => {
           if (item.includeInVMS === true) {
             this.reasons.push({
               id: item.id,
               reason: item.reason,
               businessUnitId: item.businessUnitId,
-              isAutoPopulate: item.isAutoPopulate
+              isAutoPopulate: item.isAutoPopulate,
             });
           }
           if (item.isAutoPopulate === true) {
@@ -355,8 +355,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     if (orderType === OrderType.PermPlacement) {
       return;
     }
-    const startDate = DateTimeHelper.toUtcFormat(jobStartDate);
-    const endDate = DateTimeHelper.toUtcFormat(jobEndDate);
+    const startDate = DateTimeHelper.setUtcTimeZone(jobStartDate);
+    const endDate = DateTimeHelper.setUtcTimeZone(jobEndDate);
 
     this.orderManagementService
       .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate)
@@ -631,54 +631,24 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.generalInformationForm.controls['compBonus'].patchValue(compBonus);
     this.generalInformationForm.controls['duration'].patchValue(order.duration);
     this.generalInformationForm.controls['shiftStartTime'].patchValue(
-      order.shiftStartTime ? DateTimeHelper.convertDateToUtc(order.shiftStartTime.toString()) : null
+      order.shiftStartTime ? DateTimeHelper.setCurrentTimeZone(order.shiftStartTime.toString()) : null
     );
     this.generalInformationForm.controls['shiftEndTime'].patchValue(
-      order.shiftEndTime ? DateTimeHelper.convertDateToUtc(order.shiftEndTime.toString()) : null
+      order.shiftEndTime ? DateTimeHelper.setCurrentTimeZone(order.shiftEndTime.toString()) : null
     );
 
     this.populatePermPlacementControls(order);
-
-    this.projectSpecialData$.pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
-      this.specialProject.controls['projectNameId'].patchValue(order.projectNameId);
-      this.specialProject.controls['poNumberId'].patchValue(order.poNumberId);
-    });
-
-    if (order.regionId) {
-      this.store
-        .dispatch(new GetLocationsByRegionId(order.regionId, undefined, true, order.locationId))
-        .pipe(
-          take(1),
-          takeUntil(this.componentDestroy())
-        ).subscribe((data) => {
-          this.selectedLocation = data.organizationManagement.locations?.find((location: Location) => location.id === order.locationId);
-          this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
-        });
-    }
-
-    if (order.locationId) {
-      this.store
-        .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
-        .pipe(
-          take(1),
-          takeUntil(this.componentDestroy())
-        ).subscribe((data) => {
-          this.selectedDepartment = data.organizationManagement.departments?.find((department: Department) => department.departmentId === order.departmentId);
-          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
-        });
-    }
+    this.populateProjectSpecialData(order);
+    this.populateRegionLocation(order);
 
     if (order.jobStartDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobStartDate'].patchValue(
-        DateTimeHelper.convertDateToUtc(order.jobStartDate.toString()));
+        DateTimeHelper.setCurrentTimeZone(order.jobStartDate.toString()));
     }
 
     if (order.jobEndDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobEndDate'].patchValue(
-        DateTimeHelper.convertDateToUtc(order.jobEndDate.toString())
+        DateTimeHelper.setCurrentTimeZone(order.jobEndDate.toString())
       );
     }
 
@@ -738,6 +708,44 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.disableFormControls(order);
     this.handlePerDiemOrder();
     this.handlePermPlacementOrder();
+  }
+
+  private populateProjectSpecialData(order: Order): void {
+    this.projectSpecialData$.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
+      this.specialProject.controls['projectNameId'].patchValue(order.projectNameId);
+      this.specialProject.controls['poNumberId'].patchValue(order.poNumberId);
+    });
+  }
+
+  private populateRegionLocation(order: Order): void {
+    if (order.regionId) {
+      this.store
+        .dispatch(new GetLocationsByRegionId(order.regionId, undefined, true, order.locationId))
+        .pipe(
+          take(1),
+        ).subscribe((data) => {
+          this.selectedLocation = data.organizationManagement.locations?.find(
+            (location: Location) => location.id === order.locationId
+          );
+          this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
+        });
+    }
+
+    if (order.locationId) {
+      this.store
+        .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
+        .pipe(
+          take(1),
+        ).subscribe((data) => {
+          this.selectedDepartment = data.organizationManagement.departments?.find(
+            (department: Department) => department.departmentId === order.departmentId
+          );
+          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId, { emitEvent: false });
+        });
+    }
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
@@ -830,7 +838,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       .pipe(
         filter(Boolean),
         switchMap((d) => {
-          unitDescriptionValue = unitDescriptionValue === null ? unitDescriptionValue : this.jobDescriptionForm.get('unitDescription')?.value;
+          unitDescriptionValue = unitDescriptionValue === null ?
+            unitDescriptionValue : this.jobDescriptionForm.get('unitDescription')?.value;
           return this.contactDetails$;
         }),
         filter(Boolean),
@@ -839,7 +848,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       .subscribe((contactDetails) => {
         const { facilityContact, facilityPhoneNo, facilityEmail, unitDescription } = contactDetails;
         this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
-        this.jobDescriptionForm.get('unitDescription')?.setValue(unitDescriptionValue ? unitDescriptionValue : unitDescription);
+        this.jobDescriptionForm.get('unitDescription')?.setValue(
+          unitDescriptionValue ? unitDescriptionValue : unitDescription
+        );
         unitDescriptionValue = null;
       });
   }
@@ -1109,7 +1120,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       debounceTime(50),
       takeUntil(this.componentDestroy())
     ).subscribe(([orderType, departmentId, skillId, jobStartDate]) => {
-      const departmentIdValue = departmentId || this.generalInformationForm.controls['departmentId'].value;
+      const departmentIdValue = departmentId;
       if (this.isPermPlacementOrder || isNaN(parseInt(orderType)) || !departmentIdValue || !skillId || !jobStartDate) {
         return;
       }
@@ -1119,8 +1130,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           orderType,
           departmentIdValue,
           skillId,
-          DateTimeHelper.toUtcFormat(jobStartDate),
-          DateTimeHelper.toUtcFormat(this.orderControlsConfig.jobEndDateControl.value)
+          DateTimeHelper.setUtcTimeZone(jobStartDate),
+          DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value)
         )
       );
     });

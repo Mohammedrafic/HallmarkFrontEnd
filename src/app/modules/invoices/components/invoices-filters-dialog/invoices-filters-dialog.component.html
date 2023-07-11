@@ -1,7 +1,7 @@
 <app-filter-dialog
   [items]="filteredItems"
   [count]="(invoicesData$ | async)?.totalCount"
-  [targetElement]="targetElement"
+  [targetElement]="targetElement$ | async"
   (deleteFilter)="deleteFilter($event)"
   (clearAllFiltersClicked)="clearAllFilters()"
   (applyFilterClicked)="applyFilters()">
@@ -37,6 +37,7 @@
                 [dataSource]="filterColumns[fieldConfig.field]?.dataSource"
                 [showDropDownIcon]="true"
                 [formControlName]="fieldConfig.field"
+                [filterType]="filterType"
                 placeholder=""></ejs-multiselect>
             </div>
           </div>

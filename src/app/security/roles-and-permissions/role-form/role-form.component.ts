@@ -148,7 +148,8 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.treeData=roleTreeField.dataSource;
     if(this.newRoleBussinesData !=null && this.newRoleBussinesData!=undefined){
       var data=this.businessUnitIdControl?.value;
-      var selectedBussinessUnit=this.newRoleBussinesData.filter(x=>x.id==data);
+      var selectedBussinessUnit = this.newRoleBussinesData.filter(x => x.id == data);
+      this.IsIrp = selectedBussinessUnit[0]?.isIRPEnabled;  
       this.ShowIsIRPToggle(selectedBussinessUnit)
     }
     else{
@@ -343,8 +344,8 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       this.newRoleBussinesData =
       this.store.selectSnapshot(SecurityState.newRoleBussinesData)(user?.businessUnitType as BusinessUnitType);
       this.defaultBusinessValue = this.newRoleBussinesData.filter(x=>x.id==this.businessUnitIdControl?.value);
-      this.IsIrp=this.defaultBusinessValue[0].isIRPEnabled;
-      this.defaultBusinessValue=this.defaultBusinessValue[0].id;
+      this.IsIrp=this.defaultBusinessValue[0]?.isIRPEnabled;
+      this.defaultBusinessValue=this.defaultBusinessValue[0]?.id;
 
     });
   }
@@ -374,18 +375,32 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   }
   ShowIsIRPToggle(arg:any){
     if(arg.itemData){
-      if(arg.itemData.isIRPEnabled&&arg.itemData.isVMSEnabled){
+      if(arg.itemData?.isIRPEnabled&&arg.itemData?.isVMSEnabled){
         this.showIRPOnlyToggle.nativeElement.style.display='block';
       }
       else{
+        if(arg.itemData?.isIRPEnabled){
+          this.toggle=true;
+        }
+        else
+        {
+          this.toggle=false;;
+        }
         this.showIRPOnlyToggle.nativeElement.style.display='none';
       }
     }
     else{
-      if(arg[0].isIRPEnabled&&arg[0].isVMSEnabled){
+      if(arg[0]?.isIRPEnabled&&arg[0]?.isVMSEnabled){
         this.showIRPOnlyToggle.nativeElement.style.display='block';
       }
       else{
+        if(arg[0]?.isIRPEnabled){
+          this.toggle=true;
+        }
+        else
+        {
+          this.toggle=false;
+        }
         this.showIRPOnlyToggle.nativeElement.style.display='none';
       }
     }

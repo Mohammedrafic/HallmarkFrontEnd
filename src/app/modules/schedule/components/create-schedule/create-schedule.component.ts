@@ -125,7 +125,6 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   scheduleType: ScheduleItemType;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
   sideBarSettings: BarSettings = SideBarSettings;
-  disableRemoveButton = false;
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
@@ -170,7 +169,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     }
 
     if (candidates?.length && this.isEmployee) {
-      this.disableRemoveButton = candidates[0].days.some((day: ScheduleDay) => !day.employeeCanEdit);
+      this.sideBarSettings.showRemoveButton = candidates[0].days.every((day: ScheduleDay) => day.employeeCanEdit);
     }
 
     if(this.scheduleOnlyWithAvailability) {
@@ -405,7 +404,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     ]).pipe(
       takeUntil(this.componentDestroy()),
     ).subscribe(([startTime, endTime]: [Date, Date]) => {
-      const shiftTime = `${DateTimeHelper.toUtcFormat(startTime)}/${DateTimeHelper.toUtcFormat(endTime)}`;
+      const shiftTime = `${DateTimeHelper.setUtcTimeZone(startTime)}/${DateTimeHelper.setUtcTimeZone(endTime)}`;
       this.openPositionService.setOpenPosition('shiftTime', shiftTime);
     });
   }

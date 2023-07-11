@@ -171,7 +171,7 @@
     </div>
   </div>
 
-  <div *ngIf="!isCreateMode" class="sidebar-footer">
+  <div *ngIf="!isCreateMode && !isEmployee" class="sidebar-footer">
     <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
       <ejs-checkbox
       [(ngModel)]="isCreateReplacementPerDiemOrder"

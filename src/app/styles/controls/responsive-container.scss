@@ -1,0 +1,23 @@
+@import 'adaptive-response';
+
+@media #{$min-desktop-large} {
+  #main {
+    container-type: inline-size;
+    overflow: auto;
+  }
+
+  .order-details-dialog {
+    .open-per-diem-order {
+
+      @container (max-width: 1580px) {
+        .custom-order-btn {
+          display: none;
+        }
+
+        .menu-desktop-small {
+          display: inline-block;
+        }
+      }
+    }
+  }
+}

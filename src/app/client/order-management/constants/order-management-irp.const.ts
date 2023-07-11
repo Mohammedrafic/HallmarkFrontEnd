@@ -232,7 +232,7 @@ export const DefaultOrderManagementSubGridCells: ColDef[] = [
   {
     field: 'name',
     headerName: 'Employee Name',
-    width: 140,
+    width: 250,
   },
 ];
 
@@ -243,7 +243,7 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
   {
     field: 'skill',
     headerName: 'Primary Skill',
-    width: 160,
+    width: 240,
   },
   {
     field: 'workCommitment',

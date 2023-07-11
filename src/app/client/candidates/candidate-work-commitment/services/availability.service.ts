@@ -7,7 +7,7 @@ import { CustomFormGroup } from '@core/interface';
 
 @Injectable()
 export class AvailabilityService {
-  
+
   public createAvailabilityForm(): CustomFormGroup<AvailabilityRestrictionFormState> {
     return new FormGroup({
       [AvailabilityFilterColumns.START_DAY]: new FormControl(null, [Validators.required]),
@@ -26,8 +26,8 @@ export class AvailabilityService {
       ...formData,
       id: restrictionId,
       candidateProfileId: employeeId,
-      startTime: DateTimeHelper.toUtcFormat(formData.startTime),
-      endTime: DateTimeHelper.toUtcFormat(formData.endTime),
+      startTime: DateTimeHelper.setUtcTimeZone(formData.startTime),
+      endTime: DateTimeHelper.setUtcTimeZone(formData.endTime),
     };
   }
 }
