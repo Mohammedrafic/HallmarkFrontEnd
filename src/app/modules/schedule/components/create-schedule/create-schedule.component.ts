@@ -315,7 +315,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   saveBooking(): Observable<ScheduleBookingErrors[]> {
-    return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook).pipe(
+    return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook, false).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
       tap((errors: ScheduleBookingErrors[]) => {
         this.scheduleItemsService.setErrors(errors);
