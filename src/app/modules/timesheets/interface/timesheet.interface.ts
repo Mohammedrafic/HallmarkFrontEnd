@@ -45,7 +45,7 @@ export interface TimesheetsFilterState {
   startDate?: string;
   endDate?: string;
   searchTerm?: string;
-  orderIds?: string[];
+  orderIds?: string[] | string;
   locationIds?: string[] | number[];
   regionsIds?: string[] | number[];
   departmentIds?: string[];

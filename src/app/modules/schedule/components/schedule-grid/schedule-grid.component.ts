@@ -452,6 +452,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: filteringEventArgs.text,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
+        departmentsIds : this.selectedFilters.departmentsIds
       }).pipe(
         tap((employeeDto) => {
           this.candidatesSuggestions = ScheduleGridAdapter.prepareCandidateFullName(employeeDto.items);
@@ -475,6 +476,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: user.fullName,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
+        departmentsIds : this.selectedFilters.departmentsIds
       })
         .pipe(take(1))
         .subscribe((page: ScheduleCandidatesPage) => {
@@ -500,7 +502,9 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private setScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null): void {
-    if(scheduleData != null && this.selectedFilters?.isOnlySchedulatedCandidate === true){
+    const user = this.store.selectSnapshot(UserState.user);
+
+    if(scheduleData != null && this.selectedFilters?.isOnlySchedulatedCandidate === true && user?.isEmployee === false){
       scheduleData.items = scheduleData?.items?.filter(schedule_Data => schedule_Data.schedule?.find(day_Schedule => day_Schedule.daySchedules?.find(schedule_Type => schedule_Type.scheduleType === ScheduleType.Book)));
     }
     this.scheduleData = scheduleData;
