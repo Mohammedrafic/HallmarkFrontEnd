@@ -7,7 +7,7 @@
   <section class="container preview-dialog">
     <section class="header-container">
       <div class="e-card-header preview-header">
-        <div class="e-card-header-caption">
+        <div class="e-card-header-caption" *ngIf="(selectedLog$ | async)  as selectedLog">
           <h3 class="e-card-title preview-title">{{ selectedLog?.customReportName }}</h3>
         </div>
         <div class="e-card-content">

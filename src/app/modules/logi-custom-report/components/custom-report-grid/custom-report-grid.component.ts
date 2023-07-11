@@ -66,7 +66,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   maxBlocksInCache: any;
   sideBar = SideBarConfig;
   itemList: Array<LogiCustomReport> = [];
-  selectedCustomReportItem: LogiCustomReport;
+  selectedCustomReportItem$: BehaviorSubject<LogiCustomReport> = new BehaviorSubject<LogiCustomReport>(null!);
   openCustomReportDialogue = new Subject<boolean>();
   private unsubscribe$: Subject<void> = new Subject();
   public organizations: Organisation[] = [];
@@ -163,6 +163,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
     });
 
     this.logInterfacePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+    
       this.itemList = data?.items?.sort(function (a: any, b: any) {
         return b.createdAt.localeCompare(a.createdAt);
       });
@@ -206,7 +207,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   };
 
   public onEdit(data: any): void {
-    this.selectedCustomReportItem = data.rowData;
+    this.selectedCustomReportItem$.next(data.rowData);
     this.openCustomReportDialogue.next(true);
   }
 
