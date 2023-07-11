@@ -42,22 +42,50 @@
               <div class="vertical-divider"></div>
             </div>
 
-            <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
+            <app-tooltip-container [showToolTip]="!CanEditOrderBillRateIRP">
               <button
+                *ngIf="activeSystem === systemType.IRP"
                 ejs-button
                 cssClass="e-outline edit-button"
-                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission || !CanEditOrderBillRateIRP"
+                [disabled]="disableEdit || !CanEditOrderBillRateIRP"
                 (click)="editOrder(order)"
               >
                 <i-feather name="edit" class="icon"></i-feather>
               </button>
             </app-tooltip-container>
-            <app-tooltip-container *ngIf="!canCloseOrder" [showToolTip]="!hasCreateEditOrderPermission">
+
+            <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
               <button
+                *ngIf="activeSystem !==  systemType.IRP"
+                ejs-button
+                cssClass="e-outline edit-button"
+                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission"
+                (click)="editOrder(order)"
+              >
+                <i-feather name="edit" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
+
+            <app-tooltip-container [showToolTip]="!CanCloseOrdersIRP">
+              <button
+                *ngIf="activeSystem === systemType.IRP"
                 ejs-button
                 cssClass="e-outline"
                 [class.custom-order-btn]="showApproveAndCancel"
-                [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission || !CanCloseOrdersIRP"
+                [disabled]="disableCloseOrder || !CanCloseOrdersIRP"
+                (click)="closeOrder(order)"
+              >
+                Close Order
+              </button>
+            </app-tooltip-container>
+
+            <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                *ngIf="activeSystem !==  systemType.IRP"
+                ejs-button
+                cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
+                [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
                 (click)="closeOrder(order)"
               >
                 Close Order
