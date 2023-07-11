@@ -61,10 +61,8 @@
       </e-column>
       <e-column field="AgencyName" headerText="AGENCY NAME" width="430">
         <ng-template #template let-data>
-          <app-agency-name
-            [agencyName]="data.agencyDetails.name"
-            [isMsp]="data.isMsp"
-          ></app-agency-name>
+          <app-agency-name [agencyName]="data.agencyDetails.name"
+                           [isMsp]="data.isMsp"></app-agency-name>
         </ng-template>
       </e-column>
       <e-column field="AgencyStatus" headerText="AGENCY STATUS" width=200>
@@ -90,7 +88,14 @@
           {{ data.contactPerson }}
         </ng-template>
       </e-column>
-      <e-column field="agencyContactDetails.0.phone1" headerText="PHONE" width="220" [allowSorting]="false"></e-column>
+      <e-column field="agencyContactDetails.0.phone1" headerText="PHONE" width="220" [allowSorting]="false">
+
+      </e-column>
+      <e-column field="agencyContactDetails.0.phone1" headerText="NETSUITE ID" width="220" [allowSorting]="false">
+        <ng-template #template let-data>
+          {{ data.netSuiteId }}
+        </ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">

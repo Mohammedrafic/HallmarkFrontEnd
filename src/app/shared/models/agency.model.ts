@@ -15,7 +15,8 @@ export type Agency = {
   agencyContactDetails: AgencyContactDetails[];
   agencyPaymentDetails: PaymentDetails[] | ElectronicPaymentDetails[];
   agencyJobDistribution: AgencyRegionSkills;
-  contactPerson?: string
+  contactPerson?: string;
+  netSuiteId?: number;
 };
 
 export type AgencyCreateUnder = {
@@ -42,6 +43,7 @@ export type AgencyDetails = {
   fax: string;
   website: string;
   status: number;
+  netSuiteId?: number;
 };
 
 export type AgencyBillingDetails = {
@@ -77,6 +79,7 @@ export type AgencyPaymentDetails = {
   city: string;
   zip: string;
   startDate: string;
+  netSuitePaymentId: number;
 };
 
 export type AgencyPage = PageOfCollections<Agency>;
