@@ -655,18 +655,23 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   private watchForSavePaymentAction(): void {
     this.actions$.pipe(ofActionSuccessful(Invoices.SavePayment), takeUntil(this.componentDestroy())).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
-      this.store.dispatch(
-        new Invoices.ToggleInvoiceDialog(
-          DialogAction.Open,
-          this.isAgency,
-          {
-            invoiceIds: this.gridSelections.selectedInvoiceIds,
-            organizationIds: [this.organizationId],
-          },
-          null,
-          null
-        )
-      );
+      const isDialogOpen = this.store.selectSnapshot(InvoicesState.isInvoiceDetailDialogOpen);
+      // Update data only for already open invoice dialog.
+      if (isDialogOpen.dialogState) {
+        this.store.dispatch(
+          new Invoices.ToggleInvoiceDialog(
+            DialogAction.Open,
+            this.isAgency,
+            {
+              invoiceIds: this.gridSelections.selectedInvoiceIds,
+              organizationIds: [this.organizationId],
+            },
+            null,
+            null
+          )
+        );
+      }
+
       this.cdr.markForCheck();
     });
   }

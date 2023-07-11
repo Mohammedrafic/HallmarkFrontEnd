@@ -163,7 +163,6 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
     });
 
     this.logInterfacePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-    
       this.itemList = data?.items?.sort(function (a: any, b: any) {
         return b.createdAt.localeCompare(a.createdAt);
       });
@@ -222,7 +221,9 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
     this.gridApi.setRowData(this.itemList);
   }
 
-
+  public refreshParentComponent() {
+    this.dispatchNewPage({ currentPage: this.currentPage, pageSize: this.pageSize });
+  }
   public dispatchNewPage(postData: any): void {
    
     if (localStorage.getItem('lastSelectedOrganizationId') === null) {

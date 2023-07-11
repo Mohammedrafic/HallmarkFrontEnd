@@ -37,6 +37,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   public credType : any;
   public isMobile = false;
   public isSmallDesktop = false;
+  public redirectedFromDashboard : any;
   
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
@@ -59,6 +60,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
     this.credStartDate = routerState?.['startDate'];
     this.credEndDate = routerState?.['endDate'];
     this.credType = routerState?.['type'];
+    this.redirectedFromDashboard = routerState?.['redirectedFromDashboard'];
   }
 
   ngOnInit(): void {

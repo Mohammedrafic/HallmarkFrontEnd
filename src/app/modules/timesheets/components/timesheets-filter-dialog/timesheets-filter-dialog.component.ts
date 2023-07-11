@@ -97,8 +97,8 @@ export class TimesheetsFilterDialogComponent
         takeUntil(this.componentDestroy())
       )
       .subscribe(({ state }) => {
-        let timeSheetMissing = JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string
-        let orgpendingwidget = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
+        const timeSheetMissing = JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string;
+        const orgpendingwidget = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
         this.applyPreservedFilters(state);
         if(timeSheetMissing != '' || orgpendingwidget != ''){
           this.clearAllFilters();
@@ -127,6 +127,9 @@ export class TimesheetsFilterDialogComponent
   }
 
   private applyPreservedFilters(filters: TimesheetsFilterState): void {
+    if (filters.orderIds) {
+      filters.orderIds = filters.orderIds[0];
+    }
     this.patchFilterForm({ ...filters });
     const contactEmails = Array.isArray(filters?.contactEmails) ? filters.contactEmails[0] : null;
     this.getPreservedContactPerson(contactEmails);

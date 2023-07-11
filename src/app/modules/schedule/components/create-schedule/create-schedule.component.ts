@@ -125,7 +125,6 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   scheduleType: ScheduleItemType;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
   sideBarSettings: BarSettings = SideBarSettings;
-  disableRemoveButton = false;
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
@@ -170,7 +169,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     }
 
     if (candidates?.length && this.isEmployee) {
-      this.disableRemoveButton = candidates[0].days.some((day: ScheduleDay) => !day.employeeCanEdit);
+      this.sideBarSettings.showRemoveButton = candidates[0].days.every((day: ScheduleDay) => day.employeeCanEdit);
     }
 
     if(this.scheduleOnlyWithAvailability) {
@@ -316,7 +315,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   saveBooking(): Observable<ScheduleBookingErrors[]> {
-    return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook).pipe(
+    return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook, false).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
       tap((errors: ScheduleBookingErrors[]) => {
         this.scheduleItemsService.setErrors(errors);

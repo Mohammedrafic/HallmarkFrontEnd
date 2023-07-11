@@ -53,7 +53,11 @@ export class ScheduleApiService {
     return this.http.post<void>('/api/Schedules/create', {...employeeScheduledDays, userLocalTime });
   }
 
-  createBookSchedule(employeeBookDays: ScheduleInt.ScheduleBook):Observable<ScheduleBookingErrors[]> {
+  createBookSchedule(
+    employeeBookDays: ScheduleInt.ScheduleBook,
+    isSingleError = true
+  ):Observable<ScheduleBookingErrors[]> {
+    employeeBookDays.isSingleError = isSingleError;
     return this.http.post<ScheduleBookingErrors[]>('/api/Schedules/book', employeeBookDays);
   }
 
