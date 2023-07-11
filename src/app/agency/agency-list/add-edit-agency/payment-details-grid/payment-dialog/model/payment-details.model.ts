@@ -7,6 +7,7 @@ export interface PaymentDetailsInterface {
   saveEvent: Subject<number>;
   paymentsList: PaymentDetails[] | ElectronicPaymentDetails[];
   mode: number;
+  editAgencyNetsuitePaymentId: boolean ;
 
   createPaymentDetailsForm(): void;
 }
