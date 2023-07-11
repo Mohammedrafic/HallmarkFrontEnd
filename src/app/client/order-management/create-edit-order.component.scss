@@ -38,7 +38,7 @@
 }
 
 .split-line {
-  height: 2px;
+  height: 1px;
   width: 100%;
   background-color: $secondary-dark-blue-40;
   margin: 10px 0;
@@ -51,6 +51,10 @@
 @media #{$max-tablet} {
   .create-order-header {
     padding-right: 16px;
+  }
+
+  .split-line {
+    width: calc(100% - 18px);
   }
 }
 
