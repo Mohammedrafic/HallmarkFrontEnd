@@ -1438,6 +1438,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   changeSystem(selectedBtn: ButtonModel) {
     this.activeSystem = selectedBtn.id;
+    this.closeModalsBeforeSwitchSystem();
     this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);
     this.clearFilters();
     this.store.dispatch([new PreservedFilters.ResetPageFilters(), new ClearOrders()]);
@@ -1732,6 +1733,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.onFilterApply();
       this.onOrderJourneyFilterApply();
     });
+  }
+
+  private closeModalsBeforeSwitchSystem(): void {
+    this.openDetails.next(false);
+    this.orderPositionSelected$.next({ state: false });
+    this.openChildDialog.next(false);
   }
 
   private adjustFilters(isNotPreservedFilter: boolean): void {
@@ -2232,7 +2239,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
       this.filters.contactEmails = this.filters.contactEmails ;
-     
+
       this.filters.orderPublicId = selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId;
       this.filters.agencyType = null;
       this.filters.includeReOrders = false;
@@ -2508,7 +2515,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private refreshFilterState(): void {
     this.filterApplied = true;
     this.filters = this.OrderFilterFormGroup.getRawValue();
- 
+
     this.filters.contactEmails = this.filters.contactEmails || null;
     this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
