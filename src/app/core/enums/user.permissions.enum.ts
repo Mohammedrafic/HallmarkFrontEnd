@@ -222,5 +222,5 @@ export enum UserPermissions {
   CanCloseOrdersIRP = 6412,
 
   //Agency setup
-  EditAgencyNetsuitePaymentId = 8108
+  EditAgencyNetsuitePaymentId = 8110
 }
