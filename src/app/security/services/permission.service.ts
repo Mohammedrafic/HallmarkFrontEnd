@@ -16,6 +16,7 @@ export interface PermissionsModel {
   canRejectCandidateIRP:boolean;
   canManageOrganizationConfigurations: boolean;
   canOrderJourney:boolean;
+  canCandidateAssignment:boolean;
 }
 
 export type CustomPermissionModel = { [key: string]: PermissionTypes  };
@@ -46,6 +47,8 @@ export class PermissionService extends DestroyableDirective {
           canCloseOrderIRP:permissionIds.includes(PermissionTypes.CanCloseOrdersIRP),
           canOnboardCandidateIRP:permissionIds.includes(PermissionTypes.CanOnboardCandidateIRP),
           canRejectCandidateIRP:permissionIds.includes(PermissionTypes.CanRejectCandidateIRP),
+          canCandidateAssignment:permissionIds.includes(PermissionTypes.CanViewCandidateAssigment),
+
           };
       })
     );

@@ -1,6 +1,6 @@
 export enum CandidateDetailsTabs {
-  All,
-  Confirmed,
-  Active,
-  Past,
+  All = 0,
+  Confirmed = 1,
+  Active = 2,
+  Past = 3,
 }
