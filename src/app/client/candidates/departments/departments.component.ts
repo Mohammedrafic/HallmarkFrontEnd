@@ -328,7 +328,6 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     const startDates: string[] = [];
     const endDates: string[] = [];
     const employeeWorkCommitmentIds: number[] = [];
-    const activeEmployeeWorkCommitmentId = this.departmentsService.employeeWorkCommitmentId;
 
     selectedRows.forEach((item) => {
       const { workCommitmentStartDate, workCommitmentEndDate, employeeWorkCommitmentId } = item.data;
@@ -344,9 +343,11 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       }
     });
 
-    if (allAreEqual(employeeWorkCommitmentIds) && employeeWorkCommitmentIds[0] !== activeEmployeeWorkCommitmentId) {
+   if (allAreEqual(employeeWorkCommitmentIds)) {
       const min = startDates[0] ? DateTimeHelper.setCurrentTimeZone(startDates[0]) : undefined;
-      const max = endDates[0] ? DateTimeHelper.setCurrentTimeZone(endDates[0]) : undefined;
+      const max = startDates.length === endDates.length
+        ? DateTimeHelper.setCurrentTimeZone(endDates[0])
+        : undefined;
       this.bulkDateRanges = { min, max };
     } else {
       this.bulkDateRanges = this.dateRanges;
