@@ -48,6 +48,7 @@ import {
   AvailabilityFormConfig,
   BookFormConfig,
   OpenPositionsConfig,
+  PastTimeErrorMessage,
   ScheduleItemType,
   ScheduleSourcesMap,
   ScheduleTypesForCreateBar,
@@ -293,6 +294,11 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   saveSchedule(): void {
    if (this.scheduleForm.invalid) {
       this.scheduleForm.markAllAsTouched();
+      return;
+    }
+
+    if (!this.createScheduleService.canEmployeeCreateRecord(this.isEmployee, this.scheduleSelectedSlots.dates)) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, PastTimeErrorMessage));
       return;
     }
 

@@ -35,7 +35,12 @@ import { UnavailabilityReason } from '@shared/models/unavailability-reason.model
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
 import { getTime } from '@shared/utils/date-time.utils';
-import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypesForEditBar } from 'src/app/modules/schedule/constants';
+import {
+  PastTimeErrorMessage,
+  ScheduleFormSourceKeys,
+  ScheduleItemType,
+  ScheduleTypesForEditBar,
+} from 'src/app/modules/schedule/constants';
 import { ScheduleType } from 'src/app/modules/schedule/enums';
 import { ShowToast } from 'src/app/store/app.actions';
 import {
@@ -289,6 +294,14 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   saveSchedule(): void {
     if (this.scheduleForm.invalid) {
       this.scheduleForm.markAllAsTouched();
+      return;
+    }
+
+    if (
+      this.isCreateMode
+      && !this.createScheduleService.canEmployeeCreateRecord(this.isEmployee, [this.scheduleForm.get('date')?.value])
+    ) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, PastTimeErrorMessage));
       return;
     }
 
