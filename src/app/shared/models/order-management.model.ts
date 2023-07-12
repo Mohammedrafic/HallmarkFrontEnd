@@ -345,6 +345,7 @@ export type AgencyOrderFilters = {
   projectNameIds?: number | null;
   poNumberIds?: number | null;
   shift?: string | string[];
+  orderLocked? : any | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -721,6 +722,7 @@ export class OrderFilter {
   reorderStatuses?: (string | number)[];
   shift?: string[] | string;
   isQuickLinkWidgetLTA?: boolean | null;
+  orderLocked? : any | null;
 }
 
 export class SortModel {

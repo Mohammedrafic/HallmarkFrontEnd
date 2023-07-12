@@ -122,6 +122,7 @@ import {
   OrderManagementIRPTabs,
   OrderManagementIRPTabsIndex,
   OrganizationOrderManagementTabs,
+  orderLockList,
 } from '@shared/enums/order-management-tabs.enum';
 import { FilterIrpOrderTypes, OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
@@ -456,6 +457,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public CanEditOrderBillRateIRP:boolean;
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
+  public orderLockList = orderLockList;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -871,20 +873,32 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.filters.isTemplate = false;
           this.filters.includeReOrders = true;
           this.hasOrderAllOrdersId();
-          cleared ? this.store.dispatch([new GetOrders(this.filters)])
+          let filtersAllOrders = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersAllOrders.orderLocked = filtersAllOrders.orderLocked == 'false' ? false : filtersAllOrders.orderLocked == 'true' ? true : null
+          }
+          cleared ? this.store.dispatch([new GetOrders(filtersAllOrders)])
             : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.PerDiem:
           this.filters.orderTypes = [OrderType.OpenPerDiem];
           this.filters.includeReOrders = true;
           this.filters.isTemplate = false;
-          cleared ? this.store.dispatch([new GetOrders(this.filters)])
+          let filtersPerDiem = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersPerDiem.orderLocked = filtersPerDiem.orderLocked == 'false' ? false : filtersPerDiem.orderLocked == 'true' ? true : null
+          }
+          cleared ? this.store.dispatch([new GetOrders(filtersPerDiem)])
             : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.PermPlacement:
           this.filters.orderTypes = [OrderType.PermPlacement];
           this.filters.isTemplate = false;
-          cleared ? this.store.dispatch([new GetOrders(this.filters)])
+          let filtersPermPlacement = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersPermPlacement.orderLocked = filtersPermPlacement.orderLocked == 'false' ? false : filtersPermPlacement.orderLocked == 'true' ? true : null
+          }
+          cleared ? this.store.dispatch([new GetOrders(filtersPermPlacement)])
             : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.ReOrders:
@@ -999,6 +1013,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       irpOnly: this.filters.irpOnly || null,
       reorderStatuses: this.filters.reorderStatuses || null,
       shift:this.filters.shift || null,
+      orderLocked:this.filters.orderLocked || null,
     });
 
     if (!prepopulate) {
