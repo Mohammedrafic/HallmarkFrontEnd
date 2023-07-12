@@ -145,6 +145,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public isAgency = false;
   public showHoursControl = false;
   public showPercentage = false;
+  public verifyNoPenalty = false;
   public candidate: OrderCandidatesList | undefined;
   public comments: Comment[] = [];
   public orderPermissions: CurrentUserPermission[];
@@ -753,6 +754,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+    this.verifyNoPenalty = value === PenaltyCriteria.NoPenalty;
   }
 
   private fieldsEnableHandlear(): void {
