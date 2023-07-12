@@ -150,8 +150,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
-  private fixedTimesheetStatusesIncluded: number[] = [1, 2, 3, 4, 5, 6];
-  private defaultTimesheetStatuses: number[] = [1, 2, 3, 4, 6];
+  private fixedTimesheetStatusesIncluded: number[] = [ 2, 3,  5, 6];
+  private defaultTimesheetStatuses: number[] = [ 2, 3, 6];
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
