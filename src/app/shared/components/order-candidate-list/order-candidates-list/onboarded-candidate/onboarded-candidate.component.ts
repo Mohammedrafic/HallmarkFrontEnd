@@ -133,6 +133,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public isActiveCandidateDialog$: Observable<boolean>;
   public showHoursControl = false;
   public showPercentage = false;
+  public verifyNoPenalty = false;
   public orderPermissions: CurrentUserPermission[];
   public canShortlist = false;
   public canInterview = false;
@@ -740,6 +741,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+    this.verifyNoPenalty = value === PenaltyCriteria.NoPenalty;
   }
 
   private switchFormState(): void {
