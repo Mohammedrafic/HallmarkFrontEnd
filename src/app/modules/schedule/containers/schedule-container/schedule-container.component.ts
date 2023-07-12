@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { filter, Observable, scheduled, switchMap, takeUntil } from 'rxjs';
@@ -25,6 +25,7 @@ import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilter
 import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatesRangeType } from '@shared/enums';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-schedule-container',
@@ -76,8 +77,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     private scheduleFiltersService: ScheduleFiltersService,
     private createScheduleService: CreateScheduleService,
     private settingService: SettingsViewService,
-    private router: Router,
-    private route: ActivatedRoute
+    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
 
@@ -396,7 +396,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
         }
       });
       const state = { redirectFromSchedule: true, data : data, dateRange : this.DateRange, scheduleFilters : this.scheduleFilters, activePeriod : this.activeTimePeriod};
-      this.router.navigate(['/schedule-export'], { state: state }).then(() => console.log("state transformed"));
+      this.globalWindow.localStorage.setItem('Schedule_Export',JSON.stringify(state));
+      window.open(window.location.origin + '/schedule-export', '_blank');
     }) ;
   }
 }

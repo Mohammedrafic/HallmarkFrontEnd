@@ -1,19 +1,15 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef, TrackByFunction, ElementRef, ViewChild, Renderer2 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef, TrackByFunction, ElementRef, ViewChild, Renderer2, Inject } from '@angular/core';
 import { DateTimeHelper } from '@core/helpers/date-time.helper';
-import { DateWeekService } from '@core/services';
 import { Store } from '@ngxs/store';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { WeekDays } from '@shared/enums/week-days.enum';
-import { debounceTime, filter, Observable, tap, windowCount } from 'rxjs';
 import { GetMonthRange } from 'src/app/modules/schedule/helpers/schedule.helper';
 import { ScheduleItemsService } from 'src/app/modules/schedule/services/schedule-items.service';
-import * as ScheduleInt from "src/app/modules/schedule/interface/index";
+import * as ScheduleInt from 'src/app/modules/schedule/interface/index';
 import { ScheduleGridService } from 'src/app/modules/schedule/components/schedule-grid/schedule-grid.service';
 import { DatesRangeType } from '@shared/enums/week-range.enum';
 import { DatesByWeekday, ScheduleExport } from 'src/app/modules/schedule/interface/index';
-import { MonthPickerService } from '@shared/components/month-date-picker';
-import { GetGroupedDatesByWeekday } from 'src/app/modules/schedule/components/month-view-grid';
+import { GlobalWindow } from '@core/tokens';
 
 @Component({
   selector: 'app-base-export',
@@ -35,24 +31,20 @@ export class BaseExportComponent implements OnInit {
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
   activePeriod = DatesRangeType.TwoWeeks;
   monthPeriod = DatesRangeType.Month;
-  receivedState: any;
 
-  constructor(private router : Router,    
-              private route : ActivatedRoute,
-              private renderer : Renderer2,
+  constructor(
               private store: Store,
               private scheduleGridService: ScheduleGridService,
               private scheduleItemsService: ScheduleItemsService,
-              private monthPickerService: MonthPickerService,
+              @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
               private cdr : ChangeDetectorRef) { 
-            
-    const routerState = this.router.getCurrentNavigation()?.extras?.state;
-    if(routerState?.['redirectFromSchedule'] === true){
-          this.setScheduleTable(routerState?.['data']);
-          this.setDateSchedule(routerState?.['dateRange']);
-          this.scheduleFilters = routerState?.["scheduleFilters"];
-          this.activePeriod = routerState?.["activePeriod"];
-    }
+              const Schedule_storage = JSON.parse((this.globalWindow.localStorage.getItem('Schedule_Export') || ''));   
+              if(Schedule_storage != ''){
+                this.setScheduleTable(Schedule_storage.data);
+                this.setDateSchedule(Schedule_storage.dateRange);
+                this.scheduleFilters = Schedule_storage.scheduleFilters;
+                this.activePeriod = Schedule_storage.activePeriod;
+              }
   }
 
   trackByDatesRange: TrackByFunction<ScheduleInt.DateRangeOption> =

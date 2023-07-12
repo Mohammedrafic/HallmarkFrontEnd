@@ -26,9 +26,6 @@
     </ng-container>
 
     <ng-template #multipleEventsView>
-      <div class="day">
-        {{currentDate | date: 'd'}}
-      </div>
       <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: firstSmallCardConfig }"></ng-container>
       <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: secondSmallCardConfig }"></ng-container>
     </ng-template>
@@ -47,8 +44,8 @@
     <div class="title">
       <span class="title__text">{{ item.title }}</span>
     </div>
-    <div class="additional-attributes" *ngIf="bigCardConfig.additionalAttributes">
-      <span>{{bigCardConfig.additionalAttributes}}</span>
+    <div class="additional-attributes" *ngIf="item.additionalAttributes">
+      <span>{{item.additionalAttributes}}</span>
     </div>
 
   </div>
