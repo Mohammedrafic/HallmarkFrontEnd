@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 import { GetQueryParams } from '@core/helpers';
-import { OrganizationSettingFilter, OrganizationSettingsGet, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
+import { OrganizationSettingFilter, Configuration, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable({ providedIn: 'root' })
@@ -16,16 +16,16 @@ export class OrganizationSettingsService {
    * @param organizationId organization id to search by
    * @return Array of organization settings
    */
-  public getOrganizationSettings(filters?: OrganizationSettingFilter, lastSelectedBusinessUnitId?: number): Observable<OrganizationSettingsGet[]> {
+  public getOrganizationSettings(filters?: OrganizationSettingFilter, lastSelectedBusinessUnitId?: number): Observable<Configuration[]> {
     let headers = {};
     if (lastSelectedBusinessUnitId) {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
 
     if (filters) {
-      return this.http.post<OrganizationSettingsGet[]>(`/api/OrganizationSettings/filter`, filters);
+      return this.http.post<Configuration[]>(`/api/OrganizationSettings/filter`, filters);
     }
-    return this.http.get<OrganizationSettingsGet[]>(`/api/OrganizationSettings/`, { headers });
+    return this.http.get<Configuration[]>(`/api/OrganizationSettings/`, { headers });
   }
 
   /**

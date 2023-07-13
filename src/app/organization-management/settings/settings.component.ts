@@ -1,10 +1,9 @@
-import { Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { distinctUntilChanged, filter, merge, Observable, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 
 import { OutsideZone } from '@core/decorators';
@@ -28,9 +27,9 @@ import { Department } from '@shared/models/department.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { Location } from '@shared/models/location.model';
 import {
-  OrganizationSettingChild,
+  ConfigurationChild,
   OrganizationSettingFilter,
-  OrganizationSettingsGet,
+  Configuration,
   OrganizationSettingsPost,
   OrganizationSettingValidation,
   OrganizationSettingValueOptions,
@@ -46,7 +45,6 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { FilterService } from '@shared/services/filter.service';
 import { customEmailValidator } from '@shared/validators/email.validator';
 import { SettingsGroupInvoicesOptions } from 'src/app/modules/invoices/constants';
-import { PermissionService } from 'src/app/security/services/permission.service';
 import { AppState } from 'src/app/store/app.state';
 
 import { ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
@@ -94,13 +92,11 @@ import { MessageTypes } from '@shared/enums/message-types';
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
-  providers: [DetailRowService, MaskedDateTimeService],
+  providers: [MaskedDateTimeService],
 })
 export class SettingsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
-  @ViewChild('grid') grid: GridComponent;
-
   @Select(OrganizationManagementState.organizationSettings)
-  settings$: Observable<OrganizationSettingsGet[]>;
+  settings$: Observable<Configuration[]>;
 
   @Select(OrganizationManagementState.sortedRegions)
   regions$: Observable<Region[]>;
@@ -179,15 +175,15 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private readonly settingsAppliedToPermissions = SettingsAppliedToPermissions;
 
-  private selectedParentRecord: OrganizationSettingsGet | null;
-  private selectedChildRecord: OrganizationSettingChild | null;
+  private selectedParentRecord: Configuration | null;
+  private selectedChildRecord: ConfigurationChild | null;
   private orgStructure: OrganizationStructure;
   private orgRegions: OrganizationRegion[] = [];
   private organizationHierarchy: number;
   private organizationHierarchyId: number;
   private organizationId: number;
-  private dataSource: OrganizationSettingsGet[];
-  private configurations: OrganizationSettingsGet[] = [];
+  private dataSource: Configuration[];
+  public configurations: Configuration[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private filters: OrganizationSettingFilter = {};
   private configurationSystemType: SystemType = SystemType.VMS;
@@ -203,7 +199,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     private formBuilder: FormBuilder,
     private confirmService: ConfirmService,
     private filterService: FilterService,
-    private permissionService: PermissionService,
     private sideMenuService: SideMenuService,
     private readonly ngZone: NgZone,
   ) {
@@ -277,7 +272,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  openOverrideSettingDialog(data: OrganizationSettingsGet): void {
+  openOverrideSettingDialog(data: Configuration): void {
     this.setSelectedRecords(data);
     this.setOrganizationSettingKey(data.settingKey);
     this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
@@ -316,10 +311,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   openEditSettingDialog(
-    parentRecord: OrganizationSettingsGet,
-    childRecord: OrganizationSettingChild | undefined,
-    event: MouseEvent
+    data: {
+      parentRecord: Configuration,
+      childRecord: ConfigurationChild | undefined,
+      event: MouseEvent
+    }
   ): void {
+    const {parentRecord, childRecord, event} = data;
     this.setSelectedRecords(parentRecord, childRecord);
     this.setOrganizationSettingKey(parentRecord.settingKey);
     this.separateValuesInSystems = parentRecord.separateValuesInSystems;
@@ -338,7 +336,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.addActiveCssClass(event);
     this.setEditMode();
     this.regularLocalRatesToggleMessage = OrganizationSettings.MandateCandidateAddress === parentRecord.settingKey &&
-    this.dataSource.find((data: OrganizationSettingsGet) => data.settingKey === OrganizationSettings.EnableRegularLocalRates)?.value == 'true';
+    this.dataSource.find((data: Configuration) => data.settingKey === OrganizationSettings.EnableRegularLocalRates)?.value == 'true';
     this.formControlType = parentRecord.controlType;
     this.disableDepForInvoiceGeneration();
     this.setFormValidation(parentRecord);
@@ -403,7 +401,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (
       this.regionRequiredFormGroup.valid
       && this.isPushStartDateValid()
-      && this.invoiceAutoGeneratingValig()
+      && this.invoiceAutoGeneratingValid()
       && this.switchedValueForm.valid
       && this.checkboxValueForm.valid
     ) {
@@ -513,21 +511,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.sideMenuService.selectedMenuItem$.next(ORG_SETTINGS[13]);
   }
 
-  changePageSize(event: { isInteracted: boolean }): void {
-    if (event.isInteracted) {
-      this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
-      this.lastAvailablePage = this.getLastPage(this.configurations);
-    }
-  }
-
-  changePage(event: { currentPage: number, value: number }): void {
-    if ((event.currentPage && event.currentPage !== this.currentPagerPage) || event.value) {
-      this.gridDataSource = this.getRowsPerPage(this.configurations, event.currentPage || event.value);
-      this.lastAvailablePage = this.getLastPage(this.configurations);
-      this.currentPagerPage = event.currentPage || event.value;
-    }
-  }
-
   private isPushStartDateValid(): boolean {
     return (
       this.formControlType !== OrganizationSettingControlType.FixedKeyDictionary || this.pushStartDateFormGroup.valid
@@ -543,7 +526,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  private invoiceAutoGeneratingValig(): boolean {
+  private invoiceAutoGeneratingValid(): boolean {
     return (
       this.formControlType !== OrganizationSettingControlType.InvoiceAutoGeneration ||
       this.invoiceGeneratingFormGroup.valid
@@ -565,11 +548,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         skip(1),
         takeUntil(this.unsubscribe$),
       )
-      .subscribe((data: OrganizationSettingsGet[]) => {
+      .subscribe((data: Configuration[]) => {
         const adaptedData = SettingsDataAdapter.adaptSettings(data, this.orgSystems);
 
         this.configurations = data;
-        this.lastAvailablePage = this.getLastPage(data);
         let settingData = this.getRowsPerPage(adaptedData, this.currentPagerPage);
         settingData.forEach(element => {
           if (element?.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
@@ -577,22 +559,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
               if (e.regionId == null && e.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
                 e.hidden = true;
               }
-            })
+            });
           }
         });
         this.gridDataSource = settingData;
         this.totalDataRecords = adaptedData.length;
         this.dataSource = adaptedData;
-        this.grid?.refresh();
       });
-  }
-
-  public rowDataBound(args: any): void {
-    // hides expand button if no children
-    if (args.data.children.length === 0) {
-      args.row.querySelector('td').innerHTML = ' ';
-      args.row.querySelector('td').className = 'e-customized-expand-cell';
-    }
   }
 
   private sendForm(): void {
@@ -661,7 +634,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.isFormShown = false;
   }
 
-  private setFormValidation(data: OrganizationSettingsGet): void {
+  private setFormValidation(data: Configuration): void {
     this.maxFieldLength = 100;
     const validators: ValidatorFn[] = [];
 
@@ -711,7 +684,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  private setFormValuesForOverride(data: OrganizationSettingsGet): void {
+  private setFormValuesForOverride(data: Configuration): void {
     if (
       this.formControlType === OrganizationSettingControlType.Multiselect ||
       this.formControlType === OrganizationSettingControlType.Select
@@ -729,7 +702,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     });
   }
 
-  private setFormValuesForEdit(parentData: OrganizationSettingsGet, childData: OrganizationSettingChild | null): void {
+  private setFormValuesForEdit(parentData: Configuration, childData: ConfigurationChild | null): void {
     let dynamicValue: any;
     const childDataValue = childData?.value;
     const parentDataValue = SettingsDataAdapter
@@ -917,15 +890,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     return parseInt(this.activeRowsPerPageDropDown);
   }
 
-  private getRowsPerPage(data: OrganizationSettingsGet[], currentPage: number): OrganizationSettingsGet[] {
+  private getRowsPerPage(data: Configuration[], currentPage: number): Configuration[] {
     return data.slice(
       currentPage * this.getActiveRowsPerPage() - this.getActiveRowsPerPage(),
       currentPage * this.getActiveRowsPerPage()
     );
-  }
-
-  private getLastPage(data: object[]): number {
-    return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
 
   private setPermissionsToManageSettings(): void {
@@ -1291,7 +1260,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.filters = {};
   }
 
-  private setChildRecordData(childRecord: OrganizationSettingChild | undefined): void {
+  private setChildRecordData(childRecord: ConfigurationChild | undefined): void {
     if (!childRecord) {
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
@@ -1417,7 +1386,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     else if (
       this.organizationSettingsFormGroup.valid &&
       this.isPushStartDateValid() &&
-      this.invoiceAutoGeneratingValig()
+      this.invoiceAutoGeneratingValid()
       && this.switchedValueForm.valid
       && this.checkboxValueForm.valid
     ) {
@@ -1431,8 +1400,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   @OutsideZone
   private updateFormOutsideZone(
-    parentData: OrganizationSettingsGet,
-    childData: OrganizationSettingChild | null,
+    parentData: Configuration,
+    childData: ConfigurationChild | null,
     dynamicValue: any,
   ): void {
     setTimeout(() => {
@@ -1482,7 +1451,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  private setSystemTypeForEditMode(childRecord: OrganizationSettingChild | undefined): void {
+  private setSystemTypeForEditMode(childRecord: ConfigurationChild | undefined): void {
     if (childRecord) {
       this.setConfigurationSystemType(childRecord.isIRPConfigurationValue ? SystemType.IRP : SystemType.VMS, true);
     } else {
@@ -1491,8 +1460,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private setSelectedRecords(
-    parentRecord: OrganizationSettingsGet | null = null,
-    childRecord: OrganizationSettingChild | null = null
+    parentRecord: Configuration | null = null,
+    childRecord: ConfigurationChild | null = null
   ): void {
     this.selectedParentRecord = parentRecord;
     this.selectedChildRecord = childRecord;

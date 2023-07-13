@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { OrganizationSettingKeys } from '@shared/constants';
 
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import { UserState } from 'src/app/store/user.state';
 
 @Pipe({
@@ -14,7 +14,7 @@ export class CanManageSettingPipe implements PipeTransform {
 
   transform(
     hasPermission: Record<string, boolean>,
-    data: OrganizationSettingsGet,
+    data: Configuration,
     overridableByOrg: boolean,
     disableSettingsKeys?: string[]
   ): boolean {

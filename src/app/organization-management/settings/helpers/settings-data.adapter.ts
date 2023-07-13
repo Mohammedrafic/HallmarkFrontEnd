@@ -4,9 +4,9 @@ import { DropdownOption } from '@core/interface';
 import { OrganizationSystems } from '@organization-management/settings/settings.constant';
 import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
 import {
-  OrganizationSettingChild,
+  ConfigurationChild,
   OrganizationSettingsDropDownOption,
-  OrganizationSettingsGet,
+  Configuration,
   OrganizationSettingValueOptions,
 } from '@shared/models/organization-settings.model';
 
@@ -23,11 +23,11 @@ export class SettingsDataAdapter {
   }
 
   static adaptSettings(
-    settings: OrganizationSettingsGet[],
+    settings: Configuration[],
     orgSystems: typeof OrganizationSystems
-  ): OrganizationSettingsGet[] {
+  ): Configuration[] {
     SettingsDataAdapter.setParsedValues(settings);
-    return settings.map((item: OrganizationSettingsGet) => {
+    return settings.map((item: Configuration) => {
       if (
         item.controlType === OrganizationSettingControlType.Select ||
         item.controlType === OrganizationSettingControlType.Multiselect
@@ -37,7 +37,7 @@ export class SettingsDataAdapter {
           item.value = SettingsDataAdapter.getDropDownOptionsFromString(item.value, item.valueOptions);
         }
 
-        item.children?.forEach((child: OrganizationSettingChild) => {
+        item.children?.forEach((child: ConfigurationChild) => {
           if (typeof child.value === 'string') {
             child.value = SettingsDataAdapter.getDropDownOptionsFromString(child.value, item.valueOptions);
           }
@@ -45,7 +45,7 @@ export class SettingsDataAdapter {
 
       }
 
-      item.children?.forEach((child: OrganizationSettingChild) => {
+      item.children?.forEach((child: ConfigurationChild) => {
         child.systemType = orgSystems.IRPAndVMS ? SettingsDataAdapter.getSettingChildSystemType(child) : null;
         child.displayValue = SettingsDataAdapter.getSettingChildDisplayValue(child, item.controlType);
       });
@@ -57,19 +57,19 @@ export class SettingsDataAdapter {
     });
   }
 
-  static getParentSettingValue(parentSetting: OrganizationSettingsGet, isIRP: boolean): any {
+  static getParentSettingValue(parentSetting: Configuration, isIRP: boolean): any {
     if (!parentSetting.children?.length) {
       return parentSetting.value;
     }
 
     if (isIRP) {
       const setting = parentSetting.children
-        .find((item: OrganizationSettingChild) => item.isIRPConfigurationValue && !item.regionId);
+        .find((item: ConfigurationChild) => item.isIRPConfigurationValue && !item.regionId);
 
       return setting?.value || parentSetting.value;
     } else {
       const setting = parentSetting.children
-        .find((item: OrganizationSettingChild) => !item.isIRPConfigurationValue && !item.regionId);
+        .find((item: ConfigurationChild) => !item.isIRPConfigurationValue && !item.regionId);
 
       return setting?.value || parentSetting.value;
     }
@@ -104,7 +104,7 @@ export class SettingsDataAdapter {
     return options;
   }
 
-  private static getSettingSystemType(setting: OrganizationSettingsGet): string | null {
+  private static getSettingSystemType(setting: Configuration): string | null {
     if (setting.includeInVMS && !setting.includeInIRP) {
       return 'VMS';
     }
@@ -120,7 +120,7 @@ export class SettingsDataAdapter {
     return null;
   }
 
-  private static getSettingChildSystemType(setting: OrganizationSettingChild): string {
+  private static getSettingChildSystemType(setting: ConfigurationChild): string {
     if (setting.isIRPConfigurationValue) {
       return 'IRP';
     } else {
@@ -128,8 +128,8 @@ export class SettingsDataAdapter {
     }
   }
 
-  private static setParsedValues(data: OrganizationSettingsGet[]): void {
-    const invoiceGeneration: OrganizationSettingsGet | undefined = data.find((setting: OrganizationSettingsGet) => {
+  private static setParsedValues(data: Configuration[]): void {
+    const invoiceGeneration: Configuration | undefined = data.find((setting: Configuration) => {
       return setting.controlType === OrganizationSettingControlType.InvoiceAutoGeneration;
     });
 
@@ -137,7 +137,7 @@ export class SettingsDataAdapter {
       invoiceGeneration.parsedValue = SettingsDataAdapter.getParsedValue(invoiceGeneration.value);
     }
 
-    const payPeriodGeneration: OrganizationSettingsGet | undefined  = data.find((setting: OrganizationSettingsGet) => {
+    const payPeriodGeneration: Configuration | undefined  = data.find((setting: Configuration) => {
       return setting.controlType === OrganizationSettingControlType.PayPeriod;
     });
 
@@ -145,17 +145,17 @@ export class SettingsDataAdapter {
       payPeriodGeneration.parsedValue = SettingsDataAdapter.getParsedValue(payPeriodGeneration.value);
     }
 
-    const switchedValues: OrganizationSettingsGet[] = data.filter((setting: OrganizationSettingsGet) => {
+    const switchedValues: Configuration[] = data.filter((setting: Configuration) => {
       return setting.controlType === OrganizationSettingControlType.SwitchedValue;
     });
 
-    switchedValues.forEach((setting: OrganizationSettingsGet) => {
+    switchedValues.forEach((setting: Configuration) => {
       if (setting.value && typeof setting.value === 'string') {
         setting.parsedValue = SettingsDataAdapter.getParsedValue(setting.value);
       }
 
       if (setting.children && setting.children.length) {
-        setting.children.forEach((child: OrganizationSettingChild) => {
+        setting.children.forEach((child: ConfigurationChild) => {
           if (child.value && typeof child.value === 'string') {
             child.parsedValue = SettingsDataAdapter.getParsedValue(child.value);
           }
@@ -164,7 +164,7 @@ export class SettingsDataAdapter {
     });
   }
 
-  private static getSettingDisplayValue(setting: OrganizationSettingsGet, orgSystems: typeof OrganizationSystems): string {
+  private static getSettingDisplayValue(setting: Configuration, orgSystems: typeof OrganizationSystems): string {
     let displayValue: string;
 
     if (setting.separateValuesInSystems && orgSystems.IRPAndVMS) {
@@ -210,7 +210,7 @@ export class SettingsDataAdapter {
     return displayValue;
   }
 
-  private static getSharedSettingDisplayValue(setting: OrganizationSettingsGet): string {
+  private static getSharedSettingDisplayValue(setting: Configuration): string {
     if (setting.controlType === OrganizationSettingControlType.Checkbox) {
       const irpValue = SettingsDataAdapter
         .getCheckboxDisplayValue(SettingsDataAdapter.getParentSettingValue(setting, true));
@@ -286,7 +286,7 @@ export class SettingsDataAdapter {
     return '';
   }
 
-  private static getSettingChildDisplayValue(child: OrganizationSettingChild, type: OrganizationSettingControlType): string {
+  private static getSettingChildDisplayValue(child: ConfigurationChild, type: OrganizationSettingControlType): string {
     let displayValue: string;
 
     switch (type) {
@@ -361,19 +361,19 @@ export class SettingsDataAdapter {
     return result;
   }
 
-  private static getParentSettingParsedValue(parentSetting: OrganizationSettingsGet, isIRP: boolean): any {
+  private static getParentSettingParsedValue(parentSetting: Configuration, isIRP: boolean): any {
     if (!parentSetting.children?.length) {
       return parentSetting.parsedValue;
     }
 
     if (isIRP) {
       const setting = parentSetting.children
-        .find((item: OrganizationSettingChild) => item.isIRPConfigurationValue && !item.regionId);
+        .find((item: ConfigurationChild) => item.isIRPConfigurationValue && !item.regionId);
 
       return setting?.parsedValue || parentSetting.parsedValue;
     } else {
       const setting = parentSetting.children
-        .find((item: OrganizationSettingChild) => !item.isIRPConfigurationValue && !item.regionId);
+        .find((item: ConfigurationChild) => !item.isIRPConfigurationValue && !item.regionId);
 
       return setting?.parsedValue || parentSetting.parsedValue;
     }

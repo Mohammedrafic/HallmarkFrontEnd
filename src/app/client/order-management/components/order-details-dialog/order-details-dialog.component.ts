@@ -50,7 +50,7 @@ import { AddEditReorderComponent } from '@client/order-management/components/add
 import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import { SettingsKeys } from '@shared/enums/settings';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import {
   ExtensionCandidateComponent,
 } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
@@ -84,7 +84,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() openEvent: Subject<boolean>;
   @Input() orderPositionSelected$: Subject<{ state: boolean; index?: number }>;
   @Input() children: OrderManagementChild[] | undefined;
-  @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  @Input() settings: { [key in SettingsKeys]?: Configuration };
   @Input() hasCreateEditOrderPermission: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() CanEditOrderBillRateIRP: boolean;

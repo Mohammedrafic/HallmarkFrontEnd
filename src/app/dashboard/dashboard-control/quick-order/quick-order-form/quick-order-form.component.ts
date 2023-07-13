@@ -50,7 +50,7 @@ import PriceUtils from '@shared/utils/price.utils';
 import { ORDER_CONTACT_DETAIL_TITLES, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import { GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { SettingsKeys } from '@shared/enums/settings';
@@ -130,7 +130,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public orderStatus = 'Open';
   public priceUtils = PriceUtils;
-  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  public settings: { [key in SettingsKeys]?: Configuration };
   public readonly orderTypes = OrderTypeOptions;
   public readonly durations = ORDER_DURATION_LIST;
   public readonly masterShiftNames = ORDER_MASTER_SHIFT_NAME_LIST;
@@ -152,7 +152,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   @Select(RejectReasonState.sortedOrderRequisition)
   public readonly reasons$: Observable<RejectReasonPage>;
   @Select(OrganizationManagementState.organizationSettings)
-  private readonly organizationSettings$: Observable<OrganizationSettingsGet[]>;
+  private readonly organizationSettings$: Observable<Configuration[]>;
   @Select(OrderManagementContentState.contactDetails)
   private readonly contactDetails$: Observable<ContactDetails>;
   @Select(DashboardState.getOrganizationSkills) public readonly organizationSkills$: Observable<AssignedSkillsByOrganization[]>;
@@ -695,7 +695,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private subscribeForSettings(): void {
     this.organizationSettings$.pipe(
       takeUntil(this.destroy$)
-    ).subscribe((settings: OrganizationSettingsGet[]) => {
+    ).subscribe((settings: Configuration[]) => {
       const projectFields = ['projectTypeId', 'projectNameId', 'poNumberId'];
       this.settings = SettingsHelper.mapSettings(settings);
       this.quickOrderConditions.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
