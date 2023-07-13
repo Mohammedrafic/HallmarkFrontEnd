@@ -89,6 +89,7 @@ export class OrderManagementService extends DestroyableDirective {
       reorderStatuses: new FormControl([]),
       shiftIds: new FormControl([]),
       shift: new FormControl([]),
+      orderLocked: new FormControl(null),
     });
   }
 

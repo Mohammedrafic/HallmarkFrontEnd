@@ -533,19 +533,31 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
         this.filters.includeReOrders = true;
+        let filtersMyAgency = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersMyAgency.orderLocked = filtersMyAgency.orderLocked == 'false' ? false : filtersMyAgency.orderLocked == 'true' ? true : null
+          }
         this.hasOrderMyAgencyId();
         selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder &&
-          this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+          this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersMyAgency));
         break;
       case AgencyOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.filters.includeReOrders = true;
-        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        let filtersOpenPerDiem = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersOpenPerDiem.orderLocked = filtersOpenPerDiem.orderLocked == 'false' ? false : filtersOpenPerDiem.orderLocked == 'true' ? true : null
+          }
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersOpenPerDiem));
         break;
       case AgencyOrderManagementTabs.PermPlacement:
         this.filters.orderTypes = [OrderType.PermPlacement];
         this.filters.includeReOrders = false;
-        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        let filtersPermPlacement = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersPermPlacement.orderLocked = filtersPermPlacement.orderLocked == 'false' ? false : filtersPermPlacement.orderLocked == 'true' ? true : null
+          }
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersPermPlacement));
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.hasOrderMyAgencyId();
@@ -556,7 +568,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       default:
         this.hasOrderMyAgencyId();
         this.filters.includeReOrders = false;
-        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        let filtersDefault = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersDefault.orderLocked = filtersDefault.orderLocked == 'false' ? false : filtersDefault.orderLocked == 'true' ? true : null
+          }
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersDefault));
         break;
     }
 
@@ -793,7 +809,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
       shift:this.filters.shift || null,
-
+      orderLocked:this.filters.orderLocked || null,
     });
 
     if(!prepopulate) {

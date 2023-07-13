@@ -44,6 +44,12 @@ export const AllOrdersDefaultStatuses = [
   CandidateStatus.Incomplete,
 ];
 
+export const filterOrderLockList: { text: string; value: any }[] = [
+  { text: 'All', value: 'all' },
+  { text: 'Locked', value: 'true' },
+  { text: 'Unlocked', value: 'false' }
+];
+
 export const initOrderManagementFilterColumns = () => ({
   orderPublicId: { type: ControlTypes.Text, valueType: ValueType.Text },
   regionIds: {
@@ -173,5 +179,12 @@ export const initOrderManagementFilterColumns = () => ({
     type: ControlTypes.Checkbox,
     valueType: ValueType.Text,
     checkBoxTitle: 'IRP Only',
+  },
+  orderLocked: {
+    type: ControlTypes.Dropdown,
+    valueType: ValueType.Id,
+    dataSource: filterOrderLockList,
+    valueField: 'name',
+    valueId: 'id',
   },
 });
