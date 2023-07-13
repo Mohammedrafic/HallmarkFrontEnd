@@ -101,12 +101,17 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   subscribeToReasons() {
-    this.closureReasonsPage$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      if (data != undefined) {
-        if (this.orderManagementService.getOrderManagementSystem() == OrderManagementIRPSystemId.IRP)
-          this.closureReasons = data.items.filter(f => f.includeInIRP == true)
-        if (this.orderManagementService.getOrderManagementSystem() == OrderManagementIRPSystemId.VMS)
-          this.closureReasons = data.items.filter(f => f.includeInVMS == true)
+    this.closureReasonsPage$.pipe(
+      filter(x => x != undefined && x != null), 
+      takeUntil(this.destroy$)
+      ).subscribe((data) => {
+      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.IRP)
+      {        
+        this.closureReasons = data.items.filter(f => f.includeInIRP == true);
+      }
+      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.VMS)
+      {
+        this.closureReasons = data.items.filter(f => f.includeInVMS == true);
       }
     });
   }
