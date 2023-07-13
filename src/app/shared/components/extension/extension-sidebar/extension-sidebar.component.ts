@@ -219,7 +219,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         this.extensionStartDateValidation = false;
         let actualEndDate = new Date(this.candidateJob?.actualEndDate);
         let twoWeekDate = new Date(actualEndDate.setDate(actualEndDate.getDate() + 14));
-        if(formatDate(twoWeekDate, 'MM/dd/yyyy', 'en-US') < formatDate(startDate, 'MM/dd/yyyy', 'en-US')){
+        if(startDate && startDate > twoWeekDate){
            this.extensionStartDateValidation = true;
         }
         if (startDate > endDate) {

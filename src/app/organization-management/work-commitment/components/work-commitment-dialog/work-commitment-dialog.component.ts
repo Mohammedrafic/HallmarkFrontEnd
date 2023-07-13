@@ -64,7 +64,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
   @Output() saveCommitment = new EventEmitter<WorkCommitmentDTO>();
 
   public title = '';
-  public commitmentForm: CustomFormGroup<WorkCommitmentForm> | null;
+  public commitmentForm: CustomFormGroup<WorkCommitmentForm>;
   public dialogConfig: CommitmentDialogConfig;
   public readonly FieldTypes = FieldType;
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
@@ -73,6 +73,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
   public allSkillsLength: number;
   public isEdit = false;
   public showOverrideDialog = false;
+  public showReplacementCheckbox = false;
   public replaceOrder = false;
   public replacementConfirmationMessage = IRP_DEPARTMENT_CHANGE_WARNING;
   public overrideCommitmentConfirm$ = new Subject<boolean>();
@@ -128,6 +129,8 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
   }
 
   private checkForChanges(): void {
+    this.showReplacementCheckbox = !!this.commitmentForm?.get('endDate')?.dirty;
+
     const isRequiredFieldModified = 
       this.commitmentForm?.get('regions')?.dirty || 
       this.commitmentForm?.get('locations')?.dirty || 
@@ -148,7 +151,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
       WorkCommitmentAdapter.prepareToSave(
         this.regionsDTO,
         this.allSkillsLength,
-        this.commitmentForm!,
+        this.commitmentForm,
         this.replaceOrder,
       )
     );
