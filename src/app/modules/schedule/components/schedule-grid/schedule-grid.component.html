@@ -72,7 +72,7 @@
         <tr>
           <th class="table-title candidates-head-cell fixed fixed--left fixed--top">
             <span>{{ employeesTitle }}</span>
-            <span class="e-badge e-badge-success e-badge-pill align-text">{{ scheduleData?.items?.length || 0 }}</span>
+            <span class="e-badge e-badge-success e-badge-pill align-text">{{ scheduleData?.totalCount || 0 }}</span>
           </th>
           <ng-container *ngIf="activePeriod !== monthPeriod; else monthRange">
             <th
