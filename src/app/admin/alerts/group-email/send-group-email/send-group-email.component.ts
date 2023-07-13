@@ -643,11 +643,13 @@ export class SendGroupEmailComponent
           this.userData = [];
           this.roleData = [];
           if(this.isOrgUser){
-            let businessUnitIds = value.join();
-            this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds, true));
-            this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-              if(data != undefined) this.userData = data;
-            });
+            let businessUnitIds = value.join();          
+            if (businessUnitIds != undefined && businessUnitIds > 0) {
+              this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
+              this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+                this.roleData = data;
+              });
+            }
           } else {
             let businessUnitIds = value;
             this.dispatchUserPage(businessUnitIds);
@@ -657,11 +659,6 @@ export class SendGroupEmailComponent
                 this.roleData = data;
               });
             }
-            this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-              if (data != undefined) {
-                this.userData = data.items.filter(i => i.isDeleted == false);
-              }
-            });
           }
         }
       }
@@ -680,13 +677,13 @@ export class SendGroupEmailComponent
         }
         let orgList = this.organizations?.filter((x) => value == x.organizationId);
         this.regionsList = [];
-        this.locationsList = [];
+        this.locationsData = [];
         orgList.forEach((value) => {
           this.regionsList.push(...value.regions);
           value.regions.forEach((region) => {
-            this.locationsList.push(...region.locations);
+            this.locationsData.push(...region.locations);
           });
-          this.departmentsList = this.locationsList
+          this.departmentsList = this.locationsData
               .map((obj) => {
                 return obj.departments.filter((department) => department.locationId === obj.id);
               })
@@ -694,10 +691,10 @@ export class SendGroupEmailComponent
         });
 
         this.regionsList = sortByField(this.regionsList, 'name');
-        this.locationsList = sortByField(this.locationsList, 'name');
+        this.locationsData = sortByField(this.locationsData, 'name');
         this.departmentsList = sortByField(this.departmentsList, 'name');
 
-        this.locationsData = this.locationsList;
+        this.locationsData = this.locationsData;
         this.departmentsData = this.departmentsList;
 
         if(value > 0 && this.businessUnitControl.value == 3){
@@ -747,7 +744,7 @@ export class SendGroupEmailComponent
           this.getWorkCommitments();
         }
       } else {
-        this.locationsList = this.locationsData;
+        this.locationsList = [];
       }
       this.locationControl.patchValue([]);
       this.departmentControl.patchValue([]);
@@ -825,12 +822,16 @@ export class SendGroupEmailComponent
 
   private onRolesValueChanged(): void {
     this.rolesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if(!value || value==null ||!value.length){
+        this.usersControl.reset()
+      }
       this.getUsersByRole();
     });
   }
 
   private getUsersByRole(): void{
     this.userData = [];
+ 
     var regionId = this.regionControl.value.join();
     var locationId = this.locationControl.value.join();
     var roles = this.rolesControl.value.join();
@@ -841,7 +842,6 @@ export class SendGroupEmailComponent
         this.userData = data;
       });
     }
-    if (this.businessUnitControl.value == 4) {
       if (this.rolesControl.value.length > 0) {
         this.dispatchUserPage(this.businessesControl.value);
         this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
@@ -851,7 +851,6 @@ export class SendGroupEmailComponent
           }
         });
       }
-    }
   }
 
   private onUserTypeValueChanged(): void {
@@ -914,13 +913,8 @@ export class SendGroupEmailComponent
           if (value == 1) {
             this.isAgencyUserType = true;
             this.roleData = [];
-            this.userData = [];
             if(this.isOrgUser){
               let businessUnitIds = this.businessesControl.value.join();
-              this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds, true));
-              this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-                if(data != undefined) this.userData = data;
-              });
             } else {
               let businessUnitIds = this.businessesControl.value;
               if (businessUnitIds != undefined && businessUnitIds > 0) {
