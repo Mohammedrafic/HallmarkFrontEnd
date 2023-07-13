@@ -115,7 +115,7 @@
                 placeholder="Go to:"
                 min="1" [max]="(skills$ | async)?.totalPages"
                 [showSpinButton]="false"
-                (change)="switchPage($event)"
+                (change)="changePage($event)"
               >
               </ejs-numerictextbox>
               <div class="total-rows">
