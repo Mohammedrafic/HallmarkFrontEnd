@@ -76,6 +76,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { getDepartmentFromLocations, getLocationsFromRegions } from '@agency/order-management/order-management-grid/agency-order-filters/agency-order-filters.utils';
 import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import { GetUserAgencies, GetUserOrganizations } from 'src/app/store/user.actions';
+import { Organisation } from '@shared/models/visibility-settings.model';
 @Component({
   selector: 'app-candidate-details',
   templateUrl: './candidate-details.component.html',
@@ -166,6 +167,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   protected readonly destroy$: Subject<void> = new Subject();
   public isClear: boolean = false;
   public orgAgencyName:string;  
+
   constructor(
     store: Store,
     private router: Router,
@@ -198,7 +200,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         takeUntil(this.unsubscribe$),
       ).subscribe((id) => {
 
-        let agencyIdvalue = id.toString();
+        const agencyIdvalue = id.toString();
        
         this.store.dispatch(new GetAssociateOrganizations(Number(agencyIdvalue)));
         this.subscribeOnAgencyOrganizationChanges();
@@ -218,7 +220,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         takeUntil(this.unsubscribe$),
       ).subscribe((id) => {
 
-        let OrgID = id.toString();
+        const OrgID = id.toString();
   
         this.store.dispatch([new GetAssociateAgencies(Number(OrgID))]);
    
@@ -277,7 +279,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   public allAgenciesLoad() {
     this.agencies$
       .pipe(filter(() => this.isAgency), takeUntil(this.unsubscribe$)).subscribe((data: UserAgencyOrganization) => {
-        let agencyData: AssociateAgency[] = data.businessUnits.map((business) => ({
+        const agencyData: AssociateAgency[] = data.businessUnits.map((business) => ({
           agencyName: business.name,
           agencyId: business.id,
         }));
@@ -289,27 +291,25 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           const filteredArray = agencyData.filter((item: { agencyId: any; }) => item?.agencyId === Number(agencyIdvalue));
           this.orgAgencyName = filteredArray[0]?.agencyName;
         });
-      });
+      });      
     this.organizations$
       .pipe(filter(() => !this.isAgency), takeUntil(this.unsubscribe$)).subscribe((data: UserAgencyOrganization) => {
-        let orgData: any = []
-
-        data.businessUnits.forEach(element => {
-          orgData.push({
-            "name": element.name,
-            "id": element.id
-          });
-
-        });
+        const orgData: Organisation[] = data.businessUnits.map((business) => ({
+          name: business.name,
+          id: business.id,
+          organizationId:business.id,
+          regions:[]
+        }));
+      
 
         this.lastSelectedOrganizationId$.pipe(
           filter(Boolean),
           takeUntil(this.unsubscribe$),
         ).subscribe((id) => {
 
-          let orgId = id.toString();
+          const orgId = id.toString();
 
-          const filtereorgdArray = orgData.filter((item: { id: any; }) => item?.id === Number(orgId));
+          const filtereorgdArray = orgData.filter((item) => item?.id === Number(orgId));
 
           this.orgAgencyName = filtereorgdArray[0]?.name;
 
@@ -322,7 +322,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((structure: OrganizationStructure) => {
         this.allLocations = [];
-        structure.regions.forEach((region) => {
+        structure.regions.map((region) => {
           region.locations && this.allLocations.push(...getIRPOrgItems(region?.locations));
         });
         if (this.filterColumns.locationIds) {
@@ -346,7 +346,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         startDate: toCorrectTimezoneFormat(startDate),
         endDate: toCorrectTimezoneFormat(endDate),
       };
-       
+
       this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
       this.updatePage();
       this.store.dispatch(new ShowFilterDialog(false));
@@ -359,7 +359,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         });
         this.filters.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
       }
-
+     
       this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(), this.filters));
       this.filtersForm.markAsPristine();
     } else {
