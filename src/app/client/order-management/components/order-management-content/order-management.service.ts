@@ -119,7 +119,9 @@ export class OrderManagementService extends DestroyableDirective {
   }
 
   public setPreviousOrganizationId(id: number): void {
-    if (this.previousSelectedOrganizationId !== id) {
+    const previousOrganizationId = this.globalWindow.localStorage.getItem('lastSelectedOrganizationId');
+
+    if (Number(previousOrganizationId) !== id) {
       this.orderManagementSystem = null;
     }
 

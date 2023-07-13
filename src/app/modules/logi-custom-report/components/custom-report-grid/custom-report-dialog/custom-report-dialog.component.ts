@@ -3,7 +3,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Inject, C
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeWhile } from 'rxjs';
 import { AppSettings, APP_SETTINGS } from '../../../../../../app.settings';
 import { LogiReportComponent } from '../../../../../shared/components/logi-report/logi-report.component';
 import { LogiReportTypes } from '../../../../../shared/enums/logi-report-type.enum';
@@ -25,11 +25,13 @@ import { LogiCustomReportState } from '../../../store/state/logi-custom-report.s
 })
 export class CustomReportDialogComponent extends AbstractPermissionGrid implements OnInit {
   public user: User | null;
-  @Input() selectedLog: LogiCustomReport;
+  @Input() selectedLog$: BehaviorSubject<LogiCustomReport> = new BehaviorSubject<LogiCustomReport>(null!);
   @Input() openDialogue: Subject<boolean>;
   @ViewChild('customReportSideDialog') sideDialog: DialogComponent;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   @Output() refreshParent: EventEmitter<any> = new EventEmitter<any>();
+
+  selectedLog : LogiCustomReport;
   private isAlive = true;
   private unsubscribe$: Subject<void> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -39,9 +41,11 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
     LocationsParam: '',
     DepartmentsParam: '',
   };
-  public catelogName: LogiReportFileDetails;
-  public reportName: LogiReportFileDetails;
-  
+  public catelogName: LogiReportFileDetails = { name: '/CustomReport/CustomReport.cat' };
+  public RegularReportName: string = '/CustomReport/FinanaceReport.wls';
+  public reportName: LogiReportFileDetails = {
+    name: this.RegularReportName,
+  };
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public reportFormGroup: FormGroup;
   public isAddCustomReportSidebarShown: boolean;
@@ -60,18 +64,19 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
   }
   override ngOnInit(): void {
 
-    this.openDialogue.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
+    this.selectedLog$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+      if(data){
+        this.selectedLog = data;
+        this.logiReportComponent.catelogName = { name: this.selectedLog.catalogPath }
+        this.logiReportComponent.reportName = { name: this.selectedLog.path }
+        this.SearchReport();
+      }
+    });
+
+    this.openDialogue.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (isOpen) {
-        windowScrollTop();
-        if (this.selectedLog) {
-          this.sideDialog.show();
-          this.catelogName = { name: this.selectedLog?.catalogPath };
-          this.reportName = { name: this.selectedLog?.path };
-          this.logiReportComponent.catelogName = { name: this.selectedLog?.catalogPath };
-          this.logiReportComponent.reportName = { name: this.selectedLog?.path };
-          this.SearchReport();
-        }
-        
+        windowScrollTop();      
+        this.sideDialog.show();
         disabledBodyOverflow(true);
       } else {
         this.sideDialog.hide();

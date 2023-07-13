@@ -219,5 +219,12 @@ export enum UserPermissions {
   CanOnboardCandidateIRP = 6409,
   CanRejectCandidateIRP = 6410,
   CanEditOrderBillRateIRP = 6411,
-  CanCloseOrdersIRP = 6412
+  CanCloseOrdersIRP = 6412,
+
+  //Agency setup
+  EditAgencyNetsuitePaymentId = 8110,
+  
+  //Candidate Assignment
+  CandidateAssigment=850,
+  CanViewCandidateAssigment=851,
 }

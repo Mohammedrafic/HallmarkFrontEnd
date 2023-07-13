@@ -69,7 +69,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
       this.filters ={}
     }
      this.filters.tab = this.activeTab;
-    this.defaultFileName = 'Candidate Assignment ' + this.generateDateTime(this.datePipe);
+    this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab] + ' '+ this.generateDateTime(this.datePipe);
     this.store.dispatch(
       new ExportCandidateAssignment(
         new ExportPayload(
@@ -91,7 +91,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
 
   private watchForDefaultExport(): void {
     this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
-      this.defaultFileName = 'Candidate Assignment ' + this.generateDateTime(this.datePipe);
+      this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab] + ' '+ this.generateDateTime(this.datePipe);
       this.defaultExport(event);
     });
   }
@@ -104,7 +104,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
         takeUntil(this.unsubscribe$)
       )
       .subscribe(() => {
-        this.defaultFileName = 'Candidate Assignment ' + this.generateDateTime(this.datePipe);
+        this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab]+ ' ' + this.generateDateTime(this.datePipe);
         this.fileName = this.defaultFileName;
       });
   }

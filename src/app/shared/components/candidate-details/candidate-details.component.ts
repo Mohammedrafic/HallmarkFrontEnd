@@ -55,7 +55,7 @@ import { GRID_CONFIG } from '@shared/constants';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { CandidateDetailsService } from './services/candidate-details.service';
-import { PreservedFiltersByPage } from '@core/interface';
+import { Permission, PreservedFiltersByPage } from '@core/interface';
 import { FilterPageName } from '@core/enums';
 import { GetMasterRegions } from '@organization-management/store/organization-management.actions';
 import { FiltersComponent } from './filters/filters.component';
@@ -142,6 +142,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   public fileName: string;
   public defaultFileName: string;
   public activeTabname: CandidateDetailsFilterTab;
+  public canViewCandidateAssignment:boolean;
   private gridApi: GridApi;
   private cd$ = new Subject();
   public columnsToExport: ExportColumn[];
@@ -202,7 +203,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     this.initFilterColumns();
     this.setOrderTypes();
     this.setApplicantStatuses();
-
+    this.watchForPermissions();
     this.watchForStructure();
     this.subscribeOnLocationChange();
     this.watchForRegionControl();
@@ -244,6 +245,13 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     this.store.dispatch(new ShowFilterDialog(true));
     this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
     this.updatePage();
+  }
+
+  private watchForPermissions(): void {
+    this.getPermissionStream().pipe(takeUntil(this.unsubscribe$)).subscribe((permissions: Permission) => {
+      this.canViewCandidateAssignment=permissions[this.userPermissions.CanViewCandidateAssigment]
+      this.cd$.next(true);
+    });
   }
 
   public onFilterApply(): void {
@@ -388,7 +396,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   }
 
   public override customExport(): void {
-    this.fileName = 'Candidate Assignment' + this.generateDateTime(this.datePipe);
+    this.fileName = 'Candidate Assignment'+ CandidateDetailsFilterTab[this.activeTab] + ' ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ShowExportDialog(true));
   }
 

@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 
 import { OrganizationDepartment, OrganizationLocation,OrganizationDepartmentInactivate,OrganizationLocationInactivate, OrganizationRegion, OrganizationLTALocationInactivate, OrganizationLTADepartmentInactivate } from '@shared/models/organization.model';
@@ -32,10 +33,10 @@ export class OrganizationStructureService {
     ).filter(
       (location) =>
         location.inactiveDate == null || (jobStartDate != null && location.inactiveDate && location.reactivateDate)
-          ? new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString() ||
-            new Date(location.reactivateDate!).toLocaleDateString() <= new Date(jobStartDate).toLocaleDateString()
+          ? formatDate(location.inactiveDate!,'yyyy-MM-dd','en_US') > formatDate(jobStartDate,'yyyy-MM-dd','en_US') ||
+          formatDate(location.reactivateDate!,'yyyy-MM-dd','en_US') <= formatDate(jobStartDate,'yyyy-MM-dd','en_US')
           : location.inactiveDate == null || (jobStartDate != null && location.inactiveDate && !location.reactivateDate)
-          ? new Date(location.inactiveDate!).toLocaleDateString() > new Date(jobStartDate).toLocaleDateString()
+          ? formatDate(location.inactiveDate!,'yyyy-MM-dd','en_US') > formatDate(jobStartDate,'yyyy-MM-dd','en_US')
           : location.inactiveDate == null
     ));
   }
@@ -62,11 +63,12 @@ export class OrganizationStructureService {
       let filteredlist: OrganizationLocation[] = [];
       filteredlist = this.selectedLocations.filter(
         (location) =>
-          location.inactiveDate == null ||
-          new Date(location.inactiveDate).toLocaleDateString() > new Date(element).toLocaleDateString() ||
-          (location.reactivateDate != null
-            ? new Date(location.reactivateDate).toLocaleDateString() <= new Date(element).toLocaleDateString()
-            : location.reactivateDate == null)
+          location.inactiveDate == null || (element != null && location.inactiveDate && location.reactivateDate)
+          ?formatDate(location.inactiveDate!,'yyyy-MM-dd','en_US') > formatDate(element,'yyyy-MM-dd','en_US') ||
+          formatDate(location.reactivateDate!,'yyyy-MM-dd','en_US') <= formatDate(element,'yyyy-MM-dd','en_US')
+          : location.inactiveDate == null || (element != null && location.inactiveDate && !location.reactivateDate)
+          ? formatDate(location.inactiveDate!,'yyyy-MM-dd','en_US') > formatDate(element,'yyyy-MM-dd','en_US')
+          : location.inactiveDate == null
       );
       if (filteredlist || filteredlist != null) {
         resultSet = resultSet.concat(filteredlist);
@@ -175,10 +177,10 @@ export class OrganizationStructureService {
     return (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).filter(
       (department) =>
       department.inactiveDate == null || (startDate != null && department.inactiveDate && department.reactivateDate)
-      ? new Date(department.inactiveDate!).toLocaleDateString() > new Date(startDate).toLocaleDateString() ||
-        new Date(department.reactivateDate!).toLocaleDateString() <= new Date(startDate).toLocaleDateString()
+      ? formatDate(department.inactiveDate!,'yyyy-MM-dd','en_US') > formatDate(startDate,'yyyy-MM-dd','en_US') ||
+      formatDate(department.reactivateDate!,'yyyy-MM-dd','en_US') <= formatDate(startDate,'yyyy-MM-dd','en_US')
       : department.inactiveDate == null || (startDate != null && department.inactiveDate && !department.reactivateDate)
-      ? new Date(department.inactiveDate!).toLocaleDateString() > new Date(startDate).toLocaleDateString()
+      ? formatDate(department.inactiveDate!,'yyyy-MM-dd','en_US') > formatDate(startDate,'yyyy-MM-dd','en_US')
       : department.inactiveDate == null
     );
   }
@@ -190,11 +192,12 @@ export class OrganizationStructureService {
       let filteredlist: OrganizationDepartment[] = [];
       filteredlist = this.selectedDepartments.filter(
         (department) =>
-          department.inactiveDate == null ||
-          new Date(department.inactiveDate).toLocaleDateString() > new Date(element).toLocaleDateString() ||
-          (department.reactivateDate != null
-            ? new Date(department.reactivateDate).toLocaleDateString() <= new Date(element).toLocaleDateString()
-            : department.reactivateDate == null)
+        department.inactiveDate == null || (element != null && department.inactiveDate && department.reactivateDate)
+        ?formatDate(department.inactiveDate!,'yyyy-MM-dd','en_US') > formatDate(element,'yyyy-MM-dd','en_US') ||
+        formatDate(department.reactivateDate!,'yyyy-MM-dd','en_US') <= formatDate(element,'yyyy-MM-dd','en_US')
+        : department.inactiveDate == null || (element != null && department.inactiveDate && !department.reactivateDate)
+        ? formatDate(department.inactiveDate!,'yyyy-MM-dd','en_US') > formatDate(element,'yyyy-MM-dd','en_US')
+        : department.inactiveDate == null
       );
       if (filteredlist || filteredlist != null) {
         resultSet = resultSet.concat(filteredlist);

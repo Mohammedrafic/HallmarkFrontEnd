@@ -251,3 +251,5 @@ export const ScheduleCircleType = {
 };
 
 export const PermissionRequired = 'Separate permission right is required';
+
+export const PastTimeErrorMessage = 'Selected time is in the past. Please select time in the future';

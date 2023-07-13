@@ -230,7 +230,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
       if( this.orderManagementSystem ) {
         this.orderManagementSystem = null;
       }
-      
+
       this.activeSystem = this.route.snapshot.data['system'] ?? OrderSystem.VMS;
       this.setSubmitButtonConfig();
       this.getSkillsByActiveSystem();
@@ -240,8 +240,9 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   }
 
   private selectSystemForOrderManagement(): void {
+    const system = this.route.snapshot.data['system'] ?? OrderSystem.VMS;
     this.orderManagementService.setOrderManagementSystem(
-      this.activeSystem === OrderSystem.IRP ? OrderManagementIRPSystemId.IRP : OrderManagementIRPSystemId.VMS
+      system === OrderSystem.IRP ? OrderManagementIRPSystemId.IRP : OrderManagementIRPSystemId.VMS
     );
   }
 

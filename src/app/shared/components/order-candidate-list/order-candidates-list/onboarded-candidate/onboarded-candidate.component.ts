@@ -133,6 +133,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public isActiveCandidateDialog$: Observable<boolean>;
   public showHoursControl = false;
   public showPercentage = false;
+  public verifyNoPenalty = false;
   public orderPermissions: CurrentUserPermission[];
   public canShortlist = false;
   public canInterview = false;
@@ -214,6 +215,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       emailBody: new FormControl('', [Validators.required]),
       fileUpload: new FormControl(null),
       emailTo: new FormControl('', [Validators.required]),
+      orderId: new FormControl('', [Validators.required]),
+      candidateId  : new FormControl('', [Validators.required]),
+      businessUnitId: new FormControl('', [Validators.required]),
     });
   }
 
@@ -393,6 +397,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             const value = this.form.getRawValue();
             this.isSend =  true;
             this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.candidateJob?.candidateProfile.email);
+            this.sendOnboardMessageEmailFormGroup.get('orderId')?.setValue(this.candidateJob?.orderId);
+            this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.candidateJob?.candidateProfileId);
+            this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.candidateJob?.organizationId);
             this.emailTo = this.candidateJob?.candidateProfile.email;
             this.store
               .dispatch(
@@ -414,9 +421,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   candidatePayRate: this.candidateJob.candidatePayRate,
                 })
               );
-              this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).pipe(
-                takeUntil(this.unsubscribe$)
-              ).subscribe(() => {
+              this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
                   const options = {
                       title: ONBOARD_CANDIDATE,
                       okButtonLabel: 'Yes',
@@ -466,6 +471,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       .pipe(
         takeUntil(this.unsubscribe$),
       ).subscribe((value) => {
+        console.log('this.candidateJob',value);
         this.candidateJob = value;
 
         if (value) {
@@ -664,6 +670,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             stream : emailvalue.fileUpload,
             extension : emailvalue.fileUpload?.type,
             documentName : emailvalue.fileUpload?.name,
+            orderId : emailvalue.orderId,
+            candidateId : emailvalue.candidateId,
+            businessUnitId : emailvalue.businessUnitId,
           })
         )
         .subscribe(() => {
@@ -732,6 +741,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+    this.verifyNoPenalty = value === PenaltyCriteria.NoPenalty;
   }
 
   private switchFormState(): void {

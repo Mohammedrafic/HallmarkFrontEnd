@@ -49,6 +49,7 @@
 </app-grid>
 
 <app-side-dialog
+  #sideDialog
   *ngIf="(selectedTab$ | async) === candidateTabsEnum.Departments"
   [header]="sideDialogTitle$ | async"
   (formCancelClicked)="onCancel()"
@@ -69,7 +70,7 @@
 
     <app-edit-departments
       #editDepartments
-      *ngIf="dialogTitle === sideDialogTitleEnum.EditBulkDepartments"
+      *ngIf="dialogTitle === sideDialogTitleEnum.EditBulkDepartments && sideDialog.sideDialog.visible"
       (refreshGrid)="refreshGrid()"
       [saveForm$]="saveForm$"
       [selectedDepartments]="selectedDepartments"
