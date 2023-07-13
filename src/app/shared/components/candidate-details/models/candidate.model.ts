@@ -56,7 +56,7 @@ export type FiltersModal = {
   applicantStatuses?: Array<number>;
   candidateNames?:number
   agencyIds?: Array<number>;
-  orderID?:string;
+  orderId?:string;
 };
 
 export interface FiltersPageModal extends FiltersModal {

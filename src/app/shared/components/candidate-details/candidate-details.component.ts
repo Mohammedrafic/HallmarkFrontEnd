@@ -532,7 +532,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       applicantStatuses: [null],
       candidateNames: [null],
       agencyIds: [null],
-      orderID: [null],
+      orderId: [null],
       organizationIds:[null]
     });
   }
@@ -693,7 +693,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       departmentIds: this.filters?.departmentIds || [],
       candidateNames: this.filters?.candidateNames || null,
       agencyIds: this.filters?.agencyIds || [],
-      orderID: this.filters?.orderID || null,
+      orderId: this.filters?.orderId || null,
       organizationIds:this.filters?.organizationIds ||null
     });
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
