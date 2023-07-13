@@ -61,7 +61,7 @@ export class TimesheetGridExportComponent extends AbstractGridConfigurationCompo
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     const filters = this.store.selectSnapshot(TimesheetsState.timesheetsFilters);
-    const ids = this.selectedRows.selectedTimesheetIds.length ? this.selectedRows.selectedTimesheetIds : null;
+    const ids = this.selectedRows.selectedTimesheetIds?.length ? this.selectedRows.selectedTimesheetIds : null;
     const filterQuery = {
       ...filters,
       offset: Math.abs(new Date().getTimezoneOffset()),
