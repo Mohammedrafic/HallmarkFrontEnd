@@ -412,6 +412,18 @@ export class CreateScheduleService {
 
     return { departmentId, skillId, startDate, endDate };
   }
+
+  canEmployeeCreateRecord(isEmployee: boolean, dates: Date[] | string[]): boolean {
+    if (!isEmployee) {
+      return true;
+    }
+
+    const selectedDatesInMs: number[] = dates.map((date: Date | string) => new Date(date).setHours(0, 0, 0, 0));
+    const todayInMs: number = new Date().setHours(0, 0, 0, 0);
+
+    return !selectedDatesInMs.filter((date: number) => date < todayInMs).length;
+  }
+
   private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]): void {
     const isCandidatesOriented = candidates.map((candidate: ScheduleCandidate) => {
       return this.getCandidateOrientation(candidate);
