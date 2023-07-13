@@ -21,7 +21,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
   @Input() public filterColumns: FilterColumnsModel;
   @Input() public filtersForm: FormGroup;
   @Input() public isAgency: boolean;
-  @Input() public orgAgencyName:any
+  @Input() public orgAgencyName:string;
   @Input() public isClear: boolean;
 
   @ViewChild('regionDropdown') public regionDropdown: MultiSelectComponent;
@@ -64,7 +64,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
     this.orgid=user?.businessUnitId
   }
 
-  public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
+  public filterCandidateName: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
     this.onFilterChild(e);
   }
   @OutsideZone

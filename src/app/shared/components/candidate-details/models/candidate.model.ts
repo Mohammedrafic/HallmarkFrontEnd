@@ -41,7 +41,7 @@ export type FilterColumnsModel = {
   candidateNames:FilterColumn
   agencyIds:FilterColumn
   organizationIds:FilterColumn
-  orderID:FilterColumn;
+  orderId:FilterColumn;
 };
 
 export type FiltersModal = {

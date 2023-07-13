@@ -107,29 +107,29 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   public candidateDepartments$: Observable<CandidatesDetailsDepartments[]>;
 
   @Select(UserState.lastSelectedAgencyId)
-  lastSelectedAgencyId$: Observable<number>;
+  public lastSelectedAgencyId$: Observable<number>;
 
   @Select(UserState.lastSelectedOrganizationId)
-  lastSelectedOrganizationId$: Observable<number>;
+  public lastSelectedOrganizationId$: Observable<number>;
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<FiltersModal>>;
 
   @Select(UserState.organizationStructure)
-  organizationStructure$: Observable<OrganizationStructure>;
+  public organizationStructure$: Observable<OrganizationStructure>;
 
   @Select(OrderManagementContentState.associateAgencies)
   public associateAgencies$: Observable<AssociateAgency[]>;
   @Select(UserState.agencies)
-  agencies$: Observable<UserAgencyOrganization>;
+ public  agencies$: Observable<UserAgencyOrganization>;
 
   @Select(UserState.organizations)
-  organizations$: Observable<UserAgencyOrganization>;
+ public organizations$: Observable<UserAgencyOrganization>;
   @Select(CandidateDetailsState.associateOrganizations)
   public associateOrg$: Observable<AgencyOrderFilteringOptions>;
 
   @Select(CandidateDetailsState.candidateRegions)
-  regions$: Observable<string[]>;
+  public regions$: Observable<string[]>;
   @ViewChild(FiltersComponent, { static: false }) filterco: FiltersComponent;
   public selectedRowDatas: any[] = [];
   @Input() export$: Subject<ExportedFileType>;
@@ -165,7 +165,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   private orgRegions: OrganizationRegion[] = [];
   protected readonly destroy$: Subject<void> = new Subject();
   public isClear: boolean = false;
-  public orgAgencyName:any
+  public orgAgencyName:string;  
   constructor(
     store: Store,
     private router: Router,
@@ -211,9 +211,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     }
     else {
 
-      this.store.dispatch(new GetUserOrganizations());
-      this.store.dispatch([new GetCandidateRegions(), new GetCandidateSkills()]);
-      this.store.dispatch(new GetMasterRegions());
+      this.store.dispatch([new GetCandidateRegions(), new GetCandidateSkills(),new GetUserOrganizations(),new GetMasterRegions()]);
       this.getRegions();
       this.lastSelectedOrganizationId$.pipe(
         filter(Boolean),
@@ -279,32 +277,18 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   public allAgenciesLoad() {
     this.agencies$
       .pipe(filter(() => this.isAgency), takeUntil(this.unsubscribe$)).subscribe((data: UserAgencyOrganization) => {
-
-        let agencyData: any = []
-
-        data.businessUnits.forEach(element => {
-          agencyData.push({
-            "agencyName": element.name,
-            "agencyId": element.id
-          });
-
-        });
-
-
+        let agencyData: AssociateAgency[] = data.businessUnits.map((business) => ({
+          agencyName: business.name,
+          agencyId: business.id,
+        }));
         this.lastSelectedAgencyId$.pipe(
           filter(Boolean),
           takeUntil(this.unsubscribe$),
         ).subscribe((id) => {
-
           let agencyIdvalue = id.toString();
-
           const filteredArray = agencyData.filter((item: { agencyId: any; }) => item?.agencyId === Number(agencyIdvalue));
           this.orgAgencyName = filteredArray[0]?.agencyName;
-
         });
-
-
-
       });
     this.organizations$
       .pipe(filter(() => !this.isAgency), takeUntil(this.unsubscribe$)).subscribe((data: UserAgencyOrganization) => {
@@ -569,7 +553,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         valueField: 'name',
         valueId: 'id',
       },
-      orderID: {
+      orderId: {
         type: ControlTypes.Text,
         valueType: ValueType.Text,
 

@@ -21,7 +21,7 @@
   <div class="input-container bootstrap" *ngIf="!isAgency">
     <label>Organization</label>
     <div class="input-group dropdown">
-      <input class="e-input" type="text"  value={{orgAgencyName}} [attr.disabled]="!isAgency"/>
+      <input class="e-input" type="text" value={{orgAgencyName}} [attr.disabled]="!isAgency"/>
     </div>
   </div>
   <div class="input-container">
@@ -174,7 +174,7 @@
         <div class="input-group dropdown">          
           <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
            filterType='StartsWith' [fields]='candidateNameFields'
-                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
+                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='filterCandidateName($event)'></ejs-autocomplete>
         </div>
       </div>
       <div class="input-container bootstrap"  *ngIf="!isAgency">
@@ -182,7 +182,7 @@
         <div class="input-group dropdown">          
           <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
            filterType='StartsWith' [fields]='candidateNameFields'
-                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
+                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='filterCandidateName($event)'></ejs-autocomplete>
         </div>
       </div>
       <div class="input-container" *ngIf="!isAgency">
