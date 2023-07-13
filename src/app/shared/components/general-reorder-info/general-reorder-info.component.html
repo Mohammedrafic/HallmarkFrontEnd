@@ -110,10 +110,7 @@
         <div class="title">{{ orderInformation.minYrsRequired }}</div>
         <div class="sup-title">Exp. Req.</div>
       </div>
-      <div class="column">
-        <div class="title">{{ orderInformation.linkedId ?? '-' }}</div>
-        <div class="sup-title">Linked ID</div>
-      </div>
+      <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
     </div>
   </section>
 
@@ -252,6 +249,8 @@
             <div class="title">{{ (orderInformation?.irpOrderMetadata?.orderOpenDate | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
             <div class="sup-title">Distributed On</div>
           </div>
+
+          <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
         </div>
       </section>
     </ng-template>
@@ -263,5 +262,12 @@
     <div class="accent link" (click)="moveToPerDiem()">
       Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
     </div>
+  </div>
+</ng-template>
+
+<ng-template #linkedId>
+  <div class="column">
+    <div class="title">{{ orderInformation.linkedId ?? orderInformation.irpOrderMetadata?.linkedId ?? '-' }}</div>
+    <div class="sup-title">Linked ID</div>
   </div>
 </ng-template>

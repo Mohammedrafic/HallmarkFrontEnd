@@ -636,6 +636,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.generalInformationForm.controls['shiftEndTime'].patchValue(
       order.shiftEndTime ? DateTimeHelper.setCurrentTimeZone(order.shiftEndTime.toString()) : null
     );
+    this.generalInformationForm.controls['linkedId'].patchValue(order.linkedId);
 
     this.populatePermPlacementControls(order);
     this.populateProjectSpecialData(order);

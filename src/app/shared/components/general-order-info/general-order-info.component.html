@@ -83,10 +83,7 @@
           <div class="title">{{ orderInformation.minYrsRequired }}</div>
           <div class="sup-title">Exp. Req.</div>
         </div>
-        <div class="column">
-          <div class="title">{{ orderInformation.linkedId ?? '-' }}</div>
-          <div class="sup-title">Linked ID</div>
-        </div>
+        <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
       </ng-container>
     </div>
   </section>
@@ -125,6 +122,7 @@
           <div class="sup-title">Shift</div>
         </div>
       </div>
+      <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
     </div>
   </section>
   <section class="candidates-additional-info" *ngIf="orderInformation">
@@ -169,10 +167,7 @@
         <div class="title">{{ orderInformation.minYrsRequired }}</div>
         <div class="sup-title">Exp. Req.</div>
       </div>
-      <div class="column">
-        <div class="title">{{ orderInformation.linkedId ?? '-' }}</div>
-        <div class="sup-title">Linked ID</div>
-      </div>
+      <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
     </div>
   </section>
 </ng-template>
@@ -328,5 +323,12 @@
       <div class="title">{{ orderInformation.regionName }}</div>
       <div class="sup-title">Region</div>
     </div>
+  </div>
+</ng-template>
+
+<ng-template #linkedId>
+  <div class="column">
+    <div class="title">{{ orderInformation.linkedId ?? orderInformation.irpOrderMetadata?.linkedId ?? '-' }}</div>
+    <div class="sup-title">Linked ID</div>
   </div>
 </ng-template>

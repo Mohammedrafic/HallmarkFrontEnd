@@ -11,7 +11,7 @@ export interface ExtensionModel {
   jobId: number;
   duration: Duration;
   ignoreMissingCredentials: boolean
-  linkedId: string;
+  linkedId: string | null;
 }
 
 export interface ExtensionFormData extends Omit<ExtensionModel, 'actualStartDate' | 'actualEndDate'> {

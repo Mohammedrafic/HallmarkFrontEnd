@@ -407,6 +407,7 @@ export interface IRPMetaData {
   skillName: string;
   skillId: number;
   orderOpenDate: Date;
+  linkedId: string | null;
 }
 
 export class Order {
@@ -503,7 +504,7 @@ export class Order {
   externalCommentsConfiguration?:boolean | null;
   activeCandidatesCount?: number;
   isLockedIRP?: boolean;
-  linkedId?: string;
+  linkedId: string | null;
 }
 
 export class ReOrder {
