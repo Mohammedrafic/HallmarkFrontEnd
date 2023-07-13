@@ -239,7 +239,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public handleExport(event: RowNode[]): void {
     const nodes = event;
     if (nodes.length) {
-      this.gridSelections.selectedTimesheetIds = nodes.map((node) => node.data.timesheetId);
+      this.gridSelections.selectedTimesheetIds = nodes.map((node) => node.data.id);
       this.gridSelections.rowNodes = nodes;
     } else {
       this.gridSelections.selectedTimesheetIds = [];
