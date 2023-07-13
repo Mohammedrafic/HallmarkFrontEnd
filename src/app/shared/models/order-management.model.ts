@@ -867,3 +867,5 @@ export class OnboardCandidateEmail {
   businessUnitId ?: number;
 
 }
+
+export type MergedOrder = AgencyOrderManagement & Order;
