@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { FieldType } from '@core/enums';
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
 import { JobClassifications } from '@client/order-management/constants';
@@ -102,6 +103,14 @@ export const GeneralInformationConfigLTA = (): OrderFormsConfig  => ({
       required: true,
       type: FieldType.Time,
     },
+    {
+      field: 'linkedId',
+      title: 'Linked ID',
+      cssClass: 'item12',
+      required: false,
+      show: true,
+      type: FieldType.Input,
+    },
   ],
 });
 
@@ -183,6 +192,14 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       cssClass: 'item9',
       required: true,
       type: FieldType.Time,
+    },
+    {
+      field: 'linkedId',
+      title: 'Linked ID',
+      cssClass: 'item10',
+      required: false,
+      show: true,
+      type: FieldType.Input,
     },
   ],
 });

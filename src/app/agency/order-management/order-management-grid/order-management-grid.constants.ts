@@ -30,6 +30,7 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Linked ID', column: 'LinkedId' },
 ];
 
 export const myAgencyChildColumnsToExport: ExportColumn[] = [
@@ -64,6 +65,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Linked ID', column: 'LinkedId' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -97,6 +99,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Linked ID', column: 'LinkedId' },
 ];
 
 export const perDiemChildColumnsToExport: ExportColumn[] = [

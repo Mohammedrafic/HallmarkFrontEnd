@@ -848,7 +848,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       departmentId: selectedOrder.departmentId,
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
-
+      linkedId: selectedOrder.linkedId,
     })
     setTimeout(()=>{
       this.generalInformationForm.patchValue({
