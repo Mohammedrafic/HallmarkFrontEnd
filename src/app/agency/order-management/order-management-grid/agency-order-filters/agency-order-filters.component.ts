@@ -76,7 +76,10 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     text: 'statusText',
     value: 'status',
   };
-
+  public filterStatusFields = {
+    text: 'filterStatus',
+    value: 'filterStatus',
+  };
   get regionIdsControl(): AbstractControl {
     return this.form.get('regionIds') as AbstractControl;
   }
@@ -231,7 +234,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
           statuses = orderStatuses.map(data => data.status);
-          candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
+          //candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
+          candidateStatusesData = candidateStatuses;
         }
 
         this.filterColumns.organizationIds.dataSource = partneredOrganizations;
@@ -340,8 +344,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'statusText',
-        valueId: 'status',
+        valueField: 'filterStatus',
+        valueId: 'filterStatus',
       },
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },

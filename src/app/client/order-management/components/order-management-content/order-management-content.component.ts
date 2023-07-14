@@ -337,7 +337,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     text: 'statusText',
     value: 'status',
   };
-
+  public filterStatusFields = {
+    text: 'filterStatus',
+    value: 'filterStatus',
+  };
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private search$ = new Subject();
@@ -440,8 +443,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private cd$ = new Subject();
   private gridApi: GridApi;
   private SelectedStatus: string[] = [];
-  private candidateStatusId: number;
-  private candidateStatusIds: number[] = [];
+  private candidateStatusId: string;
+  private candidateStatusIds: string[] = [];
   private SelectedCandiateStatuses: any[] = [];
   private eliteOrderId: number;
   private alertTitle: string;
@@ -508,7 +511,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.prefix = routerState?.['prefix'];
     this.orderPositionStatus = routerState?.['status'];
     (routerState?.['status'] == "In Progress (Pending)" || routerState?.['status'] == "In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] == "In Progress" ? this.SelectedStatus.push("InProgress") : routerState?.['status'] ? this.SelectedStatus.push(routerState?.['status']) : "";
-    this.candidateStatusId = routerState?.['candidateStatusId'] || 0;
+    this.candidateStatusId = routerState?.['candidateStatusId'] || null;
     routerState?.['candidateStatus'] != undefined && routerState?.['candidateStatus'] != '' ? this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']) : "";
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
@@ -2171,7 +2174,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     this.orderStaus > 0 ? this.numberArr.push(this.orderStaus) : [];
     filters.orderStatuses = this.numberArr;
-    this.candidateStatusId > 0 ? this.candidateStatusIds.push(this.candidateStatusId) : [];
+    this.candidateStatusId!=null ? this.candidateStatusIds.push(this.candidateStatusId) : [];
     filters.candidateStatuses = this.candidateStatusIds;
     filters.orderStatuses = this.orderPositionStatus
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
@@ -2590,7 +2593,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
     } else {
       statuses = data.orderStatuses;
-      candidateStatuses = data.candidateStatuses.filter((status) => StatusesByDefault.includes(status.status));
+      candidateStatuses = data.candidateStatuses;
     }
 
     this.filterColumns.orderStatuses.dataSource = statuses;

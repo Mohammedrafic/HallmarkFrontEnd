@@ -111,8 +111,8 @@ export const initOrderManagementFilterColumns = () => ({
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
     dataSource: [],
-    valueField: 'statusText',
-    valueId: 'status',
+    valueField: 'filterStatus',
+    valueId: 'filterStatus',
   },
   contactEmails: { type: ControlTypes.Text, valueType: ValueType.Text },
 
