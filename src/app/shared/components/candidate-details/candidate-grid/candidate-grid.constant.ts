@@ -114,7 +114,7 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
 export const CandidateExportColumns : CandidateExportColumn[] = [
   { text: 'Name', column: 'Name' },
 { text: 'Status', column: 'Status' },
-{ text: 'Classification', column: 'Classifications' },
+{ text: 'Classification', column: 'Classification' },
 {text: 'Start Date',column:'StartDate'},
 {text: 'End Date',column:'EndDate'},
 { text: 'Scheduled Date', column: 'ScheduledDate' },
