@@ -216,8 +216,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         filter(Boolean),
         takeUntil(this.unsubscribe$),
       ).subscribe((id) => {
-        const OrgID = id.toString();
-        this.store.dispatch([new GetAssociateAgencies(Number(OrgID))]);
+        const orgId = id.toString();
+        this.store.dispatch([new GetAssociateAgencies(Number(orgId))]);
       });
 
     }
