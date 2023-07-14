@@ -16,7 +16,7 @@ import {
   UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess,
   GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty,
   SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog, GetUnavailabilityReasons,
-  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess, SaveTerminatedReasonError, UpdateInternalTransferReasonsError, UpdateCategoryNoteReasonsError,
+  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess, SaveTerminatedReasonError, UpdateInternalTransferReasonsError, UpdateCategoryNoteReasonsError, GetSourcingReasons,
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
 import { RejectReason, RejectReasonPage, RejectReasonwithSystem, UnavailabilityReasons } from "@shared/models/reject-reason.model";
@@ -39,6 +39,7 @@ export interface RejectReasonStateModel {
   unavailabilityReasons: PageOfCollections<UnavailabilityReasons> | null;
   internalTransfer: RejectReasonPage | null;
   terminationReasons: RejectReasonPage | null;
+  souringReason: any | null;
   categoryNote: RejectReasonPage | null;
 }
 
@@ -54,7 +55,8 @@ export interface RejectReasonStateModel {
     unavailabilityReasons: null,
     internalTransfer: null,
     terminationReasons: null,
-    categoryNote: null
+    categoryNote: null,
+    souringReason:  null
   },
 })
 @Injectable()
@@ -105,6 +107,12 @@ export class RejectReasonState {
   static terminationReasons(state: RejectReasonStateModel) : RejectReasonPage | null {
     return state.terminationReasons;
   }
+
+  @Selector()
+  static sourcingReasons(state: RejectReasonStateModel) : any | null {
+    return state.souringReason;
+  }
+
 
   @Selector()
   static categoryNote(state: RejectReasonStateModel) : RejectReasonPage | null {
@@ -555,7 +563,21 @@ export class RejectReasonState {
     );
   }
 
+  @Action(GetSourcingReasons)
+  GetSourcingReasons(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    {}: GetTerminationReasons
+  ): Observable<any> {
+    patchState({ isReasonLoading: true });
 
+    return this.rejectReasonService.GetSourcingReasons({}).pipe(
+      tap((payload) => {
+        patchState({souringReason: payload});
+        console.log(payload)
+        return payload;
+      })
+    );
+  }
   @Action(SaveTerminationReasons)
   SaveTerminationReasons(
     { dispatch}: StateContext<RejectReasonStateModel>,

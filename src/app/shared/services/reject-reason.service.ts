@@ -229,6 +229,9 @@ export class RejectReasonService {
   public getTerminationReason(pageNumber: number, pageSize: number): Observable<RejectReasonPage> {
     return this.http.get<RejectReasonPage>(`/api/TerminatedReason?PageNumber=${pageNumber}&PageSize=${pageSize}`);
   }
+  public GetSourcingReasons(payload?:any): Observable<any> {
+    return this.http.post<any>(`/api/Employee/getSourcing`,payload);
+  }
 
   public saveTerminationReason(payload: {reason: string}): Observable<RejectReason> {
     return this.http.post<RejectReason>('/api/TerminatedReason', payload);

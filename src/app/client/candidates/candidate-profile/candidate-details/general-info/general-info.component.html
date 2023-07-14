@@ -12,17 +12,6 @@
       ></app-input>
 
       <app-input
-        *ngIf="isSourceValidated"
-        [formGroupInstance]="candidateForm"
-        [required]="true"
-        maxlength="50"
-        controlName="sourceId"
-        id="sourceId"
-        label="Source Id"
-      ></app-input>
-
-      <app-input
-        *ngIf="!isSourceValidated"
         [formGroupInstance]="candidateForm"
         [required]="true"
         maxlength="50"
@@ -32,27 +21,7 @@
       ></app-input>
     </div>      
 
-    <div *ngIf="isSourceValidated" class="two-controls">
-      <app-input
-        [formGroupInstance]="candidateForm"
-        [required]="true"
-        maxlength="50"
-        controlName="firstName"
-        id="first-name"
-        label="First Name"
-      ></app-input>
-
-      <app-input
-        [formGroupInstance]="candidateForm"
-        maxlength="10"
-        controlName="middleName"
-        id="middle-name"
-        label="Middle Name"
-      ></app-input>
-    </div>
-
     <app-input
-      *ngIf="!isSourceValidated"
       [formGroupInstance]="candidateForm"
       maxlength="10"
       controlName="middleName"
@@ -178,8 +147,18 @@
       controlName="terminationReasonId"
     ></app-dropdown>
 
+  </div>
+  <div class="row">
+    <app-input
+      [formGroupInstance]="candidateForm"
+      [required]="true"
+      maxlength="50"
+      controlName="sourceId"
+      id="sourceId"
+      label="Source Id"
+    ></app-input>
+
     <app-dropdown
-      *ngIf="isSourceValidated"
       [dataSource]="recruitContent"
       [fields]="fieldsSettings"
       [formGroupInstance]="candidateForm"
@@ -190,7 +169,6 @@
     ></app-dropdown>
 
     <app-dropdown
-      *ngIf="isSourceValidated"
       [dataSource]="sourceContent"
       [fields]="fieldsSettings"
       [formGroupInstance]="candidateForm"

@@ -207,6 +207,10 @@ export class GetTerminationReasons {
   static readonly type = '[reject reason] Get Termination reason by Page';
   constructor(public pageNumber: number, public pageSize: number) { }
 }
+export class GetSourcingReasons {
+  static readonly type = '[reject reason] Get GetSourcingReasons reason by Page';
+  constructor() { }
+}
 
 export class SaveTerminationReasons {
   static readonly type = '[reject reason] Save Termination Reason';

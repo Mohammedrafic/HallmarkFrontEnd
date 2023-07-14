@@ -19,7 +19,7 @@ import { ListOfSkills } from '@shared/models/skill.model';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
+import { GetSourcingReasons, GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
 import { endDateValidator, endTimeValidator, startDateValidator } from '@shared/validators/date.validator';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { DateTimeHelper } from '@core/helpers';
@@ -38,6 +38,11 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   pageSize = 100;
   @Select(RejectReasonState.terminationReasons)
   public reasons$: Observable<RejectReasonPage>;
+
+
+  @Select(RejectReasonState.sourcingReasons)
+  public sourcing$: Observable<any>;
+  
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   public skills$: Observable<ListOfSkills[]>;
   public primarySkillsDataSource: ListOfSkills[] = [];
@@ -67,6 +72,8 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.subscribeOnSkills();
     this.subscribeOnHoldDates();
     this.store.dispatch(new GetTerminationReasons(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetSourcingReasons());
+
   }
 
   public override ngOnDestroy(): void {
@@ -81,6 +88,10 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       this.secondarySkillsDataSource = primarySkillId
         ? this.candidateProfileFormService.getSecondarySkillsDataSource(this.primarySkillsDataSource, primarySkillId)
         : skills;
+      this.cdr.markForCheck();
+    });
+    this.sourcing$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+   console.log(data)
       this.cdr.markForCheck();
     });
   }
