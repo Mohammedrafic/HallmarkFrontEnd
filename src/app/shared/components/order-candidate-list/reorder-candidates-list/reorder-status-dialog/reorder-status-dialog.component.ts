@@ -427,6 +427,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     candidatePayRate,
     clockId,
   }: OrderCandidateJob) {
+    this.getComments();
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     let isBillRatePending: number;
 
@@ -460,7 +461,6 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     });
     this.enableFields();
     this.subscribeCandidateCancellationReasons();
-    this.getComments();
   }
 
   private getNewApplicantStatus(): ApplicantStatus {
