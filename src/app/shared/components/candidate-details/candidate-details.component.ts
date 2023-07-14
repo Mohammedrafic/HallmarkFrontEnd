@@ -200,15 +200,12 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         takeUntil(this.unsubscribe$),
       ).subscribe((id) => {
 
-        const agencyIdvalue = id.toString();
-       
+        const agencyIdvalue = id.toString(); 
         this.store.dispatch(new GetAssociateOrganizations(Number(agencyIdvalue)));
         this.subscribeOnAgencyOrganizationChanges();
         this.updatePage();
       });
-   
-       this.store.dispatch(new GetUserAgencies());
-       
+       this.store.dispatch(new GetUserAgencies());    
    
     }
     else {
@@ -219,11 +216,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         filter(Boolean),
         takeUntil(this.unsubscribe$),
       ).subscribe((id) => {
-
         const OrgID = id.toString();
-  
         this.store.dispatch([new GetAssociateAgencies(Number(OrgID))]);
-   
       });
 
     }
@@ -287,8 +281,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           filter(Boolean),
           takeUntil(this.unsubscribe$),
         ).subscribe((id) => {
-          let agencyIdvalue = id.toString();
-          const filteredArray = agencyData.filter((item: { agencyId: any; }) => item?.agencyId === Number(agencyIdvalue));
+          const agencyIdvalue = id.toString();
+          const filteredArray = agencyData.filter((item:AssociateAgency) => item?.agencyId === Number(agencyIdvalue));
           this.orgAgencyName = filteredArray[0]?.agencyName;
         });
       });      
@@ -306,14 +300,9 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           filter(Boolean),
           takeUntil(this.unsubscribe$),
         ).subscribe((id) => {
-
           const orgId = id.toString();
-
           const filtereorgdArray = orgData.filter((item) => item?.id === Number(orgId));
-
           this.orgAgencyName = filtereorgdArray[0]?.name;
-
-
         });
 
       });
