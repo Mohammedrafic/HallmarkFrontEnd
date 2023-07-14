@@ -258,7 +258,7 @@
                   formControlName="jobStartDate"
                   appValidateWithMessage
                   [enableMask]="true"
-                  [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                  [maskPlaceholder]="datepickerMask"
                 >
                 </ejs-datepicker>
               </div>
@@ -279,7 +279,7 @@
                   appValidateWithMessage
                   [enabled]="quickOrderConditions.isJobEndDateControlEnabled"
                   [enableMask]="true"
-                  [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                  [maskPlaceholder]="datepickerMask"
                   [min]="generalInformationForm.controls['jobStartDate'].value"
                 >
                 </ejs-datepicker>
@@ -339,7 +339,7 @@
                   formControlName="jobStartDate"
                   appValidateWithMessage
                   [enableMask]="true"
-                  [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                  [maskPlaceholder]="datepickerMask"
                 >
                 </ejs-datepicker>
               </div>

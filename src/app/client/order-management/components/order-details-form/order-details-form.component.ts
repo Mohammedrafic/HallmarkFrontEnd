@@ -49,6 +49,7 @@ import { Duration } from '@shared/enums/durations';
 import { OrderJobDistribution } from '@shared/enums/job-distibution';
 
 import {
+  datepickerMask,
   ORDER_CONTACT_DETAIL_TITLES,
   ORDER_EDITS,
   ORDER_PER_DIEM_EDITS,
@@ -201,6 +202,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public specialProjectCategories: SpecialProject[];
   public projectNames: SpecialProject[];
   public poNumbers: SpecialProject[];
+  public readonly datepickerMask = datepickerMask;
 
   private selectedRegion: Region;
   private selectedSkills: SkillCategory;
