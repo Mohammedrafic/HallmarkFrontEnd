@@ -9,6 +9,8 @@ import { AbstractContactDetails } from '@client/candidates/candidate-profile/can
 import {
   ProfileStatuses,
   ProfileStatusesEnum,
+  recruitContent,
+  sourceContent,
   TerminationReasons,
 } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { JobClassifications } from '@client/order-management/constants';
@@ -43,10 +45,12 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
 
   public readonly classifications = JobClassifications;
   public readonly profileStatuses = ProfileStatuses;
+  public readonly recruitContent = recruitContent;
+  public readonly sourceContent = sourceContent;
   public readonly companyCodes = ProfileStatuses;
   public readonly terminationReason = TerminationReasons;
   public readonly today = new Date();
-
+  public isSourceValidated: boolean = false;
   constructor(
     protected override cdr: ChangeDetectorRef,
     protected override candidateProfileFormService: CandidateProfileFormService,
@@ -100,17 +104,26 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       .get('profileStatus')
       ?.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((profileStatus: ProfileStatusesEnum) => {
+        this.isSourceValidated = false;
+        this.isTerminatedSelected = false;
+        this.isOnHoldSelected = false;
         const handlers = {
           [ProfileStatusesEnum.OnHold]: () => this.handleOnHoldProfileStatus(),
           [ProfileStatusesEnum.Terminated]: () => this.handleTerminatedProfileStatus(),
           [ProfileStatusesEnum.Active]: () => this.reset(),
           [ProfileStatusesEnum.Inactive]: () => this.reset(),
+          [ProfileStatusesEnum.Sourcing]: () => this.handleSourceStatus()
         };
 
         handlers[profileStatus]();
         this.candidateForm.updateValueAndValidity();
         this.cdr.markForCheck();
       });
+  }
+
+  private handleSourceStatus(): void {
+    this.candidateForm.get('employeeId')?.removeValidators(Validators.required);
+    this.isSourceValidated = true;
   }
 
   private handleOnHoldProfileStatus(): void {
