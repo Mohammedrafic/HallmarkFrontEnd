@@ -335,7 +335,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         startDate: toCorrectTimezoneFormat(startDate),
         endDate: toCorrectTimezoneFormat(endDate),
       };
-
+      this.filterColumns.candidateNames.dataSource=this.filterco.CandidateNames
       this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
       this.updatePage();
       this.store.dispatch(new ShowFilterDialog(false));
@@ -539,7 +539,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         type: ControlTypes.Autocomplete,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'name',
+        valueField: 'fullName',
         valueId: 'id',
       },
       orderId: {
