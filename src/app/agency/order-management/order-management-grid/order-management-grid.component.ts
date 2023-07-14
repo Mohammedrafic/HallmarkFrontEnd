@@ -293,12 +293,16 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = `Order Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
+    let filtersExport = {...this.filters};
+    if(this.filters.orderLocked){
+      filtersExport.orderLocked = filtersExport.orderLocked == 'false' ? false : filtersExport.orderLocked == 'true' ? true : null
+    }
     this.store.dispatch(
       new ExportAgencyOrders(
         new ExportPayload(
           fileType,
           {
-            ...this.filters,
+            filtersExport,
             offset: Math.abs(new Date().getTimezoneOffset()),
             isAgency: this.selectedTab === AgencyOrderManagementTabs.ReOrders ? true : null,
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
