@@ -570,6 +570,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       annualSalaryRangeFrom,
       annualSalaryRangeTo,
       orderPlacementFee,
+      linkedId,
     } = allValues;
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
       const {
@@ -642,6 +643,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       annualSalaryRangeTo,
       orderPlacementFee,
       isTemplate: false,
+      linkedId,
     };
 
     if (this.orderDetailsFormComponent.order?.isTemplate) {
