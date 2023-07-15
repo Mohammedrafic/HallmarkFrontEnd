@@ -1,9 +1,4 @@
-<ejs-dialog id="dialog"
-            #customReportSideDialog
-            cssClass="dialog order-details-dialog"
-            [target]="targetElement"  width="80%"
-            [visible]="false"
-            [animationSettings]="{ effect: 'SlideRight' }">
+
   <section class="container preview-dialog">
     <section class="header-container">
       <div class="e-card-header preview-header">
@@ -11,23 +6,23 @@
           <h3 class="e-card-title preview-title">{{ selectedLog?.customReportName }}</h3>
         </div>
         <div class="e-card-content">
-          <button ejs-button
+          <button ejs-button 
                   id="saveAsButton"
                   (click)="saveAsPopUp()"
-                  cssClass="e-outline button-filter">
+                  cssClass="e-outline button-filter button-right">
             <div class="filter-button-content">
               Save As <i-feather name="sliders" class="icon"></i-feather>
             </div>
           </button>
-          <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
-            <i-feather name="x" class="icon"></i-feather>
+          <button ejs-button type="submit" cssClass="e-outline button-filter" (click)="onClose()">
+           Back
           </button>
         </div>
       </div>
      
-      <section class="app-grid table-wrapper logi-report-iframe-div" >
+      <section class="app-grid table-wrapper " >
         
-          <app-logi-report [paramsData]="paramsData"  width="100%"
+          <app-logi-report [paramsData]="paramsData"  width="100%" [customCSS]="customCSSName"
                            [reportName]="reportName"
                            [catelogName]="catelogName"
                            [reportType]="reportType"></app-logi-report>
@@ -36,7 +31,7 @@
     </section>
   </section>
   
-</ejs-dialog>
+
 
 <ejs-dialog id="dialog"
             #addCustomReportSideDialog
