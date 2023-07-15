@@ -6,7 +6,7 @@
           <h3 class="e-card-title preview-title">{{ selectedLog?.customReportName }}</h3>
         </div>
         <div class="e-card-content">
-          <button ejs-button 
+          <button ejs-button  *ngIf="selectedLog?.isSystem"
                   id="saveAsButton"
                   (click)="saveAsPopUp()"
                   cssClass="e-outline button-filter button-right">

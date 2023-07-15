@@ -74,13 +74,6 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
       }
     });
 
-
-
-    this.saveCustomReport$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
-      this.isAddCustomReportSidebarShown = false;
-    });
-
-
    this.reportFormGroup=  new FormGroup({
      reportName: new FormControl('', [Validators.required]),
      
@@ -118,19 +111,19 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
         businessUnitId: this.selectedLog.businessUnitId
 
       };
-      this.store.dispatch(new SaveCustomReport(addLogiCustomReportRequestDto));
 
-      let options: any = {
-        savePath: path,
-        linkedCatalog: true,
-        saveSort: false,
-        catalog: "/CustomReport/CustomReport.cat"
-      };
-      this.logiReportComponent.SaveAsReport(options, "reportIframe");
-      this.isAddCustomReportSidebarShown = false;
-     
-     
-      this.refreshParent.emit();
+      this.saveCustomReport$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
+        let options: any = {
+          savePath: path,
+          linkedCatalog: true,
+          saveSort: false,
+          catalog: "/CustomReport/CustomReport.cat"
+        };
+        this.logiReportComponent.SaveAsReport(options, "reportIframe");
+        this.isAddCustomReportSidebarShown = false;
+        this.refreshParent.emit();
+      });
+      this.store.dispatch(new SaveCustomReport(addLogiCustomReportRequestDto));
     }
   }
   public saveAsPopUp(): void {
