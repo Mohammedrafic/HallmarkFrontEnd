@@ -122,6 +122,7 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
         catalog: "/CustomReport/CustomReport.cat"
       };
       this.logiReportComponent.SaveAsReport(options, "reportIframe");
+      setTimeout(() => { this.refreshCustomReportComponent() }, 2000);
     
     }
   }

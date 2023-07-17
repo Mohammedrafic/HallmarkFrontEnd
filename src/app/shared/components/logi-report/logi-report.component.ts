@@ -45,7 +45,6 @@ export class LogiReportComponent implements OnInit {
   @Input() reportType: LogiReportTypes;
   @Input() resultList: LogiReportFileDetails[];
   @Input() customCSS: string;
-  @Output() refreshCustomReport: EventEmitter<any> = new EventEmitter<any>();
   
   constructor(@Inject(APP_SETTINGS) private appSettings: AppSettings, private store: Store) {
   }
@@ -84,7 +83,6 @@ export class LogiReportComponent implements OnInit {
 
     rptset = app.getReportSet();
     rptset.saveAs(options, this.CallbackSaveAs);
-    this.refreshCustomReport.emit();
   }
   private CallbackSaveAs(status: any) {
     console.log(status);
