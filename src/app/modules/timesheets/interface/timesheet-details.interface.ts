@@ -144,6 +144,7 @@ export interface AddRecordDto {
   hadLunchBreak?: boolean;
   isTimeInNull?: boolean;
   forceUpdate?: boolean;
+  day: string;
 }
 
 export interface PutRecord {
@@ -153,8 +154,9 @@ export interface PutRecord {
   billRateConfigId: number;
   departmentId: number;
   value: number;
-  description?: string;
+  description?: string | null;
   isTimeInNull?: boolean;
+  hadLunchBreak?: boolean;
 }
 
 export interface PutRecordDto {

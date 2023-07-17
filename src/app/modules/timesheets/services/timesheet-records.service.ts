@@ -6,26 +6,16 @@ import { merge, Observable } from 'rxjs';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { DropdownOption } from '@core/interface';
-import { TimesheetRecordsDto, RecordValue } from './../interface';
+import { AllTimesheetTimeSet, DateTimeHelper } from '@core/helpers';
+import { TimesheetRecordsDto, RecordValue } from '../interface';
 import { RecordFields, RecordsMode, RecordStatus } from '../enums';
-import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
-import { AllTimesheetTimeSet } from '@core/helpers';
+import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor';
 
 @Injectable()
 export class TimesheetRecordsService {
   constructor(
     private fb: FormBuilder,
   ) {}
-
-  setCostOptions(defs: ColDef[], options: DropdownOption[]): void {
-    const idx = defs.findIndex((item) => item.field === 'costCenter');
-    defs[idx].cellRendererParams.options = options;
-  }
-
-  setBillRatesOptions(defs: ColDef[], options: DropdownOption[]): void {
-    const idx = defs.findIndex((item) => item.field === 'billRateType');
-    defs[idx].cellRendererParams.options = options;
-  }
 
   createEditForm(
     records: TimesheetRecordsDto,
@@ -36,7 +26,7 @@ export class TimesheetRecordsService {
 
     records[currentTab][RecordsMode.Edit].forEach((record) => {
       const config = colDefs.filter((item) => item.cellRendererParams?.editMode);
-      const controls: Record<string, string[] | number[] | Validators[]> = {};
+      const controls: Record<string, | string[] | number[] | Validators[] | null[]> = {};
       const formValidator = currentTab === RecordFields.Time ? [AllTimesheetTimeSet] : [];
 
       config.forEach((column) => {
@@ -45,14 +35,14 @@ export class TimesheetRecordsService {
 
         controls[field] = [value as string | number | boolean, Validators.required];
       });
+      const timeInValue = record['isTimeInNull'] ? null : record['timeIn'];
 
       controls['billRateConfigId'] = [record['billRateConfigId'], Validators.required];
-      controls['timeOut'] = [record['timeOut'] || ''];
-      controls['timeIn'] = [record['timeIn'] || ''];
+      controls['timeOut'] = [record['timeOut'] as string];
+      controls['timeIn'] = [timeInValue] as string[] | null[];
       controls['isTimeInNull'] = [record['isTimeInNull'] || false];
 
       formGroups[record.id] = this.fb.group(controls, { validators: formValidator } as AbstractControlOptions);
-
     });
 
     return formGroups;
@@ -61,23 +51,45 @@ export class TimesheetRecordsService {
   findDiffs(
     data: RecordValue[], forms: Record<string, FormGroup>, defs: ColDef[],
     ): RecordValue[] {
-    const diffs: Record<string, string | number  | boolean>[] = [];
-    const filedsToCompare = defs.filter((def) => def.cellRendererParams?.editMode).map((def) => def.field);
+    const diffs: Record<string, string | number  | boolean | null>[] = [];
+    const fieldsToCompare = defs.filter((def) => def.cellRendererParams?.editMode)
+      .map((def) => def.field);
 
     data.forEach((dataItem) => {
       const values: RecordValue = forms[dataItem.id].getRawValue() as RecordValue;
       const diffValues: Record<string, string | number  | boolean> = {};
 
-
-      Object.keys(dataItem).filter((key) => filedsToCompare.includes(key))
+      Object.keys(dataItem).filter((key) => fieldsToCompare.includes(key))
       .forEach((key) => {
         if (key !== 'id') {
           const keyValue = key as keyof RecordValue;
+          const initialTimeInNull = !!dataItem.isTimeInNull;
+          const timeInKey = keyValue === 'timeIn';
+          const timeOutKey = keyValue === 'timeOut';
 
-          if (dataItem[keyValue] !== values[keyValue]) {
+          if (dataItem[keyValue] !== values[keyValue] && !timeInKey && !timeOutKey) {
             diffValues[keyValue] = values[keyValue] as string | number | boolean;
           }
 
+          // Time out value may be in another format, thus values must be unified.
+          if (timeOutKey && !!dataItem[keyValue]) {
+            const dataTime = DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string);
+            const formTime = DateTimeHelper.setUtcTimeZone(values[keyValue] as string);
+            
+            if (dataTime !== formTime) {
+              diffValues[keyValue] = values[keyValue] as string;
+            }
+          } else if (timeOutKey && dataItem[keyValue] !== values[keyValue]) {
+            diffValues[keyValue] = values[keyValue] as string;
+          }
+
+          // Need to check isTimeInNull 
+          if (timeInKey && initialTimeInNull && values[keyValue] !== null) {
+            diffValues[keyValue] = values[keyValue] as string | number | boolean;
+          } else if (timeInKey && !initialTimeInNull && DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string)
+          !== DateTimeHelper.setUtcTimeZone(values[keyValue] as string)) {
+            diffValues[keyValue] = values[keyValue] as string | number | boolean;
+          }
         }
       });
 
@@ -86,7 +98,6 @@ export class TimesheetRecordsService {
           ...dataItem,
           ...diffValues,
         });
-
       }
     });
 
@@ -115,11 +126,11 @@ export class TimesheetRecordsService {
   }
 
   controlTabsVisibility(billRates: DropdownOption[], tabs: TabComponent, records: TimesheetRecordsDto): void {
-    const isMilageAvaliable = billRates.some((rate) => rate.text.includes('Mileage'));
-    const isExpensesAvaliable = !!records.expenses.viewMode.length;
+    const isMileageAvailable = billRates.some((rate) => rate.text.includes('Mileage'));
+    const isExpensesAvailable = !!records.expenses.viewMode.length;
 
-    tabs.hideTab(1, !isMilageAvaliable);
-    tabs.hideTab(2, !isExpensesAvaliable);
+    tabs.hideTab(1, !isMileageAvailable);
+    tabs.hideTab(2, !isExpensesAvailable);
   }
 
   checkForStatus(data: RecordValue[]): boolean {
@@ -133,17 +144,16 @@ export class TimesheetRecordsService {
     currentTab: RecordFields,
     formControls: Record<string, FormGroup>,
     colDefs: ColDef[]): ColDef[] {
-
-
     return colDefs.map((def) => {
+      let definition: ColDef = def;
+
       if (editOn && def.field === 'hadLunchBreak') {
-        def.cellRendererParams.disabled = false;
+        definition.cellRendererParams.disabled = false;
       } else if (def.field === 'hadLunchBreak') {
-        def.cellRendererParams.disabled = true;
+        definition.cellRendererParams.disabled = true;
       }
 
-      if (editOn && def.field === 'billRateConfigName'
-      && currentTab === RecordFields.Time) {
+      if (editOn && def.field === 'billRateConfigName' && currentTab === RecordFields.Time) {
         const editData = {
           cellRenderer: DropdownEditorComponent,
           cellRendererParams: {
@@ -153,26 +163,24 @@ export class TimesheetRecordsService {
             storeField: 'billRateTypes',
           },
         };
-        def.field = 'billRateConfigId';
-        def = {
+        definition.field = 'billRateConfigId';
+
+        definition = {
           ...def,
           ...editData,
         };
       } else if (!editOn && def.field === 'billRateConfigId' && currentTab === RecordFields.Time) {
-        def.field = 'billRateConfigName';
-        delete def.cellRenderer;
-        delete def.cellRendererParams;
+        definition.field = 'billRateConfigName';
+        delete definition.cellRenderer;
+        delete definition.cellRendererParams;
       }
 
-      if ((def.field === 'billRate' || def.field === 'total') && currentTab !== RecordFields.Expenses) {
-        def.hide = editOn;
+      if (definition.cellRendererParams && definition.cellRendererParams.editMode) {
+        definition.cellRendererParams.isEditable = editOn;
+        definition.cellRendererParams.formGroup = formControls;
       }
 
-      if (def.cellRendererParams && def.cellRendererParams.editMode) {
-        def.cellRendererParams.isEditable = editOn;
-        def.cellRendererParams.formGroup = formControls;
-      }
-      return def;
+      return definition;
     });
   }
 

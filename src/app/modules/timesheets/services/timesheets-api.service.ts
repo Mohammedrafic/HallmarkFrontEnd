@@ -8,7 +8,7 @@ import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import {
   TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
-  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimsheetRecordsDto, AddRecordBillRate
+  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimesheetRecordsDto, AddRecordBillRate,
 } from '../interface';
 import { CostCenterAdapter, RecordsAdapter } from '../helpers';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
@@ -41,7 +41,7 @@ export class TimesheetsApiService {
     ): Observable<TimesheetRecordsDto> {
     const endpoint = !isAgency
     ? `/api/Timesheets/${id}/records` : `/api/Timesheets/${id}/records/organization/${orgId}`;
-    return this.http.get<RawTimsheetRecordsDto>(endpoint)
+    return this.http.get<RawTimesheetRecordsDto>(endpoint)
     .pipe(
       map((data) => RecordsAdapter.adaptRecordsDto(data)),
       catchError(() => of({
@@ -73,10 +73,6 @@ export class TimesheetsApiService {
     dto: PutRecordDto,
   ): Observable<void> {
     return this.http.put<void>(`/api/Timesheets/${dto.timesheetId}/records`, dto);
-  }
-
-  public deleteProfileTimesheets(profileId: number, profileTimesheetId: number): Observable<null> {
-    return of(null);
   }
 
   public getFiltersDataSource(
