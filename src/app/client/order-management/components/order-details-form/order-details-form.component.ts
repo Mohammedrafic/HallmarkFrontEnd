@@ -666,9 +666,11 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
     this.filteredJobDistributionValue = getFilteredJobDistribution(jobDistributionValues)[0];
 
-    this.jobDistributionForm.controls['jobDistribution'].patchValue(
-      this.filteredJobDistributionValue
-    );
+    if (this.filteredJobDistributionValue && this.filteredJobDistributionValue === OrderJobDistribution.TierLogic) {
+      this.distribution = distributionSource(true);
+    }
+
+    this.jobDistributionForm.controls['jobDistribution'].patchValue(this.filteredJobDistributionValue);
 
     this.associateAgencies$
       .pipe(
