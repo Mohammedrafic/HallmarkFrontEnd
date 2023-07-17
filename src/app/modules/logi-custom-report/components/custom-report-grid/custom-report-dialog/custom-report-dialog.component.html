@@ -22,10 +22,11 @@
      
       <section class="app-grid table-wrapper " >
         
-          <app-logi-report [paramsData]="paramsData"  width="100%" [customCSS]="customCSSName"
-                           [reportName]="reportName"
-                           [catelogName]="catelogName"
-                           [reportType]="reportType"></app-logi-report>
+        <app-logi-report [paramsData]="paramsData" width="100%" [customCSS]="customCSSName"
+                         [reportName]="reportName"
+                         [catelogName]="catelogName"
+                         (refreshCustomReport)="refreshCustomReportComponent()"
+                         [reportType]="reportType"></app-logi-report>
        
       </section>
     </section>
