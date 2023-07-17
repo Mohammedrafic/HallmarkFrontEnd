@@ -123,12 +123,13 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
       };
       this.logiReportComponent.SaveAsReport(options, "reportIframe");
       setTimeout(() => { this.refreshCustomReportComponent() }, 2000);
+      this.isAddCustomReportSidebarShown = false;
     
     }
   }
 
   public refreshCustomReportComponent() {
-     this.isAddCustomReportSidebarShown = false;
+    
       this.refreshParent.emit();
   }
   public saveAsPopUp(): void {
