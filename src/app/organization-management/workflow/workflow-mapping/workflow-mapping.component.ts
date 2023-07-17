@@ -22,7 +22,7 @@ import {
   GetWorkflowsSucceed,
   RemoveWorkflowMapping,
   SaveWorkflowMapping,
-  SaveWorkflowMappingSucceed
+  SaveWorkflowMappingSucceed,
 } from '../../store/workflow.actions';
 import { UserState } from '../../../store/user.state';
 import { User } from '@shared/models/user-managment-page.model';
@@ -34,20 +34,30 @@ import {
   StepRoleUser,
   UsersByPermission,
   WorkflowMappingPage,
-  WorkflowMappingPost
+  WorkflowMappingPost,
 } from '@shared/models/workflow-mapping.model';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { isEmpty } from 'lodash';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Query } from "@syncfusion/ej2-data";
 import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
+import {
+  CreateWorkflowTypeList,
+  FiltersColumnsConfig,
+  VmsWorkflowType,
+} from '@organization-management/workflow/workflow-mapping/constants';
+import { WorkflowMappingService } from '@organization-management/workflow/workflow-mapping/services';
 
 type RoleWithUserModel = { [key: number]: { [workflowType: number]: RoleWithUser[] } };
 type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermission)[] };
@@ -64,58 +74,74 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   @ViewChild('locationDropdown') locationDropdown: MultiSelectComponent;
   @ViewChild('departmentDropdown') departmentDropdown: MultiSelectComponent;
 
-  @Input() isActive: boolean = false;
-
-  @Select(UserState.organizationStructure)
-  organizationStructure$: Observable<OrganizationStructure>;
-  public orgStructure: OrganizationStructure;
-  public orgRegions: OrganizationRegion[] = [];
-
-  public regions: Region[] = [];
-  public allRegions: OrganizationRegion[] = [];
-
-  public locations: OrganizationLocation[] = [];
-
-  public departments: OrganizationDepartment[] = [];
-  public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
-
-  @Select(OrganizationManagementState.assignedSkillsByOrganization)
-  skills$: Observable<Skill[]>;
-  skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
-  public allSkills: Skill[] = [];
-
-  public jobOrderWorkflow = 'Job Order Workflow';
-  public workflowGroupTypesData = [{ id: WorkflowGroupType.Organization, text: this.jobOrderWorkflow }];
-  public workflowGroupTypesFields: FieldSettingsModel = { text: 'text', value: 'id' };
-
-  @Select(WorkflowState.sortedWorkflows)
-  workflows$: Observable<WorkflowWithDetails[]>;
-  public workflows: WorkflowWithDetails[];
-
-  public orderWorkflowSteps: Step[] = [];
-  public applicationWorkflowSteps: Step[] = [];
+  @Input() isActive = false;
+  @Input() isIRPFlagEnabled = false;
+  @Input() isOrgUseIRPAndVMS = false;
 
   @Select(WorkflowState.workflowMappingPages)
-  workflowMappings$: Observable<WorkflowMappingPage>;
+  public workflowMappings$: Observable<WorkflowMappingPage>;
 
   @Select(WorkflowState.rolesPerUsers)
-  rolesPerUsers$: Observable<RolesByPermission[]>;
-  public rolesWithUsers: RoleWithUserModel;
+  private rolesPerUsers$: Observable<RolesByPermission[]>;
+
+  @Select(UserState.organizationStructure)
+  private organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
+  private skills$: Observable<Skill[]>;
+
+  @Select(WorkflowState.sortedWorkflows)
+  private workflows$: Observable<WorkflowWithDetails[]>;
 
   @Select(WorkflowState.users)
-  users$: Observable<UsersByPermission[]>;
+  private users$: Observable<UsersByPermission[]>;
 
   @Select(UserState.lastSelectedOrganizationId)
-  organizationId$: Observable<number>;
+  private organizationId$: Observable<number>;
 
+  public orgStructure: OrganizationStructure;
+  public orgRegions: OrganizationRegion[] = [];
+  public regions: Region[] = [];
+  public allRegions: OrganizationRegion[] = [];
+  public locations: OrganizationLocation[] = [];
+  public departments: OrganizationDepartment[] = [];
+  public skills: Skill[] = [];
+  public allSkills: Skill[] = [];
+  public workflowGroupTypesSources = [VmsWorkflowType];
+  public workflowSources: WorkflowWithDetails[] = [];
+  public allWorkflows: WorkflowWithDetails[] = [];
+  public workflows: WorkflowWithDetails[];
+  public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
+  public skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
+  public workflowGroupTypesFields: FieldSettingsModel = { text: 'text', value: 'id' };
   public fields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public optionFields = { text: 'name', value: 'id' };
+  public orderWorkflowSteps: Step[] = [];
+  public applicationWorkflowSteps: Step[] = [];
+  public rolesWithUsers: RoleWithUserModel;
   public isEdit = false;
   public workflowMappingFormGroup: FormGroup;
   public editedRecordId?: number;
-  public isMappingSectionShown: boolean = false;
+  public isMappingSectionShown = false;
   public workflowTypes = WorkflowType;
   public showForm: boolean;
+  public WorkflowFilterFormGroup: FormGroup;
+  public filters: WorkflowFilters = {
+    pageSize: this.pageSize,
+    pageNumber: 1,
+  };
+  public filterColumns: any;
+  public allRegionsSelected = false;
+  public allLocationsSelected = false;
+  public allDepartmentsSelected = false;
+  public maxDepartmentsLength = 1000;
+  public query: Query = new Query().take(this.maxDepartmentsLength);
   public filterType: string = 'Contains';
+
+  private formBuilder: FormBuilder;
+  private pageSubject = new Subject<number>();
+  private unsubscribe$: Subject<void> = new Subject();
+
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
@@ -128,32 +154,13 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     return this.workflowMappingFormGroup.get('applicationRoleUserFormArray') as FormArray;
   }
 
-  private formBuilder: FormBuilder;
-  public WorkflowFilterFormGroup: FormGroup;
-  private pageSubject = new Subject<number>();
-  private unsubscribe$: Subject<void> = new Subject();
-
-  public filters: WorkflowFilters = {
-    pageSize: this.pageSize,
-    pageNumber: 1,
-  };
-  public filterColumns: any;
-  public optionFields = {
-    text: 'name',
-    value: 'id',
-  };
-  public allRegionsSelected: boolean = false;
-  public allLocationsSelected: boolean = false;
-  public allDepartmentsSelected: boolean = false;
-  public maxDepartmentsLength = 1000;
-  public query: Query = new Query().take(this.maxDepartmentsLength);
-
   constructor(
     protected override store: Store,
     private actions$: Actions,
     private filterService: FilterService,
     @Inject(FormBuilder) private builder: FormBuilder,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private workflowMappingService: WorkflowMappingService,
   ) {
     super(store);
     this.formBuilder = builder;
@@ -171,60 +178,12 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   override ngOnInit(): void {
     super.ngOnInit();
 
-    this.filterColumns = {
-      regionIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      locationIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      departmentsIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      skillIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'skillDescription',
-        valueId: 'id',
-      },
-      types: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
-    };
-    this.filterColumns.types.dataSource = [{ id: WorkflowGroupType.Organization, name: this.jobOrderWorkflow }];
-
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
-      this.currentPage = page;
-      this.filters.pageNumber = page;
-      this.store.dispatch(new GetWorkflowMappingPages(this.filters));
-    });
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.currentPage = 1;
-      this.clearFilters();
-      this.store.dispatch(new GetAssignedSkillsByOrganization());
-      this.store.dispatch(new GetWorkflowMappingPages(this.filters));
-      this.store.dispatch(new GetRolesForWorkflowMapping());
-      this.store.dispatch(new GetUsersForWorkflowMapping());
-      this.store.dispatch(new GetWorkflows());
-    });
+    this.initFiltersConfig();
+    this.initWorkflowSources();
+    this.watchForWorkflowType();
+    this.watchForWorkflowSources();
+    this.watchForChangePage();
+    this.watchForOrganizationChange();
 
     combineLatest([this.users$, this.rolesPerUsers$])
       .pipe(
@@ -261,19 +220,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       this.filterColumns.names.dataSource = workflows.payload.map((item: WorkflowWithDetails) => item.name);
     });
 
-    this.workflowMappingFormGroup.get('regions')?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((regionIds: number[]) => {
-      if (regionIds && regionIds.length > 0) {
-        const locations: OrganizationLocation[] = [];
-        regionIds.forEach((id) => {
-          const selectedRegion = this.orgRegions.find((region) => region.id === id);
-          locations.push(...(selectedRegion?.locations as any));
-        });
-        this.locations = sortByField(locations, 'name');
-      }
-
-      this.workflowMappingFormGroup.controls['locations'].setValue(null);
-      this.workflowMappingFormGroup.controls['departments'].setValue(null);
-    });
+    this.watchForRegions();
 
     this.organizationStructure$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
@@ -330,27 +277,16 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
 
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills) => {
       if (skills && skills.length > 0) {
+        this.skills = skills;
         this.allSkills = skills;
         this.filterColumns.skillIds.dataSource = skills;
       }
     });
 
-    this.workflowMappingFormGroup.get('locations')?.valueChanges.pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe((locationIds: number[]) => {
-      if (locationIds && locationIds.length > 0) {
-        const departments: OrganizationDepartment[] = [];
-        locationIds.forEach((id) => {
-          const selectedLocation = this.locations.find((location) => location.id === id);
-          departments.push(...(selectedLocation?.departments as []));
-        });
-        this.departments = sortByField(departments, 'name');
-      }
-
-      this.workflowMappingFormGroup.controls['departments'].setValue(null);
-    });
+    this.watchForLocations();
 
     this.workflowMappingFormGroup.get('workflowName')?.valueChanges.pipe(
+      filter(Boolean),
       takeUntil(this.unsubscribe$)
     ).subscribe((id: number) => {
       if (this.orderRoleUserFormArray.length > 0) {
@@ -592,7 +528,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     setTimeout(() => {
       const foundWorkflow = this.workflows.find((w) => w.name === data.workflowName);
 
-      this.workflowMappingFormGroup.controls['workflowType'].setValue(WorkflowGroupType.Organization);
+      this.workflowMappingFormGroup.controls['workflowType'].setValue(data.workflowGroupType);
       this.workflowMappingFormGroup.controls['workflowName'].setValue(foundWorkflow?.id);
 
       this.allRegionsChange({ checked: !data.regionId });
@@ -641,13 +577,13 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       }).pipe(
-        take(1)
-      ).subscribe((confirm) => {
-        if (confirm) {
-          this.store.dispatch(new RemoveWorkflowMapping(data.mappingId, this.filters));
-        }
-        this.removeActiveCssClass();
-      });
+      take(1)
+    ).subscribe((confirm) => {
+      if (confirm) {
+        this.store.dispatch(new RemoveWorkflowMapping(data.mappingId, this.filters));
+      }
+      this.removeActiveCssClass();
+    });
   }
 
   public onCancelFormClick(): void {
@@ -662,11 +598,11 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
           filter((confirm) => !!confirm),
           take(1)
         ).subscribe(() => {
-          this.store.dispatch(new ShowSideDialog(false));
-          this.showForm = false;
-          this.clearFormDetails();
-          this.removeActiveCssClass();
-        });
+        this.store.dispatch(new ShowSideDialog(false));
+        this.showForm = false;
+        this.clearFormDetails();
+        this.removeActiveCssClass();
+      });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
       this.showForm = false;
@@ -859,25 +795,121 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   }
 
   private createWorkflowMappingFormGroup(): void {
-    this.workflowMappingFormGroup = this.formBuilder.group({
-      regions: ['', Validators.required],
-      locations: ['', Validators.required],
-      departments: ['', Validators.required],
-      skills: ['', Validators.required],
-      workflowType: ['', Validators.required],
-      workflowName: ['', Validators.required],
-      orderRoleUserFormArray: this.formBuilder.array([
-        this.formBuilder.group({
-          roleUserList: [],
-          isPermissionBased: [],
+    this.workflowMappingFormGroup = this.workflowMappingService.createWorkflowMappingForm();
+  }
+
+  private watchForWorkflowSources(): void {
+    this.workflows$.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((workflows: WorkflowWithDetails[]) => {
+      this.workflowSources = workflows;
+      this.allWorkflows = workflows;
+    });
+  }
+
+  private watchForLocations(): void {
+    this.workflowMappingFormGroup.get('locations')?.valueChanges.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((locationIds: number[]) => {
+      const departments = this.workflowMappingService.getDepartmentsBaseOnType(
+        this.workflowMappingFormGroup,
+        this.locations,
+        locationIds
+      );
+
+      this.departments = sortByField(departments, 'name');
+      this.workflowMappingService.setControlNullValue(
+        ['departments'],
+        this.workflowMappingFormGroup,
+      );
+    });
+  }
+
+  private watchForRegions(): void {
+    this.workflowMappingFormGroup.get('regions')?.valueChanges.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((regionIds: number[]) => {
+      const locations = this.workflowMappingService.getLocationsBaseOnType(
+        this.workflowMappingFormGroup,
+        this.orgRegions,
+        regionIds,
+      );
+
+
+      this.locations = sortByField(locations, 'name');
+      this.workflowMappingService.setControlNullValue(
+        ['locations', 'departments'],
+        this.workflowMappingFormGroup,
+      );
+    });
+  }
+
+  private watchForWorkflowType(): void {
+    this.workflowMappingFormGroup.get('workflowType')?.valueChanges.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((value: WorkflowGroupType) => {
+      this.workflowMappingService.resetControls(
+        ['regions', 'locations', 'departments', 'skills', 'workflowName'],
+        this.workflowMappingFormGroup
+      );
+      this.setWorkflowSources(value);
+    });
+  }
+
+  private setWorkflowSources(value: WorkflowGroupType): void {
+    if (value === WorkflowGroupType.IRPOrderWorkflow) {
+      this.skills = this.workflowMappingService.getIncludeIrpSources(this.allSkills);
+      this.workflowSources = this.workflowMappingService.getIncludeIrpSources(this.allWorkflows);
+      return;
+    }
+
+    this.skills = this.allSkills;
+    this.workflowSources = this.allWorkflows;
+  }
+
+  private initWorkflowSources(): void {
+    const workflowGroupSources = CreateWorkflowTypeList(this.isIRPFlagEnabled, this.isOrgUseIRPAndVMS);
+    this.workflowGroupTypesSources = workflowGroupSources;
+    this.filterColumns.types.dataSource = this.workflowMappingService.prepareFilterWorkflowGroupOption(
+      workflowGroupSources
+    );
+  }
+
+  private initFiltersConfig(): void {
+    this.filterColumns = FiltersColumnsConfig;
+  }
+
+  private watchForChangePage(): void {
+    this.pageSubject.pipe(
+      throttleTime(100),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((page) => {
+      this.currentPage = page;
+      this.filters.pageNumber = page;
+      this.store.dispatch(new GetWorkflowMappingPages(this.filters));
+    });
+  }
+
+  private watchForOrganizationChange(): void {
+    this.organizationId$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.currentPage = 1;
+      this.clearFilters();
+      this.store.dispatch([
+        new GetAssignedSkillsByOrganization(),
+        new GetWorkflowMappingPages(this.filters),
+        new GetRolesForWorkflowMapping(),
+        new GetUsersForWorkflowMapping(),
+        new GetWorkflows({
+          includeInVMS: false,
+          includeInIRP: false,
         }),
-      ]),
-      applicationRoleUserFormArray: this.formBuilder.array([
-        this.formBuilder.group({
-          roleUserList: [],
-          isPermissionBased: [],
-        }),
-      ]),
+      ]);
     });
   }
 
