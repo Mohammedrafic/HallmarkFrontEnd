@@ -335,12 +335,12 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.tree.selectedNodes = [this.activeMenuItemData?.anch];
   }
 
-  showContextMenu(data: MenuItem, event: any): void {
+  showContextMenu(data: MenuItem, event: MouseEvent): void {
     this.contextmenu.items = [];
 
     if (data.id != AnalyticsMenuId && data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
-      const boundingRectangle = event.target.getBoundingClientRect();
+      const boundingRectangle = (event.target as HTMLElement).getBoundingClientRect();
       this.contextmenu.items =
         data.children.map((child: any) => {
           child.text = child.title;
