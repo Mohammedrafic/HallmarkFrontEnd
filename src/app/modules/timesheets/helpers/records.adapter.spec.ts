@@ -195,12 +195,12 @@ describe('RecordsAdapter', () => {
 
     it('adaptRecordAddDto should adapt timesheet add record for post call', () => {
       const addRecord: AddTimesheetForm = {
-          timeIn: new Date('2023-06-20T00:45:00+03:00'),
-          timeOut: new Date('2023-06-20T03:30:00+03:00'),
+          timeIn: new Date('2023-06-20T00:45:00'),
+          timeOut: new Date('2023-06-20T03:30:00'),
           departmentId: 178,
           billRateConfigId: 2,
           hadLunchBreak: true,
-          day: new Date('2023-06-21T00:00:00+03:00'),
+          day: new Date('2023-06-21T00:00:00'),
       };
       const expected: AddRecordDto = {
         timesheetId: 65,
