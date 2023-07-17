@@ -34,7 +34,10 @@
           </div>
           <div
             class="e-card-content dialog-controls"
-            [ngClass]="{'open-per-diem-order': order?.orderType === orderType.OpenPerDiem}"
+            [ngClass]="{
+              'open-per-diem-order': order?.orderType === orderType.OpenPerDiem,
+              'traveler-order': order?.orderType === orderType.Traveler
+            }"
           >
             <div class="order-actions" *ngIf="showApproveAndCancel">
               <button ejs-button cssClass="e-outline" (click)="cancelOrder(order.id)">Cancel</button>
