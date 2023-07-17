@@ -85,7 +85,7 @@ export class PredictedContractLaborSpentComponent implements OnInit, OnDestroy {
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/PredictedContractLaborSpent/PredicatedContractLaborSpent.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/PredictedContractLaborSpent/PredictedContractLaborSpent.cat" };
   public message: string = "";
-  public title: string = "Predicted Contract Labor Spent";
+  public title: string = "Predicted Contract Labor Spend";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
 
