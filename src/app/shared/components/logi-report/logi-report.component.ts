@@ -44,6 +44,7 @@ export class LogiReportComponent implements OnInit {
   @Input() catelogName: LogiReportFileDetails;
   @Input() reportType: LogiReportTypes;
   @Input() resultList: LogiReportFileDetails[];
+  @Input() customCSS: string;
   
   constructor(@Inject(APP_SETTINGS) private appSettings: AppSettings, private store: Store) {
   }
@@ -68,6 +69,14 @@ export class LogiReportComponent implements OnInit {
   public SaveAsReport(options: any, entryId: any): void {
     this.CustomizeSaveAs(options, entryId);  
   }
+  public CloseReport( entryId: any): void {
+    var app = this.factory.getApp(entryId);
+    if (!app) return;
+    app.close(function () {
+      var linkPathEle = document.getElementById("linkPath");
+      console.log(linkPathEle)
+    });
+  }
   private CustomizeSaveAs(options: any,  entryId: any): void {
     var app = this.factory.getApp(entryId), rptset;
     if (!app) return;
@@ -79,6 +88,9 @@ export class LogiReportComponent implements OnInit {
   }
   public RenderReport():void
   {
+    if (this.customCSS == undefined) {
+      this.customCSS = "logi-report-iframe-div";
+    }
     if (GlobalConstants.reportBaseUrl == null || GlobalConstants.reportBaseUrl == undefined || GlobalConstants.reportBaseUrl.trim()=="") {
       this.store.dispatch(new GetLogiReportData()).pipe(takeWhile(() => this.isAlive)).subscribe((val: any) => {
         if (val) {
@@ -180,6 +192,9 @@ export class LogiReportComponent implements OnInit {
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
+    if (this.factory == undefined) {
+      this.factory = com.jinfonet.api.AppFactory;
+    }
     let test = this.factory?.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
   };

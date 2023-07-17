@@ -53,6 +53,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   public totalRecordsCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   public gridApi: any;
   private gridColumnApi: any;
+  public isCRPopup: boolean = false;
   defaultColDef: ColDef = DefaultUserGridColDef;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   cacheBlockSize: any;
@@ -208,7 +209,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
 
   public onEdit(data: any): void {
     this.selectedCustomReportItem$.next(data.rowData);
-    this.openCustomReportDialogue.next(true);
+    this.isCRPopup = true;
   }
 
 
@@ -223,6 +224,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   }
 
   public refreshParentComponent() {
+    this.isCRPopup = false;
     this.dispatchNewPage({ currentPage: this.currentPage, pageSize: this.pageSize });
   }
   public dispatchNewPage(postData: any): void {

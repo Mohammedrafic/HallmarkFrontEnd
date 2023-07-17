@@ -738,13 +738,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       );
       this.clearSelection(this.gridWithChildRow);
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
+      let filtersExport = {...this.filters};
+      if(this.filters.orderLocked){
+        filtersExport.orderLocked = filtersExport.orderLocked == 'false' ? false : filtersExport.orderLocked == 'true' ? true : null
+      }
       this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
       this.store.dispatch(
         new ExportOrders(
           new ExportPayload(
             fileType,
             {
-              ...this.filters,
+              ...filtersExport,
               offset: Math.abs(new Date().getTimezoneOffset()),
               isAgency: this.activeTab === OrganizationOrderManagementTabs.ReOrders ? false : null,
               ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,

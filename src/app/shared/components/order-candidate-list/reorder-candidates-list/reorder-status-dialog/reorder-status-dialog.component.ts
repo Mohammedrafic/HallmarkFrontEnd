@@ -51,6 +51,9 @@ import { UserState } from 'src/app/store/user.state';
 import { AcceptFormComponent } from './accept-form/accept-form.component';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { DateTimeHelper } from '@core/helpers';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -172,7 +175,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public canOnboard = false;
   public canClose = false;
   public orderPermissions: CurrentUserPermission[];
-
+  public comments: Comment[] = [];
+  public canCreateOrder:boolean;
   private defaultApplicantStatuses: ApplicantStatus[];
   private statuses: ApplicantStatus[];
   public candidatePhone1RequiredValue : string = '';
@@ -184,11 +188,14 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
     private cdr: ChangeDetectorRef,
+    private commentsService: CommentsService,
+    private permissionService : PermissionService
   ) {
     super();
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createJobStatusControl();
     this.subscribeForOrderPermissions();
@@ -309,6 +316,16 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
+  private getComments(): void {
+    this.commentsService
+      .getComments(this.orderCandidateJob?.commentContainerId as number, null).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe((comments : Comment[]) => {
+        this.comments = comments;
+        this.cdr.detectChanges();
+      });
+  }
+
   public onNextPreviousOrder(next: boolean): void {
     this.nextPreviousOrderEvent.emit(next);
   }
@@ -410,6 +427,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     candidatePayRate,
     clockId,
   }: OrderCandidateJob) {
+    this.getComments();
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     let isBillRatePending: number;
 
@@ -714,4 +732,11 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
     }
   }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
+  }
+
 }
