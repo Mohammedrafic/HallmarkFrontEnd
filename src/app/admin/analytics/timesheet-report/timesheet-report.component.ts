@@ -88,6 +88,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
   public organizationData$: Observable<Organisation[]>;
   selectedOrganizations: Organisation[];
 
+  private fixedTimesheetStatusesIncluded: number[] = [0, 2, 3, 4, 5, 6, 10];
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
@@ -279,7 +280,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
               this.isAlive = true;
               this.filterOptionsData = data;
               this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
-              let timesheetStatusData = data.timesheetStatuses;
+              let timesheetStatusData = data.timesheetStatuses.filter(i => this.fixedTimesheetStatusesIncluded.includes(i.id));
               if (timesheetStatusData.filter((item) => item.name == "DNW")[0] == undefined) {
                 timesheetStatusData.push({ id: -1, name: "DNW" }); //Include static "DNW" as a status to status dropdown with id -1
               }
