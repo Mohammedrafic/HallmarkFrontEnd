@@ -413,13 +413,14 @@ export class CreateScheduleService {
     return { departmentId, skillId, startDate, endDate };
   }
 
-  canEmployeeCreateRecord(isEmployee: boolean, dates: Date[] | string[]): boolean {
+  canEmployeeCreateRecord(isEmployee: boolean, dates: Date[] | string[], start: Date): boolean {
     if (!isEmployee) {
       return true;
     }
 
-    const selectedDatesInMs: number[] = dates.map((date: Date | string) => new Date(date).setHours(0, 0, 0, 0));
-    const todayInMs: number = new Date().setHours(0, 0, 0, 0);
+    const todayInMs: number = new Date().getTime();
+    const selectedDatesInMs: number[] = dates
+      .map((date: Date | string) => new Date(date).setHours(start.getHours(), start.getMinutes(), 0, 0));
 
     return !selectedDatesInMs.filter((date: number) => date < todayInMs).length;
   }
