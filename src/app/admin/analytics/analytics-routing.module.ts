@@ -50,6 +50,7 @@ import { StaffScheduleByShiftComponent } from './staff-schedule-by-shift/staff-s
 import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-report/finance-medicare-wage-report.component';
 import { GrantReportComponent } from './grant-report/grant-report.component';
 import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-invoice-report-beta.component';
+import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 
 const routes: Routes = [
   {
@@ -388,6 +389,13 @@ const routes: Routes = [
       {
         path: 'staff-availability',
         component: StaffAvailabilityComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'Position-Summary',
+        component: PositionSummaryComponent,
         data: {
           isOrganizationArea: true,
         }
