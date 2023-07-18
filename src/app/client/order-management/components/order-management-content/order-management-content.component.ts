@@ -511,7 +511,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.prefix = routerState?.['prefix'];
     this.orderPositionStatus = routerState?.['status'];
     (routerState?.['status'] == "In Progress (Pending)" || routerState?.['status'] == "In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] == "In Progress" ? this.SelectedStatus.push("InProgress") : routerState?.['status'] ? this.SelectedStatus.push(routerState?.['status']) : "";
-    this.candidateStatusId = routerState?.['candidateStatusId'] || null;
+    this.candidateStatusId = routerState?.['candidateStatusId'] || '';
     routerState?.['candidateStatus'] != undefined && routerState?.['candidateStatus'] != '' ? this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']) : "";
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
@@ -2174,7 +2174,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     this.orderStaus > 0 ? this.numberArr.push(this.orderStaus) : [];
     filters.orderStatuses = this.numberArr;
-    this.candidateStatusId!=null ? this.candidateStatusIds.push(this.candidateStatusId) : [];
+    this.candidateStatusId!= '' ? this.candidateStatusIds.push(this.candidateStatusId) : [];
     filters.candidateStatuses = this.candidateStatusIds;
     filters.orderStatuses = this.orderPositionStatus
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
