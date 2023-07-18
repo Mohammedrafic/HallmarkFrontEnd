@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { LogiReportTypes } from 'src/app/shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
@@ -85,6 +85,7 @@ export class LogiReportComponent implements OnInit {
     rptset.saveAs(options, this.CallbackSaveAs);
   }
   private CallbackSaveAs(status: any) {
+    console.log(status);
   }
   public RenderReport():void
   {

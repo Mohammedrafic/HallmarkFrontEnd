@@ -3,7 +3,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Inject, C
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { BehaviorSubject, Observable, Subject, takeWhile } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, take, takeWhile } from 'rxjs';
 import { AppSettings, APP_SETTINGS } from '../../../../../../app.settings';
 import { LogiReportComponent } from '../../../../../shared/components/logi-report/logi-report.component';
 import { LogiReportTypes } from '../../../../../shared/enums/logi-report-type.enum';
@@ -112,19 +112,25 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
 
       };
 
-      this.saveCustomReport$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
-        let options: any = {
-          savePath: path,
-          linkedCatalog: true,
-          saveSort: false,
-          catalog: "/CustomReport/CustomReport.cat"
-        };
-        this.logiReportComponent.SaveAsReport(options, "reportIframe");
-        this.isAddCustomReportSidebarShown = false;
-        this.refreshParent.emit();
-      });
+     
       this.store.dispatch(new SaveCustomReport(addLogiCustomReportRequestDto));
+
+      let options: any = {
+        savePath: path,
+        linkedCatalog: true,
+        saveSort: false,
+        catalog: "/CustomReport/CustomReport.cat"
+      };
+      this.logiReportComponent.SaveAsReport(options, "reportIframe");
+      setTimeout(() => { this.refreshCustomReportComponent() }, 2000);
+      this.isAddCustomReportSidebarShown = false;
+    
     }
+  }
+
+  public refreshCustomReportComponent() {
+    
+      this.refreshParent.emit();
   }
   public saveAsPopUp(): void {
     this.isAddCustomReportSidebarShown = true;

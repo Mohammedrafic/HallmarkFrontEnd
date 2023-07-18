@@ -122,7 +122,6 @@
           <div class="sup-title">Shift</div>
         </div>
       </div>
-      <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
     </div>
   </section>
   <section class="candidates-additional-info" *ngIf="orderInformation">
@@ -328,7 +327,7 @@
 
 <ng-template #linkedId>
   <div class="column">
-    <div class="title">{{ orderInformation.linkedId ?? orderInformation.irpOrderMetadata?.linkedId ?? '-' }}</div>
+    <div class="title">{{ orderInformation.linkedId || orderInformation.irpOrderMetadata?.linkedId || '-' }}</div>
     <div class="sup-title">Linked ID</div>
   </div>
 </ng-template>
