@@ -321,9 +321,9 @@ export class AlertsState {
   @Action(GetGroupMailByBusinessUnitIdPage)
   GetGroupMailByBusinessUnitIdPage(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { businessUnitId, getAll }: GetGroupMailByBusinessUnitIdPage
+    { businessUnitId, getAll,SeeMyEmailsOnly }: GetGroupMailByBusinessUnitIdPage
   ): Observable<GroupEmailByBusinessUnitIdPage | void> {
-    return this.groupEmailService.getGroupMailByBusinessUnitIdPage(businessUnitId, getAll).pipe(
+    return this.groupEmailService.getGroupMailByBusinessUnitIdPage(businessUnitId, getAll,SeeMyEmailsOnly).pipe(
       tap((payload) => {
         patchState({ groupEmailByBusinessUnitIdPage: payload });
         return payload;
