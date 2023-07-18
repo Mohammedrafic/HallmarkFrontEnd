@@ -380,7 +380,7 @@ export class DashboardService {
   public redirectToUrl(url: string,orderStatus? :number,status? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status} });
   }
-  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :number,candidateStatus?:string): void {
+  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus} });
   }
   public redirectToUrlWithAgencyposition(url: string,orderStatus? :number,condition? : string): void {

@@ -401,7 +401,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public setDefaultFilters(statuses: number[]): void {
+  public setDefaultFilters(statuses: string[]): void {
     if (this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
       this.patchFilterForm(!!this.filters?.regionIds?.length);
@@ -468,7 +468,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
-  private setDefaultStatuses(statuses: number[], setDefaultFilters: boolean): void {
+  private setDefaultStatuses(statuses: string[], setDefaultFilters: boolean): void {
     if(this.Organizations.length > 0){
       this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
       this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
