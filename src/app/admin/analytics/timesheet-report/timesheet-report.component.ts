@@ -49,7 +49,8 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
     "StatusesParamTS": "",
     "CandidateNameParamTS": "",
     "StartDateParamTS": "",
-    "EndDateParamTS": ""
+    "EndDateParamTS": "",
+    "organizationNameYTDS":""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cat" };
@@ -412,6 +413,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
       "BearerParamTS": auth,
       "BusinessUnitIdParamTS": businessIds,
       "HostName": this.baseUrl,
+      "organizationNameTS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
