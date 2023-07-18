@@ -1105,6 +1105,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public onFilterApply(): void {
     if (this.OrderFilterFormGroup.dirty) {
+      this.currentPage = 1;
       this.refreshFilterState();
       this.saveFiltersByPageName();
       this.getOrders(true);
