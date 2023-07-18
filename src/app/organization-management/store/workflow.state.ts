@@ -13,6 +13,7 @@ import {
   RemoveWorkflow,
   RemoveWorkflowDeclined,
   RemoveWorkflowMapping,
+  RemoveWorkflowSucceed,
   SaveWorkflow,
   SaveWorkflowMapping,
   SaveWorkflowMappingSucceed,
@@ -158,7 +159,10 @@ export class WorkflowState {
   RemoveWorkflow({ dispatch }: StateContext<WorkflowStateModel>, { payload }: RemoveWorkflow): Observable<void> {
     return this.workflowService.removeWorkflow(payload).pipe(
       tap(() => {
-        dispatch(new GetWorkflows(GetWorkflowFlags(payload.isIRP)));
+        dispatch([
+          new RemoveWorkflowSucceed(),
+          new GetWorkflows(GetWorkflowFlags(payload.isIRP)),
+        ]);
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {

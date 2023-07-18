@@ -32,6 +32,11 @@ export class RemoveWorkflow {
   constructor(public payload: WorkflowWithDetails) {}
 }
 
+export class RemoveWorkflowSucceed {
+  static readonly type = '[workflow] Remove Workflow Succeed';
+  constructor() {}
+}
+
 export class GetWorkflowMappingPages {
   static readonly type = '[workflow] Get Workflow Mapping Page';
   constructor(public filters?: WorkflowFilters) {}

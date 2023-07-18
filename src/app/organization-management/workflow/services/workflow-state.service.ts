@@ -14,7 +14,7 @@ export class WorkflowStateService {
     return this.selectedCard.get();
   }
 
-  public setSelectedCard(card: WorkflowWithDetails): void {
+  public setSelectedCard(card: WorkflowWithDetails | null): void {
     this.selectedCard.set(card);
   }
 

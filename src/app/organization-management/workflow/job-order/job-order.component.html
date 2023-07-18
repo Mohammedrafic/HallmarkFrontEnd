@@ -3,11 +3,12 @@
   <div class="toolbar-buttons" *ngIf="activeTab === workflowTab.IrpOrderWorkFlow">
     <app-tooltip-container
       [message]="toolTipMessage"
-      [showToolTip]="false">
+      [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
       <button
         ejs-button
         appHideBeforeSyncfusionLoad
         cssClass="e-danger delete-button"
+        *ngIf="selectedIrpCard"
         [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
         (click)="deleteWorkflow()"
       >
@@ -16,13 +17,13 @@
     </app-tooltip-container>
     <app-tooltip-container
       [message]="toolTipMessage"
-      [showToolTip]="false">
+      [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
       <button
         ejs-button
         appHideBeforeSyncfusionLoad
         cssClass="save-button"
         [isPrimary]="true"
-        [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
+        [disabled]="!userPermission[userPermissions.CanEditWorkflows] || !selectedIrpCard"
         (click)="saveWorkflowSteps()"
       >
         Save
