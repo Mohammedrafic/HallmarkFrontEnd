@@ -214,6 +214,7 @@ import {
   ThreeDotsMenuOptions,
   ThreeDotsMenuOptionsIRP,
   initOrderManagementFilterColumns,
+  AllCandidateStatuses,
 } from '@client/order-management/constants';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { BreakpointObserverService } from '@core/services';
@@ -2593,7 +2594,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
     } else {
       statuses = data.orderStatuses;
-      candidateStatuses = data.candidateStatuses;
+      candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status));
     }
 
     this.filterColumns.orderStatuses.dataSource = statuses;

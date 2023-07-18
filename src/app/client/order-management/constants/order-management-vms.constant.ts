@@ -44,6 +44,12 @@ export const AllOrdersDefaultStatuses = [
   CandidateStatus.Incomplete,
 ];
 
+export const AllCandidateStatuses = [
+  CandidatesStatusText['Bill Rate Pending'],
+  CandidatesStatusText['Offered Bill Rate'],
+];
+
+
 export const filterOrderLockList: { text: string; value: any }[] = [
   { text: 'All', value: 'all' },
   { text: 'Locked', value: 'true' },
