@@ -1,5 +1,13 @@
 <app-page-toolbar>
     <ng-container right>
+      <div  class="button-group" *ngIf="userPermission[userPermissions.CanseeGroupEmailSentbyotherusers]">
+        <ejs-switch
+        id="switcher"
+        [checked]="true" 
+        (change)="onSwitcher($event);"
+      ></ejs-switch>
+      <label for="switcher" class="switch-text">See my emails only</label>  
+      </div>
       <div class="bootstrap business-dropdowns">
         <div class="dropdown-container" *ngIf="userPermission[userPermissions.CanSendGroupEmail]">
           <button
