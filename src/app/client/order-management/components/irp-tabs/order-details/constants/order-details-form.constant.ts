@@ -110,6 +110,7 @@ export const GeneralInformationConfigLTA = (): OrderFormsConfig  => ({
       required: false,
       show: true,
       type: FieldType.Input,
+      maxLength: 20,
     },
   ],
 });
@@ -200,6 +201,7 @@ export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
       required: false,
       show: true,
       type: FieldType.Input,
+      maxLength: 20,
     },
   ],
 });
