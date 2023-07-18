@@ -2,20 +2,18 @@ import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { distinctUntilChanged, filter, merge, Observable, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 
 import { OutsideZone } from '@core/decorators';
 import { DateTimeHelper, MultiEmailValidator } from '@core/helpers';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
-import { TextFieldTypeControl } from '@organization-management/settings/enums/settings.enum';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { OrganizationSettingKeys, OrganizationSettings } from '@shared/constants';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { Days } from '@shared/enums/days';
 import { OrganizationHierarchy } from '@shared/enums/organization-hierarchy';
-import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
+import { OrganizationSettingControlType, TextFieldTypeControl } from '@shared/enums/organization-setting-control-type';
 import { OrganizationSettingValidationType } from '@shared/enums/organization-setting-validation-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { SystemType } from '@shared/enums/system-type.enum';
@@ -30,7 +28,7 @@ import {
   ConfigurationChild,
   OrganizationSettingFilter,
   Configuration,
-  OrganizationSettingsPost,
+  ConfigurationDTO,
   OrganizationSettingValidation,
   OrganizationSettingValueOptions,
 } from '@shared/models/organization-settings.model';
@@ -62,7 +60,7 @@ import {
   SaveOrganizationSettings,
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import { SettingsDataAdapter } from './helpers/settings-data.adapter';
+import { SettingsDataAdapter } from '../../shared/helpers/settings-data.adapter';
 import {
   AssociatedLink,
   BillingSettingsKey,
@@ -81,7 +79,7 @@ import {
   TextOptionFields,
   TierSettingsKey,
 } from './settings.constant';
-import { AutoGenerationPayload, PayPeriodPayload, SwitchValuePayload } from './settings.interface';
+import { AutoGenerationPayload, PayPeriodPayload, SwitchValuePayload } from '../../shared/models/settings.interface';
 import { MessageTypes } from '@shared/enums/message-types';
 
 /**
@@ -92,7 +90,6 @@ import { MessageTypes } from '@shared/enums/message-types';
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
-  providers: [MaskedDateTimeService],
 })
 export class SettingsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @Select(OrganizationManagementState.organizationSettings)
@@ -614,7 +611,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         break;
     }
 
-    const setting: OrganizationSettingsPost = {
+    const setting: ConfigurationDTO = {
       settingValueId: this.organizationSettingsFormGroup.controls['settingValueId'].value,
       settingKey: this.organizationSettingsFormGroup.controls['settingKey'].value,
       hierarchyId: this.organizationHierarchyId,
@@ -1241,7 +1238,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private setEditMode(isEdit = true): void {
     this.isEdit = isEdit;
-    this.dialogHeader = this.isEdit ? 'Edit Settings' : 'Add Settings';
+    this.dialogHeader = this.isEdit ? 'Edit Configurations' : 'Add Configurations';
   }
 
   private setOrganizationSettingKey(key: string) {

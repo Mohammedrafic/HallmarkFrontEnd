@@ -138,7 +138,14 @@ const routes: Routes = [
           isAgencyArea: true,
         },
       },
-      
+      {
+        path: 'settings',
+        loadChildren: () => import('./settings/agency-settings.module').then((m) => m.AgencySettingsModule),
+        data: {
+          isOrganizationArea: false,
+          isAgencyArea: true,
+        },
+      },
     ],
   },
 ];

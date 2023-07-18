@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 import { GetQueryParams } from '@core/helpers';
-import { OrganizationSettingFilter, Configuration, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
+import { OrganizationSettingFilter, Configuration, ConfigurationDTO } from '@shared/models/organization-settings.model';
 import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable({ providedIn: 'root' })
@@ -32,7 +32,7 @@ export class OrganizationSettingsService {
    * Save the organization settings
    @param organizationSettings organization setting
    */
-  public saveOrganizationSetting(organizationSettings: OrganizationSettingsPost): Observable<void> {
+  public saveOrganizationSetting(organizationSettings: ConfigurationDTO): Observable<void> {
     return this.http.post<void>(`/api/OrganizationSettings/`, organizationSettings);
   }
 

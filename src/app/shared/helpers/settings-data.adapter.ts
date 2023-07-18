@@ -2,15 +2,13 @@ import { formatDate } from '@angular/common';
 
 import { DropdownOption } from '@core/interface';
 import { OrganizationSystems } from '@organization-management/settings/settings.constant';
-import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
+import { OrganizationSettingControlType, CheckboxValue } from '@shared/enums/organization-setting-control-type';
 import {
   ConfigurationChild,
   OrganizationSettingsDropDownOption,
   Configuration,
   OrganizationSettingValueOptions,
 } from '@shared/models/organization-settings.model';
-
-import { CheckboxValue } from '../enums/settings.enum';
 
 export class SettingsDataAdapter {
 

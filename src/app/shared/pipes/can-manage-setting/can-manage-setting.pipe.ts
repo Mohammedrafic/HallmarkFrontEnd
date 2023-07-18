@@ -15,13 +15,18 @@ export class CanManageSettingPipe implements PipeTransform {
   transform(
     hasPermission: Record<string, boolean>,
     data: Configuration,
-    overridableByOrg: boolean,
+    overridableByOrg: boolean | null,
     disableSettingsKeys?: string[]
   ): boolean {
     const isHallmarkMspUser = this.store.selectSnapshot(UserState.isHallmarkMspUser);
-    const overridableBy = overridableByOrg
-      ? !data.overridableByOrganization
-      : !data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment;
+    let overridableBy: boolean;
+    if (overridableByOrg !== null) {
+      overridableBy = overridableByOrg
+        ? !data.overridableByOrganization
+        : !data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment;
+    } else {
+      overridableBy = false;
+    }
 
     if (isHallmarkMspUser && disableSettingsKeys) {
       return disableSettingsKeys.includes(data.settingKey);

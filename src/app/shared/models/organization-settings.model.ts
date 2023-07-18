@@ -37,7 +37,7 @@ export class ConfigurationChild {
   hidden = false;
 }
 
-export class OrganizationSettingsPost {
+export class ConfigurationDTO {
   settingValueId?: number;
   hierarchyLevel: number;
   hierarchyId: number;
@@ -46,7 +46,7 @@ export class OrganizationSettingsPost {
   locationId?: number[];
   regionId?: number[];
   departmentId?:number[];
-  isIRPConfigurationValue: boolean;
+  isIRPConfigurationValue?: boolean;
 }
 
 export class OrganizationSettingsDropDownOption {

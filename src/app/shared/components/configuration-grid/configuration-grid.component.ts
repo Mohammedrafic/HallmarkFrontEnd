@@ -22,6 +22,7 @@ export class ConfigurationGridComponent extends AbstractPermissionGrid {
   @Input() hasPermissions: Record<string, boolean> = {};
   @Input() override gridDataSource: object[] = [];
   @Input() override totalDataRecords = 0;
+  @Input() isAgency = false;
 
   @Output() openOverrideSettingDialog = new EventEmitter<Configuration>();
   @Output() openEditSettingDialog = new EventEmitter<{
@@ -59,7 +60,7 @@ export class ConfigurationGridComponent extends AbstractPermissionGrid {
 
   public rowDataBound(args: RowDataBoundEventArgs): void {
     // hides expand button if no children
-    if ((args.data as Configuration)?.children?.length === 0 && args.row) {
+    if (!(args.data as Configuration)?.children?.length && args.row) {
       const element = args.row.querySelector('td');
       if (element) {
         element.innerHTML = ' ';

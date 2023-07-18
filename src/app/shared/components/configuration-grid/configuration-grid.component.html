@@ -40,22 +40,29 @@
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button ejs-button cssClass="e-flat primary-icon-button"
               (click)="emitOpenEditSettingDialog(data, undefined, $event)"
-              [disabled]="hasPermissions | hasAccess : data : true">
+              [disabled]="hasPermissions | hasAccess : data : (isAgency ? null : true)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat default-icon-button" (click)="emitOpenOverrideSettingDialog(data)"
+            <button ejs-button 
+              cssClass="e-flat default-icon-button"
+              *ngIf="!isAgency"
+              (click)="emitOpenOverrideSettingDialog(data)"
               [disabled]="hasPermissions | hasAccess : data : false : disabledSettings">
               <span class="edit-button"><i-feather name="plus" class="icon"></i-feather></span>
             </button>
           </div>
         </ng-template>
       </e-column>
-      <e-column field="name" headerText="ATTRIBUTE" width=400></e-column>
-      <e-column [visible]="orgSystems?.IRPAndVMS" field="systemType" headerText="SYSTEM" width=150></e-column>
-      <e-column field="regionName" headerText="REGION" width=150></e-column>
-      <e-column field="locationName" headerText="LOCATION" width=150></e-column>
-      <e-column field="departmentName" headerText="DEPARTMENT" width=150></e-column>
-      <e-column field="displayValue" headerText="VALUE" width=400></e-column>
+      <e-column field="name" headerText="ATTRIBUTE" width="100%"></e-column>
+      <e-column [visible]="orgSystems?.IRPAndVMS && !isAgency" field="systemType" headerText="SYSTEM" width=150></e-column>
+      <e-column [visible]="!isAgency" field="regionName" headerText="REGION" width=150></e-column>
+      <e-column [visible]="!isAgency" field="locationName" headerText="LOCATION" width=150></e-column>
+      <e-column [visible]="!isAgency" field="departmentName" headerText="DEPARTMENT" width=150></e-column>
+      <e-column field="displayValue" headerText="VALUE" width=400>
+        <ng-template #template let-data>
+          {{ data.displayValue || data.value }}
+        </ng-template>
+      </e-column>
     </e-columns>
   </ejs-grid>
   <app-grid-pagination
