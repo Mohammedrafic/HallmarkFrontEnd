@@ -285,7 +285,8 @@
               <button
                 ejs-button
                 [disabled]="!hasCreateEditOrderPermission"
-                cssClass="e-flat default-icon-button with-badge"
+                [isPrimary]="hasCreateEditOrderPermission"
+                cssClass="e-flat with-badge"
               >
                 <span><i-feather name="message-square" class="icon"></i-feather></span>
                 <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{
