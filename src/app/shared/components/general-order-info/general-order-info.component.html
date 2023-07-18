@@ -83,7 +83,13 @@
           <div class="title">{{ orderInformation.minYrsRequired }}</div>
           <div class="sup-title">Exp. Req.</div>
         </div>
-        <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
+        <ng-container
+          [ngTemplateOutlet]="linkedId"
+          [ngTemplateOutletContext]="{
+            linkedID: orderInformation.irpOrderMetadata && !orderInformation.isIRPOnly
+              ? orderInformation.irpOrderMetadata.linkedId
+              : orderInformation.linkedId
+          }"></ng-container>
       </ng-container>
     </div>
   </section>
@@ -166,7 +172,11 @@
         <div class="title">{{ orderInformation.minYrsRequired }}</div>
         <div class="sup-title">Exp. Req.</div>
       </div>
-      <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="linkedId"
+        [ngTemplateOutletContext]="{ linkedID: orderInformation.irpOrderMetadata?.linkedId }"
+      >
+      </ng-container>
     </div>
   </section>
 </ng-template>
@@ -325,9 +335,9 @@
   </div>
 </ng-template>
 
-<ng-template #linkedId>
+<ng-template #linkedId let-linkedID="linkedID">
   <div class="column">
-    <div class="title">{{ orderInformation.linkedId || orderInformation.irpOrderMetadata?.linkedId || '-' }}</div>
+    <div class="title">{{ linkedID || '-' }}</div>
     <div class="sup-title">Linked ID</div>
   </div>
 </ng-template>

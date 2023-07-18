@@ -601,7 +601,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         ? parseFloat(order.hourlyRate.toString()).toFixed(2)
         : '0.00';
 
-    const linkedId = order.linkedId || order.irpOrderMetadata?.linkedId;
+    const linkedId = order.irpOrderMetadata && !order.isIRPOnly
+      ? order.irpOrderMetadata?.linkedId
+      : order.linkedId;
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
     const compBonus = order.compBonus ? parseFloat(order.compBonus.toString()).toFixed(2) : '';
     this.orderStatus = order.statusText;
