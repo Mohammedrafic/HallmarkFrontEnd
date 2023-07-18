@@ -601,6 +601,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         ? parseFloat(order.hourlyRate.toString()).toFixed(2)
         : '0.00';
 
+    const linkedId = order.linkedId || order.irpOrderMetadata?.linkedId;
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
     const compBonus = order.compBonus ? parseFloat(order.compBonus.toString()).toFixed(2) : '';
     this.orderStatus = order.statusText;
@@ -638,7 +639,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.generalInformationForm.controls['shiftEndTime'].patchValue(
       order.shiftEndTime ? DateTimeHelper.setCurrentTimeZone(order.shiftEndTime.toString()) : null
     );
-    this.generalInformationForm.controls['linkedId'].patchValue(order.linkedId);
+    this.generalInformationForm.controls['linkedId'].patchValue(linkedId);
 
     this.populatePermPlacementControls(order);
     this.populateProjectSpecialData(order);
