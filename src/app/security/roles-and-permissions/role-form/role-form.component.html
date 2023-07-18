@@ -22,7 +22,6 @@
         [fields]="bussinesDataFields"
         [dataSource]="newRoleBussinesData"
         [value]="defaultBusinessValue"
-        (change)="ShowIsIRPToggle($event)"
       ></ejs-dropdownlist>
     </div>
   </div>
@@ -68,10 +67,13 @@
       </div>
     </div>
   </div>
-  <div #showIRPOnlyToggle class="active-toggle">
-    <ejs-switch class="switch" [(checked)]="toggle" (change)="isShowIRPOnly($event)"></ejs-switch>
-    <span class="e-text">Show IRP Only</span>
+  <div class="input-container" *ngIf="IsShowIRPVMS">
+    <div class="bootstrap checkbox-container">
+      <ejs-checkbox formControlName="IRP" label="IRP"  (change)="OnChangeIRP($event)"></ejs-checkbox>&nbsp;&nbsp;&nbsp;
+      <ejs-checkbox formControlName="VMS" label="VMS"  (change)="OnChangeVMS($event)"></ejs-checkbox>
+    </div>
   </div>
+  
 </div>
 
   <hr class="divider" />

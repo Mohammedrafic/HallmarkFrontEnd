@@ -395,10 +395,10 @@ export class SecurityState {
   @Action(GetPermissionsTree)
   GetPermissionsTree(
     { dispatch, patchState }: StateContext<SecurityStateModel>,
-    { type }: GetPermissionsTree
+    { type,businessUnitId}: GetPermissionsTree
   ): Observable<PermissionsTree | void> {
     patchState({ isNewRoleDataLoading: true });
-    return this.roleService.getPermissionsTree(type).pipe(
+    return this.roleService.getPermissionsTree(type,businessUnitId).pipe(
       tap((payload) => {
         patchState({ permissionsTree: payload });
         patchState({ isNewRoleDataLoading: false });
