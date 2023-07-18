@@ -66,6 +66,7 @@ export class IrpOrderWorkflowComponent extends Destroyable implements OnInit {
     this.actions$.pipe(
       filter(() => this.activeTab === WorkflowNavigationTabs.IrpOrderWorkFlow),
       ofActionSuccessful(RemoveWorkflowSucceed),
+      takeUntil(this.componentDestroy()),
     ).subscribe(() => {
       this.selectedCard = null;
       this.workflowStateService.setSelectedCard(null);

@@ -274,6 +274,7 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
     this.actions$.pipe(
       filter(() => this.activeTab === WorkflowNavigationTabs.VmsOrderWorkFlow),
       ofActionSuccessful(RemoveWorkflowSucceed),
+      takeUntil(this.unsubscribe$),
     ).subscribe(() => {
       this.selectedCard = undefined;
     });
