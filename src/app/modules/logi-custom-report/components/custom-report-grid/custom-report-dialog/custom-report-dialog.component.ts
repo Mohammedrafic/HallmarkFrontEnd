@@ -3,7 +3,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Inject, C
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { BehaviorSubject, Observable, Subject, takeWhile } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, take, takeWhile } from 'rxjs';
 import { AppSettings, APP_SETTINGS } from '../../../../../../app.settings';
 import { LogiReportComponent } from '../../../../../shared/components/logi-report/logi-report.component';
 import { LogiReportTypes } from '../../../../../shared/enums/logi-report-type.enum';
@@ -26,8 +26,8 @@ import { LogiCustomReportState } from '../../../store/state/logi-custom-report.s
 export class CustomReportDialogComponent extends AbstractPermissionGrid implements OnInit {
   public user: User | null;
   @Input() selectedLog$: BehaviorSubject<LogiCustomReport> = new BehaviorSubject<LogiCustomReport>(null!);
-  @Input() openDialogue: Subject<boolean>;
-  @ViewChild('customReportSideDialog') sideDialog: DialogComponent;
+
+
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   @Output() refreshParent: EventEmitter<any> = new EventEmitter<any>();
 
@@ -46,6 +46,7 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
   public reportName: LogiReportFileDetails = {
     name: this.RegularReportName,
   };
+  public customCSSName = 'logi-Custom-report-iframe-div';
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public reportFormGroup: FormGroup;
   public isAddCustomReportSidebarShown: boolean;
@@ -69,26 +70,9 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
         this.selectedLog = data;
         this.logiReportComponent.catelogName = { name: this.selectedLog.catalogPath }
         this.logiReportComponent.reportName = { name: this.selectedLog.path }
-        this.SearchReport();
+        setTimeout(() => { this.SearchReport() }, 3000);
       }
     });
-
-    this.openDialogue.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
-      if (isOpen) {
-        windowScrollTop();      
-        this.sideDialog.show();
-        disabledBodyOverflow(true);
-      } else {
-        this.sideDialog.hide();
-        disabledBodyOverflow(false);
-      }
-      this.isAddCustomReportSidebarShown = false
-    });
-
-    this.saveCustomReport$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
-      this.isAddCustomReportSidebarShown = false;
-    });
-
 
    this.reportFormGroup=  new FormGroup({
      reportName: new FormControl('', [Validators.required]),
@@ -99,8 +83,11 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
   }
 
   public onClose(): void {
-    this.sideDialog.hide();
-    this.openDialogue.next(false);
+    this.logiReportComponent.CloseReport("reportIframe");
+    this.isAlive = false;
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+    this.refreshParent.emit();
   }
 
   ngOnDestroy(): void {
@@ -124,6 +111,8 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
         businessUnitId: this.selectedLog.businessUnitId
 
       };
+
+     
       this.store.dispatch(new SaveCustomReport(addLogiCustomReportRequestDto));
 
       let options: any = {
@@ -133,11 +122,15 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
         catalog: "/CustomReport/CustomReport.cat"
       };
       this.logiReportComponent.SaveAsReport(options, "reportIframe");
+      setTimeout(() => { this.refreshCustomReportComponent() }, 2000);
       this.isAddCustomReportSidebarShown = false;
-      this.sideDialog.hide();
-      this.openDialogue.next(false);
-      this.refreshParent.emit();
+    
     }
+  }
+
+  public refreshCustomReportComponent() {
+    
+      this.refreshParent.emit();
   }
   public saveAsPopUp(): void {
     this.isAddCustomReportSidebarShown = true;

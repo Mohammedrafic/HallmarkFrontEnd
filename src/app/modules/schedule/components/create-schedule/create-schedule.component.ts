@@ -169,8 +169,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.scheduleItemsService.setErrors([]);
     }
 
-    if (candidates?.length && this.isEmployee) {
-      this.sideBarSettings.showRemoveButton = candidates[0].days.every((day: ScheduleDay) => day.employeeCanEdit);
+    if (candidates?.length && this.isEmployee && this.sideBarSettings.showRemoveButton) {
+      this.sideBarSettings.showRemoveButton = candidates[0].days?.every((day: ScheduleDay) => day.employeeCanEdit);
     }
 
     if(this.scheduleOnlyWithAvailability) {
@@ -292,20 +292,22 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   saveSchedule(): void {
-   if (this.scheduleForm.invalid) {
+    if (this.scheduleForm.invalid) {
       this.scheduleForm.markAllAsTouched();
       return;
     }
 
-    if (!this.createScheduleService.canEmployeeCreateRecord(this.isEmployee, this.scheduleSelectedSlots.dates)) {
+    const startTime = this.scheduleForm.get('startTime')?.value;
+
+    if (!this.createScheduleService.canEmployeeCreateRecord(this.isEmployee, this.scheduleSelectedSlots.dates, startTime)) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, PastTimeErrorMessage));
       return;
     }
 
-   if (this.scheduleType === ScheduleItemType.Book) {
-     this.checkBookingsOverlaps();
-     return;
-   }
+    if (this.scheduleType === ScheduleItemType.Book) {
+      this.checkBookingsOverlaps();
+      return;
+    }
 
     if (this.scheduleType === ScheduleItemType.Unavailability) {
       this.checkUnavailabilityOverlaps();

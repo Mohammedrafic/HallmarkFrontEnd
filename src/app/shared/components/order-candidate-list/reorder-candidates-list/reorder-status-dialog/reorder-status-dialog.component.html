@@ -82,7 +82,7 @@
           </ejs-accordion>
         </div>
         <div class="comments">
-          <app-comments></app-comments>
+          <app-comments [canVmsCreateOrders]="canCreateOrder" [comments]="comments" [commentContainerId]="orderCandidateJob?.commentContainerId || 0"></app-comments>
         </div>
       </section>
 

@@ -21,6 +21,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
   @Input() public filterColumns: FilterColumnsModel;
   @Input() public filtersForm: FormGroup;
   @Input() public isAgency: boolean;
+  @Input() public orgAgencyName:string;
   @Input() public isClear: boolean;
 
   @ViewChild('regionDropdown') public regionDropdown: MultiSelectComponent;
@@ -49,7 +50,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
 
-  ngOnInit(): void {
+  ngOnInit(): void {  
     this.actions$.pipe(
       ofActionDispatched(ShowFilterDialog),
       debounceTime(300),
@@ -63,7 +64,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
     this.orgid=user?.businessUnitId
   }
 
-  public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
+  public filterCandidateName: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
     this.onFilterChild(e);
   }
   @OutsideZone

@@ -1,5 +1,5 @@
 <form [formGroup]="filtersForm">
-  <div class="input-container" *ngIf="isAgency">
+  <div class="input-container" *ngIf="isAgency"  >
     <label>Organization</label>
     <div class="input-group multiselect bootstrap">
       <ejs-multiselect
@@ -16,6 +16,12 @@
         [dataSource]="filterColumns.organizationIds.dataSource"
       >
       </ejs-multiselect>
+    </div>
+  </div>
+  <div class="input-container bootstrap" *ngIf="!isAgency">
+    <label>Organization</label>
+    <div class="input-group dropdown">
+      <input class="e-input" type="text" value={{orgAgencyName}} [attr.disabled]="!isAgency"/>
     </div>
   </div>
   <div class="input-container">
@@ -115,23 +121,19 @@
       <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  appValidateWithMessage
                        [allowFiltering]="true" [showDropDownIcon]="true" 
                        [dataSource]="filterColumns.agencyIds.dataSource"
-                       [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true placeholder="All" >
+                       [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true placeholder="All"  >
       </ejs-multiselect>
     </div>
   </div>
-  <div class="input-container">
-    <label>Candidate Status</label>
-    <div class="input-group multiselect bootstrap">
-      <ejs-multiselect mode="CheckBox"
-                       formControlName="applicantStatuses"
-                       placeholder="All"
-                       [fields]="typeFields"
-                       [allowFiltering]="true"
-                       [showDropDownIcon]="true"
-                       [dataSource]="filterColumns.applicantStatuses.dataSource">
-      </ejs-multiselect>
+
+   
+  <div class="input-container bootstrap" *ngIf="isAgency">
+    <label>Agency</label>
+    <div class="input-group dropdown">
+      <input class="e-input" type="text" value={{orgAgencyName}} [attr.disabled]="isAgency" />
     </div>
   </div>
+
   <div class="input-container">
     <label>Order Type</label>
     <div class="input-group multiselect bootstrap">
@@ -145,23 +147,67 @@
       </ejs-multiselect>
     </div>
   </div>
- 
-  <div class="input-container bootstrap">
-    <label>Position ID</label>
-    <div class="input-group dropdown">
-      <input class="e-input" type="text" appValidateWithMessage maxlength="50"  formControlName="orderID" />
+  <div class="input-container" *ngIf="isAgency">
+    <label>Candidate Status</label>
+    <div class="input-group multiselect bootstrap">
+      <ejs-multiselect mode="CheckBox"
+                       formControlName="applicantStatuses"
+                       placeholder="All"
+                       [fields]="typeFields"
+                       [allowFiltering]="true"
+                       [showDropDownIcon]="true"
+                       [dataSource]="filterColumns.applicantStatuses.dataSource">
+      </ejs-multiselect>
     </div>
   </div>
 
-      <div class="input-container bootstrap">
+ 
+  <div class="input-container bootstrap"  *ngIf="isAgency">
+    <label>Position ID</label>
+    <div class="input-group dropdown">
+      <input class="e-input" type="text" appValidateWithMessage maxlength="50"  formControlName="orderId" />
+    </div>
+  </div>
+
+      <div class="input-container bootstrap"  *ngIf="isAgency">
         <label>Candidate Name</label>
         <div class="input-group dropdown">          
           <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
            filterType='StartsWith' [fields]='candidateNameFields'
-                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
+                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='filterCandidateName($event)'></ejs-autocomplete>
         </div>
       </div>
-
+      <div class="input-container bootstrap"  *ngIf="!isAgency">
+        <label>Candidate Name</label>
+        <div class="input-group dropdown">          
+          <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
+           filterType='StartsWith' [fields]='candidateNameFields'
+                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='filterCandidateName($event)'></ejs-autocomplete>
+        </div>
+      </div>
+      <div class="input-container" *ngIf="!isAgency">
+        <label>Candidate Status</label>
+        <div class="input-group multiselect bootstrap">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="applicantStatuses"
+                           placeholder="All"
+                           [fields]="typeFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.applicantStatuses.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    
+     
+      <div class="input-container bootstrap"  *ngIf="!isAgency">
+        <label>Position ID</label>
+        <div class="input-group dropdown">
+          <input class="e-input" type="text" appValidateWithMessage maxlength="50"  formControlName="orderId" />
+        </div>
+      </div>
+    
+      
   <div class="input-container calendar">
     <label>Start Date</label>
     <div class="input-group datepicker">

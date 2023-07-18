@@ -17,7 +17,7 @@ import {
 import { RecordFields } from '../../enums';
 import { RecordsAdapter } from '../../helpers';
 import {
-  AddRecordBillRate, AddTimsheetForm, DialogConfig, DialogConfigField,
+  AddRecordBillRate, AddTimesheetForm, DialogConfig, DialogConfigField,
   TimesheetDetailsAddDialogState,
 } from '../../interface';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
@@ -30,7 +30,7 @@ import { TimesheetsState } from '../../store/state/timesheets.state';
   styleUrls: ['./add-timesheet.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> implements OnInit {
+export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> implements OnInit {
   @Input() profileId: number;
 
   @Input() public container: HTMLElement | null = null;
@@ -124,7 +124,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
           this.form = null;
           this.cd.detectChanges();
         }
-        this.form = this.addService.createForm(value.type) as CustomFormGroup<AddTimsheetForm>;
+        this.form = this.addService.createForm(value.type) as CustomFormGroup<AddTimesheetForm>;
         this.formType = value.type;
         this.setDateBounds(value.startDate, value.endDate);
         this.initialCostCenterId = value.orderCostCenterId;
@@ -136,7 +136,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       switchMap(() => merge(
         this.watchForBillRate(),
         this.watchForDayChange(),
-        this.observaStartDate(),
+        this.observeStartDate(),
       )),
       takeUntil(this.componentDestroy()),
     )
@@ -219,7 +219,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
         const selectedRate = rates.find((rate) => rate.value === rateId);
 
         if (selectedRate && this.formType === RecordFields.Time) {
-          this.checkFieldsVisiility(selectedRate);
+          this.checkFieldsVisibility(selectedRate);
         }
 
         this.cd.markForCheck();
@@ -227,7 +227,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     ) as Observable<number>;
   }
   
-  private checkFieldsVisiility(rate: AddRecordBillRate): void {
+  private checkFieldsVisibility(rate: AddRecordBillRate): void {
     const mealField = this.dialogConfig.timesheets.fields
     .find((field) => field.field === MealBreakeName) as DialogConfigField;
     const timeInField = this.dialogConfig.timesheets.fields
@@ -269,14 +269,14 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     return rates.find((rate) => rate.value === idToLook);
   }
 
-  private observaStartDate(): Observable<Date| null> {
+  private observeStartDate(): Observable<Date| null> {
     return this.form?.get('timeIn')?.valueChanges
       .pipe(
         tap((start: Date | null) => {
           const rate = this.findBillRate(this.form?.get('billRateConfigId')?.value as number | null);
           const timeOutField = this.dialogConfig.timesheets.fields
           .find((field) => field.field === TimeOutName) as DialogConfigField;
-          const notReqAndStartExist = rate?.timeNotRequired && start ;
+          const notReqAndStartExist = rate?.timeNotRequired && start;
           const timeRequired = !rate?.timeNotRequired && !timeOutField.required;
           const notReqAndStartNotExist = rate?.timeNotRequired && !start;
         

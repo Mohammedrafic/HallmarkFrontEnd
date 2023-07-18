@@ -1,9 +1,9 @@
-import { WorkflowFilters, WorkflowWithDetails, WorkflowWithDetailsPut } from "@shared/models/workflow.model";
+import { WorkflowFilters, WorkflowFlags, WorkflowWithDetails, WorkflowWithDetailsPut } from "@shared/models/workflow.model";
 import { WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 
 export class GetWorkflows {
   static readonly type = '[workflow] Get Workflow list by businessUnitId';
-  constructor() {}
+  constructor(public payload: WorkflowFlags) {}
 }
 
 export class GetWorkflowsSucceed {
@@ -14,6 +14,11 @@ export class GetWorkflowsSucceed {
 export class SaveWorkflow {
   static readonly type = '[workflow] Save Workflow';
   constructor(public payload: WorkflowWithDetails) {}
+}
+
+export class SaveWorkflowSucceed {
+  static readonly type = '[workflow] Save Workflow Succeeded';
+  constructor() {}
 }
 
 export class UpdateWorkflow {
