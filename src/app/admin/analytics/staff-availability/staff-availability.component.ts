@@ -436,10 +436,6 @@ export class StaffAvailabilityComponent implements OnInit, OnDestroy {
 
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    // let startDate = this.getLastWeek();
-    // let first = startDate.getDate() - startDate.getDay();
-    // let firstday = new Date(startDate.setDate(first));
-    // let lastday = new Date(startDate.setDate(startDate.getDate()+6));
     let startDate = new Date();
     let lastDay = new Date();
     let endDate = new Date(lastDay.setDate(lastDay.getDate()+6));
