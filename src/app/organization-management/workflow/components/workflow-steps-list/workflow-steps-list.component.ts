@@ -100,6 +100,9 @@ export class WorkflowStepsListComponent extends Destroyable implements OnInit {
 
   private watchForSelectCard(): void {
     this.workflowStateService.getCardStream().pipe(
+      map((workflow: WorkflowWithDetails | null) => {
+        return this.setWorkflowList(workflow);
+      }),
       filter((workflow: WorkflowWithDetails | null): workflow is WorkflowWithDetails => !!workflow),
       map((workflow: WorkflowWithDetails) => this.workflowStepsService.prepareWorkflowList(workflow)),
       filter((workflow: WorkflowList | null): workflow is WorkflowList => !!workflow),
@@ -120,6 +123,19 @@ export class WorkflowStepsListComponent extends Destroyable implements OnInit {
       }
       this.cdr.markForCheck();
     });
+  }
+
+  private setWorkflowList(workflow: WorkflowWithDetails | null): WorkflowWithDetails | null {
+    if (!workflow) {
+      this.workflowsList = {
+        orderWorkflow: null,
+        applicationWorkflow: null,
+      };
+
+      this.cdr.markForCheck();
+    }
+
+    return workflow;
   }
 
   private initStepsForm(): void {

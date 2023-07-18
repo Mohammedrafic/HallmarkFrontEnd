@@ -25,7 +25,7 @@ import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
-import { filterOrderLockList } from '@client/order-management/constants';
+import { AllCandidateStatuses, filterOrderLockList } from '@client/order-management/constants';
 
 enum RLDLevel {
   Orginization,
@@ -76,7 +76,10 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     text: 'statusText',
     value: 'status',
   };
-
+  public filterStatusFields = {
+    text: 'filterStatus',
+    value: 'filterStatus',
+  };
   get regionIdsControl(): AbstractControl {
     return this.form.get('regionIds') as AbstractControl;
   }
@@ -231,7 +234,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
           statuses = orderStatuses.map(data => data.status);
-          candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
+          candidateStatusesData = candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status));
         }
 
         this.filterColumns.organizationIds.dataSource = partneredOrganizations;
@@ -340,8 +343,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'statusText',
-        valueId: 'status',
+        valueField: 'filterStatus',
+        valueId: 'filterStatus',
       },
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },

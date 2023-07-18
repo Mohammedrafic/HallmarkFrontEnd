@@ -12,6 +12,7 @@ import {
   GetWorkflows,
   GetWorkflowsSucceed,
   RemoveWorkflow,
+  RemoveWorkflowSucceed,
   UpdateWorkflow,
 } from '../../store/workflow.actions';
 import { Step, Workflow, WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
@@ -46,6 +47,7 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
   public customStepOrderFormGroup: FormGroup;
   public customStepApplicationFormGroup: FormGroup;
   public selectedCard?: WorkflowWithDetails;
+  public selectedIrpCard: WorkflowWithDetails | null;
   public orderWorkflow: Workflow;
   public applicationWorkflow: Workflow;
   public showCreateWorkflowDialog = false;
@@ -83,6 +85,8 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
     super.ngOnInit();
     this.watchForChangeOrganization();
     this.watchForSucceedActionWorkflow();
+    this.watchForSelectedIrpCard();
+    this.watchForRemoveWorkflowAction();
   }
 
   override ngOnDestroy(): void {
@@ -217,6 +221,7 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
     ).subscribe(() => {
       this.checkOrgPreferences();
       this.selectedCard = undefined;
+      this.selectedIrpCard = null;
     });
   }
 
@@ -263,6 +268,25 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
         includeInIRP: isIrpTab,
       }));
     }
+  }
+
+  private watchForRemoveWorkflowAction(): void {
+    this.actions$.pipe(
+      filter(() => this.activeTab === WorkflowNavigationTabs.VmsOrderWorkFlow),
+      ofActionSuccessful(RemoveWorkflowSucceed),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.selectedCard = undefined;
+    });
+  }
+
+  private watchForSelectedIrpCard(): void {
+    this.workflowStateService.getCardStream().pipe(
+      filter(() => this.activeTab === WorkflowNavigationTabs.IrpOrderWorkFlow),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((card: WorkflowWithDetails | null) => {
+      this.selectedIrpCard = card;
+    });
   }
 
   private orderMappingTab(): void {

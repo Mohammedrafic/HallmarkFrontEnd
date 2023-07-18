@@ -321,7 +321,7 @@ export type AgencyOrderFilters = {
   orderPublicId?: string | null;
   reOrderId?: number;
   skillIds?: number[];
-  candidateStatuses?: number[];
+  candidateStatuses?: string[];
   candidatesCountFrom?: number | null;
   candidatesCountTo?: number | null;
   organizationIds?: number[];
@@ -697,7 +697,7 @@ export class OrderFilter {
   jobStartDate?: Date | null;
   jobEndDate?: Date | null;
   orderStatuses?: (string | number)[];
-  candidateStatuses?: number[];
+  candidateStatuses?: string[];
   candidatesCountFrom?: number | null;
   candidatesCountTo?: number | null;
   agencyIds?: number[];
@@ -758,6 +758,7 @@ export class FilterOrderStatus {
 export class FilterStatus {
   status: number;
   statusText: string;
+  filterStatus?: string;
 }
 
 export class OrderFilterDataSource {

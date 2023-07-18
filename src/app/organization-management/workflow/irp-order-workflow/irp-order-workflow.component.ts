@@ -9,7 +9,7 @@ import { UserPermissions } from '@core/enums';
 import { WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
 import { WorkflowWithDetails } from '@shared/models/workflow.model';
 import { WorkflowStateService } from '@organization-management/workflow/services';
-import { GetWorkflowsSucceed } from '@organization-management/store/workflow.actions';
+import { GetWorkflowsSucceed, RemoveWorkflowSucceed } from '@organization-management/store/workflow.actions';
 import { GetSelectedCardIndex } from '@organization-management/workflow/helpers';
 
 @Component({
@@ -22,7 +22,7 @@ export class IrpOrderWorkflowComponent extends Destroyable implements OnInit {
   @Input() activeTab: WorkflowNavigationTabs;
   @Input() userPermission: Permission;
 
-  public selectedCard: WorkflowWithDetails;
+  public selectedCard: WorkflowWithDetails | null;
   public showDialog = false;
   public workflowsWithDetails: WorkflowWithDetails[] = [];
 
@@ -39,6 +39,7 @@ export class IrpOrderWorkflowComponent extends Destroyable implements OnInit {
 
   ngOnInit(): void {
     this.watchForSucceedActionWorkflow();
+    this.watchForRemoveWorkflowAction();
   }
 
   public selectWorkflowCard(workflow: WorkflowWithDetails): void {
@@ -61,11 +62,21 @@ export class IrpOrderWorkflowComponent extends Destroyable implements OnInit {
     this.showDialog = false;
   }
 
+  private watchForRemoveWorkflowAction(): void {
+    this.actions$.pipe(
+      filter(() => this.activeTab === WorkflowNavigationTabs.IrpOrderWorkFlow),
+      ofActionSuccessful(RemoveWorkflowSucceed),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => {
+      this.selectedCard = null;
+      this.workflowStateService.setSelectedCard(null);
+    });
+  }
+
   private watchForSucceedActionWorkflow(): void {
     this.actions$.pipe(
       filter(() => this.activeTab === WorkflowNavigationTabs.IrpOrderWorkFlow),
       ofActionSuccessful(GetWorkflowsSucceed),
-      filter((workflow) => workflow.payload?.length),
       takeUntil(this.componentDestroy()),
     ).subscribe((workflows) => {
       this.workflowsWithDetails = workflows.payload;
