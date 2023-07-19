@@ -489,7 +489,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
-          const actualEnd = this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
+
+          const actualEnd = value.actualEndDate ||
+          this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
             jobStartDate: value.order.jobStartDate,
             jobEndDate: value.order.jobEndDate,
           }).toString();
