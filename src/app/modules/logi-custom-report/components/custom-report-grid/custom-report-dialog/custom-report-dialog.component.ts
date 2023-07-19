@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Inject, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Inject, ChangeDetectorRef, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -23,7 +23,7 @@ import { LogiCustomReportState } from '../../../store/state/logi-custom-report.s
   styleUrls: ['./custom-report-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CustomReportDialogComponent extends AbstractPermissionGrid implements OnInit {
+export class CustomReportDialogComponent extends AbstractPermissionGrid implements OnInit, AfterViewInit {
   public user: User | null;
   @Input() selectedLog$: BehaviorSubject<LogiCustomReport> = new BehaviorSubject<LogiCustomReport>(null!);
 
@@ -41,11 +41,8 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
     LocationsParam: '',
     DepartmentsParam: '',
   };
-  public catelogName: LogiReportFileDetails = { name: '/CustomReport/CustomReport.cat' };
-  public RegularReportName: string = '/CustomReport/FinanaceReport.wls';
-  public reportName: LogiReportFileDetails = {
-    name: this.RegularReportName,
-  };
+  public catelogName: LogiReportFileDetails ;
+  public reportName: LogiReportFileDetails ;
   public customCSSName = 'logi-Custom-report-iframe-div';
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public reportFormGroup: FormGroup;
@@ -68,9 +65,8 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
     this.selectedLog$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if(data){
         this.selectedLog = data;
-        this.logiReportComponent.catelogName = { name: this.selectedLog.catalogPath }
-        this.logiReportComponent.reportName = { name: this.selectedLog.path }
-        setTimeout(() => { this.SearchReport() }, 3000);
+        this.catelogName = { name: this.selectedLog.catalogPath }
+        this.reportName = { name: this.selectedLog.path }
       }
     });
 
@@ -81,7 +77,11 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
  
 
   }
+  ngAfterViewInit(): void {
 
+    this.SearchReport();
+
+  }
   public onClose(): void {
     this.logiReportComponent.CloseReport("reportIframe");
     this.isAlive = false;
@@ -109,9 +109,7 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
         catalogPath: this.selectedLog.catalogPath,
         reportParamaters: '',
         businessUnitId: this.selectedLog.businessUnitId
-
       };
-
      
       this.store.dispatch(new SaveCustomReport(addLogiCustomReportRequestDto));
 
