@@ -23,10 +23,11 @@ export class TimesheetDetailsTableService {
       [RecordFields.Time]: TimesheetRecordsColdef,
       [RecordFields.Miles]: this.milesRecordsColDef.bind(this),
       [RecordFields.Expenses]: ExpensesRecordsColDef,
-    }
+    };
   }
 
-  public milesRecordsColDef(isStatusAvaliable = false, organizationId: number | null = null, disableActions: boolean = false): ColDef[] {
+  public milesRecordsColDef(isStatusAvaliable = false,
+      organizationId: number | null = null, disableActions = false): ColDef[] {
     return [
       dayColDef,
       ...(isStatusAvaliable ? [recordStatusCell] : []),
@@ -54,7 +55,7 @@ export class TimesheetDetailsTableService {
                 organizationId,
                 file
               )),
-            }
+            },
           } as AttachmentsListParams;
         },
       },
@@ -67,7 +68,7 @@ export class TimesheetDetailsTableService {
           isEditable: false,
           type: EditFieldTypes.Text,
           validators: [Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER), Validators.required],
-        }
+        },
       },
       {
         ...billRateColDef,

@@ -35,13 +35,14 @@ export class GroupEmailService {
    */
   public getGroupMailByBusinessUnitIdPage(
     BusinessUnitId: number | null,
-    GetAll: boolean
+    GetAll: boolean,
+    SeeMyEmailsOnly:boolean |null
   ): Observable<GroupEmailByBusinessUnitIdPage> {
     if (BusinessUnitId == null) {
-      return this.http.get<GroupEmailByBusinessUnitIdPage>(`/api/GroupMail/getgroupmail?GetAll=` + GetAll);
+      return this.http.get<GroupEmailByBusinessUnitIdPage>(`/api/GroupMail/getgroupmail?GetAll=` + GetAll +'&Seemyemailsonly='+SeeMyEmailsOnly);
     }
     return this.http.get<GroupEmailByBusinessUnitIdPage>(
-      `/api/GroupMail/getgroupmail?BusinessUnitId=` + BusinessUnitId + `&GetAll=` + GetAll
+      `/api/GroupMail/getgroupmail?BusinessUnitId=` + BusinessUnitId + `&GetAll=` + GetAll +'&Seemyemailsonly='+SeeMyEmailsOnly
     );
   }
   /**

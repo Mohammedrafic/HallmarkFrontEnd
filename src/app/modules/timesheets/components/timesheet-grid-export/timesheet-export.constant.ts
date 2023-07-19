@@ -20,6 +20,6 @@ export const GetExportFileName = (tabIndex: number): string => {
     { text:'Work Week', column: 'workWeek'},
     { text:'Department', column: 'department'},
     { text:'Bill Rate($)', column: 'billRate'},   
-    { text:'Agency Name', column: 'agencyName'},
+    { text:'Organization Name', column: 'organizationName'},
     { text:'Total Days', column: 'totalDays'}
   ]

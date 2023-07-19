@@ -7,7 +7,7 @@ import { catchError, combineLatest, filter, startWith, takeUntil, tap } from 'rx
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 import isNil from 'lodash/fp/isNil';
 import { addDays } from '@shared/utils/date-time.utils';
-import { OrderCandidateJob, OrderManagementChild } from '@shared/models/order-management.model';
+import { MergedOrder, OrderCandidateJob, OrderManagementChild } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
 import { Comment } from '@shared/models/comment.model';
 import { Store } from '@ngxs/store';
@@ -30,6 +30,8 @@ import { PermissionService } from 'src/app/security/services/permission.service'
 export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   @Input() public candidateJob: OrderCandidateJob;
   @Input() public orderPosition: OrderManagementChild;
+  @Input() public order: MergedOrder;
+  
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('billRates') billRatesComponent: BillRatesComponent;
 
@@ -160,6 +162,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       endDate: ['', [Validators.required]],
       billRate: [candidateBillRate, [Validators.required]],
       comments: [null],
+      linkedId: [this.order.linkedId],
     });
   }
 
@@ -219,7 +222,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         this.extensionStartDateValidation = false;
         let actualEndDate = new Date(this.candidateJob?.actualEndDate);
         let twoWeekDate = new Date(actualEndDate.setDate(actualEndDate.getDate() + 14));
-        if(formatDate(twoWeekDate, 'MM/dd/yyyy', 'en-US') < formatDate(startDate, 'MM/dd/yyyy', 'en-US')){
+        if(startDate && startDate > twoWeekDate){
            this.extensionStartDateValidation = true;
         }
         if (startDate > endDate) {

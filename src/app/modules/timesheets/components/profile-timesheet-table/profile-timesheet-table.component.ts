@@ -587,7 +587,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private saveRecords(): void {
     const diffs = this.timesheetRecordsService.findDiffs(
-      this.records[this.currentTab][this,this.currentMode], this.formControls, this.timesheetColDef);
+      this.records[this.currentTab][this.currentMode], this.formControls, this.timesheetColDef);
 
     const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
       this.records[this.currentTab][this,this.currentMode], diffs, this.idsToDelete);
@@ -611,6 +611,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       );
 
       this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency));
+      
       this.actions$
       .pipe(
         take(1),

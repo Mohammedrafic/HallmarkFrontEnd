@@ -144,8 +144,8 @@
   font-size: 12px;
   color: $secondary-dark-blue-30;
   margin: 0 5px;
-  display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 .display_inlineblk{
@@ -153,11 +153,15 @@
 }
 .bg_grey{
   background: #f7f8fc;
-  max-height: 150px;
-  overflow: auto;
+  padding: 20px;
+}
+
+.disp_content{
+  padding: 20px;
 }
 .pt_20{
-  padding: 20px 20px 0px 20px !important;
+  padding: 0px !important;
   overflow: hidden !important;
   max-height: fit-content !important;
+  display: initial;
 }

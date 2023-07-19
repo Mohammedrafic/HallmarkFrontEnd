@@ -1,0 +1,17 @@
+<div class="job-container">
+    <app-card-menu
+      [cards]="workflowsWithDetails"
+      [userPermission]="!userPermission[userPermissions.CanEditWorkflows]"
+      (createNewWorkflowAction)="createWorkflow()"
+      (selectCardAction)="selectWorkflowCard($event)"
+    ></app-card-menu>
+  <div class="steps">
+    <app-workflow-steps-list [userPermission]="userPermission"></app-workflow-steps-list>
+  </div>
+</div>
+
+<app-create-workflow
+  *ngIf="showDialog"
+  [selectedTab]="currentTab"
+  (destroyDialog)="closeDialog()"
+></app-create-workflow>

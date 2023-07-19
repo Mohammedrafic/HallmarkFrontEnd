@@ -1,6 +1,9 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+
+import { catchError, map, Observable, of, tap } from 'rxjs';
+
 import {
   GetRolesForWorkflowMapping,
   GetUsersForWorkflowMapping,
@@ -10,9 +13,11 @@ import {
   RemoveWorkflow,
   RemoveWorkflowDeclined,
   RemoveWorkflowMapping,
+  RemoveWorkflowSucceed,
   SaveWorkflow,
   SaveWorkflowMapping,
   SaveWorkflowMappingSucceed,
+  SaveWorkflowSucceed,
   UpdateWorkflow,
 } from './workflow.actions';
 import { WorkflowService } from '@shared/services/workflow.service';
@@ -36,6 +41,7 @@ import {
 } from '@shared/models/workflow-mapping.model';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { GetWorkflowFlags, PrepareWorkflowMapping } from '@organization-management/workflow/helpers';
 
 export interface WorkflowStateModel {
   workflows: WorkflowWithDetails[] | null;
@@ -80,9 +86,9 @@ export class WorkflowState {
   @Action(GetWorkflows)
   GetWorkflows(
     { patchState, dispatch }: StateContext<WorkflowStateModel>,
-    {}: GetWorkflows
+    { payload }: GetWorkflows
   ): Observable<WorkflowWithDetails[]> {
-    return this.workflowService.getWorkflows().pipe(
+    return this.workflowService.getWorkflows(payload).pipe(
       tap((payload) => {
         patchState({ workflows: payload });
         dispatch(new GetWorkflowsSucceed(payload));
@@ -98,11 +104,15 @@ export class WorkflowState {
   ): Observable<WorkflowWithDetails | void> {
     return this.workflowService.saveWorkflow(payload).pipe(
       tap((payloadResponse) => {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-        dispatch(new GetWorkflows());
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new GetWorkflows(GetWorkflowFlags(payload.isIRP)),
+          new SaveWorkflowSucceed(),
+        ]);
+
         return payloadResponse;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         return dispatch(
           new ShowToast(
             MessageTypes.Error,
@@ -123,7 +133,7 @@ export class WorkflowState {
         payloadResponse?.requireMappingsUpdate && !isRemoveStep
           ? dispatch(new ShowToast(MessageTypes.Warning, usedInMappingMessage('Workflow')))
           : dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-        dispatch(new GetWorkflows());
+        dispatch(new GetWorkflows(GetWorkflowFlags(workflow.isIRP)));
         return payloadResponse;
       }),
       catchError((error: any) => {
@@ -149,10 +159,13 @@ export class WorkflowState {
   RemoveWorkflow({ dispatch }: StateContext<WorkflowStateModel>, { payload }: RemoveWorkflow): Observable<void> {
     return this.workflowService.removeWorkflow(payload).pipe(
       tap(() => {
-        dispatch(new GetWorkflows());
+        dispatch([
+          new RemoveWorkflowSucceed(),
+          new GetWorkflows(GetWorkflowFlags(payload.isIRP)),
+        ]);
         return payload;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         const message = error.error.errors?.EntityInUse
           ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse'])
           : 'Workflow cannot be deleted';
@@ -167,6 +180,9 @@ export class WorkflowState {
     { filters }: GetWorkflowMappingPages
   ): Observable<WorkflowMappingPage> {
     return this.workflowService.getWorkflowMappingPages(filters).pipe(
+      map((payload: WorkflowMappingPage) => {
+        return PrepareWorkflowMapping(payload);
+      }),
       tap((payload) => {
         patchState({ workflowMappingPages: payload });
         return payload;
@@ -186,7 +202,7 @@ export class WorkflowState {
         dispatch(new SaveWorkflowMappingSucceed());
         return payloadResponse;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         if (error.error && error.error.errors && error.error.errors.SkillIds[0]) {
           return dispatch(new ShowToast(MessageTypes.Error, error.error.errors.SkillIds[0]));
         } else {
@@ -206,7 +222,7 @@ export class WorkflowState {
         dispatch(new GetWorkflowMappingPages(filters));
         return payload;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         const message = error.error.errors?.EntityInUse
           ? usedByOrderErrorMessage('Workflow Mapping', error.error.errors['EntityInUse'])
           : RECORD_CANNOT_BE_DELETED;

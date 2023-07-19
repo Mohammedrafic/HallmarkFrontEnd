@@ -27,7 +27,7 @@
 
   <ng-template #footerTemplate>
     <div class="e-card-content">
-      <div class="bootstrap replacement-checkbox">
+      <div *ngIf="showReplacementCheckbox" class="bootstrap replacement-checkbox">
         <ejs-checkbox label="Create replacement Order" [(checked)]="replaceChecked" (change)="updateReplaceValue()"></ejs-checkbox>
       </div>
       <div>

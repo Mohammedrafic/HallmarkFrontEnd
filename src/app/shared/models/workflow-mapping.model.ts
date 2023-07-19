@@ -3,7 +3,7 @@ import { Step } from '@shared/models/workflow.model';
 import { User } from '@shared/models/user-managment-page.model';
 import { WorkflowType } from '@shared/enums/workflow-type';
 
-export class WorkflowMappingGet {
+export interface WorkflowMappingGet {
   mappingId: number;
   workflowName: string;
   workflowGroupId: number;
@@ -14,6 +14,7 @@ export class WorkflowMappingGet {
   departmentId?: number;
   departmentName: string;
   hasUnassignedSteps: boolean;
+  workflowGroupType: number;
   skills: WorkflowSkill[];
   stepMappings: StepMapping[];
 }

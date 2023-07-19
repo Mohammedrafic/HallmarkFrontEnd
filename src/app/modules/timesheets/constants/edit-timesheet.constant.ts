@@ -215,7 +215,7 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
   },
 };
 
-export const MapedRecordsType = {
+export const MappedRecordsType = {
   [RecordFields.Time]: 1,
   [RecordFields.Miles]: 2,
   [RecordFields.Expenses]: 3,

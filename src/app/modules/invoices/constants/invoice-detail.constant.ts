@@ -56,7 +56,7 @@ const agencyCol: ColDef = {
   type: 'rightAligned',
   headerClass: 'custom-wrap align-right',
   cellClass: 'font-weight-bold align-right',
-  valueFormatter: (params: ValueFormatterParams) => `% ${params.value}`,
+  valueFormatter: (params: ValueFormatterParams) => `${params.value}%`,
 };
 
 export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {

@@ -36,3 +36,9 @@ export enum AgencyOrderManagementTabs {
   PermPlacement = 'Perm Placement',
   ReOrders = 'Re-Orders',
 }
+
+export const orderLockList: { name: string; id: any }[] = [
+  { name: 'All', id: 'all' },
+  { name: 'Locked', id: 'true' },
+  { name: 'Unlocked', id: 'false' }
+];

@@ -33,6 +33,7 @@ export const PenaltiesMap = {
   [PenaltyCriteria.RateOfHours]: '% Rate of X Hours',
   [PenaltyCriteria.FlatRate]: 'Flat Rate',
   [PenaltyCriteria.FlatRateOfHours]: 'Flat Rate of X Hours',
+  [PenaltyCriteria.NoPenalty]: 'No Penalty',
 };
 
 
@@ -48,5 +49,9 @@ export const penaltiesDataSource = [
   {
     text: PenaltiesMap[PenaltyCriteria.FlatRateOfHours],
     value: PenaltyCriteria.FlatRateOfHours,
+  },
+  {
+    text: PenaltiesMap[PenaltyCriteria.NoPenalty],
+    value: PenaltyCriteria.NoPenalty,
   },
 ];

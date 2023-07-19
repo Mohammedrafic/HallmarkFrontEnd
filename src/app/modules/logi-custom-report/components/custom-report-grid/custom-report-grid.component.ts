@@ -53,6 +53,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   public totalRecordsCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   public gridApi: any;
   private gridColumnApi: any;
+  public isCRPopup: boolean = false;
   defaultColDef: ColDef = DefaultUserGridColDef;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   cacheBlockSize: any;
@@ -66,7 +67,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   maxBlocksInCache: any;
   sideBar = SideBarConfig;
   itemList: Array<LogiCustomReport> = [];
-  selectedCustomReportItem: LogiCustomReport;
+  selectedCustomReportItem$: BehaviorSubject<LogiCustomReport> = new BehaviorSubject<LogiCustomReport>(null!);
   openCustomReportDialogue = new Subject<boolean>();
   private unsubscribe$: Subject<void> = new Subject();
   public organizations: Organisation[] = [];
@@ -163,6 +164,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
     });
 
     this.logInterfacePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+    
       this.itemList = data?.items?.sort(function (a: any, b: any) {
         return b.createdAt.localeCompare(a.createdAt);
       });
@@ -206,8 +208,8 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   };
 
   public onEdit(data: any): void {
-    this.selectedCustomReportItem = data.rowData;
-    this.openCustomReportDialogue.next(true);
+    this.selectedCustomReportItem$.next(data.rowData);
+    this.isCRPopup = true;
   }
 
 
@@ -222,6 +224,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   }
 
   public refreshParentComponent() {
+    this.isCRPopup = false;
     this.dispatchNewPage({ currentPage: this.currentPage, pageSize: this.pageSize });
   }
   public dispatchNewPage(postData: any): void {

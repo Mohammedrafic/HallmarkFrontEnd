@@ -6,7 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { catchError, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
 
 import { CloseOrderService } from '@client/order-management/components/close-order/close-order.service';
 import { CloseOrderPayload } from '@client/order-management/components/close-order/models/closeOrderPayload.model';
@@ -81,7 +81,6 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   public ngOnChanges(changes: SimpleChanges) {
     if (!changes['currentValue']) {
-      this.onOrganizationChangedClosureReasons();
       return;
     }
     const {
@@ -94,10 +93,27 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   public ngOnInit(): void {
+    this.subscribeToReasons();
     this.subscribeOnPermissions();
     this.onOrganizationChangedClosureReasons();
     this.initForm();
     this.subscribeOnCloseSideBar();
+  }
+
+  subscribeToReasons() {
+    this.closureReasonsPage$.pipe(
+      filter(x => x != undefined && x != null), 
+      takeUntil(this.destroy$)
+      ).subscribe((data) => {
+      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.IRP)
+      {        
+        this.closureReasons = data.items.filter(f => f.includeInIRP == true);
+      }
+      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.VMS)
+      {
+        this.closureReasons = data.items.filter(f => f.includeInVMS == true);
+      }
+    });
   }
 
   public override ngOnDestroy(): void {
@@ -132,16 +148,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   private onOrganizationChangedClosureReasons(): void {
-    this.organizationId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true));
-      this.closureReasonsPage$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-        if (data != undefined) {
-          if (this.orderManagementService.getOrderManagementSystem() == OrderManagementIRPSystemId.IRP)
-            this.closureReasons = data.items.filter(f => f.includeInIRP == true)
-          if (this.orderManagementService.getOrderManagementSystem() == OrderManagementIRPSystemId.VMS)
-            this.closureReasons = data.items.filter(f => f.includeInVMS == true)
-        }
-      });
+    this.organizationId$.pipe(distinctUntilChanged(), takeUntil(this.destroy$)).subscribe((e) => {
+      this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true));      
     });
   }
 

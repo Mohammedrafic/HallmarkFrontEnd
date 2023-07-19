@@ -1,5 +1,37 @@
 <section class="container">
-  <div class="toolbar-buttons" *ngIf="isJobOrderWorkflowTabActive">
+  <!--todo: when we will have separate permission for irp combine button for both system-->
+  <div class="toolbar-buttons" *ngIf="activeTab === workflowTab.IrpOrderWorkFlow">
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        cssClass="e-danger delete-button"
+        *ngIf="selectedIrpCard"
+        [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
+        (click)="deleteWorkflow()"
+      >
+        Delete
+      </button>
+    </app-tooltip-container>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        cssClass="save-button"
+        [isPrimary]="true"
+        [disabled]="!userPermission[userPermissions.CanEditWorkflows] || !selectedIrpCard"
+        (click)="saveWorkflowSteps()"
+      >
+        Save
+      </button>
+    </app-tooltip-container>
+  </div>
+
+  <div class="toolbar-buttons" *ngIf="activeTab === workflowTab.VmsOrderWorkFlow">
     <app-tooltip-container
       [message]="toolTipMessage"
       [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
@@ -9,7 +41,8 @@
         cssClass="e-danger delete-button"
         *ngIf="workflowsWithDetails.length !== 0"
         [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
-        (click)="onDeleteWorkflowClick()">Delete</button>
+        (click)="deleteWorkflow()">Delete
+      </button>
     </app-tooltip-container>
     <app-tooltip-container
       [message]="toolTipMessage"
@@ -20,25 +53,39 @@
         cssClass="save-button"
         [isPrimary]="true"
         [disabled]="workflowsWithDetails.length === 0 || !userPermission[userPermissions.CanEditWorkflows]"
-        (click)="onUpdateWorkflowStepsClick()">Save</button>
+        (click)="saveWorkflowSteps()">Save
+      </button>
     </app-tooltip-container>
   </div>
   <ejs-tab
     id="navigationTabs"
-    (selected)="onTabSelected($event)"
+    (selected)="selectTab($event)"
     [heightAdjustMode]="'Fill'"
   >
     <e-tabitems>
+      <e-tabitem *ngIf="isIRPFlagEnabled && isOrgUseIRPAndVMS">
+        <ng-template #headerText>
+          <div>{{workflowTabNames.irpWorkflow}}</div>
+        </ng-template>
+        <ng-template #content>
+          <app-irp-order-workflow
+            [activeTab]="activeTab"
+            [userPermission]="userPermission"
+          ></app-irp-order-workflow>
+        </ng-template>
+      </e-tabitem>
       <e-tabitem>
-        <ng-template #headerText><div>Job Order Workflow</div></ng-template>
+        <ng-template #headerText>
+          <div>{{workflowTabNames.vmsWorkflow}}</div>
+        </ng-template>
         <ng-template #content>
           <section class="job-order-container">
             <section class="workflows-container">
               <app-card-menu
                 [cards]="workflowsWithDetails"
-                [userPermission]="userPermission"
-                (addNewWorkflowClick)="onAddNewWorkflowClick()"
-                (cardClicked)="onCardSelected($event)"
+                [userPermission]="!userPermission[userPermissions.CanEditWorkflows]"
+                (createNewWorkflowAction)="onAddNewWorkflowClick()"
+                (selectCardAction)="selectCard($event)"
               ></app-card-menu>
               <section class="workflow-details-container" *ngIf="workflowsWithDetails.length > 0">
                 <div class="order-workflow">
@@ -50,7 +97,7 @@
                     [workflow]="orderWorkflow"
                     [workflowSteps$]="customOrderSteps$"
                     [customStepFormGroup]="customStepOrderFormGroup"
-                    (customStepRemoveClick)="onCustomStepRemoveClick()"
+                    (customStepRemoveClick)="removeCustomStep()"
                   ></app-workflow-steps>
                 </div>
                 <div class="application-workflow">
@@ -62,43 +109,30 @@
                     [workflow]="applicationWorkflow"
                     [workflowSteps$]="customApplicationSteps$"
                     [customStepFormGroup]="customStepApplicationFormGroup"
-                    (customStepRemoveClick)="onCustomStepRemoveClick()"
+                    (customStepRemoveClick)="removeCustomStep()"
                   ></app-workflow-steps>
                 </div>
               </section>
             </section>
 
-            <app-side-dialog
-              *ngIf="isJobOrderWorkflowTabActive"
-              (formCancelClicked)="onCancelFormClick()"
-              (formSaveClicked)="onCreateWorkflowClick()"
-              header="Add Workflow"
-            >
-              <form class="form-container bootstrap"
-                    id="addWorkflow"
-                    [formGroup]="workflowFormGroup">
-                <div>
-                  <div class="input-container">
-                    <label for="workflow">Workflow <span class="required">*</span></label>
-                    <div class="input-group">
-                      <input id="workflow"
-                             class="e-input"
-                             type="text"
-                             maxlength="50"
-                             appValidateWithMessage
-                             formControlName="workflow"/>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </app-side-dialog>
+            <app-create-workflow
+              *ngIf="activeTab === workflowTab.VmsOrderWorkFlow && showCreateWorkflowDialog"
+              [selectedTab]="activeTab"
+              (destroyDialog)="closeCreateWorkflowModal()"
+            ></app-create-workflow>
           </section>
         </ng-template>
       </e-tabitem>
       <e-tabitem>
-        <ng-template #headerText><div>Workflow Mapping</div></ng-template>
+        <ng-template #headerText>
+          <div>{{workflowTabNames.mapping}}</div>
+        </ng-template>
         <ng-template #content>
-          <app-workflow-mapping [isActive]="isWorkflowMappingTabActive"></app-workflow-mapping>
+          <app-workflow-mapping
+            [isActive]="activeTab === workflowTab.WorkflowMapping"
+            [isIRPFlagEnabled]="isIRPFlagEnabled"
+            [isOrgUseIRPAndVMS]="isOrgUseIRPAndVMS"
+          ></app-workflow-mapping>
         </ng-template>
       </e-tabitem>
     </e-tabitems>

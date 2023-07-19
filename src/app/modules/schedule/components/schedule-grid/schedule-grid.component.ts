@@ -502,11 +502,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private setScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null): void {
-    const user = this.store.selectSnapshot(UserState.user);
-
-    if(scheduleData != null && this.selectedFilters?.isOnlySchedulatedCandidate === true && user?.isEmployee === false){
-      scheduleData.items = scheduleData?.items?.filter(schedule_Data => schedule_Data.schedule?.find(day_Schedule => day_Schedule.daySchedules?.find(schedule_Type => schedule_Type.scheduleType === ScheduleType.Book)));
-    }
     this.scheduleData = scheduleData;
     this.employeesTitle = scheduleData?.totalCount && scheduleData.totalCount > 1 ? 'Employees' : 'Employee';
 

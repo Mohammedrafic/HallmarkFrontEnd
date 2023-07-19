@@ -49,6 +49,7 @@ import { Duration } from '@shared/enums/durations';
 import { OrderJobDistribution } from '@shared/enums/job-distibution';
 
 import {
+  datepickerMask,
   ORDER_CONTACT_DETAIL_TITLES,
   ORDER_EDITS,
   ORDER_PER_DIEM_EDITS,
@@ -201,6 +202,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public specialProjectCategories: SpecialProject[];
   public projectNames: SpecialProject[];
   public poNumbers: SpecialProject[];
+  public readonly datepickerMask = datepickerMask;
 
   private selectedRegion: Region;
   private selectedSkills: SkillCategory;
@@ -599,6 +601,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         ? parseFloat(order.hourlyRate.toString()).toFixed(2)
         : '0.00';
 
+    const linkedId = order.linkedId || order.irpOrderMetadata?.linkedId;
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
     const compBonus = order.compBonus ? parseFloat(order.compBonus.toString()).toFixed(2) : '';
     this.orderStatus = order.statusText;
@@ -636,6 +639,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.generalInformationForm.controls['shiftEndTime'].patchValue(
       order.shiftEndTime ? DateTimeHelper.setCurrentTimeZone(order.shiftEndTime.toString()) : null
     );
+    this.generalInformationForm.controls['linkedId'].patchValue(linkedId);
 
     this.populatePermPlacementControls(order);
     this.populateProjectSpecialData(order);
@@ -663,9 +667,11 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
     this.filteredJobDistributionValue = getFilteredJobDistribution(jobDistributionValues)[0];
 
-    this.jobDistributionForm.controls['jobDistribution'].patchValue(
-      this.filteredJobDistributionValue
-    );
+    if (this.filteredJobDistributionValue && this.filteredJobDistributionValue === OrderJobDistribution.TierLogic) {
+      this.distribution = distributionSource(true);
+    }
+
+    this.jobDistributionForm.controls['jobDistribution'].patchValue(this.filteredJobDistributionValue);
 
     this.associateAgencies$
       .pipe(
