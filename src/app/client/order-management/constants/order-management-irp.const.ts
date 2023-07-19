@@ -170,6 +170,9 @@ export const ThreeDotsMenuOptions = (
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
   ],
+  moreMenuAddReOrderButton: [
+    { text: MoreMenuType[5], id: '5', disabled: !canCreateOrder },
+  ],
 });
 
 export const PositionGridCell = {
