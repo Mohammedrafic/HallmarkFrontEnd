@@ -162,7 +162,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       endDate: ['', [Validators.required]],
       billRate: [candidateBillRate, [Validators.required]],
       comments: [null],
-      linkedId: [this.order.linkedId],
+      linkedId: [this.order.linkedId, Validators.maxLength(20)],
     });
   }
 
