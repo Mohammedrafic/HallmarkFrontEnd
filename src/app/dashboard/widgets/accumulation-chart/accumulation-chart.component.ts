@@ -156,11 +156,20 @@ export class AccumulationChartComponent
           dataset = data;
         });        
         let chartInfo = dataset.find((ele:any)=>ele.status == status);
-        if(chartInfo.applicantStatus === OrderStatus.Onboard){
-          this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.applicantStatus,chartInfo.status, OrderStatus.Filled,'Filled');
+        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+          if(chartInfo.applicantStatus === OrderStatus.Onboard){
+            this.dashboardService.redirectToUrlWithCandidateStatus('agency/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status, OrderStatus.Filled,'Filled');
+          }else{
+            this.dashboardService.redirectToUrlWithCandidateStatus('agency/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status);
+          }
         }else{
-          this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.applicantStatus,chartInfo.status);
+          if(chartInfo.applicantStatus === OrderStatus.Onboard){
+            this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status, OrderStatus.Filled,'Filled');
+          }else{
+            this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status);
+          }
         }
+        
     }
 
   }

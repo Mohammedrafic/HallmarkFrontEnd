@@ -111,6 +111,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
   @Input() public orderStatus: string[];
+  @Input() public candidateStatuses: string[];
 
   @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
@@ -427,6 +428,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       if(this.orderStatus != null && this.orderStatus.length > 0){
         this.OrderFilterFormGroup.get('orderStatuses')?.setValue([...this.orderStatus]);
         this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : undefined;
+      }
+      if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
+        this.OrderFilterFormGroup.get('candidateStatuses')?.setValue([...this.candidateStatuses]);
+        this.filters.candidateStatuses = this.candidateStatuses.length > 0 ? this.candidateStatuses : undefined;
       }
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
