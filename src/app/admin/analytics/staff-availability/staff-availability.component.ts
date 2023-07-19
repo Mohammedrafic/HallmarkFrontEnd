@@ -245,12 +245,9 @@ export class StaffAvailabilityComponent implements OnInit, OnDestroy {
   }
 
   private initForm(): void {
-    let startDate = this.getLastWeek();
-    let first = startDate.getDate() - startDate.getDay();
-    let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
-    startDate = firstday;
-    let endDate = lastday;
+    let startDate = new Date();
+    let lastDay = new Date();
+    let endDate = new Date(lastDay.setDate(lastDay.getDate()+6));
     this.staffAvailabilityReportForm = this.formBuilder.group({
       businessIds: new FormControl([Validators.required]),
       startDate: new FormControl(startDate, [Validators.required]),
@@ -439,12 +436,9 @@ export class StaffAvailabilityComponent implements OnInit, OnDestroy {
 
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    let startDate = this.getLastWeek();
-    let first = startDate.getDate() - startDate.getDay();
-    let firstday = new Date(startDate.setDate(first));
-    let lastday = new Date(startDate.setDate(startDate.getDate()+6));
-    startDate = firstday;
-    let endDate = lastday;
+    let startDate = new Date();
+    let lastDay = new Date();
+    let endDate = new Date(lastDay.setDate(lastDay.getDate()+6));
     this.staffAvailabilityReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.staffAvailabilityReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.staffAvailabilityReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);

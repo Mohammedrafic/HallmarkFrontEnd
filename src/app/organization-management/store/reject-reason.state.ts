@@ -206,11 +206,17 @@ export class RejectReasonState {
   @Action(GetClosureReasonsByPage)
   GetClosureReasonsByPage(
     { patchState }: StateContext<RejectReasonStateModel>,
-    { pageNumber, pageSize, orderBy, getAll }: GetClosureReasonsByPage
+    { pageNumber, pageSize, orderBy, getAll, excludeDefaultReasons }: GetClosureReasonsByPage
   ): Observable<RejectReasonPage> {
     patchState({ isReasonLoading: true });
 
-    return this.rejectReasonService.getClosureReasonsByPage(pageNumber, pageSize, orderBy, getAll).pipe(
+    return this.rejectReasonService.getClosureReasonsByPage(
+      pageNumber,
+      pageSize,
+      orderBy,
+      getAll,
+      excludeDefaultReasons,
+    ).pipe(
       tap((payload) => {
         patchState({closureReasonsPage: payload});
         return payload;

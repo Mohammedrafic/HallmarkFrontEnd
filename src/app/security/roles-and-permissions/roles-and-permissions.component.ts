@@ -189,11 +189,6 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public showFilters(): void {
-    this.store.dispatch(new GetPermissionsTree(this.businessUnitControl.value));
-    this.store.dispatch(new ShowFilterDialog(true));
-  }
-
   private generateBusinessForm(): FormGroup {
     return new FormGroup({
       businessUnit: new FormControl(),
