@@ -85,11 +85,8 @@
         </div>
         <ng-container
           [ngTemplateOutlet]="linkedId"
-          [ngTemplateOutletContext]="{
-            linkedID: orderInformation.irpOrderMetadata && !orderInformation.isIRPOnly
-              ? orderInformation.irpOrderMetadata.linkedId
-              : orderInformation.linkedId
-          }"></ng-container>
+          [ngTemplateOutletContext]="{ linkedID: orderInformation.linkedId }"
+        ></ng-container>
       </ng-container>
     </div>
   </section>
@@ -175,8 +172,7 @@
       <ng-container
         [ngTemplateOutlet]="linkedId"
         [ngTemplateOutletContext]="{ linkedID: orderInformation.irpOrderMetadata?.linkedId }"
-      >
-      </ng-container>
+      ></ng-container>
     </div>
   </section>
 </ng-template>
