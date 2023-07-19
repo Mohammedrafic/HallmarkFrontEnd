@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } 
 import { FormArray, FormGroup } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { filter, map, takeUntil } from 'rxjs';
+import { filter, map, take, takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 import { UserPermissions } from '@core/enums';
@@ -12,6 +12,8 @@ import { Step, Workflow, WorkflowList, WorkflowWithDetails, WorkflowWithDetailsP
 import { WorkflowStepsService } from '@organization-management/workflow/components/workflow-steps-list/services';
 import { JobOrderService } from '@organization-management/workflow/job-order/services';
 import { UpdateWorkflow } from '@organization-management/store/workflow.actions';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 
 @Component({
   selector: 'app-workflow-steps-list',
@@ -36,6 +38,7 @@ export class WorkflowStepsListComponent extends Destroyable implements OnInit {
     private cdr: ChangeDetectorRef,
     private jobOrderService: JobOrderService,
     private store: Store,
+    private confirmService: ConfirmService
   ) {
     super();
   }
@@ -55,9 +58,19 @@ export class WorkflowStepsListComponent extends Destroyable implements OnInit {
   }
 
   public removeCustomStep(index: number, controlName: string): void {
-    const control = this.customStepsForm.controls[controlName] as FormArray;
-    control.removeAt(index);
-    this.updateSteps(true);
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button',
+      }).pipe(
+      filter(confirm => !!confirm),
+      take(1)
+    ).subscribe(() => {
+      const control = this.customStepsForm.controls[controlName] as FormArray;
+      control.removeAt(index);
+      this.updateSteps(true);
+    });
   }
 
 

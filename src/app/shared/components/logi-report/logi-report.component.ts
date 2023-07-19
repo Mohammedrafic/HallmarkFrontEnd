@@ -193,9 +193,7 @@ export class LogiReportComponent implements OnInit {
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
-    if (this.factory == undefined) {
-      this.factory = com.jinfonet.api.AppFactory;
-    }
+   
     let test = this.factory?.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
   };
