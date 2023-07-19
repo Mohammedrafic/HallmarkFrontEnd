@@ -58,6 +58,7 @@ import {
   VmsWorkflowType,
 } from '@organization-management/workflow/workflow-mapping/constants';
 import { WorkflowMappingService } from '@organization-management/workflow/workflow-mapping/services';
+import { SystemFlags } from '@organization-management/workflow/interfaces';
 
 type RoleWithUserModel = { [key: number]: { [workflowType: number]: RoleWithUser[] } };
 type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermission)[] };
@@ -76,7 +77,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
 
   @Input() isActive = false;
   @Input() isIRPFlagEnabled = false;
-  @Input() isOrgUseIRPAndVMS = false;
+  @Input() systemFlags: SystemFlags;
 
   @Select(WorkflowState.workflowMappingPages)
   public workflowMappings$: Observable<WorkflowMappingPage>;
@@ -872,7 +873,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   }
 
   private initWorkflowSources(): void {
-    const workflowGroupSources = CreateWorkflowTypeList(this.isIRPFlagEnabled, this.isOrgUseIRPAndVMS);
+    const workflowGroupSources = CreateWorkflowTypeList(this.isIRPFlagEnabled, this.systemFlags);
     this.workflowGroupTypesSources = workflowGroupSources;
     this.filterColumns.types.dataSource = this.workflowMappingService.prepareFilterWorkflowGroupOption(
       workflowGroupSources

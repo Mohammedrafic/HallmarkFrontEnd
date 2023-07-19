@@ -63,7 +63,7 @@
     [heightAdjustMode]="'Fill'"
   >
     <e-tabitems>
-      <e-tabitem *ngIf="isIRPFlagEnabled && isOrgUseIRPAndVMS">
+      <e-tabitem *ngIf="isIRPFlagEnabled && systemFlags.isIRPEnabled">
         <ng-template #headerText>
           <div>{{workflowTabNames.irpWorkflow}}</div>
         </ng-template>
@@ -74,7 +74,7 @@
           ></app-irp-order-workflow>
         </ng-template>
       </e-tabitem>
-      <e-tabitem>
+      <e-tabitem *ngIf="systemFlags.isVMCEnabled">
         <ng-template #headerText>
           <div>{{workflowTabNames.vmsWorkflow}}</div>
         </ng-template>
@@ -131,7 +131,7 @@
           <app-workflow-mapping
             [isActive]="activeTab === workflowTab.WorkflowMapping"
             [isIRPFlagEnabled]="isIRPFlagEnabled"
-            [isOrgUseIRPAndVMS]="isOrgUseIRPAndVMS"
+            [systemFlags]="systemFlags"
           ></app-workflow-mapping>
         </ng-template>
       </e-tabitem>
