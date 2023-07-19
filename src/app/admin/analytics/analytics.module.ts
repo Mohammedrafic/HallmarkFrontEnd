@@ -67,6 +67,7 @@ import { VendorscorecardService } from './vendor-scorecard/vendorscorecard.servi
 import { UnitProfileComponent } from './unit-profile/unit-profile.component';
 import { HoursByDepartmentComponent } from './hours-by-department/hours-by-department.component';
 import { StaffAvailabilityComponent } from './staff-availability/staff-availability.component';
+import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 
 
 @NgModule({
@@ -120,7 +121,8 @@ import { StaffAvailabilityComponent } from './staff-availability/staff-availabil
     VmsInvoiceReportBetaComponent,
     UnitProfileComponent,
     HoursByDepartmentComponent,
-    StaffAvailabilityComponent],
+    StaffAvailabilityComponent,
+    PositionSummaryComponent],
   exports: [
     CandidateListComponent
   ],
