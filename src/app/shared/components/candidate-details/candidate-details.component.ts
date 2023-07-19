@@ -167,7 +167,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   protected readonly destroy$: Subject<void> = new Subject();
   public isClear: boolean = false;
   public orgAgencyName:string;  
-
+  public lastOrgId: number;
+  public lastAgencyId: number;
   constructor(
     store: Store,
     private router: Router,
@@ -201,6 +202,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       ).subscribe((id) => {
 
         const agencyIdvalue = id.toString(); 
+        this.lastAgencyId=Number(agencyIdvalue)||0;
         this.store.dispatch(new GetAssociateOrganizations(Number(agencyIdvalue)));
         this.subscribeOnAgencyOrganizationChanges();
         this.updatePage();
@@ -217,6 +219,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         takeUntil(this.unsubscribe$),
       ).subscribe((id) => {
         const orgId = id.toString();
+      this.lastOrgId=Number(orgId)||0;
         this.store.dispatch([new GetAssociateAgencies(Number(orgId))]);
       });
 

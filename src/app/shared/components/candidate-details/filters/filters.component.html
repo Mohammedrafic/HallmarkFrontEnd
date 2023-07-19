@@ -18,7 +18,7 @@
       </ejs-multiselect>
     </div>
   </div>
-  <div class="input-container bootstrap" *ngIf="!isAgency">
+  <div class="input-container bootstrap" hidden ="true"  *ngIf="!isAgency">
     <label>Organization</label>
     <div class="input-group dropdown">
       <input class="e-input" type="text" value={{orgAgencyName}} [attr.disabled]="!isAgency"/>
@@ -127,7 +127,7 @@
   </div>
 
    
-  <div class="input-container bootstrap" *ngIf="isAgency">
+  <div class="input-container bootstrap" hidden ="true"  *ngIf="isAgency">
     <label>Agency</label>
     <div class="input-group dropdown">
       <input class="e-input" type="text" value={{orgAgencyName}} [attr.disabled]="isAgency" />
