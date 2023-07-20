@@ -52,6 +52,7 @@ import { ContactusComponent } from './components/contactus/contactus.component';
 import { UploaderModule  } from '@syncfusion/ej2-angular-inputs';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
+import { EmployeeGuard, UserLicenceGuard } from '@core/guards';
 
 
 const sidebarIcons = {
@@ -81,7 +82,7 @@ const sidebarIcons = {
   UserX,
   Server,
   Twitch,
-  TrendingUp
+  TrendingUp,
 };
 
 @NgModule({
@@ -107,8 +108,11 @@ const sidebarIcons = {
     FontAwesomeModule,
     UserChatModule,
     AnalyticByClickModule,
-    BoolValuePipeModule
+    BoolValuePipeModule,
   ],
-  providers: [],
+  providers: [
+    EmployeeGuard,
+    UserLicenceGuard,
+  ],
 })
 export class ShellModule {}

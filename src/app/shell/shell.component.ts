@@ -682,7 +682,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       if (user) {
         this.showHelpIButton = !user.isEmployee;
         this.userLogin = user;
-        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
+        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType, user.isEmployee ?? false));
         this.store.dispatch(new GetAlertsCountForCurrentUser({}));
 
         this.alertCountStateModel$

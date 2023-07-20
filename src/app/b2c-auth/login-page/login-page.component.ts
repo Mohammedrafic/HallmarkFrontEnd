@@ -53,7 +53,7 @@ export class LoginPageComponent extends DestroyableDirective implements AfterVie
 
   private navigateToDefaultPage(): void {
     const isEmployee = this.store.selectSnapshot(UserState.user)?.isEmployee;
-    const defaultUrl = isEmployee ? '/client/scheduling' : '/';
+    const defaultUrl = isEmployee ? '/employee/scheduling' : '/';
 
     this.router.navigate([defaultUrl]);
   }

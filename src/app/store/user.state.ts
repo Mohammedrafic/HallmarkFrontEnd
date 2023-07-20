@@ -230,12 +230,12 @@ export class UserState {
   }
 
   @Action(GetUserMenuConfig)
-  GetUserMenuConfig({ patchState }: StateContext<UserStateModel>, { payload }: GetUserMenuConfig): Observable<Menu> {
+  GetUserMenuConfig({ patchState }: StateContext<UserStateModel>, { payload, isEmployee }: GetUserMenuConfig): Observable<Menu> {
     return this.userService.getUserMenuConfig(payload).pipe(
       tap((menu: Menu) => {
         const education = 9;
         const faq = 10;
-        const businessUnitType = payload;
+        const businessUnitType = isEmployee ? BusinessUnitType.Employee : payload;
         if (businessUnitType) {
           menu.menuItems = menu.menuItems
             .filter((menuItem: MenuItem) => menuItem.id !== education && menuItem.id !== faq)
@@ -260,7 +260,6 @@ export class UserState {
               return menuItem;
             });
         }
-
         return patchState({ menu: menu });
       })
     );
