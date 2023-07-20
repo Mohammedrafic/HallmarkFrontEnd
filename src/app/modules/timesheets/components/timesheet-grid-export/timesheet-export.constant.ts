@@ -10,7 +10,21 @@ export const GetExportFileName = (tabIndex: number): string => {
     
   ];
 
-  export const TimesheetsExportCols: ExportColumn[] = [
+  export const TimesheetsExportColsOrg: ExportColumn[] = [
+    { text:'Name', column: 'fullName'},
+    { text:'Timesheet Status', column: 'status'},
+    { text:'Miles Status', column: 'mileageStatus'},
+    { text:'Job Id', column: 'formattedId'},
+    { text:'Skill', column: 'skill'},
+    { text:'Location', column: 'location'},
+    { text:'Work Week', column: 'workWeek'},
+    { text:'Department', column: 'department'},
+    { text:'Bill Rate($)', column: 'billRate'},   
+    { text:'Agency Name', column: 'agencyName'},
+    { text:'Total Days', column: 'totalDays'}
+  ]
+
+  export const TimesheetsExportColsAgency: ExportColumn[] = [
     { text:'Name', column: 'fullName'},
     { text:'Timesheet Status', column: 'status'},
     { text:'Miles Status', column: 'mileageStatus'},

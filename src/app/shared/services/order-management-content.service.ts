@@ -157,15 +157,6 @@ export class OrderManagementContentService {
   }
 
   /**
-   * Get the agency orders information
-   @param id
-   @param organizationId
-   */
-  public getAgencyOrderGeneralInformation(id: number, organizationId: number): Observable<Order> {
-    return this.http.get<Order>(`/api/Orders/${id}/organization/${organizationId}`);
-  }
-
-  /**
    * Get order by id
    @param id
    */

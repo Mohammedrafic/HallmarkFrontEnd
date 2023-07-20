@@ -90,7 +90,8 @@ export class ScheduleApiService {
   }
 
   deleteSchedule(deleteScheduleRequest: DeleteScheduleRequest):Observable<void> {
-    return this.http.post<void>('/api/Schedules/delete', deleteScheduleRequest);
+    const userLocalTime = DateTimeHelper.setUtcTimeZone(new Date());
+    return this.http.post<void>('/api/Schedules/delete', { ...deleteScheduleRequest, userLocalTime });
   }
 
   getOpenPositions(openPositionsParams: OpenPositionParams): Observable<OpenPositionsList[]> {

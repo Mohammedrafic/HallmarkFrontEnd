@@ -50,7 +50,6 @@ import {
   ExportAgencyOrders,
   GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
-  GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
   GetOrderById,
   ReloadOrderCandidatesLists,
@@ -648,8 +647,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           ""
         )
       );
+
       this.orderPositionSelected$.next(false);
-      this.store.dispatch(new GetAgencyOrderGeneralInformation(rowData.orderId, rowData.organizationId));
       this.selectedIndex = Number(event.rowIndex);
     }
 
@@ -706,9 +705,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.orderManagementAgencyService.excludeDeployed
       )
     );
-    this.store.dispatch(
-      new GetAgencyOrderGeneralInformation(reOrder.orderId || (reOrder.id as number), order.organizationId)
-    );
+
     this.selectedOrder = reOrder;
     this.selectedIndex = null;
     this.openPreview.next(true);
