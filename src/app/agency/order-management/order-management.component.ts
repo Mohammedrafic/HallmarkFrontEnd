@@ -28,6 +28,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   public exportSelected$ = new Subject<any>();
   public search$ = new Subject<string>();
   public orderStatus: string[]=[];
+  public candidateStatuses: string[]=[];
   private unsubscribe$: Subject<void> = new Subject();
   public organizationIds: number[] = [];
 
@@ -42,6 +43,12 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
     } else {
       if(routerState?.['status'] == "In Progress"){
         this.orderStatus.push("InProgress")
+      }
+      if(routerState?.['xtraStatus'] != undefined){
+        this.orderStatus.push(routerState?.['xtraStatus'])
+      }
+      if(routerState?.['candidateStatusId'] != undefined){
+        this.candidateStatuses.push(routerState?.['candidateStatusId'])
       }
     }
   }
