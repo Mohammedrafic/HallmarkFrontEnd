@@ -3,6 +3,7 @@ import { ApplicantStatus } from '../../../enums/applicant-status.enum';
 import { ExportedFileType } from '../../../enums/exported-file-type';
 import { CandidateStatus } from '../../../enums/status';
 import { PageOfCollections } from '../../../models/page.model';
+import { CredentialType } from '@shared/models/credential-type.model';
 
 export type CandidateRow = {
   candidateProfileId: number;
@@ -138,4 +139,5 @@ export interface CandidateListStateModel {
   listOfSkills: ListOfSkills[] | null;
   listOfRegions: string[] | null;
   tableState: CandidateListTableState | null;
+  listOfCredentialTypes: CredentialType[] | null;
 }
