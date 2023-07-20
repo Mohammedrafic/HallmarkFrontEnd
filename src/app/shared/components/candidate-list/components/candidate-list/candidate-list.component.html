@@ -164,19 +164,10 @@
         </ng-template>
       </e-column>
       <e-column textAlign="Left" field="employeeSourceId" *ngIf="isIRP && isSourceValidated" headerText="Emp Source Id">
-        <ng-template #template let-data>
-          {{data.employeeSourceId'}}
-        </ng-template>
       </e-column>
       <e-column textAlign="Left" field="source" *ngIf="isIRP && isSourceValidated" headerText="Source">
-        <ng-template #template let-data>
-          {{data.source'}}
-        </ng-template>
       </e-column>
       <e-column textAlign="Left" field="recruiter" *ngIf="isIRP && isSourceValidated" headerText="Recruiter">
-        <ng-template #template let-data>
-          {{data.recruiter'}}
-        </ng-template>
       </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
