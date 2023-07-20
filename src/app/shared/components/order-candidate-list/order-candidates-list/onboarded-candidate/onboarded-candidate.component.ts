@@ -498,8 +498,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-            date: [DateTimeHelper.setCurrentTimeZone(value.order.jobStartDate?.toString()),
-              DateTimeHelper.setCurrentTimeZone(value.order.jobEndDate?.toString())],
+            date: [DateTimeHelper.setCurrentTimeZone(actualStart),
+              DateTimeHelper.setCurrentTimeZone(actualEnd)],
             billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
