@@ -206,7 +206,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
           this.defaultAgingGroups=this.agingGroups.map((list)=>list.id);
           this.agingReportForm.get(analyticsConstants.formControlNames.AgingGroupIds)?.setValue(this.defaultAgingGroups);
           if (this.isInitialLoad) {
-            setTimeout(()=>{ this.SearchReport()},3000);
+              this.SearchReport();
             this.isInitialLoad = false;
           }
           this.changeDetectorRef.detectChanges();
