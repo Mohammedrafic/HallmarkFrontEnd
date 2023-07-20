@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { filter, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { GridApi, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 
@@ -13,6 +13,9 @@ import { InvoicesApiService } from '../../services';
 import { PaymentTableDefs } from './invoice-payment-details.constant';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceState } from '../../enums';
+import { Permission } from '@core/interface';
+import { UserState } from 'src/app/store/user.state';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-invoice-payment-details',
@@ -53,6 +56,9 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
 
   private gridApi: GridApi;
 
+  public userPermission: Permission = {};
+  public readonly userPermissions = UserPermissions;
+
   constructor(
     private store: Store,
     private apiService: InvoicesApiService,
@@ -71,6 +77,7 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
     this.watchForCloseStream();
     this.watchForInvoiceDetails();
     this.watchForPaymentSaveAction();
+    this.getuserPermission()
   }
 
   addNewPayment(): void {
@@ -140,5 +147,12 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
   private setTableRowData(data: InvoicePayment[]): void {
     this.gridApi.setRowData(data);
     this.cd.markForCheck();
+  }
+  private getuserPermission(): void {
+    this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length),take(1)
+    ).subscribe((permissions: Permission) => {
+      this.userPermission = permissions;
+    });
   }
 }
