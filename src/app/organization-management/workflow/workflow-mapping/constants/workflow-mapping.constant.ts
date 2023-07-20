@@ -1,5 +1,5 @@
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
-import { WorkflowTabName, WorkflowTypeList } from '@organization-management/workflow/interfaces';
+import { SystemFlags, WorkflowTabName, WorkflowTypeList } from '@organization-management/workflow/interfaces';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
 export const WorkflowTabNames: WorkflowTabName = {
@@ -18,12 +18,18 @@ export const VmsWorkflowType: WorkflowTypeList = {
   text: WorkflowTabNames.vmsWorkflow,
 };
 
-export const CreateWorkflowTypeList = (irpFlag: boolean, isOrgUseIRPAndVMS: boolean): WorkflowTypeList[] => {
-  if(irpFlag && isOrgUseIRPAndVMS) {
-    return [IrpWorkflowType, VmsWorkflowType];
+export const CreateWorkflowTypeList = (irpFlag: boolean, systemFlags: SystemFlags): WorkflowTypeList[] => {
+  const workflowType = [];
+
+  if (irpFlag && systemFlags.isIRPEnabled) {
+    workflowType.push(IrpWorkflowType);
   }
 
-  return [VmsWorkflowType];
+  if (systemFlags.isVMCEnabled) {
+    workflowType.push(VmsWorkflowType);
+  }
+
+  return workflowType;
 };
 
 export const FiltersColumnsConfig = {
