@@ -100,12 +100,16 @@ export class OrganizationManagementComponent extends AbstractPermission implemen
       this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
     const isIRPOnly = this.isIRPFlagEnabled && !!(isIRPEnabled && !isVMCEnabled);
 
+    this.setOrganizationSettings(isIRPOnly);
+    this.setMenuConfig();
+  }
+
+  private setOrganizationSettings(isIRPOnly: boolean): void {
     if (isIRPOnly) {
-      const filteredKeys = new Set([8, 9]);
-
+      const filteredKeys = new Set([9]);
       this.orgSettings = this.orgSettings.filter((el) => !filteredKeys.has(el.id));
-
-      this.setMenuConfig();
+    } else {
+      this.orgSettings = ORG_SETTINGS;
     }
   }
 

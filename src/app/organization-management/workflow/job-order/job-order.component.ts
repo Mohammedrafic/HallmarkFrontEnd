@@ -33,7 +33,7 @@ import { WorkflowStateService } from '@organization-management/workflow/services
 import { Organization } from '@shared/models/organization.model';
 import { GetSelectedCardIndex } from '@organization-management/workflow/helpers';
 import { WorkflowTabNames } from '@organization-management/workflow/workflow-mapping/constants';
-import { WorkflowTabName } from '@organization-management/workflow/interfaces';
+import { SystemFlags, WorkflowTabName } from '@organization-management/workflow/interfaces';
 import { OutsideZone } from '@core/decorators';
 
 @Component({
@@ -51,7 +51,10 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
   public orderWorkflow: Workflow;
   public applicationWorkflow: Workflow;
   public showCreateWorkflowDialog = false;
-  public isOrgUseIRPAndVMS = false;
+  public systemFlags: SystemFlags = {
+    isIRPEnabled: false,
+    isVMCEnabled: false,
+  };
   public isIRPFlagEnabled = false;
   public customOrderSteps$: Subject<Step[]> = new Subject<Step[]>();
   public customApplicationSteps$: Subject<Step[]> = new Subject<Step[]>();
@@ -254,8 +257,11 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
     this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
 
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
-    this.isOrgUseIRPAndVMS = !!(isVMCEnabled && isIRPEnabled);
-    this.tabList = this.jobOrderService.createTabList(this.isIRPFlagEnabled, this.isOrgUseIRPAndVMS);
+    this.systemFlags = {
+      isIRPEnabled: isIRPEnabled ?? false,
+      isVMCEnabled: isVMCEnabled ?? true,
+    };
+    this.tabList = this.jobOrderService.createTabList(this.isIRPFlagEnabled, this.systemFlags);
   }
 
   private orderWorkflowTab(): void {

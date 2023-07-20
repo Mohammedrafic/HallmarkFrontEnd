@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 
 import { WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
+import { SystemFlags } from '@organization-management/workflow/interfaces';
 
 @Injectable()
 export class JobOrderService {
@@ -19,18 +20,17 @@ export class JobOrderService {
     });
   }
 
-  public createTabList(featureFlag: boolean, system: boolean): WorkflowNavigationTabs[] {
-    if(featureFlag && system) {
-      return [
-        WorkflowNavigationTabs.IrpOrderWorkFlow,
-        WorkflowNavigationTabs.VmsOrderWorkFlow,
-        WorkflowNavigationTabs.WorkflowMapping,
-      ];
+  public createTabList(featureFlag: boolean, systemFlags: SystemFlags): WorkflowNavigationTabs[] {
+    const tabs = [WorkflowNavigationTabs.WorkflowMapping];
+
+    if (systemFlags.isVMCEnabled) {
+      tabs.unshift(WorkflowNavigationTabs.VmsOrderWorkFlow);
     }
 
-    return [
-      WorkflowNavigationTabs.VmsOrderWorkFlow,
-      WorkflowNavigationTabs.WorkflowMapping,
-    ];
+    if (featureFlag && systemFlags.isIRPEnabled) {
+      tabs.unshift(WorkflowNavigationTabs.IrpOrderWorkFlow);
+    }
+
+    return tabs;
   }
 }

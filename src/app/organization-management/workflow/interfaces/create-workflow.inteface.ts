@@ -29,3 +29,8 @@ export interface WorkFlowFilterOption {
   name: string;
   id: number;
 }
+
+export interface SystemFlags {
+  isIRPEnabled: boolean;
+  isVMCEnabled: boolean;
+}
