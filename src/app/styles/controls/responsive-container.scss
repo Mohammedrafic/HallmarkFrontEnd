@@ -56,4 +56,18 @@
       @include smallTabletMenu();
     }
   }
+
+  .contact-to-perm {
+    @container (max-width: 1555px) {
+      @include smallDesktopMenu();
+    }
+
+    @container (max-width: 1165px) and (min-width: 1105px) {
+      @include smallTabletMenu();
+    }
+
+    @container(max-width: 945px) {
+      @include smallTabletMenu();
+    }
+  }
 }
