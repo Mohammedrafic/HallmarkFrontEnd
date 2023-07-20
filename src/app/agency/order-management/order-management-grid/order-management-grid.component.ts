@@ -429,8 +429,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : undefined;
       }
       if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
-        this.OrderFilterFormGroup.get('candidateStatuses')?.setValue([...this.candidateStatuses]);
-        this.filters.candidateStatuses = this.candidateStatuses.length > 0 ? this.candidateStatuses : undefined;
+        this.clearFilters();
+        this.setDefaultStatuses(statuses, true);
       }
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
@@ -477,6 +477,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
       this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
     }
+    if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
+      this.OrderFilterFormGroup.get('candidateStatuses')?.setValue([...this.candidateStatuses]);
+      this.filters.candidateStatuses = this.candidateStatuses.length > 0 ? this.candidateStatuses : undefined;
+    }
     if (setDefaultFilters) {
       let Status = [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
@@ -485,6 +489,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       setTimeout(() => {
           this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
           this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
+
           this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
           for (let i = 0; i < this.filteredItems.length; i++) {
             if (this.filteredItems[i].text == undefined) {
