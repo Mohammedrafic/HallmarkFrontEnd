@@ -86,6 +86,8 @@ import {
 } from './candidate-list.constants';
 import { CandidateListScroll } from './candidate-list.enum';
 import { CredentialType } from '@shared/models/credential-type.model';
+import { GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 
 @Component({
   selector: 'app-candidate-list',
@@ -101,6 +103,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(CandidateListState.IRPCandidates)
   private _IRPCandidates$: Observable<IRPCandidateList>;
+
+
+  @Select(RejectReasonState.sourcingReasons)
+  public sourcing$: Observable<any>;
 
   @Select(CandidateState.skills)
   private skills$: Observable<MasterSkill[]>;
@@ -183,6 +189,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private activeTab: number;
   private scrollSubscription: Subscription;
   private redirectfromDashboard : boolean
+  public isSourceValidated :boolean=false
   constructor(
     private store: Store,
     private router: Router,
@@ -201,6 +208,14 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   ngOnInit(): void {
+    this.store.dispatch(new GetSourcingReasons());
+    this.sourcing$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      console.log(data)
+      if (data != null) {
+        this.isSourceValidated = data.issourcing
+      }
+    });
+
     this.initCandidateFilterForm();
     this.getRegions();
     this.getCredentialTypes();

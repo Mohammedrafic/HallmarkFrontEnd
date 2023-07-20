@@ -52,6 +52,7 @@ export class CandidateListState {
     return state.listOfCredentialTypes;
   }
 
+ 
   constructor(private candidateListService: CandidateListService) {}
 
   @Action(CandidateListActions.GetCandidatesByPage, { cancelUncompleted: true })

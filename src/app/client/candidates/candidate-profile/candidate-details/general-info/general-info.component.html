@@ -1,11 +1,11 @@
 <h2 class="title">General Info</h2>
 <form class="general-info__form">
   <div class="row">
-    <div class="two-controls">
+    <div class='two-controls'>
       <app-input
         [formGroupInstance]="candidateForm"
-        [required]="true"
         maxlength="25"
+        [required]="true"
         controlName="employeeId"
         id="employeeId"
         label="Employee ID"
@@ -19,7 +19,7 @@
         id="first-name"
         label="First Name"
       ></app-input>
-    </div>
+    </div>      
 
     <app-input
       [formGroupInstance]="candidateForm"
@@ -145,6 +145,40 @@
       label="Termination Reason"
       id="terminationReason"
       controlName="terminationReasonId"
+    ></app-dropdown>
+
+  </div>
+  <div class="row">
+    <app-input
+    *ngIf="isSourceValidated"
+      [formGroupInstance]="candidateForm"
+      maxlength="50"
+      controlName="employeeSourceId"
+      id="sourceId"
+      label="Source ID"
+      [required]="isSourceConfig"
+    ></app-input>
+
+    <app-dropdown
+    *ngIf="isSourceValidated"
+      [dataSource]="recruitContent"
+      [fields]="fieldsSettings"
+      [formGroupInstance]="candidateForm"
+      [hideBorder]="false"
+      label="Recruiter"
+      id="recruit-id"
+      controlName="recruiterId"
+    ></app-dropdown>
+
+    <app-dropdown
+    *ngIf="isSourceValidated"
+      [dataSource]="sourceContent"
+      [fields]="fieldsSettings"
+      [formGroupInstance]="candidateForm"
+      [hideBorder]="false"
+      label="Sources"
+      id="source-id"
+      controlName="sourceId"
     ></app-dropdown>
   </div>
 

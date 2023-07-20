@@ -52,3 +52,7 @@ export class ClearTableState {
 export class GetCredentialsTypeList {
   static readonly type = '[candidate list] Get Credential Types List';
 }
+
+export class SourceConfig{
+  static readonly type ='[candidate list] Get Sourcing Config';
+}

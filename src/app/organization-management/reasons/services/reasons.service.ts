@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 
-import { SaveCategoryNoteReasons, SaveClosureReasons, SaveOrderRequisition, SavePenalty, SaveUnavailabilityReason, UpdateCategoryNoteReasons, UpdateClosureReasonsSuccess } from '@organization-management/store/reject-reason.actions';
+import { SaveCategoryNoteReasons, SaveClosureReasons, SaveOrderRequisition, SavePenalty,  SaveUnavailabilityReason, UpdateCategoryNoteReasons,   UpdateRecuriterReasons,  UpdateSourcingReasons } from '@organization-management/store/reject-reason.actions';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { REASON_WARNING } from '@shared/constants';
@@ -24,7 +24,7 @@ export class ReasonsService {
   constructor(
     private store: Store,
   ) { }
-  
+
   @Select(OrganizationManagementState.organization)
   public readonly organization$: Observable<Organization>;
   protected componentDestroy: () => Observable<unknown>;
@@ -93,10 +93,10 @@ export class ReasonsService {
       (value.includeInIRP == null) ? (value.includeInIRP = false) : "";
       (value.includeInVMS == null) ? (value.includeInVMS = false) : "";
       var reasonvalue = {
-        id : value.id || undefined,
-        includeInIRP : this.selectedSystem.isIRP,
-        includeInVMS : this.selectedSystem.isVMS,
-        reason : params.formValue.reason
+        id: value.id || undefined,
+        includeInIRP: this.selectedSystem.isIRP,
+        includeInVMS: this.selectedSystem.isVMS,
+        reason: params.formValue.reason
       };
       ((this.selectedSystem.isIRP && this.selectedSystem.isVMS) ? "" : value = reasonvalue as Closurevalue);
       if (params.isVMSIRP) {
@@ -123,11 +123,11 @@ export class ReasonsService {
       (value.includeInIRP == null) ? (value.includeInIRP = false) : "";
       (value.includeInVMS == null) ? (value.includeInVMS = false) : "";
       var reqreasonvalue = {
-        id : value.id || undefined,
-        includeInIRP : this.selectedSystem.isIRP,
-        includeInVMS : this.selectedSystem.isVMS,
-        reason : params.formValue.reason,
-        isAutoPopulate : value.isAutoPopulate
+        id: value.id || undefined,
+        includeInIRP: this.selectedSystem.isIRP,
+        includeInVMS: this.selectedSystem.isVMS,
+        reason: params.formValue.reason,
+        isAutoPopulate: value.isAutoPopulate
       };
       ((this.selectedSystem.isIRP && this.selectedSystem.isVMS) ? "" : value = reqreasonvalue as Closurevalue);
       if (params.isVMSIRP) {
@@ -139,7 +139,7 @@ export class ReasonsService {
             reason: value.reason,
             includeInVMS: !!value.includeInVMS,
             includeInIRP: !!value.includeInIRP,
-            isAutoPopulate : !!value.isAutoPopulate
+            isAutoPopulate: !!value.isAutoPopulate
           }));
         }
       } else {
@@ -148,7 +148,7 @@ export class ReasonsService {
           reason: value.reason,
           includeInVMS: !!value.includeInVMS,
           includeInIRP: !!value.includeInIRP,
-          isAutoPopulate : !!value.isAutoPopulate
+          isAutoPopulate: !!value.isAutoPopulate
         }));
       }
 
@@ -167,11 +167,37 @@ export class ReasonsService {
           isRedFlagCategory: !!value.isRedFlagCategory,
         }));
       }
-    } else {
-      const Action = params.editMode ? UpdateReasonsActionsMap[params.selectedTab]
-        : NewReasonsActionsMap[params.selectedTab];
-      const payload = params.editMode ? this.createUpdateReasonPayload(params) : this.createNewReasonPayload(params);
-      this.store.dispatch(new Action(payload));
+
+    }
+    else if (params.selectedTab === ReasonsNavigationTabs.SourcingReason) {
+      const value = params.formValue as CategoryNoteValue;
+      if (value.id != undefined || null) {
+        this.store.dispatch(new UpdateSourcingReasons({
+          id: value.id || undefined,
+          reason: value.reason,
+        }));
+      }
+      else {
+        const Action = params.editMode ? UpdateReasonsActionsMap[params.selectedTab]
+          : NewReasonsActionsMap[params.selectedTab];
+        const payload = params.editMode ? this.createUpdateReasonPayload(params) : this.createNewReasonPayload(params);
+        this.store.dispatch(new Action(payload));
+      }
+    }
+    else if (params.selectedTab === ReasonsNavigationTabs.RecuriterReason) {
+      const value = params.formValue as CategoryNoteValue;
+      if (value.id != undefined || null) {
+        this.store.dispatch(new UpdateRecuriterReasons({
+          id: value.id || undefined,
+          reason: value.reason,
+        }));
+      }
+      else {
+        const Action = params.editMode ? UpdateReasonsActionsMap[params.selectedTab]
+          : NewReasonsActionsMap[params.selectedTab];
+        const payload = params.editMode ? this.createUpdateReasonPayload(params) : this.createNewReasonPayload(params);
+        this.store.dispatch(new Action(payload));
+      }
     }
   }
 
@@ -187,15 +213,15 @@ export class ReasonsService {
 
   private getOrganizagionData(): void {
     this.organization$
-    .pipe(
-      filter(Boolean)
-    )
-    .subscribe((organization : Organization) => {
-      const isOrgUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
-      this.selectedSystem = {
-        isIRP: !!organization.preferences.isIRPEnabled,
-        isVMS: !!organization.preferences.isVMCEnabled,
-      };
-    });
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe((organization: Organization) => {
+        const isOrgUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
+        this.selectedSystem = {
+          isIRP: !!organization.preferences.isIRPEnabled,
+          isVMS: !!organization.preferences.isVMCEnabled,
+        };
+      });
   }
 }
