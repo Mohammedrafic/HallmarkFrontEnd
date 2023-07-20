@@ -396,4 +396,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ShowToast(MessageTypes.Error, error));
     return;
   }
+  ngAfterViewInit(){
+    this.logiReportComponent.paramsData = this.paramsData;
+    this.logiReportComponent.RenderReport();
+  
+  }
 }

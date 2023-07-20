@@ -185,7 +185,9 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
           this.invoiceSummaryReportForm.get(invoiceSummaryConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
           if (this.isInitialLoad) {
             //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
-            setTimeout(() => { this.SearchReport(); }, 3000)
+            // setTimeout(() => { 
+              this.SearchReport(); 
+            // }, 3000)
             this.isInitialLoad = false;
           }
         }
@@ -530,5 +532,10 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
         });
 
     }
+  }
+
+  ngAfterViewInit(){
+    this.logiReportComponent.paramsData = this.paramsData;
+    this.logiReportComponent.RenderReport();
   }
 }
