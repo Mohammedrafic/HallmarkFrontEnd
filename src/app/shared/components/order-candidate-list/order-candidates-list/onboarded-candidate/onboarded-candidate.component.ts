@@ -489,15 +489,17 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
-          const actualEnd = this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
+
+          const actualEnd = value.actualEndDate ||
+          this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
             jobStartDate: value.order.jobStartDate,
             jobEndDate: value.order.jobEndDate,
           }).toString();
 
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-            date: [DateTimeHelper.setCurrentTimeZone(value.order.jobStartDate?.toString()),
-              DateTimeHelper.setCurrentTimeZone(value.order.jobEndDate?.toString())],
+            date: [DateTimeHelper.setCurrentTimeZone(actualStart),
+              DateTimeHelper.setCurrentTimeZone(actualEnd)],
             billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),

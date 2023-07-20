@@ -297,10 +297,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       return;
     }
 
-    if (
-      this.isCreateMode
-      && !this.createScheduleService.canEmployeeCreateRecord(this.isEmployee, [this.scheduleForm.get('date')?.value])
-    ) {
+    const { startTime, date } = this.scheduleForm.getRawValue();
+
+    if (!this.createScheduleService.canEmployeeCreateRecord(this.isEmployee, [date], startTime)) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, PastTimeErrorMessage));
       return;
     }
@@ -987,7 +986,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     const locationId = (filters.locationIds as number[])[0];
     const departmentId = (filters.departmentsIds as number[])[0];
 
-    this.availabilityOpenPositionSkillId = (filters.skillIds as number[])[0];
+    this.availabilityOpenPositionSkillId = filters.skillIds ? (filters.skillIds as number[])[0] : null;
     this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFiltersService
       .getSelectedLocatinOptions(this.scheduleFilterStructure, [regionId]);
     this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFiltersService

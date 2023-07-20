@@ -95,6 +95,7 @@ import {
   ApplicantStatus as ApplicantStatusModel,
   CandidateCancellationReason,
   CandidateCancellationReasonFilter,
+  MergedOrder,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
@@ -123,8 +124,6 @@ enum Template {
   offerDeployment,
 }
 
-type MergedOrder = AgencyOrderManagement & Order;
-
 enum MobileMenuItems {
   AddExtension = 'Add Extension',
   ClosePosition = 'Close Position',
@@ -141,7 +140,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
-  @Input() activeSystem: OrderManagementIRPSystemId;
+  @Input() activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
   @Input() orderComments: Comment[] = [];
   @Output() saveEmitter = new EventEmitter<void>();
 

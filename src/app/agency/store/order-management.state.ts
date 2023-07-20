@@ -37,7 +37,6 @@ import {
   GetAgencyFilterOptions,
   GetAgencyHistoricalData,
   GetAgencyOrderCandidatesList,
-  GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
   GetCandidateJob,
   GetDeployedCandidateOrderInfo,
@@ -68,7 +67,6 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
   orderCandidatesListPage: OrderCandidatesListPage | null;
-  orderCandidatesInformation: Order | null;
   candidatesJob: OrderCandidateJob | null;
   orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
@@ -87,7 +85,6 @@ export interface OrderManagementModel {
   defaults: {
     ordersPage: null,
     orderCandidatesListPage: null,
-    orderCandidatesInformation: null,
     orderApplicantsInitialData: null,
     selectedOrder: null,
     candidatesJob: null,
@@ -126,11 +123,6 @@ export class OrderManagementState {
           candidate.status !== ApplicantStatus.Withdraw
       ).length || 0
     );
-  }
-
-  @Selector()
-  static orderCandidatesInformation(state: OrderManagementModel): Order | null {
-    return state.orderCandidatesInformation;
   }
 
   @Selector()
@@ -245,19 +237,6 @@ export class OrderManagementState {
   @Action(ClearAgencyOrderCandidatesList)
   ClearAgencyOrderCandidatesList({ patchState }: StateContext<OrderManagementModel>): void {
     patchState({ orderCandidatesListPage: null });
-  }
-
-  @Action(GetAgencyOrderGeneralInformation)
-  GetAgencyOrderGeneralInformation(
-    { patchState }: StateContext<OrderManagementModel>,
-    { id, organizationId }: GetAgencyOrderGeneralInformation
-  ): Observable<Order> {
-    return this.orderManagementContentService.getAgencyOrderGeneralInformation(id, organizationId).pipe(
-      tap((payload) => {
-        patchState({ orderCandidatesInformation: payload });
-        return payload;
-      })
-    );
   }
 
   @Action(GetOrderById)

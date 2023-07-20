@@ -12,6 +12,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { CandidateListService } from '../services/candidate-list.service';
 import { CandidateList, CandidateListStateModel, IRPCandidateList } from '../types/candidate-list.model';
 import * as CandidateListActions from './candidate-list.actions';
+import { CredentialType } from '@shared/models/credential-type.model';
 
 @State<CandidateListStateModel>({
   name: 'candidateList',
@@ -22,6 +23,7 @@ import * as CandidateListActions from './candidate-list.actions';
     listOfSkills: null,
     listOfRegions: null,
     tableState: null,
+    listOfCredentialTypes : null
   },
 })
 @Injectable()
@@ -44,6 +46,10 @@ export class CandidateListState {
   @Selector()
   static listOfRegions(state: CandidateListStateModel): string[] | null {
     return state.listOfRegions;
+  }
+  @Selector()
+  static listOfCredentialTypes(state: CandidateListStateModel): CredentialType[] | null {
+    return state.listOfCredentialTypes;
   }
 
  
@@ -163,5 +169,14 @@ export class CandidateListState {
     patchState({
       tableState: null,
     });
+  }
+
+  @Action(CandidateListActions.GetCredentialsTypeList)
+  GetCredentialTypesList({patchState}: StateContext<CandidateListStateModel>): Observable<CredentialType[]> {
+    return this.candidateListService.getCredentialTypes().pipe(tap((data)=> {
+      patchState({
+        listOfCredentialTypes: data,
+      });
+    }));
   }
 }

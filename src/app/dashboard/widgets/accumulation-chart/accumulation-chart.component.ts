@@ -27,6 +27,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CANDIDATE_STATUS, DASHBOARD_FILTER_STATE } from '@shared/constants';
 import { AlertService } from '@shared/services/alert.service';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
+import { OrderStatus } from '@shared/enums/order-management';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -149,6 +150,26 @@ export class AccumulationChartComponent
       } else {
         this.dashboardService.redirectToUrl('client/order-management', undefined, status);
       }
+    }else if(this.chartData?.title == "Candidates for Active Positions"){
+        let dataset:any = [];
+        this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
+          dataset = data;
+        });        
+        let chartInfo = dataset.find((ele:any)=>ele.status == status);
+        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+          if(chartInfo.applicantStatus === OrderStatus.Onboard){
+            this.dashboardService.redirectToUrlWithCandidateStatus('agency/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status, OrderStatus.Filled,'Filled');
+          }else{
+            this.dashboardService.redirectToUrlWithCandidateStatus('agency/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status);
+          }
+        }else{
+          if(chartInfo.applicantStatus === OrderStatus.Onboard){
+            this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status, OrderStatus.Filled,'Filled');
+          }else{
+            this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status);
+          }
+        }
+        
     }
 
   }

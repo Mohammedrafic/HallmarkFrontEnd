@@ -44,6 +44,12 @@ export const AllOrdersDefaultStatuses = [
   CandidateStatus.Incomplete,
 ];
 
+export const AllCandidateStatuses = [
+  CandidatesStatusText['Bill Rate Pending'],
+  CandidatesStatusText['Offered Bill Rate'],
+];
+
+
 export const filterOrderLockList: { text: string; value: any }[] = [
   { text: 'All', value: 'all' },
   { text: 'Locked', value: 'true' },
@@ -111,8 +117,8 @@ export const initOrderManagementFilterColumns = () => ({
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
     dataSource: [],
-    valueField: 'statusText',
-    valueId: 'status',
+    valueField: 'filterStatus',
+    valueId: 'filterStatus',
   },
   contactEmails: { type: ControlTypes.Text, valueType: ValueType.Text },
 

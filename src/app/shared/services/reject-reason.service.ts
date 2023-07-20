@@ -73,9 +73,21 @@ export class RejectReasonService {
    * @param pageSize
    * @param orderBy
    */
-   public getClosureReasonsByPage(pageNumber?: number, pageSize?: number, orderBy?: string,
-    getAll?: boolean): Observable<RejectReasonPage> {
-     const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy, getAll);
+   public getClosureReasonsByPage(
+     pageNumber?: number,
+     pageSize?: number,
+     orderBy?: string,
+     getAll?: boolean,
+     excludeDefaultReasons = false
+  ): Observable<RejectReasonPage> {
+     const params = this.getCloseReasonsParams(
+       pageNumber,
+       pageSize,
+       orderBy,
+       getAll,
+       false,
+       excludeDefaultReasons
+     );
 
     return this.http.get<RejectReasonPage>(`/api/orderclosurereasons`,
       { params }
@@ -124,13 +136,32 @@ export class RejectReasonService {
     orderBy?: string,
     getAll?: boolean,
     excludeOpenPositionReason?: boolean,
+    excludeDefaultReasons?: boolean,
   ): HttpParams {
     let params = {};
-    if (pageNumber) params = {...params, pageNumber};
-    if (pageSize) params = {...params, pageSize};
-    if (orderBy) params = {...params, orderBy};
-    if (getAll) params = {...params, getAll};
-    if (excludeOpenPositionReason) params = {...params, excludeOpenPositionReason};
+    
+    if (pageNumber) {
+      params = {...params, pageNumber};
+    }
+    if (pageSize) {
+      params = {...params, pageSize};
+    }
+
+    if (orderBy) {
+      params = {...params, orderBy};
+    }
+
+    if (getAll) {
+      params = {...params, getAll};
+    }
+
+    if (excludeOpenPositionReason) {
+      params = {...params, excludeOpenPositionReason};
+    }
+
+    if (excludeDefaultReasons) {
+      params = {...params, excludeDefaultReasons};
+    }
 
     return <HttpParams>params;
   }

@@ -21,6 +21,7 @@ export type RejectReasonwithSystem = {
   includeInIRP?: boolean;
   isVMSIRP?:boolean;
   isAutoPopulate? : boolean;
+  excludeDefaultReasons?: boolean;
   orderClosureReasonType?: OrderClosureReasonType;
 }
 

@@ -46,7 +46,13 @@ export class RemoveClosureReasons {
 
 export class GetClosureReasonsByPage {
   static readonly type = '[reject reason] Get Closure reason by Page';
-  constructor(public pageNumber?: number, public pageSize?: number, public orderBy?: string, public getAll?: boolean) { }
+  constructor(
+    public pageNumber?: number,
+    public pageSize?: number,
+    public orderBy?: string,
+    public getAll?: boolean,
+    public excludeDefaultReasons?: boolean,
+  ) { }
 }
 
 export class SaveClosureReasons {
@@ -225,7 +231,7 @@ export class RemoveTerminationReasons {
 export class UpdateTerminationReasons {
   static readonly type = '[reject reason] Update Termination Reason';
   constructor(public payload: RejectReason) {
-  } 
+  }
 }
 
 export class UpdateTerminationReasonsSuccess {
@@ -254,7 +260,7 @@ export class RemoveCategoryNoteReasons {
 export class UpdateCategoryNoteReasons {
   static readonly type = '[reject reason] Update CategoryNote Reason';
   constructor(public payload: RejectReasonWithRedflag) {
-  } 
+  }
 }
 
 export class UpdateCategoryNoteReasonsSuccess {

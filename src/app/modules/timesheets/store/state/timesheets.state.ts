@@ -333,19 +333,6 @@ export class TimesheetsState {
     );
   }
 
-  @Action(Timesheets.DeleteProfileTimesheet)
-  DeleteProfileTimesheet(
-    ctx: StateContext<TimesheetsModel>,
-    { profileId, profileTimesheetId }: Timesheets.DeleteProfileTimesheet
-  ): Observable<null | void> {
-    return this.timesheetsApiService.deleteProfileTimesheets(profileId, profileTimesheetId)
-    .pipe(
-      catchError((err: HttpErrorResponse) => {
-        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-      }),
-    );
-  }
-
   @Action(Timesheets.ToggleCandidateDialog)
   ToggleCandidateDialog({ patchState }: StateContext<TimesheetsModel>,
     { action, timesheet }: Timesheets.ToggleCandidateDialog): void {

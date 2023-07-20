@@ -21,7 +21,10 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
   @Input() public filterColumns: FilterColumnsModel;
   @Input() public filtersForm: FormGroup;
   @Input() public isAgency: boolean;
+  @Input() public orgAgencyName:string;
   @Input() public isClear: boolean;
+  @Input() public lastOrgId:number;
+  @Input() public lastAgencyId:number;
 
   @ViewChild('regionDropdown') public regionDropdown: MultiSelectComponent;
   @ViewChild('locationDropdown') public  locationDropdown: MultiSelectComponent;
@@ -49,7 +52,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
 
-  ngOnInit(): void {
+  ngOnInit(): void {  
     this.actions$.pipe(
       ofActionDispatched(ShowFilterDialog),
       debounceTime(300),
@@ -60,10 +63,10 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
       this.departmentDropdown.refresh();
     });
     const user = this.store.selectSnapshot(UserState.user);
-    this.orgid=user?.businessUnitId
+    this.orgid=user?.businessUnitId   
   }
 
-  public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
+  public filterCandidateName: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
     this.onFilterChild(e);
   }
   @OutsideZone
@@ -71,8 +74,14 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
 
     if (e.text != '') {
  const user = this.store.selectSnapshot(UserState.user);
- let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
-    this.orgid=user?.businessUnitId|| parseInt(lastSelectedOrganizationId||'0')
+    if(this.isAgency)
+    {
+      this.orgid=Number(this.lastAgencyId);
+    }
+    else
+    {
+      this.orgid=Number(this.lastOrgId);
+    }
 
          let filter: DoNotReturnCandidateSearchFilter = {
         searchText: e.text,

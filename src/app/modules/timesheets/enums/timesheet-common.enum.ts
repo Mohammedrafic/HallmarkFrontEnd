@@ -23,4 +23,5 @@ export enum RecordsMode {
 export enum RecordStatus {
   New = 'New',
   Deleted = 'Deleted',
+  None = 'None',
 }

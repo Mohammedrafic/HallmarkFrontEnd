@@ -321,7 +321,7 @@ export type AgencyOrderFilters = {
   orderPublicId?: string | null;
   reOrderId?: number;
   skillIds?: number[];
-  candidateStatuses?: number[];
+  candidateStatuses?: string[];
   candidatesCountFrom?: number | null;
   candidatesCountTo?: number | null;
   organizationIds?: number[];
@@ -408,6 +408,7 @@ export interface IRPMetaData {
   skillName: string;
   skillId: number;
   orderOpenDate: Date;
+  linkedId: string | null;
 }
 
 export class Order {
@@ -504,6 +505,7 @@ export class Order {
   externalCommentsConfiguration?:boolean | null;
   activeCandidatesCount?: number;
   isLockedIRP?: boolean;
+  linkedId: string | null;
 }
 
 export class ReOrder {
@@ -695,7 +697,7 @@ export class OrderFilter {
   jobStartDate?: Date | null;
   jobEndDate?: Date | null;
   orderStatuses?: (string | number)[];
-  candidateStatuses?: number[];
+  candidateStatuses?: string[];
   candidatesCountFrom?: number | null;
   candidatesCountTo?: number | null;
   agencyIds?: number[];
@@ -756,6 +758,7 @@ export class FilterOrderStatus {
 export class FilterStatus {
   status: number;
   statusText: string;
+  filterStatus?: string;
 }
 
 export class OrderFilterDataSource {
@@ -868,3 +871,5 @@ export class OnboardCandidateEmail {
   businessUnitId ?: number;
 
 }
+
+export type MergedOrder = AgencyOrderManagement & Order;

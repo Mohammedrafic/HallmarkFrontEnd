@@ -8,7 +8,7 @@ import { OrganizationRegion } from '@shared/models/organization.model';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { BaseObservable } from '@core/helpers';
 
-import { TimsheetForm } from '../interface';
+import { TimesheetForm } from '../interface';
 import { Timesheets } from '../store/actions/timesheets.actions';
 import { TimesheetsTableFiltersColumns } from '../enums';
 
@@ -25,7 +25,7 @@ export class TimesheetsService {
   ) {
   }
 
-  public createForm(): CustomFormGroup<TimsheetForm> {
+  public createForm(): CustomFormGroup<TimesheetForm> {
     return this.fb.group({
       searchTerm: [''],
       orderIds: [[]],
@@ -36,7 +36,7 @@ export class TimesheetsService {
       regionsIds: [[]],
       locationIds: [[]],
       contactEmails: '',
-    }) as CustomFormGroup<TimsheetForm>;
+    }) as CustomFormGroup<TimesheetForm>;
   }
 
   public setDataSourceByFormKey(
