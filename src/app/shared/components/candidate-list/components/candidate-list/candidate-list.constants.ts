@@ -81,11 +81,7 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
   credType: {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
-    dataSource: [
-      {id : 3, name : "Licenses"},
-      {id : 1, name : "Certifications"},
-      {id : 2, name : "Checklists"}
-    ],
+    dataSource: [], 
     valueField: 'name',
     valueId: 'id',
   },

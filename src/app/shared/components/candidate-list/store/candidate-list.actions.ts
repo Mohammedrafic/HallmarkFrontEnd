@@ -49,3 +49,6 @@ export class SetTableState {
 export class ClearTableState {
   static readonly type = '[candidate list] Clear candidates table state';
 }
+export class GetCredentialsTypeList {
+  static readonly type = '[candidate list] Get Credential Types List';
+}
