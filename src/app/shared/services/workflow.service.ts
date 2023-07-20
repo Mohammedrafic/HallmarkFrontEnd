@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { WorkflowFilters, WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
+
+import { Observable } from 'rxjs';
+
+import { WorkflowFilters, WorkflowFlags, WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
 import {
   RolesByPermission,
   UsersByPermission,
@@ -13,45 +15,25 @@ import {
 export class WorkflowService {
   constructor(private http: HttpClient) {}
 
-  /**
-   * Get all workflows by businessUnitId
-   * @return workflows
-   */
-  public getWorkflows(): Observable<WorkflowWithDetails[]> {
-    return this.http.get<WorkflowWithDetails[]>(`/api/Workflows/byBusinessUnit`);
+  public getWorkflows(flags: WorkflowFlags): Observable<WorkflowWithDetails[]> {
+    const { includeInIRP, includeInVMS } = flags;
+    return this.http.get<WorkflowWithDetails[]>(`/api/Workflows/byBusinessUnit`, { params: { includeInIRP, includeInVMS } });
   }
 
-  /**
-   * Create or update workflow
-   * @param workflow object to save
-   * @return Created/Updated workflow
-   */
   public saveWorkflow(workflow: WorkflowWithDetails): Observable<WorkflowWithDetails | void> {
     return workflow.id
       ? this.http.put<WorkflowWithDetails | void>(`/api/Workflows`, workflow)
       : this.http.post<WorkflowWithDetails | void>(`/api/Workflows`, workflow);
   }
 
-  /**
-   * Update workflow
-   * @param workflow object to update
-   * @return Updated workflow
-   */
   public updateWorkflow(workflow: WorkflowWithDetailsPut): Observable<WorkflowWithDetails | void> {
     return this.http.put<WorkflowWithDetails | void>(`/api/Workflows`, workflow);
   }
 
-  /**
-   * Remove workflow by its id
-   * @param workflow
-   */
   public removeWorkflow(workflow: WorkflowWithDetails): Observable<void> {
     return this.http.delete<void>(`/api/Workflows/${workflow.id}`);
   }
 
-  /**
-   * Gets workflow mapping page
-   */
   public getWorkflowMappingPages(filters?: WorkflowFilters): Observable<WorkflowMappingPage> {
     if (filters) {
       return this.http.post<WorkflowMappingPage>(`/api/WorkflowMapping/filter`, filters);
@@ -59,33 +41,18 @@ export class WorkflowService {
     return this.http.get<WorkflowMappingPage>(`/api/WorkflowMapping`);
   }
 
-  /**
-   * Creates workflow mapping
-   * @param workflowMapping object to save
-   * @return Created workflow mapping
-   */
   public saveWorkflowMapping(workflowMapping: WorkflowMappingPost): Observable<WorkflowMappingPost | void> {
     return this.http.post<WorkflowMappingPost | void>(`/api/WorkflowMapping`, workflowMapping);
   }
 
-  /**
-   * Remove workflow mapping by its mappingId
-   * @param mappingId
-   */
   public removeWorkflowMapping(mappingId: number): Observable<void> {
     return this.http.delete<void>(`/api/WorkflowMapping/${mappingId}`);
   }
 
-  /**
-   * Gets users for workflow mapping
-   */
   public getUsersForWorkflowMapping(): Observable<UsersByPermission[]> {
     return this.http.get<any>(`/api/WorkflowMapping/usersByPermission`);
   }
 
-  /**
-   * Gets roles for workflow mapping
-   */
   public getRolesForWorkflowMapping(): Observable<RolesByPermission[]> {
     return this.http.get<any>(`/api/WorkflowMapping/rolesByPermission`);
   }

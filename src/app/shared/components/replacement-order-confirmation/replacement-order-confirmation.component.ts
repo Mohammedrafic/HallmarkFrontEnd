@@ -11,9 +11,10 @@ import { WARNING_TITLE } from '@shared/constants';
 })
 export class ReplacementOrderConfirmationComponent extends DestroyDialog implements OnInit {
   @Input() text: string;
-  @Output() confirm = new EventEmitter<boolean>();
-
   @Input() replaceChecked = false;
+  @Input() showReplacementCheckbox = true;
+
+  @Output() confirm = new EventEmitter<boolean>();
   @Output() replaceCheckedChange = new EventEmitter<boolean>();
 
   public warningTitle = WARNING_TITLE;

@@ -68,13 +68,13 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
     if(!this.filters){
       this.filters ={}
     }
-     this.filters.tab = this.activeTab;
+    let tab= this.activeTab;
     this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab] + ' '+ this.generateDateTime(this.datePipe);
     this.store.dispatch(
       new ExportCandidateAssignment(
         new ExportPayload(
           fileType,
-          { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
+          {  tab,...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
           options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
           null,
           options?.fileName || this.defaultFileName

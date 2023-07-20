@@ -47,11 +47,13 @@ const AllOrdersFilterFormConfig: CommonFormConfig[] = [
   { field: 'openPositions' },
   { field: 'jobStartDate' },
   { field: 'jobEndDate' },
+  { field: 'orderLocked' },
 ];
 
 const PerDiemFilterFormConfig: CommonFormConfig[] = [
   ...CommonFields,
   { field: 'openPositions' },
+  { field: 'orderLocked' },
 ];
 
 const PermPlacementFilterFormConfig: CommonFormConfig[] = [
@@ -59,6 +61,7 @@ const PermPlacementFilterFormConfig: CommonFormConfig[] = [
   { field: 'annualSalaryRangeFrom' },
   { field: 'annualSalaryRangeTo' },
   { field: 'jobStartDate' },
+  { field: 'orderLocked' },
 ];
 
 const ReOrderFilterFormConfig: CommonFormConfig[] = [

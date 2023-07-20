@@ -211,7 +211,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   get desktopSmallMenu(): { text: string }[] {
     let menu: { text: string }[] = [];
 
-    if (!this.canCloseOrder && !this.disableCloseOrder && this.activeSystem !== this.systemType.IRP) {
+    if (!this.disableCloseOrder && this.activeSystem !== this.systemType.IRP) {
       menu = [...menu, { text: MobileMenuItems.CloseOrder }];
     }
     if (this.canReOpen) {

@@ -1,5 +1,34 @@
 @import 'adaptive-response';
 
+@mixin smallDesktopMenu {
+  .custom-order-btn {
+    display: none !important;
+  }
+
+  .menu-desktop-small {
+    display: inline-block !important;
+  }
+}
+
+@mixin smallTabletMenu {
+  .dialog-controls {
+    display: flex !important;
+  }
+
+  button:not(.close-button, .menu-mobile, .edit-button),
+  .vertical-divider {
+    display: none !important;
+  }
+
+  .menu-tablet {
+    display: inline-block !important;
+  }
+
+  .menu-desktop-small {
+    display: none !important;
+  }
+}
+
 @media #{$min-desktop-small} {
   #main {
     container-type: inline-size;
@@ -8,34 +37,23 @@
 
   .order-details-dialog {
     .open-per-diem-order {
-      @container (max-width: 1580px) {
-        .custom-order-btn {
-          display: none;
-        }
-
-        .menu-desktop-small {
-          display: inline-block !important;
-        }
+      @container (max-width: 1775px) {
+        @include smallDesktopMenu();
       }
 
-      @container(max-width: 933px) {
-        .dialog-controls {
-          display: flex !important;
-        }
-
-        button:not(.close-button, .menu-mobile, .edit-button),
-        .vertical-divider {
-          display: none !important;
-        }
-
-        .menu-tablet {
-          display: inline-block !important;
-        }
-
-        .menu-desktop-small {
-          display: none !important;
-        }
+      @container(max-width: 1142px) {
+        @include smallTabletMenu();
       }
+    }
+  }
+
+  .traveler-order {
+    @container (max-width: 1500px) {
+      @include smallDesktopMenu();
+    }
+
+    @container(max-width: 885px) {
+      @include smallTabletMenu();
     }
   }
 }

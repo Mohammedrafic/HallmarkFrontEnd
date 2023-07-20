@@ -469,6 +469,11 @@ export const MENU_CONFIG: any = {
       icon: 'trending-up',
       route: '/reporting/custom-report',
     },
+    102: {
+      // Position-Summary
+      icon: '',
+      route: '/analytics/Position-Summary',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -1148,6 +1153,11 @@ export const MENU_CONFIG: any = {
       icon: 'trending-up',
       route: '/reporting/custom-report',
     },
+  101: {
+    // Position-Summary
+    icon: '',
+    route: '/analytics/Position-Summary',
+  },
   },
 
   [BusinessUnitType.Agency]: {

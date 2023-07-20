@@ -1,46 +1,49 @@
 import { DateTimeHelper } from '@core/helpers';
-import { RecordFields, RecordsMode } from './../enums';
+import { MappedRecordsType } from '../constants';
+import { RecordFields, RecordsMode } from '../enums';
 import {
-  AddRecordDto, AddTimsheetForm, PutRecord, PutRecordDto, RawTimsheetRecordsDto, RecordValue, TimesheetRecordsDto,
+  AddRecordDto, AddTimesheetForm, PutRecord, PutRecordDto, RawTimesheetRecordsDto, RecordDto, RecordValue,
+  TimesheetRecordsDto,
 } from '../interface';
-import { MapedRecordsType } from '../constants';
 
 export class RecordsAdapter {
   static adaptRecordPutDto(
-    diffs: RecordValue[], orgId: number, sheetId: number, type: RecordFields, delIds: number[]): PutRecordDto {
+    recordsToUpdate: RecordValue[], orgId: number, sheetId: number, type: RecordFields, delIds: number[]): PutRecordDto {
     return {
       timesheetId: sheetId,
       organizationId: orgId,
-      type: MapedRecordsType[type],
+      type: MappedRecordsType[type],
       deleteIds: delIds,
-      records: diffs.map((item) => this.adaptRecordToPut(item)),
+      records: recordsToUpdate.map((record) => this.adaptRecordToPut(record)),
     };
   }
 
   static adaptRecordAddDto(
-    data: AddTimsheetForm,
+    data: AddTimesheetForm,
     orgId: number,
     sheetId: number,
     type: RecordFields,
     timeIsNull: boolean,
     ): AddRecordDto {
-
+    // Lines 28-32 timeIn and timeOut get converted form Date object to string here.
     if (type === RecordFields.Time) {
-      data.timeIn = data.timeIn ? DateTimeHelper.setUtcTimeZone(data.timeIn) : DateTimeHelper.setUtcTimeZone(data.day as Date);
+      data.timeIn = data.timeIn ? DateTimeHelper.setUtcTimeZone(data.timeIn)
+      : DateTimeHelper.setUtcTimeZone(data.day as Date);
       data.timeOut =  data.timeOut ?  data.timeOut : DateTimeHelper.setUtcTimeZone(data.day as Date);
       data.day = DateTimeHelper.setUtcTimeZone(data.day as Date);
     }
 
+    // As day may differ timeIn date should be the same.
     if (data.day && data.timeIn) {
-      data.timeIn = this.getDateFromParts(DateTimeHelper.setUtcTimeZone(data.day), data.timeIn);
+      data.timeIn = this.getDateFromParts(DateTimeHelper.setUtcTimeZone(data.day), data.timeIn as string);
     }
 
     if (data.timeOut) {
-      data.timeOut = RecordsAdapter.checkTimeOutDate(data.timeIn, data.timeOut);
+      data.timeOut = RecordsAdapter.checkTimeOutDate(data.timeIn as string, data.timeOut as string);
     }
 
     if (type === RecordFields.Miles) {
-      data.timeIn = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(data.timeIn));
+      data.timeIn = DateTimeHelper.setUtcTimeZone(DateTimeHelper.setInitDateHours(data.timeIn));
     }
 
     if (type === RecordFields.Time) {
@@ -50,57 +53,57 @@ export class RecordsAdapter {
     const dto: AddRecordDto = {
       timesheetId: sheetId,
       organizationId: orgId,
-      type: MapedRecordsType[type],
+      type: MappedRecordsType[type],
       ...data,
       isTimeInNull: timeIsNull,
-    };
+    } as AddRecordDto;
 
     return dto;
   }
 
-  static adaptRecordsDto(data: RawTimsheetRecordsDto): TimesheetRecordsDto {
+  static adaptRecordsDto(data: RawTimesheetRecordsDto): TimesheetRecordsDto {
     const records: TimesheetRecordsDto = {
       [RecordFields.Time]: {
-        [RecordsMode.Edit]: data.timesheets.map((item: RecordValue) => {
-          const record = item;
-          record.day = item['timeIn'] as string;
-          record.isTimeInNull = !!item['isTimeInNull'];
-
-          return record;
+        [RecordsMode.Edit]: data.timesheets.map((item: RecordDto) => {
+          return ({
+            ...item,
+            day: item.timeIn,
+            isTimeInNull: !!item['isTimeInNull'],
+          });
         }),
-        [RecordsMode.View]: data.timesheetsCalculated.map((item: RecordValue) => {
-          const record = item;
-          record.day = item['timeIn'] as string;
-
-          return record;
+        [RecordsMode.View]: data.timesheetsCalculated.map((item: RecordDto) => {
+          return ({
+            ...item,
+            day: item.timeIn,
+          });
         }),
       },
       [RecordFields.Miles]: {
-        [RecordsMode.Edit]: data.miles.map((item: RecordValue) => {
-          const record = item;
-          record.day = item['timeIn'] as string;
-
-          return record;
+        [RecordsMode.Edit]: data.miles.map((item: RecordDto) => {
+          return ({
+            ...item,
+            day: item.timeIn,
+          });
         }),
-        [RecordsMode.View]: data.milesCalculated.map((item: RecordValue) => {
-          const record = item;
-          record.day = item['timeIn'] as string;
-
-          return record;
+        [RecordsMode.View]: data.milesCalculated.map((item: RecordDto) => {
+          return ({
+            ...item,
+            day: item.timeIn,
+          });
         }),
       },
       [RecordFields.Expenses]: {
-        [RecordsMode.Edit]: data.expenses.map((item: RecordValue) => {
-          const record = item;
-          record.day = item['timeIn'] as string;
-
-          return record;
+        [RecordsMode.Edit]: data.expenses.map((item: RecordDto) => {
+          return ({
+            ...item,
+            day: item.timeIn,
+          });
         }),
-        [RecordsMode.View]: data.expensesCalculated.map((item: RecordValue) => {
-          const record = item;
-          record.day = item['timeIn'] as string;
-
-          return record;
+        [RecordsMode.View]: data.expensesCalculated.map((item: RecordDto) => {
+          return ({
+            ...item,
+            day: item.timeIn,
+          });
         }),
       },
     };
@@ -125,28 +128,24 @@ export class RecordsAdapter {
     return {
       id: record.id,
       timeIn: DateTimeHelper.setUtcTimeZone(timeIn),
-      isTimeInNull: !record.timeIn,
+      isTimeInNull: !record.timeOut,
       billRateConfigId: record.billRateConfigId,
       departmentId: record.departmentId,
       value: record.value,
-      description: record.description,
       timeOut: record.timeOut ? RecordsAdapter.checkTimeOutDate(timeIn, record.timeOut) : null,
-      ...record.description && { description: record.description },
-      ...Object.prototype.hasOwnProperty.call(record, 'hadLunchBreak') && { hadLunchBreak: record.hadLunchBreak },
+      ...record.description ? { description: record.description } : {},
+      ...Object.prototype.hasOwnProperty.call(record, 'hadLunchBreak') ?  { hadLunchBreak: record.hadLunchBreak } : {},
     };
   }
 
   private static checkTimeOutDate(timeIn: string, timeOut: string): string {
-    const dtaIn = DateTimeHelper.setUtcTimeZone(timeIn);
+    const dateIn = DateTimeHelper.setUtcTimeZone(timeIn);
     let dateOut = DateTimeHelper.setUtcTimeZone(timeOut);
-    dateOut = this.getDateFromParts(dtaIn, dateOut);
+    dateOut = this.getDateFromParts(dateIn, dateOut);
 
-    if (dtaIn >= dateOut) {
+    // if date in more then date out it means that time out is on another day.
+    if (dateIn >= dateOut) {
       return new Date(new Date(dateOut).setDate(new Date(dateOut).getDate() + 1)).toISOString();
-    }
-
-    if ((Math.abs(new Date(dateOut).getTime() - new Date(dtaIn).getTime()) / 3600000) >= 24) {
-      return new Date(new Date(dateOut).setDate(new Date(dateOut).getDate() - 1)).toISOString();
     }
 
     return dateOut;

@@ -5,8 +5,12 @@
 
   .e-card-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
+
+    &:has(.replacement-checkbox) {
+      justify-content: space-between;
+    }
     
     .bootstrap.replacement-checkbox {
       ::ng-deep {

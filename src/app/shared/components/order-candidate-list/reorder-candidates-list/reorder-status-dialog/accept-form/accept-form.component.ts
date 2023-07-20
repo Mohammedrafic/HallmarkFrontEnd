@@ -47,7 +47,9 @@ export class AcceptFormComponent implements OnChanges{
   get showPercentage(): boolean {
     return this.penaltyCriteriaControlValue === PenaltiesMap[PenaltyCriteria.RateOfHours];
   }
-
+  get verifyNoPenalty(): boolean {
+    return this.penaltyCriteriaControlValue != PenaltiesMap[PenaltyCriteria.NoPenalty];
+  }
   get showHourlyRate(): boolean {
     return showHourlyRateForStatuses.includes(this.status);
   }

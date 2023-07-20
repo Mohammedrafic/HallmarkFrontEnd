@@ -1,15 +1,16 @@
-export interface AddTimsheetForm {
-  timeIn: string;
-  timeOut: string;
+export interface AddTimesheetForm {
+  timeIn: string | Date;
+  timeOut?: string | Date;
   departmentId: number;
-  billRateConfigId: number;
-  amount: number;
-  description: string;
-  hadLunchBreak: boolean;
+  billRateConfigId?: number;
+  amount?: number;
+  description?: string;
+  hadLunchBreak?: boolean;
   day?: Date | string;
+  value?: number;
 }
 
-export interface TimsheetForm {
+export interface TimesheetForm {
   searchTerm: string;
   orderIds: string[];
   statusIds: string[];

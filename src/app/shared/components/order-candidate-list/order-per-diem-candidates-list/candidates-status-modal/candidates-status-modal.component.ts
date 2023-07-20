@@ -157,7 +157,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public candidateDOBRequired :boolean;
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
-
+  public saveStatus:number =0;
   get templateEmailTitle(): string {
     return "Onboarding Email";
   }
@@ -234,6 +234,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   }
 
   public saveHandler(event: { itemData: { applicantStatus: ApplicantStatusEnum; statusText: string } | null }): void {
+    this.saveStatus = event.itemData ? event.itemData?.applicantStatus : 0;
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.onReject();
     } else {
@@ -488,7 +489,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed))
       .subscribe(() => 
       {
-        if(this.selectedApplicantStatus?.applicantStatus === ApplicantStatusEnum.OnBoarded){
+        if(this.saveStatus === ApplicantStatusEnum.OnBoarded){
           const options = {
               title: ONBOARD_CANDIDATE,
               okButtonLabel: 'Yes',

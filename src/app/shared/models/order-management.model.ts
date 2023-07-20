@@ -321,7 +321,7 @@ export type AgencyOrderFilters = {
   orderPublicId?: string | null;
   reOrderId?: number;
   skillIds?: number[];
-  candidateStatuses?: number[];
+  candidateStatuses?: string[];
   candidatesCountFrom?: number | null;
   candidatesCountTo?: number | null;
   organizationIds?: number[];
@@ -345,6 +345,7 @@ export type AgencyOrderFilters = {
   projectNameIds?: number | null;
   poNumberIds?: number | null;
   shift?: string | string[];
+  orderLocked? : any | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -407,6 +408,7 @@ export interface IRPMetaData {
   skillName: string;
   skillId: number;
   orderOpenDate: Date;
+  linkedId: string | null;
 }
 
 export class Order {
@@ -503,6 +505,7 @@ export class Order {
   externalCommentsConfiguration?:boolean | null;
   activeCandidatesCount?: number;
   isLockedIRP?: boolean;
+  linkedId: string | null;
 }
 
 export class ReOrder {
@@ -694,7 +697,7 @@ export class OrderFilter {
   jobStartDate?: Date | null;
   jobEndDate?: Date | null;
   orderStatuses?: (string | number)[];
-  candidateStatuses?: number[];
+  candidateStatuses?: string[];
   candidatesCountFrom?: number | null;
   candidatesCountTo?: number | null;
   agencyIds?: number[];
@@ -721,6 +724,7 @@ export class OrderFilter {
   reorderStatuses?: (string | number)[];
   shift?: string[] | string;
   isQuickLinkWidgetLTA?: boolean | null;
+  orderLocked? : any | null;
 }
 
 export class SortModel {
@@ -754,6 +758,7 @@ export class FilterOrderStatus {
 export class FilterStatus {
   status: number;
   statusText: string;
+  filterStatus?: string;
 }
 
 export class OrderFilterDataSource {
@@ -866,3 +871,5 @@ export class OnboardCandidateEmail {
   businessUnitId ?: number;
 
 }
+
+export type MergedOrder = AgencyOrderManagement & Order;

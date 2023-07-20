@@ -133,6 +133,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public isActiveCandidateDialog$: Observable<boolean>;
   public showHoursControl = false;
   public showPercentage = false;
+  public verifyNoPenalty = false;
   public orderPermissions: CurrentUserPermission[];
   public canShortlist = false;
   public canInterview = false;
@@ -145,6 +146,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
   public readonly reorderType: OrderType = OrderType.ReOrder;
   public canCreateOrder:boolean;
+  public saveStatus: number = 0;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -421,23 +423,28 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                 })
               );
               this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
-                  const options = {
-                      title: ONBOARD_CANDIDATE,
-                      okButtonLabel: 'Yes',
-                      okButtonClass: 'ok-button',
-                      cancelButtonLabel: 'No'
-                  };
-                  this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
-                      .subscribe((isConfirm) => {
-                        if(isConfirm){
-                          this.onboardEmailTemplateForm.rteCreated();
-                          this.onboardEmailTemplateForm.disableControls(true);
-                          this.store.dispatch(new ShowGroupEmailSideDialog(true));
-                        }else{
-                          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-                          this.closeDialog();
-                        }
-                      });
+                if(this.saveStatus === ApplicantStatusEnum.OnBoarded){
+                      const options = {
+                        title: ONBOARD_CANDIDATE,
+                        okButtonLabel: 'Yes',
+                        okButtonClass: 'ok-button',
+                        cancelButtonLabel: 'No'
+                      };
+                      this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+                          .subscribe((isConfirm) => {
+                            if(isConfirm){
+                              this.onboardEmailTemplateForm.rteCreated();
+                              this.onboardEmailTemplateForm.disableControls(true);
+                              this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                            }else{
+                              this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+                              this.closeDialog();
+                            }
+                          });
+                }else{
+                  this.closeDialog();
+                  this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+                }                
 
               });
               // this.closeDialog();
@@ -470,7 +477,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       .pipe(
         takeUntil(this.unsubscribe$),
       ).subscribe((value) => {
-        console.log('this.candidateJob',value);
         this.candidateJob = value;
 
         if (value) {
@@ -483,7 +489,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
-          const actualEnd = this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
+
+          const actualEnd = value.actualEndDate ||
+          this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
             jobStartDate: value.order.jobStartDate,
             jobEndDate: value.order.jobEndDate,
           }).toString();
@@ -685,6 +693,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
+    this.saveStatus = event.itemData ? event.itemData.applicantStatus : 0;
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded || event.itemData === null) {
       this.onAccept();
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
@@ -740,6 +749,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+    this.verifyNoPenalty = value === PenaltyCriteria.NoPenalty;
   }
 
   private switchFormState(): void {

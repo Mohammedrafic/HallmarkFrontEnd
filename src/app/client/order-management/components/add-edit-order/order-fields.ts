@@ -17,6 +17,7 @@ enum CommonInfo {
   orderType,
   id,
   isQuickOrder,
+  linkedId,
 }
 
 enum ContactToPermTravelerGeneralInfo {

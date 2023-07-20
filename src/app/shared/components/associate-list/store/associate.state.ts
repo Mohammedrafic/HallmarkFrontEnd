@@ -131,7 +131,10 @@ export class AssociateListState {
     return this.associateService.deleteAssociateOrganizationsAgencyById(id).pipe(
       tap(() => {
         patchState({ associateListPage });
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+        dispatch([
+          new TiersException.GetAssociateAgencyOrg(),
+          new ShowToast(MessageTypes.Success, RECORD_DELETE),
+        ]);
       })
     );
   }
@@ -309,8 +312,11 @@ export class AssociateListState {
         };
 
         patchState({ associateListPage });
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
-        dispatch(new TiersException.InviteOrganizationsSucceeded(payload));
+        dispatch([
+          new TiersException.GetAssociateAgencyOrg(),
+          new ShowToast(MessageTypes.Success, RECORD_SAVED),
+          new TiersException.InviteOrganizationsSucceeded(payload)
+        ]);
       })
     );
   }

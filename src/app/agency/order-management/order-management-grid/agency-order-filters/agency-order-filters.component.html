@@ -141,7 +141,7 @@
           mode="CheckBox"
           formControlName="candidateStatuses"
           placeholder="All"
-          [fields]="statusFields"
+          [fields]="filterStatusFields"
           [allowFiltering]="true"
           [showDropDownIcon]="true"
           [dataSource]="filterColumns.candidateStatuses.dataSource"
@@ -166,7 +166,15 @@
       </div>
     </div>
   </div>
-  <div>
+  <div  class="row">
+    <div class="input-container" *ngIf="activeTab != AgencyOrderManagementTabs.ReOrders">
+      <label>Order Lock</label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist  formControlName="orderLocked" [fields]="optionFields"
+            placeholder="All" [allowFiltering]="true" [dataSource]="orderLockList">
+        </ejs-dropdownlist>
+      </div>
+    </div>
     <div class="input-container">
       <label>Special Project Category</label>
       <div class="input-group multiselect">

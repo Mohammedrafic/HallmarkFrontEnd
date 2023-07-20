@@ -1,0 +1,100 @@
+<div class="workflow-steps" *ngIf="workflowsList.orderWorkflow">
+  <p class="title">Order workflow</p>
+  <ng-container *ngFor="let workflow of workflowsList.orderWorkflow.steps; trackBy:trackByWorkflow">
+    <ng-container *ngTemplateOutlet="defaultSteps; context: { workflow: workflow }"></ng-container>
+  </ng-container>
+</div>
+<div class="workflow-steps" *ngIf="workflowsList.applicationWorkflow">
+  <p class="title">Application Workflow</p>
+  <ng-container *ngFor="let workflow of workflowsList.applicationWorkflow.steps; trackBy:trackByWorkflow">
+    <ng-container *ngTemplateOutlet="defaultSteps; context: { workflow: workflow }"></ng-container>
+  </ng-container>
+</div>
+
+
+<ng-template
+  #defaultSteps
+  let-workflow="workflow"
+>
+  <div class="e-card group bootstrap">
+    <div class="input-container">
+      <label class="initial-step-label">Step</label>
+      <div class="input-group input-readonly">
+        <input
+          class="e-input"
+          type="text"
+          readonly
+          [value]="workflow?.name"
+        />
+      </div>
+    </div>
+
+    <div class="input-container with-padding">
+      <label>Current Status</label>
+      <div class="input-group input-readonly">
+        <input
+          class="e-input"
+          type="text"
+          readonly
+          [placeholder]="workflow?.status"
+        />
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="customStepsForm" *ngIf="customStepsForm.controls[workflow.formStepName]">
+    <div
+      formArrayName="{{workflow.formStepName}}"
+      *ngFor="let steps of customStepsForm.controls[workflow.formStepName]?.value; let i = index; trackBy: trackByStep"
+    >
+      <ng-container [formArrayName]="i">
+        <div class="e-card group child bootstrap">
+          <div class="input-container">
+            <label>Custom Step <span class="required">*</span></label>
+            <div class="input-group workflow">
+              <input
+                class="e-input"
+                type="text"
+                maxlength="50"
+                appValidateWithMessage
+                formControlName="name"
+              />
+            </div>
+          </div>
+          <div class="input-container with-padding">
+            <label>Current Status <span class="required">*</span></label>
+            <div class="input-group workflow">
+              <input
+                class="e-input"
+                type="text"
+                maxlength="50"
+                appValidateWithMessage
+                formControlName="status"
+              />
+            </div>
+          </div>
+
+          <div class="remove-custom-step-button with-padding">
+            <button
+              ejs-button
+              cssClass="e-flat default-icon-button"
+              [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
+              (click)="removeCustomStep(i, workflow.formStepName)"
+            >
+              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </form>
+
+  <div class="button-container" *ngIf="workflow.canBeFollowedByCustomStep">
+    <button
+      ejs-button
+      [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
+      cssClass="e-flat button-with-icon"
+      (click)="createCustomStep(workflow)"
+    ><i-feather name="plus" class="icon"></i-feather> Add Custom Step</button>
+  </div>
+</ng-template>

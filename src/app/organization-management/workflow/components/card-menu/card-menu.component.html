@@ -3,7 +3,7 @@
     <div
       class="card e-card"
       [ngClass]="{ 'active-card': card.isActive }"
-      (click)="onCardClick(card)"
+      (click)="selectCard(card)"
     >
       <div class="input-container bootstrap">
         <h4>{{card.name}}</h4>
@@ -14,9 +14,9 @@
   <div class="button-container">
     <button
       ejs-button
-      [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
+      [disabled]="userPermission"
       cssClass="e-flat button-with-icon"
-      (click)="onAddNewWorkflowClick()"
+      (click)="createNewWorkflow()"
     ><i-feather name="plus" class="icon"></i-feather> Add New Workflow</button>
   </div>
 </div>

@@ -9,4 +9,5 @@ export enum PenaltyCriteria {
   FlatRate,
   RateOfHours,
   FlatRateOfHours,
+  NoPenalty
 }

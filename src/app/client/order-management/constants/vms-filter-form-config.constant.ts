@@ -54,6 +54,7 @@ const AllOrdersFilterFormConfig: CommonFormConfig[] = [
   { field: 'projectNameIds' },
   { field: 'poNumberIds' },
   { field: 'contactEmails' },
+  { field: 'orderLocked' },
 ];
 
 const PerdiemFormConfig: CommonFormConfig[] = [
@@ -72,6 +73,7 @@ const PerdiemFormConfig: CommonFormConfig[] = [
   { field: 'distributedOnFrom' },
   { field: 'distributedOnTo' },
   { field: 'agencyType' },
+  { field: 'orderLocked' },
 ];
 
 const PermPlacementFormConfig: CommonFormConfig[] = [
@@ -94,6 +96,7 @@ const PermPlacementFormConfig: CommonFormConfig[] = [
   { field: 'distributedOnFrom' },
   { field: 'distributedOnTo' },
   { field: 'agencyType' },
+  { field: 'orderLocked' },
 ];
 
 const ReorderFormConfig: CommonFormConfig[] = [

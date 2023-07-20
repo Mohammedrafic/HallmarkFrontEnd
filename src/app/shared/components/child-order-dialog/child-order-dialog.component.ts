@@ -95,6 +95,7 @@ import {
   ApplicantStatus as ApplicantStatusModel,
   CandidateCancellationReason,
   CandidateCancellationReasonFilter,
+  MergedOrder,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
@@ -122,8 +123,6 @@ enum Template {
   onboarded,
   offerDeployment,
 }
-
-type MergedOrder = AgencyOrderManagement & Order;
 
 enum MobileMenuItems {
   AddExtension = 'Add Extension',

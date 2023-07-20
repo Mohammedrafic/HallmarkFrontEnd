@@ -15,7 +15,7 @@ import { OrganizationLocation, OrganizationRegion } from '@shared/models/organiz
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { getDepartmentFromLocations, getLocationsFromRegions } from './agency-order-filters.utils';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { AgencyOrderManagementTabs, orderLockList } from '@shared/enums/order-management-tabs.enum';
 import { CandidatesStatusText, FilterOrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { placeholderDate } from '@shared/constants/placeholder-date';
@@ -25,6 +25,7 @@ import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
+import { AllCandidateStatuses, filterOrderLockList } from '@client/order-management/constants';
 
 enum RLDLevel {
   Orginization,
@@ -61,7 +62,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
   public readonly shiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
+  public orderLockList = orderLockList;
   public readonly formatDate = formatDate;
   public readonly placeholderDate = placeholderDate;
   public readonly datepickerMask = datepickerMask;
@@ -75,7 +76,10 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     text: 'statusText',
     value: 'status',
   };
-
+  public filterStatusFields = {
+    text: 'filterStatus',
+    value: 'filterStatus',
+  };
   get regionIdsControl(): AbstractControl {
     return this.form.get('regionIds') as AbstractControl;
   }
@@ -230,7 +234,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
           statuses = orderStatuses.map(data => data.status);
-          candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
+          candidateStatusesData = candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status));
         }
 
         this.filterColumns.organizationIds.dataSource = partneredOrganizations;
@@ -286,6 +290,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       projectNameIds: new FormControl(null),
       poNumberIds: new FormControl(null),
       shift: new FormControl(null),
+      orderLocked: new FormControl(null),
     });
   }
 
@@ -338,8 +343,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'statusText',
-        valueId: 'status',
+        valueField: 'filterStatus',
+        valueId: 'filterStatus',
       },
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
@@ -388,6 +393,13 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      orderLocked: {
+        type: ControlTypes.Dropdown,
+        valueType: ValueType.Id,
+        dataSource: filterOrderLockList,
         valueField: 'name',
         valueId: 'id',
       },
