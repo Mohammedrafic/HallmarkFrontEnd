@@ -140,7 +140,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
-  @Input() activeSystem: OrderManagementIRPSystemId;
+  @Input() activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
   @Input() orderComments: Comment[] = [];
   @Output() saveEmitter = new EventEmitter<void>();
 
