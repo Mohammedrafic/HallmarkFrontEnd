@@ -4,7 +4,6 @@
     <div class='two-controls'>
       <app-input
         [formGroupInstance]="candidateForm"
-        [required]=!isSourceValidated
         maxlength="25"
         controlName="employeeId"
         id="employeeId"
@@ -150,32 +149,35 @@
   </div>
   <div class="row">
     <app-input
+    *ngIf="isSourceValidated"
       [formGroupInstance]="candidateForm"
-      [required]="true"
       maxlength="50"
-      controlName="sourceId"
+      controlName="employeeSourceId"
       id="sourceId"
-      label="Source Id"
+      label="Source ID"
+      [required]="isSourceConfig"
     ></app-input>
 
     <app-dropdown
+    *ngIf="isSourceValidated"
       [dataSource]="recruitContent"
       [fields]="fieldsSettings"
       [formGroupInstance]="candidateForm"
       [hideBorder]="false"
       label="Recruiter"
       id="recruit-id"
-      controlName="recruitId"
+      controlName="recruiterId"
     ></app-dropdown>
 
     <app-dropdown
+    *ngIf="isSourceValidated"
       [dataSource]="sourceContent"
       [fields]="fieldsSettings"
       [formGroupInstance]="candidateForm"
       [hideBorder]="false"
       label="Sources"
       id="source-id"
-      controlName="sourceDropdownId"
+      controlName="sourceId"
     ></app-dropdown>
   </div>
 

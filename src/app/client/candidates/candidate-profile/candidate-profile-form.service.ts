@@ -45,7 +45,6 @@ export class CandidateProfileFormService {
     return this.formBuilder.group(
       {
         employeeId: [null, [Validators.required, Validators.maxLength(25)]],
-        sourceId: [null, [Validators.required, Validators.maxLength(25)]],
         firstName: [null, [Validators.required, Validators.maxLength(50)]],
         middleName: [null, [Validators.maxLength(10)]],
         lastName: [null, [Validators.required, Validators.maxLength(50)]],
@@ -81,8 +80,9 @@ export class CandidateProfileFormService {
         phone2: [null],
         professionalSummary: [null, Validators.maxLength(500)],
         generalNotes: [],
-        sourceDropdownId: [SourceStatusEnum.Source1],
-        recruitId : [RecruitmentStatusEnum.Recruitment1]
+        employeeSourceId:[],
+        sourceId: [],
+        recruiterId : []
       },
       { validators: greaterThanValidator('contractStartDate', 'contractEndDate') }
     );
@@ -137,4 +137,5 @@ export class CandidateProfileFormService {
 
     return { ...candidate, ...datesWithUtc };
   }
+
 }

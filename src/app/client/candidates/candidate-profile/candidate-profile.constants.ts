@@ -3,7 +3,14 @@ export enum ProfileStatusesEnum {
   Active,
   OnHold,
   Terminated,
-  Sourcing
+  Sourcing,
+  Prospect,
+  VerbalOfferMade,
+  Onboarding,
+  ClearedForOrientation,
+  OrientationScheduled,
+  DoNotHire,
+  FallOffOnboarding
 }
 
 export enum RecruitmentStatusEnum {
@@ -23,7 +30,14 @@ export const ProfileStatuses = [
   { id: ProfileStatusesEnum.Inactive, name: 'Inactive' },
   { id: ProfileStatusesEnum.OnHold, name: 'On Hold' },
   { id: ProfileStatusesEnum.Terminated, name: 'Terminated' },
-  { id: ProfileStatusesEnum.Sourcing, name: 'Sourcing'}
+  { id: ProfileStatusesEnum.Sourcing, name: 'Sourcing' },
+  { id: ProfileStatusesEnum.Prospect, name: 'Prospect' },
+  { id: ProfileStatusesEnum.VerbalOfferMade, name: 'Verbal Offer Made' },
+  { id: ProfileStatusesEnum.Onboarding, name: 'Onboarding' },
+  { id: ProfileStatusesEnum.ClearedForOrientation, name: 'Cleared For Orientation' },
+  { id: ProfileStatusesEnum.OrientationScheduled, name: 'Orientation Scheduled' },
+  { id: ProfileStatusesEnum.DoNotHire, name: 'Do Not Hire' },
+  { id: ProfileStatusesEnum.FallOffOnboarding, name: 'Fall Off Onboarding' }
 ];
 
 export const recruitContent = [

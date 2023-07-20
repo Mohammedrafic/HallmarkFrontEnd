@@ -120,4 +120,5 @@ export class CandidateListService {
       credType: filters.credType || [],
     });
   }
+ 
 }

@@ -46,6 +46,7 @@ export class CandidateListState {
     return state.listOfRegions;
   }
 
+ 
   constructor(private candidateListService: CandidateListService) {}
 
   @Action(CandidateListActions.GetCandidatesByPage, { cancelUncompleted: true })

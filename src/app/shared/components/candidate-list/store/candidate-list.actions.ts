@@ -49,3 +49,7 @@ export class SetTableState {
 export class ClearTableState {
   static readonly type = '[candidate list] Clear candidates table state';
 }
+
+export class SourceConfig{
+  static readonly type ='[candidate list] Get Sourcing Config';
+}

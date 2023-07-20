@@ -8,7 +8,8 @@ import { UnavailabilityValue } from '@organization-management/reasons/interfaces
 import { PageOfCollections } from '@shared/models/page.model';
 import { Penalty, PenaltyPage, PenaltyPayload } from '@shared/models/penalty.model';
 import {
-  RejectReason, RejectReasonPage, RejectReasonwithSystem, UnavailabilityPaging, UnavailabilityReasons,
+  RecuriterReasonPage,
+  RejectReason, RejectReasonPage, RejectReasonwithSystem, SourcingReasonPage, UnavailabilityPaging, UnavailabilityReasons,
 } from '@shared/models/reject-reason.model';
 
 /**
@@ -262,4 +263,78 @@ export class RejectReasonService {
   }
 
 
+
+
+  //Recuriter-Reasons
+   /**
+   * Save Recuriter
+   * @param payload
+   */
+   public saveRecuriterReasons(payload: {reason: string}): Observable<RejectReason> {
+    return this.http.post<RejectReason>('/api/Recruiters', payload);
+  }
+
+  /**
+   * Remove Recuriter
+   * @param id
+   */
+  public removeRecuriterReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/Recruiters?id=${id}`);
+  }
+
+  /**
+   * Update Recuriter
+   * @param payload
+   */
+  public updateRecuriterReason(payload: RejectReason): Observable<void> {
+    return this.http.put<void>('/api/Recruiters', payload);
+  }
+
+
+  /**
+   * Get reasons by page number
+   * @param pageNumber
+   * @param pageSize
+   */
+  public getRecuriterReasonsByPage(pageNumber: number, pageSize: number): Observable<RecuriterReasonPage> {
+    return this.http.get<RecuriterReasonPage>(`/api/Recruiters?PageNumber=${pageNumber}&PageSize=${pageSize}`);
+  }
+
+
+  //Sourcing
+  
+  //Sourcing-Reasons
+   /**
+   * Save Sourcing
+   * @param payload
+   */
+   public saveSourcingReasons(payload: {reason: string}): Observable<RejectReason> {
+    return this.http.post<RejectReason>('/api/Sourcing', payload);
+  }
+
+  /**
+   * Remove Sourcing
+   * @param id
+   */
+  public removeSourcingReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/Sourcing?id=${id}`);
+  }
+
+  /**
+   * Update Sourcing
+   * @param payload
+   */
+  public updateSourcingReason(payload: RejectReason): Observable<void> {
+    return this.http.put<void>('/api/Sourcing', payload);
+  }
+
+
+  /**
+   * Get Sourcing by page number
+   * @param pageNumber
+   * @param pageSize
+   */
+  public getSourcingReasonsByPage(pageNumber: number, pageSize: number): Observable<SourcingReasonPage> {
+    return this.http.get<SourcingReasonPage>(`/api/Sourcing?PageNumber=${pageNumber}&PageSize=${pageSize}`);
+  }
 }
