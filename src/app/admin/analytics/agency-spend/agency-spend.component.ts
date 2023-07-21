@@ -109,7 +109,6 @@ export class AgencySpendComponent implements OnInit {
   public locationIdControl: AbstractControl;
   public departmentIdControl: AbstractControl;
   public organizationFields = ORGANIZATION_DATA_FIELDS;
-  public allOption = 'All';
   public candidateFilterData: { [key: number]: ScheduleCandidate }[] = [];
   candidateSearchData: ScheduleCandidate[] = [];
   public filterOptionData: StaffScheduleReportFilterOptions;
@@ -164,7 +163,7 @@ export class AgencySpendComponent implements OnInit {
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
       this.initMonthYearDropdown();
-      this.onFilterControlValueChangedHandler();
+      this.handleFilterControlValueChange();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
 
@@ -293,12 +292,12 @@ export class AgencySpendComponent implements OnInit {
 
   public showFilters(): void {
     if (this.isLoadNewFilter) {
-      this.onFilterControlValueChangedHandler();
+      this.handleFilterControlValueChange();
     }
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
-  public onFilterControlValueChangedHandler(): void {
+  public handleFilterControlValueChange(): void {
     this.bussinessControl = this.agentSpendReportForm.get(
       analyticsConstants.formControlNames.BusinessIds
     ) as AbstractControl;
@@ -389,9 +388,7 @@ export class AgencySpendComponent implements OnInit {
         this.changeDetectorRef.detectChanges();
 
         if (this.isInitialLoad) {
-          setTimeout(() => {
-            this.searchReport();
-          }, 3000);
+          this.searchReport();          
           this.isInitialLoad = false;
         }        
       });          
