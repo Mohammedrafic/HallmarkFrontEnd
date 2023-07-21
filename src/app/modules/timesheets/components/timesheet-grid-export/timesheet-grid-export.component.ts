@@ -29,7 +29,7 @@ export class TimesheetGridExportComponent extends AbstractGridConfigurationCompo
   public fileName = '';
   public defaultFileName = '';
  
-  public timeSheetColumnsToExport: ExportColumn[];
+  public timeSheetColumnsToExport = this.route.snapshot.data['isAgencyArea'] ? TimesheetsExportColsAgency : TimesheetsExportColsOrg;
 
   private selectedTabIndex = 0;
   private timesheetStatus: TimesheetStatus | null;
@@ -62,7 +62,6 @@ export class TimesheetGridExportComponent extends AbstractGridConfigurationCompo
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     const filters = this.store.selectSnapshot(TimesheetsState.timesheetsFilters);
-    this.timeSheetColumnsToExport = this.isAgency?TimesheetsExportColsAgency:TimesheetsExportColsOrg;
     const ids = this.selectedRows.selectedTimesheetIds?.length ? this.selectedRows.selectedTimesheetIds : null;
     const filterQuery = {
       ...filters,
