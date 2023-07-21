@@ -38,8 +38,3 @@ export const OrderDetailsValidationMessage = {
   position: { X: 'Center', Y: 'Top' },
   cssClass: 'error-toast',
 };
-
-export const OrderTypeTooltipMessage: Record<number, string> = {
-  [IrpOrderType.LongTermAssignment]: 'Long Term Assignment',
-  [IrpOrderType.PerDiem]: 'Per Diem',
-};

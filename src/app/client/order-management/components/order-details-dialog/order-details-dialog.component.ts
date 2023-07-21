@@ -583,7 +583,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           if (
             selectedOrder?.extensionFromId &&
             order?.items[isOrderPositionSelected.index ?? 0]?.candidateJobId &&
-            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.LongTermAssignment)
           ) {
             this.store.dispatch(
               new GetOrganizationExtensions(

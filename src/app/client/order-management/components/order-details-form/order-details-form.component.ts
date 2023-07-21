@@ -830,7 +830,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   private populateNewOrderForm(): void {
-    this.orderTypeForm.controls['orderType'].patchValue(OrderType.Traveler);
+    this.orderTypeForm.controls['orderType'].patchValue(OrderType.LongTermAssignment);
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
     this.jobDistributionForm.controls['jobDistribution'].patchValue(OrderJobDistribution.All);
 

@@ -828,7 +828,7 @@ export class OrderManagementContentState {
         let MESSAGE_TYPE = MessageTypes.Success;
         const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
         const hasntOrderBillRates =
-          ((order?.isQuickOrder && payload.orderType === OrderType.Traveler) ||
+          ((order?.isQuickOrder && payload.orderType === OrderType.LongTermAssignment) ||
             payload.orderType === OrderType.ContractToPerm) &&
           payload.billRates.length === 0;
 

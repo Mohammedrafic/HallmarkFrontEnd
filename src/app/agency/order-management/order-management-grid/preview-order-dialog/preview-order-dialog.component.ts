@@ -169,7 +169,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         if (
           order?.items[0]?.candidateJobId &&
           isOrderPositionSelected &&
-          (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+          (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.LongTermAssignment)
         ) {
           this.store.dispatch(
             new GetAgencyExtensions(order.items[0].candidateJobId, selectedOrder.id!, selectedOrder.organizationId!)

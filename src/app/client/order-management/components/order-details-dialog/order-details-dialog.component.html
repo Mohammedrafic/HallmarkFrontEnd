@@ -36,7 +36,7 @@
             class="e-card-content dialog-controls"
             [ngClass]="{
               'open-per-diem-order': order?.orderType === orderType.OpenPerDiem,
-              'traveler-order': order?.orderType === orderType.Traveler
+              'lta-order': order?.orderType === orderType.LongTermAssignment
             }"
           >
             <div class="order-actions" *ngIf="showApproveAndCancel">
@@ -241,7 +241,7 @@
             </e-tabitem>
             <e-tabitem
               *ngIf="
-                (order?.orderType === orderType.Traveler || order?.orderType === orderType.ContractToPerm) &&
+                (order?.orderType === orderType.LongTermAssignment || order?.orderType === orderType.ContractToPerm) &&
                 !isReOrder &&
                 order?.extensionFromId
               "

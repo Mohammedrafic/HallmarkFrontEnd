@@ -29,7 +29,7 @@ export class QuickOrderService {
 
   public createOrderTypeForm(): CustomFormGroup<OrderTypeDTO> {
     return this.formBuilder.group({
-      orderType: [OrderType.Traveler, Validators.required],
+      orderType: [OrderType.LongTermAssignment, Validators.required],
     }) as CustomFormGroup<OrderTypeDTO>;
   }
 

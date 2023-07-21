@@ -415,7 +415,7 @@
         </e-column>
         <e-column field="orderType" headerText="TYPE" textAlign="Center" width="85" minWidth="70" maxWidth="110">
           <ng-template #template let-data>
-            <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
+            <div class="order-type-column" *ngIf="orderTypeTooltipMessage[data.orderType] as orderType">
               <ejs-tooltip id="tooltip" [content]="orderType" position="TopCenter">
                 <span class="order-type-text-cell">{{ orderType[0] }}</span>
               </ejs-tooltip>

@@ -66,7 +66,7 @@ export enum JobDistributionOrderType {
   'Contract to perm' = 1,
   'Open per diem' = 2,
   'Perm placement' = 4,
-  'Traveler' = 5,
+  'LTA' = 5,
 }
 
 export type FeeExceptionsInitialData = {

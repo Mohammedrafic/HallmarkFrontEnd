@@ -71,7 +71,7 @@ import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
 import { AgencyOrderFiltersComponent } from './agency-order-filters/agency-order-filters.component';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
-import { OrderType } from '@shared/enums/order-type';
+import { OrderType, VmsOrderTypeTooltipMessage } from '@shared/enums/order-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PreviewOrderDialogComponent } from
@@ -165,6 +165,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
   public isLockMenuButtonsShown = true;
   public orderTypes = OrderType;
+  public orderTypeTooltipMessage = VmsOrderTypeTooltipMessage;
   public selectedRowRef: any;
   public openDetailsTab = false;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');

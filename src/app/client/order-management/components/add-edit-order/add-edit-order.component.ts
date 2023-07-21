@@ -434,7 +434,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   needToShowConfirmPopup(order: CreateOrderDto, hourlyRate: string): boolean {
     return (
-      (order.orderType === OrderType.ContractToPerm || order.orderType === OrderType.Traveler) &&
+      (order.orderType === OrderType.ContractToPerm || order.orderType === OrderType.LongTermAssignment) &&
       this.isZeroRate(hourlyRate)
     );
   }

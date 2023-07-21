@@ -157,7 +157,7 @@
       (pageSizeChangeEmitter)="gridPerPageChanged($event)"
     ></app-grid-pagination>
   </ng-container>
-  <ng-container *ngIf="system === systemType.IRP && selectedOrder.orderType === orderTypes.Traveler
+  <ng-container *ngIf="system === systemType.IRP && selectedOrder.orderType === orderTypes.LongTermAssignment
     && isFeatureIrpEnabled && !isAgency">
     <ejs-grid
       #orderCandidatesGrid

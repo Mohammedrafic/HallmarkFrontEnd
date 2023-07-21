@@ -481,7 +481,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       distinctUntilChanged()
     ).subscribe((value) => {
       this.quickOrderConditions.isContactToPermOrder = value === OrderType.ContractToPerm;
-      this.quickOrderConditions.isTravelerOrder = value === OrderType.Traveler;
+      this.quickOrderConditions.isLTAOrder = value === OrderType.LongTermAssignment;
       this.quickOrderConditions.isPermPlacementOrder = value === OrderType.PermPlacement;
       this.quickOrderConditions.isOpenPerDiem = value === OrderType.OpenPerDiem;
       this.handlePerDiemOrder();
@@ -583,7 +583,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     jobEndDate: Date,
     organizationId?: number
   ): void {
-    if (this.quickOrderConditions.isTravelerOrder || this.quickOrderConditions.isContactToPermOrder) {
+    if (this.quickOrderConditions.isLTAOrder || this.quickOrderConditions.isContactToPermOrder) {
       const startDate = DateTimeHelper.setUtcTimeZone(jobStartDate);
       const endDate = DateTimeHelper.setUtcTimeZone(jobEndDate);
       this.orderManagementService
@@ -636,7 +636,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       shiftStartTime: new Date(date.setHours(7, 0, 0)),
       shiftEndTime: new Date(date.setHours(19, 30, 0)),
     };
-    if (this.quickOrderConditions.isTravelerOrder || this.quickOrderConditions.isContactToPermOrder || this.quickOrderConditions.isPermPlacementOrder) {
+    if (this.quickOrderConditions.isLTAOrder || this.quickOrderConditions.isContactToPermOrder || this.quickOrderConditions.isPermPlacementOrder) {
       Object.entries(shiftControls).forEach(([name, value]) => {
         this.generalInformationForm.get(name)?.patchValue(value);
       });
