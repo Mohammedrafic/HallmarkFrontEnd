@@ -1,0 +1,19 @@
+@import '../../styles/variables/colors';
+
+:host {
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  height: 100%;
+
+  .grid {
+    margin-bottom: 25px;
+  }
+
+  .side-menu {
+    background-color: $white;
+    margin-right: 25px;
+  }
+}

@@ -1,9 +1,9 @@
 import { SettingsKeys } from "@shared/enums/settings";
-import { OrganizationSettingsGet } from "@shared/models/organization-settings.model";
+import { Configuration } from "@shared/models/organization-settings.model";
 
 export class SettingsHelper {
-  public static mapSettings(settings: OrganizationSettingsGet[]): {[key in SettingsKeys]?: OrganizationSettingsGet} {
-    return settings.reduce((acc: {[key in SettingsKeys]?: OrganizationSettingsGet}, curr: OrganizationSettingsGet)=> {
+  public static mapSettings(settings: Configuration[]): {[key in SettingsKeys]?: Configuration} {
+    return settings.reduce((acc: {[key in SettingsKeys]?: Configuration}, curr: Configuration)=> {
       curr.value = (curr.value === 'true' || curr.value === true);
       return ((acc as any)[curr.settingKey] = curr, acc)
     }, {});
