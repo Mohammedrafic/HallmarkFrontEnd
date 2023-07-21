@@ -232,7 +232,7 @@
           width="50"
           [allowResizing]="false"
         ></e-column>
-        <e-column headerTextAlign="Right" width="170" minWidth="160" maxWidth="200">
+        <e-column headerTextAlign="Right" width="145" minWidth="140" maxWidth="200">
           <ng-template #headerTemplate let-data>
             <div class="controls-header" [class.hidden]="!isLoaded">
               <button
@@ -266,26 +266,10 @@
           <ng-template #template let-data>
             <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
               <button
-                *ngIf="
-                  activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType
-                "
-                (click)="createReorder(data)"
-                ejs-button
-                cssClass="e-flat default-icon-button"
-                [disabled]="
-                  !canCreateOrder ||
-                  data.status === orderStatus.PreOpen ||
-                  data.status === orderStatus.Closed ||
-                  !settings[SettingsKeys.IsReOrder]?.value ||
-                  !hasCreateEditOrderPermission
-                "
-              >
-                <span><i-feather name="calendar" class="icon"></i-feather></span>
-              </button>
-              <button
                 ejs-button
                 [disabled]="!hasCreateEditOrderPermission"
-                cssClass="e-flat default-icon-button with-badge"
+                [isPrimary]="hasCreateEditOrderPermission"
+                cssClass="e-flat with-badge"
               >
                 <span><i-feather name="message-square" class="icon"></i-feather></span>
                 <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{
@@ -317,12 +301,7 @@
                 "
                 [matMenuTriggerData]="{
                   data: data,
-                  items:
-                    (data.status === orderStatus.Closed && threeDotsMenuOptions['closedOrderMenu']) ||
-                    (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
-                    (data.isMoreMenuWithDeleteButton
-                      ? threeDotsMenuOptions['moreMenuWithDeleteButton']
-                      : getMoreMenu(data))
+                  items: data.menuItems
                 }"
                 cssClass="e-flat primary-icon-button"
               >

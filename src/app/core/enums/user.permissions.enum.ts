@@ -194,6 +194,10 @@ export enum UserPermissions {
   CanSendGroupEmail = 5102,
   CanseeGroupEmailSentbyotherusers = 8111,
 
+  // Agency Settings
+  CanViewAgencySettings = 5106,
+  CanEditAgencySettings = 5107,
+
   //Orientation
   CanViewOrientation = 5201,
   CanEditOrientation = 5202,

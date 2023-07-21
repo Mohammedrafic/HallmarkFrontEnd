@@ -21,17 +21,17 @@ export interface GroupInvoicesOption {
 const groupInvoicesOptions: ReadonlyArray<GroupInvoicesOption> = [
   {
     id: InvoicesAggregationType.Agency,
-    text: 'Agency (Location - Agency)',
+    text: 'Agency (Loc - Agency)',
     tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Agency],
   },
   {
     id: InvoicesAggregationType.Candidate,
-    text: 'Candidate (Location - Candidate)',
+    text: 'Candidate (Loc - Candidate)',
     tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Candidate],
   },
   {
     id: InvoicesAggregationType.CostCenter,
-    text: 'Cost Center (Location-Department)',
+    text: 'Cost Center (Loc-Department)',
     tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.CostCenter],
   },
   {
@@ -54,7 +54,7 @@ const groupInvoicesOptions: ReadonlyArray<GroupInvoicesOption> = [
 export const SettingsGroupInvoicesOptions: GroupInvoicesOption[] = [
   {
     id: InvoicesAggregationType.CostCenter,
-    text: 'Cost Center (Location-Department)',
+    text: 'Cost Center (Loc-Department)',
     tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.CostCenter],
   },
   {

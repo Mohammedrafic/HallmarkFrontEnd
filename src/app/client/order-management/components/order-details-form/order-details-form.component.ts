@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } fro
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionCompleted, Select, Store } from '@ngxs/store';
 import {
   combineLatest,
   debounceTime,
@@ -68,7 +68,7 @@ import { Comment } from '@shared/models/comment.model';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { SettingsKeys } from '@shared/enums/settings';
@@ -197,7 +197,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public poNumberFields: FieldSettingsModel = PoNumberFields;
   public skillFields: FieldSettingsModel = { ...SkillFields, ...this.highlightDropdownSearchString };
   public isSpecialProjectFieldsRequired: boolean;
-  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  public settings: { [key in SettingsKeys]?: Configuration };
   public SettingsKeys = SettingsKeys;
   public specialProjectCategories: SpecialProject[];
   public projectNames: SpecialProject[];
@@ -234,7 +234,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   @Select(OrderManagementContentState.contactDetails)
   private contactDetails$: Observable<Department>;
   @Select(OrganizationManagementState.organizationSettings)
-  private organizationSettings$: Observable<OrganizationSettingsGet[]>;
+  private organizationSettings$: Observable<Configuration[]>;
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   @Select(OrderManagementContentState.selectedOrder)
@@ -252,6 +252,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     private cd: ChangeDetectorRef,
     private partialSearchService: PartialSearchService,
     private permissionService: PermissionService,
+    private actions$: Actions,
   ) {
     super(store);
     this.initOrderForms();
@@ -449,8 +450,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   private subscribeForSettings(): Observable<ProjectSpecialData> {
     return this.organizationSettings$
       .pipe(
-        filter((settings: OrganizationSettingsGet[]) => !!settings.length),
-        switchMap((settings: OrganizationSettingsGet[]) => {
+        filter((settings: Configuration[]) => !!settings.length),
+        switchMap((settings: Configuration[]) => {
           this.settings = SettingsHelper.mapSettings(settings);
           this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
           return this.projectSpecialData$;
@@ -591,6 +592,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   //TODO: refactor this method
+  // eslint-disable-next-line max-lines-per-function
   private populateForms(order: Order): void {
     this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
@@ -742,12 +744,16 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       this.store
         .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
         .pipe(
+          switchMap(() => this.actions$),
+          ofActionCompleted(GetDepartmentsByLocationId),
           take(1),
-        ).subscribe((data) => {
-          this.selectedDepartment = data.organizationManagement.departments?.find(
+        ).subscribe(() => {
+          const departments = this.store.selectSnapshot(OrganizationManagementState.departments) as Department[];
+
+          this.selectedDepartment = departments.find(
             (department: Department) => department.departmentId === order.departmentId
-          );
-          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId, { emitEvent: false });
+          ) as Department;
+          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
         });
     }
   }

@@ -58,6 +58,7 @@ section {
     grid-template-columns: repeat(4, 1fr);
     background-color: $secondary-dark-blue-50;
     gap: 25px 38px;
+    margin-top: 15px;
   }
 
   .column {

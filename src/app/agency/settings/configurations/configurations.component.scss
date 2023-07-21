@@ -1,0 +1,47 @@
+@import '../../styles/variables/colors';
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  h3 {
+    margin: 8px;
+  }
+}
+
+app-configuration-grid {
+  margin-top: 25px;
+  height: 90%;
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.form-container {
+  padding-top: 28px;
+
+  .input-container {
+    margin-bottom: 12px;
+    width: 386px;
+
+    .input-group.switch {
+      display: flex;
+      align-items: center;
+
+      .switch-label {
+        color: $black !important;
+      }
+    }
+  }
+}
+
+.input-group.bootstrap {
+  width: 100%;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+}

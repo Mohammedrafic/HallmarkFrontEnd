@@ -234,7 +234,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
           statuses = orderStatuses.map(data => data.status);
-          candidateStatusesData = candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status));
+          candidateStatusesData = candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
         }
 
         this.filterColumns.organizationIds.dataSource = partneredOrganizations;

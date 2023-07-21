@@ -151,7 +151,7 @@ import {
   OrderManagementPage,
   OrdersJourneyPage,
 } from '@shared/models/order-management.model';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import {
   Organization,
   OrganizationDepartment,
@@ -282,7 +282,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   skills$: Observable<Skill[]>;
 
   @Select(OrganizationManagementState.organizationSettings)
-  organizationSettings$: Observable<OrganizationSettingsGet[]>;
+  organizationSettings$: Observable<Configuration[]>;
 
   @Select(UserState.currentUserPermissions)
   currentUserPermissions$: Observable<any[]>;
@@ -315,7 +315,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
   public readonly shiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  public settings: { [key in SettingsKeys]?: Configuration };
   public SettingsKeys = SettingsKeys;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
@@ -1596,6 +1596,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       case MoreMenuType['Re-Open']:
         this.reOpenOrder(data);
         break;
+      case MoreMenuType['Add Re-Order']:
+        this.createReorder(data);
+        break;
     }
   }
 
@@ -1718,6 +1721,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (data?.items) {
         data.items.forEach((item) => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
+          item.menuItems = this.getMoreMenuDataSource(item);
+
           if (item.children && item.children.length) {
             item.children.sort((a, b) => a.positionId - b.positionId);
           }
@@ -2121,7 +2126,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         }
         else{
           return order.orderType === OrderType.OpenPerDiem
-          ? this.threeDotsMenuOptions['moreMenuWithCloseButton']
+          ? this.getMenuItems(order, 'moreMenuWithCloseButton')
           : this.threeDotsMenuOptions['moreMenu'];
         }
 
@@ -2139,7 +2144,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     else{
       return this.canReOpen(order)
       ? this.threeDotsMenuOptions['moreMenuWithReOpenButton']
-      : this.threeDotsMenuOptions['moreMenuWithCloseButton'];
+      : this.getMenuItems(order, 'moreMenuWithCloseButton');
     }
   }
 
@@ -2610,7 +2615,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
     } else {
       statuses = data.orderStatuses;
-      candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status));
+      candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
     }
 
     this.filterColumns.orderStatuses.dataSource = statuses;
@@ -2767,5 +2772,35 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       ).subscribe(() => {
         this.store.dispatch(new SaveReOrderPageSettings(pageNumber, pageSize, true));
       });
+  }
+  
+  private getMoreMenuDataSource(order: OrderManagement): ItemModel[] {
+    if (order.status === this.orderStatus.Closed) {
+      return this.threeDotsMenuOptions['closedOrderMenu'];
+    }
+    if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
+      return this.getMenuForReorders(order);
+    }
+    if (!this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase())) {
+      return this.getMenuItems(order, 'moreMenuWithDeleteButton');
+    } else {
+      return this.getMoreMenu(order);
+    }
+  }
+
+  private getMenuItems(order: OrderManagement, menuKey: string): ItemModel[] {
+    const isPerDiem =
+      this.activeTab !== OrganizationOrderManagementTabs.Incomplete && this.orderTypes.OpenPerDiem === order.orderType;
+    const hideAddReOrderButton = !this.canCreateOrder
+      || order.status === this.orderStatus.PreOpen
+      || order.status === this.orderStatus.Closed
+      || !this.settings[SettingsKeys.IsReOrder]?.value
+      || !this.hasCreateEditOrderPermission;
+  
+    if (isPerDiem && !hideAddReOrderButton) {
+       return [...this.threeDotsMenuOptions['moreMenuAddReOrderButton'], ...this.threeDotsMenuOptions[menuKey]];
+    } else {
+      return this.threeDotsMenuOptions[menuKey];
+    }
   }
 }
