@@ -129,6 +129,7 @@
         </ng-template>
         <ng-template #content>
           <app-workflow-mapping
+            *ngIf="activeTab === workflowTab.WorkflowMapping"
             [isActive]="activeTab === workflowTab.WorkflowMapping"
             [isIRPFlagEnabled]="isIRPFlagEnabled"
             [systemFlags]="systemFlags"

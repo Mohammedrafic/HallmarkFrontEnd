@@ -134,8 +134,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: '',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     29: {
       // MSP List
@@ -576,8 +576,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: '',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     28: {
       // Associated Organizations
@@ -654,7 +654,7 @@ export const MENU_CONFIG: any = {
       // New Accrual Report
       icon: '',
       route: '/analytics/accrual-report',
-    },    
+    },
     83: {
       // New Accrual Report
       icon: '',
@@ -771,7 +771,7 @@ export const MENU_CONFIG: any = {
       route: '/client/associate-list',
     },
     38: {
-      // Scheduling
+      // Scheduling for Org user
       icon: 'calendar',
       route: 'client/scheduling',
     },
@@ -838,8 +838,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: '',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     29: {
       // MSP List
@@ -1276,8 +1276,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: 'user',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     28: {
       // Associated Organizations
@@ -1406,6 +1406,14 @@ export const MENU_CONFIG: any = {
       // Communication
       icon: 'twitch',
       route: '',
+    },
+  },
+
+  [BusinessUnitType.Employee]: {
+    38: {
+      // Scheduling for Employee
+      icon: 'calendar',
+      route: 'employee/scheduling',
     },
   },
 };

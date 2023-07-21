@@ -2,15 +2,55 @@ export enum ProfileStatusesEnum {
   Inactive,
   Active,
   OnHold,
-  Terminated
+  Terminated,
+  Sourcing,
+  Prospect,
+  VerbalOfferMade,
+  Onboarding,
+  ClearedForOrientation,
+  OrientationScheduled,
+  DoNotHire,
+  FallOffOnboarding
+}
+
+export enum RecruitmentStatusEnum {
+  Recruitment1,
+  Recruitment2,
+  Recruitment3
+}
+
+export enum SourceStatusEnum {
+  Source1,
+  Source2,
+  Source3
 }
 
 export const ProfileStatuses = [
   { id: ProfileStatusesEnum.Active, name: 'Active' },
   { id: ProfileStatusesEnum.Inactive, name: 'Inactive' },
   { id: ProfileStatusesEnum.OnHold, name: 'On Hold' },
-  { id: ProfileStatusesEnum.Terminated, name: 'Terminated' }
+  { id: ProfileStatusesEnum.Terminated, name: 'Terminated' },
+  { id: ProfileStatusesEnum.Sourcing, name: 'Sourcing' },
+  { id: ProfileStatusesEnum.Prospect, name: 'Prospect' },
+  { id: ProfileStatusesEnum.VerbalOfferMade, name: 'Verbal Offer Made' },
+  { id: ProfileStatusesEnum.Onboarding, name: 'Onboarding' },
+  { id: ProfileStatusesEnum.ClearedForOrientation, name: 'Cleared For Orientation' },
+  { id: ProfileStatusesEnum.OrientationScheduled, name: 'Orientation Scheduled' },
+  { id: ProfileStatusesEnum.DoNotHire, name: 'Do Not Hire' },
+  { id: ProfileStatusesEnum.FallOffOnboarding, name: 'Fall Off Onboarding' }
 ];
+
+export const recruitContent = [
+  { id: RecruitmentStatusEnum.Recruitment1, name: 'Recruiter 1' },
+  { id: RecruitmentStatusEnum.Recruitment2, name: 'Recruiter 2' },
+  { id: RecruitmentStatusEnum.Recruitment2, name: 'Recruiter 3' },
+]
+
+export const sourceContent = [
+  { id: SourceStatusEnum.Source1, name: 'Source 1' },
+  { id: SourceStatusEnum.Source2, name: 'Source 2' },
+  { id: SourceStatusEnum.Source2, name: 'Source 3' },
+]
 
 export const HrInternalTransfersRecruitments = [
   { id: 0, name: 'New external hire' },

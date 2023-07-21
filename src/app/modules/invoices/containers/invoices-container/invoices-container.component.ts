@@ -23,8 +23,8 @@ import {
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
 import { OutsideZone } from '@core/decorators';
-import { DialogAction, FilterPageName } from '@core/enums';
-import { DataSourceItem, PreservedFiltersByPage } from '@core/interface';
+import { DialogAction, FilterPageName, UserPermissions } from '@core/enums';
+import { DataSourceItem, Permission, PreservedFiltersByPage } from '@core/interface';
 import {
   RejectReasonInputDialogComponent,
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
@@ -177,6 +177,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   private gridInstance: GridReadyEventModel;
 
   private filterState: Interfaces.InvoicesFilterState = {};
+  public userPermission: Permission = {};
+  public readonly userPermissions = UserPermissions;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -237,6 +239,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForOpenPayment();
     this.watchForSavePaymentAction();
     this.watchForPreservedFilters();
+    this.getuserPermission()
   }
 
   ngAfterViewInit(): void {
@@ -752,5 +755,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     } else {
       this.store.dispatch(new ClearOrganizationStructure());
     }
+  }
+  private getuserPermission(): void {
+    this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length), take(1)
+    ).subscribe((permissions: Permission) => {
+      this.userPermission = permissions;
+    });
   }
 }

@@ -68,7 +68,7 @@ import { Comment } from '@shared/models/comment.model';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { SettingsKeys } from '@shared/enums/settings';
@@ -197,7 +197,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public poNumberFields: FieldSettingsModel = PoNumberFields;
   public skillFields: FieldSettingsModel = { ...SkillFields, ...this.highlightDropdownSearchString };
   public isSpecialProjectFieldsRequired: boolean;
-  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  public settings: { [key in SettingsKeys]?: Configuration };
   public SettingsKeys = SettingsKeys;
   public specialProjectCategories: SpecialProject[];
   public projectNames: SpecialProject[];
@@ -234,7 +234,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   @Select(OrderManagementContentState.contactDetails)
   private contactDetails$: Observable<Department>;
   @Select(OrganizationManagementState.organizationSettings)
-  private organizationSettings$: Observable<OrganizationSettingsGet[]>;
+  private organizationSettings$: Observable<Configuration[]>;
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   @Select(OrderManagementContentState.selectedOrder)
@@ -449,8 +449,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   private subscribeForSettings(): Observable<ProjectSpecialData> {
     return this.organizationSettings$
       .pipe(
-        filter((settings: OrganizationSettingsGet[]) => !!settings.length),
-        switchMap((settings: OrganizationSettingsGet[]) => {
+        filter((settings: Configuration[]) => !!settings.length),
+        switchMap((settings: Configuration[]) => {
           this.settings = SettingsHelper.mapSettings(settings);
           this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
           return this.projectSpecialData$;

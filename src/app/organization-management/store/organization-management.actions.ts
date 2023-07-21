@@ -9,7 +9,7 @@ import { ImportedLocation, Location, LocationFilter } from '@shared/models/locat
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
-import { OrganizationSettingFilter, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
+import { OrganizationSettingFilter, ConfigurationDTO } from '@shared/models/organization-settings.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { ImportedBillRate } from '@shared/models';
 import { SkillParams } from '@client/order-management/interfaces';
@@ -371,7 +371,7 @@ export class GetOrganizationSettings {
 
 export class SaveOrganizationSettings {
   static readonly type = '[organizationManagement] Save Organization Settings';
-  constructor(public organizationSettings: OrganizationSettingsPost,
+  constructor(public organizationSettings: ConfigurationDTO,
               public filters: OrganizationSettingFilter) {}
 }
 

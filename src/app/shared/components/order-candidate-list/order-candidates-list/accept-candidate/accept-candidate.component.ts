@@ -445,13 +445,26 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
             this.candidateAddressRequiredValue = addressConfiguration.value;
           }
         }
+        
+        let jobStartDate: string;
+        let jobEndDate: string;
+        const statusesForActualDates = [ApplicantStatusEnum.OnBoarded, ApplicantStatusEnum.Cancelled,
+          ApplicantStatusEnum.Offboard];
+
+        if (this.isAgency && statusesForActualDates.includes(value.applicantStatus.applicantStatus)) {
+          jobStartDate = value.actualStartDate || '';
+          jobEndDate = value.actualEndDate || '';
+        } else {
+          jobStartDate = value.order.jobStartDate as unknown as string || '';
+          jobEndDate = value.order.jobEndDate as unknown as string || '';
+        }
+
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobStartDate.toString()) : "",
-          value.order.jobEndDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobEndDate.toString()) : ""],
+          date: [DateTimeHelper.setCurrentTimeZone(jobStartDate), DateTimeHelper.setCurrentTimeZone(jobEndDate)],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
           availableStartDate: value.availableStartDate ?
             DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
@@ -476,7 +489,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           hours: value.jobCancellation?.hours,
           dob: value.candidateProfile.dob,
           ssn: value.candidateProfile.ssn,
-          candidatePayRate: this.candidateJob.candidatePayRate
+          candidatePayRate: this.candidateJob.candidatePayRate,
         });
       }
       this.changeDetectionRef.markForCheck();

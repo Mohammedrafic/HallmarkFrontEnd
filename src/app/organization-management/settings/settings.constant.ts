@@ -2,7 +2,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { SettingsFilterColsConfig } from './settings.interface';
+import { SettingsFilterColsConfig } from '../../shared/models/settings.interface';
 import { OrganizationSettingKeys } from '@shared/constants';
 
 export const AssociatedLink = '/client/associate-list';
@@ -96,6 +96,7 @@ export const DisabledSettingsByDefault = [
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
   'OvertimeCalculation',
+  'Sourcing'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

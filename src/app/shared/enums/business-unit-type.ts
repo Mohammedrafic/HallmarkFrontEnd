@@ -9,6 +9,7 @@ export enum BusinessUnitType {
   MSP = 2,
   Organization = 3,
   Agency = 4,
+  Employee = 6,
   Candidates = 7
 }
 
