@@ -97,6 +97,7 @@ export class DashboardService {
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
 
   candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
+  candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
 
   constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
 
@@ -155,6 +156,7 @@ export class DashboardService {
   private getCandidatesWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
     return this.httpClient.post<CandidateTypeInfoModel[]>(`${this.baseUrl}/GetCandidatesByStatuses`, { ...filter }).pipe(
       map((candidatesInfo: CandidateTypeInfoModel[]) => {
+        this.candidatesOverallStatus$.next(candidatesInfo);
         return {
           id: WidgetTypeEnum.CANDIDATES,
            title: 'Candidate Overall Status',
@@ -524,4 +526,10 @@ export class DashboardService {
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
     return this.candidatesForActivePositions$.asObservable();
   }
+
+  public getcandidatesOverallStatus(): Observable<CandidateTypeInfoModel[]>{
+    return  this.candidatesOverallStatus$.asObservable();
+  }
+
+ 
 }

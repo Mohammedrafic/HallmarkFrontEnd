@@ -86,7 +86,7 @@ export class AccumulationChartComponent
       }
     }
     const user = this.store.selectSnapshot(UserState.user);
-    let Enumvalues: number;
+    /*let Enumvalues: number;
     if (this.chartData?.title == "Candidate Overall Status") {
       //if (this.chartData?.title)
       if (status.toLowerCase() == CandidatStatus[CandidatStatus['Not Applied']].toLowerCase()) {
@@ -144,17 +144,26 @@ export class AccumulationChartComponent
       else {
         this.store.dispatch(new ShowToast(MessageTypes.Warning, CANDIDATE_STATUS));
       }
-    } else if (this.chartData?.title == "Active Positions") {
+    } else*/
+    if (this.chartData?.title == "Active Positions") {
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
         this.dashboardService.redirectToUrl('client/order-management', undefined, status);
       }
-    }else if(this.chartData?.title == "Candidates for Active Positions"){
+    }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status"){
         let dataset:any = [];
-        this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
-          dataset = data;
-        });        
+        
+        if(this.chartData?.title == "Candidates for Active Positions"){
+          this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
+            dataset = data;
+          }); 
+        }else{
+          this.dashboardService.candidatesOverallStatus$.subscribe(data=>{
+            dataset = data;
+          }); 
+        }        
+
         let chartInfo = dataset.find((ele:any)=>ele.status == status);
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
           if(chartInfo.applicantStatus === OrderStatus.Onboard){
