@@ -96,6 +96,7 @@ export const DisabledSettingsByDefault = [
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
   'OvertimeCalculation',
+  'Sourcing'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

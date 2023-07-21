@@ -133,6 +133,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public isActiveCandidateDialog$: Observable<boolean>;
   public showHoursControl = false;
   public showPercentage = false;
+  public verifyNoPenalty = false;
   public orderPermissions: CurrentUserPermission[];
   public canShortlist = false;
   public canInterview = false;
@@ -145,6 +146,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
   public readonly reorderType: OrderType = OrderType.ReOrder;
   public canCreateOrder:boolean;
+  public saveStatus: number = 0;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -214,6 +216,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       emailBody: new FormControl('', [Validators.required]),
       fileUpload: new FormControl(null),
       emailTo: new FormControl('', [Validators.required]),
+      orderId: new FormControl('', [Validators.required]),
+      candidateId  : new FormControl('', [Validators.required]),
+      businessUnitId: new FormControl('', [Validators.required]),
     });
   }
 
@@ -393,6 +398,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             const value = this.form.getRawValue();
             this.isSend =  true;
             this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.candidateJob?.candidateProfile.email);
+            this.sendOnboardMessageEmailFormGroup.get('orderId')?.setValue(this.candidateJob?.orderId);
+            this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.candidateJob?.candidateProfileId);
+            this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.candidateJob?.organizationId);
             this.emailTo = this.candidateJob?.candidateProfile.email;
             this.store
               .dispatch(
@@ -414,23 +422,29 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   candidatePayRate: this.candidateJob.candidatePayRate,
                 })
               );
-              this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).pipe(
-                takeUntil(this.unsubscribe$)
-              ).subscribe(() => {
-                  const options = {
-                      title: ONBOARD_CANDIDATE,
-                      okButtonLabel: 'Yes',
-                      okButtonClass: 'ok-button',
-                      cancelButtonLabel: 'No'
-                  };
-                  this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
-                      .subscribe((isConfirm) => {
-                        if(isConfirm){
-                          this.onboardEmailTemplateForm.rteCreated();
-                          this.onboardEmailTemplateForm.disableControls(true);
-                          this.store.dispatch(new ShowGroupEmailSideDialog(true));
-                        }
-                      });
+              this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
+                if(this.saveStatus === ApplicantStatusEnum.OnBoarded){
+                      const options = {
+                        title: ONBOARD_CANDIDATE,
+                        okButtonLabel: 'Yes',
+                        okButtonClass: 'ok-button',
+                        cancelButtonLabel: 'No'
+                      };
+                      this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+                          .subscribe((isConfirm) => {
+                            if(isConfirm){
+                              this.onboardEmailTemplateForm.rteCreated();
+                              this.onboardEmailTemplateForm.disableControls(true);
+                              this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                            }else{
+                              this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+                              this.closeDialog();
+                            }
+                          });
+                }else{
+                  this.closeDialog();
+                  this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+                }                
 
               });
               // this.closeDialog();
@@ -475,15 +489,17 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
-          const actualEnd = this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
+
+          const actualEnd = value.actualEndDate ||
+          this.durationService.getEndDate(value.order.duration, new Date(actualStart), {
             jobStartDate: value.order.jobStartDate,
             jobEndDate: value.order.jobEndDate,
           }).toString();
 
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-            date: [DateTimeHelper.setCurrentTimeZone(value.order.jobStartDate?.toString()),
-              DateTimeHelper.setCurrentTimeZone(value.order.jobEndDate?.toString())],
+            date: [DateTimeHelper.setCurrentTimeZone(actualStart),
+              DateTimeHelper.setCurrentTimeZone(actualEnd)],
             billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
@@ -661,6 +677,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             stream : emailvalue.fileUpload,
             extension : emailvalue.fileUpload?.type,
             documentName : emailvalue.fileUpload?.name,
+            orderId : emailvalue.orderId,
+            candidateId : emailvalue.candidateId,
+            businessUnitId : emailvalue.businessUnitId,
           })
         )
         .subscribe(() => {
@@ -674,6 +693,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
+    this.saveStatus = event.itemData ? event.itemData.applicantStatus : 0;
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded || event.itemData === null) {
       this.onAccept();
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
@@ -729,6 +749,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+    this.verifyNoPenalty = value === PenaltyCriteria.NoPenalty;
   }
 
   private switchFormState(): void {

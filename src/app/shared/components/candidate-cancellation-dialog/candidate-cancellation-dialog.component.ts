@@ -140,11 +140,16 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     });
 
     this.form?.get('penaltyCriteria')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value: PenaltyCriteria) => {
-      this.isPenaltyCriteriaSelected = !!(value || value === PenaltyCriteria.FlatRate);
-      this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
-      this.showPercentage = value === PenaltyCriteria.RateOfHours;
-      if (this.isPenaltyCriteriaSelected) {
-        setTimeout(() => this.setDefaultValues(value));
+      if (value != PenaltyCriteria.NoPenalty) {
+        this.isPenaltyCriteriaSelected = !!(value || value === PenaltyCriteria.FlatRate);
+        this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
+        this.showPercentage = value === PenaltyCriteria.RateOfHours;
+        if (this.isPenaltyCriteriaSelected) {
+          setTimeout(() => this.setDefaultValues(value));
+        }
+      }
+      else {
+        this.isPenaltyCriteriaSelected = false;
       }
       this.cd.markForCheck();
     });

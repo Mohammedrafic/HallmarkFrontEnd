@@ -81,8 +81,6 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
       if (this.type === EditFieldTypes.Time) {
         if (this.group.get('isTimeInNull')?.value) {
           this.dateValue = null;
-          this.control.patchValue(null);
-          this.control.markAsTouched();
         }
       }
     }

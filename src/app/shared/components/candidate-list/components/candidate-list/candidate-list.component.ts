@@ -85,6 +85,9 @@ import {
   IrpCandidateExportCols, IRPCandidates, IRPFilterColumns, VMSCandidates,
 } from './candidate-list.constants';
 import { CandidateListScroll } from './candidate-list.enum';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 
 @Component({
   selector: 'app-candidate-list',
@@ -100,6 +103,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(CandidateListState.IRPCandidates)
   private _IRPCandidates$: Observable<IRPCandidateList>;
+
+
+  @Select(RejectReasonState.sourcingReasons)
+  public sourcing$: Observable<any>;
 
   @Select(CandidateState.skills)
   private skills$: Observable<MasterSkill[]>;
@@ -122,6 +129,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(AppState.getMainContentElement)
   public readonly targetElement$: Observable<HTMLElement | null>;
 
+  @Select(CandidateListState.listOfCredentialTypes)
+  credentialTypes$: Observable<CredentialType[]>;
+
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
   public filterType: string = 'Contains';
@@ -137,7 +147,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() public agencyActionsAllowed: boolean;
   @Input() public userPermission: Permission;
   @Input() public isIRP: boolean;
-
+  @Input() public redirectedFromDashboard: boolean;
+ 
   @Input()
   public set tab(tabIndex: number) {
     if (!isNil(tabIndex)) {
@@ -177,7 +188,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private isAlive = true;
   private activeTab: number;
   private scrollSubscription: Subscription;
-
+  private redirectfromDashboard : boolean
+  public isSourceValidated :boolean=false
   constructor(
     private store: Store,
     private router: Router,
@@ -196,8 +208,17 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   ngOnInit(): void {
+    this.store.dispatch(new GetSourcingReasons());
+    this.sourcing$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      console.log(data)
+      if (data != null) {
+        this.isSourceValidated = data.issourcing
+      }
+    });
+
     this.initCandidateFilterForm();
     this.getRegions();
+    this.getCredentialTypes();
     this.dispatchInitialIcon();
     this.subscribeOnSaveState();
     this.subscribeOnPageSubject();
@@ -208,6 +229,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.setFileName();
     this.filterColumns = !this.isIRP ? filterColumns : IRPFilterColumns;
     this.subscribeOnRegions();
+    this.subscribeOnCredentialTypes();
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
     this.syncFilterTagsWithControls();
@@ -427,6 +449,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private getFilterValues(): CandidateListRequest {
+    if (this.redirectfromDashboard) {
+      this.CandidateFilterFormGroup.reset();
+    }
     const filter: CandidateListRequest = {
       profileStatuses: this.filters.profileStatuses!,
       skillsIds: this.filters.skillsIds!,
@@ -565,7 +590,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         if (this.credType != null) {
           this.filters.credType = [this.credType];
         }
-
+        if (this.redirectedFromDashboard != null) {
+          this.redirectfromDashboard = this.redirectedFromDashboard;
+        }
         if (tableState) {
           this.includeDeployedCandidates = tableState.includeDeployedCandidates;
           this.includeDeployedCandidates$.next(tableState.includeDeployedCandidates);
@@ -663,6 +690,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         }
       });
   }
+  private subscribeOnCredentialTypes(): void {
+    this.credentialTypes$
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe((crdentialType) => {
+      if (this.filterColumns?.credType) {
+        this.filterColumns.credType.dataSource = crdentialType;
+      }
+    });
+  }
 
   private subscribeOnExportAction(): void {
     this.export$
@@ -727,6 +763,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         switchMap(() => this.store.dispatch(new CandidateListActions.GetRegionList())),
         takeUntil(this.unsubscribe$)
       ).subscribe();
+  }
+  private getCredentialTypes():void{
+    this.store
+      .dispatch(new CandidateListActions.GetCredentialsTypeList)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe();
   }
 
   private syncFilterTagsWithControls(): void {

@@ -157,7 +157,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public candidateDOBRequired :boolean;
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
-
+  public saveStatus:number =0;
   get templateEmailTitle(): string {
     return "Onboarding Email";
   }
@@ -176,6 +176,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       emailBody: new FormControl('', [Validators.required]),
       fileUpload: new FormControl(null),
       emailTo: new FormControl('', [Validators.required]),
+      orderId: new FormControl('', [Validators.required]),
+      candidateId  : new FormControl('', [Validators.required]),
+      businessUnitId: new FormControl('', [Validators.required]),
     });
   }
 
@@ -231,6 +234,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   }
 
   public saveHandler(event: { itemData: { applicantStatus: ApplicantStatusEnum; statusText: string } | null }): void {
+    this.saveStatus = event.itemData ? event.itemData?.applicantStatus : 0;
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.onReject();
     } else {
@@ -357,7 +361,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       this.isSend =  true;
       this.emailTo = this.orderCandidateJob?.candidateProfile.email; 
       this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.orderCandidateJob?.candidateProfile.email);
-      
+      this.sendOnboardMessageEmailFormGroup.get('orderId')?.setValue(this.orderCandidateJob?.orderId);
+      this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.orderCandidateJob?.candidateProfileId);
+      this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.orderCandidateJob?.organizationId);
+            
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -482,7 +489,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed))
       .subscribe(() => 
       {
-        if(this.selectedApplicantStatus?.applicantStatus === ApplicantStatusEnum.OnBoarded){
+        if(this.saveStatus === ApplicantStatusEnum.OnBoarded){
           const options = {
               title: ONBOARD_CANDIDATE,
               okButtonLabel: 'Yes',
@@ -495,6 +502,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
                   this.onboardEmailTemplateForm.rteCreated();
                   this.onboardEmailTemplateForm.disableControls(true);
                   this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                }
+                else{
+                  this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+                  this.closeDialog();
                 }
               });
         }else{
@@ -524,6 +535,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             stream : emailvalue.fileUpload,
             extension : emailvalue.fileUpload?.type,
             documentName : emailvalue.fileUpload?.name,
+            orderId : emailvalue.orderId,
+            candidateId : emailvalue.candidateId,
+            businessUnitId : emailvalue.businessUnitId,
           })
         )
         .subscribe(() => {

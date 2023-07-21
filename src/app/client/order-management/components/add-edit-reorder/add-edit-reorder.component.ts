@@ -86,10 +86,9 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     shiftEndTime: Date;
     jobStartDate: Date;
   };
-  private unsubscribe$: Subject<void> = new Subject();
-  private numberOfAgencies: number;
-  private multipleReorderDates: Date[] = [];
   public canCreateOrder: boolean;
+  private unsubscribe$: Subject<void> = new Subject();
+  private multipleReorderDates: Date[] = [];
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -112,7 +111,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   ngOnInit(): void {
     this.subscribeOnPermissions();
     this.listenCandidateChanges();
-    this.listenAginciesChanges();
+    this.listenAgenciesChanges();
     this.commentContainerId = this.order.commentContainerId as number;
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
       const userAgencyOrganization = this.store.selectSnapshot(UserState.organizations) as UserAgencyOrganization;
@@ -215,7 +214,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       takeUntil(this.destroy$),
     )
     .subscribe(([agencies, candidates]) => {
-      this.numberOfAgencies = agencies.length;
       this.agencies = agencies;
       this.candidates = candidates;
 
@@ -251,7 +249,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     });
   }
 
-  private listenAginciesChanges(): void {
+  private listenAgenciesChanges(): void {
     this.reorderForm.get('agencies')?.valueChanges
     .pipe(
       map((agenciesIds: number[]) => {
@@ -344,7 +342,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const reorder: ReorderModel = this.reorderForm.getRawValue();
     reorder.shiftStartTime = DateTimeHelper.setUtcTimeZone(reorder.shiftStartTime);
     reorder.shiftEndTime = DateTimeHelper.setUtcTimeZone(reorder.shiftEndTime);
-    const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
+    const agencyIds = reorder.agencies;
     const reOrderId = this.isEditMode ? this.order.id : null;
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
     const payload = { reorder, agencyIds, reOrderId, reOrderFromId };
@@ -406,7 +404,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       .subscribe();
   }
 
-  private getAgencyIds(jobDistributions: JobDistributionModel[]): (number | null)[] | void {
+  private getAgencyIds(jobDistributions: JobDistributionModel[]): (number | null)[] | void {   
     if (!jobDistributions?.length) {
       return [];
     }

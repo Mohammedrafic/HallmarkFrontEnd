@@ -12,7 +12,7 @@ export class LocationsService {
 
   createForm(): CustomFormGroup<LocationsForm> {
     return this.fb.group({
-      invoiceId: [null],
+      invoiceId: [null,Validators.required],
       externalId: [null, [Validators.maxLength(50)]],
       name: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       businessLineId: [null],

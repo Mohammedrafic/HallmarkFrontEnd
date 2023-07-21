@@ -183,11 +183,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public updateTableByFilters(filters: TimesheetsFilterState): void {
+    const mappedFilters = {...filters, orderIds: filters.orderIds ? [filters.orderIds as string] : filters.orderIds};
     this.store.dispatch([
-      new PreservedFilters.SaveFiltersByPageName(this.getPageName(), filters),
+      new PreservedFilters.SaveFiltersByPageName(this.getPageName(), mappedFilters),
       new Timesheets.UpdateFiltersState(
         {
-          ...filters,
+          ...mappedFilters,
         },
         this.activeTabIdx !== 0
       ),
@@ -238,7 +239,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public handleExport(event: RowNode[]): void {
     const nodes = event;
     if (nodes.length) {
-      this.gridSelections.selectedTimesheetIds = nodes.map((node) => node.data.timesheetId);
+      this.gridSelections.selectedTimesheetIds = nodes.map((node) => node.data.id);
       this.gridSelections.rowNodes = nodes;
     } else {
       this.gridSelections.selectedTimesheetIds = [];

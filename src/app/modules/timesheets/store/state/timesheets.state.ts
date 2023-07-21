@@ -333,19 +333,6 @@ export class TimesheetsState {
     );
   }
 
-  @Action(Timesheets.DeleteProfileTimesheet)
-  DeleteProfileTimesheet(
-    ctx: StateContext<TimesheetsModel>,
-    { profileId, profileTimesheetId }: Timesheets.DeleteProfileTimesheet
-  ): Observable<null | void> {
-    return this.timesheetsApiService.deleteProfileTimesheets(profileId, profileTimesheetId)
-    .pipe(
-      catchError((err: HttpErrorResponse) => {
-        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-      }),
-    );
-  }
-
   @Action(Timesheets.ToggleCandidateDialog)
   ToggleCandidateDialog({ patchState }: StateContext<TimesheetsModel>,
     { action, timesheet }: Timesheets.ToggleCandidateDialog): void {
@@ -739,8 +726,8 @@ export class TimesheetsState {
     { body, isAgency }: TimesheetDetails.AddTimesheetRecord
   ): Observable<void> {
     const timesheetDetails = ctx.getState().timesheetDetails as TimesheetDetailsModel;
+    const { organizationId, jobId, weekStartDate, id } = timesheetDetails;
 
-    const { organizationId, jobId, weekStartDate } = timesheetDetails;
     const creatBody: AddMileageDto = {
       organizationId: organizationId,
       jobId: jobId,
@@ -763,6 +750,7 @@ export class TimesheetsState {
         tap(() => {
           ctx.dispatch([
             new TimesheetDetails.AddTimesheetRecordSucceed(),
+            new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency),
           ]);
         }),
         catchError((err: HttpErrorResponse) => {

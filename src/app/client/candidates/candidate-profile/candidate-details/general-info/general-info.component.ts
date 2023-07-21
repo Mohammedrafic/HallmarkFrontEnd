@@ -9,6 +9,8 @@ import { AbstractContactDetails } from '@client/candidates/candidate-profile/can
 import {
   ProfileStatuses,
   ProfileStatusesEnum,
+  recruitContent,
+  sourceContent,
   TerminationReasons,
 } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { JobClassifications } from '@client/order-management/constants';
@@ -17,7 +19,7 @@ import { ListOfSkills } from '@shared/models/skill.model';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
+import { GetSourcingReasons, GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
 import { endDateValidator, endTimeValidator, startDateValidator } from '@shared/validators/date.validator';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { DateTimeHelper } from '@core/helpers';
@@ -36,17 +38,25 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   pageSize = 100;
   @Select(RejectReasonState.terminationReasons)
   public reasons$: Observable<RejectReasonPage>;
+
+
+  @Select(RejectReasonState.sourcingReasons)
+  public sourcing$: Observable<any>;
+  
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   public skills$: Observable<ListOfSkills[]>;
   public primarySkillsDataSource: ListOfSkills[] = [];
   public secondarySkillsDataSource: ListOfSkills[] = [];
 
   public readonly classifications = JobClassifications;
-  public readonly profileStatuses = ProfileStatuses;
+  public profileStatuses = ProfileStatuses;
+  public recruitContent: any;
+  public sourceContent: any;
   public readonly companyCodes = ProfileStatuses;
   public readonly terminationReason = TerminationReasons;
   public readonly today = new Date();
-
+  public isSourceValidated: boolean = false;
+  public isSourceConfig: boolean = false;
   constructor(
     protected override cdr: ChangeDetectorRef,
     protected override candidateProfileFormService: CandidateProfileFormService,
@@ -57,12 +67,16 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   }
 
   public override ngOnInit(): void {
+    let Status =[ProfileStatusesEnum.Sourcing,ProfileStatusesEnum.Prospect,ProfileStatusesEnum.Onboarding,ProfileStatusesEnum.ClearedForOrientation,ProfileStatusesEnum.OrientationScheduled,ProfileStatusesEnum.DoNotHire,ProfileStatusesEnum.FallOffOnboarding,ProfileStatusesEnum.VerbalOfferMade]
+    this.profileStatuses = this.profileStatuses.filter(f => !Status.includes(f.id));
     super.ngOnInit();
     this.listenProfileStatusChanges();
     this.listenSkillsChanges();
     this.subscribeOnSkills();
     this.subscribeOnHoldDates();
     this.store.dispatch(new GetTerminationReasons(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetSourcingReasons());
+
   }
 
   public override ngOnDestroy(): void {
@@ -77,6 +91,20 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       this.secondarySkillsDataSource = primarySkillId
         ? this.candidateProfileFormService.getSecondarySkillsDataSource(this.primarySkillsDataSource, primarySkillId)
         : skills;
+      this.cdr.markForCheck();
+    });
+    this.sourcing$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      console.log(data)
+      if (data != null) {
+        this.recruitContent = data.recruiter
+        this.sourceContent = data.sourcing
+        this.isSourceValidated = data.issourcing
+      }
+
+      if (this.isSourceValidated) {
+        this.profileStatuses = ProfileStatuses
+      }
+
       this.cdr.markForCheck();
     });
   }
@@ -100,17 +128,34 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       .get('profileStatus')
       ?.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((profileStatus: ProfileStatusesEnum) => {
+        this.isSourceConfig = false;
+        this.isTerminatedSelected = false;
+        this.isOnHoldSelected = false;
         const handlers = {
           [ProfileStatusesEnum.OnHold]: () => this.handleOnHoldProfileStatus(),
           [ProfileStatusesEnum.Terminated]: () => this.handleTerminatedProfileStatus(),
           [ProfileStatusesEnum.Active]: () => this.reset(),
           [ProfileStatusesEnum.Inactive]: () => this.reset(),
+
+          [ProfileStatusesEnum.Sourcing]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.Prospect]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.VerbalOfferMade]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.Onboarding]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.ClearedForOrientation]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.OrientationScheduled]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.DoNotHire]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.FallOffOnboarding]: () => this.handleSourceStatus(),
         };
 
         handlers[profileStatus]();
         this.candidateForm.updateValueAndValidity();
         this.cdr.markForCheck();
       });
+  }
+
+  private handleSourceStatus(): void {
+    this.candidateForm.get('employeeId')?.removeValidators(Validators.required);
+    this.isSourceConfig = true;
   }
 
   private handleOnHoldProfileStatus(): void {

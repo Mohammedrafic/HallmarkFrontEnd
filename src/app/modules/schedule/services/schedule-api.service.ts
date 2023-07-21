@@ -53,7 +53,11 @@ export class ScheduleApiService {
     return this.http.post<void>('/api/Schedules/create', {...employeeScheduledDays, userLocalTime });
   }
 
-  createBookSchedule(employeeBookDays: ScheduleInt.ScheduleBook):Observable<ScheduleBookingErrors[]> {
+  createBookSchedule(
+    employeeBookDays: ScheduleInt.ScheduleBook,
+    isSingleError = true
+  ):Observable<ScheduleBookingErrors[]> {
+    employeeBookDays.isSingleError = isSingleError;
     return this.http.post<ScheduleBookingErrors[]>('/api/Schedules/book', employeeBookDays);
   }
 
@@ -86,7 +90,8 @@ export class ScheduleApiService {
   }
 
   deleteSchedule(deleteScheduleRequest: DeleteScheduleRequest):Observable<void> {
-    return this.http.post<void>('/api/Schedules/delete', deleteScheduleRequest);
+    const userLocalTime = DateTimeHelper.setUtcTimeZone(new Date());
+    return this.http.post<void>('/api/Schedules/delete', { ...deleteScheduleRequest, userLocalTime });
   }
 
   getOpenPositions(openPositionsParams: OpenPositionParams): Observable<OpenPositionsList[]> {

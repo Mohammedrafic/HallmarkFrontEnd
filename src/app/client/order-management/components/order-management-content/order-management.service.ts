@@ -89,6 +89,7 @@ export class OrderManagementService extends DestroyableDirective {
       reorderStatuses: new FormControl([]),
       shiftIds: new FormControl([]),
       shift: new FormControl([]),
+      orderLocked: new FormControl(null),
     });
   }
 
@@ -119,7 +120,9 @@ export class OrderManagementService extends DestroyableDirective {
   }
 
   public setPreviousOrganizationId(id: number): void {
-    if (this.previousSelectedOrganizationId !== id) {
+    const previousOrganizationId = this.globalWindow.localStorage.getItem('lastSelectedOrganizationId');
+
+    if (Number(previousOrganizationId) !== id) {
       this.orderManagementSystem = null;
     }
 

@@ -38,6 +38,7 @@ import {
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
+  UpdateOrganisationCandidateJobSucceed,
   sendOnboardCandidateEmailMessage,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -144,6 +145,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public isAgency = false;
   public showHoursControl = false;
   public showPercentage = false;
+  public verifyNoPenalty = false;
   public candidate: OrderCandidatesList | undefined;
   public comments: Comment[] = [];
   public orderPermissions: CurrentUserPermission[];
@@ -241,6 +243,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       emailBody: new FormControl('', [Validators.required]),
       fileUpload: new FormControl(null),
       emailTo: new FormControl('', [Validators.required]),
+      orderId: new FormControl('', [Validators.required]),
+      candidateId  : new FormControl('', [Validators.required]),
+      businessUnitId: new FormControl('', [Validators.required]),
     });
   }
 
@@ -576,6 +581,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.isSend =  true;
       this.emailTo = this.candidateJob?.candidateProfile.email; 
       this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.candidateJob?.candidateProfile.email);
+      this.sendOnboardMessageEmailFormGroup.get('orderId')?.setValue(this.candidateJob?.orderId);
+      this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.candidateJob?.candidateProfileId);
+      this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.candidateJob?.organizationId);
       const statusChanged = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
       this.store
         .dispatch(
@@ -592,6 +600,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             this.resetStatusesFormControl();
             this.adjustCandidatePayRateField();
           }
+        });
+        this.action$.pipe(takeUntil(this.destroy$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
           if(applicantStatus.applicantStatus === ApplicantStatusEnum.OnBoarded){
             const options = {
                 title: ONBOARD_CANDIDATE,
@@ -634,6 +644,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             stream : emailvalue.fileUpload,
             extension : emailvalue.fileUpload?.type,
             documentName : emailvalue.fileUpload?.name,
+            orderId : emailvalue.orderId,
+            candidateId : emailvalue.candidateId,
+            businessUnitId : emailvalue.businessUnitId,
           })
         )
         .subscribe(() => {
@@ -741,6 +754,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+    this.verifyNoPenalty = value === PenaltyCriteria.NoPenalty;
   }
 
   private fieldsEnableHandlear(): void {

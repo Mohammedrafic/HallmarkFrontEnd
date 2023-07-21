@@ -34,7 +34,7 @@
       <e-column headerText="" field="actions" textAlign="Left" width="150" [visible]="false">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+            <button ejs-button cssClass="e-flat primary-icon-button noResponsive" (click)="onEdit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat secondary-icon-button enabled-button"
@@ -162,6 +162,12 @@
           <div *ngFor="let region of data.candidateProfileRegions; trackBy: regionTrackBy">{{ region.regionDescription ||
             region }}</div>
         </ng-template>
+      </e-column>
+      <e-column textAlign="Left" field="employeeSourceId" *ngIf="isIRP && isSourceValidated" headerText="Emp Source Id">
+      </e-column>
+      <e-column textAlign="Left" field="source" *ngIf="isIRP && isSourceValidated" headerText="Source">
+      </e-column>
+      <e-column textAlign="Left" field="recruiter" *ngIf="isIRP && isSourceValidated" headerText="Recruiter">
       </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>

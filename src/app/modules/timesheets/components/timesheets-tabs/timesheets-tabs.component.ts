@@ -63,12 +63,12 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
     if (changes['tabConfig']) {
       this.asyncRefresh();
       this.navigatingTab();
-      this.navigatetopendingtimesheet();  
+      this.navigatetopendingtimesheet();
     }
   }
 
   public getalerttitle(): void {
-    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string; 
+    this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
   }
 
   public ngOnInit(): void {

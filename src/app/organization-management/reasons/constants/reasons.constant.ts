@@ -71,7 +71,9 @@ export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
   5: ReasonFormType.Unavailability,
   6: ReasonFormType.TerminatedReason,
   7: ReasonFormType.InternalTransferReason,
-  8: ReasonFormType.CategoryNoteReason
+  8: ReasonFormType.CategoryNoteReason,
+  9: ReasonFormType.SourcingReason,
+  10: ReasonFormType.RecuriterReason
 };
 
 export const NewReasonsActionsMap = {
@@ -82,6 +84,9 @@ export const NewReasonsActionsMap = {
   [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.SaveInternalTransferReasons,
   [ReasonsNavigationTabs.Termination]: ReasonActions.SaveTerminationReasons,
   [ReasonsNavigationTabs.CategoryNote]: ReasonActions.SaveCategoryNoteReasons,
+  [ReasonsNavigationTabs.SourcingReason]: ReasonActions.SaveSourcingReasons,
+  [ReasonsNavigationTabs.RecuriterReason]: ReasonActions.SaveRecuriterReasons,
+ 
 };
 
 export const UpdateReasonsActionsMap = {
@@ -92,6 +97,8 @@ export const UpdateReasonsActionsMap = {
   [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.UpdateInternalTransferReasons,
   [ReasonsNavigationTabs.Termination]: ReasonActions.UpdateTerminationReasons,
   [ReasonsNavigationTabs.CategoryNote]: ReasonActions.UpdateCategoryNoteReasons,
+  [ReasonsNavigationTabs.SourcingReason]: ReasonActions.UpdateSourcingReasons,
+  [ReasonsNavigationTabs.RecuriterReason]: ReasonActions.UpdateRecuriterReasons,
 };
 
 export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
@@ -243,5 +250,8 @@ export const ReasonDialogConfig: ReasonFormConfigMap = {
   [ReasonFormType.CategoryNoteReason]: categoryNoteDialogConfig,
   [ReasonFormType.ManualInvoiceReason] : ManualInvoiceDialogConfig,
   [ReasonFormType.TerminatedReason] : TerminatedDialogConfig,
-  [ReasonFormType.InternalTransferReason] : InternalDialogConfig
+  [ReasonFormType.InternalTransferReason] : InternalDialogConfig,
+  [ReasonFormType.SourcingReason] : TerminatedDialogConfig,
+  [ReasonFormType.RecuriterReason] : TerminatedDialogConfig,
+
 };

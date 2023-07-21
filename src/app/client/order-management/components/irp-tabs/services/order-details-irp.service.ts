@@ -32,6 +32,7 @@ export class OrderDetailsIrpService {
       shift: [null, Validators.required],
       shiftStartTime: [null, Validators.required],
       shiftEndTime: [null, Validators.required],
+      linkedId: [null, Validators.maxLength(20)],
     });
   }
 
@@ -47,6 +48,7 @@ export class OrderDetailsIrpService {
       shift: [null, Validators.required],
       shiftStartTime: [null, Validators.required],
       shiftEndTime: [null, Validators.required],
+      linkedId: [null, Validators.maxLength(20)],
     });
   }
 

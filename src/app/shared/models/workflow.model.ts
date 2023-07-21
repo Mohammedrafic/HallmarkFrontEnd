@@ -4,22 +4,26 @@ export class WorkflowWithDetails {
   type: number;
   requireMappingsUpdate?: boolean;
   workflows?: Workflow[];
+  isIRP: boolean;
+  includeInIRP?: boolean;
   isActive?: boolean; // used only on UI to highlight clicked card
 }
 
-export class WorkflowWithDetailsPut {
+export interface WorkflowWithDetailsPut {
   id?: number;
   name: string;
+  isIRP: boolean;
   customSteps: Step[];
 }
 
-export class Workflow {
+export interface Workflow {
   id?: number;
   type: number;
+  workflowId: number;
   steps: Step[];
 }
 
-export class Step {
+export interface Step {
   id?: number;
   canBeFollowedByCustomStep?: boolean;
   isAgencyStep?: boolean;
@@ -28,8 +32,10 @@ export class Step {
   name: string;
   status: string;
   type: number;
+  formStepName?: string;
   order?: number;
   nextStepStatus?: string;
+  parentId?: number | null;
 }
 
 
@@ -44,4 +50,14 @@ export class WorkflowFilters {
   skillIds?: number[];
   types?: number[];
   names?: string[];
+}
+
+export interface WorkflowFlags {
+  includeInIRP: boolean;
+  includeInVMS: boolean;
+}
+
+export interface WorkflowList {
+  orderWorkflow: Workflow | null;
+  applicationWorkflow: Workflow | null;
 }

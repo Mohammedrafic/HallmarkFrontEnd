@@ -176,7 +176,7 @@ const contactEmailsColumnMapping = {
 
 export const DefaultFilterColumns: FilterColumns = {
   searchTerm: defaultInputMapping,
-  orderIds: defaultColumnMapping,
+  orderIds: defaultInputMapping,
   statusIds: defaultColumnMapping,
   skillIds: skillsColumnMapping ,
   departmentIds: defaultColumnMapping,

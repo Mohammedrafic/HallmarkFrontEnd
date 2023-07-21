@@ -18,9 +18,9 @@ export class SideDialogComponent extends DestroyableDirective implements OnInit 
   
   @Input() targetElement: HTMLElement | null = this.document.body.querySelector('#main');
   @Input() header: string | null;
-  @Input() width: string = '434px';
-  @Input() disableSaveButton: boolean = false;
-  @Input() saveButtonLabel: string = 'Save';
+  @Input() width = '434px';
+  @Input() disableSaveButton = false;
+  @Input() saveButtonLabel = 'Save';
 
   @Output() formCancelClicked = new EventEmitter();
   @Output() formSaveClicked = new EventEmitter();

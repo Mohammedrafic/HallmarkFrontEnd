@@ -23,6 +23,14 @@ export const STATUS_COLOR_GROUP = {
     'active',
     'completed',
     'applied',
+    'Sourcing',
+    'Prospect',
+    'Verbal Offer Made',
+    'Onboarding',
+    'Cleared For Orientation',
+    'Orientation Scheduled',
+    'Do Not Hire',
+    'Fall Off Onboarding',
     TIMETHEETS_STATUSES.PENDING_APPROVE,
     TIMETHEETS_STATUSES.PENDING_APPROVE_ASTERIX,
     INVOICES_STATUSES.PENDING_APPROVAL,
@@ -91,7 +99,15 @@ export enum EmployeeStatus {
   Inactive,
   Active,
   'On Hold',
-  Terminated
+  Terminated,
+  'Sourcing',
+  'Prospect',
+  'Verbal Offer Made',
+  'Onboarding',
+  'Cleared For Orientation',
+  'Orientation Scheduled',
+  'Do Not Hire',
+  'Fall Off Onboarding',
 }
 
 export enum CreatedCandidateStatus {

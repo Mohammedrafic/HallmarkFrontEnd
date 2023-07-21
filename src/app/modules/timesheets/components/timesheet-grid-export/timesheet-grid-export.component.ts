@@ -9,7 +9,7 @@ import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { TimesheetGridSelections } from '../../interface/timesheet.interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { GetExportFileName, TimesheetsExportCols } from './timesheet-export.constant';
+import { GetExportFileName, TimesheetsExportColsOrg, TimesheetsExportColsAgency  } from './timesheet-export.constant';
 
 @Component({
   selector: 'app-timesheet-grid-export',
@@ -28,7 +28,8 @@ export class TimesheetGridExportComponent extends AbstractGridConfigurationCompo
   public showExport = false;
   public fileName = '';
   public defaultFileName = '';
-  public timeSheetColumnsToExport: ExportColumn[] = TimesheetsExportCols;
+ 
+  public timeSheetColumnsToExport: ExportColumn[];
 
   private selectedTabIndex = 0;
   private timesheetStatus: TimesheetStatus | null;
@@ -61,7 +62,8 @@ export class TimesheetGridExportComponent extends AbstractGridConfigurationCompo
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     const filters = this.store.selectSnapshot(TimesheetsState.timesheetsFilters);
-    const ids = this.selectedRows.selectedTimesheetIds.length ? this.selectedRows.selectedTimesheetIds : null;
+    this.timeSheetColumnsToExport = this.isAgency?TimesheetsExportColsAgency:TimesheetsExportColsOrg;
+    const ids = this.selectedRows.selectedTimesheetIds?.length ? this.selectedRows.selectedTimesheetIds : null;
     const filterQuery = {
       ...filters,
       offset: Math.abs(new Date().getTimezoneOffset()),

@@ -50,7 +50,6 @@ import {
   ExportAgencyOrders,
   GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
-  GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
   GetOrderById,
   ReloadOrderCandidatesLists,
@@ -111,6 +110,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
   @Input() public orderStatus: string[];
+  @Input() public candidateStatuses: string[];
 
   @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
@@ -293,12 +293,16 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = `Order Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
+    let filtersExport = {...this.filters};
+    if(this.filters.orderLocked){
+      filtersExport.orderLocked = filtersExport.orderLocked == 'false' ? false : filtersExport.orderLocked == 'true' ? true : null
+    }
     this.store.dispatch(
       new ExportAgencyOrders(
         new ExportPayload(
           fileType,
           {
-            ...this.filters,
+            filtersExport,
             offset: Math.abs(new Date().getTimezoneOffset()),
             isAgency: this.selectedTab === AgencyOrderManagementTabs.ReOrders ? true : null,
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
@@ -397,7 +401,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public setDefaultFilters(statuses: number[]): void {
+  public setDefaultFilters(statuses: string[]): void {
     if (this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
       this.patchFilterForm(!!this.filters?.regionIds?.length);
@@ -423,6 +427,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       if(this.orderStatus != null && this.orderStatus.length > 0){
         this.OrderFilterFormGroup.get('orderStatuses')?.setValue([...this.orderStatus]);
         this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : undefined;
+      }
+      if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
+        this.clearFilters();
+        this.setDefaultStatuses(statuses, true);
       }
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
@@ -464,10 +472,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
-  private setDefaultStatuses(statuses: number[], setDefaultFilters: boolean): void {
+  private setDefaultStatuses(statuses: string[], setDefaultFilters: boolean): void {
     if(this.Organizations.length > 0){
       this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
       this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+    }
+    if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
+      this.OrderFilterFormGroup.get('candidateStatuses')?.setValue([...this.candidateStatuses]);
+      this.filters.candidateStatuses = this.candidateStatuses.length > 0 ? this.candidateStatuses : undefined;
     }
     if (setDefaultFilters) {
       let Status = [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
@@ -477,6 +489,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       setTimeout(() => {
           this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
           this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
+
           this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
           for (let i = 0; i < this.filteredItems.length; i++) {
             if (this.filteredItems[i].text == undefined) {
@@ -533,19 +546,31 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
         this.filters.includeReOrders = true;
+        let filtersMyAgency = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersMyAgency.orderLocked = filtersMyAgency.orderLocked == 'false' ? false : filtersMyAgency.orderLocked == 'true' ? true : null
+          }
         this.hasOrderMyAgencyId();
         selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder &&
-          this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+          this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersMyAgency));
         break;
       case AgencyOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.filters.includeReOrders = true;
-        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        let filtersOpenPerDiem = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersOpenPerDiem.orderLocked = filtersOpenPerDiem.orderLocked == 'false' ? false : filtersOpenPerDiem.orderLocked == 'true' ? true : null
+          }
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersOpenPerDiem));
         break;
       case AgencyOrderManagementTabs.PermPlacement:
         this.filters.orderTypes = [OrderType.PermPlacement];
         this.filters.includeReOrders = false;
-        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        let filtersPermPlacement = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersPermPlacement.orderLocked = filtersPermPlacement.orderLocked == 'false' ? false : filtersPermPlacement.orderLocked == 'true' ? true : null
+          }
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersPermPlacement));
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.hasOrderMyAgencyId();
@@ -556,7 +581,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       default:
         this.hasOrderMyAgencyId();
         this.filters.includeReOrders = false;
-        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        let filtersDefault = {...this.filters};
+          if(this.filters.orderLocked){
+            filtersDefault.orderLocked = filtersDefault.orderLocked == 'false' ? false : filtersDefault.orderLocked == 'true' ? true : null
+          }
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersDefault));
         break;
     }
 
@@ -628,8 +657,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           ""
         )
       );
+
       this.orderPositionSelected$.next(false);
-      this.store.dispatch(new GetAgencyOrderGeneralInformation(rowData.orderId, rowData.organizationId));
       this.selectedIndex = Number(event.rowIndex);
     }
 
@@ -686,9 +715,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.orderManagementAgencyService.excludeDeployed
       )
     );
-    this.store.dispatch(
-      new GetAgencyOrderGeneralInformation(reOrder.orderId || (reOrder.id as number), order.organizationId)
-    );
+
     this.selectedOrder = reOrder;
     this.selectedIndex = null;
     this.openPreview.next(true);
@@ -793,7 +820,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
       shift:this.filters.shift || null,
-
+      orderLocked:this.filters.orderLocked || null,
     });
 
     if(!prepopulate) {

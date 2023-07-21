@@ -5,7 +5,7 @@ import lodashMapPlain from 'lodash/map';
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { AccumulationChartModel } from '@syncfusion/ej2-angular-charts';
 import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
-import { catchError, forkJoin, Observable, of } from 'rxjs';
+import { BehaviorSubject, catchError, forkJoin, Observable, of } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import flow from 'lodash/fp/flow';
 import values from 'lodash/fp/values';
@@ -92,9 +92,12 @@ export class DashboardService {
     [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: (filters: DashboartFilterDto) => this.getalreadyExpiredCredentials(filters),
     [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
+    [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
+
+  candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
 
   constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
 
@@ -156,6 +159,26 @@ export class DashboardService {
         return {
           id: WidgetTypeEnum.CANDIDATES,
            title: 'Candidate Overall Status',
+          chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
+            label: status,
+            value: count,
+            text:'',
+            color:
+              candidateLegendPalette[status as CandidateChartStatuses] ||
+              candidateLegendPalette[CandidateChartStatuses.CUSTOM],
+          })),
+        };
+      })
+    );
+  }
+
+  private getCandidatesActivePositionsWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
+    return this.httpClient.post<CandidateTypeInfoModel[]>(`${this.baseUrl}/GetCandidatesForActivePositions`, { ...filter }).pipe(
+      map((candidatesInfo: CandidateTypeInfoModel[]) => {
+        this.candidatesForActivePositions$.next(candidatesInfo);
+        return {
+          id: WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS,
+           title: 'Candidates for Active Positions',
           chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
             label: status,
             value: count,
@@ -400,8 +423,8 @@ export class DashboardService {
   public redirectToUrl(url: string,orderStatus? :number,status? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status} });
   }
-  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :number,candidateStatus?:string): void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus} });
+  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string,xtraOrderStatus? :number,xtraOrderstatustext? : string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus, xtraOrderStatus: xtraOrderStatus,xtraStatus: xtraOrderstatustext} });
   }
   public redirectToUrlWithAgencyposition(url: string,orderStatus? :number,condition? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,condition: condition} });
@@ -516,5 +539,9 @@ export class DashboardService {
 
   public getAvailableEmployee(): Observable<AvailableEmployeeModel[]> {
     return this.httpClient.get<AvailableEmployeeModel[]>(`/api/Schedules/AvailableEmployee`);
+  }
+
+  public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
+    return this.candidatesForActivePositions$.asObservable();
   }
 }

@@ -16,10 +16,16 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
 import { SharedModule } from '@shared/shared.module';
 
 import { WorkflowMappingComponent } from './workflow-mapping/workflow-mapping.component';
-import { CardMenuComponent } from './job-order/card-menu/card-menu.component';
 import { WorkflowStepsComponent } from './job-order/workflow-steps/workflow-steps.component';
 import { JobOrderComponent } from './job-order/job-order.component';
 import { WorkflowRoutingModule } from './workflow-routing.module';
+import { IrpOrderWorkflowModule } from '@organization-management/workflow/irp-order-workflow/irp-order-workflow.module';
+import { CardMenuModule } from '@organization-management/workflow/components/card-menu/card-menu.module';
+import {
+  CreateWorkflowModule,
+} from '@organization-management/workflow/components/create-workflow/create-workflow.module';
+import { JobOrderService } from '@organization-management/workflow/job-order/services';
+import { WorkflowMappingService } from '@organization-management/workflow/workflow-mapping/services';
 
 const icons = {
   Sliders,
@@ -31,7 +37,6 @@ const icons = {
   declarations: [
     JobOrderComponent,
     WorkflowStepsComponent,
-    CardMenuComponent,
     WorkflowMappingComponent,
   ],
   imports: [
@@ -53,6 +58,10 @@ const icons = {
     DropDownButtonModule,
     TooltipContainerModule,
     FeatherModule.pick(icons),
+    IrpOrderWorkflowModule,
+    CardMenuModule,
+    CreateWorkflowModule,
   ],
+  providers: [JobOrderService, WorkflowMappingService],
 })
-export class WorkflowModule { }
+export class WorkflowModule {}

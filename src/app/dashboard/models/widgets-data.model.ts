@@ -35,4 +35,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.ALREADY_EXPIRED_CREDS] : ExpiryDetailsModel[];
   [WidgetTypeEnum.UPCOMING_EXP_CREDS] : ExpiryDetailsModel[];
   [WidgetTypeEnum.AVAILABLE_EMPLOYEE] : AvailableEmployeeModel[];
+  [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: ChartAccumulation;
 }

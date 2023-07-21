@@ -95,6 +95,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public priceUtils = PriceUtils;
   public showHoursControl: boolean = false;
   public showPercentage: boolean = false;
+  public verifyNoPenalty: boolean = false;
   public candidatePayRateRequired: boolean;
   public candidateSSNRequired: boolean=false;
   public candidateDOBRequired: boolean;
@@ -444,13 +445,25 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
             this.candidateAddressRequiredValue = addressConfiguration.value;
           }
         }
+        
+        let jobStartDate: string | Date;
+        let jobEndDate: string | Date;
+
+        if (this.isAgency && value.applicantStatus.applicantStatus === ApplicantStatusEnum.OnBoarded) {
+          jobStartDate = value.actualStartDate || '';
+          jobEndDate = value.actualEndDate || '';
+        } else {
+          jobStartDate = value.order.jobStartDate ? DateTimeHelper
+          .setCurrentTimeZone(value.order.jobStartDate.toString()) : '';
+          jobEndDate = value.order.jobEndDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobEndDate.toString()) : '';
+        }
+
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobStartDate.toString()) : "",
-          value.order.jobEndDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobEndDate.toString()) : ""],
+          date: [jobStartDate, jobEndDate],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
           availableStartDate: value.availableStartDate ?
             DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
@@ -543,6 +556,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+    this.verifyNoPenalty = value === PenaltyCriteria.NoPenalty;
   }
 
   private subscribeOnPermissions(): void {

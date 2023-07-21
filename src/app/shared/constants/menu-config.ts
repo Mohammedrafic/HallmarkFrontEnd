@@ -469,6 +469,11 @@ export const MENU_CONFIG: any = {
       icon: 'trending-up',
       route: '/reporting/custom-report',
     },
+    102: {
+      // Position-Summary
+      icon: '',
+      route: '/analytics/Position-Summary',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -649,7 +654,7 @@ export const MENU_CONFIG: any = {
       // New Accrual Report
       icon: '',
       route: '/analytics/accrual-report',
-    },    
+    },
     83: {
       // New Accrual Report
       icon: '',
@@ -766,7 +771,7 @@ export const MENU_CONFIG: any = {
       route: '/client/associate-list',
     },
     38: {
-      // Scheduling
+      // Scheduling for Org user
       icon: 'calendar',
       route: 'client/scheduling',
     },
@@ -1148,6 +1153,11 @@ export const MENU_CONFIG: any = {
       icon: 'trending-up',
       route: '/reporting/custom-report',
     },
+  101: {
+    // Position-Summary
+    icon: '',
+    route: '/analytics/Position-Summary',
+  },
   },
 
   [BusinessUnitType.Agency]: {
@@ -1396,6 +1406,14 @@ export const MENU_CONFIG: any = {
       // Communication
       icon: 'twitch',
       route: '',
+    },
+  },
+
+  [BusinessUnitType.Employee]: {
+    38: {
+      // Scheduling for Employee
+      icon: 'calendar',
+      route: 'employee/scheduling',
     },
   },
 };

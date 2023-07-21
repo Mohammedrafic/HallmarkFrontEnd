@@ -39,8 +39,8 @@ export class RolesService {
    * @param BusinessUnitType
    * @return PermissionsTree
    */
-  public getPermissionsTree(BusinessUnitType: BusinessUnitType): Observable<PermissionsTree> {
-    return this.http.get<PermissionsTree>(`/api/Permissions`, { params: { BusinessUnitType } });
+  public getPermissionsTree(BusinessUnitType: BusinessUnitType,BusinessUnitId:number): Observable<PermissionsTree> {
+    return this.http.get<PermissionsTree>(`/api/Permissions`, { params: { BusinessUnitType, BusinessUnitId} });
   }
 
 /**

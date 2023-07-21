@@ -13,6 +13,7 @@
               (select)="exportSelected($event)"
               id="exportButton"
               cssClass="e-outline button-export"
+              [disabled]="!canViewCandidateAssignment"
             > 
               <div class="button-export-container">
                 Export <i-feather name="upload" class="icon"></i-feather>
@@ -59,5 +60,8 @@
     [filterColumns]="filterColumns"
     [isClear]="isClear"
     [isAgency]="isAgency"
+    [orgAgencyName]="orgAgencyName"
+    [lastOrgId]="lastOrgId"
+    [lastAgencyId]="lastAgencyId"
   ></app-filters>
 </app-filter-dialog>
