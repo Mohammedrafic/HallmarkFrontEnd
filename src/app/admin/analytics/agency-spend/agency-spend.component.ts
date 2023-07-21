@@ -453,7 +453,7 @@ export class AgencySpendComponent implements OnInit {
   }
 
   public onFilterClearAll(): void {
-    let currentYear = new Date().getFullYear();    
+    const currentYear = new Date().getFullYear();    
     this.agentSpendReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.agentSpendReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.agentSpendReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
@@ -492,7 +492,7 @@ export class AgencySpendComponent implements OnInit {
       startMonth,
       endMonth,
       startYear,
-      endYear
+      endYear,
     } = this.agentSpendReportForm.getRawValue();
     if (!this.agentSpendReportForm.dirty) {
       this.message = 'Default filter selected with all regions, locations and departments.';
@@ -501,13 +501,15 @@ export class AgencySpendComponent implements OnInit {
       this.message = '';
     }
 
-    let departmentIdParam = ''
-    if(departmentIds.length > 0)
-        departmentIdParam = departmentIds.join(',')
-    else if(this.departmentsList?.length > 0)
+    let departmentIdParam = '';
+    if(departmentIds.length > 0){
+        departmentIdParam = departmentIds.join(',');
+    }
+    else if(this.departmentsList?.length > 0) {
       departmentIdParam = this.departmentsList.map((x) => x.id).join(',');
+    }
 
-    let skillIdParam = skillIds.length > 0 ? skillIds.join(',') : '';    
+    const skillIdParam = skillIds.length > 0 ? skillIds.join(',') : '';    
     this.paramsData = {
       OrganizationParam: this.selectedOrganizations?.map((list) => list.organizationId).join(','),
       DepartmentId: departmentIdParam,
@@ -515,15 +517,15 @@ export class AgencySpendComponent implements OnInit {
       StartMonth: startMonth,
       EndMonth: endMonth,
       StartYear: startYear,
-      EndYear: endYear
+      EndYear: endYear,
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
 
   getLastWeek() {
-    let today = new Date(Date.now());
-    let lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
+    const today = new Date(Date.now());
+    const lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
     return lastWeek;
   }
   
