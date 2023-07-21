@@ -96,6 +96,7 @@ export type AgencyOrderFilteringOptions = {
   candidateStatuses: {
     status: number;
     statusText: string;
+    filterStatus?: string;
   }[];
   masterSkills: {
     id: number;
