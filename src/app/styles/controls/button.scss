@@ -39,16 +39,16 @@ button.e-control.e-btn {
         transform: none;
       }
 
-      color: $supportive-red;
+      color: $primary-active-blue-10;
 
       &.e-active,
       &:focus {
         color: $white;
-        background-color: $supportive-red-00;
+        background-color: $primary-active-blue-60;
       }
 
       &:hover {
-        background-color: $supportive-red-40;
+        background-color: $primary-active-blue-80;
       }
 
       &[disabled] {

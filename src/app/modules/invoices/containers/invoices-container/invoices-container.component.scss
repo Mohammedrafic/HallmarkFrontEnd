@@ -205,7 +205,7 @@
 }
 
 .top-margin {
-  margin-left: 0;
+  margin: 10px 0 0;
 }
 
 @media #{$min-desktop-large} {
@@ -228,22 +228,34 @@
     width: 100vw !important;
     margin-left: -25px;
   }
+
   .bootstrap,
   .top-margin {
-    margin-top: 42px;
+    margin-top: 54px;
   }
+
   .bootstrap {
     margin-bottom: 12px;
+  }
+
+  .invoices-split-button {
+    width: calc(100vw - 16px);
+
+    .main-button {
+      width: calc(100% - 50px);
+    }
   }
 }
 
 
-@media (max-width: 670px) {
+@media (max-width: 688px) {
   .buttons-group {
     flex-direction: column;
+
     .e-tooltip {
       margin-top: 12px;
       margin-left: 0;
+      align-self: flex-start;
     }
   }
 }
@@ -251,6 +263,6 @@
 @media (max-width: 480px) {
   .bootstrap,
   .top-margin {
-    margin-top: 54px;
+    margin-top: 64px;
   }
 }

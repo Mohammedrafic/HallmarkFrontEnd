@@ -30,13 +30,9 @@
 
     <div class="devider" *ngIf="!(isMobile$ | async) && (userChatConfig$ | async)"></div>
 
-    <!-- Temporary solution to log out from the application -->
-
     <div class="header-item" *ngIf="!(isMobile$ | async)">
-      <ejs-menu [items]="profileDatasource" (select)="onSelectProfileMenu($event)"> </ejs-menu>
+      <ejs-menu showItemOnClick="true" [items]="profileDatasource" (select)="onSelectProfileMenu($event)"> </ejs-menu>
     </div>
-    <!-- Temporary solution to log out from the application -->
-    <!--<button class="logout-button" ejs-button cssClass="e-primary" (click)="logout()">Logout</button>-->
   </div>
 </div>
 <section class="shell">
