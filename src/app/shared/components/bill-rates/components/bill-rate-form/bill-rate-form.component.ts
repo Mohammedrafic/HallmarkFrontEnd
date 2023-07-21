@@ -31,8 +31,15 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   public rateHoursInput: MaskedTextBoxComponent;
 
   @Input() billRateForm: FormGroup;
-  @Input() billRatesData: BillRate[];
+  @Input() set billRatesData (rates: BillRate[]) {
+    if (rates) {
+      this.jobBillRates = rates;
+      this.jobBillRatesOptions = rates.map((rate) => rate.billRateConfig);
+    }
+  }
+
   @Input() selectedBillRateUnit: BillRateUnit;
+  @Input() isExtension = false;
 
   public billRateTypes = BillRateTypes;
   public billRateConfig: BillRateOption;
@@ -67,7 +74,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   }
 
   get isInternalsEnabled(): boolean {
-    return this.billRateForm.get('billRateConfigId')?.value !== BillRateTitleId.Mileage;;
+    return this.billRateForm.get('billRateConfigId')?.value !== BillRateTitleId.Mileage;
   }
 
   get categoryValue(): string {
@@ -84,6 +91,8 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
 
   private isAlive = true;
   private predefinedBillRates: BillRate[] = [];
+  private jobBillRatesOptions: BillRateOption[];
+  private jobBillRates: BillRate[] = [];
 
   constructor(private store: Store, private cdr: ChangeDetectorRef) {}
 
@@ -125,8 +134,13 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     .pipe(
       takeWhile(() => this.isAlive),
     ).subscribe((options: BillRateOption[]) => {
-      this.predefinedBillRates = this.store.selectSnapshot(OrderManagementContentState.predefinedBillRates);
-      this.billRateOptions = options;
+      if (this.isExtension) {
+        this.billRateOptions = this.jobBillRatesOptions;
+      } else {
+        this.predefinedBillRates = this.store.selectSnapshot(OrderManagementContentState.predefinedBillRates);
+        this.billRateOptions = options;
+      }
+
       this.cdr.detectChanges();
     });
   }
@@ -143,7 +157,8 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   private setOTValue(): void {
     if (BillRateFormComponent.calculateOTSFlags) {
       const configId = this.billRateForm.get('billRateConfigId')?.value;
-      const billRates = this.predefinedBillRates.filter(el => el.billRateConfigId === configId);
+      const billRates = this.isExtension ? this.jobBillRates 
+      : this.predefinedBillRates.filter(el => el.billRateConfigId === configId);
       const billRatesDates = billRates.map(el => el.effectiveDate);
       const date = this.billRateForm.get('effectiveDate')?.value;
 
@@ -162,7 +177,6 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
 
     this.cdr.detectChanges();
   }
-
 
   private onBillRateConfigIdChanged(): void {
     this.billRateForm.get('billRateConfigId')?.valueChanges
