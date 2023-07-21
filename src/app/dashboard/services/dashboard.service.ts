@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -192,24 +192,25 @@ export class DashboardService {
     );
   }
 
-  private getAvergaeDayActivePositionsWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
-    return this.httpClient.post<CandidateTypeInfoModel[]>(`${this.baseUrl}/GetCandidatesByStatuses`, { ...filter }).pipe(
-      map((candidatesInfo: CandidateTypeInfoModel[]) => {
+  private getAvergaeDayActivePositionsWidgetData(filter: DashboartFilterDto): Observable<any> {
+    return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter }).pipe(
+      map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
         return {
           id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS,
            title: 'Average Days of Active Positions ',
-            chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
-            label: status,
-            value: count,
-            text:'',
-            color:
-              candidateLegendPalette[status as CandidateChartStatuses] ||
-              candidateLegendPalette[CandidateChartStatuses.CUSTOM],
-          })),
-        };
-      })
-    );
-  }
+           chartData: lodashMapPlain(
+            orderStatusesAvgDetails,
+            ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
+              label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
+              value: average,
+              average: count,
+              color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
+            })
+            ),
+          };
+        })
+      );
+    }
 
   private getApplicantsByRegionWidgetData(
     filters: DashboartFilterDto

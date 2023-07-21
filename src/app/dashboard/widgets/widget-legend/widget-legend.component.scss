@@ -12,7 +12,8 @@
     font-size: 16px;
     font-weight: 700;
     line-height: 24px;
-    width: 100%;
+    // width: 100%;
+    width: 50%;
     text-align: right
   }
   &__head {
@@ -48,7 +49,7 @@
     line-height: 17px;
     text-overflow: ellipsis;
     white-space: nowrap;
-    // overflow: hidden;
+    overflow: hidden;
     color: $secondary-dark-blue-15;
     width: 70%;
     &.right {
@@ -57,7 +58,8 @@
   }
 
   &__point {
-    width: 32px;
+    //width: 32px;
+    width: 24px;
     height: 16px;
     border-radius: 50%;
     margin-right: 12px;
@@ -80,6 +82,9 @@
   }
   .trend-marright{
     margin-right: 6px !important;
+  }
+  .pointSize{
+    width: 32px !important;
   }
 }
 

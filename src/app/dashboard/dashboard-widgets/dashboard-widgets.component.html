@@ -29,7 +29,7 @@
          <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS"
                                   [chartData]="widgetsData?.[widgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]"
                                   [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
-                                  [description]="widgetDescriptionEnum.AVERAGE_DAY_ACTIVE_POSITIONS"></app-accumulation-chart>
+                                  [description]="widgetDescriptionEnum.AVERAGE_DAY_ACTIVE_POSITIONS" [averageFlag]="true"></app-accumulation-chart>
           <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.CANDIDATES"
                                   [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
                                   [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"

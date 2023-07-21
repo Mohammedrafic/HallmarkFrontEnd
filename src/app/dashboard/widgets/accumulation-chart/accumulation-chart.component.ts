@@ -43,6 +43,7 @@ export class AccumulationChartComponent
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean;
   @Input() public description: string;
+  @Input() public averageFlag: boolean =false;
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
@@ -218,7 +219,7 @@ export class AccumulationChartComponent
     });
     
 
-
+    console.log('this.chartData?.chartData',this.chartData?.chartData);
     this.legendData = this.chartData?.chartData as WidgetLegengDataModel[];
     this.chartData$.next(this.chartData ?? null);
     this.chartData?.chartData &&
