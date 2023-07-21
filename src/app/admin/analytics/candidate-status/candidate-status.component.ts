@@ -148,7 +148,7 @@ export class CandidateStatusComponent implements OnInit {
   private previousOrgId: number = 0;
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   private fixedCandidateStatusesIncluded: number[] = [6, 7, 11];
-  private fixedJobStatusesIncluded: number[] = [3, 4, 7, 8, 1, 9];
+  private fixedJobStatusesIncluded: number[] = [3, 4, 7, 8];
   private joinString = ",";
 
   public masterRegionsList: Region[] = [];
