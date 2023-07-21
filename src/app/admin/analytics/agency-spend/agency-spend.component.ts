@@ -1,6 +1,4 @@
-import { ScheduleCandidate, ScheduleCandidatesPage, ScheduleFilters } from 'src/app/modules/schedule/interface/schedule.interface';
-import { EmitType } from '@syncfusion/ej2-base';
-import { formatDate } from '@angular/common';
+import { ScheduleCandidate, ScheduleCandidatesPage } from 'src/app/modules/schedule/interface/schedule.interface';
 import {
   Component,
   OnInit,
@@ -9,14 +7,11 @@ import {
   NgZone,
   Inject,
   ViewChild,
-  OnDestroy,
 } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import {
   ClearLogiReportState,
-  GetCandidateSearchFromScheduling,
-  GetCommonReportCandidateSearch,
   GetStaffScheduleReportFilterOptions,
 } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
@@ -32,9 +27,9 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { User } from '@shared/models/user.model';
 import { Department, Region, Location, Organisation } from '@shared/models/visibility-settings.model';
 import { FilterService } from '@shared/services/filter.service';
-import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { uniqBy, isBoolean } from 'lodash';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { uniqBy } from 'lodash';
+import { filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
@@ -42,11 +37,8 @@ import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.a
 import { UserState } from 'src/app/store/user.state';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { analyticsConstants } from '../constants/analytics.constant';
-import { OutsideZone } from '@core/decorators';
 import {
-  CommonCandidateSearchFilter,
   CommonReportFilter,
-  SearchCandidate,
   StaffScheduleReportFilterOptions,
 } from '../models/common-report.model';
 
@@ -57,19 +49,18 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AgencySpendComponent implements OnInit {
-  public baseUrl: string = '';
+  public baseUrl= '';
   public user: User | null;
-  public filterColumns: any;
+  public filterColumns:any = {};
   public filteredItems: FilteredItem[] = [];
   public defaultRegions: (number | undefined)[] = [];
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-  public isClearAll: boolean = false;
-  public isResetFilter: boolean = false;
-  public isLoadNewFilter: boolean = false;
-  public isInitialLoad: boolean = false;
-  private isAlive: boolean = true;
+  public isClearAll = false;
+  public isResetFilter = false;
+  public isLoadNewFilter = false;
+  public isInitialLoad = false;
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -78,26 +69,26 @@ export class AgencySpendComponent implements OnInit {
   public locationsList: Location[] = [];
   public departmentsList: Department[] = [];
   public defaultOrganizations: number;
-  public paramsData: any = {
+  public paramsData = {
     OrganizationParam: '',
     DepartmentId: '',
     StartMonth: '',
     StartYear: '',
     EndMonth: '',
     EndYear: '',
-    SkillsId: ''    
+    SkillsId: '',    
   };
   public agentSpendReportForm: FormGroup;
   public reportName: LogiReportFileDetails = {
     name: '/IRPReports/AgenySpend/AgenySpendSummary.cls',
   };
   public catelogName: LogiReportFileDetails = { name: '/IRPReports/AgenySpend/AgentSpendReport.cat' };
-  public title: string = 'Agency Spend';
-  public message: string = '';
+  public title = 'Agency Spend';
+  public message = '';
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
-  remoteWaterMark: string = 'e.g. Andrew Fuller';
+  remoteWaterMark = 'e.g. Andrew Fuller';
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -108,32 +99,28 @@ export class AgencySpendComponent implements OnInit {
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
 
-  @Select(UserState.lastSelectedOrganizationId)
-  private organizationId$: Observable<number>;
-
   @Select(LogiReportState.getStaffScheduleReportOptionData)
   public staffScheduleReportFilterData$: Observable<StaffScheduleReportFilterOptions>;
 
   @Select(LogiReportState.getEmployeesSearchFromScheduling)
   public employeesSearchFromScheduling$: Observable<ScheduleCandidatesPage>;
-
-  private unsubscribe$: Subject<void> = new Subject();
   public bussinessControl: AbstractControl;
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
   public departmentIdControl: AbstractControl;
-
-  private agencyOrganizationId: number;
-  private previousOrgId: number = 0;
   public organizationFields = ORGANIZATION_DATA_FIELDS;
-  regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  public allOption: string = 'All';
+  public allOption = 'All';
   public candidateFilterData: { [key: number]: ScheduleCandidate }[] = [];
   candidateSearchData: ScheduleCandidate[] = [];
-
   public filterOptionData: StaffScheduleReportFilterOptions;
+
+  private unsubscribe$: Subject<void> = new Subject();
+  private agencyOrganizationId: number;
+  private previousOrgId = 0;  
+  private isAlive = true;
+
+  @Select(UserState.lastSelectedOrganizationId)
+  private organizationId$: Observable<number>;
 
   get startMonthControl(): AbstractControl { 
     return this.agentSpendReportForm.get('startMonth') as AbstractControl; 
@@ -160,21 +147,20 @@ export class AgencySpendComponent implements OnInit {
     this.store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: 'pie-chart' }));
     this.initForm();
     this.user = this.store.selectSnapshot(UserState.user);
-    if (this.user?.id != null) {
+    if (this.user?.id) {
       this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
     }
   }
 
   ngOnInit(): void {
+    this.initOrganizationData();
+  }
+
+  private initOrganizationData() {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.orderFilterColumnsSetup();
       this.store.dispatch(new ClearLogiReportState());
-      //this.SetReportData();
-      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
-        if (data.length > 0) {
-          this.logiReportComponent.SetReportData(data);
-        }
-      });
+      this.setReportData();
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
       this.initMonthYearDropdown();
@@ -188,39 +174,38 @@ export class AgencySpendComponent implements OnInit {
     });
   }
 
-  private initMonthYearDropdown(): void{    
-    let monthList:any[] = [];
-    let yearList:any[] = [];
+  private setReportData() {
+    this.logiReportData$
+    .pipe(filter((data) => data.length > 0), takeUntil(this.unsubscribe$))
+    .subscribe((data: ConfigurationDto[]) => {      
+      this.logiReportComponent.SetReportData(data);    
+    });
+  }
 
-    monthList.push({ name:'January', id:1 });
-    monthList.push({ name:'February', id:2 });
-    monthList.push({ name:'March', id:3 });
-    monthList.push({ name:'April', id:4 });
-    monthList.push({ name:'May', id:5 });
-    monthList.push({ name:'June', id:6 });
-    monthList.push({ name:'July', id:7 });
-    monthList.push({ name:'August', id:8 });
-    monthList.push({ name:'September', id:9 });
-    monthList.push({ name:'October', id:10 });
-    monthList.push({ name:'November', id:11 });
-    monthList.push({ name:'December', id:12 });
-
-    let currentYear = new Date().getFullYear();
+  private initMonthYearDropdown(): void{        
+    this.populateMonths();
+    const yearList = [];
+    const currentYear = new Date().getFullYear();
+    //Loading year dropdown with past 2 and future 10 years 
     for(let i = currentYear - 2; i <= currentYear + 10; i++){
       yearList.push({ name:i, id:i });
     }
 
-    this.filterColumns.startMonth.dataSource = [];
-    this.filterColumns.startMonth.dataSource = monthList;
-
-    this.filterColumns.endMonth.dataSource = [];
-    this.filterColumns.endMonth.dataSource = monthList;
-
-    this.filterColumns.startYear.dataSource = [];
     this.filterColumns.startYear.dataSource = yearList;
 
-    this.filterColumns.endYear.dataSource = [];
     this.filterColumns.endYear.dataSource = yearList;
+  }
+
+  private populateMonths() {
+    const monthList = [];
+    const monthNames = [ "January", "February", "March", "April", "May", "June",
+"July", "August", "September", "October", "November", "December" ];
+    for (let i=1; i<=monthNames.length;i++) {
+      monthList.push({ name:monthNames[i-1], id:i });
+    }
+    this.filterColumns.startMonth.dataSource = monthList;
+
+    this.filterColumns.endMonth.dataSource = monthList;
   }
 
   private orderFilterColumnsSetup(): void {
@@ -292,7 +277,7 @@ export class AgencySpendComponent implements OnInit {
   }
 
   private initForm(): void {
-    let currentYear = new Date().getFullYear();
+    const currentYear = new Date().getFullYear();
     this.agentSpendReportForm = this.formBuilder.group({
       businessIds: new FormControl([Validators.required]),
       regionIds: new FormControl([]),
@@ -318,28 +303,31 @@ export class AgencySpendComponent implements OnInit {
       analyticsConstants.formControlNames.BusinessIds
     ) as AbstractControl;
 
-    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data != null && data.length > 0) {
+    this.organizationData$
+      .pipe(filter((data) => data != null && data.length > 0), takeUntil(this.unsubscribe$))
+      .subscribe((data) => {      
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
         this.agentSpendReportForm
           .get(analyticsConstants.formControlNames.BusinessIds)
           ?.setValue(this.agencyOrganizationId);
-        this.changeDetectorRef.detectChanges();
-      }
+        this.changeDetectorRef.detectChanges();      
     });
 
+    this.onBusinessControlValueChanged();
+  }
+
+  private onBusinessControlValueChanged(){
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.agentSpendReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
-        //this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
-          let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          const orgList = this.organizations?.filter((x) => data == x.organizationId);
           this.selectedOrganizations = orgList;
           this.regionsList = [];
-          let regionsList: Region[] = [];
+          const regionsList: Region[] = [];
           let locationsList: Location[] = [];
           let departmentsList: Department[] = [];
           orgList.forEach((value) => {
@@ -365,42 +353,18 @@ export class AgencySpendComponent implements OnInit {
           this.masterDepartmentsList = this.departmentsList;
 
           if (
-            ((data == null || data <= 0) && this.regionsList.length == 0) ||
-            this.locationsList.length == 0 ||
-            this.departmentsList.length == 0
+            this.regionsList.length === 0 ||
+            this.locationsList.length === 0 ||
+            this.departmentsList.length === 0
           ) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
           } else {
             this.isResetFilter = true;
           }
-
-          let businessIdData = [];
-          businessIdData.push(data);
-          let filter: CommonReportFilter = {
-            businessUnitIds: businessIdData,
-          };
-          this.store.dispatch(new GetStaffScheduleReportFilterOptions(filter));
-          this.staffScheduleReportFilterData$
-            .pipe(takeWhile(() => this.isAlive))
-            .subscribe((data: StaffScheduleReportFilterOptions | null) => {
-              if (data != null) {
-                this.isAlive = false;
-                this.filterOptionData = data;
-                this.filterColumns.skillIds.dataSource = [];
-                this.filterColumns.skillIds.dataSource = data.masterSkills;
-                this.changeDetectorRef.detectChanges();
-
-                if (this.isInitialLoad) {
-                  setTimeout(() => {
-                    this.SearchReport();
-                  }, 3000);
-                  this.isInitialLoad = false;
-                }
-              }
-            });
-
           this.regions = this.regionsList;
-          this.filterColumns.regionIds.dataSource = this.regions;
+          this.filterColumns.regionIds.dataSource = this.regions;  
+          
+          this.loadShiftData(data);
         } else {
           this.isClearAll = false;
           this.agentSpendReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
@@ -409,17 +373,42 @@ export class AgencySpendComponent implements OnInit {
     });
   }
 
+  private loadShiftData(businessUnitId: number) {
+    const businessIdData = [];
+    businessIdData.push(businessUnitId);
+    const filterObj: CommonReportFilter = {
+      businessUnitIds: businessIdData,
+    };
+    this.store.dispatch(new GetStaffScheduleReportFilterOptions(filterObj))
+      .pipe(filter((data) => data !== null), takeWhile(() => this.isAlive))                    
+      .subscribe((data: StaffScheduleReportFilterOptions) => {        
+        this.isAlive = false;
+        this.filterOptionData = data;
+        this.filterColumns.skillIds.dataSource = [];
+        this.filterColumns.skillIds.dataSource = data.masterSkills;
+        this.changeDetectorRef.detectChanges();
+
+        if (this.isInitialLoad) {
+          setTimeout(() => {
+            this.searchReport();
+          }, 3000);
+          this.isInitialLoad = false;
+        }        
+      });          
+  }
+
   public showToastMessage(regionsLength: number, locationsLength: number, departmentsLength: number) {
     this.message = '';
-    let error: any =
-      regionsLength == 0
-        ? 'Regions/Locations/Departments are required'
-        : locationsLength == 0
-        ? 'Locations/Departments are required'
-        : departmentsLength == 0
-        ? 'Departments are required'
-        : '';
-
+    let error = '';
+    if (regionsLength == 0) {
+        error = 'Regions/Locations/Departments are required';
+    }
+    if (locationsLength == 0) {
+        error = 'Locations/Departments are required';
+    }
+    if (departmentsLength == 0) {
+        error = 'Departments are required';        
+    }
     this.store.dispatch(new ShowToast(MessageTypes.Error, error));
     return;
   }
@@ -493,18 +482,15 @@ export class AgencySpendComponent implements OnInit {
       return;
     }
     this.filteredItems = [];
-    this.SearchReport();
+    this.searchReport();
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public SearchReport(): void {
+  public searchReport(): void {
     this.filteredItems = [];
 
-    let {
-      businessIds,
-      departmentIds,
-      locationIds,
-      regionIds,      
+    const {
+      departmentIds,          
       skillIds,
       startMonth,
       endMonth,
@@ -518,29 +504,17 @@ export class AgencySpendComponent implements OnInit {
       this.message = '';
     }
 
-    regionIds =
-      regionIds.length > 0
-        ? regionIds.join(',')
-        : this.regionsList?.length > 0
-        ? this.regionsList.map((x) => x.id).join(',')
-        : '';
-    locationIds =
-      locationIds.length > 0
-        ? locationIds.join(',')
-        : this.locationsList?.length > 0
-        ? this.locationsList.map((x) => x.id).join(',')
-        : '';
-    departmentIds =
-      departmentIds.length > 0
-        ? departmentIds.join(',')
-        : this.departmentsList?.length > 0
-        ? this.departmentsList.map((x) => x.id).join(',')
-        : '';
-    skillIds = skillIds.length > 0 ? skillIds.join(',') : '';    
+    let departmentIdParam = ''
+    if(departmentIds.length > 0)
+        departmentIdParam = departmentIds.join(',')
+    else if(this.departmentsList?.length > 0)
+      departmentIdParam = this.departmentsList.map((x) => x.id).join(',');
+
+    let skillIdParam = skillIds.length > 0 ? skillIds.join(',') : '';    
     this.paramsData = {
       OrganizationParam: this.selectedOrganizations?.map((list) => list.organizationId).join(','),
-      DepartmentId: departmentIds,
-      SkillsId: skillIds,
+      DepartmentId: departmentIdParam,
+      SkillsId: skillIdParam,
       StartMonth: startMonth,
       EndMonth: endMonth,
       StartYear: startYear,
@@ -551,8 +525,8 @@ export class AgencySpendComponent implements OnInit {
   }
 
   getLastWeek() {
-    var today = new Date(Date.now());
-    var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
+    let today = new Date(Date.now());
+    let lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
     return lastWeek;
   }
   
