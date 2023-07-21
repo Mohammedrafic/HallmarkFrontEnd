@@ -695,6 +695,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
           {
             text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
             items: GetProfileMenuItems(this.isDarkTheme),
+            iconCss: this.isMobile ? '' : 'e-icons e-chevron-down',
           },
         ];
       }
