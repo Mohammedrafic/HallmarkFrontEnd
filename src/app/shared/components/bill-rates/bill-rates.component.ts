@@ -32,6 +32,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   @Input() isActive: boolean | null = false;
   @Input() readOnlyMode = false;
   @Input() isOrderPage = false;
+  @Input() isExtension = false;
   @Input() set billRates(values: BillRate[]) {
     if (values) {
       this.billRatesControl = new FormArray([]);
