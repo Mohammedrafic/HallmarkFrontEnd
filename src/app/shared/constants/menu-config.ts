@@ -1153,7 +1153,7 @@ export const MENU_CONFIG: any = {
       icon: 'trending-up',
       route: '/reporting/custom-report',
     },
-  101: {
+  102: {
     // Position-Summary
     icon: '',
     route: '/analytics/Position-Summary',
