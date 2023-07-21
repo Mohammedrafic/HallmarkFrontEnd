@@ -252,8 +252,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
          }else{
           this.filterColumns.profileStatuses.dataSource = ProfileStatuses
          }
-         console.log(this.isIRP)
-         console.log(this.isSourceValidated)
       });
     } 
   }
