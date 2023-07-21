@@ -8,7 +8,7 @@ import { AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { Penalty, PenaltyPage } from '@shared/models/penalty.model';
-import { RejectReason, RejectReasonPage, UnavailabilityReasons } from '@shared/models/reject-reason.model';
+import { Recuriter, RecuriterReasonPage, RejectReason, RejectReasonPage, Sourcing, SourcingReasonPage, UnavailabilityReasons } from '@shared/models/reject-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { UserState } from '../../../store/user.state';
 import { PageOfCollections } from '@shared/models/page.model';
@@ -21,14 +21,14 @@ export abstract class ReasonsComponent extends AbstractGridConfigurationComponen
 
   @Output()
   public readonly editReason: EventEmitter<RejectReason
-  | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue> = new EventEmitter<RejectReason | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue>();
+  | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue> = new EventEmitter<RejectReason | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue|Sourcing|Recuriter>();
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
 
   protected isAlive = true;
 
-  protected abstract readonly reasons$: Observable<RejectReasonPage | PenaltyPage
+  protected abstract readonly reasons$: Observable<RejectReasonPage | PenaltyPage |SourcingReasonPage|RecuriterReasonPage
   | PageOfCollections<UnavailabilityReasons>>;
 
   private readonly pageSubject = new Subject<number>();
@@ -51,7 +51,7 @@ export abstract class ReasonsComponent extends AbstractGridConfigurationComponen
     this.isAlive = false;
   }
 
-  public onEdit(data: RejectReason | UnavailabilityValue) {
+  public onEdit(data: RejectReason | UnavailabilityValue|Sourcing|Recuriter) {
     this.editReason.emit(data);
   }
 

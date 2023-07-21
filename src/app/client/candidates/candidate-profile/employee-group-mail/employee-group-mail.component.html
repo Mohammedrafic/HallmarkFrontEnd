@@ -1,0 +1,91 @@
+<div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="group-email-template-form">
+
+    <!-- validation errors-->
+    <div class="section-container">
+
+        <div class="left-section">
+            <div class="input-container bootstrap top-container">
+                <label>To<span class="required">*</span></label>
+                <div class="input-group">
+                    <input appValidateWithMessage formControlName="emailTo" class="e-input" type="text" />
+                </div>
+            </div>
+            <div class="input-container bootstrap top-container">
+                <label>CC</label>
+                <div class="input-group">
+                    <input formControlName="emailCc" class="e-input" type="text" (keyup)="onCCFieldKeyup()" />
+                </div>
+            </div>
+            <div class="input-container bootstrap top-container">
+                <label>Subject<span class="required">*</span></label>
+                <div class="input-group">
+                    <input appValidateWithMessage formControlName="emailSubject" class="e-input" type="text" />
+                </div>
+            </div>
+            <div class="input-container bootstrap top-container attachmentdiv"
+                *ngIf="(fileName != null) && (fileName != '')">
+                <h5 (click)="openpdf(id)">{{fileName}}</h5>&nbsp;
+                <button
+                    style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
+                    (click)="downloadfile(id)">
+                    <fa-icon [icon]='faDownload' class="pr-3">
+                        faDownload
+                    </fa-icon>
+                </button>
+            </div>
+
+            <app-document-preview-side-dialog [header]="previewTitle" (previewCloseClick)="onClosePreview()"
+                [width]="dialogWidth">
+
+
+                <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='pdfDocumentPath'
+                    style="height:1080px;" [style.display]="isPdf && !isWordDoc && !isImage ? 'block' : 'none'">
+                </ejs-pdfviewer>
+
+                <div *ngIf="isWordDoc">
+                    <iframe [src]="previewUrl" style="width:100%;height:1080px;"
+                        [style.display]="isWordDoc && !isImage && !isPdf ? 'block' : 'none'"></iframe>
+                </div>
+
+                <div *ngIf="isImage">
+                    <img [src]="previewUrl" height="400px" width="100%"
+                        [style.display]="isImage && !isWordDoc && !isPdf ? 'block' : 'none'">
+                </div>
+            </app-document-preview-side-dialog>
+            <div>
+                <div class="id-container">
+                    <div class="input-container bootstrap">
+                        <label>Attachment</label>
+                        <input *ngIf="!isSend" class="e-input" type="text" disabled [(ngModel)]="fileNameInput"
+                            [ngModelOptions]="{standalone: true}" />
+                        <div id="group-attachment-files" *ngIf="isSend"
+                            [ngClass]="uploaderstatus ? 'enabled' : 'disabled'">
+                            <div id="droparea" class="droparea" (click)="browseGroupEmail()">
+                                <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+                            </div>
+                            <ejs-uploader #filesUploaderGroupEmail formControlName="fileUpload" [dropArea]="dropElement"
+                                [allowedExtensions]="allowedExtensions" [multiple]="false" [maxFileSize]="maxFileSize"
+                                [autoUpload]="false" (selected)="onFileSelectedGroup($event)"
+                                (removing)="onFileRemoving()">
+                            </ejs-uploader>
+                        </div>
+                        <label *ngIf="isSend">Attached file size should not exceed 2MB<span
+                                class="e-input"></span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="rich-text-container">
+                <label>Mail Body<span class="required">*</span></label>
+                <div class="input-group" id="richTextEditorDiv">
+                    <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
+                        formControlName="emailBody" [toolbarSettings]='tools'>
+                    </ejs-richtexteditor>
+                </div>
+            </div>
+
+
+
+        </div>
+
+    </div>
+</div>

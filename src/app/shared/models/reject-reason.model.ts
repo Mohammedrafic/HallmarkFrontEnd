@@ -55,3 +55,20 @@ export interface UnavailabilityPaging {
   PageSize: number;
 }
 
+export type SourcingReasonPage = PageOfCollections<Sourcing>;
+export type Sourcing = {
+  id: number;
+  organizationId: number;
+  reason: string;
+ 
+}
+
+
+export type RecuriterReasonPage = PageOfCollections<Recuriter>;
+export type Recuriter = {
+  id: number;
+  organizationId: number;
+  reason: string;
+ 
+}
+

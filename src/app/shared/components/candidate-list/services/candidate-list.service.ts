@@ -8,6 +8,7 @@ import { ExportPayload } from '../../../models/export.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { sortBy } from '@shared/helpers/sort-array.helper';
 import { FormControl, FormGroup } from '@angular/forms';
+import { CredentialType } from '@shared/models/credential-type.model';
 
 @Injectable()
 export class CandidateListService {
@@ -74,6 +75,9 @@ export class CandidateListService {
   public getRegions(): Observable<string[]> {
     return this.http.get<string[]>('/api/Regions/UsaCanadaStates').pipe(map((data) => sortBy(data)));
   }
+  public getCredentialTypes(): Observable<CredentialType[]> {
+    return this.http.get<CredentialType[]>('/api/CredentialTypes/all').pipe(map((data) => sortBy(data)));
+  }
 
   public generateVMSCandidateFilterForm(): FormGroup {
     return new FormGroup({
@@ -120,4 +124,5 @@ export class CandidateListService {
       credType: filters.credType || [],
     });
   }
+ 
 }

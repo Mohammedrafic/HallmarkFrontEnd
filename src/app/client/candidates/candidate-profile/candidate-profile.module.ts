@@ -25,6 +25,12 @@ import { GeneralNotesService } from '@client/candidates/candidate-profile/genera
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { NgxsModule } from '@ngxs/store';
 import { GeneralNoteState } from './general-notes/general-notes.state';
+import { EmployeeGroupMailComponent } from './employee-group-mail/employee-group-mail.component';
+import { UploaderModule } from '@syncfusion/ej2-angular-inputs';
+import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
+import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -36,6 +42,7 @@ import { GeneralNoteState } from './general-notes/general-notes.state';
     GeneralNotesGridActionsRendererComponent,
     AddEditNoteComponent,
     GeneralNotesGridCategoryRendererComponent,
+    EmployeeGroupMailComponent,
   ],
   exports: [CandidateDetailsComponent, GeneralNotesComponent],
   imports: [
@@ -53,6 +60,12 @@ import { GeneralNoteState } from './general-notes/general-notes.state';
     ButtonModule,
     SharedModule,
     DropDownListModule,
+    UploaderModule,
+    PdfViewerModule,
+    RichTextEditorAllModule,
+    FontAwesomeModule,
+    ReactiveFormsModule,
+    FormsModule,
     //STORE
     NgxsModule.forFeature([GeneralNoteState]),
   ],

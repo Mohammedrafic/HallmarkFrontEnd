@@ -32,6 +32,8 @@ import { ValidateDirectiveModule } from '@shared/directives/validate-directive/v
 import { InternalTransferComponent } from './components/internal-transfer/internal-transfer.component';
 import { EmpTerminationComponent } from './components/emp-termination/emp-termination.component';
 import { CategoryNoteComponent } from './components/category-note/category-note.component';
+import { SourcingReasonComponent } from './components/sourcing-reason/sourcing-reason.component';
+import { RecuriterReasonComponent } from './components/recuriter-reason/recuriter-reason.component';
 
 const icons = {
     Edit,
@@ -73,6 +75,8 @@ const icons = {
         EmpTerminationComponent,
         CategoryNoteComponent,
         PenaltiesGridActionsRendererComponent,
+        SourcingReasonComponent,
+        RecuriterReasonComponent,
     ],
     providers: [ReasonsFormsService, ReasonsService],
     exports: [ReasonsComponent],

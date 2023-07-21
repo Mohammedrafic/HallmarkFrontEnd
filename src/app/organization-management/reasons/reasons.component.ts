@@ -19,7 +19,7 @@ import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Organization, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Penalty } from '@shared/models/penalty.model';
-import { RejectReason } from '@shared/models/reject-reason.model';
+import { Recuriter, RecuriterReasonPage, RejectReason, Sourcing, SourcingReasonPage } from '@shared/models/reject-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { concatMap, delay, filter, Observable, takeUntil } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -128,6 +128,10 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.InternalTransfer;
     } else if(selectedTab.selectedItem.innerText === "Category Note"){
       this.selectedTab = ReasonsNavigationTabs.CategoryNote;
+    } else if(selectedTab.selectedItem.innerText === "Sourcing Reason"){
+      this.selectedTab = ReasonsNavigationTabs.SourcingReason;
+    } else if(selectedTab.selectedItem.innerText === "Recuriter Reason"){
+      this.selectedTab = ReasonsNavigationTabs.RecuriterReason;
     } 
     
     this.formType = ReasonFormsTypeMap[this.selectedTab];
@@ -172,7 +176,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  editReason(data: RejectReason | Penalty | UnavailabilityValue | Closurevalue | CategoryNoteValue): void {
+  editReason(data: RejectReason | Penalty | UnavailabilityValue | Closurevalue | CategoryNoteValue|Sourcing|Recuriter): void {
     this.isEdit = true;
     this.title = DialogMode.Edit;
 
@@ -230,7 +234,20 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         reason: reason.categoryName,
         isRedFlagCategory: !!reason.isRedFlag,
         });
-    } else {
+    } else if((this.selectedTab ===ReasonsNavigationTabs.SourcingReason)){
+      const reason  = data as RejectReason;
+      this.reasonForm.patchValue({
+        id: (data as RejectReason).id,
+        reason: reason.reason,
+        });
+    }else if((this.selectedTab ===ReasonsNavigationTabs.RecuriterReason)){
+      const reason  = data as RejectReason;
+      this.reasonForm.patchValue({
+        id: (data as RejectReason).id,
+        reason: reason.reason,
+        });
+    }
+    else {
       this.reasonForm.patchValue({
         id: (data as RejectReason).id,
         reason: data.reason,
@@ -304,7 +321,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         ReasonActions.UpdateManualInvoiceRejectReasonSuccess, ReasonActions.UpdateOrderRequisitionSuccess,
         ReasonActions.UpdateInternalTransferReasonsSuccess, ReasonActions.UpdateTerminationReasonsSuccess,
         ReasonActions.UpdateCategoryNoteReasonsSuccess,
-        ReasonActions.SavePenaltySuccess, ReasonActions.SaveUnavailabilityReason, ReasonActions.RemoveUnavailabilityReason),
+        ReasonActions.SavePenaltySuccess, ReasonActions.SaveUnavailabilityReason, ReasonActions.RemoveUnavailabilityReason,ReasonActions.UpdateSourcingReasonsSuccess,ReasonActions.UpdateRecuriterReasonsSuccess),
       takeUntil(this.componentDestroy()),
     ).subscribe(() =>this.closeSideDialog());
   }

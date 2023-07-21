@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input,
-  OnInit, Output, ViewChild } from '@angular/core';
+  OnInit, Output, ViewChild
+} from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
 import { ColDef, GridOptions } from '@ag-grid-community/core';
@@ -15,11 +16,15 @@ import { GRID_CONFIG } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportPayload } from '@shared/models/export.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
-import { ActionBtnOnStatus, AgencyActionBtnOnStatus,
-  NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
+import {
+  ActionBtnOnStatus, AgencyActionBtnOnStatus,
+  NewStatusDependsOnAction
+} from '../../constants/invoice-detail.constant';
 import { InvoicesActionBtn, InvoiceState, INVOICES_STATUSES, PaymentDialogTitle } from '../../enums';
-import { ExportOption, InvoiceDetail, InvoiceDetailsSettings,
-  InvoiceDialogActionPayload, InvoicePaymentData, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
+import {
+  ExportOption, InvoiceDetail, InvoiceDetailsSettings,
+  InvoiceDialogActionPayload, InvoicePaymentData, InvoiceUpdateEmmit, PrintingPostDto
+} from '../../interfaces';
 import { InvoicePrintingService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -47,6 +52,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   @Input() actionAllowed = true;
   @Input() approveAllowed = false;
   @Input() payAllowed = false;
+  @Input() payButton: boolean = false;
 
   @Output() updateTable: EventEmitter<InvoiceUpdateEmmit> = new EventEmitter<InvoiceUpdateEmmit>();
 
@@ -84,7 +90,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   public paymentDialogTitle = PaymentDialogTitle.Add;
 
-  private resizeObserver: ResizeObserverModel; 
+  private resizeObserver: ResizeObserverModel;
 
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
 
@@ -188,7 +194,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   public openAddPayment(): void {
     this.paymentDialogTitle = PaymentDialogTitle.Add;
-    this.createPaymentRecords(); 
+    this.createPaymentRecords();
     this.invoiceDetailsConfig.addPaymentOpen = true;
     this.cdr.markForCheck();
   }
@@ -256,7 +262,9 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     } else {
       result = ActionBtnOnStatus.get(status) as string;
     }
-
+    if (!this.payButton) {
+      result = '';
+    }
     this.actionBtnText = result || '';
   }
 
@@ -291,8 +299,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       });
   }
 
-  public onSelectMenuItem({ item: { text }}: MenuEventArgs): void {
-    if(text === MobileMenuItems.Print) {
+  public onSelectMenuItem({ item: { text } }: MenuEventArgs): void {
+    if (text === MobileMenuItems.Print) {
       this.printInvoice();
     }
   }
