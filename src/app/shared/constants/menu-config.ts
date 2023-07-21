@@ -134,8 +134,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: '',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     29: {
       // MSP List
@@ -576,8 +576,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: '',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     28: {
       // Associated Organizations
@@ -838,8 +838,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: '',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     29: {
       // MSP List
@@ -1276,8 +1276,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: 'user',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     28: {
       // Associated Organizations

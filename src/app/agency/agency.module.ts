@@ -98,6 +98,7 @@ import { AgencySettingsService } from './services/agency-settings.service';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 import { AgencyReportsModule } from '@agency/agency-reports/agency-reports.module';
 import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
+import { AgencySettingsModule } from './settings/agency-settings.module';
 
 
 
@@ -199,6 +200,7 @@ const sidebarIcons = {
     RadioButtonModule,
     TooltipContainerModule,
     ScrollToTopModule,
+    AgencySettingsModule,
 
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),

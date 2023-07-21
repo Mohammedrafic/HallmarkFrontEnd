@@ -151,7 +151,7 @@ import {
   OrderManagementPage,
   OrdersJourneyPage,
 } from '@shared/models/order-management.model';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import {
   Organization,
   OrganizationDepartment,
@@ -282,7 +282,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   skills$: Observable<Skill[]>;
 
   @Select(OrganizationManagementState.organizationSettings)
-  organizationSettings$: Observable<OrganizationSettingsGet[]>;
+  organizationSettings$: Observable<Configuration[]>;
 
   @Select(UserState.currentUserPermissions)
   currentUserPermissions$: Observable<any[]>;
@@ -315,7 +315,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
   public readonly shiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  public settings: { [key in SettingsKeys]?: Configuration };
   public SettingsKeys = SettingsKeys;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;

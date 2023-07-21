@@ -1,0 +1,6 @@
+<section class="container">
+  <app-side-menu [config]="sideMenuConfig" *ngIf="sideMenuConfig?.length"></app-side-menu>
+  <section class="grid" style="width: calc(100% - 231px);">
+    <router-outlet></router-outlet>
+  </section>
+</section>

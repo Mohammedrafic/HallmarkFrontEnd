@@ -1,4 +1,4 @@
-export class OrganizationSettingsGet {
+export class Configuration {
   settingKey: string;
   settingValueId?: number;
   name: string;
@@ -11,7 +11,7 @@ export class OrganizationSettingsGet {
   overridableByDepartment: boolean;
   orderPosition: number;
   validations: OrganizationSettingValidation[];
-  children?: OrganizationSettingChild[];
+  children?: ConfigurationChild[];
   includeInIRP: boolean;
   includeInVMS: boolean;
   separateValuesInSystems: boolean;
@@ -20,7 +20,7 @@ export class OrganizationSettingsGet {
   parsedValue?: any;
 }
 
-export class OrganizationSettingChild {
+export class ConfigurationChild {
   settingValueId?: number;
   settingKey: string;
   value: any;
@@ -37,7 +37,7 @@ export class OrganizationSettingChild {
   hidden = false;
 }
 
-export class OrganizationSettingsPost {
+export class ConfigurationDTO {
   settingValueId?: number;
   hierarchyLevel: number;
   hierarchyId: number;
@@ -46,7 +46,7 @@ export class OrganizationSettingsPost {
   locationId?: number[];
   regionId?: number[];
   departmentId?:number[];
-  isIRPConfigurationValue: boolean;
+  isIRPConfigurationValue?: boolean;
 }
 
 export class OrganizationSettingsDropDownOption {

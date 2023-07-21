@@ -11,3 +11,13 @@ export enum OrganizationSettingControlType {
   CheckboxValue = 10,
   PayPeriod =11
 }
+
+export enum TextFieldTypeControl {
+  Email = 1,
+  Numeric = 2,
+}
+
+export enum CheckboxValue {
+  Yes = 'Yes',
+  No = 'No',
+}
