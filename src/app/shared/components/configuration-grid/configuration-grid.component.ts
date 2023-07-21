@@ -22,7 +22,11 @@ export class ConfigurationGridComponent extends AbstractPermissionGrid {
   @Input() hasPermissions: Record<string, boolean> = {};
   @Input() override gridDataSource: object[] = [];
   @Input() override totalDataRecords = 0;
-  @Input() isAgency = false;
+  @Input() set isAgency(value: boolean) {
+    this.hideColumn = value;
+    this.grid.refreshColumns();
+  }
+  public hideColumn: boolean;
 
   @Output() openOverrideSettingDialog = new EventEmitter<Configuration>();
   @Output() openEditSettingDialog = new EventEmitter<{
@@ -35,6 +39,9 @@ export class ConfigurationGridComponent extends AbstractPermissionGrid {
     protected override store: Store,
   ) {
     super(store);
+    setTimeout(() => {
+      this.grid.refresh();
+    }, 3000);
   }
 
   public changePageSize(event: number): void {
