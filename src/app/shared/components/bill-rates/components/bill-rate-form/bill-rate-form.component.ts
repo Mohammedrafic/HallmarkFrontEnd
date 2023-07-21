@@ -322,4 +322,3 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 }
-
