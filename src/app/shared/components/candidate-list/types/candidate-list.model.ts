@@ -29,9 +29,19 @@ export type IRPCandidate = {
   employeeStatus: string;
   primarySkillName: string;
   employeeSkills: string[];
-  employeeWorkCommitments:string;
+  employeeWorkCommitments?:string;
   hireDate: string;
   orgOrientation: string;
+  employeeSourceId?: string;
+  source?: string;
+  recruiter?: string
+  employeeStatusId?:number;
+  locationName?:string;
+  departmentId?:number;
+  departmentName?:string;
+  sourceId?:number;
+  recruiterId?:number
+  
 }
 
 export interface CandidateListRequest {
@@ -98,7 +108,7 @@ export interface CandidateNameFilterColumn {
 }
 
 export interface CandidateListFiltersColumn {
-  profileStatuses?: FilterColumn;
+  profileStatuses: FilterColumn;
   skillsIds?: FilterColumn;
   regionsNames?: FilterColumn;
   candidateName?: CandidateNameFilterColumn;

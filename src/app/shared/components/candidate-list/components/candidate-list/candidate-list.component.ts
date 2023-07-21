@@ -88,6 +88,7 @@ import { CandidateListScroll } from './candidate-list.enum';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
+import { ProfileStatuses, ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 
 @Component({
   selector: 'app-candidate-list',
@@ -208,13 +209,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetSourcingReasons());
-    this.sourcing$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      console.log(data)
-      if (data != null) {
-        this.isSourceValidated = data.issourcing
-      }
-    });
+      
 
     this.initCandidateFilterForm();
     this.getRegions();
@@ -227,12 +222,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.subscribeOnSkills();
     this.subscribeOnExportAction();
     this.setFileName();
-    this.filterColumns = !this.isIRP ? filterColumns : IRPFilterColumns;
+    this.filterColumns = !this.isIRP ? filterColumns : IRPFilterColumns;  
     this.subscribeOnRegions();
     this.subscribeOnCredentialTypes();
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
     this.syncFilterTagsWithControls();
+    this.getSourcingConfig();
   }
 
   ngOnDestroy(): void {
@@ -240,6 +236,24 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch(new PreservedFilters.ResetPageFilters());
+  }
+
+  private getSourcingConfig():void{
+    if(!this.isAgency){
+      this.store.dispatch(new GetSourcingReasons());
+      this.sourcing$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        if (data != null) {
+          this.isSourceValidated = data.issourcing
+         
+        }
+        if(this.isIRP && !this.isSourceValidated){
+          let Status =[ProfileStatusesEnum.Sourcing,ProfileStatusesEnum.Prospect,ProfileStatusesEnum.Onboarding,ProfileStatusesEnum.ClearedForOrientation,ProfileStatusesEnum.OrientationScheduled,ProfileStatusesEnum.DoNotHire,ProfileStatusesEnum.FallOffOnboarding,ProfileStatusesEnum.VerbalOfferMade]
+          this.filterColumns.profileStatuses.dataSource = (ProfileStatuses.filter(f => !Status.includes(f.id)));
+         }else{
+          this.filterColumns.profileStatuses.dataSource = ProfileStatuses
+         }
+      });
+    } 
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -616,7 +630,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       !this.isAgency && this.IRPVMSGridHandler();
       this.updateCandidates();
       this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
-    });
+     });
   }
 
   private subscribeOnPageSubject(): void {

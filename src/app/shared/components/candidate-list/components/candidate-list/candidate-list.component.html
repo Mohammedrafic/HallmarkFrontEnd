@@ -163,11 +163,11 @@
             region }}</div>
         </ng-template>
       </e-column>
-      <e-column textAlign="Left" field="employeeSourceId" *ngIf="isIRP && isSourceValidated" headerText="Emp Source Id">
+      <e-column textAlign="Left" field="employeeSourceId" *ngIf="(isIRP && isSourceValidated)" headerText="Emp Source Id" width="200">
       </e-column>
-      <e-column textAlign="Left" field="source" *ngIf="isIRP && isSourceValidated" headerText="Source">
+      <e-column textAlign="Left" field="source" *ngIf="(isIRP && isSourceValidated)" headerText="Source" width="200">
       </e-column>
-      <e-column textAlign="Left" field="recruiter" *ngIf="isIRP && isSourceValidated" headerText="Recruiter">
+      <e-column textAlign="Left" field="recruiter" *ngIf="(isIRP && isSourceValidated)" headerText="Recruiter" width="200">
       </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
