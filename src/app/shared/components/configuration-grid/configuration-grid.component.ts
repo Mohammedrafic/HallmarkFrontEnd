@@ -39,9 +39,6 @@ export class ConfigurationGridComponent extends AbstractPermissionGrid {
     protected override store: Store,
   ) {
     super(store);
-    setTimeout(() => {
-      this.grid.refresh();
-    }, 3000);
   }
 
   public changePageSize(event: number): void {
