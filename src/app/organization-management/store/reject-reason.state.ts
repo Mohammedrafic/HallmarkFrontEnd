@@ -592,7 +592,6 @@ export class RejectReasonState {
     return this.rejectReasonService.GetSourcingReasons({}).pipe(
       tap((payload) => {
         patchState({souringReason: payload});
-        console.log(payload)
         return payload;
       })
     );

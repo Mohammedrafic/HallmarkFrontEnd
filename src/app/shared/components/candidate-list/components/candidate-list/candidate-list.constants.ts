@@ -222,6 +222,19 @@ export const IRPCandidates = [
     fieldName: 'orgOrientation',
     visible: true,
   },
+  {
+    fieldName: 'employeeSourceId',
+    visible: true,
+  },
+  {
+    fieldName: 'source',
+    visible: true,
+  },
+  {
+    fieldName: 'recruiter',
+    visible: true,
+  },
+
 ];
 
 export const CandidatesTableFilters: CandidateListFilters = {
