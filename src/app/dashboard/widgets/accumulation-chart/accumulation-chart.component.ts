@@ -216,10 +216,9 @@ export class AccumulationChartComponent
     });
     this.chartDatachanges?.chartData.forEach(obj => {
       obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString():"0";
-    });
-    
+    });  
 
-    console.log('this.chartData?.chartData',this.chartData?.chartData);
+
     this.legendData = this.chartData?.chartData as WidgetLegengDataModel[];
     this.chartData$.next(this.chartData ?? null);
     this.chartData?.chartData &&
