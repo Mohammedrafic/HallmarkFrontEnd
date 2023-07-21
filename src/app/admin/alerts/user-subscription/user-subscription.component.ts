@@ -472,6 +472,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           self.userSubscriptionPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
 
             self.itemList = data?.items;
+            if(self.businessUnitControl?.value == BusinessUnitType.Candidates)
+            self.itemList=self.itemList?.filter((x:any)=>x.alertId!=59);
             self.totalRecordsCount = data?.totalCount;
 
             if (!self.itemList || !self.itemList.length) {
