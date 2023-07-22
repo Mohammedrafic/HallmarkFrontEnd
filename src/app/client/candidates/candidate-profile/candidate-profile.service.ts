@@ -25,7 +25,13 @@ export class CandidateProfileService {
   ) {}
 
   public saveCandidateProfile(candidateId: number, createReplacement?: boolean): Observable<CandidateModel> {
-    const { value } = this.candidateProfileForm.candidateForm;
+    let { value } = this.candidateProfileForm.candidateForm;
+    // Employee ID may be disabled (during sourcing), which prevents passing the value.
+    // We still need the value, so spread the raw value
+    if (!value.employeeId) {
+      value = { ...value, employeeId: this.candidateProfileForm.candidateForm.getRawValue().employeeId };
+    }
+
     const isOnHoldSetManually = this.candidateProfileForm.isOnHoldDateSetManually();
     const candidate = candidateId ? { id: candidateId, ...value, isOnHoldSetManually } : value;
     const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) } as CandidateModel;
