@@ -160,9 +160,12 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.candidateForm.get('employeeId')?.setValue(this.candidateForm.get('employeeSourceId')?.value);
     this.candidateForm.get('employeeId')?.disable();
     this.candidateForm.get('employeeId')?.removeValidators(Validators.required);
-    this.candidateForm.get('hireDate')?.removeValidators(Validators.required);
     this.employeeIdRequired = false;
 
+    this.candidateForm.get('employeeSourceId')?.setValidators(Validators.required);
+    this.candidateForm.get('employeeSourceId')?.updateValueAndValidity();
+
+    this.candidateForm.get('hireDate')?.removeValidators(Validators.required);
     //Set hire date 7 dats from today
     const hireDateValue = this.candidateForm.get('hireDate')?.value;
     if (!hireDateValue) {
@@ -178,6 +181,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       this.candidateForm.get('employeeId')?.setValue(value);
     });
     this.isSourceConfig = true;
+
   }
 
   private handleOnHoldProfileStatus(): void {
@@ -206,6 +210,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.candidateForm.get('employeeId')?.enable();
     this.candidateForm.get('employeeId')?.addValidators(Validators.required);
     this.candidateForm.get('hireDate')?.addValidators(Validators.required);
+    this.candidateForm.get('employeeSourceId')?.removeValidators(Validators.required);
     this.employeeIdRequired = true;
 
     this.sourceIdUpdateListener$?.unsubscribe();
@@ -239,6 +244,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.candidateForm.get('employeeId')?.enable();
     this.candidateForm.get('employeeId')?.addValidators(Validators.required);
     this.candidateForm.get('hireDate')?.addValidators(Validators.required);
+    this.candidateForm.get('employeeSourceId')?.removeValidators(Validators.required);
     this.employeeIdRequired = true;
     this.sourceIdUpdateListener$?.unsubscribe();
     this.isTerminatedSelected = false;
