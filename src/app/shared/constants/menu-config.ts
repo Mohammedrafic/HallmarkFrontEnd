@@ -474,6 +474,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/Position-Summary',
     },
+    103: {
+      // Agency-Spend
+      icon: '',
+      route: '/analytics/agency-spend',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -719,6 +724,11 @@ export const MENU_CONFIG: any = {
       // staff availability Report
       icon: '',
       route: '/analytics/staff-availability',
+    },
+    103: {
+      // Agency-Spend
+      icon: '',
+      route: '/analytics/agency-spend',
     },
   },
 
@@ -1153,11 +1163,16 @@ export const MENU_CONFIG: any = {
       icon: 'trending-up',
       route: '/reporting/custom-report',
     },
-  102: {
-    // Position-Summary
-    icon: '',
-    route: '/analytics/Position-Summary',
-  },
+    102: {
+      // Position-Summary
+      icon: '',
+      route: '/analytics/Position-Summary',
+    },
+    103: {
+      // Agency-Spend
+      icon: '',
+      route: '/analytics/agency-spend',
+    },
   },
 
   [BusinessUnitType.Agency]: {
