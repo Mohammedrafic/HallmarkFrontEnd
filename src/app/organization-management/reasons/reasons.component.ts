@@ -69,7 +69,8 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   private formType;
   public filterType: string = 'Contains';
   protected componentDestroy: () => Observable<unknown>;
-
+  public canEditAgencyFeeApplicable: boolean = false;
+  public agencyFeeApplicableSwitch?: boolean = true;
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
 
@@ -98,7 +99,6 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     this.dialogConfig = ReasonDialogConfig[this.formType];
     this.createForm();
     this.setIRPFlag();
-   
 
   }
 
@@ -118,7 +118,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.Requisition;
     } else if(selectedTab.selectedItem.innerText === "Order Closure"){
       this.selectedTab = ReasonsNavigationTabs.Closure;
-    } else if(selectedTab.selectedItem.innerText === "Manual Invoice"){
+    } else if (selectedTab.selectedItem.innerText === "Manual Invoice") {
       this.selectedTab = ReasonsNavigationTabs.ManualInvoice;
     } else if(selectedTab.selectedItem.innerText === "Unavailability"){
       this.selectedTab = ReasonsNavigationTabs.Unavailability;
@@ -169,6 +169,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   addReason(): void {
     this.title = DialogMode.Add;
     this.isEdit = false;
+    this.canEditAgencyFeeApplicable = !this.userPermission[this.userPermissions.CanEditAgencyFeeApplicable] ? true : false;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -229,18 +230,27 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         id: reason.id,
         reason: reason.categoryName,
         isRedFlagCategory: !!reason.isRedFlag,
-        });
+      });
+    } else if ((this.selectedTab === ReasonsNavigationTabs.ManualInvoice)) {
+      const reason = data as RejectReason;
+      this.reasonForm.patchValue({
+        id: reason.id,
+        reason: reason.reason,
+        agencyFeeApplicable: !!reason.agencyFeeApplicable,
+        this:this.agencyFeeApplicableSwitch = !!reason.agencyFeeApplicable,
+      });
     } else {
       this.reasonForm.patchValue({
         id: (data as RejectReason).id,
         reason: data.reason,
       });
     }
-
     this.store.dispatch(new ShowSideDialog(true));
     this.cd.markForCheck();
   }
-
+  setAgencyFeeSwitch(): void {
+    this.agencyFeeApplicableSwitch = true;
+  }
   closeDialog(): void {
     const isDirty = this.reasonForm.dirty;
 
@@ -270,7 +280,6 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      this.reasonForm.reset();
       if (this.formType === ReasonFormType.PenaltyReason) {
         this.reasonForm.controls['penaltyCriteria'].patchValue(PenaltyCriteria.FlatRateOfHours);
       }

@@ -161,6 +161,12 @@ export const ManualInvoiceDialogConfig: ReasonFormConfig[]  = [
     required: true,
     fieldType: FieldType.Input,
   },
+  {
+    field: 'agencyFeeApplicable',
+    title: 'Agency Fee Applicable',
+    required: true,
+    fieldType: FieldType.Toggle,
+  },
 ];
 
 export const categoryNoteDialogConfig: ReasonFormConfig[]  = [

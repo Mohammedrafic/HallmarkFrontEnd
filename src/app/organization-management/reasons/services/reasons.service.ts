@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 
-import { SaveCategoryNoteReasons, SaveClosureReasons, SaveOrderRequisition, SavePenalty, SaveUnavailabilityReason, UpdateCategoryNoteReasons, UpdateClosureReasonsSuccess } from '@organization-management/store/reject-reason.actions';
+import { SaveCategoryNoteReasons, SaveClosureReasons, SaveOrderRequisition, SavePenalty, SaveUnavailabilityReason, UpdateCategoryNoteReasons, UpdateClosureReasonsSuccess, CreateManualInvoiceRejectReason, UpdateManualInvoiceRejectReason } from '@organization-management/store/reject-reason.actions';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { REASON_WARNING } from '@shared/constants';
@@ -165,6 +165,20 @@ export class ReasonsService {
           id: value.id || undefined,
           reason: value.reason,
           isRedFlagCategory: !!value.isRedFlagCategory,
+        }));
+      }
+    } else if (params.selectedTab === ReasonsNavigationTabs.ManualInvoice) {
+      var valueRR = params.formValue as RejectReason;
+      if (valueRR.id != undefined || null) {
+        this.store.dispatch(new UpdateManualInvoiceRejectReason({
+          id: valueRR.id || undefined,
+          reason: valueRR.reason,
+          agencyFeeApplicable: !!valueRR.agencyFeeApplicable,
+        }));
+      } else {
+        this.store.dispatch(new CreateManualInvoiceRejectReason({
+          reason: valueRR.reason,
+          agencyFeeApplicable: !!valueRR.agencyFeeApplicable,
         }));
       }
     } else {

@@ -10,6 +10,7 @@ export type OrderRequisitionReason = {
 export type RejectReason = {
   id?: number;
   reason: string;
+  agencyFeeApplicable?: boolean;
   businessUnitId?: number;
 }
 
@@ -17,6 +18,7 @@ export type RejectReasonwithSystem = {
   id?: number;
   reason: string;
   businessUnitId?: number;
+  agencyFeeApplicable?: boolean;
   includeInVMS?: boolean;
   includeInIRP?: boolean;
   isVMSIRP?:boolean;

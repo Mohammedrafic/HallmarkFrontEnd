@@ -82,6 +82,7 @@ export class ReasonsFormsService {
         id: [],
         reason: ['', [Validators.required, Validators.maxLength(100),
           Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+        agencyFeeApplicable: [true],
       });
     }
     return this.form;
