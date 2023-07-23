@@ -88,6 +88,7 @@ import { CandidateListScroll } from './candidate-list.enum';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
+import { ProfileStatuses, ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 
 @Component({
   selector: 'app-candidate-list',
@@ -148,7 +149,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() public userPermission: Permission;
   @Input() public isIRP: boolean;
   @Input() public redirectedFromDashboard: boolean;
- 
+
   @Input()
   public set tab(tabIndex: number) {
     if (!isNil(tabIndex)) {
@@ -189,7 +190,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private activeTab: number;
   private scrollSubscription: Subscription;
   private redirectfromDashboard : boolean
-  public isSourceValidated :boolean=false
+  public isSourcingEnabled = false;
   constructor(
     private store: Store,
     private router: Router,
@@ -208,13 +209,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetSourcingReasons());
-    this.sourcing$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      console.log(data)
-      if (data != null) {
-        this.isSourceValidated = data.issourcing
-      }
-    });
+
 
     this.initCandidateFilterForm();
     this.getRegions();
@@ -233,6 +228,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
     this.syncFilterTagsWithControls();
+    this.getSourcingConfig();
   }
 
   ngOnDestroy(): void {
@@ -240,6 +236,32 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch(new PreservedFilters.ResetPageFilters());
+  }
+
+  private getSourcingConfig():void{
+    if(!this.isAgency){
+      this.store.dispatch(new GetSourcingReasons());
+      this.sourcing$.pipe(filter(x => x != null), takeUntil(this.unsubscribe$)).subscribe((data) => {
+
+        this.isSourcingEnabled = data.issourcing;
+        if(this.isIRP && !this.isSourcingEnabled){
+          const sourcingStatuses = [
+            ProfileStatusesEnum.Sourcing,
+            ProfileStatusesEnum.Prospect,
+            ProfileStatusesEnum.Onboarding,
+            ProfileStatusesEnum.ClearedForOrientation,
+            ProfileStatusesEnum.OrientationScheduled,
+            ProfileStatusesEnum.DoNotHire,
+            ProfileStatusesEnum.FallOffOnboarding,
+            ProfileStatusesEnum.VerbalOfferMade,
+          ];
+          this.filterColumns.profileStatuses.dataSource = (ProfileStatuses.filter(f => !sourcingStatuses.includes(f.id)));
+         } else {
+          this.filterColumns.profileStatuses.dataSource = ProfileStatuses;
+         }
+         this.IRPVMSGridHandler();
+      });
+    }
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -548,7 +570,19 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private IRPVMSGridHandler(): void {
     if (this.isIRP) {
-      this.refreshGridColumns(IRPCandidates, this.grid);
+      const columns = [ ...IRPCandidates ];
+
+      if (this.isSourcingEnabled) {
+        const columnsToEnable = ['employeeSourceId', 'source', 'recruiter'];
+
+        columns.forEach((column) => {
+          if (columnsToEnable.includes(column.fieldName)) {
+            column.visible = true;
+          }
+        });
+      }
+
+      this.refreshGridColumns(columns, this.grid);
     } else {
       this.refreshGridColumns(VMSCandidates, this.grid);
     }
@@ -566,7 +600,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       filter(({ dispatch }) => dispatch),
       tap((filters) => {
         const tableState = (this.store.snapshot().candidateList as CandidateListStateModel).tableState;
-        
+
         this.currentPage = tableState?.pageNumber || this.currentPage;
         this.pageSize = tableState?.pageSize || GRID_CONFIG.initialRowsPerPage;
         this.pageSettings.pageSize = tableState?.pageSize || GRID_CONFIG.initialRowsPerPage;
@@ -616,7 +650,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       !this.isAgency && this.IRPVMSGridHandler();
       this.updateCandidates();
       this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
-    });
+     });
   }
 
   private subscribeOnPageSubject(): void {

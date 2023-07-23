@@ -313,6 +313,7 @@
         [billRates]="billRatesData"
         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
         [isActive]="true"
+        [isExtension]="!!currentOrder.extensionFromId || !!currentOrder.hasExtensions"
         [readOnlyMode]="isReadOnlyBillRates"
       ></app-bill-rates>
     </ng-template>
