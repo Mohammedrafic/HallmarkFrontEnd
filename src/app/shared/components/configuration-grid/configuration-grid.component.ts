@@ -13,18 +13,21 @@ export class ConfigurationGridComponent extends AbstractPermissionGrid {
   @ViewChild('grid') grid: GridComponent;
 
   @Input() configurations: Configuration[] = [];
-  @Input() orgSystems = {
-    IRP: false,
-    VMS: false,
-    IRPAndVMS: false,
-  };
+  @Input() set showSystemColumn(value: boolean) {
+    this.showSystem = value;
+    if (this.grid) {
+      this.grid.getColumnByField('systemType').visible = value;
+      this.grid.refreshColumns();
+    }
+  }
+  public showSystem = false;
   @Input() disabledSettings: string[];
   @Input() hasPermissions: Record<string, boolean> = {};
   @Input() override gridDataSource: object[] = [];
   @Input() override totalDataRecords = 0;
   @Input() set isAgency(value: boolean) {
     this.hideColumn = value;
-    this.grid.refreshColumns();
+    this.grid?.refreshColumns();
   }
   public hideColumn: boolean;
 
