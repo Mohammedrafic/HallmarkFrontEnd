@@ -1425,7 +1425,7 @@ export const MENU_CONFIG: any = {
   },
 
   [BusinessUnitType.Employee]: {
-    38: {
+    110: {
       // Scheduling for Employee
       icon: 'calendar',
       route: 'employee/scheduling',
