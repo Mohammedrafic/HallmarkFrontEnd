@@ -301,8 +301,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
               this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
               if (this.isInitialLoad) {
-
-                setTimeout(() => { this.SearchReport() }, 3000);
+                  this.SearchReport()
                 this.isInitialLoad = false;
               }
               this.changeDetectorRef.detectChanges();
