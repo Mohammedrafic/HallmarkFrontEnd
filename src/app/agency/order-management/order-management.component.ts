@@ -11,7 +11,7 @@ import {
   TabNavigationComponent,
 } from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
 import { Router } from '@angular/router';
-import { ClearOrganizationStructure } from '@agency/store/order-management.actions';
+import { ClearOrganizationStructure, SetOrdersTab } from '@agency/store/order-management.actions';
 
 @Component({
   selector: 'app-order-management',
@@ -48,7 +48,9 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
         this.orderStatus.push(routerState?.['xtraStatus'])
       }
       if(routerState?.['candidateStatusId'] != undefined){
-        this.candidateStatuses.push(routerState?.['candidateStatusId'])
+        this.candidateStatuses.push(routerState?.['candidateStatusId']);
+        this.store.dispatch(new SetOrdersTab(AgencyOrderManagementTabs.AllAgencies));
+        this.selectedTab = AgencyOrderManagementTabs.AllAgencies;
       }
     }
   }
