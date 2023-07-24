@@ -2003,7 +2003,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
 
       if (this.isRedirectedFromVmsSystem) {
-        this.gridApi?.selectIndex(0, false, false);
+        this.selectFirstRow();
         this.isRedirectedFromVmsSystem = false;
       }
 
@@ -2870,5 +2870,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (node) {
       this.openIrpDetails({ node, data: node?.data });
     }
+  }
+  @OutsideZone
+  private selectFirstRow(): void {
+    setTimeout(() => {
+      this.gridApi?.selectIndex(0, false, false);
+    }, 300);
   }
 }
