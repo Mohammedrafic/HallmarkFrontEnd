@@ -178,8 +178,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
             let currentDate = new Date();
             this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.Month)?.setValue(currentDate.getMonth() + 1);
             this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
-
-            setTimeout(() => { this.SearchReport(); }, 3000)
+              this.SearchReport(); 
             this.isInitialLoad = false;
           }
         }
@@ -312,7 +311,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           if (this.isInitialLoad) {
-            setTimeout(() => { this.SearchReport() }, 3000);
+               this.SearchReport()
             this.isInitialLoad = false;
           }
           this.changeDetectorRef.detectChanges();
