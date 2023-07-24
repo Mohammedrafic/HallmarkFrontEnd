@@ -431,6 +431,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public userSearch$ = new Subject<FilteringEventArgs>();
 
   private isRedirectedFromDashboard: boolean;
+  private isRedirectedFromDashboardWidget: boolean;
   private isRedirectedFromVmsSystem = false;
   private orderStaus: number;
   private xtraOrderStatus: number;
@@ -456,6 +457,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private alertTitle: string;
   private orderManagementPagerState: OrderManagementPagerState | null;
   private orderPositionStatus: string | null;
+  private orderPositionWidgetStatus: string | null;
   private orderPositionXtraStatus: string | null;
   private organizationId: number;
   public isCondidateTab: boolean = false;
@@ -512,12 +514,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.activeIRPTabIndex =parseInt(routerState?.['irpActiveTab'])
     }
     this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
+    this.isRedirectedFromDashboardWidget = routerState?.['redirectedFromDashboard'] || false;
     this.orderStaus = routerState?.['orderStatus'] || 0;
     this.xtraOrderStatus= routerState?.['xtraOrderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
     this.prefix = routerState?.['prefix'];
     this.orderPositionStatus = routerState?.['status'];
+    this.orderPositionWidgetStatus = routerState?.['status'];
     this.orderPositionXtraStatus = routerState?.['xtraStatus'];
     (routerState?.['status'] == "In Progress (Pending)" || routerState?.['status'] == "In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] == "In Progress" ? this.SelectedStatus.push("InProgress") : routerState?.['status'] ? this.SelectedStatus.push(routerState?.['status']) : "";
     this.candidateStatusId = routerState?.['candidateStatusId'] || '';
@@ -1824,8 +1828,27 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
         .map((status: FilterStatus) => status.status);
       if(this.activeSystem != OrderManagementIRPSystemId.OrderJourney){
-        this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
-        this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
+        if(this.isRedirectedFromDashboardWidget){
+          if(this.orderPositionWidgetStatus == "Open"){
+            this.filters.orderStatuses = ["OrdersOpenPositions"];
+          }
+          else if(this.orderPositionWidgetStatus == "In Progress"){
+            this.filters.candidateStatuses =  ["Applied","Shortlisted"];
+          }
+          else if(this.orderPositionWidgetStatus == "In Progress (Pending)"){
+            this.filters.candidateStatuses =  ["Offered"];
+          }
+          else if(this.orderPositionWidgetStatus == "In Progress (Accepted)"){
+            this.filters.candidateStatuses =  ["Accepted"];
+          }
+          else if(this.orderPositionWidgetStatus == "Filled"){
+            this.filters.candidateStatuses =  ["Onboard"];
+          }
+        }
+        else{
+          this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
+          this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
+        }
 
       }
     }
