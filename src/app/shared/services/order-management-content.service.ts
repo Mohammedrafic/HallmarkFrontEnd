@@ -497,7 +497,7 @@ export class OrderManagementContentService {
    * @param payload
    * @param tab
    */
-  public exportAgency(payload: ExportPayload, tab: AgencyOrderManagementTabs): Observable<any> {
+  public exportAgency(payload: ExportPayload): Observable<Blob> {
     return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
   }
 

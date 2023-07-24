@@ -385,8 +385,8 @@ export class OrderManagementState {
     }
 
   @Action(ExportAgencyOrders)
-  ExportAgencyOrders({}: StateContext<OrderManagementModel>, { payload, tab }: ExportAgencyOrders): Observable<any> {
-    return this.orderManagementContentService.exportAgency(payload, tab).pipe(
+  ExportAgencyOrders({}: StateContext<OrderManagementModel>, { payload }: ExportAgencyOrders): Observable<Blob> {
+    return this.orderManagementContentService.exportAgency(payload).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
