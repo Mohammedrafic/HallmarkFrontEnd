@@ -241,7 +241,6 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       )
       .subscribe((data) => {
         this.dropDownOptions.reasons = data;
-        console.log(this.dropDownOptions.reasons.values);
         this.setOrderIdOnEdit();
         this.cd.markForCheck();
       });
