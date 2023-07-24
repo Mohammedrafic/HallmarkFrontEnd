@@ -203,12 +203,7 @@ export class ReasonsService {
           agencyFeeApplicable: !!valueRR.agencyFeeApplicable,
         }));
       } 
-    } else {
-      const Action = params.editMode ? UpdateReasonsActionsMap[params.selectedTab]
-        : NewReasonsActionsMap[params.selectedTab];
-      const payload = params.editMode ? this.createUpdateReasonPayload(params) : this.createNewReasonPayload(params);
-      this.store.dispatch(new Action(payload));
-    }
+    } 
   }
 
   private createNewReasonPayload(params: SaveReasonParams): RejectReason {

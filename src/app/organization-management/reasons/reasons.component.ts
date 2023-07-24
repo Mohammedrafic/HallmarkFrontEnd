@@ -293,12 +293,12 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       delay(500),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(() => {
+      .subscribe(() => {
+        this.reasonForm.reset();
       if (this.formType === ReasonFormType.PenaltyReason) {
         this.reasonForm.controls['penaltyCriteria'].patchValue(PenaltyCriteria.FlatRateOfHours);
       }
       if (this.formType === ReasonFormType.ManualInvoiceReason) {
-          this.reasonForm.reset();
           this.reasonForm.controls['agencyFeeApplicable'].patchValue(true);
       }
     });
