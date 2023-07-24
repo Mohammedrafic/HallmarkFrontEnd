@@ -59,6 +59,12 @@
 }
 
 @media #{$max-mobile} {
+  .button-export-container {
+    .icon {
+      margin: 0;
+    }
+  }
+
   button.e-control.e-btn {
     padding: 8px 12px;
   }
@@ -69,8 +75,13 @@
         .controls-container {
           padding: 16px 0 0;
 
+          .left-content {
+            padding: 0;
+          }
+
           .right-content {
             flex-direction: row;
+            justify-content: flex-start;
           }
         }
       }

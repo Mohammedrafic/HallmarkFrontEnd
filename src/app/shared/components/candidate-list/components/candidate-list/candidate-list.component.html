@@ -4,7 +4,7 @@
   [allowSelection]="true"
   [allowPaging]="false"
   [pageSettings]="pageSettings"
-  [height]="fullScreenGridHeight"
+  [height]="(isMobile$ | async) ? mobileGridHeight : fullScreenGridHeight"
   [rowHeight]="rowHeight"
   [enableVirtualization]="false"
   [resizeSettings]="resizeSettings"
