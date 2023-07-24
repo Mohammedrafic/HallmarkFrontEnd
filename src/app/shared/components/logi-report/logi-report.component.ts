@@ -150,7 +150,7 @@ export class LogiReportComponent implements OnInit {
     let task = this.factory?.runDashboard(server, resExt, entryId);
   }
 
-  private ShowReport(entryId: string): void {
+  private async ShowReport(entryId: string): Promise<void> {
     if (this.reportType == LogiReportTypes.PageReport) {
       this.jrdPrefer = {
         // For page report
@@ -175,8 +175,8 @@ export class LogiReportComponent implements OnInit {
           }
         }
       }
-    }
-    const user = this.store.selectSnapshot(UserState.user);
+    }  
+    const user = await this.store.selectSnapshot(UserState.user);
     var studio_mode = this.reportType == LogiReportTypes.PageReport ? "basic_only" : "view_only";
     if (user?.businessUnitType === BusinessUnitType.Hallmark) {
      
@@ -196,7 +196,8 @@ export class LogiReportComponent implements OnInit {
    
     let test = this.factory?.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
-  };
+  }
+
 
   private injectReportApiJs(): Promise<void> {
     let jrReportApiJsInjected= window.localStorage.getItem(LogiReportJsLoaded);

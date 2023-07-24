@@ -207,6 +207,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
           this.agingReportForm.get(analyticsConstants.formControlNames.AgingGroupIds)?.setValue(this.defaultAgingGroups);
           if (this.isInitialLoad) {
               this.SearchReport();
+
             this.isInitialLoad = false;
           }
           this.changeDetectorRef.detectChanges();
@@ -396,9 +397,5 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ShowToast(MessageTypes.Error, error));
     return;
   }
-  ngAfterViewInit(){
-    this.logiReportComponent.paramsData = this.paramsData;
-    this.logiReportComponent.RenderReport();
-  
-  }
+
 }
