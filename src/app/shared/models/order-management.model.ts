@@ -609,6 +609,7 @@ export type OrderCandidateJob = {
   candidateStatus: CandidateStatus;
   clockId: number;
   expAsTravelers: string;
+  isLocal: boolean;
   guaranteedWorkWeek: string;
   jobId: number;
   offeredBillRate: number;
