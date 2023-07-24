@@ -574,6 +574,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     return this.candidateService.hasWorkCommitments && this.title === DialogMode.Add;
   }
 
+  private isLocationChanged(): boolean {
+    const regionControl = this.candidateWorkCommitmentForm.get('regionIds');
+    const locationControl = this.candidateWorkCommitmentForm.get('locationIds');
+    return !!(regionControl?.dirty || locationControl?.dirty) && this.title === DialogMode.Edit;
+  }
+
   private saveCommitment(): void {
     const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
     candidateWorkCommitment.startDate =
@@ -602,7 +608,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private handleCommitmentSaving(): void {
-    if (this.isOverridingEndDate()) {
+    if (this.isOverridingEndDate() || this.isLocationChanged()) {
       this.showOverridingConfirmation();
     } else {
       this.saveCommitment();
