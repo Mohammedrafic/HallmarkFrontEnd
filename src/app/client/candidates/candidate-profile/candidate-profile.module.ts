@@ -31,6 +31,7 @@ import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     FontAwesomeModule,
     ReactiveFormsModule,
     FormsModule,
+    ValidateDirectiveModule,
     //STORE
     NgxsModule.forFeature([GeneralNoteState]),
   ],

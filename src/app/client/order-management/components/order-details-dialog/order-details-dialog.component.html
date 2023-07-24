@@ -36,7 +36,9 @@
             class="e-card-content dialog-controls"
             [ngClass]="{
               'open-per-diem-order': order?.orderType === orderType.OpenPerDiem,
-              'traveler-order': order?.orderType === orderType.Traveler
+              'traveler-order': order?.orderType === orderType.Traveler,
+              'contact-to-perm': order?.orderType === orderType.ContractToPerm,
+              'perm-placement': order?.orderType === orderType.PermPlacement
             }"
           >
             <div class="order-actions" *ngIf="showApproveAndCancel">

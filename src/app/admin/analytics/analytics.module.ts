@@ -68,6 +68,7 @@ import { UnitProfileComponent } from './unit-profile/unit-profile.component';
 import { HoursByDepartmentComponent } from './hours-by-department/hours-by-department.component';
 import { StaffAvailabilityComponent } from './staff-availability/staff-availability.component';
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
+import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 
 
 @NgModule({
@@ -122,7 +123,8 @@ import { PositionSummaryComponent } from './Position-Summary/Position-Summary.co
     UnitProfileComponent,
     HoursByDepartmentComponent,
     StaffAvailabilityComponent,
-    PositionSummaryComponent],
+    PositionSummaryComponent,
+    AgencySpendComponent],
   exports: [
     CandidateListComponent
   ],
