@@ -1,4 +1,5 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 %common-style {
   background-color: $white;
@@ -24,7 +25,15 @@
   .general-notes {
     @extend %common-style;
   }
+}
 
-  .photo {
+@media #{$max-desktop-small} {
+  .candidate-profile {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  
+  .general-notes {
+    height: 300px;
   }
 }
