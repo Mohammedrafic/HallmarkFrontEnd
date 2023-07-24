@@ -37,7 +37,6 @@ import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '@shared/models';
 import { ExportPayload } from '@shared/models/export.model';
 import {
-  AgencyOrderManagementTabs,
   OrderManagementIRPSystemId,
   OrderManagementIRPTabs,
   OrganizationOrderManagementTabs,
@@ -495,20 +494,9 @@ export class OrderManagementContentService {
   /**
    * Export agency list
    * @param payload
-   * @param tab
    */
-  public exportAgency(payload: ExportPayload, tab: AgencyOrderManagementTabs): Observable<any> {
-    switch (tab) {
-      case AgencyOrderManagementTabs.ReOrders:
-        return this.http.post(`/api/Agency/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
-      case AgencyOrderManagementTabs.PermPlacement:
-      case AgencyOrderManagementTabs.MyAgency:
-        return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
-      case AgencyOrderManagementTabs.PerDiem:
-        return this.http.post(`/api/agency/orders/perdiem/export`, payload, { responseType: 'blob' });
-      default:
-        return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
-    }
+  public exportAgency(payload: ExportPayload): Observable<Blob> {
+    return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
   }
 
   /**
