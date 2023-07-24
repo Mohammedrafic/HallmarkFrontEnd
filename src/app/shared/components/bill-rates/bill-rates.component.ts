@@ -19,6 +19,7 @@ import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/i
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
+import { GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-bill-rates',
@@ -96,6 +97,10 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     });
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
+
+    if (!this.isExtension) {
+      this.store.dispatch(new GetPredefinedBillRates());
+    }
   }
 
   public editBillRate({ index, ...value }: BillRatesGridEvent): void {
