@@ -37,6 +37,11 @@ export interface ManualInvoiceReason {
   id: number;
   reason: string;
   businessUnitId: number;
+  agencyFeeApplicable?: boolean;
+}
+
+export interface AgencyFeeApplicable {
+  agencyFeeApplicable: boolean;
 }
 
 export interface ManualInvoiceMeta {

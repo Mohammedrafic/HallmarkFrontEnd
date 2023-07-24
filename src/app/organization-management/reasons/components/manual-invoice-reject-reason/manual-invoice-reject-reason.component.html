@@ -29,18 +29,18 @@
           </ng-template>
         </e-column>
         <e-column field="reason" headerText="Reason" textAlign="Left" width="100%"></e-column>
-        <e-column>
+        <e-column headerText="Agency Fee Applicable" textAlign="Left" width="100%">
           <ng-template #template let-data>
-            <ejs-switch [checked]="true"
-                        [disabled]="true"
-                        class="toggle"
-                        onLabel="Yes"
-                        offLabel="No"
-                        formControlName="agencyFeeApplicable">
-            </ejs-switch>
+            <div class="input-container bootstrap">
+                <ejs-switch [checked]="data.agencyFeeApplicable"
+                            [disabled]="true"
+                            class="toggle"
+                            onLabel="Yes"
+                            offLabel="No"
+                            formControlName="agencyFeeApplicable">
+                </ejs-switch>
+              </div>
           </ng-template>
-        </e-column>
-        <e-column field="agencyFeeApplicable" headerText="Agency Fee Applicable" textAlign="Center" width="100%">       
         </e-column>
       </e-columns>
 

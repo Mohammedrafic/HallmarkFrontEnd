@@ -69,7 +69,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   private formType;
   public filterType: string = 'Contains';
   protected componentDestroy: () => Observable<unknown>;
-  public canEditAgencyFeeApplicable: boolean = false;
+  public canUpdateAgencyFeeApplicable: boolean = false;
   public agencyFeeApplicableSwitch?: boolean = true;
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
@@ -169,7 +169,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   addReason(): void {
     this.title = DialogMode.Add;
     this.isEdit = false;
-    this.canEditAgencyFeeApplicable = !this.userPermission[this.userPermissions.CanEditAgencyFeeApplicable] ? true : false;
+    this.canUpdateAgencyFeeApplicable = !this.userPermission[this.userPermissions.CanUpdateAgencyFeeApplicable] ? true : false;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -237,7 +237,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         id: reason.id,
         reason: reason.reason,
         agencyFeeApplicable: !!reason.agencyFeeApplicable,
-        this:this.agencyFeeApplicableSwitch = !!reason.agencyFeeApplicable,
+        agencyFeeApplicableSwitch: reason.agencyFeeApplicable === false ? false : true,
       });
     } else {
       this.reasonForm.patchValue({
@@ -248,9 +248,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     this.store.dispatch(new ShowSideDialog(true));
     this.cd.markForCheck();
   }
-  setAgencyFeeSwitch(): void {
-    this.agencyFeeApplicableSwitch = true;
-  }
+
   closeDialog(): void {
     const isDirty = this.reasonForm.dirty;
 
@@ -282,6 +280,10 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     .subscribe(() => {
       if (this.formType === ReasonFormType.PenaltyReason) {
         this.reasonForm.controls['penaltyCriteria'].patchValue(PenaltyCriteria.FlatRateOfHours);
+      }
+      if (this.formType === ReasonFormType.ManualInvoiceReason) {
+          this.reasonForm.reset();
+          this.reasonForm.controls['agencyFeeApplicable'].patchValue(true);
       }
     });
   }

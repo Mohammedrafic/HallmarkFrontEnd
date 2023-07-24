@@ -53,6 +53,7 @@
                       [fields]="dropDownFieldsConfig"
                       [formControlName]="field.field"
                       [dataSource]="field.options"
+                      (change)="updateVenorFee($event)"
                       appValidateWithMessage
                     ></ejs-dropdownlist>
                   </div>
@@ -112,6 +113,7 @@
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
                   <ejs-switch
                   [disabled]="true"
+                  [checked]="agencyFeeApplicableSelector"
                   class="toggle"
                   onLabel="Yes"
                   offLabel="No"

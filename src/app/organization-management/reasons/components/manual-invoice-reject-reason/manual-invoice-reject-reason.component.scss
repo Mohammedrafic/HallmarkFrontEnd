@@ -4,12 +4,15 @@
   height: calc(100% - 20px);
 }
 ::ng-deep {
-  .input-container.long {
     .e-switch-wrapper, body.light .bootstrap .e-css.e-switch-wrapper {
       margin-right: 0 !important;
     }
 
     .e-switch-on {
+      color: $black !important;
+    }
+
+    .e-switch-off {
       color: $black !important;
     }
 
@@ -26,13 +29,11 @@
       }
     }
 
-    .e-switch-wrapper .e-switch-inner.e-switch-active,
-    .e-css.e-switch-wrapper .e-switch-inner.e-switch-active {
+    .e-switch-wrapper .e-switch-inner.e-switch-active, .e-css.e-switch-wrapper .e-switch-inner.e-switch-active {
       opacity: 1 !important;
       background-color: $primary-active-blue-80 !important;
       border: 0px !important;
     }
-  }
 }
 
 .switch-label {

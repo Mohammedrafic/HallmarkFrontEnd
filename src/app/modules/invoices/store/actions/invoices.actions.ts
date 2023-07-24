@@ -106,6 +106,11 @@ export namespace Invoices {
     ) {}
   }
 
+  export class GetAgencyFeeApplicable {
+    static readonly type = '[manual invoice] Get Manual Invoice AgencyFeeApplicable';
+    constructor(public readonly reasonId: number,) { }
+  }
+
   export class GetManInvoiceMeta {
     static readonly type = INVOICES_ACTIONS.GetMeta;
 

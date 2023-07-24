@@ -53,6 +53,10 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   private strategy: ManualInvoiceStrategy;
 
+  public reasonId: number;
+
+  public agencyFeeApplicableSelector: boolean = true;
+
   private readonly dropDownOptions: ManualInvoiceInputOptions = {
     invoiceLocations: [],
     invoiceDepartments: [],
@@ -70,6 +74,9 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   @Select(InvoicesState.selectedOrgId)
   public selectedOrg$: Observable<number>;
+
+  @Select(InvoicesState.agencyFeeApplicable)
+  public agencyFeeApplicable$: Observable<boolean>;
 
   ngOnInit(): void {
     this.strategy = this.injector.get<ManualInvoiceStrategy>(
@@ -131,6 +138,16 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
           this.closeDialog();
         });
       });
+  }
+
+  updateVenorFee(event: Event) {
+    if (this.dropDownOptions.reasons) {
+      const reasonId = (event.target as HTMLSelectElement).selectedIndex;
+      this.reasonId = Number(this.dropDownOptions.reasons[reasonId].value);
+      this.agencyFeeApplicable$.subscribe(
+        (data) => { this.agencyFeeApplicableSelector = data }
+      )
+    }
   }
 
   setFilesForUpload(files: FileForUpload[]): void {
