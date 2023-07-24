@@ -168,12 +168,16 @@ export class AccumulationChartComponent
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
           if(chartInfo.applicantStatus === OrderStatus.Onboard){
             this.dashboardService.redirectToUrlWithCandidateStatus('agency/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status, OrderStatus.Filled,'Filled');
+          }else if(chartInfo.status === "Cancelled" || chartInfo.status === "Offboard"){ // "Cancelled" "Offboard"
+            this.dashboardService.redirectToUrlWithCandidateStatus('agency/order-management/', 0, '',chartInfo.status,chartInfo.status);
           }else{
             this.dashboardService.redirectToUrlWithCandidateStatus('agency/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status);
           }
         }else{
           if(chartInfo.applicantStatus === OrderStatus.Onboard){
             this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status, OrderStatus.Filled,'Filled');
+          }else if(chartInfo.status === "Cancelled" || chartInfo.status === "Offboard"){ // "Cancelled" "Offboard"
+            this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', 0, '',chartInfo.status,chartInfo.status);
           }else{
             this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status);
           }
