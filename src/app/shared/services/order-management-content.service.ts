@@ -400,12 +400,8 @@ export class OrderManagementContentService {
     return this.http.delete<Order>('/api/Orders', { params: { orderId: id } });
   }
 
-  /**
-   * Approve order
-   * @param id order id to approve
-   */
-  public approveOrder(id: number): Observable<string> {
-    return this.http.post(`/api/Order/approve`, { orderId: id }, { responseType: 'text' });
+  public approveOrder(orderId: number, isIRPTab: boolean): Observable<string> {
+    return this.http.post(`/api/Order/approve`, { orderId, isIRPTab }, { responseType: 'text' });
   }
 
   /**
