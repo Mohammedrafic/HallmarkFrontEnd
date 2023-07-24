@@ -100,7 +100,7 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
     this.orderManagementService.selectedOrderAfterRedirect$.next({
       orderId: Number(data.orderPublicId),
       candidateId: data.candidateProfileId as number,
-      orderType: data.orderType as number,
+      orderType: this.params.data.orderType,
       prefix: data.organizationPrefix,
     });
   }

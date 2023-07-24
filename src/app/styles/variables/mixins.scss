@@ -213,3 +213,20 @@
   width: calc(100% + 50px) !important;
   padding-left: 24px;
 }
+
+@mixin candidateMessage {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin-top: 8px;
+  border-radius: 8px;
+  background-color: $sheer-peach;
+  color: $roux;
+  font-size: 14px;
+  font-weight: 400;
+
+  i-feather {
+    color: $supportive-orange;
+    margin-right: 12px;
+  }
+}

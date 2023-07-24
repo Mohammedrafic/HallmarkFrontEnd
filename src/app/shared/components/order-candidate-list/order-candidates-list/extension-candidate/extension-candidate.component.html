@@ -46,6 +46,10 @@
         </app-tooltip-container>
       </div>
     </div>
+    <div class="candidate-message" *ngIf="candidateJob?.isLocal">
+      <i-feather name="info" class="icon"></i-feather>
+      Local Candidate
+    </div>
   </section>
   <section class="content-container">
     <div class="candidate-info">
