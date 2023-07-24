@@ -374,9 +374,21 @@ export class InvoicesState {
   GetAgencyFeeApplicable(
     { patchState, dispatch }: StateContext<InvoicesModel>,
     { reasonId }: Invoices.GetAgencyFeeApplicable,
-  ): Observable<boolean> {
+  ): Observable<boolean | void> {
 
-    return this.invoicesAPIService.getAgencyFeeApplicable(reasonId);
+    return this.invoicesAPIService.getAgencyFeeApplicable(reasonId)
+      .pipe(
+        tap((res) => {
+          patchState(
+            {
+              agencyFeeApplicable: res,
+            }
+          );
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+        }),
+      );
   }
 
 

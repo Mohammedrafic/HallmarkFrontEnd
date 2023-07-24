@@ -55,8 +55,6 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   public reasonId: number;
 
-  public agencyFeeApplicableSelector: boolean = true;
-
   private readonly dropDownOptions: ManualInvoiceInputOptions = {
     invoiceLocations: [],
     invoiceDepartments: [],
@@ -81,16 +79,22 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   ngOnInit(): void {
     this.strategy = this.injector.get<ManualInvoiceStrategy>(
       ManualInvoiceStrategyMap.get(this.isAgency) as ProviderToken<ManualInvoiceStrategy>);
-
+     
     this.form = this.addService.createForm(this.isAgency) as CustomFormGroup<AddManInvoiceForm>;
 
     this.watchForSearch();
     this.watchForCandidate();
     this.watchForLocation();
     this.watchForAgency();
+    this.watchForReason();
     this.getDialogState();
     this.getReasons();
     this.confirmMessages = InvoiceConfirmMessages;
+    this.agencyFeeApplicable$.subscribe(
+      (data) => {
+        this.form?.get('vendorFee')?.patchValue(data);
+      }
+    )
   }
 
   override closeDialog(): void {
@@ -138,16 +142,6 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
           this.closeDialog();
         });
       });
-  }
-
-  updateVenorFee(event: Event) {
-    if (this.dropDownOptions.reasons) {
-      const reasonId = (event.target as HTMLSelectElement).selectedIndex;
-      this.reasonId = Number(this.dropDownOptions.reasons[reasonId].value);
-      this.agencyFeeApplicable$.subscribe(
-        (data) => { this.agencyFeeApplicableSelector = data }
-      )
-    }
   }
 
   setFilesForUpload(files: FileForUpload[]): void {
@@ -247,7 +241,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       )
       .subscribe((data) => {
         this.dropDownOptions.reasons = data;
-
+        console.log(this.dropDownOptions.reasons.values);
         this.setOrderIdOnEdit();
         this.cd.markForCheck();
       });
@@ -356,6 +350,20 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       this.strategy.populateCandidates(id, this.searchOptions, this.dropDownOptions, this.dialogConfig, orderId);
       this.cd.markForCheck();
     });
+  }
+
+  private watchForReason(): void {
+    this.form?.controls['reasonId'].valueChanges
+      .pipe(
+        filter((value) => !!value),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((id) => {
+        const reasonId = this.form?.get('reasonId')?.value;
+        if (this.dropDownOptions.reasons) {
+          this.store.dispatch(new Invoices.GetAgencyFeeApplicable(reasonId));
+        }
+      });
   }
 
   private clearDialog(): void {
