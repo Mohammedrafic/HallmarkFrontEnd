@@ -58,6 +58,7 @@ import { GetProfileMenuItems } from './shell.constant';
 import { ProfileMenuItem, THEME } from './shell.enum';
 import { UserService } from '@shared/services/user.service';
 import { BreakpointObserverService } from '@core/services';
+import { HeaderState } from '@shared/models/header-state.model';
 
 @Component({
   selector: 'app-shell',
@@ -89,7 +90,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   isDarkTheme$: Observable<boolean>;
 
   @Select(AppState.headerState)
-  headerState$: Observable<any>;
+  headerState$: Observable<HeaderState | null>;
 
   @Select(AppState.isFirstLoad)
   isFirstLoad$: Observable<boolean>;
