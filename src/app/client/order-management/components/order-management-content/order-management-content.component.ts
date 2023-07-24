@@ -238,6 +238,8 @@ import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
+import { ButtonGroupComponent } from '@shared/components/button-group/button-group.component';
+import { OrderLinkDetails } from '@client/order-management/interfaces';
 
 @Component({
   selector: 'app-order-management-content',
@@ -253,6 +255,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @ViewChild('tabNavigation') tabNavigation: TabNavigationComponent;
   @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
   @ViewChild('updaterateRow') updaterateRow: UpdateRegRateComponent;
+  @ViewChild('systemGroup') systemGroup: ButtonGroupComponent;
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
 
@@ -428,6 +431,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public userSearch$ = new Subject<FilteringEventArgs>();
 
   private isRedirectedFromDashboard: boolean;
+  private isRedirectedFromDashboardWidget: boolean;
+  private isRedirectedFromVmsSystem = false;
   private orderStaus: number;
   private xtraOrderStatus: number;
   private numberArr: number[] = [];
@@ -452,6 +457,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private alertTitle: string;
   private orderManagementPagerState: OrderManagementPagerState | null;
   private orderPositionStatus: string | null;
+  private orderPositionWidgetStatus: string | null;
   private orderPositionXtraStatus: string | null;
   private organizationId: number;
   public isCondidateTab: boolean = false;
@@ -508,12 +514,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.activeIRPTabIndex =parseInt(routerState?.['irpActiveTab'])
     }
     this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
+    this.isRedirectedFromDashboardWidget = routerState?.['redirectedFromDashboard'] || false;
     this.orderStaus = routerState?.['orderStatus'] || 0;
     this.xtraOrderStatus= routerState?.['xtraOrderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
     this.prefix = routerState?.['prefix'];
     this.orderPositionStatus = routerState?.['status'];
+    this.orderPositionWidgetStatus = routerState?.['status'];
     this.orderPositionXtraStatus = routerState?.['xtraStatus'];
     (routerState?.['status'] == "In Progress (Pending)" || routerState?.['status'] == "In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] == "In Progress" ? this.SelectedStatus.push("InProgress") : routerState?.['status'] ? this.SelectedStatus.push(routerState?.['status']) : "";
     this.candidateStatusId = routerState?.['candidateStatusId'] || '';
@@ -609,6 +617,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.initGridColumns();
       this.getOrders();
     }
+    this.watchForOrderFromAnotherSystem();
   }
 
   ngOnDestroy(): void {
@@ -1468,11 +1477,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.activeSystem = selectedBtn.id;
     this.closeModalsBeforeSwitchSystem();
     this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);
-    this.clearFilters();
-    this.store.dispatch([new PreservedFilters.ResetPageFilters(), new ClearOrders()]);
-    this.getPreservedFiltersByPage();
-    this.orderManagementService.setOrderManagementSystem(this.activeSystem);
 
+    if (!this.isRedirectedFromVmsSystem) {
+      this.clearFilters();
+      this.store.dispatch([new PreservedFilters.ResetPageFilters(), new ClearOrders()]);
+      this.getPreservedFiltersByPage();
+    }
+
+    this.orderManagementService.setOrderManagementSystem(this.activeSystem);
     this.setOrderTypesFilterDataSource();
     this.resetTabs();
     this.initMenuItems();
@@ -1596,6 +1608,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       case MoreMenuType['Re-Open']:
         this.reOpenOrder(data);
         break;
+      case MoreMenuType['Add Re-Order']:
+        this.createReorder(data);
+        break;
     }
   }
 
@@ -1718,6 +1733,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (data?.items) {
         data.items.forEach((item) => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
+          item.menuItems = this.getMoreMenuDataSource(item);
+
           if (item.children && item.children.length) {
             item.children.sort((a, b) => a.positionId - b.positionId);
           }
@@ -1735,6 +1752,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         }
       }
       super.setHeightForMobileGrid(this.ordersPage?.items?.length);
+
+      if (this.isRedirectedFromVmsSystem) {
+        this.openFirstIrpOrderDetails();
+      }
     });
   }
 
@@ -1807,8 +1828,27 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
         .map((status: FilterStatus) => status.status);
       if(this.activeSystem != OrderManagementIRPSystemId.OrderJourney){
-        this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
-        this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
+        if(this.isRedirectedFromDashboardWidget){
+          if(this.orderPositionWidgetStatus == "Open"){
+            this.filters.orderStatuses = ["OrdersOpenPositions"];
+          }
+          else if(this.orderPositionWidgetStatus == "In Progress"){
+            this.filters.candidateStatuses =  ["Applied","Shortlisted"];
+          }
+          else if(this.orderPositionWidgetStatus == "In Progress (Pending)"){
+            this.filters.candidateStatuses =  ["Offered"];
+          }
+          else if(this.orderPositionWidgetStatus == "In Progress (Accepted)"){
+            this.filters.candidateStatuses =  ["Accepted"];
+          }
+          else if(this.orderPositionWidgetStatus == "Filled"){
+            this.filters.candidateStatuses =  ["Onboard"];
+          }
+        }
+        else{
+          this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
+          this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
+        }
 
       }
     }
@@ -1961,6 +2001,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (this.selectedOrder?.commentContainerId) {
         this.getOrderComments();
       }
+
+      if (this.isRedirectedFromVmsSystem) {
+        this.selectFirstRow();
+        this.isRedirectedFromVmsSystem = false;
+      }
+
       this.cd$.next(true);
     });
   }
@@ -2121,7 +2167,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         }
         else{
           return order.orderType === OrderType.OpenPerDiem
-          ? this.threeDotsMenuOptions['moreMenuWithCloseButton']
+          ? this.getMenuItems(order, 'moreMenuWithCloseButton')
           : this.threeDotsMenuOptions['moreMenu'];
         }
 
@@ -2139,7 +2185,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     else{
       return this.canReOpen(order)
       ? this.threeDotsMenuOptions['moreMenuWithReOpenButton']
-      : this.threeDotsMenuOptions['moreMenuWithCloseButton'];
+      : this.getMenuItems(order, 'moreMenuWithCloseButton');
     }
   }
 
@@ -2767,5 +2813,68 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       ).subscribe(() => {
         this.store.dispatch(new SaveReOrderPageSettings(pageNumber, pageSize, true));
       });
+  }
+
+  private getMoreMenuDataSource(order: OrderManagement): ItemModel[] {
+    if (order.status === this.orderStatus.Closed) {
+      return this.threeDotsMenuOptions['closedOrderMenu'];
+    }
+    if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
+      return this.getMenuForReorders(order);
+    }
+    if (!this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase())) {
+      return this.getMenuItems(order, 'moreMenuWithDeleteButton');
+    } else {
+      return this.getMoreMenu(order);
+    }
+  }
+
+  private getMenuItems(order: OrderManagement, menuKey: string): ItemModel[] {
+    const isPerDiem =
+      this.activeTab !== OrganizationOrderManagementTabs.Incomplete && this.orderTypes.OpenPerDiem === order.orderType;
+    const hideAddReOrderButton = !this.canCreateOrder
+      || order.status === this.orderStatus.PreOpen
+      || order.status === this.orderStatus.Closed
+      || !this.settings[SettingsKeys.IsReOrder]?.value
+      || !this.hasCreateEditOrderPermission;
+
+    if (isPerDiem && !hideAddReOrderButton) {
+       return [...this.threeDotsMenuOptions['moreMenuAddReOrderButton'], ...this.threeDotsMenuOptions[menuKey]];
+    } else {
+      return this.threeDotsMenuOptions[menuKey];
+    }
+  }
+
+  private watchForOrderFromAnotherSystem(): void {
+    this.orderManagementService.getOrderFromAnotherSystemStream()
+      .pipe(
+        filter((orderLinkDetails) => !!orderLinkDetails),
+        takeUntil(this.unsubscribe$),
+      )
+      .subscribe((orderLinkDetails: OrderLinkDetails | null) => {
+        if (orderLinkDetails?.system === OrderManagementIRPSystemId.IRP) {
+          this.clearFilters();
+          this.filters.orderPublicId = orderLinkDetails.orderId;
+          this.OrderFilterFormGroup.get('orderPublicId')?.setValue(orderLinkDetails.orderId);
+          this.isRedirectedFromVmsSystem = true;
+          this.isCondidateTab = true;
+        }
+
+        this.systemGroup.selectButton({ id: orderLinkDetails?.system as OrderManagementIRPSystemId } as ButtonModel);
+      });
+  }
+
+  private openFirstIrpOrderDetails(): void {
+    const node = this.gridApi?.getRowNode('0');
+
+    if (node) {
+      this.openIrpDetails({ node, data: node?.data });
+    }
+  }
+  @OutsideZone
+  private selectFirstRow(): void {
+    setTimeout(() => {
+      this.gridApi?.selectIndex(0, false, false);
+    }, 300);
   }
 }

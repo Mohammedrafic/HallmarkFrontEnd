@@ -156,6 +156,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public disabledCloseButton = true;
   public showCloseButton = false;
+  public showEmployeeTab = true;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   private secondHasOpenedOnes = false;
 
@@ -271,6 +272,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['order']?.currentValue) {
       this.setCloseOrderButtonState();
+      this.setShowEmployeeTabState();
       const order = changes['order']?.currentValue;
       const orderstatusValue=order.statusText==null?order.irpOrderMetadata.statusText:order.statusText;
       const hasStatus = this.openInProgressFilledStatuses.includes(orderstatusValue?.toLowerCase());
@@ -387,7 +389,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public approveOrder(id: number): void {
-    this.store.dispatch(new ApproveOrder(id));
+    this.store.dispatch(new ApproveOrder(id, this.activeSystem === OrderManagementIRPSystemId.IRP));
   }
 
   public editOrder(data: Order) {
@@ -632,5 +634,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private checkOrderCandidatesForOnboard(candiadtes: CandidateModel[]): boolean {
     return candiadtes.some((candidate) => candidate.status === ONBOARDED_STATUS);
+  }
+
+  private setShowEmployeeTabState(): void {
+    const status = this.order.irpOrderMetadata?.status ? this.order.irpOrderMetadata.status : this.order.status;
+    this.showEmployeeTab = !(this.activeSystem === OrderManagementIRPSystemId.IRP && status === OrderStatus.PreOpen);
   }
 }

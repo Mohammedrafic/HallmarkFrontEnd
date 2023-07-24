@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } fro
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionCompleted, Select, Store } from '@ngxs/store';
 import {
   combineLatest,
   debounceTime,
@@ -252,6 +252,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     private cd: ChangeDetectorRef,
     private partialSearchService: PartialSearchService,
     private permissionService: PermissionService,
+    private actions$: Actions,
   ) {
     super(store);
     this.initOrderForms();
@@ -591,6 +592,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   //TODO: refactor this method
+  // eslint-disable-next-line max-lines-per-function
   private populateForms(order: Order): void {
     this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
@@ -742,12 +744,16 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       this.store
         .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
         .pipe(
+          switchMap(() => this.actions$),
+          ofActionCompleted(GetDepartmentsByLocationId),
           take(1),
-        ).subscribe((data) => {
-          this.selectedDepartment = data.organizationManagement.departments?.find(
+        ).subscribe(() => {
+          const departments = this.store.selectSnapshot(OrganizationManagementState.departments) as Department[];
+
+          this.selectedDepartment = departments.find(
             (department: Department) => department.departmentId === order.departmentId
-          );
-          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId, { emitEvent: false });
+          ) as Department;
+          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
         });
     }
   }

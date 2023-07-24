@@ -31,7 +31,7 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
   { text: 'Linked ID', column: 'LinkedId' },
-  { text: 'Order Locked?', column: 'IsLocked' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 
 ];
 
@@ -68,7 +68,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
   { text: 'Linked ID', column: 'LinkedId' },
-  { text: 'Orders Lock', column: 'IsLocked' },
+  { text: 'Orders Lock', column: 'OrderLocked' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -103,7 +103,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
   { text: 'Linked ID', column: 'LinkedId' },
-  { text: 'Order Locked?', column: 'IsLocked' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
 export const perDiemChildColumnsToExport: ExportColumn[] = [

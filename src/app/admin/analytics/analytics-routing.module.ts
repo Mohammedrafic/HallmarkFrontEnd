@@ -1,3 +1,4 @@
+import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { StaffAvailabilityComponent } from './staff-availability/staff-availability.component';
 import { HoursByDepartmentComponent } from './hours-by-department/hours-by-department.component';
 import { UnitProfileComponent } from './unit-profile/unit-profile.component';
@@ -396,6 +397,13 @@ const routes: Routes = [
       {
         path: 'Position-Summary',
         component: PositionSummaryComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'agency-spend',
+        component: AgencySpendComponent,
         data: {
           isOrganizationArea: true,
         }

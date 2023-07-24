@@ -26,6 +26,11 @@
       color: $secondary-dark-blue-30;
       font-size: 12px;
     }
+
+    &__link {
+      cursor: pointer;
+      color: $primary-active-blue-10;
+    }
   }
 
   &.selected {
@@ -36,7 +41,6 @@
     width: 100%;
     max-width: 200px;
     position: relative;
-    padding-right: 70px;
 
     ejs-chiplist.e-control.e-chip-list .e-chip {
       width: 100% !important;
