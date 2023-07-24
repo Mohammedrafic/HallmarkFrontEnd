@@ -1828,27 +1828,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
         .map((status: FilterStatus) => status.status);
       if(this.activeSystem != OrderManagementIRPSystemId.OrderJourney){
-        if(this.isRedirectedFromDashboardWidget){
-          if(this.orderPositionWidgetStatus == "Open"){
-            this.filters.orderStatuses = ["OrdersOpenPositions"];
-          }
-          else if(this.orderPositionWidgetStatus == "In Progress"){
-            this.filters.candidateStatuses =  ["Applied","Shortlisted"];
-          }
-          else if(this.orderPositionWidgetStatus == "In Progress (Pending)"){
-            this.filters.candidateStatuses =  ["Offered"];
-          }
-          else if(this.orderPositionWidgetStatus == "In Progress (Accepted)"){
-            this.filters.candidateStatuses =  ["Accepted"];
-          }
-          else if(this.orderPositionWidgetStatus == "Filled"){
-            this.filters.candidateStatuses =  ["Onboard"];
-          }
-        }
-        else{
-          this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
-          this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
-        }
+        this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
+        this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
 
       }
     }
