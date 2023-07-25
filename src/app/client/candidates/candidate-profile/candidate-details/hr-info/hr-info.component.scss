@@ -24,5 +24,9 @@
     &_first {
       grid-template-columns: repeat(2, 1fr);
     }
+
+    &_second {
+      grid-template-columns: 110px auto auto;
+    }
   }
 }
