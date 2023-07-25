@@ -476,10 +476,9 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
     } else {
       regionId = this.filterStructure.regions[0].id as number;
-
+      locationId = this.scheduleFiltersService.getSelectedLocationByOrder(this.filterStructure, [regionId])[0]?.value as number;
       this.filterColumns.locationIds.dataSource = this.scheduleFiltersService
         .getSelectedLocatinOptions(this.filterStructure, [regionId]);
-      locationId = this.filterColumns.locationIds.dataSource[0]?.value as number;
 
       this.filterColumns.departmentsIds.dataSource = this.scheduleFiltersService
         .getSelectedDepartmentOptions(this.filterStructure, [locationId]);
