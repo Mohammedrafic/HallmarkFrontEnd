@@ -21,7 +21,7 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { ToggleSwitchComponent } from '../toggle-switch/toggle-switch.component';
 import { GridReadyEvent } from '@ag-grid-community/core';
-import { AlertChannel, AlertEnum } from 'src/app/admin/alerts/alerts.enum';
+import { AlertChannel, AlertEnum,AlertIdEnum } from 'src/app/admin/alerts/alerts.enum';
 import { GetUserSubscriptionPage, UpdateUserSubscription } from '@admin/store/alerts.actions';
 import {
   UserSubscription,
@@ -472,8 +472,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           self.userSubscriptionPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
 
             self.itemList = data?.items;
-            if(self.businessUnitControl?.value == BusinessUnitType.Candidates)
-            self.itemList=self.itemList?.filter((x:any)=>x.alertId!=59);
+            if(self.businessUnitControl?.value === BusinessUnitType.Candidates) {
+            self.itemList = self.itemList?.filter((x=>x.alertId!=AlertIdEnum['Order Comments-IRP']));
+            }
             self.totalRecordsCount = data?.totalCount;
 
             if (!self.itemList || !self.itemList.length) {
