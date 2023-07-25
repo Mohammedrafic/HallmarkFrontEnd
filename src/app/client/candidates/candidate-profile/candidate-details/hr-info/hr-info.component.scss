@@ -30,3 +30,15 @@
     }
   }
 }
+
+@media #{$max-tablet} {
+  .hr-info__form {
+    &_first {
+      grid-template-columns: 1fr;
+    }
+
+    &_second {
+      grid-template-columns: 1fr;
+    }
+  }
+}
