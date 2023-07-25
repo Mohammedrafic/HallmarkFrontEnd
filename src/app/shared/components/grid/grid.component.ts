@@ -43,26 +43,27 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 })
 export class GridComponent<Data = unknown> extends DestroyableDirective implements OnChanges, OnInit {
   @Input() public columnDefinitions: ColumnDefinitionModel[] | null;
-  @Input() public currentPage: number = 1;
+  @Input() public currentPage = 1;
   @Input() public isLoading: boolean | null = false;
-  @Input() public suppressRowClickSelection: boolean = false;
-  @Input() public allowBulkSelection: boolean = false;
-  @Input() public disableBulkButton: boolean = false;
+  @Input() public suppressRowClickSelection = false;
+  @Input() public allowBulkSelection = false;
+  @Input() public disableBulkButton = false;
   @Input() public rowSelection: 'single' | 'multiple' | undefined = 'single';
-  @Input() public rowDragManaged: boolean = false;
-  @Input() public suppressMoveWhenRowDragging: boolean = false;
+  @Input() public rowDragManaged = false;
+  @Input() public suppressMoveWhenRowDragging = false;
   @Input() public pageSize: number = GRID_CONFIG.rowsPerPageDropDownObject[2].value;
   @Input() public rowData: Data[] | null | undefined;
-  @Input() public totalRecordsCount: number = 1;
+  @Input() public totalRecordsCount = 1;
   @Input() public gridOptions: GridOptions;
   @Input() public paginationPanel = true;
   @Input() public gridTitle: string;
   @Input() public adjustColumnsWidth = false;
-  @Input() public context: Object;
+  @Input() public context: {componentParent: unknown};
   @Input() public gridEmptyMessage: string = GRID_EMPTY_MESSAGE;
   @Input() public customRowsPerPageDropDownObject: { text: string, value: number }[];
-  @Input() public disableRowsPerPageDropdown: boolean = false;
+  @Input() public disableRowsPerPageDropdown = false;
   @Input() public bulkActionConfig: BulkActionConfig = {};
+  @Input() public showUpScrollButton = true;
 
   @Input() set changeTableSelectedIndex(next: number | null) {
     if (next !== null) {

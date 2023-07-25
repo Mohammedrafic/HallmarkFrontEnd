@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'adaptive-response';
 
 :host {
   height: 100%;
@@ -33,5 +34,12 @@
 
   button {
     width: 50%;
+  }
+}
+
+@media #{$max-mobile} {
+  :host {
+    display: block;
+    margin-top: 16px;
   }
 }
