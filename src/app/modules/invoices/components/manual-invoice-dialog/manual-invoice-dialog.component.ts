@@ -353,7 +353,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         filter((value) => !!value),
         takeUntil(this.componentDestroy())
       )
-      .subscribe((id) => {
+      .subscribe(() => {
         const reasonId = this.form?.get('reasonId')?.value;
 
         if (this.dropDownOptions.reasons) {
