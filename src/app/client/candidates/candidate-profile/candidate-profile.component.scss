@@ -31,16 +31,11 @@
   .candidate-profile {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
+    padding-bottom: 24px;
   }
   
   .general-notes {
     height: 300px;
-  }
-}
-
-@media #{$max-tablet} {
-  .candidate-profile {
-    padding: 0 16px 24px 0;
   }
 }
 

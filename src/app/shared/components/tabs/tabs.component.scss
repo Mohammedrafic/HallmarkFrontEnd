@@ -13,7 +13,6 @@
 
 .tabs {
   max-width: calc(100% - 16px) !important;
-  overflow: hidden;
 
   @media #{$max-mobile} {
     max-width: calc(100vw - 32px) !important;
