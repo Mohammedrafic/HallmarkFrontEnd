@@ -1,4 +1,5 @@
-@import '../../../styles/variables/colors';
+@import 'colors';
+@import 'adaptive-response';
 
 .dialog {
   right: 0;
@@ -52,6 +53,18 @@
           width: 198px;
         }
       }
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .e-card-content {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 12px;
+
+    button {
+      width: 50%;
     }
   }
 }
