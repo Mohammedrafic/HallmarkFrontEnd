@@ -367,9 +367,9 @@ export class AlertsState {
   @Action(GetGroupEmailRoles)
   GetGroupEmailRoles(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { id }: GetGroupEmailRoles
+    { data }: GetGroupEmailRoles
   ): Observable<GroupEmailRole | void> {
-    return this.groupEmailService.GetGroupEmailRolesByOrgId(id).pipe(
+    return this.groupEmailService.GetGroupEmailRolesByOrgId(data).pipe(
       tap((payload) => {
         patchState({ groupEmailRoleData: payload });
         return payload;
