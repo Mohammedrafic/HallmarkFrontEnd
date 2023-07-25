@@ -1499,7 +1499,7 @@
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
   [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
   [CanEditOrderBillRateIRP]="userPermission[userPermissions.CanEditOrderBillRateIRP]"
-  [CanCloseOrdersIRP] = "userPermission[userPermissions.CanCloseOrdersIRP]"
+  [CanCloseOrdersIRP] = "canCloseOrderIRP"
   [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanCreateOrdersIRP]"
   [CanOrganizationViewOrdersIRP]="userPermission[userPermissions.CanOrganizationViewOrdersIRP]"
   (selectReOrder)="selectReOrder($event)"
