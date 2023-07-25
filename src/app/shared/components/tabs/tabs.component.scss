@@ -1,4 +1,5 @@
 @import "colors";
+@import 'adaptive-response';
 
 .stepper {
   padding-bottom: 40px;
@@ -7,5 +8,14 @@
     .required {
       color: $supportive-red;
     }
+  }
+}
+
+.tabs {
+  max-width: calc(100% - 16px) !important;
+  overflow: hidden;
+
+  @media #{$max-mobile} {
+    max-width: calc(100vw - 32px) !important;
   }
 }

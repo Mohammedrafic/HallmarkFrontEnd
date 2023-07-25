@@ -9,7 +9,7 @@ import {
   QueryList,
   ViewChild,
   ViewChildren,
-  ViewContainerRef
+  ViewContainerRef,
 } from '@angular/core';
 import { TabsModel } from '@shared/components/tabs/tabs.model';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -19,7 +19,7 @@ import { SelectEventArgs } from '@syncfusion/ej2-navigations/src/tab/tab';
   selector: 'app-tabs',
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TabsComponent<T> implements AfterViewInit {
   @ViewChildren('tabContent', { read: ViewContainerRef }) public dynamic: QueryList<ViewContainerRef>;
