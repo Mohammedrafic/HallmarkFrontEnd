@@ -1,3 +1,5 @@
+@import 'adaptive-response';
+
 .hr-info__form {
   display: grid;
   grid-gap: 12px;
@@ -6,6 +8,7 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-gap: 12px;
+    align-items: end;
   }
 
   &_second {
@@ -13,5 +16,13 @@
     grid-template-columns: 110px 160px 160px;
     grid-gap: 12px;
     align-items: center;
+  }
+}
+
+@media #{$max-tablet} {
+  .hr-info__form {
+    &_first {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 }
