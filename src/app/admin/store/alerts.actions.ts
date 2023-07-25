@@ -103,7 +103,7 @@ export class GetGroupEmailById {
 export class GetGroupEmailRoles {
   static readonly type = '[groupemail] Get Group Email roles By organization id';
   constructor(
-    public id: number
+    public data: number[]
   ) { }
 }
 
