@@ -37,3 +37,16 @@
     height: 300px;
   }
 }
+
+@media #{$max-tablet} {
+  .candidate-profile {
+    padding: 0 16px 24px 0;
+  }
+}
+
+@media #{$max-mobile} {
+  .candidate-profile {
+    display: grid;
+    padding-bottom: 90px;
+  }
+}
