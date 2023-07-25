@@ -325,7 +325,7 @@ export class JobEventComponent implements OnInit, OnDestroy {
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
               this.jobeventForm.get(JobeventConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
               //this.defaultOrderTypes = this.orderTypesList.map((list) => list.id);
-              setTimeout(() => { this.SearchReport() }, 3000);
+            this.SearchReport();
             }
           });
           this.regions = this.regionsList;

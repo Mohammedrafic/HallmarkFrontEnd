@@ -318,7 +318,7 @@ export class CandidateStatusComponent implements OnInit {
             }
           });
 
-          setTimeout(() => { this.SearchReport() }, 3000);
+         this.SearchReport()
         }
         else {
           this.isClearAll = false;

@@ -295,7 +295,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
               this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
               this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
               this.changeDetectorRef.detectChanges();
-              setTimeout(() => { this.SearchReport() }, 3000);
+              this.SearchReport();
             }
           });
           this.regions = this.regionsList;

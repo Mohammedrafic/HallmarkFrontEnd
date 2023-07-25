@@ -281,7 +281,7 @@ export class FinanceMedicareWageReportComponent implements OnInit, OnDestroy {
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
               this.financeMedicareWageReportForm.get(financeMedicareWageReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
 
-              setTimeout(() => { this.SearchReport() }, 3000);
+            this.SearchReport();
             }
           });
           this.regions = this.regionsList;

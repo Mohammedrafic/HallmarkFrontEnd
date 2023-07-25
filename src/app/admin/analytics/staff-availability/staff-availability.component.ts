@@ -162,7 +162,9 @@ export class StaffAvailabilityComponent implements OnInit, OnDestroy {
     }
   }
   ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();  
+    this.isAlive = false;  
   }
 
   ngOnInit(): void {
@@ -348,9 +350,7 @@ export class StaffAvailabilityComponent implements OnInit, OnDestroy {
                 this.changeDetectorRef.detectChanges();
 
                 if (this.isInitialLoad) {
-                  setTimeout(() => {
                     this.SearchReport();
-                  }, 3000);
                   this.isInitialLoad = false;
                 }
               }
