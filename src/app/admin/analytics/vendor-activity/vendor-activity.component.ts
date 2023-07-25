@@ -299,7 +299,7 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          setTimeout(() => { this.SearchReport() }, 3000);
+          this.SearchReport() ;
         }
         else {
           this.isClearAll = false;

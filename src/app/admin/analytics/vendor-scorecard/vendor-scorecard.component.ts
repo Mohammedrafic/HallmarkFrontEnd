@@ -306,7 +306,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
               this.defaultSkills = skills.map((list) => list.id);
               this.defaultOrderTypes = this.orderTypesList.map((list) => list.id);
               this.filterColumns.orderTypes.dataSource = this.orderTypesList;
-              setTimeout(() => { this.SearchReport() }, 3000);
+              this.SearchReport() ;
             }
           });
           this.regions = this.regionsList;

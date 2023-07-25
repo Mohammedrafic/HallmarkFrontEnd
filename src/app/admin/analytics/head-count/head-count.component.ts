@@ -252,7 +252,7 @@ export class HeadCountComponent implements OnInit {
         this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
       }
     });
-    setTimeout(()=>{ this.SearchReport()},3000);
+     this.SearchReport();
     this.isInitialLoad = false;
     this.locationIdControl = this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {

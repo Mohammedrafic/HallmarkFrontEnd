@@ -197,7 +197,7 @@ export class JobDetailsComponent implements OnInit ,OnDestroy {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
       if (this.isInitialLoad) {
         this.isInitialLoad = false;
-        setTimeout(()=>{ this.SearchReport()},3000);
+        this.SearchReport();
       }
     });
     this.onOrganizationsChange();
