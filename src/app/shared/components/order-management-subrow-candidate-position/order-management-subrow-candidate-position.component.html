@@ -17,20 +17,44 @@
 
   <ng-template #positionDetails>
     <ng-container *ngFor="let cell of colDefs; trackBy:trackByField">
-      <div
-        class="custom-cell"
-        [ngStyle]="{
+      <ng-container [ngSwitch]="cell.field">
+        <div
+          class="custom-cell"
+          [ngStyle]="{
              width: cell?.width + 'px',
              'min-width': cell.minWidth + 'px',
              'max-width': cell.maxWidth + 'px'
         }"
-      >
-        <ng-container
-          *ngIf="cell.field !== 'candidateStatus' && cell.field !== 'orderStatus'; else statusCell"
         >
-          <p class="custom-cell__value">{{ candidate[cell?.field || ''] }}</p>
-          <h3 class="custom-cell__title">{{ cell?.headerName }}</h3>
-        </ng-container>
+          <ng-container *ngSwitchCase="'orderStatus'">
+            <ng-container *ngTemplateOutlet="statusCell"></ng-container>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'candidateStatus'">
+            <ng-container *ngTemplateOutlet="statusCell"></ng-container>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'system'">
+
+            <ng-container *ngIf="vmsPosition; else irpSystem">
+              <p class="custom-cell__value">{{ candidate[cell?.field || ''] }}</p>
+            </ng-container>
+
+            <ng-template #irpSystem>
+              <p class="custom-cell__value custom-cell__link" (click)="navigateToPositionDetails(candidate)">
+                {{ candidate[cell?.field || ''] }}
+              </p>
+            </ng-template>
+
+            <h3 class="custom-cell__title">{{ cell?.headerName }}</h3>
+          </ng-container>
+
+          <ng-container *ngSwitchDefault>
+            <p class="custom-cell__value">{{ candidate[cell?.field || ''] }}</p>
+            <h3 class="custom-cell__title">{{ cell?.headerName }}</h3>
+          </ng-container>
+        </div>
+
         <ng-template #statusCell>
           <ng-container *ngIf="candidate[cell?.field || ''] as cellValue">
             <div [class]="cell?.cellClass">
@@ -42,8 +66,7 @@
             </div>
           </ng-container>
         </ng-template>
-      </div>
+      </ng-container>
     </ng-container>
   </ng-template>
-    
 </ng-container>

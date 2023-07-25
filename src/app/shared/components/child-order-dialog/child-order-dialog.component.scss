@@ -1,8 +1,21 @@
 @import 'colors';
 @import 'adaptive-response';
+@import 'mixins';
+
+.dialog {
+  .header-container {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-top: 10px;
+    box-sizing: border-box;
+    background-color: $white;
+  }
+}
 
 .order-tabs {
-  margin-top: 24px;
+  position: relative;
+  padding-top: 24px;
 
   span {
     margin-left: 12px;
@@ -12,6 +25,22 @@
     .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
       left: 114px !important;
       right: 109px !important;
+    }
+  }
+
+  ::ng-deep {
+    .e-tab-header {
+      @include stickyTabsPosition(70px);
+
+      @media #{$max-mobile} {
+        top: 86px;
+        margin-left: -18px;
+        width: calc(100% + 36px) !important;
+      }
+    }
+
+    .e-content .e-tab-content {
+      overflow-y: auto;
     }
   }
 }

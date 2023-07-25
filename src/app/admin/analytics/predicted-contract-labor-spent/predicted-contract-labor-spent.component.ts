@@ -278,7 +278,7 @@ export class PredictedContractLaborSpentComponent implements OnInit, OnDestroy {
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              setTimeout(() => { this.SearchReport() }, 3000);
+             this.SearchReport() ;
             }
           });
           this.regions = this.regionsList;

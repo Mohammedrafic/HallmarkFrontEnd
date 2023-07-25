@@ -1,3 +1,5 @@
+import { ItemModel } from '@syncfusion/ej2-angular-navigations';
+
 import { CandidateModel } from '@client/order-management/components/add-edit-reorder/models/candidate.model';
 import { ApplicantStatus as CandidateStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { Duration } from '@shared/enums/durations';
@@ -62,6 +64,7 @@ export class OrderManagement {
   irpCandidatesCount?: number;
   activeCandidatesCount?: number;
   isLockedIRP: boolean;
+  menuItems?: ItemModel[]; // use only in UI for context menu datasource
 }
 
 export interface IRPOrderManagement {
@@ -606,6 +609,7 @@ export type OrderCandidateJob = {
   candidateStatus: CandidateStatus;
   clockId: number;
   expAsTravelers: string;
+  isLocal: boolean;
   guaranteedWorkWeek: string;
   jobId: number;
   offeredBillRate: number;

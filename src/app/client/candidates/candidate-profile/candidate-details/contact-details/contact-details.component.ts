@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractContactDetails } from '@client/candidates/candidate-profile/candidate-details/abstract-contact-details';
-import { formatDate, PhoneMask, ZipCodeMask } from '@shared/constants';
+import { formatDate, PhoneMask, SEND_EMAIL, SEND_EMAIL_REQUIRED, ZipCodeMask } from '@shared/constants';
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { BehaviorSubject, Observable, takeUntil } from 'rxjs';
 import { CanadaStates, Country, UsaStates } from '@shared/enums/states';
@@ -27,6 +27,10 @@ import { CandidateListState } from '@shared/components/candidate-list/store/cand
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { GroupMailStatus, OrganizationUserType } from '@admin/alerts/group-email.enum';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { SendGroupEmail } from '@admin/store/alerts.actions';
+import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 @Component({
   selector: 'app-contact-details',
   templateUrl: './contact-details.component.html',
@@ -41,8 +45,10 @@ export class ContactDetailsComponent extends AbstractContactDetails implements O
   public isSourceValidated:boolean =false
   isFormInvalid: boolean = false;
   public readonly maxFileSize = 2000000; // 2 mb
+  @ViewChild('RTEGroupEmail') public rteObj: RichTextEditorComponent;
   @Select(UserState.lastSelectedOrganizationId)
   lastSelectedOrgId$: Observable<number>;
+  @ViewChild(EmployeeGroupMailComponent, { static: true }) employeeEmailTemplateForm: EmployeeGroupMailComponent;
 
   
   @Select(RejectReasonState.sourcingReasons)
@@ -103,9 +109,16 @@ public id:any;
     });
   }
   onGroupEmailFormSendClick(){
-    this.isSend=true;
-    this.store.dispatch(new ShowGroupEmailSideDialog(true));
-    //this.router.navigate(['alerts/group-email'],{ queryParams: { redirectFromEmployee: true , businessUnitType: BusinessUnitType.Organization,businessUnit: this.businessUnitId,userType:OrganizationUserType.Employees,employeeId:parseInt(this.route.snapshot.paramMap.get('id') as string) } });
+   
+    if(this.candidateForm.get("personalEmail")?.value){
+      this.groupEmailTemplateForm.controls['emailTo'].setValue(this.candidateForm.get("personalEmail")?.value);
+      this.groupEmailTemplateForm.controls['emailTo'].disable();
+      this.store.dispatch(new ShowGroupEmailSideDialog(true));
+      this.isSend=true;
+    }else{
+      this.store.dispatch(new ShowToast(MessageTypes.Error, "Email Required"));
+    }
+
   }
 
    onCCFieldKeyup() {
@@ -117,56 +130,48 @@ public id:any;
   private groupEmailCloseDialog(): void {
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
   }
-  public onGroupEmailSend(): void {
-    this.store.dispatch(new ShowToast(MessageTypes.Success,"Mail Send Successfully"));
-    // this.groupEmailTemplateForm.markAllAsTouched();
-    // if (this.groupEmailTemplateForm.invalid) {
-    //   this.isFormInvalid = true;
-    //   return;
-    // }
-    // if (this.groupEmailTemplateForm.get("emailBody")?.value != '' && this.groupEmailTemplateForm.get("emailTo")?.value != '' && this.groupEmailTemplateForm.get("emailSubject")?.value != '') {
-    //   const formValues = this.groupEmailTemplateForm.getRawValue();
-    //   let businessUnitId: number | null = null;
-    //   if (formValues.businessUnit == 4)
-    //     businessUnitId = formValues.businesses[0]
-    //   if (formValues.businessUnit == 3)
-    //     businessUnitId = formValues.business == 0 ? null : formValues.business
-    //   const sendGroupEmailDto: SendGroupEmailRequest = {
-    //     businessUnitId: businessUnitId,
-    //     bodyMail: formValues.emailBody,
-    //     subjectMail: formValues.emailSubject,
-    //     toList: formValues.emailTo == undefined ? "" : formValues.emailTo,
-    //     cCList: formValues.emailCc == undefined ? "" : formValues.emailCc,
-    //     bCCList: "",
-    //     status: GroupMailStatus.Pending,
-    //     fromMail: this.userObj?.email == undefined ? "" : this.userObj?.email,
-    //     selectedFile: formValues.fileUpload,
-    //     businessUnitType: formValues.businessUnit == 0 ? null : formValues.businessUnit,
-    //     userType: formValues.userType
-    //   };
-    //   this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
 
-    // }
-    // else {
-    //   // let controlNames = "";
-    //   // let isAre = " is ";
-    //   // let field = "Field ";
-    //   // if (this.groupEmailTemplateForm.emailTo == '') {
-    //   //   controlNames = "Email To";
-    //   //   this.groupEmailTemplateForm.isFormInvalid = true;
-    //   // }
-    //   // if (this.groupEmailTemplateForm.emailSubject == '') {
-    //   //   controlNames = controlNames == "" ? "Email Subject" : controlNames + ",Email Subject";
-    //   // }
-    //   // if (this.groupEmailTemplateForm.emailBody == '') {
-    //   //   controlNames = controlNames == "" ? "Email Body" : controlNames + ",Email Body";
-    //   // }
-    //   // if (controlNames.indexOf(",") > 0) {
-    //   //   isAre = " are "
-    //   //   field = "Fields "
-    //   // }
-    //   //this.store.dispatch(new ShowToast(MessageTypes.Error,field+controlNames+isAre+ SEND_EMAIL_REQUIRED));
-    // }
+  public onGroupEmailSend(): void {
+
+    if (this.employeeEmailTemplateForm.emailBody != '' && this.groupEmailTemplateForm.get("emailTo")?.value != '' && this.groupEmailTemplateForm.get("emailSubject")?.value != '') {
+      const formValues = this.groupEmailTemplateForm.getRawValue();
+      const sendGroupEmailDto: SendGroupEmailRequest = {
+        businessUnitId: this.businessUnitId,
+        bodyMail: formValues.emailBody,
+        subjectMail: formValues.emailSubject,
+        toList: formValues.emailTo == undefined ? "" : formValues.emailTo,
+        cCList: formValues.emailCc == undefined ? "" : formValues.emailCc,
+        bCCList: "",
+        status: GroupMailStatus.Pending,
+        fromMail: this.userObj?.email == undefined ? "" : this.userObj?.email,
+        selectedFile: formValues.fileUpload,
+        businessUnitType: BusinessUnitType.Organization,
+        userType: OrganizationUserType.Employees
+      };
+      this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
+      this.store.dispatch(new ShowGroupEmailSideDialog(false));
+      this.store.dispatch(new ShowToast(MessageTypes.Success,SEND_EMAIL));
+    }
+    else {
+      let controlNames = "";
+      let isAre = " is ";
+      let field = "Field ";
+      if (this.groupEmailTemplateForm.get("emailBody")?.value == '') {
+        controlNames = "Email To";
+        //this.groupEmailTemplateForm.isFormInvalid = true;
+      }
+      if (this.groupEmailTemplateForm.get("emailSubject")?.value == '') {
+        controlNames = controlNames == "" ? "Email Subject" : controlNames + ",Email Subject";
+      }
+      if (this.groupEmailTemplateForm.get("emailBody")?.value== '') {
+        controlNames = controlNames == "" ? "Email Body" : controlNames + ",Email Body";
+      }
+      if (controlNames.indexOf(",") > 0) {
+        isAre = " are "
+        field = "Fields "
+      }
+      this.store.dispatch(new ShowToast(MessageTypes.Error,field+controlNames+isAre+ SEND_EMAIL_REQUIRED));
+    }
   }
 }
 

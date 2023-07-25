@@ -196,7 +196,7 @@ export class ClientFinanceReportComponent implements OnInit,OnDestroy {
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
       if (this.isInitialLoad) {
-        setTimeout(()=>{ this.SearchReport()},3000);
+         this.SearchReport()
         this.isInitialLoad = false;
       }
     });

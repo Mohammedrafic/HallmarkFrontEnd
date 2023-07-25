@@ -97,7 +97,7 @@ export class DailyOrderStatusComponent implements OnInit, OnDestroy {
       let businessIdData = [];
       businessIdData.push(data);
       this.onFilterControlValueChangedHandler();
-      setTimeout(() => { this.SearchReport(); }, 3000)
+      this.SearchReport();
     });
   }
 

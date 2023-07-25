@@ -294,7 +294,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
               this.filterColumns.timesheetStatuses.dataSource = data.timesheetStatuses.filter(i => this.fixedTimesheetStatusesIncluded.includes(i.id));
               this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue(this.defaultTimesheetStatuses); 
               this.isDefaultLoad = true;
-              setTimeout(() => { this.SearchReport() }, 3000);
+                this.SearchReport()
             }
           });
           this.regions = this.regionsList;

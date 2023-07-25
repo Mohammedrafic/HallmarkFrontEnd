@@ -469,10 +469,20 @@ export const MENU_CONFIG: any = {
       icon: 'trending-up',
       route: '/reporting/custom-report',
     },
+    101: {
+      // shift-breakdown
+      icon: '',
+      route: '/analytics/shift-breakdown',
+    },
     102: {
       // Position-Summary
       icon: '',
       route: '/analytics/Position-Summary',
+    },
+    103: {
+      // Agency-Spend
+      icon: '',
+      route: '/analytics/agency-spend',
     },
   },
 
@@ -719,6 +729,16 @@ export const MENU_CONFIG: any = {
       // staff availability Report
       icon: '',
       route: '/analytics/staff-availability',
+    },
+    101: {
+      // shift-breakdown
+      icon: '',
+      route: '/analytics/shift-breakdown',
+    },
+    103: {
+      // Agency-Spend
+      icon: '',
+      route: '/analytics/agency-spend',
     },
   },
 
@@ -1153,11 +1173,21 @@ export const MENU_CONFIG: any = {
       icon: 'trending-up',
       route: '/reporting/custom-report',
     },
-  101: {
-    // Position-Summary
-    icon: '',
-    route: '/analytics/Position-Summary',
-  },
+    101: {
+      // shift-breakdown
+      icon: '',
+      route: '/analytics/shift-breakdown',
+    },
+    102: {
+      // Position-Summary
+      icon: '',
+      route: '/analytics/Position-Summary',
+    },
+    103: {
+      // Agency-Spend
+      icon: '',
+      route: '/analytics/agency-spend',
+    },
   },
 
   [BusinessUnitType.Agency]: {
@@ -1410,7 +1440,7 @@ export const MENU_CONFIG: any = {
   },
 
   [BusinessUnitType.Employee]: {
-    38: {
+    110: {
       // Scheduling for Employee
       icon: 'calendar',
       route: 'employee/scheduling',
