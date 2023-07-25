@@ -40,10 +40,6 @@ export interface ManualInvoiceReason {
   agencyFeeApplicable?: boolean;
 }
 
-export interface AgencyFeeApplicable {
-  agencyFeeApplicable: boolean;
-}
-
 export interface ManualInvoiceMeta {
   jobId: number;
   orderId: number;

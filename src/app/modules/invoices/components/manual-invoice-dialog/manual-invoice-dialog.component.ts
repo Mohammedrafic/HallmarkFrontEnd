@@ -89,12 +89,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     this.watchForReason();
     this.getDialogState();
     this.getReasons();
+    this.getVendorFee();
     this.confirmMessages = InvoiceConfirmMessages;
-    this.agencyFeeApplicable$.subscribe(
-      (data) => {
-        this.form?.get('vendorFee')?.patchValue(data);
-      }
-    )
   }
 
   override closeDialog(): void {
@@ -359,10 +355,22 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       )
       .subscribe((id) => {
         const reasonId = this.form?.get('reasonId')?.value;
+
         if (this.dropDownOptions.reasons) {
           this.store.dispatch(new Invoices.GetAgencyFeeApplicable(reasonId));
         }
       });
+  }
+
+  private getVendorFee(): void {
+    this.agencyFeeApplicable$
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((data) => {
+        this.form?.get('vendorFee')?.patchValue(data);
+      }
+    )
   }
 
   private clearDialog(): void {

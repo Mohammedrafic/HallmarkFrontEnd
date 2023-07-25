@@ -40,5 +40,3 @@ testem.log
 .DS_Store
 Thumbs.db
 /.vs
-/package-lock.json
-/yarn.lock
