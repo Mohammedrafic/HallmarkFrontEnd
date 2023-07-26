@@ -112,7 +112,7 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
     },
   ];
 };
-export const CandidateExportColumns : CandidateExportColumn[] = [
+export const CandidateAgencyExportColumns : CandidateExportColumn[] = [
   { text: 'Name', column: 'Name' },
 { text: 'Status', column: 'Status' },
 { text: 'Classification', column: 'Classification' },
@@ -128,3 +128,21 @@ export const CandidateExportColumns : CandidateExportColumn[] = [
 { text: 'Agency Name', column: 'Agencyname' },
 { text: 'Skill', column: 'Skill' },
 ];
+
+export const CandidateOrgExportColumns : CandidateExportColumn[] = [
+  { text: 'Name', column: 'Name' },
+{ text: 'Status', column: 'Status' },
+{ text: 'Classification', column: 'Classification' },
+{text: 'Start Date',column:'StartDate'},
+{text: 'End Date',column:'EndDate'},
+{ text: 'Scheduled Date', column: 'ScheduledDate' },
+{ text: 'Region', column: 'Region' },
+{ text: 'Location/Department', column: 'LocationDepartment' },
+{ text: 'Initial Rate', column: 'InitialRate' },
+{ text: 'Candidate Rate', column: 'BillRate' },
+{ text: 'Position ID', column: 'PositionId' },
+{ text: 'Assignment', column: 'Assignment' },
+{ text: 'Organization Name', column: 'Organizationname' },
+{ text: 'Skill', column: 'Skill' },
+];
+
