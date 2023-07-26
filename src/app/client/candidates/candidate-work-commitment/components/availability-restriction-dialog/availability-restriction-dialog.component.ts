@@ -11,7 +11,8 @@ import {
 import { FormGroup } from '@angular/forms';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Subject, takeUntil, take, filter } from 'rxjs';
+import { Subject, takeUntil, take, filter, Observable } from 'rxjs';
+import { Select } from '@ngxs/store';
 
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
@@ -21,6 +22,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, formatTime } from '@shared/constants';
 import { AvailabilityFilterColumns } from '../../enums';
 import { AvailabilityService } from '../../services/availability.service';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-availability-restriction-dialog',
@@ -35,6 +37,9 @@ export class AvailabilityRestrictionDialogComponent extends Destroyable implemen
   @Input() public employeeId: number;
 
   @Output() public saveAvailabilityRestriction: EventEmitter<AvailabilityRestriction> = new EventEmitter();
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public formGroup: FormGroup;
   public filtersFormConfig = DepartmentFilterFormConfig();

@@ -17,4 +17,8 @@
   @media #{$max-mobile} {
     max-width: calc(100vw - 32px) !important;
   }
+
+  .e-content {
+    height: auto !important;
+  }
 }

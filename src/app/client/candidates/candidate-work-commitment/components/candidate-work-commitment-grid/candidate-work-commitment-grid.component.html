@@ -10,6 +10,7 @@
   [disableRowsPerPageDropdown]="true"
   [gridOptions]="gridOptions"
   [context]="context"
+  [showUpScrollButton]="false"
   (navigateToPageEmitter)="handleChangePage($event)"
 >
   <button
@@ -22,6 +23,6 @@
     [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
   >
     <i-feather name="plus" class="icon"></i-feather>
-    Add Commitment
+    <span class="btn-label">Add Commitment</span>
   </button>
 </app-grid>
