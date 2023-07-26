@@ -31,7 +31,7 @@
   }
 }
 
-@media #{$max-tablet} {
+@media #{$max-mobile} {
   .hr-info__form {
     &_first {
       grid-template-columns: 1fr;
