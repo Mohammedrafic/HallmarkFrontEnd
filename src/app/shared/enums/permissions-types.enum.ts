@@ -45,7 +45,7 @@ export enum PermissionTypes {
   CanOnboardCandidateIRP = 6409,
   CanRejectCandidateIRP = 6410,
   CanEditOrderBillRateIRP = 6411,
-  CanCloseOrdersIRP = 6412,
+  CanCloseOrdersIRP = 6413,
   //Candidate Assignment
   CandidateAssigment=850,
   CanViewCandidateAssigment=851,
