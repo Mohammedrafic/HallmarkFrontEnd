@@ -3,7 +3,7 @@ import { extensionDurationPrimary, extensionDurationSecondary } from '@shared/co
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Duration } from '@shared/enums/durations';
-import { catchError, combineLatest, filter, startWith, takeUntil, tap } from 'rxjs';
+import { Observable, catchError, combineLatest, filter, startWith, takeUntil, tap } from 'rxjs';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 import isNil from 'lodash/fp/isNil';
 import { addDays } from '@shared/utils/date-time.utils';
@@ -21,6 +21,8 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { formatDate } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { Data } from '@syncfusion/ej2-angular-grids';
+import { ExtenstionResponseModel } from './models/extension.model';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -90,7 +92,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     this.billRateControl.patchValue(value, { emitEvent: false, onlySelf: true });
   }
 
-  public saveExtension(positionDialog: DialogComponent, ignoreMissingCredentials: boolean): void {
+  public saveExtension(positionDialog: DialogComponent, ignoreMissingCredentials: boolean): void  {
     if (this.extensionForm.invalid) {
       this.extensionForm.markAllAsTouched();
       return;
@@ -101,7 +103,6 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     }
     const { value: billRate } = this.billRatesComponent.billRatesControl;
     const extension = this.extensionForm.getRawValue();
-
     this.extensionSidebarService
       .saveExtension({
         billRates: billRate,
@@ -112,8 +113,13 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         ignoreMissingCredentials,
       })
       .pipe(
-        tap(() => {
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        tap((data : ExtenstionResponseModel) => {
+          this.store.dispatch(
+            new ShowToast(
+              MessageTypes.Success,
+              'Extension Order ' + data.organizationPrefix + '-' + data.publicId + ' has been added'
+            )
+          );
           positionDialog.hide();
           this.saveEmitter.emit();
         }),
