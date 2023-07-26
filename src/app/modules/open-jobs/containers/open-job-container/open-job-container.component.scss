@@ -1,0 +1,11 @@
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0;
+
+  .title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 32px;
+  }
+}

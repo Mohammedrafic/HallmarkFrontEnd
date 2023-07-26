@@ -332,7 +332,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     const user = this.store.selectSnapshot(UserState.user);
     if(user?.isEmployee){
       this.filters.isOnlySchedulatedCandidate = true;
-    }     
+    }
     this.updateScheduleFilter.emit({
       filters: this.filters,
       filteredItems: this.filteredItems,
