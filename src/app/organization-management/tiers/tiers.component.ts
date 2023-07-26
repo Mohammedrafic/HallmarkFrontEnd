@@ -45,6 +45,8 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
   private readonly isIrpFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   private unsubscribe$: Subject<void> = new Subject();
   public workcommitments:any;
+  public workCommitArray :any;
+
   @Select(UserState.tireOrganizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
 
@@ -126,7 +128,15 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
 
   public handleEditTier(tier: TierDetails): void {
     this.isEdit = true;
-    tier.workCommitments = tier.workCommitments.map((data : { workCommitmentId: number; }) => data.workCommitmentId ? data.workCommitmentId : tier.workCommitments.join(","));
+    this.workCommitArray = [];
+    for(let i=0; i<tier.workCommitments.length; i++){
+      if(tier.workCommitments[i].workCommitmentId){
+        this.workCommitArray.push(tier.workCommitments[i].workCommitmentId);
+      } else {
+        this.workCommitArray.push(tier.workCommitments[i] as string);
+      }
+    }
+    tier.workCommitments = this.workCommitArray;
     tier.skills == 1 ? tier.skills = "1" : (tier.skills == 2 ? tier.skills = "2" : (tier.skills == 3 ? tier.skills = "3" : ""));
     this.selectedTier = {...tier};
     this.store.dispatch(new ShowSideDialog(true));

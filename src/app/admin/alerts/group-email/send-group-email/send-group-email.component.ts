@@ -95,6 +95,12 @@ export class SendGroupEmailComponent
   @Input() groupEmailTemplateForm: FormGroup;
   @Input() title: string;
   @Input() emailSubject: string;
+  @Input() roles: string;
+  @Input() location: string;
+  @Input() region: string;
+  @Input() skills: string;
+  @Input() candidate: string;
+  @Input() user: string;
   @Input() emailBody: string;
   @Input() emailTo: string | null;
   @Input() emailCc: string | null;
@@ -516,6 +522,21 @@ export class SendGroupEmailComponent
 
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.groupEmailTemplateForm.get('agencies')?.removeValidators(Validators.required);
+      this.groupEmailTemplateForm.get('agencies')?.updateValueAndValidity({emitEvent : false});
+      this.groupEmailTemplateForm.get('skills')?.removeValidators(Validators.required);
+      this.groupEmailTemplateForm.get('skills')?.updateValueAndValidity({emitEvent : false});
+      this.groupEmailTemplateForm.get('region')?.removeValidators(Validators.required);
+      this.groupEmailTemplateForm.get('region')?.updateValueAndValidity({emitEvent : false});
+      this.groupEmailTemplateForm.get('location')?.removeValidators(Validators.required);
+      this.groupEmailTemplateForm.get('location')?.updateValueAndValidity({emitEvent : false});
+      this.groupEmailTemplateForm.get('candidate')?.removeValidators(Validators.required);
+      this.groupEmailTemplateForm.get('candidate')?.updateValueAndValidity({emitEvent : false});
+      this.groupEmailTemplateForm.get('roles')?.removeValidators(Validators.required);
+      this.groupEmailTemplateForm.get('roles')?.updateValueAndValidity({emitEvent : false});
+      this.groupEmailTemplateForm.get('user')?.removeValidators(Validators.required);
+      this.groupEmailTemplateForm.get('user')?.updateValueAndValidity({emitEvent : false});
+      this.groupEmailTemplateForm.get('roles')?.updateValueAndValidity({emitEvent : false});  
       this.isBusinessUnitTypeAgency = false;
       if (this.isSend == true && value != null) {
         this.clearFields();
@@ -580,7 +601,6 @@ export class SendGroupEmailComponent
               }
               if (this.userBusinessUnitType === BusinessUnitType.Agency){
                 var defaultAgencies = data.map((list) => list.id);
-                console.log(defaultAgencies);
                 this.businessesControl.setValue(defaultAgencies);
               }
             });
@@ -642,20 +662,24 @@ export class SendGroupEmailComponent
           this.getCandidates();
         else {
           this.userData = [];
+          this.roleData = [];
           if(this.isOrgUser){
-            let businessUnitIds = value.join();
-            this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds, true));
-            this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-              if(data != undefined) this.userData = data;
-            });
+            let businessUnitIds = value.join();          
+            if (businessUnitIds != undefined && businessUnitIds.length > 0) {
+              this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
+              this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+                this.roleData = data;
+              });
+            }
           } else {
             let businessUnitIds = value;
             this.dispatchUserPage(businessUnitIds);
-            this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-              if (data != undefined) {
-                this.userData = data.items.filter(i => i.isDeleted == false);
-              }
-            });
+            if (businessUnitIds != undefined && businessUnitIds.length > 0) {
+              this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
+              this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+                this.roleData = data;
+              });
+            }
           }
         }
       }
@@ -674,13 +698,13 @@ export class SendGroupEmailComponent
         }
         let orgList = this.organizations?.filter((x) => value == x.organizationId);
         this.regionsList = [];
-        this.locationsList = [];
+        this.locationsData = [];
         orgList.forEach((value) => {
           this.regionsList.push(...value.regions);
           value.regions.forEach((region) => {
-            this.locationsList.push(...region.locations);
+            this.locationsData.push(...region.locations);
           });
-          this.departmentsList = this.locationsList
+          this.departmentsList = this.locationsData
               .map((obj) => {
                 return obj.departments.filter((department) => department.locationId === obj.id);
               })
@@ -688,10 +712,10 @@ export class SendGroupEmailComponent
         });
 
         this.regionsList = sortByField(this.regionsList, 'name');
-        this.locationsList = sortByField(this.locationsList, 'name');
+        this.locationsData = sortByField(this.locationsData, 'name');
         this.departmentsList = sortByField(this.departmentsList, 'name');
 
-        this.locationsData = this.locationsList;
+        this.locationsData = this.locationsData;
         this.departmentsData = this.departmentsList;
 
         if(value > 0 && this.businessUnitControl.value == 3){
@@ -741,7 +765,7 @@ export class SendGroupEmailComponent
           this.getWorkCommitments();
         }
       } else {
-        this.locationsList = this.locationsData;
+        this.locationsList = [];
       }
       this.locationControl.patchValue([]);
       this.departmentControl.patchValue([]);
@@ -819,12 +843,16 @@ export class SendGroupEmailComponent
 
   private onRolesValueChanged(): void {
     this.rolesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if(!value || value==null ||!value.length){
+        this.usersControl.reset()
+      }
       this.getUsersByRole();
     });
   }
 
   private getUsersByRole(): void{
     this.userData = [];
+ 
     var regionId = this.regionControl.value.join();
     var locationId = this.locationControl.value.join();
     var roles = this.rolesControl.value.join();
@@ -835,6 +863,15 @@ export class SendGroupEmailComponent
         this.userData = data;
       });
     }
+      if (this.rolesControl.value.length > 0) {
+        this.dispatchUserPage(this.businessesControl.value);
+        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+          if (data != undefined) {
+            this.userData = data.items.filter(i => i.isDeleted == false);
+            this.userData = this.userData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
+          }
+        });
+      }
   }
 
   private onUserTypeValueChanged(): void {
@@ -850,11 +887,25 @@ export class SendGroupEmailComponent
         var businessId = this.businessControl.value;
         if (businessUnit == 3) {
           if (value == 1) {
+            this.groupEmailTemplateForm.get('region')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('region')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('location')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('location')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('roles')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('roles')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('user')?.setValidators(Validators.required);    
+            this.groupEmailTemplateForm.get('user')?.updateValueAndValidity({emitEvent : false});        
+            this.groupEmailTemplateForm.get('agencies')?.removeValidators(Validators.required); 
+            this.groupEmailTemplateForm.get('agencies')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('candidate')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('candidate')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('skills')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('skills')?.updateValueAndValidity({emitEvent : false});   
             this.isOrgInternalUserType = true;
             this.userData = [];
             this.dispatchNewPage(null);
-            if (businessId != undefined && businessId > 0) {
-              this.store.dispatch(new GetGroupEmailRoles(businessId));
+            if (businessId != undefined && businessId > 0) {                     
+              this.store.dispatch(new GetGroupEmailRoles([businessId]));
               this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
                 this.roleData = data;
               });
@@ -866,6 +917,21 @@ export class SendGroupEmailComponent
             this.isOrgCandidatesType = true;
             this.skillsControl.patchValue([]);
             this.candidateControl.patchValue([]);
+            this.groupEmailTemplateForm.get('agencies')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('agencies')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('skills')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('skills')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('region')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('region')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('location')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('location')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('candidate')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('candidate')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('roles')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('roles')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('user')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('user')?.updateValueAndValidity({emitEvent : false});
+           
             this.store.dispatch(new GetGroupEmailAgencies(businessId));
             this.agencyData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
               this.agencyData = data;
@@ -895,25 +961,51 @@ export class SendGroupEmailComponent
           }
         } else if (businessUnit == 4) {
           if (value == 1) {
+            this.groupEmailTemplateForm.get('agencies')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('agencies')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('skills')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('skills')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('region')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('region')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('location')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('location')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('candidate')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('candidate')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('roles')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('roles')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('user')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('user')?.updateValueAndValidity({emitEvent : false});
+           
             this.isAgencyUserType = true;
-            this.userData = [];
+            this.roleData = [];
             if(this.isOrgUser){
               let businessUnitIds = this.businessesControl.value.join();
-              this.store.dispatch(new GetGroupEmailInternalUsers('null', 'null', 'null', businessUnitIds, true));
-              this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-                if(data != undefined) this.userData = data;
-              });
             } else {
               let businessUnitIds = this.businessesControl.value;
-              this.dispatchUserPage(businessUnitIds);
-              this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-                if (data != undefined) {
-                  this.userData = data.items.filter(i => i.isDeleted == false);
-                }
-              });
+              if (businessUnitIds != undefined && businessUnitIds.length > 0) {
+                this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
+                this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+                  this.roleData = data;
+                });
+              }
             }
           }
           if (value == 2) {
+            this.groupEmailTemplateForm.get('agencies')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('agencies')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('skills')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('skills')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('region')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('region')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('location')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('location')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('candidate')?.setValidators(Validators.required);
+            this.groupEmailTemplateForm.get('candidate')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('roles')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('roles')?.updateValueAndValidity({emitEvent : false});
+            this.groupEmailTemplateForm.get('user')?.removeValidators(Validators.required);
+            this.groupEmailTemplateForm.get('user')?.updateValueAndValidity({emitEvent : false});
+           
             this.userData = [];
             this.usersControl.patchValue([]);
             this.isAgencyCandidatesType = true;
@@ -1141,7 +1233,13 @@ export class SendGroupEmailComponent
       this.groupEmailTemplateForm.controls['emailTo'].disable();
       this.groupEmailTemplateForm.controls['emailCc'].enable();
       this.groupEmailTemplateForm.controls['emailSubject'].enable();
+      this.groupEmailTemplateForm.controls['roles'].enable();
+      this.groupEmailTemplateForm.controls['region'].enable();
+      this.groupEmailTemplateForm.controls['location'].enable();
       this.groupEmailTemplateForm.controls['user'].enable();
+      this.groupEmailTemplateForm.controls['agencies'].enable();
+      this.groupEmailTemplateForm.controls['skills'].enable();
+      this.groupEmailTemplateForm.controls['candidate'].enable();
       this.groupEmailTemplateForm.controls['userType'].enable();
       this.rteObj.enabled = true;
       ele.className = 'rich-text-container-edit';
@@ -1154,7 +1252,13 @@ export class SendGroupEmailComponent
       this.groupEmailTemplateForm.controls['emailTo'].disable();
       this.groupEmailTemplateForm.controls['emailCc'].disable();
       this.groupEmailTemplateForm.controls['emailSubject'].disable();
+      this.groupEmailTemplateForm.controls['roles'].disable();
+      this.groupEmailTemplateForm.controls['region'].disable();
+      this.groupEmailTemplateForm.controls['location'].disable();
       this.groupEmailTemplateForm.controls['user'].disable();
+      this.groupEmailTemplateForm.controls['agencies'].disable();
+      this.groupEmailTemplateForm.controls['skills'].disable();
+      this.groupEmailTemplateForm.controls['candidate'].disable();
       this.groupEmailTemplateForm.controls['userType'].disable();
       this.rteObj.enabled = false;
       ele.className = 'rich-text-container-disable';
@@ -1172,10 +1276,10 @@ export class SendGroupEmailComponent
       business: new FormControl(0),
       businesses: new FormControl([]),
       userType: new FormControl(0),
-      region: new FormControl(),
-      location: new FormControl(),
+      region: new FormControl([]),
+      location: new FormControl([]),
       departmentIds:new FormControl(),
-      roles: new FormControl([]),
+      roles: new FormControl(null),
       agencies: new FormControl([]),
       skills: new FormControl([]),
       workCommitments: new FormControl([]),
@@ -1208,7 +1312,13 @@ export class SendGroupEmailComponent
     this.groupEmailTemplateForm.controls['emailCc'].setValue('');
     this.groupEmailTemplateForm.controls['emailSubject'].setValue('');
     this.groupEmailTemplateForm.controls['emailBody'].setValue('');
-    this.groupEmailTemplateForm.controls['user'].setValue([]);
+    this.groupEmailTemplateForm.controls['roles'].setValue('');    
+    this.groupEmailTemplateForm.controls['region'].setValue('');    
+    this.groupEmailTemplateForm.controls['location'].setValue('');    
+    this.groupEmailTemplateForm.controls['agencies'].setValue('');    
+    this.groupEmailTemplateForm.controls['skills'].setValue('');    
+    this.groupEmailTemplateForm.controls['candidate'].setValue('');
+    this.groupEmailTemplateForm.controls['user'].setValue('');
   }
 
   public openpdf(id: any) {
@@ -1360,7 +1470,6 @@ export class SendGroupEmailComponent
 
 export function emailsValidator(): ValidatorFn {
   function validateEmails(emails: string) {
-    console.log(emails);
     return (emails.split(',')
       .map(email => Validators.email(<AbstractControl>{ value: email.trim() }))
       .find(_ => _ !== null) === undefined);

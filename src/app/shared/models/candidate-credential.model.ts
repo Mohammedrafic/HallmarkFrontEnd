@@ -1,6 +1,7 @@
 import { DepartmentMatchStatus } from '@shared/components/credentials-grid/department-match-cell/department-match-cell-enum';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { PageOfCollections } from '@shared/models/page.model';
+import { CredentialType } from './credential-type.model';
 
 export interface CandidateCredential {
   id?: number;
@@ -29,6 +30,7 @@ export interface CandidateCredential {
   certifiedOn?: string;
   certifiedUntil?: string;
   departmentMatch?: DepartmentMatchStatus;
+  credentialType?: CredentialType;
 }
 
 export interface CandidateCredentialGridItem extends CandidateCredential {
@@ -77,3 +79,4 @@ export interface CredentialParams {
 export interface BulkVerifyCandidateCredential{
   candidateCredentials:CandidateCredential[];
 }
+

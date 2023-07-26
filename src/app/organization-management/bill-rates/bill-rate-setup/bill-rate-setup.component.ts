@@ -152,7 +152,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
-
+  public filterType: string = 'Contains';
   constructor(
     private store: Store,
     private actions$: Actions,
@@ -486,7 +486,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFilterApply(): void {
     this.filters = this.billRateFilterFormGroup.getRawValue();
-    const effectiveDate = this.filters.effectiveDate ? DateTimeHelper.toUtcFormat(this.filters.effectiveDate) : null;
+    const effectiveDate = this.filters.effectiveDate ? DateTimeHelper.setUtcTimeZone(this.filters.effectiveDate) : null;
     this.filters.effectiveDate = effectiveDate;
     this.filteredItems = this.filterService.generateChips(
       this.billRateFilterFormGroup,

@@ -39,7 +39,7 @@ export class ImportLocationsComponent extends AbstractImport implements OnChange
   }
 
   private setIrpColumnsConfig(): void {
-    this.columnDefs = JSON.parse(JSON.stringify(LocationsIrpColumnsConfig));
+    this.columnDefs = LocationsIrpColumnsConfig;
     
     if (!this.orgVMSEnabled) {
       this.columnDefs = this.columnDefs.filter((column) => !FieldsToHideInIrp.includes(column.field as string));

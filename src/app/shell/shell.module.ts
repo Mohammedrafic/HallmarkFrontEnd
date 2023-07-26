@@ -35,7 +35,8 @@ import {
   File,
   UserX,
   Server,
-  Twitch
+  Twitch,
+  TrendingUp
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -51,6 +52,7 @@ import { ContactusComponent } from './components/contactus/contactus.component';
 import { UploaderModule  } from '@syncfusion/ej2-angular-inputs';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
+import { EmployeeGuard, UserLicenceGuard } from '@core/guards';
 
 
 const sidebarIcons = {
@@ -79,7 +81,8 @@ const sidebarIcons = {
   File,
   UserX,
   Server,
-  Twitch
+  Twitch,
+  TrendingUp,
 };
 
 @NgModule({
@@ -105,8 +108,11 @@ const sidebarIcons = {
     FontAwesomeModule,
     UserChatModule,
     AnalyticByClickModule,
-    BoolValuePipeModule
+    BoolValuePipeModule,
   ],
-  providers: [],
+  providers: [
+    EmployeeGuard,
+    UserLicenceGuard,
+  ],
 })
 export class ShellModule {}

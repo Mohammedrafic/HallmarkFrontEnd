@@ -253,6 +253,7 @@
                 [fields]="fields"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
+                [filterType]="filterType"
                 formControlName="locationIds"
               >
               </ejs-multiselect>
@@ -284,6 +285,7 @@
                 [fields]="fields"
                 [allowFiltering]="true"
                 [showDropDownIcon]="true"
+                [filterType]="filterType"
                 formControlName="departmentIds"
                 maximumSelectionLength="50000"
                 [query]="query"
@@ -572,6 +574,7 @@
               formControlName="locationIds"
               placeholder="All"
               [fields]="fields"
+              [filterType]="filterType"
               [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.locationIds.dataSource"
@@ -590,6 +593,7 @@
               placeholder="All"
               [fields]="fields"
               [allowFiltering]="true"
+              [filterType]="filterType"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.departmentIds.dataSource"
             >

@@ -2,6 +2,7 @@ import { FieldType } from '@core/enums';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { CommitmentDialogConfig } from '../interfaces';
 
+// eslint-disable-next-line max-lines-per-function
 export const CommitmentsDialogConfig = (): CommitmentDialogConfig => ({
   title: 'Add Commitment',
   editTitle: 'Edit Commitment',

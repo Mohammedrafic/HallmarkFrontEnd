@@ -1,5 +1,6 @@
 @import 'colors';
 @import 'adaptive-response';
+@import 'mixins';
 
 :host {
   overflow-y: auto;
@@ -167,3 +168,12 @@
   }
 }
 
+::ng-deep{
+  .e-confirm-dialog.e-control.e-dialog.e-popup.unsaved-changes-dialog {
+    width: 470px !important;
+  }
+}
+
+.candidate-message {
+  @include candidateMessage;
+}

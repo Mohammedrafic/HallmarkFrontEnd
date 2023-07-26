@@ -6,6 +6,7 @@
   position="TopLeft"
   width="100%"
   cssClass="custom-tooltip"
+  *ngIf="!isMobile; else uploadFile"
 >
   <ng-template #content>
     <div
@@ -15,13 +16,18 @@
       [exclude]="excludeElement"
     >
       <h2>Upload Documents</h2>
-      <app-file-uploader
-        [allowedFileExtensions]="allowedFileExtensions"
-        [maxFileSize]="maxFileSize"
-        [maxFiles]="maxFiles"
-        [showSelectedFiles]="false"
-        (selectedFilesChanged)="emitSelectedFiles($event)"
-      ></app-file-uploader>
+      <ng-container *ngTemplateOutlet="uploadFile"></ng-container>
     </div>
   </ng-template>
 </ejs-tooltip>
+
+<ng-template #uploadFile>
+  <app-file-uploader
+    #fileUploader
+    [allowedFileExtensions]="allowedFileExtensions"
+    [maxFileSize]="maxFileSize"
+    [maxFiles]="maxFiles"
+    [showSelectedFiles]="false"
+    (selectedFilesChanged)="emitSelectedFiles($event)"
+  ></app-file-uploader>
+</ng-template>

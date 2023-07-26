@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { OrganizationSettingKeys } from '@shared/constants';
 
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import { UserState } from 'src/app/store/user.state';
 
 @Pipe({
@@ -14,14 +14,19 @@ export class CanManageSettingPipe implements PipeTransform {
 
   transform(
     hasPermission: Record<string, boolean>,
-    data: OrganizationSettingsGet,
-    overridableByOrg: boolean,
+    data: Configuration,
+    overridableByOrg: boolean | null,
     disableSettingsKeys?: string[]
   ): boolean {
     const isHallmarkMspUser = this.store.selectSnapshot(UserState.isHallmarkMspUser);
-    const overridableBy = overridableByOrg
-      ? !data.overridableByOrganization
-      : !data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment;
+    let overridableBy: boolean;
+    if (overridableByOrg !== null) {
+      overridableBy = overridableByOrg
+        ? !data.overridableByOrganization
+        : !data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment;
+    } else {
+      overridableBy = false;
+    }
 
     if (isHallmarkMspUser && disableSettingsKeys) {
       return disableSettingsKeys.includes(data.settingKey);

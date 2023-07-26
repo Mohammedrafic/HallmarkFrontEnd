@@ -1,5 +1,5 @@
 <form class="department-form">
-  <ng-container *ngIf="true">
+  <ng-container>
     <div class="dropdown-wrapper">
       <app-multiselect-dropdown
         [formGroupInstance]="assignDepartmentForm"
@@ -29,6 +29,7 @@
         [required]="true"
         [sortOrder]="sortOrder"
         controlName="locationIds"
+        [popupWidth]="'auto'"
         id="location"
         label="Location"
         class="multiselect-dropdown"
@@ -51,6 +52,7 @@
         [required]="true"
         [sortOrder]="sortOrder"
         controlName="departmentIds"
+        [popupWidth]="'auto'"
         id="department"
         label="Department"
         class="multiselect-dropdown"

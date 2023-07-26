@@ -10,24 +10,27 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
-import { Observable } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-grid-name-renderer',
   templateUrl: './grid-name-renderer.component.html',
   styleUrls: ['./grid-name-renderer.component.scss'],
 })
-export class GridNameRendererComponent implements ICellRendererAngularComp {
+export class GridNameRendererComponent extends DestroyableDirective implements ICellRendererAngularComp {
   public cellValue: CandidatesDetailsModel;
   public valueHelper = new GridHelper();
   isMobileScreen:boolean=false;
   @Select(AppState.isMobileScreen) public readonly isMobile$: Observable<boolean>;
 
-  constructor(private store: Store, private router: Router) {}
+  constructor(private store: Store, private router: Router) {
+    super();
+  }
 
   public agInit(params: ICellRendererParams): void {
     this.cellValue = params.data;
-    this.isMobile$.subscribe(data=>{
+    this.isMobile$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       if(data){
         this.isMobileScreen = data;
       }
@@ -40,9 +43,6 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
   }
 
   public onViewNavigation(): void {
-    if(this.isMobileScreen){
-      return;
-    }
     const user = this.store.selectSnapshot(UserState.user);
     const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =

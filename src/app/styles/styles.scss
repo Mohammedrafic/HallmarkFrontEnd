@@ -11,6 +11,7 @@
 @import '@ag-grid-community/core/dist/styles/ag-grid.scss';
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 @import "adaptive-response.scss";
+@import 'controls/responsive-container.scss';
 
 html {
   height: 100%;
@@ -705,4 +706,13 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 }
 .shared-with-grid .ag-root-wrapper-body, .shared-with-grid .ag-body-viewport {
   overflow: scroll;
+}
+@media screen and (min-width: 0px) and (max-width: 400px) {
+  [data-uid="Master Data"],[data-uid="Communication/Document Library"],[data-uid="Administration/Organization Interface "],[data-uid="Administration/Interface Logs"],[data-uid="Organization/Candidate Assignment"],[data-uid="Organization/Settings"],
+  [data-uid="Agency/Reports"],[data-uid="Agency/Timesheets"],[data-uid="Agency/Candidate Assignment"],[data-uid="Organization/Scheduling"],[data-uid="Organization/Timesheets"],[data-uid="Organization Profile"],[data-uid="Profile"],[data-uid="Reports"],
+  [data-uid="Organization Profile"],[data-uid="Analytics"],[data-uid="Candidate Assignment"],[data-uid="Order Management"],[data-uid="Scheduling"],[data-uid="Settings"],[data-uid="Timesheets"],[data-uid="Administration/User List"],[data-uid="Administration/Roles & Permissions"]
+  ,body.light .e-btn.noResponsive
+  {
+    display: none;
+  }
 }

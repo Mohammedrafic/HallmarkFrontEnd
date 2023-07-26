@@ -50,7 +50,7 @@ import { AddEditReorderComponent } from '@client/order-management/components/add
 import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import { SettingsKeys } from '@shared/enums/settings';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import {
   ExtensionCandidateComponent,
 } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
@@ -69,8 +69,10 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
 import { ReOrderPage } from '@shared/components/order-reorders-container/interfaces';
 import { CandidateModel } from '../add-edit-reorder/models/candidate.model';
-import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { ONBOARDED_STATUS } from
+  '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { GlobalWindow } from '@core/tokens';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -82,7 +84,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() openEvent: Subject<boolean>;
   @Input() orderPositionSelected$: Subject<{ state: boolean; index?: number }>;
   @Input() children: OrderManagementChild[] | undefined;
-  @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  @Input() settings: { [key in SettingsKeys]?: Configuration };
   @Input() hasCreateEditOrderPermission: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() CanEditOrderBillRateIRP: boolean;
@@ -129,6 +131,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
+
   @Select(ReOrderState.GetReOrdersByOrderId)
   public readonly reOrderList$: Observable<ReOrderPage | null>;
 
@@ -139,7 +144,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public SettingsKeys = SettingsKeys;
   public firstActive = true;
-  public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
   public orderStatus = OrderStatus;
   public reOrderToEdit: Order | null;
@@ -152,6 +156,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public disabledCloseButton = true;
   public showCloseButton = false;
+  public showEmployeeTab = true;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   private secondHasOpenedOnes = false;
 
@@ -174,7 +179,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   get showApproveAndCancel(): boolean {
-    return this.order?.canApprove && this.order?.status === this.orderStatus.PreOpen && (!this.order?.orderOpenDate || this.order?.extensionFromId != null);
+    const status = this.activeSystem === OrderManagementIRPSystemId.IRP ?
+      this.order?.irpOrderMetadata?.status : this.order?.status;
+    return this.order?.canApprove &&
+      status === this.orderStatus.PreOpen &&
+      (!this.order?.orderOpenDate || this.order?.extensionFromId != null);
   }
 
   get showLockOrder(): boolean {
@@ -203,7 +212,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   get desktopSmallMenu(): { text: string }[] {
     let menu: { text: string }[] = [];
 
-    if (!this.canCloseOrder && !this.disableCloseOrder && this.activeSystem !== this.systemType.IRP) {
+    if (!this.disableCloseOrder && this.activeSystem !== this.systemType.IRP) {
       menu = [...menu, { text: MobileMenuItems.CloseOrder }];
     }
     if (this.canReOpen) {
@@ -263,12 +272,17 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['order']?.currentValue) {
       this.setCloseOrderButtonState();
+      this.setShowEmployeeTabState();
       const order = changes['order']?.currentValue;
-      const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase());
+      const orderstatusValue=order.statusText==null?order.irpOrderMetadata.statusText:order.statusText;
+      const hasStatus = this.openInProgressFilledStatuses.includes(orderstatusValue?.toLowerCase());
       this.showCloseButton = hasStatus || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate));
 
       if (this.chipList) {
-        const status = this.order.irpOrderMetadata ? this.order.irpOrderMetadata.statusText : this.order.statusText;
+        const status = this.order.irpOrderMetadata?.statusText
+          ? this.order.irpOrderMetadata.statusText
+          : this.order.statusText;
+
         this.chipList.cssClass = this.chipsCssClass.transform(status);
         this.chipList.text = status?(status).toUpperCase():"";
       }
@@ -375,7 +389,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public approveOrder(id: number): void {
-    this.store.dispatch(new ApproveOrder(id));
+    this.store.dispatch(new ApproveOrder(id, this.activeSystem === OrderManagementIRPSystemId.IRP));
   }
 
   public editOrder(data: Order) {
@@ -620,5 +634,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private checkOrderCandidatesForOnboard(candiadtes: CandidateModel[]): boolean {
     return candiadtes.some((candidate) => candidate.status === ONBOARDED_STATUS);
+  }
+
+  private setShowEmployeeTabState(): void {
+    const status = this.order.irpOrderMetadata?.status ? this.order.irpOrderMetadata.status : this.order.status;
+    this.showEmployeeTab = !(this.activeSystem === OrderManagementIRPSystemId.IRP && status === OrderStatus.PreOpen);
   }
 }

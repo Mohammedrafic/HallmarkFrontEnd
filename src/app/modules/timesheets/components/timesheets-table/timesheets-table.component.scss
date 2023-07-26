@@ -29,3 +29,13 @@
     }
   }
 }
+
+@media #{$max-mobile} {
+  :host {
+    ::ng-deep {
+      app-grid .app-grid {
+        height: auto;
+      }
+    }
+  }
+}

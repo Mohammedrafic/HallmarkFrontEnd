@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { merge, Observable, Subject, takeUntil } from 'rxjs';
+import { merge, Observable, Subject, take, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -14,6 +14,7 @@ import {
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
+  sendOnboardCandidateEmailMessage,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
 } from '@client/store/order-managment-content.actions';
@@ -32,10 +33,14 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
-import { ShowToast } from 'src/app/store/app.actions';
+import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired } from '@shared/constants';
+import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired, ONBOARD_CANDIDATE, onBoardCandidateMessage, SEND_EMAIL } from '@shared/constants';
 import { CommonHelper } from '@shared/helpers/common.helper';
+import { PermissionService } from 'src/app/security/services/permission.service';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
+import { OnboardCandidateMessageDialogComponent } from '../../order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -145,17 +150,40 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public orderCandidateJob: OrderCandidateJob | null;
   public comments: Comment[] = [];
   public selectedApplicantStatus: ApplicantStatus | null = null;
-
+  public canCreateOrder: boolean;
   private unsubscribe$: Subject<void> = new Subject();
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
   public candidateSSNRequired :boolean=false;
   public candidateDOBRequired :boolean;
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
+  public saveStatus:number =0;
+  get templateEmailTitle(): string {
+    return "Onboarding Email";
+  }
+  isSend:boolean = false;
+  public sendOnboardMessageEmailFormGroup: FormGroup;
+  emailTo:any = '';
+  isSendOnboardFormInvalid:boolean = false;
+  @ViewChild('RTE')
+  public rteEle: RichTextEditorComponent;
+  @ViewChild(OnboardCandidateMessageDialogComponent, { static: true }) onboardEmailTemplateForm: OnboardCandidateMessageDialogComponent;
+  
 
-  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef) {}
+  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef, private permissionService : PermissionService,private confirmService: ConfirmService,) {
+    this.sendOnboardMessageEmailFormGroup = new FormGroup({
+      emailSubject: new FormControl('', [Validators.required]),
+      emailBody: new FormControl('', [Validators.required]),
+      fileUpload: new FormControl(null),
+      emailTo: new FormControl('', [Validators.required]),
+      orderId: new FormControl('', [Validators.required]),
+      candidateId  : new FormControl('', [Validators.required]),
+      businessUnitId: new FormControl('', [Validators.required]),
+    });
+  }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.subscribeOnGetStatus();
     this.onOpenEvent();
     this.createForm();
@@ -184,8 +212,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
 
   private getComments(): void {
     this.commentsService
-      .getComments(this.orderCandidateJob?.commentContainerId as number, null)
-      .subscribe((comments: Comment[]) => {
+      .getComments(this.orderCandidateJob?.commentContainerId as number, null).pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe((comments: Comment[]) => {
         this.comments = comments;
         this.cd.detectChanges();
       });
@@ -205,6 +234,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   }
 
   public saveHandler(event: { itemData: { applicantStatus: ApplicantStatusEnum; statusText: string } | null }): void {
+    this.saveStatus = event.itemData ? event.itemData?.applicantStatus : 0;
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.onReject();
     } else {
@@ -242,7 +272,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       }
       if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
         if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){
-            if(this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null 
+            if(this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === null
                 || this.orderApplicantsInitialData?.candidateProfileContactDetails.phone1 === ''){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
               return;
@@ -254,7 +284,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       }
 
       if(this.candidateAddressRequiredValue === ConfigurationValues.Apply){
-        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){ 
+        if(this.orderApplicantsInitialData?.candidateProfileContactDetails != null){
             if(CommonHelper.candidateAddressCheck(this.orderApplicantsInitialData?.candidateProfileContactDetails)){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
                 return;
@@ -272,7 +302,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             candidateId: this.orderApplicantsInitialData.candidateId,
             candidatePayRate: this.orderApplicantsInitialData.candidatePayRate,
           })
-        )
+        ).pipe(takeUntil(this.unsubscribe$))
         .subscribe(() => {
           this.store.dispatch(new ReloadOrderCandidatesLists());
         });
@@ -289,7 +319,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     }
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
       if(this.orderCandidateJob?.candidateProfileContactDetails != null){
-          if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null 
+          if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null
               || this.orderCandidateJob?.candidateProfileContactDetails.phone1 === ''){
             this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
             return;
@@ -299,15 +329,15 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
           return;
         }
     }
-   
-    
+
+
     if (this.candidatePayRateRequired && this.form.get('candidatePayRate')?.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.orderCandidateJob?.candidateProfileContactDetails != null){ 
+      if(this.orderCandidateJob?.candidateProfileContactDetails != null){
           if(CommonHelper.candidateAddressCheck(this.orderCandidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
@@ -328,7 +358,13 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   private updateOrganizationCandidateJob(status: { applicantStatus: ApplicantStatusEnum; statusText: string } | null): void {
     if (this.form.valid && this.orderCandidateJob) {
       const value = this.form.getRawValue();
-
+      this.isSend =  true;
+      this.emailTo = this.orderCandidateJob?.candidateProfile.email; 
+      this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.orderCandidateJob?.candidateProfile.email);
+      this.sendOnboardMessageEmailFormGroup.get('orderId')?.setValue(this.orderCandidateJob?.orderId);
+      this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.orderCandidateJob?.candidateProfileId);
+      this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.orderCandidateJob?.organizationId);
+            
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -340,11 +376,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             nextApplicantStatus: this.selectedApplicantStatus || this.orderCandidateJob.applicantStatus,
             candidatePayRate: value.candidatePayRate,
           })
-        )
+        ).pipe(takeUntil(this.unsubscribe$))
         .subscribe({
-          next: () => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()),
-          error: () => this.closeDialog(),
-          complete: () => this.closeDialog(),
+          // next: () => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()),
+            error: () => this.closeDialog(),
+          //  complete: () => this.closeDialog(),
         });
     }
   }
@@ -361,7 +397,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             nextApplicantStatus: applicantStatus,
             candidatePayRate: value.candidatePayRate,
           })
-        )
+        ).pipe(takeUntil(this.unsubscribe$))
         .subscribe(() => {
           this.store.dispatch(new ReloadOrderCandidatesLists());
         });
@@ -399,6 +435,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((reasons: RejectReason[]) => {
         this.rejectReasons = reasons;
+        this.cd.markForCheck();
       });
   }
 
@@ -431,7 +468,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       ssn:orderCandidateJob.candidateProfile.ssn,
     });
     this.candidateDOBRequired=orderCandidateJob.candidateDOBRequired;
-    this.candidateSSNRequired=orderCandidateJob.candidateSSNRequired; 
+    this.candidateSSNRequired=orderCandidateJob.candidateSSNRequired;
     if(orderCandidateJob.candidatePhone1Required != null){
       let phone1Configuration = JSON.parse(orderCandidateJob.candidatePhone1Required);
       if(phone1Configuration.isEnabled){
@@ -450,7 +487,67 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   private subscribeOnUpdateCandidateJobSucceed(): void {
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed))
-      .subscribe(() => this.closeDialog());
+      .subscribe(() => 
+      {
+        if(this.saveStatus === ApplicantStatusEnum.OnBoarded){
+          const options = {
+              title: ONBOARD_CANDIDATE,
+              okButtonLabel: 'Yes',
+              okButtonClass: 'ok-button',
+              cancelButtonLabel: 'No'
+          };
+          this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+              .subscribe((isConfirm) => {
+                if(isConfirm){
+                  this.onboardEmailTemplateForm.rteCreated();
+                  this.onboardEmailTemplateForm.disableControls(true);
+                  this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                }
+                else{
+                  this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+                  this.closeDialog();
+                }
+              });
+        }else{
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+          this.closeDialog();
+        }
+      });
+  }
+
+  onGroupEmailAddCancel(){
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    this.isSend =  false;
+    this.store.dispatch(new ShowGroupEmailSideDialog(false));
+    this.closeDialog();
+    this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+  }
+
+  onGroupEmailSend(){
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    if(this.sendOnboardMessageEmailFormGroup.valid){
+      const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();  
+      this.store.dispatch(new sendOnboardCandidateEmailMessage({
+            subjectMail : emailvalue.emailSubject,
+            bodyMail : emailvalue.emailBody,
+            toList : emailvalue.emailTo,
+            status : 1,
+            stream : emailvalue.fileUpload,
+            extension : emailvalue.fileUpload?.type,
+            documentName : emailvalue.fileUpload?.name,
+            orderId : emailvalue.orderId,
+            candidateId : emailvalue.candidateId,
+            businessUnitId : emailvalue.businessUnitId,
+          })
+        )
+        .subscribe(() => {
+          this.isSend =  false;
+          this.closeDialog();
+          this.store.dispatch(new ShowGroupEmailSideDialog(false));  
+          this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+        });
+    }
   }
 
   private subscribeOnGetStatus(): void {
@@ -500,7 +597,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       });
   }
 
-  
+
   private adjustCandidatePayRateControl(): void {
     const candidatePayRateControl = this.form?.get('candidatePayRate');
 
@@ -510,4 +607,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       candidatePayRateControl?.disable();
     }
   }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
+  }
+
 }

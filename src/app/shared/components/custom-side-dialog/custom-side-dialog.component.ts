@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewChildren } from '@angular/core';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { takeUntil } from 'rxjs';
@@ -12,7 +12,7 @@ import { DestroyableDirective } from '../../directives/destroyable.directive';
   styleUrls: ['./custom-side-dialog.component.scss']
 })
 export class CustomSideDialogComponent extends DestroyableDirective implements OnInit {
-  @ViewChild('customSideDialog') customSideDialog: DialogComponent;
+  @ViewChildren('customSideDialog') customSideDialog: DialogComponent;
   targetElement: HTMLElement = document.body;
 
   @Input() header: string | null;

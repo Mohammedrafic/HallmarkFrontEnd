@@ -10,6 +10,11 @@
   }
 }
 
+app-configuration-grid {
+  margin-top: 25px;
+  height: 90%;
+}
+
 .row {
   display: flex;
 
@@ -61,53 +66,6 @@ app-button-group {
   margin-bottom: 12px;
 }
 
-.grid-component {
-  margin-top: 25px;
-  overflow-y: auto;
-}
-
-.e-row {
-  .e-customized-expand-cell {
-    border-top: 1px solid $grid-row-border;
-  }
-
-  &:last-of-type .e-customized-expand-cell,
-  &:last-of-type .e-detailrowcollapse {
-    border-bottom: 1px solid $grid-row-border;
-  }
-}
-
-.e-row[aria-selected='true'] {
-  .e-customized-expand-cell {
-    background-color: $primary-active-blue-70;
-  }
-
-  td.e-detailrowcollapse {
-    div.e-icons.e-dtdiagonalright.e-icon-grightarrow::before {
-      color: $white !important;
-    }
-  }
-
-  td.e-detailrowexpand {
-    div.e-icons.e-dtdiagonaldown.e-icon-gdownarrow::before {
-      color: $white !important;
-    }
-  }
-}
-
-.e-grid.e-gridhover tr[role='row']:hover {
-  &:not(.e-row[aria-selected='true']) {
-    background-color: $primary-active-blue-90;
-    color: $white !important;
-
-    .e-detailrowexpand,
-    .e-detailrowcollapse {
-      background-color: $primary-active-blue-90 !important;
-      color: $white !important;
-    }
-  }
-}
-
 .toggle-message {
   font-weight: 400;
   font-size: 13px;
@@ -123,7 +81,6 @@ ejs-textbox.e-control {
     height: 120px !important;
   }
 }
-
 
 .dropdown-wrapper {
   display: flex;

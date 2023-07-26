@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
 import {
   FeeExceptions,
   FeeExceptionsInitialData,
@@ -69,8 +69,10 @@ export class AddNewFeeDialogComponent extends DestroyableDirective implements On
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => !!confirm),
+          take(1)
+        ).subscribe(() => {
           this.editMode = false;
           this.sideDialog.hide();
         });
@@ -89,7 +91,9 @@ export class AddNewFeeDialogComponent extends DestroyableDirective implements On
   }
 
   private onOpenEvent(): void {
-    this.openEvent.subscribe((id: number) => {
+    this.openEvent.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((id: number) => {
       if (id) {
         this.organizationId = id;
         this.feeFormGroup.reset();
@@ -99,7 +103,9 @@ export class AddNewFeeDialogComponent extends DestroyableDirective implements On
   }
 
   private onOpenEditEvent(): void {
-    this.openEditEvent.subscribe((feeData: FeeExceptions) => {
+    this.openEditEvent.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((feeData: FeeExceptions) => {
       if (feeData) {
         this.editMode = true;
         this.feeFormGroup.patchValue({

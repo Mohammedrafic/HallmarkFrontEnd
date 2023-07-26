@@ -27,6 +27,7 @@ export class ManualFormComponent extends DestroyableDirective implements Payment
   @Input() public formValue: PaymentDetails | ElectronicPaymentDetails;
   @Input() public paymentsList: PaymentDetails[] | ElectronicPaymentDetails[];
   @Input() public mode: number;
+  @Input() editAgencyNetsuitePaymentId: boolean;
 
   public paymentDetailsForm: FormGroup;
   public readonly formatInput = FORMAT_INPUT;

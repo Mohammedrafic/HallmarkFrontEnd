@@ -284,7 +284,7 @@ export class GrantReportComponent implements OnInit {
               this.filterColumns.invoiceStatusIds.dataSource=data?.invoiceStatuses;
               this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.id);
               this.grantReportForm.get(grantReportConstants.formControlNames.InvoiceStatusIds)?.setValue(this.defaultInvoiceStausIds);
-              setTimeout(() => { this.SearchReport() }, 3000);
+               this.SearchReport();
             }
           });
           this.regions = this.regionsList;

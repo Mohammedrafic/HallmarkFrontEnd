@@ -7,6 +7,7 @@ export interface PaymentDetailsInterface {
   saveEvent: Subject<number>;
   paymentsList: PaymentDetails[] | ElectronicPaymentDetails[];
   mode: number;
+  editAgencyNetsuitePaymentId: boolean ;
 
   createPaymentDetailsForm(): void;
 }
@@ -41,4 +42,5 @@ export interface ElectronicPaymentDetails extends PaymentDetails {
   fee: string;
   routingNumber: string;
   swiftCode: string;
+  netSuiteId?: number;
 }

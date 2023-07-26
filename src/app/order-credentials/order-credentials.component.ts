@@ -80,7 +80,7 @@ export class OrderCredentialsComponent {
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onDialogCancel(): void {
+  public cancelChanges(): void {
     if ((!this.isEditMode && this.addCred?.form.dirty) || (this.isEditMode && this.editCred?.form.dirty)) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
@@ -99,42 +99,44 @@ export class OrderCredentialsComponent {
     }
   }
 
-  public onDialogOk(): void {
+  public saveCredential(): void {
     this.formSubmitted = true;
-    if (this.CredentialForm.valid) {
-      if (this.isEditMode) {
-        this.editExistedCred();
-      } else {
-        this.addNewCred();
-      }
-      this.resetToDefault();
-      this.formSubmitted = false;
-      this.showForm = false;
-      this.store.dispatch(new ShowSideDialog(false));
+
+    if (!this.CredentialForm.valid) {
+      return;
     }
+
+    if (this.isEditMode) {
+      this.editExistedCred();
+    } else {
+      this.addNewCred();
+    }
+    
+    this.resetToDefault();
+    this.formSubmitted = false;
+    this.showForm = false;
+    this.store.dispatch(new ShowSideDialog(false));
   }
 
-  public onUpdate(data: IOrderCredentialItem): void {
+  public updateCredential(data: IOrderCredentialItem): void {
     this.editExistedCred(data);
   }
 
-  public onDelete(credentialId: number): void {
+  public deleteCredential(credentialId: number): void {
     const credToDelete = this.credentials.find((cred) => cred.credentialId === credentialId) as IOrderCredentialItem;
+
     if (credToDelete) {
-      const index = this.credentials.indexOf(credToDelete);
-      this.credentials.splice(index, 1);
       this.credentialDeleted.emit(Object.assign({}, { ...credToDelete }));
-      this.credentials = [...this.credentials];
+      this.credentials = [...this.credentials.filter((cred) => cred.credentialId !== credentialId)];
     }
   }
 
   private editExistedCred(data?: IOrderCredentialItem): void {
     const cred = data || (this.CredentialForm.getRawValue() as IOrderCredentialItem);
-    this.updateCredList(cred);
+    
     this.credentialChanged.emit(Object.assign({}, { ...cred }));
     this.isEditMode = false;
   }
-
 
   private resetToDefault(): void {
     this.CredentialForm.setValue({
@@ -151,17 +153,7 @@ export class OrderCredentialsComponent {
   private addNewCred(): void {
     const value = this.CredentialForm.getRawValue();
     this.credentialChanged.emit(Object.assign({}, { ...value }, { id: 0, orderId: 0 }));
-    this.updateCredList(value);
   }
-
-  private updateCredList(cred: IOrderCredentialItem): void {
-    const isExist = this.credentials.find(this.byCredentilaId(cred));
-    if (!isExist) {
-      this.credentials.push(cred);
-    }
-    this.credentials = [...this.credentials];
-  }
-
 
   private handleOnCancel(): void {
     this.CredentialForm.reset();
@@ -169,9 +161,5 @@ export class OrderCredentialsComponent {
     this.showForm = false;
     this.store.dispatch(new ShowSideDialog(false));
     this.formSubmitted = false;
-  }
-
-  private byCredentilaId(target: IOrderCredentialItem) {
-    return (iter: IOrderCredentialItem) => iter.credentialId === target.credentialId;
   }
 }

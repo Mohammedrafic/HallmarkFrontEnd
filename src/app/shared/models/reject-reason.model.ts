@@ -21,6 +21,7 @@ export type RejectReasonwithSystem = {
   includeInIRP?: boolean;
   isVMSIRP?:boolean;
   isAutoPopulate? : boolean;
+  excludeDefaultReasons?: boolean;
   orderClosureReasonType?: OrderClosureReasonType;
 }
 
@@ -52,5 +53,22 @@ export interface UnavailabilityReasons {
 export interface UnavailabilityPaging {
   PageNumber: number;
   PageSize: number;
+}
+
+export type SourcingReasonPage = PageOfCollections<Sourcing>;
+export type Sourcing = {
+  id: number;
+  organizationId: number;
+  reason: string;
+ 
+}
+
+
+export type RecuriterReasonPage = PageOfCollections<Recuriter>;
+export type Recuriter = {
+  id: number;
+  organizationId: number;
+  reason: string;
+ 
 }
 

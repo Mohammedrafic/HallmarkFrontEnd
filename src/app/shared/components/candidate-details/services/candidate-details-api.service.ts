@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import {
   CandidateDetailsPage,
@@ -10,6 +10,7 @@ import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
 @Injectable()
 export class CandidateDetailsApiService {
@@ -35,5 +36,28 @@ export class CandidateDetailsApiService {
     }
     return this.http.post(`/api/CandidateProfile/profiles/export`, payload, { responseType: 'blob' });
   }
+
+  public getAssociateOrganizations(lastSelectedBusinessUnitId?: number): Observable<AgencyOrderFilteringOptions> {
+    let headers = {};
+
+    if (lastSelectedBusinessUnitId) {
+      headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
+    }
+    return this.http.get<AgencyOrderFilteringOptions>(`/api/OrdersFilteringOptions/agencyorg`).pipe(
+      map((data) => {
+        const sortedFields: Record<keyof AgencyOrderFilteringOptions, string> = {
+          partneredOrganizations: 'name',
+          candidateStatuses: 'statusText',
+          orderStatuses: 'statusText',
+          masterSkills: 'name',
+          poNumbers: 'poNumber',
+          projectNames: 'projectName',
+          specialProjectCategories: 'projectType',
+        }
+          return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof AgencyOrderFilteringOptions])]))
+      }),
+    );;
+  }
+
 
 }

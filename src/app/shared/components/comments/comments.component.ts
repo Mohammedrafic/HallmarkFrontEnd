@@ -117,7 +117,7 @@ export class CommentsComponent {
         this.scroll$.next(null);
       }
     });
-    this.isAgencyUser = this.router.url.includes('agency'); 
+    this.isAgencyUser = this.router.url.includes('agency');
     if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
@@ -181,11 +181,16 @@ export class CommentsComponent {
       isRead: true,
     };
     this.comments.push(comment);
+    this.commentData.push(comment);
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
-      this.store.dispatch(new SaveComment(comment));
-      this.getOrderComments();
+      this.store.dispatch(new SaveComment(comment)).subscribe(data => {
+        if(data.orderManagement?.orderComments){
+          this.comments = [];
+          this.getOrderComments();
+        }
+      });
     }
   }
 

@@ -181,7 +181,7 @@ export class CreateScheduleService {
   getEmployeeScheduledDays(scheduleItems: CreateScheduleItem[]): ScheduleInt.EmployeeScheduledDay[] {
     return scheduleItems.map((item: CreateScheduleItem) => {
       const dates: string[] = item.selectedDates
-        .map((date: Date) => DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(date)));
+        .map((date: Date) => DateTimeHelper.setUtcTimeZone(DateTimeHelper.setInitDateHours(date)));
 
       return {
         employeeId: item.candidateId,
@@ -195,7 +195,7 @@ export class CreateScheduleService {
       const bookedDays = item.selectedDates.map((date: Date) => {
         const initDate = new Date(date.setHours(0, 0, 0));
 
-        return DateTimeHelper.toUtcFormat(initDate);
+        return DateTimeHelper.setUtcTimeZone(initDate);
       });
 
       return {
@@ -350,7 +350,7 @@ export class CreateScheduleService {
   getCandidateOrientation(candidate: ScheduleCandidate): boolean {
     return candidate.dates.every((date: string) => {
       if(candidate.orientationDate) {
-        return DateTimeHelper.convertDateToUtc(date) >= DateTimeHelper.convertDateToUtc(candidate.orientationDate);
+        return DateTimeHelper.setCurrentTimeZone(date) >= DateTimeHelper.setCurrentTimeZone(candidate.orientationDate);
       } else {
         return false;
       }
@@ -412,6 +412,19 @@ export class CreateScheduleService {
 
     return { departmentId, skillId, startDate, endDate };
   }
+
+  canEmployeeCreateRecord(isEmployee: boolean, dates: Date[] | string[], start: Date): boolean {
+    if (!isEmployee) {
+      return true;
+    }
+
+    const todayInMs: number = new Date().getTime();
+    const selectedDatesInMs: number[] = dates
+      .map((date: Date | string) => new Date(date).setHours(start.getHours(), start.getMinutes(), 0, 0));
+
+    return !selectedDatesInMs.filter((date: number) => date < todayInMs).length;
+  }
+
   private orientationForMultiCandidates(control: AbstractControl, candidates: ScheduleCandidate[]): void {
     const isCandidatesOriented = candidates.map((candidate: ScheduleCandidate) => {
       return this.getCandidateOrientation(candidate);

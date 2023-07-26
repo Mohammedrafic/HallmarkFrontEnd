@@ -1,5 +1,5 @@
 <app-page-toolbar>
-  <ng-container left>
+  <ng-container left *ngIf="!isMobile">
     <h3 *ngIf="isIRP">Employees</h3>
     <h3 *ngIf="!isIRP">Candidates</h3>
   </ng-container>
@@ -10,7 +10,7 @@
         (change)="onSwitcher($event);"
         [checked]="true"
       ></ejs-switch>
-      <label for="switcher" class="switch-text">Include Deployed Employees</label>
+      <label for="switcher" class="switch-text">Include Deployed Candidates</label>
       <button
         ejs-dropdownbutton
         appHideBeforeSyncfusionLoad
@@ -19,7 +19,8 @@
         (select)="exportSelected($event)"
       >
         <div class="button-export-container">
-          Export <i-feather name="upload" class="icon"></i-feather>
+          <span *ngIf="!isMobile">Export</span>
+          <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
       <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
@@ -34,38 +35,46 @@
     </div>
     <div class="button-group" *ngIf="isIRP">
       <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        id="filterButton"
+        cssClass="e-outline button-filter"
+        (click)="showFilters()"
+      >
+        <div class="filter-button-content">
+          <span
+            *ngIf="(filteredItems$ | async) || 0 as filteredItems"
+            class="e-badge e-badge-success e-badge-pill"
+          >
+            {{filteredItems}}
+          </span>
+          Filters
+          <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
+      <button
         ejs-dropdownbutton
         appHideBeforeSyncfusionLoad
         cssClass="e-outline button-export"
         [items]="exportOptions"
         (select)="exportSelected($event)"
       >
-      <div class="button-export-container">
-        Export <i-feather name="upload" class="icon"></i-feather>
-      </div>
-      </button>
-      <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
-        <div class="filter-button-content">
-          <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill">{{
-            filteredItems
-            }}</span>
-          Filters
-          <i-feather name="sliders" class="icon"></i-feather>
+        <div class="button-export-container">
+          <span *ngIf="!isMobile">Export</span>
+          <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
-      <ng-container *ngIf="!isMobile">
         <button
           *ngIf="(currentUserPermissions$ | async) as userPermission"
           ejs-button
           appHideBeforeSyncfusionLoad
           id="addIRPCandidate"
-          cssClass="e-primary"
+          cssClass="e-primary" class="noResponsive"
           [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
           (click)="addIRPCandidate()"
         >
           Add Employee
         </button>
-      </ng-container>
 
     </div>
   </ng-container>
@@ -90,6 +99,9 @@
     [credStartDate] = "credStartDate"
     [credEndDate] = "credEndDate"
     [credType] = "credType"
+    [redirectedFromDashboard] = "redirectedFromDashboard"
     [isMobileScreen] = "isMobile"
   ></app-candidate-list>
 </section>
+
+<app-scroll-to-top *ngIf="isMobile"></app-scroll-to-top>

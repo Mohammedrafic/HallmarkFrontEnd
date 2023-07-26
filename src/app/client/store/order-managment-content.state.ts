@@ -67,6 +67,7 @@ import {
   GetOrdersJourney,
   ExportOrdersJourney,
   GetAllShifts,
+  sendOnboardCandidateEmailMessage,
   GetOrderComments,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -76,6 +77,7 @@ import {
   GetPredefinedBillRatesData,
   IrpCandidatesParams,
   IrpOrderCandidate,
+  OnboardCandidateEmail,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -131,8 +133,10 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { UpdateRegRateService } from '@client/order-management/components/update-reg-rate/update-reg-rate.service';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { HttpErrorResponse } from '@angular/common/http';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -165,10 +169,11 @@ export interface OrderManagementContentStateModel {
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
   candidateCancellationReasons:CandidateCancellationReason[]|null;
   allShifts:ScheduleShift[]|null;
+  sendOnboardCandidateEmail:OnboardCandidateEmail | null;
   orderComments: Comment[]
 }
 
-@State<OrderManagementContentStateModel>({
+@State<OrderManagementContentStateModel>( {
   name: 'orderManagement',
   defaults: {
     ordersPage: null,
@@ -205,9 +210,10 @@ export interface OrderManagementContentStateModel {
     irpCandidates: null,
     candidateCancellationReasons:null,
     allShifts:null,
+    sendOnboardCandidateEmail:null,
     orderComments : []
   },
-  
+
 })
 @Injectable()
 export class OrderManagementContentState {
@@ -481,8 +487,8 @@ export class OrderManagementContentState {
             orderType,
             departmentId,
             skill,
-            jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-            jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+            jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : jobStartDate,
+            jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : jobEndDate
           )
         );
 
@@ -568,8 +574,9 @@ export class OrderManagementContentState {
               orderType,
               departmentId,
               skill,
-              jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-              jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+              jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : jobStartDate,
+              jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : jobEndDate,
+              true
             )
           );
         }
@@ -726,18 +733,12 @@ export class OrderManagementContentState {
 
   @Action(SetPredefinedBillRatesData)
   SetPredefinedBillRatesData(
-    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
-    { orderType, departmentId, skillId, jobStartDate, jobEndDate }: SetPredefinedBillRatesData
-  ): Observable<void> {
-    patchState({ getPredefinedBillRatesData: null });
-
-    return of(null).pipe(
-      debounceTime(100),
-      tap(() =>
-        patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId, jobStartDate, jobEndDate } })
-      ),
-      switchMap(() => dispatch(new GetPredefinedBillRates())),
-    );
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate }: SetPredefinedBillRatesData
+  ): OrderManagementContentStateModel {
+    return patchState({ getPredefinedBillRatesData: {
+      orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate,
+    } });
   }
 
   @Action(GetPredefinedBillRates)
@@ -748,7 +749,7 @@ export class OrderManagementContentState {
     const state = getState();
     const getPredefinedBillRatesData = state.getPredefinedBillRatesData;
 
-    if (getPredefinedBillRatesData) {
+    if (getPredefinedBillRatesData && !getPredefinedBillRatesData.ignoreUpdateBillRate) {
       const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = getPredefinedBillRatesData;
 
       if (!isNaN(orderType) && !isNaN(departmentId) && !isNaN(skillId)) {
@@ -762,7 +763,6 @@ export class OrderManagementContentState {
       }
     }
 
-    patchState({ predefinedBillRates: [] });
     return of([]);
   }
 
@@ -785,12 +785,26 @@ export class OrderManagementContentState {
   @Action(SaveIrpOrder)
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents,inActivedatestr }: SaveIrpOrder
+    { order, documents,inActivedatestr,isLocation,isLocationAndDepartment }: SaveIrpOrder
   ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
-          new ShowToast(MessageTypes.Success,  order.length==1?'Order '+order[0].organizationPrefix?.toString()+'-'+order[0].publicId?.toString()+' has been added': inActivedatestr?.toString()!="" && inActivedatestr?.toString()!=undefined  ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr +' Dates orders not added.':RECORD_ADDED),
+          new ShowToast(
+            MessageTypes.Success,
+            order.length == 1 && !(inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined)
+              ? 'Order ' +
+                order[0].organizationPrefix?.toString() +
+                '-' +
+                order[0].publicId?.toString() +
+                ' has been added'
+              : inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined
+              ?  isLocationAndDepartment ?  RECORD_ADDED +' Due to location and Department Expiry ' + inActivedatestr + ' Dates orders not added.'
+              : isLocation
+                ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr + ' Dates orders not added.'
+                : RECORD_ADDED + ' Due to Department Expiry ' + inActivedatestr + ' Dates orders not added.'
+              : RECORD_ADDED
+          ),
           new SaveIrpOrderSucceeded(),
         ]);
           if (documents.length) {
@@ -946,10 +960,10 @@ export class OrderManagementContentState {
   @Action(ApproveOrder)
   ApproveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id }: ApproveOrder
+    { id, isIRPTab }: ApproveOrder
   ): Observable<string | void> {
     return this.orderManagementService
-      .approveOrder(id)
+      .approveOrder(id, isIRPTab)
       .pipe(catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error))));
   }
 
@@ -1171,7 +1185,7 @@ export class OrderManagementContentState {
     ): Observable<Comment[]> {
       return this.commentService.getComments(commentContainerId, null)
         .pipe(tap((payload) => patchState({ orderComments: payload })));
-    }  
+    }
 
     @Action(GetAllShifts)
     GetAllShifts(
@@ -1181,5 +1195,21 @@ export class OrderManagementContentState {
           patchState({ allShifts: payload });
           return payload
         }));
+      }
+
+      @Action(sendOnboardCandidateEmailMessage)
+      sendOnboardCandidateEmailMessage(
+        { dispatch, patchState }: StateContext<OrderManagementContentStateModel>,
+        { onboardCandidateEmailData }: sendOnboardCandidateEmailMessage
+      ): Observable<any | void> {
+        return this.orderManagementService.sendCandidateOnboardEmail(onboardCandidateEmailData).pipe(
+          tap((payload) => {
+            patchState({ sendOnboardCandidateEmail: payload });
+            return payload;
+          }),
+          catchError((error: HttpErrorResponse) => {
+            return dispatch(new ShowToast(MessageTypes.Error, error.error));
+          })
+        );
       }
 }

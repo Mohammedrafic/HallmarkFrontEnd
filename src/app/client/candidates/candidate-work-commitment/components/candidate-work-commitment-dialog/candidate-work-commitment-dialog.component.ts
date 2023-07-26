@@ -10,7 +10,12 @@ import {
   WorkCommitmentOrgHierarchies,
 } from '@organization-management/work-commitment/interfaces';
 import { DatepickerComponent } from '@shared/components/form-controls/datepicker/datepicker.component';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, EMPLOYEE_SKILL_CHANGE_WARNING, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  EMPLOYEE_SKILL_CHANGE_WARNING,
+  RECORD_ADDED, RECORD_MODIFIED,
+} from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -264,15 +269,15 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private setDatesValidation(commitment: WorkCommitmentDetails): void {
-    const commitmentEndDate = DateTimeHelper.convertDateToUtc(commitment.endDate as string);
+    const commitmentEndDate = DateTimeHelper.setCurrentTimeZone(commitment.endDate as string);
     this.selectWorkCommitmentStartDate = this.setWorkCommitmentStartDate();
     this.minimumDate = this.setMinimumDate();
 
     const terminationDate = this.candidateService.getTerminationDate();
     if (terminationDate) {
-      this.maximumDate = DateTimeHelper.convertDateToUtc(terminationDate);
+      this.maximumDate = DateTimeHelper.setCurrentTimeZone(terminationDate);
     } else {
-      this.maximumDate = DateTimeHelper.isDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
+      this.maximumDate = DateTimeHelper.hasDateBefore(this.minimumDate, commitmentEndDate) ? commitmentEndDate : undefined;
     }
 
     this.setWCStartDate();
@@ -369,6 +374,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].setValue('' + id, { emitEvent: false });
         this.candidateWorkCommitmentForm.patchValue(candidateCommitment, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
+        this.minimumDate = candidateCommitment.startDate as Date;
       }
       this.refreshDatepicker();
       this.cd.detectChanges();
@@ -401,7 +407,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         takeUntil(this.destroy$)
       ).subscribe((activeCommitment) => {
         if (activeCommitment) {
-          this.lastActiveDate = DateTimeHelper.convertDateToUtc(activeCommitment.startDate as string);
+          this.lastActiveDate = DateTimeHelper.setCurrentTimeZone(activeCommitment.startDate as string);
           this.lastActiveDate = addDays(this.lastActiveDate, 1) as Date;
         } else {
           this.minimumDate = undefined;
@@ -450,7 +456,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       takeUntil(this.destroy$),
     ).subscribe((commitment: CandidateWorkCommitment) => {
         if (commitment.workCommitmentIds) {
-          commitment.startDate = commitment.startDate && DateTimeHelper.convertDateToUtc(commitment.startDate as string);
+          commitment.startDate = commitment.startDate && DateTimeHelper.setCurrentTimeZone(commitment.startDate as string);
           const masterId = this.allWorkCommitments.find(item => item.workCommitmentId === commitment.workCommitmentIds[0]);
           masterId && this.getWorkCommitmentById(masterId.masterWorkCommitmentId, commitment, false);
         }
@@ -572,7 +578,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
     candidateWorkCommitment.startDate =
       candidateWorkCommitment.startDate &&
-      DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(this.startDate));
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.startDate));
     candidateWorkCommitment.employeeId = this.employeeId;
     candidateWorkCommitment.createReplacement = this.replaceOrder;
     this.replaceOrder = false;
@@ -648,7 +654,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   private setWCStartDate(): void {
     if (!this.lastActiveDate) {
       const employeeHireDate = this.candidateService.getEmployeeHireDate();
-      const startDate = DateTimeHelper.convertDateToUtc(employeeHireDate as string);
+      const startDate = DateTimeHelper.setCurrentTimeZone(employeeHireDate as string);
       const isHireDateLessWCStartDate = startDate.getTime() < this.selectWorkCommitmentStartDate.getTime();
 
       this.startDate = isHireDateLessWCStartDate ? this.todayDate : startDate;
@@ -657,13 +663,13 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private setMinimumDate(): Date {
     const employeeHireDate = this.candidateService.getEmployeeHireDate();
-    const startDate = DateTimeHelper.convertDateToUtc(employeeHireDate as string);
+    const startDate = DateTimeHelper.setCurrentTimeZone(employeeHireDate as string);
     const isHireDateLessWCStartDate = startDate.getTime() < this.selectWorkCommitmentStartDate.getTime();
     let minimumDate = isHireDateLessWCStartDate ? this.selectWorkCommitmentStartDate : startDate;
 
     if (this.lastActiveDate) {
       minimumDate =
-        DateTimeHelper.isDateBefore(this.lastActiveDate, this.selectWorkCommitmentStartDate)
+        DateTimeHelper.hasDateBefore(this.lastActiveDate, this.selectWorkCommitmentStartDate)
           ? this.selectWorkCommitmentStartDate
           : this.lastActiveDate;
     }
@@ -672,7 +678,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   private setWorkCommitmentStartDate(): Date {
     const workCommitmentsDates = this.workCommitmentGroup.items.map((item) => {
-      return DateTimeHelper.convertDateToUtc(item.startDate).getTime();
+      return DateTimeHelper.setCurrentTimeZone(item.startDate).getTime();
     });
     const theLeastDate = Math.min(...workCommitmentsDates);
 

@@ -1,5 +1,6 @@
-@import "colors";
-@import "mixins";
+@import 'colors';
+@import 'mixins';
+@import 'adaptive-response';
 
 .dialog-header {
   display: flex;
@@ -46,7 +47,17 @@
 
 .input-container {
   @include input-form-container;
-  padding-top: 20px
+  padding-top: 5px;
+
+  &.flexed {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  label {
+    margin: 0;
+  }
 }
 
 .bootstrap {
@@ -65,3 +76,18 @@
   }
 }
 
+@media #{$max-mobile} {
+  .controls {
+    justify-content: center;
+    column-gap: 16px;
+    padding: 10px 20px;
+
+    .action-btn {
+      width: 45%;
+    }
+  }
+
+  .title {
+    font-size: 24px !important;
+  }
+}

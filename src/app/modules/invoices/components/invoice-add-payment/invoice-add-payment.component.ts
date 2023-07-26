@@ -234,7 +234,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
     .subscribe((response) => {
       this.checkForm.patchValue({
         id: response.check.id,
-        checkDate: DateTimeHelper.convertDateToUtc(response.check.checkDate),
+        checkDate: DateTimeHelper.setCurrentTimeZone(response.check.checkDate),
         initialAmount: response.check.initialAmount,
         paymentMode: response.check.paymentMode,
         isRefund: response.check.isRefund,

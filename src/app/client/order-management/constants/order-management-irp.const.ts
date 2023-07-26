@@ -170,6 +170,9 @@ export const ThreeDotsMenuOptions = (
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
   ],
+  moreMenuAddReOrderButton: [
+    { text: MoreMenuType[5], id: '5', disabled: !canCreateOrder },
+  ],
 });
 
 export const PositionGridCell = {
@@ -232,7 +235,7 @@ export const DefaultOrderManagementSubGridCells: ColDef[] = [
   {
     field: 'name',
     headerName: 'Employee Name',
-    width: 140,
+    width: 250,
   },
 ];
 
@@ -243,7 +246,7 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
   {
     field: 'skill',
     headerName: 'Primary Skill',
-    width: 160,
+    width: 240,
   },
   {
     field: 'workCommitment',

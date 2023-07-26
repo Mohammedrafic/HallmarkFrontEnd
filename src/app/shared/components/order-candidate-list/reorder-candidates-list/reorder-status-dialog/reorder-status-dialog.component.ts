@@ -51,6 +51,9 @@ import { UserState } from 'src/app/store/user.state';
 import { AcceptFormComponent } from './accept-form/accept-form.component';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { DateTimeHelper } from '@core/helpers';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -172,7 +175,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public canOnboard = false;
   public canClose = false;
   public orderPermissions: CurrentUserPermission[];
-
+  public comments: Comment[] = [];
+  public canCreateOrder:boolean;
   private defaultApplicantStatuses: ApplicantStatus[];
   private statuses: ApplicantStatus[];
   public candidatePhone1RequiredValue : string = '';
@@ -184,11 +188,14 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
     private cdr: ChangeDetectorRef,
+    private commentsService: CommentsService,
+    private permissionService : PermissionService
   ) {
     super();
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createJobStatusControl();
     this.subscribeForOrderPermissions();
@@ -225,7 +232,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
       if(this.orderCandidateJob?.candidateProfileContactDetails != null){
-        if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null 
+        if(this.orderCandidateJob?.candidateProfileContactDetails.phone1 === null
             || this.orderCandidateJob?.candidateProfileContactDetails.phone1 === ''){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
               return;
@@ -237,7 +244,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.orderCandidateJob?.candidateProfileContactDetails != null){ 
+      if(this.orderCandidateJob?.candidateProfileContactDetails != null){
           if(CommonHelper.candidateAddressCheck(this.orderCandidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
@@ -309,6 +316,16 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
+  private getComments(): void {
+    this.commentsService
+      .getComments(this.orderCandidateJob?.commentContainerId as number, null).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe((comments : Comment[]) => {
+        this.comments = comments;
+        this.cdr.detectChanges();
+      });
+  }
+
   public onNextPreviousOrder(next: boolean): void {
     this.nextPreviousOrderEvent.emit(next);
   }
@@ -370,7 +387,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.orderCandidateJob.candidatePayRate,
           })
-        )
+        ).pipe(takeUntil(this.destroy$))
         .subscribe(() => {
           this.deleteUpdateFieldInRate();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
@@ -410,6 +427,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     candidatePayRate,
     clockId,
   }: OrderCandidateJob) {
+    this.getComments();
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     let isBillRatePending: number;
 
@@ -428,9 +446,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: DateTimeHelper.convertDateToUtc(reOrderDate as string),
-      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
-      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
+      orderOpenDate: DateTimeHelper.setCurrentTimeZone(reOrderDate as string),
+      shiftStartTime: shiftStartTime ? DateTimeHelper.setCurrentTimeZone(shiftStartTime.toString()) : '',
+      shiftEndTime: shiftEndTime ? DateTimeHelper.setCurrentTimeZone(shiftEndTime.toString()) : '',
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
       rejectReason,
@@ -521,7 +539,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
               statusText: status.statusText,
             },
           })
-        )
+        ).pipe(takeUntil(this.destroy$))
         .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
     }
   }
@@ -673,19 +691,19 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private setCorrectActualDates(initDate: string, shiftStartTime: Date, shiftEndTime: Date) {
     if (shiftStartTime > shiftEndTime) {
-      const formatedInitDate = DateTimeHelper.toUtcFormat(initDate);
+      const formatedInitDate = DateTimeHelper.setUtcTimeZone(initDate);
       const endDate = new Date(new Date(new Date(formatedInitDate).setDate(new Date(formatedInitDate)
       .getDate() + 1)).setHours(0, 0, 0));
 
       return {
-        actualStartDate: DateTimeHelper.toUtcFormat(initDate),
-        actualEndDate: DateTimeHelper.toUtcFormat(endDate),
+        actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+        actualEndDate: DateTimeHelper.setUtcTimeZone(endDate),
       };
     }
 
     return {
-      actualStartDate: DateTimeHelper.toUtcFormat(initDate),
-      actualEndDate: DateTimeHelper.toUtcFormat(initDate),
+      actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+      actualEndDate: DateTimeHelper.setUtcTimeZone(initDate),
     };
   }
 
@@ -708,10 +726,17 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
-        .pipe().subscribe((value) => {
+        .pipe(takeUntil(this.destroy$)).subscribe((value) => {
           this.candidateCancellationReasons =value;
         });
 
     }
   }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
+  }
+
 }

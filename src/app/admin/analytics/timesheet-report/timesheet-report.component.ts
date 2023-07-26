@@ -49,7 +49,8 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
     "StatusesParamTS": "",
     "CandidateNameParamTS": "",
     "StartDateParamTS": "",
-    "EndDateParamTS": ""
+    "EndDateParamTS": "",
+    "organizationNameYTDS":""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cat" };
@@ -88,6 +89,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
   public organizationData$: Observable<Organisation[]>;
   selectedOrganizations: Organisation[];
 
+  private fixedTimesheetStatusesIncluded: number[] = [0, 2, 3, 4, 5, 6, 10];
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
@@ -276,26 +278,30 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
-              this.isAlive = false;
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
-              let timesheetStatusData = data.timesheetStatuses;
-              timesheetStatusData.push({ id: -1, name: "DNW" }); //Include static "DNW" as a status to status dropdown with id -1
+              let timesheetStatusData = data.timesheetStatuses.filter(i => this.fixedTimesheetStatusesIncluded.includes(i.id));
+              if (timesheetStatusData.filter((item) => item.name == "DNW")[0] == undefined) {
+                timesheetStatusData.push({ id: -1, name: "DNW" }); //Include static "DNW" as a status to status dropdown with id -1
+              }
               let archived = timesheetStatusData.filter((item) => item.name == "Archived")[0];
               let archivedIndex = timesheetStatusData.indexOf(archived, 0);
-              timesheetStatusData.splice(archivedIndex, 1);
+              if (archivedIndex >= 0) {
+                timesheetStatusData.splice(archivedIndex, 1);
+              }
 
               let noMileageExist = timesheetStatusData.filter((item) => item.name == "No mileages exist")[0];
               let noMileageExistIndex = timesheetStatusData.indexOf(noMileageExist, 0);
-              timesheetStatusData.splice(noMileageExistIndex, 1);
-
+              if (noMileageExistIndex >= 0) {
+                timesheetStatusData.splice(noMileageExistIndex, 1);
+              }
               this.filterColumns.timesheetStatusIds.dataSource = timesheetStatusData;
               this.filterColumns.agencyIds.dataSource = data.agencies;
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
               this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
               if (this.isInitialLoad) {
-
-                setTimeout(() => { this.SearchReport() }, 3000);
+                  this.SearchReport()
                 this.isInitialLoad = false;
               }
               this.changeDetectorRef.detectChanges();
@@ -406,6 +412,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
       "BearerParamTS": auth,
       "BusinessUnitIdParamTS": businessIds,
       "HostName": this.baseUrl,
+      "organizationNameTS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -504,7 +511,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
     this.filterService.removeValue(event, this.timesheetReportForm, this.filterColumns);
   }
   public onFilterClearAll(): void {
-    this.isClearAll = true;
+    //this.isClearAll = true;
     let startDate = this.getLastWeek();
     let first = startDate.getDate() - startDate.getDay();
     //let last = first + 6;
@@ -521,7 +528,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
     this.timesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.timesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(endDate);
     this.timesheetReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
-    this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
+    this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

@@ -294,7 +294,7 @@ export class GeneralCommentsComponent implements OnInit {
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
               this.generalcmntReportForm.get(GeneralCommentReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-              setTimeout(() => { this.SearchReport() }, 3000);
+              this.SearchReport();
             }
           });
           this.regions = this.regionsList;

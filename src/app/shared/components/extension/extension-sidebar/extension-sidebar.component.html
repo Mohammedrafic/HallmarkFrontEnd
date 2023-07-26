@@ -36,7 +36,7 @@
             class="durations-control"
           ></app-numeric-textbox>
         </div>
-        <div class="extension-dates">
+        <div class="row">
           <app-datepicker
             [formGroupInstance]="extensionForm"
             [enableMask]="true"
@@ -48,7 +48,7 @@
             label="Extension Start Date"
             format="MM/dd/yyyy"
             placeholder="MM/DD/YYYY"
-            class="extension-dates__control"
+            class="form-line-item-50"
           ></app-datepicker>
           <app-datepicker
             [formGroupInstance]="extensionForm"
@@ -61,24 +61,35 @@
             label="Extension End Date"
             format="MM/dd/yyyy"
             placeholder="MM/DD/YYYY"
-            class="extension-dates__control"
+            class="form-line-item-50"
           ></app-datepicker>
         </div>
-        <app-numeric-textbox
-          [formGroupInstance]="extensionForm"
-          [required]="true"
-          [htmlAttributes]="billRateAttributes"
-          [decimals]="2"
-          [min]="0"
-          format="c"
-          controlName="billRate"
-          label="Bill Rate"
-          class="bill-rate__control"
-        ></app-numeric-textbox>
+        <div class="row">
+          <app-numeric-textbox
+            [formGroupInstance]="extensionForm"
+            [required]="true"
+            [htmlAttributes]="billRateAttributes"
+            [decimals]="2"
+            [min]="0"
+            format="c"
+            controlName="billRate"
+            label="Bill Rate"
+            class="form-line-item-50"
+          ></app-numeric-textbox>
+          <app-input
+            [formGroupInstance]="extensionForm"
+            controlName="linkedId"
+            id="linkedId"
+            maxlength="20"
+            label="Linked ID"
+            class="form-line-item-50"
+          ></app-input>
+        </div>
       </form>
     </div>
     <div class="extension__comments">
       <app-comments
+        [canVmsCreateOrders]="canCreateOrder"
         [comments]="comments"
         [isCreating]="true"></app-comments>
     </div>

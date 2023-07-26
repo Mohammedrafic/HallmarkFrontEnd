@@ -73,7 +73,7 @@ import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { GetBusinessByUnitType } from '../../../../../security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
+import { DOCUMENT_NAME_PATTERN, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -517,6 +517,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
   }
 
+  get formAltaControls(): any {
+    return this.documentLibraryform['controls'];
+  }
 
   private getDocumentTypes(selectedBusinessUnitId: number | null) {
     let documentTypesFilter: DocumentTypeFilter = {
@@ -558,7 +561,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
     else if (this.isUpload || this.isEditDocument) {
       if (this.documentLibraryform.contains(FormControlNames.FolderName)) this.documentLibraryform.removeControl(FormControlNames.FolderName);
-      this.documentLibraryform.addControl(FormControlNames.DocumentName, new FormControl(null, [Validators.required, Validators.maxLength(216), Validators.minLength(3)]));
+      this.documentLibraryform.addControl(FormControlNames.DocumentName, new FormControl(null, [Validators.required, Validators.maxLength(216), Validators.minLength(3), Validators.pattern(DOCUMENT_NAME_PATTERN)]));
       this.documentLibraryform.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
       this.documentLibraryform.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
       this.documentLibraryform.addControl(FormControlNames.TypeIds, new FormControl(null, [Validators.required]));

@@ -7,18 +7,20 @@ import { catchError, combineLatest, filter, startWith, takeUntil, tap } from 'rx
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 import isNil from 'lodash/fp/isNil';
 import { addDays } from '@shared/utils/date-time.utils';
-import { OrderCandidateJob, OrderManagementChild } from '@shared/models/order-management.model';
+import { MergedOrder, OrderCandidateJob, OrderManagementChild } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
 import { Comment } from '@shared/models/comment.model';
 import { Store } from '@ngxs/store';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED } from '@shared/constants';
+import { ExtensionStartDateValidation, RECORD_ADDED } from '@shared/constants';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { BillRate } from '@shared/models';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { formatDate } from '@angular/common';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -28,6 +30,8 @@ import { DateTimeHelper, Destroyable } from '@core/helpers';
 export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   @Input() public candidateJob: OrderCandidateJob;
   @Input() public orderPosition: OrderManagementChild;
+  @Input() public order: MergedOrder;
+  
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('billRates') billRatesComponent: BillRatesComponent;
 
@@ -37,12 +41,13 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
   public readonly numericInputAttributes = { maxLength: '2' };
   public readonly billRateAttributes = { maxLength: '10' };
-
+  public canCreateOrder: boolean;
   public minDate: Date;
   public extensionForm: FormGroup;
   public comments: Comment[] = [];
   public startDate: Date;
   public maxEndDate: Date;
+  public extensionStartDateValidation = false;
 
   private get billRateControl(): FormControl {
     return this.extensionForm?.get('billRate') as FormControl;
@@ -52,14 +57,16 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     private formBuilder: FormBuilder,
     private extensionSidebarService: ExtensionSidebarService,
     private store: Store,
-    private billRatesSyncService: BillRatesSyncService
+    private billRatesSyncService: BillRatesSyncService,
+    private permissionService: PermissionService
   ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.subscribeOnPermissions();
     const minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
-    this.minDate = DateTimeHelper.convertDateToUtc(minDate.toString());
+    this.minDate = DateTimeHelper.setCurrentTimeZone(minDate.toString());
     this.initExtensionForm();
     this.listenPrimaryDuration();
     this.listenDurationChanges();
@@ -73,7 +80,9 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       return;
     }
     const billRates = this.billRatesComponent?.billRatesControl.value;
-    let billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
+    const billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+      billRates, this.extensionForm.get('startDate')?.value
+    );
     if (billRateToUpdate?.id !== billRate?.id && billRate?.id !== 0) {
       return;
     }
@@ -84,6 +93,10 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public saveExtension(positionDialog: DialogComponent, ignoreMissingCredentials: boolean): void {
     if (this.extensionForm.invalid) {
       this.extensionForm.markAllAsTouched();
+      return;
+    }
+    if (this.extensionStartDateValidation) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
       return;
     }
     const { value: billRate } = this.billRatesComponent.billRatesControl;
@@ -106,8 +119,9 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         }),
         catchError((error) =>
           this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)))
-        ))
-      .subscribe();
+        ),
+        takeUntil(this.componentDestroy())
+      ).subscribe();
   }
 
   private subsToBillRateControlChange(): void {
@@ -117,7 +131,9 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       }
 
       const billRates = this.billRatesComponent?.billRatesControl.value;
-      let billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
+      const billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+        billRates, this.extensionForm.get('startDate')?.value
+      );
 
       if (!billRateToUpdate) {
         return;
@@ -142,15 +158,18 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       durationPrimary: [Duration.Other],
       durationSecondary: [],
       durationTertiary: [],
-      startDate: [startDate ? DateTimeHelper.convertDateToUtc(startDate.toString()) : null, [Validators.required]],
+      startDate: [startDate ? DateTimeHelper.setCurrentTimeZone(startDate.toString()) : null, [Validators.required]],
       endDate: ['', [Validators.required]],
       billRate: [candidateBillRate, [Validators.required]],
       comments: [null],
+      linkedId: [this.order.linkedId, Validators.maxLength(20)],
     });
   }
 
   private listenPrimaryDuration(): void {
-    this.extensionForm.get('durationPrimary')?.valueChanges.subscribe((duration: Duration) => {
+    this.extensionForm.get('durationPrimary')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((duration: Duration) => {
       const durationSecondary = this.extensionForm.get('durationSecondary');
       const durationTertiary = this.extensionForm.get('durationTertiary');
 
@@ -177,6 +196,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     combineLatest([durationSecondary$, durationTertiary$])
       .pipe(
         filter(([durationSecondary$, durationTertiary$]) => !isNil(durationSecondary$) && !isNil(durationTertiary$)),
+        takeUntil(this.componentDestroy())
       )
       .subscribe(([durationSecondary, durationTertiary]: number[]) => {
         const { value: startDate } = this.extensionForm.get('startDate')!;
@@ -193,13 +213,28 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       startDateControl?.valueChanges.pipe(startWith(null))!,
       endDateControl?.valueChanges.pipe(startWith(null))!
     ])
-      .pipe(filter(() => startDateControl?.dirty! || endDateControl?.dirty!))
+      .pipe(
+        filter(() => startDateControl?.dirty! || endDateControl?.dirty!),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe(([startDate, endDate]) => {
         this.startDate = startDate;
+        this.extensionStartDateValidation = false;
+        let actualEndDate = new Date(this.candidateJob?.actualEndDate);
+        let twoWeekDate = new Date(actualEndDate.setDate(actualEndDate.getDate() + 14));
+        if(startDate && startDate > twoWeekDate){
+           this.extensionStartDateValidation = true;
+        }
         if (startDate > endDate) {
           this.extensionForm.get('endDate')?.setErrors({incorrect: true});
         }
         this.extensionForm.get('durationPrimary')?.setValue(Duration.Other);
       });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

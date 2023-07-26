@@ -7,17 +7,15 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
-import { Subject, takeUntil, debounceTime } from "rxjs";
+import { Subject, takeUntil } from "rxjs";
 
 import {
   penaltiesDataSource,
-  reOrderReasonsDataSource,
-  travelReasonsDataSource
 } from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 import { DestroyableDirective } from "@shared/directives/destroyable.directive";
 import { JobCancellationReason, PenaltyCriteria } from "@shared/enums/candidate-cancellation";
@@ -46,7 +44,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   @Input() set orderType(value: OrderType | undefined) {
     //this.reasons = value === OrderType.ReOrder ? reOrderReasonsDataSource : travelReasonsDataSource;
   };
-  
+
   @Input() candidateJob: OrderCandidateJob | null;
 
   @Input() set candidateCancellation(value:CandidateCancellationReason[] |null){
@@ -66,7 +64,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     text: 'text',
     value: 'value',
   };
-  
+
   public ReasonOptionFields = {
     text: 'name',
     value: 'id',
@@ -124,12 +122,16 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   }
 
   private onControlChanges(): void {
-    this.form?.get('jobCancellationReason')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value: JobCancellationReason) =>  {
+    this.form?.get('jobCancellationReason')?.valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((value: JobCancellationReason) =>  {
       this.isReasonSelected = !!(value || value === JobCancellationReason.TravelCancellationOnBehalfOfOrganization);
       if (this.isReasonSelected && this.candidateJob) {
         this.form?.get('penaltyCriteria')?.setValue(null);
         this.predefinedPenalties = null;
-        this.orderService.getPredefinedPenalties(this.candidateJob, value).subscribe((data) => {
+        this.orderService.getPredefinedPenalties(this.candidateJob, value).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe((data) => {
           this.predefinedPenalties = data;
           this.form?.get('penaltyCriteria')?.setValue(data.penaltyCriteria);
         });
@@ -138,11 +140,16 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     });
 
     this.form?.get('penaltyCriteria')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value: PenaltyCriteria) => {
-      this.isPenaltyCriteriaSelected = !!(value || value === PenaltyCriteria.FlatRate);
-      this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
-      this.showPercentage = value === PenaltyCriteria.RateOfHours;
-      if (this.isPenaltyCriteriaSelected) {
-        setTimeout(() => this.setDefaultValues(value));
+      if (value != PenaltyCriteria.NoPenalty) {
+        this.isPenaltyCriteriaSelected = !!(value || value === PenaltyCriteria.FlatRate);
+        this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
+        this.showPercentage = value === PenaltyCriteria.RateOfHours;
+        if (this.isPenaltyCriteriaSelected) {
+          setTimeout(() => this.setDefaultValues(value));
+        }
+      }
+      else {
+        this.isPenaltyCriteriaSelected = false;
       }
       this.cd.markForCheck();
     });

@@ -44,7 +44,6 @@ export type RoleTreeField = {
   text: 'name';
   hasChildren: 'hasChild';
 };
-
 @Component({
   selector: 'app-role-form',
   templateUrl: './role-form.component.html',
@@ -58,7 +57,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   @Output() changeUnitId = new EventEmitter<boolean>();
 
   @ViewChild('tree') tree: TreeViewComponent;
-  @ViewChild('showIRPOnlyToggle') showIRPOnlyToggle:ElementRef;
+  @ViewChild('showIRPOnlyToggle') showIRPOnlyToggle: ElementRef;
 
   public newRoleBussinesData: BusinessUnit[];
 
@@ -81,12 +80,17 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     text: 'name',
     value: 'id',
   };
-  IsIrp:any=false;
-  public toggle:boolean=false;
+  IsIrp: any = false;
+  IsVMS: any = false;
+  IsShowIRPVMS: any = false;
+  IsVMSChecked: boolean = true;
+  IsIRPChecked: boolean = true;
+  public toggle: boolean = false;
   public fields = {
-    dataSource: null, id: 'id', text: 'name',parentID: 'parentId', hasChildren: 'hasChild', htmlAttributes:'htmlAttributes'
+    dataSource: null, id: 'id', text: 'name', parentID: 'parentId', hasChildren: 'hasChild', htmlAttributes: 'htmlAttributes'
   }
-  public treeData:PermissionsTree;
+  public treeData: PermissionsTree;
+  public treeSource: PermissionsTree;
 
   defaultBusinessValue: any;
 
@@ -112,7 +116,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   private isAlive = true;
   private notAssignableIds: number[];
 
-  constructor(private store: Store, private actions$: Actions,private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(private store: Store, private actions$: Actions, private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.onBusinessUnitControlChanged();
@@ -123,13 +127,13 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.onUsersAssignedToRoleFetched();
     this.subOnBusinessUnitControlChange();
     this.copyRoleData$ = this.store.select(SecurityState.copyRoleData)
-    .pipe(
-      map((roles) => {
-        const id = this.form.value.id;
-        return id ? roles.filter((role) => role.id !== id) : roles;
-      })
-    );
-   }
+      .pipe(
+        map((roles) => {
+          const id = this.form.value.id;
+          return id ? roles.filter((role) => role.id !== id) : roles;
+        })
+      );
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['roleId']?.currentValue) {
@@ -141,88 +145,69 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.isAlive = false;
   }
 
-  ngAfterViewInit():void{
+  ngAfterViewInit(): void {
     this.roleTreeField$.pipe(
       takeWhile(() => this.isAlive)
     ).subscribe((roleTreeField) => {
-    this.treeData=roleTreeField.dataSource;
-    if(this.newRoleBussinesData !=null && this.newRoleBussinesData!=undefined){
-      var data=this.businessUnitIdControl?.value;
-      var selectedBussinessUnit=this.newRoleBussinesData.filter(x=>x.id==data);
-      this.ShowIsIRPToggle(selectedBussinessUnit)
-    }
-    else{
-      this.showIRPOnlyToggle.nativeElement.style.display='none';
-    }
-    if(this.form.status=='DISABLED'){
-      this.toggle=false;
-    }
-    this.setTreeFilter(this.toggle);
+      this.treeData = roleTreeField.dataSource;
+      this.treeSource = this.treeData;
+
+      if (this.newRoleBussinesData != null && this.newRoleBussinesData != undefined) {
+        var data = this.businessUnitIdControl?.value;
+        var selectedBussinessUnit = this.newRoleBussinesData.filter(x => x.id == data);
+        this.IsIrp = selectedBussinessUnit[0]?.isIRPEnabled;
+        this.IsVMS = selectedBussinessUnit[0]?.isVMSEnabled;
+        this.IsShowIRPVMS = this.IsIrp && this.IsVMS;
+        this.form.controls["VMS"]?.setValue(true);
+        this.form.controls["IRP"]?.setValue(true);
+      }
+      this.changeDataSource(this.treeData);
     });
   }
-  public changeDataSource(data:any) {
-    for(let i=0; i < data.length;i++){
+  public changeDataSource(data: any) {
+    for (let i = 0; i < data.length; i++) {
       let dataId = data[i]["id"].toString();
-      if(this.tree.checkedNodes.indexOf(dataId) > -1 && this.permissionsControl?.value?.indexOf(dataId)===-1)
-      this.permissionsControl.value.push(dataId)
+      if (this.tree.checkedNodes.indexOf(dataId) > -1 && this.permissionsControl?.value?.indexOf(dataId) === -1)
+        this.permissionsControl.value.push(dataId)
     }
     this.tree.fields = {
-      dataSource: data, id: 'id', text: 'name',parentID: 'parentId', hasChildren: 'hasChild'
+      dataSource: data, id: 'id', text: 'name', parentID: 'parentId', hasChildren: 'hasChild'
+
     }
 
   }
-  private setTreeFilter(val:boolean){
-    let filteredList:any=[];
-    if(val==false){
-      this.treeData.map((x)=>
-      {
-        if(x.includeInIRP==false){
-          x.htmlAttributes={class:'e-show'}
-        }
-        else if(x.includeInIRP==true &&this.IsIrp==true){
-          x.htmlAttributes={class:'e-show'}
-        }
-        else if(x.includeInIRP==true &&this.IsIrp==false){
-          x.htmlAttributes={class:'e-hidden'}
-        }
-      });
-      this.treeData = [ ...this.treeData ]
-      this.changeDataSource(this.treeData);
-    }
-    else{
-      this.treeData.forEach((x)=>
-      {
-        if(x.includeInIRP==false){
-          x.htmlAttributes={class:'e-hidden'}
-        }
-        else{
-          x.htmlAttributes={class:'e-show'}
-          filteredList.push(x);
-        }
-      });
-      let _array = [], _filter = [];
-      for (let j = 0; j < filteredList.length; j++) {
-        const index = this.treeData.findIndex(x => x.id === filteredList[j].id);
-        this.treeData.map((data)=>data.id==filteredList[j].id? this.treeData[index].htmlAttributes={class:'e-show'}:'')
-        _filter.push(filteredList[j]);
-        let filters = this.getFilterItems(filteredList[j], this.treeData);
-        for (let i = 0; i < filters.length; i++) {
-          const index = this.treeData.findIndex(x => x.id === filters[i]);
-          if (_array.indexOf(filters[i]) == -1 && filters[i] != null) {
-            this.treeData.map((data)=>data.id==filters[i]? this.treeData[index].htmlAttributes={class:'e-show'}:'')
-            _array.push(filters[i]);
-          }
-        }
-      }
-      this.treeData = [ ...this.treeData ]
-      var data=this.treeData;
-      this.tree.fields = {
-        dataSource: data, id: 'id', text: 'name',parentID: 'parentId', hasChildren: 'hasChild'
-      }
-      this.changeDataSource(this.treeData);
-    }
+  public OnChangeVMS(arg: any) {
+    if (arg.checked) 
+      this.IsVMSChecked=true;
+    else
+    this.IsVMSChecked=false;
+    this.setTreeFilter();
+    this.changeDetectorRef.detectChanges();
   }
 
+  public OnChangeIRP(arg: any) {
+    if (arg.checked) 
+      this.IsIRPChecked=true;
+    else
+    this.IsIRPChecked=false;
+    this.setTreeFilter();
+    this.changeDetectorRef.detectChanges();
+  }
+public setTreeFilter()
+{
+   if(this.IsVMSChecked && !this.IsIRPChecked){
+    this.treeData = this.treeSource.filter(x => x.includeInVMS);
+  }
+  else if(!this.IsVMSChecked && this.IsIRPChecked){
+    this.treeData = this.treeSource.filter(x => x.includeInIRP);
+  }
+  else{
+    this.treeData = this.treeSource;
+  }
+  this.tree.fields = {
+    dataSource: this.treeData, id: 'id', text: 'name', parentID: 'parentId', hasChildren: 'hasChild'
+  }
+}
   public toggleActive(): void {
     const activeControl = this.form.get('isActive');
     activeControl?.patchValue(!activeControl.value);
@@ -230,18 +215,18 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       this.store.dispatch(new GetUsersAssignedToRole(this.roleId as number));
     }
   }
-  public getFilterItems(fList:any, list:any):any[] {
+  public getFilterItems(fList: any, list: any): any[] {
     let nodes = [];
     nodes.push(fList["id"]);
     let query2 = new Query().where('id', 'equal', fList["parentId"], false);
-    let fList1 = new  DataManager(list).executeLocal(query2);
+    let fList1 = new DataManager(list).executeLocal(query2);
     if (fList1.length != 0) {
-        let pNode = this.getFilterItems(fList1[0], list);
-        for (let i = 0; i < pNode.length; i++) {
-          if (nodes.indexOf(pNode[i]) == -1 && pNode[i] != null)
-            nodes.push(pNode[i]);
-        }
-        return nodes;
+      let pNode = this.getFilterItems(fList1[0], list);
+      for (let i = 0; i < pNode.length; i++) {
+        if (nodes.indexOf(pNode[i]) == -1 && pNode[i] != null)
+          nodes.push(pNode[i]);
+      }
+      return nodes;
     }
     return nodes;
   }
@@ -284,6 +269,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
         )
         .subscribe(([type, id]) => {
           this.copyRoleControl.reset();
+          this.store.dispatch(new GetPermissionsTree(type, id));
           this.store.dispatch(new GetRolesForCopy(type, id || ''));
         });
     }
@@ -319,34 +305,35 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
         takeWhile(() => this.isAlive)
       )
       .subscribe((value) => {
-        this.store.dispatch(new GetPermissionsTree(value));
-        this.store.dispatch(new GetIRPPermissionsTree(value));
+
         this.store.dispatch(new GetNewRoleBusinessByUnitType(value));
-    });
+      });
   }
 
   private onRoleTreeFieldChanged(): void {
     this.roleTreeField$.pipe(takeWhile(() => this.isAlive))
-    .subscribe((roleTreeField) => {
-      this.notAssignableIds = roleTreeField.dataSource
-        .filter(({ isAssignable, isAvailable }) => !isAssignable || !isAvailable)
-        .map(({ id }) => id);
-    });
+      .subscribe((roleTreeField) => {
+        this.notAssignableIds = roleTreeField.dataSource
+          .filter(({ isAssignable, isAvailable }) => !isAssignable || !isAvailable)
+          .map(({ id }) => id);
+      });
   }
 
   private onNewRoleBussinesDataFetched(): void {
     this.actions$.pipe(
       ofActionSuccessful(GetNewRoleBusinessByUnitTypeSucceeded),
       takeWhile(() => this.isAlive))
-    .subscribe(() => {
-      const user = this.store.selectSnapshot(UserState.user);
-      this.newRoleBussinesData =
-      this.store.selectSnapshot(SecurityState.newRoleBussinesData)(user?.businessUnitType as BusinessUnitType);
-      this.defaultBusinessValue = this.newRoleBussinesData.filter(x=>x.id==this.businessUnitIdControl?.value);
-      this.IsIrp=this.defaultBusinessValue[0].isIRPEnabled;
-      this.defaultBusinessValue=this.defaultBusinessValue[0].id;
+      .subscribe(() => {
+        const user = this.store.selectSnapshot(UserState.user);
+        this.newRoleBussinesData =
+          this.store.selectSnapshot(SecurityState.newRoleBussinesData)(user?.businessUnitType as BusinessUnitType);
+        this.defaultBusinessValue = this.newRoleBussinesData.filter(x => x.id == this.businessUnitIdControl?.value);
+        this.IsIrp = this.defaultBusinessValue[0]?.isIRPEnabled;
+        this.IsVMS = this.defaultBusinessValue[0]?.isVMSEnabled;
+        this.IsShowIRPVMS = this.IsIrp && this.IsVMS;
+        this.defaultBusinessValue = this.defaultBusinessValue[0]?.id;
 
-    });
+      });
   }
 
   private onUsersAssignedToRoleFetched(): void {
@@ -372,29 +359,6 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
         }
       });
   }
-  ShowIsIRPToggle(arg:any){
-    if(arg.itemData){
-      if(arg.itemData.isIRPEnabled&&arg.itemData.isVMSEnabled){
-        this.showIRPOnlyToggle.nativeElement.style.display='block';
-      }
-      else{
-        this.showIRPOnlyToggle.nativeElement.style.display='none';
-      }
-    }
-    else{
-      if(arg[0].isIRPEnabled&&arg[0].isVMSEnabled){
-        this.showIRPOnlyToggle.nativeElement.style.display='block';
-      }
-      else{
-        this.showIRPOnlyToggle.nativeElement.style.display='none';
-      }
-    }
-  }
-  isShowIRPOnly(arg:any){
-    this.toggle=arg.checked;
-    this.setTreeFilter(arg.checked)
-    this.changeDetectorRef.detectChanges();
-  }
 
   static createForm(): FormGroup {
     return new FormGroup({
@@ -403,7 +367,8 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
       businessUnitId: new FormControl('', [Validators.required]),
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       isActive: new FormControl(true),
-      isShowIRPOnly:new FormControl(false),
+      IRP: new FormControl(true),
+      VMS: new FormControl(true),
       permissions: new FormControl([], [Validators.required]),
     });
   }

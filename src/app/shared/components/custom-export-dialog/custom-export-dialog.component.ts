@@ -1,16 +1,19 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Actions, ofActionDispatched } from '@ngxs/store';
-import { ShowCustomExportDialog, ShowExportDialog } from '../../../store/app.actions';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
-import { Subject, takeUntil } from 'rxjs';
+import { Actions, Select, ofActionDispatched } from '@ngxs/store';
+import { Observable, Subject, takeUntil } from 'rxjs';
+
 import { ExportColumn } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { AppState } from 'src/app/store/app.state';
+import { ShowCustomExportDialog } from '../../../store/app.actions';
 
 @Component({
   selector: 'app-custom-export-dialog',
   templateUrl: './custom-export-dialog.component.html',
-  styleUrls: ['./custom-export-dialog.component.scss']
+  styleUrls: ['./custom-export-dialog.component.scss'],
 })
 export class CustomExportDialogComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
@@ -27,6 +30,9 @@ export class CustomExportDialogComponent implements OnInit, OnDestroy {
   @Input() columns: ExportColumn[] = [];
   @Output() cancel = new EventEmitter();
   @Output() export = new EventEmitter();
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public ExportedFileType = ExportedFileType;
   public selectedColumns: string[] = [];

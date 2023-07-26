@@ -1,0 +1,175 @@
+<section class="container">
+  <section class="grid">
+    <ejs-grid
+      #grid
+      [dataSource]="(skillGroups$ | async)?.items"
+      [allowPaging]="allowPaging"
+      [pageSettings]="pageSettings"
+      [height]="gridHeight"
+      [rowHeight]="rowHeight"
+      [enableVirtualization]="false"
+      [resizeSettings]="resizeSettings"
+      [allowSorting]="allowSorting"
+      [allowResizing]="allowResizing"
+    >
+      <e-columns>
+        <e-column textAlign="Right" width="100">
+          <ng-template #template let-data>
+            <div class="row-tool-buttons" >
+              <button hideBeforeSyncfusionLoad ejs-button cssClass="e-flat primary-icon-button" (click)="editRow(data, $event)">
+                <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
+              </button>
+              <button hideBeforeSyncfusionLoad ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteRow(data, $event)">
+                <span class="remove-button" ><i-feather name="trash-2" class="icon"></i-feather></span>
+              </button>
+            </div>
+          </ng-template>
+        </e-column>
+        <e-column field="system" headerText="SYSTEM" width=144>
+          <ng-template #template let-data>
+            <span>{{ data.includeInIRP | irpSystemGridText: data.includeInVMS }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="name" headerText="GROUP NAME" width="300"></e-column>
+        <e-column field="skills" headerText="SKILLS" width="300">
+          <ng-template #template let-data>
+            <span *ngFor="let skill of data.skills; let i = index" class="skill-name">
+              {{skill.name}}
+              <span *ngIf="i !== data.skills.length - 1">, </span>
+            </span>
+          </ng-template>
+        </e-column>
+      </e-columns>
+      <ng-template #pagerTemplate let-data>
+        <div class="e-pagertemplate">
+          <div class="control-section">
+            <div class="content-wrapper">
+              <section class="left-side-pager-controls">
+                <ejs-dropdownlist
+                  id="rowsPerPage"
+                  class="dropdown-no-border"
+                  [allowFiltering]="true"
+                  [dataSource]="rowsPerPageDropDown"
+                  [(value)]="activeRowsPerPageDropDown"
+                  (change)="onRowsDropDownChanged()"
+                >
+                </ejs-dropdownlist>
+                <ejs-numerictextbox
+                  id="goToPage"
+                  class="numeric-input-no-border"
+                  format="#"
+                  [validateDecimalOnType]="validateDecimalOnType"
+                  [decimals]="decimals"
+                  placeholder="Go to:"
+                  min="1" [max]="(skillGroups$ | async)?.totalPages"
+                  [showSpinButton]="false"
+                  (change)="nextPage($event)"
+                >
+                </ejs-numerictextbox>
+                <div class="total-rows">
+                  Total Rows: {{(skillGroups$ | async)?.totalCount}}
+                </div>
+              </section>
+              <section class="right-side-pager-controls">
+                <ejs-pager
+                  id="gridPager"
+                  #gridPager
+                  [pageSize]="pageSize"
+                  [totalRecordsCount]="(skillGroups$ | async)?.totalCount"
+                  [enablePagerMessage]="false"
+                  [currentPage]="currentPage"
+                  (click)="nextPage($event)"
+                >
+                </ejs-pager>
+              </section>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ejs-grid>
+  </section>
+
+  <app-side-dialog
+    (formCancelClicked)="closeSkillGroupModal()"
+    (formSaveClicked)="saveSkillGroup()"
+    [header]="dialogHeader + ' Group'"
+    [width]="'434px'"
+  >
+    <form
+      *ngIf="skillGroupsFormGroup"
+      class="form-container"
+      id="addEditRecordForm"
+      [formGroup]="skillGroupsFormGroup"
+    >
+      <div *ngIf="isIRPAndVMSEnabled">
+        <div class="bootstrap system-wrapper">
+          <label class="label-gray">System Configuration<span class="required">*</span></label>
+          <div class="checkbox-group">
+            <ejs-checkbox
+              formControlName="includeInIRP"
+              label="IRP"
+            ></ejs-checkbox>
+            <ejs-checkbox
+              formControlName="includeInVMS"
+              label="VMS"
+            ></ejs-checkbox>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="input-container bootstrap">
+          <label for="externalId">Group <span class="required">*</span></label>
+          <div class="input-group">
+            <input id="externalId"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   formControlName="name"/>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="group-title">Skills</h3>
+      </div>
+      <div class="search">
+        <div class="input-container">
+          <label>Search Skill</label>
+          <div>
+            <app-search (inputKeyUpEnter)="searchSkill($event)"></app-search>
+          </div>
+        </div>
+        <ng-container *ngIf="searchDataSource">
+            <span
+              *ngIf="isGridStateInvalid"
+              class="grid-error-validation"
+            >
+              <span class="required">*</span>
+              <i-feather name="alert-circle" class="icon"></i-feather>
+              <span class="required-title">Required</span>
+            </span>
+          <ejs-grid
+            #searchGrid
+            class="search-grid" *ngIf="searchDataSource.length"
+            [dataSource]="searchDataSource"
+            [selectionSettings]="{ type: 'Multiple', enableSimpleMultiRowSelection: true }"
+            (rowSelected)="selectSkillId($event)"
+            (rowDeselected)="removeSkillId($event)"
+            (dataBound)="gridDataBound()"
+            [height]="560"
+            [rowHeight]="48"
+          >
+            <e-columns>
+              <e-column field="skillDescription"></e-column>
+            </e-columns>
+          </ejs-grid>
+          <div class="empty-list" *ngIf="!searchDataSource.length">
+            <i-feather name="alert-circle" class="icon"></i-feather>
+            <span>There are no records to display</span>
+          </div>
+        </ng-container>
+      </div>
+    </form>
+  </app-side-dialog>
+</section>

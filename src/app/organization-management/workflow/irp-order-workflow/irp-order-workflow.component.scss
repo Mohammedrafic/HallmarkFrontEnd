@@ -1,0 +1,11 @@
+@import "colors";
+
+.job-container {
+  display: flex;
+  padding-top: 26px;
+  width: 100%;
+
+  .steps {
+    width: 100%;
+  }
+}

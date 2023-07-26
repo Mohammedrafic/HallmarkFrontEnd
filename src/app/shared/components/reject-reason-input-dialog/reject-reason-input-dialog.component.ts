@@ -2,10 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  Input, OnChanges,
+  Input,
   Output,
-  SimpleChanges,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 

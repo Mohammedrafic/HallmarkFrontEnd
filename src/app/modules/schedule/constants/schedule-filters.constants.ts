@@ -100,7 +100,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
-    filterTitle: 'Show Only Scheduled Candidates',
+    filterTitle: 'Show Only Scheduled Emp',
   },
   [ScheduleFilterFormSourceKeys.isExcludeNotOrganized]: {
     type: ControlTypes.Toggle,
@@ -108,7 +108,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     dataSource: [],
     valueField: 'text',
     valueId: 'value',
-    filterTitle: 'Show Exclude not Oriented',
+    filterTitle: 'Exclude not Oriented Emp',
   },
 };
 
@@ -183,14 +183,14 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
   },
   {
     field: 'isOnlySchedulatedCandidate',
-    title: 'Show Only Scheduled Candidates',
+    title: 'Show Only Scheduled Emp',
     type: FieldType.Toggle,
     required: false,
     sourceKey: ScheduleFilterFormSourceKeys.isOnlySchedulatedCandidate,
   },
   {
     field: 'isExcludeNotOrganized',
-    title: 'Show Exclude not Oriented',
+    title: 'Exclude not Oriented Emp',
     type: FieldType.Toggle,
     required: false,
     sourceKey: ScheduleFilterFormSourceKeys.isExcludeNotOrganized,

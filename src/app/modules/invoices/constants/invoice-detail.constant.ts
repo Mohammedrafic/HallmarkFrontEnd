@@ -40,12 +40,12 @@ export const invoiceInfoItems = (data: InvoiceDetail, isAgency: boolean): Invoic
   {
     title: 'Invoice Date',
     icon: 'calendar',
-    value: formatDate(DateTimeHelper.toUtcFormat(data.meta.invoiceDate), 'MM/dd/yyyy', 'en-US', 'utc'),
+    value: formatDate(DateTimeHelper.setUtcTimeZone(data.meta.invoiceDate), 'MM/dd/yyyy', 'en-US', 'utc'),
   },
   {
     title: 'Due Date',
     icon: 'calendar',
-    value: formatDate(DateTimeHelper.toUtcFormat(data.meta.dueDate), 'MM/dd/yyyy', 'en-US', 'utc'),
+    value: formatDate(DateTimeHelper.setUtcTimeZone(data.meta.dueDate), 'MM/dd/yyyy', 'en-US', 'utc'),
   },
 ];
 
@@ -56,7 +56,7 @@ const agencyCol: ColDef = {
   type: 'rightAligned',
   headerClass: 'custom-wrap align-right',
   cellClass: 'font-weight-bold align-right',
-  valueFormatter: (params: ValueFormatterParams) => `% ${params.value}`,
+  valueFormatter: (params: ValueFormatterParams) => `${params.value}%`,
 };
 
 export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
@@ -274,7 +274,7 @@ export const InvoiceSummaryColumnDefs: ColDef[] = [
       const loactionIdText = params.data.locationIExternalId  ? `${params.data.locationIExternalId}-` : '';
       const departmentIdText = params.data.invoiceDepartmentId ? `-${params.data.invoiceDepartmentId}` : '';
       const skillGlText = params.data.skillGLNumber ? `-${params.data.skillGLNumber}` : '';
-      
+
       return `${loactionIdText}${params.data.departmentName}${departmentIdText}${skillGlText}`;
     },
   },

@@ -1,3 +1,4 @@
 export enum WorkflowGroupType {
-  Organization = 1
+  VMSOrderWorkflow = 1,
+  IRPOrderWorkflow = 2
 }

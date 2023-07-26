@@ -61,7 +61,7 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
   }
 
   cancelChanges(): void {
-    if (this.form?.touched) {
+    if (this.form?.dirty) {
 
       /**
        * TODO: move this chain in AddDialogHelperService, leave only subscription.

@@ -3,12 +3,14 @@ import { Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { distinctUntilChanged, Observable, takeUntil } from 'rxjs';
+import { distinctUntilChanged, Observable, Subscription, takeUntil } from 'rxjs';
 
 import { AbstractContactDetails } from '@client/candidates/candidate-profile/candidate-details/abstract-contact-details';
 import {
   ProfileStatuses,
   ProfileStatusesEnum,
+  recruitContent,
+  sourceContent,
   TerminationReasons,
 } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { JobClassifications } from '@client/order-management/constants';
@@ -17,7 +19,7 @@ import { ListOfSkills } from '@shared/models/skill.model';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
+import { GetSourcingReasons, GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
 import { endDateValidator, endTimeValidator, startDateValidator } from '@shared/validators/date.validator';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { DateTimeHelper } from '@core/helpers';
@@ -36,16 +38,28 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   pageSize = 100;
   @Select(RejectReasonState.terminationReasons)
   public reasons$: Observable<RejectReasonPage>;
+
+
+  @Select(RejectReasonState.sourcingReasons)
+  public sourcing$: Observable<any>;
+
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   public skills$: Observable<ListOfSkills[]>;
   public primarySkillsDataSource: ListOfSkills[] = [];
   public secondarySkillsDataSource: ListOfSkills[] = [];
 
   public readonly classifications = JobClassifications;
-  public readonly profileStatuses = ProfileStatuses;
+  public profileStatuses = ProfileStatuses;
+  public recruitContent: any;
+  public sourceContent: any;
   public readonly companyCodes = ProfileStatuses;
   public readonly terminationReason = TerminationReasons;
   public readonly today = new Date();
+  public isSourceValidated = false;
+  public isSourceConfig = false;
+  public sourceIdUpdateListener$: Subscription | undefined;
+
+  public employeeIdRequired = true;
 
   constructor(
     protected override cdr: ChangeDetectorRef,
@@ -57,12 +71,16 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   }
 
   public override ngOnInit(): void {
+    let Status =[ProfileStatusesEnum.Sourcing,ProfileStatusesEnum.Prospect,ProfileStatusesEnum.Onboarding,ProfileStatusesEnum.ClearedForOrientation,ProfileStatusesEnum.OrientationScheduled,ProfileStatusesEnum.DoNotHire,ProfileStatusesEnum.FallOffOnboarding,ProfileStatusesEnum.VerbalOfferMade]
+    this.profileStatuses = this.profileStatuses.filter(f => !Status.includes(f.id));
     super.ngOnInit();
     this.listenProfileStatusChanges();
     this.listenSkillsChanges();
     this.subscribeOnSkills();
     this.subscribeOnHoldDates();
     this.store.dispatch(new GetTerminationReasons(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetSourcingReasons());
+
   }
 
   public override ngOnDestroy(): void {
@@ -77,6 +95,19 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       this.secondarySkillsDataSource = primarySkillId
         ? this.candidateProfileFormService.getSecondarySkillsDataSource(this.primarySkillsDataSource, primarySkillId)
         : skills;
+      this.cdr.markForCheck();
+    });
+    this.sourcing$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      if (data != null) {
+        this.recruitContent = data.recruiter
+        this.sourceContent = data.sourcing
+        this.isSourceValidated = data.issourcing
+      }
+
+      if (this.isSourceValidated) {
+        this.profileStatuses = ProfileStatuses
+      }
+
       this.cdr.markForCheck();
     });
   }
@@ -100,11 +131,23 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       .get('profileStatus')
       ?.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((profileStatus: ProfileStatusesEnum) => {
+        this.isSourceConfig = false;
+        this.isTerminatedSelected = false;
+        this.isOnHoldSelected = false;
         const handlers = {
           [ProfileStatusesEnum.OnHold]: () => this.handleOnHoldProfileStatus(),
           [ProfileStatusesEnum.Terminated]: () => this.handleTerminatedProfileStatus(),
           [ProfileStatusesEnum.Active]: () => this.reset(),
           [ProfileStatusesEnum.Inactive]: () => this.reset(),
+
+          [ProfileStatusesEnum.Sourcing]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.Prospect]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.VerbalOfferMade]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.Onboarding]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.ClearedForOrientation]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.OrientationScheduled]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.DoNotHire]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.FallOffOnboarding]: () => this.handleSourceStatus(),
         };
 
         handlers[profileStatus]();
@@ -113,13 +156,41 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       });
   }
 
+  private handleSourceStatus(): void {
+    this.candidateForm.get('employeeId')?.setValue(this.candidateForm.get('employeeSourceId')?.value);
+    this.candidateForm.get('employeeId')?.disable();
+    this.candidateForm.get('employeeId')?.removeValidators(Validators.required);
+    this.employeeIdRequired = false;
+
+    this.candidateForm.get('employeeSourceId')?.setValidators(Validators.required);
+    this.candidateForm.get('employeeSourceId')?.updateValueAndValidity();
+
+    this.candidateForm.get('hireDate')?.removeValidators(Validators.required);
+    //Set hire date 7 dats from today
+    const hireDateValue = this.candidateForm.get('hireDate')?.value;
+    if (!hireDateValue) {
+      const currentDate = new Date();
+      currentDate.setDate(currentDate.getDate() + 7);
+      this.candidateForm.get('hireDate')?.setValue(currentDate);
+    }
+
+    this.sourceIdUpdateListener$ =
+    this.candidateForm.get('employeeSourceId')?.valueChanges
+      .pipe(distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((value: string) => {
+      this.candidateForm.get('employeeId')?.setValue(value);
+    });
+    this.isSourceConfig = true;
+
+  }
+
   private handleOnHoldProfileStatus(): void {
     const profileData = this.candidatesService.getProfileData();
     const startDate = profileData?.holdStartDate
-      ? DateTimeHelper.convertDateToUtc(profileData.holdStartDate as string)
+      ? DateTimeHelper.setCurrentTimeZone(profileData.holdStartDate as string)
       : this.today;
     const endDate = profileData?.holdEndDate
-      ? DateTimeHelper.convertDateToUtc(profileData.holdEndDate as string)
+      ? DateTimeHelper.setCurrentTimeZone(profileData.holdEndDate as string)
       : null;
 
     this.isOnHoldSelected = true;
@@ -136,9 +207,16 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   }
 
   private handleTerminatedProfileStatus(): void {
+    this.candidateForm.get('employeeId')?.enable();
+    this.candidateForm.get('employeeId')?.addValidators(Validators.required);
+    this.candidateForm.get('hireDate')?.addValidators(Validators.required);
+    this.candidateForm.get('employeeSourceId')?.removeValidators(Validators.required);
+    this.employeeIdRequired = true;
+
+    this.sourceIdUpdateListener$?.unsubscribe();
     const profileData = this.candidatesService.getProfileData();
     const startDate = profileData?.terminationDate
-      ? DateTimeHelper.convertDateToUtc(profileData.terminationDate)
+      ? DateTimeHelper.setCurrentTimeZone(profileData.terminationDate)
       : this.today;
 
     this.isTerminatedSelected = true;
@@ -163,8 +241,15 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   }
 
   private reset(): void {
+    this.candidateForm.get('employeeId')?.enable();
+    this.candidateForm.get('employeeId')?.addValidators(Validators.required);
+    this.candidateForm.get('hireDate')?.addValidators(Validators.required);
+    this.candidateForm.get('employeeSourceId')?.removeValidators(Validators.required);
+    this.employeeIdRequired = true;
+    this.sourceIdUpdateListener$?.unsubscribe();
     this.isTerminatedSelected = false;
     this.isOnHoldSelected = false;
+
     this.removeValidatorsAndReset(['holdStartDate', 'terminationDate', 'terminationReasonId', 'holdEndDate']);
   }
 

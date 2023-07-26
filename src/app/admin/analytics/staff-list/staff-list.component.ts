@@ -316,17 +316,13 @@ export class StaffListComponent implements OnInit, OnDestroy {
             .subscribe((data: StaffScheduleReportFilterOptions | null) => {
               if (data != null) {
                 this.isAlive = false;
-                console.log(data);
                 this.filterOptionData = data;
-                console.log(this.filterOptionData)
                 this.filterColumns.skillIds.dataSource = this.filterOptionData.masterSkills;
                 this.filterColumns.workCommitmentIds.dataSource = this.filterOptionData.masterWorkCommitments;
                 this.changeDetectorRef.detectChanges();
 
                 if (this.isInitialLoad) {
-                  setTimeout(() => {
                     this.SearchReport();
-                  }, 3000);
                   this.isInitialLoad = false;
                 }
               }

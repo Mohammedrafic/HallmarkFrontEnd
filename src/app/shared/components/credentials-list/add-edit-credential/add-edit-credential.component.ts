@@ -10,7 +10,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { filter, Observable, takeUntil } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -29,7 +29,7 @@ import { Destroyable } from '@core/helpers';
 import { CredentialListService } from '@shared/components/credentials-list/services';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { SaveCredential } from '@organization-management/store/organization-management.actions';
+import { SaveCredential, SaveCredentialSucceeded } from '@organization-management/store/organization-management.actions';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { Credential } from '@shared/models/credential.model';
@@ -96,6 +96,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
     private credentialListService: CredentialListService,
     private confirmService: ConfirmService,
     private store: Store,
+    private actions$: Actions,
     private route: ActivatedRoute,
     private permissionService: PermissionService,
   ) {
@@ -106,6 +107,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
     this.setDialogTitle();
     this.watchForCredentialTypes();
     this.watchForIrpCheckbox();
+    this.watchForCredentialSaveSucceeded();
   }
 
   public saveCredential(): void {
@@ -143,6 +145,21 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
 
   public trackByIndex(index: number, config: CredentialInputConfig): string {
     return config.field;
+  }
+
+  private watchForCredentialSaveSucceeded(): void {
+    this.actions$
+      .pipe(ofActionDispatched(SaveCredentialSucceeded), takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        if (this.showIrpFields() && this.isCredentialSettings) {
+          this.credentialForm.reset({
+            includeInIRP: false,
+            includeInVMS: false,
+          });
+        } else {
+          this.credentialForm.reset();
+        }
+      });
   }
 
   private watchForCredentialTypes(): void {
@@ -256,7 +273,6 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
       };
 
       this.store.dispatch(new SaveCredential(credential));
-      this.credentialForm.reset();
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, ErrorMessageForSystem));
       this.credentialForm.markAllAsTouched();
@@ -270,7 +286,6 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
       };
 
       this.store.dispatch(new SaveCredential(credential));
-      this.credentialForm.reset();
     } else {
       this.credentialForm.markAllAsTouched();
     }

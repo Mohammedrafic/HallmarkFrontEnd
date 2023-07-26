@@ -16,6 +16,7 @@ import {
   IrpCandidatesParams,
   IrpOrderCandidate,
   IrpOrderCandidateDto,
+  OnboardCandidateEmail,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -36,7 +37,6 @@ import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '@shared/models';
 import { ExportPayload } from '@shared/models/export.model';
 import {
-  AgencyOrderManagementTabs,
   OrderManagementIRPSystemId,
   OrderManagementIRPTabs,
   OrganizationOrderManagementTabs,
@@ -153,15 +153,6 @@ export class OrderManagementContentService {
       `/api/CandidateProfile/order/${orderId}/organization/${organizationId}`,
       { params }
     );
-  }
-
-  /**
-   * Get the agency orders information
-   @param id
-   @param organizationId
-   */
-  public getAgencyOrderGeneralInformation(id: number, organizationId: number): Observable<Order> {
-    return this.http.get<Order>(`/api/Orders/${id}/organization/${organizationId}`);
   }
 
   /**
@@ -318,7 +309,6 @@ export class OrderManagementContentService {
     if (jobStartDate && jobEndDate) {
       params = params.append('jobStartDate', jobStartDate).append('jobEndDate', jobEndDate);
     }
-
     return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params }).pipe(
       map((items) =>
         items.map((rate) => {
@@ -410,12 +400,8 @@ export class OrderManagementContentService {
     return this.http.delete<Order>('/api/Orders', { params: { orderId: id } });
   }
 
-  /**
-   * Approve order
-   * @param id order id to approve
-   */
-  public approveOrder(id: number): Observable<string> {
-    return this.http.post(`/api/Order/approve`, { orderId: id }, { responseType: 'text' });
+  public approveOrder(orderId: number, isIRPTab: boolean): Observable<string> {
+    return this.http.post(`/api/Order/approve`, { orderId, isIRPTab }, { responseType: 'text' });
   }
 
   /**
@@ -456,7 +442,7 @@ export class OrderManagementContentService {
 
         return Object.fromEntries(
           Object.entries(data)
-            .map(([key, value]) => 
+            .map(([key, value]) =>
               [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]
             ));
       }),
@@ -504,20 +490,9 @@ export class OrderManagementContentService {
   /**
    * Export agency list
    * @param payload
-   * @param tab
    */
-  public exportAgency(payload: ExportPayload, tab: AgencyOrderManagementTabs): Observable<any> {
-    switch (tab) {
-      case AgencyOrderManagementTabs.ReOrders:
-        return this.http.post(`/api/Agency/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
-      case AgencyOrderManagementTabs.PermPlacement:
-      case AgencyOrderManagementTabs.MyAgency:
-        return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
-      case AgencyOrderManagementTabs.PerDiem:
-        return this.http.post(`/api/agency/orders/perdiem/export`, payload, { responseType: 'blob' });
-      default:
-        return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
-    }
+  public exportAgency(payload: ExportPayload): Observable<Blob> {
+    return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
   }
 
   /**
@@ -556,10 +531,10 @@ export class OrderManagementContentService {
 
     return <CreateOrderDto>{
       ...order,
-      jobStartDate: jobStartDate ? new Date(DateTimeHelper.toUtcFormat(jobStartDate)) : null,
-      jobEndDate: jobEndDate ? new Date(DateTimeHelper.toUtcFormat(jobEndDate)) : null,
-      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.toUtcFormat(shiftStartTime)) : null,
-      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.toUtcFormat(shiftEndTime)) : null,
+      jobStartDate: jobStartDate ? new Date(DateTimeHelper.setUtcTimeZone(jobStartDate)) : null,
+      jobEndDate: jobEndDate ? new Date(DateTimeHelper.setUtcTimeZone(jobEndDate)) : null,
+      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.setUtcTimeZone(shiftStartTime)) : null,
+      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.setUtcTimeZone(shiftEndTime)) : null,
     };
   }
 
@@ -578,5 +553,13 @@ export class OrderManagementContentService {
 
   public getAllShifts(): Observable<ScheduleShift[]> {
     return this.http.get<ScheduleShift[]>(`/api/MasterShifts/all`);
+  }
+
+  public sendCandidateOnboardEmail(payload: OnboardCandidateEmail): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', payload?.stream != null ? payload?.stream : '');
+    delete payload.stream;
+    formData.append('content', JSON.stringify(payload))
+    return this.http.post<any>(`/api/AppliedCandidates/candidateOnboardemail`, formData);
   }
 }

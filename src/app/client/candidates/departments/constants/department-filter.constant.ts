@@ -54,7 +54,7 @@ export const FilterColumnConfig: DepartmentFiltersColumns = {
   locationIds: commonColumnData,
   departmentsIds: commonColumnData,
   skillIds: { ...commonColumnData, valueField: 'skillDescription' },
-  isOriented: { ...commonColumnData, type: ControlTypes.Radio, dataSource: { 1: 'Oriented', 2: 'Not Oriented' } },
+  isOrientedFilter: { ...commonColumnData, type: ControlTypes.Radio, dataSource: { 1: 'Oriented', 2: 'Not Oriented' } },
 };
 
 export const OrientedFilterPayload: (boolean | null)[] = [null, true, false];

@@ -1,3 +1,5 @@
+import { ItemModel } from '@syncfusion/ej2-angular-navigations';
+
 import { CandidateModel } from '@client/order-management/components/add-edit-reorder/models/candidate.model';
 import { ApplicantStatus as CandidateStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { Duration } from '@shared/enums/durations';
@@ -62,6 +64,7 @@ export class OrderManagement {
   irpCandidatesCount?: number;
   activeCandidatesCount?: number;
   isLockedIRP: boolean;
+  menuItems?: ItemModel[]; // use only in UI for context menu datasource
 }
 
 export interface IRPOrderManagement {
@@ -144,6 +147,8 @@ export interface IRPOrderPosition {
   nextShiftScheduledEndTime: string;
   scheduledWeeklyHours: number;
   overtime: number;
+  skillToolTip: boolean;
+  fullSkillName: string;
   system: number | string;
   positionId: string;
   organizationPrefix: string;
@@ -151,6 +156,12 @@ export interface IRPOrderPosition {
   billRate?: number | string | null;
   actualStartDate?: Date | string | null;
   actualEndDate?: Date | string | null;
+}
+
+export interface IrpPositionSkillName {
+  skillToolTip: boolean;
+  skill: string;
+  fullSkillName: string,
 }
 
 export interface IRPOrderPositionDisplay {
@@ -313,7 +324,7 @@ export type AgencyOrderFilters = {
   orderPublicId?: string | null;
   reOrderId?: number;
   skillIds?: number[];
-  candidateStatuses?: number[];
+  candidateStatuses?: string[];
   candidatesCountFrom?: number | null;
   candidatesCountTo?: number | null;
   organizationIds?: number[];
@@ -337,6 +348,7 @@ export type AgencyOrderFilters = {
   projectNameIds?: number | null;
   poNumberIds?: number | null;
   shift?: string | string[];
+  orderLocked? : any | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -386,6 +398,7 @@ export class GetPredefinedBillRatesData {
   skillId: number;
   jobStartDate?: string;
   jobEndDate?: string;
+  ignoreUpdateBillRate?: boolean;
 }
 
 export interface IRPMetaData {
@@ -398,6 +411,7 @@ export interface IRPMetaData {
   skillName: string;
   skillId: number;
   orderOpenDate: Date;
+  linkedId: string | null;
 }
 
 export class Order {
@@ -460,6 +474,7 @@ export class Order {
   reOrderFrom?: Order;
   reOrderId?: number;
   orderId?: number;
+  contract?: boolean;
   candidates?: CandidateModel[];
   orderCloseDate?: string;
   orderClosureReason?: string;
@@ -493,6 +508,7 @@ export class Order {
   externalCommentsConfiguration?:boolean | null;
   activeCandidatesCount?: number;
   isLockedIRP?: boolean;
+  linkedId: string | null;
 }
 
 export class ReOrder {
@@ -593,6 +609,7 @@ export type OrderCandidateJob = {
   candidateStatus: CandidateStatus;
   clockId: number;
   expAsTravelers: string;
+  isLocal: boolean;
   guaranteedWorkWeek: string;
   jobId: number;
   offeredBillRate: number;
@@ -684,7 +701,7 @@ export class OrderFilter {
   jobStartDate?: Date | null;
   jobEndDate?: Date | null;
   orderStatuses?: (string | number)[];
-  candidateStatuses?: number[];
+  candidateStatuses?: string[];
   candidatesCountFrom?: number | null;
   candidatesCountTo?: number | null;
   agencyIds?: number[];
@@ -705,12 +722,13 @@ export class OrderFilter {
   projectNameIds?: number | null;
   poNumberIds?: number | null;
   orderType?: number | null;
-  contactEmails?: string[] | string;
+  contactEmails?: string | null;
   irpOnly?: boolean | null;
   shiftIds?: number[];
   reorderStatuses?: (string | number)[];
   shift?: string[] | string;
   isQuickLinkWidgetLTA?: boolean | null;
+  orderLocked? : any | null;
 }
 
 export class SortModel {
@@ -744,6 +762,7 @@ export class FilterOrderStatus {
 export class FilterStatus {
   status: number;
   statusText: string;
+  filterStatus?: string;
 }
 
 export class OrderFilterDataSource {
@@ -841,3 +860,20 @@ export class OrderJourneyFilter {
   includeInIRP?:boolean;
   includeInVMS?:boolean;
 }
+
+export class OnboardCandidateEmail {
+  subjectMail ?: string;
+  bodyMail ?: string;
+  toList ?: string;
+  status ?: number;
+  fromMail ?: string;
+  stream ?: Blob | null;
+  extension ?: string;
+  documentName ?: string;
+  orderId ?: number;
+  candidateId ?: number;
+  businessUnitId ?: number;
+
+}
+
+export type MergedOrder = AgencyOrderManagement & Order;

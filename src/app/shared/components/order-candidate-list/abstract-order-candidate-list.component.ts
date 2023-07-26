@@ -91,12 +91,6 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   public onViewNavigation(data: any): void {
     if(data.candidateId!=undefined)
     {
-
-    
-
-    if(this.isMobileScreen){
-      return;
-    }
     const user = this.store.selectSnapshot(UserState.user);
     const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =

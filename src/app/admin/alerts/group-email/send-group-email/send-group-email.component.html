@@ -1,33 +1,6 @@
 <div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="group-email-template-form">
     
-    <!-- validation errors-->
-    <div *ngIf="isSend && isFormInvalid" class="alert alert-danger">
-      <div *ngIf="emailToControl.value == ''">
-        Field Email To is required.
-      </div>
-    </div>
-
-    <div *ngIf="emailCcControl.invalid && isFormInvalid"
-      class="alert alert-danger">
-      <div *ngIf="emailCcControl.errors?.['emails']">
-        Some of email(s) in CC not matching valid email address pattern.
-      </div>
-    </div>
-
-    <div *ngIf="subjectControl.invalid && isFormInvalid"
-      class="alert alert-danger">
-      <div *ngIf="subjectControl.errors?.['required']">
-        Field Email Subject is required.
-      </div>
-    </div>
-
-    <div *ngIf="emailBodyControl.invalid && isFormInvalid"
-      class="alert alert-danger">
-      <div *ngIf="emailBodyControl.errors?.['required']">
-        Field Email Body is required.
-      </div>
-    </div>
-
+    <!-- validation errors-->  
     <div class="section-container">
 
       <div class="left-section">
@@ -96,6 +69,7 @@
                                 [dataSource]="agencyData"                                
                                 [allowFiltering]="true"
                                 placeholder="Agencies"
+                                [(ngModel)]="agencies"
                                 [showDropDownIcon]="true"
                                 [selectAllText]='allOption'
                                 showSelectAll=true>
@@ -111,6 +85,7 @@
                                 [dataSource]="skillData"                                
                                 [allowFiltering]="true"
                                 placeholder="Skills"
+                                [(ngModel)]="skills"
                                 [showDropDownIcon]="true"
                                 [selectAllText]='allOption'
                                 showSelectAll=true>
@@ -126,6 +101,7 @@
                                [fields]="regionFields"
                                [dataSource]="regionsList"
                                placeholder="Region"
+                               [(ngModel)]="region"
                                [showDropDownIcon]="true"
                                [selectAllText]='allOption'
                                showSelectAll=true>
@@ -141,6 +117,7 @@
                                [fields]="regionFields"
                                [dataSource]="locationsList"
                                placeholder="Location"
+                               [(ngModel)]="location"
                                [showDropDownIcon]="true"
                                [selectAllText]='allOption'
                                showSelectAll=true>
@@ -205,12 +182,13 @@
                    (keyup.enter)="onJobIdStatusValueChanged()"/>
             </div>
           </div>
-          <div *ngIf="isOrgInternalUserType" class="dropdown-container">
+          <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="dropdown-container">
             <div class="input-group dropdown">
               <label>Role<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox"
                                formControlName="roles"
                                [placeholder]='placeholderValue'
+                               [(ngModel)]="roles"
                                [allowFiltering]="true"
                                [showDropDownIcon]="true"
                                appValidateWithMessage
@@ -266,6 +244,7 @@
               <ejs-multiselect mode="CheckBox"
                                formControlName="user"
                                [placeholder]='placeholderValue'
+                               [(ngModel)]="user"
                                [allowFiltering]="true"
                                [showDropDownIcon]="true"
                                appValidateWithMessage
@@ -283,6 +262,7 @@
               <ejs-multiselect mode="CheckBox"
                                formControlName="candidate"
                                [placeholder]='placeholderValue'
+                               [(ngModel)]="candidate"
                                [allowFiltering]="true"
                                [showDropDownIcon]="true"
                                appValidateWithMessage

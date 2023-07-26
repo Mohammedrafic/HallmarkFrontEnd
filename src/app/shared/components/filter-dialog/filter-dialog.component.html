@@ -23,7 +23,7 @@
   </ng-template>
   <ng-template #content>
     <section class="filter-wrapper">
-      <section class="container">
+      <section [ngClass]="useGroupingFilters ? 'disp_content' : 'container'">
         <ng-content></ng-content>
       </section>
       <section class="applied-filters" *ngIf="items?.length && !groupedChips && !useGroupingFilters">

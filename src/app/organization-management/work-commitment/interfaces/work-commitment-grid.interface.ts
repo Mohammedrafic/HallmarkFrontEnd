@@ -3,6 +3,7 @@ import { ListOfSkills } from '@shared/models/skill.model';
 import { ICellRendererParams } from '@ag-grid-community/core';
 
 export interface WorkCommitmentFilters {
+  orderBy?: string;
   pageNumber: number;
   pageSize: number;
 }

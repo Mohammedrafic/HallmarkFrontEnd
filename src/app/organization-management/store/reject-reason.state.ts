@@ -16,10 +16,10 @@ import {
   UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess,
   GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty,
   SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog, GetUnavailabilityReasons,
-  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess, SaveTerminatedReasonError, UpdateInternalTransferReasonsError, UpdateCategoryNoteReasonsError,
+  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess, SaveTerminatedReasonError, UpdateInternalTransferReasonsError, UpdateCategoryNoteReasonsError, GetSourcingReasons, GetRecuriterReasonsByPage, SaveRecuriterReasons, SaveRecuriterReasonsSuccess, SaveRecuriterReasonsError, RemoveRecuriterReasons, UpdateRecuriterReasonsSuccess, SaveSourcingReasonsError, SaveSourcingReasonsSuccess, UpdateSourcingReasonsSuccess, GetSourcingReasonsByPage, SaveSourcingReasons, RemoveSourcingReasons, UpdateSourcingReasons, UpdateRecuriterReasons,
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
-import { RejectReason, RejectReasonPage, RejectReasonwithSystem, UnavailabilityReasons } from "@shared/models/reject-reason.model";
+import { RecuriterReasonPage, RejectReason, RejectReasonPage, RejectReasonwithSystem, SourcingReasonPage, UnavailabilityReasons } from "@shared/models/reject-reason.model";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ShowToast } from "../../store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
@@ -39,7 +39,10 @@ export interface RejectReasonStateModel {
   unavailabilityReasons: PageOfCollections<UnavailabilityReasons> | null;
   internalTransfer: RejectReasonPage | null;
   terminationReasons: RejectReasonPage | null;
+  souringReason: any | null;
   categoryNote: RejectReasonPage | null;
+  recuriterReasonsPage: RecuriterReasonPage | null;
+  sourcingReasonsPage: SourcingReasonPage | null;
 }
 
 @State<RejectReasonStateModel>({
@@ -54,7 +57,10 @@ export interface RejectReasonStateModel {
     unavailabilityReasons: null,
     internalTransfer: null,
     terminationReasons: null,
-    categoryNote: null
+    categoryNote: null,
+    souringReason:  null,
+    recuriterReasonsPage:null,
+    sourcingReasonsPage:null
   },
 })
 @Injectable()
@@ -107,10 +113,25 @@ export class RejectReasonState {
   }
 
   @Selector()
+  static sourcingReasons(state: RejectReasonStateModel) : any | null {
+    return state.souringReason;
+  }
+
+
+  @Selector()
   static categoryNote(state: RejectReasonStateModel) : RejectReasonPage | null {
     return state.categoryNote;
   }
 
+  @Selector()
+  static recuriterReasons(state: RejectReasonStateModel) : RecuriterReasonPage | null {
+    return state.recuriterReasonsPage;
+  }
+
+  @Selector()
+  static sourcingReasonspage(state: RejectReasonStateModel) : SourcingReasonPage | null {
+    return state.sourcingReasonsPage;
+  }
 
   constructor(private rejectReasonService:RejectReasonService) {}
 
@@ -206,11 +227,17 @@ export class RejectReasonState {
   @Action(GetClosureReasonsByPage)
   GetClosureReasonsByPage(
     { patchState }: StateContext<RejectReasonStateModel>,
-    { pageNumber, pageSize, orderBy, getAll }: GetClosureReasonsByPage
+    { pageNumber, pageSize, orderBy, getAll, excludeDefaultReasons }: GetClosureReasonsByPage
   ): Observable<RejectReasonPage> {
     patchState({ isReasonLoading: true });
 
-    return this.rejectReasonService.getClosureReasonsByPage(pageNumber, pageSize, orderBy, getAll).pipe(
+    return this.rejectReasonService.getClosureReasonsByPage(
+      pageNumber,
+      pageSize,
+      orderBy,
+      getAll,
+      excludeDefaultReasons,
+    ).pipe(
       tap((payload) => {
         patchState({closureReasonsPage: payload});
         return payload;
@@ -555,7 +582,20 @@ export class RejectReasonState {
     );
   }
 
+  @Action(GetSourcingReasons)
+  GetSourcingReasons(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    {}: GetTerminationReasons
+  ): Observable<any> {
+    patchState({ isReasonLoading: true });
 
+    return this.rejectReasonService.GetSourcingReasons({}).pipe(
+      tap((payload) => {
+        patchState({souringReason: payload});
+        return payload;
+      })
+    );
+  }
   @Action(SaveTerminationReasons)
   SaveTerminationReasons(
     { dispatch}: StateContext<RejectReasonStateModel>,
@@ -674,5 +714,153 @@ export class RejectReasonState {
     );
   }
 
+
+  //Recuriter-Reasons
+  @Action(GetRecuriterReasonsByPage)
+  GetRecuriterReasonsByPage(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { pageNumber, pageSize }: GetRecuriterReasonsByPage
+  ): Observable<RecuriterReasonPage> {
+    patchState({ isReasonLoading: true });
+
+    return this.rejectReasonService.getRecuriterReasonsByPage(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({recuriterReasonsPage: payload});
+        return payload;
+      })
+    );
+  }
+
+  @Action(SaveRecuriterReasons)
+  SaveRecuriterReasons(
+    { patchState, getState, dispatch}: StateContext<RejectReasonStateModel>,
+    { payload }: SaveRecuriterReasons
+  ): Observable<RejectReason | void> {
+    const state = getState();
+
+    return this.rejectReasonService.saveRecuriterReasons(payload).pipe(
+      tap(payload => {
+        if(state.rejectReasonsPage){
+          const items = [payload, ...state.rejectReasonsPage?.items];
+          const rejectReasonsPage = { ...state.rejectReasonsPage, items };
+          patchState({rejectReasonsPage});
+        }
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        dispatch(new UpdateRecuriterReasonsSuccess());
+
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveRecuriterReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(RemoveRecuriterReasons)
+  RemoveRecuriterReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveRecuriterReasons
+  ): Observable<void> {
+    return this.rejectReasonService.removeRecuriterReason(id).pipe(
+      tap(() => {
+        dispatch(new UpdateRecuriterReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      })
+    );
+  }
+
+  @Action(UpdateRecuriterReasons)
+  UpdateRecuriterReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: UpdateRecuriterReasons
+  ): Observable<void> {
+    return this.rejectReasonService.updateRecuriterReason(payload).pipe(
+      tap(() => {
+        dispatch(new UpdateRecuriterReasonsSuccess());
+        dispatch(new SaveRecuriterReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveRecuriterReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+
+
+  //Sourcing -reason
+  @Action(GetSourcingReasonsByPage)
+  GetSourcingReasonsByPage(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { pageNumber, pageSize }: GetSourcingReasonsByPage
+  ): Observable<SourcingReasonPage> {
+    patchState({ isReasonLoading: true });
+
+    return this.rejectReasonService.getSourcingReasonsByPage(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({sourcingReasonsPage: payload});
+        return payload;
+      })
+    );
+  }
+
+  @Action(SaveSourcingReasons)
+  SaveSourcingReasons(
+    { patchState, getState, dispatch}: StateContext<RejectReasonStateModel>,
+    { payload }: SaveSourcingReasons
+  ): Observable<RejectReason | void> {
+    const state = getState();
+
+    return this.rejectReasonService.saveSourcingReasons(payload).pipe(
+      tap(payload => {
+        if(state.rejectReasonsPage){
+          const items = [payload, ...state.rejectReasonsPage?.items];
+          const rejectReasonsPage = { ...state.rejectReasonsPage, items };
+          patchState({rejectReasonsPage});
+        }
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        dispatch(new UpdateSourcingReasonsSuccess());
+
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveSourcingReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(RemoveSourcingReasons)
+  RemoveSourcingReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveSourcingReasons
+  ): Observable<void> {
+    return this.rejectReasonService.removeSourcingReason(id).pipe(
+      tap(() => {
+        dispatch(new UpdateSourcingReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      })
+    );
+  }
+
+  @Action(UpdateSourcingReasons)
+  UpdateSourcingReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: UpdateSourcingReasons
+  ): Observable<void> {
+    return this.rejectReasonService.updateSourcingReason(payload).pipe(
+      tap(() => {
+        dispatch(new UpdateSourcingReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveSourcingReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
 }
+
 

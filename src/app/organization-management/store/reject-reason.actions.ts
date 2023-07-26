@@ -46,7 +46,13 @@ export class RemoveClosureReasons {
 
 export class GetClosureReasonsByPage {
   static readonly type = '[reject reason] Get Closure reason by Page';
-  constructor(public pageNumber?: number, public pageSize?: number, public orderBy?: string, public getAll?: boolean) { }
+  constructor(
+    public pageNumber?: number,
+    public pageSize?: number,
+    public orderBy?: string,
+    public getAll?: boolean,
+    public excludeDefaultReasons?: boolean,
+  ) { }
 }
 
 export class SaveClosureReasons {
@@ -207,6 +213,10 @@ export class GetTerminationReasons {
   static readonly type = '[reject reason] Get Termination reason by Page';
   constructor(public pageNumber: number, public pageSize: number) { }
 }
+export class GetSourcingReasons {
+  static readonly type = '[reject reason] Get GetSourcingReasons reason by Page';
+  constructor() { }
+}
 
 export class SaveTerminationReasons {
   static readonly type = '[reject reason] Save Termination Reason';
@@ -221,7 +231,7 @@ export class RemoveTerminationReasons {
 export class UpdateTerminationReasons {
   static readonly type = '[reject reason] Update Termination Reason';
   constructor(public payload: RejectReason) {
-  } 
+  }
 }
 
 export class UpdateTerminationReasonsSuccess {
@@ -250,7 +260,7 @@ export class RemoveCategoryNoteReasons {
 export class UpdateCategoryNoteReasons {
   static readonly type = '[reject reason] Update CategoryNote Reason';
   constructor(public payload: RejectReasonWithRedflag) {
-  } 
+  }
 }
 
 export class UpdateCategoryNoteReasonsSuccess {
@@ -260,3 +270,76 @@ export class UpdateCategoryNoteReasonsSuccess {
 export class UpdateCategoryNoteReasonsError {
   static readonly type = '[reject reason] Save CategoryNote Reason Error';
 }
+
+//Recuriter-reasons
+
+export class GetRecuriterReasonsByPage {
+  static readonly type = '[recuriter reason] Get Recuriter reason by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class SaveRecuriterReasons {
+  static readonly type = '[recuriter reason] Save Recuriter Reason';
+  constructor(public payload: RejectReason){}
+}
+
+export class RemoveRecuriterReasons {
+  static readonly type = '[recuriter reason] Remove Recuriter Reason';
+  constructor(public id: number){}
+}
+
+export class UpdateRecuriterReasons {
+  static readonly type = '[recuriter reason] Update Recuriter Reason';
+  constructor(public payload: RejectReason) {
+  }
+}
+
+export class SaveRecuriterReasonsError {
+  static readonly type = '[recuriter reason] Save Recuriter Reason Error';
+}
+
+export class UpdateRecuriterReasonsSuccess {
+  static readonly type = '[recuriter reason] Update Recuriter Reason Success';
+}
+
+export class SaveRecuriterReasonsSuccess {
+  static readonly type = '[recuriter reason] Save Recuriter Reason Success';
+}
+
+
+
+//Sourcing-reasons
+
+export class GetSourcingReasonsByPage {
+  static readonly type = '[sourcing reason] Get Sourcing reason by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class SaveSourcingReasons {
+  static readonly type = '[sourcing reason] Save Sourcing Reason';
+  constructor(public payload: RejectReason){}
+}
+
+export class RemoveSourcingReasons {
+  static readonly type = '[sourcing reason] Remove Sourcing Reason';
+  constructor(public id: number){}
+}
+
+export class UpdateSourcingReasons {
+  static readonly type = '[sourcing reason] Update Sourcing Reason';
+  constructor(public payload: RejectReason) {
+  }
+}
+
+export class SaveSourcingReasonsError {
+  static readonly type = '[sourcing reason] Save Sourcing Reason Error';
+}
+
+export class UpdateSourcingReasonsSuccess {
+  static readonly type = '[sourcing reason] Update Sourcing Reason Success';
+}
+
+export class SaveSourcingReasonsSuccess {
+  static readonly type = '[sourcing reason] Save Sourcing Reason Success';
+}
+

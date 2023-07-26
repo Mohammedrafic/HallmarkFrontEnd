@@ -42,7 +42,7 @@
       <app-tooltip-container
         [message]="toolTipMessage"
         [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]">
-          <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToCandidateForm()" [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">Add Candidates</button>
+          <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToCandidateForm()" [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]" class="noResponsive">Add Candidates</button>
       </app-tooltip-container>
     </div>
   </ng-container>

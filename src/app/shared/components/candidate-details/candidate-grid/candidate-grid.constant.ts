@@ -9,6 +9,7 @@ import { CandidateExportColumn } from './candidate-grid.interface';
 
 const valueHelper = new GridHelper();
 
+// eslint-disable-next-line max-lines-per-function
 export const CandidatesColumnsDefinition = (isAgency: boolean) => {
   return [
     {
@@ -74,12 +75,12 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
       field: 'initialRate',
       headerName: 'INITIAL RATE',
       type: 'rightAligned',
-      width: 150,
+      width: 170,
       sortable: true,
     },
     {
       field: 'billRate',
-      headerName: 'BILL RATE',
+      headerName: 'Candidate RATE',
       type: 'rightAligned',
       width: 140,
       sortable: true,
@@ -114,17 +115,16 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
 export const CandidateExportColumns : CandidateExportColumn[] = [
   { text: 'Name', column: 'Name' },
 { text: 'Status', column: 'Status' },
-{ text: 'Classifications', column: 'Classifications' },
-{text: 'StartDate',column:'StartDate'},
-{text: 'EndDate',column:'EndDate'},
-{ text: 'ScheduledDate', column: 'ScheduledDate' },
+{ text: 'Classification', column: 'Classification' },
+{text: 'Start Date',column:'StartDate'},
+{text: 'End Date',column:'EndDate'},
+{ text: 'Scheduled Date', column: 'ScheduledDate' },
 { text: 'Region', column: 'Region' },
-{ text: 'LocationDepartment', column: 'LocationDepartment' },
-{ text: 'InitialRate', column: 'InitialRate' },
-{ text: 'BillRate', column: 'BillRate' },
-{ text: 'InitialRate', column: 'InitialRate' },
-{ text: 'PositionId', column: 'PositionId' },
+{ text: 'Location/Department', column: 'LocationDepartment' },
+{ text: 'Initial Rate', column: 'InitialRate' },
+{ text: 'Candidate Rate', column: 'BillRate' },
+{ text: 'Position ID', column: 'PositionId' },
 { text: 'Assignment', column: 'Assignment' },
-{ text: 'Agencyname', column: 'Agencyname' },
+{ text: 'Agency Name', column: 'Agencyname' },
 { text: 'Skill', column: 'Skill' },
 ];

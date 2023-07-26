@@ -6,7 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { catchError, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
 
 import { CloseOrderService } from '@client/order-management/components/close-order/close-order.service';
 import { CloseOrderPayload } from '@client/order-management/components/close-order/models/closeOrderPayload.model';
@@ -29,6 +29,7 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { UserState } from 'src/app/store/user.state';
 import { ShowCloseOrderDialog, ShowToast } from '../../../../store/app.actions';
 import { OrderManagementService } from '../order-management-content/order-management.service';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-close-order',
@@ -62,6 +63,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public comments: Comment[] = [];
   public closureReasons: RejectReasonwithSystem[];
   private unsubscribe$: Subject<void> = new Subject();
+  public canCreateOrder: boolean;
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -72,13 +74,13 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private commentsService: CommentsService,
     private cd: ChangeDetectorRef,
     private orderManagementService: OrderManagementService,
+    private permissionService: PermissionService
   ) {
     super();
   }
 
   public ngOnChanges(changes: SimpleChanges) {
     if (!changes['currentValue']) {
-      this.onOrganizationChangedClosureReasons();
       return;
     }
     const {
@@ -91,9 +93,27 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   public ngOnInit(): void {
+    this.subscribeToReasons();
+    this.subscribeOnPermissions();
     this.onOrganizationChangedClosureReasons();
     this.initForm();
     this.subscribeOnCloseSideBar();
+  }
+
+  subscribeToReasons() {
+    this.closureReasonsPage$.pipe(
+      filter(x => x != undefined && x != null), 
+      takeUntil(this.destroy$)
+      ).subscribe((data) => {
+      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.IRP)
+      {        
+        this.closureReasons = data.items.filter(f => f.includeInIRP == true);
+      }
+      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.VMS)
+      {
+        this.closureReasons = data.items.filter(f => f.includeInVMS == true);
+      }
+    });
   }
 
   public override ngOnDestroy(): void {
@@ -128,16 +148,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   private onOrganizationChangedClosureReasons(): void {
-    this.organizationId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true));
-      this.closureReasonsPage$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-        if (data != undefined) {
-          if (this.orderManagementService.getOrderManagementSystem() == OrderManagementIRPSystemId.IRP)
-            this.closureReasons = data.items.filter(f => f.includeInIRP == true)
-          if (this.orderManagementService.getOrderManagementSystem() == OrderManagementIRPSystemId.VMS)
-            this.closureReasons = data.items.filter(f => f.includeInVMS == true)
-        }
-      });
+    this.organizationId$.pipe(distinctUntilChanged(), takeUntil(this.destroy$)).subscribe((e) => {
+      this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true));      
     });
   }
 
@@ -182,7 +194,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.isPosition = isPosition;
     this.setMaxDate();
     // converting jobStartDate to string as it is not a Date object actually and interface is wrong.
-    this.minDate = DateTimeHelper.convertDateToUtc(this.order.jobStartDate as unknown as string);
+    this.minDate = DateTimeHelper.setCurrentTimeZone(this.order.jobStartDate as unknown as string);
     this.getComments();
   }
 
@@ -196,7 +208,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
     let formData = this.closeForm.getRawValue();
     const { closingDate } = formData;
-    formData = { ...formData, closingDate: DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(closingDate)) };
+    formData = { ...formData, closingDate: DateTimeHelper.setUtcTimeZone(DateTimeHelper.setInitDateHours(closingDate)) };
 
     if (this.isPosition) {
       this.closePosition(formData);
@@ -253,6 +265,12 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
       if (!res.isDialogShown) {
         this.closeForm.reset();
       }
+    });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
     });
   }
 }

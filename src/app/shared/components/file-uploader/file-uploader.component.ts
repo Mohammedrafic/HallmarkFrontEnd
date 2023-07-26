@@ -46,11 +46,11 @@ export class FileUploaderComponent implements OnChanges {
 
   @Input() maxFileSize: FileSize = FileSize.MB_5;
 
-  @Input() showSelectedFiles: boolean = true;
+  @Input() showSelectedFiles = true;
 
   @Input() clearAll: FilesClearEvent | null;
 
-  @Input() useRedTrashBin: boolean = false;
+  @Input() useRedTrashBin = false;
 
   @Output() selectedFilesChanged: EventEmitter<FileForUpload[]> = new EventEmitter();
 
@@ -70,7 +70,7 @@ export class FileUploaderComponent implements OnChanges {
           name,
           type,
           size: 0,
-        }
+        };
       });
     }
   }

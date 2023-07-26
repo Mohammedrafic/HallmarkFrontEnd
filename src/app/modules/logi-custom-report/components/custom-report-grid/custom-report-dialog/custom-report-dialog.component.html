@@ -1,0 +1,87 @@
+
+  <section class="container preview-dialog">
+    <section class="header-container">
+      <div class="e-card-header preview-header">
+        <div class="e-card-header-caption" *ngIf="(selectedLog$ | async)  as selectedLog">
+          <h3 class="e-card-title preview-title">{{ selectedLog?.customReportName }}</h3>
+        </div>
+        <div class="e-card-content">
+          <button ejs-button  *ngIf="selectedLog?.isSystem"
+                  id="saveAsButton"
+                  (click)="saveAsPopUp()"
+                  cssClass="e-outline button-filter button-right">
+            <div class="filter-button-content">
+              Save As <i-feather name="sliders" class="icon"></i-feather>
+            </div>
+          </button>
+          <button ejs-button type="submit" cssClass="e-outline button-filter" (click)="onClose()">
+           Back
+          </button>
+        </div>
+      </div>
+     
+      <section class="app-grid table-wrapper " >
+        
+        <app-logi-report [paramsData]="paramsData" width="100%" [customCSS]="customCSSName"
+                         [reportName]="reportName"
+                         [catelogName]="catelogName"
+                         [reportType]="reportType"></app-logi-report>
+       
+      </section>
+    </section>
+  </section>
+  
+
+
+<ejs-dialog id="dialog"
+            #addCustomReportSideDialog
+            cssClass="dialog order-details-dialog"
+            [target]="targetElement"  width="45%"
+            [visible]="isAddCustomReportSidebarShown"
+            [animationSettings]="{ effect: 'SlideRight' }">
+  <section class="container preview-dialog">
+    <section class="header-container">
+      <div class="e-card-header preview-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title preview-title"> Add Report</h3>
+        </div>
+        <div class="e-card-content">
+          <button ejs-button
+                  id="saveAsButton"
+                  (click)="saveAsReport()"
+                  cssClass="e-outline button-filter">
+            <div class="filter-button-content">
+              Add <i-feather name="sliders" class="icon"></i-feather>
+            </div>
+          </button>
+          <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onAddReportClose()">
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
+        </div>
+      </div>
+
+      <section class="app-grid table-wrapper">
+
+        <form class="form-container bootstrap"
+              id="addReportForm"
+              [formGroup]="reportFormGroup">
+
+          <div class="group">
+            <div class="input-container">
+              <label for="name">Report Name <span class="required">*</span></label>
+              <input id="reportName"
+                     class="e-input"
+                     type="text"
+                     maxlength="50"
+                     formControlName="reportName" />
+            </div>
+          </div>
+
+
+        </form>
+
+      </section>
+    </section>
+  </section>
+
+</ejs-dialog>

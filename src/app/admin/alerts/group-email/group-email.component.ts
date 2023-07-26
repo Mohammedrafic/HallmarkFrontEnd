@@ -105,7 +105,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   cacheBlockSize: any;
   pagination: boolean;
   paginationPageSize: number;
-  
+
   filterText: string | undefined;
   frameworkComponents: any;
   serverSideStoreType: any;
@@ -123,9 +123,9 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     menuTabs: []
   };
   public readonly columnDefs: ColumnDefinitionModel[] = GroupEmailColumnsDefinition(this.actionCellrenderParams);
- 
-  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
+  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
+  public SeeMyEmailsOnly: boolean = true;
   constructor(private actions$: Actions,
     private confirmService: ConfirmService,
     private store: Store) {
@@ -141,7 +141,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       this.cacheBlockSize = this.pageSize;
     this.serverSideStoreType = 'partial';
     this.maxBlocksInCache = 2;
-   
+
     this.defaultColDef = {
       flex: 1,
       minWidth: 120,
@@ -166,26 +166,25 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.sendGroupEmailFormGroup = SendGroupEmailComponent.createForm();
 
     this.viewGroupEmail$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-      
-      if (data != undefined) {        
+
+      if (data != undefined) {
         this.groupEmailTemplateForm.rteCreated();
         this.viewGroupEmailData = data;
-        this.UpdateForm(data);           
-            
+        this.UpdateForm(data);
+
         this.store.dispatch(new ShowGroupEmailSideDialog(true));
       }
     });
-    
+
     this.sendGroupEmail$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
       if (data != undefined && data != null) {
-        this.dispatchNewPage();       
-          this.groupEmailCloseDialog(); 
+        this.dispatchNewPage();
+        this.groupEmailCloseDialog();
         this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
       }
     });
     this.getGroupEmails();
     this.getPermission();
-    console.log(this.userPermission);
   }
   public onViewGroupEmail(data: any): void {
     this.onView(data.rowData);
@@ -196,7 +195,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.gridApi = params.api;
     this.gridApi.setRowData(this.rowData);
   }
-  
+
   public getGroupEmails(): void {
     this.dispatchNewPage();
     this.groupEmailPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -209,10 +208,11 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         this.gridApi?.setRowData(this.rowData);
       }
     });
-  
+
   }
   private dispatchNewPage(): void {
-    this.store.dispatch(new GetGroupMailByBusinessUnitIdPage(this.userObj == null ? null : this.userObj.businessUnitId,true));
+    this.store.dispatch(new GetGroupMailByBusinessUnitIdPage(this.userObj == null ? null : this.userObj.businessUnitId, true,
+      this.SeeMyEmailsOnly));
   }
   private dispatchViewGroupEmail(id: number): void {
     this.store.dispatch(new GetGroupEmailById(id));
@@ -226,14 +226,14 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     }
   }
   public onView({ index, column, foreignKeyData, id, ...groupEMail }: GroupEmail & { index: string; column: unknown; foreignKeyData: unknown }): void {
-   this.ResetForm();
-   this.isSend=false;
+    this.ResetForm();
+    this.isSend=false;
     this.groupEmailTemplateForm.isSend=false;
     this.groupEmailTemplateForm.rteCreated();
     this.groupEmailTemplateForm.disableControls(false);
     let data ={id,...groupEMail};
-    this.UpdateForm(data);           
-        
+    this.UpdateForm(data);
+
     this.store.dispatch(new ShowGroupEmailSideDialog(true));
   }
   public onGroupEmailAddCancel(): void {
@@ -248,7 +248,6 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     }
     if (this.groupEmailTemplateForm.emailBody!=''&&this.groupEmailTemplateForm.emailTo!=''&&this.groupEmailTemplateForm.emailSubject!='') {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
-      console.log(formValues)
       let businessUnitId: number | null = null;
       if(formValues.businessUnit == 4)
         businessUnitId = formValues.businesses[0]
@@ -284,7 +283,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         controlNames=controlNames==""?"Email Subject":controlNames+",Email Subject";
       }
       if(this.groupEmailTemplateForm.emailBody=='')
-      {
+       {
         controlNames=controlNames==""?"Email Body":controlNames+",Email Body";
       }
       if(controlNames.indexOf(",")>0)
@@ -350,7 +349,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     }
   };
   public onGroupEmailFormSendClick():void{
-    this.ResetForm(); 
+    this.ResetForm();
     this.isSend=true;
     this.groupEmailTemplateForm.isSend=true;
     this.groupEmailTemplateForm.rteCreated();
@@ -361,19 +360,19 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   private groupEmailCloseDialog(): void {
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
   }
-  
+
   private UpdateForm(data: any): void {
     this.groupEmailTemplateForm.emailBody = data.bodyMail;
     this.groupEmailTemplateForm.emailSubject = data.subjectMail;
     this.groupEmailTemplateForm.emailTo=data.toList==null?"":data.toList;
     this.groupEmailTemplateForm.emailCc=data.ccList==null?"":data.ccList;
     this.groupEmailTemplateForm.businessUnitType = data.businessUnitType;
-    this.groupEmailTemplateForm.businessUnit = data.businessUnitId;    
+    this.groupEmailTemplateForm.businessUnit = data.businessUnitId;
     this.groupEmailTemplateForm.userTypeInput = data.userType;
     this.groupEmailTemplateForm.fileNameInput = data.fileName;
     this.groupEmailTemplateForm.fileName = data.fileName == null?"":data.fileName;
     this.groupEmailTemplateForm.id = data.id;
-    this.groupEmailTemplateForm.populateUserType();    
+    this.groupEmailTemplateForm.populateUserType();
   }
   private ResetForm(): void {
     this.groupEmailTemplateForm.emailBody = "";
@@ -384,12 +383,15 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.groupEmailTemplateForm.controls['user'].setValue([]);
 
   }
+  public onSwitcher(event: { checked: boolean }): void {
+    this.SeeMyEmailsOnly = event.checked;
+    this.getGroupEmails();
+  }
   private getPermission(): void {
     this.store.select(UserState.userPermission).pipe(
       filter((permissions: Permission) => !!Object.keys(permissions).length),
       take(1)
     ).subscribe((permissions: Permission) => {
-      console.log(permissions);
       this.userPermission = permissions;
     });
   }

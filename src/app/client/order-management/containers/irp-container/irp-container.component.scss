@@ -9,3 +9,13 @@ ejs-tab {
     }
   }
 }
+
+:host {
+  ::ng-deep {
+    app-order-credentials {
+      .actions {
+        margin-top: 18px;
+      }
+    }
+  }
+}

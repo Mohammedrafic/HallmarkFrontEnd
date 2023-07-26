@@ -17,6 +17,8 @@ import { Edit, Trash2 } from 'angular-feather/icons';
 import { ClosureReasonComponent } from './components/closure-reason/closure-reason.component';
 import { ManualInvoiceRejectReasonComponent,
 } from './components/manual-invoice-reject-reason/manual-invoice-reject-reason.component';
+import { PenaltiesGridActionsRendererComponent,
+} from './components/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
 import { OrderRequisitionComponent } from './components/order-requisition/order-requisition.component';
 import { PenaltiesComponent } from './components/penalties/penalties.component';
 import { ReasonsRoutingModule } from './reasons-routing.module';
@@ -30,6 +32,8 @@ import { ValidateDirectiveModule } from '@shared/directives/validate-directive/v
 import { InternalTransferComponent } from './components/internal-transfer/internal-transfer.component';
 import { EmpTerminationComponent } from './components/emp-termination/emp-termination.component';
 import { CategoryNoteComponent } from './components/category-note/category-note.component';
+import { SourcingReasonComponent } from './components/sourcing-reason/sourcing-reason.component';
+import { RecuriterReasonComponent } from './components/recuriter-reason/recuriter-reason.component';
 
 const icons = {
     Edit,
@@ -70,6 +74,9 @@ const icons = {
         InternalTransferComponent,
         EmpTerminationComponent,
         CategoryNoteComponent,
+        PenaltiesGridActionsRendererComponent,
+        SourcingReasonComponent,
+        RecuriterReasonComponent,
     ],
     providers: [ReasonsFormsService, ReasonsService],
     exports: [ReasonsComponent],

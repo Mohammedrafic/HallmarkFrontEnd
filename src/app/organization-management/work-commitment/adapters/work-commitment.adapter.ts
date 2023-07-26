@@ -14,7 +14,8 @@ export class WorkCommitmentAdapter {
   public static prepareToSave(
     correctRegions: RegionsDTO[],
     allSkillsLength: number,
-    formGroup: CustomFormGroup<WorkCommitmentForm>
+    formGroup: CustomFormGroup<WorkCommitmentForm>,
+    replaceOrder: boolean
   ): WorkCommitmentDTO {
     const {
       masterWorkCommitmentId,
@@ -30,7 +31,6 @@ export class WorkCommitmentAdapter {
       comments,
       workCommitmentId,
     } = formGroup.getRawValue();
-
     const commitmentId: { workCommitmentId?: number } = {};
     if (workCommitmentId) {
       commitmentId.workCommitmentId = workCommitmentId;
@@ -45,11 +45,12 @@ export class WorkCommitmentAdapter {
       schedulePeriod,
       criticalOrder,
       holiday,
-      startDate: startDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(new Date(startDate))) : null,
-      endDate: endDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(new Date(endDate))) : null,
+      startDate: startDate ? DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(new Date(startDate))) : null,
+      endDate: endDate ? DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(new Date(endDate))) : null,
       jobCode,
       comments,
       regions: correctRegions,
+      createReplacement: replaceOrder,
     };
   }
 
@@ -75,7 +76,7 @@ export class WorkCommitmentAdapter {
         workCommitmentId,
         workCommitmentOrgHierarchies,
         allLocationsSelected,
-        allRegionsSelected
+        allRegionsSelected,
       } = item;
       itemsForGrid.push({
         availabilityRequirement,

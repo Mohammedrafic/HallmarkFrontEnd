@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, filter, Observable, Subject, take, takeUntil } from 'rxjs';
+import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { UserState } from 'src/app/store/user.state';
 import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments-irp.actions';
 import { CommentsState } from './store/comments-irp.state';
@@ -19,7 +19,7 @@ import { CommentsFilter } from '@core/enums/common.enum';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommentsIrpComponent {
-  
+
   faUserFriends = faUserFriends as IconProp;
   faEye = faEye as IconProp;
   faEyeSlash = faEyeSlash as IconProp;
@@ -27,6 +27,7 @@ export class CommentsIrpComponent {
   @Input() useBackground: boolean = true;
   @Input() disabled: boolean = false;
   @Input() orderId: number;
+  @Input() candidateJobId : number;
   @Input() CanOrganizationEditOrdersIRP:boolean;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
@@ -172,7 +173,8 @@ export class CommentsIrpComponent {
       commentContainerId: this.commentContainerId,
       isRead: true,
       isPrivate: this.isPrivate,
-      isIRP:true
+      isIRP:true,
+      candidateJobId:this.candidateJobId
     };
     this.comments.push(comment);
     this.message = '';

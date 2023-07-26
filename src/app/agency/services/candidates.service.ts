@@ -37,10 +37,11 @@ export class CandidateService {
       : this.http.post<Candidate>(`/api/CandidateProfile`, candidate);
   }
 
-  public saveCandidatePhoto(file: Blob, candidateProfileId: number): Observable<any> {
+  public saveCandidatePhoto(file: Blob, candidateProfileId: number, isInitialUpload: boolean): Observable<null> {
     const formData = new FormData();
     formData.append('photo', file);
-    return this.http.post(`/api/CandidateProfile/${candidateProfileId}/photo`, formData);
+    return this.http.post<null>(
+      `/api/CandidateProfile/${candidateProfileId}/photo${isInitialUpload ? '/true' : ''}`, formData);
   }
 
   public getCandidatePhoto(candidateProfileId: number): Observable<Blob> {

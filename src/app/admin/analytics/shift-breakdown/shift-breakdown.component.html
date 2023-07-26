@@ -1,0 +1,184 @@
+<section class="flex-column">
+    <section class="toolbar">
+      <section class="toolbar-header">
+        <div class="toolbar-header-div">
+          {{title }}
+        </div>
+      </section>
+      <section class="toolbar-message">
+        <div class="toolbar-message-div">
+          {{message}}
+        </div>
+      </section>
+      <section class="toolbar-buttons">
+        <button ejs-button
+                id="filterButton"
+                (click)="showFilters()"
+                cssClass="e-outline button-filter">
+          <div class="filter-button-content">
+            Filters <i-feather name="sliders" class="icon"></i-feather>
+          </div>
+        </button>
+      </section>
+    </section>
+  </section>
+  <section class="invoice-report-section">
+    <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName"
+                     [reportType]="reportType"></app-logi-report>
+    <router-outlet></router-outlet>
+  </section>
+  <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
+                     (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+    <form [formGroup]="shiftBreakdownForm" class="filter-form-dialog form-container bootstrap">
+        <div class="form-elemet">
+            <div class="input-container bootstrap">
+              <label>Organization Name<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
+                                  [dataSource]="filterColumns.businessIds.dataSource" placeholder="Business">
+                </ejs-dropdownlist>
+              </div>
+            </div>
+        </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Region</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" 
+                             formControlName="regionIds" 
+                             appValidateWithMessage placeholder="All"
+                             [allowFiltering]="true" 
+                             [showDropDownIcon]="true" 
+                             selectAllText="All"
+                             [showSelectAll]="true"                     
+                             [dataSource]="filterColumns.regionIds.dataSource"
+                             [fields]="commonFields">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Location</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" 
+                             formControlName="locationIds" 
+                             appValidateWithMessage
+                             [placeholder]="allOption" 
+                             selectAllText="All"
+                             [showSelectAll]="true"                     
+                             [allowFiltering]="true" 
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.locationIds.dataSource" 
+                             [fields]="commonFields">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Department</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" 
+                             formControlName="departmentIds" 
+                             appValidateWithMessage 
+                             selectAllText="All"
+                             [showSelectAll]="true"                     
+                             placeholder="All"
+                             [allowFiltering]="true" 
+                             [showDropDownIcon]="true" 
+                             [dataSource]="filterColumns.departmentIds.dataSource"
+                             [fields]="commonFields">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container bootstrap">
+            <label>Skill</label>
+            <div class="input-group dropdown">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="skillIds"
+                appValidateWithMessage
+                placeholder="All"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.skillIds.dataSource"
+                [fields]="commonFields"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container bootstrap">
+            <label>Start Year</label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="startYear"
+                                [fields]="commonFields"
+                                [dataSource]="filterColumns.startYear.dataSource"
+                                [allowFiltering]="true"
+                                placeholder="Year">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="input-container bootstrap">
+            <label>Start Month</label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="startMonth"
+                                [fields]="commonFields"
+                                [dataSource]="filterColumns.startMonth.dataSource"
+                                [allowFiltering]="true"
+                                placeholder="Month">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container bootstrap">
+            <label>End Year</label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="endYear"
+                                [fields]="commonFields"
+                                [dataSource]="filterColumns.endYear.dataSource"
+                                [allowFiltering]="true"
+                                placeholder="Year">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="input-container bootstrap">
+            <label>End Month</label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="endMonth"
+                                [fields]="commonFields"
+                                [dataSource]="filterColumns.endMonth.dataSource"
+                                [allowFiltering]="true"
+                                placeholder="Month">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container bootstrap">
+            <ejs-radiobutton label="Summary Chart" formControlName="ViewType" name="ViewType" value="0" (change)="chartChanged('Summary',$event)"></ejs-radiobutton>
+          </div>
+          <div class="input-container bootstrap">
+            <ejs-radiobutton label="Detail Chart" formControlName="ViewType" name="ViewType" value="1" (change)="chartChanged('Detail',$event)"></ejs-radiobutton>
+          </div>
+        </div>
+      </div> 
+    </form>
+  </app-filter-dialog>
+  

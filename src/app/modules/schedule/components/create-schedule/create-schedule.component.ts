@@ -48,6 +48,7 @@ import {
   AvailabilityFormConfig,
   BookFormConfig,
   OpenPositionsConfig,
+  PastTimeErrorMessage,
   ScheduleItemType,
   ScheduleSourcesMap,
   ScheduleTypesForCreateBar,
@@ -170,7 +171,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     }
 
     if (candidates?.length && this.isEmployee) {
-      this.disableRemoveButton = candidates[0].days.some((day: ScheduleDay) => !day.employeeCanEdit);
+      this.disableRemoveButton = candidates[0].days?.some((day: ScheduleDay) => !day.employeeCanEdit);
     }
 
     if(this.scheduleOnlyWithAvailability) {
@@ -292,15 +293,22 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   saveSchedule(): void {
-   if (this.scheduleForm.invalid) {
+    if (this.scheduleForm.invalid) {
       this.scheduleForm.markAllAsTouched();
       return;
     }
 
-   if (this.scheduleType === ScheduleItemType.Book) {
-     this.checkBookingsOverlaps();
-     return;
-   }
+    const startTime = this.scheduleForm.get('startTime')?.value;
+
+    if (!this.createScheduleService.canEmployeeCreateRecord(this.isEmployee, this.scheduleSelectedSlots.dates, startTime)) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, PastTimeErrorMessage));
+      return;
+    }
+
+    if (this.scheduleType === ScheduleItemType.Book) {
+      this.checkBookingsOverlaps();
+      return;
+    }
 
     if (this.scheduleType === ScheduleItemType.Unavailability) {
       this.checkUnavailabilityOverlaps();
@@ -316,7 +324,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   }
 
   saveBooking(): Observable<ScheduleBookingErrors[]> {
-    return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook).pipe(
+    return this.scheduleApiService.createBookSchedule(this.scheduleToBook as ScheduleBook, false).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleErrorMessage(error)),
       tap((errors: ScheduleBookingErrors[]) => {
         this.scheduleItemsService.setErrors(errors);
@@ -405,7 +413,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     ]).pipe(
       takeUntil(this.componentDestroy()),
     ).subscribe(([startTime, endTime]: [Date, Date]) => {
-      const shiftTime = `${DateTimeHelper.toUtcFormat(startTime)}/${DateTimeHelper.toUtcFormat(endTime)}`;
+      const shiftTime = `${DateTimeHelper.setUtcTimeZone(startTime)}/${DateTimeHelper.setUtcTimeZone(endTime)}`;
       this.openPositionService.setOpenPosition('shiftTime', shiftTime);
     });
   }

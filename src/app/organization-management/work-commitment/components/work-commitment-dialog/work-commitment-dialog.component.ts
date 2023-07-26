@@ -8,16 +8,17 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { CustomFormGroup } from '@core/interface';
+import { AbstractControl } from '@angular/forms';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, take, takeUntil, tap } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CANCEL_CONFIRM_TEXT, datepickerMask, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, datepickerMask, DELETE_CONFIRM_TITLE, IRP_DEPARTMENT_CHANGE_WARNING } from '@shared/constants';
 import { WorkCommitmentService } from '../../services/work-commitment.service';
 import {
   CommitmentDialogConfig,
@@ -29,7 +30,6 @@ import {
 } from '../../interfaces';
 import { CommitmentsDialogConfig, OPTION_FIELDS } from '../../constants/work-commitment-dialog.constant';
 import { FieldType } from '@core/enums';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { mapperSelectedItems, setDataSourceValue } from '../../helpers';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -37,9 +37,9 @@ import { UserState } from '../../../../store/user.state';
 import { findSelectedItems } from '@core/helpers/functions.helper';
 import { GetOrganizationStructure } from '../../../../store/user.actions';
 import { WorkCommitmentAdapter } from '../../adapters/work-commitment.adapter';
-import { AbstractControl } from '@angular/forms';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
+import { CustomFormGroup } from '@core/interface';
 
 @Component({
   selector: 'app-work-commitment-dialog',
@@ -63,15 +63,20 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
 
   @Output() saveCommitment = new EventEmitter<WorkCommitmentDTO>();
 
-  public title: string = '';
-  public commitmentForm: CustomFormGroup<WorkCommitmentForm> | null;
+  public title = '';
+  public commitmentForm: CustomFormGroup<WorkCommitmentForm>;
   public dialogConfig: CommitmentDialogConfig;
   public readonly FieldTypes = FieldType;
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
   public buttonType = ButtonTypeEnum;
   public datepickerMask = datepickerMask;
   public allSkillsLength: number;
-  public isEdit: boolean = false;
+  public isEdit = false;
+  public showOverrideDialog = false;
+  public showReplacementCheckbox = false;
+  public replaceOrder = false;
+  public replacementConfirmationMessage = IRP_DEPARTMENT_CHANGE_WARNING;
+  public overrideCommitmentConfirm$ = new Subject<boolean>();
 
   @Select(UserState.organizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
@@ -117,16 +122,52 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
 
   public saveWorkCommitment(): void {
     if (this.commitmentForm?.valid) {
-      this.saveCommitment.emit(
-        WorkCommitmentAdapter.prepareToSave(this.regionsDTO, this.allSkillsLength, this.commitmentForm!)
-      );
+      this.checkForChanges();
     } else {
       this.commitmentForm?.markAllAsTouched();
     }
   }
 
+  private checkForChanges(): void {
+    this.showReplacementCheckbox = !!this.commitmentForm?.get('endDate')?.dirty;
+
+    const isRequiredFieldModified = 
+      this.commitmentForm?.get('regions')?.dirty || 
+      this.commitmentForm?.get('locations')?.dirty || 
+      this.commitmentForm?.get('endDate')?.dirty;
+    if (this.isEdit && isRequiredFieldModified) {
+      this.showOverridingConfirmation();
+    } else {
+      this.emitSaving();
+    }
+  }
+
   public trackByIndex(index: number, config: CommitmentsInputConfig): string {
     return index + config.field;
+  }
+
+  private emitSaving(): void {
+    this.saveCommitment.emit(
+      WorkCommitmentAdapter.prepareToSave(
+        this.regionsDTO,
+        this.allSkillsLength,
+        this.commitmentForm,
+        this.replaceOrder,
+      )
+    );
+  }
+
+  private showOverridingConfirmation(): void {
+    this.replaceOrder = false;
+    this.showOverrideDialog = true;
+    this.overrideCommitmentConfirm$
+      .pipe(
+        take(1),
+        tap(() => this.showOverrideDialog = false),
+        filter(Boolean),
+    ).subscribe(() => {
+      this.emitSaving();
+    });
   }
 
   private watchForShowDialog(): void {
@@ -237,7 +278,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
         this.selectedRegions.map((item) => {
           const locationArr = new Set<number>();
           value.forEach((locationId) => {
-            item.locations!.filter((location: any) => {
+            item.locations!.filter((location: OrganizationLocation) => {
               if (location.id === locationId) {
                 locationArr.add(location.id);
               }

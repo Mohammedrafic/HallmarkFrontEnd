@@ -1,0 +1,40 @@
+<section class="grid flex-column">
+  <section class="toolbar">
+    <section>
+      <h3>Configurations</h3>
+    </section>
+  </section>
+  <app-configuration-grid
+    [isAgency]="true"
+    [configurations]="configurations"
+    [hasPermissions]="hasPermissions"
+    [gridDataSource]="gridDataSource"
+    [totalDataRecords]="totalDataRecords"
+    (openEditSettingDialog)="openEditSettingDialog($event)"
+    ></app-configuration-grid>
+</section>
+
+<app-side-dialog [disableSaveButton]="!userPermission[userPermissions.CanEditAgencySettings]"
+                 (formCancelClicked)="cancelSettingChanges()" 
+                 (formSaveClicked)="saveSetting()" 
+                 [header]="dialogHeader">
+  <form class="form-container" id="addEditRecordForm" *ngIf="isFormShown" [formGroup]="configurationFormGroup">
+    <div>
+      <div class="input-container bootstrap">
+        <label for="attribute">Attribute</label>
+        <div class="input-group">
+          <ejs-tooltip [content]="attribute.value" [showTipPointer]="false">
+            <input #attribute id="attribute" class="e-input" type="text" formControlName="name" />
+          </ejs-tooltip>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <div class="input-group switch">
+        <ejs-switch id="switcher" class="switch" formControlName="value"></ejs-switch>
+        <label class="switch-label">Turned {{ switcherValue }}</label>
+      </div>
+    </div>
+  </form>
+</app-side-dialog>

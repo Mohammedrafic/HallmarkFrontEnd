@@ -1,0 +1,70 @@
+<div [formGroup]="onBoardMessageEmailTemplateForm" id="onBoardMessageEmailTemplateForm" class="group-email-template-form">
+  <div *ngIf="subjectControl.invalid && isFormInvalid"
+      class="alert alert-danger">
+      <div *ngIf="subjectControl.errors?.['required']">
+        Field Email Subject is required.
+      </div>
+    </div>
+
+    <div *ngIf="emailBodyControl.invalid && isFormInvalid"
+      class="alert alert-danger">
+      <div *ngIf="emailBodyControl.errors?.['required']">
+        Field Email Body is required.
+      </div>
+    </div>
+
+    <div *ngIf="emailToControl.invalid && isFormInvalid"
+      class="alert alert-danger">
+      <div *ngIf="emailToControl.errors?.['required']">
+        Field Email To is required.
+      </div>
+    </div>
+
+    <div class="section-container">
+
+        <div class="left-section">
+            <div class="input-container bootstrap top-container">
+              <label>Subject<span class="required">*</span></label>
+              <div class="input-group">
+                <input appValidateWithMessage formControlName="emailSubject" class="e-input" type="text"
+                      [(ngModel)]="emailSubject" />
+              </div>
+            </div>
+
+            <div>
+              <div class="id-container">
+                <div class="input-container bootstrap">
+                  <label>Attachment</label>
+                  <input *ngIf="!isSend" class="e-input" type="text" disabled [(ngModel)]="fileNameInput" 
+                        [ngModelOptions]="{standalone: true}" />
+                  <div id="onboard-attachment-files" *ngIf="isSend" [ngClass]="uploaderstatus ? 'enabled' : 'disabled'">
+                    <div id="droparea" class="droparea" (click)="browseGroupEmail()">
+                      <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+                    </div>
+                    <ejs-uploader #filesUploaderOnboardEmail formControlName="fileUpload"
+                                  [dropArea]="dropElement"
+                                  [allowedExtensions]="allowedExtensions"
+                                  [multiple]="false"
+                                  [maxFileSize]="maxFileSize"
+                                  [autoUpload]="false"
+                                  (selected)="onFileSelectedGroup($event)"
+                                  (removing)="onFileRemoving()">
+                    </ejs-uploader>
+                  </div>
+                  <label *ngIf="isSend">Attached file size should not exceed 2MB<span class="e-input"></span></label>
+                </div>
+              </div>
+            </div>
+           
+            <div class="rich-text-container">
+              <label>Mail Body<span class="required">*</span></label>
+              <div class="input-group" id="richTextEditorDiv">
+                <ejs-richtexteditor #OnboardCandidateEmail id='OnboardCandidateEmailRTE' appValidateWithMessage
+                                    formControlName="emailBody" [toolbarSettings]='tools' [(ngModel)]='emailBody'
+                                    [(value)]='emailBody'>
+                </ejs-richtexteditor>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -6,23 +6,25 @@ import { Actions, Store, ofActionDispatched } from '@ngxs/store';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { debounceTime, delay, distinctUntilChanged, takeUntil } from 'rxjs';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OutsideZone } from '@core/decorators';
 import { UserState } from 'src/app/store/user.state';
 import { DoNotReturnCandidateSearchFilter } from '@shared/models/donotreturn.model';
-import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { Getcandidatesearchbytext } from '../store/candidate.actions';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-filters',
   templateUrl: './filters.component.html',
   styleUrls: ['./filters.component.scss'],
 })
-export class FiltersComponent implements OnInit, AfterViewInit {
+export class FiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @Input() public filterColumns: FilterColumnsModel;
   @Input() public filtersForm: FormGroup;
   @Input() public isAgency: boolean;
+  @Input() public orgAgencyName:string;
   @Input() public isClear: boolean;
+  @Input() public lastOrgId:number;
+  @Input() public lastAgencyId:number;
 
   @ViewChild('regionDropdown') public regionDropdown: MultiSelectComponent;
   @ViewChild('locationDropdown') public  locationDropdown: MultiSelectComponent;
@@ -40,7 +42,9 @@ export class FiltersComponent implements OnInit, AfterViewInit {
     text: 'agencyName',
     value: 'agencyId',
   };
-  constructor(private actions$: Actions, protected  store: Store, private readonly ngZone: NgZone,) { 
+  public filterType: string = 'Contains';
+  constructor(private actions$: Actions, protected  store: Store, private readonly ngZone: NgZone,) {
+    super();
     const user = this.store.selectSnapshot(UserState.user);
     this.orgid=user?.businessUnitId
   }
@@ -48,20 +52,21 @@ export class FiltersComponent implements OnInit, AfterViewInit {
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
 
-  ngOnInit(): void {
+  ngOnInit(): void {  
     this.actions$.pipe(
       ofActionDispatched(ShowFilterDialog),
-      debounceTime(300)
+      debounceTime(300),
+      takeUntil(this.destroy$)
     ).subscribe(() => {
       this.regionDropdown.refresh();
       this.locationDropdown.refresh();
       this.departmentDropdown.refresh();
     });
     const user = this.store.selectSnapshot(UserState.user);
-    this.orgid=user?.businessUnitId
+    this.orgid=user?.businessUnitId   
   }
 
-  public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
+  public filterCandidateName: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
     this.onFilterChild(e);
   }
   @OutsideZone
@@ -69,18 +74,27 @@ export class FiltersComponent implements OnInit, AfterViewInit {
 
     if (e.text != '') {
  const user = this.store.selectSnapshot(UserState.user);
- let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
-    this.orgid=user?.businessUnitId|| parseInt(lastSelectedOrganizationId||'0')
-    
+    if(this.isAgency)
+    {
+      this.orgid=Number(this.lastAgencyId);
+    }
+    else
+    {
+      this.orgid=Number(this.lastOrgId);
+    }
+
          let filter: DoNotReturnCandidateSearchFilter = {
         searchText: e.text,
         businessUnitId: this.orgid
       };
       this.CandidateNames = [];
       this.store.dispatch(new Getcandidatesearchbytext(filter))
-        .pipe(delay(500),distinctUntilChanged())
-        .subscribe((result) => {
-      
+        .pipe(
+          delay(500),
+          distinctUntilChanged(),
+          takeUntil(this.destroy$)
+        ).subscribe((result) => {
+
           this.CandidateNames = result.candidateDetails.searchCandidates
           e.updateData(result.candidateDetails.searchCandidates);
         });

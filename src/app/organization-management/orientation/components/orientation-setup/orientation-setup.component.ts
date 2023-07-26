@@ -99,6 +99,7 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
   public readonly orientationTab = OrientationTab;
 
   protected componentDestroy: () => Observable<unknown>;
+  public filterType: string = 'Contains';
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
@@ -339,8 +340,8 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       this.orientationForm.markAllAsTouched();
     } else {
       const data = this.orientationForm.getRawValue();
-      data.startDate = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.startDate));
-      data.endDate = data.endDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.endDate)) : data.endDate;
+      data.startDate = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(data.startDate));
+      data.endDate = data.endDate ? DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(data.endDate)) : data.endDate;
       this.orientationService.saveOrientationConfiguration(data).pipe(
         takeUntil(this.componentDestroy()),
       ).subscribe({
@@ -377,8 +378,8 @@ export class OrientationSetupComponent extends AbstractPermissionGrid implements
       skillIds: data.orientationConfigurationSkills.map(v => v.skillId),
       completedOrientation: data.completedOrientation,
       removeOrientation: data.removeOrientation,
-      startDate: DateTimeHelper.convertDateToUtc(data.startDate.toString()),
-      endDate: data.endDate ? DateTimeHelper.convertDateToUtc(data.endDate.toString()) : null,
+      startDate: DateTimeHelper.setCurrentTimeZone(data.startDate.toString()),
+      endDate: data.endDate ? DateTimeHelper.setCurrentTimeZone(data.endDate.toString()) : null,
     });
     this.cd.markForCheck();
   }

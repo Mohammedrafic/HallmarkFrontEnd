@@ -51,6 +51,7 @@ export class OrderDetailsService {
         shift: [null, Validators.required],
         shiftStartTime: [null, Validators.required],
         shiftEndTime: [null, Validators.required],
+        linkedId: [null, Validators.maxLength(20)],
       },
       { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
     ) as CustomFormGroup<GeneralInformationDTO>;

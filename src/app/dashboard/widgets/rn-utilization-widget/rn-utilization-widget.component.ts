@@ -48,6 +48,7 @@ import { AbstractControl } from '@angular/forms';
   styleUrls: ['./rn-utilization-widget.component.scss'],
 })
 export class RnUtilizationWidgetComponent implements OnInit {
+  
   @Input() isLoading: boolean;
   @Input() isDarkTheme: boolean | false;
   @Input() description: string;
@@ -186,7 +187,6 @@ export class RnUtilizationWidgetComponent implements OnInit {
         }
 
         // this.pb[0].refresh()
-        console.log('percent', this.percent, 'color', this.kpiColor)
       }),
       takeUntil(this.unsubscribe$),
     )

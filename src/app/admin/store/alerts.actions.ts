@@ -84,7 +84,8 @@ export class GetGroupMailByBusinessUnitIdPage {
   static readonly type = '[groupemail] GetGroupMailByBusinessUnitId';
   constructor(
     public businessUnitId: number|null,
-    public getAll:boolean
+    public getAll:boolean,
+    public SeeMyEmailsOnly:boolean|null,
   ) {}
 }
 export class SendGroupEmail {
@@ -102,7 +103,7 @@ export class GetGroupEmailById {
 export class GetGroupEmailRoles {
   static readonly type = '[groupemail] Get Group Email roles By organization id';
   constructor(
-    public id: number
+    public data: number[]
   ) { }
 }
 

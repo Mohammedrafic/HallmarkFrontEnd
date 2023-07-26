@@ -37,6 +37,7 @@ import { ValidateDirectiveModule } from '@shared/directives/validate-directive/v
 
 import { SettingsComponent } from './settings.component';
 import { SettingsRoutingModule } from './settings-routing.module';
+import { ConfigurationGridModule } from '@shared/components/configuration-grid/configuration-grid.module';
 
 const icons = {
   Download,
@@ -82,6 +83,7 @@ const icons = {
     SwitchAllModule,
     TimePickerAllModule,
     DatePickerModule,
+    ConfigurationGridModule,
   ],
 })
 export class SettingsModule { }

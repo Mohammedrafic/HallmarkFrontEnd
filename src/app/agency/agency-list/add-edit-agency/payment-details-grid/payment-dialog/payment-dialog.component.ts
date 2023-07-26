@@ -3,6 +3,7 @@ import {
   ComponentRef,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   Type,
@@ -23,17 +24,21 @@ import {
   PAYMENT_MODE,
   PaymentDetailMode,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/constant/payment.constant';
-import { filter, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { UserState } from 'src/app/store/user.state';
+import { Select } from '@ngxs/store';
+import { Permission } from '../../../../../core/interface';
+import { UserPermissions } from '../../../../../core/enums';
 
 @Component({
   selector: 'app-payment-dialog',
   templateUrl: './payment-dialog.component.html',
   styleUrls: ['./payment-dialog.component.scss'],
 })
-export class PaymentDialogComponent extends DestroyableDirective implements OnInit {
+export class PaymentDialogComponent extends DestroyableDirective implements OnInit, OnDestroy {
   @ViewChild('paymentFormContainer', { read: ViewContainerRef, static: true }) paymentContainer!: ViewContainerRef;
 
   @Output() modalClose = new EventEmitter<boolean>();
@@ -47,18 +52,33 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
     }
   }
 
+  @Select(UserState.userPermission)
+  currentUserPermissions$: Observable<Permission>;
+
   public dialogTitle: string = ADD_PAYMENT;
   public paymentModeControl = new FormControl();
   public paymentModeList = PAYMENT_MODE;
-
+  private unsubscribe$: Subject<void> = new Subject();
   private components = new Map<number, ComponentRef<PaymentDetailsInterface>>();
-
+  public permissionList : Permission
+  public userPermissions = UserPermissions;
   constructor(private confirmService: ConfirmService) {
     super();
   }
 
   ngOnInit(): void {
     this.subscribeOnOpenEvent();
+    this.currentUserPermissions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data: Permission) => {
+        this.permissionList = data;
+        //console.log(this.permissionList[this.userPermissions.EditAgencyNetsuitePaymentId]);
+      });
+  }
+
+  override ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public onCancel(): void {
@@ -109,7 +129,7 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
     const componentType = this.getComponentType(mode);
     const component = this.paymentContainer.createComponent(componentType);
     component.instance.paymentsList = this.paymentsList.value;
-    component.instance.mode = mode;
+    component.instance.mode = mode; 
     this.components.set(mode, component);
   }
 
@@ -149,6 +169,7 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
     const currentComponent = this.getFormInstance(value.mode);
     if (currentComponent) {
       currentComponent.formValue = value;
+      currentComponent.editAgencyNetsuitePaymentId = this.permissionList[this.userPermissions.EditAgencyNetsuitePaymentId];
     }
   }
 

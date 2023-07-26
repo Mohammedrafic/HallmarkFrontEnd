@@ -26,7 +26,12 @@ import {
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { Department as ContactDetails } from '@shared/models/department.model';
 import { currencyValidator } from '@shared/validators/currency.validator';
@@ -47,14 +52,14 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import PriceUtils from '@shared/utils/price.utils';
-import { ORDER_CONTACT_DETAIL_TITLES, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { datepickerMask, ORDER_CONTACT_DETAIL_TITLES, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import { GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { SettingsKeys } from '@shared/enums/settings';
-import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { GetOrderRequisitionByPage } from '@organization-management/store/reject-reason.actions';
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
@@ -62,7 +67,11 @@ import { distributionSource, ORDER_JOB_DISTRIBUTION } from '@shared/constants/or
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { ManualInvoiceReason } from '@shared/models/manual-invoice-reasons.model';
 import { DurationService } from '@shared/services/duration.service';
-import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage, IsStartEndDateOverlapWithInactivePeriod } from '@core/helpers';
+import {
+  DateTimeHelper,
+  GenerateLocationDepartmentOverlapMessage,
+  IsStartEndDateOverlapWithInactivePeriod,
+} from '@core/helpers';
 import { TierLogic } from '@shared/enums/tier-logic.enum';
 import { SettingsViewService } from '@shared/services';
 import {
@@ -114,9 +123,11 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public shiftStartTimeField: AbstractControl;
   public shiftEndTimeField: AbstractControl;
   private filterQueryString: string;
-  private readonly highlightDropdownSearchString  = { itemCreated: (e: { item: HTMLElement; }) => {
-    highlightSearch(e.item, this.filterQueryString, true, 'Contains') }
-  }
+  private readonly highlightDropdownSearchString = {
+    itemCreated: (e: { item: HTMLElement; }) => {
+      highlightSearch(e.item, this.filterQueryString, true, 'Contains');
+    },
+  };
 
   public readonly quickOrderConditions: QuickOrderConditions = { ...QuickOrderCondition };
   public readonly optionFields: FieldSettingsModel = { ...optionFields, ...this.highlightDropdownSearchString };
@@ -130,15 +141,17 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public orderStatus = 'Open';
   public priceUtils = PriceUtils;
-  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  public settings: { [key in SettingsKeys]?: Configuration };
   public readonly orderTypes = OrderTypeOptions;
   public readonly durations = ORDER_DURATION_LIST;
   public readonly masterShiftNames = ORDER_MASTER_SHIFT_NAME_LIST;
   public readonly contactDetailTitles = ORDER_CONTACT_DETAIL_TITLES;
+  public readonly datepickerMask = datepickerMask;
   public regionDataSource: OrganizationRegion[] = [];
   public locationDataSource: OrganizationLocation[] = [];
   public departmentDataSource: OrganizationDepartment[] = [];
   public jobDistributions = ORDER_JOB_DISTRIBUTION;
+  public reasons: RejectReasonwithSystem[] = [];
 
   private selectedOrganizationId: number;
   private selectedLocation: OrganizationLocation;
@@ -150,11 +163,13 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
   @Select(RejectReasonState.sortedOrderRequisition)
   public readonly reasons$: Observable<RejectReasonPage>;
+  @Select(DashboardState.getOrganizationSkills)
+  public readonly organizationSkills$: Observable<AssignedSkillsByOrganization[]>;
+
   @Select(OrganizationManagementState.organizationSettings)
-  private readonly organizationSettings$: Observable<OrganizationSettingsGet[]>;
+  private readonly organizationSettings$: Observable<Configuration[]>;
   @Select(OrderManagementContentState.contactDetails)
   private readonly contactDetails$: Observable<ContactDetails>;
-  @Select(DashboardState.getOrganizationSkills) public readonly organizationSkills$: Observable<AssignedSkillsByOrganization[]>;
 
   get orderTypeControl() {
     return this.orderTypeForm.get('orderType') as AbstractControl;
@@ -205,6 +220,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   public ngOnInit(): void {
+    this.getVMSOrderRequisition();
     this.handleOrderTypeControlValueChanges();
     this.orderTypeDepartmentSkillListener();
     this.handleJobStartDateValueChanges();
@@ -342,6 +358,28 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     return arr.filter((department: OrganizationDepartment) => !department.isDeactivated);
   }
 
+  public getVMSOrderRequisition() {
+    this.reasons$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.reasons = [];
+        data.items.forEach(item => {
+          if (item.includeInVMS === true) {
+            this.reasons.push({
+              id: item.id,
+              reason: item.reason,
+              businessUnitId: item.businessUnitId,
+              isAutoPopulate: item.isAutoPopulate,
+            });
+          }
+          if (item.isAutoPopulate === true) {
+            this.jobDistributionDescriptionForm.controls['orderRequisitionReasonId'].setValue(item.id);
+          }
+        });
+      });
+  }
+
+
   private populateRegLocDepFields(region: OrganizationRegion): void {
     if (region) {
       this.generalInformationForm.controls['regionId'].patchValue(region.id);
@@ -414,7 +452,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         new GetProjectSpecialData(),
         new GetOrganizationSettings(),
         new GetOrderRequisitionByPage(),
-        new GetOrganizationSkills()
+        new GetOrganizationSkills(),
       ]);
     }
   }
@@ -546,8 +584,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     organizationId?: number
   ): void {
     if (this.quickOrderConditions.isTravelerOrder || this.quickOrderConditions.isContactToPermOrder) {
-      const startDate = DateTimeHelper.toUtcFormat(jobStartDate);
-      const endDate = DateTimeHelper.toUtcFormat(jobEndDate);
+      const startDate = DateTimeHelper.setUtcTimeZone(jobStartDate);
+      const endDate = DateTimeHelper.setUtcTimeZone(jobEndDate);
       this.orderManagementService
         .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate, organizationId)
         .pipe(take(1))
@@ -671,7 +709,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private subscribeForSettings(): void {
     this.organizationSettings$.pipe(
       takeUntil(this.destroy$)
-    ).subscribe((settings: OrganizationSettingsGet[]) => {
+    ).subscribe((settings: Configuration[]) => {
       const projectFields = ['projectTypeId', 'projectNameId', 'poNumberId'];
       this.settings = SettingsHelper.mapSettings(settings);
       this.quickOrderConditions.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
@@ -724,7 +762,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         new Date(DateTimeHelper.formatDateUTC(this.selectedDepartment.reactivateDate, 'MM/dd/yyyy')) : null;
         locationInactiveDate && locationInactiveDate.setHours(0, 0, 0, 0);
         departmentInactiveDate && departmentInactiveDate.setHours(0, 0, 0, 0);
-        const isLocationOverlaps = IsStartEndDateOverlapWithInactivePeriod(locationInactiveDate, locationReactivateDate, jobStartDate, jobEndDate); 
+        const isLocationOverlaps = IsStartEndDateOverlapWithInactivePeriod(locationInactiveDate, locationReactivateDate, jobStartDate, jobEndDate);
         const isDepartmentOverlaps = IsStartEndDateOverlapWithInactivePeriod(departmentInactiveDate, departmentReactivateDate, jobStartDate, jobEndDate);
       const isLocationDepartmentDateSame = this.selectedLocation.inactiveDate === this.selectedDepartment.inactiveDate;
       if (isLocationOverlaps || isDepartmentOverlaps) {
@@ -812,10 +850,10 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   setShiftsValidation(): void {
     this.shiftStartTimeField.addValidators([
-      Validators.required
+      Validators.required,
     ]);
     this.shiftEndTimeField.addValidators([
-      Validators.required
+      Validators.required,
     ]);
   }
 
@@ -839,7 +877,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
             OrganizationalHierarchy.Department,
             id,
             this.selectedOrganizationId
-          )
+          );
         }),
         takeUntil(this.destroy$)
       ).subscribe(({ TieringLogic }) => {

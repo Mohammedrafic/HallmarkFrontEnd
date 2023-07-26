@@ -1,19 +1,19 @@
 <ejs-tab
+  *ngIf="tabCounts$ | async"
   id="tab_default"
+  cssClass="{{ isDisabled && 'disabled' }} tabs"
   heightAdjustMode="Auto"
   overflowMode="Scrollable"
-  (selecting)="onSelect($event)"
   [width]="tabsWidth$ | async"
-  cssClass="{{ isDisabled && 'disabled' }} tabs">
-  <e-tabitems>
-
-    <e-tabitem *ngFor="let tab of tabConfig; trackBy: trackBy">
-      <ng-template #headerText>
+  (selecting)="onSelect($event)"
+>
+  <div class="e-tab-header">
+      <div *ngFor="let tab of tabConfig; trackBy: trackBy">
         {{ tab.title }}
-        <span *ngIf="tab?.amount"class="tab-navigation e-badge e-badge-success e-badge-pill">
-            {{ tab.amount }}
+        <span *ngIf="tab?.amount" class="tab-navigation e-badge e-badge-success e-badge-pill">
+          {{ tab.amount }}
         </span>
-      </ng-template>
-    </e-tabitem>
-  </e-tabitems>
+      </div>
+  </div>
+  <div class="e-content"></div>
 </ejs-tab>

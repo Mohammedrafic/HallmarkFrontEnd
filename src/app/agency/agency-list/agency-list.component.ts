@@ -37,11 +37,34 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public readonly statusMapper = agencyStatusMapper;
 
   public columnsToExport: ExportColumn[] = [
+    { text: 'Agency VMSId', column: 'AgencyVMSID' },
     { text: 'Agency Name', column: 'AgencyName' },
     { text: 'Agency Status', column: 'AgencyStatus' },
+    { text: 'NetSuite Id', column:'NetSuiteId'},
     { text: 'Tax ID', column: 'TaxID' },
+    { text: 'Address Line1', column: 'AddressLine1' },
+    { text: 'Address Line2', column: 'AddressLine2' },
+    { text: 'City', column: 'City' },
+    { text: 'State', column: 'State' },
+    { text: 'Country', column: 'Country' },
+    { text: 'ZipCode', column: 'ZipCode' },
+    { text: 'Phone Line1', column: 'PhoneLine1' },
+    { text: 'Phone Line 2', column: 'PhoneLine2' },
+    { text: 'Fax', column: 'Fax' },
+    { text: 'Last Modified At', column: 'LastModifiedAt' },
+    { text: 'Last Modified By', column: 'LastModifiedBy' },
+    { text: 'Base Fee', column: 'BaseFee' },
+    { text: 'Payment Mode', column: 'PaymentMode' },
+    { text: 'Payee', column: 'Payee' },
+    { text: 'Effective date', column: 'Effectivedate' },
+    { text: 'Effective date ending', column: 'Effectivedateending' },
+    { text: 'Bank Name', column: 'BankName' },
+    { text: 'Routing Number', column:'RoutingNumber'},
+    { text: 'Account Holder Name', column: 'AccountHolderName' },
+    { text: 'NS PaymentId', column:'NSPaymentID'},
     { text: 'Contact Person', column: 'ContactPerson' },
     { text: 'Phone', column: 'Phone' },
+    
   ];
   public fileName: string;
   public defaultFileName: string;

@@ -4,7 +4,7 @@
     class="datepicker"
     format="MM/dd/yyyy"
     appValidateWithMessage
-    placeholder="From: MM/DD/YYYY - To: MM/DD/YYYY"
+    [placeholder]="(isMobile$ | async) ? mobilePlaceholder : placeholder"
     [formControl]="dateControl"
     [allowEdit]="false"
     [max]="maxDate"

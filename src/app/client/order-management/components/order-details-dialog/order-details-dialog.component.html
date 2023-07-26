@@ -2,7 +2,7 @@
   id="dialog"
   #sideDialog
   cssClass="dialog order-details-dialog"
-  [target]="targetElement"
+  [target]="targetElement$ | async"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
@@ -32,29 +32,65 @@
               </div>
             </div>
           </div>
-          <div class="e-card-content dialog-controls">
+          <div
+            class="e-card-content dialog-controls"
+            [ngClass]="{
+              'open-per-diem-order': order?.orderType === orderType.OpenPerDiem,
+              'traveler-order': order?.orderType === orderType.Traveler,
+              'contact-to-perm': order?.orderType === orderType.ContractToPerm,
+              'perm-placement': order?.orderType === orderType.PermPlacement
+            }"
+          >
             <div class="order-actions" *ngIf="showApproveAndCancel">
               <button ejs-button cssClass="e-outline" (click)="cancelOrder(order.id)">Cancel</button>
               <button ejs-button cssClass="e-primary" (click)="approveOrder(order.id)">Approve</button>
               <div class="vertical-divider"></div>
             </div>
 
-            <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
+            <app-tooltip-container [showToolTip]="!CanEditOrderBillRateIRP">
               <button
+                *ngIf="activeSystem === systemType.IRP"
                 ejs-button
                 cssClass="e-outline edit-button"
-                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission || !CanEditOrderBillRateIRP"
+                [disabled]="disableEdit || !CanEditOrderBillRateIRP"
                 (click)="editOrder(order)"
               >
                 <i-feather name="edit" class="icon"></i-feather>
               </button>
             </app-tooltip-container>
-            <app-tooltip-container *ngIf="!canCloseOrder" [showToolTip]="!hasCreateEditOrderPermission">
+
+            <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
               <button
+                *ngIf="activeSystem !==  systemType.IRP"
+                ejs-button
+                cssClass="e-outline edit-button"
+                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission"
+                (click)="editOrder(order)"
+              >
+                <i-feather name="edit" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
+
+            <app-tooltip-container [showToolTip]="!CanCloseOrdersIRP">
+              <button
+                *ngIf="activeSystem === systemType.IRP"
                 ejs-button
                 cssClass="e-outline"
                 [class.custom-order-btn]="showApproveAndCancel"
-                [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission || !CanCloseOrdersIRP"
+                [disabled]="disableCloseOrder || !CanCloseOrdersIRP"
+                (click)="closeOrder(order)"
+              >
+                Close Order
+              </button>
+            </app-tooltip-container>
+
+            <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                *ngIf="activeSystem !==  systemType.IRP"
+                ejs-button
+                cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
+                [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
                 (click)="closeOrder(order)"
               >
                 Close Order
@@ -84,7 +120,6 @@
             </app-tooltip-container>
             <app-tooltip-container *ngIf="!showCloseButton" [showToolTip]="!hasCreateEditOrderPermission">
               <button
-            
                 ejs-button
                 cssClass="e-primary delete-button"
                 [class.custom-order-btn]="showApproveAndCancel"
@@ -118,7 +153,7 @@
             </app-tooltip-container>
 
             <app-tooltip-container *ngIf="showLockOrder" [showToolTip]="!hasCreateEditOrderPermission">
-              <button              
+              <button
                 ejs-button
                 cssClass="e-outline"
                 [class.custom-order-btn]="showApproveAndCancel"
@@ -167,7 +202,7 @@
                   [activeSystem]="activeSystem"></app-order-details-container>
               </ng-template>
             </e-tabitem>
-            <e-tabitem>
+            <e-tabitem *ngIf="showEmployeeTab">
               <ng-template #headerText>
                 <span *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">{{ order?.extensionFromId ? 'Employee' : 'Employees' }}</span>
                 <span *ngIf="activeSystem !== OrderManagementIRPSystemId.IRP">{{ order?.extensionFromId ? 'Candidate' : 'Candidates' }}</span>

@@ -36,7 +36,7 @@ export const GetScheduleDayWithEarliestTime = (schedules: ScheduleInt.ScheduleIt
 export const CreateScheduleDateItems = (dateValue: string): DateItem => {
   const date = new Date(`${dateValue}T00:00:00`);
   return {
-    dateValue: DateTimeHelper.toUtcFormat(date),
+    dateValue: DateTimeHelper.setUtcTimeZone(date),
     id: null,
     date,
   };
@@ -123,7 +123,7 @@ export const ScheduleItemsWithErrors = (
 export const DataItemsWithErrors = (dateItems: DateItem[], dateLevelErrors: BookingError[]): DateItem[] => {
   return dateItems.map((item: DateItem) => {
     const findItemWithError = dateLevelErrors.find((error: BookingError) => {
-      return DateTimeHelper.toUtcFormat(error.Key) === item.dateValue;
+      return DateTimeHelper.setUtcTimeZone(error.Key) === item.dateValue;
     });
 
     if(findItemWithError) {
@@ -165,9 +165,9 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
     startDate: startDate || '',
     endDate: endDate || '',
     departmentsIds: departmentsIds ?? [],
-    userLocalTime: DateTimeHelper.toUtcFormat(new Date()),
+    userLocalTime: DateTimeHelper.setUtcTimeZone(new Date()),
     isAvailablity : isAvailablity || false,
-    isUnavailablity : isUnavailablity || false, 
+    isUnavailablity : isUnavailablity || false,
     isOnlySchedulatedCandidate : isOnlySchedulatedCandidate || false,
     startTime : startTime || null,
     endTime : endTime || null,

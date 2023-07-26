@@ -38,6 +38,10 @@
     </div>
     <app-eligibility-message [message]="candidateJob?.notEligibilityMessage"></app-eligibility-message>
     <app-deploy-candidate-message *ngIf="isDeployedCandidate" [isAgency]="isAgency" [candidateBasicInfo]="deployedCandidateOrderInfo"></app-deploy-candidate-message>
+    <div class="candidate-message" *ngIf="candidateJob?.isLocal">
+      <i-feather name="info" class="icon"></i-feather>
+      Local Candidate
+    </div>
   </section>
   <section class="content-container">
     <div class="candidate-info">
@@ -241,7 +245,7 @@
                       <input appValidateWithMessage formControlName="penaltyCriteria" class="e-input" type="text" readonly/>
                     </div>
                   </div>
-                  <div class="d-flex">
+                  <div class="d-flex" *ngIf="!verifyNoPenalty">
                     <div class="input-container bootstrap">
                       <label class="input-group">{{ showPercentage ? '% ' : '' }}Rate</label>
                       <div class="input-group input-readonly">
@@ -271,7 +275,7 @@
       </ejs-accordion>
     </div>
     <div class="comments">
-      <app-comments *ngIf="candidateJob" [comments]="comments" [externalCommentConfiguration]="order.externalCommentsConfiguration" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
+      <app-comments *ngIf="candidateJob" [canVmsCreateOrders]="canCreateOrder" [comments]="comments" [externalCommentConfiguration]="order.externalCommentsConfiguration" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section>
@@ -315,6 +319,13 @@
   (applyReject)="onRejectCandidate($event)"
   (cancelReject)="resetStatusesFormControl()"
 ></app-reject-reason-dialog>
+
+<!--  -->
+<app-send-email-side-dialog [header]="templateEmailTitle" [isSend]="isSend" (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()" [width]="'1000px'">
+    <app-onboard-candidate-message-dialog [isFormInvalid]="isSendOnboardFormInvalid" 
+      [onBoardMessageEmailTemplateForm]="$any(sendOnboardMessageEmailFormGroup)" [title]="templateEmailTitle" [isSend]="isSend" [emailTo]="emailTo" 
+    ></app-onboard-candidate-message-dialog>
+</app-send-email-side-dialog>
 
 <app-candidate-cancellation-dialog
   [openEvent]="openCandidateCancellationDialog"

@@ -35,7 +35,12 @@ import { UnavailabilityReason } from '@shared/models/unavailability-reason.model
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShiftsService } from '@shared/services/shift.service';
 import { getTime } from '@shared/utils/date-time.utils';
-import { ScheduleFormSourceKeys, ScheduleItemType, ScheduleTypesForEditBar } from 'src/app/modules/schedule/constants';
+import {
+  PastTimeErrorMessage,
+  ScheduleFormSourceKeys,
+  ScheduleItemType,
+  ScheduleTypesForEditBar,
+} from 'src/app/modules/schedule/constants';
 import { ScheduleType } from 'src/app/modules/schedule/enums';
 import { ShowToast } from 'src/app/store/app.actions';
 import {
@@ -79,7 +84,7 @@ import { EditScheduleService } from './edit-schedule.service';
 import { SettingsViewService } from '@shared/services';
 import { OrganizationSettingKeys,OrganizationalHierarchy } from '@shared/constants';
 import { UserState } from 'src/app/store/user.state';
- 
+
 
 @Component({
   selector: 'app-edit-schedule',
@@ -264,7 +269,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.watchForShiftControl();
     this.watchForDateControl();
 
-    patchData.date = DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date);
+    patchData.date = DateTimeHelper.setCurrentTimeZone(this.scheduledItem.schedule.date);
 
     this.scheduleForm.patchValue(patchData);
     this.cdr.markForCheck();
@@ -289,6 +294,13 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   saveSchedule(): void {
     if (this.scheduleForm.invalid) {
       this.scheduleForm.markAllAsTouched();
+      return;
+    }
+
+    const { startTime, date } = this.scheduleForm.getRawValue();
+
+    if (!this.createScheduleService.canEmployeeCreateRecord(this.isEmployee, [date], startTime)) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, PastTimeErrorMessage));
       return;
     }
 
@@ -581,7 +593,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       departmentId,
       skillId,
       shiftId: shiftId === this.customShiftId ? null : shiftId,
-      date: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+      date: DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(date)),
       startTime: getTime(startTime),
       endTime: getTime(endTime),
       createOrder: this.createPerDiemOrderControl.value,
@@ -610,8 +622,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private setTimeForCustomShift(): void {
     this.scheduleForm.patchValue({
-      startTime: DateTimeHelper.convertDateToUtc(this.selectedDaySchedule.startDate),
-      endTime: DateTimeHelper.convertDateToUtc(this.selectedDaySchedule.endDate),
+      startTime: DateTimeHelper.setCurrentTimeZone(this.selectedDaySchedule.startDate),
+      endTime: DateTimeHelper.setCurrentTimeZone(this.selectedDaySchedule.endDate),
     });
     this.setHours();
   }
@@ -679,7 +691,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
     this.watchForShiftControl();
     this.watchForDateControl();
-    patchData.date = DateTimeHelper.convertDateToUtc(this.scheduledItem.schedule.date);
+    patchData.date = DateTimeHelper.setCurrentTimeZone(this.scheduledItem.schedule.date);
     patchData.shiftId = this.selectedDaySchedule.shiftId || this.customShiftId;
 
     if (!this.selectedDaySchedule.shiftId) {
@@ -696,7 +708,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     const schedule: Schedule = {
       employeeScheduledDays: [{
         employeeId: this.scheduledItem.candidate.id,
-        dates: [DateTimeHelper.toUtcFormat(new Date(date.setHours(0, 0, 0)))],
+        dates: [DateTimeHelper.setUtcTimeZone(new Date(date.setHours(0, 0, 0)))],
       }],
       scheduleType: this.scheduleTypesControl.value,
       startTime: getTime(startTime),
@@ -721,7 +733,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleToBook = {
       employeeBookedDays: [{
         employeeId: this.scheduledItem.candidate.id,
-        bookedDays: [DateTimeHelper.toUtcFormat(new Date(date.setHours(0, 0, 0)))],
+        bookedDays: [DateTimeHelper.setUtcTimeZone(new Date(date.setHours(0, 0, 0)))],
       }],
       departmentId: departmentId as number,
       skillId: skillId,
@@ -746,7 +758,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleApiService.checkBookingsOverlaps(request).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
       switchMap((response: BookingsOverlapsResponse[]) => {
-        if (!response.length && this.scheduleToBook) {
+        if ((!response.length && this.scheduleToBook) || this.isEmployee) {
           return this.createBookSchedule();
         } else {
           this.openReplacementOrderDialog(response);
@@ -763,7 +775,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.unavailabilityToSave = {
       employeeScheduledDays: [{
         employeeId: this.scheduledItem.candidate.id,
-        dates: [DateTimeHelper.toUtcFormat(new Date(date.setHours(0, 0, 0)))],
+        dates: [DateTimeHelper.setUtcTimeZone(new Date(date.setHours(0, 0, 0)))],
       }],
       scheduleType: this.scheduleTypesControl.value,
       startTime: getTime(startTime),
@@ -775,7 +787,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     const request: BookingsOverlapsRequest = {
       employeeScheduledDays: [{
         employeeId: this.scheduledItem.candidate.id,
-        bookedDays: [DateTimeHelper.toUtcFormat(new Date(date.setHours(0, 0, 0)))],
+        bookedDays: [DateTimeHelper.setUtcTimeZone(new Date(date.setHours(0, 0, 0)))],
       }],
       shiftId: this.unavailabilityToSave.shiftId,
       startTime: this.unavailabilityToSave.startTime,
@@ -785,7 +797,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.scheduleApiService.checkBookingsOverlaps(request).pipe(
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
       switchMap((response: BookingsOverlapsResponse[]) => {
-        if (!response.length && this.unavailabilityToSave) {
+        if ((!response.length && this.unavailabilityToSave) || this.isEmployee) {
           return this.createUnavailability();
         } else {
           this.openReplacementOrderDialog(response);
@@ -833,7 +845,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
         scheduleId: this.selectedDaySchedule.id,
         unavailabilityReasonId,
         shiftId: shiftId === this.customShiftId ? null : shiftId,
-        date: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+        date: DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(date)),
         startTime: getTime(startTime),
         endTime: getTime(endTime),
         createOrder: !!this.unavailabilityToSave?.createOrder,
@@ -895,7 +907,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     const { date } = this.scheduleForm.getRawValue();
     const updatedCandidate = {
       ...this.scheduledItem.candidate,
-      dates: [DateTimeHelper.toUtcFormat(date)],
+      dates: [DateTimeHelper.setUtcTimeZone(date)],
     };
     const isCandidateOriented = this.createScheduleService.getCandidateOrientation(updatedCandidate);
 
@@ -974,7 +986,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     const locationId = (filters.locationIds as number[])[0];
     const departmentId = (filters.departmentsIds as number[])[0];
 
-    this.availabilityOpenPositionSkillId = (filters.skillIds as number[])[0];
+    this.availabilityOpenPositionSkillId = filters.skillIds ? (filters.skillIds as number[])[0] : null;
     this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFiltersService
       .getSelectedLocatinOptions(this.scheduleFilterStructure, [regionId]);
     this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Departments] = this.scheduleFiltersService

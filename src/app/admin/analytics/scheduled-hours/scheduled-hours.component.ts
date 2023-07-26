@@ -303,9 +303,7 @@ export class ScheduledHoursComponent implements OnInit, OnDestroy {
                 this.changeDetectorRef.detectChanges();
 
                 if (this.isInitialLoad) {
-                  setTimeout(() => {
                     this.SearchReport();
-                  }, 3000);
                   this.isInitialLoad = false;
                 }
               }
@@ -503,7 +501,6 @@ export class ScheduledHoursComponent implements OnInit, OnDestroy {
       IncludeOnCallParam: includeOnCallHours,
       ShowAllParam: showAll
     };
-    console.log(this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }

@@ -105,14 +105,14 @@ export class AddEditReorderService {
     checkAgencies(agencies: AgencyModel[], selectedIds: number[]): boolean {
       const mandatoryAgencyIds = agencies.filter((agency) => agency.hasActiveCandidate)
       .map((agency) => agency.agencyId);
-  
+
       if (!mandatoryAgencyIds.length) {
         return true;
       }
-  
+
       const allMandatoryPresent = mandatoryAgencyIds.every((id) => {
         const idPresent = selectedIds.includes(id);
-  
+
         if (!idPresent) {
           const agencyName = agencies.find((agency) => agency.agencyId === id)?.agencyName as string;
           const message = MandatoryAgencyErrorMessage(agencyName);
@@ -124,10 +124,10 @@ export class AddEditReorderService {
             cssClass: 'error-toast',
           });
         }
-  
+
         return idPresent;
       });
-  
+
       return allMandatoryPresent;
     }
 
@@ -139,7 +139,7 @@ export class AddEditReorderService {
     const reorderDates: string[] = dates.map((date: Date) => {
       date.setHours(0, 0, 0, 0);
 
-      return DateTimeHelper.toUtcFormat(date);
+      return DateTimeHelper.setUtcTimeZone(date);
     });
 
     return {
@@ -148,8 +148,8 @@ export class AddEditReorderService {
       agencyIds,
       reorderDates,
       candidateProfileIds: reorder.candidates,
-      shiftEndTime: new Date(DateTimeHelper.toUtcFormat(reorder.shiftEndTime)),
-      shiftStartTime: new Date(DateTimeHelper.toUtcFormat(reorder.shiftStartTime)),
+      shiftEndTime: new Date(DateTimeHelper.setUtcTimeZone(reorder.shiftEndTime)),
+      shiftStartTime: new Date(DateTimeHelper.setUtcTimeZone(reorder.shiftStartTime)),
       billRate: reorder.billRate,
       openPositions: reorder.openPosition,
     };

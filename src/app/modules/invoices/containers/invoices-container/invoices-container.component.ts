@@ -23,8 +23,8 @@ import {
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
 import { OutsideZone } from '@core/decorators';
-import { DialogAction, FilterPageName } from '@core/enums';
-import { DataSourceItem, PreservedFiltersByPage } from '@core/interface';
+import { DialogAction, FilterPageName, UserPermissions } from '@core/enums';
+import { DataSourceItem, Permission, PreservedFiltersByPage } from '@core/interface';
 import {
   RejectReasonInputDialogComponent,
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
@@ -177,6 +177,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   private gridInstance: GridReadyEventModel;
 
   private filterState: Interfaces.InvoicesFilterState = {};
+  public userPermission: Permission = {};
+  public readonly userPermissions = UserPermissions;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -237,6 +239,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForOpenPayment();
     this.watchForSavePaymentAction();
     this.watchForPreservedFilters();
+    this.getuserPermission()
   }
 
   ngAfterViewInit(): void {
@@ -464,6 +467,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       ...this.filterState,
       pageNumber,
     }, true));
+    this.changeMultiSelection([]);
+    this.clearGroupedInvoices();
   }
 
   public changePageSize(pageSize: number): void {
@@ -474,6 +479,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       pageSize,
     }, useFilterState));
     this.previousSelectedTabIdx = this.selectedTabIdx;
+    this.changeMultiSelection([]);
+    this.clearGroupedInvoices();
   }
 
   public changeSorting(event: string): void {
@@ -521,7 +528,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public changeMultiSelection(nodes: RowNode[]): void {
     if (nodes.length) {
-      this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
+      if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords)
+      this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.id);
+      else
+        this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
       this.gridSelections.rowNodes = nodes;
     } else {
       this.gridSelections.selectedInvoiceIds = [];
@@ -538,9 +548,14 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       } : {
         organizationId: this.organizationId as number,
       }),
-    };
+    };    
+    if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords)
+    {
+      dto.ids = this.gridSelections.selectedInvoiceIds;
+      delete dto.invoiceIds;
+    }
 
-    this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency))
+    this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency,this.selectedTabIdx))
       .pipe(
         filter((state) => !!state.invoices.printData),
         map((state) => state.invoices.printData),
@@ -550,7 +565,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         if (this.isAgency) {
           this.printingService.printAgencyInvoice(data);
         } else {
-          this.printingService.printInvoice(data);
+          this.printingService.printInvoice(data,this.selectedTabIdx);
+          if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords){
+            this.resetTableSelection();
+          }
         }
       });
   }
@@ -640,18 +658,23 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   private watchForSavePaymentAction(): void {
     this.actions$.pipe(ofActionSuccessful(Invoices.SavePayment), takeUntil(this.componentDestroy())).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
-      this.store.dispatch(
-        new Invoices.ToggleInvoiceDialog(
-          DialogAction.Open,
-          this.isAgency,
-          {
-            invoiceIds: this.gridSelections.selectedInvoiceIds,
-            organizationIds: [this.organizationId],
-          },
-          null,
-          null
-        )
-      );
+      const isDialogOpen = this.store.selectSnapshot(InvoicesState.isInvoiceDetailDialogOpen);
+      // Update data only for already open invoice dialog.
+      if (isDialogOpen.dialogState) {
+        this.store.dispatch(
+          new Invoices.ToggleInvoiceDialog(
+            DialogAction.Open,
+            this.isAgency,
+            {
+              invoiceIds: this.gridSelections.selectedInvoiceIds,
+              organizationIds: [this.organizationId],
+            },
+            null,
+            null
+          )
+        );
+      }
+
       this.cdr.markForCheck();
     });
   }
@@ -732,5 +755,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     } else {
       this.store.dispatch(new ClearOrganizationStructure());
     }
+  }
+  private getuserPermission(): void {
+    this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length), take(1)
+    ).subscribe((permissions: Permission) => {
+      this.userPermission = permissions;
+    });
   }
 }

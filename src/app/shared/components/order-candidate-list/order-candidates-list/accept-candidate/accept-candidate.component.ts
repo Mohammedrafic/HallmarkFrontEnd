@@ -54,6 +54,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { formatNumber } from '@angular/common';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -94,12 +95,14 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public priceUtils = PriceUtils;
   public showHoursControl: boolean = false;
   public showPercentage: boolean = false;
+  public verifyNoPenalty: boolean = false;
   public candidatePayRateRequired: boolean;
   public candidateSSNRequired: boolean=false;
   public candidateDOBRequired: boolean;
   public payRateSetting = CandidatePayRateSettings;
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
+  public canCreateOrder : boolean;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -176,6 +179,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private changeDetectionRef: ChangeDetectorRef,
+    private permissionService: PermissionService
   ) {
     this.createForm();
   }
@@ -187,6 +191,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.patchForm();
     this.subscribeOnReasonsList();
     this.subscribeOnSuccessRejection();
@@ -205,8 +210,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
+        .pipe(
+          filter((confirm) => confirm),
+          take(1)
+        ).subscribe(() => {
           this.closeDialog();
         });
     } else {
@@ -222,8 +229,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){ 
-          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+      if(this.candidateJob?.candidateProfileContactDetails != null){
+          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null
               || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
             this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
             return;
@@ -235,7 +242,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){ 
+      if(this.candidateJob?.candidateProfileContactDetails != null){
           if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
               this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
               return;
@@ -269,8 +276,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
       if(this.candidatePhone1RequiredValue === ConfigurationValues.Apply){
-        if(this.candidateJob?.candidateProfileContactDetails != null){ 
-          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null 
+        if(this.candidateJob?.candidateProfileContactDetails != null){
+          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null
             || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
             this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Apply)));
             return;
@@ -282,7 +289,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       }
 
       if(this.candidateAddressRequiredValue === ConfigurationValues.Apply){
-        if(this.candidateJob?.candidateProfileContactDetails != null){ 
+        if(this.candidateJob?.candidateProfileContactDetails != null){
             if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
                 this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Apply)));
                 return;
@@ -339,7 +346,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload)).subscribe(() => {
+      this.store.dispatch(new RejectCandidateJob(payload)).pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
       });
 
@@ -361,7 +370,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           offeredBillRate: value.offeredBillRate || null,
           requestComment: value.comments,
           expAsTravelers: value.expAsTravelers,
-          availableStartDate: DateTimeHelper.toUtcFormat(new Date(value.availableStartDate)),
+          availableStartDate: DateTimeHelper.setUtcTimeZone(new Date(value.availableStartDate)),
           actualStartDate: this.candidateJob.actualStartDate,
           actualEndDate: this.candidateJob.actualEndDate,
           clockId: this.candidateJob.clockId,
@@ -371,8 +380,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           offeredStartDate: this.candidateJob.offeredStartDate,
           candidatePayRate: value.candidatePayRate
         })
-      )
-      .subscribe(() => {
+      ).pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
       });
     this.closeDialog();
@@ -435,13 +445,26 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
             this.candidateAddressRequiredValue = addressConfiguration.value;
           }
         }
+        
+        let jobStartDate: string;
+        let jobEndDate: string;
+        const statusesForActualDates = [ApplicantStatusEnum.OnBoarded, ApplicantStatusEnum.Cancelled,
+          ApplicantStatusEnum.Offboard];
+
+        if (this.isAgency && statusesForActualDates.includes(value.applicantStatus.applicantStatus)) {
+          jobStartDate = value.actualStartDate || '';
+          jobEndDate = value.actualEndDate || '';
+        } else {
+          jobStartDate = value.order.jobStartDate as unknown as string || '';
+          jobEndDate = value.order.jobEndDate as unknown as string || '';
+        }
+
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate ? DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()) : "",
-          value.order.jobEndDate ? DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()) : ""],
+          date: [DateTimeHelper.setCurrentTimeZone(jobStartDate), DateTimeHelper.setCurrentTimeZone(jobEndDate)],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
           availableStartDate: value.availableStartDate ?
             DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
@@ -454,19 +477,19 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           rejectReason: value.rejectReason,
           guaranteedWorkWeek: value.guaranteedWorkWeek,
           offeredStartDate: value.offeredStartDate ? DateTimeHelper.formatDateUTC(
-            DateTimeHelper.toUtcFormat(value.offeredStartDate).toString(), 'MM/dd/yyyy') : '',
+            DateTimeHelper.setUtcTimeZone(value.offeredStartDate).toString(), 'MM/dd/yyyy') : '',
           clockId: value.clockId,
           actualStartDate: value.actualStartDate ? DateTimeHelper.formatDateUTC(
-            DateTimeHelper.toUtcFormat(value.actualStartDate).toString(), 'MM/dd/yyyy') : '',
+            DateTimeHelper.setUtcTimeZone(value.actualStartDate).toString(), 'MM/dd/yyyy') : '',
           actualEndDate: value.actualEndDate ? DateTimeHelper.formatDateUTC(
-            DateTimeHelper.toUtcFormat(value.actualEndDate).toString(), 'MM/dd/yyyy') : '',
+            DateTimeHelper.setUtcTimeZone(value.actualEndDate).toString(), 'MM/dd/yyyy') : '',
           jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
           penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
           rate: value.jobCancellation?.rate,
           hours: value.jobCancellation?.hours,
           dob: value.candidateProfile.dob,
           ssn: value.candidateProfile.ssn,
-          candidatePayRate: this.candidateJob.candidatePayRate
+          candidatePayRate: this.candidateJob.candidatePayRate,
         });
       }
       this.changeDetectionRef.markForCheck();
@@ -534,5 +557,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+    this.verifyNoPenalty = value === PenaltyCriteria.NoPenalty;
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

@@ -65,13 +65,16 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.filters.tab = this.activeTab;
-    this.defaultFileName = 'Candidate Assignment ' + this.generateDateTime(this.datePipe);
+    if(!this.filters){
+      this.filters ={}
+    }
+    let tab= this.activeTab;
+    this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab] + ' '+ this.generateDateTime(this.datePipe);
     this.store.dispatch(
       new ExportCandidateAssignment(
         new ExportPayload(
           fileType,
-          { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
+          {  tab,...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
           options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
           null,
           options?.fileName || this.defaultFileName
@@ -88,7 +91,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
 
   private watchForDefaultExport(): void {
     this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
-      this.defaultFileName = 'Candidate Assignment ' + this.generateDateTime(this.datePipe);
+      this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab] + ' '+ this.generateDateTime(this.datePipe);
       this.defaultExport(event);
     });
   }
@@ -101,7 +104,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
         takeUntil(this.unsubscribe$)
       )
       .subscribe(() => {
-        this.defaultFileName = 'Candidate Assignment ' + this.generateDateTime(this.datePipe);
+        this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab]+ ' ' + this.generateDateTime(this.datePipe);
         this.fileName = this.defaultFileName;
       });
   }

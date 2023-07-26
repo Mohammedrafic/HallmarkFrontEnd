@@ -95,6 +95,7 @@ import {
   ApplicantStatus as ApplicantStatusModel,
   CandidateCancellationReason,
   CandidateCancellationReasonFilter,
+  MergedOrder,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
@@ -123,8 +124,6 @@ enum Template {
   offerDeployment,
 }
 
-type MergedOrder = AgencyOrderManagement & Order;
-
 enum MobileMenuItems {
   AddExtension = 'Add Extension',
   ClosePosition = 'Close Position',
@@ -141,7 +140,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
-  @Input() activeSystem: OrderManagementIRPSystemId;
+  @Input() activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
   @Input() orderComments: Comment[] = [];
   @Output() saveEmitter = new EventEmitter<void>();
 
@@ -391,7 +390,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   public onClose(): void {
     if (this.unsavedForm?.hasChanges) {
-      this.saveExtensionChanges().subscribe(() => this.closeSideDialog());
+      this.saveExtensionChanges().pipe(takeWhile(() => this.isAlive)).subscribe(() => this.closeSideDialog());
     } else {
       this.closeSideDialog();
     }
@@ -424,6 +423,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
             candidatePayRate: this.candidateJob.candidatePayRate,
           })
         )
+        .pipe(takeWhile(() => this.isAlive))
         .subscribe(() => {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
           this.deleteUpdateFieldInRate();
@@ -483,8 +483,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter(Boolean))
-        .subscribe(() => {
+        .pipe(
+          filter(Boolean),
+          take(1)
+        ).subscribe(() => {
           this.isExtensionSidebarShown = false;
           this.changeDetectorRef.markForCheck();
         });
@@ -764,9 +766,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: DateTimeHelper.convertDateToUtc(orderDate as string),
-      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
-      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
+      orderOpenDate: DateTimeHelper.setCurrentTimeZone(orderDate as string),
+      shiftStartTime: shiftStartTime ? DateTimeHelper.setCurrentTimeZone(shiftStartTime.toString()) : '',
+      shiftEndTime: shiftEndTime ? DateTimeHelper.setCurrentTimeZone(shiftEndTime.toString()) : '',
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
       jobCancellationReason: CancellationReasonsMap[jobCancellation?.jobCancellationReason || 0],
@@ -867,8 +869,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         okButtonLabel: 'Yes',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter(Boolean))
-      .subscribe(() => {
+      .pipe(
+        filter(Boolean),
+        take(1)
+      ).subscribe(() => {
         this.isExtensionSidebarShown = true;
         this.ignoreMissingCredentials = true;
         this.changeDetectorRef.markForCheck();
@@ -880,7 +884,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       orderId: this.order.orderId || this.order.id,
       candidateProfileId: this.candidate.candidateId,
       validateForDate: DateTimeHelper.setInitHours(
-        DateTimeHelper.toUtcFormat(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
+        DateTimeHelper.setUtcTimeZone(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
       ),
     };
   }
@@ -943,7 +947,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       };
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
-        .pipe().subscribe((value) => {
+        .pipe(
+          takeUntil(this.componentDestroy())
+        ).subscribe((value) => {
           this.candidateCancellationReasons =value;
         });
 
