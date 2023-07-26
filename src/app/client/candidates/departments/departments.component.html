@@ -18,7 +18,7 @@
   >
     <app-toggle
       action-button
-      label="All"
+      [label]="(isMobile$ | async) ? '' : 'All'"
       [value]="conditions.showAllDepartments"
       [disabled]="conditions.noActiveWC"
       (checked)="showHideActiveDepartments($event)"
@@ -27,7 +27,7 @@
   <app-button
     action-button
     iconName="sliders"
-    text="Filters"
+    [text]="(isMobile$ | async) ? '' : 'Filters'"
     [type]="buttonType.ACTION"
     [badgeText]="filtersAmount"
     (clickEmitter)="showFilters()"
@@ -40,7 +40,7 @@
   >
     <app-button
       iconName="plus"
-      text="Assign Department"
+      [text]="(isMobile$ | async) ? '' : 'Assign Department'"
       [type]="buttonType.ACTION"
       [disabled]="!userPermission[this.userPermissions.ManageIrpCandidateProfile] || conditions.showAllDepartments"
       (clickEmitter)="showAssignDepartmentDialog()"

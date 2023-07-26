@@ -1,0 +1,7 @@
+@import 'adaptive-response';
+
+@media #{$max-mobile} {
+  .e-switch-wrapper.e-wrapper {
+    margin-right: 0;
+  }
+}
