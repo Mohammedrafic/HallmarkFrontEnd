@@ -31,6 +31,7 @@ export const DefaultInvoicesState: InvoicesModel = {
   paymentDetails: [],
   selectedPayment: null,
   organizationStructure: null,
+  agencyFeeApplicable: true,
 };
 
 export const DefaultFiltersState: InvoicesFilterState = {

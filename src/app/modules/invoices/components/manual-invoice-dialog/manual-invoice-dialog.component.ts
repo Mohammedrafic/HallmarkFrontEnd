@@ -53,6 +53,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   private strategy: ManualInvoiceStrategy;
 
+  public reasonId: number;
+
   private readonly dropDownOptions: ManualInvoiceInputOptions = {
     invoiceLocations: [],
     invoiceDepartments: [],
@@ -71,18 +73,23 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   @Select(InvoicesState.selectedOrgId)
   public selectedOrg$: Observable<number>;
 
+  @Select(InvoicesState.agencyFeeApplicable)
+  public agencyFeeApplicable$: Observable<boolean>;
+
   ngOnInit(): void {
     this.strategy = this.injector.get<ManualInvoiceStrategy>(
       ManualInvoiceStrategyMap.get(this.isAgency) as ProviderToken<ManualInvoiceStrategy>);
-
+     
     this.form = this.addService.createForm(this.isAgency) as CustomFormGroup<AddManInvoiceForm>;
 
     this.watchForSearch();
     this.watchForCandidate();
     this.watchForLocation();
     this.watchForAgency();
+    this.watchForReason();
     this.getDialogState();
     this.getReasons();
+    this.getVendorFee();
     this.confirmMessages = InvoiceConfirmMessages;
   }
 
@@ -230,7 +237,6 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       )
       .subscribe((data) => {
         this.dropDownOptions.reasons = data;
-
         this.setOrderIdOnEdit();
         this.cd.markForCheck();
       });
@@ -339,6 +345,32 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       this.strategy.populateCandidates(id, this.searchOptions, this.dropDownOptions, this.dialogConfig, orderId);
       this.cd.markForCheck();
     });
+  }
+
+  private watchForReason(): void {
+    this.form?.controls['reasonId'].valueChanges
+      .pipe(
+        filter((value) => !!value),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        const reasonId = this.form?.get('reasonId')?.value;
+
+        if (this.dropDownOptions.reasons) {
+          this.store.dispatch(new Invoices.GetAgencyFeeApplicable(reasonId));
+        }
+      });
+  }
+
+  private getVendorFee(): void {
+    this.agencyFeeApplicable$
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((data) => {
+        this.form?.get('vendorFee')?.patchValue(data);
+      }
+    )
   }
 
   private clearDialog(): void {

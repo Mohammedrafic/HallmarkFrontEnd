@@ -21,7 +21,6 @@ import { RejectReasonPage } from '@shared/models/reject-reason.model';
 export class ManualInvoiceRejectReasonComponent extends ReasonsComponent implements OnInit, OnDestroy {
   @Select(RejectReasonState.manualInvoiceReasonsPage)
   public reasons$: Observable<RejectReasonPage>;
-
   protected remove(id: number) {
     this.store.dispatch(new RemoveManualInvoiceRejectReason(id));
   }

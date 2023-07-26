@@ -29,3 +29,42 @@
 .reason-form {
   margin-top: 24px;
 }
+
+::ng-deep {
+  .e-switch-wrapper, body.light .bootstrap .e-css.e-switch-wrapper {
+    margin-right: 0 !important;
+  }
+
+  .e-switch-on {
+    color: $black !important;
+  }
+
+  .e-switch-off {
+    color: $black !important;
+  }
+
+  .e-switch-wrapper .e-switch-handle {
+    background-color: #f5f5f5 !important;
+    box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 12%) !important;
+    height: 18px !important;
+    width: 18px !important;
+    left: 0 !important;
+
+    &.e-switch-active {
+      background-color: $primary-active-blue-10 !important;
+      left: 100% !important;
+    }
+  }
+
+  .e-switch-wrapper .e-switch-inner.e-switch-active, .e-css.e-switch-wrapper .e-switch-inner.e-switch-active {
+    opacity: 1 !important;
+    background-color: $primary-active-blue-80 !important;
+    border: 0px !important;
+  }
+}
+
+.switch-label {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 400;
+}

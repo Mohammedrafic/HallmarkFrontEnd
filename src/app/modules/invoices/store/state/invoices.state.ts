@@ -138,6 +138,11 @@ export class InvoicesState {
   }
 
   @Selector([InvoicesState])
+  static agencyFeeApplicable(state: InvoicesModel): boolean {
+    return state.agencyFeeApplicable;
+  }
+
+  @Selector([InvoicesState])
   static selectedOrgId(state: InvoicesModel): number {
     return state.selectedOrganizationId;
   }
@@ -364,6 +369,29 @@ export class InvoicesState {
         }),
       );
   }
+
+  @Action(Invoices.GetAgencyFeeApplicable)
+  GetAgencyFeeApplicable(
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { reasonId }: Invoices.GetAgencyFeeApplicable,
+  ): Observable<boolean | void> {
+
+    return this.invoicesAPIService.getAgencyFeeApplicable(reasonId)
+      .pipe(
+        tap((res) => {
+          patchState(
+            {
+              agencyFeeApplicable: res,
+            }
+          );
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+        }),
+      );
+  }
+
+
 
   @Action(Invoices.GetManInvoiceMeta)
   GetInvoiceMeta(

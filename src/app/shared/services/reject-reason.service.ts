@@ -116,9 +116,9 @@ export class RejectReasonService {
 
   public saveManualInvoiceReason(payload: RejectReason): Observable<RejectReason> {
     const { reason } = payload;
-
+    const { agencyFeeApplicable } = payload;
     return this.http.post<RejectReason>('/api/ManualInvoiceReasons', {
-      reason,
+      reason, agencyFeeApplicable,
     });
   }
 

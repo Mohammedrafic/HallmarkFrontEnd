@@ -11,6 +11,10 @@ export interface DropdownOption {
   value: string | number;
 }
 
+export interface ToggleOption {
+  vendorFeeToggle: boolean;
+  value: string | number;
+}
 export interface DataSourceItem {
   id: number;
   name: string;
