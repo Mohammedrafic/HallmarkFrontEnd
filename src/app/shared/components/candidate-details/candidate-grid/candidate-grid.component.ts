@@ -47,6 +47,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
 
   override ngOnInit(): void {
     this.isAgency = this.router.url.includes('agency');
+    this.columnsToExport =this.isAgency ? CandidateAgencyExportColumns : CandidateOrgExportColumns;
     this.columnDefinitions = CandidatesColumnsDefinition(this.isAgency);
     this.watchForDefaultExport();
     this.watchForExportDialog();
