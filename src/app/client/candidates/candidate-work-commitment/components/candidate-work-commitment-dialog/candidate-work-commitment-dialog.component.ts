@@ -35,6 +35,7 @@ import { CandidateWorkCommitment } from '../../models/candidate-work-commitment.
 import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { commonRangesValidator } from '@shared/validators/date.validator';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-candidate-work-commitment-dialog',
@@ -58,6 +59,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public title: string;
   public workCommitments: WorkCommitmentDetailsGroup[] = [];
