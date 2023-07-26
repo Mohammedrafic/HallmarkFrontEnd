@@ -10,13 +10,15 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { Subject, takeUntil, filter, take } from 'rxjs';
+import { Subject, takeUntil, filter, take, Observable } from 'rxjs';
+import { Select } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { Destroyable } from '@core/helpers';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { DateRanges } from '@client/candidates/departments/departments.model';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-pay-rate-history-dialog',
@@ -35,6 +37,9 @@ export class PayRateHistoryDialogComponent extends Destroyable implements OnInit
 
   public actionTitle = 'Add';
   public formatPayRate = '#.###';
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
