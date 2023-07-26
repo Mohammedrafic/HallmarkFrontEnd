@@ -52,6 +52,7 @@ import { FinanceMedicareWageReportComponent } from './finance-medicare-wage-repo
 import { GrantReportComponent } from './grant-report/grant-report.component';
 import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-invoice-report-beta.component';
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
+import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
 
 const routes: Routes = [
   {
@@ -404,6 +405,13 @@ const routes: Routes = [
       {
         path: 'agency-spend',
         component: AgencySpendComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'shift-breakdown',
+        component: ShiftBreakdownComponent,
         data: {
           isOrganizationArea: true,
         }

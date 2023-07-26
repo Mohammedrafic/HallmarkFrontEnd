@@ -199,7 +199,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
           let a = this.candidateListForm.get(analyticsConstants.formControlNames.SearchBy)?.value;
 
           if (this.isInitialLoad) {
-            setTimeout(() => { this.SearchReport(); }, 3000)
+             this.SearchReport();
             this.isInitialLoad = false;
           }
         }

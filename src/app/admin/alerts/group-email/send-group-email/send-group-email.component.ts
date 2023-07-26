@@ -665,7 +665,7 @@ export class SendGroupEmailComponent
           this.roleData = [];
           if(this.isOrgUser){
             let businessUnitIds = value.join();          
-            if (businessUnitIds != undefined && businessUnitIds > 0) {
+            if (businessUnitIds != undefined && businessUnitIds.length > 0) {
               this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
               this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
                 this.roleData = data;
@@ -674,7 +674,7 @@ export class SendGroupEmailComponent
           } else {
             let businessUnitIds = value;
             this.dispatchUserPage(businessUnitIds);
-            if (businessUnitIds != undefined && businessUnitIds > 0) {
+            if (businessUnitIds != undefined && businessUnitIds.length > 0) {
               this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
               this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
                 this.roleData = data;
@@ -904,8 +904,8 @@ export class SendGroupEmailComponent
             this.isOrgInternalUserType = true;
             this.userData = [];
             this.dispatchNewPage(null);
-            if (businessId != undefined && businessId > 0) {
-              this.store.dispatch(new GetGroupEmailRoles(businessId));
+            if (businessId != undefined && businessId > 0) {                     
+              this.store.dispatch(new GetGroupEmailRoles([businessId]));
               this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
                 this.roleData = data;
               });
@@ -982,7 +982,7 @@ export class SendGroupEmailComponent
               let businessUnitIds = this.businessesControl.value.join();
             } else {
               let businessUnitIds = this.businessesControl.value;
-              if (businessUnitIds != undefined && businessUnitIds > 0) {
+              if (businessUnitIds != undefined && businessUnitIds.length > 0) {
                 this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
                 this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
                   this.roleData = data;

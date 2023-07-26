@@ -469,6 +469,11 @@ export const MENU_CONFIG: any = {
       icon: 'trending-up',
       route: '/reporting/custom-report',
     },
+    101: {
+      // shift-breakdown
+      icon: '',
+      route: '/analytics/shift-breakdown',
+    },
     102: {
       // Position-Summary
       icon: '',
@@ -724,6 +729,11 @@ export const MENU_CONFIG: any = {
       // staff availability Report
       icon: '',
       route: '/analytics/staff-availability',
+    },
+    101: {
+      // shift-breakdown
+      icon: '',
+      route: '/analytics/shift-breakdown',
     },
     103: {
       // Agency-Spend
@@ -1162,6 +1172,11 @@ export const MENU_CONFIG: any = {
     // custom-report
       icon: 'trending-up',
       route: '/reporting/custom-report',
+    },
+    101: {
+      // shift-breakdown
+      icon: '',
+      route: '/analytics/shift-breakdown',
     },
     102: {
       // Position-Summary

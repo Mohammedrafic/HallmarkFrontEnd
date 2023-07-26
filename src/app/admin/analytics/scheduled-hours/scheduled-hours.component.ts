@@ -303,9 +303,7 @@ export class ScheduledHoursComponent implements OnInit, OnDestroy {
                 this.changeDetectorRef.detectChanges();
 
                 if (this.isInitialLoad) {
-                  setTimeout(() => {
                     this.SearchReport();
-                  }, 3000);
                   this.isInitialLoad = false;
                 }
               }
