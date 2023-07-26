@@ -346,11 +346,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload)).pipe(
-        takeUntil(this.unsubscribe$)
-      ).subscribe(() => {
-        this.store.dispatch(new ReloadOrderCandidatesLists());
-      });
+      this.store.dispatch(new RejectCandidateJob(payload));
 
       this.closeDialog();
     }
@@ -445,7 +441,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
             this.candidateAddressRequiredValue = addressConfiguration.value;
           }
         }
-        
+
         let jobStartDate: string;
         let jobEndDate: string;
         const statusesForActualDates = [ApplicantStatusEnum.OnBoarded, ApplicantStatusEnum.Cancelled,
