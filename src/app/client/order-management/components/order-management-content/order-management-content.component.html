@@ -268,7 +268,7 @@
             <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
               <button
                 ejs-button
-                [disabled]="!(data.unreadComments > 0)"
+                [disabled]="data.unreadComments <= 0"
                 [isPrimary]="data.unreadComments > 0"
                 cssClass="e-flat default-icon-button with-badge"
               >
