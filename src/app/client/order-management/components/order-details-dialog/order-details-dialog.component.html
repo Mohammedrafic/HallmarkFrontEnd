@@ -38,7 +38,8 @@
               'open-per-diem-order': order?.orderType === orderType.OpenPerDiem,
               'traveler-order': order?.orderType === orderType.Traveler,
               'contact-to-perm': order?.orderType === orderType.ContractToPerm,
-              'perm-placement': order?.orderType === orderType.PermPlacement
+              'perm-placement': order?.orderType === orderType.PermPlacement,
+              'open-status': order?.status === orderStatus.Open
             }"
           >
             <div class="order-actions" *ngIf="showApproveAndCancel">

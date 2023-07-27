@@ -44,32 +44,41 @@
       @container(max-width: 1142px) {
         @include smallTabletMenu();
       }
-    }
-  }
 
-  .traveler-order {
-    @container (max-width: 1500px) {
-      @include smallDesktopMenu();
-    }
 
-    @container(max-width: 885px) {
-      @include smallTabletMenu();
-    }
-  }
-
-  .perm-placement,
-  .contact-to-perm {
-    @container (max-width: 1555px) {
-      @include smallDesktopMenu();
+      &.open-status {
+        @media #{$min-desktop-large} {
+          @container (max-width: 1345px) and (min-width: 1107px) {
+            @include smallTabletMenu();
+          }
+        }
+      }
     }
 
-    @container(max-width: 945px) {
-      @include smallTabletMenu();
-    }
+    .traveler-order {
+      @container (max-width: 1500px) {
+        @include smallDesktopMenu();
+      }
 
-    @media #{$min-desktop-large} {
-      @container (max-width: 1165px) and (min-width: 1105px) {
+      @container(max-width: 885px) {
         @include smallTabletMenu();
+      }
+    }
+
+    .perm-placement,
+    .contact-to-perm {
+      @container (max-width: 1555px) {
+        @include smallDesktopMenu();
+      }
+
+      @container(max-width: 945px) {
+        @include smallTabletMenu();
+      }
+
+      @media #{$min-desktop-large} {
+        @container (max-width: 1165px) and (min-width: 1105px) {
+          @include smallTabletMenu();
+        }
       }
     }
   }

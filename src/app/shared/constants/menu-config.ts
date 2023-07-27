@@ -1445,6 +1445,11 @@ export const MENU_CONFIG: any = {
       icon: 'calendar',
       route: 'employee/scheduling',
     },
+    111: {
+      // Open Jobs
+      icon: 'briefcase',
+      route: 'employee/open-jobs',
+    },
   },
 };
 

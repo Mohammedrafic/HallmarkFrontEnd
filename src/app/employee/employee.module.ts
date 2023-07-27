@@ -8,6 +8,8 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { EmployeeComponent } from './employee.component';
 import { EmployeeRoutingModule } from './employee-routing.module';
 import { ScheduleModule } from '../modules/schedule/schedule.module';
+import { OpenJobsModule } from '../modules/open-jobs/open-jobs.module';
+import { OpenJobResolver } from '../modules/open-jobs/resolvers/open-job.resolver';
 
 @NgModule({
   declarations: [
@@ -18,10 +20,12 @@ import { ScheduleModule } from '../modules/schedule/schedule.module';
     RouterModule,
     EmployeeRoutingModule,
     ScheduleModule,
+    OpenJobsModule,
     //STORE
     NgxsModule.forFeature([
       OrganizationManagementState,
     ]),
   ],
+  providers: [OpenJobResolver],
 })
 export class EmployeeModule { }

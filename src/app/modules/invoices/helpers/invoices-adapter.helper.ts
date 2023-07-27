@@ -9,5 +9,5 @@ export class InvoicesAdapter {
         value: item.id,
       };
     });
-  }
+  } 
 }

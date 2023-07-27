@@ -148,6 +148,7 @@ export enum UserPermissions {
   WidgetLTAOrderEnding = 3403,
   ViewUnavailabilityReasons = 2811,
   CanEditUnavailabilityReasons = 2812,
+  CanUpdateAgencyFeeApplicable = 8114,
 
   // Order management
   CanUpdateBillRates = 8101,
