@@ -230,7 +230,7 @@ describe('RecordsAdapter', () => {
       expect(result.timeIn).toBe('2023-06-20T00:00:00.000Z');
       expect(result.organizationId).toBe(158);
       expect(result.timesheetId).toBe(65);
-      expect(result.type).toBe(2);
+      expect(result.type).toBe(3);
     });
 
     it('adaptRecordsDto should adapt incoming timesheet records data', () => {
@@ -264,6 +264,7 @@ describe('RecordsAdapter', () => {
             disableTime: false,
           },
         ],
+        invoiceHistoricalRecords: [],
         timesheetsCalculated: [
           {
             id: 57204,

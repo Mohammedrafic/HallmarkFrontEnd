@@ -1,6 +1,6 @@
 <ejs-dialog
   #sideDialog
-  cssClass="dialog"
+  cssClass="dialog responsive"
   [width]="'528px'"
   [visible]="false"
   [isModal]="true"
@@ -13,19 +13,7 @@
         <div class="e-card-header-caption">
           <h3 class="e-card-title"> {{ title }} Avail. Restriction</h3>
         </div>
-        <div  class="e-card-content">
-          <button
-            ejs-button
-            cssClass="e-outline button-cancel"
-            (click)="closeDialog()"
-          >Cancel</button>
-          <button
-            ejs-button
-            type="submit"
-            [isPrimary]="true"
-            (click)="submitForm()"
-          >Save</button>
-        </div>
+        <ng-container *ngIf="!(isMobile$ | async)" [ngTemplateOutlet]="actionButtons"></ng-container>
       </div>
     </section>
     <section>
@@ -62,4 +50,28 @@
     </section>
   </section>
 </ng-template>
+<ng-template #footerTemplate>
+  <ng-container *ngIf="isMobile$ | async" [ngTemplateOutlet]="actionButtons"></ng-container>
+</ng-template>
 </ejs-dialog>
+
+<ng-template #actionButtons>
+  <div  class="e-card-content">
+    <button
+      ejs-button
+      cssClass="e-outline button-cancel action-btn"
+      (click)="closeDialog()"
+    >
+      Cancel
+    </button>
+    <button
+      ejs-button
+      type="submit"
+      cssClass="action-btn"
+      [isPrimary]="true"
+      (click)="submitForm()"
+    >
+      Save
+    </button>
+  </div>
+</ng-template>

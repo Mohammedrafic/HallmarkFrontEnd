@@ -6,7 +6,7 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
   selector: 'app-candidate-details',
   templateUrl: './candidate-details.component.html',
   styleUrls: ['./candidate-details.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidateDetailsComponent extends AbstractContactDetails implements OnInit {
   constructor(

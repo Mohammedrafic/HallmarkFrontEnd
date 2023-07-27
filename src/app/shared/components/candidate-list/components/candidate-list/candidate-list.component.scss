@@ -1,5 +1,5 @@
-@import "colors";
-@import "adaptive-response";
+@import 'colors';
+@import 'adaptive-response';
 
 .user-photo {
   background-color: $secondary-dark-blue-40;
@@ -15,7 +15,6 @@
   .user-icon {
     color: $secondary-dark-blue-20;
   }
-
 }
 
 .name-wrapper {
@@ -67,5 +66,11 @@ ejs-checkbox.e-checkbox-wrapper.e-wrapper {
 }
 
 .table-container {
-  height: 95%;
+  height: 100%;
+}
+
+@media #{$max-tablet} {
+  .table-container {
+    height: 95%;
+  }
 }

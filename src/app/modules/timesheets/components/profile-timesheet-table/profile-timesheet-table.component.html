@@ -14,7 +14,7 @@
         </ejs-tab>
       </div>
 
-      <div class="action-buttons">
+      <div class="action-buttons" *ngIf="currentTab !== tableTypes.HistoricalData">
         <button
           *ngIf="canRecalculateTimesheet"
           ejs-button

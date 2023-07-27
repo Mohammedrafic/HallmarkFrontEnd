@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { Validators } from '@angular/forms';
 
 import { ColDef } from '@ag-grid-community/core';
@@ -6,6 +7,7 @@ import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entit
 import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { EditFieldTypes } from '@core/enums';
 import { AttachmentsListComponent } from '@shared/components/attachments';
+import { InvoiceRecordState } from 'src/app/modules/timesheets/enums';
 import { TabConfig } from '../interface';
 import { ActionsCellComponent } from '../components/cell-editors/actions-cell/actions-cell.component';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
@@ -14,6 +16,7 @@ import { GridDayComponent } from '../components/cell-editors/grid-day/grid-day.c
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { RecordStatusCellComponent } from '../components/cell-editors/record-status-cell/record-status-cell.component';
 import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
+import { BillRateCalculationType } from '@shared/models';
 
 const commonColumn: ColDef = {
   filter: true,
@@ -273,9 +276,107 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   actionCol(),
 ]);
 
+export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
+  {
+    field: 'timesheetId',
+    headerName: 'Version Id',
+    width: 120,
+    minWidth: 80,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: 'common-cell',
+  },
+  {
+    field: 'id',
+    headerName: 'Id',
+    width: 92,
+    minWidth: 80,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: 'common-cell',
+  },
+  {
+    ...dayColDef,
+    width: 102,
+    minWidth: 80,
+    filter: false,
+    sortable: false,
+  },
+  {
+    field: 'timeIn',
+    headerName: 'Time In',
+    width: 92,
+    minWidth: 80,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: 'common-cell',
+    valueFormatter: (data) => {
+      return formatDate(data.value, 'H:mm', 'en-US');
+    },
+  },
+  {
+    field: 'timeOut',
+    headerName: 'Time Out',
+    width: 100,
+    minWidth: 80,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: 'common-cell',
+    valueFormatter: (data) => {
+      return formatDate(data.value, 'H:mm', 'en-US');
+    },
+  },
+  {
+    field: 'hours',
+    headerName: 'Hours',
+    width: 77,
+    minWidth: 70,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: ['common-cell', 'bold'],
+  },
+  {
+    field: 'type',
+    headerName: 'Type',
+    width: 140,
+    minWidth: 80,
+    resizable: true,
+    cellClass: ['common-cell', 'align-left'],
+    valueFormatter: (data) => {
+      return billRateCalculationTypeMapper[data.value as BillRateCalculationType];
+    },
+  },
+  {
+    field: 'state',
+    headerName: 'State',
+    width: 187,
+    minWidth: 80,
+    resizable: true,
+    cellClass: ['common-cell', 'align-left'],
+    cellStyle: (data) => {
+      return { color: getStateCellColor(data.value) };
+    },
+    valueFormatter: (data) => {
+      return invoiceRecordStateMapper[data.value as InvoiceRecordState];
+    },
+  },
+  {
+    field: 'invoiceId',
+    headerName: 'Invoice Id',
+    width: 120,
+    minWidth: 80,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: ['common-cell', 'bold'],
+  },
+]);
+
 export const RecordsTabConfig: TabConfig[] = [
   {
     title: 'Timesheet',
+  },
+  {
+    title: 'Historical Data',
   },
   {
     title: 'Miles',
@@ -310,3 +411,39 @@ export const orgSubmitEmptyTimesheetDialogData = () => ({
   submitButtonText: 'Ok',
   confirmMessage: 'If the candidate did not work this week, check the DNW switch.',
 });
+
+const billRateCalculationTypeMapper = {
+  [BillRateCalculationType.Regular]: 'Regular',
+  [BillRateCalculationType.RegularLocal]: 'Regular Local',
+  [BillRateCalculationType.GuaranteedHours]: 'Guaranteed Hours',
+  [BillRateCalculationType.Callback]: 'Callback',
+  [BillRateCalculationType.Charge]: 'Charge',
+  [BillRateCalculationType.Holiday]: 'Holiday',
+  [BillRateCalculationType.Oncall]: 'On call',
+  [BillRateCalculationType.Orientation]: 'Orientation',
+  [BillRateCalculationType.Preceptor]: 'Preceptor',
+  [BillRateCalculationType.Mileage]: 'Mileage',
+  [BillRateCalculationType.DailyOT]: 'Daily OT',
+  [BillRateCalculationType.DailyPremiumOT]: 'Daily Premium OT',
+  [BillRateCalculationType.WeeklyOT]: 'Weekly OT',
+  [BillRateCalculationType.SevenDayOT]: 'Seven Day OT',
+  [BillRateCalculationType.SevenDayPremiumOT]: 'Seven Day Premium OT',
+};
+
+const invoiceRecordStateMapper = {
+  [InvoiceRecordState.None]: '',
+  [InvoiceRecordState.New]: 'NEW',
+  [InvoiceRecordState.Deleted]: 'DELETE',
+  [InvoiceRecordState.NotChanged]: 'NOT CHANGED',
+};
+
+const invoiceRecordStateColorMapper = {
+  [InvoiceRecordState.None]: '#060715',
+  [InvoiceRecordState.New]: '#70B16E',
+  [InvoiceRecordState.Deleted]: '#FF5858',
+  [InvoiceRecordState.NotChanged]: '#060715',
+};
+
+const getStateCellColor = (state: InvoiceRecordState): string => {
+  return invoiceRecordStateColorMapper[state];
+};

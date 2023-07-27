@@ -72,6 +72,10 @@ export const GetRecordAddDialogConfig = (isMobile: boolean): DialogConfig => {
         },
       ],
     },
+    historicalData: {
+      title: '',
+      fields: [],
+    },
     miles: {
       title: 'Add Miles Record',
       fields: [
@@ -217,8 +221,9 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
 
 export const MappedRecordsType = {
   [RecordFields.Time]: 1,
-  [RecordFields.Miles]: 2,
-  [RecordFields.Expenses]: 3,
+  [RecordFields.HistoricalData]: 2,
+  [RecordFields.Miles]: 3,
+  [RecordFields.Expenses]: 4,
 };
 
 export const AddSuccessMessage = {
