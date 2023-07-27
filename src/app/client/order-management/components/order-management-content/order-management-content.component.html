@@ -184,7 +184,22 @@
   </button>
 
   <app-tooltip-container
-    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney"
+    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney && isActiveSystemIRP"
+    [message]="toolTipMessage"
+    [showToolTip]="!userPermission[userPermissions.CanCreateOrdersIRP]"
+  >
+    <button
+      [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]"
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      [isPrimary]="true"
+      (click)="navigateToOrderForm()"
+    >
+      Create Order
+    </button>
+  </app-tooltip-container>
+  <app-tooltip-container
+    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney && !isActiveSystemIRP"
     [message]="toolTipMessage"
     [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
   >

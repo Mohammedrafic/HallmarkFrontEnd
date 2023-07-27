@@ -211,3 +211,14 @@
     }
   }
 }
+
+@media (max-width: 1024px) {
+  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button){
+    display: block;
+  }
+}
+@media (max-width: 640px) {
+  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button){
+    display: none;
+  }
+}
