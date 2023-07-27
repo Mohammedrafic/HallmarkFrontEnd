@@ -25,7 +25,7 @@
             Invoice Amount: {{ invoiceData.amount || '' | currency: 'USD' }}
           </span>
         </div>
-        <div *ngIf="userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] || userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid]">
+        <div *ngIf="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] && !isAgency)|| (userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)">
           <button (click)="addNewPayment()" class="add-btn" [disabled]="!actionsAllowed">
             + Add Payment
           </button>

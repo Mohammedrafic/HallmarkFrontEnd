@@ -50,7 +50,7 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
     agencySuffix: null,
   };
 
-  private isAgency = false;
+  public isAgency = false;
 
   private currentOrgId: number;
 
