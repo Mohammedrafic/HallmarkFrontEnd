@@ -489,7 +489,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       setTimeout(() => {
           this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
           this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
-
           this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
           for (let i = 0; i < this.filteredItems.length; i++) {
             if (this.filteredItems[i].text == undefined) {

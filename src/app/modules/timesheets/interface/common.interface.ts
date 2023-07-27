@@ -3,6 +3,7 @@ import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-g
 
 import { FieldType, FieldWidthStyle } from '@core/enums';
 import { DropdownOption } from '@core/interface';
+import { BillRateCalculationType } from '@shared/models';
 import { Attachment } from '@shared/components/attachments/models/attachment.interface';
 import { TimesheetsModel } from '../store/model/timesheets.model';
 import { RecordFields, RecordsMode, RecordStatus } from '../enums';
@@ -27,6 +28,7 @@ export interface DialogConfigBlock {
 
 export interface DialogConfig {
   timesheets: DialogConfigBlock;
+  historicalData: DialogConfigBlock;
   miles: DialogConfigBlock;
   expenses: DialogConfigBlock;
 }
@@ -62,10 +64,12 @@ export interface RawTimesheetRecordsDto {
   timesheetsCalculated: RecordDto[];
   milesCalculated: RecordDto[];
   expensesCalculated: RecordDto[];
+  invoiceHistoricalRecords: RecordDto[];
 }
 
 export interface TimesheetRecordsDto {
   [RecordFields.Time]: RecordsDetails;
+  [RecordFields.HistoricalData]: RecordsDetails;
   [RecordFields.Miles]: RecordsDetails;
   [RecordFields.Expenses]: RecordsDetails;
 }
@@ -100,6 +104,11 @@ export interface RecordValue {
   timesheetRecordId?: number | null;
   total: number;
   value: number;
+  dayOfWeek?: number;
+  hours?: number;
+  invoiceId?: number;
+  timesheetId?: number;
+  type?: BillRateCalculationType;
 }
 
 export type RecordDto = Omit<RecordValue, 'day'>;

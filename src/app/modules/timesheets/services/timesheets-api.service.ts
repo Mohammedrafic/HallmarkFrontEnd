@@ -49,6 +49,10 @@ export class TimesheetsApiService {
           editMode: [],
           viewMode: [],
         },
+        historicalData: {
+          editMode: [],
+          viewMode: [],
+        },
         miles: {
           editMode: [],
           viewMode: [],

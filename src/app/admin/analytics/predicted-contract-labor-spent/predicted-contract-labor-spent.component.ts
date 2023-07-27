@@ -491,7 +491,28 @@ export class PredictedContractLaborSpentComponent implements OnInit, OnDestroy {
     this.locationsList = this.masterLocationsList;
     this.departmentsList = this.masterDepartmentsList;
   }
+
   public onFilterApply(): void {
+    let {
+      startDate,
+      endDate
+    }
+      = this.PredictedContractLaborSpentForm.getRawValue();
+    let CurrentDate: string = formatDate(new Date(), this.dateFormat, this.culture);
+    let StartChkDate: string = formatDate(startDate, this.dateFormat, this.culture);
+    let EndDateChk: string = formatDate(endDate, this.dateFormat, this.culture);
+    if (StartChkDate < CurrentDate || EndDateChk < StartChkDate) {
+      //this.message = "";
+      //let error: any = "Start Date should be Gretaer Than or Equal to Current Date";
+      //this.store.dispatch(new ShowToast(MessageTypes.Error, error));
+      return;
+    }
+    //if (EndDateChk < StartChkDate) {
+    //  this.message = "";
+    //  let error: any = "End Date should be Gretaer Than or Equal to Start Date";
+    //  this.store.dispatch(new ShowToast(MessageTypes.Error, error));
+    //  return;
+    //}
     this.PredictedContractLaborSpentForm.markAllAsTouched();
     if (this.PredictedContractLaborSpentForm?.invalid) {
       return;

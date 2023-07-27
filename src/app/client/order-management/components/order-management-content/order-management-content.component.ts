@@ -10,7 +10,7 @@ import {
   NgZone,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { DatePipe, Location } from '@angular/common';
+import { DOCUMENT, DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -223,7 +223,6 @@ import { MiddleTabletWidth, SmallDesktopWidth, TabletWidth } from '@shared/const
 import { UpdateRegRateComponent } from '../update-reg-rate/update-reg-rate.component';
 import { FilteredUser } from '@shared/models/user.model';
 import { Comment } from '@shared/models/comment.model';
-import { CommentsService } from '@shared/services/comments.service';
 import { GlobalWindow } from '@core/tokens';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { SetOrderManagementPagerState } from '@agency/store/candidate.actions';
@@ -240,6 +239,7 @@ import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shi
 import { ReOrderState } from '@shared/components/order-reorders-container/store/re-order.state';
 import { ButtonGroupComponent } from '@shared/components/button-group/button-group.component';
 import { OrderLinkDetails } from '@client/order-management/interfaces';
+import { CurrentUserPermission } from '@shared/models/permission.model';
 
 @Component({
   selector: 'app-order-management-content',
@@ -288,7 +288,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   organizationSettings$: Observable<Configuration[]>;
 
   @Select(UserState.currentUserPermissions)
-  currentUserPermissions$: Observable<any[]>;
+  currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
   @Select(OrderManagementContentState.candidatesJob)
   private readonly candidatesJob$: Observable<OrderCandidateJob | null>;
@@ -497,10 +497,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private permissionService: PermissionService,
     private cd: ChangeDetectorRef,
     private breakpointService: BreakpointObserverService,
-    private commentsService: CommentsService,
     private readonly ngZone: NgZone,
     private preservedOrderService: PreservedOrderService,
-
+    @Inject(DOCUMENT) private documentEle: Document,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -516,13 +515,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
     this.isRedirectedFromDashboardWidget = routerState?.['redirectedFromDashboard'] || false;
     this.orderStaus = routerState?.['orderStatus'] || 0;
-    this.xtraOrderStatus= routerState?.['xtraOrderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
     this.prefix = routerState?.['prefix'];
     this.orderPositionStatus = routerState?.['status'];
     this.orderPositionWidgetStatus = routerState?.['status'];
-    this.orderPositionXtraStatus = routerState?.['xtraStatus'];
     (routerState?.['status'] == "In Progress (Pending)" || routerState?.['status'] == "In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] == "In Progress" ? this.SelectedStatus.push("InProgress") : routerState?.['status'] ? this.SelectedStatus.push(routerState?.['status']) : "";
     this.candidateStatusId = routerState?.['candidateStatusId'] || '';
     routerState?.['candidateStatus'] != undefined && routerState?.['candidateStatus'] != '' ? this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']) : "";
@@ -889,60 +886,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.globalWindow.localStorage.setItem("IsLTAOrders", JSON.stringify(false));
       }) : this.store.dispatch([new GetOrderFilterDataSources(true)]);
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
-      switch (this.activeTab) {
-        case OrganizationOrderManagementTabs.AllOrders:
-          this.filters.isTemplate = false;
-          this.filters.includeReOrders = true;
-          this.hasOrderAllOrdersId();
-          let filtersAllOrders = {...this.filters};
-          if(this.filters.orderLocked){
-            filtersAllOrders.orderLocked = filtersAllOrders.orderLocked == 'false' ? false : filtersAllOrders.orderLocked == 'true' ? true : null
-          }
-          cleared ? this.store.dispatch([new GetOrders(filtersAllOrders)])
-            : this.store.dispatch([new GetOrderFilterDataSources()]);
-          break;
-        case OrganizationOrderManagementTabs.PerDiem:
-          this.filters.orderTypes = [OrderType.OpenPerDiem];
-          this.filters.includeReOrders = true;
-          this.filters.isTemplate = false;
-          let filtersPerDiem = {...this.filters};
-          if(this.filters.orderLocked){
-            filtersPerDiem.orderLocked = filtersPerDiem.orderLocked == 'false' ? false : filtersPerDiem.orderLocked == 'true' ? true : null
-          }
-          cleared ? this.store.dispatch([new GetOrders(filtersPerDiem)])
-            : this.store.dispatch([new GetOrderFilterDataSources()]);
-          break;
-        case OrganizationOrderManagementTabs.PermPlacement:
-          this.filters.orderTypes = [OrderType.PermPlacement];
-          this.filters.isTemplate = false;
-          let filtersPermPlacement = {...this.filters};
-          if(this.filters.orderLocked){
-            filtersPermPlacement.orderLocked = filtersPermPlacement.orderLocked == 'false' ? false : filtersPermPlacement.orderLocked == 'true' ? true : null
-          }
-          cleared ? this.store.dispatch([new GetOrders(filtersPermPlacement)])
-            : this.store.dispatch([new GetOrderFilterDataSources()]);
-          break;
-        case OrganizationOrderManagementTabs.ReOrders:
-          this.hasOrderAllOrdersId();
-          this.filters.orderTypes = [OrderType.ReOrder];
-          this.filters.isTemplate = false;
-          cleared ? this.store.dispatch([new GetOrders(this.filters)])
-            : this.store.dispatch([new GetOrderFilterDataSources()]);
-          break;
-        case OrganizationOrderManagementTabs.Incomplete:
-          this.columnsToExport = allOrdersColumnsToExport;
-          this.filters.isTemplate = false;
-          this.isIncomplete = true;
-          cleared ? this.store.dispatch([new GetOrders(this.filters, true)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
-          break;
-        case OrganizationOrderManagementTabs.OrderTemplates:
-          this.filters.isTemplate = true;
-          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
-          break;
-      }
-
-      this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.VMS);
-      this.checkSelectedChildrenItem();
+      this.getVmsOrders(cleared);
     } else if (this.activeSystem === OrderManagementIRPSystemId.OrderJourney) {
       this.filtersOrderJourney.orderBy = this.orderBy;
       this.filtersOrderJourney.orderPublicId = this.filtersOrderJourney.orderPublicId ? this.filtersOrderJourney.orderPublicId.toUpperCase() : null;
@@ -960,6 +904,63 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
 
     this.cd$.next(true);
+  }
+
+  private getVmsOrders(cleared?: boolean): void {
+    switch (this.activeTab) {
+      case OrganizationOrderManagementTabs.AllOrders:
+        this.filters.isTemplate = false;
+        this.filters.includeReOrders = true;
+        this.hasOrderAllOrdersId();
+        let filtersAllOrders = {...this.filters};
+        if(this.filters.orderLocked){
+          filtersAllOrders.orderLocked = filtersAllOrders.orderLocked == 'false' ? false : filtersAllOrders.orderLocked == 'true' ? true : null
+        }
+        cleared ? this.store.dispatch([new GetOrders(filtersAllOrders)])
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
+        break;
+      case OrganizationOrderManagementTabs.PerDiem:
+        this.filters.orderTypes = [OrderType.OpenPerDiem];
+        this.filters.includeReOrders = true;
+        this.filters.isTemplate = false;
+        let filtersPerDiem = {...this.filters};
+        if(this.filters.orderLocked){
+          filtersPerDiem.orderLocked = filtersPerDiem.orderLocked == 'false' ? false : filtersPerDiem.orderLocked == 'true' ? true : null
+        }
+        cleared ? this.store.dispatch([new GetOrders(filtersPerDiem)])
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
+        break;
+      case OrganizationOrderManagementTabs.PermPlacement:
+        this.filters.orderTypes = [OrderType.PermPlacement];
+        this.filters.isTemplate = false;
+        let filtersPermPlacement = {...this.filters};
+        if(this.filters.orderLocked){
+          filtersPermPlacement.orderLocked = filtersPermPlacement.orderLocked == 'false' ? false : filtersPermPlacement.orderLocked == 'true' ? true : null
+        }
+        cleared ? this.store.dispatch([new GetOrders(filtersPermPlacement)])
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
+        break;
+      case OrganizationOrderManagementTabs.ReOrders:
+        this.hasOrderAllOrdersId();
+        this.filters.orderTypes = [OrderType.ReOrder];
+        this.filters.isTemplate = false;
+        cleared ? this.store.dispatch([new GetOrders(this.filters)])
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
+        break;
+      case OrganizationOrderManagementTabs.Incomplete:
+        this.columnsToExport = allOrdersColumnsToExport;
+        this.filters.isTemplate = false;
+        this.isIncomplete = true;
+        cleared ? this.store.dispatch([new GetOrders(this.filters, true)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+        break;
+      case OrganizationOrderManagementTabs.OrderTemplates:
+        this.filters.isTemplate = true;
+        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+        break;
+    }
+
+    this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.VMS);
+    this.checkSelectedChildrenItem();
   }
 
   private getAllShifts(): void {
@@ -1353,6 +1354,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public navigateToOrderForm(): void {
     this.router.navigate(['./add'], { relativeTo: this.route });
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
+    this.orderManagementService.setOrderTypeToPrePopulate(this.activeTab, this.activeIRPTabIndex, this.activeSystem);
   }
 
   public navigateToOrderTemplateForm(id: number): void {
@@ -2210,19 +2212,25 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const filters = {} as OrderFilter;
 
     this.orderStaus > 0 ? this.numberArr.push(this.orderStaus) : [];
-    this.xtraOrderStatus > 0 ? this.numberArr.push(this.xtraOrderStatus) : [];
+
+    const candidatesOrderStatusList = JSON.parse(this.globalWindow.localStorage.getItem('candidatesOrderStatusListFromDashboard') || '{}');
+    if(candidatesOrderStatusList != '{}'){
+      this.numberArr = [];
+      candidatesOrderStatusList.forEach((data:any)=>{
+        this.numberArr.push(data.value);
+        data.name = data.name.replace(/\s*\([^)]*\)\s*|\s+/g, '')
+        this.SelectedStatus.push(data.name)
+      })
+      this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(''));
+    }
+
     filters.orderStatuses = this.numberArr;
     this.candidateStatusId!= '' ? this.candidateStatusIds.push(this.candidateStatusId) : [];
     filters.candidateStatuses = this.candidateStatusIds;
     filters.orderStatuses = this.orderPositionStatus
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
       : [];
-
-      if(this.orderPositionXtraStatus){
-        this.orderPositionXtraStatus = this.orderPositionXtraStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')
-        filters.orderStatuses.push(this.orderPositionXtraStatus);
-        this.SelectedStatus.push(this.orderPositionXtraStatus)
-      }
+      
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
     const items = JSON.parse(dashboardFilterState) as FilteredItem[] || [];
     let pendingApprovalOrders = this.globalWindow.localStorage.getItem('pendingApprovalOrders') || 'null';
@@ -2244,7 +2252,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
 
     this.orderPositionStatus = null;
-    this.orderPositionXtraStatus = null;
     this.isRedirectedFromDashboard = false;
 
     return filters;

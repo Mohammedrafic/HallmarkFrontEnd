@@ -10,6 +10,8 @@ export enum OrderStatus {
   Onboard = 60,
   // This status is only for service purposes, to prevent status checks.
   NoOrder = -1,
+  Offboard = 90,
+  Cancelled = 110,
 }
 
 export enum CandidateJobStatus {

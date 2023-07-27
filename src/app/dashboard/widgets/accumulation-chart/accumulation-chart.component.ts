@@ -28,6 +28,7 @@ import { CANDIDATE_STATUS, DASHBOARD_FILTER_STATE } from '@shared/constants';
 import { AlertService } from '@shared/services/alert.service';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { OrderStatus } from '@shared/enums/order-management';
+import { PositionTrendTypeEnum } from '../../enums/position-trend-type.enum';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -86,88 +87,39 @@ export class AccumulationChartComponent
       }
     }
     const user = this.store.selectSnapshot(UserState.user);
-    let Enumvalues: number;
-    if (this.chartData?.title == "Candidate Overall Status") {
-      //if (this.chartData?.title)
-      if (status.toLowerCase() == CandidatStatus[CandidatStatus['Not Applied']].toLowerCase()) {
-        Enumvalues = CandidatStatus['Not Applied'];
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Applied].toLowerCase()) {
-        Enumvalues = CandidatStatus.Applied;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Shortlisted].toLowerCase()) {
-        Enumvalues = CandidatStatus.Shortlisted;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus['Pre Offer Custom']].toLowerCase()) {
-        Enumvalues = CandidatStatus['Pre Offer Custom'];
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Withdraw].toLowerCase()) {
-        Enumvalues = CandidatStatus.Withdraw;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Offered].toLowerCase()) {
-        Enumvalues = CandidatStatus.Offered;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.BillRatePending].toLowerCase()) {
-        Enumvalues = CandidatStatus.BillRatePending;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.OfferedBR].toLowerCase()) {
-        Enumvalues = CandidatStatus.OfferedBR;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Accepted].toLowerCase()) {
-        Enumvalues = CandidatStatus.Accepted;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.OnBoard].toLowerCase()) {
-        Enumvalues = CandidatStatus.OnBoard;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.End].toLowerCase()) {
-        Enumvalues = CandidatStatus.End;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Offboard].toLowerCase()) {
-        Enumvalues = CandidatStatus.Offboard;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Rejected].toLowerCase()) {
-        Enumvalues = CandidatStatus.Rejected;
-      }
-      else if (status.toLowerCase() == CandidatStatus[CandidatStatus.Cancelled].toLowerCase()) {
-        Enumvalues = CandidatStatus.Cancelled;
-      }
-      else {
-        Enumvalues = 0;
-      }
-      if (Enumvalues > 0) {
-        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-          this.dashboardService.redirectToUrl('agency/candidate-details', Enumvalues, undefined);
-        } else {
-          this.dashboardService.redirectToUrl('client/candidate-details', Enumvalues, undefined);
-        }
-      }
-      else {
-        this.store.dispatch(new ShowToast(MessageTypes.Warning, CANDIDATE_STATUS));
-      }
-    } else if (this.chartData?.title == "Active Positions") {
+    if (this.chartData?.title == "Active Positions") {
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
         this.dashboardService.redirectToUrl('client/order-management', undefined, status);
       }
-    }else if(this.chartData?.title == "Candidates for Active Positions"){
-        let dataset:any = [];
-        this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
-          dataset = data;
-        });        
-        let chartInfo = dataset.find((ele:any)=>ele.status == status);
-        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-          if(chartInfo.applicantStatus === OrderStatus.Onboard){
-            this.dashboardService.redirectToUrlWithCandidateStatus('agency/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status, OrderStatus.Filled,'Filled');
-          }else{
-            this.dashboardService.redirectToUrlWithCandidateStatus('agency/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status);
-          }
+    }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status"){
+        let candidatesDataset:any = [];
+        let candidatesOrderDataSet = [];
+        if(this.chartData?.title == "Candidates for Active Positions"){
+          this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
+            candidatesDataset = data;
+          }); 
         }else{
-          if(chartInfo.applicantStatus === OrderStatus.Onboard){
-            this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status, OrderStatus.Filled,'Filled');
-          }else{
-            this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/', OrderStatus.InProgress, 'In Progress',chartInfo.status,chartInfo.status);
-          }
+          this.dashboardService.candidatesOverallStatus$.subscribe(data=>{
+            candidatesDataset = data;
+          }); 
+        }        
+
+        let candidatesChartInfo = candidatesDataset.find((ele:any)=>ele.status == status);
+        candidatesOrderDataSet.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
+        if(candidatesChartInfo.applicantStatus === OrderStatus.Onboard){
+          candidatesOrderDataSet.push({"value":OrderStatus.Filled, "name": PositionTrendTypeEnum.FILLED});
+        }else if(candidatesChartInfo.applicantStatus === OrderStatus.Cancelled || candidatesChartInfo.applicantStatus === OrderStatus.Offboard){ // "Cancelled" "Offboard"
+          candidatesOrderDataSet.push({"value":OrderStatus.Filled, "name": PositionTrendTypeEnum.FILLED});
+          candidatesOrderDataSet.push({"value":OrderStatus.Closed, "name": PositionTrendTypeEnum.CLOSED});
+        }
+        window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(candidatesOrderDataSet));
+
+        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {         
+            this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
+        }else{
+            this.dashboardService.redirectToUrlWithStatus('client/order-management/',candidatesChartInfo.status);
         }
         
     }
