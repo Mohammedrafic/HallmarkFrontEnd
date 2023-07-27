@@ -10,7 +10,7 @@ import {
   NgZone,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { DatePipe, Location } from '@angular/common';
+import { DOCUMENT, DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -500,7 +500,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private commentsService: CommentsService,
     private readonly ngZone: NgZone,
     private preservedOrderService: PreservedOrderService,
-
+    @Inject(DOCUMENT) private documentEle: Document,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -516,13 +516,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
     this.isRedirectedFromDashboardWidget = routerState?.['redirectedFromDashboard'] || false;
     this.orderStaus = routerState?.['orderStatus'] || 0;
-    this.xtraOrderStatus= routerState?.['xtraOrderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
     this.prefix = routerState?.['prefix'];
     this.orderPositionStatus = routerState?.['status'];
     this.orderPositionWidgetStatus = routerState?.['status'];
-    this.orderPositionXtraStatus = routerState?.['xtraStatus'];
     (routerState?.['status'] == "In Progress (Pending)" || routerState?.['status'] == "In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] == "In Progress" ? this.SelectedStatus.push("InProgress") : routerState?.['status'] ? this.SelectedStatus.push(routerState?.['status']) : "";
     this.candidateStatusId = routerState?.['candidateStatusId'] || '';
     routerState?.['candidateStatus'] != undefined && routerState?.['candidateStatus'] != '' ? this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']) : "";
@@ -2210,19 +2208,25 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const filters = {} as OrderFilter;
 
     this.orderStaus > 0 ? this.numberArr.push(this.orderStaus) : [];
-    this.xtraOrderStatus > 0 ? this.numberArr.push(this.xtraOrderStatus) : [];
+
+    const candidatesOrderStatusList = JSON.parse(this.globalWindow.localStorage.getItem('candidatesOrderStatusListFromDashboard') || '{}');
+    if(candidatesOrderStatusList != '{}'){
+      this.numberArr = [];
+      candidatesOrderStatusList.forEach((data:any)=>{
+        this.numberArr.push(data.value);
+        data.name = data.name.replace(/\s*\([^)]*\)\s*|\s+/g, '')
+        this.SelectedStatus.push(data.name)
+      })
+      this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(''));
+    }
+
     filters.orderStatuses = this.numberArr;
     this.candidateStatusId!= '' ? this.candidateStatusIds.push(this.candidateStatusId) : [];
     filters.candidateStatuses = this.candidateStatusIds;
     filters.orderStatuses = this.orderPositionStatus
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
       : [];
-
-      if(this.orderPositionXtraStatus){
-        this.orderPositionXtraStatus = this.orderPositionXtraStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')
-        filters.orderStatuses.push(this.orderPositionXtraStatus);
-        this.SelectedStatus.push(this.orderPositionXtraStatus)
-      }
+      
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
     const items = JSON.parse(dashboardFilterState) as FilteredItem[] || [];
     let pendingApprovalOrders = this.globalWindow.localStorage.getItem('pendingApprovalOrders') || 'null';
@@ -2244,7 +2248,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
 
     this.orderPositionStatus = null;
-    this.orderPositionXtraStatus = null;
     this.isRedirectedFromDashboard = false;
 
     return filters;
