@@ -56,7 +56,6 @@ export class CandidateListState {
   }
 
  
-  constructor(private candidateListService: CandidateListService) {}
   constructor(private candidateListService: CandidateListService,private employeeService :EmployeeImportService) {}
 
   @Action(CandidateListActions.GetCandidatesByPage, { cancelUncompleted: true })
