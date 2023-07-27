@@ -9,6 +9,10 @@
   [disableBulkButton]="conditions.disableBulkButton"
   [rowSelection]="rowSelection"
   [bulkActionConfig]="bulkActionConfig"
+  [pageSize]="filters.pageSize"
+  [currentPage]="filters.pageNumber"
+  (navigateToPageEmitter)="handleChangePage($event)"
+  (pageSizeChangeEmitter)="handleChangePageSize($event)"
 >
   <app-tooltip-container
     action-button

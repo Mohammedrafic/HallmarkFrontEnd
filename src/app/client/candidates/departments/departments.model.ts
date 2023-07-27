@@ -66,13 +66,16 @@ export interface AssignDepartmentFormState {
 }
 
 export interface DepartmentFilterState {
-  regionIds: number[];
-  locationIds: number[];
-  departmentsIds: number[];
-  skillIds: number[];
-  oriented: boolean;
-  employeeWorkCommitmentId: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  skillIds?: number[];
+  oriented?: boolean;
+  employeeWorkCommitmentId?: number;
+  pageNumber: number;
+  pageSize: number;
 }
+
 export interface EditDepartmentFormState {
   [EditDepartmentFields.START_DATE]: Date;
   [EditDepartmentFields.END_DATE]: Date;
