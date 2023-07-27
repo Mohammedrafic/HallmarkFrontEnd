@@ -401,12 +401,14 @@ export class DashboardService {
       })
     );
   }
-
+  public redirectToUrlWithStatus(url: string,candidateStatusId? :string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , candidateStatusId:candidateStatusId} });
+  }
   public redirectToUrl(url: string,orderStatus? :number,status? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status} });
   }
-  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string,xtraOrderStatus? :number,xtraOrderstatustext? : string): void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus, xtraOrderStatus: xtraOrderStatus,xtraStatus: xtraOrderstatustext} });
+  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus} });
   }
   public redirectToUrlWithAgencyposition(url: string,orderStatus? :number,condition? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,condition: condition} });

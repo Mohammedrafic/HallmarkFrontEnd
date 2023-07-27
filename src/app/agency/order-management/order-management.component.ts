@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Subject } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
@@ -12,6 +12,8 @@ import {
 } from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
 import { Router } from '@angular/router';
 import { ClearOrganizationStructure, SetOrdersTab } from '@agency/store/order-management.actions';
+import { GlobalWindow } from '@core/tokens';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-order-management',
@@ -32,7 +34,10 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   private unsubscribe$: Subject<void> = new Subject();
   public organizationIds: number[] = [];
 
-  constructor(private store: Store,private router: Router) {
+  constructor(private store: Store,private router: Router,
+    @Inject(DOCUMENT) private documentEle: Document,
+    @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis
+    ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
@@ -42,7 +47,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
       this.organizationIds.push(routerState?.['orderStatus'])
     } else {
       if(routerState?.['status'] == "In Progress"){
-        this.orderStatus.push("InProgress")
+        this.orderStatus.push("InProgress");
       }
       if(routerState?.['xtraStatus'] != undefined){
         this.orderStatus.push(routerState?.['xtraStatus'])
@@ -51,6 +56,16 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
         this.candidateStatuses.push(routerState?.['candidateStatusId']);
         this.store.dispatch(new SetOrdersTab(AgencyOrderManagementTabs.AllAgencies));
         this.selectedTab = AgencyOrderManagementTabs.AllAgencies;
+        let orderStatus:string[] = [];
+        const candidatesOrderStatusList = JSON.parse(this.globalWindow.localStorage.getItem('candidatesOrderStatusListFromDashboard') || '{}');
+        if(candidatesOrderStatusList != '{}'){
+          candidatesOrderStatusList.forEach((data:any)=>{
+            data.name = data.name.replace(/\s*\([^)]*\)\s*|\s+/g, '');
+            orderStatus.push(data.name);
+          })
+          this.orderStatus = orderStatus;
+          this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(''));
+        }
       }
     }
   }

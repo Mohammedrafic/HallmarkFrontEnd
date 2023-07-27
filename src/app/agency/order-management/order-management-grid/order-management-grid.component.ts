@@ -182,7 +182,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private alertOrderId:number;
-  orderValueSet:boolean = true;
 
   constructor(
     private store: Store,
@@ -430,10 +429,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : undefined;
       }
       if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
-        this.orderValueSet = true;
-        if(this.orderStatus.length == 0){
-          this.orderValueSet = false;
-        }
         this.clearFilters();
         this.setDefaultStatuses(statuses, true);
       }
@@ -492,10 +487,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         Status.includes(f)
       );
       setTimeout(() => {
-          if(this.orderValueSet){
-            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
-            this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
-          }
+          this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
+          this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
           this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
           for (let i = 0; i < this.filteredItems.length; i++) {
             if (this.filteredItems[i].text == undefined) {
