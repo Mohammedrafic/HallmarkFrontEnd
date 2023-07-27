@@ -12,6 +12,10 @@ export const DefaultTimesheetState: TimesheetsModel = {
       editMode: [],
       viewMode: [],
     },
+    historicalData: {
+      editMode: [],
+      viewMode: [],
+    },
     miles: {
       editMode: [],
       viewMode: [],

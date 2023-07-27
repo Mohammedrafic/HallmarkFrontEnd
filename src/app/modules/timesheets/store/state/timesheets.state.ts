@@ -812,7 +812,7 @@ export class TimesheetsState {
             ctx.patchState({
               timesheetDetails: {
                 ...ctx.getState().timesheetDetails as TimesheetDetailsModel,
-                status: 0 as TimesheetStatus, 
+                status: 0 as TimesheetStatus,
                 statusText: '',
                 rejectionReason: undefined,
                 noWorkPerformed: false,
@@ -834,6 +834,10 @@ export class TimesheetsState {
               },
               timeSheetRecords: {
                 timesheets: {
+                  editMode: [],
+                  viewMode: [],
+                },
+                historicalData: {
                   editMode: [],
                   viewMode: [],
                 },

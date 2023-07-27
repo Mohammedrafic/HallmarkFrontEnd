@@ -11,8 +11,16 @@ export enum SubmitBtnText {
 
 export enum RecordFields {
   Time = 'timesheets',
+  HistoricalData = 'historicalData',
   Miles = 'miles',
   Expenses = 'expenses',
+}
+
+export enum TableTabIndex {
+  Time = 0,
+  HistoricalData = 1,
+  Miles = 2,
+  Expenses = 3,
 }
 
 export enum RecordsMode {

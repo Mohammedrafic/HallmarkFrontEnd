@@ -8,7 +8,7 @@ import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DropdownOption } from '@core/interface';
 import { AllTimesheetTimeSet, DateTimeHelper } from '@core/helpers';
 import { TimesheetRecordsDto, RecordValue } from '../interface';
-import { RecordFields, RecordsMode, RecordStatus } from '../enums';
+import { RecordFields, RecordsMode, RecordStatus, TableTabIndex } from '../enums';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor';
 
 @Injectable()
@@ -75,7 +75,7 @@ export class TimesheetRecordsService {
           if (timeOutKey && !!dataItem[keyValue]) {
             const dataTime = DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string);
             const formTime = DateTimeHelper.setUtcTimeZone(values[keyValue] as string);
-            
+
             if (dataTime !== formTime) {
               diffValues[keyValue] = values[keyValue] as string;
             }
@@ -83,7 +83,7 @@ export class TimesheetRecordsService {
             diffValues[keyValue] = values[keyValue] as string;
           }
 
-          // Need to check isTimeInNull 
+          // Need to check isTimeInNull
           if (timeInKey && initialTimeInNull && values[keyValue] !== null) {
             diffValues[keyValue] = values[keyValue] as string | number | boolean;
           } else if (timeInKey && !initialTimeInNull && DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string)
@@ -114,23 +114,25 @@ export class TimesheetRecordsService {
     return Object.keys(controls).some((key) => controls[key].touched);
   }
 
-  getCurrentTabName(idx: number): RecordFields {
-    if (idx === 1) {
-      return  RecordFields.Miles;
+  getCurrentTabName(idx: TableTabIndex): RecordFields {
+    switch (idx) {
+      case TableTabIndex.HistoricalData:
+        return RecordFields.HistoricalData;
+      case TableTabIndex.Miles:
+        return RecordFields.Miles;
+      case TableTabIndex.Expenses:
+        return RecordFields.Expenses;
+      default:
+        return RecordFields.Time;
     }
-    if (idx === 2) {
-      return RecordFields.Expenses;
-    }
-
-    return RecordFields.Time;
   }
 
   controlTabsVisibility(billRates: DropdownOption[], tabs: TabComponent, records: TimesheetRecordsDto): void {
     const isMileageAvailable = billRates.some((rate) => rate.text.includes('Mileage'));
     const isExpensesAvailable = !!records.expenses.viewMode.length;
 
-    tabs.hideTab(1, !isMileageAvailable);
-    tabs.hideTab(2, !isExpensesAvailable);
+    tabs.hideTab(TableTabIndex.Miles, !isMileageAvailable);
+    tabs.hideTab(TableTabIndex.Expenses, !isExpensesAvailable);
   }
 
   checkForStatus(data: RecordValue[]): boolean {
