@@ -364,8 +364,10 @@ export class SendGroupEmailComponent
     }
   }
 
-  receivedData(data: any) {}
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  
+  initLoadItems() {
     this.onBusinessUnitValueChanged();
     this.onBusinessValueChanged();
     this.onBusinessesValueChanged();
@@ -539,9 +541,9 @@ export class SendGroupEmailComponent
       this.validationCheckForBusiness();
       if (this.isSend == true && value != null) {
         this.clearFields();
-        //this.businessControl.patchValue(0);
-        //this.businessesControl.patchValue([]);
-        //this.userTypeControl.patchValue(0);
+        this.businessControl.patchValue(null);
+        this.businessesControl.patchValue(null);
+        this.userTypeControl.patchValue(null);
         this.userData = [];
         this.dispatchNewPage(null);
         this.isAgencyCandidatesType = false;
@@ -665,7 +667,7 @@ export class SendGroupEmailComponent
           this.userData = [];
           this.roleData = [];
           if(this.isOrgUser){
-            let businessUnitIds = value.join();          
+            let businessUnitIds = value && value.length > 0  ? value.join() : [];          
             if (businessUnitIds != undefined && businessUnitIds.length > 0) {
               this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
               this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -735,23 +737,14 @@ export class SendGroupEmailComponent
   }
 
   validationCheckForBusiness() {
-
     this.groupEmailTemplateForm.get('business')?.removeValidators(Validators.required);
-
     this.groupEmailTemplateForm.get('businesses')?.removeValidators(Validators.required);
-
     if (this.isBusinessUnitTypeAgency) {
-
       this.groupEmailTemplateForm.get('businesses')?.setValidators(Validators.required);
-
     } else {
-
       this.groupEmailTemplateForm.get('business')?.setValidators(Validators.required);
-
     }
-
     this.groupEmailTemplateForm.get('business')?.updateValueAndValidity({ emitEvent: false });
-
     this.groupEmailTemplateForm.get('businesses')?.updateValueAndValidity({ emitEvent: false });
 
   }
@@ -822,7 +815,9 @@ export class SendGroupEmailComponent
 
   private onDepartmentValueChanged(): void {
     this.departmentControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.getSkillsByDepartments();
+      if(value && value.length > 0){
+        this.getSkillsByDepartments();
+      }
     });
   }
 
@@ -866,10 +861,16 @@ export class SendGroupEmailComponent
 
   private onRolesValueChanged(): void {
     this.rolesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      if(!value || value==null ||!value.length){
+      /*if(!value || value==null ||!value.length){
         this.usersControl.reset()
       }
       this.getUsersByRole();
+      */
+      if(value && value.length >0){
+        this.usersControl.reset()
+        this.getUsersByRole();
+      }
+
     });
   }
 
@@ -890,9 +891,8 @@ export class SendGroupEmailComponent
       this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         this.userData = data;
       });
-    }
-    if (this.rolesControl.value != null) {
-        this.dispatchUserPage(this.businessesControl.value);
+    }else if (this.rolesControl.value.length > 0) {
+        // this.dispatchUserPage(this.businessesControl.value);
         this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           if (data != undefined) {
             this.userData = data.items.filter(i => i.isDeleted == false);
@@ -946,14 +946,17 @@ export class SendGroupEmailComponent
 
             this.store.dispatch(new GetGroupEmailCandidateStatuses(businessId));
             this.candidateStatusData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-              this.candidateStatusData = data;
-              let billRatePending = this.candidateStatusData?.filter((item)=>item.statusText=="Bill Rate Pending")[0];
-              let billRatePendingIndex = this.candidateStatusData.indexOf(billRatePending, 0);
-              this.candidateStatusData.splice(billRatePendingIndex, 1);
+              if(data && data.length > 0){
+                this.candidateStatusData = data;
+                let billRatePending = this.candidateStatusData?.filter((item)=>item.statusText=="Bill Rate Pending")[0];
+                let billRatePendingIndex = this.candidateStatusData.indexOf(billRatePending, 0);
+                this.candidateStatusData.splice(billRatePendingIndex, 1);
+  
+                let offeredBillRate = this.candidateStatusData?.filter((item)=>item.statusText=="Offered Bill Rate")[0];
+                let offeredBillRateIndex = this.candidateStatusData.indexOf(offeredBillRate, 0);
+                this.candidateStatusData.splice(offeredBillRateIndex, 1);
+              }
 
-              let offeredBillRate = this.candidateStatusData?.filter((item)=>item.statusText=="Offered Bill Rate")[0];
-              let offeredBillRateIndex = this.candidateStatusData.indexOf(offeredBillRate, 0);
-              this.candidateStatusData.splice(offeredBillRateIndex, 1);
             });
           }
           if (value == 4) {
@@ -1163,37 +1166,40 @@ export class SendGroupEmailComponent
     this.workCommitmentsControl.patchValue([]);
     this.workCommitmentData = [];
     var skills =
-      this.skillsControl.value != null && this.skillsControl.value != undefined
+      this.skillsControl.value != null && this.skillsControl.value != undefined && this.skillsControl.value.length >0
         ? this.skillsControl.value.join()
-        : 'null';
+        : null;
     var regions =
-      this.regionControl.value != null && this.regionControl.value != undefined
+      this.regionControl.value != null && this.regionControl.value != undefined && this.regionControl.value.length >0
         ? this.regionControl.value.join()
-        : 'null';
+        : null;
     var locations =
-      this.locationControl.value != null && this.locationControl.value != undefined
+      this.locationControl.value != null && this.locationControl.value != undefined && this.locationControl.value.length >0
         ? this.locationControl.value.join()
-        : 'null';
+        : null;
+    if(skills != null && regions != null && locations != null){
+      this.store.dispatch(
+        new GetGroupEmailWorkCommitments(
+          this.businessControl.value,
+          regions,
+          locations,
+          skills,
+        )
+      );
+      this.workCommitmentData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        this.workCommitmentData = data;
+      });
+  
+      this.changeDetectorRef.detectChanges();
+    }
 
-    this.store.dispatch(
-      new GetGroupEmailWorkCommitments(
-        this.businessControl.value,
-        regions,
-        locations,
-        skills,
-      )
-    );
-    this.workCommitmentData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.workCommitmentData = data;
-    });
-
-    this.changeDetectorRef.detectChanges();
   }
 
   rteCreated(): void {
     this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
     this.rteObj.toolbarSettings.enableFloating = true;
     this.rteObj.height = '300px';
+    this.initLoadItems();
   }
   disableControls(isSend: boolean): void {
     let ele = document.getElementById('richTextEditorDiv') as HTMLElement;
