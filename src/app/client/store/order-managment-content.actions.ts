@@ -5,6 +5,7 @@ import {
   CandidateCancellationReasonFilter,
   CreateOrderDto,
   EditOrderDto,
+  OnboardCandidateEmail,
   Order,
   OrderFilter,
   OrderManagement,
@@ -169,7 +170,8 @@ export class SetPredefinedBillRatesData {
     public departmentId: number,
     public skillId: number,
     public jobStartDate: string,
-    public jobEndDate?: string
+    public jobEndDate?: string,
+    public ignoreUpdateBillRate?: boolean
   ) {}
 }
 
@@ -286,7 +288,7 @@ export class CancelOrganizationCandidateJobSuccess {
 
 export class ApproveOrder {
   static readonly type = '[order management] Approve Order';
-  constructor(public id: number) {}
+  constructor(public id: number, public isIRPTab: boolean) {}
 }
 
 export class GetOrderFilterDataSources {
@@ -425,6 +427,16 @@ export class GetAllShifts{
   constructor(){}
 }
 
+
+export class sendOnboardCandidateEmailMessage {
+  static readonly type = '[order management] Send message to Onboard Candidate Job';
+  constructor(public onboardCandidateEmailData : OnboardCandidateEmail) {}
+}
+
+export class sendOnboardCandidateEmailMessageSucceed {
+  static readonly type = '[order management] Send message to Onboard Candidate Job Succeed';
+  constructor() {}
+}
 export class GetOrderComments {
   static readonly type = '[agency order management] Get Order Comments';
   constructor(public commentContainerId: number) {}

@@ -3,6 +3,7 @@ import { ApplicantStatus } from '../../../enums/applicant-status.enum';
 import { ExportedFileType } from '../../../enums/exported-file-type';
 import { CandidateStatus } from '../../../enums/status';
 import { PageOfCollections } from '../../../models/page.model';
+import { CredentialType } from '@shared/models/credential-type.model';
 
 export type CandidateRow = {
   candidateProfileId: number;
@@ -28,9 +29,19 @@ export type IRPCandidate = {
   employeeStatus: string;
   primarySkillName: string;
   employeeSkills: string[];
-  employeeWorkCommitments:string;
+  employeeWorkCommitments?:string;
   hireDate: string;
   orgOrientation: string;
+  employeeSourceId?: string;
+  source?: string;
+  recruiter?: string
+  employeeStatusId?:number;
+  locationName?:string;
+  departmentId?:number;
+  departmentName?:string;
+  sourceId?:number;
+  recruiterId?:number
+  
 }
 
 export interface CandidateListRequest {
@@ -97,7 +108,7 @@ export interface CandidateNameFilterColumn {
 }
 
 export interface CandidateListFiltersColumn {
-  profileStatuses?: FilterColumn;
+  profileStatuses: FilterColumn;
   skillsIds?: FilterColumn;
   regionsNames?: FilterColumn;
   candidateName?: CandidateNameFilterColumn;
@@ -138,4 +149,5 @@ export interface CandidateListStateModel {
   listOfSkills: ListOfSkills[] | null;
   listOfRegions: string[] | null;
   tableState: CandidateListTableState | null;
+  listOfCredentialTypes: CredentialType[] | null;
 }

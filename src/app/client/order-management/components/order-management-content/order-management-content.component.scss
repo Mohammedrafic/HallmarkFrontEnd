@@ -340,15 +340,17 @@
   align-self: flex-end;
 }
 
-::ng-deep {
-  app-page-toolbar {
-    .controls-container {
-      flex-direction: row;
+:host {
+  ::ng-deep {
+    app-page-toolbar {
+      .controls-container {
+        flex-direction: row;
 
-      .right-content {
-        align-items: flex-end;
-        justify-content: flex-end;
-        padding-bottom: 6px;
+        .right-content {
+          align-items: flex-end;
+          justify-content: flex-end;
+          padding-bottom: 6px;
+        }
       }
     }
   }
@@ -363,10 +365,10 @@
   ::ng-deep {
     app-page-toolbar {
       .controls-container {
-        flex-direction: column;
+        flex-direction: column !important;
 
         .right-content {
-          justify-content: flex-start;
+          justify-content: flex-start !important;
           margin-top: 12px;
         }
       }

@@ -224,7 +224,7 @@ export class OrientationHistoricalDataComponent extends AbstractPermissionGrid i
       this.orientationForm.markAllAsTouched();
     } else {
       const data = this.orientationForm.getRawValue();
-      data.endDate = data.endDate ? DateTimeHelper.toUtcFormat(data.endDate) : data.endDate;
+      data.endDate = data.endDate ? DateTimeHelper.setUtcTimeZone(data.endDate) : data.endDate;
       this.orientationService.reactivateOrientationConfiguration(data).pipe(
         takeUntil(this.componentDestroy()),
       ).subscribe({

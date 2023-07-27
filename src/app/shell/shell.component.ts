@@ -58,6 +58,7 @@ import { GetProfileMenuItems } from './shell.constant';
 import { ProfileMenuItem, THEME } from './shell.enum';
 import { UserService } from '@shared/services/user.service';
 import { BreakpointObserverService } from '@core/services';
+import { HeaderState } from '@shared/models/header-state.model';
 
 @Component({
   selector: 'app-shell',
@@ -89,7 +90,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   isDarkTheme$: Observable<boolean>;
 
   @Select(AppState.headerState)
-  headerState$: Observable<any>;
+  headerState$: Observable<HeaderState | null>;
 
   @Select(AppState.isFirstLoad)
   isFirstLoad$: Observable<boolean>;
@@ -223,6 +224,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.attachElementToResizeObserver();
     this.watchForRouterEvents();
     this.getSiteHelpUrl();
+    this.saveMainContentElement();
     this.alertStateModel$
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe((alertdata) => {
@@ -243,7 +245,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   ngAfterViewInit(): void {
     this.hideAnalyticsSubMenuItems();
     this.getAlertsPoollingTime();
-    this.saveMainContentElement();
   }
 
   onSelectProfileMenu(event: any): void {
@@ -318,11 +319,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   selectMenuItem(menuItem: MenuItem): void {
-    /** Preventing the page navigation  which are not responsive*/
-    if(this.isMobile){
-      if(this.nonResponsiveMenuItesm.includes(menuItem.id))
-        return;
-    }
+
     this.setSideBarForFirstLoad(menuItem.route as string);
 
     if (menuItem.id == AnalyticsMenuId) {
@@ -339,12 +336,12 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.tree.selectedNodes = [this.activeMenuItemData?.anch];
   }
 
-  showContextMenu(data: MenuItem, event: any): void {
+  showContextMenu(data: MenuItem, event: MouseEvent): void {
     this.contextmenu.items = [];
 
     if (data.id != AnalyticsMenuId && data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
-      const boundingRectangle = event.target.getBoundingClientRect();
+      const boundingRectangle = (event.target as HTMLElement).getBoundingClientRect();
       this.contextmenu.items =
         data.children.map((child: any) => {
           child.text = child.title;
@@ -686,7 +683,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       if (user) {
         this.showHelpIButton = !user.isEmployee;
         this.userLogin = user;
-        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
+        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType, user.isEmployee ?? false));
         this.store.dispatch(new GetAlertsCountForCurrentUser({}));
 
         this.alertCountStateModel$
@@ -699,6 +696,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
           {
             text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
             items: GetProfileMenuItems(this.isDarkTheme),
+            iconCss: this.isMobile ? '' : 'e-icons e-chevron-down',
           },
         ];
       }

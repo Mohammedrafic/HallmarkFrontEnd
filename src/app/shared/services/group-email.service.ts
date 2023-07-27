@@ -35,13 +35,14 @@ export class GroupEmailService {
    */
   public getGroupMailByBusinessUnitIdPage(
     BusinessUnitId: number | null,
-    GetAll: boolean
+    GetAll: boolean,
+    SeeMyEmailsOnly:boolean |null
   ): Observable<GroupEmailByBusinessUnitIdPage> {
     if (BusinessUnitId == null) {
-      return this.http.get<GroupEmailByBusinessUnitIdPage>(`/api/GroupMail/getgroupmail?GetAll=` + GetAll);
+      return this.http.get<GroupEmailByBusinessUnitIdPage>(`/api/GroupMail/getgroupmail?GetAll=` + GetAll +'&Seemyemailsonly='+SeeMyEmailsOnly);
     }
     return this.http.get<GroupEmailByBusinessUnitIdPage>(
-      `/api/GroupMail/getgroupmail?BusinessUnitId=` + BusinessUnitId + `&GetAll=` + GetAll
+      `/api/GroupMail/getgroupmail?BusinessUnitId=` + BusinessUnitId + `&GetAll=` + GetAll +'&Seemyemailsonly='+SeeMyEmailsOnly
     );
   }
   /**
@@ -74,10 +75,11 @@ export class GroupEmailService {
    *
    * @return GroupEmail
    */
-  public GetGroupEmailRolesByOrgId(id: number): Observable<GroupEmailRole> {
-    return this.http.get<GroupEmailRole>(`/api/GroupMail/getroles?OrganizationId=` + id);
+  public GetGroupEmailRolesByOrgId(id: number[]): Observable<GroupEmailRole> {
+    return this.http.post<GroupEmailRole>(`/api/GroupMail/getroles`,  {
+      organizationId: id,
+    });
   }
-
   /**
    * Get Group Email internal users By regionId, locationId and roles
    * @param regionIds

@@ -9,6 +9,8 @@ import { OrderTab } from '@shared/components/candidate-details/models/candidate.
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { GlobalWindow } from '@core/tokens';
 
+import { OrderLinkDetails } from '../../../order-management/interfaces';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -34,6 +36,8 @@ export class OrderManagementService extends DestroyableDirective {
   private previousSelectedOrganizationId: number;
   private readonly isAvailable: BaseObservable<boolean> = new BaseObservable<boolean>(false);
   private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
+  private readonly orderFromAnotherSystem: BaseObservable<OrderLinkDetails | null> =
+    new BaseObservable<OrderLinkDetails | null>(null);
 
   constructor(
     private fb: FormBuilder,
@@ -89,6 +93,7 @@ export class OrderManagementService extends DestroyableDirective {
       reorderStatuses: new FormControl([]),
       shiftIds: new FormControl([]),
       shift: new FormControl([]),
+      orderLocked: new FormControl(null),
     });
   }
 
@@ -119,7 +124,9 @@ export class OrderManagementService extends DestroyableDirective {
   }
 
   public setPreviousOrganizationId(id: number): void {
-    if (this.previousSelectedOrganizationId !== id) {
+    const previousOrganizationId = this.globalWindow.localStorage.getItem('lastSelectedOrganizationId');
+
+    if (Number(previousOrganizationId) !== id) {
       this.orderManagementSystem = null;
     }
 
@@ -140,6 +147,14 @@ export class OrderManagementService extends DestroyableDirective {
 
   getCandidate(): Observable<boolean> {
     return this.updatedCandidate.getStream();
+  }
+
+  setOrderFromAnotherSystem(orderLinkDetails: OrderLinkDetails): void {
+    this.orderFromAnotherSystem.set(orderLinkDetails);
+  }
+
+  getOrderFromAnotherSystemStream(): Observable<OrderLinkDetails | null> {
+    return this.orderFromAnotherSystem.getStream();
   }
 
   saveSelectedOrderManagementSystem(activeSystem: OrderManagementIRPSystemId): void {

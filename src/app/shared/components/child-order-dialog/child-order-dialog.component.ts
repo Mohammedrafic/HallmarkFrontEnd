@@ -95,6 +95,7 @@ import {
   ApplicantStatus as ApplicantStatusModel,
   CandidateCancellationReason,
   CandidateCancellationReasonFilter,
+  MergedOrder,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
@@ -123,8 +124,6 @@ enum Template {
   offerDeployment,
 }
 
-type MergedOrder = AgencyOrderManagement & Order;
-
 enum MobileMenuItems {
   AddExtension = 'Add Extension',
   ClosePosition = 'Close Position',
@@ -141,7 +140,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
-  @Input() activeSystem: OrderManagementIRPSystemId;
+  @Input() activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
   @Input() orderComments: Comment[] = [];
   @Output() saveEmitter = new EventEmitter<void>();
 
@@ -767,9 +766,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: DateTimeHelper.convertDateToUtc(orderDate as string),
-      shiftStartTime: shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
-      shiftEndTime: shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
+      orderOpenDate: DateTimeHelper.setCurrentTimeZone(orderDate as string),
+      shiftStartTime: shiftStartTime ? DateTimeHelper.setCurrentTimeZone(shiftStartTime.toString()) : '',
+      shiftEndTime: shiftEndTime ? DateTimeHelper.setCurrentTimeZone(shiftEndTime.toString()) : '',
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
       jobCancellationReason: CancellationReasonsMap[jobCancellation?.jobCancellationReason || 0],
@@ -885,7 +884,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       orderId: this.order.orderId || this.order.id,
       candidateProfileId: this.candidate.candidateId,
       validateForDate: DateTimeHelper.setInitHours(
-        DateTimeHelper.toUtcFormat(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
+        DateTimeHelper.setUtcTimeZone(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
       ),
     };
   }

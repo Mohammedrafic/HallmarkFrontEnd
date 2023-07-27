@@ -134,8 +134,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: '',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     29: {
       // MSP List
@@ -459,6 +459,31 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/hours-by-department',
     },
+    99: {
+      // staff availability Report
+      icon: '',
+      route: '/analytics/staff-availability',
+    },
+    100: {
+      // custom-report
+      icon: 'trending-up',
+      route: '/reporting/custom-report',
+    },
+    101: {
+      // shift-breakdown
+      icon: '',
+      route: '/analytics/shift-breakdown',
+    },
+    102: {
+      // Position-Summary
+      icon: '',
+      route: '/analytics/Position-Summary',
+    },
+    103: {
+      // Agency-Spend
+      icon: '',
+      route: '/analytics/agency-spend',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -561,8 +586,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: '',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     28: {
       // Associated Organizations
@@ -639,7 +664,7 @@ export const MENU_CONFIG: any = {
       // New Accrual Report
       icon: '',
       route: '/analytics/accrual-report',
-    },    
+    },
     83: {
       // New Accrual Report
       icon: '',
@@ -700,6 +725,21 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/hours-by-department',
     },
+    99: {
+      // staff availability Report
+      icon: '',
+      route: '/analytics/staff-availability',
+    },
+    101: {
+      // shift-breakdown
+      icon: '',
+      route: '/analytics/shift-breakdown',
+    },
+    103: {
+      // Agency-Spend
+      icon: '',
+      route: '/analytics/agency-spend',
+    },
   },
 
   [BusinessUnitType.Organization]: {
@@ -751,7 +791,7 @@ export const MENU_CONFIG: any = {
       route: '/client/associate-list',
     },
     38: {
-      // Scheduling
+      // Scheduling for Org user
       icon: 'calendar',
       route: 'client/scheduling',
     },
@@ -818,8 +858,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: '',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     29: {
       // MSP List
@@ -1123,6 +1163,31 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/hours-by-department',
     },
+    99: {
+      // staff availability Report
+      icon: '',
+      route: '/analytics/staff-availability',
+    },
+    100: {
+    // custom-report
+      icon: 'trending-up',
+      route: '/reporting/custom-report',
+    },
+    101: {
+      // shift-breakdown
+      icon: '',
+      route: '/analytics/shift-breakdown',
+    },
+    102: {
+      // Position-Summary
+      icon: '',
+      route: '/analytics/Position-Summary',
+    },
+    103: {
+      // Agency-Spend
+      icon: '',
+      route: '/analytics/agency-spend',
+    },
   },
 
   [BusinessUnitType.Agency]: {
@@ -1241,8 +1306,8 @@ export const MENU_CONFIG: any = {
     },
     27: {
       // Settings
-      icon: 'user',
-      route: '',
+      icon: 'settings',
+      route: 'agency/settings',
     },
     28: {
       // Associated Organizations
@@ -1371,6 +1436,19 @@ export const MENU_CONFIG: any = {
       // Communication
       icon: 'twitch',
       route: '',
+    },
+  },
+
+  [BusinessUnitType.Employee]: {
+    110: {
+      // Scheduling for Employee
+      icon: 'calendar',
+      route: 'employee/scheduling',
+    },
+    111: {
+      // Open Jobs
+      icon: 'briefcase',
+      route: 'employee/open-jobs',
     },
   },
 };

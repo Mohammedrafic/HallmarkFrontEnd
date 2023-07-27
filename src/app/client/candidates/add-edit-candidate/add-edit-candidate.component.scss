@@ -1,5 +1,15 @@
 :host {
   height: 100%;
+
+  ::ng-deep {
+    .controls-container {
+      flex-direction: row;
+      
+      .right-content {
+        justify-content: flex-end;
+      }
+    }
+  }
 }
 
 .candidate-name-title {

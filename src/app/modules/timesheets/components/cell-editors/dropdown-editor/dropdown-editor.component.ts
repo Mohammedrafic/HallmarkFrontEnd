@@ -78,6 +78,7 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
     if (params.colDef?.cellRendererParams.formGroup?.[params.data.id]) {
 
       const group = params.colDef?.cellRendererParams.formGroup[params.data.id] as FormGroup;
+
       this.control = group.get((params.colDef as ColDef).field as string) as AbstractControl;
     }
   }

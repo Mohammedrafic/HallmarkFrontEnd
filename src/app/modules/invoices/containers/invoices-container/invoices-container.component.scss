@@ -58,13 +58,6 @@
     }
   }
 }
-.invoices-page-toolbar{
-  ::ng-deep{
-    .left-content{
-      max-width: 40% !important;
-    }
-  }
-}
 
 .tab-navigation {
   &.e-badge {
@@ -207,46 +200,69 @@
   column-gap: 12px;
 }
 
+.menu-mobile {
+  display: none !important;
+}
+
+.top-margin {
+  margin: 10px 0 0;
+}
+
+@media #{$min-desktop-large} {
+  .invoices-page-toolbar{
+    ::ng-deep{
+      .left-content{
+        max-width: 40% !important;
+      }
+    }
+  }
+}
+
 @media #{$max-mobile} {
   .tabs {
     position: fixed;
-    background: #f6f6f6;
+    background: $background;
     z-index: 100;
     margin-top: -19px;
     padding: 20px 25px 0;
     width: 100vw !important;
     margin-left: -25px;
   }
+
   .bootstrap,
   .top-margin {
-    margin-top: 42px;
+    margin-top: 54px;
   }
+
   .bootstrap {
     margin-bottom: 12px;
   }
+
+  .invoices-split-button {
+    width: calc(100vw - 16px);
+
+    .main-button {
+      width: calc(100% - 50px);
+    }
+  }
 }
 
-.top-margin {
-  margin-left: 0;
+
+@media (max-width: 688px) {
+  .buttons-group {
+    flex-direction: column;
+
+    .e-tooltip {
+      margin-top: 12px;
+      margin-left: 0;
+      align-self: flex-start;
+    }
+  }
 }
 
 @media (max-width: 480px) {
   .bootstrap,
   .top-margin {
-    margin-top: 54px;
-  }
-}
-
-.menu-mobile {
-  display: none !important;
-}
-
-@media (max-width: 670px) {
-  .buttons-group {
-    flex-direction: column;
-    .e-tooltip {
-      margin-top: 12px;
-      margin-left: 0;
-    }
+    margin-top: 64px;
   }
 }

@@ -285,15 +285,17 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
               this.isAlive = true;
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
-              this.filterColumns.skillIds.dataSource = [];
+              this.filterColumns.skillIds.dataSource = data.masterSkills;
               this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
               this.filterColumns.agencyIds.dataSource = data.agencies;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+              this.defaultSkills = [];
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
               this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+              this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
               this.changeDetectorRef.detectChanges();
-              setTimeout(() => { this.SearchReport() }, 3000);
+              this.SearchReport();
             }
           });
           this.regions = this.regionsList;
@@ -349,17 +351,21 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.skillCategoryIdControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds) as AbstractControl;
     this.skillCategoryIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.skillCategoryIdControl.value.length > 0) {
+        this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
         let masterSkills = this.filterOptionsData.masterSkills;
         this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
         let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
         this.filterColumns.skillIds.dataSource = skills;
-        this.defaultSkills = skills.map((list) => list.id);
-        this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
-        this.changeDetectorRef.detectChanges();
+        //this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(skills.map((list) => list.id));
+        //this.defaultSkills = skills.map((list) => list.id);
+        //this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
+        //this.changeDetectorRef.detectChanges();
       }
       else {
-        this.filterColumns.skillIds.dataSource = [];
         this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
+        let masterSkills = this.filterOptionsData.masterSkills;
+       
+        this.filterColumns.skillIds.dataSource = masterSkills;
       }
     });
     this.skillIdControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds) as AbstractControl;
@@ -535,8 +541,10 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue([]);
+    let masterSkills = this.filterOptionsData.masterSkills;
+
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
-    this.filterColumns.skillIds.dataSource = [];
+    this.filterColumns.skillIds.dataSource = masterSkills;
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.CandidateName)?.setValue(null);
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.JobStatuses)?.setValue([]);

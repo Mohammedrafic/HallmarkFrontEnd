@@ -63,7 +63,7 @@ export class ScheduleItemsService {
         const date = new Date(`${dateValue}T00:00:00`);
 
         scheduleDateItems.push({
-          dateValue: DateTimeHelper.toUtcFormat(date),
+          dateValue: DateTimeHelper.setUtcTimeZone(date),
           tooltipContent: CreateBookTooltip(daySchedules) as string,
           scheduleType: scheduleDayWithEarliestTime.scheduleType,
           orderType,
@@ -118,7 +118,7 @@ export class ScheduleItemsService {
     const date = new Date(dateString);
 
     return {
-      dateValue: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(date)),
+      dateValue: DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(date)),
       tooltipContent: CreateTooltip(daySchedule),
       scheduleType: daySchedule.scheduleType,
       id: daySchedule.id,

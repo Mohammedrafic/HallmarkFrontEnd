@@ -7,6 +7,7 @@ export enum OrderStatus {
   InProgressOfferAccepted = 32,
   Filled = 50,
   Closed = 60,
+  Onboard = 60,
   // This status is only for service purposes, to prevent status checks.
   NoOrder = -1,
 }

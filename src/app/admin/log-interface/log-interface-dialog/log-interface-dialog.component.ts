@@ -313,12 +313,6 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'Job Code',
-      field: 'jobcode',
-      minWidth: 150,
-      resizable: true
-    },
-    {
       headerName: 'Deleted',
       field: 'deleted',
       minWidth: 150,

@@ -1,7 +1,7 @@
 <app-filter-dialog
   [items]="filteredItems"
   [count]="(timesheets$ | async)?.totalCount"
-  [targetElement]="targetElement"
+  [targetElement]="targetElement$ | async"
   (deleteFilter)="deleteFilter($event)"
   (clearAllFiltersClicked)="clearAllFilters()"
   (applyFilterClicked)="applyFilters()">
@@ -21,15 +21,12 @@
     <div class="input-container">
       <label for="orderId">Order ID</label>
       <div class="input-group dropdown">
-        <ejs-multiselect
+        <input
+          class="e-input"
+          type="text"
           id="orderId"
-          mode="CheckBox"
-          [allowFiltering]="true"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.orderIds?.dataSource"
-          [showDropDownIcon]="true"
           formControlName="orderIds"
-          placeholder=""></ejs-multiselect>
+        />
       </div>
     </div>
     <div *ngIf="showStatuses" class="input-container">

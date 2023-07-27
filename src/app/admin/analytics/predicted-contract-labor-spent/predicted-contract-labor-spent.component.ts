@@ -85,7 +85,7 @@ export class PredictedContractLaborSpentComponent implements OnInit, OnDestroy {
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/PredictedContractLaborSpent/PredicatedContractLaborSpent.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/PredictedContractLaborSpent/PredictedContractLaborSpent.cat" };
   public message: string = "";
-  public title: string = "Predicted Contract Labor Spent";
+  public title: string = "Predicted Contract Labor Spend";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
 
@@ -278,7 +278,7 @@ export class PredictedContractLaborSpentComponent implements OnInit, OnDestroy {
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              setTimeout(() => { this.SearchReport() }, 3000);
+             this.SearchReport() ;
             }
           });
           this.regions = this.regionsList;
@@ -491,7 +491,28 @@ export class PredictedContractLaborSpentComponent implements OnInit, OnDestroy {
     this.locationsList = this.masterLocationsList;
     this.departmentsList = this.masterDepartmentsList;
   }
+
   public onFilterApply(): void {
+    let {
+      startDate,
+      endDate
+    }
+      = this.PredictedContractLaborSpentForm.getRawValue();
+    let CurrentDate: string = formatDate(new Date(), this.dateFormat, this.culture);
+    let StartChkDate: string = formatDate(startDate, this.dateFormat, this.culture);
+    let EndDateChk: string = formatDate(endDate, this.dateFormat, this.culture);
+    if (StartChkDate < CurrentDate || EndDateChk < StartChkDate) {
+      //this.message = "";
+      //let error: any = "Start Date should be Gretaer Than or Equal to Current Date";
+      //this.store.dispatch(new ShowToast(MessageTypes.Error, error));
+      return;
+    }
+    //if (EndDateChk < StartChkDate) {
+    //  this.message = "";
+    //  let error: any = "End Date should be Gretaer Than or Equal to Start Date";
+    //  this.store.dispatch(new ShowToast(MessageTypes.Error, error));
+    //  return;
+    //}
     this.PredictedContractLaborSpentForm.markAllAsTouched();
     if (this.PredictedContractLaborSpentForm?.invalid) {
       return;

@@ -10,8 +10,13 @@
   }
 
   .tabs {
-    max-width: calc(100vw - 32px) !important;
+    max-width: 100% !important;
     overflow: hidden !important;
+
+    @media #{$max-tablet} {
+      max-width: calc(100% - 24px) !important;
+    }
+
     .e-hscroll-content {
       padding: 0;
     }

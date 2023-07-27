@@ -154,7 +154,7 @@ export class PayrateSetupComponent extends AbstractGridConfigurationComponent im
   public skillSelected:any = [];
   public locationSelected:any = [];
   public editedData: PayRateSetup;
-
+  public filterType: string = 'Contains';
   constructor(
     private store: Store,
     private actions$: Actions,

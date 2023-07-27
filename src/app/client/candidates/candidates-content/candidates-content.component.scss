@@ -42,14 +42,47 @@
 }
 
 @media #{$max-desktop-small} {
-  ::ng-deep {
-    app-page-toolbar {
-      .controls-container {
-        flex-direction: row;
+  :host {
+    ::ng-deep {
+      app-page-toolbar {
+        .controls-container {
+          flex-direction: row;
 
-        .right-content {
-          margin-top: 0;
-          justify-content: flex-end;
+          .right-content {
+            margin-top: 0;
+            justify-content: flex-end;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .button-export-container {
+    .icon {
+      margin: 0;
+    }
+  }
+
+  button.e-control.e-btn {
+    padding: 8px 12px;
+  }
+
+  :host {
+    ::ng-deep {
+      app-page-toolbar {
+        .controls-container {
+          padding: 16px 0 0;
+
+          .left-content {
+            padding: 0;
+          }
+
+          .right-content {
+            flex-direction: row;
+            justify-content: flex-start;
+          }
         }
       }
     }

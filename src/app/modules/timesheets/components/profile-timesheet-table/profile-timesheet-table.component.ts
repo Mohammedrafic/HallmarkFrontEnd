@@ -263,9 +263,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public openAddDialog(): void {
     const { weekStartDate, weekEndDate, jobEndDate, jobStartDate } = this.store.snapshot().timesheets.timesheetDetails;
-    const startDate = DateTimeHelper.convertDateToUtc(jobStartDate) > DateTimeHelper.convertDateToUtc(weekStartDate)
+    const startDate = DateTimeHelper.setCurrentTimeZone(jobStartDate) > DateTimeHelper.setCurrentTimeZone(weekStartDate)
       ? jobStartDate : weekStartDate;
-    const endDate = DateTimeHelper.convertDateToUtc(jobEndDate) < DateTimeHelper.convertDateToUtc(weekEndDate)
+    const endDate = DateTimeHelper.setCurrentTimeZone(jobEndDate) < DateTimeHelper.setCurrentTimeZone(weekEndDate)
       ? jobEndDate : weekEndDate;
 
     this.openAddSideDialog.emit({
@@ -587,7 +587,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private saveRecords(): void {
     const diffs = this.timesheetRecordsService.findDiffs(
-      this.records[this.currentTab][this,this.currentMode], this.formControls, this.timesheetColDef);
+      this.records[this.currentTab][this.currentMode], this.formControls, this.timesheetColDef);
 
     const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
       this.records[this.currentTab][this,this.currentMode], diffs, this.idsToDelete);
@@ -595,7 +595,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     if (diffs.length || this.idsToDelete.length) {
       this.loading = true;
       this.cd.detectChanges();
-      
+
       createSpinner({
         target: this.spinner.nativeElement,
       });
@@ -611,6 +611,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       );
 
       this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency));
+      
       this.actions$
       .pipe(
         take(1),
@@ -628,7 +629,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
                 if (!confirm) {
                   this.loading = false;
                   this.cd.markForCheck();
-                } 
+                }
               }),
               filter((confirm) => !!confirm),
               switchMap(() => {

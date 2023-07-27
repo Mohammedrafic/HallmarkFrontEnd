@@ -47,3 +47,8 @@ export class GetCandidateSkills {
   static readonly type = '[candidate details] Get Candidate Skills';
   constructor() {}
 }
+
+export class GetAssociateOrganizations {
+  static readonly type = '[candidate details] Get Associate Organizations';
+  constructor(public lastSelectedBusinessUnitId?: number) {}
+}

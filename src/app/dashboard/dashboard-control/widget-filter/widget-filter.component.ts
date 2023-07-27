@@ -68,6 +68,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   public widgetFilterFormGroup: FormGroup;
   public filterColumns: IFilterColumnsDataModel = {} as IFilterColumnsDataModel;
   public orderedFilterChips: (string | FilteredItem)[][] = [];
+  public filterType: string = 'Contains';
   public readonly optionFields = {
     text: 'name',
     value: 'id',

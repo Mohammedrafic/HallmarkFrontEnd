@@ -37,7 +37,6 @@ import {
   GetAgencyFilterOptions,
   GetAgencyHistoricalData,
   GetAgencyOrderCandidatesList,
-  GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
   GetCandidateJob,
   GetDeployedCandidateOrderInfo,
@@ -50,6 +49,7 @@ import {
   SetOrdersTab,
   UpdateAgencyCandidateJob,
   ClearOrganizationStructure,
+  ReloadOrderCandidatesLists,
 } from './order-management.actions';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { OrderFilteringOptionsService } from '@shared/services/order-filtering-options.service';
@@ -68,7 +68,6 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
   orderCandidatesListPage: OrderCandidatesListPage | null;
-  orderCandidatesInformation: Order | null;
   candidatesJob: OrderCandidateJob | null;
   orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
@@ -87,7 +86,6 @@ export interface OrderManagementModel {
   defaults: {
     ordersPage: null,
     orderCandidatesListPage: null,
-    orderCandidatesInformation: null,
     orderApplicantsInitialData: null,
     selectedOrder: null,
     candidatesJob: null,
@@ -126,11 +124,6 @@ export class OrderManagementState {
           candidate.status !== ApplicantStatus.Withdraw
       ).length || 0
     );
-  }
-
-  @Selector()
-  static orderCandidatesInformation(state: OrderManagementModel): Order | null {
-    return state.orderCandidatesInformation;
   }
 
   @Selector()
@@ -247,19 +240,6 @@ export class OrderManagementState {
     patchState({ orderCandidatesListPage: null });
   }
 
-  @Action(GetAgencyOrderGeneralInformation)
-  GetAgencyOrderGeneralInformation(
-    { patchState }: StateContext<OrderManagementModel>,
-    { id, organizationId }: GetAgencyOrderGeneralInformation
-  ): Observable<Order> {
-    return this.orderManagementContentService.getAgencyOrderGeneralInformation(id, organizationId).pipe(
-      tap((payload) => {
-        patchState({ orderCandidatesInformation: payload });
-        return payload;
-      })
-    );
-  }
-
   @Action(GetOrderById)
   GetOrderById(
     { patchState }: StateContext<OrderManagementModel>,
@@ -352,7 +332,11 @@ export class OrderManagementState {
   ): Observable<void> {
     return this.orderManagementContentService.rejectCandidateJob(payload).pipe(
       tap(() => {
-        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new RejectCandidateForAgencySuccess()]);
+        dispatch([
+            new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+            new RejectCandidateForAgencySuccess(),
+            new ReloadOrderCandidatesLists(),
+          ]);
       })
     );
   }
@@ -406,8 +390,8 @@ export class OrderManagementState {
     }
 
   @Action(ExportAgencyOrders)
-  ExportAgencyOrders({}: StateContext<OrderManagementModel>, { payload, tab }: ExportAgencyOrders): Observable<any> {
-    return this.orderManagementContentService.exportAgency(payload, tab).pipe(
+  ExportAgencyOrders({}: StateContext<OrderManagementModel>, { payload }: ExportAgencyOrders): Observable<Blob> {
+    return this.orderManagementContentService.exportAgency(payload).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);

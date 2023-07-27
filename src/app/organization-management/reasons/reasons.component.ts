@@ -19,7 +19,7 @@ import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Organization, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Penalty } from '@shared/models/penalty.model';
-import { RejectReason } from '@shared/models/reject-reason.model';
+import { Recuriter, RecuriterReasonPage, RejectReason, Sourcing, SourcingReasonPage } from '@shared/models/reject-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { concatMap, delay, filter, Observable, takeUntil } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -67,8 +67,10 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   private isAllLocationsSelected = false;
   private isEdit = false;
   private formType;
+  public filterType: string = 'Contains';
   protected componentDestroy: () => Observable<unknown>;
-
+  public canUpdateAgencyFeeApplicable: boolean = false;
+  public agencyFeeApplicableSwitch?: boolean = true;
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
 
@@ -97,7 +99,6 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     this.dialogConfig = ReasonDialogConfig[this.formType];
     this.createForm();
     this.setIRPFlag();
-   
 
   }
 
@@ -117,7 +118,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.Requisition;
     } else if(selectedTab.selectedItem.innerText === "Order Closure"){
       this.selectedTab = ReasonsNavigationTabs.Closure;
-    } else if(selectedTab.selectedItem.innerText === "Manual Invoice"){
+    } else if (selectedTab.selectedItem.innerText === "Manual Invoice") {
       this.selectedTab = ReasonsNavigationTabs.ManualInvoice;
     } else if(selectedTab.selectedItem.innerText === "Unavailability"){
       this.selectedTab = ReasonsNavigationTabs.Unavailability;
@@ -127,6 +128,10 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.InternalTransfer;
     } else if(selectedTab.selectedItem.innerText === "Category Note"){
       this.selectedTab = ReasonsNavigationTabs.CategoryNote;
+    } else if (selectedTab.selectedItem.innerText === "Sourcing Reason") {
+      this.selectedTab = ReasonsNavigationTabs.SourcingReason;
+    } else if (selectedTab.selectedItem.innerText === "Recuriter Reason") {
+      this.selectedTab = ReasonsNavigationTabs.RecuriterReason;
     } 
     
     this.formType = ReasonFormsTypeMap[this.selectedTab];
@@ -168,10 +173,11 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   addReason(): void {
     this.title = DialogMode.Add;
     this.isEdit = false;
+    this.canUpdateAgencyFeeApplicable = !this.userPermission[this.userPermissions.CanUpdateAgencyFeeApplicable] ? true : false;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  editReason(data: RejectReason | Penalty | UnavailabilityValue | Closurevalue | CategoryNoteValue): void {
+  editReason(data: RejectReason | Penalty | UnavailabilityValue | Closurevalue | CategoryNoteValue | Sourcing | Recuriter): void {
     this.isEdit = true;
     this.title = DialogMode.Edit;
 
@@ -228,14 +234,33 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         id: reason.id,
         reason: reason.categoryName,
         isRedFlagCategory: !!reason.isRedFlag,
+      });
+    } else if((this.selectedTab ===ReasonsNavigationTabs.SourcingReason)){
+      const reason  = data as RejectReason;
+      this.reasonForm.patchValue({
+        id: (data as RejectReason).id,
+        reason: reason.reason,
         });
+    }else if((this.selectedTab ===ReasonsNavigationTabs.RecuriterReason)){
+      const reason  = data as RejectReason;
+      this.reasonForm.patchValue({
+        id: (data as RejectReason).id,
+        reason: reason.reason,
+        });
+    } else if ((this.selectedTab === ReasonsNavigationTabs.ManualInvoice)) {
+      const reason = data as RejectReason;
+      this.reasonForm.patchValue({
+        id: reason.id,
+        reason: reason.reason,
+        agencyFeeApplicable: !!reason.agencyFeeApplicable,
+        agencyFeeApplicableSwitch: reason.agencyFeeApplicable === false ? false : true,
+      });
     } else {
       this.reasonForm.patchValue({
         id: (data as RejectReason).id,
         reason: data.reason,
       });
     }
-
     this.store.dispatch(new ShowSideDialog(true));
     this.cd.markForCheck();
   }
@@ -268,10 +293,13 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       delay(500),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(() => {
-      this.reasonForm.reset();
+      .subscribe(() => {
+        this.reasonForm.reset();
       if (this.formType === ReasonFormType.PenaltyReason) {
         this.reasonForm.controls['penaltyCriteria'].patchValue(PenaltyCriteria.FlatRateOfHours);
+      }
+      if (this.formType === ReasonFormType.ManualInvoiceReason) {
+          this.reasonForm.controls['agencyFeeApplicable'].patchValue(true);
       }
     });
   }
@@ -303,7 +331,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         ReasonActions.UpdateManualInvoiceRejectReasonSuccess, ReasonActions.UpdateOrderRequisitionSuccess,
         ReasonActions.UpdateInternalTransferReasonsSuccess, ReasonActions.UpdateTerminationReasonsSuccess,
         ReasonActions.UpdateCategoryNoteReasonsSuccess,
-        ReasonActions.SavePenaltySuccess, ReasonActions.SaveUnavailabilityReason, ReasonActions.RemoveUnavailabilityReason),
+        ReasonActions.SavePenaltySuccess, ReasonActions.SaveUnavailabilityReason, ReasonActions.RemoveUnavailabilityReason, ReasonActions.UpdateSourcingReasonsSuccess, ReasonActions.UpdateRecuriterReasonsSuccess),
       takeUntil(this.componentDestroy()),
     ).subscribe(() =>this.closeSideDialog());
   }

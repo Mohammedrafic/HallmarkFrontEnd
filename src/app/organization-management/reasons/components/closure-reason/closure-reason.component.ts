@@ -58,9 +58,9 @@ export class ClosureReasonComponent extends ReasonsComponent implements OnInit,O
   ngOnChanges():void {
     this.getClosureReason();
   }
-  
+
   protected getData(): void {
-    this.store.dispatch(new GetClosureReasonsByPage(this.currentPage, this.pageSize, this.orderBy));
+    this.store.dispatch(new GetClosureReasonsByPage(this.currentPage, this.pageSize, this.orderBy, false, true));
   }
 
   protected remove(id: number): void {

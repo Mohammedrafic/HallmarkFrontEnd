@@ -46,6 +46,10 @@
         </app-tooltip-container>
       </div>
     </div>
+    <div class="candidate-message" *ngIf="candidateJob?.isLocal">
+      <i-feather name="info" class="icon"></i-feather>
+      Local Candidate
+    </div>
   </section>
   <section class="content-container">
     <div class="candidate-info">
@@ -259,7 +263,7 @@
                       />
                     </div>
                   </div>
-                  <div class="d-flex">
+                  <div class="d-flex" *ngIf="!verifyNoPenalty">
                     <div class="input-container bootstrap">
                       <label class="input-group">{{ showPercentage ? '% ' : '' }}Rate</label>
                       <div class="input-group input-readonly">
@@ -297,6 +301,7 @@
       <app-comments
         *ngIf="candidateJob"
         [comments]="comments"
+        [canVmsCreateOrders]="canCreateOrder"
         [externalCommentConfiguration]="currentOrder.externalCommentsConfiguration"
         [commentContainerId]="candidateJob.commentContainerId || 0"
       ></app-comments>
@@ -312,6 +317,7 @@
         [billRates]="billRatesData"
         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
         [isActive]="true"
+        [isExtension]="!!currentOrder.extensionFromId"
         [readOnlyMode]="isReadOnlyBillRates"
       ></app-bill-rates>
     </ng-template>
@@ -350,3 +356,9 @@
   [candidateCancellation]="candidateCancellationReasons"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
 ></app-candidate-cancellation-dialog>
+
+<app-send-email-side-dialog [header]="templateEmailTitle" [isSend]="isSend"  (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()" [width]="'1000px'">
+  <app-onboard-candidate-message-dialog  [isFormInvalid]="isSendOnboardFormInvalid"
+    [onBoardMessageEmailTemplateForm]="$any(sendOnboardMessageEmailFormGroup)" [title]="templateEmailTitle" [isSend]="isSend" [emailTo]="emailTo" 
+  ></app-onboard-candidate-message-dialog>
+</app-send-email-side-dialog>

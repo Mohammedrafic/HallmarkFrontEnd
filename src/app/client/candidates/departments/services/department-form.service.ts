@@ -36,7 +36,7 @@ export class DepartmentFormService {
       locationIds: [null],
       departmentsIds: [null],
       skillIds: [null],
-      isOriented: [0],
+      isOrientedFilter: [0],
     }) as CustomFormGroup<DepartmentFiltersColumns>;
   }
 
@@ -105,11 +105,11 @@ export class DepartmentFormService {
       regionIds: [regionId],
       locationIds: [locationId],
       departmentIds: [departmentId],
-      startDate: DateTimeHelper.convertDateToUtc(startDate),
-      endDate: endDate && DateTimeHelper.convertDateToUtc(endDate),
+      startDate: DateTimeHelper.setCurrentTimeZone(startDate),
+      endDate: endDate && DateTimeHelper.setCurrentTimeZone(endDate),
       isOriented: isOriented,
       isHomeCostCenter: isHomeCostCenter,
-      orientationDate: orientationDate && DateTimeHelper.convertDateToUtc(orientationDate),
+      orientationDate: orientationDate && DateTimeHelper.setCurrentTimeZone(orientationDate),
     });
   }
 

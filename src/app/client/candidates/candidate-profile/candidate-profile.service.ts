@@ -25,7 +25,13 @@ export class CandidateProfileService {
   ) {}
 
   public saveCandidateProfile(candidateId: number, createReplacement?: boolean): Observable<CandidateModel> {
-    const { value } = this.candidateProfileForm.candidateForm;
+    let { value } = this.candidateProfileForm.candidateForm;
+    // Employee ID may be disabled (during sourcing), which prevents passing the value.
+    // We still need the value, so spread the raw value
+    if (!value.employeeId) {
+      value = { ...value, employeeId: this.candidateProfileForm.candidateForm.getRawValue().employeeId };
+    }
+
     const isOnHoldSetManually = this.candidateProfileForm.isOnHoldDateSetManually();
     const candidate = candidateId ? { id: candidateId, ...value, isOnHoldSetManually } : value;
     const candidateDateInUTC = { ...candidate, ...this.convertDatesToUTC(candidate) } as CandidateModel;
@@ -106,7 +112,7 @@ export class CandidateProfileService {
 
     return Object.fromEntries(
       Object.entries(dates).map(([key, value]: [string, any]) => {
-        return [key, value ? DateTimeHelper.toUtcFormat(DateTimeHelper.setInitDateHours(value)) : value];
+        return [key, value ? DateTimeHelper.setUtcTimeZone(DateTimeHelper.setInitDateHours(value)) : value];
       })
     );
   }

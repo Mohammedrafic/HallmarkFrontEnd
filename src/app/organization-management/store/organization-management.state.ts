@@ -161,7 +161,7 @@ import {
   usedByOrderErrorMessage,
 } from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import { CategoriesService } from '@shared/services/categories.service';
 import { DepartmentsService } from '@shared/services/departments.service';
 import { RegionService } from '@shared/services/region.service';
@@ -218,7 +218,7 @@ export interface OrganizationManagementStateModel {
   isSkillGroupLoading: boolean;
   isCredentialSetupLoading: boolean;
   isOrganizationSettingsLoading: boolean;
-  organizationSettings: OrganizationSettingsGet[];
+  organizationSettings: Configuration[];
   skillDataSource: SkillDataSource;
   allOrganizationSkills: Skill[] | null;
   locationFilterOptions: LocationFilterOptions | null;
@@ -442,7 +442,7 @@ export class OrganizationManagementState {
   }
 
   @Selector()
-  static organizationSettings(state: OrganizationManagementStateModel): OrganizationSettingsGet[] {
+  static organizationSettings(state: OrganizationManagementStateModel): Configuration[] {
     return state.organizationSettings;
   }
 
@@ -1277,7 +1277,7 @@ export class OrganizationManagementState {
   GetOrganizationSettingsByOrganizationId(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
     { filters, lastSelectedBusinessUnitId }: GetOrganizationSettings
-  ): Observable<OrganizationSettingsGet[] | unknown> {
+  ): Observable<Configuration[] | unknown> {
     return this.organizationSettingsService.getOrganizationSettings(filters, lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({ organizationSettings: payload });
@@ -1445,9 +1445,9 @@ export class OrganizationManagementState {
   @Action(GetOrganizationSettingsFilterOptions)
   GetOrganizationSettingsFilterOptions(
     { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetOrganizationSettingsFilterOptions
+    { includeInIRP, includeInVMS }: GetOrganizationSettingsFilterOptions
   ): Observable<string[]> {
-    return this.organizationSettingsService.getOrganizationSettingsFilteringOptions().pipe(
+    return this.organizationSettingsService.getOrganizationSettingsFilteringOptions(includeInIRP, includeInVMS).pipe(
       tap((options) => {
         patchState({ organizationSettingsFilterOptions: options });
         return options;

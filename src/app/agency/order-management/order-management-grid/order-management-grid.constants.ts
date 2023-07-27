@@ -30,6 +30,9 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Linked ID', column: 'LinkedId' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
+
 ];
 
 export const myAgencyChildColumnsToExport: ExportColumn[] = [
@@ -45,9 +48,9 @@ export const myAgencyChildColumnsToExport: ExportColumn[] = [
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Re-Order ID', column: 'ReOrderId' },
-  { text: 'Status', column: 'Status' },
+  { text: 'Status', column: 'OrderStatus' },
   { text: 'Job Title', column: 'JobTitle' },
-  { text: 'Skill', column: 'Skill' },
+  { text: 'Skill', column: 'OrderSkill' },
   { text: 'Region', column: 'Region' },
   { text: '# of Positions', column: 'CountOfPosition' },
   { text: 'Location', column: 'Location' },
@@ -64,6 +67,8 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Linked ID', column: 'LinkedId' },
+  { text: 'Orders Lock', column: 'OrderLocked' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -78,14 +83,14 @@ export const reOrdersChildColumnToExport: ExportColumn[] = [
 
 export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Order ID', column: 'OrderId' },
-  { text: 'Status', column: 'Status' },
+  { text: 'Status', column: 'OrderStatus' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Organization', column: 'OrganizationName' },
   { text: 'Candidates', column: 'CandidatesCount' },
-  { text: 'Skill', column: 'Skill' },
+  { text: 'Skill', column: 'OrderSkill' },
   { text: 'Region', column: 'Region' },
-  { text: 'Location', column: 'LocationName' },
-  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
   { text: 'ShiftName', column: 'ShiftName' },
   { text: 'Shift Start Time', column: 'ShiftStartTime' },
@@ -97,6 +102,8 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Linked ID', column: 'LinkedId' },
+  { text: 'Order Locked?', column: 'OrderLocked' },
 ];
 
 export const perDiemChildColumnsToExport: ExportColumn[] = [

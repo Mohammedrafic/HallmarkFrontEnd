@@ -66,6 +66,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
+  public isIRPLTAorder:boolean=false;
   public templateState: Subject<any> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
@@ -129,6 +130,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([agOrder, orgOrder]) => {
         this.selectedOrder = agOrder ?? orgOrder;
+        this.isIRPLTAorder=this.selectedOrder.orderType === this.orderTypes.Traveler;
         this.initPredefinedBillRates();
       });
     if (this.isAgency) {

@@ -32,9 +32,9 @@ export class WorkCommitmentState {
   @Action(WorkCommitment.GetCommitmentsByPage)
   GetCommitmentsByPage(
     { patchState }: StateContext<WorkCommitmentStateModel>,
-    { pageNumber, pageSize }: WorkCommitment.GetCommitmentsByPage
+    { filters }: WorkCommitment.GetCommitmentsByPage
   ): Observable<WorkCommitmentsPage> {
-    return this.workCommitmentApiService.getCommitmentsByPage(pageNumber, pageSize).pipe(
+    return this.workCommitmentApiService.getCommitmentsByPage(filters).pipe(
       tap((commitmentsByPage: WorkCommitmentsPage) => {
         patchState({ commitmentsByPage: commitmentsByPage });
       })

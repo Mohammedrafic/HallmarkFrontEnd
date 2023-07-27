@@ -41,7 +41,7 @@ export class CandidateChartComponent  {
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
       const user = this.store.selectSnapshot(UserState.user);
       if (user?.businessUnitType != null && (user?.businessUnitType != BusinessUnitType.Agency)) {
-                this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/',this.chartData === undefined ? 0 : OrderStatus.InProgress, this.chartData === undefined ? '' : 'In Progress',this.chartData === undefined ? 0 : this.chartData.candidateStatus,this.chartData?.statusName);
+                this.dashboardService.redirectToUrlWithCandidateStatus('client/order-management/',this.chartData === undefined ? 0 : OrderStatus.InProgress, this.chartData === undefined ? '' : 'In Progress',this.chartData === undefined ? '' : this.chartData?.statusName,this.chartData?.statusName);
 
       }
     }

@@ -13,7 +13,7 @@ export class PaymentsAdapter {
         check: {
           checkNumber: check.checkNumber,
           initialAmount: check.initialAmount,
-          checkDate: DateTimeHelper.toUtcFormat(DateTimeHelper.setInitHours(check.checkDate.toString())),
+          checkDate: DateTimeHelper.setUtcTimeZone(DateTimeHelper.setInitHours(check.checkDate.toString())),
           paymentMode: check.paymentMode,
           isRefund: check.isRefund,
           ...check.id ? { id: check.id } : {},
@@ -32,7 +32,7 @@ export class PaymentsAdapter {
           invoiceId: invoiceId,
           checkId: checkId,
           agencySuffix: agencySuffix,
-          paymentDate: DateTimeHelper.toUtcFormat(DateTimeHelper.setInitHours(check.date.toString())),
+          paymentDate: DateTimeHelper.setUtcTimeZone(DateTimeHelper.setInitHours(check.date.toString())),
           payment: formValue.amount,
           organizationId: orgId,
           ...paymentId ? { id: paymentId } : {},

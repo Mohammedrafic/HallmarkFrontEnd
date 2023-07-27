@@ -1,0 +1,85 @@
+@import 'adaptive-response';
+
+@mixin smallDesktopMenu {
+  .custom-order-btn {
+    display: none !important;
+  }
+
+  .menu-desktop-small {
+    display: inline-block !important;
+  }
+}
+
+@mixin smallTabletMenu {
+  .dialog-controls {
+    display: flex !important;
+  }
+
+  button:not(.close-button, .menu-mobile, .edit-button),
+  .vertical-divider {
+    display: none !important;
+  }
+
+  .menu-tablet {
+    display: inline-block !important;
+  }
+
+  .menu-desktop-small {
+    display: none !important;
+  }
+}
+
+@media #{$min-desktop-small} {
+  #main {
+    container-type: inline-size;
+    overflow: auto;
+  }
+
+  .order-details-dialog {
+    .open-per-diem-order {
+      @container (max-width: 1775px) {
+        @include smallDesktopMenu();
+      }
+
+      @container(max-width: 1142px) {
+        @include smallTabletMenu();
+      }
+
+
+      &.open-status {
+        @media #{$min-desktop-large} {
+          @container (max-width: 1345px) and (min-width: 1107px) {
+            @include smallTabletMenu();
+          }
+        }
+      }
+    }
+
+    .traveler-order {
+      @container (max-width: 1500px) {
+        @include smallDesktopMenu();
+      }
+
+      @container(max-width: 885px) {
+        @include smallTabletMenu();
+      }
+    }
+
+    .perm-placement,
+    .contact-to-perm {
+      @container (max-width: 1555px) {
+        @include smallDesktopMenu();
+      }
+
+      @container(max-width: 945px) {
+        @include smallTabletMenu();
+      }
+
+      @media #{$min-desktop-large} {
+        @container (max-width: 1165px) and (min-width: 1105px) {
+          @include smallTabletMenu();
+        }
+      }
+    }
+  }
+}

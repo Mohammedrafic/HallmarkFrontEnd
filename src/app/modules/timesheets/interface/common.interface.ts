@@ -31,27 +31,7 @@ export interface DialogConfig {
   expenses: DialogConfigBlock;
 }
 
-export interface RawTimsheetRecordsDto {
-  timesheets: RecordValue[];
-  miles: RecordValue[];
-  expenses: RecordValue[];
-  timesheetsCalculated: RecordValue[];
-  milesCalculated: RecordValue[];
-  expensesCalculated: RecordValue[];
-}
-
-export interface TimesheetRecordsDto {
-  [RecordFields.Time]: RecordsDetails;
-  [RecordFields.Miles]: RecordsDetails;
-  [RecordFields.Expenses]: RecordsDetails;
-}
-
-export interface RecordsDetails {
-  [RecordsMode.Edit]: RecordValue[];
-  [RecordsMode.View]: RecordValue[];
-}
-
-export interface RecordValue {
+export interface RawRecordValue {
   id: number;
   day: string;
   timeIn: string;
@@ -66,13 +46,63 @@ export interface RecordValue {
   isGenerated?: boolean;
   extDepartmentId: string;
   total:  number;
-  value: 10;
+  value: number;
   state: number;
   stateText: RecordStatus;
   timesheetRecordId?: number;
   hadLunchBreak?: boolean;
   isTimeInNull?: boolean;
+
 }
+
+export interface RawTimesheetRecordsDto {
+  timesheets: RecordDto[];
+  miles: RecordDto[];
+  expenses: RecordDto[];
+  timesheetsCalculated: RecordDto[];
+  milesCalculated: RecordDto[];
+  expensesCalculated: RecordDto[];
+}
+
+export interface TimesheetRecordsDto {
+  [RecordFields.Time]: RecordsDetails;
+  [RecordFields.Miles]: RecordsDetails;
+  [RecordFields.Expenses]: RecordsDetails;
+}
+
+export interface RecordsDetails {
+  [RecordsMode.Edit]: RecordValue[];
+  [RecordsMode.View]: RecordValue[];
+}
+
+export interface RecordValue {
+  billRate: number;
+  billRateConfigId: number;
+  billRateConfigName: string;
+  costCenterFormattedName: string;
+  costCenterName: string;
+  day: string;
+  departmentId: number;
+  description?: string;
+  disableMealBreak: boolean;
+  disableTime: boolean;
+  doNotRequireTime: boolean;
+  extDepartmentId: string;
+  hadLunchBreak?: boolean;
+  id: number;
+  isGenerated?: boolean;
+  isTimeInNull?: boolean;
+  location: string;
+  state: number;
+  stateText: RecordStatus;
+  timeIn: string;
+  timeOut?: string | null;
+  timesheetRecordId?: number | null;
+  total: number;
+  value: number;
+}
+
+export type RecordDto = Omit<RecordValue, 'day'>;
 
 export interface TimesheetAttachments {
   attachments: Attachment[];

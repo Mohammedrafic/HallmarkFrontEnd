@@ -96,3 +96,10 @@ export class SaveEmployeeImportResultFailAndSucceeded {
   static readonly type = '[candidate list] Upload Employee Import Result Fail And Success';
   constructor(public payload: ImportResult<any>) {}
 }
+export class GetCredentialsTypeList {
+  static readonly type = '[candidate list] Get Credential Types List';
+}
+
+export class SourceConfig{
+  static readonly type ='[candidate list] Get Sourcing Config';
+}

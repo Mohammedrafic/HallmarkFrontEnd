@@ -27,6 +27,7 @@ export class CommentsIrpComponent {
   @Input() useBackground: boolean = true;
   @Input() disabled: boolean = false;
   @Input() orderId: number;
+  @Input() candidateJobId : number;
   @Input() CanOrganizationEditOrdersIRP:boolean;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
@@ -172,7 +173,8 @@ export class CommentsIrpComponent {
       commentContainerId: this.commentContainerId,
       isRead: true,
       isPrivate: this.isPrivate,
-      isIRP:true
+      isIRP:true,
+      candidateJobId:this.candidateJobId
     };
     this.comments.push(comment);
     this.message = '';

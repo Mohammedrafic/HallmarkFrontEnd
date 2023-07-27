@@ -21,7 +21,7 @@ import { AutoCompleteComponent } from '@syncfusion/ej2-angular-dropdowns/src/aut
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { catchError, debounceTime, EMPTY, fromEvent, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, EMPTY, fromEvent, Observable, scheduled, switchMap, take, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { DatesRangeType, WeekDays } from '@shared/enums';
@@ -57,6 +57,7 @@ import { GetPreservedFiltersByPage, ResetPageFilters } from 'src/app/store/prese
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 import { BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
+import { ScheduleType } from '../../enums';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -263,14 +264,14 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         candidateSelectedSlot.dates.add(date);
 
         if(schedule) {
+          const days = candidateSelectedSlot.candidate?.days ?? candidate.days;
           candidateSelectedSlot.candidate.days =
-            this.scheduleGridService.createDaysForSelectedSlots(candidate.days, schedule.daySchedules);
+            this.scheduleGridService.createDaysForSelectedSlots(days, schedule.daySchedules);
         }
       }
     } else {
       const selectedCandidateSlots =
         this.scheduleGridService.createSelectedCandidateSlotsWithDays(candidate, date, schedule);
-
       this.selectedCandidatesSlot.set(candidate.id, selectedCandidateSlots);
     }
   }
@@ -451,6 +452,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: filteringEventArgs.text,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
+        departmentsIds : this.selectedFilters.departmentsIds
       }).pipe(
         tap((employeeDto) => {
           this.candidatesSuggestions = ScheduleGridAdapter.prepareCandidateFullName(employeeDto.items);
@@ -474,6 +476,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: user.fullName,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
+        departmentsIds : this.selectedFilters.departmentsIds
       })
         .pipe(take(1))
         .subscribe((page: ScheduleCandidatesPage) => {

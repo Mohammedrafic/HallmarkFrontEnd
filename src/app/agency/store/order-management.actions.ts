@@ -27,11 +27,6 @@ export class GetAgencyOrderCandidatesList {
   ) {}
 }
 
-export class GetAgencyOrderGeneralInformation {
-  static readonly type = '[agency order management] Get Agency Order General Information';
-  constructor(public id: number, public organizationId: number) {}
-}
-
 export class GetCandidateJob {
   static readonly type = '[agency order management] Get Agency Candidate Job';
   constructor(public organizationId: number, public jobId: number) {}

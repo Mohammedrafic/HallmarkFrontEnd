@@ -92,8 +92,8 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     noActiveWC: false,
     disableBulkButton: false,
   };
+  public filters: DepartmentFilterState | null;
 
-  private filters: DepartmentFilterState | null;
 
   public constructor(
     protected override store: Store,
@@ -314,8 +314,8 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private setDateRanges(employeeWorkCommitment: CandidateWorkCommitmentShort): void {
     const { startDate, endDate } = employeeWorkCommitment;
 
-    this.dateRanges.max = endDate ? DateTimeHelper.convertDateToUtc(endDate) : undefined;
-    this.dateRanges.min = startDate ? DateTimeHelper.convertDateToUtc(startDate) : undefined;
+    this.dateRanges.max = endDate ? DateTimeHelper.setCurrentTimeZone(endDate) : undefined;
+    this.dateRanges.min = startDate ? DateTimeHelper.setCurrentTimeZone(startDate) : undefined;
     this.cdr.markForCheck();
   }
 
@@ -327,17 +327,28 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   private setBulkDateRanges(selectedRows: RowNode[]): void {
     const startDates: string[] = [];
     const endDates: string[] = [];
+    const employeeWorkCommitmentIds: number[] = [];
 
     selectedRows.forEach((item) => {
-      startDates.push(item.data.startDate);
-      endDates.push(item.data.endDate);
+      const { workCommitmentStartDate, workCommitmentEndDate, employeeWorkCommitmentId } = item.data;
+
+      if (workCommitmentStartDate) {
+        startDates.push(workCommitmentStartDate);
+      }
+      if (workCommitmentEndDate) {
+        endDates.push(workCommitmentEndDate);
+      }
+      if (employeeWorkCommitmentId) {
+        employeeWorkCommitmentIds.push(employeeWorkCommitmentId);
+      }
     });
 
-    if (allAreEqual(startDates) && allAreEqual(endDates)) {
-      this.bulkDateRanges = {
-        min: startDates[0] ? new Date(startDates[0]) : undefined,
-        max: endDates[0] ? new Date(endDates[0]) : undefined,
-      };
+   if (allAreEqual(employeeWorkCommitmentIds)) {
+      const min = startDates[0] ? DateTimeHelper.setCurrentTimeZone(startDates[0]) : undefined;
+      const max = startDates.length === endDates.length
+        ? DateTimeHelper.setCurrentTimeZone(endDates[0])
+        : undefined;
+      this.bulkDateRanges = { min, max };
     } else {
       this.bulkDateRanges = this.dateRanges;
     }

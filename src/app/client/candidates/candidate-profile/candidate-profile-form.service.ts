@@ -7,7 +7,7 @@ import { difference } from 'lodash';
 
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
-import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
+import { ProfileStatusesEnum, RecruitmentStatusEnum, SourceStatusEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { DateTimeHelper } from '@core/helpers';
 import { candidateDateFields } from '../constants';
@@ -80,6 +80,9 @@ export class CandidateProfileFormService {
         phone2: [null],
         professionalSummary: [null, Validators.maxLength(500)],
         generalNotes: [],
+        employeeSourceId:[],
+        sourceId: [],
+        recruiterId : []
       },
       { validators: greaterThanValidator('contractStartDate', 'contractEndDate') }
     );
@@ -101,7 +104,7 @@ export class CandidateProfileFormService {
   }
 
   public populateHoldEndDate(candidate: CandidateModel): void {
-    const holdEndDate = candidate.holdEndDate ? DateTimeHelper.convertDateToUtc(candidate.holdEndDate as string) : null;
+    const holdEndDate = candidate.holdEndDate ? DateTimeHelper.setCurrentTimeZone(candidate.holdEndDate as string) : null;
     this.candidateForm.get('holdEndDate')?.setValue(holdEndDate);
   }
 
@@ -127,11 +130,12 @@ export class CandidateProfileFormService {
   private convertDateFildsToUtc(candidate: CandidateModel): CandidateModel {
     const datesWithUtc = Object.fromEntries(candidateDateFields.map((dateName) => {
       const date = candidate[dateName as keyof CandidateModel];
-      const dateUtc = date ? DateTimeHelper.convertDateToUtc(date as string) : null;
+      const dateUtc = date ? DateTimeHelper.setCurrentTimeZone(date as string) : null;
 
       return [dateName, dateUtc];
     }));
 
     return { ...candidate, ...datesWithUtc };
   }
+
 }

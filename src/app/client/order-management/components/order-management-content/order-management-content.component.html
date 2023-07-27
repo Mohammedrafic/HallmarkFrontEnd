@@ -1,4 +1,5 @@
 <app-button-group
+  #systemGroup
   class="button-group system-buttons"
   *ngIf="isIRPFlagEnabled"
   [buttonOptions]="systemGroupConfig"
@@ -232,7 +233,7 @@
           width="50"
           [allowResizing]="false"
         ></e-column>
-        <e-column headerTextAlign="Right" width="170" minWidth="160" maxWidth="200">
+        <e-column headerTextAlign="Right" width="145" minWidth="140" maxWidth="200">
           <ng-template #headerTemplate let-data>
             <div class="controls-header" [class.hidden]="!isLoaded">
               <button
@@ -266,25 +267,9 @@
           <ng-template #template let-data>
             <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
               <button
-                *ngIf="
-                  activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType
-                "
-                (click)="createReorder(data)"
                 ejs-button
-                cssClass="e-flat default-icon-button"
-                [disabled]="
-                  !canCreateOrder ||
-                  data.status === orderStatus.PreOpen ||
-                  data.status === orderStatus.Closed ||
-                  !settings[SettingsKeys.IsReOrder]?.value ||
-                  !hasCreateEditOrderPermission
-                "
-              >
-                <span><i-feather name="calendar" class="icon"></i-feather></span>
-              </button>
-              <button
-                ejs-button
-                [disabled]="!hasCreateEditOrderPermission"
+                [disabled]="data.unreadComments <= 0"
+                [isPrimary]="data.unreadComments > 0"
                 cssClass="e-flat default-icon-button with-badge"
               >
                 <span><i-feather name="message-square" class="icon"></i-feather></span>
@@ -317,12 +302,7 @@
                 "
                 [matMenuTriggerData]="{
                   data: data,
-                  items:
-                    (data.status === orderStatus.Closed && threeDotsMenuOptions['closedOrderMenu']) ||
-                    (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
-                    (data.isMoreMenuWithDeleteButton
-                      ? threeDotsMenuOptions['moreMenuWithDeleteButton']
-                      : getMoreMenu(data))
+                  items: data.menuItems
                 }"
                 cssClass="e-flat primary-icon-button"
               >
@@ -769,6 +749,7 @@
             [fields]="optionFields"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
+            [filterType]="filterType"
             [dataSource]="filterColumns.locationIds.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
           >
@@ -787,6 +768,7 @@
             [fields]="optionFields"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
+            [filterType]="filterType"
             [dataSource]="filterColumns.departmentsIds.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
           >
@@ -913,7 +895,7 @@
             mode="CheckBox"
             formControlName="candidateStatuses"
             placeholder="All"
-            [fields]="statusFields"
+            [fields]="filterStatusFields"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.candidateStatuses.dataSource"
@@ -924,28 +906,22 @@
       </div>
     </div>
     <div class="filter-row bootstrap">
-      <div class="input-container">
-        <label>Contact Person</label>
-        <div class="input-group multiselect">
-          <ejs-autocomplete
-            mode="CheckBox"
-            formControlName="contactEmails"
-            [dataSource]="filteredUsers"
-            [autofill]="true"
-            [minLength]="3"
-            [allowCustom]="false"
-            (filtering)="contactPersonFiltering($event)"
-            [fields]="contactPersonFields"
-          >
-            <ng-template #itemTemplate="" let-data="">
-              <div class="contact-option-container">
-                <span class="contact-name">{{ data.fullName }}</span>
-                <span class="contact-email">{{ data.email }}</span>
-              </div>
-            </ng-template>
-          </ejs-autocomplete>
+      <div class="input-container" *ngIf="activeTab == 'Perm Placement' || activeTab == 'All Orders' || activeTab == 'Per Diem'">
+        <label>Order Lock</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist  formControlName="orderLocked" [fields]="optionFields"
+              placeholder="All" [allowFiltering]="true" [dataSource]="orderLockList">
+          </ejs-dropdownlist>
         </div>
       </div>
+      <div class="input-container">
+        <label>Contact Person</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="contactEmails" />
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
       <div class="input-container">
         <label>Special Project Category</label>
         <div class="input-group multiselect">
@@ -1269,6 +1245,7 @@
             [fields]="optionFields"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
+            [filterType]="filterType"
             [dataSource]="filterOrderJourneyColumns.locationIds.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
           >
@@ -1287,6 +1264,7 @@
             [fields]="optionFields"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
+            [filterType]="filterType"
             [dataSource]="filterOrderJourneyColumns.departmentsIds.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
           >
@@ -1441,6 +1419,7 @@
             placeholder="All"
             [fields]="optionFields"
             [allowFiltering]="true"
+            [filterType]="filterType"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.locationIds.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
@@ -1460,6 +1439,7 @@
             [fields]="optionFields"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
+            [filterType]="filterType"
             [dataSource]="filterColumns.departmentsIds.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
           >

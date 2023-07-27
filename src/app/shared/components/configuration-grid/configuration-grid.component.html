@@ -1,0 +1,74 @@
+<div class="table-container">
+  <ejs-grid #grid 
+    [dataSource]="gridDataSource" 
+    (rowDataBound)="rowDataBound($event)" 
+    [pageSettings]="pageSettings" 
+    [height]="fullScreenGridHeight" 
+    [rowHeight]="rowHeight" 
+    [resizeSettings]="resizeSettings" 
+    [allowSorting]="allowSorting" 
+    [allowResizing]="allowResizing"
+    (dataBound)="gridDataBound(grid)" 
+    (actionBegin)="actionBegin($event, grid)" 
+    class="grid-component">
+    <ng-template #detailTemplate let-data>
+      <table class="detailtable" width="100%">
+        <tbody>
+          <tr *ngFor="let child of data.children" [hidden]="child.hidden">
+            <td class="e-rowcell e-templatecell" [style.width.px]="100">
+              <div class="row-tool-buttons">
+                <button ejs-button cssClass="e-flat primary-icon-button"
+                  (click)="emitOpenEditSettingDialog(data, child, $event)"
+                  [disabled]="hasPermissions | hasAccess : data : false">
+                  <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+                </button>
+              </div>
+            </td>
+            <td class="e-rowcell e-templatecell attr-td" [style.width.px]="400"> </td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.systemType}}</td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.regionName}}</td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.locationName}}</td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.departmentName}}</td>
+            <td class="e-rowcell e-templatecell" [style.width.px]="400" style="text-align: left">{{child.displayValue}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-template>
+    <e-columns>
+      <e-column textAlign="Right" width="100">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
+            <button ejs-button cssClass="e-flat primary-icon-button"
+              (click)="emitOpenEditSettingDialog(data, undefined, $event)"
+              [disabled]="hasPermissions | hasAccess : data : (hideColumn ? null : true)">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button 
+              cssClass="e-flat default-icon-button"
+              *ngIf="!hideColumn"
+              (click)="emitOpenOverrideSettingDialog(data)"
+              [disabled]="hasPermissions | hasAccess : data : false : disabledSettings">
+              <span class="edit-button"><i-feather name="plus" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="name" headerText="ATTRIBUTE" minWidth="380" width="100%"></e-column>
+      <e-column [visible]="showSystem" field="systemType" headerText="SYSTEM" width=150></e-column>
+      <e-column [visible]="!hideColumn" field="regionName" headerText="REGION" width=150></e-column>
+      <e-column [visible]="!hideColumn" field="locationName" headerText="LOCATION" width=150></e-column>
+      <e-column [visible]="!hideColumn" field="departmentName" headerText="DEPARTMENT" width=150></e-column>
+      <e-column field="displayValue" headerText="VALUE" width=380>
+        <ng-template #template let-data>
+          {{ data.displayValue || data.value }}
+        </ng-template>
+      </e-column>
+    </e-columns>
+  </ejs-grid>
+  <app-grid-pagination
+    [currentPage]="currentPagerPage"
+    [pageSize]="pageSizePager"
+    [totalRecordsCount]="totalDataRecords"
+    (navigateToPageEmitter)="changePage($event)"
+    (pageSizeChangeEmitter)="changePageSize($event)"></app-grid-pagination>
+</div>

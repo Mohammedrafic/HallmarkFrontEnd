@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { CustomFormGroup } from '@core/interface';
 import { RecordFields } from '../enums';
-import { AddTimsheetForm } from '../interface';
+import { AddTimesheetForm } from '../interface';
 
 @Injectable()
 export class AddRecordService {
@@ -11,7 +11,7 @@ export class AddRecordService {
     private fb: FormBuilder,
   ) {}
 
-  createForm(type: RecordFields): CustomFormGroup<AddTimsheetForm> {
+  createForm(type: RecordFields): CustomFormGroup<AddTimesheetForm> {
     if (type === RecordFields.Time) {
       return this.fb.group({
           day: [null, [Validators.required]],
@@ -20,7 +20,7 @@ export class AddRecordService {
           departmentId: [null, Validators.required],
           billRateConfigId: [null, Validators.required],
           hadLunchBreak: [false],
-        }) as CustomFormGroup<AddTimsheetForm>;
+        }) as CustomFormGroup<AddTimesheetForm>;
     }
 
     if (type === RecordFields.Miles) {
@@ -30,7 +30,7 @@ export class AddRecordService {
           departmentId: [null, Validators.required],
           value: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
         }
-      ) as CustomFormGroup<AddTimsheetForm>;
+      ) as CustomFormGroup<AddTimesheetForm>;
     }
 
     return this.fb.group(
@@ -40,24 +40,24 @@ export class AddRecordService {
         description: [null, Validators.maxLength(250)],
         value: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
       }
-    ) as CustomFormGroup<AddTimsheetForm>;
+    ) as CustomFormGroup<AddTimesheetForm>;
   }
 
-  removeTimeValidators(form: CustomFormGroup<AddTimsheetForm>): void {
+  removeTimeValidators(form: CustomFormGroup<AddTimesheetForm>): void {
     form.get('timeIn')?.removeValidators(Validators.required);
     form.get('timeOut')?.removeValidators(Validators.required);
   }
 
-  addTimeValidators(form: CustomFormGroup<AddTimsheetForm>): void {
+  addTimeValidators(form: CustomFormGroup<AddTimesheetForm>): void {
     form.get('timeIn')?.addValidators(Validators.required);
     form.get('timeOut')?.addValidators(Validators.required);
   }
 
-  addTimeOutValidator(form: CustomFormGroup<AddTimsheetForm>): void {
+  addTimeOutValidator(form: CustomFormGroup<AddTimesheetForm>): void {
     form.get('timeOut')?.addValidators(Validators.required);
   }
 
-  removeTimeOutValidator(form: CustomFormGroup<AddTimsheetForm>): void {
+  removeTimeOutValidator(form: CustomFormGroup<AddTimesheetForm>): void {
     form.get('timeOut')?.removeValidators(Validators.required);
   }
 }

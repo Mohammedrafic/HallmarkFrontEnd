@@ -28,7 +28,7 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
   @Select(OrderManagementState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
-  @Select(OrderManagementState.orderCandidatesInformation)
+  @Select(OrderManagementState.selectedOrder)
   public orderCandidatesInformation$: Observable<Order>;
 
   @Select(CandidateState.orderManagementPagerState)

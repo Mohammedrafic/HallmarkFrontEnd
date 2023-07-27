@@ -6,6 +6,7 @@ import { Component, EventEmitter, forwardRef, Input, Output, ViewChild } from '@
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
+import { inputs } from '@syncfusion/ej2-angular-popups/src/dialog/dialog.component';
 
 @Component({
   selector: 'app-multiselect-dropdown',
@@ -25,6 +26,9 @@ export class MultiselectDropdownComponent extends BaseFormControlDirective {
   @Input() public sortOrder: SortOrder = SortOrder.NONE;
   @Input() showClearAll = true;
   @Input() allowFilter = true;
+  @Input() public popupWidth : string | undefined;
+  @Input() public filterType ='Contains';
+
 
   @Output() public selectAllEmitter: EventEmitter<ISelectAllEventArgs> = new EventEmitter<ISelectAllEventArgs>();
 }

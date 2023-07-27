@@ -81,11 +81,7 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
   credType: {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
-    dataSource: [
-      {id : 3, name : "Licenses"},
-      {id : 1, name : "Certifications"},
-      {id : 2, name : "Checklists"}
-    ],
+    dataSource: [],
     valueField: 'name',
     valueId: 'id',
   },
@@ -124,6 +120,10 @@ export const VMSCandidates = [
     visible: false,
   },
   {
+    fieldName: 'employeeSkills',
+    visible: false,
+  },
+  {
     fieldName: 'candidateProfileSkills',
     visible: true,
   },
@@ -140,23 +140,15 @@ export const VMSCandidates = [
     visible: true,
   },
   {
-    fieldName: 'hireDate',
+    fieldName: 'employeeSourceId',
     visible: false,
   },
   {
-    fieldName: 'startDate',
+    fieldName: 'source',
     visible: false,
   },
   {
-    fieldName: 'endDate',
-    visible: false,
-  },
-  {
-    fieldName: 'credType',
-    visible: false,
-  },
-  {
-    fieldName: 'orgOrientation',
+    fieldName: 'recruiter',
     visible: false,
   },
 ];
@@ -191,8 +183,12 @@ export const IRPCandidates = [
     visible: true,
   },
   {
-    fieldName: 'candidateProfileSkills',
+    fieldName: 'employeeSkills',
     visible: true,
+  },
+  {
+    fieldName: 'candidateProfileSkills',
+    visible: false,
   },
   {
     fieldName: 'lastAssignmentEndDate',
@@ -207,24 +203,16 @@ export const IRPCandidates = [
     visible: false,
   },
   {
-    fieldName: 'hireDate',
-    visible: true,
-  },
-  {
-    fieldName: 'startDate',
+    fieldName: 'employeeSourceId',
     visible: false,
   },
   {
-    fieldName: 'endDate',
+    fieldName: 'source',
     visible: false,
   },
   {
-    fieldName: 'credType',
+    fieldName: 'recruiter',
     visible: false,
-  },
-  {
-    fieldName: 'orgOrientation',
-    visible: true,
   },
 ];
 

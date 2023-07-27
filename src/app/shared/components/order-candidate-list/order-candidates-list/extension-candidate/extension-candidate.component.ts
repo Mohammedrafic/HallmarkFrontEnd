@@ -1,5 +1,5 @@
 import { DatePipe, formatNumber } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -15,6 +15,7 @@ import {
   map,
   merge,
   mergeMap,
+  take,
   takeUntil,
 } from 'rxjs';
 
@@ -37,6 +38,8 @@ import {
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
+  UpdateOrganisationCandidateJobSucceed,
+  sendOnboardCandidateEmailMessage,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
@@ -46,7 +49,8 @@ import {
 } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import {
   CandidateADDRESSRequired, CandidateDOBRequired, CandidatePHONE1Required,
-  OrganizationSettingKeys, OrganizationalHierarchy,
+  ONBOARD_CANDIDATE,
+  OrganizationSettingKeys, OrganizationalHierarchy, SEND_EMAIL, onBoardCandidateMessage,
 } from '@shared/constants';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -78,9 +82,13 @@ import { SettingsViewService } from '@shared/services';
 import { CommentsService } from '@shared/services/comments.service';
 import { DurationService } from '@shared/services/duration.service';
 import PriceUtils from '@shared/utils/price.utils';
-import { ShowToast } from 'src/app/store/app.actions';
+import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
+import { PermissionService } from 'src/app/security/services/permission.service';
+import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
+import { OnboardCandidateMessageDialogComponent } from '../onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -137,6 +145,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public isAgency = false;
   public showHoursControl = false;
   public showPercentage = false;
+  public verifyNoPenalty = false;
   public candidate: OrderCandidatesList | undefined;
   public comments: Comment[] = [];
   public orderPermissions: CurrentUserPermission[];
@@ -149,6 +158,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public payRateSetting = CandidatePayRateSettings;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public isCandidatePayRateVisible: boolean;
+  public canCreateOrder : boolean;
 
   public applicantStatusEnum = ApplicantStatusEnum;
   public candidateSSNRequired: boolean;
@@ -200,6 +210,20 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     return this.candidate?.status === ApplicantStatusEnum.Offboard;
   }
 
+  get templateEmailTitle(): string {
+    return "Onboarding Email";
+  }
+
+
+  isSend:boolean = false;
+  public sendOnboardMessageEmailFormGroup: FormGroup;
+
+  emailTo:any = '';
+  isSendOnboardFormInvalid:boolean = false;
+  @ViewChild('RTE')
+  public rteEle: RichTextEditorComponent;
+  @ViewChild(OnboardCandidateMessageDialogComponent, { static: true }) onboardEmailTemplateForm: OnboardCandidateMessageDialogComponent;
+
   constructor(
     private store: Store,
     private action$: Actions,
@@ -209,12 +233,24 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef,
     private settingService: SettingsViewService,
+    private permissionService : PermissionService,
+    private confirmService: ConfirmService,
   ) {
     super();
     this.isAgency = this.router.url.includes('agency');
+    this.sendOnboardMessageEmailFormGroup = new FormGroup({
+      emailSubject: new FormControl('', [Validators.required]),
+      emailBody: new FormControl('', [Validators.required]),
+      fileUpload: new FormControl(null),
+      emailTo: new FormControl('', [Validators.required]),
+      orderId: new FormControl('', [Validators.required]),
+      candidateId  : new FormControl('', [Validators.required]),
+      businessUnitId: new FormControl('', [Validators.required]),
+    });
   }
 
   ngOnInit(): void {
+    this.subscribeOnPermissions();
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
     this.createForm();
@@ -230,8 +266,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       let additionalValues = {};
       if (this.isOnBoard) {
         additionalValues = {
-          actualStartDate: DateTimeHelper.toUtcFormat(this.candidateJob.actualStartDate),
-          actualEndDate: DateTimeHelper.toUtcFormat(this.candidateJob.actualEndDate),
+          actualStartDate: DateTimeHelper.setUtcTimeZone(this.candidateJob.actualStartDate),
+          actualEndDate: DateTimeHelper.setUtcTimeZone(this.candidateJob.actualEndDate),
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
           clockId: this.candidateJob.clockId,
         };
@@ -245,7 +281,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         jobId: this.candidateJob.jobId,
         skillName: value.skillName,
         offeredBillRate: this.candidateJob?.offeredBillRate,
-        offeredStartDate: this.candidateJob ? DateTimeHelper.toUtcFormat(this.candidateJob.offeredStartDate) : undefined,
+        offeredStartDate: this.candidateJob ? DateTimeHelper.setUtcTimeZone(this.candidateJob.offeredStartDate) : undefined,
         candidateBillRate: this.candidateJob.candidateBillRate,
         nextApplicantStatus: {
           applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
@@ -533,8 +569,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         candidateBillRate: this.candidateJob.candidateBillRate,
         offeredBillRate: value.offeredBillRate,
         requestComment: value.comments,
-        actualStartDate: DateTimeHelper.toUtcFormat(value.actualStartDate),
-        actualEndDate: DateTimeHelper.toUtcFormat(value.actualEndDate),
+        actualStartDate: DateTimeHelper.setUtcTimeZone(value.actualStartDate),
+        actualEndDate: DateTimeHelper.setUtcTimeZone(value.actualEndDate),
         offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,
@@ -542,6 +578,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         clockId: value.clockId,
         candidatePayRate: value.candidatePayRate,
       };
+      this.isSend =  true;
+      this.emailTo = this.candidateJob?.candidateProfile.email; 
+      this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.candidateJob?.candidateProfile.email);
+      this.sendOnboardMessageEmailFormGroup.get('orderId')?.setValue(this.candidateJob?.orderId);
+      this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.candidateJob?.candidateProfileId);
+      this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.candidateJob?.organizationId);
       const statusChanged = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
       this.store
         .dispatch(
@@ -559,9 +601,61 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             this.adjustCandidatePayRateField();
           }
         });
+        this.action$.pipe(takeUntil(this.destroy$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
+          if(applicantStatus.applicantStatus === ApplicantStatusEnum.OnBoarded){
+            const options = {
+                title: ONBOARD_CANDIDATE,
+                okButtonLabel: 'Yes',
+                okButtonClass: 'ok-button',
+                cancelButtonLabel: 'No'
+            };
+            this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+                .subscribe((isConfirm) => {
+                  if(isConfirm){
+                    this.onboardEmailTemplateForm.rteCreated();
+                    this.onboardEmailTemplateForm.disableControls(true);
+                    this.store.dispatch(new ShowGroupEmailSideDialog(true));
+                  }
+                });
+          }
+        });
     } else {
       this.resetStatusesFormControl();
     }
+  }
+
+  onGroupEmailAddCancel(){
+    // console.log('this.candidateJob at cancel',this.candidateJob);
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    this.isSend =  false;
+    this.store.dispatch(new ShowGroupEmailSideDialog(false));
+  }
+
+  onGroupEmailSend(){
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    if(this.sendOnboardMessageEmailFormGroup.valid){
+      const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();   
+      // console.log('emailvalue',emailvalue);         
+      this.store.dispatch(new sendOnboardCandidateEmailMessage({
+            subjectMail : emailvalue.emailSubject,
+            bodyMail : emailvalue.emailBody,
+            toList : emailvalue.emailTo,
+            status : 1,
+            stream : emailvalue.fileUpload,
+            extension : emailvalue.fileUpload?.type,
+            documentName : emailvalue.fileUpload?.name,
+            orderId : emailvalue.orderId,
+            candidateId : emailvalue.candidateId,
+            businessUnitId : emailvalue.businessUnitId,
+          })
+        )
+        .subscribe(() => {
+          this.isSend =  false;
+          this.store.dispatch(new ShowGroupEmailSideDialog(false));
+          this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
+        });
+    }
+
   }
 
   private createForm(): void {
@@ -660,6 +754,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
+    this.verifyNoPenalty = value === PenaltyCriteria.NoPenalty;
   }
 
   private fieldsEnableHandlear(): void {
@@ -780,5 +875,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         });
 
     }
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

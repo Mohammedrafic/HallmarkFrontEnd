@@ -22,8 +22,8 @@
       [enableMask]="true"
       [required]="true"
       [maskPlaceholder]="datepickerMask"
-      [min]="minDate"
       [max]="maxDate"
+      [strictMode]="true"
       id="date"
       controlName="closingDate"
       label="Closing Date"
@@ -34,6 +34,7 @@
       <div class="e-card-content">
         <app-comments
           [comments]="comments"
+          [canVmsCreateOrders]="canCreateOrder"
           [commentContainerId]="commentContainerId"
           [useBackground]="false"></app-comments>
       </div>

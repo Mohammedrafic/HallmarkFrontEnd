@@ -118,6 +118,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public credentialStatusOptions: FieldSettingsModel[] = [];
   public existingFiles: FilesPropModel[] = [];
   public hideFileSize = false;
+  public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -127,7 +128,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private removeExistingFiles = false;
   private file: CredentialFile | null;
   private candidateProfileId: number;
-  public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
+  private credentialType: CredentialType;
 
   @Select(CandidateState.candidateCredential)
   candidateCredential$: Observable<CandidateCredentialResponse>;
@@ -326,11 +327,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     if (cred.masterCredentialId) {
       cred.status=CredentialStatus.Verified;
       if (cred.createdOn != null) {
-        cred.createdOn = DateTimeHelper.toUtcFormat(cred.createdOn);
+        cred.createdOn = DateTimeHelper.setUtcTimeZone(cred.createdOn);
       }
 
       if (cred.createdUntil != null) {
-        cred.createdUntil = DateTimeHelper.toUtcFormat(cred.createdUntil);
+        cred.createdUntil = DateTimeHelper.setUtcTimeZone(cred.createdUntil);
       }
 
       cred.orderId= this.orderId;
@@ -354,6 +355,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     event.stopPropagation();
     this.disabledCopy = true;
     this.masterCredentialId = data.masterCredentialId;
+    this.credentialType = data.credentialType as CredentialType;
     this.saveCredential({
       ...data,
       status: CredentialStatus.Pending,
@@ -392,6 +394,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       id,
       credentialFiles,
       expireDateApplicable,
+      credentialTypeId,
       credentialTypeName,
       masterName,
       rejectReason,
@@ -402,6 +405,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.credentialId = id as number;
     this.credentialStatus = status as CredentialStatus;
     this.masterCredentialId = masterCredentialId;
+    this.credentialType = { id: credentialTypeId, name: credentialTypeName as string };
     this.setExistingFiles(credentialFiles);
 
     this.store.dispatch(
@@ -427,10 +431,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
     this.addCredentialForm.patchValue({
       insitute,
-      createdOn: createdOn && DateTimeHelper.convertDateToUtc(createdOn.toString()),
+      createdOn: createdOn && DateTimeHelper.setCurrentTimeZone(createdOn.toString()),
       number,
       experience,
-      createdUntil: createdUntil && DateTimeHelper.convertDateToUtc(createdUntil.toString()),
+      createdUntil: createdUntil && DateTimeHelper.setCurrentTimeZone(createdUntil.toString()),
       completedDate,
       rejectReason,
     });
@@ -483,7 +487,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public selectMasterCredentialId(event: { data: Credential }): void {
-    this.masterCredentialId = event.data.id as number;
+    const { id, credentialTypeId, credentialTypeName } = event.data;
+
+    this.masterCredentialId = id as number;
+    this.credentialType = { id: credentialTypeId, name: credentialTypeName as string };
     this.checkCertifiedFields(event.data.expireDateApplicable);
   }
 
@@ -515,6 +522,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         this.credentialStatus = CredentialStatus.Pending;
         this.masterCredentialId = null;
         this.removeExistingFiles = false;
+        this.credentialType = {} as CredentialType;
         this.existingFiles = [];
         this.uploadObj.clearAll();
       });
@@ -532,11 +540,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }: CandidateCredential): void {
     if (this.masterCredentialId) {
       if (createdOn) {
-        createdOn = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(createdOn));
+        createdOn = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdOn));
       }
 
       if (createdUntil) {
-        createdUntil = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(createdUntil));
+        createdUntil = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdUntil));
       }
 
       if (this.isOrganizationAgencyArea.isAgencyArea) {
@@ -568,6 +576,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
             certifiedOn: createdOn,
             certifiedUntil: createdUntil,
             completedDate,
+            credentialType: this.credentialType,
           })
         );
       }
@@ -635,7 +644,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$
       .pipe(ofActionSuccessful(DownloadCredentialFilesSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((payload: { file: Blob; candidateName: string }) => {
-        let dateTime = DateTimeHelper.formatDateUTC(DateTimeHelper.toUtcFormat(new Date()), 'MM/dd/YYYY HH:mm');
+        let dateTime = DateTimeHelper.formatDateUTC(DateTimeHelper.setUtcTimeZone(new Date()), 'MM/dd/YYYY HH:mm');
         dateTime=dateTime.replace(/[/: ]/g, '_');
         downloadBlobFile(payload.file, `${payload.candidateName} Credentials ${dateTime}.pdf`);
       });
@@ -740,6 +749,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           (item.status === this.statusEnum.Reviewed) &&
           !this.isOrganizationSide,
         disableDelete: this.disableDelete(item),
+        credentialTypeName: item.credentialType?.name,
+        credentialTypeId: item.credentialType?.id,
       };
     });
   }

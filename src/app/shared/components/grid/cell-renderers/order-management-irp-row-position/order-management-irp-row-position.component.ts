@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
+import { Store } from '@ngxs/store';
 import { map, takeUntil } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 
 import { TakeUntilDestroy } from '@core/decorators';
-import { Destroyable } from '@core/helpers';
 import {
   IRPCandidateForPosition,
   IRPOrderPosition,
@@ -17,10 +17,18 @@ import { OrderManagementIrpApiService } from '@shared/services/order-management-
 import {
   OrderManagementSubGridCells,
 } from '@client/order-management/constants';
-import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
+import { AdditionalPermission, GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
+import { ShowToast } from 'src/app/store/app.actions';
 import {
-  OrderManagementIrpRowCandidatesAdapter,
-} from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.adapter';
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
+import { OrderInfo } from '@client/order-management/interfaces';
+import { MessageTypes } from '@shared/enums/message-types';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { AbstractPermission } from '@shared/helpers/permissions';
+
+import { OrderManagementIrpCandidateSystem } from './order-management-irp-row-position.enum';
+import { OrderManagementIrpRowCandidatesAdapter } from './order-management-irp-row-position.adapter';
 
 @TakeUntilDestroy
 @Component({
@@ -29,18 +37,22 @@ import {
   styleUrls: ['./order-management-irp-row-position.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrderManagementIrpRowPositionComponent extends Destroyable implements ICellRendererAngularComp {
+export class OrderManagementIrpRowPositionComponent extends AbstractPermission implements ICellRendererAngularComp {
   public params: ICellRendererParams;
   //todo: remove any[]
   public displayRows: IRPCandidateForPosition[] | any[] = [];
   public colDefs: Record<string, ColDef[]> = OrderManagementSubGridCells;
   public emptyMessage = GRID_EMPTY_MESSAGE;
 
+  public readonly vmsSystem = OrderManagementIrpCandidateSystem[OrderManagementIrpCandidateSystem.VMS];
+
   constructor(
     private cdr: ChangeDetectorRef,
+    protected override store: Store,
+    private orderManagementService: OrderManagementService,
     private orderManagementIrpApiService: OrderManagementIrpApiService,
   ) {
-    super();
+    super(store);
   }
 
   public agInit(params: ICellRendererParams): void {
@@ -76,5 +88,20 @@ export class OrderManagementIrpRowPositionComponent extends Destroyable implemen
 
   public trackByField(index: number, config: ColDef): string {
     return config.field as string;
+  }
+
+  navigateToPositionDetails(data: OrderInfo): void {
+    if (!this.userPermission[this.userPermissions.CanOrganizationViewOrders]) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, AdditionalPermission));
+      return;
+    }
+
+    this.orderManagementService.setOrderFromAnotherSystem({ system: OrderManagementIRPSystemId.VMS });
+    this.orderManagementService.selectedOrderAfterRedirect$.next({
+      orderId: Number(data.orderPublicId),
+      candidateId: data.candidateProfileId as number,
+      orderType: this.params.data.orderType,
+      prefix: data.organizationPrefix,
+    });
   }
 }

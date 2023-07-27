@@ -20,8 +20,10 @@
           ejs-button
           cssClass="e-action-button"
           class="add-action spaced no-right-space"
+          [ngClass]="{ 'adaptive-btn': isMiddleContentWidth }"
           (click)="recalculateTimesheets()">
-          Recalculate
+          <i-feather name="refresh-cw" class="icon"></i-feather>
+          <span *ngIf="!isMiddleContentWidth">Recalculate</span>
         </button>
         <ng-container *ngIf="isEditEnabled">
           <app-tooltip-container

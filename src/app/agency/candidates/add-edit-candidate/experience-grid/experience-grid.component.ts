@@ -104,8 +104,8 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
       candidateProfileId: experience.candidateProfileId,
       employer: experience.employer,
       jobTitle: experience.jobTitle,
-      startDate: DateTimeHelper.convertDateToUtc(experience.startDate),
-      endDate: DateTimeHelper.convertDateToUtc(experience.endDate),
+      startDate: DateTimeHelper.setCurrentTimeZone(experience.startDate),
+      endDate: DateTimeHelper.setCurrentTimeZone(experience.endDate),
       comments: experience.comments,
     });
     if (this.readonlyMode) {
@@ -159,8 +159,8 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
   public saveExperience(): void {
     if (this.experienceForm.valid) {
       const experience: Experience = this.experienceForm.getRawValue();
-      experience.startDate = experience.startDate ? DateTimeHelper.toUtcFormat(experience.startDate) : experience.startDate;
-      experience.endDate = experience.endDate ? DateTimeHelper.toUtcFormat(experience.endDate) : experience.endDate;
+      experience.startDate = experience.startDate ? DateTimeHelper.setUtcTimeZone(experience.startDate) : experience.startDate;
+      experience.endDate = experience.endDate ? DateTimeHelper.setUtcTimeZone(experience.endDate) : experience.endDate;
       this.store.dispatch(new SaveExperience(experience));
     } else {
       this.experienceForm.markAllAsTouched();

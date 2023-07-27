@@ -140,7 +140,6 @@
 
                     <ng-container *ngSwitchCase="candidateTemplate.apply">
                       <app-apply-candidate
-                        [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
                         [candidate]="$any(candidate)"
                         [order]="$any(selectedOrder$ | async)"
                         [isTab]="true"
@@ -238,6 +237,7 @@
     <div class="extension-sidebar">
       <app-extension-sidebar
         *ngIf="isExtensionSidebarShown"
+        [order]="order"
         [candidateJob]="candidateJob!"
         [orderPosition]="candidate"
         (saveEmitter)="updateGrid()"
@@ -317,6 +317,7 @@
       <div class="comments">
         <app-comments
           *ngIf="candidateJob"
+          [canVmsCreateOrders]="canCreateOrder"
           [comments]="comments"
           [commentContainerId]="candidateJob.commentContainerId || 0"
         ></app-comments>

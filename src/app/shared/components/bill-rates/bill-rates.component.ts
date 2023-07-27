@@ -19,6 +19,7 @@ import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/i
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
+import { GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-bill-rates',
@@ -32,6 +33,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   @Input() isActive: boolean | null = false;
   @Input() readOnlyMode = false;
   @Input() isOrderPage = false;
+  @Input() isExtension = false;
   @Input() set billRates(values: BillRate[]) {
     if (values) {
       this.billRatesControl = new FormArray([]);
@@ -95,6 +97,10 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     });
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
+
+    if (!this.isExtension) {
+      this.store.dispatch(new GetPredefinedBillRates());
+    }
   }
 
   public editBillRate({ index, ...value }: BillRatesGridEvent): void {
@@ -113,7 +119,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       {
         billRateConfig: value.billRateConfig,
         billRateConfigId: value.billRateConfigId,
-        effectiveDate: DateTimeHelper.convertDateToUtc(value.effectiveDate),
+        effectiveDate: DateTimeHelper.setCurrentTimeZone(value.effectiveDate),
         id: value.id,
         intervalMax: value.intervalMax && String(value.intervalMax),
         intervalMin: value.intervalMin && String(value.intervalMin),
@@ -224,7 +230,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       }
 
       if (value.effectiveDate) {
-        value.effectiveDate = DateTimeHelper.toUtcFormat(value.effectiveDate);
+        value.effectiveDate = DateTimeHelper.setUtcTimeZone(value.effectiveDate);
         this.billRateForm.get('effectiveDate')?.patchValue(value.effectiveDate);
       }
 

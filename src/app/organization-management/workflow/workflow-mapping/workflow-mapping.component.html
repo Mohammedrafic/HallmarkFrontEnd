@@ -134,7 +134,7 @@
       </e-column>
       <e-column headerText="WORKFLOW TYPE" width="180">
         <ng-template #template let-data>
-          <span>Job Order Workflow</span>
+          <span>{{data.workflowGroupName}}</span>
         </ng-template>
       </e-column>
       <e-column field="workflowName" headerText="WORKFLOW NAME" width="180"></e-column>
@@ -224,6 +224,7 @@
             [fields]="optionFields"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
+            [filterType]="filterType"
             [dataSource]="filterColumns.locationIds.dataSource"
           >
           </ejs-multiselect>
@@ -239,6 +240,7 @@
             [fields]="optionFields"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
+            [filterType]="filterType"
             [dataSource]="filterColumns.departmentsIds.dataSource"
           >
           </ejs-multiselect>
@@ -300,6 +302,24 @@
     [width]="'569'"
   >
     <form class="form-container" id="addWorkflow" *ngIf="showForm" [formGroup]="workflowMappingFormGroup">
+
+      <div>
+        <div class="input-container dropdown">
+          <label for="workflowType">Workflow Type <span class="required">*</span></label>
+          <div class="input-group dropdown bootstrap">
+            <ejs-dropdownlist
+              id="workflowType"
+              appValidateWithMessage
+              [allowFiltering]="true"
+              [dataSource]="workflowGroupTypesSources"
+              [fields]="workflowGroupTypesFields"
+              formControlName="workflowType"
+            >
+            </ejs-dropdownlist>
+          </div>
+        </div>
+      </div>
+
       <div>
         <div class="input-container dropdown">
           <label for="region">Region <span class="required">*</span></label>
@@ -407,7 +427,7 @@
               appValidateWithMessage
               selectAllText="Select All"
               mode="CheckBox"
-              [dataSource]="skills$ | async"
+              [dataSource]="skills"
               [fields]="skillsFields"
               [showSelectAll]="true"
               [allowFiltering]="true"
@@ -415,23 +435,6 @@
               formControlName="skills"
             >
             </ejs-multiselect>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="input-container dropdown">
-          <label for="workflowType">Workflow Type <span class="required">*</span></label>
-          <div class="input-group dropdown bootstrap">
-            <ejs-dropdownlist
-              id="workflowType"
-              appValidateWithMessage
-              [allowFiltering]="true"
-              [dataSource]="workflowGroupTypesData"
-              [fields]="workflowGroupTypesFields"
-              formControlName="workflowType"
-            >
-            </ejs-dropdownlist>
           </div>
         </div>
       </div>
@@ -445,7 +448,7 @@
               id="workflowName"
               formControlName="workflowName"
               [allowFiltering]="true"
-              [dataSource]="workflows$ | async"
+              [dataSource]="workflowSources"
               [fields]="fields"
             >
             </ejs-dropdownlist>

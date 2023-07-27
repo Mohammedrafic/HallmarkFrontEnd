@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Duration } from '@shared/enums/durations';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
-import { ExtensionGridModel, ExtensionModel } from './models/extension.model';
+import { ExtensionFormData, ExtensionGridModel, ExtensionModel, ExtenstionResponseModel } from './models/extension.model';
 import { AppState } from '../../../../store/app.state';
 import { Store } from '@ngxs/store';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
@@ -14,9 +14,9 @@ import { DateTimeHelper } from '@core/helpers';
 export class ExtensionSidebarService {
   constructor(private http: HttpClient, private store: Store) {}
 
-  public saveExtension(extension: ExtensionModel): Observable<void> {
+  public saveExtension(extension: ExtensionFormData): Observable<ExtenstionResponseModel> {
     const payload = this.prepareExtension(extension);
-    return this.http.post<void>('/api/candidatejobs/extensions', payload);
+    return this.http.post<ExtenstionResponseModel>('/api/candidatejobs/extensions', payload);
   }
 
   public getExtensions(id: number, orderId: number, organizationId?: number): Observable<ExtensionGridModel[]> {
@@ -89,9 +89,9 @@ export class ExtensionSidebarService {
     }
   }
 
-  private prepareExtension(extension: any): ExtensionModel {
+  private prepareExtension(extension: ExtensionFormData): ExtensionModel {
     const { orderId, startDate, endDate, billRate, billRates, comments,
-      jobId, durationPrimary, ignoreMissingCredentials } = extension || {};
+      jobId, durationPrimary, ignoreMissingCredentials, linkedId } = extension || {};
 
     return {
       jobId,
@@ -103,6 +103,7 @@ export class ExtensionSidebarService {
       actualEndDate: DateTimeHelper.setInitHours(toCorrectTimezoneFormat(endDate)),
       duration: durationPrimary,
       ignoreMissingCredentials,
+      linkedId,
     };
   }
 }

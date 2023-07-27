@@ -11,7 +11,7 @@ import {
   TabNavigationComponent,
 } from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
 import { Router } from '@angular/router';
-import { ClearOrganizationStructure } from '@agency/store/order-management.actions';
+import { ClearOrganizationStructure, SetOrdersTab } from '@agency/store/order-management.actions';
 
 @Component({
   selector: 'app-order-management',
@@ -28,6 +28,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   public exportSelected$ = new Subject<any>();
   public search$ = new Subject<string>();
   public orderStatus: string[]=[];
+  public candidateStatuses: string[]=[];
   private unsubscribe$: Subject<void> = new Subject();
   public organizationIds: number[] = [];
 
@@ -42,6 +43,14 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
     } else {
       if(routerState?.['status'] == "In Progress"){
         this.orderStatus.push("InProgress")
+      }
+      if(routerState?.['xtraStatus'] != undefined){
+        this.orderStatus.push(routerState?.['xtraStatus'])
+      }
+      if(routerState?.['candidateStatusId'] != undefined){
+        this.candidateStatuses.push(routerState?.['candidateStatusId']);
+        this.store.dispatch(new SetOrdersTab(AgencyOrderManagementTabs.AllAgencies));
+        this.selectedTab = AgencyOrderManagementTabs.AllAgencies;
       }
     }
   }

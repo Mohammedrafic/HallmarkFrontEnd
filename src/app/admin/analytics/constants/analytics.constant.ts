@@ -197,6 +197,35 @@ export const grantReportConstants = {
     InvoiceStatusIds: 'invoiceStatusIds'
   }
 }
+export const PositionSummaryConstants = {
+  formControlNames: {
+    businessIds: 'businessIds',
+    regionIds: 'regionIds',
+    locationIds: 'locationIds',
+    departmentIds: 'departmentIds',
+    skillCategoryIds: 'skillCategoryIds',
+    skillIds: 'skillIds',
+    candidateName: 'candidateName',
+    candidateStatuses: 'candidateStatuses',
+    agencyIds: 'agencyIds',
+    startDate: 'startDate',
+    endDate: 'endDate'
+  }
+}
+
+export const shiftBreakdownConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    startYear: 'startYear',
+    startMonth: 'startMonth',
+    endYear: 'endYear',
+    endMonth: 'endMonth'
+  }
+}
+
 export const accrualReportTypesList : { name: string; id: number }[] = [
   { name: 'Invoice date range', id: 0 },
   { name: 'Timesheet date range', id: 1 }

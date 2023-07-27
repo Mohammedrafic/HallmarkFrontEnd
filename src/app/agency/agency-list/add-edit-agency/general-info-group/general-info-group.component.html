@@ -14,7 +14,7 @@
           <div class="id-container">
             <div class="input-container">
               <label>External ID</label>
-              <input formControlName="externalId" class="e-input" type="text" maxlength="10"/>
+              <input formControlName="externalId" class="e-input" type="text" maxlength="10" />
             </div>
             <div class="input-container">
               <label>Tax ID<span class="required">*</span></label>
@@ -25,33 +25,35 @@
             <div class="input-container bootstrap">
               <label>Standard Base Fee %</label>
               <div class="input-group">
-                <input
-                  appValidateWithMessage
-                  formControlName="baseFee"
-                  class="e-input"
-                  type="number"
-                  (focus)="priceUtils.setPriceMask(formGroup, 'baseFee', $event)"
-                  (blur)="priceUtils.setTwoDecimals(formGroup, 'baseFee', $event)"
-                  maxlength="5"
-                />
+                <input appValidateWithMessage
+                       formControlName="baseFee"
+                       class="e-input"
+                       type="number"
+                       (focus)="priceUtils.setPriceMask(formGroup, 'baseFee', $event)"
+                       (blur)="priceUtils.setTwoDecimals(formGroup, 'baseFee', $event)"
+                       maxlength="5" />
               </div>
             </div>
+           
           </div>
         </div>
       </div>
       <div class="right-column">
         <div class="org-section bootstrap">
-          <div class="input-container"></div>
+          <div class="input-container">
+            <label>NetSuite ID</label>
+            <div class="input-group">
+              <input appValidateWithMessage formControlName="netSuiteId" [readonly]="true" class="e-input" type="text" maxlength="15" />
+            </div>
+          </div>
           <div class="dropdown-container">
             <label>Status<span class="required">*</span></label>
             <div class="input-group dropdown">
-              <ejs-dropdownlist
-                appValidateWithMessage
-                formControlName="status"
-                [fields]="optionFields"
-                [allowFiltering]="true"
-                [dataSource]="statuses"
-              ></ejs-dropdownlist>
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="status"
+                                [fields]="optionFields"
+                                [allowFiltering]="true"
+                                [dataSource]="statuses"></ejs-dropdownlist>
             </div>
           </div>
         </div>

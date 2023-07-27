@@ -141,7 +141,10 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
     if (this.allRecords['regionIds']) {
       this.dataSource.locations = mapperSelectedItems(this.departmentHierarchy, 'locations');
       regionsControl?.setValue(null, { emitEvent: false });
-      regionsControl?.disable();
+      regionsControl?.disable({
+        onlySelf: true,
+        emitEvent: false,
+      });
     } else {
       regionsControl?.enable();
       this.dataSource.locations = [];
@@ -161,7 +164,10 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
       this.dataSource.departments = mapperSelectedItems(this.dataSource.locations, 'departments');
       const locationControl = this.assignDepartmentForm.get('locationIds');
       locationControl?.setValue(null, { emitEvent: false });
-      locationControl?.disable();
+      locationControl?.disable({
+        onlySelf: true,
+        emitEvent: false,
+      });
     } else {
       this.dataSource.departments = [];
       this.allRecords['departmentIds'] = false;
@@ -264,8 +270,9 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
                 filter(Boolean),
                 switchMap(() => {
                   return this.departmentService.editAssignedDepartments(
-                    formData, [this.departmentId as number], 
-                    this.replaceOrder
+                    formData, [this.departmentId as number],
+                    null,
+                    this.replaceOrder,
                   );
                 }));
            } else {
@@ -353,10 +360,10 @@ export class AssignDepartmentComponent extends DestroyableDirective implements O
   private setupDialogState(data: DepartmentAssigned): void {
     const { workCommitmentStartDate, workCommitmentEndDate } = data;
     const minDate = workCommitmentStartDate
-      ? DateTimeHelper.convertDateToUtc(workCommitmentStartDate)
+      ? DateTimeHelper.setCurrentTimeZone(workCommitmentStartDate)
       : undefined;
     const maxDate = workCommitmentEndDate
-      ? DateTimeHelper.convertDateToUtc(workCommitmentEndDate)
+      ? DateTimeHelper.setCurrentTimeZone(workCommitmentEndDate)
       : undefined;
     this.setMinMaxDateRange({ min: minDate, max: maxDate });
   }

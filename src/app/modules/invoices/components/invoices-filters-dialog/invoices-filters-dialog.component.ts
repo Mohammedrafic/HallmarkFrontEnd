@@ -93,7 +93,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   public filterOptionFields = filterOptionFields;
   public skillOptionFields = SkillFilterOptionFields;
   public isAgency = false;
-  public targetElement: HTMLElement | null = null;
+  public filterType: string = 'Contains';
 
   private regions: OrganizationRegion[] = [];
 
@@ -122,7 +122,6 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.setFormGroupValidators();
     this.startFormGroupWatching();
     this.getAgencyOrgStructure();
-    this.getFilterTargetElement();
   }
 
   ngOnChanges(): void {
@@ -387,17 +386,5 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     if (!this.isAgency) {
       this.store.dispatch(new GetOrganizationStructure());
     }
-  }
-
-  private getFilterTargetElement(): void {
-    this.targetElement$
-      .pipe(
-        filter((el) => !!el),
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe((el: HTMLElement | null) => {
-        this.targetElement = el;
-        this.cdr.detectChanges();
-      });
   }
 }

@@ -329,15 +329,9 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     this.grid.pageSettings.pageSize = this.pageSize;
   }
 
-  changePage(event: ChangeEventArgs & { value: number }): void {
-    if (event.value) {
-      this.pageSubject.next(event.value);
-    }
-  }
-
-  switchPage(event: PagerChangeEvent): void {
-    if (event.currentPage) {
-      this.pageSubject.next(event.currentPage);
+  changePage(event: any): void {
+    if (event.currentPage || event.value) {
+      this.pageSubject.next(event.currentPage || event.value);
     }
   }
 

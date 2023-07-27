@@ -15,7 +15,7 @@
   </ng-template>
   <ng-template #OrgChart>
     <div *ngIf="!isAgencyUser" [ngClass]="selectedSystem.isIRP ? 'irpWidget' : '' ">
-      <div class="widget">
+      <div class="widget"  *ngIf="selectedSystem.isVMS">
         <span class="widget__type" (mousedown)="defineMousePosition($event)"
           (click)="toSourceContent('OrdersforApproval')">
           <ejs-tooltip id="tooltip" content="Pending Order(s) Approval" position="TopCenter">
@@ -28,7 +28,7 @@
           </ejs-tooltip>
         </span>
       </div>
-      <div class="widget">
+      <div class="widget"  *ngIf="selectedSystem.isVMS">
         <span class="widget__type" (mousedown)="defineMousePosition($event)" (click)="toSourceContent('ManualInvoice')">
           <ejs-tooltip id="tooltip" content="Pending Manual Invoice(s) Approval" position="TopCenter">
             <ul>
@@ -40,7 +40,7 @@
           </ejs-tooltip>
         </span>
       </div>
-      <div class="widget">
+      <div class="widget"  *ngIf="selectedSystem.isVMS">
         <span class="widget__type" (mousedown)="defineMousePosition($event)" (click)="toSourceContent('pendingInvoice')">
           <ejs-tooltip id="tooltip" content="Pending Invoice(s) Approval" position="TopCenter">
             <ul>
@@ -52,7 +52,7 @@
           </ejs-tooltip>
         </span>
       </div>
-      <div class="widget">
+      <div class="widget"  *ngIf="selectedSystem.isVMS">
         <span class="widget__type" (mousedown)="defineMousePosition($event)"
           (click)="toSourceContent('Pending Timesheet')">
           <ejs-tooltip id="tooltip" content="Pending Timesheet(s) Approval" position="TopCenter">

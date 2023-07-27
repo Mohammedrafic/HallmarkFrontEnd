@@ -21,8 +21,8 @@ export class MonthPickerService {
 
   public setDates(currentDate: Date, firstDayOfWeek: number): void {
     if(currentDate && firstDayOfWeek !== null && firstDayOfWeek !== undefined) {
-      const utcStartDate = DateTimeHelper.toUtcFormat(this.getWeekByDayFirstMonth(currentDate,firstDayOfWeek));
-      const utcLastDate = DateTimeHelper.toUtcFormat(this.getWeekByDayLastMonth(currentDate,firstDayOfWeek));
+      const utcStartDate = DateTimeHelper.setUtcTimeZone(this.getWeekByDayFirstMonth(currentDate,firstDayOfWeek));
+      const utcLastDate = DateTimeHelper.setUtcTimeZone(this.getWeekByDayLastMonth(currentDate,firstDayOfWeek));
 
       this.weekService.setRange([
         utcStartDate,

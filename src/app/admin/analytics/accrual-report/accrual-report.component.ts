@@ -366,8 +366,7 @@ export class AccrualReportComponent implements OnInit, OnDestroy {
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
               this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-
-              setTimeout(() => { this.SearchReport() }, 3000);
+              this.SearchReport()
             }
           });
           this.regions = this.regionsList;

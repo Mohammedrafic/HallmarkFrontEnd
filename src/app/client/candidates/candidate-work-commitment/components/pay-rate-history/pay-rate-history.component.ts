@@ -98,7 +98,7 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
       const payload = {
         employeeWorkCommitmentId: this.employeeWorkCommitmentId,
         payRate: formData.payRate,
-        startDate: DateTimeHelper.toUtcFormat(formData.startDate),
+        startDate: DateTimeHelper.setUtcTimeZone(formData.startDate),
       };
 
       this.payRateApiService.addPayRateRecord(payload)
@@ -179,8 +179,8 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
   private setDateRanges(employeeWorkCommitment: CandidateWorkCommitmentShort): void {
     const { startDate, endDate } = employeeWorkCommitment;
 
-    this.dateRanges.max = endDate ? DateTimeHelper.convertDateToUtc(endDate) : undefined;
-    this.dateRanges.min = startDate ? DateTimeHelper.convertDateToUtc(startDate) : undefined;
+    this.dateRanges.max = endDate ? DateTimeHelper.setCurrentTimeZone(endDate) : undefined;
+    this.dateRanges.min = startDate ? DateTimeHelper.setCurrentTimeZone(startDate) : undefined;
     this.cdr.markForCheck();
   }
 

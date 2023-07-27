@@ -69,10 +69,10 @@ export const MultiEmailValidator = (control: AbstractControl): ValidationErrors 
 
 export const IsStartEndDateOverlapWithInactivePeriod = (inactiveDate: Date | null, reactivateDate: Date | null, startDate: Date, endDate: Date): boolean => {
   if (reactivateDate) {
-    return (!!inactiveDate && DateTimeHelper.isDateBefore(inactiveDate, endDate)) && 
-           (!!reactivateDate && DateTimeHelper.isDateBefore(startDate, reactivateDate));
+    return (!!inactiveDate && DateTimeHelper.hasDateBefore(inactiveDate, endDate)) &&
+           (!!reactivateDate && DateTimeHelper.hasDateBefore(startDate, reactivateDate));
   }
-  return (!!inactiveDate && DateTimeHelper.isDateBefore(inactiveDate, endDate));
+  return (!!inactiveDate && DateTimeHelper.hasDateBefore(inactiveDate, endDate));
 }
 
 export const GenerateLocationDepartmentOverlapMessage = (isLocationOverlaps: boolean, isDepartmentOverlaps: boolean, isLocationDepartmentDateSame: boolean, locationInactiveDate: Date, departmentInactiveDate: Date): string => {

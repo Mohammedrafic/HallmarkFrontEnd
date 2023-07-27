@@ -321,9 +321,9 @@ export class AlertsState {
   @Action(GetGroupMailByBusinessUnitIdPage)
   GetGroupMailByBusinessUnitIdPage(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { businessUnitId, getAll }: GetGroupMailByBusinessUnitIdPage
+    { businessUnitId, getAll,SeeMyEmailsOnly }: GetGroupMailByBusinessUnitIdPage
   ): Observable<GroupEmailByBusinessUnitIdPage | void> {
-    return this.groupEmailService.getGroupMailByBusinessUnitIdPage(businessUnitId, getAll).pipe(
+    return this.groupEmailService.getGroupMailByBusinessUnitIdPage(businessUnitId, getAll,SeeMyEmailsOnly).pipe(
       tap((payload) => {
         patchState({ groupEmailByBusinessUnitIdPage: payload });
         return payload;
@@ -367,9 +367,9 @@ export class AlertsState {
   @Action(GetGroupEmailRoles)
   GetGroupEmailRoles(
     { dispatch, patchState }: StateContext<AlertsStateModel>,
-    { id }: GetGroupEmailRoles
+    { data }: GetGroupEmailRoles
   ): Observable<GroupEmailRole | void> {
-    return this.groupEmailService.GetGroupEmailRolesByOrgId(id).pipe(
+    return this.groupEmailService.GetGroupEmailRolesByOrgId(data).pipe(
       tap((payload) => {
         patchState({ groupEmailRoleData: payload });
         return payload;

@@ -7,7 +7,9 @@ export enum ReasonsNavigationTabs {
   Unavailability,
   Termination,
   InternalTransfer,
-  CategoryNote
+  CategoryNote,
+  SourcingReason,
+  RecuriterReason
 }
 
 export enum ReasonFormType {
@@ -19,5 +21,7 @@ export enum ReasonFormType {
   CategoryNoteReason = "CategoryNoteReason",
   ManualInvoiceReason = "ManualInvoiceReason",
   TerminatedReason = "TerminatedReason",
-  InternalTransferReason = "InternalTransferReason"
+  InternalTransferReason = "InternalTransferReason",
+  RecuriterReason = "RecuriterReason",
+  SourcingReason = "SourcingReason"
 }

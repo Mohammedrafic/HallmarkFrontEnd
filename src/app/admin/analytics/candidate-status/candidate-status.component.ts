@@ -35,7 +35,7 @@ import { CandidateStatusAndReasonFilterOptionsDto, CommonCandidateSearchFilter, 
 import { OutsideZone } from "@core/decorators";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
-
+import { OrderStatus } from '../analytics.enum';
 @Component({
   selector: 'app-candidate-status',
   templateUrl: './candidate-status.component.html',
@@ -148,7 +148,7 @@ export class CandidateStatusComponent implements OnInit {
   private previousOrgId: number = 0;
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   private fixedCandidateStatusesIncluded: number[] = [6, 7, 11];
-  private fixedJobStatusesIncluded: number[] = [3, 4, 7, 8, 1, 9];
+  private fixedJobStatusesIncluded: number[] = [OrderStatus.Open,OrderStatus.Inprogress,OrderStatus.Filled,OrderStatus.Closed];
   private joinString = ",";
 
   public masterRegionsList: Region[] = [];
@@ -318,7 +318,7 @@ export class CandidateStatusComponent implements OnInit {
             }
           });
 
-          setTimeout(() => { this.SearchReport() }, 3000);
+         this.SearchReport()
         }
         else {
           this.isClearAll = false;

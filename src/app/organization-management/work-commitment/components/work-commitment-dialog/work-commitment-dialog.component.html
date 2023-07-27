@@ -114,3 +114,11 @@
     </section>
   </ng-template>
 </ejs-dialog>
+
+<app-replacement-order-confirmation
+  *ngIf="showOverrideDialog"
+  [text]="replacementConfirmationMessage"
+  [showReplacementCheckbox]="showReplacementCheckbox"
+  (confirm)="overrideCommitmentConfirm$.next($event)"
+  [(replaceChecked)]="replaceOrder"
+></app-replacement-order-confirmation>

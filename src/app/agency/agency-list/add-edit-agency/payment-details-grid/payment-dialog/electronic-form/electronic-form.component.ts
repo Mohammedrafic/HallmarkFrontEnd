@@ -21,6 +21,7 @@ import { SetPaymentDetailsForm } from '@agency/store/agency.actions';
 import PriceUtils from '@shared/utils/price.utils';
 import { startDateDuplicationValidator } from '@shared/validators/start-date-duplication.validator';
 import { COUNTRIES } from '@shared/constants/countries-list';
+import { debug } from 'console'; 
 
 @Component({
   selector: 'app-electronic-form',
@@ -33,6 +34,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
   @Input() public formValue: PaymentDetails | ElectronicPaymentDetails;
   @Input() public paymentsList: PaymentDetails[] | ElectronicPaymentDetails[];
   @Input() public mode: number;
+  @Input() editAgencyNetsuitePaymentId: boolean;
 
   get startDateControl(): AbstractControl | null {
     return this.paymentDetailsForm?.get('startDate');
@@ -48,7 +50,8 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
   public readonly placeholderInput = PLACEHOLDER;
   public readonly zipCodeMask = ZIP_CODE_MASK;
   public readonly holderPhoneMask = PHONE_MASK;
-
+  public isControlDisabled: boolean = true;
+  private hasEditAgencyNetsuitePaymentId: boolean = false;
   constructor(private formBuilder: FormBuilder, private changeDetectorRef: ChangeDetectorRef, private store: Store) {
     super();
   }
@@ -67,6 +70,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         mode: [''],
         startDate: [null, [Validators.required]],
         endDate: [null],
+        nsPaymentId: [''],
         bankName: ['', [Validators.required]],
         routingNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
         bankAddress1: ['', [Validators.required]],
@@ -86,10 +90,11 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         accountHolderZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
         fee: [''],
         swiftCode: ['', [Validators.pattern(/^[0-9]+$/)]],
+        netSuiteId: ['']
       },
       {
         validators: startDateDuplicationValidator('startDate', this.paymentsList, this.formValue?.startDate, this.mode),
-      }
+      },
     );
   }
 
@@ -124,6 +129,15 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
   private setFormValue(): void {
     if (this.formValue) {
       this.paymentDetailsForm.patchValue({ ...this.formValue });
+      this.hasEditAgencyNetsuitePaymentId = this.editAgencyNetsuitePaymentId;
+      if (this.formValue?.id && this.hasEditAgencyNetsuitePaymentId) {
+        if (this.paymentDetailsForm?.get("netSuiteId")?.value && this.hasEditAgencyNetsuitePaymentId) {
+          this.isControlDisabled = false;
+        } else
+          this.isControlDisabled = false;
+      } else if (!this.hasEditAgencyNetsuitePaymentId) {
+        this.isControlDisabled = true;
+      }
     }
   }
 }

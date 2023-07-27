@@ -4,7 +4,9 @@ import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/stor
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { 
+  AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { TAB_CANDIDATES } from '@client/candidates/candidates-content/candidates.constant';
 import { TabConfig } from '../interface';
 import { UserState } from 'src/app/store/user.state';
@@ -35,6 +37,8 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   public credType: any;
   public isMobile = false;
   public isSmallDesktop = false;
+  public redirectedFromDashboard : any;
+  
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
 
   @Select(UserState.lastSelectedOrganizationId)
@@ -58,6 +62,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
     this.credStartDate = routerState?.['startDate'];
     this.credEndDate = routerState?.['endDate'];
     this.credType = routerState?.['type'];
+    this.redirectedFromDashboard = routerState?.['redirectedFromDashboard'];
   }
 
   ngOnInit(): void {

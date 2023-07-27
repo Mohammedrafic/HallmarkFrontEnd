@@ -18,7 +18,7 @@
     .e-input-group input.e-input,
     .e-input-group.e-control-wrapper {
       @media #{$max-mobile} {
-        width: calc(100vw - 110px) !important;
+        width: calc(100vw - 200px) !important;
       }
     }
   }

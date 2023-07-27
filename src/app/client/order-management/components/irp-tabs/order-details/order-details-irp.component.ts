@@ -175,6 +175,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private reason: OrderRequisitionReason[] = [];
   public allShifts: any[];
   private selectedStructureState: SelectedStructureState;
+  public filterType: string = 'Contains';
 
   @Select(RejectReasonState.sortedOrderRequisition)
   private reasons$: Observable<RejectReasonPage>;
@@ -522,7 +523,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       let startDate = this.generalInformationForm.get('jobStartDate')?.value ?this.generalInformationForm.get('jobStartDate')?.value :this.generalInformationForm.get('jobDates')?.value;
-      const locations = this.organizationStructureService.getLocationsById(value,startDate??new Date);
+      const locations = this.generalInformationForm.get('jobDates')?.value ? this.organizationStructureService.getLocationsByIdSet(value,startDate??new Date) :this.organizationStructureService.getLocationsById(value,startDate??new Date);
       this.generalInformationForm.get('locationId')?.reset();
       this.generalInformationForm.get('departmentId')?.reset();
 
@@ -538,7 +539,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       let startDate = this.generalInformationForm.get('jobStartDate')?.value ?this.generalInformationForm.get('jobStartDate')?.value :this.generalInformationForm.get('jobDates')?.value;
-      const departments = this.organizationStructureService.getDepartmentsById(value,startDate?? new Date);
+      const departments =this.generalInformationForm.get('jobDates')?.value ?  this.organizationStructureService.getDepartmentByIdSet(value,startDate?? new Date):this.organizationStructureService.getDepartmentsById(value,startDate?? new Date);
       this.generalInformationForm.get('departmentId')?.reset();
 
       this.updateDataSourceFormList('departments', departments);
@@ -583,7 +584,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       if (!(jobStartDate instanceof Date)) {
         return;
       }
-
+      
       this.autoSetupJobEndDateControl(value, jobStartDate);
       this.changeDetection.markForCheck();
     });
@@ -719,6 +720,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       .get('jobDates')
       ?.valueChanges.pipe(filter(()=> true), takeUntil(this.componentDestroy()))
       .subscribe((value: any | undefined) => {
+        if (value.length>0)
+        {
         let regionID = this.generalInformationForm.get('regionId')?.value;
         const locations = this.organizationStructureService.getLocationsByIdSet(regionID, value);
           let locID = this.generalInformationForm.get('locationId')?.value;
@@ -739,6 +742,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           setDataSource(selectedForm.fields, 'locationId', locations);
           setDataSource(selectedForm.fields, 'departmentId', deparment);
           this.changeDetection.markForCheck();
+        }
       });
   }
 
@@ -844,14 +848,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       departmentId: selectedOrder.departmentId,
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
-      duration: selectedOrder.duration,
-      
+      linkedId: selectedOrder.linkedId,
     })
     setTimeout(()=>{
       this.generalInformationForm.patchValue({
         shift: selectedOrder.shift,
         shiftStartTime: selectedOrder.shiftStartTime,
-        shiftEndTime: selectedOrder.shiftEndTime
+        shiftEndTime: selectedOrder.shiftEndTime,
+        duration: selectedOrder.duration,
       }, { emitEvent: false })
     },1000)
 

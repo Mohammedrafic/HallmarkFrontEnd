@@ -1,0 +1,42 @@
+@import 'colors';
+
+.cards-container {
+  padding-right: 15px;
+
+  .cards {
+    padding-bottom: 12px;
+  }
+
+  .card.e-card {
+    border: 1px solid $secondary-dark-blue-45;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+    width: 256px;
+
+    &:hover {
+      background-color: $primary-active-blue-80;
+    }
+
+    h4 {
+      padding: 4px;
+      color: $black;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 20px;
+      overflow: hidden;
+      margin: 0;
+      text-overflow: ellipsis;
+    }
+
+    &.active-card {
+      background-color:$primary-active-blue;
+
+      h4 {
+        color: $white;
+      }
+    }
+  }
+
+  .button-container {
+    padding: 0 12px;
+  }
+}
