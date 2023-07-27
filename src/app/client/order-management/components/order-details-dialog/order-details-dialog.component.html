@@ -18,8 +18,7 @@
             <div
               class="order-statuses"
               [ngClass]="{
-                'align-label': order?.orderType === orderType.OpenPerDiem
-                            || order?.orderType === orderType.PermPlacement
+                'align-label': order?.orderType === orderType.OpenPerDiem || order?.orderType === orderType.PermPlacement
               }"
             >
               <ejs-chiplist #chipList>
