@@ -125,6 +125,7 @@ import { JobClassifications, OptionFields } from '@client/order-management/const
 import { PartialSearchService } from '@shared/services/partial-search.service';
 import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
 import { PermissionService } from '../../../../security/services/permission.service';
+import { OrderManagementService } from '../order-management-content/order-management.service';
 
 @Component({
   selector: 'app-order-details-form',
@@ -244,7 +245,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     protected override store: Store,
     private route: ActivatedRoute,
     private alertService: AlertService,
-    private orderManagementService: OrderManagementContentService,
+    private orderManagementContentService: OrderManagementContentService,
+    private orderManagementService: OrderManagementService,
     private commentsService: CommentsService,
     private durationService: DurationService,
     private settingsViewService: SettingsViewService,
@@ -361,7 +363,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     const startDate = DateTimeHelper.setUtcTimeZone(jobStartDate);
     const endDate = DateTimeHelper.setUtcTimeZone(jobEndDate);
 
-    this.orderManagementService
+    this.orderManagementContentService
       .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((billRate: BillRate) => {
@@ -836,7 +838,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   private populateNewOrderForm(): void {
-    this.orderTypeForm.controls['orderType'].patchValue(OrderType.Traveler);
+    const orderTypeToPrePopulate = this.orderManagementService.getOrderTypeToPrePopulate() || OrderType.Traveler;
+    this.orderManagementService.clearOrderTypeToPrePopulate();
+    this.orderTypeForm.controls['orderType'].patchValue(orderTypeToPrePopulate);
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
     this.jobDistributionForm.controls['jobDistribution'].patchValue(OrderJobDistribution.All);
 
