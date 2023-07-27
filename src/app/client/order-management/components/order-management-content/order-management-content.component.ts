@@ -623,6 +623,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       new PreservedFilters.ResetPageFilters(),
       new ClearPredefinedBillRates(),
       new ClearSelectedOrder(),
+      new ClearOrders(),
     ]);
     this.resizeObserver.detach();
     this.unsubscribe$.next();

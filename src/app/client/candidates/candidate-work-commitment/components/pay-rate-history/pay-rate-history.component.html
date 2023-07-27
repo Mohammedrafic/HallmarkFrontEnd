@@ -8,6 +8,7 @@
   [currentPage]="pagingData.pageNumber"
   [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject"
   [disableRowsPerPageDropdown]="true"
+  [showUpScrollButton]="false"
   (navigateToPageEmitter)="handleChangePage($event)">
 
   <app-tooltip-container
@@ -24,7 +25,7 @@
       [disabled]="disableDeleteButton || this.noActiveWorkCommitment"
     >
       <i-feather name="plus" class="icon"></i-feather>
-      Add Pay Rate
+      <span class="btn-label">Add Pay Rate</span>
     </button>
   </app-tooltip-container>
 </app-grid>

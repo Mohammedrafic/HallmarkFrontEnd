@@ -17,6 +17,8 @@ import { CredentialGridService } from '@agency/services/credential-grid.service'
 import { CredentialStorageService } from '@agency/services/credential-storage.service';
 import { CredentialStorageFacadeService } from '@agency/services/credential-storage-facade.service';
 import { DepartmentMatchCellComponent } from './department-match-cell/department-match-cell.component';
+import { GridPaginationModule } from '../grid/grid-pagination/grid-pagination.module';
+import { ScrollToTopModule } from '../scroll-to-top/scroll-to-top.module';
 
 
 @NgModule({
@@ -42,6 +44,8 @@ import { DepartmentMatchCellComponent } from './department-match-cell/department
     AgencyFileViewerModule,
     ValidateDirectiveModule,
     ReactiveFormsModule,
+    GridPaginationModule,
+    ScrollToTopModule,
   ],
   providers: [CredentialGridService, CredentialStorageService, CredentialStorageFacadeService,
   ],

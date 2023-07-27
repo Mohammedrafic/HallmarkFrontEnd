@@ -1,7 +1,21 @@
+@import 'adaptive-response';
+
 .contact-details__form {
   display: grid;
   grid-auto-flow: row;
   grid-gap: 12px;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(2, auto);
+
+  @media #{$max-tablet} {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 716px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media #{$max-mobile} {
+    grid-template-columns: 1fr;
+  }
 }

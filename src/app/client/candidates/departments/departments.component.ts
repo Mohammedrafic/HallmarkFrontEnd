@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import {
   BehaviorSubject,
   filter,
@@ -52,6 +52,7 @@ import { EditDepartmentsComponent } from './edit-departments/edit-departments.co
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
 import { DateTimeHelper, allAreEqual } from '@core/helpers';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-departments',
@@ -62,6 +63,9 @@ import { DateTimeHelper, allAreEqual } from '@core/helpers';
 export class DepartmentsComponent extends AbstractPermission implements OnInit {
   @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
   @ViewChild('editDepartments') private editDepartments: EditDepartmentsComponent;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;

@@ -31,6 +31,7 @@ import { OrderManagementPagerState } from '@shared/models/candidate.model';
 import { Location } from "@angular/common";
 
 import { GlobalWindow } from "@core/tokens";
+import { AppState } from 'src/app/store/app.state';
 @Component({
   selector: 'app-add-edit-candidate',
   templateUrl: './add-edit-candidate.component.html',
@@ -42,6 +43,9 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
 
   @Select(UserState.userPermission)
   public readonly userPermissions$: Observable<Permission>;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public readonly tabsConfig = tabsConfig;
   public readonly userPermissions = UserPermissions;

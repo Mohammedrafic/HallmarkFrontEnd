@@ -12,7 +12,10 @@ export abstract class AbstractContactDetails extends DestroyableDirective implem
   public readonly fieldsSettings: FieldSettingsModel = { text: 'name', value: 'id' };
   public readonly skillOptionFields: FieldSettingsModel = { text: 'name', value: 'masterSkillId' };
 
-  protected constructor(protected cdr: ChangeDetectorRef, protected candidateProfileFormService: CandidateProfileFormService) {
+  protected constructor(
+    protected cdr: ChangeDetectorRef,
+    protected candidateProfileFormService: CandidateProfileFormService,
+  ) {
     super();
   }
 
