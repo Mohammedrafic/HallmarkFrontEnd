@@ -125,7 +125,7 @@ export const CandidateAgencyExportColumns : CandidateExportColumn[] = [
 { text: 'Candidate Rate', column: 'BillRate' },
 { text: 'Position ID', column: 'PositionId' },
 { text: 'Assignment', column: 'Assignment' },
-{ text: 'Agency Name', column: 'Agencyname' },
+{ text: 'Organization Name', column: 'Organizationname' },
 { text: 'Skill', column: 'Skill' },
 ];
 
@@ -142,7 +142,7 @@ export const CandidateOrgExportColumns : CandidateExportColumn[] = [
 { text: 'Candidate Rate', column: 'BillRate' },
 { text: 'Position ID', column: 'PositionId' },
 { text: 'Assignment', column: 'Assignment' },
-{ text: 'Organization Name', column: 'Organizationname' },
+{ text: 'Agency Name', column: 'Agencyname' },
 { text: 'Skill', column: 'Skill' },
 ];
 
