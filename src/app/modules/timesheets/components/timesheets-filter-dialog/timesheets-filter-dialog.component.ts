@@ -127,7 +127,7 @@ export class TimesheetsFilterDialogComponent
   }
 
   private applyPreservedFilters(filters: TimesheetsFilterState): void {
-    if (filters?.orderIds) {
+    if (filters?.orderIds && Array.isArray(filters.orderIds)) {
       filters.orderIds = filters.orderIds[0];
     }
     this.patchFilterForm({ ...filters });
