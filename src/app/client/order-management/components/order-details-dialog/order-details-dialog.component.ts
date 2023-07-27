@@ -240,8 +240,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get mobileMenu(): { text: string }[] {
     let menu: { text: string }[] = this.tabletMenu;
-    if (!this.disableEdit) {
-      menu = [...menu, { text: MobileMenuItems.Edit }];
+    if (!this.disableEdit  &&  this.activeSystem === this.systemType.IRP) {
+      menu = [...menu, { text: MobileMenuItems.Edit }, { text: MobileMenuItems.CloseOrder}];
     }
     return menu;
   }

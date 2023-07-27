@@ -172,7 +172,7 @@
                 <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
               </button>
             </app-tooltip-container>
-            <app-tooltip-container *ngIf="mobileMenu.length" [showToolTip]="!hasCreateEditOrderPermission">
+            <app-tooltip-container *ngIf="mobileMenu.length && activeSystem ===  systemType.VMS" [showToolTip]="!hasCreateEditOrderPermission">
               <button
                 ejs-dropdownbutton
                 [items]="mobileMenu"
@@ -184,7 +184,18 @@
                 <i-feather name="more-vertical" class="icon"></i-feather>
               </button>
             </app-tooltip-container>
-
+            <app-tooltip-container *ngIf="mobileMenu.length && activeSystem ===  systemType.IRP" [showToolTip]="!CanOrganizationEditOrdersIRP">
+              <button
+                ejs-dropdownbutton
+                [items]="mobileMenu"
+                [disabled]="!canCreateOrderIRP || !CanOrganizationEditOrdersIRP"
+                (select)="onMobileMenuSelect($event)"
+                iconCss="e-icons"
+                cssClass="e-caret-hide primary-icon-button menu-mobile sdfsdf"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
