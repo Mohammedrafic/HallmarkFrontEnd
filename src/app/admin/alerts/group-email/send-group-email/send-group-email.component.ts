@@ -664,7 +664,7 @@ export class SendGroupEmailComponent
           this.userData = [];
           this.roleData = [];
           if(this.isOrgUser){
-            let businessUnitIds = value.join();          
+            let businessUnitIds = value;          
             if (businessUnitIds != undefined && businessUnitIds.length > 0) {
               this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
               this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
