@@ -165,3 +165,24 @@ body.dark {
     }
   }
 }
+
+@media (max-width: 400px) {
+  body.light,
+  body.dark {
+    .open-per-diem-order {
+      &.e-tab {
+        .e-tab-header {
+          display: flex;
+          justify-content: center;
+          padding-left: 6px;
+
+          .e-toolbar-item {
+            margin: 5px 5px 3px 0 !important;
+
+            .e-badge { margin-left: 6px; }
+          }
+        }
+      }
+    }
+  }
+}
