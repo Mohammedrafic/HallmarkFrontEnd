@@ -1,185 +1,176 @@
 <h2 class="title">General Info</h2>
 <form class="general-info__form">
-  <div class="row">
-    <div class='two-controls'>
-      <app-input
-        [formGroupInstance]="candidateForm"
-        maxlength="25"
-        [required]="employeeIdRequired"
-        controlName="employeeId"
-        id="employeeId"
-        label="Employee ID"
-      ></app-input>
-
-      <app-input
-        [formGroupInstance]="candidateForm"
-        [required]="true"
-        maxlength="50"
-        controlName="firstName"
-        id="first-name"
-        label="First Name"
-      ></app-input>
-    </div>
-
+  <div class="two-controls">
     <app-input
       [formGroupInstance]="candidateForm"
-      maxlength="10"
-      controlName="middleName"
-      id="middle-name"
-      label="Middle Name"
+      [required]="employeeIdRequired"
+      maxlength="25"
+      controlName="employeeId"
+      id="employeeId"
+      label="Employee ID"
     ></app-input>
 
     <app-input
       [formGroupInstance]="candidateForm"
       [required]="true"
       maxlength="50"
-      controlName="lastName"
-      id="last-name"
-      label="Last Name"
+      controlName="firstName"
+      id="first-name"
+      label="First Name"
     ></app-input>
-
-    <app-datepicker
-      [formGroupInstance]="candidateForm"
-      [max]="today"
-      id="dob"
-      controlName="dob"
-      label="DOB"
-    ></app-datepicker>
-  </div>
-  <div class="row">
-    <app-dropdown
-      [dataSource]="primarySkillsDataSource"
-      [fields]="fieldsSettings"
-      [formGroupInstance]="candidateForm"
-      [hideBorder]="false"
-      [required]="true"
-      label="Primary Skill"
-      id="primary-skill"
-      controlName="primarySkillId"
-    ></app-dropdown>
-
-    <app-multiselect-dropdown
-      [dataSource]="secondarySkillsDataSource"
-      [formGroupInstance]="candidateForm"
-      [fields]="skillOptionFields"
-      controlName="secondarySkills"
-      id="secondary-skill"
-      label="Secondary Skill"
-    ></app-multiselect-dropdown>
-
-    <app-dropdown
-      [dataSource]="classifications"
-      [fields]="fieldsSettings"
-      [formGroupInstance]="candidateForm"
-      [hideBorder]="false"
-      label="Classification"
-      id="classification"
-      controlName="classification"
-    ></app-dropdown>
-
-    <app-datepicker
-      [formGroupInstance]="candidateForm"
-      [required]="true"
-      id="hire-date"
-      controlName="hireDate"
-      label="Hire Date"
-    ></app-datepicker>
   </div>
 
-  <div class="row">
-    <app-numeric-textbox
-      [formGroupInstance]="candidateForm"
-      [required]="true"
-      [strictMode]="true"
-      [decimals]="1"
-      format="#.#"
-      id="fte"
-      label="FTE"
-      controlName="fte"
-    >
-    </app-numeric-textbox>
+  <app-input
+    [formGroupInstance]="candidateForm"
+    maxlength="10"
+    controlName="middleName"
+    id="middle-name"
+    label="Middle Name"
+  ></app-input>
 
-    <app-dropdown
-      [dataSource]="profileStatuses"
-      [fields]="fieldsSettings"
-      [formGroupInstance]="candidateForm"
-      [hideBorder]="false"
-      label="Profile Status"
-      id="profile-status"
-      controlName="profileStatus"
-    ></app-dropdown>
+  <app-input
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    maxlength="50"
+    controlName="lastName"
+    id="last-name"
+    label="Last Name"
+  ></app-input>
 
-    <app-datepicker
-      *ngIf="isOnHoldSelected"
-      [formGroupInstance]="candidateForm"
-      [required]="true"
-      id="hold-start-date"
-      controlName="holdStartDate"
-      label="On Hold Start Date"
-    ></app-datepicker>
+  <app-datepicker
+    [formGroupInstance]="candidateForm"
+    [max]="today"
+    id="dob"
+    controlName="dob"
+    label="DOB"
+  ></app-datepicker>
 
-    <app-datepicker
-      *ngIf="isOnHoldSelected"
-      [formGroupInstance]="candidateForm"
-      id="hold-end-date"
-      controlName="holdEndDate"
-      label="On Hold End Date"
-    ></app-datepicker>
+  <app-dropdown
+    [dataSource]="primarySkillsDataSource"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    [required]="true"
+    label="Primary Skill"
+    id="primary-skill"
+    controlName="primarySkillId"
+  ></app-dropdown>
 
-    <app-datepicker
-      *ngIf="isTerminatedSelected"
-      [formGroupInstance]="candidateForm"
-      [required]="true"
-      id="termination-date"
-      controlName="terminationDate"
-      label="Termination Date"
-    ></app-datepicker>
+  <app-multiselect-dropdown
+    [dataSource]="secondarySkillsDataSource"
+    [formGroupInstance]="candidateForm"
+    [fields]="skillOptionFields"
+    controlName="secondarySkills"
+    id="secondary-skill"
+    label="Secondary Skill"
+  ></app-multiselect-dropdown>
 
-    <app-dropdown
-      *ngIf="isTerminatedSelected"
-      [dataSource]="(reasons$ | async)?.items"
-      [fields]="fieldsSettingsTeminated"
-      [formGroupInstance]="candidateForm"
-      [hideBorder]="false"
-      [required]="true"
-      label="Termination Reason"
-      id="terminationReason"
-      controlName="terminationReasonId"
-    ></app-dropdown>
+  <app-dropdown
+    [dataSource]="classifications"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="Classification"
+    id="classification"
+    controlName="classification"
+  ></app-dropdown>
 
-  </div>
-  <div class="row">
-    <app-input
+  <app-datepicker
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    id="hire-date"
+    controlName="hireDate"
+    label="Hire Date"
+  ></app-datepicker>
+
+  <app-numeric-textbox
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    [strictMode]="true"
+    [decimals]="1"
+    format="#.#"
+    id="fte"
+    label="FTE"
+    controlName="fte"
+  ></app-numeric-textbox>
+
+  <app-dropdown
+    [dataSource]="profileStatuses"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="Profile Status"
+    id="profile-status"
+    controlName="profileStatus"
+  ></app-dropdown>
+
+  <app-datepicker
+    *ngIf="isOnHoldSelected"
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    id="hold-start-date"
+    controlName="holdStartDate"
+    label="On Hold Start Date"
+  ></app-datepicker>
+
+  <app-datepicker
+    *ngIf="isOnHoldSelected"
+    [formGroupInstance]="candidateForm"
+    id="hold-end-date"
+    controlName="holdEndDate"
+    label="On Hold End Date"
+  ></app-datepicker>
+
+  <app-datepicker
+    *ngIf="isTerminatedSelected"
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    id="termination-date"
+    controlName="terminationDate"
+    label="Termination Date"
+  ></app-datepicker>
+
+  <app-dropdown
+    *ngIf="isTerminatedSelected"
+    [dataSource]="(reasons$ | async)?.items"
+    [fields]="fieldsSettingsTeminated"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    [required]="true"
+    label="Termination Reason"
+    id="terminationReason"
+    controlName="terminationReasonId"
+  ></app-dropdown>
+
+  <app-input
     *ngIf="isSourceValidated"
-      [formGroupInstance]="candidateForm"
-      maxlength="50"
-      controlName="employeeSourceId"
-      id="sourceId"
-      label="Source ID"
-      [required]="isSourceConfig"
-    ></app-input>
+    [formGroupInstance]="candidateForm"
+    maxlength="50"
+    controlName="employeeSourceId"
+    id="sourceId"
+    label="Source ID"
+    [required]="isSourceConfig"
+  ></app-input>
 
-    <app-dropdown
+  <app-dropdown
     *ngIf="isSourceValidated"
-      [dataSource]="recruitContent"
-      [fields]="fieldsSettings"
-      [formGroupInstance]="candidateForm"
-      [hideBorder]="false"
-      label="Recruiter"
-      id="recruit-id"
-      controlName="recruiterId"
-    ></app-dropdown>
+    [dataSource]="recruitContent"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="Recruiter"
+    id="recruit-id"
+    controlName="recruiterId"
+  ></app-dropdown>
 
-    <app-dropdown
+  <app-dropdown
     *ngIf="isSourceValidated"
-      [dataSource]="sourceContent"
-      [fields]="fieldsSettings"
-      [formGroupInstance]="candidateForm"
-      [hideBorder]="false"
-      label="Sources"
-      id="source-id"
-      controlName="sourceId"
-    ></app-dropdown>
-  </div>
-
+    [dataSource]="sourceContent"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="Sources"
+    id="source-id"
+    controlName="sourceId"
+  ></app-dropdown>
 </form>

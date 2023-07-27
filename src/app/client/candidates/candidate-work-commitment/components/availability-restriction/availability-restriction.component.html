@@ -8,6 +8,7 @@
   [currentPage]="pagingData.pageNumber"
   [customRowsPerPageDropDownObject]="customRowsPerPageDropDownObject"
   [disableRowsPerPageDropdown]="true"
+  [showUpScrollButton]="false"
   (navigateToPageEmitter)="handleChangePage($event)">
 
   <button 
@@ -18,7 +19,7 @@
     [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
   >
     <i-feather name="plus" class="icon"></i-feather>
-    Add Restriction
+    <span class="btn-label">Add Restriction</span>
   </button>
 </app-grid>
 

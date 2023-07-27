@@ -157,3 +157,21 @@ app-grid {
     color: $secondary-dark-blue-30 !important;
   }
 }
+
+@media #{$max-mobile} {
+  .app-grid {
+    .app-grid__header {
+      .action-button {
+        .btn-label {
+          display: none;
+        }
+
+        .e-action-button {
+          .icon {
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+}

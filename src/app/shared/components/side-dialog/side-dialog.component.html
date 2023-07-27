@@ -1,7 +1,7 @@
 <ejs-dialog
   id="dialog"
   #sideDialog
-  cssClass="dialog"
+  cssClass="dialog responsive"
   [width]="width"
   [target]="targetElement"
   [visible]="false"
@@ -15,23 +15,34 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title">{{header}}</h3>
           </div>
-          <div  class="e-card-content">
-            <button
-              ejs-button
-              cssClass="e-outline button-cancel"
-              id="cancelFormButton"
-              (click)="onFormCancelClick()">Cancel</button>
-            <button
-              ejs-button
-              id="addFormButton"
-              type="submit"
-              [isPrimary]="true"
-              [disabled]="disableSaveButton"
-              (click)="onFormSaveClick()">{{ saveButtonLabel }}</button>
-          </div>
+          <ng-container *ngIf="!(isMobile$ | async)" [ngTemplateOutlet]="actionButtons"></ng-container>
         </div>
       </section>
       <ng-content></ng-content>
     </section>
   </ng-template>
+  <ng-template #footerTemplate>
+    <ng-container *ngIf="(isMobile$ | async)" [ngTemplateOutlet]="actionButtons"></ng-container>
+  </ng-template>
 </ejs-dialog>
+
+
+<ng-template #actionButtons>
+  <div class="e-card-content">
+    <button
+      ejs-button
+      cssClass="e-outline button-cancel action-btn"
+      id="cancelFormButton"
+      (click)="onFormCancelClick()"
+    >Cancel</button>
+    <button
+      ejs-button
+      id="addFormButton"
+      type="submit"
+      cssClass="action-btn"
+      [isPrimary]="true"
+      [disabled]="disableSaveButton"
+      (click)="onFormSaveClick()"
+    >{{ saveButtonLabel }}</button>
+  </div>
+</ng-template>

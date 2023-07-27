@@ -1,6 +1,9 @@
 <ejs-tab
   #tabComponent
   class="stepper"
+  heightAdjustMode="Auto"
+  overflowMode="Scrollable"
+  cssClass="tabs"
   (selected)="selectEmitter.emit($event)"
   (created)="onCreated($event)"
   (selecting)="onSelecting($event)"
