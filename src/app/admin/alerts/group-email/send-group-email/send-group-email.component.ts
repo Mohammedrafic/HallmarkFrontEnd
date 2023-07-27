@@ -23,7 +23,7 @@ import {
   GetGroupEmailWorkCommitments
 } from './../../../store/alerts.actions';
 import { DownloadDocumentDetail, GroupEmailRole } from '@shared/models/group-email.model';
-import { takeUntil } from 'rxjs';
+import { distinctUntilChanged, takeUntil } from 'rxjs';
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import {
@@ -368,6 +368,7 @@ export class SendGroupEmailComponent
 
   
   initLoadItems() {
+    this.populateUserType();
     this.onBusinessUnitValueChanged();
     this.onBusinessValueChanged();
     this.onBusinessesValueChanged();
@@ -380,10 +381,12 @@ export class SendGroupEmailComponent
     this.onSkillsValueChanged();
     this.onCandidateValueChanged();
     this.onCandidateStatusValueChanged();
+    this.onAgenciesValueChanged();
     this.onOrderTypeValueChanged();
     this.onWorkCommitmentValueChanged();
     this.onOrientationValueChanged();
     const user = this.store.selectSnapshot(UserState.user);
+    this.store.dispatch(new GetOrganizationsStructureAll(user?.id!));
     this.userBusinessUnitType = user?.businessUnitType;
     if (user?.businessUnitType === BusinessUnitType.MSP ||
       user?.businessUnitType === BusinessUnitType.Hallmark) {
@@ -433,23 +436,49 @@ export class SendGroupEmailComponent
       }
     });
 
-    this.populateUserType();
 
-    this.store.dispatch(new GetOrganizationsStructureAll(user?.id!));
-    if(this.isBusinessFormDisabled) {
+    
+    //if(this.isBusinessFormDisabled) {
       this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         this.organizations = [];
         if (data != null && data.length > 0) {
           this.organizations = uniqBy(data, 'organizationId');
+          if(user?.businessUnitId){
+            this.regionAndLocationDataset(user?.businessUnitId);
+          }
         }
       });
-    }
+    //}
   }
 
   CheckBusinessIRPEnabled(businessId:number): void{
     let currentBusinessData = this.businessData?.filter(i=>i.id == businessId)[0];
     this.isCurrentBusinessHasIRPEnabled = currentBusinessData?.isIRPEnabled;
     this.isCurrentBusinessHasVMSEnabled = currentBusinessData?.isVMSEnabled;
+  }
+
+  regionAndLocationDataset(value:number){
+    let orgList = this.organizations?.filter((x) => value == x.organizationId);
+    this.regionsList = [];
+    this.locationsData = [];
+    orgList.forEach((value) => {
+      this.regionsList.push(...value.regions);
+      value.regions.forEach((region) => {
+        this.locationsData.push(...region.locations);
+      });
+      this.departmentsList = this.locationsData
+          .map((obj) => {
+            return obj.departments.filter((department) => department.locationId === obj.id);
+          })
+          .reduce((a, b) => a.concat(b), []);
+    });
+
+    this.regionsList = sortByField(this.regionsList, 'name');
+    this.locationsData = sortByField(this.locationsData, 'name');
+    this.departmentsList = sortByField(this.departmentsList, 'name');
+
+    this.locationsData = this.locationsData;
+    this.departmentsData = this.departmentsList;
   }
 
   populateUserType(): void{
@@ -535,7 +564,7 @@ export class SendGroupEmailComponent
     }
   }
   private onBusinessUnitValueChanged(): void {
-    this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+    this.businessUnitControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       this.onFormvalidation([]);
       this.isBusinessUnitTypeAgency = false;
       this.validationCheckForBusiness();
@@ -607,13 +636,6 @@ export class SendGroupEmailComponent
               }
             });
           }
-          this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-            this.organizations = [];
-            if (data != null && data.length > 0) {
-              this.organizations = uniqBy(data, 'organizationId');
-            }
-          });
-          //this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {});
         }
       }
       if(this.isSend == false){
@@ -658,9 +680,10 @@ export class SendGroupEmailComponent
     });
   }
   private onBusinessesValueChanged(): void {
-    this.businessesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+    this.businessesControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       if(this.isSend == true){
         this.clearFields();
+        this.userTypeControl.patchValue(null);
         if(this.isAgencyCandidatesType)
           this.getCandidates();
         else {
@@ -690,37 +713,17 @@ export class SendGroupEmailComponent
   }
 
   private onBusinessValueChanged(): void {
-    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+    this.businessControl.valueChanges.pipe(distinctUntilChanged(),takeWhile(() => this.isAlive)).subscribe((value) => {
       if (this.isSend == true) {
         this.clearFields();
+        this.userTypeControl.patchValue(null);
         this.userData = [];
         this.ResetForm();
         let businessUnitIds = [];
         if (value != 0 && value != null) {
           businessUnitIds.push(this.businessControl.value);
-        }
-        let orgList = this.organizations?.filter((x) => value == x.organizationId);
-        this.regionsList = [];
-        this.locationsData = [];
-        orgList.forEach((value) => {
-          this.regionsList.push(...value.regions);
-          value.regions.forEach((region) => {
-            this.locationsData.push(...region.locations);
-          });
-          this.departmentsList = this.locationsData
-              .map((obj) => {
-                return obj.departments.filter((department) => department.locationId === obj.id);
-              })
-              .reduce((a, b) => a.concat(b), []);
-        });
-
-        this.regionsList = sortByField(this.regionsList, 'name');
-        this.locationsData = sortByField(this.locationsData, 'name');
-        this.departmentsList = sortByField(this.departmentsList, 'name');
-
-        this.locationsData = this.locationsData;
-        this.departmentsData = this.departmentsList;
-
+          this.regionAndLocationDataset(value);
+        }    
         if(value > 0 && this.businessUnitControl.value == 3){
           this.CheckBusinessIRPEnabled(value);
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == false);
@@ -785,7 +788,7 @@ export class SendGroupEmailComponent
       }
       this.locationControl.patchValue([]);
       this.departmentControl.patchValue([]);
-      this.skillsControl.patchValue([]);
+      // this.skillsControl.patchValue([]);
     });
   }
 
@@ -860,14 +863,11 @@ export class SendGroupEmailComponent
   }
 
   private onRolesValueChanged(): void {
-    this.rolesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      /*if(!value || value==null ||!value.length){
-        this.usersControl.reset()
-      }
-      this.getUsersByRole();
-      */
+    this.rolesControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.groupEmailTemplateForm.controls['emailTo'].setValue('');
+      this.usersControl.reset();
+      this.userData = [];
       if(value && value.length >0){
-        this.usersControl.reset()
         this.getUsersByRole();
       }
 
@@ -877,22 +877,20 @@ export class SendGroupEmailComponent
   private getUsersByRole(): void{
     this.userData = [];
     var regionId = this.regionControl.value ? this.regionControl.value.join() : '';
-
     var locationId = this.locationControl.value ? this.locationControl.value.join() : '';
-
     var roles = this.rolesControl.value ? this.rolesControl.value.join() : '';
-
-    //var regionId = this.regionControl.value.join();
-    //var locationId = this.locationControl.value.join();
-    //var roles = this.rolesControl.value.join();
     var businessUnitId = this.businessControl.value;
+
     if(regionId !='' && locationId !='' && roles !=''){
       this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles, businessUnitId, false));
       this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         this.userData = data;
       });
     }else if (this.rolesControl.value.length > 0) {
-        // this.dispatchUserPage(this.businessesControl.value);
+        const user = this.store.selectSnapshot(UserState.user);
+        if (user?.businessUnitType != BusinessUnitType.MSP &&   user?.businessUnitType != BusinessUnitType.Hallmark) {
+          this.dispatchUserPage(this.businessesControl.value);
+        }
         this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           if (data != undefined) {
             this.userData = data.items.filter(i => i.isDeleted == false);
@@ -903,7 +901,7 @@ export class SendGroupEmailComponent
   }
 
   private onUserTypeValueChanged(): void {
-    this.userTypeControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+    this.userTypeControl.valueChanges.pipe(distinctUntilChanged(),takeWhile(() => this.isAlive)).subscribe((value) => {
       if(this.isSend == true){
         this.isAgencyCandidatesType = false;
         this.isAgencyUserType = false;
@@ -960,6 +958,7 @@ export class SendGroupEmailComponent
             });
           }
           if (value == 4) {
+            this.onFormvalidation(['candidate']);
             this.isEmployeeType = true;
             this.userData = [];
             this.loadSkillsAndWorkCommitments(businessId);
@@ -1060,6 +1059,13 @@ export class SendGroupEmailComponent
 
   onJobIdStatusValueChanged(): void {
     this.getCandidates();
+  }
+
+  private onAgenciesValueChanged(): void {
+    this.agenciesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if (value != undefined && value.length > 0)
+        this.getCandidates();
+    });
   }
 
   private getCandidates(): void {
