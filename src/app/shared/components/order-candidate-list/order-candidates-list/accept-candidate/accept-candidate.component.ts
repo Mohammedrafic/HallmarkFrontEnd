@@ -441,19 +441,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
             this.candidateAddressRequiredValue = addressConfiguration.value;
           }
         }
-
-        let jobStartDate: string;
-        let jobEndDate: string;
-        const statusesForActualDates = [ApplicantStatusEnum.OnBoarded, ApplicantStatusEnum.Cancelled,
-          ApplicantStatusEnum.Offboard];
-
-        if (this.isAgency && statusesForActualDates.includes(value.applicantStatus.applicantStatus)) {
-          jobStartDate = value.actualStartDate || '';
-          jobEndDate = value.actualEndDate || '';
-        } else {
-          jobStartDate = value.order.jobStartDate as unknown as string || '';
-          jobEndDate = value.order.jobEndDate as unknown as string || '';
-        }
+        
+        const jobStartDate = value.actualStartDate || value.order.jobStartDate as unknown as string;
+        const jobEndDate = value.actualEndDate || value.order.jobEndDate as unknown as string;
 
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
