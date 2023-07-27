@@ -49,9 +49,6 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
       if(routerState?.['status'] == "In Progress"){
         this.orderStatus.push("InProgress");
       }
-      if(routerState?.['xtraStatus'] != undefined){
-        this.orderStatus.push(routerState?.['xtraStatus'])
-      }
       if(routerState?.['candidateStatusId'] != undefined){
         this.candidateStatuses.push(routerState?.['candidateStatusId']);
         this.store.dispatch(new SetOrdersTab(AgencyOrderManagementTabs.AllAgencies));
