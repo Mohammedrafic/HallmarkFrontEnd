@@ -70,6 +70,7 @@ import { StaffAvailabilityComponent } from './staff-availability/staff-availabil
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
+import { UserActivityComponent } from './user-activity/user-activity.component';
 
 
 @NgModule({
@@ -126,7 +127,8 @@ import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.compo
     StaffAvailabilityComponent,
     PositionSummaryComponent,
     AgencySpendComponent,
-    ShiftBreakdownComponent],
+    ShiftBreakdownComponent,
+    UserActivityComponent],
   exports: [
     CandidateListComponent
   ],
