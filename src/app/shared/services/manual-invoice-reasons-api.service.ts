@@ -26,7 +26,7 @@ export class ManualInvoiceReasonsApiService {
    * Save reason
    * @param body
    */
-  public postManualInvoiceReason(body: { reason: string }): Observable<ManualInvoiceReason> {
+  public postManualInvoiceReason(body: { reason: string, agencyFeeApplicable: boolean }): Observable<ManualInvoiceReason> {
     return this.http.post<ManualInvoiceReason>('/api/ManualInvoiceReasons', body);
   }
 

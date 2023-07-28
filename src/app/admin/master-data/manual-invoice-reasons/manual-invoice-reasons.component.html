@@ -43,7 +43,7 @@
         </ng-template>
       </e-column>
       <e-column field="reason" headerText="Reason" textAlign="Left" width="100%"></e-column>
-      <e-column headerText="Agency Fee Applicable" textAlign="Left" width="100%">
+      <e-column headerText="Vendor Fee Applicable" textAlign="Left" width="100%">
         <ng-template #template let-data>
           <div class="input-container bootstrap">
             <ejs-switch [checked]="data.agencyFeeApplicable"
@@ -119,7 +119,19 @@
                appValidateWithMessage
                placeholder="Reason"
                maxlength="100"
-               formControlName="reason"/>
+               formControlName="reason" />
+      </div>
+    </div>
+    <div class="input-container bootstrap">
+      <label>Vendor Fee Applicable<span class="required">*</span></label>
+      <div class="input-container long flexed">
+        <ejs-switch [checked]="agencyFeeApplicableSwitch" 
+                    [disabled]="canUpdateAgencyFeeApplicable"
+                    class="toggle"
+                    onLabel="Yes"
+                    offLabel="No"
+                    formControlName="agencyFeeApplicable">
+        </ejs-switch>
       </div>
     </div>
   </form>
