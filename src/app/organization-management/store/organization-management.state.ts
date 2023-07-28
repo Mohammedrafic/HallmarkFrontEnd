@@ -1285,9 +1285,9 @@ export class OrganizationManagementState {
       }),
       catchError((error: HttpErrorResponse) => {
         patchState({ organizationSettings: [] });
-        var errmsg=error.error.detail;
-        if(errmsg.indexOf("permissions") > 0){
-          var re = /permissions/;
+         let errmsg=error.error.detail;
+         if(errmsg.indexOf('permissions') > 0){
+          let re = /permissions/;
           errmsg=errmsg.replace(re,'permissions ');
         }
         return dispatch(new ShowToast(MessageTypes.Error, errmsg));
