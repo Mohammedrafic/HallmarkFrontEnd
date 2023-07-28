@@ -75,6 +75,7 @@ export class DocumentLibraryDto {
   locationId: string | null;
   locationName: string | null;
   isSharedWithMe: boolean;
+  isSharedByMe: boolean;
   documentVisibilities: any | null;
 }
 
