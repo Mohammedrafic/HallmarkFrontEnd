@@ -248,6 +248,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         reason: reason.reason,
         });
     } else if ((this.selectedTab === ReasonsNavigationTabs.ManualInvoice)) {
+      this.canUpdateAgencyFeeApplicable = !this.userPermission[this.userPermissions.CanUpdateAgencyFeeApplicable] ? true : false;
       const reason = data as RejectReason;
       this.reasonForm.patchValue({
         id: reason.id,

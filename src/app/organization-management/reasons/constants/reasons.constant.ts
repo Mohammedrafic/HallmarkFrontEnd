@@ -170,7 +170,7 @@ export const ManualInvoiceDialogConfig: ReasonFormConfig[]  = [
   },
   {
     field: 'agencyFeeApplicable',
-    title: 'Agency Fee Applicable',
+    title: 'Vendor Fee Applicable',
     required: true,
     fieldType: FieldType.Toggle,
   },
