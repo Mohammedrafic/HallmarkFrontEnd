@@ -54,14 +54,14 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
         this.store.dispatch(new SetOrdersTab(AgencyOrderManagementTabs.AllAgencies));
         this.selectedTab = AgencyOrderManagementTabs.AllAgencies;
         let orderStatus:string[] = [];
-        const candidatesOrderStatusList = JSON.parse(this.globalWindow.localStorage.getItem('candidatesOrderStatusListFromDashboard') || '{}');
-        if(candidatesOrderStatusList != '{}'){
-          candidatesOrderStatusList.forEach((data:any)=>{
-            data.name = data.name.replace(/\s*\([^)]*\)\s*|\s+/g, '');
+        const candidatesOrderStatusList = this.globalWindow.localStorage.getItem('candidatesOrderStatusListFromDashboard');
+        if(candidatesOrderStatusList){
+          JSON.parse(candidatesOrderStatusList).forEach((data:any)=>{
+            data.name = data.name.replace(/\s/g, '');
             orderStatus.push(data.name);
           })
           this.orderStatus = orderStatus;
-          this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(''));
+          this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard','');
         }
       }
     }

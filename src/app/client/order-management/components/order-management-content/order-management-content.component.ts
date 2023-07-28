@@ -2214,15 +2214,15 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     this.orderStaus > 0 ? this.numberArr.push(this.orderStaus) : [];
 
-    const candidatesOrderStatusList = JSON.parse(this.globalWindow.localStorage.getItem('candidatesOrderStatusListFromDashboard') || '{}');
-    if(candidatesOrderStatusList != '{}'){
+    const candidatesOrderStatusList = this.globalWindow.localStorage.getItem('candidatesOrderStatusListFromDashboard');
+    if(candidatesOrderStatusList){
       this.numberArr = [];
-      candidatesOrderStatusList.forEach((data:any)=>{
+      JSON.parse(candidatesOrderStatusList).forEach((data:any)=>{
         this.numberArr.push(data.value);
-        data.name = data.name.replace(/\s*\([^)]*\)\s*|\s+/g, '')
+        data.name = data.name.replace(/\s/g, '');
         this.SelectedStatus.push(data.name)
       })
-      this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(''));
+      this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', '');
     }
 
     filters.orderStatuses = this.numberArr;
