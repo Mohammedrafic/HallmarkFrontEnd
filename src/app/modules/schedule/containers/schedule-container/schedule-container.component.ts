@@ -395,7 +395,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
           return 0;
         }
       });
-      const state = { redirectFromSchedule: true, data : data, dateRange : this.DateRange, scheduleFilters : this.scheduleFilters, activePeriod : this.activeTimePeriod};
+      const state = { redirectFromSchedule: true, data : data, dateRange : this.DateRange, scheduleFilters : this.chipsData, activePeriod : this.activeTimePeriod, startDate : this.scheduleFilters.startDate};
       this.globalWindow.localStorage.setItem('Schedule_Export',JSON.stringify(state));
       window.open(window.location.origin + '/schedule-export', '_blank');
     }) ;

@@ -24,13 +24,18 @@ export class BaseExportComponent implements OnInit {
   .createRangeOptions(DateTimeHelper.getDatesBetween());
   orgFirstDayOfWeek: number;
   monthRangeDays: WeekDays[] = [];
-  scheduleFilters: ScheduleInt.ScheduleFilters;
+  public scheduleFilters;
   employeesTitle = 'Employee';
   public dateList: DatesByWeekday[][];
   scheduleSlotsWithDate: string[];
   @ViewChild('scrollArea', { static: true }) scrollArea: ElementRef;
   activePeriod = DatesRangeType.TwoWeeks;
   monthPeriod = DatesRangeType.Month;
+  regions: string[] = [];
+  locations: string[] = [];
+  departments: string[] = [];
+  public orgName:string = 'Hallmark Healthcare';
+  startDate: Date;
 
   constructor(
               private store: Store,
@@ -44,6 +49,7 @@ export class BaseExportComponent implements OnInit {
                 this.setDateSchedule(Schedule_storage.dateRange);
                 this.scheduleFilters = Schedule_storage.scheduleFilters;
                 this.activePeriod = Schedule_storage.activePeriod;
+                this.startDate = Schedule_storage.startDate;
               }
   }
 
@@ -54,12 +60,42 @@ export class BaseExportComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkOrgPreferences();
+    this.getHeaderInfo();
   }
 
+  public getHeaderInfo():void {
+    if(this.scheduleFilters){
+      for(let i=0; i<this.scheduleFilters.length; i++){
+        if(this.scheduleFilters[i].groupTitle === 'Region'){
+          this.regions = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: any; }) => {
+            if (combinedObj !== '') {
+              combinedObj += ',';
+            }
+            return combinedObj + obj;
+          }, '');
+        }
+        if(this.scheduleFilters[i].groupTitle === 'Location'){
+          this.locations = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: any; }) => {
+            if (combinedObj !== '') {
+              combinedObj += ',';
+            }
+            return combinedObj + obj;
+          }, '');
+        }
+        if(this.scheduleFilters[i].groupTitle === 'Department'){
+          this.departments = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: any; }) => {
+            if (combinedObj !== '') {
+              combinedObj += ',';
+            }
+            return combinedObj + obj;
+          }, '');
+        }
+      }
+    }
+  }
   ngAfterViewInit(): void {
-    setTimeout(() => {
       window.print();   
-    },5000)
+      localStorage.removeItem('Schedule_Export');
   }
 
   private checkOrgPreferences(): void {
@@ -70,7 +106,17 @@ export class BaseExportComponent implements OnInit {
   }
 
   private setScheduleTable(scheduleData: ScheduleExport[]):void {
-      this.scheduleData = scheduleData.filter(schedules => schedules.employeeSchedules && schedules.employeeSchedules !== null);
+    const empSchedule = {
+      employeeId : 0,
+      schedules : [],
+      workHours : 0
+    }
+      for(let i=0; i<scheduleData.length; i++){
+        if(scheduleData[i].employeeSchedules == null){
+          scheduleData[i].employeeSchedules = empSchedule;
+        }
+      }
+      this.scheduleData = scheduleData;
       this.employeesTitle = scheduleData?.length && scheduleData.length > 1 ? 'Employees' : 'Employee';
   
       if(scheduleData) {

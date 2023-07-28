@@ -11,32 +11,38 @@
     <div class="row pt-3 pb-2 border-top border-bottom border-secondary-subtle border-3">
       <div class="col-auto">
         <div class="pe-4">
-          <p class="mb-1 text-bold">Hallmark Healthcare</p>
+          <p class="mb-1 text-bold">{{orgName}}</p>
           <p class="text-muted">Organization Name</p>
         </div>
       </div>
-      <div class="col-auto">
+      <div class="col-2">
         <div class="pe-4">
-          <p class="mb-1 text-bold">Boston</p>
+          <p class="mb-1 text-bold">
+            <span class="headerdata">{{regions}}</span>
+          </p>
           <p class="text-muted">Region</p>
         </div>
       </div>
-      <div class="col-auto">
+      <div class="col-2">
         <div class="pe-4">
-          <p class="mb-1 text-bold">Beth Israel Clinic</p>
+          <p class="mb-1 text-bold">
+            <span class="headerdata">{{locations}}</span>
+          </p>
           <p class="text-muted">Location</p>
         </div>
       </div>
-      <div class="col-auto">
+      <div class="col-2">
         <div class="pe-4">
-          <p class="mb-1 text-bold">Cardiologist</p>
+          <p class="mb-1 text-bold">
+            <span class="headerdata">{{departments}}</span>
+          </p>
           <p class="text-muted">Department</p>
         </div>
       </div>
   
-      <div class="col-auto">
+      <div class="col-2">
         <div class="pe-4">
-          <p class="mb-1 text-bold">04/01/2023</p>
+          <p class="mb-1 text-bold">{{startDate | date: 'MM/dd/yyy':'UTC'}}</p>
           <p class="text-muted">Start Date</p>
         </div>
       </div>
@@ -123,13 +129,13 @@
             <span>ID : {{scheduleItem.employeeId}}</span>
           </td>
           <td>{{scheduleItem.skill}}</td>
-          <td>{{scheduleItem.employeeSchedules.workHours}}</td>
+          <td>{{scheduleItem.employeeSchedules?.workHours}}</td>
           <td>
             <span *ngFor="let schedule_workcommit of scheduleItem.workCommitments">{{schedule_workcommit}}</span>
           </td>
             <ng-container 
               *ngFor="let dateSlot of datesRanges; trackBy: trackByDatesRange">
-              <td
+                <td
                 *ngIf="dateSlot.dateText| calendarDateSlotExport: scheduleItem.employeeSchedules.schedules as dateSchedule; else emptyCell"
                 
                 weeksEnd [date]="dateSlot.dateText"
@@ -152,7 +158,7 @@
                   </ng-container>
 
                 </div>
-              </td>
+              </td>              
 
               <ng-template #emptyCell>
                 <td weeksEnd [date]="dateSlot.dateText"
