@@ -20,9 +20,10 @@
       >
         <div class="button-export-container">Export <i-feather name="upload" class="icon"></i-feather></div>
       </button>
-      <app-tooltip-container>
+      <app-tooltip-container [showToolTip]="!userPermission[userPermissions.CanEditPayRates]">
         <button
           ejs-button [isPrimary]="true"
+          [disabled]="!userPermission[userPermissions.CanEditPayRates]"
           (click)="addPayRateSetupRecord()"
         >
           {{addPayRateBtnText}}
