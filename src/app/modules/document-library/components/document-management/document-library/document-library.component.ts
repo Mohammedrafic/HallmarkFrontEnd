@@ -922,7 +922,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     const downloadFilter: DownloadDocumentDetailFilter = {
       documentId: docItem.id,
       businessUnitType: this.filterSelecetdBusinesType,
-      businessUnitId: docItem.businessUnitId
+      businessUnitId: this.filterSelectedBusinesUnitId
     }
     this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter));
     this.documentDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
