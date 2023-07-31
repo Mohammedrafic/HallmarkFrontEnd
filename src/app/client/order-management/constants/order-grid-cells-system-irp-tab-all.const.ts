@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { formatDate } from '@angular/common';
 
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
@@ -43,13 +44,13 @@ export const GridCellsSystemIRPTabAll = (
         actionsConfig: [
           {
             action: () => {
-              // TODO open IRP Order detail
+              params.context.componentParent.openIrpDetails(params);
             },
             iconName: 'message-square',
-            buttonClass: 'default',
+            buttonClass: 'e-flat e-primary with-badge',
             useBadge: true,
             badgeValue: params.data.unreadComments,
-            disabled: true,
+            disabled: false,
           },
           (!isIncompleteTab && {
             action: () => {

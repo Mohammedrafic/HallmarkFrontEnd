@@ -280,12 +280,10 @@
             </div>
           </ng-template>
           <ng-template #template let-data>
-            <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
+            <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons defaut">
               <button
                 ejs-button
-                [disabled]="data.unreadComments <= 0"
-                [isPrimary]="data.unreadComments > 0"
-                cssClass="e-flat default-icon-button with-badge"
+                cssClass="e-flat e-primary with-badge"
               >
                 <span><i-feather name="message-square" class="icon"></i-feather></span>
                 <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{
