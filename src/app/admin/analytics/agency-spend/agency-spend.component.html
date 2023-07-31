@@ -176,6 +176,7 @@
           </div>
           <div *ngIf="endMonthControl.invalid" class="alert alert-danger">
             <div *ngIf="endMonthControl.errors?.['required']">Select End Month</div>
+            <div *ngIf="endMonthControl.errors?.['validationFailure']">Invalid end month selection</div>
           </div>
         </div>
         <div class="input-container calendar">
@@ -192,6 +193,7 @@
           </div>
           <div *ngIf="endYearControl.invalid" class="alert alert-danger">
             <div *ngIf="endYearControl.errors?.['required']">Select Start Year</div>
+            <div *ngIf="endYearControl.errors?.['validationFailure']">Invalid end year selection</div>
           </div>
         </div>
       </div>

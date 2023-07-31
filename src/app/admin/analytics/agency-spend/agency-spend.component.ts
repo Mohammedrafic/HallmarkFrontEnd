@@ -474,6 +474,7 @@ export class AgencySpendComponent implements OnInit {
   }
 
   public onFilterApply(): void {
+    this.validateMonthYear();
     this.agentSpendReportForm.markAllAsTouched();
     if (this.agentSpendReportForm?.invalid) {
       return;
@@ -533,5 +534,18 @@ export class AgencySpendComponent implements OnInit {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();  
     this.isAlive = false;  
+  }
+
+  validateMonthYear(): void {
+    const startMonth = this.startMonthControl?.value;
+    const endMonth = this.endMonthControl?.value;
+    const startYear = this.startYearControl?.value;
+    const endYear = this.endYearControl?.value;
+    if(endYear < startYear) {
+      this.endYearControl.setErrors({validationFailure:true});
+    }
+    if(endMonth < startMonth && parseInt(startYear) === parseInt(endYear)) {
+      this.endMonthControl.setErrors({validationFailure:true});     
+    }
   }
 }
