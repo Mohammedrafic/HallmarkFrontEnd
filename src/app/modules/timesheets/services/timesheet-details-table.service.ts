@@ -7,8 +7,11 @@ import { EditFieldTypes } from '@core/enums';
 import { Attachment, AttachmentsListParams } from '@shared/components/attachments';
 
 import { RecordFields } from '../enums';
-import { actionCol, amountColdef, attachmentsCol, billRateColDef, billRateTypeStatic, dayColDef,
-  editableCostCenterDef, ExpensesRecordsColDef, recordStatusCell, TimesheetRecordsColdef, totalCol } from '../constants';
+import {
+  actionCol, amountColdef, attachmentsCol, billRateColDef, billRateTypeStatic, dayColDef,
+  editableCostCenterDef, ExpensesRecordsColDef, HistoricalDataRecordsColDef, recordStatusCell,
+  TimesheetRecordsColdef, totalCol,
+} from '../constants';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { Timesheets } from '../store/actions/timesheets.actions';
 
@@ -21,6 +24,7 @@ export class TimesheetDetailsTableService {
     Record<string, ((isStatusAvaliable: boolean, organizationId?: number | null, disableActions?: boolean) => ColDef[])> {
     return {
       [RecordFields.Time]: TimesheetRecordsColdef,
+      [RecordFields.HistoricalData]: HistoricalDataRecordsColDef,
       [RecordFields.Miles]: this.milesRecordsColDef.bind(this),
       [RecordFields.Expenses]: ExpensesRecordsColDef,
     };

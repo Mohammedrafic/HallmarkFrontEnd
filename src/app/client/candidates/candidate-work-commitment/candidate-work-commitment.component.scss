@@ -1,4 +1,6 @@
 @import 'colors';
+@import 'adaptive-response';
+
 :host {
   height: calc(100vh - 340px);
 }
@@ -9,9 +11,16 @@
   row-gap: 80px;
   height: auto;
   position: relative;
+  padding-bottom: 90px;
 
   .grid {
     position: relative;
     height: 305px;
+  }
+}
+
+@media #{$max-mobile} {
+  .candidate-work-commitment-tab {
+    row-gap: 95px;
   }
 }

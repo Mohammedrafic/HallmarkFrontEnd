@@ -1,4 +1,5 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 .commitment-form {
   &>div {
@@ -27,5 +28,12 @@
     bottom: -16px;
     font-size: 12px;
     color: $supportive-red;
+  }
+}
+
+@media #{$max-mobile} {
+  .row {
+    flex-direction: column;
+    row-gap: 12px;
   }
 }

@@ -113,7 +113,7 @@
   (formCancelClicked)="closeDialog()"
   [width]="reasonsNavigationTabs.Penalties === selectedTab ? '572px' : '434px'"
 >
-  <form *ngIf="reasonsNavigationTabs.Penalties === selectedTab; else dynamicForm" [formGroup]="reasonForm" class="penalties-form">
+  <form *ngIf="reasonsNavigationTabs.Penalties === selectedTab; else (reasonsNavigationTabs.ManualInvoice === selectedTab ? manualInvoiceForm : dynamicForm)" [formGroup]="reasonForm" class="penalties-form">
     <div>
       <div class="input-container bootstrap">
         <label for="reason">Reason <span class="required">*</span></label>
@@ -289,6 +289,33 @@
     </div>
   </form>
 
+  <ng-template #manualInvoiceForm>
+    <form [formGroup]="reasonForm" class="reason-form">
+      <div class="input-container bootstrap">
+        <label for="reason">Reason <span class="required">*</span></label>
+        <div class="input-group">
+          <input class="e-input"
+                 type="text"
+                 appValidateWithMessage
+                 formControlName="reason" />
+        </div>
+      </div>
+
+      <div class="input-container bootstrap">
+        <label for="agencyFeeApplicable">Vendor Fee Applicable<span class="required">*</span></label>
+        <div class="input-container long flexed">
+          <ejs-switch [checked]="agencyFeeApplicableSwitch"                      
+                      [disabled]="canUpdateAgencyFeeApplicable"
+                      class="toggle"
+                      onLabel="Yes"
+                      offLabel="No"
+                      formControlName="agencyFeeApplicable">
+          </ejs-switch>
+        </div>
+      </div>
+    </form>
+  </ng-template>
+
   <ng-template #dynamicForm>
 
     <form [formGroup]="reasonForm" class="reason-form">
@@ -329,8 +356,8 @@
               <div class="input-group wide">
                 <ejs-switch
                   class="toggle"
-                  [formControlName]="control.field"
-                ></ejs-switch>
+                  [formControlName]="control.field">
+                </ejs-switch>
                 <label [for]="control.field">{{ control.title }}</label>
               </div>
             </div>

@@ -351,7 +351,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         });
         this.filters.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
       }
-     
+      this.filters!.organizationIds = this.filterco.filtersForm.value.organizationIds == null ? []: this.filterco.filtersForm.value.organizationIds;
+
       this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(), this.filters));
       this.filtersForm.markAsPristine();
     } else {
@@ -686,7 +687,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       candidateNames: this.filters?.candidateNames || null,
       agencyIds: this.filters?.agencyIds || [],
       orderId: this.filters?.orderId || null,
-      organizationIds:this.filters?.organizationIds ||null
+      organizationIds:this.filters?.organizationIds ||[]
     });
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
   }
@@ -700,10 +701,11 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         startDate: state?.startDate,
         endDate: state?.endDate,
         skillsIds: (state?.skillsIds && [...state.skillsIds]) || [],
+        organizationIds: (state?.organizationIds && [...state.organizationIds]) || [],
         regionsIds: (state?.regionsIds && [...state.regionsIds]) || [],
         applicantStatuses: state?.applicantStatuses || [],
         locationIds: (state?.locationIds && [...state.locationIds]) || [],
-        departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
+        departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],      
       };
 
       dispatchPatch = true;

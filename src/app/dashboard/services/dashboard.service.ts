@@ -98,6 +98,7 @@ export class DashboardService {
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
 
   candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
+  candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
 
   constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
 
@@ -156,6 +157,7 @@ export class DashboardService {
   private getCandidatesWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
     return this.httpClient.post<CandidateTypeInfoModel[]>(`${this.baseUrl}/GetCandidatesByStatuses`, { ...filter }).pipe(
       map((candidatesInfo: CandidateTypeInfoModel[]) => {
+        this.candidatesOverallStatus$.next(candidatesInfo);
         return {
           id: WidgetTypeEnum.CANDIDATES,
            title: 'Candidate Overall Status',
@@ -420,12 +422,14 @@ export class DashboardService {
       })
     );
   }
-
+  public redirectToUrlWithStatus(url: string,candidateStatusId? :string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , candidateStatusId:candidateStatusId} });
+  }
   public redirectToUrl(url: string,orderStatus? :number,status? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status} });
   }
-  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string,xtraOrderStatus? :number,xtraOrderstatustext? : string): void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus, xtraOrderStatus: xtraOrderStatus,xtraStatus: xtraOrderstatustext} });
+  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus} });
   }
   public redirectToUrlWithAgencyposition(url: string,orderStatus? :number,condition? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,condition: condition} });
@@ -545,4 +549,10 @@ export class DashboardService {
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
     return this.candidatesForActivePositions$.asObservable();
   }
+
+  public getcandidatesOverallStatus(): Observable<CandidateTypeInfoModel[]>{
+    return  this.candidatesOverallStatus$.asObservable();
+  }
+
+ 
 }

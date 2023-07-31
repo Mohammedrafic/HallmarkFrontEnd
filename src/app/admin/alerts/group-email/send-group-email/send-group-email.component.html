@@ -69,7 +69,6 @@
                                 [dataSource]="agencyData"                                
                                 [allowFiltering]="true"
                                 placeholder="Agencies"
-                                [(ngModel)]="agencies"
                                 [showDropDownIcon]="true"
                                 [selectAllText]='allOption'
                                 showSelectAll=true>
@@ -85,7 +84,6 @@
                                 [dataSource]="skillData"                                
                                 [allowFiltering]="true"
                                 placeholder="Skills"
-                                [(ngModel)]="skills"
                                 [showDropDownIcon]="true"
                                 [selectAllText]='allOption'
                                 showSelectAll=true>
@@ -101,7 +99,6 @@
                                [fields]="regionFields"
                                [dataSource]="regionsList"
                                placeholder="Region"
-                               [(ngModel)]="region"
                                [showDropDownIcon]="true"
                                [selectAllText]='allOption'
                                showSelectAll=true>
@@ -117,7 +114,6 @@
                                [fields]="regionFields"
                                [dataSource]="locationsList"
                                placeholder="Location"
-                               [(ngModel)]="location"
                                [showDropDownIcon]="true"
                                [selectAllText]='allOption'
                                showSelectAll=true>
@@ -188,12 +184,11 @@
               <ejs-multiselect mode="CheckBox"
                                formControlName="roles"
                                [placeholder]='placeholderValue'
-                               [(ngModel)]="roles"
                                [allowFiltering]="true"
                                [showDropDownIcon]="true"
                                appValidateWithMessage
                                [fields]="businessDataFields"
-                               [dataSource]="roleData"
+                               [dataSource]="roleData$ | async"
                                [selectAllText]='allOption'
                                showSelectAll=true>
               </ejs-multiselect>
@@ -244,7 +239,6 @@
               <ejs-multiselect mode="CheckBox"
                                formControlName="user"
                                [placeholder]='placeholderValue'
-                               [(ngModel)]="user"
                                [allowFiltering]="true"
                                [showDropDownIcon]="true"
                                appValidateWithMessage
@@ -262,7 +256,6 @@
               <ejs-multiselect mode="CheckBox"
                                formControlName="candidate"
                                [placeholder]='placeholderValue'
-                               [(ngModel)]="candidate"
                                [allowFiltering]="true"
                                [showDropDownIcon]="true"
                                appValidateWithMessage
@@ -353,7 +346,7 @@
           <div class="input-group" id="richTextEditorDiv">
             <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
                                 formControlName="emailBody" [toolbarSettings]='tools' [(ngModel)]='emailBody'
-                                [(value)]='emailBody'>
+                                [(value)]='emailBody' required>
             </ejs-richtexteditor>
           </div>
         </div>

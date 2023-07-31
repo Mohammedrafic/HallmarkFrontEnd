@@ -156,14 +156,14 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
   {
     field: 'startTime',
     title: 'Shift Start Time',
-    required: true,
+    required: false,
     type: FieldType.Time,
     sourceKey: ScheduleFilterFormSourceKeys.startTime,
   },
   {
     field: 'endTime',
     title: 'Shift End Time',
-    required: true,
+    required: false,
     type: FieldType.Time,
     sourceKey: ScheduleFilterFormSourceKeys.endTime,
   },

@@ -10,9 +10,18 @@
     background-color: $white;
 
     .order-statuses {
-      @media #{$max-mobile} {
-        margin-left: -15px;
-        margin-right: -15px;
+
+      &.align-label {
+        @media #{$max-mobile} {
+          margin-right: -22px;
+        }
+
+        @media (max-width: 412px) {
+          display: flex;
+          justify-content: center;
+          width: 100vw;
+          margin-left: -22px;
+        }
       }
     }
   }
@@ -148,7 +157,7 @@
     }
   }
 
-  @media (max-width: 380px) {
+  @media (max-width: 412px) {
     margin-left: -25%;
   }
 }
@@ -209,5 +218,16 @@
     &:has(app-add-edit-reorder) {
       height: calc(100% - 115px);
     }
+  }
+}
+
+@media (max-width: 1024px) {
+  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button){
+    display: block;
+  }
+}
+@media (max-width: 640px) {
+  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button){
+    display: none;
   }
 }

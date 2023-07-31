@@ -35,6 +35,7 @@ import { CandidateWorkCommitment } from '../../models/candidate-work-commitment.
 import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { commonRangesValidator } from '@shared/validators/date.validator';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-candidate-work-commitment-dialog',
@@ -58,6 +59,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public title: string;
   public workCommitments: WorkCommitmentDetailsGroup[] = [];
@@ -574,6 +578,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     return this.candidateService.hasWorkCommitments && this.title === DialogMode.Add;
   }
 
+  private isLocationChanged(): boolean {
+    const regionControl = this.candidateWorkCommitmentForm.get('regionIds');
+    const locationControl = this.candidateWorkCommitmentForm.get('locationIds');
+    return !!(regionControl?.dirty || locationControl?.dirty) && this.title === DialogMode.Edit;
+  }
+
   private saveCommitment(): void {
     const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
     candidateWorkCommitment.startDate =
@@ -602,7 +612,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private handleCommitmentSaving(): void {
-    if (this.isOverridingEndDate()) {
+    if (this.isOverridingEndDate() || this.isLocationChanged()) {
       this.showOverridingConfirmation();
     } else {
       this.saveCommitment();

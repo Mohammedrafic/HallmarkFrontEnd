@@ -184,7 +184,22 @@
   </button>
 
   <app-tooltip-container
-    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney"
+    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney && isActiveSystemIRP"
+    [message]="toolTipMessage"
+    [showToolTip]="!userPermission[userPermissions.CanCreateOrdersIRP]"
+  >
+    <button
+      [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]"
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      [isPrimary]="true"
+      (click)="navigateToOrderForm()"
+    >
+      Create Order
+    </button>
+  </app-tooltip-container>
+  <app-tooltip-container
+    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney && !isActiveSystemIRP"
     [message]="toolTipMessage"
     [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
   >
@@ -268,9 +283,9 @@
             <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
               <button
                 ejs-button
-                [disabled]="!hasCreateEditOrderPermission"
-                [isPrimary]="hasCreateEditOrderPermission"
-                cssClass="e-flat with-badge"
+                [disabled]="data.unreadComments <= 0"
+                [isPrimary]="data.unreadComments > 0"
+                cssClass="e-flat default-icon-button with-badge"
               >
                 <span><i-feather name="message-square" class="icon"></i-feather></span>
                 <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{

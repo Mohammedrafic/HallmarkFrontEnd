@@ -82,7 +82,7 @@ export const ManualInvoiceDialogConfig = (isAgency: boolean): AddManInvoiceDialo
     {
       field: 'vendorFee',
       title: 'Vendor Fee Applicable',
-      disabled: false,
+      disabled: true,
       required: true,
       type: FieldType.Toggle,
       widthStyle: FieldWidthStyle.Long,
@@ -91,7 +91,7 @@ export const ManualInvoiceDialogConfig = (isAgency: boolean): AddManInvoiceDialo
       field: 'reasonId',
       title: 'Reason Code',
       disabled: false,
-      required: false,
+      required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Long,
       optionsStateKey: ManInvoiceOptionsKeys.Reasons,

@@ -39,7 +39,7 @@ export class ApiInterceptor implements HttpInterceptor {
       };
 
       const { isOrganizationArea, isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-      
+
       if(request.headers.has('selected-businessunit-id')) {
         headers['selected-businessunit-id'] = request.headers.get('selected-businessunit-id') as string;
       }
@@ -54,11 +54,13 @@ export class ApiInterceptor implements HttpInterceptor {
       request = request.clone({ headers: new HttpHeaders(headers) });
     }
 
-    if (request.url === APP_SETTINGS_URL) {
-      return next.handle(request);
+    const sanitizedRequest = this.trimRequest(request);
+
+    if (sanitizedRequest.url === APP_SETTINGS_URL) {
+      return next.handle(sanitizedRequest);
     }
 
-    return next.handle(this.setUrl(request, this.appSettings.host)).pipe(
+    return next.handle(this.setUrl(sanitizedRequest, this.appSettings.host)).pipe(
       catchError((error: HttpErrorResponse) => {
         /** If we got 401 Error then do log out */
         if (error.status === 401) {
@@ -74,5 +76,29 @@ export class ApiInterceptor implements HttpInterceptor {
   private setUrl(request: HttpRequest<any>, url: string): HttpRequest<any> {
     return request.url.startsWith('assets') ? request : request.clone({ url: `${url}${request.url}` });
   }
+
+  private trimRequest(req: HttpRequest<any>): HttpRequest<any> {
+    if (req.body && typeof req.body === 'object') {
+      const trimmedBody = this.trimObjectStrings(req.body);
+      return req.clone({ body: trimmedBody });
+    }
+    return req;
+  }
+
+  private isString = (value: string): value is string => typeof value === 'string';
+
+  private trimObjectStrings = (obj: any): any => {
+    if (typeof obj === 'object') {
+      for (const key in obj) {
+        const value = obj[key];
+        if (this.isString(value)) {
+          obj[key] = value.replace(/^\s+|\s+$/g, '');
+        } else if (typeof value === 'object') {
+          obj[key] = this.trimObjectStrings(value);
+        }
+      }
+    }
+    return obj;
+  };
 }
 

@@ -428,7 +428,7 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
       UserIdPS    }
       = this.PositionSummaryForm.getRawValue();
     if (!this.PositionSummaryForm.dirty) {
-      this.message = "Default filter selected with all regions, locations and departments for 30 days";
+      this.message = "Default filter selected with all regions, locations and departments for 14 days";
     }
     else {
       this.isResetFilter = false;

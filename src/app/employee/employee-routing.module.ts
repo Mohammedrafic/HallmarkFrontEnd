@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 
 import { EmployeeComponent } from './employee.component';
+import { OpenJobResolver } from '../modules/open-jobs/resolvers/open-job.resolver';
 
 const routes: Routes = [
   { path: '', redirectTo: 'scheduling', pathMatch: 'full' },
@@ -17,6 +18,16 @@ const routes: Routes = [
           isOrganizationArea: true,
         },
       },
+      {
+        path: 'open-jobs',
+        loadChildren: () => import('../modules/open-jobs/open-jobs.module').then((m) => m.OpenJobsModule),
+        resolve: {
+          preservedFilters: OpenJobResolver,
+        },
+        data: {
+          isOrganizationArea: true,
+        },
+      },
     ],
   },
 ];
@@ -24,6 +35,5 @@ const routes: Routes = [
 @NgModule({
   imports: [CommonModule, RouterModule.forChild(routes)],
   exports: [RouterModule],
-  providers: [],
 })
 export class EmployeeRoutingModule {}

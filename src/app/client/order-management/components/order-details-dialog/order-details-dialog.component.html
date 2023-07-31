@@ -15,7 +15,12 @@
               {{ (isReOrder && activeSystem !==  systemType.IRP) ? 'Re-Order' : 'Order' }} ID
               {{ order?.organizationPrefix }}-{{ order?.publicId }}
             </h3>
-            <div class="order-statuses">
+            <div
+              class="order-statuses"
+              [ngClass]="{
+                'align-label': order?.orderType === orderType.OpenPerDiem || order?.orderType === orderType.PermPlacement
+              }"
+            >
               <ejs-chiplist #chipList>
                 <e-chips>
                   <e-chip [text]="activeSystem !==  systemType.IRP  ? order?.statusText : order?.irpOrderMetadata?.statusText"></e-chip>
@@ -38,7 +43,8 @@
               'open-per-diem-order': order?.orderType === orderType.OpenPerDiem,
               'traveler-order': order?.orderType === orderType.Traveler,
               'contact-to-perm': order?.orderType === orderType.ContractToPerm,
-              'perm-placement': order?.orderType === orderType.PermPlacement
+              'perm-placement': order?.orderType === orderType.PermPlacement,
+              'open-status': order?.status === orderStatus.Open
             }"
           >
             <div class="order-actions" *ngIf="showApproveAndCancel">
@@ -166,7 +172,7 @@
                 <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
               </button>
             </app-tooltip-container>
-            <app-tooltip-container *ngIf="mobileMenu.length" [showToolTip]="!hasCreateEditOrderPermission">
+            <app-tooltip-container *ngIf="mobileMenu.length && activeSystem ===  systemType.VMS" [showToolTip]="!hasCreateEditOrderPermission">
               <button
                 ejs-dropdownbutton
                 [items]="mobileMenu"
@@ -178,7 +184,18 @@
                 <i-feather name="more-vertical" class="icon"></i-feather>
               </button>
             </app-tooltip-container>
-
+            <app-tooltip-container *ngIf="mobileMenu.length && activeSystem ===  systemType.IRP" [showToolTip]="!CanOrganizationEditOrdersIRP">
+              <button
+                ejs-dropdownbutton
+                [items]="mobileMenu"
+                [disabled]="!canCreateOrderIRP || !CanOrganizationEditOrdersIRP"
+                (select)="onMobileMenuSelect($event)"
+                iconCss="e-icons"
+                cssClass="e-caret-hide primary-icon-button menu-mobile sdfsdf"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -186,9 +203,14 @@
         </div>
       </section>
       <div class="order-tabs">
-        <ejs-tab #tab *ngIf="activeSystem !==  systemType.IRP ? orderStatus.Incomplete !== order?.status
-          : orderStatus.Incomplete !== order?.irpOrderMetadata?.status"
-        (selecting)="onTabSelecting($event)">
+        <ejs-tab
+          #tab 
+          *ngIf="activeSystem !==  systemType.IRP
+            ? orderStatus.Incomplete !== order?.status
+            : orderStatus.Incomplete !== order?.irpOrderMetadata?.status"
+          cssClass="{{order?.orderType === orderType.OpenPerDiem ? 'open-per-diem-order' : ''}}"
+          (selecting)="onTabSelecting($event)"
+        >
           <e-tabitems>
             <e-tabitem>
               <ng-template #headerText>{{ isReOrder && activeSystem !==  systemType.IRP ? 'Re-Order' : 'Order' }} Details</ng-template>
@@ -258,9 +280,14 @@
             </e-tabitem>
           </e-tabitems>
         </ejs-tab>
-        <ejs-tab #tab *ngIf="activeSystem !==  systemType.IRP ? orderStatus.Incomplete === order?.status
-        : orderStatus.Incomplete === order?.irpOrderMetadata?.status"
-        (selecting)="onTabSelecting($event)">
+        <ejs-tab
+          #tab
+          *ngIf="activeSystem !==  systemType.IRP
+            ? orderStatus.Incomplete === order?.status
+            : orderStatus.Incomplete === order?.irpOrderMetadata?.status"
+          cssClass="{{order?.orderType === orderType.OpenPerDiem ? 'open-per-diem-order' : ''}}"
+          (selecting)="onTabSelecting($event)"
+        >
           <e-tabitems>
             <e-tabitem>
               <ng-template #headerText>Order Details</ng-template>

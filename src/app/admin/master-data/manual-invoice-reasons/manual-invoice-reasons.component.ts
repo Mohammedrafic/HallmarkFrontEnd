@@ -5,7 +5,6 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { delay, filter, Observable, takeWhile } from 'rxjs';
 
 import { ManualInvoiceReasons } from '@admin/store/manual-invoice-reasons.actions';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, ONLY_LETTERS } from '@shared/constants';
@@ -17,6 +16,7 @@ import { UserState } from 'src/app/store/user.state';
 import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { DonotReturnState } from '@admin/store/donotreturn.state';
 import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
+import { AbstractPermissionGrid } from '../../../shared/helpers/permissions';
 
 @Component({
   selector: 'app-manual-invoice-reasons',
@@ -24,7 +24,7 @@ import { UserAgencyOrganization } from '@shared/models/user-agency-organization.
   styleUrls: ['./manual-invoice-reasons.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class ManualInvoiceReasonsComponent extends AbstractPermissionGrid implements OnInit {
   @Select(ManualInvoiceReasonsState.manualInvoiceReasons)
   public manualInvoiceReasons$: Observable<ManualInvoiceReasonPage>
 
@@ -40,20 +40,23 @@ export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComp
   private isEdit = false;
   private isAlive = true;
   businessUnitId:number=0;
+  public canUpdateAgencyFeeApplicable: boolean = false;
+  public agencyFeeApplicableSwitch?: boolean = true;
 
   constructor(
     private confirmService: ConfirmService,
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions
   ) {
-    super();
+    super(store);
   }
 
   get reasonControl(): AbstractControl | null {
     return this.form.get('reason');
   }
 
-  public ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.createForm();
     this.initGrid();
     this.subscribeOnSaveReasonError();
@@ -87,15 +90,19 @@ export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComp
   public addReason(): void {
     this.title = DialogMode.Add;
     this.isEdit = false;
+    this.canUpdateAgencyFeeApplicable = !this.userPermission[this.userPermissions.CanUpdateAgencyFeeApplicable] ? true : false;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onEdit(data: {reason: string, id: number}): void {
+  public onEdit(data: { reason: string, id: number, agencyFeeApplicable: boolean }): void {
     this.isEdit = true;
     this.title = DialogMode.Edit;
+    this.canUpdateAgencyFeeApplicable = !this.userPermission[this.userPermissions.CanUpdateAgencyFeeApplicable] ? true : false;
     this.form.patchValue({
       id: data.id,
-      reason: data.reason
+      reason: data.reason,
+      agencyFeeApplicable: !!data.agencyFeeApplicable,
+      agencyFeeApplicableSwitch: data.agencyFeeApplicable === false ? false : true,
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -132,12 +139,13 @@ export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComp
       return;
     }
 
-    if(!this.isEdit) {
-      this.store.dispatch(new ManualInvoiceReasons.Save({ reason: this.form.value.reason }));
+    if (!this.isEdit) {
+      this.store.dispatch(new ManualInvoiceReasons.Save({ reason: this.form.value.reason, agencyFeeApplicable: this.form.value.agencyFeeApplicable }));
     } else if(this.isEdit) {
       const payload = {
         id: this.form.value.id,
-        reason: this.form.value.reason
+        reason: this.form.value.reason,
+        agencyFeeApplicable: this.form.value.agencyFeeApplicable
       }
 
       this.store.dispatch( new ManualInvoiceReasons.Update(payload));
@@ -164,7 +172,8 @@ export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComp
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(null),
-      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)])
+      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)]),
+      agencyFeeApplicable: new FormControl(true)
     })
   }
 
@@ -199,6 +208,7 @@ export class ManualInvoiceReasonsComponent extends AbstractGridConfigurationComp
       takeWhile(() => this.isAlive)
     ).subscribe(() => {
       this.form.reset();
+      this.form.controls['agencyFeeApplicable'].patchValue(true);
     });
   }
 }

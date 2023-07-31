@@ -1,7 +1,15 @@
+@import 'adaptive-response';
+
 .filter-button-content {
   column-gap: 4px;
 
   &.icon-button {
     column-gap: unset;
+  }
+}
+
+@media #{$max-mobile} {
+  .e-control.e-btn {
+    padding: 8px 8px;
   }
 }

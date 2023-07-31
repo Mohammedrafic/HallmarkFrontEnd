@@ -49,6 +49,7 @@ import {
   SetOrdersTab,
   UpdateAgencyCandidateJob,
   ClearOrganizationStructure,
+  ReloadOrderCandidatesLists,
 } from './order-management.actions';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { OrderFilteringOptionsService } from '@shared/services/order-filtering-options.service';
@@ -331,7 +332,11 @@ export class OrderManagementState {
   ): Observable<void> {
     return this.orderManagementContentService.rejectCandidateJob(payload).pipe(
       tap(() => {
-        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new RejectCandidateForAgencySuccess()]);
+        dispatch([
+            new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+            new RejectCandidateForAgencySuccess(),
+            new ReloadOrderCandidatesLists(),
+          ]);
       })
     );
   }

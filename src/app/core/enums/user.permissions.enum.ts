@@ -148,6 +148,7 @@ export enum UserPermissions {
   WidgetLTAOrderEnding = 3403,
   ViewUnavailabilityReasons = 2811,
   CanEditUnavailabilityReasons = 2812,
+  CanUpdateAgencyFeeApplicable = 8114,
 
   // Order management
   CanUpdateBillRates = 8101,
@@ -224,7 +225,7 @@ export enum UserPermissions {
   CanOnboardCandidateIRP = 6409,
   CanRejectCandidateIRP = 6410,
   CanEditOrderBillRateIRP = 6411,
-  CanCloseOrdersIRP = 6412,
+  CanCloseOrdersIRP = 6413,
 
   //Agency setup
   EditAgencyNetsuitePaymentId = 8110,

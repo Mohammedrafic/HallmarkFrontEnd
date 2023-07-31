@@ -5,7 +5,7 @@ import {ColDef} from '@ag-grid-community/core';
 
 import {TimesheetRecordsService} from './timesheet-records.service';
 import {RecordValue, TimesheetRecordsDto} from '../interface';
-import {RecordFields, RecordsMode, RecordStatus} from '../enums';
+import { RecordFields, RecordsMode, RecordStatus, TableTabIndex } from '../enums';
 import {TimesheetRecordsColdef} from '../constants';
 import {TabComponent} from '@syncfusion/ej2-angular-navigations';
 import {DropdownOption} from '@core/interface';
@@ -107,6 +107,10 @@ describe('TimesheetRecordsService', () => {
         ],
         viewMode: []
       },
+      historicalData: {
+        editMode: [],
+        viewMode: [],
+      },
       miles: {
         editMode: [],
         viewMode: []
@@ -188,8 +192,8 @@ describe('TimesheetRecordsService', () => {
     service.controlTabsVisibility(rates, tabComponent, records);
 
     expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenCalledWith(1, true);
-    expect(spy).toHaveBeenCalledWith(2, true);
+    expect(spy).toHaveBeenCalledWith(TableTabIndex.Miles, true);
+    expect(spy).toHaveBeenCalledWith(TableTabIndex.Expenses, true);
   });
 
   it('controlTabsVisibility should show mileage and expenses tabs', () => {
@@ -200,8 +204,8 @@ describe('TimesheetRecordsService', () => {
     service.controlTabsVisibility(rates, tabComponent, records);
 
     expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenCalledWith(1, false);
-    expect(spy).toHaveBeenCalledWith(2, false);
+    expect(spy).toHaveBeenCalledWith(TableTabIndex.Miles, false);
+    expect(spy).toHaveBeenCalledWith(TableTabIndex.Expenses, false);
   });
 
   it('checkForStatus should return true for record with Deleted status', () => {

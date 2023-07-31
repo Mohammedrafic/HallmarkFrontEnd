@@ -346,11 +346,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload)).pipe(
-        takeUntil(this.unsubscribe$)
-      ).subscribe(() => {
-        this.store.dispatch(new ReloadOrderCandidatesLists());
-      });
+      this.store.dispatch(new RejectCandidateJob(payload));
 
       this.closeDialog();
     }
@@ -446,18 +442,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           }
         }
         
-        let jobStartDate: string;
-        let jobEndDate: string;
-        const statusesForActualDates = [ApplicantStatusEnum.OnBoarded, ApplicantStatusEnum.Cancelled,
-          ApplicantStatusEnum.Offboard];
-
-        if (this.isAgency && statusesForActualDates.includes(value.applicantStatus.applicantStatus)) {
-          jobStartDate = value.actualStartDate || '';
-          jobEndDate = value.actualEndDate || '';
-        } else {
-          jobStartDate = value.order.jobStartDate as unknown as string || '';
-          jobEndDate = value.order.jobEndDate as unknown as string || '';
-        }
+        const jobStartDate = value.actualStartDate || value.order.jobStartDate as unknown as string;
+        const jobEndDate = value.actualEndDate || value.order.jobEndDate as unknown as string;
 
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();

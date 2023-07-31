@@ -78,6 +78,15 @@ export class RecordsAdapter {
           });
         }),
       },
+      [RecordFields.HistoricalData]: {
+        [RecordsMode.Edit]: [],
+        [RecordsMode.View]: data.invoiceHistoricalRecords.map((item: RecordDto) => {
+          return ({
+            ...item,
+            day: item.timeIn,
+          });
+        }),
+      },
       [RecordFields.Miles]: {
         [RecordsMode.Edit]: data.miles.map((item: RecordDto) => {
           return ({

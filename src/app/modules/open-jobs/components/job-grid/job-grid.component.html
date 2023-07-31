@@ -1,0 +1,20 @@
+<section class="grid-table-container">
+  <ag-grid-angular
+    (sortChanged)="handleSortChanged($event)"
+    [columnDefs]="gridDefs"
+    [rowData]="jobsPage?.items ?? []"
+    [rowHeight]="64"
+    [context]="context"
+    [overlayNoRowsTemplate]="gridEmptyMessage"
+    [class.empty-table]="!jobsPage?.items?.length"
+    class="ag-theme-alpine app-grid__component"
+  >
+  </ag-grid-angular>
+  <app-grid-pagination
+    [currentPage]="pageSettings.pageNumber"
+    [pageSize]="pageSettings.pageSize"
+    [totalRecordsCount]="jobsPage?.items?.length || 0"
+    (navigateToPageEmitter)="changePage($event)"
+    (pageSizeChangeEmitter)="changePageSize($event)"
+  ></app-grid-pagination>
+</section>

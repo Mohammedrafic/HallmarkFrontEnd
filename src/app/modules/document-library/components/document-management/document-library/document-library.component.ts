@@ -135,6 +135,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public isAddNewFolder: boolean = false;
   public isUpload: boolean = false;
   public isShowSharedWith: boolean = false;
+  public isSharedByMe: boolean = false;
   public formDailogTitle: string = '';
   public today = new Date();
   public startDate: any = new Date();
@@ -921,7 +922,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     const downloadFilter: DownloadDocumentDetailFilter = {
       documentId: docItem.id,
       businessUnitType: this.filterSelecetdBusinesType,
-      businessUnitId: docItem.businessUnitId
+      businessUnitId: this.filterSelectedBusinesUnitId
     }
     this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter));
     this.documentDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
@@ -1288,9 +1289,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.createForm();
       this.isShowSharedWith=false;
       this.shareDocumentIds = [data.id];
-      if(this.user?.businessUnitType === this.businessUnitTypes.Organization)
+      if(this.businessFilterForm.get('filterBusinessUnit')?.value === this.businessUnitTypes.Organization)
       {
         this.onAgencyChanges();
+      }
+      if(this.businessFilterForm.get('filterBusinessUnit')?.value === this.businessUnitTypes.Agency)
+      {
+        this.onOrganizationChanges();
       }
       this.store.dispatch(new ShowSideDialog(true));
     }
@@ -1376,7 +1381,7 @@ public onAgencyChanges()
       });
   }
 
-  public onOrganizationSwitcher(event: any) {
+  public onOrganizationChanges()  {
     this.organizationSwitch = !this.organizationSwitch;
     this.allOrgnizations = false;
     this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
@@ -1396,6 +1401,10 @@ public onAgencyChanges()
       this.sharedWith?.gridOptions.api?.setRowData([]);
       this.isShowSharedWith=false;
     }
+  }
+
+  public onOrganizationSwitcher(event: any){
+    this.onOrganizationChanges();
     this.changeDetectorRef.markForCheck();
   }
 

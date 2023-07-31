@@ -15,21 +15,34 @@
         (actionBegin)="actionBegin($event)"
         (dataBound)="gridDataBound(reasonGrid, null)"
     >
-        <e-columns>
-            <e-column textAlign="Right" width="100">
-                <ng-template #template let-data>
-                    <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-                        <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
-                            <span><i-feather name="edit" class="icon"></i-feather></span>
-                        </button>
-                        <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data.id)">
-                            <span><i-feather name="trash-2" class="icon"></i-feather></span>
-                        </button>
-                    </div>
-                </ng-template>
-            </e-column>
-            <e-column field="reason" headerText="Reason" textAlign="Left" width="100%"></e-column>
-        </e-columns>
+      <e-columns>
+        <e-column textAlign="Right" width="100">
+          <ng-template #template let-data>
+            <div class="row-tool-buttons" [class.hidden]="!isLoaded">
+              <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+                <span><i-feather name="edit" class="icon"></i-feather></span>
+              </button>
+              <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data.id)">
+                <span><i-feather name="trash-2" class="icon"></i-feather></span>
+              </button>
+            </div>
+          </ng-template>
+        </e-column>
+        <e-column field="reason" headerText="Reason" textAlign="Left" width="100%"></e-column>
+        <e-column headerText="Vendor Fee Applicable" textAlign="Left" width="100%">
+          <ng-template #template let-data>
+            <div class="input-container bootstrap">
+                <ejs-switch [checked]="data.agencyFeeApplicable"
+                            [disabled]="true"
+                            class="toggle"
+                            onLabel="Yes"
+                            offLabel="No"
+                            formControlName="agencyFeeApplicable">
+                </ejs-switch>
+              </div>
+          </ng-template>
+        </e-column>
+      </e-columns>
 
         <ng-template #pagerTemplate let-data>
             <div class="e-pagertemplate">
