@@ -13,7 +13,7 @@ import { DatepickerComponent } from '@shared/components/form-controls/datepicker
 import {
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
-  EMPLOYEE_SKILL_CHANGE_WARNING,
+  IRP_DEPARTMENT_CHANGE_WARNING,
   RECORD_ADDED, RECORD_MODIFIED,
 } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -96,7 +96,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public showOverrideDialog = false;
   public replaceOrder = false;
   public overrideCommitmentConfirm$ = new Subject<boolean>();
-  public replacementConfirmationMessage = EMPLOYEE_SKILL_CHANGE_WARNING;
+  public replacementConfirmationMessage = IRP_DEPARTMENT_CHANGE_WARNING;
 
 
   constructor(
