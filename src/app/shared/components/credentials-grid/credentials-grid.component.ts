@@ -112,7 +112,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public candidateCredentialResponse: CandidateCredentialResponse;
   public gridItems: CandidateCredentialGridItem[] = [];
   public openFileViewerDialog = new EventEmitter<number>();
-  public today = new Date();
   public disableAddCredentialButton: boolean;
   public requiredCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
