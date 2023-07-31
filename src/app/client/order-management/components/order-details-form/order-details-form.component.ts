@@ -569,6 +569,15 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
   }
 
+  private populateOpenPositions(order: Order): void {
+    const openPositionsControl = this.generalInformationForm.controls['openPositions'];
+    openPositionsControl.patchValue(order.openPositions);
+
+    if (order.status === OrderStatus.Filled) {
+      openPositionsControl.disable();
+    }
+  }
+
   private removePermPlacementControls(controls: string[]): void {
     controls.forEach((control: string) => {
       this.generalInformationForm.contains(control) &&
@@ -630,7 +639,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       });
 
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
-    this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);
+    this.populateOpenPositions(order);
     this.generalInformationForm.controls['minYrsRequired'].patchValue(order.minYrsRequired);
     this.generalInformationForm.controls['joiningBonus'].patchValue(joiningBonus);
     this.generalInformationForm.controls['compBonus'].patchValue(compBonus);
