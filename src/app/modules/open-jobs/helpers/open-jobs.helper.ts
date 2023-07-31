@@ -1,6 +1,5 @@
-import { DateTimeHelper } from '@core/helpers';
+import { formatDate } from '@angular/common';
 
 export const GetLocalDate = (): string => {
-  const today = DateTimeHelper.setInitDateHours(new Date().toUTCString());
-  return DateTimeHelper.setUtcTimeZone(today) ;
+  return formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss', 'en-US');
 };
