@@ -20,7 +20,15 @@ import {
   ScheduleModelPage,
 } from '../interface';
 import { CreateScheduleItem, DateItem } from '../components/schedule-items/schedule-items.interface';
-import { AboutSixHoursMs, AboutTwentyHoursMs, DayMs, HalfHourTimeMealMs, HourTimeMealMs, WeekList } from '../constants';
+import {
+  AboutSixHoursMs,
+  AboutThirteenHoursMs,
+  DayMs,
+  HalfHourTimeMealMs,
+  HourTimeMealMs,
+  ThirteenHoursMs,
+  WeekList,
+} from '../constants';
 
 export const GetScheduleDayWithEarliestTime = (schedules: ScheduleInt.ScheduleItem[]): ScheduleItem => {
   if(schedules.length >= 2) {
@@ -191,11 +199,11 @@ export const GetShiftHours = (startTimeDate: Date, endTimeDate: Date, meal = fal
     return convertMsToTime(workTime);
   }
 
-  if(meal && workTime >= AboutSixHoursMs && workTime <= AboutTwentyHoursMs) {
+  if(meal && workTime >= AboutSixHoursMs && workTime <= AboutThirteenHoursMs) {
     return convertMsToTime(workTime - HalfHourTimeMealMs);
   }
 
-  if(meal && workTime >= AboutTwentyHoursMs) {
+  if(meal && workTime >= ThirteenHoursMs) {
     return convertMsToTime(workTime - HourTimeMealMs);
   }
 
