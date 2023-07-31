@@ -218,13 +218,13 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       this.candidates = candidates;
 
       this.setFormData(this.order);
-      this.disablePositionsIfFilled(this.order);
+      this.disablePositionsField(this.order);
       this.setInitialDatesValue();
       this.cdr.markForCheck();
     });
   }
 
-  private disablePositionsIfFilled(reorder: Order): void {
+  private disablePositionsField(reorder: Order): void {
     if (reorder.status === OrderStatus.Filled) {
       this.reorderForm.get('openPosition')?.disable();
     }
