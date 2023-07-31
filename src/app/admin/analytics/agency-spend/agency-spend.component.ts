@@ -379,8 +379,8 @@ export class AgencySpendComponent implements OnInit {
       businessUnitIds: businessIdData,
     };
     this.store.dispatch(new GetStaffScheduleReportFilterOptions(filterObj))
-      .pipe(filter((data) => data !== null), takeWhile(() => this.isAlive))                    
-      .subscribe((data: StaffScheduleReportFilterOptions) => {        
+      .pipe(filter((data) => data !== null), takeWhile(() => this.isAlive));                    
+    this.staffScheduleReportFilterData$.subscribe((data: StaffScheduleReportFilterOptions) => {        
         this.isAlive = false;
         this.filterOptionData = data;
         this.filterColumns.skillIds.dataSource = [];
