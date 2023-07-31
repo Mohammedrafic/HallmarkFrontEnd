@@ -43,14 +43,18 @@ export class BaseExportComponent implements OnInit {
               private scheduleItemsService: ScheduleItemsService,
               @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
               private cdr : ChangeDetectorRef) { 
-              const Schedule_storage = JSON.parse((this.globalWindow.localStorage.getItem('Schedule_Export') || ''));   
-              if(Schedule_storage != ''){
-                this.setScheduleTable(Schedule_storage.data);
-                this.setDateSchedule(Schedule_storage.dateRange);
-                this.scheduleFilters = Schedule_storage.scheduleFilters;
-                this.activePeriod = Schedule_storage.activePeriod;
-                this.startDate = Schedule_storage.startDate;
+              const scheduleStorage = JSON.parse((this.globalWindow.localStorage.getItem('Schedule_Export') || ''));   
+              if(scheduleStorage != ''){
+                this.getExportDetails(scheduleStorage);
+                this.scheduleFilters = scheduleStorage.scheduleFilters;
               }
+  }
+
+  public getExportDetails(data: { data: ScheduleInt.ScheduleExport[]; dateRange: ScheduleInt.DateRangeOption[]; activePeriod: DatesRangeType; startDate: Date; }){
+    this.setScheduleTable(data.data);
+    this.setDateSchedule(data.dateRange);
+    this.activePeriod = data.activePeriod;
+    this.startDate = data.startDate;
   }
 
   trackByDatesRange: TrackByFunction<ScheduleInt.DateRangeOption> =
@@ -67,7 +71,7 @@ export class BaseExportComponent implements OnInit {
     if(this.scheduleFilters){
       for(let i=0; i<this.scheduleFilters.length; i++){
         if(this.scheduleFilters[i].groupTitle === 'Region'){
-          this.regions = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: any; }) => {
+          this.regions = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: string }) => {
             if (combinedObj !== '') {
               combinedObj += ',';
             }
@@ -75,7 +79,7 @@ export class BaseExportComponent implements OnInit {
           }, '');
         }
         if(this.scheduleFilters[i].groupTitle === 'Location'){
-          this.locations = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: any; }) => {
+          this.locations = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: string; }) => {
             if (combinedObj !== '') {
               combinedObj += ',';
             }
@@ -83,7 +87,7 @@ export class BaseExportComponent implements OnInit {
           }, '');
         }
         if(this.scheduleFilters[i].groupTitle === 'Department'){
-          this.departments = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: any; }) => {
+          this.departments = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: {value : string}) => {
             if (combinedObj !== '') {
               combinedObj += ',';
             }
@@ -111,11 +115,7 @@ export class BaseExportComponent implements OnInit {
       schedules : [],
       workHours : 0
     }
-      for(let i=0; i<scheduleData.length; i++){
-        if(scheduleData[i].employeeSchedules == null){
-          scheduleData[i].employeeSchedules = empSchedule;
-        }
-      }
+      scheduleData.map(value => value.employeeSchedules === null ? value.employeeSchedules = empSchedule : '');
       this.scheduleData = scheduleData;
       this.employeesTitle = scheduleData?.length && scheduleData.length > 1 ? 'Employees' : 'Employee';
   

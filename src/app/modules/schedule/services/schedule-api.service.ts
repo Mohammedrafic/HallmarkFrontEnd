@@ -23,6 +23,7 @@ import {
   Schedule,
   ScheduleBookingErrors,
   ScheduleCandidatesPage,
+  ScheduleExport,
   ScheduleFilters,
 } from '../interface';
 
@@ -98,8 +99,8 @@ export class ScheduleApiService {
     return this.http.post<OpenPositionsList[]>('/api/schedules/openPositions', openPositionsParams);
   }
 
-  exportSchedule( employeeIds: number[], filters: EmployeesFilters): Observable<CandidateSchedules[]> {
-    return this.http.post<CandidateSchedules[]>('/api/Schedules/exportschedules', { employeeIds, ...filters });
+  exportSchedule( employeeIds: number[], filters: EmployeesFilters): Observable<ScheduleExport[]> {
+    return this.http.post<ScheduleExport[]>('/api/Schedules/exportschedules', { employeeIds, ...filters });
   }
 
 }

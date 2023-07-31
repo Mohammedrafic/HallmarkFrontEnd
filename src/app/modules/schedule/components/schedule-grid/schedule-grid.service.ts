@@ -6,6 +6,7 @@ import {
   ScheduleDateSlot,
   ScheduleDay,
   ScheduleExport,
+  ScheduleExportPage,
   ScheduleItem,
   ScheduleModel,
   ScheduleModelPage,
@@ -22,9 +23,9 @@ export class ScheduleGridService {
       }).flat();
   }
 
-  public getSlotsWithDateforExport(scheduleData:any): string[] {
+  public getSlotsWithDateforExport(scheduleData:ScheduleExport[]): string[] {
     return scheduleData
-      .filter((item: ScheduleExport) => item.employeeSchedules !== null ? (!!item.employeeSchedules?.schedules?.length) : "")
+      .filter((item: ScheduleExport) => item.employeeSchedules !== null ? (!!item.employeeSchedules?.schedules?.length) : '')
       .map((item: ScheduleExport) => {
         return item.employeeSchedules?.schedules?.map((scheduleItem: Schedules) => scheduleItem.date);
       }).flat();

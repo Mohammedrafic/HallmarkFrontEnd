@@ -8,7 +8,6 @@ import { CreateScheduleService } from '../modules/schedule/services/create-sched
 import { OpenPositionService, ScheduleApiService, ScheduleFiltersService } from '../modules/schedule/services';
 import { ScheduleGridService } from '../modules/schedule/components/schedule-grid/schedule-grid.service';
 import { WeeksEndModule } from '../modules/schedule/directives/weeks-end/weeks-end.module';
-import { CalendarDateSlotModule } from '../modules/schedule/pipes/calendar-date-slot/calendar-date-slot.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FeatherModule } from 'angular-feather';
 import { Search, Slash } from 'angular-feather/icons';
@@ -17,6 +16,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
 import { CanScheduleModule } from '../modules/schedule/directives/can-schedule/can-schedule.module';
 import { MonthPickerService } from '@shared/components/month-date-picker';
 import { ExportMonthViewModule } from '../modules/schedule/components/export-month-view/export-month-view.module';
+import { ExportCalendarDateSlotModule } from '../modules/schedule/pipes/calendar-date-slot/export-calendar-date-slot.module';
 
 const icons = {
   Search,
@@ -30,7 +30,7 @@ const icons = {
     ScheduleExportRoutingModule, 
     CommonModule, 
     WeeksEndModule, 
-    CalendarDateSlotModule,
+    ExportCalendarDateSlotModule,
     DragDropModule,
     FeatherModule.pick(icons),
     TooltipContainerModule,

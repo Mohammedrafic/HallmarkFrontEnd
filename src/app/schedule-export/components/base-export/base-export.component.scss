@@ -9,8 +9,7 @@ $otherDept: #2368EE;
 $available: #5AA658;
 $unavailable: #E24D4D;
 
-
-@media print{
+@media print {
   html {
     font-size: 14px;
   }
@@ -32,45 +31,50 @@ $unavailable: #E24D4D;
   color: $unavailable;
 }
 
-
 .text-bold {
   font-weight: bold;
 }
 
-.pt_30{
+.pt_30 {
   padding: 30px;
 }
+
 .f-14 {
   font-size: 14px;
+}
+
+.float_right {
+  float: right;
+}
+
+.headerdata {
+  word-break: break-all;
 }
 
 table {
   span {
     display: block;
   }
+
   tbody {
     vertical-align: top;
     font-weight: 500;
+
     tr {
       border-top: 1px solid gainsboro;
       border-bottom: 1px solid gainsboro;
     }
+
     td {
       padding: 10px;
     }
   }
+
   thead {
-    background : gainsboro;
+    background: gainsboro;
+
     th {
       padding: 10px;
     }
   }
-}
-
-.float_right{
-  float: right;
-}
-
-.headerdata{
-  word-break: break-all;
 }

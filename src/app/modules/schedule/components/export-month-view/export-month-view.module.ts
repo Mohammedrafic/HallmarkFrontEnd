@@ -9,12 +9,12 @@ import { SharedModule } from '@shared/shared.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { WeeksEndModule } from '../../directives/weeks-end/weeks-end.module';
 import { CandidateCardModule } from '../candidate-card/candidate-card.module';
-import { CalendarDateSlotModule } from '../../pipes/calendar-date-slot/calendar-date-slot.module';
 import { CalendarTooltipSlotModule } from '../../pipes/calendar-tooltip-slot/calendar-tooltip-slot.module';
 import { CanScheduleModule } from '../../directives/can-schedule/can-schedule.module';
 import { ExportMonthViewComponent } from './export-month-view.component';
 import { ExportMonthCardComponent } from './export-month-card/export-month-card.component';
 import { ExportScheduleCardModule } from '../export-schedule-card/export-schedule-card.module';
+import { ExportCalendarDateSlotModule } from '../../pipes/calendar-date-slot/export-calendar-date-slot.module';
 
 @NgModule({
   exports: [ExportMonthViewComponent],
@@ -25,7 +25,7 @@ import { ExportScheduleCardModule } from '../export-schedule-card/export-schedul
     imports: [
         CommonModule,
         CandidateCardModule,
-        CalendarDateSlotModule,
+        ExportCalendarDateSlotModule,
         TooltipContainerModule,
         CalendarTooltipSlotModule,
         SharedModule,

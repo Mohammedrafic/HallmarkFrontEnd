@@ -83,14 +83,14 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @Input() hasViewPermission = false;
   @Input() hasSchedulePermission = false;
 
-  @Output() DateRange: EventEmitter<any> = new EventEmitter<any>();
+  @Output() dateRange: EventEmitter<ScheduleInt.DateRangeOption[]> = new EventEmitter<ScheduleInt.DateRangeOption[]>();
   @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectedCells: EventEmitter<SelectedCells> = new EventEmitter<SelectedCells>();
   @Output() selectCandidate: EventEmitter<ScheduleInt.ScheduleCandidate | null>
     = new EventEmitter<ScheduleInt.ScheduleCandidate | null>();
   @Output() editCell: EventEmitter<ScheduleInt.ScheduledItem> = new EventEmitter<ScheduleInt.ScheduledItem>();
-  @Output() activeTimePeriod: EventEmitter<any> = new EventEmitter<any>();
+  @Output() activeTimePeriod: EventEmitter<DatesRangeType> = new EventEmitter<DatesRangeType>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -409,7 +409,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       filter(([startDate, endDate]: [string, string]) => !!startDate && !!endDate),
       tap(([startDate, endDate]: [string, string]) => {
         this.datesRanges = this.scheduleItemsService.createRangeOptions(DateTimeHelper.getDatesBetween(startDate, endDate));
-        this.DateRange.emit(this.datesRanges);
+        this.dateRange.emit(this.datesRanges);
         this.changeFilter.emit({ startDate, endDate });
         this.scrollArea.nativeElement.scrollTo(0, 0);
 

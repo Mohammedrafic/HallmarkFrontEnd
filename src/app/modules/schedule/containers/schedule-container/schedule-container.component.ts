@@ -20,7 +20,7 @@ import { ScheduleGridAdapter } from '../../adapters';
 import { FilterErrorMessage } from '../../constants';
 import * as ScheduleInt from '../../interface';
 import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from '../../services';
-import { ScheduledItem, SelectedCells, SideBarSettings } from '../../interface';
+import { ScheduledItem, ScheduleExport, SelectedCells, SideBarSettings } from '../../interface';
 import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters, GetScheduledShift } from '../../helpers';
 import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -66,7 +66,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   selectedCandidate: ScheduleInt.ScheduleCandidate | null;
   candidateDetails: ScheduleInt.ScheduleCandidatesPage;
-  DateRange: any;
+  dateRange: ScheduleInt.DateRangeOption[];
   activeTimePeriod = DatesRangeType.TwoWeeks;
 
   constructor(
@@ -192,8 +192,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.detectWhatDataNeeds();
   }
 
-  datesRanges(date : any): void {
-    this.DateRange = date;
+  datesRanges(date : ScheduleInt.DateRangeOption[]): void {
+    this.dateRange = date;
   }
 
   deleteFilterItem(event: ChipDeleteEventType): void {
@@ -371,7 +371,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     return !this.isEmployee && !!filterError;
   }
 
-  activePeriod(activePeriod: any) : void {
+  activePeriod(activePeriod: DatesRangeType) : void {
     this.activeTimePeriod = activePeriod;
   }
 
@@ -380,10 +380,23 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       this.candidateDetails.items.map(candidate => candidate.id),
       GetScheduleFilterByEmployees(this.scheduleFilters),
     ).pipe(
-      take(1),
       takeUntil(this.componentDestroy()),
-    ).subscribe((data: any) => {
-      data.sort((Emp1: { lastName: string; } , Emp2: { lastName: string; } ) => {
+    ).subscribe((data) => {
+      this.sortData(data);
+      const state = { 
+        data : data, 
+        dateRange : this.dateRange, 
+        scheduleFilters : this.chipsData, 
+        activePeriod : this.activeTimePeriod, 
+        startDate : this.scheduleFilters.startDate
+      };
+      this.globalWindow.localStorage.setItem('Schedule_Export',JSON.stringify(state));
+      window.open(window.location.origin + '/schedule-export', '_blank');
+    });
+  }
+
+  public sortData(data: ScheduleExport[]) {
+    data.sort((Emp1: { lastName: string; } , Emp2: { lastName: string; } ) => {
         const nameA = Emp1.lastName.toLowerCase();
         const nameB = Emp2.lastName.toLowerCase();
       
@@ -395,9 +408,5 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
           return 0;
         }
       });
-      const state = { redirectFromSchedule: true, data : data, dateRange : this.DateRange, scheduleFilters : this.chipsData, activePeriod : this.activeTimePeriod, startDate : this.scheduleFilters.startDate};
-      this.globalWindow.localStorage.setItem('Schedule_Export',JSON.stringify(state));
-      window.open(window.location.origin + '/schedule-export', '_blank');
-    }) ;
   }
 }

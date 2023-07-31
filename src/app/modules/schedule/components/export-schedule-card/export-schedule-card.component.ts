@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
 import { ScheduleExportCard } from '../../helpers/schedule-export.helper';
 
 @Component({

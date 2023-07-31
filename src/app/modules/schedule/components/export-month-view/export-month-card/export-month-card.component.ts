@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+
 import { ScheduleExportCard } from '../../../helpers/schedule-export.helper';
-import { Schedules } from '../../../interface';
 
 @Component({
   selector: 'app-export-month-card',
@@ -9,7 +9,6 @@ import { Schedules } from '../../../interface';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ExportMonthCardComponent extends ScheduleExportCard {
-
   @Input() isDateActive: boolean;
   @Input() currentDate: string;
 }

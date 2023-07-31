@@ -2,21 +2,12 @@ import {
   Component,
   ChangeDetectionStrategy,
   Input,
-  Output,
-  EventEmitter,
   ChangeDetectorRef,
   TrackByFunction,
-  OnInit,
 } from '@angular/core';
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
-
-import { takeUntil } from 'rxjs';
-
-import { Destroyable } from '@core/helpers';
 import { MonthPickerService } from '@shared/components/month-date-picker';
 import * as ScheduleInt from '../../interface';
-import { CardClickEvent, DatesByWeekday, DroppedEvent, PositionDragEvent, ScheduleDateItem, ScheduleExport } from '../../interface';
-import { OpenPositionService } from '../../services';
+import { DatesByWeekday, PositionDragEvent, ScheduleExport } from '../../interface';
 import { GetGroupedDatesByWeekday } from '../month-view-grid';
 
 @Component({
@@ -25,7 +16,7 @@ import { GetGroupedDatesByWeekday } from '../month-view-grid';
   styleUrls: ['./export-month-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ExportMonthViewComponent extends Destroyable implements OnInit {
+export class ExportMonthViewComponent {
   @Input() scheduleData: ScheduleExport[];
   @Input() selectedCandidatesSlot: Map<number, ScheduleInt.ScheduleDateSlot>;
 
@@ -46,12 +37,8 @@ export class ExportMonthViewComponent extends Destroyable implements OnInit {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private monthPickerService: MonthPickerService,
-    private openPositionService: OpenPositionService,
+    private monthPickerService: MonthPickerService
   ) {
-    super();
-  }
-  ngOnInit(): void {
   }
 
 }
