@@ -484,6 +484,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/agency-spend',
     },
+    104: {
+      // credential-expiry-irp
+      icon: '',
+      route: '/analytics/credential-expiry-irp',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -739,6 +744,11 @@ export const MENU_CONFIG: any = {
       // Agency-Spend
       icon: '',
       route: '/analytics/agency-spend',
+    },
+    104: {
+      // credential-expiry-irp
+      icon: '',
+      route: '/analytics/credential-expiry-irp',
     },
   },
 
@@ -1187,6 +1197,11 @@ export const MENU_CONFIG: any = {
       // Agency-Spend
       icon: '',
       route: '/analytics/agency-spend',
+    },
+    104: {
+      // credential-expiry-irp
+      icon: '',
+      route: '/analytics/credential-expiry-irp',
     },
   },
 

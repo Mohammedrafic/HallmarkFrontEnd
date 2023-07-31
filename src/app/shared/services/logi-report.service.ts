@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
 import { ConfigurationDto } from "@shared/models/analytics.model";
+import { CredentialType } from "@shared/models/credential-type.model";
 import { DepartmentsPage } from "@shared/models/department.model";
 import { LocationsPage } from "@shared/models/location.model";
 import { regionsPage } from "@shared/models/region.model";
@@ -149,4 +150,7 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
     }));
   }
 
+  public getCredentialTypes(): Observable<CredentialType[]> {
+    return this.http.get<CredentialType[]>(`/api/CredentialTypes/all`);
+  }
 }

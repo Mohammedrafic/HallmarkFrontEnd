@@ -1,3 +1,4 @@
+import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { ScheduleApiService } from 'src/app/modules/schedule/services/schedule-api.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -70,6 +71,7 @@ import { StaffAvailabilityComponent } from './staff-availability/staff-availabil
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
+import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential-expiry-irp.component';
 
 
 @NgModule({
@@ -126,7 +128,8 @@ import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.compo
     StaffAvailabilityComponent,
     PositionSummaryComponent,
     AgencySpendComponent,
-    ShiftBreakdownComponent],
+    ShiftBreakdownComponent,
+    CredentialExpiryIrpComponent],
   exports: [
     CandidateListComponent
   ],
@@ -146,7 +149,8 @@ import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.compo
     RadioButtonModule,
     LogiReportModule,
     ProgressBarAllModule,
-    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState])
+    TextBoxModule,
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState]),
   ],
   providers:[
     ScheduleApiService,
