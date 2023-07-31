@@ -13,6 +13,7 @@ import { DatepickerComponent } from '@shared/components/form-controls/datepicker
 import {
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
+  EMPLOYEE_SKILL_CHANGE_WARNING,
   IRP_DEPARTMENT_CHANGE_WARNING,
   RECORD_ADDED, RECORD_MODIFIED,
 } from '@shared/constants';
@@ -96,7 +97,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public showOverrideDialog = false;
   public replaceOrder = false;
   public overrideCommitmentConfirm$ = new Subject<boolean>();
-  public replacementConfirmationMessage = IRP_DEPARTMENT_CHANGE_WARNING;
+  public replacementConfirmationMessage = EMPLOYEE_SKILL_CHANGE_WARNING;
 
 
   constructor(
@@ -612,7 +613,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private handleCommitmentSaving(): void {
-    if (this.isOverridingEndDate() || this.isLocationChanged()) {
+    const isOverridingEndDate = this.isOverridingEndDate();
+    const isLocationChanged = this.isLocationChanged();
+
+    this.replacementConfirmationMessage = isLocationChanged ? IRP_DEPARTMENT_CHANGE_WARNING : EMPLOYEE_SKILL_CHANGE_WARNING;
+
+    if (isOverridingEndDate || isLocationChanged) {
       this.showOverridingConfirmation();
     } else {
       this.saveCommitment();
