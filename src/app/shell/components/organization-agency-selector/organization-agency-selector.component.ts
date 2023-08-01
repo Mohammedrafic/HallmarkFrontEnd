@@ -22,6 +22,7 @@ import {
   UserOrganizationsAgenciesChanged,
   SetAgencyActionsAllowed,
   SetAgencyInvoicesActionsAllowed,
+  SetLastSelectedOrganizationAgencyId
 } from 'src/app/store/user.actions';
 
 import { AppState } from 'src/app/store/app.state';
@@ -40,6 +41,7 @@ import { ToggleSidebarState } from 'src/app/store/app.actions';
 import { ActivatedRoute } from '@angular/router';
 import { IOrganizationAgency } from './unit-selector.interface';
 import { UnitSelectorHelper } from './unit-selector.helper';
+import { GetUserMenuConfig } from '../../../store/user.actions';
 
 @Component({
   selector: 'app-organization-agency-selector',
@@ -215,7 +217,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     } else {
       this.organizationsAgencies$.next(organizationsAgencies.sort((a, b) => a.name.localeCompare(b.name)));
     }
-
+ 
     const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
     const lastSelectedAgencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
     const isAgency = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Agency';
@@ -317,11 +319,17 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         if (selectedType === 'Agency') {
           this.selectAgency(selectedType, selectedOrganizationAgencyId, selectedOrganizationAgency);
         }
+        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType,false));
       });
   }
 
   private selectOrganization(type: 'Organization' | 'Agency', selectedId: number): void {
     this.store.dispatch(new LastSelectedOrganisationAgency(type));
+    this.store.dispatch(
+      new SetLastSelectedOrganizationAgencyId({
+        lastSelectedAgencyId: this.store.selectSnapshot(UserState.lastSelectedAgencyId),
+        lastSelectedOrganizationId: selectedId
+      }));
     this.store.dispatch(
       new SaveLastSelectedOrganizationAgencyId(
         {
@@ -335,6 +343,11 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   private selectAgency(type: 'Organization' | 'Agency', selectedId: number, unit: IOrganizationAgency): void {
     this.store.dispatch(new LastSelectedOrganisationAgency(type));
+    this.store.dispatch(
+      new SetLastSelectedOrganizationAgencyId({
+        lastSelectedOrganizationId: this.store.selectSnapshot(UserState.lastSelectedOrganizationId),
+          lastSelectedAgencyId: selectedId,
+      }));
     this.store.dispatch(
       new SaveLastSelectedOrganizationAgencyId(
         {

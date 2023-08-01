@@ -23,4 +23,6 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   22: WidgetTypeEnum.UPCOMING_EXP_CREDS,
   23: WidgetTypeEnum.ALREADY_EXPIRED_CREDS,
   24: WidgetTypeEnum.AVAILABLE_EMPLOYEE,
+  25: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS,
+  26: WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS,
 };

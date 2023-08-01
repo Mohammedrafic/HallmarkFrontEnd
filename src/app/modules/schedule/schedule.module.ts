@@ -16,6 +16,7 @@ import { ScheduleContainerComponent } from './containers/schedule-container/sche
 import { ScheduleRoutingModule } from './schedule-routing.module';
 import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } from './services';
 import { CreateScheduleModule } from './components/create-schedule/create-schedule.module';
+import { OrganizationStructureService, SettingsViewService } from '@shared/services';
 
 const icons = { Sliders };
 
@@ -39,6 +40,8 @@ const icons = { Sliders };
     ScheduleApiService,
     ScheduleFiltersService,
     CreateScheduleService,
+    SettingsViewService,
+    OrganizationStructureService,
   ],
 })
 export class ScheduleModule {}

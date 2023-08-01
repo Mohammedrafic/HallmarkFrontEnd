@@ -75,10 +75,11 @@ export class GroupEmailService {
    *
    * @return GroupEmail
    */
-  public GetGroupEmailRolesByOrgId(id: number): Observable<GroupEmailRole> {
-    return this.http.get<GroupEmailRole>(`/api/GroupMail/getroles?OrganizationId=` + id);
+  public GetGroupEmailRolesByOrgId(id: number[]): Observable<GroupEmailRole> {
+    return this.http.post<GroupEmailRole>(`/api/GroupMail/getroles`,  {
+      organizationId: id,
+    });
   }
-
   /**
    * Get Group Email internal users By regionId, locationId and roles
    * @param regionIds

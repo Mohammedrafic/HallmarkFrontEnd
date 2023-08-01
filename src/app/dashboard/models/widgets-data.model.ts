@@ -15,6 +15,7 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
   [WidgetTypeEnum.APPLICANTS_BY_POSITIONS]: CandidatesByStateWidgetAggregatedDataModel;
   [WidgetTypeEnum.CANDIDATES]: ChartAccumulation;
+  [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]: ChartAccumulation;
   [WidgetTypeEnum.POSITIONS_BY_TYPES]: PositionsByTypeAggregatedModel;
   [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: CandidatesPositionDataModel;
   [WidgetTypeEnum.OPEN_POSITIONS]: CandidatesPositionDataModel;
@@ -34,4 +35,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.ALREADY_EXPIRED_CREDS] : ExpiryDetailsModel[];
   [WidgetTypeEnum.UPCOMING_EXP_CREDS] : ExpiryDetailsModel[];
   [WidgetTypeEnum.AVAILABLE_EMPLOYEE] : AvailableEmployeeModel[];
+  [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: ChartAccumulation;
 }

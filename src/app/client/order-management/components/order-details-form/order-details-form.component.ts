@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } fro
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionCompleted, Select, Store } from '@ngxs/store';
 import {
   combineLatest,
   debounceTime,
@@ -68,7 +68,7 @@ import { Comment } from '@shared/models/comment.model';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { SettingsKeys } from '@shared/enums/settings';
@@ -125,6 +125,7 @@ import { JobClassifications, OptionFields } from '@client/order-management/const
 import { PartialSearchService } from '@shared/services/partial-search.service';
 import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
 import { PermissionService } from '../../../../security/services/permission.service';
+import { OrderManagementService } from '../order-management-content/order-management.service';
 
 @Component({
   selector: 'app-order-details-form',
@@ -197,7 +198,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public poNumberFields: FieldSettingsModel = PoNumberFields;
   public skillFields: FieldSettingsModel = { ...SkillFields, ...this.highlightDropdownSearchString };
   public isSpecialProjectFieldsRequired: boolean;
-  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  public settings: { [key in SettingsKeys]?: Configuration };
   public SettingsKeys = SettingsKeys;
   public specialProjectCategories: SpecialProject[];
   public projectNames: SpecialProject[];
@@ -234,7 +235,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   @Select(OrderManagementContentState.contactDetails)
   private contactDetails$: Observable<Department>;
   @Select(OrganizationManagementState.organizationSettings)
-  private organizationSettings$: Observable<OrganizationSettingsGet[]>;
+  private organizationSettings$: Observable<Configuration[]>;
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   @Select(OrderManagementContentState.selectedOrder)
@@ -244,7 +245,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     protected override store: Store,
     private route: ActivatedRoute,
     private alertService: AlertService,
-    private orderManagementService: OrderManagementContentService,
+    private orderManagementContentService: OrderManagementContentService,
+    private orderManagementService: OrderManagementService,
     private commentsService: CommentsService,
     private durationService: DurationService,
     private settingsViewService: SettingsViewService,
@@ -252,6 +254,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     private cd: ChangeDetectorRef,
     private partialSearchService: PartialSearchService,
     private permissionService: PermissionService,
+    private actions$: Actions,
   ) {
     super(store);
     this.initOrderForms();
@@ -360,7 +363,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     const startDate = DateTimeHelper.setUtcTimeZone(jobStartDate);
     const endDate = DateTimeHelper.setUtcTimeZone(jobEndDate);
 
-    this.orderManagementService
+    this.orderManagementContentService
       .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((billRate: BillRate) => {
@@ -449,8 +452,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   private subscribeForSettings(): Observable<ProjectSpecialData> {
     return this.organizationSettings$
       .pipe(
-        filter((settings: OrganizationSettingsGet[]) => !!settings.length),
-        switchMap((settings: OrganizationSettingsGet[]) => {
+        filter((settings: Configuration[]) => !!settings.length),
+        switchMap((settings: Configuration[]) => {
           this.settings = SettingsHelper.mapSettings(settings);
           this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
           return this.projectSpecialData$;
@@ -566,6 +569,15 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
   }
 
+  private populateOpenPositions(order: Order): void {
+    const openPositionsControl = this.generalInformationForm.controls['openPositions'];
+    openPositionsControl.patchValue(order.openPositions);
+
+    if (order.status === OrderStatus.Filled) {
+      openPositionsControl.disable();
+    }
+  }
+
   private removePermPlacementControls(controls: string[]): void {
     controls.forEach((control: string) => {
       this.generalInformationForm.contains(control) &&
@@ -591,6 +603,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   //TODO: refactor this method
+  // eslint-disable-next-line max-lines-per-function
   private populateForms(order: Order): void {
     this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
@@ -626,7 +639,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       });
 
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
-    this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);
+    this.populateOpenPositions(order);
     this.generalInformationForm.controls['minYrsRequired'].patchValue(order.minYrsRequired);
     this.generalInformationForm.controls['joiningBonus'].patchValue(joiningBonus);
     this.generalInformationForm.controls['compBonus'].patchValue(compBonus);
@@ -739,16 +752,21 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
 
     if (order.locationId) {
-      this.store
-        .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
-        .pipe(
+      this.actions$.pipe(
+          ofActionCompleted(GetDepartmentsByLocationId),
           take(1),
-        ).subscribe((data) => {
-          this.selectedDepartment = data.organizationManagement.departments?.find(
+        ).subscribe(() => {
+          const departments = this.store.selectSnapshot(OrganizationManagementState.departments) as Department[];
+
+          this.selectedDepartment = departments.find(
             (department: Department) => department.departmentId === order.departmentId
-          );
-          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId, { emitEvent: false });
+          ) as Department;
+          this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
         });
+  
+        this.store.dispatch(
+          new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId)
+        );
     }
   }
 
@@ -830,7 +848,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   private populateNewOrderForm(): void {
-    this.orderTypeForm.controls['orderType'].patchValue(OrderType.LongTermAssignment);
+
+    const orderTypeToPrePopulate = this.orderManagementService.getOrderTypeToPrePopulate() || OrderType.LongTermAssignment;
+    this.orderManagementService.clearOrderTypeToPrePopulate();
+    this.orderTypeForm.controls['orderType'].patchValue(orderTypeToPrePopulate);
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
     this.jobDistributionForm.controls['jobDistribution'].patchValue(OrderJobDistribution.All);
 
@@ -1129,13 +1150,21 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         return;
       }
 
+      const ignoreUpdateBillRate = !(
+        this.orderControlsConfig.orderTypeControl.dirty ||
+        this.orderControlsConfig.departmentIdControl.dirty ||
+        this.orderControlsConfig.skillIdControl.dirty ||
+        this.orderControlsConfig.jobStartDateControl.dirty
+      );
+
       this.store.dispatch(
         new SetPredefinedBillRatesData(
           orderType,
           departmentIdValue,
           skillId,
           DateTimeHelper.setUtcTimeZone(jobStartDate),
-          DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value)
+          DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value),
+          ignoreUpdateBillRate
         )
       );
     });

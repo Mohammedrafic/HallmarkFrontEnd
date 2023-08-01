@@ -50,7 +50,7 @@ import { AddEditReorderComponent } from '@client/order-management/components/add
 import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import { SettingsKeys } from '@shared/enums/settings';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { Configuration } from '@shared/models/organization-settings.model';
 import {
   ExtensionCandidateComponent,
 } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
@@ -84,7 +84,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() openEvent: Subject<boolean>;
   @Input() orderPositionSelected$: Subject<{ state: boolean; index?: number }>;
   @Input() children: OrderManagementChild[] | undefined;
-  @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  @Input() settings: { [key in SettingsKeys]?: Configuration };
   @Input() hasCreateEditOrderPermission: boolean;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Input() CanEditOrderBillRateIRP: boolean;
@@ -156,6 +156,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public disabledCloseButton = true;
   public showCloseButton = false;
+  public showEmployeeTab = true;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   private secondHasOpenedOnes = false;
 
@@ -239,8 +240,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get mobileMenu(): { text: string }[] {
     let menu: { text: string }[] = this.tabletMenu;
-    if (!this.disableEdit) {
-      menu = [...menu, { text: MobileMenuItems.Edit }];
+    if (!this.disableEdit  &&  this.activeSystem === this.systemType.IRP) {
+      menu = [...menu, { text: MobileMenuItems.Edit }, { text: MobileMenuItems.CloseOrder}];
     }
     return menu;
   }
@@ -271,8 +272,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['order']?.currentValue) {
       this.setCloseOrderButtonState();
+      this.setShowEmployeeTabState();
       const order = changes['order']?.currentValue;
-      const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText?.toLowerCase());
+      const orderstatusValue=order.statusText==null?order.irpOrderMetadata.statusText:order.statusText;
+      const hasStatus = this.openInProgressFilledStatuses.includes(orderstatusValue?.toLowerCase());
       this.showCloseButton = hasStatus || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate));
 
       if (this.chipList) {
@@ -386,7 +389,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public approveOrder(id: number): void {
-    this.store.dispatch(new ApproveOrder(id));
+    this.store.dispatch(new ApproveOrder(id, this.activeSystem === OrderManagementIRPSystemId.IRP));
   }
 
   public editOrder(data: Order) {
@@ -631,5 +634,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private checkOrderCandidatesForOnboard(candiadtes: CandidateModel[]): boolean {
     return candiadtes.some((candidate) => candidate.status === ONBOARDED_STATUS);
+  }
+
+  private setShowEmployeeTabState(): void {
+    const status = this.order.irpOrderMetadata?.status ? this.order.irpOrderMetadata.status : this.order.status;
+    this.showEmployeeTab = !(this.activeSystem === OrderManagementIRPSystemId.IRP && status === OrderStatus.PreOpen);
   }
 }

@@ -70,6 +70,10 @@
     text-align: right;
   }
 
+  .align-left {
+    text-align: left !important;
+  }
+
   .custom-wrap {
     .ag-header-cell-text {
       white-space: pre-wrap;
@@ -103,6 +107,10 @@
 
   .custom-scroll {
     overflow-y: auto;
+  }
+
+  .bold {
+    font-weight: bold;
   }
 }
 

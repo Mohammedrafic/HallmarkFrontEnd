@@ -98,7 +98,6 @@
             <e-tabitem>
               <ng-template #headerText>Candidate</ng-template>
               <ng-template #content>
-                <hr />
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate" *ngIf="!order?.extensionFromId; else extensionCandidate">
                     <ng-container *ngSwitchCase="candidateTemplate.onboarded">

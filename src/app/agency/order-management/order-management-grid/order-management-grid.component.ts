@@ -110,6 +110,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
   @Input() public orderStatus: string[];
+  @Input() public candidateStatuses: string[];
 
   @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
@@ -302,7 +303,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         new ExportPayload(
           fileType,
           {
-            filtersExport,
+            ...filtersExport,
             offset: Math.abs(new Date().getTimezoneOffset()),
             isAgency: this.selectedTab === AgencyOrderManagementTabs.ReOrders ? true : null,
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
@@ -428,6 +429,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.OrderFilterFormGroup.get('orderStatuses')?.setValue([...this.orderStatus]);
         this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : undefined;
       }
+      if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
+        this.clearFilters();
+        this.setDefaultStatuses(statuses, true);
+      }
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
       this.dispatchNewPage();
@@ -472,6 +477,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     if(this.Organizations.length > 0){
       this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
       this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+    }
+    if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
+      this.OrderFilterFormGroup.get('candidateStatuses')?.setValue([...this.candidateStatuses]);
+      this.filters.candidateStatuses = this.candidateStatuses.length > 0 ? this.candidateStatuses : undefined;
     }
     if (setDefaultFilters) {
       let Status = [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];

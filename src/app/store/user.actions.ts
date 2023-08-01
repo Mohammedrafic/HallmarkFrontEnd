@@ -14,7 +14,10 @@ export class LogoutUser {
 
 export class GetUserMenuConfig {
   static readonly type = '[user] Get Users Menu Configuration';
-  constructor(public payload: BusinessUnitType) { }
+  constructor(
+    public payload: BusinessUnitType,
+    public isEmployee?: boolean,
+  ) { }
 }
 
 export class GetUserAgencies {

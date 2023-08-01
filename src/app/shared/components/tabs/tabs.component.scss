@@ -1,4 +1,5 @@
 @import "colors";
+@import 'adaptive-response';
 
 .stepper {
   padding-bottom: 40px;
@@ -6,6 +7,40 @@
   .stepper-title {
     .required {
       color: $supportive-red;
+    }
+  }
+}
+
+.tabs {
+  max-width: calc(100% - 16px) !important;
+
+  @media #{$max-mobile} {
+    max-width: calc(100vw - 32px) !important;
+  }
+
+  .e-content {
+    height: auto !important;
+  }
+}
+
+@media #{$max-tablet} {
+  @container main-content (max-width: 640px) {
+    .tabs {
+      .e-tab-header {
+        overflow: hidden;
+  
+        .e-item {
+          max-width: 135px;
+        }
+      }
+    }
+  
+    .stepper {
+      .stepper-title {
+        .text {
+          white-space: pre-line;
+        }
+      }
     }
   }
 }

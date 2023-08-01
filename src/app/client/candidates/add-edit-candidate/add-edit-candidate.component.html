@@ -3,10 +3,10 @@
     <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
     <h3>{{titlevalue}}  <span class="candidate-name-title">{{candidateName$ | async}}</span></h3>
   </ng-container>
-  <ng-container right *ngIf="showButtons">
-    <button ejs-button cssClass="e-outline" [disabled]="isCandidateFormPristine" (click)="clearForm()">Clear</button>
-    <button ejs-button cssClass="e-primary" (click)="saveCandidate()" [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageIrpCandidateProfile]">Save</button>
-  </ng-container>
+  <ng-container right
+    *ngIf="!(isMobile$ | async) && showButtons"
+    [ngTemplateOutlet]="actionButtons"
+  ></ng-container>
 </app-page-toolbar>
 
 <app-tabs
@@ -14,3 +14,33 @@
   [tabs]="tabsConfig"
   (selectEmitter)="onTabChange($event)"
 ></app-tabs>
+
+<div
+  *ngIf="(isMobile$ | async) && showButtons"
+  class="mobile-buttons"
+>
+  <ng-container
+    [ngTemplateOutlet]="actionButtons"
+  ></ng-container>
+</div>
+
+<ng-template #actionButtons>
+  <button
+    ejs-button
+    appHideBeforeSyncfusionLoad
+    cssClass="e-outline" 
+    [disabled]="isCandidateFormPristine"
+    (click)="clearForm()"
+  >
+    Clear
+  </button>
+  <button
+    ejs-button
+    appHideBeforeSyncfusionLoad
+    cssClass="e-primary"
+    [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageIrpCandidateProfile]"
+    (click)="saveCandidate()"
+  >
+    Save
+  </button>
+</ng-template>

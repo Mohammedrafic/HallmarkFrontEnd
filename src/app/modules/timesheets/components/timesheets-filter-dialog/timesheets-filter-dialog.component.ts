@@ -121,13 +121,13 @@ export class TimesheetsFilterDialogComponent
       filter(({ state }) => !!state?.statusIds?.length),
       map(({ state }) => this.filterPreservedFilters(state)),
       takeUntil(this.componentDestroy())
-    ).subscribe((state) => { 
+    ).subscribe((state) => {
       this.applyPreservedFilters(state);
     });
   }
 
   private applyPreservedFilters(filters: TimesheetsFilterState): void {
-    if (filters.orderIds) {
+    if (filters?.orderIds && Array.isArray(filters.orderIds)) {
       filters.orderIds = filters.orderIds[0];
     }
     this.patchFilterForm({ ...filters });

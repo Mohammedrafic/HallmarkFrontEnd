@@ -223,7 +223,7 @@ export class OverallStatusComponent implements OnInit, OnDestroy {
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.isDefaultLoad = true;
-          setTimeout(() => { this.SearchReport() }, 3000);
+          this.SearchReport() ;
         }
         else {
           this.isClearAll = false;

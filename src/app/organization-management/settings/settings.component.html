@@ -14,83 +14,16 @@
       </button>
     </section>
   </section>
-  <ejs-grid #grid [dataSource]="gridDataSource" (rowDataBound)="rowDataBound($event)" [allowPaging]="allowPaging"
-    [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight" [enableVirtualization]="false"
-    [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
-    (dataBound)="gridDataBound(grid)" (actionBegin)="actionBegin($event, grid)" class="grid-component">
-    <ng-template #detailTemplate let-data>
-      <table class="detailtable" width="100%">
-        <tbody>
-          <tr *ngFor="let child of data.children" [hidden]="child.hidden">
-            <td class="e-rowcell e-templatecell" [style.width.px]="100">
-              <div class="row-tool-buttons">
-                <button ejs-button cssClass="e-flat primary-icon-button"
-                  (click)="openEditSettingDialog(data, child, $event)"
-                  [disabled]="hasPermissions | hasAccess : data : false">
-                  <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-                </button>
-              </div>
-            </td>
-            <td class="e-rowcell e-templatecell attr-td" [style.width.px]="400"> </td>
-            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.systemType}}</td>
-            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.regionName}}</td>
-            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.locationName}}</td>
-            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.departmentName}}</td>
-            <td class="e-rowcell e-templatecell" [style.width.px]="400" style="text-align: left">{{child.displayValue}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </ng-template>
-    <e-columns>
-      <e-column textAlign="Right" width="100">
-        <ng-template #template let-data>
-          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat primary-icon-button"
-              (click)="openEditSettingDialog(data, undefined, $event)"
-              [disabled]="hasPermissions | hasAccess : data : true">
-              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button cssClass="e-flat default-icon-button" (click)="openOverrideSettingDialog(data)"
-              [disabled]="hasPermissions | hasAccess : data : false : disabledSettings">
-              <span class="edit-button"><i-feather name="plus" class="icon"></i-feather></span>
-            </button>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column field="name" headerText="ATTRIBUTE" width=400></e-column>
-      <e-column [visible]="orgSystems.IRPAndVMS" field="systemType" headerText="SYSTEM" width=150></e-column>
-      <e-column field="regionName" headerText="REGION" width=150></e-column>
-      <e-column field="locationName" headerText="LOCATION" width=150></e-column>
-      <e-column field="departmentName" headerText="DEPARTMENT" width=150></e-column>
-      <e-column field="displayValue" headerText="VALUE" width=400></e-column>
-    </e-columns>
-    <ng-template #pagerTemplate let-data>
-      <div class="e-pagertemplate">
-        <div class="control-section">
-          <div class="content-wrapper">
-            <section class="left-side-pager-controls">
-              <ejs-dropdownlist id="rowsPerPage" class="dropdown-no-border" [allowFiltering]="true"
-                [dataSource]="rowsPerPageDropDown" [(value)]="activeRowsPerPageDropDown"
-                (change)="changePageSize($event)">
-              </ejs-dropdownlist>
-              <ejs-numerictextbox id="goToPage" class="numeric-input-no-border" format="#"
-                [validateDecimalOnType]="validateDecimalOnType" [decimals]="decimals" placeholder="Go to:" min="1"
-                [max]="lastAvailablePage" [showSpinButton]="false" (change)="changePage($event)">
-              </ejs-numerictextbox>
-              <div class="total-rows">
-                Total Rows: {{totalDataRecords}}
-              </div>
-            </section>
-            <section class="right-side-pager-controls">
-              <ejs-pager id="gridPager" #gridPager [pageSize]="pageSizePager" [totalRecordsCount]="totalDataRecords"
-                [enablePagerMessage]="false" [currentPage]="currentPagerPage" (click)="changePage($event)">
-              </ejs-pager>
-            </section>
-          </div>
-        </div>
-      </div>
-    </ng-template>
-  </ejs-grid>
+  <app-configuration-grid
+    [configurations]="configurations"
+    [showSystemColumn]="orgSystems.IRPAndVMS"
+    [disabledSettings]="disabledSettings"
+    [hasPermissions]="hasPermissions"
+    [gridDataSource]="gridDataSource"
+    [totalDataRecords]="totalDataRecords"
+    (openOverrideSettingDialog)="openOverrideSettingDialog($event)"
+    (openEditSettingDialog)="openEditSettingDialog($event)"
+    ></app-configuration-grid>
 </section>
 
 <app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="deleteFilter($event)"

@@ -281,7 +281,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           if (this.isInitialLoad) {
-            setTimeout(() => { this.SearchReport() }, 3000);
+         this.SearchReport() ;
             this.isInitialLoad = false;
           }
           this.changeDetectorRef.detectChanges();

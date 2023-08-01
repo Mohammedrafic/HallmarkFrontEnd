@@ -82,8 +82,22 @@ export class ReasonsFormsService {
         id: [],
         reason: ['', [Validators.required, Validators.maxLength(100),
           Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+        agencyFeeApplicable: [true],
       });
-    }
+    }else if(formType === ReasonFormType.RecuriterReason){
+      this.form = this.fb.group({
+        id: [],
+        reason: ['', [Validators.required, Validators.maxLength(100),
+          Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+      });
+    } 
+    else if(formType === ReasonFormType.SourcingReason){
+      this.form = this.fb.group({
+        id: [],
+        reason: ['', [Validators.required, Validators.maxLength(100),
+          Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+      });
+    } 
     return this.form;
   }
 }

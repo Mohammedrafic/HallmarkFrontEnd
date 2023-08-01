@@ -124,10 +124,10 @@
             </div>
           </ng-template>
         </e-column>
-        <e-column field="hourlyBillRate" textAlign="Right" headerText="Bill Rate &dollar;" width="120">
+        <e-column field="hourlyBillRate" textAlign="Right" headerText="Candidate Bill Rate &dollar;" width="160">
           <ng-template #template let-data>
             <div class="align-right">
-              {{ data.hourlyBillRate | bulkbillRate: data.candidateBillRate:data.status:data.offeredBillRate?data.offeredBillRate:data.candidateBillRate}}
+              {{ data.status !== applicantStatus.NotApplied ? data.initialBillRate : 0 | number: '1.2-2'}}
             </div>
           </ng-template>
         </e-column>

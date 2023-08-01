@@ -49,6 +49,7 @@
 
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
+                      [required]="field.required"
                       [allowFiltering]="true"
                       [fields]="dropDownFieldsConfig"
                       [formControlName]="field.field"
@@ -111,6 +112,7 @@
                 <div class="input-container long flexed">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
                   <ejs-switch
+                  [disabled]="field.disabled"
                   class="toggle"
                   onLabel="Yes"
                   offLabel="No"

@@ -10,6 +10,7 @@ export enum WidgetDescriptionEnum {
   OPEN_POSITIONS = 'Open Positions',
   FILLED_POSITIONS = 'Filled positions for active orders',
   ACTIVE_POSITIONS = 'Active Positions by Status',
+  AVERAGE_DAY_ACTIVE_POSITIONS = 'Average days positions are active by position status category',
   TASKS = 'Tasks_widget',
   FILLED_POSITIONS_TREND = 'Filled_Positions_Trend',
   CHAT = 'Chat_widget',
@@ -24,5 +25,6 @@ export enum WidgetDescriptionEnum {
   RN_UTILIZATION_DESCRIPTION = 'RN Utilization Widget Description',
   ALREADY_EXPIRED_CREDS = 'Already Expired Credentials',
   UPCOMING_EXP_CREDS = 'Upcoming Expiring Credentials',
-  AVAILABLE_EMPLOYEE='Available Employees in next 24 hrs.'
+  AVAILABLE_EMPLOYEE='Available Employees in next 24 hrs.',
+  CANDIDATES_ACTIVE_POSITIONS="Count of Candidate statuses in Active Orders/Positions.",
 }

@@ -1,5 +1,6 @@
 @import 'colors';
 @import 'adaptive-response';
+@import 'mixins';
 
 :host {
   overflow-y: auto;
@@ -130,5 +131,9 @@
   @media (max-width: $tablet-min) {
     display: flex;
   }
+}
+
+.candidate-message {
+  @include candidateMessage;
 }
 

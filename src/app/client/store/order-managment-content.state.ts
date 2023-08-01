@@ -411,7 +411,7 @@ export class OrderManagementContentState {
     private UpdateRegRateService : UpdateRegRateService,
     private commentService : CommentsService
   ) {}
-  
+
   @Action(GetOrders, { cancelUncompleted: true })
   GetOrders(
     { patchState }: StateContext<OrderManagementContentStateModel>,
@@ -960,10 +960,10 @@ export class OrderManagementContentState {
   @Action(ApproveOrder)
   ApproveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id }: ApproveOrder
+    { id, isIRPTab }: ApproveOrder
   ): Observable<string | void> {
     return this.orderManagementService
-      .approveOrder(id)
+      .approveOrder(id, isIRPTab)
       .pipe(catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error))));
   }
 

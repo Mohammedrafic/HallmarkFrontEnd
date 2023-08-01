@@ -102,6 +102,9 @@ export class InvoicesApiService {
     return this.organizationDeleteManualInvoice(id);
   }
 
+  public getAgencyFeeApplicable(id: number): Observable<boolean> {
+    return this.http.get<boolean>(`/api/ManualInvoiceRecords/agencyFeeApplicable/${id}`);
+  }
     /**
    * TODO: remove this with shared service
    */

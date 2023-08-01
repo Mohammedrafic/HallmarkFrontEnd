@@ -346,11 +346,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload)).pipe(
-        takeUntil(this.unsubscribe$)
-      ).subscribe(() => {
-        this.store.dispatch(new ReloadOrderCandidatesLists());
-      });
+      this.store.dispatch(new RejectCandidateJob(payload));
 
       this.closeDialog();
     }
@@ -445,13 +441,16 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
             this.candidateAddressRequiredValue = addressConfiguration.value;
           }
         }
+        
+        const jobStartDate = value.actualStartDate || value.order.jobStartDate as unknown as string;
+        const jobEndDate = value.actualEndDate || value.order.jobEndDate as unknown as string;
+
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobStartDate.toString()) : "",
-          value.order.jobEndDate ? DateTimeHelper.setCurrentTimeZone(value.order.jobEndDate.toString()) : ""],
+          date: [DateTimeHelper.setCurrentTimeZone(jobStartDate), DateTimeHelper.setCurrentTimeZone(jobEndDate)],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
           availableStartDate: value.availableStartDate ?
             DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
@@ -476,7 +475,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           hours: value.jobCancellation?.hours,
           dob: value.candidateProfile.dob,
           ssn: value.candidateProfile.ssn,
-          candidatePayRate: this.candidateJob.candidatePayRate
+          candidatePayRate: this.candidateJob.candidatePayRate,
         });
       }
       this.changeDetectionRef.markForCheck();

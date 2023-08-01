@@ -1,15 +1,34 @@
-<app-grid gridTitle="General Notes" [rowData]="generalNotes$ | async" [columnDefinitions]="columnDef"
-  [rowSelection]="rowSelection" [totalRecordsCount]="(generalNotes$ | async)?.length!">
-  <button ejs-dropdownbutton action-button  [items]="exportOptions" (select)="exportSelected($event)"
-    id="exportButton" cssClass="e-outline button-export">
+<app-grid
+  gridTitle="General Notes"
+  [rowData]="generalNotes$ | async"
+  [columnDefinitions]="columnDef"
+  [rowSelection]="rowSelection"
+  [totalRecordsCount]="(generalNotes$ | async)?.length!"
+  [showUpScrollButton]="false"
+>
+  <button
+    ejs-dropdownbutton
+    action-button
+    id="exportButton"
+    cssClass="e-outline button-export"
+    [items]="exportOptions"
+    (select)="exportSelected($event)"
+  >
     <div class="button-export-container">
-      Export <i-feather name="upload" class="icon"></i-feather>
+      <span class="btn-label">Export</span>
+      <i-feather name="upload" class="icon"></i-feather>
     </div>
   </button>
-  <button action-button cssClass="e-action-button" ejs-button
-    [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageIrpCandidateProfile]" (click)="addNote()">
+  <button
+    action-button
+    ejs-button
+    id="addNoteButton"
+    cssClass="e-action-button"
+    [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageIrpCandidateProfile]"
+    (click)="addNote()"
+  >
     <i-feather name="plus" class="icon"></i-feather>
-    Add Note
+    <span class="btn-label">Add Note</span>
   </button>
 </app-grid>
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"

@@ -72,6 +72,14 @@ export class ScheduleFiltersService {
     return ScheduleFilterHelper.adaptLocationToOption(sortByField(locations, 'name'));
   }
 
+  getSelectedLocationByOrder(structure: ScheduleFilterStructure, selectedIds: number[]): DropdownOption[] {
+    const selectedRegions: OrganizationRegion[] = structure.regions
+    .filter((region) => selectedIds.includes(region.id as number));
+    const locations = selectedRegions.flatMap((region) => region.locations as OrganizationLocation[]);
+
+    return ScheduleFilterHelper.adaptLocationToOption(locations);
+  }
+
   getSelectedDepartmentOptions(structure: ScheduleFilterStructure, selectedIds: number[], sort = true): DropdownOption[] {
     const selectedLocations = structure.locations
     .filter((location) => selectedIds.includes(location.id));

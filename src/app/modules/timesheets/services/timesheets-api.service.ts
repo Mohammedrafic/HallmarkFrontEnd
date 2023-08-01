@@ -23,14 +23,16 @@ export class TimesheetsApiService {
   ) {}
 
   public getTimesheets(filters: TimesheetsFilterState): Observable<TimeSheetsPage> {
+    const mappedFilters = this.mapTimeSheetsFilters(filters);
     return this.http.post<TimeSheetsPage>('/api/Timesheets', {
-      ...filters,
+      ...mappedFilters,
     });
   }
 
   public getTabsCounts(filters: TimesheetsFilterState): Observable<TabCountConfig> {
+    const mappedFilters = this.mapTimeSheetsFilters(filters);
     return this.http.post<TabCountConfig>('/api/Timesheets/tabcounters', {
-      ...filters,
+      ...mappedFilters,
     });
   }
 
@@ -46,6 +48,10 @@ export class TimesheetsApiService {
       map((data) => RecordsAdapter.adaptRecordsDto(data)),
       catchError(() => of({
         timesheets: {
+          editMode: [],
+          viewMode: [],
+        },
+        historicalData: {
           editMode: [],
           viewMode: [],
         },
@@ -147,5 +153,12 @@ export class TimesheetsApiService {
   public exportTimeSheets(payload: ExportPayload): Observable<Blob> {
     const url =  '/api/Timesheets/exporttimesheets';
     return this.http.post(url, payload, { responseType: 'blob' });
+  }
+
+  private mapTimeSheetsFilters(filters: TimesheetsFilterState): TimesheetsFilterState {
+    return {
+      ...filters, 
+      orderIds: filters.orderIds && !Array.isArray(filters.orderIds) ? [filters.orderIds as string] : filters.orderIds,
+    };
   }
 }

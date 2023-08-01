@@ -40,6 +40,20 @@
               </ng-container>
             </ng-container>
 
+            <ng-container *ngSwitchCase="'system'">
+              <ng-container *ngIf="row.system === vmsSystem && isBothSystemsEnabled; else defaultCell">
+                <p class="custom-cell__value custom-cell__link" (click)="navigateToPositionDetails(data)">
+                  {{ data[cell?.field || ''] }}
+                </p>
+              </ng-container>
+
+              <ng-template #defaultCell>
+                <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
+              </ng-template>
+
+              <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
+            </ng-container>
+
             <ng-container *ngSwitchDefault>
               <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
               <h3 class="custom-cell__title">{{ cell.headerName }}</h3>

@@ -360,7 +360,7 @@
         <div class="group">
           <div class="input-container agency-switcher-container">
             <div class="input-group datepicker">
-              <ejs-switch id="agency-switcher"
+              <ejs-switch id="agency-switcher" *ngIf="isSharedByMe"
                           [checked]="agencySwitch"
                           (change)="onAgencySwitcher($event);"></ejs-switch>
               <label for="agency-switcher" class="switch-text">Agencies</label>

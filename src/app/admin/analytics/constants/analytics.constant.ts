@@ -212,6 +212,20 @@ export const PositionSummaryConstants = {
     endDate: 'endDate'
   }
 }
+
+export const shiftBreakdownConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    startYear: 'startYear',
+    startMonth: 'startMonth',
+    endYear: 'endYear',
+    endMonth: 'endMonth'
+  }
+}
+
 export const accrualReportTypesList : { name: string; id: number }[] = [
   { name: 'Invoice date range', id: 0 },
   { name: 'Timesheet date range', id: 1 }

@@ -349,7 +349,6 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
     { text: 'PunchOut Time', column: 'PunchOutTime' },
     { text: 'Lunch', column: 'Lunch' },
     { text: 'Total Hours', column: 'TotalHours' },
-    { text: 'Job Code', column: 'JobCode' },
     { text: 'Deleted', column: 'Deleted' },
     { text: 'Error Description', column: 'ErrorDescription' },
   ];

@@ -1,83 +1,41 @@
 <h2 class="title">Contact Details</h2>
 <form class="contact-details__form">
-  <app-input
-    [formGroupInstance]="candidateForm"
-    maxlength="100"
-    controlName="address1"
-    id="address"
-    label="Address"
-  ></app-input>
+  <app-input [formGroupInstance]="candidateForm" maxlength="100" controlName="address1" id="address"
+    label="Address"></app-input>
 
-  <app-dropdown
-    [dataSource]="countries"
-    [fields]="addressFieldSettings"
-    [formGroupInstance]="candidateForm"
-    [hideBorder]="false"
-    [required]="true"
-    label="Country"
-    id="country"
-    controlName="country"
-  ></app-dropdown>
+  <app-dropdown [dataSource]="countries" [fields]="addressFieldSettings" [formGroupInstance]="candidateForm"
+    [hideBorder]="false" [required]="true" label="Country" id="country" controlName="country"></app-dropdown>
 
-  <app-dropdown
-    [dataSource]="states$ | async"
-    [fields]="addressFieldSettings"
-    [formGroupInstance]="candidateForm"
-    [hideBorder]="false"
- 
-    label="State"
-    id="state"
-    controlName="state"
-  ></app-dropdown>
+  <app-dropdown [dataSource]="states$ | async" [fields]="addressFieldSettings" [formGroupInstance]="candidateForm"
+    [hideBorder]="false" label="State" id="state" controlName="state"></app-dropdown>
 
-  <app-input
-    [formGroupInstance]="candidateForm"
+  <app-input [formGroupInstance]="candidateForm" maxlength="20" controlName="city" id="city" label="City"></app-input>
 
-    maxlength="20"
-    controlName="city"
-    id="city"
-    label="City"
-  ></app-input>
+  <app-input [formGroupInstance]="candidateForm" [mask]="zipCodeMask" controlName="zipCode" id="zip-code"
+    label="ZIP Code"></app-input>
 
-  <app-input
-    [formGroupInstance]="candidateForm"
-    [mask]="zipCodeMask"
-    controlName="zipCode"
-    id="zip-code"
-    label="Zip Code"
-  ></app-input>
+  <app-input [formGroupInstance]="candidateForm" [required]="true" maxlength="200" controlName="personalEmail"
+    id="email" label="Email"></app-input>
 
-  <app-input
-    [formGroupInstance]="candidateForm"
-    [required]="true"
-    maxlength="200"
-    controlName="personalEmail"
-    id="email"
-    label="Email"
-  ></app-input>
+  <app-input [formGroupInstance]="candidateForm" maxlength="200" controlName="workEmail" id="work-email"
+    label="Work Email"></app-input>
 
-  <app-input
-    [formGroupInstance]="candidateForm"
-    maxlength="200"
-    controlName="workEmail"
-    id="work-email"
-    label="Work Email"
-  ></app-input>
+  <app-input [formGroupInstance]="candidateForm" [mask]="phoneMask" [required]="true" controlName="phone1"
+    id="cellphone" label="Cellphone"></app-input>
 
-  <app-input
-    [formGroupInstance]="candidateForm"
-    [mask]="phoneMask"
-    [required]="true"
-    controlName="phone1"
-    id="cellphone"
-    label="Cellphone"
-  ></app-input>
-
-  <app-input
-    [formGroupInstance]="candidateForm"
-    [mask]="phoneMask"
-    controlName="phone2"
-    id="alternativePhone"
-    label="Alternative Phone"
-  ></app-input>
+  <app-input [formGroupInstance]="candidateForm" [mask]="phoneMask" controlName="phone2" id="alternativePhone"
+    label="Alternative Phone"></app-input>
+  <button *ngIf="isSourceValidated" ejs-button id="sendGroupEmailFormButton" type="button" [isPrimary]="true"
+    (click)="onGroupEmailFormSendClick()">Send Email</button>
 </form>
+
+<app-send-email-side-dialog [header]="templateEmailTitle" [isSend]="isSend" 
+  (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()"
+  [width]="'1000px'">
+  <section>
+    <app-employee-group-mail #emailTemplateForm [groupEmailTemplateForm]="$any(groupEmailTemplateForm)" [title]="templateEmailTitle"
+                                    [isSend]="isSend"> 
+
+</app-employee-group-mail>
+     </section>
+</app-send-email-side-dialog>

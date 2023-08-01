@@ -22,6 +22,14 @@
         [sizeY]="panel.sizeY"
       >
         <ng-template #content [ngSwitch]="panel.id">
+          <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS"
+                                    [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]"
+                                    [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
+                                    [description]="widgetDescriptionEnum.CANDIDATES_ACTIVE_POSITIONS"></app-accumulation-chart>
+         <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS"
+                                  [chartData]="widgetsData?.[widgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]"
+                                  [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
+                                  [description]="widgetDescriptionEnum.AVERAGE_DAY_ACTIVE_POSITIONS" [averageFlag]="true"></app-accumulation-chart>
           <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.CANDIDATES"
                                   [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
                                   [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"

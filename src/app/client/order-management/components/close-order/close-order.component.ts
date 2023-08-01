@@ -1,12 +1,12 @@
 import {
-  ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy,
+  ChangeDetectorRef, Component, EventEmitter, Input, OnChanges,
   OnInit, Output, SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { catchError, distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
 
 import { CloseOrderService } from '@client/order-management/components/close-order/close-order.service';
 import { CloseOrderPayload } from '@client/order-management/components/close-order/models/closeOrderPayload.model';
@@ -36,7 +36,7 @@ import { PermissionService } from 'src/app/security/services/permission.service'
   templateUrl: './close-order.component.html',
   styleUrls: ['./close-order.component.scss'],
 })
-export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit, OnDestroy {
+export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit {
   @Input() public order: Order | OrderManagement;
   @Input() candidate: OrderManagementChild;
   @Input() currentSystem: OrderManagementIRPSystemId;
@@ -62,7 +62,6 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public commentContainerId = 0;
   public comments: Comment[] = [];
   public closureReasons: RejectReasonwithSystem[];
-  private unsubscribe$: Subject<void> = new Subject();
   public canCreateOrder: boolean;
 
   public constructor(
@@ -104,22 +103,16 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.closureReasonsPage$.pipe(
       filter(x => x != undefined && x != null), 
       takeUntil(this.destroy$)
-      ).subscribe((data) => {
-      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.IRP)
-      {        
+    ).subscribe((data) => {
+      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.IRP) {        
         this.closureReasons = data.items.filter(f => f.includeInIRP == true);
       }
-      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.VMS)
-      {
+      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.VMS) {
         this.closureReasons = data.items.filter(f => f.includeInVMS == true);
       }
     });
   }
 
-  public override ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
-  }
   public onCancel(): void {
     if (this.closeForm.dirty) {
       this.confirmService
@@ -149,7 +142,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   private onOrganizationChangedClosureReasons(): void {
     this.organizationId$.pipe(distinctUntilChanged(), takeUntil(this.destroy$)).subscribe((e) => {
-      this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true));      
+      this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true, true));      
     });
   }
 

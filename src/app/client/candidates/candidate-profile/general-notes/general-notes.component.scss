@@ -1,4 +1,17 @@
+@import 'adaptive-response';
+
 :host {
   display: flex;
   height: calc(100% - 56px);
+}
+
+@media #{$max-mobile} {
+  #addNoteButton,
+  #exportButton {
+    border: none;
+
+    .icon {
+      margin-left: 0;
+    }
+  }
 }

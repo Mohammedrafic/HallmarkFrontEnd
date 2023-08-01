@@ -6,8 +6,15 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { BaseObservable } from '@core/helpers';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
-import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { 
+  OrderManagementIRPSystemId,
+  OrderManagementIRPTabsIndex,
+  OrganizationOrderManagementTabs,
+} from '@shared/enums/order-management-tabs.enum';
 import { GlobalWindow } from '@core/tokens';
+
+import { OrderLinkDetails } from '../../../order-management/interfaces';
+import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 
 @Injectable({
   providedIn: 'root',
@@ -31,9 +38,12 @@ export class OrderManagementService extends DestroyableDirective {
 
   private _selectedOrderAfterRedirect: OrderTab | null;
   private orderManagementSystem: OrderManagementIRPSystemId | null;
+  private orderTypeToPrePopulate: OrderType | IrpOrderType | null;
   private previousSelectedOrganizationId: number;
   private readonly isAvailable: BaseObservable<boolean> = new BaseObservable<boolean>(false);
   private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
+  private readonly orderFromAnotherSystem: BaseObservable<OrderLinkDetails | null> =
+    new BaseObservable<OrderLinkDetails | null>(null);
 
   constructor(
     private fb: FormBuilder,
@@ -110,6 +120,27 @@ export class OrderManagementService extends DestroyableDirective {
     });
   }
 
+  public setOrderTypeToPrePopulate(
+    vmsTab: OrganizationOrderManagementTabs,
+    irpTab: OrderManagementIRPTabsIndex,
+    system: OrderManagementIRPSystemId
+  ): void {
+    if (system === OrderManagementIRPSystemId.VMS) {
+      this.orderTypeToPrePopulate = this.getVMSOrderType(vmsTab);
+    } else if (system === OrderManagementIRPSystemId.IRP) {
+      this.orderTypeToPrePopulate = this.getIRPOrderType(irpTab);
+    } else {
+      this.clearOrderTypeToPrePopulate();
+    }
+  }
+
+  public getOrderTypeToPrePopulate(): OrderType | IrpOrderType | null {
+    return this.orderTypeToPrePopulate;
+  }
+
+  public clearOrderTypeToPrePopulate(): void {
+    this.orderTypeToPrePopulate = null;
+  }
 
   public setOrderManagementSystem(system: OrderManagementIRPSystemId | null) {
     this.orderManagementSystem = system;
@@ -145,7 +176,39 @@ export class OrderManagementService extends DestroyableDirective {
     return this.updatedCandidate.getStream();
   }
 
+  setOrderFromAnotherSystem(orderLinkDetails: OrderLinkDetails): void {
+    this.orderFromAnotherSystem.set(orderLinkDetails);
+  }
+
+  getOrderFromAnotherSystemStream(): Observable<OrderLinkDetails | null> {
+    return this.orderFromAnotherSystem.getStream();
+  }
+
   saveSelectedOrderManagementSystem(activeSystem: OrderManagementIRPSystemId): void {
     this.globalWindow.localStorage.setItem('selectedOrderManagementSystem', activeSystem.toString());
+  }
+
+  private getVMSOrderType(tab: OrganizationOrderManagementTabs): OrderType | null {
+    if (tab === OrganizationOrderManagementTabs.PerDiem) {
+      return OrderType.OpenPerDiem;
+    }
+
+    if (tab === OrganizationOrderManagementTabs.PermPlacement) {
+      return OrderType.PermPlacement;
+    }
+
+    return null;
+  }
+
+  private getIRPOrderType(tab: OrderManagementIRPTabsIndex): IrpOrderType | null {
+    if (tab === OrderManagementIRPTabsIndex.PerDiem) {
+      return IrpOrderType.PerDiem;
+    }
+
+    if (tab === OrderManagementIRPTabsIndex.Lta) {
+      return IrpOrderType.LongTermAssignment;
+    }
+
+    return null;
   }
 }

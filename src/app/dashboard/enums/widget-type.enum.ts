@@ -7,6 +7,7 @@ export enum WidgetTypeEnum {
   OPEN_POSITIONS = 'Open_Positions',
   FILLED_POSITIONS = 'Filled_Positions',
   ACTIVE_POSITIONS = 'Active_Positions',
+  AVERAGE_DAY_ACTIVE_POSITIONS = 'Average_Day_Of_Active_Positions',
   TASKS = 'Tasks_widget',
   FILLED_POSITIONS_TREND = 'Filled_Positions_Trend',
   CHAT = 'Chat_widget',
@@ -20,5 +21,6 @@ export enum WidgetTypeEnum {
   RN_UTILIZATION ="RN_UTILIZATION",
   ALREADY_EXPIRED_CREDS = 'Already_expired_creds',
   UPCOMING_EXP_CREDS = 'Upcoming_exp_creds',
-  AVAILABLE_EMPLOYEE = 'Available_Employee'
+  AVAILABLE_EMPLOYEE = 'Available_Employee',
+  CANDIDATES_ACTIVE_POSITIONS="Candidates_Active_Positions",
 }

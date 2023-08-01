@@ -5,8 +5,13 @@
     class="table-tabs" (selectedTab)="tabSelected($event)"></app-tab-navigation>
   </ng-container>
   <ng-container right>
-   
-   <button
+    <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="showFilters()">
+      <div class="filter-button-content">
+        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
+    </button>
+    <button
               ejs-dropdownbutton
               appHideBeforeSyncfusionLoad
               [items]="exportOptions"
@@ -19,12 +24,6 @@
                 Export <i-feather name="upload" class="icon"></i-feather>
               </div>
    </button>
-    <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="showFilters()">
-      <div class="filter-button-content">
-        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
-        Filters <i-feather name="sliders" class="icon"></i-feather>
-      </div>
-    </button>
   </ng-container>
 </app-page-toolbar>
 <section class="tab-legend">

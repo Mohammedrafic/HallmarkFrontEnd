@@ -2,7 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { CandidateStatus } from '@shared/enums/status';
 import { Actions, Store, ofActionDispatched } from '@ngxs/store';
-import { CandidateExportColumns, CandidatesColumnsDefinition } from '@shared/components/candidate-details/candidate-grid/candidate-grid.constant';
+import { CandidateAgencyExportColumns, CandidateOrgExportColumns, CandidatesColumnsDefinition } from '@shared/components/candidate-details/candidate-grid/candidate-grid.constant';
 import { Router } from '@angular/router';
 import { ExportCandidateAssignment, SetPageNumber, SetPageSize } from '@shared/components/candidate-details/store/candidate.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -37,7 +37,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
   public columnDefinitions: ColDef[];
   public selectedRowDatas: any[] = [];
   @Input() export$: Subject<ExportedFileType>;
-  public columnsToExport: ExportColumn[] = CandidateExportColumns;
+  public columnsToExport: ExportColumn[];
   private unsubscribe$: Subject<void> = new Subject();
   public defaultFileName: string;
   public fileName: string;
@@ -47,6 +47,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
 
   override ngOnInit(): void {
     this.isAgency = this.router.url.includes('agency');
+    this.columnsToExport =this.isAgency ? CandidateAgencyExportColumns : CandidateOrgExportColumns;
     this.columnDefinitions = CandidatesColumnsDefinition(this.isAgency);
     this.watchForDefaultExport();
     this.watchForExportDialog();
@@ -68,6 +69,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
     if(!this.filters){
       this.filters ={}
     }
+    this.columnsToExport = this.isAgency ? CandidateAgencyExportColumns : CandidateOrgExportColumns;
     let tab= this.activeTab;
     this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab] + ' '+ this.generateDateTime(this.datePipe);
     this.store.dispatch(

@@ -43,4 +43,5 @@ export interface InvoicesModel {
   paymentDetails: InvoicePayment[];
   selectedPayment: InvoicePaymentData | null;
   organizationStructure: OrganizationStructure | null;
+  agencyFeeApplicable: boolean;
 }

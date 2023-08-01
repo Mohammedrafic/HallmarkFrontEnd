@@ -4,14 +4,14 @@
   [allowSelection]="true"
   [allowPaging]="false"
   [pageSettings]="pageSettings"
-  [height]="fullScreenGridHeight"
+  [height]="(isMobile$ | async) ? mobileGridHeight : fullScreenGridHeight"
   [rowHeight]="rowHeight"
   [enableVirtualization]="false"
   [resizeSettings]="resizeSettings"
   [allowSorting]="allowSorting"
   [allowResizing]="allowResizing"
   [selectionSettings]="selectionOptions"
-  [enablePersistence]="true"
+  [enablePersistence]="false"
   (dataBound)="dataBound()"
   (rowSelected)="rowSelected($event, grid)"
   (rowDeselected)="rowDeselected($event, grid)">
@@ -34,7 +34,7 @@
       <e-column headerText="" field="actions" textAlign="Left" width="150" [visible]="false">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat primary-icon-button noResponsive" (click)="onEdit(data)">
+            <button ejs-button cssClass="e-flat primary-icon-button {{ !isIRP ? 'noResponsive' : '' }}" (click)="onEdit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat secondary-icon-button enabled-button"
@@ -87,7 +87,7 @@
         </ng-template>
       </e-column>
       <e-column headerText="Primary Skill" field="primarySkillName" [visible]="false" width=200></e-column>
-      <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200 *ngIf="isIRP">
+      <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="employeeSkills" width=200 [visible]="isIRP">
         <ng-template #template let-data>
           <!-- <div  *ngFor="let skill of (data.candidateProfileSkills || data.employeeSkills)">{{skill.skillDescription || skill}}</div>  -->
           <ng-container *ngIf="data.employeeSkills?.length === 2 || data.employeeSkills?.length === 1">
@@ -103,7 +103,7 @@
           </ng-container>
         </ng-template>
       </e-column>
-      <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200 *ngIf="!isIRP">
+      <e-column [headerText]="!isIRP ? 'Skill' : 'Secondary Skill'" field="candidateProfileSkills" width=200 [visible]="!isIRP">
         <ng-template #template let-data>
           <ng-container *ngIf="data.candidateProfileSkills?.length === 2 || data.candidateProfileSkills?.length === 1">
             <span *ngFor="let skill of data.candidateProfileSkills; let i = index" class="skill-name">
@@ -135,11 +135,6 @@
           {{data.hireDate | date: 'MM/dd/yyy': 'UTC'}}
         </ng-template>
       </e-column>
-      <!-- <e-column headerText="Org. Orientation" field="orgOrientation" textAlign="Left"  [visible]="false" width=200>
-        <ng-template #template let-data>
-          {{data.orgOrientation | date: 'MM/dd/yyy': 'UTC'}}
-        </ng-template>
-      </e-column> -->
       <e-column textAlign="Left" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
         <ng-template #template let-data>
           {{data.lastAssignmentEndDate | date: 'MM/dd/yyy': 'UTC'}}
@@ -162,6 +157,12 @@
           <div *ngFor="let region of data.candidateProfileRegions; trackBy: regionTrackBy">{{ region.regionDescription ||
             region }}</div>
         </ng-template>
+      </e-column>
+      <e-column textAlign="Left" field="employeeSourceId" [visible]="false" headerText="Emp Source Id" width="200">
+      </e-column>
+      <e-column textAlign="Left" field="source" [visible]="false" headerText="Source" width="200">
+      </e-column>
+      <e-column textAlign="Left" field="recruiter" [visible]="false" headerText="Recruiter" width="200">
       </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>

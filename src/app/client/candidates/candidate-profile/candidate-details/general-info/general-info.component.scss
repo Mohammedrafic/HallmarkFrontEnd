@@ -1,17 +1,54 @@
+@import 'adaptive-response';
+
 .general-info__form {
   display: grid;
   grid-gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(3, 1fr);
+  align-items: end;
 
-  .row {
-    display: grid;
-    grid-gap: 12px;
-    grid-template-columns: 1fr 1fr 1fr 200px;
+  .two-controls {
+    display: flex;
+    column-gap: 12px;
+    align-items: end;
+
+    #employeeId {
+      width: 50%;
+    }
+  }
+}
+
+#first-name label {
+  white-space: nowrap;
+}
+
+@media #{$max-tablet} {
+  .general-info__form {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 716px) {
+  .general-info__form {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+  }
+}
+
+@media #{$max-mobile} {
+  .general-info__form {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
 
     .two-controls {
-      display: grid;
-      grid-gap: 12px;
-      grid-template-columns: 100px 1fr;
+      flex-direction: column;
+      row-gap: 12px;
+
+      #first-name,
+      #employeeId {
+        width: 100%;
+      }
     }
   }
 }

@@ -1,0 +1,35 @@
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="countItems"
+  (deleteFilter)="deleteFilter($event)"
+  (clearAllFiltersClicked)="clearAllFilters()"
+  (applyFilterClicked)="applyFilter()"
+  (closeDialogClicked)="closeFilterDialog()"
+>
+  <form
+    [formGroup]="openJobFilterForm"
+    class="formGroup bootstrap"
+  >
+  <ng-container *ngFor="let field of openJobConfig">
+    <ng-container [ngSwitch]="field.fieldType">
+
+      <ng-template [ngSwitchCase]="fieldTypes.Dropdown">
+        <div class="input-container">
+          <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+          </label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              appValidateWithMessage
+              [formControlName]="field.field"
+              [fields]="optionFields"
+              [dataSource]="field.sources"
+              [allowFiltering]="true"
+            ></ejs-dropdownlist>
+          </div>
+        </div>
+      </ng-template>
+
+    </ng-container>
+  </ng-container>
+  </form>
+</app-filter-dialog>

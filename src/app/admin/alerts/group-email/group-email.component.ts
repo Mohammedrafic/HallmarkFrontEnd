@@ -238,6 +238,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   }
   public onGroupEmailAddCancel(): void {
     this.groupEmailCloseDialog();
+    this.sendGroupEmailFormGroup.reset();
   }
 
   public onGroupEmailSend(): void {

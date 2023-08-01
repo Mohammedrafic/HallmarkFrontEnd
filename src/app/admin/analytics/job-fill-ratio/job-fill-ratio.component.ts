@@ -194,7 +194,7 @@ export class JobFillRatioComponent implements OnInit {
           this.filterColumns.skillIds.dataSource = skills;
 
           if (this.isInitialLoad) {
-            setTimeout(() => { this.SearchReport(); }, 3000)
+          this.SearchReport(); 
             this.isInitialLoad = false;
           }
 
@@ -293,7 +293,7 @@ export class JobFillRatioComponent implements OnInit {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          setTimeout(() => { this.SearchReport() }, 3000);
+         this.SearchReport() ;
         }
         else {
           this.isClearAll = false;
