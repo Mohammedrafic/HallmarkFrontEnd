@@ -752,10 +752,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
 
     if (order.locationId) {
-      this.store
-        .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
-        .pipe(
-          switchMap(() => this.actions$),
+      this.actions$.pipe(
           ofActionCompleted(GetDepartmentsByLocationId),
           take(1),
         ).subscribe(() => {
@@ -766,6 +763,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           ) as Department;
           this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
         });
+  
+        this.store.dispatch(
+          new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId)
+        );
     }
   }
 
@@ -1148,13 +1149,21 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         return;
       }
 
+      const ignoreUpdateBillRate = !(
+        this.orderControlsConfig.orderTypeControl.dirty ||
+        this.orderControlsConfig.departmentIdControl.dirty ||
+        this.orderControlsConfig.skillIdControl.dirty ||
+        this.orderControlsConfig.jobStartDateControl.dirty
+      );
+
       this.store.dispatch(
         new SetPredefinedBillRatesData(
           orderType,
           departmentIdValue,
           skillId,
           DateTimeHelper.setUtcTimeZone(jobStartDate),
-          DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value)
+          DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value),
+          ignoreUpdateBillRate
         )
       );
     });

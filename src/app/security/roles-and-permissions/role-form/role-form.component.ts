@@ -83,8 +83,8 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   IsIrp: any = false;
   IsVMS: any = false;
   IsShowIRPVMS: any = false;
-  IsVMSChecked: boolean = true;
-  IsIRPChecked: boolean = true;
+  isVMSChecked: boolean = true;
+  isIRPChecked: boolean = true;
   public toggle: boolean = false;
   public fields = {
     dataSource: null, id: 'id', text: 'name', parentID: 'parentId', hasChildren: 'hasChild', htmlAttributes: 'htmlAttributes'
@@ -177,28 +177,22 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
 
   }
   public OnChangeVMS(arg: any) {
-    if (arg.checked) 
-      this.IsVMSChecked=true;
-    else
-    this.IsVMSChecked=false;
+    this.isVMSChecked=arg.checked;
     this.setTreeFilter();
     this.changeDetectorRef.detectChanges();
   }
 
   public OnChangeIRP(arg: any) {
-    if (arg.checked) 
-      this.IsIRPChecked=true;
-    else
-    this.IsIRPChecked=false;
+    this.isIRPChecked=arg.checked;
     this.setTreeFilter();
     this.changeDetectorRef.detectChanges();
   }
 public setTreeFilter()
 {
-   if(this.IsVMSChecked && !this.IsIRPChecked){
+   if(this.isVMSChecked && !this.isIRPChecked){
     this.treeData = this.treeSource.filter(x => x.includeInVMS);
   }
-  else if(!this.IsVMSChecked && this.IsIRPChecked){
+  else if(!this.isVMSChecked && this.isIRPChecked){
     this.treeData = this.treeSource.filter(x => x.includeInIRP);
   }
   else{

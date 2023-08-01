@@ -413,8 +413,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public selectedRowRef: any;
   public selectedRowIndex: number | null;
 
-  private isOrgIRPEnabled = false;
-  private isOrgVMSEnabled = false;
+  public isOrgIRPEnabled = false;
+  public isOrgVMSEnabled = false;
 
   public isMobile = false;
   public isTablet = false;
@@ -1756,7 +1756,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       super.setHeightForMobileGrid(this.ordersPage?.items?.length);
 
-      if (this.isRedirectedFromVmsSystem) {
+      if (data?.items.length && this.isRedirectedFromVmsSystem) {
         this.openFirstIrpOrderDetails();
       }
     });
@@ -2231,7 +2231,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     filters.orderStatuses = this.orderPositionStatus
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
       : [];
-      
+
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
     const items = JSON.parse(dashboardFilterState) as FilteredItem[] || [];
     let pendingApprovalOrders = this.globalWindow.localStorage.getItem('pendingApprovalOrders') || 'null';
@@ -2853,13 +2853,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       });
   }
 
+  @OutsideZone
   private openFirstIrpOrderDetails(): void {
-    const node = this.gridApi?.getRowNode('0');
+    setTimeout(() => {
+      const node = this.gridApi?.getRowNode('0');
 
-    if (node) {
-      this.openIrpDetails({ node, data: node?.data });
-    }
+      if (node) {
+        this.openIrpDetails({node, data: node?.data});
+      }
+    });
   }
+
   @OutsideZone
   private selectFirstRow(): void {
     setTimeout(() => {

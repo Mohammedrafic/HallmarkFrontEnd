@@ -603,6 +603,7 @@
             <app-order-management-subrow-candidate-position
               *ngFor="let child of data.children; index as i; trackBy: trackById"
               [candidatePosition]="child"
+              [isBothSystemsEnabled]="isOrgIRPEnabled && isOrgVMSEnabled"
               [selected]="
                 selectedCandidate?.selected?.order === data.id &&
                 selectedCandidate?.selected.positionId === child.positionId"

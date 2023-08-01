@@ -32,6 +32,7 @@ import { OrderManagementIrpCandidateSystem,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderManagementSubrowCandidatePositionComponent extends AbstractPermission {
+  @Input() public isBothSystemsEnabled: boolean;
   @Input() public selected: boolean;
   @Input() set candidatePosition(candidate: OrderManagementChild) {
     this.vmsPosition = candidate.system === OrderManagementIrpCandidateSystem.VMS;

@@ -36,7 +36,7 @@
 
           <ng-container *ngSwitchCase="'system'">
 
-            <ng-container *ngIf="vmsPosition; else irpSystem">
+            <ng-container *ngIf="vmsPosition || !isBothSystemsEnabled; else irpSystem">
               <p class="custom-cell__value">{{ candidate[cell?.field || ''] }}</p>
             </ng-container>
 
