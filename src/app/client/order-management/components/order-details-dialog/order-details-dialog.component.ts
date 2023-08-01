@@ -390,6 +390,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public approveOrder(id: number): void {
     this.store.dispatch(new ApproveOrder(id, this.activeSystem === OrderManagementIRPSystemId.IRP));
+    this.updateOrders.emit();
   }
 
   public editOrder(data: Order) {
