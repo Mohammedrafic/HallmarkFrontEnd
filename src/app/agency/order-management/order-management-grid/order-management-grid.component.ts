@@ -111,6 +111,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() search$: Subject<string>;
   @Input() public orderStatus: string[];
   @Input() public candidateStatuses: string[];
+  @Input() public ltaOrder: boolean | null;
 
   @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
@@ -546,6 +547,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
         this.filters.includeReOrders = true;
+        if(this.ltaOrder){
+          this.filters.orderStatuses = [];
+          this.filters.candidateStatuses = [];
+          this.filters.ltaOrder = this.ltaOrder; 
+        }
         let filtersMyAgency = {...this.filters};
           if(this.filters.orderLocked){
             filtersMyAgency.orderLocked = filtersMyAgency.orderLocked == 'false' ? false : filtersMyAgency.orderLocked == 'true' ? true : null

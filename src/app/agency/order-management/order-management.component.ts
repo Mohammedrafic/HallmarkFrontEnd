@@ -33,6 +33,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   public candidateStatuses: string[]=[];
   private unsubscribe$: Subject<void> = new Subject();
   public organizationIds: number[] = [];
+  public ltaOrder: boolean|null;
 
   constructor(private store: Store,private router: Router,
     @Inject(DOCUMENT) private documentEle: Document,
@@ -41,6 +42,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    this.ltaOrder = routerState?.['ltaorderending'];
     if(routerState?.['condition'] == "Open&Inprogress"){
       this.orderStatus.push("Open");
       this.orderStatus.push("InProgress");

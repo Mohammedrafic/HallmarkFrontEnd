@@ -33,13 +33,14 @@ export class PositionChartComponent {
   }
 
   public toSourceContent(event: MouseEvent): void {
+    let ltaorderending = true;
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
       const user = this.store.selectSnapshot(UserState.user);
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-        this.dashboardService.redirectToUrl('agency/order-management/', this.chartData === undefined ? 0 : this.chartData.orderStatus);
+        this.dashboardService.redirectToUrl('agency/order-management/', this.chartData === undefined ? 0 : this.chartData.orderStatus,undefined,ltaorderending);
 
       } else {
-        this.dashboardService.redirectToUrl('client/order-management/', this.chartData === undefined ? 0 : this.chartData.orderStatus);
+        this.dashboardService.redirectToUrl('client/order-management/', this.chartData === undefined ? 0 : this.chartData.orderStatus,undefined,ltaorderending);
       }
     }
   }

@@ -425,8 +425,8 @@ export class DashboardService {
   public redirectToUrlWithStatus(url: string,candidateStatusId? :string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , candidateStatusId:candidateStatusId} });
   }
-  public redirectToUrl(url: string,orderStatus? :number,status? : string): void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status} });
+  public redirectToUrl(url: string,orderStatus? :number,status? : string,ltaorderending?:boolean): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status,ltaorderending:ltaorderending} });
   }
   public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus} });

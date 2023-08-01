@@ -471,6 +471,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   public orderLockList = orderLockList;
+  private ltaOrder: boolean|null;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -527,6 +528,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
     this.OrderJourneyFilterFormGroup = this.orderManagementService.createOrderJourneyFilterForm();
+    this.ltaOrder = routerState?.['ltaorderending'];
   }
 
   public get isActiveSystemIRP(): boolean {
@@ -913,6 +915,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
         this.filters.includeReOrders = true;
+        this.filters.ltaOrder = this.ltaOrder;
+        if(this.filters.ltaOrder){
+          this.filters.candidateStatuses = [];
+          this.filters.orderStatuses = [];
+        }
         this.hasOrderAllOrdersId();
         let filtersAllOrders = {...this.filters};
         if(this.filters.orderLocked){
@@ -2225,7 +2232,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       })
       this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', '');
     }
-
+    this.filters.ltaOrder = this.ltaOrder;
     filters.orderStatuses = this.numberArr;
     this.candidateStatusId!= '' ? this.candidateStatusIds.push(this.candidateStatusId) : [];
     filters.candidateStatuses = this.candidateStatusIds;
