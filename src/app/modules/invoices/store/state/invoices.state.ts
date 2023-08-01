@@ -54,6 +54,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Attachment } from '@shared/components/attachments';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
 import { InvoiceFiltersAdapter } from '../../adapters';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -259,6 +260,10 @@ export class InvoicesState {
     { orgId }: Invoices.GetFiltersDataSource,
   ): Observable<InvoicesFilteringOptions | void> {
     return this.invoicesAPIService.getFiltersDataSource(orgId).pipe(
+      map(res => ({
+        ...res,
+        agency: sortByField(res.agency, 'name')
+      })),
       tap((res) => {
         const { invoiceFiltersColumns } = getState();
 
@@ -285,6 +290,7 @@ export class InvoicesState {
         regions: [],
         locations: [],
         departments: [],
+        agency: sortByField(res.agency, 'name')
       })),
       tap((res) => {
         const { invoiceFiltersColumns } = getState();
