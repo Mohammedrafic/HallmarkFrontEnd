@@ -153,7 +153,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private currentApplicantStatus: ApplicantStatus;
   private readOnlyMode: boolean;
 
-  public comments: Comment[] = [];
+  public candidateComments: Comment[] = [];
 
   public canShortlist = false;
   public canInterview = false;
@@ -376,11 +376,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private getComments(): void {
-    this.candidateJob?.commentContainerId && this.commentsService
+    this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((comments: Comment[]) => {
-        this.comments = comments;
+        this.candidateComments = comments;
         this.changeDetectorRef.markForCheck();
       });
   }

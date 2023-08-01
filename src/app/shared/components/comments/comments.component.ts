@@ -66,12 +66,6 @@ export class CommentsComponent {
   @ViewChild('body')
   public body: ElementRef;
 
-  @Select(CommentsState.comments)
-  comments$: Observable<Comment[]>;
-
-  @Select(OrderManagementContentState.orderComments)
-  private orderComments$: Observable<Comment[]>;
-
   private unsubscribe$: Subject<void> = new Subject();
 
   public selectedFilter = CommentsFilter.All;
@@ -185,21 +179,8 @@ export class CommentsComponent {
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
-      this.store.dispatch(new SaveComment(comment)).subscribe(data => {
-        if(data.orderManagement?.orderComments){
-          this.comments = [];
-          this.getOrderComments();
-        }
-      });
+      this.store.dispatch(new SaveComment(comment));
     }
-  }
-
-  private getOrderComments(): void {
-    this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
-    this.orderComments$.subscribe((comments: Comment[]) => {
-      this.comments = comments;
-      this.cd.markForCheck();
-    });
   }
 
 
