@@ -848,7 +848,6 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   private populateNewOrderForm(): void {
-
     const orderTypeToPrePopulate = this.orderManagementService.getOrderTypeToPrePopulate() || OrderType.LongTermAssignment;
     this.orderManagementService.clearOrderTypeToPrePopulate();
     this.orderTypeForm.controls['orderType'].patchValue(orderTypeToPrePopulate);
