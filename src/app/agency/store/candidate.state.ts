@@ -395,17 +395,15 @@ export class CandidateState {
     { patchState, dispatch, getState }: StateContext<CandidateStateModel>,
     { payload }: SaveCandidatesCredential
   ): Observable<CandidateCredential | void> {
-    const isCreating = !payload.id;
     payload.candidateProfileId = payload.candidateProfileId ? payload.candidateProfileId : getState().candidate?.id as number;
     patchState({ isCandidateLoading: true });
     return this.candidateService.saveCredential(payload).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false });
         dispatch(new SaveCandidatesCredentialSucceeded(payload));
-        dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
         return payload;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         dispatch(new SaveCandidatesCredentialFailed());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
@@ -475,6 +473,9 @@ export class CandidateState {
         patchState({ isCandidateLoading: false });
         dispatch(new UploadCredentialFilesSucceeded());
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
