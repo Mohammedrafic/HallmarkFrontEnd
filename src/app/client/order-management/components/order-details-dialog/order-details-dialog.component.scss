@@ -271,7 +271,7 @@
       }
     }
 
-    .traveler-order {
+    .lta-order {
       @container main-content (max-width: 1500px) {
         @include smallDesktopMenu();
       }

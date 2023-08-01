@@ -124,7 +124,7 @@ import {
   OrganizationOrderManagementTabs,
   orderLockList,
 } from '@shared/enums/order-management-tabs.enum';
-import { FilterIrpOrderTypes, OrderType, OrderTypeOptions } from '@shared/enums/order-type';
+import { FilterIrpOrderTypes, OrderType, OrderTypeOptions, VmsOrderTypeTooltipMessage } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import {
@@ -380,6 +380,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public orderStatus = OrderStatus;
   public reOrderCount$ = new Subject<number>();
   public orderTypes = OrderType;
+  public orderTypeTooltipMessage = VmsOrderTypeTooltipMessage;
   public canCreateOrder: boolean;
   public canOrderJourney: boolean=false;
   public canCloseOrder: boolean;

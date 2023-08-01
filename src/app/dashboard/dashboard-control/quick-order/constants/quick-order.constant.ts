@@ -19,7 +19,7 @@ export const QuickOrderCondition: QuickOrderConditions = {
   isPermPlacementOrder: false,
   isContactToPermOrder: false,
   isEditContactTitle: false,
-  isTravelerOrder: true,
+  isLTAOrder: true,
   isOpenPerDiem: false,
   isRegionsDropDownEnabled: false,
   isLocationsDropDownEnabled: false,
@@ -27,6 +27,6 @@ export const QuickOrderCondition: QuickOrderConditions = {
   isJobEndDateControlEnabled: false,
   agencyControlEnabled: false,
   isShiftTimeRequired: true,
-  isFormDirty: false
-}
+  isFormDirty: false,
+};
 

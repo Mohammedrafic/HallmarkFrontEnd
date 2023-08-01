@@ -228,7 +228,7 @@
           <div class="row">
             <!-- Duration -->
             <div
-              *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+              *ngIf="quickOrderConditions.isLTAOrder || quickOrderConditions.isContactToPermOrder"
               class="input-container bootstrap duration-form-line"
             >
               <label>Duration<span class="required">*</span></label>
@@ -246,7 +246,7 @@
 
             <!-- Job Start Date -->
             <div
-              *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+              *ngIf="quickOrderConditions.isLTAOrder || quickOrderConditions.isContactToPermOrder"
               class="datepicker-container form-line-item-30"
             >
               <label>Job Start Date<span class="required">*</span></label>
@@ -266,7 +266,7 @@
 
             <!-- Job End Date -->
             <div
-              *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+              *ngIf="quickOrderConditions.isLTAOrder || quickOrderConditions.isContactToPermOrder"
               class="datepicker-container form-line-item-30"
             >
               <label>Job End Date<span class="required">*</span></label>
@@ -288,7 +288,7 @@
 
             <!-- Hourly Rate -->
             <div
-              *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+              *ngIf="quickOrderConditions.isLTAOrder || quickOrderConditions.isContactToPermOrder"
               class="input-container bootstrap form-line-item-30"
             >
               <label>Hourly Rate ($)<span class="required">*</span></label>
@@ -309,7 +309,7 @@
 
             <!-- of Position -->
             <div
-              *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+              *ngIf="quickOrderConditions.isLTAOrder || quickOrderConditions.isContactToPermOrder"
               class="input-container bootstrap form-line-item-30"
             >
               <label># Open Positions<span class="required">*</span></label>
@@ -401,7 +401,7 @@
         <div
           class="row margin-top-15"
           *ngIf="
-            quickOrderConditions.isTravelerOrder ||
+            quickOrderConditions.isLTAOrder ||
             quickOrderConditions.isContactToPermOrder ||
             quickOrderConditions.isPermPlacementOrder
           "

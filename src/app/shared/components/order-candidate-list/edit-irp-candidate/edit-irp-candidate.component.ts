@@ -300,7 +300,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private watchForActualDateValues(): void {
     this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
       filter((value: string) => {
-        return !!value && this.candidateModelState.order.orderType === OrderType.Traveler;
+        return !!value && this.candidateModelState.order.orderType === OrderType.LongTermAssignment;
       }),
       skip(1),
       distinctUntilChanged(),

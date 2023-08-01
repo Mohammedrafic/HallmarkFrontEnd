@@ -90,7 +90,7 @@
                 </ng-template>
               </e-tabitem>
 
-              <e-tabitem *ngIf="(orderType.Traveler === currentOrder.orderType || orderType.ContractToPerm === currentOrder.orderType) && currentOrder.extensionFromId">
+              <e-tabitem *ngIf="(orderType.LongTermAssignment === currentOrder.orderType || orderType.ContractToPerm === currentOrder.orderType) && currentOrder.extensionFromId">
                 <ng-template #headerText>Extensions</ng-template>
                 <ng-template #content>
                   <section class="order-details">
