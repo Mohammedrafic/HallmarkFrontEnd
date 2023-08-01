@@ -85,6 +85,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public showactualStartEndDate:boolean;
   public availableStartDate:string | Date;
   public candidateJobId:number;
+  public candidateCommentContainerId: number;
+
 
   public comments: Comment[] = [];
   @Input() public externalCommentConfiguration ?: boolean | null;
@@ -114,7 +116,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.observeCloseControl();
     this.observeStatusControl();
     this.watchForActualDateValues();
-    this.getComments();
   }
 
   save(): void {
@@ -165,10 +166,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   private getComments(): void {
-    this.commentsService.getComments(this.commentContainerId, null)
+    this.commentsService.getComments(this.candidateCommentContainerId, null)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.cdr.markForCheck();
     });
   }
 
@@ -238,6 +240,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     .pipe(
         filter(Boolean),
         tap((candidateDetails: CandidateDetails) => {
+          this.candidateCommentContainerId = candidateDetails.commentContainerId;
+          this.getComments();
           const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
 
           statusConfigField.dataSource = this.editIrpCandidateService
