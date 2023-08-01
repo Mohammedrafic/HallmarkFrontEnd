@@ -478,7 +478,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           candidatePayRate: this.candidateJob.candidatePayRate,
         });
       }
-      this.changeDetectionRef.markForCheck();
+      this.changeDetectionRef.detectChanges();
     });
   }
 
