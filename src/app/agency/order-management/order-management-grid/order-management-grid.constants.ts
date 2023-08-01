@@ -68,7 +68,6 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
   { text: 'Linked ID', column: 'LinkedId' },
-  { text: 'Orders Lock', column: 'OrderLocked' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
