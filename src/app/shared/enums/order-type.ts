@@ -39,9 +39,9 @@ export const OrderTypeTitlesMap = new Map([
 
 export const OrderTypeOptions = [
   { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
+  { id: OrderType.LongTermAssignment, name: 'LTA' },
   { id: OrderType.OpenPerDiem, name: 'Open Per Diem' },
   { id: OrderType.PermPlacement, name: 'Perm. Placement' },
-  { id: OrderType.LongTermAssignment, name: 'LTA' },
 ];
 
 export const PayrateOrderType = [
