@@ -45,10 +45,10 @@
 }
 
 .staff-schedule-report-section {
-  display: flex;
-  height: 65%;
+  width: 100%;
+  height: calc(100% - 75px);
+  position: relative;
 }
-
 
 .form-line {
   display: flex;
