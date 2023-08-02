@@ -126,6 +126,7 @@ import { PartialSearchService } from '@shared/services/partial-search.service';
 import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { OrderManagementService } from '../order-management-content/order-management.service';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 
 @Component({
   selector: 'app-order-details-form',
@@ -255,6 +256,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     private partialSearchService: PartialSearchService,
     private permissionService: PermissionService,
     private actions$: Actions,
+    private billRatesSyncService: BillRatesSyncService,
   ) {
     super(store);
     this.initOrderForms();
@@ -1149,12 +1151,14 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         return;
       }
 
-      const ignoreUpdateBillRate = !(
+      const updateBillRateGrid = (
         this.orderControlsConfig.orderTypeControl.dirty ||
         this.orderControlsConfig.departmentIdControl.dirty ||
         this.orderControlsConfig.skillIdControl.dirty ||
         this.orderControlsConfig.jobStartDateControl.dirty
       );
+
+      this.billRatesSyncService.setUpdateBillRateGrid(updateBillRateGrid);
 
       this.store.dispatch(
         new SetPredefinedBillRatesData(
@@ -1162,8 +1166,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           departmentIdValue,
           skillId,
           DateTimeHelper.setUtcTimeZone(jobStartDate),
-          DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value),
-          ignoreUpdateBillRate
+          DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value)
         )
       );
     });

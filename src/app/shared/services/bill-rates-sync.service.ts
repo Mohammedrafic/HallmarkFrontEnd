@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
+import { BaseObservable } from '@core/helpers';
 import { BillRate } from '@shared/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BillRatesSyncService {
-  getBillRateForSync(billRates: BillRate[], jobStartDate?: Date): BillRate | null {
+  private updateBillRateGrid$ = new BaseObservable<boolean>(false);
+
+  public getBillRateForSync(billRates: BillRate[], jobStartDate?: Date): BillRate | null {
     const jobStartDateTimeStamp = jobStartDate ? jobStartDate.getTime() : new Date().getTime();
     let billRateForSync: BillRate | null = null;
     const sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
@@ -19,6 +22,14 @@ export class BillRatesSyncService {
       }
     }
     return billRateForSync;
+  }
+
+  public setUpdateBillRateGrid(value: boolean): void {
+    this.updateBillRateGrid$.set(value);
+  }
+
+  public getUpdateBillRateGrid(): boolean {
+    return this.updateBillRateGrid$.get();
   }
 
   private getDESCsortedBillRates(billRates: BillRate[]): BillRate[] {

@@ -20,6 +20,7 @@ import { ShowSideDialog } from 'src/app/store/app.actions';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
 import { GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 
 @Component({
   selector: 'app-bill-rates',
@@ -57,7 +58,11 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
 
   private editBillRateIndex: string | null;
 
-  constructor(private confirmService: ConfirmService, protected override store: Store) {
+  constructor(
+    protected override store: Store,
+    private confirmService: ConfirmService,
+    private billRatesSyncService: BillRatesSyncService,
+    ) {
     super(store);
     this.billRatesControl = new FormArray([]);
   }
@@ -83,6 +88,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   }
 
   public addBillRate(): void {
+    this.billRatesSyncService.setUpdateBillRateGrid(false);
     this.editBillRateIndex = null;
     this.billRateForm.reset();
     this.billRateFormHeader = 'Add Bill Rate';
@@ -106,6 +112,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   public editBillRate({ index, ...value }: BillRatesGridEvent): void {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
+    this.billRatesSyncService.setUpdateBillRateGrid(false);
 
     const foundBillRateOption = this.billRatesOptions.find((option) => option.id === value.billRateConfigId);
     const decimals = value.billRateConfigId !== BillRateTitleId.Mileage ? 2 : 3;
