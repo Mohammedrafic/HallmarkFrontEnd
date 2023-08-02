@@ -44,6 +44,7 @@ export class AccumulationChartComponent
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean;
   @Input() public description: string;
+  @Input() public averageFlag: boolean =false;
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
@@ -167,8 +168,7 @@ export class AccumulationChartComponent
     });
     this.chartDatachanges?.chartData.forEach(obj => {
       obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString():"0";
-    });
-    
+    });  
 
 
     this.legendData = this.chartData?.chartData as WidgetLegengDataModel[];

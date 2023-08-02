@@ -40,7 +40,7 @@ import { CandidateState } from '@agency/store/candidate.state';
 import { CredentialGridService } from '@agency/services/credential-grid.service';
 import { AbstractGridConfigurationComponent } from
   '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED, RECORD_MODIFIED } from
   '@shared/constants/messages';
 import { optionFields } from '@shared/constants';
 import { FileStatusCode } from '@shared/enums/file.enum';
@@ -112,7 +112,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public candidateCredentialResponse: CandidateCredentialResponse;
   public gridItems: CandidateCredentialGridItem[] = [];
   public openFileViewerDialog = new EventEmitter<number>();
-  public today = new Date();
   public disableAddCredentialButton: boolean;
   public requiredCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
@@ -662,10 +661,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$
       .pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((credential: { payload: CandidateCredential }) => {
+        const isEdit = this.isEdit;
         this.credentialId = credential.payload.id as number;
         this.disabledCopy = false;
         this.selectedItems = [];
-
         if (this.uploadObj.filesData[0]?.statusCode === FileStatusCode.Valid) {
           this.store.dispatch(
             new UploadCredentialFiles([this.uploadObj.filesData[0].rawFile as Blob], this.credentialId)
@@ -678,6 +677,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           return;
         }
 
+        this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADDED : RECORD_MODIFIED));
         this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
         this.addCredentialForm.markAsPristine();
         this.closeDialog();

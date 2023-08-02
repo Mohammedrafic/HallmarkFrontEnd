@@ -409,7 +409,6 @@ export class SendGroupEmailComponent
     } else if (user?.businessUnitType === BusinessUnitType.Organization) {
       this.isOrgUser = true;
       this.businessUnits = [
-        { id: BusinessUnitType.Agency, text: 'Agency' },
         { id: BusinessUnitType.Organization, text: 'Organization' },
       ];
     } else if (user?.businessUnitType === BusinessUnitType.Agency) {

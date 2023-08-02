@@ -22,6 +22,10 @@ import { ShowToast } from 'src/app/store/app.actions';
 import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
+import {
+  OrderManagementContentComponent,
+} from '@client/order-management/components/order-management-content/order-management-content.component';
+
 import { OrderInfo } from '@client/order-management/interfaces';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
@@ -43,6 +47,7 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
   public displayRows: IRPCandidateForPosition[] | any[] = [];
   public colDefs: Record<string, ColDef[]> = OrderManagementSubGridCells;
   public emptyMessage = GRID_EMPTY_MESSAGE;
+  public isBothSystemsEnabled = false;
 
   public readonly vmsSystem = OrderManagementIrpCandidateSystem[OrderManagementIrpCandidateSystem.VMS];
 
@@ -57,6 +62,7 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
 
   public agInit(params: ICellRendererParams): void {
     this.params = params;
+    this.setSystemsFlag(params.context.componentParent);
 
     this.orderManagementIrpApiService.getOrderPositions([params.data.id]).pipe(
       take(1),
@@ -103,5 +109,9 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
       orderType: this.params.data.orderType,
       prefix: data.organizationPrefix,
     });
+  }
+
+  private setSystemsFlag(componentParent: OrderManagementContentComponent) {
+    this.isBothSystemsEnabled = componentParent.isOrgVMSEnabled && componentParent.isOrgIRPEnabled;
   }
 }

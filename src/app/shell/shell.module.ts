@@ -52,7 +52,8 @@ import { ContactusComponent } from './components/contactus/contactus.component';
 import { UploaderModule  } from '@syncfusion/ej2-angular-inputs';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
-import { EmployeeGuard, UserLicenceGuard } from '@core/guards';
+import { AdminGuard, AgencyGuard, EmployeeGuard } from '@core/guards';
+import { OrganizationGuard } from '@core/guards/organization.guard';
 
 
 const sidebarIcons = {
@@ -111,8 +112,10 @@ const sidebarIcons = {
     BoolValuePipeModule,
   ],
   providers: [
+    AdminGuard,
+    OrganizationGuard,
+    AgencyGuard,
     EmployeeGuard,
-    UserLicenceGuard,
   ],
 })
 export class ShellModule {}

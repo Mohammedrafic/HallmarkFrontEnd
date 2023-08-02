@@ -24,7 +24,7 @@ export class GeneralOrderInfoComponent {
   public orderType: typeof OrderType = OrderType;
 
   public readonly systemType = OrderManagementIRPSystemId;
-  public readonly ltaOrderType: OrderType =  OrderType.Traveler;
+  public readonly ltaOrderType: OrderType =  OrderType.LongTermAssignment;
 
   get hideEndDate(): boolean {
     return [this.orderType.ReOrder, this.orderType.PermPlacement].includes(this.orderInformation.orderType);

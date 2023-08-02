@@ -125,7 +125,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     this.form?.get('jobCancellationReason')?.valueChanges.pipe(
       takeUntil(this.destroy$)
     ).subscribe((value: JobCancellationReason) =>  {
-      this.isReasonSelected = !!(value || value === JobCancellationReason.TravelCancellationOnBehalfOfOrganization);
+      this.isReasonSelected = !!(value || value === JobCancellationReason.LTACancellationOnBehalfOfOrganization);
       if (this.isReasonSelected && this.candidateJob) {
         this.form?.get('penaltyCriteria')?.setValue(null);
         this.predefinedPenalties = null;

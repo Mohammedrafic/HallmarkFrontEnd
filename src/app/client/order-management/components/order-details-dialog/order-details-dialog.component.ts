@@ -390,6 +390,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public approveOrder(id: number): void {
     this.store.dispatch(new ApproveOrder(id, this.activeSystem === OrderManagementIRPSystemId.IRP));
+    this.updateOrders.emit();
   }
 
   public editOrder(data: Order) {
@@ -586,7 +587,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           if (
             selectedOrder?.extensionFromId &&
             order?.items[isOrderPositionSelected.index ?? 0]?.candidateJobId &&
-            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.LongTermAssignment)
           ) {
             this.store.dispatch(
               new GetOrganizationExtensions(

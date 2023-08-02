@@ -14,6 +14,7 @@ import {
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   EMPLOYEE_SKILL_CHANGE_WARNING,
+  IRP_DEPARTMENT_CHANGE_WARNING,
   RECORD_ADDED, RECORD_MODIFIED,
 } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -612,7 +613,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private handleCommitmentSaving(): void {
-    if (this.isOverridingEndDate() || this.isLocationChanged()) {
+    const isOverridingEndDate = this.isOverridingEndDate();
+    const isLocationChanged = this.isLocationChanged();
+
+    this.replacementConfirmationMessage = isLocationChanged ? IRP_DEPARTMENT_CHANGE_WARNING : EMPLOYEE_SKILL_CHANGE_WARNING;
+
+    if (isOverridingEndDate || isLocationChanged) {
       this.showOverridingConfirmation();
     } else {
       this.saveCommitment();

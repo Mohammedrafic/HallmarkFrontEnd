@@ -282,6 +282,7 @@ export type OrderCandidatesList = {
   candidateId: number;
   firstName: string;
   hourlyBillRate: number;
+  initialBillRate: number;
   lastName: string;
   middleName?: string;
   candidateProfileId: number;

@@ -2,8 +2,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
-
-import { OrderTypeTooltipMessage } from '@client/order-management/constants';
+import { IrpOrderTypeTooltipMessage } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-table-type-cell',
@@ -17,7 +16,7 @@ export class TableTypeCellComponent implements ICellRendererAngularComp {
 
   agInit(params: ICellRendererParams): void {
     this.cellValue = this.setOrderAbbreviation(params.data.orderTypeText);
-    this.tooltipMessage = OrderTypeTooltipMessage[params.data.orderType];
+    this.tooltipMessage = IrpOrderTypeTooltipMessage[params.data.orderType];
   }
 
   refresh(params: ICellRendererParams): boolean {
