@@ -189,7 +189,7 @@ export class OrderManagementService extends DestroyableDirective {
   }
 
   private getVMSOrderType(tab: OrganizationOrderManagementTabs): OrderType | null {
-    if (tab === OrganizationOrderManagementTabs.PerDiem) {
+    if (tab === OrganizationOrderManagementTabs.PerDiem || tab === OrganizationOrderManagementTabs.ReOrders) {
       return OrderType.OpenPerDiem;
     }
 
