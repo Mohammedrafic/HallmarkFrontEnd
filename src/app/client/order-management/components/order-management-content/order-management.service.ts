@@ -15,6 +15,7 @@ import { GlobalWindow } from '@core/tokens';
 
 import { OrderLinkDetails } from '../../../order-management/interfaces';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
+import { ControlsConfig } from '../order-details-form/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -186,6 +187,12 @@ export class OrderManagementService extends DestroyableDirective {
 
   saveSelectedOrderManagementSystem(activeSystem: OrderManagementIRPSystemId): void {
     this.globalWindow.localStorage.setItem('selectedOrderManagementSystem', activeSystem.toString());
+  }
+
+  getControlsChangeState(controlNames: string[], formControls: ControlsConfig): boolean {
+    return controlNames
+      .map((name) => formControls[name as keyof ControlsConfig])
+      .some((control) => control.dirty);
   }
 
   private getVMSOrderType(tab: OrganizationOrderManagementTabs): OrderType | null {
