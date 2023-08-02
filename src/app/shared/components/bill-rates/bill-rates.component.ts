@@ -88,7 +88,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   }
 
   public addBillRate(): void {
-    this.billRatesSyncService.setUpdateBillRateGrid(false);
+    this.billRatesSyncService.setFormChangedState(false);
     this.editBillRateIndex = null;
     this.billRateForm.reset();
     this.billRateFormHeader = 'Add Bill Rate';
@@ -112,7 +112,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   public editBillRate({ index, ...value }: BillRatesGridEvent): void {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
-    this.billRatesSyncService.setUpdateBillRateGrid(false);
+    this.billRatesSyncService.setFormChangedState(false);
 
     const foundBillRateOption = this.billRatesOptions.find((option) => option.id === value.billRateConfigId);
     const decimals = value.billRateConfigId !== BillRateTitleId.Mileage ? 2 : 3;

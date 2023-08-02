@@ -6,7 +6,7 @@ import { BillRate } from '@shared/models';
   providedIn: 'root',
 })
 export class BillRatesSyncService {
-  private updateBillRateGrid$ = new BaseObservable<boolean>(false);
+  private rateFormChanged$ = new BaseObservable<boolean>(false);
 
   public getBillRateForSync(billRates: BillRate[], jobStartDate?: Date): BillRate | null {
     const jobStartDateTimeStamp = jobStartDate ? jobStartDate.getTime() : new Date().getTime();
@@ -24,12 +24,12 @@ export class BillRatesSyncService {
     return billRateForSync;
   }
 
-  public setUpdateBillRateGrid(value: boolean): void {
-    this.updateBillRateGrid$.set(value);
+  public setFormChangedState(value: boolean): void {
+    this.rateFormChanged$.set(value);
   }
 
-  public getUpdateBillRateGrid(): boolean {
-    return this.updateBillRateGrid$.get();
+  public getFormChangedState(): boolean {
+    return this.rateFormChanged$.get();
   }
 
   private getDESCsortedBillRates(billRates: BillRate[]): BillRate[] {

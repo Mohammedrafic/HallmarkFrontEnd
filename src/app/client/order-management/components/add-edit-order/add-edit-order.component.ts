@@ -736,7 +736,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private subscribeOnPredefinedBillRates(): void {
     this.predefinedBillRates$
       .pipe(
-        filter(() => this.billRatesSyncService.getUpdateBillRateGrid()),
+        filter(() => this.billRatesSyncService.getFormChangedState()),
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedBillRates) => {
