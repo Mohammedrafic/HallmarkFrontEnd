@@ -1,5 +1,9 @@
-#main {
-  container-type: inline-size;
-  container-name: main-content;
-  overflow: auto;
+@import 'adaptive-response';
+
+@media #{$min-tablet} {
+  #main {
+    container-type: inline-size;
+    container-name: main-content;
+    overflow: auto;
+  }
 }
