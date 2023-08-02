@@ -84,6 +84,7 @@ import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { OrderDetailsService } from '@client/order-management/components/order-details-form/services';
 import {
   AssociateAgencyFields,
+  BillRateDependencyControlNames,
   ControlsForDisable,
   DepartmentField,
   DepartmentFields,
@@ -1151,14 +1152,12 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         return;
       }
 
-      const updateBillRateGrid = (
-        this.orderControlsConfig.orderTypeControl.dirty ||
-        this.orderControlsConfig.departmentIdControl.dirty ||
-        this.orderControlsConfig.skillIdControl.dirty ||
-        this.orderControlsConfig.jobStartDateControl.dirty
+      const formChangedState = this.orderManagementService.getControlsChangeState(
+        BillRateDependencyControlNames,
+        this.orderControlsConfig
       );
 
-      this.billRatesSyncService.setUpdateBillRateGrid(updateBillRateGrid);
+      this.billRatesSyncService.setFormChangedState(formChangedState);
 
       this.store.dispatch(
         new SetPredefinedBillRatesData(
