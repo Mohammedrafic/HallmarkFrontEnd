@@ -823,14 +823,14 @@ export class OrderManagementContentState {
     { order, documents, comments, lastSelectedBusinessUnitId }: SaveOrder
   ): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
-      tap((payload) => {
+      switchMap((payload:Order[]) => {
         let TOAST_MESSAGE = 'Record has been created';
         let MESSAGE_TYPE = MessageTypes.Success;
-        const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
+        const hasntOrderCredentials = order?.isQuickOrder && payload[0].credentials.length === 0;
         const hasntOrderBillRates =
-          ((order?.isQuickOrder && payload.orderType === OrderType.LongTermAssignment) ||
-            payload.orderType === OrderType.ContractToPerm) &&
-          payload.billRates.length === 0;
+          ((order?.isQuickOrder && payload[0].orderType === OrderType.LongTermAssignment) ||
+            payload[0].orderType === OrderType.ContractToPerm) &&
+          payload[0].billRates.length === 0;
 
         if (hasntOrderCredentials && hasntOrderBillRates) {
           TOAST_MESSAGE += `. ${ORDER_WITHOUT_CRED_BILLRATES}`;
@@ -848,15 +848,15 @@ export class OrderManagementContentState {
                 MESSAGE_TYPE,
                 TOAST_MESSAGE,
                 order.isQuickOrder,
-                payload.organizationPrefix,
-                payload.publicId
+                payload[0].organizationPrefix,
+                payload[0].publicId
               )
-            : new ShowToast(MessageTypes.Success, 'Order '+ payload.organizationPrefix?.toString()+'-'+payload.publicId?.toString()+' has been added'),
-          new SaveOrderSucceeded(payload),
+            : new ShowToast(MessageTypes.Success, 'Order '+ payload[0].organizationPrefix?.toString()+'-'+payload[0].publicId?.toString()+' has been added'),
+          new SaveOrderSucceeded(payload[0]),
           new SetIsDirtyOrderForm(false),
           new SaveLastSelectedOrganizationAgencyId(
             {
-              lastSelectedOrganizationId: Number(payload.organizationId),
+              lastSelectedOrganizationId: Number(payload[0].organizationId),
               lastSelectedAgencyId: null,
             },
             true
@@ -873,15 +873,15 @@ export class OrderManagementContentState {
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: EditIrpOrder
-  ): Observable<void | Blob[] | Order[]> {
+  ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.editIrpOrder(order).pipe(
-      switchMap((order: Order[]) => {
+      tap((orders) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+          new ShowToast(MessageTypes.Success, 'Order '+ orders.organizationPrefix?.toString()+'-'+orders.publicId?.toString()+' has been added'),
           new SaveIrpOrderSucceeded(),
         ]);
         if (documents.length) {
-          return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
+          return this.orderManagementService.saveDocumentsForIrpOrder(createFormData([orders], documents));
         } else {
           return of(order);
         }
@@ -893,12 +893,12 @@ export class OrderManagementContentState {
   @Action(EditOrder)
   EditOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents, message }: EditOrder
-  ): Observable<Order | void> {
+    { order, documents }: EditOrder
+  ): Observable<Order| void> {
     return this.orderManagementService.editOrder(order, documents).pipe(
-      tap((payload: Order) => {
+      tap((payload) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, message ?? RECORD_MODIFIED),
+          new ShowToast(MessageTypes.Success, 'Order '+ payload.organizationPrefix?.toString()+'-'+payload.publicId?.toString()+' has been added'),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
