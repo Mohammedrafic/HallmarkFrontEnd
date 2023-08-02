@@ -565,6 +565,7 @@ export class SendGroupEmailComponent
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       this.onFormvalidation([]);
+      this.groupEmailTemplateForm.markAsUntouched();
       this.isBusinessUnitTypeAgency = false;
       this.validationCheckForBusiness();
       if (this.isSend == true && value != null) {
@@ -1437,6 +1438,13 @@ export class SendGroupEmailComponent
       link.download = `${fileName}`;
       link.click();
     }
+  }
+
+  validationCheck(){
+    if(this.groupEmailTemplateForm!.invalid && this.groupEmailTemplateForm!.controls['emailBody'].touched && this.groupEmailTemplateForm.controls['emailBody'].errors!['required']){
+      return true;
+    }else
+    return false;
   }
 
   ngAfterViewInit() {
