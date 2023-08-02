@@ -1,5 +1,6 @@
-@import "colors";
+@import 'colors';
 @import 'adaptive-response';
+@import 'mixins';
 
 :host {
   overflow-y: auto;
@@ -125,3 +126,6 @@
   }
 }
 
+.candidate-message {
+  @include candidateMessage;
+}
