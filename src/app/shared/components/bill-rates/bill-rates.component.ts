@@ -295,7 +295,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       this.billRatesControl.push(this.fromValueToBillRate(rate));
     }
 
-    this.billRatesChanged.emit(this.billRateForm.value);
+    this.billRatesChanged.emit(this.billRateForm.getRawValue());
     this.billRateForm.reset();
     this.store.dispatch(new ShowSideDialog(false));
   }
