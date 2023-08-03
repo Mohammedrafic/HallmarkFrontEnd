@@ -324,7 +324,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         structure.regions.map((region) => {
           region.locations && this.allLocations.push(...getIRPOrgItems(region?.locations));
         });
-        if (this.filterColumns.locationIds) {
+        if (this.filterColumns?.locationIds) {
           this.filterColumns.locationIds.dataSource = this.allLocations;
         }
       });
