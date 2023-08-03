@@ -333,12 +333,14 @@ export class AgencySpendComponent implements OnInit {
             regionsList.push(...value.regions);
             locationsList = regionsList
               .map((obj) => {
-                return obj.locations.filter((location) => location.regionId === obj.id);
+                return obj.locations.filter(
+                  (location) => location.regionId === obj.id && this.checkInactiveDate(location.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
             departmentsList = locationsList
               .map((obj) => {
-                return obj.departments.filter((department) => department.locationId === obj.id);
+                return obj.departments.filter(
+                  (department) => department.locationId === obj.id && this.checkInactiveDate(department.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
           });
@@ -372,6 +374,18 @@ export class AgencySpendComponent implements OnInit {
     });
   }
 
+  checkInactiveDate(dateStr?:string) : boolean {
+    if(dateStr == null || dateStr == undefined) {
+      return true;
+    }
+    const date = new Date(dateStr);
+    const today = new Date();
+    if(date < today) {
+      return false;
+    }
+    return true;
+  }
+
   private loadShiftData(businessUnitId: number) {
     const businessIdData = [];
     businessIdData.push(businessUnitId);
@@ -379,8 +393,8 @@ export class AgencySpendComponent implements OnInit {
       businessUnitIds: businessIdData,
     };
     this.store.dispatch(new GetStaffScheduleReportFilterOptions(filterObj))
-      .pipe(filter((data) => data !== null), takeWhile(() => this.isAlive))                    
-      .subscribe((data: StaffScheduleReportFilterOptions) => {        
+      .pipe(filter((data) => data !== null), takeWhile(() => this.isAlive));                    
+    this.staffScheduleReportFilterData$.subscribe((data: StaffScheduleReportFilterOptions) => {        
         this.isAlive = false;
         this.filterOptionData = data;
         this.filterColumns.skillIds.dataSource = [];
@@ -474,6 +488,7 @@ export class AgencySpendComponent implements OnInit {
   }
 
   public onFilterApply(): void {
+    this.validateMonthYear();
     this.agentSpendReportForm.markAllAsTouched();
     if (this.agentSpendReportForm?.invalid) {
       return;
@@ -533,5 +548,18 @@ export class AgencySpendComponent implements OnInit {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();  
     this.isAlive = false;  
+  }
+
+  validateMonthYear(): void {
+    const startMonth = this.startMonthControl?.value;
+    const endMonth = this.endMonthControl?.value;
+    const startYear = this.startYearControl?.value;
+    const endYear = this.endYearControl?.value;
+    if(endYear < startYear) {
+      this.endYearControl.setErrors({validationFailure:true});
+    }
+    if(endMonth < startMonth && parseInt(startYear) === parseInt(endYear)) {
+      this.endMonthControl.setErrors({validationFailure:true});     
+    }
   }
 }
