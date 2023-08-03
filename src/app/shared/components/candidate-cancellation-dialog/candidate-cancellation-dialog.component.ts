@@ -12,18 +12,24 @@ import {
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
-import { Subject, takeUntil } from "rxjs";
+import { Subject, takeUntil, tap, switchMap, Observable } from "rxjs";
+import { Select, Store } from '@ngxs/store';
 
 import {
   penaltiesDataSource,
 } from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 import { DestroyableDirective } from "@shared/directives/destroyable.directive";
 import { JobCancellationReason, PenaltyCriteria } from "@shared/enums/candidate-cancellation";
-import { OrderType } from "@shared/enums/order-type";
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
-import { CandidateCancellationReason, OrderCandidateJob } from '@shared/models/order-management.model';
+import {
+  CandidateCancellationReason,
+  CandidateCancellationReasonFilter,
+  OrderCandidateJob,
+} from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { Penalty } from '@shared/models/penalty.model';
+import { GetCandidateCancellationReason } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 interface DataSourceObject<T> {
   text: string;
@@ -34,32 +40,26 @@ interface DataSourceObject<T> {
   selector: 'app-candidate-cancellation-dialog',
   templateUrl: './candidate-cancellation-dialog.component.html',
   styleUrls: ['./candidate-cancellation-dialog.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidateCancellationDialogComponent extends DestroyableDirective implements OnInit, OnDestroy {
   @ViewChild('candidateCancellationDialog') candidateCancellationDialog: DialogComponent;
 
   @Input() openEvent: Subject<void>;
 
-  @Input() set orderType(value: OrderType | undefined) {
-    //this.reasons = value === OrderType.ReOrder ? reOrderReasonsDataSource : travelReasonsDataSource;
-  };
-
   @Input() candidateJob: OrderCandidateJob | null;
-
-  @Input() set candidateCancellation(value:CandidateCancellationReason[] |null){
-    this.reasons =value;
-  }
-
 
   @Output() submitCandidateCancellation = new EventEmitter<JobCancellation>();
   @Output() cancelCandidateCancellation = new EventEmitter<void>();
 
+  @Select(OrderManagementContentState.getCandidateCancellationReasons)
+  private candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
+
   public form: FormGroup;
-  public isReasonSelected: boolean = false;
-  public isPenaltyCriteriaSelected: boolean = false;
-  public showHoursControl: boolean = false;
-  public showPercentage: boolean = false;
+  public isReasonSelected = false;
+  public isPenaltyCriteriaSelected = false;
+  public showHoursControl = false;
+  public showPercentage = false;
   public optionFields = {
     text: 'text',
     value: 'value',
@@ -70,14 +70,17 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     value: 'id',
   };
 
-  public reasons: CandidateCancellationReason[]|null;
+  public reasons: CandidateCancellationReason[] | null;
   public readonly penalties: DataSourceObject<PenaltyCriteria>[] = penaltiesDataSource;
 
   private predefinedPenalties: Penalty | null;
 
-  constructor(private formBuilder: FormBuilder,
-              private cd: ChangeDetectorRef,
-              private orderService: OrderManagementContentService) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private cd: ChangeDetectorRef,
+    private orderService: OrderManagementContentService,
+    private store: Store
+  ) {
     super();
   }
 
@@ -106,10 +109,22 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   }
 
   private onOpenEvent(): void {
-    this.openEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.candidateCancellationDialog.show();
-      this.form.reset();
-    });
+    this.openEvent
+      .pipe(
+        tap(() => {
+          const payload: CandidateCancellationReasonFilter = {
+            locationId: this.candidateJob?.order.locationId,
+            regionId: this.candidateJob?.order.regionId,
+          };
+          this.store.dispatch(new GetCandidateCancellationReason(payload));
+        }),
+        switchMap(() => this.candidateCancellationReasons$),
+        takeUntil(this.destroy$)
+      ).subscribe((cancellationReasons) => {
+        this.reasons = cancellationReasons;
+        this.candidateCancellationDialog.show();
+        this.form.reset();
+      });
   }
 
   private createForm(): void {
@@ -124,7 +139,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   private onControlChanges(): void {
     this.form?.get('jobCancellationReason')?.valueChanges.pipe(
       takeUntil(this.destroy$)
-    ).subscribe((value: JobCancellationReason) =>  {
+    ).subscribe((value: JobCancellationReason) => {
       this.isReasonSelected = !!(value || value === JobCancellationReason.LTACancellationOnBehalfOfOrganization);
       if (this.isReasonSelected && this.candidateJob) {
         this.form?.get('penaltyCriteria')?.setValue(null);
@@ -156,7 +171,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   }
 
   private setDefaultValues(value: PenaltyCriteria): void {
-    switch(value) {
+    switch (value) {
       case PenaltyCriteria.FlatRate:
         this.form?.get('rate')?.setValue(this.predefinedPenalties?.flatRate || 0);
         this.form?.get('hours')?.setValue(0);

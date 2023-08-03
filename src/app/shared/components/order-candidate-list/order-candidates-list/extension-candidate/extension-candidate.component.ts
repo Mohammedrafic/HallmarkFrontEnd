@@ -31,7 +31,6 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
-  GetCandidateCancellationReason,
   GetOrganisationCandidateJob,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
@@ -56,8 +55,9 @@ import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-s
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { UNSAVED_FORM_PROVIDERS, UnsavedFormComponentRef } from '@shared/directives/unsaved-form.directive';
 import {
-  ApplicantStatus as ApplicantStatusEnum, CandidatStatus,
-  ConfigurationValues
+  ApplicantStatus as ApplicantStatusEnum,
+  CandidatStatus,
+  ConfigurationValues,
 } from '@shared/enums/applicant-status.enum';
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -69,8 +69,6 @@ import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { Comment } from '@shared/models/comment.model';
 import {
   ApplicantStatus,
-  CandidateCancellationReason,
-  CandidateCancellationReasonFilter,
   Order,
   OrderCandidateJob,
   OrderCandidatesList,
@@ -124,9 +122,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Select(OrderManagementState.candidatesJob)
   private readonly candidateJobState$: Observable<OrderCandidateJob>;
 
-  @Select(OrderManagementContentState.getCandidateCancellationReasons)
-  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
-
   public rejectReasons$: Observable<RejectReason[]>;
   public form: FormGroup;
   public statusesFormControl = new FormControl();
@@ -165,7 +160,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public candidateDOBRequired: boolean;
   public candidatePhone1RequiredValue = '';
   public candidateAddressRequiredValue = '';
-  public candidateCancellationReasons: CandidateCancellationReason[] | null;
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -746,7 +740,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       if (!this.isRejected) {
         this.fieldsEnableHandlear();
       }
-      this.subscribeCandidateCancellationReasons();
     }
     this.changeDetectorRef.markForCheck();
   }
@@ -862,20 +855,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
 
-  private subscribeCandidateCancellationReasons() {
-    if (this.candidateJob) {
-      let payload: CandidateCancellationReasonFilter = {
-        locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId
-      };
-      this.store.dispatch(new GetCandidateCancellationReason(payload));
-      this.candidateCancellationReasons$
-        .pipe(takeUntil(this.destroy$)).subscribe((value) => {
-          this.candidateCancellationReasons =value;
-        });
-
-    }
-  }
 
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {

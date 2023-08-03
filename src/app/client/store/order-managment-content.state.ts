@@ -167,7 +167,7 @@ export interface OrderManagementContentStateModel {
   contactDetails: Department | null;
   extensions: any;
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
-  candidateCancellationReasons:CandidateCancellationReason[]|null;
+  candidateCancellationReasons: CandidateCancellationReason[] | null;
   allShifts:ScheduleShift[]|null;
   sendOnboardCandidateEmail:OnboardCandidateEmail | null;
   orderComments: Comment[]
@@ -208,7 +208,7 @@ export interface OrderManagementContentStateModel {
     contactDetails: null,
     extensions: null,
     irpCandidates: null,
-    candidateCancellationReasons:null,
+    candidateCancellationReasons: null,
     allShifts:null,
     sendOnboardCandidateEmail:null,
     orderComments : []
