@@ -53,6 +53,7 @@ import { GrantReportComponent } from './grant-report/grant-report.component';
 import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-invoice-report-beta.component';
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
+import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 
 const routes: Routes = [
   {
@@ -412,6 +413,13 @@ const routes: Routes = [
       {
         path: 'shift-breakdown',
         component: ShiftBreakdownComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'financial-time-sheet-report-beta',
+        component: FinancialTimeSheetBetaComponent,
         data: {
           isOrganizationArea: true,
         }
