@@ -343,7 +343,7 @@
         </div>
         <div class="rich-text-container">
           <label>Mail Body<span class="required">*</span></label>
-          <div class="input-group" id="richTextEditorDiv" [ngClass]="validationCheck() ? 'invalidRichTextEditorDiv' : ''">
+          <div class="input-group" id="richTextEditorDiv" [ngClass]="emailBodyRequired ? 'invalidRichTextEditorDiv' : ''">
             <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
                                 formControlName="emailBody" [toolbarSettings]='tools' [(ngModel)]='emailBody'
                                 [(value)]='emailBody' required>

@@ -34,7 +34,7 @@
       <app-send-group-email #emailTemplateForm [groupEmailTemplateForm]="$any(sendGroupEmailFormGroup)" [title]="templateEmailTitle"
                                       [emailSubject]="viewGroupEmailData.subjectMail" [emailBody]="viewGroupEmailData.bodyMail"
                                       [emailTo]="viewGroupEmailData.toList" [emailCc]="viewGroupEmailData.cCList"
-                                      [isSend]="isSend">
+                                      [isSend]="isSend" [emailBodyRequired$]="emailBodyRequiredFlag$">
      </app-send-group-email>
     </section>
   </app-send-email-side-dialog>
