@@ -10,17 +10,40 @@ export class useractivitlogreportPage {
   }
   
   export class userActivity {
+
     id: string;
-    customReportName: string;
-    isSystem: boolean;
-    path: string;
-    catalogPath: string;
-    reportParamaters: string;
-    createdAt: DateTime;
-    lastModifiedAt: DateTime;
-    CreatedBy: string;
-    LastModifiedBy: string;
-    businessUnitId: number;
+
+    message: string;
+
+    utcDate: DateTime;
+
+    eventType: string;
+
+    eventTargetType: string;
+    eventTarget: string;
+
+    eventValue: string;
+
+    screenUrl: string;
+
+    screenName: string;
+
+    client: string;
+
+    userIP: string;
+
+    userId: string
+
+
+    isHallmark: boolean;
+
+    userName: string;
+
+    userEmailId: string;
+
+    businessUnitName: string;
+
+    dateTime: DateTime;
   }
   
   

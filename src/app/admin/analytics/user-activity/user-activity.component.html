@@ -22,8 +22,30 @@
   </section>
 
   <section class="credential-expiry-section">
-    <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName" [reportType]="reportType"></app-logi-report>
-    <router-outlet></router-outlet>
+    <section class="app-grid table-wrapper controls-container" >
+      <div class="custom-grid">
+        <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
+                         [gridOptions]="gridOptions"
+                         (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
+                         [headerHeight]="52"></ag-grid-angular>
+    
+        <div class="grid-pagination">
+          <ejs-dropdownlist id="rowsPerPage"
+                            class="dropdown-no-border"
+                            [allowFiltering]="true"
+                            [dataSource]="rowsPerPageDropDown"
+                            [(value)]="activeRowsPerPageDropDown"
+                            >
+          </ejs-dropdownlist>
+          <div class="total-rows">
+            Total Rows: {{totalRecordsCount$ | async}}
+          </div>
+        </div>
+      </div>
+    
+     
+  
+    </section>
   </section>
 
   <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"

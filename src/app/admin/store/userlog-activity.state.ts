@@ -25,7 +25,7 @@ interface useractivitylogreportStateModel {
   },
 })
 @Injectable()
-export class LogiCustomReportState {
+export class useractivityReportState {
 
 
   @Selector()
@@ -40,15 +40,15 @@ export class LogiCustomReportState {
   @Action(GetuserlogReportPage)
   GetuserlogReportPage(
     { dispatch, patchState }: StateContext<useractivitylogreportStateModel>,
-    { organizationId, pageNumber, pageSize }: GetuserlogReportPage
+    { payload }: GetuserlogReportPage
   ): Observable<useractivitlogreportPage | void> {
    
     return this.logiCustomReportService
-      .getCustomReportPage(organizationId, pageNumber, pageSize)
+      .userLogreport(payload)
       .pipe(
         tap((payload) => {
           patchState({ useractivitlogreportPage: payload });
-          return payload;
+          return payload
         }),
         catchError((error: HttpErrorResponse) => {
           return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));

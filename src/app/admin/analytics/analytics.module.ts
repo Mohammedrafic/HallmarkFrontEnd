@@ -71,6 +71,8 @@ import { PositionSummaryComponent } from './Position-Summary/Position-Summary.co
 import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
 import { UserActivityComponent } from './user-activity/user-activity.component';
+import { useractivityReportState } from '@admin/store/userlog-activity.state';
+import { AgGridModule } from '@ag-grid-community/angular';
 
 
 @NgModule({
@@ -148,7 +150,8 @@ import { UserActivityComponent } from './user-activity/user-activity.component';
     RadioButtonModule,
     LogiReportModule,
     ProgressBarAllModule,
-    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState])
+    AgGridModule,
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState,useractivityReportState])
   ],
   providers:[
     ScheduleApiService,
