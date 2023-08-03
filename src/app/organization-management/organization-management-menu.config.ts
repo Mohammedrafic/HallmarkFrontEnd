@@ -26,7 +26,7 @@ export const ORG_SETTINGS: MenuSettings[] = [
   { text: 'Workflow', id: 8, route: './workflow', permissionKeys: ['CanViewWorkflows'] },
   { text: 'Bill Rates', id: 9, route: './bill-rates', permissionKeys: ['CanViewSettingsBillRates'] },
   { text: 'Configurations', id: 6, route: './settings', permissionKeys: ['CanViewOrganizationSettings'] },
-  { text: 'Reasons', id: 10, route: './reasons', permissionKeys: ['CanOrganizationViewOrders'] },
+  { text: 'Reasons', id: 10, route: './reasons'},
   { text: 'Special Project', id: 12, route: './specialproject', permissionKeys: ['CanViewSpecialProjects'] },
   { text: 'Business Lines', id: 13, route: './businesslines' },
   { text: 'Tiers', id: 14, route: './tiers', permissionKeys: ['CanViewOrganizationTiers'] },

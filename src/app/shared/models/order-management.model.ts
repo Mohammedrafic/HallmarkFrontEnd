@@ -611,6 +611,7 @@ export type OrderCandidateJob = {
   clockId: number;
   expAsTravelers: string;
   isLocal: boolean;
+  initialBillRate: number;
   guaranteedWorkWeek: string;
   jobId: number;
   offeredBillRate: number;
