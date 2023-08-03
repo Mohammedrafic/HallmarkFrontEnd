@@ -40,7 +40,7 @@
         </ng-template>
       </e-tabitem>
 
-      <e-tabitem *ngIf="userPermission[userPermissions.CanViewOrderClosureReasons] && userPermission[userPermissions.CanManageOrderClosureReasons]">
+      <e-tabitem *ngIf="userPermission[userPermissions.CanViewOrderClosureReasons]">
         <ng-template #headerText><div>Order Closure</div></ng-template>
         <ng-template #content>
           <app-closure-reason [userPermission]="userPermission" (editReason)="editReason($event)" [showSystem]="showSystem" [system]="system" [form]="reasonForm"></app-closure-reason>

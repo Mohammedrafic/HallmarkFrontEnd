@@ -960,11 +960,18 @@ export class OrderManagementContentState {
   @Action(ApproveOrder)
   ApproveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, isIRPTab }: ApproveOrder
+    { id, isIRPTab, updateOpenedOrder }: ApproveOrder
   ): Observable<string | void> {
     return this.orderManagementService
       .approveOrder(id, isIRPTab)
-      .pipe(catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error))));
+      .pipe(
+        tap(() => {
+          if (updateOpenedOrder) {
+            dispatch(new GetSelectedOrderById(id, isIRPTab));
+          }
+        }),
+        catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
+      );
   }
 
   @Action(GetOrderFilterDataSources)

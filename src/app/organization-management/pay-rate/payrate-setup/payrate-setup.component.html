@@ -33,7 +33,7 @@
                 ejs-button
                 cssClass="e-flat secondary-icon-button"
                 (click)="onRemoveRecordButtonClick(data, $event)"
-                [disabled]="!userPermission[userPermissions.CanDeleteSettingsBillRates]"
+                [disabled]="!userPermission[userPermissions.CanEditPayRates]"
               >
                 <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
               </button>

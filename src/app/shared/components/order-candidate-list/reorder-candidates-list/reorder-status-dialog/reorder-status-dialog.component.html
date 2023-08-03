@@ -47,6 +47,10 @@
 
           </div>
         </div>
+        <div class="candidate-message" *ngIf="orderCandidateJob?.isLocal">
+          <i-feather name="info" class="icon"></i-feather>
+          Local Candidate
+        </div>
       </section>
       <section class="content-container">
         <div class="job-details">

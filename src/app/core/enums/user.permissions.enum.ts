@@ -224,7 +224,7 @@ export enum UserPermissions {
   CanCreateOrdersIRP = 6408,
   CanOnboardCandidateIRP = 6409,
   CanRejectCandidateIRP = 6410,
-  CanEditOrderBillRateIRP = 6411,
+  CanEditOrderBillRateIRP = 6412,
   CanCloseOrdersIRP = 6413,
 
   //Agency setup

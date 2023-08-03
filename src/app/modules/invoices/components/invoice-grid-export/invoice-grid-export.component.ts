@@ -13,6 +13,7 @@ import { AgencyInvoiceExportCols, GetExportFileName, GetInvoiceState, GetTabsToE
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
 import { Invoices } from '../../store/actions/invoices.actions';
+import { InvoicesModel } from '../../store/invoices.model';
 
 @Component({
   selector: 'app-invoice-grid-export',
@@ -21,7 +22,6 @@ import { Invoices } from '../../store/actions/invoices.actions';
 })
 export class InvoiceGridExportComponent extends AbstractGridConfigurationComponent {
   @Input() public selectedRows: InvoiceGridSelections;
-  @Input() public isAgency = false;
   @Input() public organizationId: number;
   @Input() set selectedTab(selectedTabIdx: number | never) {
    this.setSelectedTab(selectedTabIdx);
@@ -36,6 +36,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
 
   private selectedTabIndex = 0;
   private invoiceState: InvoiceState | null;
+  public isAgency:boolean;
 
   constructor(
     private store: Store,
@@ -43,6 +44,9 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
   ) {
     super();
     this.exportColumns();
+    this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
+   
+
   }
 
   public override customExport(): void {

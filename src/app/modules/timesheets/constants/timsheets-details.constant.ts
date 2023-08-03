@@ -281,16 +281,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     field: 'timesheetId',
     headerName: 'Version Id',
     width: 120,
-    minWidth: 80,
-    resizable: true,
-    type: 'rightAligned',
-    cellClass: 'common-cell',
-  },
-  {
-    field: 'id',
-    headerName: 'Id',
-    width: 92,
-    minWidth: 80,
+    minWidth: 90,
     resizable: true,
     type: 'rightAligned',
     cellClass: 'common-cell',
@@ -298,7 +289,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
   {
     ...dayColDef,
     width: 102,
-    minWidth: 80,
+    minWidth: 90,
     filter: false,
     sortable: false,
   },
@@ -306,31 +297,31 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     field: 'timeIn',
     headerName: 'Time In',
     width: 92,
-    minWidth: 80,
+    minWidth: 90,
     resizable: true,
     type: 'rightAligned',
     cellClass: 'common-cell',
     valueFormatter: (data) => {
-      return formatDate(data.value, 'H:mm', 'en-US');
+      return formatDate(data.value, 'H:mm', 'en-US', 'UTC');
     },
   },
   {
     field: 'timeOut',
     headerName: 'Time Out',
     width: 100,
-    minWidth: 80,
+    minWidth: 90,
     resizable: true,
     type: 'rightAligned',
     cellClass: 'common-cell',
     valueFormatter: (data) => {
-      return formatDate(data.value, 'H:mm', 'en-US');
+      return formatDate(data.value, 'H:mm', 'en-US', 'UTC');
     },
   },
   {
     field: 'hours',
     headerName: 'Hours',
-    width: 77,
-    minWidth: 70,
+    width: 90,
+    minWidth: 90,
     resizable: true,
     type: 'rightAligned',
     cellClass: ['common-cell', 'bold'],
@@ -339,7 +330,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     field: 'type',
     headerName: 'Type',
     width: 140,
-    minWidth: 80,
+    minWidth: 90,
     resizable: true,
     cellClass: ['common-cell', 'align-left'],
     valueFormatter: (data) => {
@@ -350,7 +341,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     field: 'state',
     headerName: 'State',
     width: 187,
-    minWidth: 80,
+    minWidth: 90,
     resizable: true,
     cellClass: ['common-cell', 'align-left'],
     cellStyle: (data) => {
@@ -364,7 +355,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     field: 'invoiceId',
     headerName: 'Invoice Id',
     width: 120,
-    minWidth: 80,
+    minWidth: 90,
     resizable: true,
     type: 'rightAligned',
     cellClass: ['common-cell', 'bold'],
