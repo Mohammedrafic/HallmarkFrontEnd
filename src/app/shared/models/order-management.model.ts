@@ -838,12 +838,6 @@ export class CandidateCancellationReason{
   name: string;
 }
 
-export class CandidateCancellationReasonFilter{
-  regionId?:number;
-  locationId?:number;
-}
-
-
 export class OrderJourneyFilter {
   orderBy?: string;
   pageNumber?: number;

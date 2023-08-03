@@ -2,7 +2,7 @@ import { SaveLastSelectedOrganizationAgencyId } from '../../store/user.actions';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { catchError, debounceTime, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, Observable, of, switchMap, tap } from 'rxjs';
 import {
   ApproveOrder,
   CancelOrganizationCandidateJob,
@@ -136,7 +136,6 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -1170,13 +1169,16 @@ export class OrderManagementContentState {
 
   @Action(GetCandidateCancellationReason)
   GetCandidateCancellationReason(
-    { patchState } : StateContext<OrderManagementContentStateModel>, { payload } : GetCandidateCancellationReason
-    ) : Observable<CandidateCancellationReason[] |null>{
-      return this.orderManagementService.GetCandidateCancellationReasons(payload).pipe(tap((payload: CandidateCancellationReason[]) => {
-        patchState({ candidateCancellationReasons: payload });
-        return payload;
-      }));
-    }
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderId }: GetCandidateCancellationReason
+  ): Observable<CandidateCancellationReason[] | null> {
+    return this.orderManagementService.getCandidateCancellationReasons(orderId)
+      .pipe(
+        tap((payload: CandidateCancellationReason[]) => {
+          patchState({ candidateCancellationReasons: payload });
+          return payload;
+        }));
+  }
 
     @Action(GetOrderComments)
     GetOrderComments(

@@ -23,7 +23,6 @@ import { JobCancellationReason, PenaltyCriteria } from "@shared/enums/candidate-
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import {
   CandidateCancellationReason,
-  CandidateCancellationReasonFilter,
   OrderCandidateJob,
 } from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -53,7 +52,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   @Output() cancelCandidateCancellation = new EventEmitter<void>();
 
   @Select(OrderManagementContentState.getCandidateCancellationReasons)
-  private candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
+  private candidateCancellationReasons$: Observable<CandidateCancellationReason[] | null>;
 
   public form: FormGroup;
   public isReasonSelected = false;
@@ -112,18 +111,15 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     this.openEvent
       .pipe(
         tap(() => {
-          const payload: CandidateCancellationReasonFilter = {
-            locationId: this.candidateJob?.order.locationId,
-            regionId: this.candidateJob?.order.regionId,
-          };
-          this.store.dispatch(new GetCandidateCancellationReason(payload));
+          const orderId = this.candidateJob?.order.id as number;
+          this.store.dispatch(new GetCandidateCancellationReason(orderId));
+          this.candidateCancellationDialog.show();
+          this.form.reset();
         }),
         switchMap(() => this.candidateCancellationReasons$),
         takeUntil(this.destroy$)
       ).subscribe((cancellationReasons) => {
         this.reasons = cancellationReasons;
-        this.candidateCancellationDialog.show();
-        this.form.reset();
       });
   }
 
