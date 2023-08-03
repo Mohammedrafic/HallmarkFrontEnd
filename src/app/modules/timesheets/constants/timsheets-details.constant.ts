@@ -311,7 +311,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     type: 'rightAligned',
     cellClass: 'common-cell',
     valueFormatter: (data) => {
-      return formatDate(data.value, 'H:mm', 'en-US');
+      return formatDate(data.value, 'H:mm', 'en-US', 'UTC');
     },
   },
   {
@@ -323,7 +323,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     type: 'rightAligned',
     cellClass: 'common-cell',
     valueFormatter: (data) => {
-      return formatDate(data.value, 'H:mm', 'en-US');
+      return formatDate(data.value, 'H:mm', 'en-US', 'UTC');
     },
   },
   {
