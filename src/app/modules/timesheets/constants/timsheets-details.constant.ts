@@ -325,6 +325,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     resizable: true,
     type: 'rightAligned',
     cellClass: ['common-cell', 'bold'],
+    valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatNumber(params.value, '1.2-2'),
   },
   {
     field: 'type',
