@@ -310,8 +310,12 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         this.canRejectOrClosure = this.userPermission[this.userPermissions.CanRejectCandidate];
       } else if (this.selectedTab === ReasonsNavigationTabs.Unavailability) {
         this.canRejectOrClosure = this.userPermission[this.userPermissions.CanEditUnavailabilityReasons];
-      } else {
-        this.canRejectOrClosure = this.userPermission[this.userPermissions.CanManageOrderClosureReasons];
+      }
+      else if (this.selectedTab === ReasonsNavigationTabs.Closure) {
+        this.canRejectOrClosure = this.userPermission[this.userPermissions.CanManageOrderClosureReasons]
+      }
+      else{
+        this.canRejectOrClosure=true;
       }
   }
 
