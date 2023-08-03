@@ -426,9 +426,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     orderPublicId,
     candidatePayRate,
     clockId,
+    initialBillRate,
   }: OrderCandidateJob) {
     this.getComments();
-    const candidateBillRateValue = candidateBillRate ?? hourlyRate;
+    const candidateBillRateValue = candidateBillRate ?? initialBillRate;
     let isBillRatePending: number;
 
     if (this.orderCandidateJob.applicantStatus.applicantStatus === CandidatStatus.BillRatePending) {
