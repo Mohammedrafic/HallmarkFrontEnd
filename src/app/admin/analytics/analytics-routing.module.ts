@@ -418,7 +418,7 @@ const routes: Routes = [
         }
       },
       {
-        path: 'financial-time-sheet-report-beta',
+        path: 'financial-time-sheet-beta',
         component: FinancialTimeSheetBetaComponent,
         data: {
           isOrganizationArea: true,
