@@ -106,6 +106,11 @@
                                 [description]="widgetDescriptionEnum.AVAILABLE_EMPLOYEE"
                                 [chartData]="widgetsData?.[widgetTypeEnum.AVAILABLE_EMPLOYEE]"
                                 [isDarkTheme]="isDarkTheme" ></app-available-employee>
+          <app-positions-count-day-range *ngSwitchCase="widgetTypeEnum.POSITIONS_COUNT_DAY_RANGE"
+                                [isLoading]="isLoading"
+                                [description]="widgetDescriptionEnum.POSITIONS_COUNT_DAY_RANGE"
+                                [chartData]="widgetsData?.[widgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]"
+                                [isDarkTheme]="isDarkTheme" ></app-positions-count-day-range>
         </ng-template>
       </e-panel>
     </e-panels>

@@ -1,0 +1,105 @@
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+    <ng-template #header>
+        <div class="positions-count-day-range-chart__title">
+          <h3 class="widget-header__title">Count Of Positions by Day Range</h3>
+        </div>
+        <div class="positions-count-day-range-chart__tooltip" *ngIf="description.length>0">
+          <ejs-tooltip [content]="description" position='TopCenter'>
+            <span class="mytooltip">
+              <i-feather name="info" id="info"
+                         [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+            </span>
+          </ejs-tooltip>
+        </div>
+      </ng-template>
+    <ng-template #positions_count_day_range>
+        <section>
+          <header>
+            <div class="col center"><span>Status</span></div>
+            <div class="col no-pad alignItem">
+              <div class="middle-col pos-center">
+                <div class="row middle-cell">Day Range</div>
+                <div class="row border-top flex-container">
+                  <div>1-3</div>
+                  <div>4-7</div>
+                  <div>8-14</div>
+                  <div>15-30</div>
+                  <div>30+</div>
+                </div>
+              </div>
+            </div>
+            <div class="col center"><span>Total<br> Positions</span></div>
+          </header>
+         <div class="row">
+            <div class="col border-top-none"><span>Open</span></div>
+            <div class="middle-col">
+              <div class="row flex-container">
+                <div>&nbsp;</div>
+                <div>22</div>
+                <div>23</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+              </div>
+            </div>            
+            <div class="col border-top-none">3</div>
+          </div>
+         <div class="row">
+            <div class="col border-top-none"><span>In-Progress</span></div>
+            <div class="middle-col">
+              <div class="row flex-container">
+                <div>51</div>
+                <div></div>
+                <div>53</div>
+                <div>54</div>
+                <div>55</div>
+              </div>
+            </div>
+           
+            <div class="col border-top-none">6</div>
+          </div>
+          <div class="row">
+            <div class="col border-top-none"><span>In-Progress(Pending)</span></div>
+            <div class="middle-col">
+              <div class="row flex-container">
+                <div>&nbsp;</div>
+                <div>82</div>
+                <div>&nbsp;</div>
+                <div>84</div>
+                <div>85</div>
+              </div>
+            </div>
+            
+            <div class="col border-top-none">9</div>
+          </div>
+          <div class="row">
+            <div class="col border-top-none"><span>In-Progress(Accepted)</span></div>
+            <div class="middle-col">
+              <div class="row flex-container">
+                <div>81</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div>84</div>
+                <div>85</div>
+              </div>
+            </div>
+           
+            <div class="col border-top-none">9</div>
+          </div>
+          <div class="row">
+            <div class="col border-top-none"><span>Filled</span></div>
+            <div class="middle-col">
+              <div class="row flex-container">
+                <div>122</div>
+                <div> </div>
+                <div> </div>
+                <div> </div>
+                <div>26</div>
+              </div>
+            </div>
+            
+            <div class="col border-top-none">150</div>
+          </div> 
+        </section>
+
+    </ng-template>
+</app-widget-wrapper>
