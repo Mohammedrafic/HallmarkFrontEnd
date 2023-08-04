@@ -376,7 +376,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           expAsTravelers: value.expAsTravelers,
           availableStartDate: DateTimeHelper.setUtcTimeZone(new Date(value.availableStartDate)),
           actualStartDate: this.candidateJob.offeredStartDate,
-          actualEndDate: actualEndDate,
+          actualEndDate: DateTimeHelper.setUtcTimeZone(actualEndDate),
           clockId: this.candidateJob.clockId,
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
           allowDeployWoCredentials: false,

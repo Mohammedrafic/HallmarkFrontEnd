@@ -573,7 +573,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         offeredBillRate: value.offeredBillRate,
         requestComment: value.comments,
         actualStartDate: this.candidateJob?.offeredStartDate,
-        actualEndDate:actualEndDate,
+        actualEndDate: DateTimeHelper.setUtcTimeZone(actualEndDate),
         offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,
