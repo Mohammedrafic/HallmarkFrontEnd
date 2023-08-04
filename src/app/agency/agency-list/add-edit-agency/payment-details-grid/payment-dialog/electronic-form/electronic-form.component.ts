@@ -143,22 +143,21 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
     }
   }
 
+  private subscribeOnDateChange(dateControl: AbstractControl, controlToUpdate: AbstractControl): void {
+    dateControl.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        controlToUpdate.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+        this.changeDetectorRef.markForCheck();
+      });
+  }
+
   private setDateRangeValidators(): void {
     const startTimeField = this.paymentDetailsForm.get('startDate') as AbstractControl;
     const endTimeField = this.paymentDetailsForm.get('endDate') as AbstractControl;
     startTimeField.addValidators(startDateValidator(this.paymentDetailsForm, 'endDate'));
-    startTimeField.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-        this.changeDetectorRef.markForCheck();
-      });
+    this.subscribeOnDateChange(startTimeField, endTimeField);
     endTimeField.addValidators(endDateValidator(this.paymentDetailsForm, 'startDate'));
-    endTimeField.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-        this.changeDetectorRef.markForCheck();
-      });
+    this.subscribeOnDateChange(endTimeField, startTimeField);
   }
 }
