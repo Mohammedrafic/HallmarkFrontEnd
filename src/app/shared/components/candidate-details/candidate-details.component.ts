@@ -843,7 +843,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       .get('locationIds')
       ?.valueChanges.pipe(filter(()=>!this.isAgency), takeUntil(this.unsubscribe$))
       .subscribe((val: number[]) => {
-        if (this.filterColumns.departmentIds) {
+        if (this.filterColumns?.departmentIds) {
           this.filterColumns.departmentIds.dataSource = [];
           if (val?.length) {
             const locationDataSource = this.filterColumns.locationIds?.dataSource as OrganizationLocation[];
