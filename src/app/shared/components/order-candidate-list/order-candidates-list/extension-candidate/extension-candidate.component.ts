@@ -158,7 +158,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public payRateSetting = CandidatePayRateSettings;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public isCandidatePayRateVisible: boolean;
-  public canCreateOrder : boolean;
+  public canCreateOrder: boolean;
 
   public applicantStatusEnum = ApplicantStatusEnum;
   public candidateSSNRequired: boolean;
@@ -191,7 +191,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   get canAccept(): boolean {
     return this.candidateJob && this.isAgency && !this.isOnBoard
-    && this.candidateJob?.applicantStatus?.applicantStatus !== this.candidatStatus.Offboard;
+      && this.candidateJob?.applicantStatus?.applicantStatus !== this.candidatStatus.Offboard;
   }
 
   get actualStartDateValue(): Date {
@@ -215,11 +215,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
 
-  isSend:boolean = false;
+  isSend: boolean = false;
   public sendOnboardMessageEmailFormGroup: FormGroup;
 
-  emailTo:any = '';
-  isSendOnboardFormInvalid:boolean = false;
+  emailTo: any = '';
+  isSendOnboardFormInvalid: boolean = false;
   @ViewChild('RTE')
   public rteEle: RichTextEditorComponent;
   @ViewChild(OnboardCandidateMessageDialogComponent, { static: true }) onboardEmailTemplateForm: OnboardCandidateMessageDialogComponent;
@@ -233,7 +233,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef,
     private settingService: SettingsViewService,
-    private permissionService : PermissionService,
+    private permissionService: PermissionService,
     private confirmService: ConfirmService,
   ) {
     super();
@@ -244,7 +244,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       fileUpload: new FormControl(null),
       emailTo: new FormControl('', [Validators.required]),
       orderId: new FormControl('', [Validators.required]),
-      candidateId  : new FormControl('', [Validators.required]),
+      candidateId: new FormControl('', [Validators.required]),
       businessUnitId: new FormControl('', [Validators.required]),
     });
   }
@@ -366,14 +366,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       }
     }
 
-    if(this.candidatePhone1RequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){
-          if(this.candidateJob?.candidateProfileContactDetails.phone1 === null
-              || this.candidateJob?.candidateProfileContactDetails.phone1 === ''){
-                this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
-                return;
-            }
-      }else{
+    if (this.candidatePhone1RequiredValue === ConfigurationValues.Accept) {
+      if (this.candidateJob?.candidateProfileContactDetails != null) {
+        if (this.candidateJob?.candidateProfileContactDetails.phone1 === null
+          || this.candidateJob?.candidateProfileContactDetails.phone1 === '') {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
+          return;
+        }
+      } else {
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidatePHONE1Required(ConfigurationValues.Accept)));
         return;
       }
@@ -384,13 +384,13 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       return;
     }
 
-    if(this.candidateAddressRequiredValue === ConfigurationValues.Accept){
-      if(this.candidateJob?.candidateProfileContactDetails != null){
-          if(CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)){
-              this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
-              return;
-          }
-      }else{
+    if (this.candidateAddressRequiredValue === ConfigurationValues.Accept) {
+      if (this.candidateJob?.candidateProfileContactDetails != null) {
+        if (CommonHelper.candidateAddressCheck(this.candidateJob?.candidateProfileContactDetails)) {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
+          return;
+        }
+      } else {
         this.store.dispatch(new ShowToast(MessageTypes.Error, CandidateADDRESSRequired(ConfigurationValues.Accept)));
         return;
       }
@@ -552,13 +552,33 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
   }
 
+  getDaysDifference(start: Date, end: Date): number {
+    const oneDay = 24 * 60 * 60 * 1000;
+    return Math.round(Math.abs((end.getTime() - start.getTime()) / oneDay));
+  }
+
+  calculateActualEndDate(startDate: Date, daysToAdd: number): Date {
+    const actualEndDate = new Date(startDate); actualEndDate.setDate(startDate.getDate() + daysToAdd);
+    return actualEndDate;
+  }
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
-    if (typeof value.actualStartDate === 'string') {
+    const jobStartDate = new Date(this.candidateJob.order.jobStartDate);
+    const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
+    const daysDifference = this.getDaysDifference(jobStartDate, jobEndDate);
+    const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString();
+    const accepted = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
+    if (accepted) {
       value.actualStartDate = new Date(value.actualStartDate);
+      value.actualEndDate = actualEndDate;
     }
-    if (typeof value.actualEndDate === 'string') {
-      value.actualEndDate = new Date(value.actualEndDate);
+    else {
+      if (typeof value.actualStartDate === 'string') {
+        value.actualStartDate = new Date(value.actualStartDate);
+      }
+      if (typeof value.actualEndDate === 'string') {
+        value.actualEndDate = new Date(value.actualEndDate);
+      }
     }
     if (this.form.valid) {
       const updatedValue = {
@@ -578,8 +598,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         clockId: value.clockId,
         candidatePayRate: value.candidatePayRate,
       };
-      this.isSend =  true;
-      this.emailTo = this.candidateJob?.candidateProfile.email; 
+      const statusChangeds = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
+      this.isSend = true;
+      this.emailTo = this.candidateJob?.candidateProfile.email;
       this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.candidateJob?.candidateProfile.email);
       this.sendOnboardMessageEmailFormGroup.get('orderId')?.setValue(this.candidateJob?.orderId);
       this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.candidateJob?.candidateProfileId);
@@ -601,56 +622,56 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             this.adjustCandidatePayRateField();
           }
         });
-        this.action$.pipe(takeUntil(this.destroy$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
-          if(applicantStatus.applicantStatus === ApplicantStatusEnum.OnBoarded){
-            const options = {
-                title: ONBOARD_CANDIDATE,
-                okButtonLabel: 'Yes',
-                okButtonClass: 'ok-button',
-                cancelButtonLabel: 'No'
-            };
-            this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
-                .subscribe((isConfirm) => {
-                  if(isConfirm){
-                    this.onboardEmailTemplateForm.rteCreated();
-                    this.onboardEmailTemplateForm.disableControls(true);
-                    this.store.dispatch(new ShowGroupEmailSideDialog(true));
-                  }
-                });
-          }
-        });
+      this.action$.pipe(takeUntil(this.destroy$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
+        if (applicantStatus.applicantStatus === ApplicantStatusEnum.OnBoarded) {
+          const options = {
+            title: ONBOARD_CANDIDATE,
+            okButtonLabel: 'Yes',
+            okButtonClass: 'ok-button',
+            cancelButtonLabel: 'No'
+          };
+          this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
+            .subscribe((isConfirm) => {
+              if (isConfirm) {
+                this.onboardEmailTemplateForm.rteCreated();
+                this.onboardEmailTemplateForm.disableControls(true);
+                this.store.dispatch(new ShowGroupEmailSideDialog(true));
+              }
+            });
+        }
+      });
     } else {
       this.resetStatusesFormControl();
     }
   }
 
-  onGroupEmailAddCancel(){
+  onGroupEmailAddCancel() {
     // console.log('this.candidateJob at cancel',this.candidateJob);
     this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
-    this.isSend =  false;
+    this.isSend = false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
   }
 
-  onGroupEmailSend(){
+  onGroupEmailSend() {
     this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
-    if(this.sendOnboardMessageEmailFormGroup.valid){
-      const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();   
+    if (this.sendOnboardMessageEmailFormGroup.valid) {
+      const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();
       // console.log('emailvalue',emailvalue);         
       this.store.dispatch(new sendOnboardCandidateEmailMessage({
-            subjectMail : emailvalue.emailSubject,
-            bodyMail : emailvalue.emailBody,
-            toList : emailvalue.emailTo,
-            status : 1,
-            stream : emailvalue.fileUpload,
-            extension : emailvalue.fileUpload?.type,
-            documentName : emailvalue.fileUpload?.name,
-            orderId : emailvalue.orderId,
-            candidateId : emailvalue.candidateId,
-            businessUnitId : emailvalue.businessUnitId,
-          })
-        )
+        subjectMail: emailvalue.emailSubject,
+        bodyMail: emailvalue.emailBody,
+        toList: emailvalue.emailTo,
+        status: 1,
+        stream: emailvalue.fileUpload,
+        extension: emailvalue.fileUpload?.type,
+        documentName: emailvalue.fileUpload?.name,
+        orderId: emailvalue.orderId,
+        candidateId: emailvalue.candidateId,
+        businessUnitId: emailvalue.businessUnitId,
+      })
+      )
         .subscribe(() => {
-          this.isSend =  false;
+          this.isSend = false;
           this.store.dispatch(new ShowGroupEmailSideDialog(false));
           this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
         });
@@ -700,15 +721,15 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.candidateJob = value;
     this.candidateSSNRequired = value.candidateSSNRequired;
     this.candidateDOBRequired = value.candidateDOBRequired;
-    if(value.candidatePhone1Required != null){
+    if (value.candidatePhone1Required != null) {
       let phone1Configuration = JSON.parse(value.candidatePhone1Required);
-      if(phone1Configuration.isEnabled){
+      if (phone1Configuration.isEnabled) {
         this.candidatePhone1RequiredValue = phone1Configuration.value;
       }
     }
-    if(value.candidateAddressRequired != null){
+    if (value.candidateAddressRequired != null) {
       let addressConfiguration = JSON.parse(value.candidateAddressRequired);
-      if(addressConfiguration.isEnabled){
+      if (addressConfiguration.isEnabled) {
         this.candidateAddressRequiredValue = addressConfiguration.value;
       }
     }
@@ -852,9 +873,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   private deleteUpdateFieldInRate(): void {
     this.candidateJob?.billRates.filter((rate) => Object.prototype.hasOwnProperty.call(rate, 'isUpdated'))
-    .forEach((rate) => {
-      delete rate.isUpdated;
-    });
+      .forEach((rate) => {
+        delete rate.isUpdated;
+      });
   }
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
@@ -871,14 +892,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.store.dispatch(new GetCandidateCancellationReason(payload));
       this.candidateCancellationReasons$
         .pipe(takeUntil(this.destroy$)).subscribe((value) => {
-          this.candidateCancellationReasons =value;
+          this.candidateCancellationReasons = value;
         });
 
     }
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder }) => {
       this.canCreateOrder = canCreateOrder;
     });
   }
