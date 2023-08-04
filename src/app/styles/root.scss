@@ -24,6 +24,8 @@
   --widget-status-accepted: #{mix($supportive-purple, $primary-active-blue-60, 65%)};
   --widget-status-onboard-filled: #{mix($primary-active-blue-30, $primary-active-blue-60, 65%)};
   --widget-status-in-progress: #{mix($primary-active-blue, $primary-active-blue-60, 65%)};
+  --widget-status-offboard : #{mix($supportive-pink, $primary-active-blue-60, 50%)};
+  --widget-status-cancelled : #{mix($supportive-red-50, $primary-active-blue-60, 50%)};
   --widget-status-custom: #{mix($secondary-dark-blue-15, $primary-active-blue-60, 65%)};
 
   --form-control-gap-y: 15px;
