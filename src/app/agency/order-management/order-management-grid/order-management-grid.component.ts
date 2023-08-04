@@ -481,8 +481,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private setDefaultStatuses(statuses: string[], setDefaultFilters: boolean): void {
     if(this.ltaOrder){
       this.clearFilters();
-      this.orderStatus = [];
-      this.candidateStatuses = [];
     }
     if(this.Organizations.length > 0){
       this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
