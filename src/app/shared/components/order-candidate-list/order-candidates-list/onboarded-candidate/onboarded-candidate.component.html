@@ -274,8 +274,8 @@
         </e-accordionitems>
       </ejs-accordion>
     </div>
-    <div class="comments">
-      <app-comments *ngIf="candidateJob" [canVmsCreateOrders]="canCreateOrder" [comments]="comments" [externalCommentConfiguration]="order.externalCommentsConfiguration" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
+    <div class="comments" *ngIf="candidateJob?.commentContainerId !== null">
+      <app-comments *ngIf="candidateJob" [canVmsCreateOrders]="canCreateOrder" [comments]="candidateComments" [externalCommentConfiguration]="order.externalCommentsConfiguration" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section>
@@ -322,8 +322,8 @@
 
 <!--  -->
 <app-send-email-side-dialog [header]="templateEmailTitle" [isSend]="isSend" (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()" [width]="'1000px'">
-    <app-onboard-candidate-message-dialog [isFormInvalid]="isSendOnboardFormInvalid" 
-      [onBoardMessageEmailTemplateForm]="$any(sendOnboardMessageEmailFormGroup)" [title]="templateEmailTitle" [isSend]="isSend" [emailTo]="emailTo" 
+    <app-onboard-candidate-message-dialog [isFormInvalid]="isSendOnboardFormInvalid"
+      [onBoardMessageEmailTemplateForm]="$any(sendOnboardMessageEmailFormGroup)" [title]="templateEmailTitle" [isSend]="isSend" [emailTo]="emailTo"
     ></app-onboard-candidate-message-dialog>
 </app-send-email-side-dialog>
 

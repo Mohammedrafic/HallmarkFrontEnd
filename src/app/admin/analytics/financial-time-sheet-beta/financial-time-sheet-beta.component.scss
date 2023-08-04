@@ -44,10 +44,10 @@
   }
 }
 
-.agency-spend-report-section {
-  width: 100%;
-  height: calc(100% - 75px);
-  position: relative;
+.accrual-report-section {
+  display: flex;
+  height: 65%;
+  padding-top: 20px !important;
 }
 
 .form-line {
@@ -109,10 +109,4 @@
       width: 100%;
     }
   }
-}
-
-.alert.alert-danger div {
-  color: red;
-  font-size: 1.1em;
-  font-weight: bold;
 }

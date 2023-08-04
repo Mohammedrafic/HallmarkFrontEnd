@@ -1285,7 +1285,12 @@ export class OrganizationManagementState {
       }),
       catchError((error: HttpErrorResponse) => {
         patchState({ organizationSettings: [] });
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+         let errmsg=error.error.detail;
+         if(errmsg.indexOf('permissions') > 0){
+          let re = /permissions/;
+          errmsg=errmsg.replace(re,'permissions ');
+        }
+        return dispatch(new ShowToast(MessageTypes.Error, errmsg));
       })
     );
   }

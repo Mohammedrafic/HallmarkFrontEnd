@@ -100,7 +100,6 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
-  { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
 ];
 

@@ -30,7 +30,7 @@
   }
 }
 
-@media #{$max-tablet} {
+@media #{$max-desktop-small} {
   .job-info-container {
     justify-content: flex-start;
     flex-wrap: wrap;

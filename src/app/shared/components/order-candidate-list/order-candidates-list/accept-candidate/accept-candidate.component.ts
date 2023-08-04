@@ -352,9 +352,22 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  getDaysDifference(start: Date, end: Date): number { 
+    const oneDay = 24 * 60 * 60 * 1000; 
+    return Math.round(Math.abs((end.getTime() - start.getTime()) / oneDay));
+  }
+  
+  calculateActualEndDate(startDate: Date, daysToAdd: number): Date { 
+    const actualEndDate = new Date(startDate); actualEndDate.setDate(startDate.getDate() + daysToAdd);
+     return actualEndDate; 
+    } 
+
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
-
+    const jobStartDate = new Date(this.candidateJob.order.jobStartDate); 
+    const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
+    const daysDifference = this.getDaysDifference(jobStartDate, jobEndDate); 
+    const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString(); 
     this.store
       .dispatch(
         new UpdateAgencyCandidateJob({
@@ -367,8 +380,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           requestComment: value.comments,
           expAsTravelers: value.expAsTravelers,
           availableStartDate: DateTimeHelper.setUtcTimeZone(new Date(value.availableStartDate)),
-          actualStartDate: this.candidateJob.actualStartDate,
-          actualEndDate: this.candidateJob.actualEndDate,
+          actualStartDate: this.candidateJob.offeredStartDate,
+          actualEndDate: actualEndDate,
           clockId: this.candidateJob.clockId,
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
           allowDeployWoCredentials: false,
@@ -478,7 +491,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           candidatePayRate: this.candidateJob.candidatePayRate,
         });
       }
-      this.changeDetectionRef.markForCheck();
+      this.changeDetectionRef.detectChanges();
     });
   }
 

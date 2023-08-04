@@ -23,7 +23,7 @@ import {
   GetGroupEmailWorkCommitments
 } from './../../../store/alerts.actions';
 import { DownloadDocumentDetail, GroupEmailRole } from '@shared/models/group-email.model';
-import { distinctUntilChanged, takeUntil } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, takeUntil } from 'rxjs';
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import {
@@ -112,6 +112,7 @@ export class SendGroupEmailComponent
   @Input() userTypeInput: number | null;
   @Input() fileNameInput: string | undefined;
   @Input() id:any;
+  @Input() emailBodyRequired$ : BehaviorSubject<boolean> =new BehaviorSubject<boolean>(false);
   override selectedItems: any;
 
   public selectedBusinessUnit: number | null;
@@ -173,6 +174,7 @@ export class SendGroupEmailComponent
   @Select(AlertsState.getStaffScheduleReportOptionData)
   public staffScheduleReportFilterData$: Observable<StaffScheduleReportFilterOptions>;
 
+  public emailBodyRequired : boolean = false
   public organizations: Organisation[] = [];
   public agencies: AgencyDto[] = [];
   public regionsList: Region[] = [];
@@ -409,7 +411,6 @@ export class SendGroupEmailComponent
     } else if (user?.businessUnitType === BusinessUnitType.Organization) {
       this.isOrgUser = true;
       this.businessUnits = [
-        { id: BusinessUnitType.Agency, text: 'Agency' },
         { id: BusinessUnitType.Organization, text: 'Organization' },
       ];
     } else if (user?.businessUnitType === BusinessUnitType.Agency) {
@@ -449,6 +450,10 @@ export class SendGroupEmailComponent
         }
       });
     //}
+
+    this.emailBodyRequired$.subscribe(val=>{
+      this.emailBodyRequired = val;
+    })
   }
 
   CheckBusinessIRPEnabled(businessId:number): void{
@@ -566,6 +571,7 @@ export class SendGroupEmailComponent
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       this.onFormvalidation([]);
+      this.groupEmailTemplateForm.markAsUntouched();
       this.isBusinessUnitTypeAgency = false;
       this.validationCheckForBusiness();
       if (this.isSend == true && value != null) {

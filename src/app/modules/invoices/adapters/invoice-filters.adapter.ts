@@ -5,6 +5,7 @@ import { DateTimeHelper, LeftOnlyValidValues } from '@core/helpers';
 import { InvoiceManualPendingRecordsFilteringOptions, InvoicesFilterState, TypedInvoiceKey } from '../interfaces';
 import { CreateInvoiceReasonList, CreateVendorFeeList } from '../helpers';
 import { FiltersDateFields } from '../constants';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 export class InvoiceFiltersAdapter {
   static prepareFilters(formGroup: FormGroup): InvoicesFilterState {
@@ -32,6 +33,7 @@ export class InvoiceFiltersAdapter {
       regions: [],
       locations: [],
       departments: [],
+      agency: sortByField(data.agency, 'name'),
       reasons: CreateInvoiceReasonList(data.reasons),
       vendorFee: CreateVendorFeeList(),
     } as InvoiceManualPendingRecordsFilteringOptions;
