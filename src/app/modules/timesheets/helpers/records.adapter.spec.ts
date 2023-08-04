@@ -1,4 +1,4 @@
-import { RecordFields, RecordStatus } from '../enums';
+import { RecordFields, RecordStatus, TimesheetRecordType } from '../enums';
 import { AddRecordDto, AddTimesheetForm, PutRecord, RawTimesheetRecordsDto, RecordValue } from '../interface';
 import { RecordsAdapter } from './records.adapter';
 
@@ -88,7 +88,7 @@ describe('RecordsAdapter', () => {
         expect(result.organizationId).toBe(158);
         expect(result.deleteIds?.length).toBe(2);
         expect(result.forceUpdate).toBe(undefined);
-        expect(result.type).toBe(1);
+        expect(result.type).toBe(TimesheetRecordType.Timesheet);
         expect(result.records?.length).toBe(3);
         expect((result.records as PutRecord[])[0].timeIn).toBe('2023-03-12T07:00:00.000Z');
         expect((result.records as PutRecord[])[0].timeOut).toBe('2023-03-12T14:00:00.000Z');
@@ -230,7 +230,7 @@ describe('RecordsAdapter', () => {
       expect(result.timeIn).toBe('2023-06-20T00:00:00.000Z');
       expect(result.organizationId).toBe(158);
       expect(result.timesheetId).toBe(65);
-      expect(result.type).toBe(3);
+      expect(result.type).toBe(TimesheetRecordType.Miles);
     });
 
     it('adaptRecordsDto should adapt incoming timesheet records data', () => {
