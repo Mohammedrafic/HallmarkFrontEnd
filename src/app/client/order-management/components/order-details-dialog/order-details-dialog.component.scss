@@ -301,8 +301,12 @@
 }
 
 @media (max-width: 1024px) {
-  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button) {
+  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button, .delete-button) {
     display: block;
+  }
+
+  .order-actions {
+    display: none;
   }
 }
 
