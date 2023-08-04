@@ -34,7 +34,6 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   private unsubscribe$: Subject<void> = new Subject();
   public organizationIds: number[] = [];
   public ltaOrder: boolean|null;
-
   constructor(private store: Store,private router: Router,
     @Inject(DOCUMENT) private documentEle: Document,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis
@@ -42,7 +41,6 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
-    this.ltaOrder = routerState?.['ltaorderending'];
     if(routerState?.['condition'] == "Open&Inprogress"){
       this.orderStatus.push("Open");
       this.orderStatus.push("InProgress");
@@ -65,6 +63,11 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
           this.orderStatus = orderStatus;
           this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard','');
         }
+      }
+      const ltaOrderFlag = JSON.parse(localStorage.getItem('ltaorderending') || '"false"') as boolean;
+      if(ltaOrderFlag){
+        this.ltaOrder = ltaOrderFlag;
+        this.globalWindow.localStorage.setItem("ltaorderending", JSON.stringify(false));
       }
     }
   }
