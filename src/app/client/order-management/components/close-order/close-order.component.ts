@@ -30,6 +30,7 @@ import { UserState } from 'src/app/store/user.state';
 import { ShowCloseOrderDialog, ShowToast } from '../../../../store/app.actions';
 import { OrderManagementService } from '../order-management-content/order-management.service';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-close-order',
@@ -53,8 +54,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public readonly reasonFields: FieldSettingsModel = { text: 'reason', value: 'id' };
   public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
   public readonly systemTypes = OrderManagementIRPSystemId;
-  public maxDate: Date | null;
-  public minDate: Date | null;
+  public maxDate: string | Date | null;
+  public minDate: string | Date | null;
 
   public dialogTitleType: string;
   public isPosition = false;
@@ -153,12 +154,19 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     });
   }
 
+  private getPositionMaxDate(): string | null {
+    if (this.candidate.actualEndDate) {
+      return formatDate(this.candidate.actualEndDate as string, 'MM/dd/yyyy', 'en-US', 'UTC');
+    }
+    return null;
+  }
+
   private setMaxDate(): void {
     let maxDate;
     if (this.order.orderType === OrderType.ReOrder) {
       maxDate = this.order.jobStartDate;
     } else if (this.isPosition) {
-      maxDate = new Date(this.candidate.actualEndDate || 0);
+      maxDate = this.getPositionMaxDate();
     } else {
       maxDate = this.order.jobEndDate;
     }
