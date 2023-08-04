@@ -1738,6 +1738,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         data.items.forEach((item) => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
           item.menuItems = this.getMoreMenuDataSource(item);
+          item.attachedFiles = [1]; //TODO remove after BE implementation
 
           if (item.children && item.children.length) {
             item.children.sort((a, b) => a.positionId - b.positionId);

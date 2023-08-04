@@ -221,7 +221,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     });
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.ordersPage = data;
+      this.ordersPage = {
+        ...data,
+        items: data?.items.map((item) => ({...item, attachedFiles: [1, 2]})),
+      }; //TODO remove after BE implementation
       super.setHeightForMobileGrid(data?.items.length);
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
       if(this.ordersPage?.items){
