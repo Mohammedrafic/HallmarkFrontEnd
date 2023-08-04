@@ -955,6 +955,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           this.selectedReOrder = null;
         }
       }
+      this.alertOrderId = 0;
     });
   }
 
