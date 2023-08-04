@@ -9,10 +9,15 @@
     </div>
   </div>
   <div id="documents-uploader" class="e-card-content">
-    <div id="droparea" class="droparea" (click)="browse()" [class.disabled]="disabled">
+    <div *ngIf="!isMaxFilesReached; else maxFilesReached" id="droparea" class="droparea" (click)="browse()" [class.disabled]="disabled">
       <span *ngIf="!disabled">Drag & Drop or <span class="browse-link">browse</span> files here</span>
       <span *ngIf="disabled">Uploads are not available for this organization</span>
     </div>
+    <ng-template #maxFilesReached>
+      <div class="max-files">
+        <span>You have reached the maximum number of uploaded files ({{maxFileAmount}})</span>
+      </div>
+    </ng-template>
     <div *ngIf="documents?.length" class="e-upload uploaded-list">
       <ul class="e-upload-files">
         <li *ngFor="let document of documents" class="e-upload-file-list">
@@ -22,14 +27,19 @@
             <span class="e-file-size"></span>
             <span class="e-file-status">Uploaded</span>
           </span>
-          <span class="e-icons e-file-remove-btn" title="Remove" (click)="onDelete(document)"></span>
+          <span class="custom-trash">
+            <span class="e-icons e-file-delete-btn" title="Remove" (click)="onDelete(document)"></span>
+          </span>
         </li>
       </ul>
     </div>
     <ejs-uploader #previewupload [dropArea]="dropElement" [allowedExtensions]="allowedExtensions"
+                  cssClass="custom-trash"
                   [autoUpload]="false"
                   [maxFileSize]="maxFileSize"
-                  (selected)="onFileSelected($event)">
+                  (selected)="onFileSelected($event)"
+                  (removing)="removeUplodedFile($event)"
+                  >
     </ejs-uploader>
   </div>
 </div>

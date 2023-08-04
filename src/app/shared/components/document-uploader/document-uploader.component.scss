@@ -54,6 +54,12 @@
   display: none;
 }
 
+.max-files {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+}
+
 @media #{$max-tablet} {
   #droparea {
     display: none;
