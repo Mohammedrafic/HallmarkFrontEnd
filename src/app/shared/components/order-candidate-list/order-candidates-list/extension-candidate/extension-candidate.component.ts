@@ -567,7 +567,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
     const daysDifference = this.getDaysDifference(jobStartDate, jobEndDate);
     const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString();
-   
     const accepted = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
     if (!accepted) {
        if (typeof value.actualStartDate === 'string') {
@@ -577,7 +576,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         value.actualEndDate = new Date(value.actualEndDate);
       }
     }
-    else {
+    else if (accepted && (!value.actualStartDate || !value.actualEndDate)) {    
       value.actualStartDate = this.candidateJob?.offeredStartDate;
       value.actualEndDate = actualEndDate;
     }
