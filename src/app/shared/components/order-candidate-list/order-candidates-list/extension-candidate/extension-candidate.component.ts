@@ -567,18 +567,19 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
     const daysDifference = this.getDaysDifference(jobStartDate, jobEndDate);
     const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString();
+   
     const accepted = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
-    if (accepted) {
-      value.actualStartDate = new Date(value.actualStartDate);
-      value.actualEndDate = actualEndDate;
-    }
-    else {
-      if (typeof value.actualStartDate === 'string') {
+    if (!accepted) {
+       if (typeof value.actualStartDate === 'string') {
         value.actualStartDate = new Date(value.actualStartDate);
       }
       if (typeof value.actualEndDate === 'string') {
         value.actualEndDate = new Date(value.actualEndDate);
       }
+    }
+    else {
+      value.actualStartDate = this.candidateJob?.offeredStartDate;
+      value.actualEndDate = actualEndDate;
     }
     if (this.form.valid) {
       const updatedValue = {
@@ -598,7 +599,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         clockId: value.clockId,
         candidatePayRate: value.candidatePayRate,
       };
-      const statusChangeds = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
       this.isSend = true;
       this.emailTo = this.candidateJob?.candidateProfile.email;
       this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.candidateJob?.candidateProfile.email);
