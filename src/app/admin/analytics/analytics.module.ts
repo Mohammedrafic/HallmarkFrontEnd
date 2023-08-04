@@ -74,6 +74,7 @@ import { UserActivityComponent } from './user-activity/user-activity.component';
 import { useractivityReportState } from '@admin/store/userlog-activity.state';
 import { AgGridModule } from '@ag-grid-community/angular';
 
+import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 
 @NgModule({
   declarations: [
@@ -130,7 +131,8 @@ import { AgGridModule } from '@ag-grid-community/angular';
     PositionSummaryComponent,
     AgencySpendComponent,
     ShiftBreakdownComponent,
-    UserActivityComponent],
+    UserActivityComponent,
+    FinancialTimeSheetBetaComponent  ],
   exports: [
     CandidateListComponent
   ],

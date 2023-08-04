@@ -54,6 +54,7 @@ import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-inv
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
 import { UserActivityComponent } from './user-activity/user-activity.component';
+import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 
 const routes: Routes = [
   {
@@ -418,6 +419,13 @@ const routes: Routes = [
         }
       },
       {
+        path: 'financial-time-sheet-beta',
+        component: FinancialTimeSheetBetaComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },{
+
         path: 'user-activity',
         component: UserActivityComponent,
         data: {
