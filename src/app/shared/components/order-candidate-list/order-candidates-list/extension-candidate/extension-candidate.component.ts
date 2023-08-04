@@ -566,20 +566,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const jobStartDate = new Date(this.candidateJob.order.jobStartDate);
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
     const daysDifference = this.getDaysDifference(jobStartDate, jobEndDate);
-    const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString();
-    const accepted = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
-    if (!accepted) {
-       if (typeof value.actualStartDate === 'string') {
-        value.actualStartDate = new Date(value.actualStartDate);
-      }
-      if (typeof value.actualEndDate === 'string') {
-        value.actualEndDate = new Date(value.actualEndDate);
-      }
-    }
-    else if (accepted && (!value.actualStartDate || !value.actualEndDate)) {    
-      value.actualStartDate = this.candidateJob?.offeredStartDate;
-      value.actualEndDate = actualEndDate;
-    }
+    const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString();   
     if (this.form.valid) {
       const updatedValue = {
         organizationId: this.candidateJob.organizationId,
@@ -589,8 +576,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         candidateBillRate: this.candidateJob.candidateBillRate,
         offeredBillRate: value.offeredBillRate,
         requestComment: value.comments,
-        actualStartDate: DateTimeHelper.setUtcTimeZone(value.actualStartDate),
-        actualEndDate: DateTimeHelper.setUtcTimeZone(value.actualEndDate),
+        actualStartDate: this.candidateJob?.offeredStartDate,
+        actualEndDate:actualEndDate,
         offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,
