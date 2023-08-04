@@ -552,10 +552,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
   }
 
-  getDaysDifference(start: Date, end: Date): number {
-    const oneDay = 24 * 60 * 60 * 1000;
-    return Math.round(Math.abs((end.getTime() - start.getTime()) / oneDay));
-  }
 
   calculateActualEndDate(startDate: Date, daysToAdd: number): Date {
     const actualEndDate = new Date(startDate); actualEndDate.setDate(startDate.getDate() + daysToAdd);
@@ -565,7 +561,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const value = this.form.getRawValue();
     const jobStartDate = new Date(this.candidateJob.order.jobStartDate);
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
-    const daysDifference = this.getDaysDifference(jobStartDate, jobEndDate);
+    const daysDifference =  DateTimeHelper.getDateDiffInDays(jobStartDate, jobEndDate);
     const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString();   
     if (this.form.valid) {
       const updatedValue = {
@@ -577,7 +573,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         offeredBillRate: value.offeredBillRate,
         requestComment: value.comments,
         actualStartDate: this.candidateJob?.offeredStartDate,
-        actualEndDate:actualEndDate,
+        actualEndDate: DateTimeHelper.setUtcTimeZone(actualEndDate),
         offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,
@@ -592,6 +588,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.candidateJob?.candidateProfileId);
       this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.candidateJob?.organizationId);
       const statusChanged = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
+    
       this.store
         .dispatch(
           this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
