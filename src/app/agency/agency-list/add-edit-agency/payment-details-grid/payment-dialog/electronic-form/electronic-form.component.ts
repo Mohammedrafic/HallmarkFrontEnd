@@ -21,7 +21,7 @@ import { SetPaymentDetailsForm } from '@agency/store/agency.actions';
 import PriceUtils from '@shared/utils/price.utils';
 import { startDateDuplicationValidator } from '@shared/validators/start-date-duplication.validator';
 import { COUNTRIES } from '@shared/constants/countries-list';
-import { debug } from 'console'; 
+import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-electronic-form',
@@ -52,12 +52,14 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
   public readonly holderPhoneMask = PHONE_MASK;
   public isControlDisabled: boolean = true;
   private hasEditAgencyNetsuitePaymentId: boolean = false;
+  
   constructor(private formBuilder: FormBuilder, private changeDetectorRef: ChangeDetectorRef, private store: Store) {
     super();
   }
 
   public ngOnInit(): void {
     this.createPaymentDetailsForm();
+    this.setDateRangeValidators();
     this.onCountryChange('bankCountry');
     this.onCountryChange('accountHolderCountry');
     this.subscribeOnSaveEvent();
@@ -139,5 +141,24 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         this.isControlDisabled = true;
       }
     }
+  }
+
+  private setDateRangeValidators(): void {
+    const startTimeField = this.paymentDetailsForm.get('startDate') as AbstractControl;
+    const endTimeField = this.paymentDetailsForm.get('endDate') as AbstractControl;
+    startTimeField.addValidators(startDateValidator(this.paymentDetailsForm, 'endDate'));
+    startTimeField.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+        this.changeDetectorRef.markForCheck();
+      });
+    endTimeField.addValidators(endDateValidator(this.paymentDetailsForm, 'startDate'));
+    endTimeField.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+        this.changeDetectorRef.markForCheck();
+      });
   }
 }
