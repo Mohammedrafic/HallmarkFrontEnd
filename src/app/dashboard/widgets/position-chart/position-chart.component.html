@@ -21,8 +21,9 @@
       <span class="widget__type" *ngIf="isLTAOrderEnding"
             (mousedown)="defineMousePosition($event)"
             (click)="toSourceContent($event)">{{ chartData?.statusName | titlecase }} Positions</span>
-      <span class="widget__type__paddtop" *ngIf="!isLTAOrderEnding"
-            (mousedown)="defineMousePosition($event)">Positions ending in next  45  days</span>
+      <span class="widget__type" *ngIf="!isLTAOrderEnding"
+            (mousedown)="defineMousePosition($event)"
+            (click)="toSourceContent($event)">Positions ending in next  45  days</span>
     </div>
   </ng-template>
 </app-widget-wrapper>
