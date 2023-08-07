@@ -5,9 +5,9 @@
   ></app-general-order-per-diem-info>
   <app-general-reorder-info
     *ngSwitchCase="orderType.ReOrder"
-    [orderInformation]="orderCandidateInformation"
+    [order]="orderCandidateInformation"
   ></app-general-reorder-info>
-  <app-general-order-info *ngSwitchDefault [orderInformation]="orderCandidateInformation"></app-general-order-info>
+  <app-general-order-info *ngSwitchDefault [order]="orderCandidateInformation"></app-general-order-info>
 </div>
 <div class="line"></div>
 <ng-container *ngIf="orderCandidateInformation?.orderClosureReason">
