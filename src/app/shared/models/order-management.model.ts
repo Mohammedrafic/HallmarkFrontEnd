@@ -881,3 +881,8 @@ export class OnboardCandidateEmail {
 }
 
 export type MergedOrder = AgencyOrderManagement & Order;
+
+export interface RegularRatesData {
+  regular: number | null;
+  regularLocal: number | null;
+}

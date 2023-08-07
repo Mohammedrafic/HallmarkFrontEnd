@@ -4,8 +4,11 @@
     [orderInformation]="order"
     [system]="activeSystem"
   ></app-general-order-per-diem-info>
-  <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="order" [system]="activeSystem"></app-general-reorder-info>
-  <app-general-order-info *ngSwitchDefault [orderInformation]="order" [system]="activeSystem"></app-general-order-info>
+  <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [order]="order" [system]="activeSystem"></app-general-reorder-info>
+  <app-general-order-info
+    *ngSwitchDefault
+    [order]="order"
+    [system]="activeSystem"></app-general-order-info>
 </section>
 <div class="separator"></div>
 <ng-container *ngIf="isClosedOrder">
