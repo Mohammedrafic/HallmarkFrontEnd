@@ -559,10 +559,23 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
+    console.log(applicantStatus)
     const jobStartDate = new Date(this.candidateJob.order.jobStartDate);
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
     const daysDifference =  DateTimeHelper.getDateDiffInDays(jobStartDate, jobEndDate);
-    const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString();   
+    const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString();  
+    const accepted = applicantStatus.applicantStatus ===ApplicantStatusEnum.Accepted;
+    if (accepted && (!value.actualStartDate || !value.actualEndDate)) {
+      value.actualStartDate = this.candidateJob?.offeredStartDate;
+      value.actualEndDate = actualEndDate;
+     }  else{
+      if (typeof value.actualStartDate === 'string') {
+        value.actualStartDate = new Date(value.actualStartDate);
+      }
+      if (typeof value.actualEndDate === 'string') {
+        value.actualEndDate = new Date(value.actualEndDate);
+      }
+     }
     if (this.form.valid) {
       const updatedValue = {
         organizationId: this.candidateJob.organizationId,
@@ -572,8 +585,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         candidateBillRate: this.candidateJob.candidateBillRate,
         offeredBillRate: value.offeredBillRate,
         requestComment: value.comments,
-        actualStartDate: this.candidateJob?.offeredStartDate,
-        actualEndDate: DateTimeHelper.setUtcTimeZone(actualEndDate),
+        actualStartDate: DateTimeHelper.setUtcTimeZone(value.actualStartDate),
+        actualEndDate: DateTimeHelper.setUtcTimeZone(value.actualEndDate),
         offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,
