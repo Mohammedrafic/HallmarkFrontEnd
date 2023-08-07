@@ -216,7 +216,6 @@ export class CandidateListState {
   ): Observable<ImportResult<any> | Observable<void>> {
     return this.employeeService.uploadImportEmployeeFile(payload).pipe(
       tap((payload) => {
-        payload = CommonHelper.formatTheSSN(payload);
         dispatch(new CandidateListActions.UploadEmployeeFileSucceeded(payload));
         return payload;
       }),
@@ -246,7 +245,7 @@ export class CandidateListState {
         dispatch(new CandidateListActions.SaveEmployeeImportResultFailAndSucceeded(payload));  
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'DoNotReturn list were not imported'))))
+      catchError((error:any) => of( dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))))
     );
   }
 

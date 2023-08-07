@@ -16,6 +16,8 @@ import { UserPermissions } from '@core/enums';
 import { Permission } from '@core/interface';
 import { AppState } from 'src/app/store/app.state';
 import { BreakpointObserverService } from '@core/services';
+import { CandidateListRequest } from '@shared/components/candidate-list/types/candidate-list.model';
+import { GetIRPCandidatesByPage } from '@shared/components/candidate-list/store/candidate-list.actions';
 
 @Component({
   selector: 'app-candidates-content',
@@ -145,6 +147,22 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
     this.importDialogEvent.next(true);
   }
   public override updatePage(clearedFilters?: boolean): void {
-    // this.getOrders(clearedFilters);
+    const candidateListRequest: CandidateListRequest = {
+      ...[],
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize,
+      orderBy: this.orderBy,
+      profileStatuses: [],
+      skillsIds: [],
+      regionsNames: [],
+      tab: 0,
+      candidateName: null,
+      includeDeployedCandidates: false
+    };
+
+    this.store.dispatch(
+     new  GetIRPCandidatesByPage(candidateListRequest)
+    );
+
   }
 }

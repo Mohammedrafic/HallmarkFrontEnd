@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { EmployeeImportResult, ImportedEmployee } from '@shared/models/imported-employee';
+import { EmployeeImportDto, EmployeeImportResult, ImportedEmployee } from '@shared/models/imported-employee';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -14,7 +14,7 @@ export class EmployeeImportService {
     return this.http.post('/api/Employee/template', [], { responseType: 'blob' });
   }
 
-  public getImportEmployeeErrors(errorRecords: ImportedEmployee[]): Observable<any> {
+  public getImportEmployeeErrors(errorRecords: EmployeeImportDto[]): Observable<any> {
     return this.http.post('/api/Employee/template', errorRecords, { responseType: 'blob' });
   }
 

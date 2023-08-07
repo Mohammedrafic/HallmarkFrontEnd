@@ -1,13 +1,16 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Inject, OnChanges } from '@angular/core';
 import { recordsListField, selectionSettings } from '@client/order-management/components/order-import/order-import.config';
-import { Actions, Store } from '@ngxs/store';
+import { Actions, Store, ofActionSuccessful } from '@ngxs/store';
 import { AbstractImport } from '@shared/classes/abstract-import';
 import { ImportedEmployeeGrid } from '@shared/models/imported-employee';
-import { ListBoxItem } from '@shared/models/imported-order.model';
-import { FieldSettingsModel, SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ImportedOrder, ListBoxItem, OrderGrid } from '@shared/models/imported-order.model';
+import { FieldSettingsModel, ListBoxChangeEventArgs, SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GetEmployeeImportErrors, GetEmployeeImportErrorsSucceeded, GetEmployeeImportTemplate, GetEmployeeImportTemplateSucceeded, SaveEmployeeImportResult, SaveEmployeeImportResultFailAndSucceeded, SaveEmployeeImportResultSucceeded, UploadEmployeeFile, UploadEmployeeFileSucceeded } from '@shared/components/candidate-list/store/candidate-list.actions';
 import { ColDef } from '@ag-grid-community/core';
 import { LocationsColumnsConfig } from '@organization-management/locations/import-locations/location-grid.constants';
+import { EmployeesColumnsConfig } from './employee-grid.constants';
+import { takeUntil } from 'rxjs';
+import { UploadOrderImportFileSucceeded } from '@client/store/order-managment-content.actions';
 
 const employeeImportConfig = {
   importTemplate: GetEmployeeImportTemplate,
@@ -40,7 +43,7 @@ export class ImportEmployeeComponent  extends AbstractImport implements OnChange
   public dataSource: ImportedEmployeeGrid[] = [];
   public activeErrorTab: boolean;
   
-  public columnDefs: ColDef[] = LocationsColumnsConfig;
+  public columnDefs: ColDef[] = EmployeesColumnsConfig;
 
 
   constructor(
@@ -55,5 +58,16 @@ export class ImportEmployeeComponent  extends AbstractImport implements OnChange
   ngOnChanges(): void {
     
   }
+  
+ 
+
+  public trackByErrorHandler(index: number, grid: OrderGrid): string {
+    return `error${grid.gridName ?? ''}${index}`;
+  }
+
+  public trackBySuccessHandler(index: number, grid: OrderGrid): string {
+    return `success${grid.gridName ?? ''}${index}`;
+  }
+
  
 }

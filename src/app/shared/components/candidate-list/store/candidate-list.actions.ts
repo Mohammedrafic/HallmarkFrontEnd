@@ -1,6 +1,7 @@
 import { ImportResult } from '@shared/models/import.model';
 import { CandidateListExport, CandidateListRequest, CandidateListTableState } from '../types/candidate-list.model';
 import { CandidateStatus } from '@shared/enums/status';
+import { EmployeeImportDto, ImportedEmployee } from '@shared/models/imported-employee';
 
 export class GetCandidatesByPage {
   static readonly type = '[candidate-list] Get Candidates List';
@@ -54,7 +55,7 @@ export class ClearTableState {
 
 export class GetEmployeeImportTemplate {
   static readonly type = '[candidate list] Get Employee Import Template';
-  constructor(public payload: any) {}
+  constructor(public payload: EmployeeImportDto[]) {}
 }
 
 export class GetEmployeeImportTemplateSucceeded {
@@ -64,7 +65,7 @@ export class GetEmployeeImportTemplateSucceeded {
 
 export class GetEmployeeImportErrors {
   static readonly type = '[candidate list] Get Employee Import Errors';
-  constructor(public errorpayload: any) {}
+  constructor(public errorpayload: EmployeeImportDto[]) {}
 }
 
 export class GetEmployeeImportErrorsSucceeded {
