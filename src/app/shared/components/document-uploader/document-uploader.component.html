@@ -9,15 +9,21 @@
     </div>
   </div>
   <div id="documents-uploader" class="e-card-content">
-    <div *ngIf="!isMaxFilesReached; else maxFilesReached" id="droparea" class="droparea" (click)="browse()" [class.disabled]="disabled">
+    <div
+      id="droparea"
+      class="droparea"
+      [ngClass]="{'hidden': isMaxFilesReached, 'disabled': disabled}"
+      (click)="browse()"
+    >
       <span *ngIf="!disabled">Drag & Drop or <span class="browse-link">browse</span> files here</span>
       <span *ngIf="disabled">Uploads are not available for this organization</span>
     </div>
-    <ng-template #maxFilesReached>
+
+    <ng-container *ngIf="isMaxFilesReached">
       <div class="max-files">
         <span>You have reached the maximum number of uploaded files ({{maxFileAmount}})</span>
       </div>
-    </ng-template>
+    </ng-container>
     <div *ngIf="documents?.length" class="e-upload uploaded-list">
       <ul class="e-upload-files">
         <li *ngFor="let document of documents" class="e-upload-file-list">
