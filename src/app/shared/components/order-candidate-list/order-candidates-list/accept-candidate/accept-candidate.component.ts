@@ -352,11 +352,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  getDaysDifference(start: Date, end: Date): number { 
-    const oneDay = 24 * 60 * 60 * 1000; 
-    return Math.round(Math.abs((end.getTime() - start.getTime()) / oneDay));
-  }
-  
   calculateActualEndDate(startDate: Date, daysToAdd: number): Date { 
     const actualEndDate = new Date(startDate); actualEndDate.setDate(startDate.getDate() + daysToAdd);
      return actualEndDate; 
@@ -366,7 +361,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     const value = this.form.getRawValue();
     const jobStartDate = new Date(this.candidateJob.order.jobStartDate); 
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
-    const daysDifference = this.getDaysDifference(jobStartDate, jobEndDate); 
+    const daysDifference =  DateTimeHelper.getDateDiffInDays(jobStartDate, jobEndDate);
     const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString(); 
     this.store
       .dispatch(
@@ -381,7 +376,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           expAsTravelers: value.expAsTravelers,
           availableStartDate: DateTimeHelper.setUtcTimeZone(new Date(value.availableStartDate)),
           actualStartDate: this.candidateJob.offeredStartDate,
-          actualEndDate: actualEndDate,
+          actualEndDate: DateTimeHelper.setUtcTimeZone(actualEndDate),
           clockId: this.candidateJob.clockId,
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
           allowDeployWoCredentials: false,

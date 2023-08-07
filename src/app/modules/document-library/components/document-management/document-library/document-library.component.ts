@@ -928,9 +928,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.documentDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: DownloadDocumentDetail) => {
         if (data) {
-          if (this.downloadedFileName != data.fileName) {
-            this.downloadedFileName = data.fileName;
-            this.createLinkToDownload(data.fileAsBase64, data.fileName, data.contentType);
+          if (this.downloadedFileName != data.name) {
+            this.downloadedFileName = data.name;
+            this.createLinkToDownload(data.fileAsBase64, data.name, data.contentType);
           }
         }
       });
