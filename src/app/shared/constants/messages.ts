@@ -133,3 +133,5 @@ export const HaveScheduleBooking =
 export const N_FAILED_RECORDS = (count: number) => `${count} failed to process.`;
 export const N_SUCCESS_RECORDS = (count: number) => `${count} records successfully processed.`;
 export const ExtensionStartDateValidation = 'Extension may not be created with more than a 14 day gap from initial order to extension order.';
+export const ManageOrderIRP_PERMISSION = 'User missing required permissions (CanOrganizationEditOrdersIRP)';
+export const CloseOrderIRP_PERMISSION = 'User missing required permissions (CanCloseOrdersIRP)';
