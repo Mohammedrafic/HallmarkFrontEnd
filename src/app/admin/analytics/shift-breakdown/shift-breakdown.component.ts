@@ -388,8 +388,7 @@ export class ShiftBreakdownComponent implements OnInit {
       businessUnitIds: businessIdData,
     };
     this.store.dispatch(new GetCommonReportFilterOptions(filterObj));
-    this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
-      if (data != null) {
+    this.CommonReportFilterData$.pipe(filter((data) => data !== null), takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions) => {
         this.isAlive = false;
         this.filterOptionData = data;
         this.filterColumns.skillIds.dataSource = [];
@@ -400,7 +399,6 @@ export class ShiftBreakdownComponent implements OnInit {
           this.searchReport();          
           this.isInitialLoad = false;
         } 
-      }       
     });
   }
 
