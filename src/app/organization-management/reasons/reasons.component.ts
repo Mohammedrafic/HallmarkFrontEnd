@@ -248,6 +248,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         reason: reason.reason,
         });
     } else if ((this.selectedTab === ReasonsNavigationTabs.ManualInvoice)) {
+      this.canUpdateAgencyFeeApplicable = !this.userPermission[this.userPermissions.CanUpdateAgencyFeeApplicable] ? true : false;
       const reason = data as RejectReason;
       this.reasonForm.patchValue({
         id: reason.id,
@@ -309,8 +310,12 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         this.canRejectOrClosure = this.userPermission[this.userPermissions.CanRejectCandidate];
       } else if (this.selectedTab === ReasonsNavigationTabs.Unavailability) {
         this.canRejectOrClosure = this.userPermission[this.userPermissions.CanEditUnavailabilityReasons];
-      } else {
-        this.canRejectOrClosure = this.userPermission[this.userPermissions.CanManageOrderClosureReasons];
+      }
+      else if (this.selectedTab === ReasonsNavigationTabs.Closure) {
+        this.canRejectOrClosure = this.userPermission[this.userPermissions.CanManageOrderClosureReasons]
+      }
+      else{
+        this.canRejectOrClosure=true;
       }
   }
 

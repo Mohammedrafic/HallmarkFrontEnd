@@ -1,5 +1,5 @@
-import { DateTimeHelper } from '@core/helpers';
+import { formatDate } from '@angular/common';
 
-export const GetLocalDate = (): Date => {
-  return DateTimeHelper.setCurrentTimeZone(new Date().toDateString());
+export const GetLocalDate = (): string => {
+  return formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss', 'en-US');
 };

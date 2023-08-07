@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { FieldType, FieldWidthStyle } from '@core/enums';
-import { RecordFields, TableColumnAlign } from '../enums';
+import { RecordFields, TableColumnAlign, TimesheetRecordType } from '../enums';
 import { DetailsTableConfig, DialogConfig } from '../interface';
 
 export const MealBreakeName = 'hadLunchBreak';
@@ -71,6 +71,10 @@ export const GetRecordAddDialogConfig = (isMobile: boolean): DialogConfig => {
           visible: true,
         },
       ],
+    },
+    historicalData: {
+      title: '',
+      fields: [],
     },
     miles: {
       title: 'Add Miles Record',
@@ -216,9 +220,10 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
 };
 
 export const MappedRecordsType = {
-  [RecordFields.Time]: 1,
-  [RecordFields.Miles]: 2,
-  [RecordFields.Expenses]: 3,
+  [RecordFields.Time]: TimesheetRecordType.Timesheet,
+  [RecordFields.Miles]: TimesheetRecordType.Miles,
+  [RecordFields.Expenses]: TimesheetRecordType.Expenses,
+  [RecordFields.HistoricalData]: 4, // TODO: update TimesheetRecordType enum on BE side
 };
 
 export const AddSuccessMessage = {

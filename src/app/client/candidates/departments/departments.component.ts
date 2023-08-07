@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import {
   BehaviorSubject,
   filter,
@@ -37,6 +37,7 @@ import {
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
   formatDate,
+  GRID_CONFIG,
   NO_ACTIVE_WORK_COMMITMET,
   RECORD_DELETE,
 } from '@shared/constants';
@@ -52,6 +53,7 @@ import { EditDepartmentsComponent } from './edit-departments/edit-departments.co
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateWorkCommitmentShort } from '../interface/employee-work-commitments.model';
 import { DateTimeHelper, allAreEqual } from '@core/helpers';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-departments',
@@ -62,6 +64,9 @@ import { DateTimeHelper, allAreEqual } from '@core/helpers';
 export class DepartmentsComponent extends AbstractPermission implements OnInit {
   @ViewChild('assignDepartment') private assignDepartment: AssignDepartmentComponent;
   @ViewChild('editDepartments') private editDepartments: EditDepartmentsComponent;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public readonly buttonType: typeof ButtonTypeEnum = ButtonTypeEnum;
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
@@ -92,8 +97,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
     noActiveWC: false,
     disableBulkButton: false,
   };
-  public filters: DepartmentFilterState | null;
-
+  public filters: DepartmentFilterState = { pageNumber: GRID_CONFIG.initialPage, pageSize: GRID_CONFIG.initialRowsPerPage };
 
   public constructor(
     protected override store: Store,
@@ -152,7 +156,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   }
 
   public updateTableByFilters(filters: DepartmentFilterState): void {
-    this.filters = filters;
+    this.filters = { ...filters, pageNumber: GRID_CONFIG.initialPage, pageSize: this.filters.pageSize };
     this.getDepartmentsWithFilters(this.filters);
     this.store.dispatch(new ShowFilterDialog(false));
   }
@@ -189,6 +193,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   public showHideActiveDepartments(event: boolean): void {
     this.conditions.showAllDepartments = event;
     this.departmentsService.showAllDepartments = this.conditions.showAllDepartments;
+    this.filters.pageNumber = GRID_CONFIG.initialPage;
     this.getDepartmentsWithFilters(this.filters);
   }
 
@@ -215,7 +220,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
           this.conditions.showAllDepartments = !(commitment && commitment.id);
           this.conditions.noActiveWC = this.conditions.showAllDepartments;
           this.departmentsService.showAllDepartments = this.conditions.showAllDepartments;
-          return this.departmentsService.getDepartmentsAssigned();
+          return this.departmentsService.getDepartmentsAssigned(this.filters);
         }),
         takeUntil(this.componentDestroy())
       )
@@ -321,7 +326,7 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
 
   private clearFilterState(): void {
     this.filtersAmount = 0;
-    this.filters = null;
+    this.filters = { pageNumber: GRID_CONFIG.initialPage, pageSize: this.filters.pageSize };
   }
 
   private setBulkDateRanges(selectedRows: RowNode[]): void {
@@ -351,6 +356,20 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
       this.bulkDateRanges = { min, max };
     } else {
       this.bulkDateRanges = this.dateRanges;
+    }
+  }
+
+  public handleChangePage(pageNumber: number): void {
+    if(pageNumber && this.filters.pageNumber !== pageNumber) {
+      this.filters.pageNumber = pageNumber;
+      this.refreshGrid();
+    }
+  }
+
+  public handleChangePageSize(pageSize: number): void {
+    if(pageSize) {
+      this.filters.pageSize = pageSize;
+      this.refreshGrid();
     }
   }
 }

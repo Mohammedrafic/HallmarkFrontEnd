@@ -12,8 +12,10 @@ import {
 import { DatepickerComponent } from '@shared/components/form-controls/datepicker/datepicker.component';
 import {
   CANCEL_CONFIRM_TEXT,
+  CommitmentOverlapMessage,
   DELETE_CONFIRM_TITLE,
   EMPLOYEE_SKILL_CHANGE_WARNING,
+  IRP_DEPARTMENT_CHANGE_WARNING,
   RECORD_ADDED, RECORD_MODIFIED,
 } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -35,6 +37,7 @@ import { CandidateWorkCommitment } from '../../models/candidate-work-commitment.
 import { CandidateWorkCommitmentService } from '../../services/candidate-work-commitment.service';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { commonRangesValidator } from '@shared/validators/date.validator';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-candidate-work-commitment-dialog',
@@ -58,6 +61,9 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public title: string;
   public workCommitments: WorkCommitmentDetailsGroup[] = [];
@@ -93,6 +99,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public replaceOrder = false;
   public overrideCommitmentConfirm$ = new Subject<boolean>();
   public replacementConfirmationMessage = EMPLOYEE_SKILL_CHANGE_WARNING;
+  public isEdit = false;
 
 
   constructor(
@@ -474,6 +481,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           this.sideDialog.hide();
         }
         this.title = value.isEdit ? DialogMode.Edit : DialogMode.Add;
+        this.isEdit = value.isEdit;
+        
         if (value.isEdit) {
           this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].disable({ emitEvent: false });
           this.enableRegionLocation();
@@ -574,6 +583,12 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     return this.candidateService.hasWorkCommitments && this.title === DialogMode.Add;
   }
 
+  private isLocationChanged(): boolean {
+    const regionControl = this.candidateWorkCommitmentForm.get('regionIds');
+    const locationControl = this.candidateWorkCommitmentForm.get('locationIds');
+    return !!(regionControl?.dirty || locationControl?.dirty) && this.title === DialogMode.Edit;
+  }
+
   private saveCommitment(): void {
     const candidateWorkCommitment: CandidateWorkCommitment = this.candidateWorkCommitmentForm.getRawValue();
     candidateWorkCommitment.startDate =
@@ -602,7 +617,18 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private handleCommitmentSaving(): void {
-    if (this.isOverridingEndDate()) {
+    const isOverridingEndDate = this.isOverridingEndDate();
+    const isLocationChanged = this.isLocationChanged();
+
+    if (isLocationChanged) {
+      this.replacementConfirmationMessage = IRP_DEPARTMENT_CHANGE_WARNING;
+    } else if (this.isEdit && isOverridingEndDate) {
+      this.replacementConfirmationMessage = EMPLOYEE_SKILL_CHANGE_WARNING;
+    } else if (isOverridingEndDate) {
+      this.replacementConfirmationMessage = CommitmentOverlapMessage;
+    }
+
+    if (isOverridingEndDate || isLocationChanged) {
       this.showOverridingConfirmation();
     } else {
       this.saveCommitment();

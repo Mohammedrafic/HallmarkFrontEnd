@@ -1,4 +1,5 @@
-@import "../../../styles/variables/colors.scss";
+@import 'colors';
+@import 'adaptive-response';
 
 #droparea {
   height: 118px;
@@ -52,6 +53,61 @@
     &.small {
       width: 30px;
       margin-right: 0;
+    }
+  }
+}
+
+.upload-btn {
+  display: none;
+}
+
+@media #{$max-desktop-small} {
+  .e-card {
+    margin-bottom: 0;
+  }
+}
+
+@media #{$max-tablet} {
+  #droparea {
+    display: none;
+  }
+
+  #image-uploader {
+    padding: 0;
+  }
+
+  .e-card-header-caption {
+    flex-direction: row !important;
+    justify-content: space-between;
+  }
+
+  .upload-btn {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    color: $primary-active-blue-10;
+
+    &:hover,
+    &:focus {
+      background-color: $primary-active-blue-70;
+      border-color: transparent;
+    }
+
+    &.disable {
+      color: $primary-active-blue-60;
+
+      &:hover,
+      &:focus {
+        background-color: $primary-active-blue-90;
+      }
+    }
+
+    i-feather {
+      vertical-align: bottom;
     }
   }
 }

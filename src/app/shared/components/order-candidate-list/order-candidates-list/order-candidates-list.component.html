@@ -127,7 +127,7 @@
         <e-column field="hourlyBillRate" textAlign="Right" headerText="Candidate Bill Rate &dollar;" width="160">
           <ng-template #template let-data>
             <div class="align-right">
-              {{ data.hourlyBillRate | bulkbillRate: data.candidateBillRate:data.status:data.offeredBillRate?data.offeredBillRate:data.candidateBillRate}}
+              {{ data.status !== applicantStatus.NotApplied ? (data.candidateBillRate || data.initialBillRate) : 0 | number: '1.2-2'}}
             </div>
           </ng-template>
         </e-column>
@@ -157,7 +157,7 @@
       (pageSizeChangeEmitter)="gridPerPageChanged($event)"
     ></app-grid-pagination>
   </ng-container>
-  <ng-container *ngIf="system === systemType.IRP && selectedOrder.orderType === orderTypes.Traveler
+  <ng-container *ngIf="system === systemType.IRP && selectedOrder.orderType === orderTypes.LongTermAssignment
     && isFeatureIrpEnabled && !isAgency">
     <ejs-grid
       #orderCandidatesGrid
@@ -256,7 +256,6 @@
   (handleCloseModal)="closeEditCandidateModal($event)"
   (handleSuccessSaveCandidate)="saveIrpCandidate()"
   [isIRPLTAOrder]="isIRPLTAorder"
-  [commentContainerId] = "commentContainerId"
   [CanOrganizationViewOrdersIRP]="userPermission[userPermissions.CanOrganizationViewOrdersIRP]"
   [CanOrganizationEditOrdersIRP]="userPermission[userPermissions.CanCreateOrdersIRP]"
 ></app-edit-irp-candidate>

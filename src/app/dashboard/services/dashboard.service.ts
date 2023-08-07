@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -73,6 +73,7 @@ export class DashboardService {
     [WidgetTypeEnum.APPLICANTS_BY_POSITIONS]: (filters: DashboartFilterDto) => this.getApplicantsByPositionsWidgetData(filters),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getActivePositionWidgetData(filters),
       [WidgetTypeEnum.CANDIDATES]: (filters: DashboartFilterDto) => this.getCandidatesWidgetData(filters),
+      [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivePositionsWidgetData(filters),
       [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getFilledPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboartFilterDto) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
@@ -97,6 +98,7 @@ export class DashboardService {
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
 
   candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
+  candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
 
   constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
 
@@ -155,6 +157,7 @@ export class DashboardService {
   private getCandidatesWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
     return this.httpClient.post<CandidateTypeInfoModel[]>(`${this.baseUrl}/GetCandidatesByStatuses`, { ...filter }).pipe(
       map((candidatesInfo: CandidateTypeInfoModel[]) => {
+        this.candidatesOverallStatus$.next(candidatesInfo);
         return {
           id: WidgetTypeEnum.CANDIDATES,
            title: 'Candidate Overall Status',
@@ -190,6 +193,26 @@ export class DashboardService {
       })
     );
   }
+
+  private getAvergaeDayActivePositionsWidgetData(filter: DashboartFilterDto): Observable<any> {
+    return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter }).pipe(
+      map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
+        return {
+          id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS,
+           title: 'Average Days of Active Positions ',
+           chartData: lodashMapPlain(
+            orderStatusesAvgDetails,
+            ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
+              label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
+              value: average,
+              average: count,
+              color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
+            })
+            ),
+          };
+        })
+      );
+    }
 
   private getApplicantsByRegionWidgetData(
     filters: DashboartFilterDto
@@ -399,12 +422,14 @@ export class DashboardService {
       })
     );
   }
-
+  public redirectToUrlWithStatus(url: string,candidateStatusId? :string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , candidateStatusId:candidateStatusId} });
+  }
   public redirectToUrl(url: string,orderStatus? :number,status? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: status} });
   }
-  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string,xtraOrderStatus? :number,xtraOrderstatustext? : string): void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus, xtraOrderStatus: xtraOrderStatus,xtraStatus: xtraOrderstatustext} });
+  public redirectToUrlWithCandidateStatus(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus} });
   }
   public redirectToUrlWithAgencyposition(url: string,orderStatus? :number,condition? : string): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,condition: condition} });
@@ -524,4 +549,10 @@ export class DashboardService {
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
     return this.candidatesForActivePositions$.asObservable();
   }
+
+  public getcandidatesOverallStatus(): Observable<CandidateTypeInfoModel[]>{
+    return  this.candidatesOverallStatus$.asObservable();
+  }
+
+ 
 }

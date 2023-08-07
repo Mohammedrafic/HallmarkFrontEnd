@@ -8,5 +8,7 @@ export const candidateLegendPalette: Record<CandidateChartStatuses, string> = {
   [CandidateChartStatuses.REJECTED]: 'var(--widget-status-rejected-closed)',
   [CandidateChartStatuses.ACCEPTED]: 'var(--widget-status-accepted)',
   [CandidateChartStatuses.ONBOARD]: 'var(--widget-status-onboard-filled)',
+  [CandidateChartStatuses.OFFBOARD]: 'var(--widget-status-offboard)',
+  [CandidateChartStatuses.CANCELLED]: 'var(--widget-status-cancelled)',
   [CandidateChartStatuses.CUSTOM]: 'var(--widget-status-custom)',
 };

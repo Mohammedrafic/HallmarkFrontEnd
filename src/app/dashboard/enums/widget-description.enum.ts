@@ -10,6 +10,7 @@ export enum WidgetDescriptionEnum {
   OPEN_POSITIONS = 'Open Positions',
   FILLED_POSITIONS = 'Filled positions for active orders',
   ACTIVE_POSITIONS = 'Active Positions by Status',
+  AVERAGE_DAY_ACTIVE_POSITIONS = 'Average days positions are active by position status category',
   TASKS = 'Tasks_widget',
   FILLED_POSITIONS_TREND = 'Filled_Positions_Trend',
   CHAT = 'Chat_widget',

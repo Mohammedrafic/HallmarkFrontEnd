@@ -240,8 +240,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get mobileMenu(): { text: string }[] {
     let menu: { text: string }[] = this.tabletMenu;
-    if (!this.disableEdit) {
-      menu = [...menu, { text: MobileMenuItems.Edit }];
+    if (!this.disableEdit  &&  this.activeSystem === this.systemType.IRP) {
+      menu = [...menu, { text: MobileMenuItems.Edit }, { text: MobileMenuItems.CloseOrder}];
     }
     return menu;
   }
@@ -389,7 +389,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public approveOrder(id: number): void {
-    this.store.dispatch(new ApproveOrder(id, this.activeSystem === OrderManagementIRPSystemId.IRP));
+    this.store.dispatch(new ApproveOrder(id, this.activeSystem === OrderManagementIRPSystemId.IRP, true));
+    this.updateOrders.emit();
   }
 
   public editOrder(data: Order) {
@@ -586,7 +587,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           if (
             selectedOrder?.extensionFromId &&
             order?.items[isOrderPositionSelected.index ?? 0]?.candidateJobId &&
-            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.LongTermAssignment)
           ) {
             this.store.dispatch(
               new GetOrganizationExtensions(

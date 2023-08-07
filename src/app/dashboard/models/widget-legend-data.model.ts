@@ -4,4 +4,5 @@ export interface WidgetLegengDataModel {
   value: number;
   text: string;
   totalCount:number;
+  average?:number;
 }

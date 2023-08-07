@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -611,7 +611,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
           this.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
           this.isOrgIrpEnabled = !!organization.preferences.isIRPEnabled;
           this.columnsToExport = this.isOrgIrpEnabled ? LocationsExportIrpColumns : LocationExportColumns;
-
+          this.setInvoiceIdControlValidators(!this.isOrgVMSEnabled && this.isOrgIrpEnabled);
           this.filterExportColumns();
           this.checkFieldsVisibility();
         }
@@ -711,5 +711,12 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     }
 
     return false;
+  }
+
+  private setInvoiceIdControlValidators(isOrgIrpOnly: boolean) {
+    const invoiceIdControl = this.locationDetailsFormGroup.get('invoiceId');
+
+    invoiceIdControl?.setValidators(isOrgIrpOnly ? [] : [Validators.required]);
+    invoiceIdControl?.updateValueAndValidity();
   }
 }

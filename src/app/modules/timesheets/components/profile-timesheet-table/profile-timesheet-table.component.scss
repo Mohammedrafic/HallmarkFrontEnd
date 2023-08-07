@@ -70,6 +70,10 @@
     text-align: right;
   }
 
+  .align-left {
+    text-align: left !important;
+  }
+
   .custom-wrap {
     .ag-header-cell-text {
       white-space: pre-wrap;
@@ -104,6 +108,10 @@
   .custom-scroll {
     overflow-y: auto;
   }
+
+  .bold {
+    font-weight: bold;
+  }
 }
 
 .first-tab {
@@ -119,6 +127,22 @@ button.privilege {
 
 .action-buttons {
   display: flex;
+}
+
+button.dropdown-btn {
+  width: 40px;
+  padding: 6px 4px 6px 0 !important;
+  border: 1px solid $primary-active-blue !important;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+.edit-handler-buttons {
+  display: flex;
+  gap: 12px;
+  margin-left: 12px;
 }
 
 ::ng-deep {
@@ -155,8 +179,11 @@ button.privilege {
   justify-content: center;
   padding-top: 20px;
   width: 100%;
+  gap: 12px;
 
   .btn-group {
+    display: flex;
+
     .spinner-btn {
       width: 100px !important;
     }
@@ -167,7 +194,7 @@ button.privilege {
     }
 
     > *:not(:first-child) {
-      margin-left: 16px;
+      margin-left: 12px;
     }
   }
 

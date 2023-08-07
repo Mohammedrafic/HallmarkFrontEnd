@@ -118,6 +118,7 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { Permission } from '@core/interface/permission.interface';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
+import { OrderManagementService } from '../../order-management-content/order-management.service';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -208,6 +209,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     private organizationStructureService: OrganizationStructureService,
     private settingsViewService: SettingsViewService,
     private skillsService: SkillsService,
+    private orderManagementService: OrderManagementService,
   ) {
     super();
   }
@@ -966,7 +968,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter((organisation: Organization) => !!organisation && !this.selectedOrder),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      this.orderTypeForm.get('orderType')?.patchValue(IrpOrderType.LongTermAssignment);
+      const orderTypeToPrePopulate = 
+        this.orderManagementService.getOrderTypeToPrePopulate() || IrpOrderType.LongTermAssignment;
+      this.orderManagementService.clearOrderTypeToPrePopulate();
+      this.orderTypeForm.get('orderType')?.patchValue(orderTypeToPrePopulate);
       this.store.dispatch([
         new GetProjectSpecialData(),
         new GetOrganizationStatesWithKeyCode(),

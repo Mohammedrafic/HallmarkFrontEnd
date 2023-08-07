@@ -10,6 +10,8 @@ export enum OrderStatus {
   Onboard = 60,
   // This status is only for service purposes, to prevent status checks.
   NoOrder = -1,
+  Offboard = 90,
+  Cancelled = 110,
 }
 
 export enum CandidateJobStatus {
@@ -19,7 +21,12 @@ export enum CandidateJobStatus {
 }
 
 export enum OrderMatch {
-  Unassigned = "Unassigned",
-  Assigned = "Assigned",
-  NotRequired = "Not Required",
+  Unassigned = 'Unassigned',
+  Assigned = 'Assigned',
+  NotRequired = 'Not Required',
+}
+
+export enum RegularRates {
+  Regular = 1,
+  RegularLocal = 2,
 }

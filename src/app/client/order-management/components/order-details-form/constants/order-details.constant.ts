@@ -29,3 +29,9 @@ export const LocationField = 'location';
 export const DepartmentField = 'department';
 export const SkillsField = 'skills';
 export const RegionField = 'region';
+export const BillRateDependencyControlNames: string[] = [
+  'orderTypeControl',
+  'departmentIdControl',
+  'skillIdControl',
+  'jobStartDateControl',
+];

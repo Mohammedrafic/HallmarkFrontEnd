@@ -7,4 +7,6 @@ export enum CandidateChartStatuses {
   ACCEPTED = 'Accepted',
   ONBOARD = 'Onboard',
   CUSTOM = 'Custom',
+  OFFBOARD = 'Offboard',
+  CANCELLED = 'Cancelled',
 }

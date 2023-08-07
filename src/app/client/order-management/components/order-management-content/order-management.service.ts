@@ -4,12 +4,20 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { BaseObservable } from '@core/helpers';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
-import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { GlobalWindow } from '@core/tokens';
-
+import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { RegularRates } from '@shared/enums/order-management';
+import {
+  OrderManagementIRPSystemId,
+  OrderManagementIRPTabsIndex,
+  OrganizationOrderManagementTabs,
+} from '@shared/enums/order-management-tabs.enum';
+import { IrpOrderType, OrderType } from '@shared/enums/order-type';
+import { BillRate } from '@shared/models';
+import { RegularRatesData } from '@shared/models/order-management.model';
 import { OrderLinkDetails } from '../../../order-management/interfaces';
+import { ControlsConfig } from '../order-details-form/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +41,7 @@ export class OrderManagementService extends DestroyableDirective {
 
   private _selectedOrderAfterRedirect: OrderTab | null;
   private orderManagementSystem: OrderManagementIRPSystemId | null;
+  private orderTypeToPrePopulate: OrderType | IrpOrderType | null;
   private previousSelectedOrganizationId: number;
   private readonly isAvailable: BaseObservable<boolean> = new BaseObservable<boolean>(false);
   private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
@@ -114,6 +123,27 @@ export class OrderManagementService extends DestroyableDirective {
     });
   }
 
+  public setOrderTypeToPrePopulate(
+    vmsTab: OrganizationOrderManagementTabs,
+    irpTab: OrderManagementIRPTabsIndex,
+    system: OrderManagementIRPSystemId
+  ): void {
+    if (system === OrderManagementIRPSystemId.VMS) {
+      this.orderTypeToPrePopulate = this.getVMSOrderType(vmsTab);
+    } else if (system === OrderManagementIRPSystemId.IRP) {
+      this.orderTypeToPrePopulate = this.getIRPOrderType(irpTab);
+    } else {
+      this.clearOrderTypeToPrePopulate();
+    }
+  }
+
+  public getOrderTypeToPrePopulate(): OrderType | IrpOrderType | null {
+    return this.orderTypeToPrePopulate;
+  }
+
+  public clearOrderTypeToPrePopulate(): void {
+    this.orderTypeToPrePopulate = null;
+  }
 
   public setOrderManagementSystem(system: OrderManagementIRPSystemId | null) {
     this.orderManagementSystem = system;
@@ -159,5 +189,42 @@ export class OrderManagementService extends DestroyableDirective {
 
   saveSelectedOrderManagementSystem(activeSystem: OrderManagementIRPSystemId): void {
     this.globalWindow.localStorage.setItem('selectedOrderManagementSystem', activeSystem.toString());
+  }
+
+  getControlsChangeState(controlNames: string[], formControls: ControlsConfig): boolean {
+    return controlNames
+      .map((name) => formControls[name as keyof ControlsConfig])
+      .some((control) => control.dirty);
+  }
+
+  setRegularRates(rates: BillRate[]): RegularRatesData {
+    return ({
+      regular: rates.find((rate) => rate.billRateConfigId === RegularRates.Regular)?.rateHour as number || null,
+      regularLocal: rates.find((rate) => rate.billRateConfigId === RegularRates.RegularLocal)?.rateHour as number || null,
+    });
+  }
+
+  private getVMSOrderType(tab: OrganizationOrderManagementTabs): OrderType | null {
+    if (tab === OrganizationOrderManagementTabs.PerDiem) {
+      return OrderType.OpenPerDiem;
+    }
+
+    if (tab === OrganizationOrderManagementTabs.PermPlacement) {
+      return OrderType.PermPlacement;
+    }
+
+    return null;
+  }
+
+  private getIRPOrderType(tab: OrderManagementIRPTabsIndex): IrpOrderType | null {
+    if (tab === OrderManagementIRPTabsIndex.PerDiem) {
+      return IrpOrderType.PerDiem;
+    }
+
+    if (tab === OrderManagementIRPTabsIndex.Lta) {
+      return IrpOrderType.LongTermAssignment;
+    }
+
+    return null;
   }
 }

@@ -1,4 +1,5 @@
 import { ProfileMenuItem } from './shell.enum';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 export const MenuItemNames = {
   // TODO: edit profile
@@ -47,3 +48,10 @@ export const GetProfileMenuItems = (isDarkTheme: boolean) => {
     },
   ];
 };
+
+export const AllBusinessTypeRoles: BusinessUnitType[] = [
+  BusinessUnitType.Hallmark,
+  BusinessUnitType.Agency,
+  BusinessUnitType.MSP,
+  BusinessUnitType.Organization,
+];

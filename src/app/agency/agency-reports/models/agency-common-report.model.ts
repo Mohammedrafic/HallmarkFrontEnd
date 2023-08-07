@@ -83,7 +83,7 @@ export const OrderTypeOptionsForReport = [
   { id: OrderType.OpenPerDiem, name: 'Open Per Diem' },
   { id: OrderType.PermPlacement, name: 'Perm. Placement' },
   { id: OrderType.ReOrder, name: 'Re-Order' },
-  { id: OrderType.Traveler, name: 'Traveler' },
+  { id: OrderType.LongTermAssignment, name: 'LTA' },
 ];
 export class CommonCredentialSearchFilter {
   searchText: string;

@@ -7,7 +7,7 @@ import {
   JobDistributionDTO,
   OrderTypeDTO, SpecialProjectDTO,
 } from '@client/order-management/components/order-details-form/interfaces';
-import { NUMBER_AND_ONE_DECIMAL,ONLY_NUMBER, ONLY_NUMBER_AND_DOT } from '@shared/constants';
+import { ONLY_NUMBER, ONLY_NUMBER_AND_DOT } from '@shared/constants';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 import { OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
 import { ValidatorsListForNumberWithDots } from '@client/order-management/components/order-details-form/constants';

@@ -192,7 +192,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   isSend:boolean = false;
   public sendOnboardMessageEmailFormGroup: FormGroup;
 
-  public comments: Comment[] = [];
+  public candidateComments: Comment[] = [];
   emailTo:any = '';
   isSendOnboardFormInvalid:boolean = false;
   @ViewChild('RTE')
@@ -245,7 +245,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((comments: Comment[]) => {
-        this.comments = comments;
+        this.candidateComments = comments;
         this.changeDetectorRef.markForCheck();
       });
   }
@@ -444,7 +444,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                 }else{
                   this.closeDialog();
                   this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-                }                
+                }
 
               });
               // this.closeDialog();

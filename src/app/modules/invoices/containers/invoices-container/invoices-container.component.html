@@ -40,7 +40,6 @@
 
           <app-invoice-grid-export [selectedTab]="selectedTabIdx"
                                    [selectedRows]="gridSelections"
-                                   [isAgency]="isAgency"
                                    [organizationId]="organizationId"
                                    (resetTableSelection)="resetTableSelection()"></app-invoice-grid-export>
 
@@ -52,7 +51,7 @@
             <span>Print</span>
             <i-feather name="printer" class="icon"></i-feather>
           </button>
-          <div *ngIf="userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] || userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid]">
+          <div *ngIf="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] && !isAgency) || (userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)">
             <button ejs-button
                     *ngIf="(!isAgency && (selectedTabIdx === 3 || selectedTabIdx === 5)) || (isAgency && selectedTabIdx !== 0)"
                     [disabled]="
@@ -198,7 +197,7 @@
                               [payAllowed]="canPay"
                               (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
                               (updateTable)="updateTable($event)"
-                              [payButton]="userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] || userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid]"
+                              [payButton]="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] &&  !isAgency) ||( userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)"
                               ></app-invoice-detail-container>
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>

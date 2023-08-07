@@ -342,7 +342,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   }
 
   private saveEditOrderWithoutRevoke(order: CreateOrderDto): void {
-    if (this.selectedOrder.orderType === OrderType.Traveler) {
+    if (this.selectedOrder.orderType === OrderType.LongTermAssignment) {
       this.irpContainerApiService
         .checkLinkedSchedules(this.selectedOrder.id)
         .pipe(

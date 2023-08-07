@@ -69,12 +69,13 @@
                 </ng-template>
 
                 <ng-template [ngSwitchCase]="FieldTypes.Input">
-                  <div class="{{item.cssClass}} input-container" *ngIf="item.show">
+                  <div class="{{item.cssClass}} input-container" [ngClass]="{'input-readonly': item.field ==='billRate' && !userPermission[userPermissions.CanEditOrderBillRateIRP]}" *ngIf="item.show">
                     <label [for]="item.field">
                       {{ item.title }} <span *ngIf="item.required" class="required">*</span>
                     </label>
                     <div class="input-group">
                       <input
+                      [readonly]="item.field ==='billRate' && !userPermission[userPermissions.CanEditOrderBillRateIRP]"
                         class="e-input"
                         [name]="item.field"
                         appValidateWithMessage
@@ -168,12 +169,13 @@
                 </ng-template>
 
                 <ng-template [ngSwitchCase]="FieldTypes.Number">
-                  <div class="{{item.cssClass}} input-container" *ngIf="item.show">
+                  <div class="{{item.cssClass}} input-container" [ngClass]="{'input-readonly': item.field ==='hourlyRate' && !userPermission[userPermissions.CanEditOrderBillRateIRP]}" *ngIf="item.show">
                     <label [for]="item.field">
                       {{ item.title }} <span *ngIf="item.required" class="required">*</span>
                     </label>
                     <div class="input-group">
                       <input
+                       [readonly]="item.field ==='hourlyRate' && !userPermission[userPermissions.CanEditOrderBillRateIRP]"
                         class="e-input"
                         [name]="item.field"
                         appValidateWithMessage

@@ -68,7 +68,7 @@ export interface FiltersColumnConfig {
 }
 
 export interface FiltersState {
-  employeeTime: Date;
+  employeeTime: string;
   orderType: OrderJobType | number |null;
   orderBy: string | null;
   pageNumber: number;
@@ -93,7 +93,7 @@ export interface EmployeeScheduledDays {
 
 export interface PerDiemEmployeeDto {
   employeeScheduledDays: EmployeeScheduledDays[];
-  userLocalTime: Date;
+  userLocalTime: string;
   scheduleType: number;
   startTime: string;
   endTime: string;

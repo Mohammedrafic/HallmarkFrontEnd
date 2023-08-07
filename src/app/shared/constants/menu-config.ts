@@ -484,6 +484,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/agency-spend',
     },
+    112: {
+      // financial-time-sheet-beta
+      icon: 'pie-chart',
+      route: '/analytics/financial-time-sheet-beta',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -1187,6 +1192,11 @@ export const MENU_CONFIG: any = {
       // Agency-Spend
       icon: '',
       route: '/analytics/agency-spend',
+    },
+    112: {
+      // financial-time-sheet-beta
+      icon: 'pie-chart',
+      route: '/analytics/financial-time-sheet-beta',
     },
   },
 

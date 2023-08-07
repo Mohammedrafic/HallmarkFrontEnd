@@ -29,7 +29,7 @@
       </div>
     </div>
     <app-deploy-candidate-message *ngIf="isDeployedCandidate" [isAgency]="isAgency" [candidateBasicInfo]="deployedCandidateOrderInfo"></app-deploy-candidate-message>
-    <div class="candidate-message" *ngIf="candidateJob?.isLocal">
+    <div class="candidate-message" *ngIf="orderApplicantsInitialData?.isLocal">
       <i-feather name="info" class="icon"></i-feather>
       Local Candidate
     </div>

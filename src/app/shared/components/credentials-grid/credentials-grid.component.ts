@@ -40,7 +40,7 @@ import { CandidateState } from '@agency/store/candidate.state';
 import { CredentialGridService } from '@agency/services/credential-grid.service';
 import { AbstractGridConfigurationComponent } from
   '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED, RECORD_MODIFIED } from
   '@shared/constants/messages';
 import { optionFields } from '@shared/constants';
 import { FileStatusCode } from '@shared/enums/file.enum';
@@ -112,7 +112,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public candidateCredentialResponse: CandidateCredentialResponse;
   public gridItems: CandidateCredentialGridItem[] = [];
   public openFileViewerDialog = new EventEmitter<number>();
-  public today = new Date();
   public disableAddCredentialButton: boolean;
   public requiredCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
@@ -141,6 +140,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public get selectCredentialError(): boolean {
     return !this.masterCredentialId && this.addCredentialForm.dirty;
@@ -340,15 +342,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return cred;
   }
 
-  public selectRowsPerPage(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+  public selectRowsPerPage(pageSize: number): void {
+    this.pageSize = pageSize;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 
-  public selectPage(event: { currentPage: number; value: number }): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
+  public selectPage(page: number): void {
+    this.pageSubject.next(page);
   }
 
   public copyCredential(event: MouseEvent, data: CandidateCredential) {
@@ -661,10 +661,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$
       .pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((credential: { payload: CandidateCredential }) => {
+        const isEdit = this.isEdit;
         this.credentialId = credential.payload.id as number;
         this.disabledCopy = false;
         this.selectedItems = [];
-
         if (this.uploadObj.filesData[0]?.statusCode === FileStatusCode.Valid) {
           this.store.dispatch(
             new UploadCredentialFiles([this.uploadObj.filesData[0].rawFile as Blob], this.credentialId)
@@ -677,6 +677,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           return;
         }
 
+        this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADDED : RECORD_MODIFIED));
         this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
         this.addCredentialForm.markAsPristine();
         this.closeDialog();
@@ -753,6 +754,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         credentialTypeId: item.credentialType?.id,
       };
     });
+
+    super.setHeightForMobileGrid(this.gridItems?.length);
   }
  private disableViewDocument(item:CandidateCredential):boolean{
   let length= item.credentialFiles==null?0:item.credentialFiles?.length;

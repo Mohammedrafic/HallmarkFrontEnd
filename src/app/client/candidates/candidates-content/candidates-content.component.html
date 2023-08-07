@@ -43,6 +43,15 @@
           <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
+        <button
+          *ngIf="(currentUserPermissions$ | async) as userPermission"
+          ejs-button
+          appHideBeforeSyncfusionLoad
+          id="addIRPCandidate"
+          cssClass="e-primary"
+          [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
+          (click)="addIRPCandidate()"
+        >
       <button ejs-button appHideBeforeSyncfusionLoad (click)="openImportDialog()" class="e-outline">
         <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
       </button>

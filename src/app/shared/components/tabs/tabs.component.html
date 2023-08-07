@@ -1,6 +1,9 @@
 <ejs-tab
   #tabComponent
   class="stepper"
+  heightAdjustMode="Auto"
+  overflowMode="Scrollable"
+  cssClass="tabs"
   (selected)="selectEmitter.emit($event)"
   (created)="onCreated($event)"
   (selecting)="onSelecting($event)"
@@ -9,7 +12,7 @@
     <div *ngFor="let tab of tabs">
       <div class="stepper-header">
         <div class="stepper-title">
-          <span>{{tab.title}}</span>
+          <span class="text">{{tab.title}}</span>
           <span *ngIf="tab.isRequired" class="required">*</span>
         </div>
         <div class="stepper-sub-title">{{tab.subtitle}}</div>

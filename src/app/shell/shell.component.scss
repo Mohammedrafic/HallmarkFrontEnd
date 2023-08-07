@@ -36,15 +36,10 @@
       background-color: $primary-active-blue-70;
       border-radius: 8px;
       color: $primary-active-blue-10;
-
-      .e-icons {
-        color: $primary-active-blue-10;
-      }
     }
 
     .e-selected {
       .e-icons {
-        color: $primary-active-blue-10;
         transform: rotate(180deg);
       }
     }
@@ -54,8 +49,9 @@
       top: 7px;
       right: 0;
       margin-right: 0;
-      font-size: 11px;
+      font-size: 10px;
       transition: .4s;
+      color: $secondary-dark-blue-15;
     }
 
     h1 {

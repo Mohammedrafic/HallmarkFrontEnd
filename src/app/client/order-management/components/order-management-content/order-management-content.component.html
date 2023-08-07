@@ -184,7 +184,22 @@
   </button>
 
   <app-tooltip-container
-    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney"
+    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney && isActiveSystemIRP"
+    [message]="toolTipMessage"
+    [showToolTip]="!userPermission[userPermissions.CanCreateOrdersIRP]"
+  >
+    <button
+      [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]"
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      [isPrimary]="true"
+      (click)="navigateToOrderForm()"
+    >
+      Create Order
+    </button>
+  </app-tooltip-container>
+  <app-tooltip-container
+    *ngIf="isMobile && activeSystem!=OrderManagementIRPSystemId.OrderJourney && !isActiveSystemIRP"
     [message]="toolTipMessage"
     [showToolTip]="!userPermission[userPermissions.CanCreateOrders]"
   >
@@ -268,9 +283,7 @@
             <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
               <button
                 ejs-button
-                [disabled]="data.unreadComments <= 0"
-                [isPrimary]="data.unreadComments > 0"
-                cssClass="e-flat default-icon-button with-badge"
+                cssClass="e-flat e-primary with-badge"
               >
                 <span><i-feather name="message-square" class="icon"></i-feather></span>
                 <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{
@@ -395,7 +408,7 @@
         </e-column>
         <e-column field="orderType" headerText="TYPE" textAlign="Center" width="85" minWidth="70" maxWidth="110">
           <ng-template #template let-data>
-            <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
+            <div class="order-type-column" *ngIf="orderTypeTooltipMessage[data.orderType] as orderType">
               <ejs-tooltip id="tooltip" [content]="orderType" position="TopCenter">
                 <span class="order-type-text-cell">{{ orderType[0] }}</span>
               </ejs-tooltip>
@@ -588,6 +601,7 @@
             <app-order-management-subrow-candidate-position
               *ngFor="let child of data.children; index as i; trackBy: trackById"
               [candidatePosition]="child"
+              [isBothSystemsEnabled]="isOrgIRPEnabled && isOrgVMSEnabled"
               [selected]="
                 selectedCandidate?.selected?.order === data.id &&
                 selectedCandidate?.selected.positionId === child.positionId"
@@ -1506,7 +1520,7 @@
   (saveReOrderEmitter)="updateGrid(true)"
   (closeReOrderEmitter)="onAddReorderClose()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
-  (updateOrders)="getOrders()"
+  (updateOrders)="getOrders(true)"
   (reOpenOrderSuccess)="updateOrderDetails($event)"
   [orderComments]="orderComments"
   (editOrderPressed)="preserveOrder($event)"

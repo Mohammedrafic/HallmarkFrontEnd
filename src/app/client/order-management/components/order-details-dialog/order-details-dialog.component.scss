@@ -2,6 +2,35 @@
 @import 'adaptive-response';
 @import 'mixins';
 
+@mixin smallDesktopMenu {
+  .custom-order-btn {
+    display: none !important;
+  }
+
+  .menu-desktop-small {
+    display: inline-block !important;
+  }
+}
+
+@mixin smallTabletMenu {
+  .dialog-controls {
+    display: flex !important;
+  }
+
+  button:not(.close-button, .menu-mobile, .edit-button),
+  .vertical-divider {
+    display: none !important;
+  }
+
+  .menu-tablet {
+    display: inline-block !important;
+  }
+
+  .menu-desktop-small {
+    display: none !important;
+  }
+}
+
 .dialog {
   .header-container {
     position: sticky;
@@ -10,9 +39,18 @@
     background-color: $white;
 
     .order-statuses {
-      @media #{$max-mobile} {
-        margin-left: -15px;
-        margin-right: -15px;
+
+      &.align-label {
+        @media #{$max-mobile} {
+          margin-right: -22px;
+        }
+
+        @media (max-width: 412px) {
+          display: flex;
+          justify-content: center;
+          width: 100vw;
+          margin-left: -22px;
+        }
       }
     }
   }
@@ -148,7 +186,7 @@
     }
   }
 
-  @media (max-width: 380px) {
+  @media (max-width: 412px) {
     margin-left: -25%;
   }
 }
@@ -209,5 +247,71 @@
     &:has(app-add-edit-reorder) {
       height: calc(100% - 115px);
     }
+  }
+}
+
+@media #{$min-desktop-small} {
+  .order-details-dialog {
+    .open-per-diem-order {
+      @container main-content (max-width: 1775px) {
+        @include smallDesktopMenu();
+      }
+
+      @container main-content (max-width: 1142px) {
+        @include smallTabletMenu();
+      }
+
+
+      &.open-status {
+        @media #{$min-desktop-large} {
+          @container main-content (max-width: 1345px) and (min-width: 1107px) {
+            @include smallTabletMenu();
+          }
+        }
+      }
+    }
+
+    .lta-order {
+      @container main-content (max-width: 1500px) {
+        @include smallDesktopMenu();
+      }
+
+      @container main-content (max-width: 885px) {
+        @include smallTabletMenu();
+      }
+    }
+
+    .perm-placement,
+    .contact-to-perm {
+      @container main-content (max-width: 1555px) {
+        @include smallDesktopMenu();
+      }
+
+      @container main-content (max-width: 945px) {
+        @include smallTabletMenu();
+      }
+
+      @media #{$min-desktop-large} {
+        @container main-content (max-width: 1165px) and (min-width: 1105px) {
+          @include smallTabletMenu();
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button, .delete-button) {
+    display: block;
+  }
+
+  .order-actions {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button) {
+    display: none;
   }
 }

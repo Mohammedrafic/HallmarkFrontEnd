@@ -352,9 +352,17 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  calculateActualEndDate(startDate: Date, daysToAdd: number): Date { 
+    const actualEndDate = new Date(startDate); actualEndDate.setDate(startDate.getDate() + daysToAdd);
+     return actualEndDate; 
+    } 
+
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
-
+    const jobStartDate = new Date(this.candidateJob.order.jobStartDate); 
+    const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
+    const daysDifference =  DateTimeHelper.getDateDiffInDays(jobStartDate, jobEndDate);
+    const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString(); 
     this.store
       .dispatch(
         new UpdateAgencyCandidateJob({
@@ -367,8 +375,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           requestComment: value.comments,
           expAsTravelers: value.expAsTravelers,
           availableStartDate: DateTimeHelper.setUtcTimeZone(new Date(value.availableStartDate)),
-          actualStartDate: this.candidateJob.actualStartDate,
-          actualEndDate: this.candidateJob.actualEndDate,
+          actualStartDate: this.candidateJob.offeredStartDate,
+          actualEndDate: DateTimeHelper.setUtcTimeZone(actualEndDate),
           clockId: this.candidateJob.clockId,
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
           allowDeployWoCredentials: false,
@@ -441,19 +449,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
             this.candidateAddressRequiredValue = addressConfiguration.value;
           }
         }
-
-        let jobStartDate: string;
-        let jobEndDate: string;
-        const statusesForActualDates = [ApplicantStatusEnum.OnBoarded, ApplicantStatusEnum.Cancelled,
-          ApplicantStatusEnum.Offboard];
-
-        if (this.isAgency && statusesForActualDates.includes(value.applicantStatus.applicantStatus)) {
-          jobStartDate = value.actualStartDate || '';
-          jobEndDate = value.actualEndDate || '';
-        } else {
-          jobStartDate = value.order.jobStartDate as unknown as string || '';
-          jobEndDate = value.order.jobEndDate as unknown as string || '';
-        }
+        
+        const jobStartDate = value.actualStartDate || value.order.jobStartDate as unknown as string;
+        const jobEndDate = value.actualEndDate || value.order.jobEndDate as unknown as string;
 
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
@@ -488,7 +486,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           candidatePayRate: this.candidateJob.candidatePayRate,
         });
       }
-      this.changeDetectionRef.markForCheck();
+      this.changeDetectionRef.detectChanges();
     });
   }
 

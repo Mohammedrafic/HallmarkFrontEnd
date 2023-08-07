@@ -72,8 +72,8 @@
                     <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem"
                       [orderInformation]="currentOrder" [system]="activeSystem"></app-general-order-per-diem-info>
                     <app-general-reorder-info *ngSwitchCase="orderType.ReOrder"
-                      [orderInformation]="currentOrder" [system]="activeSystem"></app-general-reorder-info>
-                    <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"
+                      [order]="currentOrder" [system]="activeSystem"></app-general-reorder-info>
+                    <app-general-order-info *ngSwitchDefault [order]="currentOrder"
                       [system]="activeSystem"></app-general-order-info>
                   </section>
                   <hr />
@@ -98,7 +98,6 @@
             <e-tabitem>
               <ng-template #headerText>Candidate</ng-template>
               <ng-template #content>
-                <hr />
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate" *ngIf="!order?.extensionFromId; else extensionCandidate">
                     <ng-container *ngSwitchCase="candidateTemplate.onboarded">
@@ -182,12 +181,12 @@
               </ng-template>
             </e-tabitem>
 
-            <e-tabitem *ngIf="order?.orderType === orderType.ContractToPerm || order?.orderType === orderType.Traveler">
+            <e-tabitem *ngIf="order?.orderType === orderType.ContractToPerm || order?.orderType === orderType.LongTermAssignment">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
                 <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
                   <section class="job-details">
-                    <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                    <app-general-order-info [order]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
                   <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>

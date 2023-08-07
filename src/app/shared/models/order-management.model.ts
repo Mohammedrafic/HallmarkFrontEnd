@@ -282,6 +282,7 @@ export type OrderCandidatesList = {
   candidateId: number;
   firstName: string;
   hourlyBillRate: number;
+  initialBillRate: number;
   lastName: string;
   middleName?: string;
   candidateProfileId: number;
@@ -349,6 +350,7 @@ export type AgencyOrderFilters = {
   poNumberIds?: number | null;
   shift?: string | string[];
   orderLocked? : any | null;
+  ltaOrder? : boolean | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -610,6 +612,7 @@ export type OrderCandidateJob = {
   clockId: number;
   expAsTravelers: string;
   isLocal: boolean;
+  initialBillRate: number;
   guaranteedWorkWeek: string;
   jobId: number;
   offeredBillRate: number;
@@ -729,6 +732,7 @@ export class OrderFilter {
   shift?: string[] | string;
   isQuickLinkWidgetLTA?: boolean | null;
   orderLocked? : any | null;
+  ltaOrder? : boolean | null;
 }
 
 export class SortModel {
@@ -877,3 +881,8 @@ export class OnboardCandidateEmail {
 }
 
 export type MergedOrder = AgencyOrderManagement & Order;
+
+export interface RegularRatesData {
+  regular: number | null;
+  regularLocal: number | null;
+}

@@ -16,4 +16,6 @@ export enum MobileMenuItems {
   ExportExel = 'Export Excel File',
   ExportCSV = 'Export CSV File',
   ExportCustom = 'Export Custom',
+  Recalculate = 'Recalculate',
+  AddRecord = 'Add Record',
 }

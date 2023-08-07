@@ -21,7 +21,7 @@ import { TimesheetDetailsApiService, TimesheetsApiService } from '../../services
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
-  FilteringOptionsFields,
+  FilteringOptionsFields, TimesheetRecordType,
   TimesheetsTableFiltersColumns,
   TimesheetTargetStatus,
 } from '../../enums';
@@ -734,13 +734,13 @@ export class TimesheetsState {
       weekStartDate: weekStartDate,
     };
 
-    if (body.type === 2 && timesheetDetails.mileageTimesheetId) {
+    if (body.type === TimesheetRecordType.Miles && timesheetDetails.mileageTimesheetId) {
       body.timesheetId = timesheetDetails.mileageTimesheetId;
     }
 
     let recordsApi: Observable<void>;
 
-    if (body.type === 2 && !timesheetDetails.mileageTimesheetId) {
+    if (body.type === TimesheetRecordType.Miles && !timesheetDetails.mileageTimesheetId) {
       recordsApi = this.timesheetDetailsApiService.createMilesEntity(creatBody)
       .pipe(
         switchMap((data) => {
@@ -812,7 +812,7 @@ export class TimesheetsState {
             ctx.patchState({
               timesheetDetails: {
                 ...ctx.getState().timesheetDetails as TimesheetDetailsModel,
-                status: 0 as TimesheetStatus, 
+                status: 0 as TimesheetStatus,
                 statusText: '',
                 rejectionReason: undefined,
                 noWorkPerformed: false,
@@ -834,6 +834,10 @@ export class TimesheetsState {
               },
               timeSheetRecords: {
                 timesheets: {
+                  editMode: [],
+                  viewMode: [],
+                },
+                historicalData: {
                   editMode: [],
                   viewMode: [],
                 },

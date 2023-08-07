@@ -109,6 +109,6 @@ export const orderFieldsConfig = {
   [OrderType.ContractToPerm]: contactToPerm,
   [OrderType.OpenPerDiem]: openPerDiem,
   [OrderType.PermPlacement]: permPlacement,
-  [OrderType.Traveler]: contactToPerm,
+  [OrderType.LongTermAssignment]: contactToPerm,
   [OrderType.ReOrder]: [] as string[],
 };

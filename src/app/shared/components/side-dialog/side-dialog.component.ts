@@ -2,11 +2,12 @@ import { DOCUMENT } from "@angular/common";
 import { Component, EventEmitter, Inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Actions, ofActionDispatched } from '@ngxs/store';
+import { Actions, Select, ofActionDispatched } from '@ngxs/store';
+import { Observable, takeUntil } from 'rxjs';
 
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { takeUntil } from 'rxjs';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-side-dialog',
@@ -24,6 +25,9 @@ export class SideDialogComponent extends DestroyableDirective implements OnInit 
 
   @Output() formCancelClicked = new EventEmitter();
   @Output() formSaveClicked = new EventEmitter();
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   constructor(@Inject(DOCUMENT) private document: Document,
               private action$: Actions) {
