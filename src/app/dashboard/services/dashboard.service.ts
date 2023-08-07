@@ -93,7 +93,7 @@ export class DashboardService {
     [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
-    [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: () => this.getPositionsCountByDayRange(),
+    [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -547,8 +547,10 @@ export class DashboardService {
     return this.httpClient.get<AvailableEmployeeModel[]>(`/api/Schedules/AvailableEmployee`);
   }
 
-  public getPositionsCountByDayRange(): Observable<any[]>{
-    return this.httpClient.get<any[]>(`${this.baseUrl}/GetPositionsCountByDayRange`);
+  public getPositionsCountByDayRange(filter: DashboartFilterDto): Observable<any[]>{
+    return this.httpClient.post<any>(`${this.baseUrl}/GetPositionsCountByDayRange`, { ...filter }).pipe(map((data) =>{
+     return data.orderStatusesAvgDetails;
+    } ));
   }
 
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{

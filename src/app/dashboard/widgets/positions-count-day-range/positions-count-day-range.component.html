@@ -30,75 +30,19 @@
             </div>
             <div class="col center"><span>Total<br> Positions</span></div>
           </header>
-         <div class="row">
-            <div class="col border-top-none"><span>Open</span></div>
+         <div class="row" *ngFor="let data of chartData">
+            <div class="col border-top-none"><span>{{data.statusName}}</span></div>
             <div class="middle-col">
               <div class="row flex-container">
-                <div>&nbsp;</div>
-                <div>22</div>
-                <div>23</div>
-                <div>&nbsp;</div>
-                <div>&nbsp;</div>
+                <div>{{data.count3Positions}}</div>
+                <div>{{data.count7Positions}}</div>
+                <div>{{data.count15Positions}}</div>
+                <div>{{data.count30Positions}}</div>
+                <div>{{data.count30PlusPositions}}</div>
               </div>
             </div>            
-            <div class="col border-top-none">3</div>
+            <div class="col border-top-none">{{data.totalCount}}</div>
           </div>
-         <div class="row">
-            <div class="col border-top-none"><span>In-Progress</span></div>
-            <div class="middle-col">
-              <div class="row flex-container">
-                <div>51</div>
-                <div></div>
-                <div>53</div>
-                <div>54</div>
-                <div>55</div>
-              </div>
-            </div>
-           
-            <div class="col border-top-none">6</div>
-          </div>
-          <div class="row">
-            <div class="col border-top-none"><span>In-Progress(Pending)</span></div>
-            <div class="middle-col">
-              <div class="row flex-container">
-                <div>&nbsp;</div>
-                <div>82</div>
-                <div>&nbsp;</div>
-                <div>84</div>
-                <div>85</div>
-              </div>
-            </div>
-            
-            <div class="col border-top-none">9</div>
-          </div>
-          <div class="row">
-            <div class="col border-top-none"><span>In-Progress(Accepted)</span></div>
-            <div class="middle-col">
-              <div class="row flex-container">
-                <div>81</div>
-                <div>&nbsp;</div>
-                <div>&nbsp;</div>
-                <div>84</div>
-                <div>85</div>
-              </div>
-            </div>
-           
-            <div class="col border-top-none">9</div>
-          </div>
-          <div class="row">
-            <div class="col border-top-none"><span>Filled</span></div>
-            <div class="middle-col">
-              <div class="row flex-container">
-                <div>122</div>
-                <div> </div>
-                <div> </div>
-                <div> </div>
-                <div>26</div>
-              </div>
-            </div>
-            
-            <div class="col border-top-none">150</div>
-          </div> 
         </section>
 
     </ng-template>
