@@ -244,8 +244,9 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
             : ScheduleFilterHelper.adaptOrganizationSkillToOption(skills as AssignedSkillsByOrganization[]);
 
           this.filterColumns.skillIds.dataSource = skillOption;
+          const skillIds = this.getSkillsIds(skillOption);
           this.chipsSettings.editedChips = false;
-          this.setFilteredItems();
+          this.scheduleFilterFormGroup.get("skillIds")?.patchValue(this.getSkillsPatchValue(skillIds));
         } else {
           this.resetSkillFilters();
         }
@@ -535,13 +536,23 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterService.deleteInlineChip(event);
   }
 
+  getSkillsIds(skillOption: DropdownOption[]): number[] {
+    if(this.isPreservedFilters) {
+      return this.filters.skillIds as number[];
+    }
+    if(this.chipsSettings.editedChips) {
+      return [];
+    }
+    return [skillOption[0]?.value as number];
+  }
+
+
   private getSkillsPatchValue(skillIds: number[]): number [] {
     if (this.chipsSettings.preservedChipsSkills.length) {
       const selectedFilterSkills = this.scheduleFiltersService.getSelectedSkillFilterColumns(
         this.filterColumns.skillIds.dataSource,
         this.chipsSettings.preservedChipsSkills
       );
-
       return selectedFilterSkills;
     }
 
@@ -550,7 +561,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     if (departments.length < 2) {
       return skillIds;
     }
-
-    return [];
+    return skillIds;
   }
 }
