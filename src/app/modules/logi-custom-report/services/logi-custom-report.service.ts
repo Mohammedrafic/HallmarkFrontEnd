@@ -46,7 +46,7 @@ export class LogiCustomReportService {
    @param payload filter with details we need to get
    */
    public userLogreport(payload: useractivitlogreportPage | object): Observable<useractivitlogreportPage> {
-    return this.http.post<useractivitlogreportPage>(`/api/Orders/all`, payload);
+    return this.http.post<useractivitlogreportPage>(`/api/Reports/UserLogReport`, payload);
   }
 
 }

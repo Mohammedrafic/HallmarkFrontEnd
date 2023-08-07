@@ -324,10 +324,10 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
     this.paramsData =
     {
       "businessUnitType":businessunitType,
-      "businnessUnit":  businessunitName  ,  
+      "id":  businessunitName  ,  
       "userId":  userName  ,
-      "StartDateParamTS": startDate,
-      "EndDateParamTS": endDate,
+      "periodFrom": startDate,
+      "periodTo": endDate,
   
     };
     //  this.logiReportComponent.paramsData = this.paramsData;
