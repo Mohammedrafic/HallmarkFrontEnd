@@ -438,7 +438,9 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       this.loadMoreData.emit(pageNumber + 1);
     }
   }
-
+   public ClearCandidateSuggesstion():void{
+    this.autoCompleteSearch?.clear();
+   }
   private watchForCandidateSearch(): void {
     this.searchControl.valueChanges.pipe(
       debounceTime(1000),
