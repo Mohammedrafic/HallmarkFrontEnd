@@ -454,7 +454,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: filteringEventArgs.text,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
-        departmentsIds : this.selectedFilters.departmentsIds
+        departmentsIds : this.selectedFilters.departmentsIds,
+        isExcludeNotOrganized : this.selectedFilters.isExcludeNotOrganized
       }).pipe(
         tap((employeeDto) => {
           this.candidatesSuggestions = ScheduleGridAdapter.prepareCandidateFullName(employeeDto.items);
@@ -478,7 +479,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: user.fullName,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
-        departmentsIds : this.selectedFilters.departmentsIds
+        departmentsIds : this.selectedFilters.departmentsIds,
+        isExcludeNotOrganized : this.selectedFilters.isExcludeNotOrganized
       })
         .pipe(take(1))
         .subscribe((page: ScheduleCandidatesPage) => {
