@@ -23,6 +23,12 @@ export enum TableTabIndex {
   Expenses = 3,
 }
 
+export enum TimesheetRecordType {
+  Timesheet = 1,
+  Miles = 2,
+  Expenses = 3,
+}
+
 export enum RecordsMode {
   View = 'viewMode',
   Edit = 'editMode',

@@ -25,3 +25,8 @@ export enum OrderMatch {
   Assigned = 'Assigned',
   NotRequired = 'Not Required',
 }
+
+export enum RegularRates {
+  Regular = 1,
+  RegularLocal = 2,
+}
