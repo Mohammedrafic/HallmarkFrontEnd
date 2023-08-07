@@ -148,7 +148,6 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   }
   public override updatePage(clearedFilters?: boolean): void {
     const candidateListRequest: CandidateListRequest = {
-      ...[],
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
       orderBy: this.orderBy,

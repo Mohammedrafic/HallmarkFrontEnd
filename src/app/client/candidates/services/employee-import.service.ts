@@ -3,9 +3,7 @@ import { Injectable } from '@angular/core';
 import { EmployeeImportDto, EmployeeImportResult, ImportedEmployee } from '@shared/models/imported-employee';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class EmployeeImportService {
 
   constructor(private http: HttpClient) {}
