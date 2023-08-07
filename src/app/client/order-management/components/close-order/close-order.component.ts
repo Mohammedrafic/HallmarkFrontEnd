@@ -156,7 +156,14 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   private getPositionMaxDate(): string | null {
     if (this.candidate.actualEndDate) {
-      return formatDate(this.candidate.actualEndDate as string, 'MM/dd/yyyy', 'en-US', 'UTC');
+      return formatDate(this.candidate.actualEndDate, 'MM/dd/yyyy', 'en-US', 'UTC');
+    }
+    return null;
+  }
+
+  private getReorderMaxDate(): string | null {
+    if (this.order.jobStartDate) {
+      return formatDate(this.order.jobStartDate, 'MM/dd/yyyy', 'en-US', 'UTC');
     }
     return null;
   }
@@ -164,7 +171,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   private setMaxDate(): void {
     let maxDate;
     if (this.order.orderType === OrderType.ReOrder) {
-      maxDate = this.order.jobStartDate;
+      maxDate = this.getReorderMaxDate();
     } else if (this.isPosition) {
       maxDate = this.getPositionMaxDate();
     } else {

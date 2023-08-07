@@ -182,6 +182,8 @@ button.dropdown-btn {
   gap: 12px;
 
   .btn-group {
+    display: flex;
+
     .spinner-btn {
       width: 100px !important;
     }

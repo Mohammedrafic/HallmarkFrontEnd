@@ -172,7 +172,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     return this.candidate?.status || (this.candidate?.candidateStatus as any);
   }
 
-  get actualStartDateValue(): Date {
+  get actualStartDateValue(): Date | null {
+    if (this.candidateJob?.closeDate) {
+      return null;
+    }
     return toCorrectTimezoneFormat(this.form.controls['startDate'].value);
   }
 
