@@ -559,11 +559,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
-    console.log(applicantStatus)
     const jobStartDate = new Date(this.candidateJob.order.jobStartDate);
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
+    const finalDate = this.candidateJob.offeredStartDate && this.candidateJob.offeredStartDate !== '' ? new Date(this.candidateJob.offeredStartDate) : jobStartDate; 
     const daysDifference =  DateTimeHelper.getDateDiffInDays(jobStartDate, jobEndDate);
-    const actualEndDate = this.calculateActualEndDate(jobStartDate, daysDifference).toISOString();  
+    const actualEndDate = this.calculateActualEndDate(finalDate, daysDifference).toISOString(); 
     const accepted = applicantStatus.applicantStatus ===ApplicantStatusEnum.Accepted;
     if (accepted && (!value.actualStartDate || !value.actualEndDate)) {
       value.actualStartDate = this.candidateJob?.offeredStartDate;
