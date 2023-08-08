@@ -17,7 +17,7 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged, tap, switchMap } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged, switchMap } from 'rxjs';
 import {
   OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
