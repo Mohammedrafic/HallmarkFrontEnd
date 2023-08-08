@@ -81,7 +81,7 @@
               <button
                 *ngIf="activeSystem === systemType.IRP"
                 ejs-button
-                cssClass="e-outline"
+                cssClass="e-outline close-btn"
                 [class.custom-order-btn]="showApproveAndCancel"
                 [disabled]="disableCloseOrder || !CanCloseOrdersIRP"
                 (click)="closeOrder(order)"
@@ -92,9 +92,9 @@
 
             <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
               <button
-                *ngIf="activeSystem !==  systemType.IRP"
+                *ngIf="activeSystem !== systemType.IRP"
                 ejs-button
-                cssClass="e-outline"
+                cssClass="e-outline close-btn"
                 [class.custom-order-btn]="showApproveAndCancel"
                 [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
                 (click)="closeOrder(order)"
@@ -116,7 +116,7 @@
             <app-tooltip-container *ngIf="showCreateReOrder" [showToolTip]="!hasCreateEditOrderPermission">
               <button
                 ejs-button
-                cssClass="e-outline"
+                cssClass="e-outline create-reorder-btn"
                 [class.custom-order-btn]="showApproveAndCancel"
                 (click)="createReOrder()"
                 [disabled]="disableCreateReOrder || !canCreateOrder || !hasCreateEditOrderPermission"
@@ -161,7 +161,7 @@
             <app-tooltip-container *ngIf="showLockOrder" [showToolTip]="!hasCreateEditOrderPermission">
               <button
                 ejs-button
-                cssClass="e-outline"
+                cssClass="e-outline lock-btn"
                 [class.custom-order-btn]="showApproveAndCancel"
                 [isPrimary]="true"
                 (click)="lockOrder()"
