@@ -73,15 +73,15 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cat" };
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
   private unsubscribe$: Subject<void> = new Subject();
+  cacheBlockSize: any;
 
+  
   public paramsData: any = {
     "businessUnitType":'',
-    "businnessUnit":  ''  ,  
+    "id":  ''  ,  
     "userId":  ''  ,
-    "StartDateParamTS": '',
-    "EndDateParamTS": '',
-    "BearerParamAR": '',
-    "HostName":'',
+    "periodFrom": '',
+    "periodTo": '',
   };
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
@@ -189,6 +189,30 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
+    {
+      headerName: 'EventTarget',
+      field: 'eventTarget',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'EventTargetType',
+      field: 'eventTargetType',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'EventValue',
+      field: 'eventValue',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    }
   
   ];
 
@@ -233,6 +257,11 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
     this.store.dispatch(new ShowFilterDialog(false));
   }
   onFilterClearAll() {
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 7);
+    this.userActivityForm.controls['startDate'].setValue(startDate);
+    this.userActivityForm.controls['endDate'].setValue(new Date(Date.now()));
+
 
   }
   public showFilters(): void {
@@ -376,10 +405,15 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       }
     }
   };
-  cacheBlockSize: any;
 
   onGridReady(params: any) {
     this.gridApi = params.api;
     this.gridApi.setRowData(this.itemList);
+  }
+
+  
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }
