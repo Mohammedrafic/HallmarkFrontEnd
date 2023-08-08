@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { Observable, catchError, tap } from 'rxjs';
+import { Observable, catchError, of, tap } from 'rxjs';
 
 import { MessageTypes } from '@shared/enums/message-types';
 import { ListOfSkills } from '@shared/models/skill.model';
@@ -13,6 +13,9 @@ import { CandidateListService } from '../services/candidate-list.service';
 import { CandidateList, CandidateListStateModel, IRPCandidateList } from '../types/candidate-list.model';
 import * as CandidateListActions from './candidate-list.actions';
 import { CredentialType } from '@shared/models/credential-type.model';
+import { ImportResult } from '@shared/models/import.model';
+import { EmployeeImportService } from '@client/candidates/services/employee-import.service';
+import { CommonHelper } from '@shared/helpers/common.helper';
 
 @State<CandidateListStateModel>({
   name: 'candidateList',
@@ -53,7 +56,7 @@ export class CandidateListState {
   }
 
  
-  constructor(private candidateListService: CandidateListService) {}
+  constructor(private candidateListService: CandidateListService,private employeeService :EmployeeImportService) {}
 
   @Action(CandidateListActions.GetCandidatesByPage, { cancelUncompleted: true })
   GetCandidatesByPage(
@@ -170,6 +173,82 @@ export class CandidateListState {
       tableState: null,
     });
   }
+
+  
+  @Action(CandidateListActions.GetEmployeeImportTemplate)
+  GetEmployeeImportTemplate(
+    { dispatch }: StateContext<CandidateListStateModel>,
+    { payload }: CandidateListActions.GetEmployeeImportTemplate): Observable<any> {
+    return this.employeeService.getImportEmployeeTemplate().pipe(
+      tap((payload) => {
+        dispatch(new CandidateListActions.GetEmployeeImportTemplateSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(CandidateListActions.GetEmployeeImportErrors)
+  GetEmployeeImportErrors(
+    { dispatch }: StateContext<CandidateListStateModel>,
+    { errorpayload }: CandidateListActions.GetEmployeeImportErrors
+  ): Observable<any> {
+    if(errorpayload.length > 0){          
+      errorpayload.forEach((data:any)=>{
+        if(data.ssn != undefined && data.ssn != ''){
+          data.ssn = data.ssn.replace(/\d/g, "X");
+        }
+      })
+    }
+    return this.employeeService.getImportEmployeeErrors(errorpayload).pipe(
+      tap((payload) => {
+        dispatch(new CandidateListActions.GetEmployeeImportErrorsSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(CandidateListActions.UploadEmployeeFile)
+  UploadEmployeesFile(
+    { dispatch }: StateContext<CandidateListStateModel>,
+    { payload }: CandidateListActions.UploadEmployeeFile
+  ): Observable<ImportResult<any> | Observable<void>> {
+    return this.employeeService.uploadImportEmployeeFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new CandidateListActions.UploadEmployeeFileSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) =>
+        of(
+          dispatch(
+            new ShowToast(
+              MessageTypes.Error,
+              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
+            )
+          )
+        )
+      )
+    );
+  }
+
+  @Action(CandidateListActions.SaveEmployeeImportResult)
+  SaveEmployeesImportResult(
+    { dispatch }: StateContext<CandidateListStateModel>,
+    { payload }: CandidateListActions.SaveEmployeeImportResult
+  ): Observable<ImportResult<any> | Observable<void>> {
+    return this.employeeService.saveImportEmployeeResult(payload).pipe(
+      tap((payload) => {
+        if(payload.errorRecords.length > 0){          
+          dispatch(new CandidateListActions.UploadEmployeeFileSucceeded(payload));          
+        }
+        dispatch(new CandidateListActions.SaveEmployeeImportResultFailAndSucceeded(payload));  
+        return payload;
+      }),
+      catchError((error:any) => of( dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))))
+    );
+  }
+
 
   @Action(CandidateListActions.GetCredentialsTypeList)
   GetCredentialTypesList({patchState}: StateContext<CandidateListStateModel>): Observable<CredentialType[]> {
