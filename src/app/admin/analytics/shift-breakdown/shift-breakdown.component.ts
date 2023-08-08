@@ -41,6 +41,7 @@ import {
   CommonReportFilter,
   StaffScheduleReportFilterOptions,
 } from '../models/common-report.model';
+import { YEARANDMONTH_Validation } from '@shared/constants/messages';
 
 @Component({
   selector: 'app-shift-breakdown',
@@ -524,8 +525,26 @@ export class ShiftBreakdownComponent implements OnInit {
       StartYear: startYear,
       EndYear: endYear,
     };
+    if(startYear > endYear){
+      this.showErrorMessage();
+    } else if(startYear === endYear){
+      if(startMonth <= endMonth){
+        this.filterCall();  
+      } else {
+        this.showErrorMessage();
+      }
+    } else if(startYear < endYear){
+      this.filterCall();
+    }
+  }
+
+  showErrorMessage() {
+    this.store.dispatch(new ShowToast(MessageTypes.Error, YEARANDMONTH_Validation));
+  }
+
+  filterCall() {
     this.logiReportComponent.paramsData = this.paramsData;
-    this.logiReportComponent.RenderReport();
+    this.logiReportComponent.RenderReport();  
   }
 
   getLastWeek() {
