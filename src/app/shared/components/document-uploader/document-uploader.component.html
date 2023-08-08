@@ -29,9 +29,10 @@
         <li *ngFor="let document of documents" class="e-upload-file-list">
           <span class="e-file-container">
             <span class="e-file-name">{{document.documentName}}</span>
-            <span class="e-file-type"></span>
-            <span class="e-file-size"></span>
-            <span class="e-file-status">Uploaded</span>
+            <div class="file-info">
+              <span class="e-file-type">{{document.createdAt}}</span> | <!--TODO provide created at data-->
+              <span class="e-file-size">{{document.size}}</span>
+            </div>
           </span>
           <span class="custom-trash">
             <span class="e-icons e-file-delete-btn" title="Remove" (click)="onDelete(document)"></span>

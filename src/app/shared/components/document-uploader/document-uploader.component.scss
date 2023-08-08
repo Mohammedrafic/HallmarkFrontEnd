@@ -43,6 +43,18 @@
 
   .e-file-container {
     width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+
+    .e-file-name {
+      font-weight: 600;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: baseline;
+      column-gap: 8px;
+    }
   }
 
   .e-file-status {
