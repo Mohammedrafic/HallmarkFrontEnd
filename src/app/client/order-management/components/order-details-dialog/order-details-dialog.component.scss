@@ -301,7 +301,7 @@
 }
 
 @media (max-width: 1024px) {
-  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button, .delete-button) {
+  .dialog-controls button:not(.close-button, .menu-mobile, .edit-button, .delete-button, .close-btn, .create-reorder-btn, .lock-btn) {
     display: block;
   }
 
