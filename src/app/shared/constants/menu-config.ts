@@ -197,6 +197,12 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/aging-details',
     },
+    44: {
+      // Organization Profile
+      icon: 'organization',
+      custom: true,
+      route: '/admin/profile',
+    },
     48: {
       // Client Finance Report
       icon: '',

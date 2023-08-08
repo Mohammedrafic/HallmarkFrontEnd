@@ -1,4 +1,4 @@
-import { RecordFields, TableColumnAlign } from '../enums';
+import { RecordFields, TableColumnAlign, TimesheetRecordType } from '../enums';
 import { TimesheetStatistics } from './timesheet-statistics.interface';
 import { Attachment } from '@shared/components/attachments/models/attachment.interface';
 import { TimesheetInvoice } from './timesheet-invoice.interface';
@@ -134,7 +134,7 @@ export interface RecordsPutDto {
 export interface AddRecordDto {
   timesheetId: number;
   organizationId: number;
-  type: number;
+  type: TimesheetRecordType;
   timeIn: string;
   timeOut?: string;
   billRateConfigId: number;

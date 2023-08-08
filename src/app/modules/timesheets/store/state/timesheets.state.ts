@@ -21,7 +21,7 @@ import { TimesheetDetailsApiService, TimesheetsApiService } from '../../services
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
-  FilteringOptionsFields,
+  FilteringOptionsFields, TimesheetRecordType,
   TimesheetsTableFiltersColumns,
   TimesheetTargetStatus,
 } from '../../enums';
@@ -734,13 +734,13 @@ export class TimesheetsState {
       weekStartDate: weekStartDate,
     };
 
-    if (body.type === 2 && timesheetDetails.mileageTimesheetId) {
+    if (body.type === TimesheetRecordType.Miles && timesheetDetails.mileageTimesheetId) {
       body.timesheetId = timesheetDetails.mileageTimesheetId;
     }
 
     let recordsApi: Observable<void>;
 
-    if (body.type === 2 && !timesheetDetails.mileageTimesheetId) {
+    if (body.type === TimesheetRecordType.Miles && !timesheetDetails.mileageTimesheetId) {
       recordsApi = this.timesheetDetailsApiService.createMilesEntity(creatBody)
       .pipe(
         switchMap((data) => {
@@ -751,6 +751,7 @@ export class TimesheetsState {
           ctx.dispatch([
             new TimesheetDetails.AddTimesheetRecordSucceed(),
             new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency),
+            new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency),
           ]);
         }),
         catchError((err: HttpErrorResponse) => {

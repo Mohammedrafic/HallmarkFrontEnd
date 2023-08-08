@@ -50,6 +50,15 @@
   position: relative;
 }
 
+:host {
+  ::ng-deep {
+    div#reportIframe {
+      width: 100% !important;
+      height: 90% !important;
+    }
+  }
+}
+
 .form-line {
   display: flex;
   align-items: flex-end;

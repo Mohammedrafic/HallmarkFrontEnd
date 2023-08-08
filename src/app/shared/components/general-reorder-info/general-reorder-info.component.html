@@ -29,8 +29,8 @@
         </div>
       </div>
       <div class="column last-column">
-        <div class="cost">${{ orderInformation.hourlyRate }}</div>
-        <div class="sup-title">Bill Rate</div>
+        <div class="cost">${{ regularRates.regular }}</div>
+        <div class="sup-title">Regular Bill Rate</div>
       </div>
       <div class="column">
         <div class="icon">
@@ -59,9 +59,15 @@
           <div class="sup-title">Reason for Requisition</div>
         </div>
       </div>
-      <ng-container *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
-        <ng-container *ngTemplateOutlet="orderIdText"></ng-container>
-      </ng-container>
+      <div class="column last-column" *ngIf="regularRates.regularLocal && (isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
+        <div class="cost">${{ regularRates.regularLocal }}</div>
+        <div class="sup-title">Regular Local Bill Rate</div>
+      </div>
+      <div class="column last-column" *ngIf="!regularRates.regularLocal">
+        <ng-container *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
+          <ng-container *ngTemplateOutlet="orderIdText"></ng-container>
+        </ng-container>
+      </div>
       <div class="column">
         <div class="icon">
           <i-feather name="briefcase" class="icon"></i-feather>
@@ -71,13 +77,19 @@
           <div class="sup-title">Skill</div>
         </div>
       </div>
-      <ng-container *ngIf="(isOrganizationOrAgencyArea$ | async)?.isAgencyArea">
-        <ng-container *ngTemplateOutlet="orderIdText"></ng-container>
-      </ng-container>
+      <div class="column last-column" *ngIf="!(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
+        <div class="cost">${{ regularRates.regularLocal }}</div>
+        <div class="sup-title">Regular Local Bill Rate</div>
+      </div>
+
       <div class="column" *ngIf="!(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea"></div>
       <div class="column empty-column"></div>
       <div class="column empty-column"></div>
-      <div class="last-column"></div>
+      <div class="last-column">
+        <ng-container *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea && regularRates.regularLocal">
+          <ng-container *ngTemplateOutlet="orderIdText"></ng-container>
+        </ng-container>
+      </div>
     </div>
   </section>
 
