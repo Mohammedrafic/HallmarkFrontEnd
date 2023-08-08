@@ -74,6 +74,7 @@ export class AccumulationChartComponent
   }
 
   public redirectToSourceContent(status: string): void {
+    let candidatesStatusDataSet:any = []
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
     let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
     if (filteredList.length > 0) {
@@ -92,7 +93,25 @@ export class AccumulationChartComponent
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
-        this.dashboardService.redirectToUrl('client/order-management', undefined, status);
+        if(OrderStatus[OrderStatus.Open] ===  status){
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
+        }
+        else if(status === 'In Progress'){
+          candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
+          candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
+          candidatesStatusDataSet.push({"value":CandidatStatus['Pre Offer Custom']});
+          window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
+        }
+        else if(status === 'In Progress (Pending)'){
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status,CandidatStatus[CandidatStatus.Offered]);
+        }
+        else if(status === 'In Progress (Accepted)'){
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status,CandidatStatus[CandidatStatus.Accepted]);
+        }
+        else if(OrderStatus[OrderStatus.Filled] === status){
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status,CandidatStatus[CandidatStatus.Onboard]);
+        }
       }
     }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status"){
         let candidatesDataset:any = [];

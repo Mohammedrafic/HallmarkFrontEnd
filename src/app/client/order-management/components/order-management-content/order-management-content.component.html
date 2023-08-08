@@ -865,6 +865,9 @@
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.orderStatuses.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
+            (select)="onSelect($event)"
+            cssClass="custom"
+            (click)="orderStatusSelect()"
           >
           </ejs-multiselect>
         </div>
