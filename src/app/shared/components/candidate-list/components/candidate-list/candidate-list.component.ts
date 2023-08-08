@@ -232,7 +232,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.setFileName();
     this.filterColumns = !this.isIRP ? filterColumns : IRPFilterColumns;
     this.subscribeOnRegions();
-    this.subscribeOnCredentialTypes();
+    this.subscribeOnMasterCredentials();
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
     this.syncFilterTagsWithControls();
@@ -738,7 +738,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         }
       });
   }
-  private subscribeOnCredentialTypes(): void {
+  private subscribeOnMasterCredentials(): void {
       this.masterCredentials$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((crdentialType) => {
