@@ -17,7 +17,7 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged, tap, switchMap } from 'rxjs';
 import {
   OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
@@ -392,31 +392,35 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     return billRates as BillRate[];
   }
 
+  private displayMessageConfirmation(): Observable<boolean> {
+    const options = {
+      title: ONBOARD_CANDIDATE,
+      okButtonLabel: 'Yes',
+      okButtonClass: 'ok-button',
+      cancelButtonLabel: 'No',
+    };
+    if (this.saveStatus === ApplicantStatusEnum.OnBoarded) {
+      return this.confirmService.confirm(onBoardCandidateMessage, options)
+        .pipe(take(1));
+    }
+    return of(false);
+  }
+
   private subscribeOnJobUpdate(): void {
     this.actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed))
-      .subscribe(() => {
-        if(this.saveStatus === ApplicantStatusEnum.OnBoarded){
-              const options = {
-                title: ONBOARD_CANDIDATE,
-                okButtonLabel: 'Yes',
-                okButtonClass: 'ok-button',
-                cancelButtonLabel: 'No',
-              };
-              this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
-                  .subscribe((isConfirm) => {
-                    if(isConfirm){
-                      this.onboardEmailTemplateForm.rteCreated();
-                      this.onboardEmailTemplateForm.disableControls(true);
-                      this.store.dispatch(new ShowGroupEmailSideDialog(true));
-                    }else{
-                      this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-                      this.closeDialog();
-                    }
-                  });
+      .pipe(
+        ofActionSuccessful(UpdateOrganisationCandidateJobSucceed),
+        takeUntil(this.unsubscribe$),
+        switchMap(() => this.displayMessageConfirmation()),
+      )
+      .subscribe((isConfirm) => {
+        if (isConfirm) {
+          this.onboardEmailTemplateForm.rteCreated();
+          this.onboardEmailTemplateForm.disableControls(true);
+          this.store.dispatch(new ShowGroupEmailSideDialog(true));
         } else {
-          this.closeDialog();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+          this.closeDialog();
         }
       });
   }
