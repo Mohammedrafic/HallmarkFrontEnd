@@ -410,8 +410,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.actions$
       .pipe(
         ofActionSuccessful(UpdateOrganisationCandidateJobSucceed),
-        takeUntil(this.unsubscribe$),
         switchMap(() => this.displayMessageConfirmation()),
+        takeUntil(this.unsubscribe$),
       )
       .subscribe((isConfirm) => {
         if (isConfirm) {
