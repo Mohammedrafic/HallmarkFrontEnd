@@ -1,0 +1,19 @@
+<div class="file-container">
+  <h2 class="title">Files</h2>
+  <div class="file-list">
+    <div class="file" *ngFor="let file of fileList">
+      <div class="wrapper">
+
+        <span class="name">{{file.documentName}}</span>
+        <span>
+          <span class="size">{{file.size}} </span>
+          <span class="createdAt">| {{file.createdAt}}</span>
+        </span>
+      </div>
+      <button ejs-button cssClass="default-icon-button e-flat e-primary" (click)="downloadFile(file.id)">
+        <span><i-feather name="download" class="icon file-icon"></i-feather></span>
+      </button>
+
+    </div>
+  </div>
+</div>

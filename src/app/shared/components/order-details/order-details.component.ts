@@ -36,7 +36,10 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   @Input() CanOrganizationEditOrdersIRP : boolean;
   @Input() CanOrganizationViewOrdersIRP: boolean;
   @Input() set currentOrder(value: Order) {
-    this.order = value;
+    this.order = { ...value,
+      documents: (value.documents || []).map((file) => ({...file, size: 89, createdAt: '08/08/2023'})),
+      //TODO remove after BE implementation
+    };
     this.getContactDetails();
   }
 

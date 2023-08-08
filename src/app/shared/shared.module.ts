@@ -181,6 +181,7 @@ import {
 import {
     EligibilityMessageModule
 } from '@shared/components/order-candidate-list/components/eligibility-message/eligibility-message.module';
+import { FileListModule } from './components/file-list/file-list.module';
 
 const icons = {
   AlertCircle,
@@ -327,6 +328,7 @@ const COMPONENTS = [
     RichTextEditorAllModule,
     ReplacementPdOrdersDialogModule,
     EligibilityMessageModule,
+    FileListModule,
   ],
   exports: [
     ...COMPONENTS,
