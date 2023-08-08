@@ -116,7 +116,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public requiredCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
   public existingFiles: FilesPropModel[] = [];
-  public hideFileSize = false;
   public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
 
   private pageSubject = new Subject<number>();
@@ -442,12 +441,14 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public clearFiles(): void {
     this.removeExistingFiles = !!this.existingFiles.length;
+    this.existingFiles = [];
     this.uploadObj.clearAll();
   }
 
   public selectCredentialFile(event: SelectedEventArgs): void {
     this.removeExistingFiles = false;
-    this.hideFileSize = false;
+    this.existingFiles = [];
+
     if (event.filesData[0].statusCode !== FileStatusCode.Valid) {
       this.addFilesValidationMessage(event.filesData[0]);
     }
@@ -795,7 +796,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private setExistingFiles(credentialFiles: CredentialFile[] = []): void {
     if (credentialFiles.length) {
       this.existingFiles = [this.credentialGridService.getExistingFile(credentialFiles[0])];
-      this.hideFileSize = true;
     }
   }
 
