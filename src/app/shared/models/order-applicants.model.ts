@@ -24,7 +24,8 @@ export type OrderApplicantsInitialData = {
   candidateProfileContactDetails:CandidateProfileContactDetail;
   candidatePhone1Required:any;
   candidateAddressRequired:any;
-  billRates: BillRate[]
+  billRates: BillRate[];
+  isLocal: boolean;
 }
 
 export type OrderApplicantsApplyData = {

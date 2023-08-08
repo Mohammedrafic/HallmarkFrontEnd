@@ -22,3 +22,25 @@
     height: auto !important;
   }
 }
+
+@media #{$max-tablet} {
+  @container main-content (max-width: 640px) {
+    .tabs {
+      .e-tab-header {
+        overflow: hidden;
+  
+        .e-item {
+          max-width: 135px;
+        }
+      }
+    }
+  
+    .stepper {
+      .stepper-title {
+        .text {
+          white-space: pre-line;
+        }
+      }
+    }
+  }
+}

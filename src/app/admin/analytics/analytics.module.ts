@@ -72,7 +72,7 @@ import { PositionSummaryComponent } from './Position-Summary/Position-Summary.co
 import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
 import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential-expiry-irp.component';
-
+import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 
 @NgModule({
   declarations: [
@@ -129,7 +129,8 @@ import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential
     PositionSummaryComponent,
     AgencySpendComponent,
     ShiftBreakdownComponent,
-    CredentialExpiryIrpComponent],
+    CredentialExpiryIrpComponent,
+    FinancialTimeSheetBetaComponent],
   exports: [
     CandidateListComponent
   ],

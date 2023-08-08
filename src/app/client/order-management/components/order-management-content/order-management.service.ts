@@ -4,17 +4,20 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { BaseObservable } from '@core/helpers';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { GlobalWindow } from '@core/tokens';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
-import { 
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { RegularRates } from '@shared/enums/order-management';
+import {
   OrderManagementIRPSystemId,
   OrderManagementIRPTabsIndex,
   OrganizationOrderManagementTabs,
 } from '@shared/enums/order-management-tabs.enum';
-import { GlobalWindow } from '@core/tokens';
-
-import { OrderLinkDetails } from '../../../order-management/interfaces';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
+import { BillRate } from '@shared/models';
+import { RegularRatesData } from '@shared/models/order-management.model';
+import { OrderLinkDetails } from '../../../order-management/interfaces';
+import { ControlsConfig } from '../order-details-form/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -186,6 +189,19 @@ export class OrderManagementService extends DestroyableDirective {
 
   saveSelectedOrderManagementSystem(activeSystem: OrderManagementIRPSystemId): void {
     this.globalWindow.localStorage.setItem('selectedOrderManagementSystem', activeSystem.toString());
+  }
+
+  getControlsChangeState(controlNames: string[], formControls: ControlsConfig): boolean {
+    return controlNames
+      .map((name) => formControls[name as keyof ControlsConfig])
+      .some((control) => control.dirty);
+  }
+
+  setRegularRates(rates: BillRate[]): RegularRatesData {
+    return ({
+      regular: rates.find((rate) => rate.billRateConfigId === RegularRates.Regular)?.rateHour as number || null,
+      regularLocal: rates.find((rate) => rate.billRateConfigId === RegularRates.RegularLocal)?.rateHour as number || null,
+    });
   }
 
   private getVMSOrderType(tab: OrganizationOrderManagementTabs): OrderType | null {

@@ -84,6 +84,7 @@ import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { OrderDetailsService } from '@client/order-management/components/order-details-form/services';
 import {
   AssociateAgencyFields,
+  BillRateDependencyControlNames,
   ControlsForDisable,
   DepartmentField,
   DepartmentFields,
@@ -126,6 +127,7 @@ import { PartialSearchService } from '@shared/services/partial-search.service';
 import { PartialSearchDataType } from '@shared/models/partial-search-data-source.model';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { OrderManagementService } from '../order-management-content/order-management.service';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 
 @Component({
   selector: 'app-order-details-form',
@@ -255,6 +257,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     private partialSearchService: PartialSearchService,
     private permissionService: PermissionService,
     private actions$: Actions,
+    private billRatesSyncService: BillRatesSyncService,
   ) {
     super(store);
     this.initOrderForms();
@@ -569,6 +572,15 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
   }
 
+  private populateOpenPositions(order: Order): void {
+    const openPositionsControl = this.generalInformationForm.controls['openPositions'];
+    openPositionsControl.patchValue(order.openPositions);
+
+    if (order.status === OrderStatus.Filled) {
+      openPositionsControl.disable();
+    }
+  }
+
   private removePermPlacementControls(controls: string[]): void {
     controls.forEach((control: string) => {
       this.generalInformationForm.contains(control) &&
@@ -630,7 +642,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       });
 
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
-    this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);
+    this.populateOpenPositions(order);
     this.generalInformationForm.controls['minYrsRequired'].patchValue(order.minYrsRequired);
     this.generalInformationForm.controls['joiningBonus'].patchValue(joiningBonus);
     this.generalInformationForm.controls['compBonus'].patchValue(compBonus);
@@ -743,10 +755,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
 
     if (order.locationId) {
-      this.store
-        .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
-        .pipe(
-          switchMap(() => this.actions$),
+      this.actions$.pipe(
           ofActionCompleted(GetDepartmentsByLocationId),
           take(1),
         ).subscribe(() => {
@@ -757,6 +766,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           ) as Department;
           this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
         });
+  
+        this.store.dispatch(
+          new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId)
+        );
     }
   }
 
@@ -838,7 +851,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   private populateNewOrderForm(): void {
-    const orderTypeToPrePopulate = this.orderManagementService.getOrderTypeToPrePopulate() || OrderType.Traveler;
+    const orderTypeToPrePopulate = this.orderManagementService.getOrderTypeToPrePopulate() || OrderType.LongTermAssignment;
     this.orderManagementService.clearOrderTypeToPrePopulate();
     this.orderTypeForm.controls['orderType'].patchValue(orderTypeToPrePopulate);
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
@@ -1138,6 +1151,13 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       if (this.isPermPlacementOrder || isNaN(parseInt(orderType)) || !departmentIdValue || !skillId || !jobStartDate) {
         return;
       }
+
+      const formChangedState = this.orderManagementService.getControlsChangeState(
+        BillRateDependencyControlNames,
+        this.orderControlsConfig
+      );
+
+      this.billRatesSyncService.setFormChangedState(formChangedState);
 
       this.store.dispatch(
         new SetPredefinedBillRatesData(

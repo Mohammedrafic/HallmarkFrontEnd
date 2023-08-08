@@ -164,7 +164,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   }
 
   public changeInvoiceStatus(): void {
-    if (this.invoiceDetail.meta.invoiceState === InvoiceState.PendingPayment) {
+    if (this.invoiceDetail.meta.invoiceState === InvoiceState.PendingPayment || (this.invoiceDetail.meta.invoiceState === InvoiceState.SubmittedPendingApproval && this.isAgency)) {
       this.openAddPayment();
     } else {
       this.updateTable.emit({

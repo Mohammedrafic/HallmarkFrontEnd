@@ -12,8 +12,10 @@ import {
 import { DatepickerComponent } from '@shared/components/form-controls/datepicker/datepicker.component';
 import {
   CANCEL_CONFIRM_TEXT,
+  CommitmentOverlapMessage,
   DELETE_CONFIRM_TITLE,
   EMPLOYEE_SKILL_CHANGE_WARNING,
+  IRP_DEPARTMENT_CHANGE_WARNING,
   RECORD_ADDED, RECORD_MODIFIED,
 } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -97,6 +99,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public replaceOrder = false;
   public overrideCommitmentConfirm$ = new Subject<boolean>();
   public replacementConfirmationMessage = EMPLOYEE_SKILL_CHANGE_WARNING;
+  public isEdit = false;
 
 
   constructor(
@@ -478,6 +481,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
           this.sideDialog.hide();
         }
         this.title = value.isEdit ? DialogMode.Edit : DialogMode.Add;
+        this.isEdit = value.isEdit;
+        
         if (value.isEdit) {
           this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].disable({ emitEvent: false });
           this.enableRegionLocation();
@@ -612,7 +617,18 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private handleCommitmentSaving(): void {
-    if (this.isOverridingEndDate() || this.isLocationChanged()) {
+    const isOverridingEndDate = this.isOverridingEndDate();
+    const isLocationChanged = this.isLocationChanged();
+
+    if (isLocationChanged) {
+      this.replacementConfirmationMessage = IRP_DEPARTMENT_CHANGE_WARNING;
+    } else if (this.isEdit && isOverridingEndDate) {
+      this.replacementConfirmationMessage = EMPLOYEE_SKILL_CHANGE_WARNING;
+    } else if (isOverridingEndDate) {
+      this.replacementConfirmationMessage = CommitmentOverlapMessage;
+    }
+
+    if (isOverridingEndDate || isLocationChanged) {
       this.showOverridingConfirmation();
     } else {
       this.saveCommitment();

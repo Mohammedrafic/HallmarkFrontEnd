@@ -21,7 +21,7 @@
               </ejs-chiplist>
               <div class="vertical-divider"></div>
               <div *ngIf="order && !isReOrder" class="order-other-statuses">
-                <span class="custom-chip">{{ orderType[order.orderType] }}</span>
+                <span class="custom-chip">{{ order.orderType | orderTypeName }}</span>
                 <span class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
               </div>
             </div>
@@ -45,8 +45,8 @@
                     <app-general-reorder-info
                       *ngSwitchCase="orderType.ReOrder"
                       [system]="system"
-                      [orderInformation]="currentOrder"></app-general-reorder-info>
-                    <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
+                      [order]="currentOrder"></app-general-reorder-info>
+                    <app-general-order-info *ngSwitchDefault [order]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
                   <ng-container *ngIf="isClosedOrder">
@@ -90,12 +90,12 @@
                 </ng-template>
               </e-tabitem>
 
-              <e-tabitem *ngIf="(orderType.Traveler === currentOrder.orderType || orderType.ContractToPerm === currentOrder.orderType) && currentOrder.extensionFromId">
+              <e-tabitem *ngIf="(orderType.LongTermAssignment === currentOrder.orderType || orderType.ContractToPerm === currentOrder.orderType) && currentOrder.extensionFromId">
                 <ng-template #headerText>Extensions</ng-template>
                 <ng-template #content>
                   <section class="order-details">
                     <section class="job-details">
-                      <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                      <app-general-order-info [order]="currentOrder"></app-general-order-info>
                     </section>
                     <hr />
                     <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>

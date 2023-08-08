@@ -197,6 +197,12 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/aging-details',
     },
+    44: {
+      // Organization Profile
+      icon: 'organization',
+      custom: true,
+      route: '/admin/profile',
+    },
     48: {
       // Client Finance Report
       icon: '',
@@ -488,6 +494,11 @@ export const MENU_CONFIG: any = {
       // credential-expiry-irp
       icon: '',
       route: '/analytics/credential-expiry-irp',
+    },
+    112: {
+      // financial-time-sheet-beta
+      icon: 'pie-chart',
+      route: '/analytics/financial-time-sheet-beta',
     },
   },
 
@@ -1202,6 +1213,11 @@ export const MENU_CONFIG: any = {
       // credential-expiry-irp
       icon: '',
       route: '/analytics/credential-expiry-irp',
+    },
+    112: {
+      // financial-time-sheet-beta
+      icon: 'pie-chart',
+      route: '/analytics/financial-time-sheet-beta',
     },
   },
 

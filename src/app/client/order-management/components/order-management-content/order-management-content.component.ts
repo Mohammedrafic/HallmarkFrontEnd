@@ -124,7 +124,7 @@ import {
   OrganizationOrderManagementTabs,
   orderLockList,
 } from '@shared/enums/order-management-tabs.enum';
-import { FilterIrpOrderTypes, OrderType, OrderTypeOptions } from '@shared/enums/order-type';
+import { FilterIrpOrderTypes, OrderType, OrderTypeOptions, VmsOrderTypeTooltipMessage } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import {
@@ -380,6 +380,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public orderStatus = OrderStatus;
   public reOrderCount$ = new Subject<number>();
   public orderTypes = OrderType;
+  public orderTypeTooltipMessage = VmsOrderTypeTooltipMessage;
   public canCreateOrder: boolean;
   public canOrderJourney: boolean=false;
   public canCloseOrder: boolean;
@@ -413,8 +414,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public selectedRowRef: any;
   public selectedRowIndex: number | null;
 
-  private isOrgIRPEnabled = false;
-  private isOrgVMSEnabled = false;
+  public isOrgIRPEnabled = false;
+  public isOrgVMSEnabled = false;
 
   public isMobile = false;
   public isTablet = false;
@@ -470,6 +471,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   public orderLockList = orderLockList;
+  private ltaOrder: boolean|null = false;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -526,6 +528,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
     this.OrderJourneyFilterFormGroup = this.orderManagementService.createOrderJourneyFilterForm();
+    this.ltaOrder = JSON.parse(localStorage.getItem('ltaorderending') || '"false"') as boolean;
   }
 
   public get isActiveSystemIRP(): boolean {
@@ -912,6 +915,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
         this.filters.includeReOrders = true;
+        if(this.ltaOrder){
+          this.filters.ltaOrder = true;
+        }
         this.hasOrderAllOrdersId();
         let filtersAllOrders = {...this.filters};
         if(this.filters.orderLocked){
@@ -1119,6 +1125,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public onFilterApply(): void {
+    this.ltaOrder = false;
     if (this.OrderFilterFormGroup.dirty) {
       this.currentPage = 1;
       this.refreshFilterState();
@@ -1756,7 +1763,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       super.setHeightForMobileGrid(this.ordersPage?.items?.length);
 
-      if (this.isRedirectedFromVmsSystem) {
+      if (data?.items.length && this.isRedirectedFromVmsSystem) {
         this.openFirstIrpOrderDetails();
       }
     });
@@ -1833,7 +1840,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if(this.activeSystem != OrderManagementIRPSystemId.OrderJourney){
         this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
         this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
-
+        if(this.ltaOrder){
+          this.clearFilters();
+        }
       }
     }
   }
@@ -1965,6 +1974,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           table.style.transform = 'translate(0px, 0px)';
         }
       }
+      this.eliteOrderId = 0;
       this.cd$.next(true);
     });
   }
@@ -2214,24 +2224,27 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     this.orderStaus > 0 ? this.numberArr.push(this.orderStaus) : [];
 
-    const candidatesOrderStatusList = JSON.parse(this.globalWindow.localStorage.getItem('candidatesOrderStatusListFromDashboard') || '{}');
-    if(candidatesOrderStatusList != '{}'){
+    const candidatesOrderStatusList = this.globalWindow.localStorage.getItem('candidatesOrderStatusListFromDashboard');
+    if(candidatesOrderStatusList){
       this.numberArr = [];
-      candidatesOrderStatusList.forEach((data:any)=>{
+      JSON.parse(candidatesOrderStatusList).forEach((data:any)=>{
         this.numberArr.push(data.value);
-        data.name = data.name.replace(/\s*\([^)]*\)\s*|\s+/g, '')
+        data.name = data.name.replace(/\s/g, '');
         this.SelectedStatus.push(data.name)
       })
-      this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(''));
+      this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', '');
     }
-
+    if(this.ltaOrder){
+      this.filters.ltaOrder = this.ltaOrder;
+      this.clearFilters();
+    }
     filters.orderStatuses = this.numberArr;
     this.candidateStatusId!= '' ? this.candidateStatusIds.push(this.candidateStatusId) : [];
     filters.candidateStatuses = this.candidateStatusIds;
     filters.orderStatuses = this.orderPositionStatus
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
       : [];
-      
+
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
     const items = JSON.parse(dashboardFilterState) as FilteredItem[] || [];
     let pendingApprovalOrders = this.globalWindow.localStorage.getItem('pendingApprovalOrders') || 'null';
@@ -2647,7 +2660,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       statuses = data.orderStatuses;
       candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
     }
-
+    
     this.filterColumns.orderStatuses.dataSource = statuses;
     this.filterOrderJourneyColumns.orderStatuses.dataSource = statuses;
     this.filterColumns.reorderStatuses.dataSource = data.reorderStatuses;
@@ -2853,13 +2866,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       });
   }
 
+  @OutsideZone
   private openFirstIrpOrderDetails(): void {
-    const node = this.gridApi?.getRowNode('0');
+    setTimeout(() => {
+      const node = this.gridApi?.getRowNode('0');
 
-    if (node) {
-      this.openIrpDetails({ node, data: node?.data });
-    }
+      if (node) {
+        this.openIrpDetails({node, data: node?.data});
+      }
+    });
   }
+
   @OutsideZone
   private selectFirstRow(): void {
     setTimeout(() => {

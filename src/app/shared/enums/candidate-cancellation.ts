@@ -1,6 +1,6 @@
 export enum JobCancellationReason {
-  TravelCancellationOnBehalfOfOrganization,
-  TravelCancellationOnBehalfOfAgency,
+  LTACancellationOnBehalfOfOrganization,
+  LTACancellationOnBehalfOfAgency,
   ReOrderCancellationOnBehalfOfOrganization,
   ReOrderCancellationOnBehalfOfAgency,
 }

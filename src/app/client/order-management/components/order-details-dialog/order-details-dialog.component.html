@@ -41,7 +41,7 @@
             class="e-card-content dialog-controls"
             [ngClass]="{
               'open-per-diem-order': order?.orderType === orderType.OpenPerDiem,
-              'traveler-order': order?.orderType === orderType.Traveler,
+              'lta-order': order?.orderType === orderType.LongTermAssignment,
               'contact-to-perm': order?.orderType === orderType.ContractToPerm,
               'perm-placement': order?.orderType === orderType.PermPlacement,
               'open-status': order?.status === orderStatus.Open
@@ -81,7 +81,7 @@
               <button
                 *ngIf="activeSystem === systemType.IRP"
                 ejs-button
-                cssClass="e-outline"
+                cssClass="e-outline close-btn"
                 [class.custom-order-btn]="showApproveAndCancel"
                 [disabled]="disableCloseOrder || !CanCloseOrdersIRP"
                 (click)="closeOrder(order)"
@@ -92,9 +92,9 @@
 
             <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
               <button
-                *ngIf="activeSystem !==  systemType.IRP"
+                *ngIf="activeSystem !== systemType.IRP"
                 ejs-button
-                cssClass="e-outline"
+                cssClass="e-outline close-btn"
                 [class.custom-order-btn]="showApproveAndCancel"
                 [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
                 (click)="closeOrder(order)"
@@ -116,7 +116,7 @@
             <app-tooltip-container *ngIf="showCreateReOrder" [showToolTip]="!hasCreateEditOrderPermission">
               <button
                 ejs-button
-                cssClass="e-outline"
+                cssClass="e-outline create-reorder-btn"
                 [class.custom-order-btn]="showApproveAndCancel"
                 (click)="createReOrder()"
                 [disabled]="disableCreateReOrder || !canCreateOrder || !hasCreateEditOrderPermission"
@@ -161,7 +161,7 @@
             <app-tooltip-container *ngIf="showLockOrder" [showToolTip]="!hasCreateEditOrderPermission">
               <button
                 ejs-button
-                cssClass="e-outline"
+                cssClass="e-outline lock-btn"
                 [class.custom-order-btn]="showApproveAndCancel"
                 [isPrimary]="true"
                 (click)="lockOrder()"
@@ -264,7 +264,7 @@
             </e-tabitem>
             <e-tabitem
               *ngIf="
-                (order?.orderType === orderType.Traveler || order?.orderType === orderType.ContractToPerm) &&
+                (order?.orderType === orderType.LongTermAssignment || order?.orderType === orderType.ContractToPerm) &&
                 !isReOrder &&
                 order?.extensionFromId
               "
@@ -272,7 +272,7 @@
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
                 <section class="job-details">
-                  <app-general-order-info [orderInformation]="order"></app-general-order-info>
+                  <app-general-order-info [order]="order"></app-general-order-info>
                 </section>
                 <hr />
                 <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>

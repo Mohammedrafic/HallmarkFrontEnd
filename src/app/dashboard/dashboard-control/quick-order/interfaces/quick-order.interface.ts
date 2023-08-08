@@ -5,7 +5,7 @@ export interface QuickOrderConditions {
   isPermPlacementOrder: boolean;
   isContactToPermOrder: boolean;
   isEditContactTitle: boolean;
-  isTravelerOrder: boolean;
+  isLTAOrder: boolean;
   isOpenPerDiem: boolean;
   isRegionsDropDownEnabled: boolean;
   isLocationsDropDownEnabled: boolean;

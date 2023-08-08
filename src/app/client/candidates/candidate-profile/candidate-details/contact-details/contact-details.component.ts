@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, 
 import { AbstractContactDetails } from '@client/candidates/candidate-profile/candidate-details/abstract-contact-details';
 import { formatDate, PhoneMask, SEND_EMAIL, SEND_EMAIL_REQUIRED, ZipCodeMask } from '@shared/constants';
 import { COUNTRIES } from '@shared/constants/countries-list';
-import { BehaviorSubject, Observable, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, distinctUntilChanged, takeUntil } from 'rxjs';
 import { CanadaStates, Country, UsaStates } from '@shared/enums/states';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { TakeUntilDestroy } from '@core/decorators';
@@ -102,6 +102,7 @@ public id:any;
 
   private listenCountryChanges(): void {
     this.candidateForm.get('country')?.valueChanges.pipe(
+      distinctUntilChanged(),
       takeUntil((this.componentDestroy()))
     ).subscribe((country: Country) => {
       this.states$.next(country === Country.USA ? UsaStates : CanadaStates);

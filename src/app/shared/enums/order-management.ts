@@ -21,7 +21,12 @@ export enum CandidateJobStatus {
 }
 
 export enum OrderMatch {
-  Unassigned = "Unassigned",
-  Assigned = "Assigned",
-  NotRequired = "Not Required",
+  Unassigned = 'Unassigned',
+  Assigned = 'Assigned',
+  NotRequired = 'Not Required',
+}
+
+export enum RegularRates {
+  Regular = 1,
+  RegularLocal = 2,
 }

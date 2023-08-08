@@ -434,7 +434,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   needToShowConfirmPopup(order: CreateOrderDto, hourlyRate: string): boolean {
     return (
-      (order.orderType === OrderType.ContractToPerm || order.orderType === OrderType.Traveler) &&
+      (order.orderType === OrderType.ContractToPerm || order.orderType === OrderType.LongTermAssignment) &&
       this.isZeroRate(hourlyRate)
     );
   }
@@ -736,19 +736,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private subscribeOnPredefinedBillRates(): void {
     this.predefinedBillRates$
       .pipe(
-        skip(1),
+        filter(() => this.billRatesSyncService.getFormChangedState()),
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedBillRates) => {
-        if (!this.billRatesComponent?.billRatesControl && this.order) {
-          this.orderBillRates = predefinedBillRates;
-          return;
-        }
         if (this.billRatesComponent?.billRatesControl) {
           this.manuallyAddedBillRates = this.billRatesComponent.billRatesControl
             .getRawValue()
             .filter((billrate) => !billrate.isPredefined);
         }
+        
         this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
         this.cd.detectChanges();
       });

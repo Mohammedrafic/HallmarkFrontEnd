@@ -9,7 +9,7 @@ export namespace ManualInvoiceReasons {
 
   export class Save {
     static readonly type = ManualInvoiceReasonsActionsTypesEnum.SAVE;
-    constructor(public payload: { reason: string }) {}
+    constructor(public payload: { reason: string, agencyFeeApplicable: boolean }) { }
   }
 
   export class Update {

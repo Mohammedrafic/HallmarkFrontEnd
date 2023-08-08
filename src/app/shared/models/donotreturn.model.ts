@@ -198,8 +198,9 @@ export class Donotreturn {
 
 }
 export class DoNotReturnCandidateSearchFilter{
-  searchText:string;
+  searchText:string|null;
   businessUnitId?:number;
+  searchCanidateId?:number|null;
 }
 export class DoNotReturnCandidateListSearchFilter{
   candidateProfileId:number | null;

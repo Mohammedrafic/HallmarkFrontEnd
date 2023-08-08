@@ -13,7 +13,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { catchError, distinctUntilChanged, EMPTY, filter, map, Observable, Subject, take, takeUntil, zip } from 'rxjs';
-import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -29,6 +29,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import {
   ApproveOrder,
+  ApproveOrderSucceeded,
   ClearOrderCandidatePage,
   DeleteOrder,
   GetOrganizationExtensions,
@@ -267,6 +268,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.subscribeOnOrderCandidatePage();
     this.subsToTabChange();
     this.subscribeOnPermissions();
+    this.watchForApproveOrderSucceeded();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -389,7 +391,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public approveOrder(id: number): void {
-    this.store.dispatch(new ApproveOrder(id, this.activeSystem === OrderManagementIRPSystemId.IRP));
+    this.store.dispatch(new ApproveOrder(id, this.activeSystem === OrderManagementIRPSystemId.IRP, true));
   }
 
   public editOrder(data: Order) {
@@ -586,7 +588,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           if (
             selectedOrder?.extensionFromId &&
             order?.items[isOrderPositionSelected.index ?? 0]?.candidateJobId &&
-            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.LongTermAssignment)
           ) {
             this.store.dispatch(
               new GetOrganizationExtensions(
@@ -639,5 +641,16 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   private setShowEmployeeTabState(): void {
     const status = this.order.irpOrderMetadata?.status ? this.order.irpOrderMetadata.status : this.order.status;
     this.showEmployeeTab = !(this.activeSystem === OrderManagementIRPSystemId.IRP && status === OrderStatus.PreOpen);
+  }
+
+  private watchForApproveOrderSucceeded(): void {
+    this.actions$
+      .pipe(
+        ofActionSuccessful(ApproveOrderSucceeded),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe(() => {
+        this.updateOrders.emit();
+      });
   }
 }

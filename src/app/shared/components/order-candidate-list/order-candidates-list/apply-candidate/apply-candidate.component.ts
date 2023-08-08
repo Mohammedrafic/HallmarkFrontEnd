@@ -72,7 +72,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private candidateId: number;
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
-  private orderApplicantsInitialData: OrderApplicantsInitialData | null;
+  public orderApplicantsInitialData: OrderApplicantsInitialData | null;
   public canCreateOrder : boolean;
 
   get candidateStatus(): ApplicantStatus {

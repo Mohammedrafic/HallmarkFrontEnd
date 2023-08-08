@@ -16,7 +16,7 @@ export enum ScheduleOrderType {
   ContractToPerm = 'ContractToPerm',
   OpenPerDiem = 'OpenPerDiem',
   PermPlacement = 'PermPlacement',
-  Traveler = 'Traveler',
+  LongTermAssignment = 'LongTermAssignment',
   ReOrder = 'ReOrder',
 }
 

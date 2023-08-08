@@ -69,6 +69,7 @@ import {
   GetAllShifts,
   sendOnboardCandidateEmailMessage,
   GetOrderComments,
+  ApproveOrderSucceeded,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -828,7 +829,7 @@ export class OrderManagementContentState {
         let MESSAGE_TYPE = MessageTypes.Success;
         const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
         const hasntOrderBillRates =
-          ((order?.isQuickOrder && payload.orderType === OrderType.Traveler) ||
+          ((order?.isQuickOrder && payload.orderType === OrderType.LongTermAssignment) ||
             payload.orderType === OrderType.ContractToPerm) &&
           payload.billRates.length === 0;
 
@@ -960,11 +961,18 @@ export class OrderManagementContentState {
   @Action(ApproveOrder)
   ApproveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, isIRPTab }: ApproveOrder
+    { id, isIRPTab, updateOpenedOrder }: ApproveOrder
   ): Observable<string | void> {
     return this.orderManagementService
       .approveOrder(id, isIRPTab)
-      .pipe(catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error))));
+      .pipe(
+        tap(() => {
+          if (updateOpenedOrder) {
+            dispatch([new GetSelectedOrderById(id, isIRPTab), new ApproveOrderSucceeded()]);
+          }
+        }),
+        catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
+      );
   }
 
   @Action(GetOrderFilterDataSources)

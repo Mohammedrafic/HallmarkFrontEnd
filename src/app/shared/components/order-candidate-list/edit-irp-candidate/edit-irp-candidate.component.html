@@ -83,7 +83,7 @@
         </ng-container>
       </form>
     </div>
-    <app-comments-irp *ngIf="CanOrganizationViewOrdersIRP" [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP" [comments]="comments" [commentContainerId]="commentContainerId" [candidateJobId]="candidateJobId" [useBackground]="false"
+    <app-comments-irp *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId" [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP" [comments]="comments" [commentContainerId]="candidateCommentContainerId" [candidateJobId]="candidateJobId" [useBackground]="false"
       [externalCommentConfiguration]="externalCommentConfiguration"></app-comments-irp>
   </div>
 </ejs-dialog>

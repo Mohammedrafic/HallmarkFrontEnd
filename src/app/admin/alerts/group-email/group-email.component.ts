@@ -5,7 +5,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { filter, take, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, take, Observable, Subject, takeUntil, BehaviorSubject } from 'rxjs';
 import { FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { ClearAlertTemplateState, GetGroupEmailById, SendGroupEmail} from '@admin/store/alerts.actions';
 import { AlertsState } from '@admin/store/alerts.state';
@@ -91,7 +91,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   get templateEmailTitle(): string {
     return "Send Group Email";
   }
-
+  emailBodyRequiredFlag$: BehaviorSubject<boolean> =new BehaviorSubject<boolean>(false);
   private gridApi: GridApi;
   private gridColumnApi: any;
   private isAlive = true;
@@ -238,12 +238,17 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   }
   public onGroupEmailAddCancel(): void {
     this.groupEmailCloseDialog();
+    this.sendGroupEmailFormGroup.reset();
+    this.emailBodyRequiredFlag$.next(false);
   }
 
   public onGroupEmailSend(): void {
     this.sendGroupEmailFormGroup.markAllAsTouched();
     if (this.sendGroupEmailFormGroup.invalid) {
       this.groupEmailTemplateForm.isFormInvalid = true;
+      if(this.sendGroupEmailFormGroup?.controls['emailBody'].errors!['required']){
+        this.emailBodyRequiredFlag$.next(true);
+      }
       return;
     }
     if (this.groupEmailTemplateForm.emailBody!=''&&this.groupEmailTemplateForm.emailTo!=''&&this.groupEmailTemplateForm.emailSubject!='') {
@@ -266,6 +271,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         businessUnitType: formValues.businessUnit==0?null:formValues.businessUnit,
         userType: formValues.userType
       };
+      this.emailBodyRequiredFlag$.next(false);
       this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
 
     }
