@@ -69,6 +69,7 @@ import {
   GetAllShifts,
   sendOnboardCandidateEmailMessage,
   GetOrderComments,
+  ApproveOrderSucceeded,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -967,7 +968,7 @@ export class OrderManagementContentState {
       .pipe(
         tap(() => {
           if (updateOpenedOrder) {
-            dispatch(new GetSelectedOrderById(id, isIRPTab));
+            dispatch([new GetSelectedOrderById(id, isIRPTab), new ApproveOrderSucceeded()]);
           }
         }),
         catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
