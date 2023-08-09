@@ -375,6 +375,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
                     this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(true);
                 }
               }else{
+                if(this.agencySwitch) {
+                  this.AssociateAgencyData = this.AssociateAgencyData.filter(item1 => !data.some(item2 => (item2.id === item1.agencyId && item2.name === item1.agencyName)));
+                }
+                if(this.organizationSwitch) {
+                  this.ShareOrganizationsData = this.ShareOrganizationsData.filter(item1 => !data.some(item2 => (item2.id === item1.id && item2.name === item1.name)));
+                }
                 this.sharedWith?.gridOptions?.api?.setRowData(data);
               }
             }
