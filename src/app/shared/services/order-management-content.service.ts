@@ -341,7 +341,7 @@ export class OrderManagementContentService {
     documents: Blob[],
     comments: Comment[] | undefined,
     lastSelectedBusinessUnitId?: number
-  ): Observable<Order[]> {
+  ): Observable<Order> {
     let headers = {};
 
     if (lastSelectedBusinessUnitId) {
@@ -349,18 +349,18 @@ export class OrderManagementContentService {
     }
 
     return this.http
-      .post<Order[]>('/api/Orders', this.changeDateToUtc(this.prepareFieldsByOrderType(order)), { headers })
+      .post<Order>('/api/Orders', this.changeDateToUtc(this.prepareFieldsByOrderType(order)), { headers })
       .pipe(
         switchMap((createdOrder) => {
           const formData = new FormData();
           if (comments?.length) {
             comments.forEach((comment: Comment) => {
-              comment.commentContainerId = createdOrder[0].commentContainerId as number;
+              comment.commentContainerId = createdOrder.commentContainerId as number;
             });
             this.http.post('/api/Comments', { comments }).subscribe();
           }
           documents.forEach((document) => formData.append('documents', document));
-          return this.http.post(`/api/Orders/${createdOrder[0].id}/documents`, formData).pipe(map(() => createdOrder));
+          return this.http.post(`/api/Orders/${createdOrder.id}/documents`, formData).pipe(map(() => createdOrder));
         })
       );
   }
@@ -373,8 +373,8 @@ export class OrderManagementContentService {
     return this.http.post<Blob[]>(`/api/IRPOrders/documents`, formData) as Observable<Blob[]>;
   }
 
-  public editIrpOrder(order: EditOrderDto): Observable<Order> {
-    return this.http.put<Order>('/api/IRPOrders', this.changeDateToUtc(order));
+  public editIrpOrder(order: EditOrderDto): Observable<Order[]> {
+    return this.http.put<Order[]>('/api/IRPOrders', this.changeDateToUtc(order));
   }
 
   /**

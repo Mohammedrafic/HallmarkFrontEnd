@@ -107,6 +107,8 @@ import {
   PerDiemReOrdersErrorMessage,
   TravelerContracttoPermOrdersSucceedMessage,
   RECORD_DELETE,
+  RECORD_MODIFIED_SUCCESS_WITH_ORDERID,
+  RECORD_SAVED_SUCCESS_WITH_ORDERID,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -824,14 +826,14 @@ export class OrderManagementContentState {
     { order, documents, comments, lastSelectedBusinessUnitId }: SaveOrder
   ): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
-      switchMap((payload:Order[]) => {
-        let TOAST_MESSAGE = 'Record has been created';
+      tap((payload) => {
+        let TOAST_MESSAGE = RECORD_ADDED;
         let MESSAGE_TYPE = MessageTypes.Success;
-        const hasntOrderCredentials = order?.isQuickOrder && payload[0].credentials.length === 0;
+        const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
         const hasntOrderBillRates =
-          ((order?.isQuickOrder && payload[0].orderType === OrderType.LongTermAssignment) ||
-            payload[0].orderType === OrderType.ContractToPerm) &&
-          payload[0].billRates.length === 0;
+          ((order?.isQuickOrder && payload.orderType === OrderType.LongTermAssignment) ||
+            payload.orderType === OrderType.ContractToPerm) &&
+          payload.billRates.length === 0;
 
         if (hasntOrderCredentials && hasntOrderBillRates) {
           TOAST_MESSAGE += `. ${ORDER_WITHOUT_CRED_BILLRATES}`;
@@ -849,15 +851,15 @@ export class OrderManagementContentState {
                 MESSAGE_TYPE,
                 TOAST_MESSAGE,
                 order.isQuickOrder,
-                payload[0].organizationPrefix,
-                payload[0].publicId
+                payload.organizationPrefix,
+                payload.publicId
               )
-            : new ShowToast(MessageTypes.Success, 'Order '+ payload[0].organizationPrefix?.toString()+'-'+payload[0].publicId?.toString()+' has been added'),
-          new SaveOrderSucceeded(payload[0]),
+            : new ShowToast(MessageTypes.Success, RECORD_SAVED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')),
+          new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
           new SaveLastSelectedOrganizationAgencyId(
             {
-              lastSelectedOrganizationId: Number(payload[0].organizationId),
+              lastSelectedOrganizationId: Number(payload.organizationId),
               lastSelectedAgencyId: null,
             },
             true
@@ -874,15 +876,15 @@ export class OrderManagementContentState {
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: EditIrpOrder
-  ): Observable<void | Blob[] | Order> {
+  ): Observable<void | Blob[] | Order[]> {
     return this.orderManagementService.editIrpOrder(order).pipe(
-      tap((orders) => {
+      switchMap((order: Order[]) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, 'Order '+ orders.organizationPrefix?.toString()+'-'+orders.publicId?.toString()+' has been added'),
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED_SUCCESS_WITH_ORDERID(order[0]?.organizationPrefix??'',order[0]?.publicId?.toString()??'')),
           new SaveIrpOrderSucceeded(),
         ]);
         if (documents.length) {
-          return this.orderManagementService.saveDocumentsForIrpOrder(createFormData([orders], documents));
+          return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
         } else {
           return of(order);
         }
@@ -894,12 +896,12 @@ export class OrderManagementContentState {
   @Action(EditOrder)
   EditOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: EditOrder
-  ): Observable<Order| void> {
+    { order, documents, message }: EditOrder
+  ): Observable<Order | void> {
     return this.orderManagementService.editOrder(order, documents).pipe(
-      tap((payload) => {
+      tap((payload: Order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, 'Order '+ payload.organizationPrefix?.toString()+'-'+payload.publicId?.toString()+' has been added'),
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')??message),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
