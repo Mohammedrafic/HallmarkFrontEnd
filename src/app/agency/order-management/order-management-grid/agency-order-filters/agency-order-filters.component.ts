@@ -233,7 +233,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           ).map(data => data.status);
           candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
-          statuses = orderStatuses.map(data => data.status);
+          statuses = orderStatuses;
           candidateStatusesData = candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
         }
 
@@ -404,5 +404,54 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         valueId: 'id',
       },
     };
+  }
+  public onSelect(args:any) {
+    if (args.itemData.status == 'OrdersOpenPositions') {
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText != 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+    else{
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText == 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+  }
+  public orderStatusSelect(){
+    let orderStatus = this.form.get("orderStatuses")?.value;
+    if (orderStatus == 'OrdersOpenPositions') {
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText != 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+    else if (orderStatus != 'OrdersOpenPositions' && orderStatus.length != 0) {
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText == 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
   }
 }

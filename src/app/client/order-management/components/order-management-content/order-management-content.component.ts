@@ -472,7 +472,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   public orderLockList = orderLockList;
   private ltaOrder: boolean|null = false;
-  private xtraCandidateStatus: string;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -530,7 +529,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
     this.OrderJourneyFilterFormGroup = this.orderManagementService.createOrderJourneyFilterForm();
     this.ltaOrder = JSON.parse(localStorage.getItem('ltaorderending') || 'false') as boolean;
-    this.xtraCandidateStatus = routerState?.['xtraCandidateStatus'] || '';
   }
 
   public get isActiveSystemIRP(): boolean {
@@ -2246,7 +2244,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     filters.orderStatuses = this.orderPositionStatus
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
       : [];
-    this.xtraCandidateStatus != '' ? this.candidateStatusIds.push(this.xtraCandidateStatus) : [];
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
     const items = JSON.parse(dashboardFilterState) as FilteredItem[] || [];
     let pendingApprovalOrders = this.globalWindow.localStorage.getItem('pendingApprovalOrders') || 'null';
@@ -2672,9 +2669,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if(candidatesOrderStatusList != ''){
       const candstatuses = this.filterColumns.candidateStatuses.dataSource.filter((f: { status: any; })=>candidatesOrderStatusList.map((m: { value: any; })=>m.value).includes(f.status))
       const candidateStatuses = candstatuses.map((m: { filterStatus: any; })=>m.filterStatus);
-      this.numberArr = [];
       candidateStatuses.forEach((candidateStatuses:any)=>{
-        this.numberArr.push(candidateStatuses);
         this.candidateStatusIds.push(candidateStatuses)
       })
       this.documentEle.defaultView?.localStorage.setItem('candidateStatusListFromDashboard', JSON.stringify(''));

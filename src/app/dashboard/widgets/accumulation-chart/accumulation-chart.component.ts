@@ -104,13 +104,19 @@ export class AccumulationChartComponent
           this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
         }
         else if(status === 'In Progress (Pending)'){
-          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status,CandidatStatus[CandidatStatus.Offered]);
+          candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
+          window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
         }
         else if(status === 'In Progress (Accepted)'){
-          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status,CandidatStatus[CandidatStatus.Accepted]);
+          candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
+          window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
         }
         else if(OrderStatus[OrderStatus.Filled] === status){
-          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status,CandidatStatus[CandidatStatus.Onboard]);
+          candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
+          window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
         }
       }
     }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status"){
