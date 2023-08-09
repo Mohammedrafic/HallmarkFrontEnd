@@ -35,10 +35,11 @@ export class InvoiceAddPaymentService {
 
   createTableData(
     payments: InvoicePaymentData[],
+    
     forms: Record<string, CustomFormGroup<PaymentForm>>): PaymentsTableData[] {
     return payments.map((record) => {
       return ({
-        id: null,
+        id: record.invoiceId,
         invoiceNumber: record.invoiceNumber,
         amount: record.amount,
         payment: 0,

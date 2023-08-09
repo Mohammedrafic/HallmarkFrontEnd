@@ -288,7 +288,11 @@ export class CancelOrganizationCandidateJobSuccess {
 
 export class ApproveOrder {
   static readonly type = '[order management] Approve Order';
-  constructor(public id: number, public isIRPTab: boolean) {}
+  constructor(public id: number, public isIRPTab: boolean, public updateOpenedOrder = false) {}
+}
+
+export class ApproveOrderSucceeded {
+  static readonly type = '[order management] Approve Order Succeeded';
 }
 
 export class GetOrderFilterDataSources {
