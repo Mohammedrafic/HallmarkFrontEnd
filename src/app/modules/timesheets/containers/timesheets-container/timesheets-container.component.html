@@ -12,7 +12,7 @@
   <ng-container right>
     <div class="right-container top-margin">
       <div class="dropdown-filter">
-        <div *ngIf="isAgency" class="bootstrap">
+        <div *ngIf="isAgency" class="bootstrap org-selector">
           <div class="input-container">
             <ejs-dropdownlist
               appHideBeforeSyncfusionLoad
@@ -41,7 +41,12 @@
             <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">{{
               appliedFiltersAmount
             }}</span>
-            <span class="filter-button-text">Filters</span> <i-feather name="sliders" class="icon"></i-feather>
+            <span
+              class="filter-button-text"
+              [ngClass]="{'hide-text': isAgency}"
+            >
+              Filters
+            </span> <i-feather name="sliders" class="icon"></i-feather>
           </div>
         </button>
         <app-timesheet-grid-export
