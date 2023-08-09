@@ -451,7 +451,7 @@ export class SendGroupEmailComponent
       });
     //}
 
-    this.emailBodyRequired$.subscribe(val=>{
+    this.emailBodyRequired$.pipe(takeUntil(this.unsubscribe$)).subscribe(val=>{
       this.emailBodyRequired = val;
     })
   }
