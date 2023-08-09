@@ -590,14 +590,13 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   goToCandidate(): void {
-    debugger;
     const user = this.store.selectSnapshot(UserState.user);
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
     const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const pageToBack = this.router.url;
     const state = {
-            orderId: this.currentOrder.orderId,
+            orderId: this.currentOrder.id,
             candidateStatus: this.candidate?.status,
             pageToBack,
             orderManagementPagerState: this.orderManagementPagerState,
