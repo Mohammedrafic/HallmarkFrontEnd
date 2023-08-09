@@ -100,22 +100,18 @@ export class AccumulationChartComponent
           candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
           candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
           candidatesStatusDataSet.push({"value":CandidatStatus['Pre Offer Custom']});
-          window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
           this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
         }
         else if(status === 'In Progress (Pending)'){
           candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
-          window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
           this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
         }
         else if(status === 'In Progress (Accepted)'){
           candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
-          window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
           this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
         }
         else if(OrderStatus[OrderStatus.Filled] === status){
           candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
-          window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
           this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
         }
       }
@@ -141,7 +137,7 @@ export class AccumulationChartComponent
           candidatesOrderDataSet.push({"value":OrderStatus.Closed, "name": PositionTrendTypeEnum.CLOSED});
         }
         window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(candidatesOrderDataSet));
-
+        window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {         
             this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
         }else{
