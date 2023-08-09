@@ -215,9 +215,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           CandidatStatus.Cancelled,
         ];
         if (this.activeTab === AgencyOrderManagementTabs.ReOrders) {
-          statuses = orderStatuses.filter((status) =>
-          [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled, FilterOrderStatusText.Closed].includes(status.status)
-          ).map(data => data.status);
+          statuses = orderStatuses;
           candidateStatusesData = candidateStatuses.filter((status) =>
             [
               CandidatesStatusText['Bill Rate Pending'],
