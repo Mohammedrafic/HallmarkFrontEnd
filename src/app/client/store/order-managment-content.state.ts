@@ -1018,22 +1018,24 @@ export class OrderManagementContentState {
   }
 
   @Action(ExportOrders)
-  ExportOrders({}: StateContext<OrderManagementContentStateModel>, { payload, tab }: ExportOrders): Observable<any> {
+  ExportOrders({dispatch}: StateContext<OrderManagementContentStateModel>, { payload, tab }: ExportOrders): Observable<any> {
     return this.orderManagementService.export(payload, tab).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
-      })
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
     );
   }
 
   @Action(ExportIRPOrders)
-  ExportIRPOrders({}: StateContext<OrderManagementContentStateModel>, { payload, tab}: ExportIRPOrders): Observable<any> {
+  ExportIRPOrders({dispatch}: StateContext<OrderManagementContentStateModel>, { payload, tab}: ExportIRPOrders): Observable<any> {
     return this.orderManagementService.irpexport(payload,tab).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
-      })
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
     );
   }
 
