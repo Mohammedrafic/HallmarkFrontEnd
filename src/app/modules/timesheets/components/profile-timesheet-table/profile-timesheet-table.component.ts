@@ -9,6 +9,7 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { MenuEventArgs, SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { ComponentStateChangedEvent, GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
@@ -160,8 +161,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
 
-  public mobileEditMenuActions = [{ text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Save }];
-
   public readonly timesheetStatuses = TimesheetStatus;
 
   private records: TimesheetRecordsDto;
@@ -181,6 +180,33 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private readonly componentStateChanged$: Subject<ComponentStateChangedEvent> = new Subject();
 
   private resizeObserver: ResizeObserverModel;
+
+  get dropDownBtnActionItems(): ItemModel[] {
+    const actionItems: ItemModel[] = [];
+
+    if (this.canRecalculateTimesheet) {
+      actionItems.push({ text: MobileMenuItems.Recalculate });
+    }
+
+    if (this.isEditEnabled && !this.actionsDisabled && this.currentTab !== this.tableTypes.Expenses) {
+      actionItems.push({
+        text: MobileMenuItems.AddRecord,
+        disabled: this.disableAnyAction || !this.hasEditPermissions || this.disableEditButton,
+      });
+    }
+
+    if (
+      this.isEditEnabled && !this.actionsDisabled && !this.isEditOn
+      && this.recordsToShow?.[this.currentTab]?.[this.modeValues.Edit]?.length
+    ) {
+      actionItems.push({
+        text: MobileMenuItems.Edit,
+        disabled: this.disableAnyAction || !this.hasEditPermissions || this.disableEditButton,
+      });
+    }
+
+    return actionItems;
+  }
 
   constructor(
     private store: Store,
@@ -359,12 +385,17 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.uploadSideDialog.emit({ id, attachments });
   }
 
-  public onMobileEditMenuSelect({ item: { text }}: MenuEventArgs): void {
-    if(text === MobileMenuItems.Cancel) {
-      this.cancelChanges();
-    }
-    if(text === MobileMenuItems.Save) {
-      this.saveChanges();
+  public selectDropDownBtnActionItem({ item: { text } }: MenuEventArgs): void {
+    switch (text) {
+      case MobileMenuItems.Recalculate:
+        this.recalculateTimesheets();
+        break;
+      case MobileMenuItems.AddRecord:
+        this.openAddDialog();
+        break;
+      case MobileMenuItems.Edit:
+        this.editTimesheets();
+        break;
     }
   }
 
@@ -611,7 +642,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       );
 
       this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency));
-      
+
       this.actions$
       .pipe(
         take(1),

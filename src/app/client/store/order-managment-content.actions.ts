@@ -291,6 +291,10 @@ export class ApproveOrder {
   constructor(public id: number, public isIRPTab: boolean, public updateOpenedOrder = false) {}
 }
 
+export class ApproveOrderSucceeded {
+  static readonly type = '[order management] Approve Order Succeeded';
+}
+
 export class GetOrderFilterDataSources {
   static readonly type = '[order management] Get Order Filter Data Sources';
   constructor(public isIRP?: boolean) {}

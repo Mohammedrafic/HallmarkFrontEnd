@@ -67,6 +67,7 @@ import {
 } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { CandidateListService } from '../../services/candidate-list.service';
 import * as CandidateListActions from '../../store/candidate-list.actions';
+import{ GetMasterCredentials } from '@agency/store/candidate.actions';
 import { CandidateListState } from '../../store/candidate-list.state';
 import {
   CandidateList,
@@ -89,7 +90,8 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { ProfileStatuses, ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
-
+import { Credential } from '@shared/models/credential.model';
+import { CredentialTypeFilter } from '@shared/models/credential.model';
 @Component({
   selector: 'app-candidate-list',
   templateUrl: './candidate-list.component.html',
@@ -135,6 +137,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(CandidateListState.listOfCredentialTypes)
   credentialTypes$: Observable<CredentialType[]>;
+
+  @Select(CandidateState.masterCredentials)
+  masterCredentials$: Observable<Credential[]>;
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
@@ -192,7 +197,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private isAlive = true;
   private activeTab: number;
   private scrollSubscription: Subscription;
-  private redirectfromDashboard : boolean
+  private redirectfromDashboard: boolean
   public isSourcingEnabled = false;
   constructor(
     private store: Store,
@@ -227,7 +232,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.setFileName();
     this.filterColumns = !this.isIRP ? filterColumns : IRPFilterColumns;
     this.subscribeOnRegions();
-    this.subscribeOnCredentialTypes();
+    this.subscribeOnMasterCredentials();
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
     this.syncFilterTagsWithControls();
@@ -241,13 +246,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.store.dispatch(new PreservedFilters.ResetPageFilters());
   }
 
-  private getSourcingConfig():void{
-    if(!this.isAgency){
+  private getSourcingConfig(): void {
+    if (!this.isAgency) {
       this.store.dispatch(new GetSourcingReasons());
       this.sourcing$.pipe(filter(x => x != null), takeUntil(this.unsubscribe$)).subscribe((data) => {
 
         this.isSourcingEnabled = data.issourcing;
-        if(this.isIRP && !this.isSourcingEnabled){
+        if (this.isIRP && !this.isSourcingEnabled) {
           const sourcingStatuses = [
             ProfileStatusesEnum.Sourcing,
             ProfileStatusesEnum.Prospect,
@@ -259,10 +264,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
             ProfileStatusesEnum.VerbalOfferMade,
           ];
           this.filterColumns.profileStatuses.dataSource = (ProfileStatuses.filter(f => !sourcingStatuses.includes(f.id)));
-         } else {
+        } else {
           this.filterColumns.profileStatuses.dataSource = ProfileStatuses;
-         }
-         this.IRPVMSGridHandler();
+        }
+        this.IRPVMSGridHandler();
       });
     }
   }
@@ -279,9 +284,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFilterApply(): void {
-    if(this.isIRP){
+    if (this.isIRP) {
       if (this.CandidateFilterFormGroup.get("startDate") != null && this.CandidateFilterFormGroup.get("endDate") != null) {
-        if (new Date(this.CandidateFilterFormGroup.get("endDate")?.value) >= new Date(this.CandidateFilterFormGroup.get("startDate")?.value)){
+        if (new Date(this.CandidateFilterFormGroup.get("endDate")?.value) >= new Date(this.CandidateFilterFormGroup.get("startDate")?.value)) {
           if (this.CandidateFilterFormGroup.dirty) {
             this.filters = this.CandidateFilterFormGroup.getRawValue();
             this.filters.profileStatuses = this.filters.profileStatuses || [];
@@ -300,13 +305,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
           } else {
             this.store.dispatch(new ShowFilterDialog(false));
           }
-       }
-          else {
-            this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_START_LESS_END_DATE));
-           }
         }
         else {
-          this.store.dispatch(new ShowToast(MessageTypes.Error, END_DATE_REQUIRED));
+          this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_START_LESS_END_DATE));
+        }
+      }
+      else {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, END_DATE_REQUIRED));
       }
     } else {
       if (this.CandidateFilterFormGroup.dirty) {
@@ -424,10 +429,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public dispatchNewPage(firstDispatch = false): void {
     const candidateListRequest: CandidateListRequest = {
-      ...this.getFilterValues(),
+      profileStatuses: [],
+      skillsIds: [],
+      regionsNames: [],
+      candidateName: null,
+      includeDeployedCandidates: false,
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
       orderBy: this.orderBy,
+      tab: 0
     };
 
     this.store.dispatch(
@@ -497,13 +507,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       hireDate: this.filters.hireDate ? DateTimeHelper.setUtcTimeZone(this.filters.hireDate) : null,
       includeDeployedCandidates: this.includeDeployedCandidates,
       ids: this.selecteditmesids,
-      expiry : {
-        type : this.filters.credType! ? this.filters.credType! : [],
-        startDate : this.filters.startDate! ? DateTimeHelper.setUtcTimeZone(this.filters.startDate!) : null,
-        endDate : this.filters.endDate! ? DateTimeHelper.setUtcTimeZone(this.filters.endDate!) : null,
+      expiry: {
+        type: this.filters.credType! ? this.filters.credType! : [],
+        startDate: this.filters.startDate! ? DateTimeHelper.setUtcTimeZone(this.filters.startDate!) : null,
+        endDate: this.filters.endDate! ? DateTimeHelper.setUtcTimeZone(this.filters.endDate!) : null,
       },
       orderBy: this.orderBy,
-      ShowNoWorkCommitmentOnly : this.unassignedworkCommitment
+      ShowNoWorkCommitmentOnly: this.unassignedworkCommitment
     };
     this.unassignedworkCommitment = false;
     this.globalWindow.localStorage.setItem("unassignedworkcommitment", JSON.stringify(false));
@@ -579,7 +589,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private IRPVMSGridHandler(): void {
     if (this.isIRP) {
-      const columns = [ ...IRPCandidates ];
+      const columns = [...IRPCandidates];
 
       if (this.isSourcingEnabled) {
         const columnsToEnable = ['employeeSourceId', 'source', 'recruiter'];
@@ -659,18 +669,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       !this.isAgency && this.IRPVMSGridHandler();
       this.updateCandidates();
       this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
-     });
+    });
   }
 
   private subscribeOnPageSubject(): void {
     this.pageSubject
-    .pipe(
-      debounceTime(1),
-      takeUntil(this.unsubscribe$)
-    ).subscribe((page) => {
-      this.currentPage = page;
-      this.dispatchNewPage();
-    });
+      .pipe(
+        debounceTime(1),
+        takeUntil(this.unsubscribe$)
+      ).subscribe((page) => {
+        this.currentPage = page;
+        this.dispatchNewPage();
+      });
   }
 
   private subscribeOnActions(): void {
@@ -691,12 +701,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private subscribeOnDeploydCandidates(): void {
     this.includeDeployedCandidates$.asObservable()
-    .pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe((isInclude: boolean) => {
-      this.includeDeployedCandidates = isInclude;
-      this.dispatchNewPage();
-    });
+      .pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe((isInclude: boolean) => {
+        this.includeDeployedCandidates = isInclude;
+        this.dispatchNewPage();
+      });
   }
 
   private subscribeOnSkills(): void {
@@ -733,14 +743,22 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         }
       });
   }
-  private subscribeOnCredentialTypes(): void {
-    this.credentialTypes$
-    .pipe(takeUntil(this.unsubscribe$))
-    .subscribe((crdentialType) => {
-      if (this.filterColumns?.credType) {
-        this.filterColumns.credType.dataSource = crdentialType;
-      }
-    });
+  private subscribeOnMasterCredentials(): void {
+      this.masterCredentials$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((crdentialType) => {
+        let credentialtypes:CredentialTypeFilter[]=crdentialType.map((obj)=>{
+          return {id:obj.id=obj.credentialTypeId,name:obj.credentialTypeName!}
+        })
+       .reduce((acc:CredentialTypeFilter[], current:CredentialTypeFilter) => {
+          if(!acc.some(el=> el.id === current.id)) acc.push(current)
+          return acc
+        }, [] as CredentialTypeFilter[])
+        if (this.filterColumns?.credType) {
+          this.filterColumns.credType.dataSource = credentialtypes;
+        }
+      });
+    
   }
 
   private subscribeOnExportAction(): void {
@@ -808,10 +826,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       ).subscribe();
   }
   private getCredentialTypes():void{
-    this.store
-      .dispatch(new CandidateListActions.GetCredentialsTypeList)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe();
+    this.store.dispatch(new GetMasterCredentials('', '', null, true));
   }
 
   private syncFilterTagsWithControls(): void {
@@ -875,17 +890,17 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       const element = this.grid.element.querySelectorAll('.e-content')[0];
 
       this.scrollSubscription = fromEvent(element, 'scroll')
-      .pipe(
-        debounceTime(500),
-        map(() => {
-          return element.scrollTop;
-        }),
-        distinctUntilChanged(),
-        takeUntil(this.unsubscribe$),
-      )
-      .subscribe((position) => {
-        this.scrollService.setScrollPosition(CandidateListScroll.CandidateList, position);
-      });
+        .pipe(
+          debounceTime(500),
+          map(() => {
+            return element.scrollTop;
+          }),
+          distinctUntilChanged(),
+          takeUntil(this.unsubscribe$),
+        )
+        .subscribe((position) => {
+          this.scrollService.setScrollPosition(CandidateListScroll.CandidateList, position);
+        });
     }
   }
 

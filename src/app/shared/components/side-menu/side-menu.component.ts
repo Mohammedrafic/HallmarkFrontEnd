@@ -49,7 +49,7 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
         const navigateToSubMenu = this.config.find((item) => item.route === this.navigateTo);
         if (navigateToSubMenu) {
           selection = navigateToSubMenu;
-        } 
+        }
       }
       this.listBox.selectItems([selection['text'] as string]);
       this.router.navigate([(selection as any).route], { relativeTo: this.route });
@@ -60,9 +60,9 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
         position: 'RightCenter',
         content: this.content,
         beforeRender: this.onBeforeRender
-    });  
-    this.tooltip.appendTo('body');   
-    }  
+    });
+    this.tooltip.appendTo('body');
+    }
   }
 
     onBeforeRender(args: TooltipEventArgs): void {

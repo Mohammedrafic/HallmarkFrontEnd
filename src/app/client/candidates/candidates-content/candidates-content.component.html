@@ -5,25 +5,17 @@
   </ng-container>
   <ng-container right>
     <div class="button-group" *ngIf="!isIRP">
-      <ejs-switch
-        id="switcher"
-        (change)="onSwitcher($event);"
-        [checked]="true"
-      ></ejs-switch>
+      <ejs-switch id="switcher" (change)="onSwitcher($event);" [checked]="true"></ejs-switch>
       <label for="switcher" class="switch-text">Include Deployed Candidates</label>
-      <button
-        ejs-dropdownbutton
-        appHideBeforeSyncfusionLoad
-        cssClass="e-outline button-export"
-        [items]="exportOptions"
-        (select)="exportSelected($event)"
-      >
+      <button ejs-dropdownbutton appHideBeforeSyncfusionLoad cssClass="e-outline button-export" [items]="exportOptions"
+        (select)="exportSelected($event)">
         <div class="button-export-container">
           <span *ngIf="!isMobile">Export</span>
           <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
+      <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter"
+        (click)="showFilters()">
         <div class="filter-button-content">
           <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill">{{
             filteredItems
@@ -34,74 +26,50 @@
       </button>
     </div>
     <div class="button-group" *ngIf="isIRP">
-      <button
-        ejs-button
-        appHideBeforeSyncfusionLoad
-        id="filterButton"
-        cssClass="e-outline button-filter"
-        (click)="showFilters()"
-      >
+      <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter"
+        (click)="showFilters()">
         <div class="filter-button-content">
-          <span
-            *ngIf="(filteredItems$ | async) || 0 as filteredItems"
-            class="e-badge e-badge-success e-badge-pill"
-          >
+          <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill">
             {{filteredItems}}
           </span>
           Filters
           <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <button
-        ejs-dropdownbutton
-        appHideBeforeSyncfusionLoad
-        cssClass="e-outline button-export"
-        [items]="exportOptions"
-        (select)="exportSelected($event)"
-      >
+      <button ejs-dropdownbutton appHideBeforeSyncfusionLoad cssClass="e-outline button-export" [items]="exportOptions"
+        (select)="exportSelected($event)">
         <div class="button-export-container">
           <span *ngIf="!isMobile">Export</span>
           <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
-        <button
-          *ngIf="(currentUserPermissions$ | async) as userPermission"
-          ejs-button
-          appHideBeforeSyncfusionLoad
-          id="addIRPCandidate"
-          cssClass="e-primary"
-          [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]"
-          (click)="addIRPCandidate()"
-        >
-          Add Employee
+      
+        <button ejs-button appHideBeforeSyncfusionLoad (click)="openImportDialog()" class="e-outline">
+          <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
         </button>
-
+        <ng-container *ngIf="!isMobile">
+          <button *ngIf="(currentUserPermissions$ | async) as userPermission" ejs-button appHideBeforeSyncfusionLoad
+            id="addIRPCandidate" cssClass="e-primary" class="noResponsive"
+            [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="addIRPCandidate()">
+            Add Employee
+          </button>
+        </ng-container>
+    
     </div>
+
   </ng-container>
 </app-page-toolbar>
 <section class="tabs">
-<app-tabs-list *ngIf="!isIRP"
-  [tabConfig]="tabConfig"
-  (changeTab)="handleChangeTab($event)"
-></app-tabs-list>
+  <app-tabs-list *ngIf="!isIRP" [tabConfig]="tabConfig" (changeTab)="handleChangeTab($event)"></app-tabs-list>
 </section>
 <section [ngClass]="isIRP ? 'grid-component__irp' : 'grid-component__vms'">
-  <app-candidate-list
-    *ngIf="preferencesLoaded"
-    [userPermission]="(currentUserPermissions$ | async) ?? {}"
-    [filteredItems$]="filteredItems$"
-    [export$]="exportUsers$"
-    [search$]="search$"
-    [includeDeployedCandidates$]="includeDeployedCandidates$"
-    [isAgency]="false"
-    [tab]="activeTabIndex"
-    [isIRP]="isIRP"
-    [credStartDate] = "credStartDate"
-    [credEndDate] = "credEndDate"
-    [credType] = "credType"
-    [redirectedFromDashboard] = "redirectedFromDashboard"
-    [isMobileScreen] = "isMobile"
-  ></app-candidate-list>
+  <app-candidate-list *ngIf="preferencesLoaded" [userPermission]="(currentUserPermissions$ | async) ?? {}"
+    [filteredItems$]="filteredItems$" [export$]="exportUsers$" [search$]="search$"
+    [includeDeployedCandidates$]="includeDeployedCandidates$" [isAgency]="false" [tab]="activeTabIndex" [isIRP]="isIRP"
+    [credStartDate]="credStartDate" [credEndDate]="credEndDate" [credType]="credType"
+    [redirectedFromDashboard]="redirectedFromDashboard" [isMobileScreen]="isMobile"></app-candidate-list>
 </section>
 
 <app-scroll-to-top *ngIf="isMobile"></app-scroll-to-top>
+
+<app-import-employee [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-employee>

@@ -199,7 +199,6 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
 
     this.allAgenciesLoad();
     if (this.isAgency) {
-    
       this.store.dispatch([new GetCandidateSkills()]);
       const user = this.store.selectSnapshot(UserState.user);
       let lastSelectedAgencyId = window.localStorage.getItem('lastSelectedAgencyId');
@@ -215,7 +214,6 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         this.updatePage();
       });
        this.store.dispatch(new GetUserAgencies());    
-   
     }
     else {
 
@@ -282,11 +280,13 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   }
   public allAgenciesLoad() {
     this.agencies$
-      .pipe(filter(() => this.isAgency), takeUntil(this.unsubscribe$)).subscribe((data: UserAgencyOrganization) => {       
-        const agencyData: AssociateAgency[] = data.businessUnits.map((business) => ({
+      .pipe(filter(() => this.isAgency), takeUntil(this.unsubscribe$)).subscribe((data: UserAgencyOrganization) => {   
+        if(data!=null)
+        { 
+        const agencyData: AssociateAgency[] = data?.businessUnits.map((business) => ({
             agencyName: business.name,
             agencyId: business.id,
-          })); 
+          }));       
         this.lastSelectedAgencyId$.pipe(
           filter(Boolean),
           takeUntil(this.unsubscribe$),
@@ -295,6 +295,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           const filteredArray = agencyData.filter((item:AssociateAgency) => item?.agencyId === Number(agencyIdvalue));
           this.orgAgencyName = filteredArray[0]?.agencyName;
         });
+        this.subscribeOnAgencyOrganizationChanges();
+      }
       });       
     this.organizations$
       .pipe(filter(() => !this.isAgency), takeUntil(this.unsubscribe$)).subscribe((data: UserAgencyOrganization) => {
@@ -648,12 +650,11 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     combineLatest([
       this.lastSelectedOrganizationId$,
       this.lastSelectedAgencyId$,
-      this.candidateRegions$,
-      this.candidateDepartments$,
+      this.candidateRegions$, 
       this.candidateLocations$,
+      this.candidateDepartments$,
     ])
       .pipe(        
-       filter((data) => !!data[2]),
         debounceTime(600),
         tap(() => {     
           this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
@@ -682,31 +683,28 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   }
 
   private patchFormValue(): void {  
-      this.filtersForm.setValue({
-        orderTypes: this.filters?.orderTypes || [],
-        startDate: this.filters?.startDate || null,
-        endDate: this.filters?.endDate || null,
-        skillsIds: this.filters?.skillsIds || [],
-        regionsIds: this.filters?.regionsIds || [],
-        applicantStatuses: this.filters?.applicantStatuses || [],
-        locationIds: this.filters?.locationIds || [],
-        departmentIds: this.filters?.departmentIds || [],
-        candidateNames: this.filters?.candidateNames || null,
-        agencyIds: this.filters?.agencyIds || [],
-        orderId: this.filters?.orderId || null,
-        organizationIds:this.filters?.organizationIds ||[]
-      });
+    this.filtersForm.setValue({
+      orderTypes: this.filters?.orderTypes || [],
+      startDate: this.filters?.startDate || null,
+      endDate: this.filters?.endDate || null,
+      skillsIds: this.filters?.skillsIds || [],
+      regionsIds: this.filters?.regionsIds || [],
+      applicantStatuses: this.filters?.applicantStatuses || [],
+      locationIds: this.filters?.locationIds || [],
+      departmentIds: this.filters?.departmentIds || [],
+      candidateNames: this.filters?.candidateNames || null,
+      agencyIds: this.filters?.agencyIds || [],
+      orderId: this.filters?.orderId || null,
+      organizationIds: this.filters?.organizationIds || []
+    });
+    if (this.isAgency) {
+      this.orgAgencyId = Number(this.lastAgencyId);
+    }
+    else {
+      this.orgAgencyId = Number(this.lastOrgId);
+    }
 
-  if(this.isAgency)
-  {
-    this.orgAgencyId=Number(this.lastAgencyId);
-  }
-  else
-  {
-    this.orgAgencyId=Number(this.lastOrgId);
-  }
-
-       let filter: DoNotReturnCandidateSearchFilter = {
+    let filter: DoNotReturnCandidateSearchFilter = {
       searchText: null,
       businessUnitId: this.orgAgencyId,
       searchCanidateId: this.filtersForm.value.candidateNames,
@@ -720,41 +718,101 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       ).subscribe((result) => {
 
         this.CandidateNames = result.candidateDetails.searchCandidates;
-        this.filterColumns.candidateNames.dataSource=this.CandidateNames;
-      });  
+        this.filterColumns.candidateNames.dataSource = this.CandidateNames;
+      });
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
   }
 
-  private handleFilterState(filters: PreservedFiltersByPage<FiltersModal>): void {
+  private  handleFilterState(filters: PreservedFiltersByPage<FiltersModal>): void {
     let dispatchPatch = false;
     const { isNotPreserved, state, dispatch } = filters;
-    if (!isNotPreserved && dispatch) {
-      this.filters = {
-        orderTypes: state?.orderTypes || [],
-        startDate: state?.startDate,
-        endDate: state?.endDate,
-        skillsIds: (state?.skillsIds && [...state.skillsIds]) || [],
-        organizationIds: (state?.organizationIds && [...state.organizationIds]) || [],
-        regionsIds: (state?.regionsIds && [...state.regionsIds]) || [],
-        applicantStatuses: state?.applicantStatuses || [],
-        locationIds: (state?.locationIds && [...state.locationIds]) || [],
-        departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],     
-        candidateNames:state.candidateNames, 
-      };
+    const filterValues = state;
+    if (this.isAgency) {
+      if (!isNotPreserved && dispatch) {
+        this.filters = {
+          orderTypes: state?.orderTypes || [],
+          startDate: state?.startDate,
+          endDate: state?.endDate,
+          skillsIds: (state?.skillsIds && [...state.skillsIds]) || [],
+          organizationIds: (state?.organizationIds && [...state.organizationIds]) || [],
+          regionsIds: (state?.regionsIds && [...state.regionsIds]) || [],
+          applicantStatuses: state?.applicantStatuses || [],
+          locationIds: (state?.locationIds && [...state.locationIds]) || [],
+          departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
+          candidateNames: state.candidateNames,
+        };
 
-      dispatchPatch = true;
+        dispatchPatch = true;
+      }
+
+      if (this.CandidateStatus) {
+        this.filters = {
+          ...this.filters,
+          applicantStatuses: [this.CandidateStatus],
+        };
+        dispatchPatch = true;
+      }
+
+      if (dispatchPatch) {
+        this.patchFormValue();
+      }
+     
+      setTimeout(() => {
+        this.filters = {
+          ...this.filters,
+          regionsIds: filterValues?.regionsIds,
+        };
+
+        dispatchPatch = true;
+        if (dispatchPatch) {
+          this.patchFormValue();
+        }
+        this.filters = {
+          ...this.filters,
+          locationIds: filterValues?.locationIds,
+        };
+        dispatchPatch = true;
+        if (dispatchPatch) {
+          this.patchFormValue();
+        }
+        this.filters = {
+          ...this.filters,
+          departmentIds: filterValues?.departmentIds,
+        };
+        dispatchPatch = true;
+        if (dispatchPatch) {
+          this.patchFormValue();
+        }}, 1000);
     }
-   
-    if (this.CandidateStatus) {
-      this.filters = {
-        ...this.filters,
-        applicantStatuses: [this.CandidateStatus],
-      };
-      dispatchPatch = true;
-    }
-    
-    if (dispatchPatch) {
-      this.patchFormValue();   
+    else {
+      if (!isNotPreserved && dispatch) {
+        this.filters = {
+          orderTypes: state?.orderTypes || [],
+          startDate: state?.startDate,
+          endDate: state?.endDate,
+          skillsIds: (state?.skillsIds && [...state.skillsIds]) || [],
+          organizationIds: (state?.organizationIds && [...state.organizationIds]) || [],
+          regionsIds: (state?.regionsIds && [...state.regionsIds]) || [],
+          applicantStatuses: state?.applicantStatuses || [],
+          locationIds: (state?.locationIds && [...state.locationIds]) || [],
+          departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
+          candidateNames: state.candidateNames,
+          agencyIds: (state?.agencyIds && [...state.agencyIds]) || [],
+        };
+
+        dispatchPatch = true;
+      }
+      if (this.CandidateStatus) {
+        this.filters = {
+          ...this.filters,
+          applicantStatuses: [this.CandidateStatus],
+        };
+        dispatchPatch = true;
+      }
+
+      if (dispatchPatch) {
+        this.patchFormValue();
+      }
     }
   }
 
@@ -785,7 +843,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       .get('locationIds')
       ?.valueChanges.pipe(filter(()=>!this.isAgency), takeUntil(this.unsubscribe$))
       .subscribe((val: number[]) => {
-        if (this.filterColumns.departmentIds) {
+        if (this.filterColumns?.departmentIds) {
           this.filterColumns.departmentIds.dataSource = [];
           if (val?.length) {
             const locationDataSource = this.filterColumns.locationIds?.dataSource as OrganizationLocation[];

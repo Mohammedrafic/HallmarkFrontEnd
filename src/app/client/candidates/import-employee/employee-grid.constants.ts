@@ -1,0 +1,192 @@
+import { ColDef } from "@ag-grid-community/core";
+import { GridErroredCellComponent } from "@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
+
+export const EmployeesColumnsConfig: ColDef[] = [
+    {
+      field: 'employeeID',
+      width: 50,
+      headerName: 'Employee ID',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'firstName',
+      width: 50,
+      headerName: 'First Name',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'middleName',
+      width: 50,
+      headerName: 'Middle Name',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'lastName',
+      width: 50,
+      headerName: 'Last Name',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'dob',
+      width: 70,
+      headerName: 'DOB',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'primarySkill',
+      width: 80,
+      headerName: 'Primary Skill',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'secondarySkill',
+      width: 80,
+      headerName: 'Secondary Skill',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'classification',
+      width: 90,
+      headerName: 'Classification',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'hireDate',
+      width: 70,
+      headerName: 'Hire Date',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'fte',
+      width: 100,
+      headerName: 'FTE',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'hrCompanyCode',
+      width: 80,
+      headerName: 'Hr Company Code',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'internalTransferRecruitment',
+      width: 50,
+      headerName: 'Internal Transfer Recruitment',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'contract',
+      width: 50,
+      headerName: 'Contract',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'contractStartDate',
+      width: 110,
+      headerName: 'Contract Start Date',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'contractEndDate',
+      width: 110,
+      headerName: 'Contract End Date',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'address',
+      width: 10,
+      headerName: 'Address',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'country',
+      width: 10,
+      headerName: 'Country',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'state',
+      width: 10,
+      headerName: 'State',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'city',
+      width: 80,
+      headerName: 'City',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'zipCode',
+      width: 70,
+      headerName: 'Zip Code',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+        field: 'email',
+        width: 80,
+        headerName: 'Email',
+        cellRenderer: GridErroredCellComponent,
+    },
+    {
+        field: 'workEmail',
+        width: 70,
+        headerName: 'Work Email',
+        cellRenderer: GridErroredCellComponent,
+      },
+      {
+        field: 'cellphone',
+        width: 80,
+        headerName: 'Cell phone',
+        cellRenderer: GridErroredCellComponent,
+      },
+      {
+        field: 'alternativePhone',
+        width: 80,
+        headerName: 'Alternative Phone',
+        cellRenderer: GridErroredCellComponent,
+      },
+      {
+        field: 'professionalSummary',
+        width: 80,
+        headerName: 'Professional Summary',
+        cellRenderer: GridErroredCellComponent,
+      },
+      {
+        field: 'profileStatus',
+        width: 80,
+        headerName: 'Profile Status',
+        cellRenderer: GridErroredCellComponent,
+      },
+      {
+        field: 'holdStartDate',
+        width: 70,
+        headerName: 'Hold Start Date',
+        cellRenderer: GridErroredCellComponent,
+      },
+      {
+        field: 'holdEndDate',
+        width: 70,
+        headerName: 'Hold End Date',
+        cellRenderer: GridErroredCellComponent,
+      },
+      {
+        field: 'terminationDate',
+        width: 70,
+        headerName: 'Termination Date',
+        cellRenderer: GridErroredCellComponent,
+      },
+      {
+        field: 'terminationReason',
+        width: 70,
+        headerName: 'Termination Reason',
+        cellRenderer: GridErroredCellComponent,
+      },
+      {
+        field: 'workCommitment',
+        width: 70,
+        headerName: 'Work Commitment',
+        cellRenderer: GridErroredCellComponent,
+      },
+      
+  ];

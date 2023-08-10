@@ -120,6 +120,7 @@ import { DatepickerModule } from '@shared/components/form-controls/datepicker/da
 import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
 import { ImportDnrComponent } from './do-not-return/import-dnr/import-dnr.component';
 import { CreateEditOrderResolver } from '@client/order-management/resolvers/create-edit-order.resolver';
+import { ImportEmployeeComponent } from './candidates/import-employee/import-employee.component';
 
 
 const gridIcons = {
@@ -176,6 +177,7 @@ const gridIcons = {
     DoNotReturnDetailsComponent,
     DoNotReturnGridComponent,
     ImportDnrComponent,
+    ImportEmployeeComponent
   ],
   imports: [
     CommonModule,

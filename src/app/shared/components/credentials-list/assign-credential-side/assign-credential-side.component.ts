@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { filter, map, Observable, Subject, take, takeUntil, tap } from 'rxjs';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { filter, map, Observable, take, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -19,6 +19,7 @@ import {
 import { CredentialsState } from '@organization-management/store/credentials.state';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { CredentialListService } from '@shared/components/credentials-list/services';
 
 const TREEVIEW_FIELDS_CONFIG = {
   id: 'id',
@@ -38,8 +39,6 @@ enum NodeCheckEventArgsAction {
   styleUrls: ['./assign-credential-side.component.scss', '../../side-dialog/side-dialog.component.scss'],
 })
 export class AssignCredentialSideComponent extends DestroyableDirective implements OnInit, AfterViewInit {
-  @Input() openSidebar: Subject<boolean>;
-
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('tree') tree: TreeViewComponent;
 
@@ -51,7 +50,11 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
 
   private newSelectedNodes = new Set<HTMLElement>();
 
-  constructor(private store: Store, private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private confirmService: ConfirmService,
+    private credentialListService: CredentialListService
+  ) {
     super();
   }
 
@@ -60,7 +63,7 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
   }
 
   ngAfterViewInit(): void {
-    this.openSidebar
+    this.credentialListService.getAssignCredentialModalStateStream()
       .pipe(
         takeUntil(this.destroy$),
         tap((isOpen) => {
@@ -134,7 +137,7 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
 
   private clearAndClose(): void {
     this.newSelectedNodes.clear();
-    this.openSidebar.next(false);
+    this.credentialListService.setAssignCredentialModalState(false);
   }
 }
 

@@ -57,7 +57,6 @@ import { AppState } from '../../../store/app.state';
 export class CredentialsListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
-  public openAssignSidebarSubject = new Subject<boolean>();
   public gridSortSettings: SortSettingsModel = SortSettings;
   public optionFields: FieldSettingsModel = OptionFields;
   public columnsToExport: ExportColumn[];
@@ -217,10 +216,6 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
       });
   }
 
-  public showAssignSiderbar(): void {
-    this.openAssignSidebarSubject.next(true);
-  }
-
   private mapGridData(): void {
     this.credentials$.pipe(
       combineLatestWith(this.credentialTypes$),
@@ -274,6 +269,7 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
       if(this.grid) {
         this.showHideGridColumns();
       }
+
       const { isCredentialSettings } = this.route.snapshot.data;
       this.isCredentialSettings = !!isCredentialSettings;
 

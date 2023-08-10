@@ -111,7 +111,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() search$: Subject<string>;
   @Input() public orderStatus: string[];
   @Input() public candidateStatuses: string[];
-
+  @Input() public ltaOrder: boolean | null = false;
+  
   @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
 
@@ -436,6 +437,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.clearFilters();
         this.setDefaultStatuses(statuses, true);
       }
+      if(this.ltaOrder){
+        this.clearFilters();
+      }
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
       this.dispatchNewPage();
@@ -448,6 +452,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     } else {
       this.setDefaultStatuses(statuses, preservedFiltes.dispatch);
     }
+    
   }
 
   private prepopulateFilterFormStructure(): void {
@@ -477,6 +482,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private setDefaultStatuses(statuses: string[], setDefaultFilters: boolean): void {
+    if(this.ltaOrder){
+      this.clearFilters();
+    }
     if(this.Organizations.length > 0){
       this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
       this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
@@ -491,9 +499,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         Status.includes(f)
       );
       setTimeout(() => {
-          this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
-          this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
-          this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+        if(!this.ltaOrder) {
+            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
+            this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
+          }
+            this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
           for (let i = 0; i < this.filteredItems.length; i++) {
             if (this.filteredItems[i].text == undefined) {
               this.filteredItems[i].text = this.filteredItems[i].value;
@@ -545,9 +555,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private dispatchNewPage(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     this.filters.orderBy = this.orderBy;
-
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
+        if(this.ltaOrder){
+          this.filters.ltaOrder = this.ltaOrder;
+        }
         this.filters.includeReOrders = true;
         let filtersMyAgency = {...this.filters};
           if(this.filters.orderLocked){
@@ -874,6 +886,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onFilterApply(): void {
+    this.ltaOrder = false;
     if (this.OrderFilterFormGroup.dirty) {
       this.filters = this.OrderFilterFormGroup.getRawValue();
       this.filters.orderPublicId = this.filters.orderPublicId?.toUpperCase() || null;
@@ -958,6 +971,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           this.selectedReOrder = null;
         }
       }
+      this.alertOrderId = 0;
     });
   }
 
