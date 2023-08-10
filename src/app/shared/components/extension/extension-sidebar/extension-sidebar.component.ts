@@ -3,7 +3,7 @@ import { extensionDurationPrimary, extensionDurationSecondary } from '@shared/co
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Duration } from '@shared/enums/durations';
-import { Observable, catchError, combineLatest, filter, startWith, takeUntil, tap } from 'rxjs';
+import { catchError, combineLatest, distinctUntilChanged, filter, startWith, takeUntil, tap } from 'rxjs';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 import isNil from 'lodash/fp/isNil';
 import { addDays } from '@shared/utils/date-time.utils';
@@ -19,9 +19,7 @@ import { BillRate } from '@shared/models';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
-import { formatDate } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
-import { Data } from '@syncfusion/ej2-angular-grids';
 import { ExtenstionResponseModel } from './models/extension.model';
 
 @Component({
@@ -82,9 +80,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       return;
     }
     const billRates = this.billRatesComponent?.billRatesControl.value;
-    const billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
-      billRates, this.extensionForm.get('startDate')?.value
-    );
+    const billRateToUpdate: BillRate | null = this.getBillRate(billRates, this.extensionForm.get('startDate')?.value);
     if (billRateToUpdate?.id !== billRate?.id && billRate?.id !== 0) {
       return;
     }
@@ -130,41 +126,54 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       ).subscribe();
   }
 
+  private getBillRate(billRates: BillRate[], startDate?: Date): BillRate | null {
+    const isLocal = this.candidateJob.isLocal;
+    const billRate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+      billRates, startDate, isLocal
+    );
+    return billRate;
+  }
+
   private subsToBillRateControlChange(): void {
-    this.billRateControl.valueChanges.subscribe((value) => {
-      if (!this.billRatesComponent?.billRatesControl.value) {
-        return;
-      }
+    this.billRateControl.valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((value) => {
+        if (!this.billRatesComponent?.billRatesControl.value) {
+          return;
+        }
 
-      const billRates = this.billRatesComponent?.billRatesControl.value;
-      const billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
-        billRates, this.extensionForm.get('startDate')?.value
-      );
+        const billRates = this.billRatesComponent?.billRatesControl.value;
+        const billRateToUpdate: BillRate | null = this.getBillRate(billRates, this.extensionForm.get('startDate')?.value);
 
-      if (!billRateToUpdate) {
-        return;
-      }
+        if (!billRateToUpdate) {
+          return;
+        }
 
-      const restBillRates = this.billRatesComponent?.billRatesControl.value.filter(
-        (billRate: BillRate) => billRate.id !== billRateToUpdate?.id
-      );
+        const restBillRates = this.billRatesComponent?.billRatesControl.value.filter(
+          (billRate: BillRate) => billRate.id !== billRateToUpdate?.id
+        );
 
-      billRateToUpdate.rateHour = value || '0.00';
+        billRateToUpdate.rateHour = value || '0.00';
 
-      this.billRatesComponent.billRatesControl.patchValue([billRateToUpdate, ...restBillRates]);
-    });
+        this.billRatesComponent.billRatesControl.patchValue([billRateToUpdate, ...restBillRates]);
+      });
   }
 
   private initExtensionForm(): void {
-    const { actualEndDate, candidateBillRate } = this.candidateJob || {};
+    const { actualEndDate } = this.candidateJob || {};
     const startDate = addDays(actualEndDate, 1);
+    const startDateValue = startDate ? DateTimeHelper.setCurrentTimeZone(startDate.toString()) : undefined;
+    const candidateBillRate = this.getBillRate(this.candidateJob.billRates, startDateValue)?.rateHour;
     this.maxEndDate = addDays(startDate as Date, 14) as Date;
 
     this.extensionForm = this.formBuilder.group({
       durationPrimary: [Duration.Other],
       durationSecondary: [],
       durationTertiary: [],
-      startDate: [startDate ? DateTimeHelper.setCurrentTimeZone(startDate.toString()) : null, [Validators.required]],
+      startDate: [startDateValue, [Validators.required]],
       endDate: ['', [Validators.required]],
       billRate: [candidateBillRate, [Validators.required]],
       comments: [null],
