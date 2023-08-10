@@ -572,6 +572,7 @@ export class SendGroupEmailComponent
     this.businessUnitControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       this.onFormvalidation([]);
       this.groupEmailTemplateForm.markAsUntouched();
+      this.emailBodyRequired$.next(false);
       this.isBusinessUnitTypeAgency = false;
       this.validationCheckForBusiness();
       if (this.isSend == true && value != null) {
