@@ -67,6 +67,7 @@ import {
 } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { CandidateListService } from '../../services/candidate-list.service';
 import * as CandidateListActions from '../../store/candidate-list.actions';
+import{ GetMasterCredentials } from '@agency/store/candidate.actions';
 import { CandidateListState } from '../../store/candidate-list.state';
 import {
   CandidateList,
@@ -89,7 +90,8 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { ProfileStatuses, ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
-
+import { Credential } from '@shared/models/credential.model';
+import { CredentialTypeFilter } from '@shared/models/credential.model';
 @Component({
   selector: 'app-candidate-list',
   templateUrl: './candidate-list.component.html',
@@ -135,6 +137,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(CandidateListState.listOfCredentialTypes)
   credentialTypes$: Observable<CredentialType[]>;
+
+  @Select(CandidateState.masterCredentials)
+  masterCredentials$: Observable<Credential[]>;
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
@@ -227,7 +232,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.setFileName();
     this.filterColumns = !this.isIRP ? filterColumns : IRPFilterColumns;
     this.subscribeOnRegions();
-    this.subscribeOnCredentialTypes();
+    this.subscribeOnMasterCredentials();
     this.subscribeOnOrgStructure();
     this.subscribeOnLocationChange();
     this.syncFilterTagsWithControls();
@@ -738,14 +743,22 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         }
       });
   }
-  private subscribeOnCredentialTypes(): void {
-    this.credentialTypes$
+  private subscribeOnMasterCredentials(): void {
+      this.masterCredentials$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((crdentialType) => {
+        let credentialtypes:CredentialTypeFilter[]=crdentialType.map((obj)=>{
+          return {id:obj.id=obj.credentialTypeId,name:obj.credentialTypeName!}
+        })
+       .reduce((acc:CredentialTypeFilter[], current:CredentialTypeFilter) => {
+          if(!acc.some(el=> el.id === current.id)) acc.push(current)
+          return acc
+        }, [] as CredentialTypeFilter[])
         if (this.filterColumns?.credType) {
-          this.filterColumns.credType.dataSource = crdentialType;
+          this.filterColumns.credType.dataSource = credentialtypes;
         }
       });
+    
   }
 
   private subscribeOnExportAction(): void {
@@ -812,11 +825,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         takeUntil(this.unsubscribe$)
       ).subscribe();
   }
-  private getCredentialTypes(): void {
-    this.store
-      .dispatch(new CandidateListActions.GetCredentialsTypeList)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe();
+  private getCredentialTypes():void{
+    this.store.dispatch(new GetMasterCredentials('', '', null, true));
   }
 
   private syncFilterTagsWithControls(): void {
