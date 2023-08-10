@@ -9,6 +9,11 @@
   }
 }
 
+.link {
+  cursor: pointer;
+  color: $primary-active-blue-10!important;
+}
+
 @media #{$max-mobile} {
   .candidate-title {
     margin-bottom: 16px !important;

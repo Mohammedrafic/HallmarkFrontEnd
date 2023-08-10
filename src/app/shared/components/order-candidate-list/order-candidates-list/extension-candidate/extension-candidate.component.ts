@@ -83,12 +83,17 @@ import { CommentsService } from '@shared/services/comments.service';
 import { DurationService } from '@shared/services/duration.service';
 import PriceUtils from '@shared/utils/price.utils';
 import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
-import { GetOrderPermissions } from 'src/app/store/user.actions';
+import { GetOrderPermissions, SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { OnboardCandidateMessageDialogComponent } from '../onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { disabledBodyOverflow } from '@shared/utils/styles.utils';
+import { AppState } from 'src/app/store/app.state';
+import { OrderManagementPagerState } from '@shared/models/candidate.model';
+import { CandidateState } from '@agency/store/candidate.state';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -126,6 +131,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   @Select(OrderManagementContentState.getCandidateCancellationReasons)
   candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
+
+
+  @Select(CandidateState.orderManagementPagerState)
+  public orderManagementPagerState$: Observable<OrderManagementPagerState | null>;
 
   public rejectReasons$: Observable<RejectReason[]>;
   public form: FormGroup;
@@ -166,6 +175,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public candidatePhone1RequiredValue = '';
   public candidateAddressRequiredValue = '';
   public candidateCancellationReasons: CandidateCancellationReason[] | null;
+  public agencyId: number | undefined;
+  public orderManagementPagerState: OrderManagementPagerState | null;
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -257,6 +268,15 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.onRejectSuccess();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeToCandidateJob();
+    this.observeOrderManagementPagerState();
+  }
+
+  observeOrderManagementPagerState() {
+    this.orderManagementPagerState$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((state) => {
+      this.orderManagementPagerState = state;
+    });
   }
 
   public updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
@@ -551,6 +571,45 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.form?.get('offeredBillRate')?.disable();
     }
   }
+  public onViewNavigation(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+      this.agencyId = this.currentOrder.candidates?.find((c) => c.id === this.candidate?.candidateId)?.agencyId;
+      this.store.dispatch(
+        new SetLastSelectedOrganizationAgencyId({
+          lastSelectedAgencyId: this.agencyId ?? null,
+          lastSelectedOrganizationId: this.candidateJob?.organizationId ?? null,
+        })
+      )
+      .pipe(takeUntil(this.destroy$)).subscribe(() => {
+        this.goToCandidate();
+      });
+    } else {
+      this.goToCandidate();
+    }
+  }
+
+  goToCandidate(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    const url =
+      user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
+    const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const pageToBack = this.router.url;
+    const state = {
+            orderId: this.currentOrder.id,
+            candidateStatus: this.candidate?.status,
+            pageToBack,
+            orderManagementPagerState: this.orderManagementPagerState,
+            readonly: !this.isAgency,
+            isRedirectFromOrder: true,
+            isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
+          };
+    window.localStorage.setItem('navigationState', JSON.stringify(state));
+    this.router.navigate([url, this.candidate?.candidateId], {
+      state: state,
+    });
+    disabledBodyOverflow(false);
+  }
 
 
   calculateActualEndDate(startDate: Date, daysToAdd: number): Date {
@@ -561,9 +620,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const value = this.form.getRawValue();
     const jobStartDate = new Date(this.candidateJob.order.jobStartDate);
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
-    const finalDate = this.candidateJob.offeredStartDate && this.candidateJob.offeredStartDate !== '' ? new Date(this.candidateJob.offeredStartDate) : jobStartDate; 
+    const finalDate = this.candidateJob.offeredStartDate && this.candidateJob.offeredStartDate !== '' ? new Date(this.candidateJob.offeredStartDate) : jobStartDate;
     const daysDifference =  DateTimeHelper.getDateDiffInDays(jobStartDate, jobEndDate);
-    const actualEndDate = this.calculateActualEndDate(finalDate, daysDifference).toISOString(); 
+    const actualEndDate = this.calculateActualEndDate(finalDate, daysDifference).toISOString();
     const accepted = applicantStatus.applicantStatus ===ApplicantStatusEnum.Accepted;
     if (accepted && (!value.actualStartDate || !value.actualEndDate)) {
       value.actualStartDate = this.candidateJob?.offeredStartDate;
@@ -601,7 +660,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.candidateJob?.candidateProfileId);
       this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.candidateJob?.organizationId);
       const statusChanged = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
-    
+
       this.store
         .dispatch(
           this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
@@ -652,7 +711,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
     if (this.sendOnboardMessageEmailFormGroup.valid) {
       const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();
-      // console.log('emailvalue',emailvalue);         
+      // console.log('emailvalue',emailvalue);
       this.store.dispatch(new sendOnboardCandidateEmailMessage({
         subjectMail: emailvalue.emailSubject,
         bodyMail: emailvalue.emailBody,

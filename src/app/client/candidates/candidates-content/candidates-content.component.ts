@@ -16,6 +16,8 @@ import { UserPermissions } from '@core/enums';
 import { Permission } from '@core/interface';
 import { AppState } from 'src/app/store/app.state';
 import { BreakpointObserverService } from '@core/services';
+import { CandidateListRequest } from '@shared/components/candidate-list/types/candidate-list.model';
+import { GetIRPCandidatesByPage } from '@shared/components/candidate-list/store/candidate-list.actions';
 
 @Component({
   selector: 'app-candidates-content',
@@ -32,13 +34,15 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   public preferencesLoaded = false;
   public readonly tabConfig: TabConfig[] = TAB_CANDIDATES;
   public readonly userPermissions = UserPermissions;
-  public credEndDate : any;
-  public credStartDate :  any;
-  public credType : any;
+  public credEndDate: any;
+  public credStartDate: any;
+  public credType: any;
   public isMobile = false;
   public isSmallDesktop = false;
   public redirectedFromDashboard : any;
   
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
+
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
 
@@ -118,7 +122,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
 
   private checkOrgPreferences(): void {
     const { isIRPEnabled } =
-    this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+      this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
 
     this.isIRP = !!isIRPEnabled && this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     this.preferencesLoaded = true;
@@ -137,5 +141,27 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
         this.isMobile = screen.isMobile;
         this.isSmallDesktop = screen.isDesktopSmall;
       });
+  }
+
+  public openImportDialog(): void {
+    this.importDialogEvent.next(true);
+  }
+  public override updatePage(clearedFilters?: boolean): void {
+    const candidateListRequest: CandidateListRequest = {
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize,
+      orderBy: this.orderBy,
+      profileStatuses: [],
+      skillsIds: [],
+      regionsNames: [],
+      tab: 0,
+      candidateName: null,
+      includeDeployedCandidates: false
+    };
+
+    this.store.dispatch(
+     new  GetIRPCandidatesByPage(candidateListRequest)
+    );
+
   }
 }
