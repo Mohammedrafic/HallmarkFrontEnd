@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BaseObservable } from '@core/helpers';
-import { BillRate } from '@shared/models';
+import { BillRate, BillRateCalculationType } from '@shared/models';
 
 @Injectable({
   providedIn: 'root',
@@ -8,13 +8,14 @@ import { BillRate } from '@shared/models';
 export class BillRatesSyncService {
   private rateFormChanged$ = new BaseObservable<boolean>(false);
 
-  public getBillRateForSync(billRates: BillRate[], jobStartDate?: Date): BillRate | null {
+  public getBillRateForSync(billRates: BillRate[], jobStartDate?: Date, isLocal = false): BillRate | null {
     const jobStartDateTimeStamp = jobStartDate ? jobStartDate.getTime() : new Date().getTime();
     let billRateForSync: BillRate | null = null;
+    const billRateType = isLocal ? BillRateCalculationType.RegularLocal : BillRateCalculationType.Regular;
     const sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
-      (billRate) => billRate.billRateConfig.id === 1
+      (billRate) => billRate.billRateConfig.id === billRateType
     );
-    for (let billRate of sortedBillRates) {
+    for (const billRate of sortedBillRates) {
       const timeStamp = new Date(billRate.effectiveDate).getTime();
       if (timeStamp < jobStartDateTimeStamp) {
         billRateForSync = billRate;
