@@ -75,6 +75,7 @@ import { useractivityReportState } from '@admin/store/userlog-activity.state';
 import { AgGridModule } from '@ag-grid-community/angular';
 
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
+import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
 
 @NgModule({
   declarations: [
@@ -132,7 +133,8 @@ import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/fin
     AgencySpendComponent,
     ShiftBreakdownComponent,
     UserActivityComponent,
-    FinancialTimeSheetBetaComponent  ],
+    FinancialTimeSheetBetaComponent,
+    DepartmentSpendAndHoursComponent  ],
   exports: [
     CandidateListComponent
   ],

@@ -55,6 +55,7 @@ import { PositionSummaryComponent } from './Position-Summary/Position-Summary.co
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
 import { UserActivityComponent } from './user-activity/user-activity.component';
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
+import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
 
 const routes: Routes = [
   {
@@ -428,6 +429,14 @@ const routes: Routes = [
 
         path: 'user-activity',
         component: UserActivityComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      }
+      ,
+      {
+        path: 'department-spend-and-hours-report',
+        component: DepartmentSpendAndHoursComponent,
         data: {
           isOrganizationArea: true,
         }
