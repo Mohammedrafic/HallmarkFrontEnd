@@ -11,8 +11,6 @@ import { Injectable } from '@angular/core';
 import {
   GroupEmail,
   GroupEmailByBusinessUnitIdPage,
-  GroupEmailFilters,
-  GroupEmailRequest,
   SendGroupEmailRequest,
 } from '@shared/models/group-email.model';
 import { Observable } from 'rxjs';
