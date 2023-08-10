@@ -62,7 +62,9 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
   }
 
   public updateCredential(data: IOrderCredentialItem): void {
-    this.update.emit(Object.assign({}, { ...data }));
+    // Do not send column property to the backend, it is a fully qualified object with circular references
+    const setupData = Object.assign({}, { ...data, column: undefined });
+    this.update.emit(setupData);
   }
 
   public onEdit(event: MouseEvent, data: IOrderCredentialItem): void {

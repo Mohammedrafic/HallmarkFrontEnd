@@ -79,8 +79,13 @@ export class ApiInterceptor implements HttpInterceptor {
 
   private trimRequest(req: HttpRequest<any>): HttpRequest<any> {
     if (req.body && typeof req.body === 'object') {
-      const trimmedBody = this.trimObjectStrings(req.body);
-      return req.clone({ body: trimmedBody });
+      //We have some objects that are not properly built, we need a clean escape for cases like that.
+      try {
+        const trimmedBody = this.trimObjectStrings(req.body);
+        return req.clone({ body: trimmedBody });
+      } catch (e) {
+        return req;
+      }
     }
     return req;
   }
