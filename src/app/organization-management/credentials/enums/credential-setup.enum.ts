@@ -8,5 +8,6 @@ export enum DropdownsList {
   Regions = 'regions',
   Locations = 'locations',
   Departments = 'departments',
-  Groups = 'groups'
+  Groups = 'groups',
+  Types = 'types',
 }
