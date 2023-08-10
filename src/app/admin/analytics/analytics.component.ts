@@ -44,13 +44,13 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
           analyticsMenuItem[0].children.forEach((x, index) => {
             this.sideMenuConfig.push({ text: x.title, id: index + 1, route: x.route ? x.route : '' });
           });
-          const additionalItem = {
-            text: "User Activity",
-            id: this.sideMenuConfig.length + 1, // Generate a unique ID for the additional item
-            route: "/analytics/user-activity", // Replace this with the desired route for the additional item
-          };
+          // const additionalItem = {
+          //   text: "User Activity",
+          //   id: this.sideMenuConfig.length + 1, // Generate a unique ID for the additional item
+          //   route: "/analytics/user-activity", // Replace this with the desired route for the additional item
+          // };
         
-          this.sideMenuConfig.push(additionalItem);
+          // this.sideMenuConfig.push(additionalItem);
           this.isLoad = true;
         }
       }
