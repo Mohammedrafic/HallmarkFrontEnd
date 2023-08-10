@@ -61,8 +61,6 @@ import { NgxMaskModule } from 'ngx-mask';
 import { ClientRoutingModule } from './client-routing.module';
 import { OrderManagementContentComponent } from './order-management/components/order-management-content/order-management-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
-import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
-import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
 import { TabNavigationComponent } from './order-management/components/order-management-content/tab-navigation/tab-navigation.component';
@@ -165,8 +163,6 @@ const gridIcons = {
     ClientComponent,
     OrderManagementContentComponent,
     CandidatesContentComponent,
-    InvoicesContentComponent,
-    TimesheetsContentComponent,
     ReportsContentComponent,
     TabNavigationComponent,
     OrderDetailsDialogComponent,
