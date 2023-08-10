@@ -358,7 +358,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       jobId: `${data.organizationPrefix}-${data.orderPublicId}`,
       jobDate: [DateTimeHelper.formatDateUTC(data.order.jobStartDate.toString(),'MM/dd/yyyy'),
       data.order.jobEndDate ? DateTimeHelper.formatDateUTC(data.order.jobEndDate.toString(), 'MM/dd/yyyy') : null],
-      offeredBillRate: formatNumber(CheckNumberValue(data.offeredBillRate || data.order.hourlyRate), 'en-US', '0.2-2'),
+      offeredBillRate: formatNumber(CheckNumberValue(data.offeredBillRate ?? data.initialBillRate), 'en-US', '0.2-2'),
       orderBillRate: data.order.hourlyRate && PriceUtils.formatNumbers(data.order.hourlyRate),
       locationName: data.order.locationName,
       availableStartDate: DateTimeHelper.formatDateUTC(data.availableStartDate, 'MM/dd/yyyy'),

@@ -16,13 +16,14 @@ import PriceUtils from '@shared/utils/price.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CandidateSSNRequired,CandidatePHONE1Required,CandidateADDRESSRequired, deployedCandidateMessage, DEPLOYED_CANDIDATE, REQUIRED_PERMISSIONS, SubmissionsLimitReached } from '@shared/constants';
+import { CandidateSSNRequired,CandidatePHONE1Required,CandidateADDRESSRequired, deployedCandidateMessage, DEPLOYED_CANDIDATE, REQUIRED_PERMISSIONS, SubmissionsLimitReached, APPLICATION_DISABLED } from '@shared/constants';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
 import { MessageTypes } from '../../../../enums/message-types';
 import { ShowToast } from '../../../../../store/app.actions';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { OrderStatus } from '@shared/enums/order-management';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -246,6 +247,18 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       });
   }
 
+  private getTooltip(): string {
+    if (this.canApplyCandidate) {
+      return REQUIRED_PERMISSIONS;
+    }
+
+    if (this.order.status === OrderStatus.Closed) {
+      return APPLICATION_DISABLED;
+    }
+
+    return SubmissionsLimitReached;
+  }
+
   private subscribeOnInitialData(): void {
     this.candidateJobState$
     .pipe(takeUntil(this.unsubscribe$))
@@ -282,7 +295,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         this.candidateId = data.candidateId;
         this.orderId = data.orderId;
         this.canApplyCandidate = data.canApplyCandidatesToOrder;
-        this.applyRestrictionMessage = this.canApplyCandidate ? REQUIRED_PERMISSIONS : SubmissionsLimitReached;
+        this.applyRestrictionMessage = this.getTooltip();
         this.setFormValue(data);
         this.changeDetectorRef.detectChanges();
       });
