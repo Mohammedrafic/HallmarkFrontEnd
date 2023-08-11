@@ -42,6 +42,7 @@ import {
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
+import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
 
 
 @NgModule({
@@ -76,6 +77,7 @@ import { IrpContainerApiService } from '@client/order-management/containers/irp-
     MaskedTextBoxModule,
     MultiDatePickerModule,
     ValidateDirectiveModule,
+    DocumentUploaderModule,
   ],
   providers: [
     OrderDetailsIrpService,
