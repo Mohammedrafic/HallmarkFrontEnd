@@ -31,7 +31,8 @@ export const analyticsConstants = {
     EndStartDate: 'endStartDate',
     jobId: 'jobId',
     jobStatuses: 'jobStatuses',
-    opcredFlag: 'opcredFlag'
+    opcredFlag: 'opcredFlag',
+    IsOptionalRequred:'IsOptionalRequred'
 
   }
 }
