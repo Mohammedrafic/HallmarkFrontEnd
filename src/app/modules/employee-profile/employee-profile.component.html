@@ -1,0 +1,12 @@
+<div class="employee-name">{{employeeName}}</div>
+<div class="employee-profile-sections">
+  <a
+    *ngFor="let link of sectionLinks; trackBy: trackByLinkRoute"
+    routerLinkActive="active-link"
+    [routerLink]="link.route"
+    class="section-link"
+  >
+    {{link.title}}
+  </a>
+</div>
+<router-outlet></router-outlet>

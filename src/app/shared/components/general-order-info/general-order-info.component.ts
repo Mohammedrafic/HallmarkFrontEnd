@@ -22,7 +22,10 @@ enum Active {
 export class GeneralOrderInfoComponent {
   @Input() set order(order: Order) {
     this.orderInformation = order;
-    this.setRegularRates(order.billRates);
+
+    if (order.billRates) {
+      this.setRegularRates(order.billRates);
+    }
   }
 
   @Input() system: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;

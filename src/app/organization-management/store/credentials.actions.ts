@@ -1,12 +1,11 @@
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
-import { CredentialSetupFilterDto, CredentialSetupMappingPost, CredentialSetupPost } from '@shared/models/credential-setup.model';
+import {
+  CredentialSetupFilterDto,
+  CredentialSetupMappingPost,
+  CredentialSetupPost,
+} from '@shared/models/credential-setup.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-
-export class SetNavigationTab {
-  static readonly type = '[credentials] Set Navigation Tab';
-  constructor(public payload: number) {}
-}
 
 export class SetCredentialSetupFilter {
   static readonly type = '[credentials] Set Credential Setup Filter';
@@ -75,19 +74,13 @@ export class UpdateCredentialSetup {
 
 export class UpdateCredentialSetupSucceeded {
   static readonly type = '[credentials] Update Credential Setup Succeeded';
-  constructor() { }
-}
-
-export class GetCredentialsDataSources {
-  static readonly type = '[credentials] Get Credentials Data Sources';
-  constructor() { }
+  constructor(public mappingId: number) { }
 }
 
 export class SetCredentialsFilterCount {
   static readonly type = '[credentials] Set The Amount Of Applied Filters';
   constructor(public payload: number) { }
 }
-
 
 export class GetAssignedCredentialTree {
   static readonly type = '[credentials] Get Assigned Credential Tree';

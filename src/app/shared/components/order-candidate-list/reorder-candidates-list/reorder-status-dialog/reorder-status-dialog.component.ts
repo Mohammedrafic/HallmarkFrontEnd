@@ -442,7 +442,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.acceptForm.reset();
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
-      offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
+      offeredBillRate: PriceUtils.formatNumbers(initialBillRate),
       candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
       locationName,
       departmentName,
