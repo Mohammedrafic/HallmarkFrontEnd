@@ -30,7 +30,8 @@ export const analyticsConstants = {
     BeginStartDate: 'beginStartDate',
     EndStartDate: 'endStartDate',
     jobId: 'jobId',
-    jobStatuses: 'jobStatuses'
+    jobStatuses: 'jobStatuses',
+    IsOptionalRequred:'IsOptionalRequred'
 
   }
 }
