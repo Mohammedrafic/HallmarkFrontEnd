@@ -54,6 +54,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     "AgencyParamCREXP": "",
     "CandidateStatusCREXP": "",
     "JobIdCREXP": "",
+    "OpCredFlagEXP":"",
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cat" };
@@ -112,7 +113,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public defaultLocations:(number|undefined)[]=[];
   public defaultDepartments: (number | undefined)[] = [];
   public defaultAgencys: (number | undefined)[] = [];
-  public defaultCandidateStatuses: (number | undefined)[] = [3, 4, 5];
+  public defaultCandidateStatuses: (number | undefined)[] = [ 4, 5];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
@@ -131,7 +132,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5,10,13];
+  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5,10,13,12];
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
@@ -162,7 +163,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
           this.isAlive = false;
           this.filterOptionsData = data;
           //let notLoadingStatuses :string[]= ['Applied','Shortlisted','Rejected','Bill Rate Pending','Offered Bill Rate','Offboard','Withdraw','Cancelled','Not Applied'];
-          
+          debugger;
           this.candidateStatusesData=data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
             this.filterColumns.candidateStatuses.dataSource =this.candidateStatusesData;
               this.filterColumns.agencyIds.dataSource = data.agencies;
@@ -208,6 +209,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         agencyIds: new FormControl([]),
         jobId: new FormControl(''),
         candidateStatuses: new FormControl([]),
+        opcredFlag: new FormControl(false),
       }
     );
   }
@@ -350,7 +352,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { departmentIds, locationIds,  regionIds, startDate, endDate, jobId,candidateStatuses } = this.credentialExpiryForm.getRawValue();
+    let { departmentIds, locationIds,  regionIds, startDate, endDate, jobId,candidateStatuses ,opcredFlag} = this.credentialExpiryForm.getRawValue();
 
     if (!this.credentialExpiryForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
@@ -385,7 +387,8 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
       this.organizations[0].id.toString():"1": 
       window.localStorage.getItem("lastSelectedOrganizationId"),
-        "HostName": this.baseUrl,
+      "HostName": this.baseUrl,
+      "OpCredFlagEXP":opcredFlag==""?"false":opcredFlag.toString(),
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
@@ -501,4 +504,3 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     return;
   }
 }
-
