@@ -65,7 +65,6 @@ export class OrderManagement {
   activeCandidatesCount?: number;
   isLockedIRP: boolean;
   menuItems?: ItemModel[]; // use only in UI for context menu datasource
-  attachedFiles?: unknown[]; //TODO provide interface after BE implementation
 }
 
 export interface IRPOrderManagement {
@@ -244,7 +243,6 @@ export type AgencyOrderManagement = {
   extensionFromId?: number;
   candidates?: CandidateModel[];
   irpOrderMetadata?: IRPMetaData;
-  attachedFiles?: unknown[]; //TODO provide interface after BE implementation
 };
 
 export interface OrderManagementChild  {
