@@ -392,8 +392,8 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
       "TodayMSR": formatDate(new Date(), this.dateFormat, this.culture),
       "IsOptionalRequred": IsOptionalRequred
     };
-    //this.logiReportComponent.paramsData = this.paramsData;
-    //this.logiReportComponent.RenderReport();
+    this.logiReportComponent.paramsData = this.paramsData;
+    this.logiReportComponent.RenderReport();
   }
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
