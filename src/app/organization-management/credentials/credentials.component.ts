@@ -112,7 +112,7 @@ export class CredentialsComponent extends AbstractPermissionGrid implements OnIn
       filter(() => this.activeTab === CredentialsNavigationTabs.Setup),
       takeUntil(this.unsubscribe$),
     ).subscribe(([credential, skillGroup]) => {
-      this.showCredentialMessage = !credential.length && !skillGroup?.items?.length;
+      this.showCredentialMessage = !credential.length || !skillGroup?.items?.length;
       this.cdr.markForCheck();
     });
   }
