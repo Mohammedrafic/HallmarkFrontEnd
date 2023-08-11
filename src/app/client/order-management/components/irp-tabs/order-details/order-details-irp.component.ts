@@ -540,7 +540,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.getAllShifts();
   }
 
-  // eslint-disable-next-line max-lines-per-function
   private watchForFormValueChanges(): void {
     this.watchForCredentialsControls();
 
@@ -565,7 +564,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       const startDate = this.generalInformationForm.get('jobStartDate')?.value ? this.generalInformationForm.get('jobStartDate')?.value : this.generalInformationForm.get('jobDates')?.value;
-      // eslint-disable-next-line max-len
       const departments = this.generalInformationForm.get('jobDates')?.value ? this.organizationStructureService.getDepartmentByIdSet(value, startDate ?? new Date) : this.organizationStructureService.getDepartmentsById(value, startDate ?? new Date);
       this.generalInformationForm.get('departmentId')?.reset();
 
