@@ -1,4 +1,12 @@
+@import 'colors';
+
 .grid-table-container {
   height: 800px;
   width: 100%;
+
+  ::ng-deep {
+    .ag-header-cell {
+      color: $secondary-dark-blue-15;
+    }
+  }
 }

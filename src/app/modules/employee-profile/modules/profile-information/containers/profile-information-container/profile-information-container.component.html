@@ -1,0 +1,12 @@
+<div class="profile-information-container">
+  <div class="form e-card">
+    <app-employee-profile-form [employeeProfileData]="employeeProfileData"></app-employee-profile-form>
+  </div>
+  <div class="photo">
+    <app-image-uploader
+      uploaderTitle="Photo"
+      [disabled]="true"
+      [logo]="photo">
+    </app-image-uploader>
+  </div>
+</div>
