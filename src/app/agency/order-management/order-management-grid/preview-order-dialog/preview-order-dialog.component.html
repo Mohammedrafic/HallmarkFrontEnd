@@ -45,8 +45,8 @@
                     <app-general-reorder-info
                       *ngSwitchCase="orderType.ReOrder"
                       [system]="system"
-                      [orderInformation]="currentOrder"></app-general-reorder-info>
-                    <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
+                      [order]="currentOrder"></app-general-reorder-info>
+                    <app-general-order-info *ngSwitchDefault [order]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
                   <ng-container *ngIf="isClosedOrder">
@@ -95,7 +95,7 @@
                 <ng-template #content>
                   <section class="order-details">
                     <section class="job-details">
-                      <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                      <app-general-order-info [order]="currentOrder"></app-general-order-info>
                     </section>
                     <hr />
                     <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>

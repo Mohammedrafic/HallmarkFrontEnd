@@ -438,9 +438,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     orderPublicId,
     candidatePayRate,
     clockId,
+    initialBillRate,
   }: OrderCandidateJob) {
     this.getComments();
-    const candidateBillRateValue = candidateBillRate ?? hourlyRate;
+    const candidateBillRateValue = candidateBillRate ?? initialBillRate;
     let isBillRatePending: number;
 
     if (this.orderCandidateJob.applicantStatus.applicantStatus === CandidatStatus.BillRatePending) {
@@ -453,7 +454,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.acceptForm.reset();
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
-      offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
+      offeredBillRate: PriceUtils.formatNumbers(initialBillRate),
       candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
       locationName,
       departmentName,

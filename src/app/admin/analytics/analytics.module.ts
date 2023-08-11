@@ -70,7 +70,8 @@ import { StaffAvailabilityComponent } from './staff-availability/staff-availabil
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
-
+import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
+import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
 
 @NgModule({
   declarations: [
@@ -126,7 +127,9 @@ import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.compo
     StaffAvailabilityComponent,
     PositionSummaryComponent,
     AgencySpendComponent,
-    ShiftBreakdownComponent],
+    ShiftBreakdownComponent,
+    FinancialTimeSheetBetaComponent,
+    DepartmentSpendAndHoursComponent  ],
   exports: [
     CandidateListComponent
   ],

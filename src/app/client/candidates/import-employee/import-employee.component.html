@@ -1,0 +1,29 @@
+<app-import-dialog-content
+  [importResponse]="importResponse"
+  [dialogEvent]="dialogEvent"
+  [selectErrorsTab]="selectErrorsTab"
+  (downloadErrorsEvent)="downloadErrors($event)"
+  (downloadTemplateEvent)="downloadTemplate()"
+  (saveImportResult)="saveImportResult($event)"
+  (uploadImportFile)="uploadImportFile($event)"
+  [title]="titleImport"
+>
+  <div successful class="grid-wrapper">
+    <app-import-grid
+      class="import-grid"
+      gridName="Employee"
+      *ngIf="importResponse?.succesfullRecords?.length"
+      [importedItems]="importResponse?.succesfullRecords || []"
+      [columnDefs]="columnDefs"
+    ></app-import-grid>
+  </div>
+  <div errors class="grid-wrapper">
+    <app-import-grid
+      class="import-grid"
+      gridName="Employee"
+      *ngIf="importResponse?.errorRecords?.length"
+      [importedItems]="importResponse?.errorRecords || []"
+      [columnDefs]="columnDefs"
+    ></app-import-grid>
+  </div>
+</app-import-dialog-content>

@@ -375,6 +375,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
                     this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(true);
                 }
               }else{
+                if(this.agencySwitch) {
+                  this.AssociateAgencyData = this.AssociateAgencyData.filter(item1 => !data.some(item2 => (item2.id === item1.agencyId && item2.name === item1.agencyName)));
+                }
+                if(this.organizationSwitch) {
+                  this.ShareOrganizationsData = this.ShareOrganizationsData.filter(item1 => !data.some(item2 => (item2.id === item1.id && item2.name === item1.name)));
+                }
                 this.sharedWith?.gridOptions?.api?.setRowData(data);
               }
             }
@@ -928,9 +934,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.documentDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: DownloadDocumentDetail) => {
         if (data) {
-          if (this.downloadedFileName != data.fileName) {
-            this.downloadedFileName = data.fileName;
-            this.createLinkToDownload(data.fileAsBase64, data.fileName, data.contentType);
+          if (this.downloadedFileName != data.name) {
+            this.downloadedFileName = data.name;
+            this.createLinkToDownload(data.fileAsBase64, data.name, data.contentType);
           }
         }
       });

@@ -20,12 +20,12 @@ import { datepickerMask } from '@shared/constants';
 export class DatepickerComponent extends BaseFormControlDirective {
   @ViewChild('datepicker') datepicker: DatePickerComponent;
   @Input() format: string | FormatObject = 'MM/dd/yyyy';
-  @Input() enableMask: boolean = true;
+  @Input() enableMask = true;
   @Input() maskPlaceholder: MaskPlaceholderModel = datepickerMask;
-  @Input() min: Date | null | undefined;
-  @Input() max: Date | null | undefined;
+  @Input() min: string | Date | null | undefined;
+  @Input() max: string | Date | null | undefined;
   @Input() public override placeholder = 'MM/DD/YYYY';
-  @Input() public strictMode: boolean = false;
+  @Input() public strictMode = false;
 
   @Output() valueChange: EventEmitter<Date> = new EventEmitter();
   @Output() change: EventEmitter<ChangedEventArgs> = new EventEmitter();

@@ -15,21 +15,23 @@
       </div>
 
       <div class="action-buttons" *ngIf="currentTab !== tableTypes.HistoricalData">
+        <ng-container *ngIf="isTablet && !isSmallContentWidth">
+          <ng-container *ngTemplateOutlet="dropdownButton"></ng-container>
+        </ng-container>
+
         <button
-          *ngIf="canRecalculateTimesheet"
+          *ngIf="canRecalculateTimesheet && !isTablet"
           ejs-button
           cssClass="e-action-button"
           class="add-action spaced no-right-space"
-          [ngClass]="{ 'adaptive-btn': isMiddleContentWidth }"
           (click)="recalculateTimesheets()">
           <i-feather name="refresh-cw" class="icon"></i-feather>
-          <span *ngIf="!isMiddleContentWidth">Recalculate</span>
+          <span>Recalculate</span>
         </button>
         <ng-container *ngIf="isEditEnabled">
           <app-tooltip-container
-            [ngClass]="{ 'middle-tablet': isMiddleContentWidth }"
             [showToolTip]="!hasEditPermissions"
-            *ngIf="!actionsDisabled && currentTab !== tableTypes.Expenses"
+            *ngIf="!actionsDisabled && currentTab !== tableTypes.Expenses && !isTablet"
           >
             <button
               class="add-action spaced"
@@ -43,11 +45,7 @@
           </app-tooltip-container>
 
           <ng-container *ngIf="!actionsDisabled && (recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn)">
-            <app-tooltip-container
-              [ngClass]="{ 'middle-tablet': isMiddleContentWidth }"
-              [showToolTip]="!hasEditPermissions"
-              *ngIf="!isEditOn; else isMobile ? editMobileBtnHandlers : editHandlers"
-            >
+            <app-tooltip-container [showToolTip]="!hasEditPermissions" *ngIf="!isEditOn && !isTablet">
               <button
                 (click)="editTimesheets()"
                 [disabled]="disableAnyAction || !hasEditPermissions ||disableEditButton"
@@ -59,34 +57,11 @@
                 <span class="action-text">Edit</span>
               </button>
             </app-tooltip-container>
+            <div class="edit-handler-buttons" *ngIf="isEditOn && !isSmallContentWidth">
+              <ng-container *ngTemplateOutlet="editHandlers"></ng-container>
+            </div>
           </ng-container>
         </ng-container>
-
-        <ng-template #editHandlers>
-          <div class="controls-wrapper">
-            <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
-            <button (click)="saveChanges()" ejs-button [isPrimary]="true" class="spinner-btn">
-              <div #spinner class="spinner-container" *ngIf="loading; else savetext"></div>
-              <ng-template #savetext>
-                <span>Save</span>
-              </ng-template>
-            </button>
-          </div>
-        </ng-template>
-
-        <ng-template #editMobileBtnHandlers>
-            <app-tooltip-container>
-              <button
-                ejs-dropdownbutton
-                iconCss="e-icons"
-                cssClass="e-caret-hide primary-icon-button menu-mobile"
-                [items]="mobileEditMenuActions"
-                (select)="onMobileEditMenuSelect($event)"
-              >
-                <i-feather name="more-vertical" class="icon"></i-feather>
-              </button>
-            </app-tooltip-container>
-        </ng-template>
 
         <div class="desktop-tablet-btn-group" *ngIf="!isSmallContentWidth">
           <ng-container *ngTemplateOutlet="btnGroup"></ng-container>
@@ -114,7 +89,13 @@
       </ag-grid-angular>
     </div>
     <div [ngClass]="{ 'mobile-btn-group': true, 'small-tablet': isSmallContentWidth }">
+      <ng-container *ngIf="isMobile && currentTab !== tableTypes.HistoricalData">
+        <ng-container  *ngTemplateOutlet="dropdownButton"></ng-container>
+      </ng-container>
       <ng-container *ngTemplateOutlet="btnGroup"></ng-container>
+      <ng-container *ngIf="isSmallContentWidth && !actionsDisabled && recordsToShow?.[currentTab]?.[modeValues.Edit]?.length && isEditOn">
+        <ng-container  *ngTemplateOutlet="editHandlers"></ng-container>
+      </ng-container>
     </div>
   </div>
 </section>
@@ -161,4 +142,26 @@
       </button>
     </app-tooltip-container>
   </div>
+</ng-template>
+
+<ng-template #dropdownButton>
+  <button
+    ejs-dropdownbutton
+    iconCss="e-icons"
+    cssClass="e-caret-hide primary-icon-button menu-mobile dropdown-btn"
+    [items]="dropDownBtnActionItems"
+    (select)="selectDropDownBtnActionItem($event)"
+  >
+    <i-feather name="more-vertical" class="icon"></i-feather>
+  </button>
+</ng-template>
+
+<ng-template #editHandlers>
+    <button ejs-button cssClass="e-outline flex-grow-1" (click)="cancelChanges()">Cancel</button>
+    <button (click)="saveChanges()" ejs-button [isPrimary]="true" class="spinner-btn" cssClass="flex-grow-1">
+      <div #spinner class="spinner-container" *ngIf="loading; else savetext"></div>
+      <ng-template #savetext>
+        <span>Save</span>
+      </ng-template>
+    </button>
 </ng-template>

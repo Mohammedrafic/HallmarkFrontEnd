@@ -1,0 +1,32 @@
+@import 'colors';
+
+.employee-name {
+  color: $secondary-dark-blue-10;
+  font-size: 24px;
+  line-height: 32px;
+  padding: 16px 0;
+  border-bottom: 1px solid $secondary-dark-blue-40;
+}
+
+.employee-profile-sections {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0 28px;
+
+  .section-link {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    color: $secondary-dark-blue-10;
+    background-color: $white;
+    border: 1px solid $secondary-dark-blue-45;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .active-link {
+    color: $white;
+    background-color: $primary-active-blue-10;
+    border-color: $primary-active-blue-10;
+  }
+}

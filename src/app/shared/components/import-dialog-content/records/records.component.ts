@@ -5,8 +5,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base
 @Component({
   selector: 'app-records',
   templateUrl: './records.component.html',
-  styleUrls: ['./records.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RecordsComponent {
   @Input() dataSource: any;
@@ -16,6 +15,4 @@ export class RecordsComponent {
   @Output() changeEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   public selectionSettings: SelectionSettingsModel = { mode: 'Single' };
-
-  constructor() { }
 }

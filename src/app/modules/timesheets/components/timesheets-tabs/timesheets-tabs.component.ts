@@ -9,19 +9,21 @@ import {
   SimpleChanges,
   ViewChild,Inject,
   OnInit,
+  ViewContainerRef,
+  TemplateRef,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
-import { Select } from '@ngxs/store';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { Observable, takeUntil, filter, take } from 'rxjs';
+import { Observable, takeUntil, filter, distinctUntilChanged, debounceTime } from 'rxjs';
+import { Select } from '@ngxs/store';
 
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { OutsideZone } from '@core/decorators';
 import { TabConfig, TabCountConfig } from '../../interface';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { GlobalWindow } from '@core/tokens';
-import { Destroyable } from '@core/helpers';
+import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { ResizeContentService } from '@shared/services/resize-main-content.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 
@@ -35,6 +37,12 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
   @ViewChild(TabComponent)
   public tabComponent: TabComponent;
 
+  @ViewChild('outletRef', { read: ViewContainerRef })
+  private outletContainerRef: ViewContainerRef;
+
+  @ViewChild('tabsRef', { read: TemplateRef })
+  private tabsTemplateRef: TemplateRef<HTMLElement>;
+
   @Input()
   public tabConfig: TabConfig[];
 
@@ -47,8 +55,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
   public missingtimesheet: string;
   public tabsWidth$: Observable<string>;
 
-  @Select(TimesheetsState.tabCounts)
-  readonly tabCounts$: Observable<TabCountConfig>;
+  @Select(TimesheetsState.tabCounts) private tabsConfig$: Observable<TabCountConfig>;
 
   constructor(
     @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis,
@@ -57,11 +64,11 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
     private ResizeContentService: ResizeContentService,
   ) {
     super();
+    this.watchForTabConfig();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['tabConfig']) {
-      this.asyncRefresh();
       this.navigatingTab();
       this.navigatetopendingtimesheet();
     }
@@ -72,7 +79,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
   }
 
   public ngOnInit(): void {
-    this.subscribeOnTabSource();
+    this.getTabsWidth();
   }
 
   public override ngOnDestroy(): void {
@@ -92,12 +99,6 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
     this.changeTab.emit(selectEvent.selectingIndex);
   }
 
-  @OutsideZone
-  private asyncRefresh(): void {
-    setTimeout(() => {
-      this.tabComponent?.refreshActiveTabBorder();
-    });
-  }
   @OutsideZone
   private navigatetopendingtimesheet(): void {
     setTimeout(() => {
@@ -138,20 +139,31 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
 
   }
 
-  private subscribeOnTabSource(): void {
-    this.tabCounts$.pipe(
-      filter((tabs) => !!tabs),
-      take(1),
-    )
-      .subscribe(() => {
-        this.getTabsWidth();
-      });
-  }
-
   private getTabsWidth(): void {
     this.ResizeContentService.initResizeObservable()
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe();
     this.tabsWidth$ = this.ResizeContentService.getContainerWidth();
+  }
+
+  private watchForTabConfig(): void {
+    this.tabsConfig$.pipe(
+      filter(() => !!this.outletContainerRef),
+      distinctUntilChanged((prev, curr) => {
+        return isObjectsEqual(
+          prev as unknown as Record<string, unknown>,
+          curr as unknown as Record<string, unknown>
+        );
+      }),
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe(() => {
+      this.reRenderTabs();
+    });
+  }
+  
+  private reRenderTabs(): void {
+    this.outletContainerRef.clear();
+    this.outletContainerRef.createEmbeddedView(this.tabsTemplateRef);
   }
 }

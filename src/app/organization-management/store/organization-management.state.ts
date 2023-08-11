@@ -230,6 +230,7 @@ export interface OrganizationManagementStateModel {
   isLocationTypesLoading: boolean;
   assignedSkillsByOrganization: ListOfSkills[];
   filteringAssignedSkillsByOrganization: ListOfSkills[];
+  credentialSettingPage: CredentialPage | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -288,6 +289,7 @@ export interface OrganizationManagementStateModel {
     isLocationTypesLoading: false,
     assignedSkillsByOrganization: [],
     filteringAssignedSkillsByOrganization: [],
+    credentialSettingPage: null,
   },
 })
 @Injectable()
@@ -434,6 +436,11 @@ export class OrganizationManagementState {
   @Selector()
   static credentials(state: OrganizationManagementStateModel): Credential[] | CredentialPage {
     return state.credentials;
+  }
+
+  @Selector()
+  static credentialSettingPage(state: OrganizationManagementStateModel): CredentialPage | null {
+    return state.credentialSettingPage;
   }
 
   @Selector()
@@ -1160,9 +1167,12 @@ export class OrganizationManagementState {
   ): Observable<CredentialPage> {
     return this.credentialsService.getCredentialForSettings(filters).pipe(
       tap((payload: CredentialPage) => {
-        patchState({credentials: payload});
+        patchState({
+          credentials: payload,
+          credentialSettingPage: payload,
+        });
       })
-    )
+    );
   }
 
   @Action(SaveCredential)

@@ -1,7 +1,15 @@
 import { formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 
-import { OrganizationDepartment, OrganizationLocation,OrganizationDepartmentInactivate,OrganizationLocationInactivate, OrganizationRegion, OrganizationLTALocationInactivate, OrganizationLTADepartmentInactivate } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationDepartmentInactivate,
+  OrganizationLocationInactivate,
+  OrganizationRegion,
+  OrganizationLTALocationInactivate,
+  OrganizationLTADepartmentInactivate,
+} from '@shared/models/organization.model';
 
 @Injectable()
 export class OrganizationStructureService {

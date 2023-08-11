@@ -61,8 +61,6 @@ import { NgxMaskModule } from 'ngx-mask';
 import { ClientRoutingModule } from './client-routing.module';
 import { OrderManagementContentComponent } from './order-management/components/order-management-content/order-management-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
-import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
-import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
 import { TabNavigationComponent } from './order-management/components/order-management-content/tab-navigation/tab-navigation.component';
@@ -120,6 +118,7 @@ import { DatepickerModule } from '@shared/components/form-controls/datepicker/da
 import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
 import { ImportDnrComponent } from './do-not-return/import-dnr/import-dnr.component';
 import { CreateEditOrderResolver } from '@client/order-management/resolvers/create-edit-order.resolver';
+import { ImportEmployeeComponent } from './candidates/import-employee/import-employee.component';
 
 
 const gridIcons = {
@@ -164,8 +163,6 @@ const gridIcons = {
     ClientComponent,
     OrderManagementContentComponent,
     CandidatesContentComponent,
-    InvoicesContentComponent,
-    TimesheetsContentComponent,
     ReportsContentComponent,
     TabNavigationComponent,
     OrderDetailsDialogComponent,
@@ -176,6 +173,7 @@ const gridIcons = {
     DoNotReturnDetailsComponent,
     DoNotReturnGridComponent,
     ImportDnrComponent,
+    ImportEmployeeComponent
   ],
   imports: [
     CommonModule,

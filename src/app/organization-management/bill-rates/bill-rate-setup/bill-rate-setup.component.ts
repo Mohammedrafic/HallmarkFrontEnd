@@ -805,7 +805,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         ? data.rateHour
         : parseFloat(data.rateHour.toString()).toFixed(decimals);
     this.billRatesFormGroup.controls['billRateValueRateTimes'].setValue(rateHour);
-    this.billRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
+    this.billRatesFormGroup.controls['effectiveDate'].setValue(DateTimeHelper.setCurrentTimeZone(data.effectiveDate));
     this.billRatesFormGroup.controls['intervalMin'].setValue(data.intervalMin);
     this.billRatesFormGroup.controls['intervalMax'].setValue(data.intervalMax);
     this.billRatesFormGroup.controls['considerForWeeklyOt'].setValue(data.considerForWeeklyOT);

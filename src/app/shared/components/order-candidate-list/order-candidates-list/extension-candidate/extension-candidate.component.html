@@ -2,7 +2,7 @@
   <section class="header-container">
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
-        <h3 class="e-card-title candidate-title">{{ candidate?.lastName }}, {{ candidate?.firstName }}</h3>
+        <h3 class="e-card-title candidate-title link" (click)="onViewNavigation()">{{ candidate?.lastName }}, {{ candidate?.firstName }}</h3>
         <ng-container *ngIf="candidate.workflowStepType">
           <ejs-chiplist [text]="candidate.statusName">
             <e-chips>
@@ -357,6 +357,6 @@
 
 <app-send-email-side-dialog [header]="templateEmailTitle" [isSend]="isSend"  (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()" [width]="'1000px'">
   <app-onboard-candidate-message-dialog  [isFormInvalid]="isSendOnboardFormInvalid"
-    [onBoardMessageEmailTemplateForm]="$any(sendOnboardMessageEmailFormGroup)" [title]="templateEmailTitle" [isSend]="isSend" [emailTo]="emailTo" 
+    [onBoardMessageEmailTemplateForm]="$any(sendOnboardMessageEmailFormGroup)" [title]="templateEmailTitle" [isSend]="isSend" [emailTo]="emailTo"
   ></app-onboard-candidate-message-dialog>
 </app-send-email-side-dialog>

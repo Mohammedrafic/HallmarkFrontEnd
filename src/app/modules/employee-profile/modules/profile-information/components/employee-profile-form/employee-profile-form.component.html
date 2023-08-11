@@ -1,0 +1,101 @@
+<div class="employee-profile-form-container">
+  <ng-container *ngTemplateOutlet="form; context: { formGroup: demographicsForm, config: formsConfig.demographics }"></ng-container>
+  <ng-container *ngTemplateOutlet="form; context: { formGroup: professionalDetailsForm, config: formsConfig.professionalDetails }"></ng-container>
+  <ng-container *ngTemplateOutlet="form; context: { formGroup: contactDetailsForm, config: formsConfig.contactDetails }"></ng-container>
+</div>
+
+<ng-template #form let-formGroup="formGroup" let-config="config">
+  <div class="form-container" *ngIf="formGroup">
+    <div class="form-title">{{ config.title }}</div>
+    <form [formGroup]="formGroup" [class]="config.class">
+      <ng-container *ngFor="let control of config.fields">
+        <ng-container [ngSwitch]="control.type">
+          <ng-template [ngSwitchCase]="fieldTypes.Calendar">
+            <div *ngIf="control.subGridClass; else calendar" [class]="control.subGridClass">
+              <ng-container *ngTemplateOutlet="calendar"></ng-container>
+            </div>
+            <ng-template #calendar>
+              <div [ngStyle]="{'grid-area': control.gridAreaName}">
+                <app-datepicker
+                  class="input-container bootstrap"
+                  [label]="control.title"
+                  [required]="control.required"
+                  [controlName]="control.field"
+                  [formGroupInstance]="formGroup"
+                  [disabled]="!!control.readonly"
+                ></app-datepicker>
+              </div>
+            </ng-template>
+          </ng-template>
+          <ng-template [ngSwitchCase]="fieldTypes.Input">
+            <div *ngIf="control.subGridClass; else input" [class]="control.subGridClass">
+              <ng-container *ngTemplateOutlet="input"></ng-container>
+            </div>
+            <ng-template #input>
+              <div class="input-container bootstrap"  [ngStyle]="{'grid-area': control.gridAreaName}">
+                <label [for]="control.field">{{ control.title }} <span class="required" *ngIf="control.required">*</span></label>
+                <app-tooltip-container [showToolTip]="!!control.tooltipContent" position="TopCenter" [message]="control.tooltipContent">
+                  <div class="input-group" [ngClass]="{'input-readonly': control.readonly}">
+                    <input
+                      class="e-input"
+                      [name]="control.field"
+                      [readonly]="control.readonly"
+                      [formControlName]="control.field"
+                    />
+                  </div>
+                </app-tooltip-container>
+              </div>
+            </ng-template>
+          </ng-template>
+          <ng-template [ngSwitchCase]="fieldTypes.Dropdown">
+            <div *ngIf="control.subGridClass; else dropdown" [class]="control.subGridClass">
+              <ng-container *ngTemplateOutlet="dropdown"></ng-container>
+            </div>
+            <ng-template #dropdown>
+              <div class="input-container bootstrap" [ngStyle]="{'grid-area': control.gridAreaName}">
+                <label [for]="control.field">{{ control.title }} <span class="required" *ngIf="control.required">*</span></label>
+                <app-tooltip-container [showToolTip]="!!control.tooltipContent" position="TopCenter" [message]="control.tooltipContent">
+                  <div class="input-group dropdown" *ngIf="control.sourceKey">
+                    <ejs-dropdownlist
+                      [dataSource]="formSourceMap[control.sourceKey]"
+                      [fields]="dropDownFields"
+                      [enabled]="!control.readonly"
+                      [formControlName]="control.field">
+                    </ejs-dropdownlist>
+                  </div>
+                </app-tooltip-container>
+              </div>
+            </ng-template>
+          </ng-template>
+          <ng-template [ngSwitchCase]="fieldTypes.MultiSelectDropdown">
+            <div *ngIf="control.subGridClass; else multiSelectDropdown" [class]="control.subGridClass">
+              <ng-container *ngTemplateOutlet="multiSelectDropdown"></ng-container>
+            </div>
+            <ng-template #multiSelectDropdown>
+              <div class="input-container bootstrap" [ngStyle]="{'grid-area': control.gridAreaName}">
+                <label [for]="control.field">{{ control.title }} <span class="required" *ngIf="control.required">*</span></label>
+                <app-tooltip-container [showToolTip]="!!control.tooltipContent" position="TopCenter" [message]="control.tooltipContent">
+                  <div class="input-group dropdown">
+                    <ejs-multiselect
+                      appValidateWithMessage
+                      selectAllText="Select All"
+                      mode="CheckBox"
+                      [dataSource]="formSourceMap[control.sourceKey]"
+                      [fields]="dropDownFields"
+                      [showSelectAll]="true"
+                      [allowFiltering]="true"
+                      [showDropDownIcon]="true"
+                      [formControlName]="control.field"
+                      [enabled]="!control.readonly"
+                    >
+                    </ejs-multiselect>
+                  </div>
+                </app-tooltip-container>
+              </div>
+            </ng-template>
+          </ng-template>
+        </ng-container>
+      </ng-container>
+    </form>
+  </div>
+</ng-template>

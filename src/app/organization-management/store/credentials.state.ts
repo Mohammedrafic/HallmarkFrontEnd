@@ -10,7 +10,6 @@ import {
   SaveCredentialGroupMapping,
   UpdateCredentialSetup,
   SetCredentialSetupFilter,
-  SetNavigationTab,
   UpdateCredentialSetupSucceeded,
   SaveUpdateCredentialSetupMappingData,
   SaveUpdateCredentialSetupMappingSucceeded,
@@ -28,23 +27,22 @@ import {
   RECORD_ADDED,
   RECORD_CANNOT_BE_DELETED,
   RECORD_CANNOT_BE_SAVED,
-  RECORD_MODIFIED
+  RECORD_MODIFIED,
 } from '@shared/constants';
 import { CredentialsService } from '@shared/services/credentials.service';
 import {
   CredentialSetupGet,
   CredentialSetupPage,
-  SaveUpdatedCredentialSetupDetailIds
+  SaveUpdatedCredentialSetupDetailIds,
 } from '@shared/models/credential-setup.model';
 import { getAllErrors } from '@shared/utils/error.utils';
 import {
   AssignedCredentialTree,
-  AssignedCredentialTreeData
+  AssignedCredentialTreeData,
 } from '@shared/models/credential.model';
 import { compact } from 'lodash';
 
 export interface CredentialsStateModel {
-  activeTab: number;
   setupFilter: CredentialSetupFilter | null;
   groupMappings: SkillGroupMapping[],
   filteredCredentialSetupData: CredentialSetupPage | null,
@@ -55,7 +53,6 @@ export interface CredentialsStateModel {
 @State<CredentialsStateModel>({
   name: 'credentials',
   defaults: {
-    activeTab: 0,
     setupFilter: null,
     groupMappings: [],
     filteredCredentialSetupData: null,
@@ -65,9 +62,6 @@ export interface CredentialsStateModel {
 })
 @Injectable()
 export class CredentialsState {
-  @Selector()
-  static activeTab(state: CredentialsStateModel): number { return state.activeTab; }
-
   @Selector()
   static setupFilter(state: CredentialsStateModel): CredentialSetupFilter | null { return state.setupFilter; }
 
@@ -88,11 +82,6 @@ export class CredentialsState {
 
   constructor(private skillGroupService: SkillGroupService,
               private credentialService: CredentialsService) {}
-
-  @Action(SetNavigationTab)
-  SetNavigationTab({ patchState }: StateContext<CredentialsStateModel>, { payload }: SetNavigationTab): void {
-    patchState({ activeTab: payload });
-  }
 
   @Action(SetCredentialSetupFilter)
   SetCredentialSetupFilter({ patchState }: StateContext<CredentialsStateModel>, { payload }: SetCredentialSetupFilter): void {
@@ -188,10 +177,16 @@ export class CredentialsState {
   }
 
   @Action(UpdateCredentialSetup)
-  UpdateCredentialSetup({ dispatch }: StateContext<CredentialsStateModel>, { credentialSetup }: UpdateCredentialSetup): Observable<CredentialSetupGet> {
-    return this.credentialService.updateCredentialSetup(credentialSetup).pipe(tap((response) => {
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED))
-      dispatch(new UpdateCredentialSetupSucceeded());
+  UpdateCredentialSetup(
+    { dispatch }: StateContext<CredentialsStateModel>,
+    { credentialSetup }: UpdateCredentialSetup
+  ): Observable<CredentialSetupGet> {
+    return this.credentialService.updateCredentialSetup(credentialSetup)
+      .pipe(tap((response) => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+          new UpdateCredentialSetupSucceeded(credentialSetup.mappingId),
+        ]);
       return response;
     }));
   }

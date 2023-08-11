@@ -69,6 +69,7 @@ import {
   GetAllShifts,
   sendOnboardCandidateEmailMessage,
   GetOrderComments,
+  ApproveOrderSucceeded,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -106,6 +107,8 @@ import {
   PerDiemReOrdersErrorMessage,
   TravelerContracttoPermOrdersSucceedMessage,
   RECORD_DELETE,
+  RECORD_MODIFIED_SUCCESS_WITH_ORDERID,
+  RECORD_SAVED_SUCCESS_WITH_ORDERID,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -136,6 +139,7 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { ChangeInternalDistributionSuccess } from '@client/order-management/components/irp-tabs/order-details/constants';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -784,7 +788,7 @@ export class OrderManagementContentState {
   @Action(SaveIrpOrder)
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents,inActivedatestr,isLocation,isLocationAndDepartment }: SaveIrpOrder
+    { order, documents, inActivedatestr,isLocation,isLocationAndDepartment }: SaveIrpOrder
   ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
@@ -823,7 +827,7 @@ export class OrderManagementContentState {
   ): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
-        let TOAST_MESSAGE = 'Record has been created';
+        let TOAST_MESSAGE = RECORD_ADDED;
         let MESSAGE_TYPE = MessageTypes.Success;
         const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
         const hasntOrderBillRates =
@@ -850,7 +854,7 @@ export class OrderManagementContentState {
                 payload.organizationPrefix,
                 payload.publicId
               )
-            : new ShowToast(MessageTypes.Success, 'Order '+ payload.organizationPrefix?.toString()+'-'+payload.publicId?.toString()+' has been added'),
+            : new ShowToast(MessageTypes.Success, RECORD_SAVED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
           new SaveLastSelectedOrganizationAgencyId(
@@ -871,12 +875,15 @@ export class OrderManagementContentState {
   @Action(EditIrpOrder)
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: EditIrpOrder
+    { order, documents, internalDistributionChanged }: EditIrpOrder
   ): Observable<void | Blob[] | Order[]> {
     return this.orderManagementService.editIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
+        const successMessage = internalDistributionChanged ? ChangeInternalDistributionSuccess
+        : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(order[0]?.organizationPrefix??'',order[0]?.publicId?.toString()??'');
+
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+          new ShowToast(MessageTypes.Success, successMessage),
           new SaveIrpOrderSucceeded(),
         ]);
         if (documents.length) {
@@ -897,7 +904,7 @@ export class OrderManagementContentState {
     return this.orderManagementService.editOrder(order, documents).pipe(
       tap((payload: Order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, message ?? RECORD_MODIFIED),
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')??message),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
@@ -959,11 +966,18 @@ export class OrderManagementContentState {
   @Action(ApproveOrder)
   ApproveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, isIRPTab }: ApproveOrder
+    { id, isIRPTab, updateOpenedOrder }: ApproveOrder
   ): Observable<string | void> {
     return this.orderManagementService
       .approveOrder(id, isIRPTab)
-      .pipe(catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error))));
+      .pipe(
+        tap(() => {
+          if (updateOpenedOrder) {
+            dispatch([new GetSelectedOrderById(id, isIRPTab), new ApproveOrderSucceeded()]);
+          }
+        }),
+        catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
+      );
   }
 
   @Action(GetOrderFilterDataSources)
