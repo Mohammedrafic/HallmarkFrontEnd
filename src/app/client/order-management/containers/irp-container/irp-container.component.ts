@@ -367,7 +367,8 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           id: this.selectedOrder.id,
           deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
         },
-        this.irpStateService.getDocuments()
+        this.irpStateService.getDocuments(),
+        this.irpStateService.getFormState().internalDistributionChanged,
       )
     );
   }

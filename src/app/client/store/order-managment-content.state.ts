@@ -140,6 +140,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
+import { ChangeInternalDistributionSuccess } from '@client/order-management/components/irp-tabs/order-details/constants';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -788,7 +789,7 @@ export class OrderManagementContentState {
   @Action(SaveIrpOrder)
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents,inActivedatestr,isLocation,isLocationAndDepartment }: SaveIrpOrder
+    { order, documents, inActivedatestr,isLocation,isLocationAndDepartment }: SaveIrpOrder
   ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
@@ -875,12 +876,15 @@ export class OrderManagementContentState {
   @Action(EditIrpOrder)
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: EditIrpOrder
+    { order, documents, internalDistributionChanged }: EditIrpOrder
   ): Observable<void | Blob[] | Order[]> {
     return this.orderManagementService.editIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
+        const successMessage = internalDistributionChanged ? ChangeInternalDistributionSuccess
+        : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(order[0]?.organizationPrefix??'',order[0]?.publicId?.toString()??'');
+
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_MODIFIED_SUCCESS_WITH_ORDERID(order[0]?.organizationPrefix??'',order[0]?.publicId?.toString()??'')),
+          new ShowToast(MessageTypes.Success, successMessage),
           new SaveIrpOrderSucceeded(),
         ]);
         if (documents.length) {
