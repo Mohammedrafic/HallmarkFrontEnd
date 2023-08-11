@@ -66,7 +66,7 @@ import {
   DisableEditMessage,
   StatusFieldSettingsModel,
 } from './credentials-grid.constants';
-import { AddCredentialForm, SearchCredentialForm } from './credentials-grid.interface';
+import { AddCredentialForm, CredentialFiles, SearchCredentialForm } from './credentials-grid.interface';
 import { AppState } from '../../../store/app.state';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { CandidateService } from '@agency/services/candidates.service';
@@ -115,7 +115,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public disableAddCredentialButton: boolean;
   public requiredCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
-  public existingFiles: FilesPropModel[] = [];
+  public existingFiles: CredentialFiles[] = [];
   public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
 
   private pageSubject = new Subject<number>();
