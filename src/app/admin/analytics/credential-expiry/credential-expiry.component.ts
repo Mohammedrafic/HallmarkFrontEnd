@@ -479,6 +479,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.JobId)?.setValue('');
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.opcredFlag)?.setValue(false);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
