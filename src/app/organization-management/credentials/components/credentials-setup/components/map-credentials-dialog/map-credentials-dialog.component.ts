@@ -448,7 +448,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     this.selectedCredentialList = credentialSetupMapping.credentials;
 
    credentialSetupMapping.credentials.forEach(savedMapping => {
-      (this.gridDataSource as CredentialSetupGet[]).map((credential, index) => {
+      (this.gridDataSource as CredentialSetupGet[]).map((credential) => {
         if (credential.masterCredentialId === savedMapping.masterCredentialId) {
           credential.inactiveDate = savedMapping.inactiveDate;
           credential.isActive = savedMapping.isActive;
@@ -673,7 +673,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
 
   private watchForCredentialTypesChange(): void {
     this.mapCredentialsFormGroup.get('credentialType')?.valueChanges.pipe(
-      filter((values: number[]) => this.isIRPAndVmsEnabled && !!values?.length),
+      filter((values: number[]) => !!values?.length),
       takeUntil(this.componentDestroy()),
     ).subscribe((values: number[]) => {
       this.selectedCredentialTypes = values;

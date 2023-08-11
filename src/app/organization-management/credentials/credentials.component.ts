@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute,  RouterOutlet } from '@angular/router';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { combineLatest, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-navigations';
@@ -17,11 +17,15 @@ import {
   SetCredentialsFilterCount,
   ShowExportCredentialListDialog,
 } from '../store/credentials.actions';
-import { CredentialListService } from '@shared/components/credentials-list/services';
+import { CredentialFiltersService, CredentialListService } from '@shared/components/credentials-list/services';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { Credential } from '@shared/models/credential.model';
+import { CredentialPage } from '@shared/models/credential.model';
 import { CredentialSkillGroupPage } from '@shared/models/skill-group.model';
-import { GetCredential, GetCredentialTypes } from '@organization-management/store/organization-management.actions';
+import {
+  GetCredential,
+  GetCredentialForSettings,
+  GetCredentialTypes,
+} from '@organization-management/store/organization-management.actions';
 
 @Component({
   selector: 'app-credentials',
@@ -29,10 +33,8 @@ import { GetCredential, GetCredentialTypes } from '@organization-management/stor
   styleUrls: ['./credentials.component.scss'],
 })
 export class CredentialsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
-  @ViewChild(RouterOutlet) outlet: RouterOutlet;
-
-  @Select(OrganizationManagementState.credentials)
-  private credentials$: Observable<Credential[]>;
+  @Select(OrganizationManagementState.credentialSettingPage)
+  private credentialsPage$: Observable<CredentialPage>;
   @Select(OrganizationManagementState.skillGroups)
   private skillGroups$: Observable<CredentialSkillGroupPage>;
 
@@ -50,7 +52,8 @@ export class CredentialsComponent extends AbstractPermissionGrid implements OnIn
     private actions$: Actions,
     private permissionService: PermissionService,
     private credentialListService: CredentialListService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private credentialFiltersService: CredentialFiltersService
   ) {
     super(store);
 
@@ -61,6 +64,7 @@ export class CredentialsComponent extends AbstractPermissionGrid implements OnIn
     super.ngOnInit();
     this.getStructureAndPermission();
     this.watchForSkillGroupAndCredentials();
+    this.getCredentialForPage();
   }
 
   ngOnDestroy(): void {
@@ -106,13 +110,13 @@ export class CredentialsComponent extends AbstractPermissionGrid implements OnIn
 
   private watchForSkillGroupAndCredentials(): void {
     combineLatest([
-      this.credentials$,
+      this.credentialsPage$,
       this.skillGroups$,
     ]).pipe(
       filter(() => this.activeTab === CredentialsNavigationTabs.Setup),
       takeUntil(this.unsubscribe$),
     ).subscribe(([credential, skillGroup]) => {
-      this.showCredentialMessage = !credential.length || !skillGroup?.items?.length;
+      this.showCredentialMessage = !credential?.items?.length || !skillGroup?.items?.length;
       this.cdr.markForCheck();
     });
   }
@@ -124,6 +128,10 @@ export class CredentialsComponent extends AbstractPermissionGrid implements OnIn
     ).subscribe((count) => {
       this.filteredItemsCount = count.payload;
     });
+  }
+
+  private getCredentialForPage(): void {
+    this.store.dispatch( new GetCredentialForSettings(this.credentialFiltersService.filtersState));
   }
 }
 
