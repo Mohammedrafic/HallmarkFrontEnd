@@ -154,6 +154,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   IsSettingKeyScheduleOnlyWithAvailability: boolean = false;
   IsSettingKeyAvailabiltyOverLap: boolean = false;
   IsSettingKeyCreatePartialOrder: boolean = false;
+  IsSettingKeyAutomatedDistributedToVMS: boolean = false;
+  SettingKeyAutomatedDistributedToVMS: string = '';
   systemButtons: ButtonModel[] = [];
   isEdit = false;
   isParentEdit = false;
@@ -279,6 +281,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyPayPeriod = OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == data.settingKey;
     this.IsSettingKeyAvailabiltyOverLap = OrganizationSettingKeys[OrganizationSettingKeys['AvailabilityOverLapRule']].toString() == data.settingKey;
     this.IsSettingKeyCreatePartialOrder = OrganizationSettingKeys[OrganizationSettingKeys['CreatePartialOrder']].toString() == data.settingKey;
+    this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey;
+    this.SettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey?data.settingKey:'';
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == data.settingKey;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
@@ -305,6 +309,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.switchedValueForm.get('value')?.clearValidators();
       this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     }
+    if (this.IsSettingKeyAutomatedDistributedToVMS){
+      this.switchedValueForm.controls["value"].setValue(48)
+      this.switchedValueForm.controls['isEnabled'].setValue(true)
+    }
+    else {
+      this.switchedValueForm.get('value')?.clearValidators();
+      this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
+    }
   }
 
   openEditSettingDialog(
@@ -326,6 +338,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == parentRecord.settingKey;
     this.setNumericValueLabel(parentRecord.settingKey);
     this.IsSettingKeyCreatePartialOrder = OrganizationSettingKeys[OrganizationSettingKeys['CreatePartialOrder']].toString() == parentRecord.settingKey;
+    this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == parentRecord.settingKey;
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -403,6 +416,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       && this.checkboxValueForm.valid
     ) {
       if (this.organizationSettingsFormGroup.valid) {
+        this.sendForm();
+      } else {
+        this.organizationSettingsFormGroup.markAllAsTouched();
+        this.validatePushStartDateForm();
+        this.validateInvoiceGeneratingForm();
+      }
+      if(this.IsSettingKeyAutomatedDistributedToVMS && this.SettingKeyAutomatedDistributedToVMS==this.organizationSettingsFormGroup.value?.settingKey){
         this.sendForm();
       } else {
         this.organizationSettingsFormGroup.markAllAsTouched();
@@ -1001,7 +1021,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private disableDepForInvoiceGeneration(): void {
     if (this.organizationSettingKey === OrganizationSettingKeys.InvoiceAutoGeneration
       || this.organizationSettingKey === OrganizationSettingKeys.PayHigherBillRates
-      || this.organizationSettingKey === OrganizationSettingKeys.OTHours) {
+      || this.organizationSettingKey === OrganizationSettingKeys.OTHours
+      || this.organizationSettingKey === OrganizationSettingKeys.AutomatedDistributionToVMS) {
       this.departmentFormGroup.get('departmentId')?.disable();
     } else {
       this.departmentFormGroup.get('departmentId')?.enable();
