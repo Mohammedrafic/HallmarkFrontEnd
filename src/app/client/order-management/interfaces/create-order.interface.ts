@@ -117,6 +117,7 @@ export interface ListOfKeyForms {
   workLocationList: FormGroup[];
   specialProjectForm: FormGroup;
   orderType: FormGroup;
+  internalDistributionChanged: boolean;
 }
 
 export interface StateList {

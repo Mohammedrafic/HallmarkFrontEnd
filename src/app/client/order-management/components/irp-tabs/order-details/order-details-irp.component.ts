@@ -654,7 +654,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((value: number[]) => {
       const internalLogicIncompatible = value.includes(TierInternal.id)
-      && this.selectedOrder.jobDistributionValue?.includes(AllInternalJob.id);
+      && this.selectedOrder?.jobDistributionValue?.includes(AllInternalJob.id);
 
       if (internalLogicIncompatible) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, InternalTieringError));
@@ -828,8 +828,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       this.irpStateService.setFormState({
         orderType: this.orderTypeForm,
+        internalDistributionChanged: this.checkIfInternalDistributionChanged(),
         ...this.listOfKeyForms,
       });
+
       this.irpStateService.setDocuments(this.documents);
       this.changeDetection.markForCheck();
     });
@@ -1106,5 +1108,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     }
 
     return filteredValues;
+  }
+
+  private checkIfInternalDistributionChanged(): boolean {
+    const internalTieringWasSelected = this.selectedOrder
+    && this.selectedOrder.jobDistributionValue?.includes(TierInternal.id);
+    const allInternalSelected = this.jobDistributionForm.get('jobDistribution')?.value.includes(AllInternalJob.id);
+
+    return internalTieringWasSelected && allInternalSelected;
   }
 }
