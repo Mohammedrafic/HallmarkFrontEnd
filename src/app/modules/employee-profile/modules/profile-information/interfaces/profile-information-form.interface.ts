@@ -17,6 +17,7 @@ export interface ProfileInformationFormsFieldConfig {
   sourceKey?: ProfileInformationFormsSourceKeys;
   tooltipContent?: string;
   subGridClass?: string;
+  mask?: string;
 }
 
 export interface ProfileInformationFormConfig {

@@ -1,4 +1,5 @@
 import { FieldType, InputAttrType } from '@core/enums';
+import { PhoneMask } from '@shared/constants';
 
 import { ProfileInformationFormsSourceKeys } from '../enums';
 import {
@@ -161,6 +162,7 @@ const contactDetailsFormFields: ProfileInformationFormsFieldConfig[] = [
     readonly: true,
     gridAreaName: 'phone1',
     inputType: InputAttrType.Tel,
+    mask: PhoneMask,
   },
   {
     field: 'phone2',
@@ -170,6 +172,7 @@ const contactDetailsFormFields: ProfileInformationFormsFieldConfig[] = [
     readonly: true,
     gridAreaName: 'phone2',
     inputType: InputAttrType.Tel,
+    mask: PhoneMask,
   },
 ];
 

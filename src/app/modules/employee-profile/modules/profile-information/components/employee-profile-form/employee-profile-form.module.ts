@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
+import { NgxMaskModule } from 'ngx-mask';
 
 import { DatepickerModule } from '@shared/components/form-controls/datepicker/datepicker.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
@@ -21,6 +22,7 @@ import { EmployeeProfileFormComponent } from './employee-profile-form.component'
     DropDownListModule,
     MultiSelectModule,
     TooltipContainerModule,
+    NgxMaskModule,
   ],
   exports: [
     EmployeeProfileFormComponent,
