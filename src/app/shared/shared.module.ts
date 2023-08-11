@@ -42,7 +42,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MessageToastComponent } from './components/message-toast/message-toast.component';
 import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
-import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
 import { ButtonModule, CheckBoxModule,
   ChipListAllModule, RadioButtonAllModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
@@ -225,7 +224,6 @@ const COMPONENTS = [
   HighlightGridRowDirective,
   ClickOutsideDirective,
   ImageUploaderComponent,
-  DocumentUploaderComponent,
   SideDialogComponent,
   CloseOrderSideDialogComponent,
   MessageToastComponent,
@@ -270,7 +268,7 @@ const COMPONENTS = [
   CustomExportDialogComponent,
   CommentsIrpComponent,
   EditIrpCandidateComponent,
-  CommentdataComponent
+  CommentdataComponent,
 ];
 
 @NgModule({

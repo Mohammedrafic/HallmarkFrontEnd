@@ -121,6 +121,7 @@ import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-
 import { ImportDnrComponent } from './do-not-return/import-dnr/import-dnr.component';
 import { CreateEditOrderResolver } from '@client/order-management/resolvers/create-edit-order.resolver';
 import { ImportEmployeeComponent } from './candidates/import-employee/import-employee.component';
+import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
 
 
 const gridIcons = {
@@ -246,6 +247,7 @@ const gridIcons = {
     NumericTextboxModule,
     AutoCompleteAllModule,
     OrderReOrdersContainerModule,
+    DocumentUploaderModule,
   ],
   providers: [
     ResizeService,

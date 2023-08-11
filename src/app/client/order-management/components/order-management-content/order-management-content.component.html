@@ -293,11 +293,11 @@
               <button
                 ejs-button
                 cssClass="default-icon-button e-flat e-primary with-badge"
-                [disabled]="!data.attachedFiles.length"
+                [disabled]="!data.documentsCount"
               >
                 <span><i-feather name="paperclip" class="icon"></i-feather></span>
-                <span *ngIf="data.attachedFiles.length > 0" class="e-badge e-badge-success e-badge-pill right-overflow">
-                  {{data.attachedFiles.length}}
+                <span *ngIf="data.documentsCount > 0" class="e-badge e-badge-success e-badge-pill right-overflow">
+                  {{data.documentsCount}}
                 </span>
               </button>
               <button
