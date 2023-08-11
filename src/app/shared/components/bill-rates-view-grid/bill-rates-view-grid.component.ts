@@ -11,7 +11,6 @@ export type BillRatesGridEvent = BillRate & { index: string };
 @Component({
   selector: 'app-bill-rates-view-grid',
   templateUrl: './bill-rates-view-grid.component.html',
-  styleUrls: ['./bill-rates-view-grid.component.scss'],
 })
 export class BillRatesViewGridComponent extends AbstractGridConfigurationComponent {
   @ViewChild('grid') grid: GridComponent;

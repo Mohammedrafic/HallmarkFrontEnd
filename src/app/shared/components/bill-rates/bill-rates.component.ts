@@ -25,7 +25,6 @@ import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 @Component({
   selector: 'app-bill-rates',
   templateUrl: './bill-rates.component.html',
-  styleUrls: ['./bill-rates.component.scss'],
 })
 export class BillRatesComponent extends AbstractPermission implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.predefinedBillRatesOptions)

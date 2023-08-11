@@ -7,8 +7,7 @@ import { BaseFormControlDirective } from '../base-form-control.directive';
 @Component({
   selector: 'app-radio-button',
   templateUrl: './radio-button.component.html',
-  styleUrls: ['./radio-button.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RadioButtonComponent extends BaseFormControlDirective {
   @Input('value') public radioValue: number;
