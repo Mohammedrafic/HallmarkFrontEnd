@@ -16,7 +16,10 @@ export class OrganizationSettingsService {
    * @param organizationId organization id to search by
    * @return Array of organization settings
    */
-  public getOrganizationSettings(filters?: OrganizationSettingFilter, lastSelectedBusinessUnitId?: number): Observable<Configuration[]> {
+  public getOrganizationSettings(
+    filters?: OrganizationSettingFilter,
+    lastSelectedBusinessUnitId?: number
+  ): Observable<Configuration[]> {
     let headers = {};
     if (lastSelectedBusinessUnitId) {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });

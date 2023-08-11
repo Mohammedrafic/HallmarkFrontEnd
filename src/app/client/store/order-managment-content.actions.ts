@@ -238,6 +238,7 @@ export class EditIrpOrder {
   constructor(
     public readonly order: EditOrderDto,
     public readonly documents: Blob[],
+    public readonly internalDistributionChanged: boolean,
   ) {}
 }
 

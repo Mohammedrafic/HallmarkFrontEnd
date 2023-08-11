@@ -315,12 +315,9 @@
   [orderPositionSelected$]="orderPositionSelected$"
   [openDetailsTab]="openDetailsTab"
   [openCandidateTab]="!!previousSelectedOrderId"
-  (compareEvent)="onCompare()"
   (selectReOrder)="selectReOrder($event)"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-preview-order-dialog>
-
-<app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>
 
 <app-child-order-dialog
   [order]="$any(selectedOrder)"

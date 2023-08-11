@@ -1,8 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
+import { map, Observable } from 'rxjs';
+
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { BusinessLines, BusinessLinesDtoModel } from '@shared/models/business-line.model';
-import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -29,9 +31,15 @@ export class BusinessLineService {
 
   private getCloseReasonsParams(pageNumber?: number, pageSize?: number, orderBy?: string): HttpParams {
     let params = {};
-    if (pageNumber) params = { ...params, pageNumber };
-    if (pageSize) params = { ...params, pageSize };
-    if (orderBy) params = { ...params, orderBy };
+    if (pageNumber) {
+      params = { ...params, pageNumber };
+    }
+    if (pageSize) {
+      params = { ...params, pageSize };
+    }
+    if (orderBy) {
+      params = { ...params, orderBy };
+    }
     return <HttpParams>params;
   }
 }

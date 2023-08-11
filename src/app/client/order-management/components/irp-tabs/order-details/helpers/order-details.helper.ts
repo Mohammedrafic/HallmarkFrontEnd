@@ -20,6 +20,7 @@ import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 import {
   JobDistributionIrpOnly,
   JobDistributionIrpVms,
+  TierInternal,
   TitleField,
 } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { ButtonType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
@@ -154,12 +155,12 @@ export const mapperForContactDetail = (contactDetails: Department): ContactDetai
   mobilePhone: contactDetails.facilityPhoneNo,
 });
 
-export const getDataSourceForJobDistribution = (selectedSystem: SelectSystem) => {
+export const getDataSourceForJobDistribution = (selectedSystem: SelectSystem, tieringLogicEnabled: boolean) => {
   if (selectedSystem.isIRP && selectedSystem.isVMS) {
-    return JobDistributionIrpVms;
-  } else {
-    return JobDistributionIrpOnly;
+    return JobDistributionIrpVms(tieringLogicEnabled);
   }
+
+  return JobDistributionIrpOnly(tieringLogicEnabled);
 };
 
 export const showHideFormAction = (config: OrderFormsArrayConfig, list: FormGroup[]): void => {
