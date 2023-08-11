@@ -107,6 +107,8 @@ import {
   PerDiemReOrdersErrorMessage,
   TravelerContracttoPermOrdersSucceedMessage,
   RECORD_DELETE,
+  RECORD_MODIFIED_SUCCESS_WITH_ORDERID,
+  RECORD_SAVED_SUCCESS_WITH_ORDERID,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -826,7 +828,7 @@ export class OrderManagementContentState {
   ): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
-        let TOAST_MESSAGE = 'Record has been created';
+        let TOAST_MESSAGE = RECORD_ADDED;
         let MESSAGE_TYPE = MessageTypes.Success;
         const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
         const hasntOrderBillRates =
@@ -853,7 +855,7 @@ export class OrderManagementContentState {
                 payload.organizationPrefix,
                 payload.publicId
               )
-            : new ShowToast(MessageTypes.Success, 'Order '+ payload.organizationPrefix?.toString()+'-'+payload.publicId?.toString()+' has been added'),
+            : new ShowToast(MessageTypes.Success, RECORD_SAVED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
           new SaveLastSelectedOrganizationAgencyId(
@@ -878,7 +880,8 @@ export class OrderManagementContentState {
   ): Observable<void | Blob[] | Order[]> {
     return this.orderManagementService.editIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
-        const successMessage = internalDistributionChanged ? ChangeInternalDistributionSuccess : RECORD_MODIFIED;
+        const successMessage = internalDistributionChanged ? ChangeInternalDistributionSuccess
+        : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(order[0]?.organizationPrefix??'',order[0]?.publicId?.toString()??'');
 
         dispatch([
           new ShowToast(MessageTypes.Success, successMessage),
@@ -902,7 +905,7 @@ export class OrderManagementContentState {
     return this.orderManagementService.editOrder(order, documents).pipe(
       tap((payload: Order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, message ?? RECORD_MODIFIED),
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')??message),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
