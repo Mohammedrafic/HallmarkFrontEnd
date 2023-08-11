@@ -496,7 +496,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.CredentialName)?.setValue([]);
-    this.credentialExpiryForm.get(analyticsConstants.formControlNames.IsOptionalRequred)?.setValue(false);
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.IsOptionalRequred)?.setValue(false);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
