@@ -70,6 +70,7 @@ import {
   sendOnboardCandidateEmailMessage,
   GetOrderComments,
   ApproveOrderSucceeded,
+  ClearCandidateCancellationReason,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -1190,8 +1191,14 @@ export class OrderManagementContentState {
       .pipe(
         tap((payload: CandidateCancellationReason[]) => {
           patchState({ candidateCancellationReasons: payload });
-          return payload;
         }));
+  }
+
+  @Action(ClearCandidateCancellationReason)
+  ClearCandidateCancellationReason(
+    { patchState }: StateContext<OrderManagementContentStateModel>
+  ): void {
+    patchState({ candidateCancellationReasons: null });
   }
 
     @Action(GetOrderComments)

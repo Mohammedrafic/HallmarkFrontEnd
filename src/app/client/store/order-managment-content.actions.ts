@@ -426,6 +426,10 @@ export class GetCandidateCancellationReason {
   constructor(public orderId: number){}
 }
 
+export class ClearCandidateCancellationReason {
+  static readonly type ='[order management] Clear Candidate Cancellation Reason';
+}
+
 export class GetAllShifts{
   static readonly type ='[order management] Get All Shifts';
   constructor(){}

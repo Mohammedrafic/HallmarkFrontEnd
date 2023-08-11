@@ -27,7 +27,10 @@ import {
 } from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { Penalty } from '@shared/models/penalty.model';
-import { GetCandidateCancellationReason } from '@client/store/order-managment-content.actions';
+import {
+  ClearCandidateCancellationReason,
+  GetCandidateCancellationReason,
+} from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 interface DataSourceObject<T> {
@@ -107,6 +110,10 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     }
   }
 
+  public clearReasons(): void {
+    this.store.dispatch(new ClearCandidateCancellationReason());
+  }
+
   private onOpenEvent(): void {
     this.openEvent
       .pipe(
@@ -119,7 +126,8 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
         switchMap(() => this.candidateCancellationReasons$),
         takeUntil(this.destroy$)
       ).subscribe((cancellationReasons) => {
-        this.reasons = cancellationReasons;
+        this.reasons = cancellationReasons ?? [];
+        this.cd.markForCheck();
       });
   }
 

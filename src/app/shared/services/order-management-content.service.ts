@@ -547,9 +547,8 @@ export class OrderManagementContentService {
   }
 
   public getCandidateCancellationReasons(orderId: number): Observable<CandidateCancellationReason[]> {
-    return this.http.post<CandidateCancellationReason[]>(
-      `/api/CandidateCancellationSettings/getCandidateCancellationReason`,
-      { orderId }
+    return this.http.get<CandidateCancellationReason[]>(
+      `/api/CandidateCancellationSettings/orders/${orderId}`
     );
   }
 
