@@ -6,8 +6,8 @@
 
         <span class="name">{{file.documentName}}</span>
         <span>
-          <span class="size">{{file.size}} </span>
-          <span class="createdAt">| {{file.createdAt}}</span>
+          <span class="size">{{file.size | formatBytes}} </span>
+          <span class="createdAt">| {{file.uploadedDate | date: "MM/dd/yyyy":"utc": "en-US"}}</span>
         </span>
       </div>
       <button ejs-button cssClass="default-icon-button e-flat e-primary" (click)="downloadFile(file.id)">

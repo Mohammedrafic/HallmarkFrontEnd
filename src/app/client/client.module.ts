@@ -178,7 +178,7 @@ const gridIcons = {
     DoNotReturnDetailsComponent,
     DoNotReturnGridComponent,
     ImportDnrComponent,
-    ImportEmployeeComponent
+    ImportEmployeeComponent,
   ],
   imports: [
     CommonModule,

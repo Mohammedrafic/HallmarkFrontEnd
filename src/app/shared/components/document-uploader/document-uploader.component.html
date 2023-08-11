@@ -30,8 +30,8 @@
           <span class="e-file-container">
             <span class="e-file-name">{{document.documentName}}</span>
             <div class="file-info">
-              <span class="e-file-type">{{document.createdAt}}</span> | <!--TODO provide created at data-->
-              <span class="e-file-size">{{document.size}}</span>
+              <span class="e-file-type">{{document.uploadedDate | date: "MM/dd/yyyy":"utc": "en-US"}}</span> | <!--TODO provide created at data-->
+              <span class="e-file-size">{{document.size | formatBytes}}</span>
             </div>
           </span>
           <span class="custom-trash">

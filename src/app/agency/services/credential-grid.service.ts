@@ -42,8 +42,8 @@ export class CredentialGridService {
     return {
       name,
       type,
-      size: credentialFile.size || 456,
-      uploadedDate: credentialFile.uploadedDate || '08/08/2023',
+      size: credentialFile.size,
+      uploadedDate: credentialFile.uploadedDate,
     };
   }
 
