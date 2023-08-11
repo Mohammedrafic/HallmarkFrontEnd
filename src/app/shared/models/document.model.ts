@@ -3,5 +3,5 @@ export class Document {
   documentId: string;
   documentName: string;
   size: number;
-  createdAt: string;
+  uploadedDate: string;
 }
