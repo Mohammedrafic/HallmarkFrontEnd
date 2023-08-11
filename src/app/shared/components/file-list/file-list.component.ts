@@ -1,6 +1,10 @@
-import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+
+import { take } from 'rxjs';   
 
 import { Document } from '@shared/models/document.model';
+import { OrderFileService } from './service/download-file.service';
+import { downloadBlobFile } from '@shared/utils/file.utils';
 
 @Component({
   selector: 'app-file-list',
@@ -10,10 +14,15 @@ import { Document } from '@shared/models/document.model';
 })
 export class FileListComponent {
   @Input() public fileList: Document[] = [];
+  @Input() public orderId: number;
 
-  @Output() public download: EventEmitter<number> = new EventEmitter();
+  constructor(private orderFileService: OrderFileService) {}
 
-  public downloadFile(fileId: number): void {
-    this.download.emit(fileId);
+  public downloadFile(document: Document): void {
+    this.orderFileService.downloadFile(this.orderId, document.documentId)
+    .pipe(take(1))
+    .subscribe((file: Blob) => {
+        downloadBlobFile(file, document.documentName);
+    });
   }
 }

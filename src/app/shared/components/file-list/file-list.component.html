@@ -10,7 +10,11 @@
           <span class="createdAt">| {{file.uploadedDate | date: "MM/dd/yyyy":"utc": "en-US"}}</span>
         </span>
       </div>
-      <button ejs-button cssClass="default-icon-button e-flat e-primary" (click)="downloadFile(file.id)">
+      <button
+        ejs-button
+        cssClass="default-icon-button e-flat e-primary"
+        (click)="downloadFile(file)"
+      >
         <span><i-feather name="download" class="icon file-icon"></i-feather></span>
       </button>
 

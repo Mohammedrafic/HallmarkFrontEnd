@@ -113,7 +113,10 @@
         </e-accordionitems>
       </ejs-accordion>
     </div>
-    <app-file-list [fileList]="order?.documents || []"></app-file-list>
+    <app-file-list
+      [fileList]="order?.documents || []"
+      [orderId]="order.id"
+    ></app-file-list>
   </div>
 </section>
 <section

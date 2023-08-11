@@ -36,10 +36,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   @Input() CanOrganizationEditOrdersIRP : boolean;
   @Input() CanOrganizationViewOrdersIRP: boolean;
   @Input() set currentOrder(value: Order) {
-    this.order = { ...value,
-      documents: (value.documents || []).map((file) => ({...file, size: 89, createdAt: '08/08/2023'})),
-      //TODO remove after BE implementation
-    };
+    this.order = value;
     this.getContactDetails();
   }
 
@@ -113,6 +110,10 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     }
   }
 
+  public onBillRatesChanged(): void {
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
+  }
+
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
@@ -128,10 +129,6 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
       this.events = data;
       this.cdr.markForCheck();
     });
-  }
-
-  public onBillRatesChanged(): void {
-    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   private getContactDetails(): void {
