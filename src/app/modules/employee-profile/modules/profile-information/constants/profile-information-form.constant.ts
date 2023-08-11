@@ -1,7 +1,7 @@
 import { FieldType, InputAttrType } from '@core/enums';
 import { PhoneMask } from '@shared/constants';
 
-import { ProfileInformationFormsSourceKeys } from '../enums';
+import { ProfileInformationFormsKeys, ProfileInformationFormsSourceKeys } from '../enums';
 import {
   EmployeeProfileFormSource,
   ProfileInformationConfig,
@@ -177,17 +177,17 @@ const contactDetailsFormFields: ProfileInformationFormsFieldConfig[] = [
 ];
 
 export const ProfileInformationConf: ProfileInformationConfig = {
-  demographics: {
+  [ProfileInformationFormsKeys.Demographics]: {
     title: 'Demographics',
     fields: demographicsFormFields,
     class: 'demographics',
   },
-  professionalDetails: {
+  [ProfileInformationFormsKeys.ProfessionalDetails]: {
     title: 'Professional Details',
     fields: professionalDetailsFormFields,
     class: 'professional-details',
   },
-  contactDetails: {
+  [ProfileInformationFormsKeys.ContactDetails]: {
     title: 'Employee Contact Details',
     fields: contactDetailsFormFields,
     class: 'contact-details',
