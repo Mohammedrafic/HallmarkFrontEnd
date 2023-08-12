@@ -390,7 +390,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
       "TodayMSR": formatDate(new Date(), this.dateFormat, this.culture),
-      "IsOptionalRequred": IsOptionalRequred
+      "ISOptionalRequired": IsOptionalRequred
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
