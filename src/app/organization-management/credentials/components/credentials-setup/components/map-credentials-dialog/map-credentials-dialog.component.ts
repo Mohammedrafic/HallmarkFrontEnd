@@ -580,6 +580,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     this.gridDataSource = [];
     this.selectedCredentialList = [];
     this.selectedCredentialTypes = [];
+    this.mapCredentialsService.setSelectedMapping(null);
     this.allRegionsChange({checked: false});
     this.allLocationsChange({checked: false});
     this.allDepartmentsChange({checked: false});
