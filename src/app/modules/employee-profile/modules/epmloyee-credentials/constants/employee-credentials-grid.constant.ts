@@ -4,6 +4,7 @@ import { ColDef, ValueFormatterParams } from '@ag-grid-community/core';
 
 import { CredentialStatusCellComponent } from '../components/credential-status-cell/credential-status-cell.component';
 import { DepartmentMatchCellComponent } from '../components/department-match-cell/department-match-cell.component';
+import { CredentialFileCellComponent } from '../components/credential-file-cell/credential-file-cell.component';
 import { PageSettings } from '../interfaces';
 
 export const CredentialsPageSettings: PageSettings = {
@@ -78,12 +79,6 @@ export const EmployeeCredentialsGridConfig: ColDef[] = [
     headerName: 'File',
     width: 400,
     type: 'leftAligned',
-    valueFormatter: (params: ValueFormatterParams) => {
-      if (!params.value?.length) {
-        return '';
-      }
-
-      return params.value[0].name;
-    },
+    cellRenderer: CredentialFileCellComponent,
   },
 ];
