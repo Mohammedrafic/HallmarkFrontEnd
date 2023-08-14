@@ -1979,6 +1979,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           table.style.transform = 'translate(0px, 0px)';
         }
       }
+      this.eliteOrderId = 0;
       this.cd$.next(true);
     });
   }

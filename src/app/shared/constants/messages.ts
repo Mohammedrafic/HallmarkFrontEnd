@@ -50,6 +50,7 @@ export const ORDER_WITHOUT_CRED_BILLRATES =
   'Added order doesn’t contain the Credentials and Bill Rates. Please edit the order to onboard candidates successfully';
 export const UNSAVE_CHANGES_TEXT = 'Do you want to save changes?';
 export const REQUIRED_PERMISSIONS = 'Separate permission right is required';
+export const APPLICATION_DISABLED = 'Application is disabled. The order has been closed';
 export const ERROR_START_LESS_END_DATE = 'Start date should be before end date or less';
 export const SHOULD_LOC_DEP_INCLUDE_IRP = 'Should all locations and departments be included in IRP?';
 export const JOB_DISTRIBUTION_TITLE = 'Job Distribution';
@@ -119,6 +120,7 @@ export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Do you want to update Employee Ski
 export const IRP_DEPARTMENT_CHANGE_WARNING = 'Do you want to provide that change? It may cause deleting future schedules and canceling Employee from orders.';
 export const EMPLOYEE_TERMINATED_WARNING = 'Do you want to terminate the employee?';
 export const addAvailabilityToStart = 'Add Availability to start Scheduling';
+export const CommitmentOverlapMessage = 'Are you sure you want assign new Work Commitment? It may have impact on existing schedules and orders';
 
 export const RECORD_SAVED_SUCCESS = 'Record saved successfully';
 export const INACTIVEDATE = 'Location will be inactivated at '
@@ -132,3 +134,7 @@ export const HaveScheduleBooking =
 export const N_FAILED_RECORDS = (count: number) => `${count} failed to process.`;
 export const N_SUCCESS_RECORDS = (count: number) => `${count} records successfully processed.`;
 export const ExtensionStartDateValidation = 'Extension may not be created with more than a 14 day gap from initial order to extension order.';
+export const RECORD_SAVED_SUCCESS_WITH_ORDERID=(organizationPrefix: string,publicId:string)=>
+`Order ${organizationPrefix}-${publicId} has been added`;
+export const RECORD_MODIFIED_SUCCESS_WITH_ORDERID=(organizationPrefix: string,publicId:string)=>
+`Order ${organizationPrefix}-${publicId} has been modified`

@@ -56,10 +56,10 @@
         <input appValidateWithMessage formControlName="departmentName" class="e-input" type="text" />
       </div>
     </div>
-    <div class="input-container bootstrap" *ngIf="!isReorder">
+    <div class="input-container bootstrap">
       <label class="input-group">Clock ID</label>
       <div>
-        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" maxlength="50"/>
+        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" [disabled]="isReorder" maxlength="50"/>
       </div>
     </div>
     <div *ngIf="showHourlyRate">

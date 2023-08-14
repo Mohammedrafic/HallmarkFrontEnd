@@ -30,16 +30,18 @@ import {
   StateList,
 } from '@client/order-management/interfaces';
 import {
+  AllInternalJob,
   ContactDetailsList,
   DateFormat,
   DateMask,
   GeneralInformationForm,
   Incomplete,
+  InternalTieringError,
   JobDescriptionForm,
   JobDistributionForm,
   OrderTypeList,
   SpecialProjectForm,
-  TierExternalJob,
+  TierInternal,
   TimeMask,
   WorkLocationList,
 } from '@client/order-management/components/irp-tabs/order-details/constants/order-details.constant';
@@ -119,7 +121,13 @@ import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { Permission } from '@core/interface/permission.interface';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 import { OrderManagementService } from '../../order-management-content/order-management.service';
+import { Configuration } from '@shared/models/organization-settings.model';
+import { SettingsHelper } from '@core/helpers/settings.helper';
+import { SettingsKeys } from '@shared/enums/settings';
+import {
 
+  GetOrganizationSettings,
+} from '@organization-management/store/organization-management.actions';
 @Component({
   selector: 'app-order-details-irp',
   templateUrl: './order-details-irp.component.html',
@@ -144,8 +152,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public contactDetailsForm: FormGroup;
   public workLocationForm: FormGroup;
   public specialProjectForm: FormGroup;
-  public isShow : boolean | undefined;
-  public isDeptShow : boolean | undefined;
+  public isShow: boolean | undefined;
+  public isDeptShow: boolean | undefined;
   public readonly optionFields: FieldSettingsModel = OptionFields;
   public readonly orderTypesDataSource: OrderTypes[] = OrderTypeList;
   public readonly FieldTypes = FieldType;
@@ -176,7 +184,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private reason: OrderRequisitionReason[] = [];
   public allShifts: any[];
   private selectedStructureState: SelectedStructureState;
-  public filterType: string = 'Contains';
+  public filterType = 'Contains';
+  public disabledIrp = false;
+  public settings: { [key in SettingsKeys]?: Configuration };
 
   @Select(RejectReasonState.sortedOrderRequisition)
   private reasons$: Observable<RejectReasonPage>;
@@ -198,6 +208,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private readonly organization$: Observable<Organization>;
   @Select(OrderManagementContentState.getAllShifts)
   private getAllShifts$: Observable<ScheduleShift[]>;
+  @Select(OrganizationManagementState.organizationSettings)
+  private organizationSettings$: Observable<Configuration[]>;
 
   constructor(
     private orderDetailsService: OrderDetailsIrpService,
@@ -219,12 +231,28 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.initOrderTypeForm();
     this.initForms(IrpOrderType.LongTermAssignment);
     this.watchForOrderTypeControl();
+    this.store.dispatch(new GetAllShifts());
     this.watchForDataSources();
     this.watchForSaveAction();
     this.watchForSelectOrder();
     this.watchForOrganizationStructure();
     this.watchForSpecialProjectCategory();
     this.setReasonAutopopulate();
+    this.subscribeForSettings();
+
+  }
+
+  private subscribeForSettings() {
+    this.store.dispatch(new GetOrganizationSettings());
+    this.organizationSettings$.pipe(filter((settings: Configuration[]) => !!settings.length), takeUntil(this.componentDestroy())).subscribe((settings: Configuration[]) => {
+      this.settings = SettingsHelper.mapSettings(settings);
+
+      const settingValue = this.settings[SettingsKeys.AllowDocumentUpload]?.children?.find(f => f.isIRPConfigurationValue == true)?.value;
+
+      if (!settingValue) {
+        this.disabledIrp = true;
+      }
+    });
   }
 
   private getPermission(): void {
@@ -235,8 +263,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.userPermission = permissions;
     });
   }
-
-
 
   public changeOrderType(): void {
     const { regionId, locationId, departmentId, skillId } = this.generalInformationForm.getRawValue();
@@ -332,7 +358,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.generalInformationForm = this.orderDetailsService.createGeneralInformationPOForm();
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionPOForm();
       this.jobDescriptionForm = this.orderDetailsService.createJobDescriptionPOForm();
-   }
+    }
   }
 
   private watchForOrderTypeControl(): void {
@@ -341,7 +367,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     ).subscribe((value: number) => {
       this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
       this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
-        this.changeDetection.markForCheck();
+      this.changeDetection.markForCheck();
       this.clearFormLists();
       if (value === IrpOrderType.LongTermAssignment) {
         this.orderFormsArrayConfig =
@@ -431,7 +457,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private getIRPOrderRequisition(orderRequisition: RejectReasonwithSystem[]): OrderRequisitionReason[] {
-    this.reason=[];
+    this.reason = [];
     if (orderRequisition.length > 0) {
       orderRequisition.forEach(element => {
         if (element.includeInIRP === true) {
@@ -439,9 +465,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
             {
               id: element.id,
               name: element.reason,
-              businessUnitId: element.businessUnitId
+              businessUnitId: element.businessUnitId,
             }
-          )
+          );
         }
         if (element.isAutoPopulate === true) {
           this.AutopopulateId = element.id;
@@ -451,9 +477,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     return this.reason;
   }
   private watchForDataSources(): void {
-    this.store.dispatch(new GetAllShifts()).subscribe(data => {
-
-    });
     this.reasons$.pipe(
       filter(Boolean),
       map((reasons: RejectReasonPage) => mapReasonsStructure(reasons.items)),
@@ -524,8 +547,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-      let startDate = this.generalInformationForm.get('jobStartDate')?.value ?this.generalInformationForm.get('jobStartDate')?.value :this.generalInformationForm.get('jobDates')?.value;
-      const locations = this.generalInformationForm.get('jobDates')?.value ? this.organizationStructureService.getLocationsByIdSet(value,startDate??new Date) :this.organizationStructureService.getLocationsById(value,startDate??new Date);
+      const startDate = this.generalInformationForm.get('jobStartDate')?.value ? this.generalInformationForm.get('jobStartDate')?.value : this.generalInformationForm.get('jobDates')?.value;
+      const locations = this.generalInformationForm.get('jobDates')?.value ? this.organizationStructureService.getLocationsByIdSet(value, startDate ?? new Date) : this.organizationStructureService.getLocationsById(value, startDate ?? new Date);
       this.generalInformationForm.get('locationId')?.reset();
       this.generalInformationForm.get('departmentId')?.reset();
 
@@ -540,8 +563,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-      let startDate = this.generalInformationForm.get('jobStartDate')?.value ?this.generalInformationForm.get('jobStartDate')?.value :this.generalInformationForm.get('jobDates')?.value;
-      const departments =this.generalInformationForm.get('jobDates')?.value ?  this.organizationStructureService.getDepartmentByIdSet(value,startDate?? new Date):this.organizationStructureService.getDepartmentsById(value,startDate?? new Date);
+      const startDate = this.generalInformationForm.get('jobStartDate')?.value ? this.generalInformationForm.get('jobStartDate')?.value : this.generalInformationForm.get('jobDates')?.value;
+      const departments = this.generalInformationForm.get('jobDates')?.value ? this.organizationStructureService.getDepartmentByIdSet(value, startDate ?? new Date) : this.organizationStructureService.getDepartmentsById(value, startDate ?? new Date);
       this.generalInformationForm.get('departmentId')?.reset();
 
       this.updateDataSourceFormList('departments', departments);
@@ -586,7 +609,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       if (!(jobStartDate instanceof Date)) {
         return;
       }
-      
+
       this.autoSetupJobEndDateControl(value, jobStartDate);
       this.changeDetection.markForCheck();
     });
@@ -605,48 +628,48 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     });
 
     this.generalInformationForm.get('departmentId')?.valueChanges.pipe(
-      filter(Boolean),
+      filter((id) => !!id),
       map((id: number) => this.getContactDetailsById(id)),
-      filter((Boolean)),
       switchMap((id: number) => {
         return this.settingsViewService.getViewSettingKey(
           OrganizationSettingKeys.TieringLogic,
           OrganizationalHierarchy.Department,
-          id);
+          id, undefined, true);
       }),
       takeUntil(this.componentDestroy())
     ).subscribe(({ TieringLogic }) => {
       const jobDistributionForm = this.getSelectedFormConfig(JobDistributionForm);
-      const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem);
+      const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem, TieringLogic === 'true');
 
-      if (TieringLogic && this.selectedSystem.isIRP && this.selectedSystem.isVMS) {
-        setDataSource(jobDistributionForm.fields, 'jobDistribution', [
-          sourceForJobDistribution[0],
-          sourceForJobDistribution[1],
-          TierExternalJob,
-          sourceForJobDistribution[2],
-        ]);
-      } else {
-        setDataSource(jobDistributionForm.fields, 'jobDistribution', sourceForJobDistribution);
-      }
+      setDataSource(jobDistributionForm.fields, 'jobDistribution', sourceForJobDistribution);
 
       this.setJobDistributionValue();
       this.changeDetection.markForCheck();
     });
 
     this.jobDistributionForm.get('jobDistribution')?.valueChanges.pipe(
-      filter(Boolean),
+      filter((id) => !!id),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number[]) => {
-      const selectedConfig = this.getSelectedFormConfig(JobDistributionForm);
-      const agencyFormControl = this.jobDistributionForm.get('agencyId') as AbstractControl;
-      updateJobDistributionForm(value, selectedConfig, this.orderTypeForm, agencyFormControl);
-      agencyFormControl?.updateValueAndValidity();
-      this.showDistributionErrorMessage();
+      const internalLogicIncompatible = value.includes(TierInternal.id)
+      && this.selectedOrder?.jobDistributionValue?.includes(AllInternalJob.id);
+
+      if (internalLogicIncompatible) {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, InternalTieringError));
+        const filteredValues = this.setCorrectDistributions(value);
+        
+        this.jobDistributionForm.get('jobDistribution')?.patchValue(filteredValues,
+        { emitEvent: false });
+      } else {
+        const selectedConfig = this.getSelectedFormConfig(JobDistributionForm);
+        const agencyFormControl = this.jobDistributionForm.get('agencyId') as AbstractControl;
+        updateJobDistributionForm(value, selectedConfig, this.orderTypeForm, agencyFormControl);
+        agencyFormControl?.updateValueAndValidity();
+        this.showDistributionErrorMessage();
+      }
 
       this.changeDetection.markForCheck();
     });
-
 
     this.generalInformationForm.get('shift')?.valueChanges.pipe(
       filter(() => true),
@@ -654,9 +677,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     ).subscribe((value: number) => {
       this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
       this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
-        this.changeDetection.markForCheck();
-      if (value!=null) {
-        let shiftDetails = this.allShifts.find(f => f.id == value)
+      this.changeDetection.markForCheck();
+      if (value != null) {
+        const shiftDetails = this.allShifts.find(f => f.id == value);
         if (shiftDetails != null && shiftDetails.id != 0) {
           const [startH, startM, startS] = getHoursMinutesSeconds(shiftDetails.startTime);
           const [endH, endM, endS] = getHoursMinutesSeconds(shiftDetails.endTime);
@@ -676,6 +699,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       }
 
     });
+
     this.generalInformationForm.get('shiftStartTime')?.valueChanges.pipe(
       filter(() => true),
       takeUntil(this.componentDestroy())
@@ -685,24 +709,25 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       }
 
     });
+
     this.generalInformationForm.get('shiftEndTime')?.valueChanges.pipe(
       filter(() => true),
       takeUntil(this.componentDestroy())
     ).subscribe((value: Date) => {
-     if (value instanceof Date) {
+      if (value instanceof Date) {
         this.generalInformationForm.get('shift')?.setValue(0, { emitEvent: false });
       }
     });
     this.generalInformationForm
-    .get('jobStartDate')
-    ?.valueChanges.pipe(filter(Boolean), takeUntil(this.componentDestroy()))
-    .subscribe((value: any | undefined) => {
-      let regionID = this.generalInformationForm.get('regionId')?.value;
-      const locations = this.organizationStructureService.getLocationsById(regionID, value);
-      let locID = this.generalInformationForm.get('locationId')?.value;
-      const deparment = this.organizationStructureService.getDepartmentsById(locID,value)
-      let deptID = this.generalInformationForm.get('departmentId')?.value;
-      this.isDeptShow = deparment.some((deparment) => deparment.id == deptID);
+      .get('jobStartDate')
+      ?.valueChanges.pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+      .subscribe((value: any | undefined) => {
+        const regionID = this.generalInformationForm.get('regionId')?.value;
+        const locations = this.organizationStructureService.getLocationsById(regionID, value);
+        const locID = this.generalInformationForm.get('locationId')?.value;
+        const deparment = this.organizationStructureService.getDepartmentsById(locID, value);
+        const deptID = this.generalInformationForm.get('departmentId')?.value;
+        this.isDeptShow = deparment.some((deparment) => deparment.id == deptID);
         this.isShow = locations.some((location) => location.id == locID);
         if (!this.isShow) {
           this.generalInformationForm.get('locationId')?.reset();
@@ -711,24 +736,24 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         if (!this.isDeptShow) {
           this.generalInformationForm.get('departmentId')?.reset();
         }
-      this.updateDataSourceFormList('locations', locations);
-      this.updateDataSourceFormList('departments', deparment);
-      const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
-      setDataSource(selectedForm.fields, 'locationId', locations);
-      setDataSource(selectedForm.fields, 'departmentId', deparment);
-      this.changeDetection.markForCheck();
-    });
+        this.updateDataSourceFormList('locations', locations);
+        this.updateDataSourceFormList('departments', deparment);
+        const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
+        setDataSource(selectedForm.fields, 'locationId', locations);
+        setDataSource(selectedForm.fields, 'departmentId', deparment);
+        this.changeDetection.markForCheck();
+      });
+
     this.generalInformationForm
       .get('jobDates')
-      ?.valueChanges.pipe(filter(()=> true), takeUntil(this.componentDestroy()))
+      ?.valueChanges.pipe(filter(() => true), takeUntil(this.componentDestroy()))
       .subscribe((value: any | undefined) => {
-        if (value.length>0)
-        {
-        let regionID = this.generalInformationForm.get('regionId')?.value;
-        const locations = this.organizationStructureService.getLocationsByIdSet(regionID, value);
-          let locID = this.generalInformationForm.get('locationId')?.value;
-          const deparment = this.organizationStructureService.getDepartmentByIdSet(locID,value)
-          let deptID = this.generalInformationForm.get('departmentId')?.value;
+        if (value.length > 0) {
+          const regionID = this.generalInformationForm.get('regionId')?.value;
+          const locations = this.organizationStructureService.getLocationsByIdSet(regionID, value);
+          const locID = this.generalInformationForm.get('locationId')?.value;
+          const deparment = this.organizationStructureService.getDepartmentByIdSet(locID, value);
+          const deptID = this.generalInformationForm.get('departmentId')?.value;
           this.isDeptShow = deparment.some((deparment) => deparment.id == deptID);
           this.isShow = locations.some((location) => location.id == locID);
           if (!this.isShow) {
@@ -801,8 +826,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       this.irpStateService.setFormState({
         orderType: this.orderTypeForm,
+        internalDistributionChanged: this.checkIfInternalDistributionChanged(),
         ...this.listOfKeyForms,
       });
+
       this.irpStateService.setDocuments(this.documents);
       this.changeDetection.markForCheck();
     });
@@ -851,15 +878,15 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
       linkedId: selectedOrder.linkedId,
-    })
-    setTimeout(()=>{
+    });
+    setTimeout(() => {
       this.generalInformationForm.patchValue({
         shift: selectedOrder.shift,
         shiftStartTime: selectedOrder.shiftStartTime,
         shiftEndTime: selectedOrder.shiftEndTime,
         duration: selectedOrder.duration,
-      }, { emitEvent: false })
-    },1000)
+      }, { emitEvent: false });
+    }, 1000);
 
 
     // this.generalInformationForm.patchValue(selectedOrder);
@@ -876,7 +903,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
       changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
 
-      if(isPerDiemOrderEditable) {
+      if (isPerDiemOrderEditable) {
         this.generalInformationForm.controls['jobDates'].disable();
       }
     }
@@ -968,7 +995,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter((organisation: Organization) => !!organisation && !this.selectedOrder),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      const orderTypeToPrePopulate = 
+      const orderTypeToPrePopulate =
         this.orderManagementService.getOrderTypeToPrePopulate() || IrpOrderType.LongTermAssignment;
       this.orderManagementService.clearOrderTypeToPrePopulate();
       this.orderTypeForm.get('orderType')?.patchValue(orderTypeToPrePopulate);
@@ -1038,9 +1065,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
             data?.projectNames.filter(f => f.includeInIRP == true && f.projectTypeId == id) ?? this.dataSourceContainer.projectNames as ProjectNames[]
           );
           this.changeDetection.markForCheck();
-        })
+        });
       } else {
-        this.specialProjectForm.controls['projectNameId'].reset()
+        this.specialProjectForm.controls['projectNameId'].reset();
         this.updateDataSourceFormList('projectNames', []);
         const specialProjectForm = this.getSelectedFormConfig(SpecialProjectForm);
         setDataSource(
@@ -1051,7 +1078,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       }
 
       this.changeDetection.markForCheck();
-    })
+    });
   }
 
   private watchForCredentialsControls(): void {
@@ -1069,5 +1096,23 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId, SystemType.IRP));
         }
       });
+  }
+
+  private setCorrectDistributions(values: number[]): number[] {
+    const filteredValues = values.filter((item) => item !== TierInternal.id);
+
+    if (!filteredValues.includes(AllInternalJob.id)) {
+      filteredValues.push(AllInternalJob.id);
+    }
+
+    return filteredValues;
+  }
+
+  private checkIfInternalDistributionChanged(): boolean {
+    const internalTieringWasSelected = this.selectedOrder
+    && this.selectedOrder.jobDistributionValue?.includes(TierInternal.id);
+    const allInternalSelected = this.jobDistributionForm.get('jobDistribution')?.value.includes(AllInternalJob.id);
+
+    return internalTieringWasSelected && allInternalSelected;
   }
 }

@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
-import { ExportPayload } from '@shared/models/export.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({ providedIn: 'root' })

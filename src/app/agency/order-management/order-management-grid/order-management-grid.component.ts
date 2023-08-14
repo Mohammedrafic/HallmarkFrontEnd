@@ -147,7 +147,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
-  public openCandidat = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<boolean>();
   public openChildDialog = new Subject<any>();
   public previousSelectedOrderId: number | null;
@@ -629,10 +628,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public onCompare(): void {
-    this.openCandidat.next(true);
-  }
-
   public onRowClick(event: RowSelectEventArgs): void {
     if (event.target) {
       this.orderManagementAgencyService.excludeDeployed = false;
@@ -950,7 +945,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private onOrderPreviewChange(): void {
     this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (!isOpen) {
-        this.openCandidat.next(false);
         this.clearSelection(this.gridWithChildRow);
         this.previousSelectedOrderId = null;
         this.orderManagementPagerState = null;
@@ -969,6 +963,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           this.selectedReOrder = null;
         }
       }
+      this.alertOrderId = 0;
     });
   }
 
@@ -1001,7 +996,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       )
       .subscribe(() => {
         this.openPreview.next(false);
-        this.openCandidat.next(false);
         this.clearFilters();
         this.getPreservedFiltersByPageName();
         this.store.dispatch(new GetAgencyFilterOptions());

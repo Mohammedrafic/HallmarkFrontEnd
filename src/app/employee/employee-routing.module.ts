@@ -28,6 +28,14 @@ const routes: Routes = [
           isOrganizationArea: true,
         },
       },
+      {
+        path: 'profile',
+        loadChildren: () => import('../modules/employee-profile/employee-profile.module')
+          .then((m) => m.EmployeeProfileModule),
+        data: {
+          isOrganizationArea: true,
+        },
+      },
     ],
   },
 ];
