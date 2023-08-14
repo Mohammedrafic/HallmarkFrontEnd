@@ -42,7 +42,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MessageToastComponent } from './components/message-toast/message-toast.component';
 import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
-import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
 import { ButtonModule, CheckBoxModule,
   ChipListAllModule, RadioButtonAllModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
@@ -181,6 +180,7 @@ import {
 import {
     EligibilityMessageModule
 } from '@shared/components/order-candidate-list/components/eligibility-message/eligibility-message.module';
+import { FileListModule } from './components/file-list/file-list.module';
 
 const icons = {
   AlertCircle,
@@ -224,7 +224,6 @@ const COMPONENTS = [
   HighlightGridRowDirective,
   ClickOutsideDirective,
   ImageUploaderComponent,
-  DocumentUploaderComponent,
   SideDialogComponent,
   CloseOrderSideDialogComponent,
   MessageToastComponent,
@@ -269,7 +268,7 @@ const COMPONENTS = [
   CustomExportDialogComponent,
   CommentsIrpComponent,
   EditIrpCandidateComponent,
-  CommentdataComponent
+  CommentdataComponent,
 ];
 
 @NgModule({
@@ -327,6 +326,7 @@ const COMPONENTS = [
     RichTextEditorAllModule,
     ReplacementPdOrdersDialogModule,
     EligibilityMessageModule,
+    FileListModule,
   ],
   exports: [
     ...COMPONENTS,

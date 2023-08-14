@@ -110,6 +110,10 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     }
   }
 
+  public onBillRatesChanged(): void {
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
+  }
+
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
@@ -125,10 +129,6 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
       this.events = data;
       this.cdr.markForCheck();
     });
-  }
-
-  public onBillRatesChanged(): void {
-    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   private getContactDetails(): void {

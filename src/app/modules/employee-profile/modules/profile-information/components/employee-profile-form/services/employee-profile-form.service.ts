@@ -11,6 +11,7 @@ import {
   ProfileInformationConfig,
   ProfileInformationFormsFieldConfig,
 } from '../../../interfaces/profile-information-form.interface';
+import { ProfileInformationFormsKeys } from '../../../../profile-information/enums';
 
 @Injectable()
 export class EmployeeProfileFormService {
@@ -50,9 +51,9 @@ export class EmployeeProfileFormService {
   }
 
   setTooltips(data: EmployeeProfileData, formsConfig: ProfileInformationConfig) {
-    const primarySkillField = this.getConfigField('primarySkillId', formsConfig);
-    const secondarySkillsField = this.getConfigField('secondarySkills', formsConfig);
-    const employeeIdField = this.getConfigField('employeeId', formsConfig);
+    const primarySkillField = this.getProfessionalDetailsField('primarySkillId', formsConfig);
+    const secondarySkillsField = this.getProfessionalDetailsField('secondarySkills', formsConfig);
+    const employeeIdField = this.getProfessionalDetailsField('employeeId', formsConfig);
 
     if (primarySkillField && primarySkillField.readonly) {
       primarySkillField.tooltipContent = data.skills
@@ -68,11 +69,11 @@ export class EmployeeProfileFormService {
     }
   }
 
-  private getConfigField(
+  private getProfessionalDetailsField(
     field: string,
     formsConfig: ProfileInformationConfig
   ): ProfileInformationFormsFieldConfig | undefined {
-    return formsConfig.professionalDetails.fields.find((item) => item.field === field);
+    return formsConfig[ProfileInformationFormsKeys.ProfessionalDetails].fields.find((item) => item.field === field);
   }
 
   private getSecondarySkillsFieldTooltip(data: EmployeeProfileData): string {

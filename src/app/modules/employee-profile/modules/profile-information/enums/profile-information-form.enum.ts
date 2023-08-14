@@ -4,3 +4,9 @@ export enum ProfileInformationFormsSourceKeys {
   Country = 'country',
   State = 'state',
 }
+
+export enum ProfileInformationFormsKeys {
+  Demographics = 'demographics',
+  ProfessionalDetails = 'professionalDetails',
+  ContactDetails = 'contactDetails',
+}

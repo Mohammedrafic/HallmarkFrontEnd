@@ -1,4 +1,4 @@
-import { DatePipe, formatNumber } from '@angular/common';
+import { formatDate, formatNumber } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -238,7 +238,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   constructor(
     private store: Store,
     private action$: Actions,
-    private datePipe: DatePipe,
     private commentsService: CommentsService,
     private router: Router,
     private durationService: DurationService,
@@ -758,8 +757,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     });
   }
 
-  private getDateString(date: string): string | null {
-    return this.datePipe.transform(date, 'MM/dd/yyyy', 'utc');
+  private getDateString(date: string | Date): string | null {
+    return formatDate(date, 'MM/dd/yyyy', 'en-US', 'utc');
   }
 
   private getComments(): void {
@@ -789,6 +788,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       }
     }
     if (this.candidateJob) {
+      const extensionStartDate = this.isOffered ? this.currentOrder.jobStartDate : this.candidateJob.actualStartDate;
+      const extensionEndDate = this.isOffered ? this.currentOrder.jobEndDate : this.candidateJob.actualEndDate;
       this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
       this.getComments();
       if (!this.isAgency) {
@@ -802,8 +803,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         locationName: this.candidateJob.order?.locationName,
         actualStartDate: this.getDateString(this.candidateJob.actualStartDate),
         actualEndDate: this.getDateString(this.candidateJob.actualEndDate),
-        extensionStartDate: this.getDateString(this.candidateJob.actualStartDate),
-        extensionEndDate: this.getDateString(this.candidateJob.actualEndDate),
+        extensionStartDate: this.getDateString(extensionStartDate),
+        extensionEndDate: this.getDateString(extensionEndDate),
         offeredBillRate: formatNumber(CheckNumberValue(this.candidateJob.offeredBillRate), 'en-US', '0.2-2'),
         comments: this.candidateJob.requestComment,
         guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,

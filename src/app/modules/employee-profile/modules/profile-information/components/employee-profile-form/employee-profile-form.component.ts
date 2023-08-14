@@ -1,9 +1,10 @@
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 import { FieldType } from '@core/enums';
 import { CustomFormGroup } from '@core/interface';
 
-import { ProfileInformationFormsSourceKeys } from '../../enums';
+import { ProfileInformationFormsKeys, ProfileInformationFormsSourceKeys } from '../../enums';
 import { EmployeeProfileFormSourceMap, ProfileInformationConf } from '../../constants';
 import {
   EmployeeDTO,
@@ -12,6 +13,7 @@ import {
   EmployeeProfileData,
   ProfessionalDetailsForm,
   ProfileInformationConfig,
+  EmployeeProfileFormSource,
 } from '../../interfaces';
 import { EmployeeProfileFormService } from './services/employee-profile-form.service';
 
@@ -26,11 +28,16 @@ export class EmployeeProfileFormComponent {
     this.setComponentData(data);
   }
 
-  // TODO: find the better solution to replace any
-  readonly formSourceMap: any = EmployeeProfileFormSourceMap; // we need any here to fix errors in the template
+  readonly formSourceMap: EmployeeProfileFormSource = EmployeeProfileFormSourceMap;
   readonly formsConfig: ProfileInformationConfig = ProfileInformationConf;
+  readonly formsKeys = ProfileInformationFormsKeys;
   readonly fieldTypes = FieldType;
   readonly dropDownFields = { text: 'text', value: 'value' };
+  readonly forms: Record<string, FormGroup> = {
+    demographics: this.formService.createDemographicsForm(),
+    professionalDetails: this.formService.createProfessionalDetailsForm(),
+    contactDetails: this.formService.createContactDetailsForm(),
+  };
 
   readonly demographicsForm: CustomFormGroup<DemographicsForm> =
     this.formService.createDemographicsForm();
@@ -57,19 +64,19 @@ export class EmployeeProfileFormComponent {
   }
 
   private setFormsValues(employeeDTO: EmployeeDTO) {
-    this.demographicsForm.setValue({
+    this.forms[ProfileInformationFormsKeys.Demographics].setValue({
       firstName: employeeDTO.firstName,
       middleName: employeeDTO.middleName,
       lastName: employeeDTO.lastName,
       dob: employeeDTO.dob,
     });
-    this.professionalDetailsForm.setValue({
+    this.forms[ProfileInformationFormsKeys.ProfessionalDetails].setValue({
       primarySkillId: employeeDTO.primarySkillId,
       secondarySkills: employeeDTO.secondarySkills,
       hireDate: employeeDTO.hireDate,
       employeeId: employeeDTO.employeeId,
     });
-    this.contactDetailsForm.setValue({
+    this.forms[ProfileInformationFormsKeys.ContactDetails].setValue({
       country: employeeDTO.country,
       address1: employeeDTO.address1,
       city: employeeDTO.city,

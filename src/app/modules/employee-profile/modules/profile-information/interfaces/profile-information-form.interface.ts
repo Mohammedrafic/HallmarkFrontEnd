@@ -17,6 +17,7 @@ export interface ProfileInformationFormsFieldConfig {
   sourceKey?: ProfileInformationFormsSourceKeys;
   tooltipContent?: string;
   subGridClass?: string;
+  mask?: string;
 }
 
 export interface ProfileInformationFormConfig {
@@ -25,11 +26,7 @@ export interface ProfileInformationFormConfig {
   fields: ProfileInformationFormsFieldConfig[];
 }
 
-export interface ProfileInformationConfig {
-  demographics: ProfileInformationFormConfig;
-  professionalDetails: ProfileInformationFormConfig;
-  contactDetails: ProfileInformationFormConfig;
-}
+export type ProfileInformationConfig = Record<string, ProfileInformationFormConfig>;
 
 export interface DemographicsForm {
   firstName: string;
@@ -57,11 +54,8 @@ export interface ContactDetailsForm {
   phone2: string;
 }
 
-export interface EmployeeProfileFormSource {
-  [ProfileInformationFormsSourceKeys.PrimarySkill]: DropdownOption[],
-  [ProfileInformationFormsSourceKeys.SecondarySkill]: DropdownOption[],
-  [ProfileInformationFormsSourceKeys.Country]: DropdownOption[],
-  [ProfileInformationFormsSourceKeys.State]: string[],
+export type EmployeeProfileFormSource = {
+  [key in ProfileInformationFormsSourceKeys]: DropdownOption[] | string[]
 }
 
 export interface EmployeeProfileData {

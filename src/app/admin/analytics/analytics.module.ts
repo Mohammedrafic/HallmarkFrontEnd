@@ -76,6 +76,7 @@ import { AgGridModule } from '@ag-grid-community/angular';
 
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
+import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
 
 @NgModule({
   declarations: [
