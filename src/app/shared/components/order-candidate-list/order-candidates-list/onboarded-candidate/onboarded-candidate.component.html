@@ -329,9 +329,7 @@
 
 <app-candidate-cancellation-dialog
   [openEvent]="openCandidateCancellationDialog"
-  [orderType]="candidateJob?.order?.orderType"
   [candidateJob]="candidateJob"
-  [candidateCancellation]="candidateCancellationReasons"
   (submitCandidateCancellation)="cancelCandidate($event)"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
 ></app-candidate-cancellation-dialog>

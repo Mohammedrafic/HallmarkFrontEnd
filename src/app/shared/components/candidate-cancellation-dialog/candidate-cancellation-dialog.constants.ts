@@ -7,35 +7,12 @@ export const CancellationReasonsMap = {
   [JobCancellationReason.LTACancellationOnBehalfOfOrganization]: 'LTA Cancellation on behalf of Organization',
 };
 
-export const travelReasonsDataSource = [
-  {
-    text: CancellationReasonsMap[JobCancellationReason.LTACancellationOnBehalfOfOrganization],
-    value: JobCancellationReason.LTACancellationOnBehalfOfOrganization,
-  },
-  {
-    text: CancellationReasonsMap[JobCancellationReason.LTACancellationOnBehalfOfAgency],
-    value: JobCancellationReason.LTACancellationOnBehalfOfAgency,
-  },
-];
-
-export const reOrderReasonsDataSource = [
-  {
-    text: CancellationReasonsMap[JobCancellationReason.ReOrderCancellationOnBehalfOfOrganization],
-    value: JobCancellationReason.ReOrderCancellationOnBehalfOfOrganization,
-  },
-  {
-    text: CancellationReasonsMap[JobCancellationReason.ReOrderCancellationOnBehalfOfAgency],
-    value: JobCancellationReason.ReOrderCancellationOnBehalfOfAgency,
-  },
-];
-
 export const PenaltiesMap = {
   [PenaltyCriteria.RateOfHours]: '% Rate of X Hours',
   [PenaltyCriteria.FlatRate]: 'Flat Rate',
   [PenaltyCriteria.FlatRateOfHours]: 'Flat Rate of X Hours',
   [PenaltyCriteria.NoPenalty]: 'No Penalty',
 };
-
 
 export const penaltiesDataSource = [
   {

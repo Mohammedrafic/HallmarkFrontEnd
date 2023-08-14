@@ -23,7 +23,7 @@ import {
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order,
+import { ApplicantStatus, Order,
   OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { formatDate, formatNumber } from '@angular/common';
@@ -32,7 +32,6 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
-  GetCandidateCancellationReason,
   GetRejectReasonsForOrganisation,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
@@ -97,9 +96,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Select(UserState.orderPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
 
-  @Select(OrderManagementContentState.getCandidateCancellationReasons)
-  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
-
   @Output() closeModalEvent = new EventEmitter<never>();
 
   @Input() candidate: OrderCandidatesList;
@@ -143,7 +139,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canClose = false;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
-  public candidateCancellationReasons: CandidateCancellationReason[] | null;
   public readonly reorderType: OrderType = OrderType.ReOrder;
   public canCreateOrder:boolean;
   public saveStatus: number = 0;
@@ -536,7 +531,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           this.switchFormState();
           this.configureCandidatePayRateField();
-          this.subscribeCandidateCancellationReasons();
         }
 
         this.changeDetectorRef.markForCheck();
@@ -770,21 +764,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
-  }
-
-  private subscribeCandidateCancellationReasons() {
-    if (this.candidateJob) {
-      const payload: CandidateCancellationReasonFilter = {
-        locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId,
-      };
-      this.store.dispatch(new GetCandidateCancellationReason(payload));
-      this.candidateCancellationReasons$
-        .pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
-          this.candidateCancellationReasons =value;
-        });
-
-    }
   }
 
   private getRecalculateActualEndDate(
