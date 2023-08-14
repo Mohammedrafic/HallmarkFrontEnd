@@ -401,6 +401,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
       return;
     }
 
+    this.selectedCredentialList = credentialSetupMapping.credentials;
     this.mapCredentialsFormGroup.controls['mappingId'].setValue(credentialSetupMapping.credentionSetupMappingId);
     this.allRegionsChange({ checked: !credentialSetupMapping.regionIds });
     this.allLocationsChange({ checked: !credentialSetupMapping.locationIds });
@@ -444,8 +445,6 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     if (this.isIRPAndVmsEnabled) {
       this.groupCredentials(groupIds);
     }
-
-    this.selectedCredentialList = credentialSetupMapping.credentials;
 
    credentialSetupMapping.credentials.forEach(savedMapping => {
       (this.gridDataSource as CredentialSetupGet[]).map((credential) => {
@@ -705,11 +704,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   }
 
   private setRowsToGridDataSource(activeRowsPerPage: number): void {
-    const hasNotSavedCredentialToEdit = this.isEdit &&
-      this.selectedCredentialList?.length &&
-      this.selectedCredentialList?.length !== this.selectedCredentialTypes?.length;
-
-    if(hasNotSavedCredentialToEdit) {
+    if(this.isEdit) {
       const selectedCredentialListIds = this.mapCredentialsService.getSelectedCredentialListIds(
         this.selectedCredentialList
       );
