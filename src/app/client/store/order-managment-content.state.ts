@@ -2,7 +2,7 @@ import { SaveLastSelectedOrganizationAgencyId } from '../../store/user.actions';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { catchError, debounceTime, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, Observable, of, switchMap, tap } from 'rxjs';
 import {
   ApproveOrder,
   CancelOrganizationCandidateJob,
@@ -70,6 +70,7 @@ import {
   sendOnboardCandidateEmailMessage,
   GetOrderComments,
   ApproveOrderSucceeded,
+  ClearCandidateCancellationReason,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -139,7 +140,6 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { ChangeInternalDistributionSuccess } from '@client/order-management/components/irp-tabs/order-details/constants';
 
 export interface OrderManagementContentStateModel {
@@ -171,7 +171,7 @@ export interface OrderManagementContentStateModel {
   contactDetails: Department | null;
   extensions: any;
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
-  candidateCancellationReasons:CandidateCancellationReason[]|null;
+  candidateCancellationReasons: CandidateCancellationReason[] | null;
   allShifts:ScheduleShift[]|null;
   sendOnboardCandidateEmail:OnboardCandidateEmail | null;
   orderComments: Comment[]
@@ -212,7 +212,7 @@ export interface OrderManagementContentStateModel {
     contactDetails: null,
     extensions: null,
     irpCandidates: null,
-    candidateCancellationReasons:null,
+    candidateCancellationReasons: null,
     allShifts:null,
     sendOnboardCandidateEmail:null,
     orderComments : []
@@ -1184,13 +1184,22 @@ export class OrderManagementContentState {
 
   @Action(GetCandidateCancellationReason)
   GetCandidateCancellationReason(
-    { patchState } : StateContext<OrderManagementContentStateModel>, { payload } : GetCandidateCancellationReason
-    ) : Observable<CandidateCancellationReason[] |null>{
-      return this.orderManagementService.GetCandidateCancellationReasons(payload).pipe(tap((payload: CandidateCancellationReason[]) => {
-        patchState({ candidateCancellationReasons: payload });
-        return payload;
-      }));
-    }
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderId }: GetCandidateCancellationReason
+  ): Observable<CandidateCancellationReason[] | null> {
+    return this.orderManagementService.getCandidateCancellationReasons(orderId)
+      .pipe(
+        tap((payload: CandidateCancellationReason[]) => {
+          patchState({ candidateCancellationReasons: payload });
+        }));
+  }
+
+  @Action(ClearCandidateCancellationReason)
+  ClearCandidateCancellationReason(
+    { patchState }: StateContext<OrderManagementContentStateModel>
+  ): void {
+    patchState({ candidateCancellationReasons: null });
+  }
 
     @Action(GetOrderComments)
     GetOrderComments(

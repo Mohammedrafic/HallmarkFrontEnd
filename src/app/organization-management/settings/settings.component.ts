@@ -1,7 +1,7 @@
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { distinctUntilChanged, filter, merge, Observable, skip, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 
@@ -198,6 +198,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     private filterService: FilterService,
     private sideMenuService: SideMenuService,
     private readonly ngZone: NgZone,
+    private actions$: Actions,
   ) {
     super(store);
     this.createSettingsForm();
@@ -793,20 +794,39 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  private locationChanged(locationId: number): void {
-    if (locationId) {
-      this.store.dispatch(new GetDepartmentsByLocationId(locationId));
-      this.organizationHierarchy = OrganizationHierarchy.Location;
-      this.organizationHierarchyId = locationId;
-      this.locationFormGroup.patchValue({ locationId: locationId }, { emitEvent: false, onlySelf: true });
+  private locationChanged(locationId: number, load = false): void {
+    if (!locationId) {
+      return;
+    }
+
+    if (load) {
+      this.actions$
+      .pipe(
+        ofActionSuccessful(GetLocationsByRegionId),
+        take(1),
+      ).subscribe(() => {
+        this.setLocation(locationId);
+      });
+    } else {
+      this.setLocation(locationId);
     }
   }
 
-  private departmentChanged(departmentId: number): void {
-    if (departmentId) {
-      this.organizationHierarchy = OrganizationHierarchy.Department;
-      this.organizationHierarchyId = departmentId;
-      this.departmentFormGroup.patchValue({ departmentId: departmentId }, { emitEvent: false, onlySelf: true });
+  private departmentChanged(departmentId: number, load = false): void {
+    if (!departmentId) {
+      return;
+    }
+
+    if (load) {
+      this.actions$.pipe(
+        ofActionSuccessful(GetDepartmentsByLocationId),
+        take(1),
+      )
+      .subscribe(() => {
+        this.setDepartment(departmentId);
+      });
+    } else {
+      this.setDepartment(departmentId);
     }
   }
 
@@ -1284,7 +1304,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyCreatePartialOrder) {
         this.otHoursLocationsEdit(childRecord.locationId);
       } else {
-        this.locationChanged(childRecord.locationId);
+        this.locationChanged(childRecord.locationId, true);
       }
     } else {
       if (this.IsSettingKeyOtHours || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyCreatePartialOrder) {
@@ -1308,7 +1328,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (childRecord.departmentId) {
 
-      this.departmentChanged(childRecord.departmentId);
+      this.departmentChanged(childRecord.departmentId, true);
 
 
     }
@@ -1483,5 +1503,18 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           ));
         });
     }
+  }
+
+  private setLocation(id: number): void {
+    this.store.dispatch(new GetDepartmentsByLocationId(id));
+    this.organizationHierarchy = OrganizationHierarchy.Location;
+    this.organizationHierarchyId = id;
+    this.locationFormGroup.patchValue({ locationId: id }, { emitEvent: false, onlySelf: true });
+  }
+
+  private setDepartment(id: number): void {
+    this.organizationHierarchy = OrganizationHierarchy.Department;
+    this.organizationHierarchyId = id;
+    this.departmentFormGroup.patchValue({ departmentId: id }, { emitEvent: false, onlySelf: true });
   }
 }
