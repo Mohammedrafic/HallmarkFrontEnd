@@ -27,7 +27,7 @@ import {
   ScheduleFormConfig,
   ScheduleFormFieldConfig,
   ScheduleSelectedSlots,
-  ScheduleTypeRadioButton,
+  ScheduleTypeRadioButton
 } from '../interface';
 import { ScheduleFiltersService } from './schedule-filters.service';
 import { ScheduleClassesList, ScheduleCustomClassesList, ToggleControls } from '../components/create-schedule';
@@ -286,18 +286,27 @@ export class CreateScheduleService {
     scheduleWithAvailability: boolean,
     candidates: ScheduleCandidate[]
   ): CreateScheduleTypesConfig {
-    let canScheduleWithoutAvailability = false;
+    let canSchedule = {
+      book: false,
+      openPosition: false,
+    };
 
     if(scheduleWithAvailability) {
-      canScheduleWithoutAvailability = !this.hasDifferentTypeSchedule(candidates);
+      const book = !this.hasDifferentTypeSchedule(candidates);
+      const openPosition = !this.hasDifferentOpenPositionType(candidates);
+      canSchedule = {
+        book,
+        openPosition,
+      };
     }
 
     let types = scheduleTypes.source.map((item: ScheduleTypeRadioButton) => {
       return {
         ...item,
         toolTipMessage: !userPermission[item.permission] ? REQUIRED_PERMISSIONS : addAvailabilityToStart,
-        disabled: !userPermission[item.permission] || (canScheduleWithoutAvailability &&
-            (item.value === ScheduleItemType.Book || item.value === ScheduleItemType.OpenPositions)),
+        disabled: !userPermission[item.permission] ||
+          (canSchedule.book && item.value === ScheduleItemType.Book) ||
+          (canSchedule.openPosition && item.value === ScheduleItemType.OpenPositions),
       };
     });
 
@@ -439,10 +448,36 @@ export class CreateScheduleService {
     }
   }
 
-  private hasDifferentTypeSchedule(candidates: ScheduleCandidate[]): boolean {
+  private hasDifferentOpenPositionType(candidates: ScheduleCandidate[]): boolean {
     const candidateDays = candidates?.map((candidate: ScheduleCandidate) => candidate.days).flat();
     return candidateDays?.some((day: ScheduleDay) => {
       return day?.scheduleType === ScheduleType.Book || day?.scheduleType === ScheduleType.Availability;
+    });
+  }
+
+  private hasDifferentTypeSchedule(candidates: ScheduleCandidate[]): boolean {
+    const candidateDays = candidates?.map((candidate: ScheduleCandidate) => candidate.days).flat();
+    const isDatesEqualForSingleCandidate = candidates.length === 1 &&
+      candidateDays.length === 1 &&
+      candidates[0].ltaAssignment &&
+      this.isSelectedDateEqualAssigmentDate(candidates);
+
+    if(isDatesEqualForSingleCandidate) {
+      return true;
+    }
+
+    return this.hasDifferentOpenPositionType(candidates);
+  }
+
+  private isSelectedDateEqualAssigmentDate(candidates: ScheduleCandidate[]): boolean {
+    const candidateDates = candidates[0].dates;
+    const assigmentDateRange = DateTimeHelper.getDatesBetween(
+      candidates[0].ltaAssignment?.startDate,
+      candidates[0].ltaAssignment?.endDate
+    );
+
+    return candidateDates.every((date: string) => {
+     return assigmentDateRange.includes(date);
     });
   }
 
