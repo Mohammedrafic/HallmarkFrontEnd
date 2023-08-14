@@ -155,6 +155,7 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     RadioButtonModule,
     LogiReportModule,
     ProgressBarAllModule,
+    SwitchModule,
     AgGridModule,
     NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState,useractivityReportState])
   ],
