@@ -22,7 +22,8 @@ export class SettingsViewService {
       ...organizationId ? { OrganizationId: organizationId } : {},
       ...includeInIrp ? { IsIRPConfiguration: includeInIrp }: {},
     };
+    const url = includeInIrp ? '/api/OrganizationSettings/hierarchy/byKeys' : '/api/OrganizationSettings/byKeys';
 
-    return this.http.get<Record<string, string>>('/api/OrganizationSettings/byKeys', { params: GetQueryParams(params) });
+    return this.http.get<Record<string, string>>(url, { params: GetQueryParams(params) });
   }
 }
