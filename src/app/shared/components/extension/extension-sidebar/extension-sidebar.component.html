@@ -99,6 +99,7 @@
       #billRates
       [billRates]="candidateJob?.billRates!"
       [isActive]="true"
+      [isLocal]="candidateJob?.isLocal!"
       (hourlyRateSync)="hourlyRateToOrderSync($event)"></app-bill-rates>
   </div>
 </div>

@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-clear-cache',
   templateUrl: './clear-cache.component.html',
-  styleUrls: ['./clear-cache.component.scss']
 })
 export class ClearCacheComponent implements OnInit {
 

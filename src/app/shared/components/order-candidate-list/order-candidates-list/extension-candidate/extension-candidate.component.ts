@@ -1,4 +1,4 @@
-import { DatePipe, formatNumber } from '@angular/common';
+import { formatDate, formatNumber } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -31,7 +31,6 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
-  GetCandidateCancellationReason,
   GetOrganisationCandidateJob,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
@@ -56,8 +55,9 @@ import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-s
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { UNSAVED_FORM_PROVIDERS, UnsavedFormComponentRef } from '@shared/directives/unsaved-form.directive';
 import {
-  ApplicantStatus as ApplicantStatusEnum, CandidatStatus,
-  ConfigurationValues
+  ApplicantStatus as ApplicantStatusEnum,
+  CandidatStatus,
+  ConfigurationValues,
 } from '@shared/enums/applicant-status.enum';
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -69,8 +69,6 @@ import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { Comment } from '@shared/models/comment.model';
 import {
   ApplicantStatus,
-  CandidateCancellationReason,
-  CandidateCancellationReasonFilter,
   Order,
   OrderCandidateJob,
   OrderCandidatesList,
@@ -129,10 +127,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Select(OrderManagementState.candidatesJob)
   private readonly candidateJobState$: Observable<OrderCandidateJob>;
 
-  @Select(OrderManagementContentState.getCandidateCancellationReasons)
-  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
-
-
   @Select(CandidateState.orderManagementPagerState)
   public orderManagementPagerState$: Observable<OrderManagementPagerState | null>;
 
@@ -174,9 +168,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public candidateDOBRequired: boolean;
   public candidatePhone1RequiredValue = '';
   public candidateAddressRequiredValue = '';
-  public candidateCancellationReasons: CandidateCancellationReason[] | null;
   public agencyId: number | undefined;
   public orderManagementPagerState: OrderManagementPagerState | null;
+
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -238,7 +232,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   constructor(
     private store: Store,
     private action$: Actions,
-    private datePipe: DatePipe,
     private commentsService: CommentsService,
     private router: Router,
     private durationService: DurationService,
@@ -758,8 +751,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     });
   }
 
-  private getDateString(date: string): string | null {
-    return this.datePipe.transform(date, 'MM/dd/yyyy', 'utc');
+  private getDateString(date: string | Date): string | null {
+    return formatDate(date, 'MM/dd/yyyy', 'en-US', 'utc');
   }
 
   private getComments(): void {
@@ -789,6 +782,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       }
     }
     if (this.candidateJob) {
+      const extensionStartDate = this.isOffered ? this.currentOrder.jobStartDate : this.candidateJob.actualStartDate;
+      const extensionEndDate = this.isOffered ? this.currentOrder.jobEndDate : this.candidateJob.actualEndDate;
       this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
       this.getComments();
       if (!this.isAgency) {
@@ -802,8 +797,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         locationName: this.candidateJob.order?.locationName,
         actualStartDate: this.getDateString(this.candidateJob.actualStartDate),
         actualEndDate: this.getDateString(this.candidateJob.actualEndDate),
-        extensionStartDate: this.getDateString(this.candidateJob.actualStartDate),
-        extensionEndDate: this.getDateString(this.candidateJob.actualEndDate),
+        extensionStartDate: this.getDateString(extensionStartDate),
+        extensionEndDate: this.getDateString(extensionEndDate),
         offeredBillRate: formatNumber(CheckNumberValue(this.candidateJob.offeredBillRate), 'en-US', '0.2-2'),
         comments: this.candidateJob.requestComment,
         guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
@@ -822,7 +817,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       if (!this.isRejected) {
         this.fieldsEnableHandlear();
       }
-      this.subscribeCandidateCancellationReasons();
     }
     this.changeDetectorRef.markForCheck();
   }
@@ -935,22 +929,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
     return rates.some((rate) => !!rate.isUpdated);
-  }
-
-
-  private subscribeCandidateCancellationReasons() {
-    if (this.candidateJob) {
-      let payload: CandidateCancellationReasonFilter = {
-        locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId
-      };
-      this.store.dispatch(new GetCandidateCancellationReason(payload));
-      this.candidateCancellationReasons$
-        .pipe(takeUntil(this.destroy$)).subscribe((value) => {
-          this.candidateCancellationReasons = value;
-        });
-
-    }
   }
 
   private subscribeOnPermissions(): void {

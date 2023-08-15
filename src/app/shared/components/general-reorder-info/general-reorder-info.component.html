@@ -59,7 +59,7 @@
           <div class="sup-title">Reason for Requisition</div>
         </div>
       </div>
-      <div class="column last-column" *ngIf="regularRates.regularLocal && (isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
+      <div class="column last-column second-row" *ngIf="regularRates.regularLocal && (isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
         <div class="cost">${{ regularRates.regularLocal }}</div>
         <div class="sup-title">Regular Local Bill Rate</div>
       </div>
@@ -85,7 +85,7 @@
       <div class="column" *ngIf="!(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea"></div>
       <div class="column empty-column"></div>
       <div class="column empty-column"></div>
-      <div class="last-column">
+      <div class="last-column third-row">
         <ng-container *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea && regularRates.regularLocal">
           <ng-container *ngTemplateOutlet="orderIdText"></ng-container>
         </ng-container>

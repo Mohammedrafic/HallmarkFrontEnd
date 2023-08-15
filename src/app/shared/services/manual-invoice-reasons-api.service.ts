@@ -4,7 +4,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { ManualInvoiceReason, ManualInvoiceReasonPage } from '@shared/models/manual-invoice-reasons.model';
-import { RejectReason } from '@shared/models/reject-reason.model';
 
 @Injectable({
   providedIn: 'root',

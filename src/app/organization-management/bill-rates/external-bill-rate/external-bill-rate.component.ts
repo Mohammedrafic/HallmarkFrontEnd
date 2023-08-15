@@ -26,14 +26,13 @@ import { UserPermissions } from "@core/enums";
   selector: 'app-external-bill-rate',
   templateUrl: './external-bill-rate.component.html',
   styleUrls: [
-    './external-bill-rate.component.scss',
-    '../bill-rate-setup/bill-rate-setup.component.scss'
-  ]
+    '../bill-rate-setup/bill-rate-setup.component.scss',
+  ],
 })
 export class ExternalBillRateComponent extends AbstractGridConfigurationComponent implements OnInit, OnChanges {
   @ViewChild('grid') grid: GridComponent;
-  @Input() isActive: boolean = false;
-  @Input() searchQuery: string = '';
+  @Input() isActive = false;
+  @Input() searchQuery = '';
   @Input() export$: Subject<ExportedFileType> | undefined;
   @Input() userPermission: Permission;
 
