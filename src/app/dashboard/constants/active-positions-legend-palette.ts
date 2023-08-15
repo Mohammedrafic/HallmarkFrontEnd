@@ -8,6 +8,7 @@ export const activePositionsLegendPalette: Record<ActivePositionsChartStatuses, 
   [ActivePositionsChartStatuses.FILLED]: 'var(--widget-status-onboard-filled)',
   [ActivePositionsChartStatuses.CLOSED]: 'var(--widget-status-rejected-closed)',
   [ActivePositionsChartStatuses.INCOMPLETE]: 'var(--widget-status-shortlisted-incomplete)',
+  [ActivePositionsChartStatuses.CUSTOM]: 'var(--widget-status-custom)'
 }
 
 export const activePositionsLegendDisplayText: Record<ActivePositionsChartStatuses, string> = {
@@ -18,4 +19,5 @@ export const activePositionsLegendDisplayText: Record<ActivePositionsChartStatus
   [ActivePositionsChartStatuses.FILLED]: ActivePositionsChartStatuses.FILLED,
   [ActivePositionsChartStatuses.CLOSED]: ActivePositionsChartStatuses.CLOSED,
   [ActivePositionsChartStatuses.INCOMPLETE]: ActivePositionsChartStatuses.INCOMPLETE,
+  [ActivePositionsChartStatuses.CUSTOM]: ActivePositionsChartStatuses.CUSTOM
 }

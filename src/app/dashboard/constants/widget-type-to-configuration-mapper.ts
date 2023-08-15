@@ -4,7 +4,7 @@ import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 export const widgetTypeToConfigurationMapper: Record<WidgetTypeEnum, PanelModel> = {
   [WidgetTypeEnum.CANDIDATES]: { sizeX: 3, sizeY: 4, maxSizeY: 4, maxSizeX: 3, minSizeX: 3, minSizeY: 4 },
   [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM]: { sizeX: 4, sizeY: 4, maxSizeY: 4, maxSizeX: 4, minSizeX: 4, minSizeY: 4 },
-  [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]: { sizeX: 4, sizeY: 3.5, maxSizeY: 4, maxSizeX: 3.5, minSizeX: 3.5, minSizeY: 4 },
+  [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]: { sizeX: 4, sizeY: 4, maxSizeY: 4, maxSizeX: 4, minSizeX: 4, minSizeY: 4 },
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: { sizeX: 3, sizeY: 3, maxSizeY: 3, maxSizeX: 3, minSizeX: 3, minSizeY: 3 },
   [WidgetTypeEnum.APPLICANTS_BY_POSITIONS]: { sizeX: 3, sizeY: 3, maxSizeY: 3, maxSizeX: 3, minSizeX: 3, minSizeY: 3 },
   [WidgetTypeEnum.ACTIVE_POSITIONS]: { sizeX: 3, sizeY: 4, maxSizeY: 4, maxSizeX: 3, minSizeX: 3, minSizeY: 4 },

@@ -212,7 +212,7 @@ export class DashboardService {
     }
 
     private getAvergaeDayCUSTOMActivePositionsWidgetData(filter: DashboartFilterDto): Observable<any> {
-      return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter }).pipe(
+      return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter, type : 'Custom' }).pipe(
         map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
           return {
             id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM,
@@ -220,10 +220,11 @@ export class DashboardService {
              chartData: lodashMapPlain(
               orderStatusesAvgDetails,
               ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
-                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
+                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || statusName,
                 value: average,
                 average: count,
-                color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
+                color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses] ||
+                        activePositionsLegendPalette[ActivePositionsChartStatuses.CUSTOM]
               })
               ),
             };
