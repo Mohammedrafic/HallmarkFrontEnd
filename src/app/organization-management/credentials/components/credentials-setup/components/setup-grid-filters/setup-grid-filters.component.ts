@@ -21,6 +21,7 @@ import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { CredentialSetupSystemEnum } from '@organization-management/credentials/enums';
 import { CredentialSetupAdapter } from '@organization-management/credentials/adapters/credential-setup.adapter';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { CredentialSetupFilterDto } from '@shared/models/credential-setup.model';
 import { ClearCredentialSetup } from '@organization-management/store/credentials.actions';
 import { GetCredentialSkillGroup } from '@organization-management/store/organization-management.actions';
 import { UserState } from '../../../../../../store/user.state';
@@ -81,8 +82,9 @@ export class SetupGridFiltersComponent extends Destroyable implements OnInit {
   }
 
   public clearFilters(): void {
-    this.filterForm.reset();
-    this.systemIdControl.reset();
+    this.filterForm.reset({}, { onlySelf: true, emitEvent: false });
+    this.systemIdControl.reset(null, { onlySelf: true, emitEvent: false });
+    this.setGridFilterForm({ pageNumber: 1 });
   }
 
   private createFilterForm(): void {
@@ -90,7 +92,8 @@ export class SetupGridFiltersComponent extends Destroyable implements OnInit {
   }
 
   private setClearOrgStructure(regions: OrganizationRegion[]): void {
-    this.clearFilters();
+    this.filterForm.reset();
+    this.systemIdControl.reset();
     this.orgRegions = regions;
     this.locations = [];
     this.departments = [];
@@ -199,9 +202,9 @@ export class SetupGridFiltersComponent extends Destroyable implements OnInit {
     });
   }
 
-  private setGridFilterForm(): void {
+  private setGridFilterForm(value?: CredentialSetupFilterDto): void {
     this.credentialsSetupService.setFilterGridState(
-      CredentialSetupAdapter.prepareFilter(this.filterForm)
+      value ? value : CredentialSetupAdapter.prepareFilter(this.filterForm)
     );
   }
 }
