@@ -561,8 +561,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     this.setTypesControlValue();
     this.updateScheduleDialogConfig(this.scheduleType);
     this.showShiftTimeFields(false);
-    this.scheduleFormConfig.formClass =
-      this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
+    this.scheduleFormConfig.formClass = this.createScheduleService.updateScheduleFormClass(this.scheduleType, false);
+    this.sideBarSettings.showOpenPositions = this.scheduleType !== ScheduleItemType.OpenPositions;
   }
 
   @OutsideZone
