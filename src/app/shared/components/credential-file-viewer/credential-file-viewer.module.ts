@@ -8,8 +8,6 @@ import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuAllModule, SidebarModule, ToolbarModule } from '@syncfusion/ej2-angular-navigations';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
-import { FileViewerComponent } from '@agency/candidates/add-edit-candidate/file-viewer/file-viewer.component';
-
 import {
   ChevronLeft,
   ChevronRight,
@@ -20,8 +18,10 @@ import {
   RefreshCw,
   X,
   ZoomIn,
-  ZoomOut
+  ZoomOut,
 } from 'angular-feather/icons';
+
+import { FileViewerComponent } from './file-viewer.component';
 
 const icons = {
   X,
@@ -55,4 +55,4 @@ const icons = {
   ],
   exports: [FileViewerComponent],
 })
-export class AgencyFileViewerModule {}
+export class CredentialFileViewerModule {}

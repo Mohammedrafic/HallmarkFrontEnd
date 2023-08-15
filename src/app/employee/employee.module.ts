@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { NgxsModule } from '@ngxs/store';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { CandidateState } from '@agency/store/candidate.state';
 import { EmployeeComponent } from './employee.component';
 import { EmployeeRoutingModule } from './employee-routing.module';
 import { ScheduleModule } from '../modules/schedule/schedule.module';
@@ -24,6 +25,7 @@ import { OpenJobResolver } from '../modules/open-jobs/resolvers/open-job.resolve
     //STORE
     NgxsModule.forFeature([
       OrganizationManagementState,
+      CandidateState,
     ]),
   ],
   providers: [OpenJobResolver],

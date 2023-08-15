@@ -97,7 +97,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   }
 
   get showDropdown(): boolean {
-    return !this.isRejected && !this.isAgency && !this.isOnboard && !this.isWithdraw;
+    return !this.isRejected && !this.isAgency && !this.isWithdraw;
   }
 
   get isRejected(): boolean {

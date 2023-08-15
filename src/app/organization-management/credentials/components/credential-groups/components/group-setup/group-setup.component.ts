@@ -154,6 +154,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       this.setSelectedIndexSkills(saveSkillGroup,savedSkillIds);
+      this.cdr.markForCheck();
     });
   }
 

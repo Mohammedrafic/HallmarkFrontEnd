@@ -401,6 +401,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
       return;
     }
 
+    this.selectedCredentialList = credentialSetupMapping.credentials;
     this.mapCredentialsFormGroup.controls['mappingId'].setValue(credentialSetupMapping.credentionSetupMappingId);
     this.allRegionsChange({ checked: !credentialSetupMapping.regionIds });
     this.allLocationsChange({ checked: !credentialSetupMapping.locationIds });
@@ -445,10 +446,8 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
       this.groupCredentials(groupIds);
     }
 
-    this.selectedCredentialList = credentialSetupMapping.credentials;
-
    credentialSetupMapping.credentials.forEach(savedMapping => {
-      (this.gridDataSource as CredentialSetupGet[]).map((credential, index) => {
+      (this.gridDataSource as CredentialSetupGet[]).map((credential) => {
         if (credential.masterCredentialId === savedMapping.masterCredentialId) {
           credential.inactiveDate = savedMapping.inactiveDate;
           credential.isActive = savedMapping.isActive;
@@ -581,6 +580,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     this.gridDataSource = [];
     this.selectedCredentialList = [];
     this.selectedCredentialTypes = [];
+    this.mapCredentialsService.setSelectedMapping(null);
     this.allRegionsChange({checked: false});
     this.allLocationsChange({checked: false});
     this.allDepartmentsChange({checked: false});
@@ -673,7 +673,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
 
   private watchForCredentialTypesChange(): void {
     this.mapCredentialsFormGroup.get('credentialType')?.valueChanges.pipe(
-      filter((values: number[]) => this.isIRPAndVmsEnabled && !!values?.length),
+      filter((values: number[]) => !!values?.length),
       takeUntil(this.componentDestroy()),
     ).subscribe((values: number[]) => {
       this.selectedCredentialTypes = values;
@@ -705,11 +705,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   }
 
   private setRowsToGridDataSource(activeRowsPerPage: number): void {
-    const hasNotSavedCredentialToEdit = this.isEdit &&
-      this.selectedCredentialList?.length &&
-      this.selectedCredentialList?.length !== this.selectedCredentialTypes?.length;
-
-    if(hasNotSavedCredentialToEdit) {
+    if(this.isEdit) {
       const selectedCredentialListIds = this.mapCredentialsService.getSelectedCredentialListIds(
         this.selectedCredentialList
       );

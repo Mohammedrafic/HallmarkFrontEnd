@@ -13,7 +13,7 @@ import {
 } from '@agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { EducationGridComponent } from '@agency/candidates/add-edit-candidate/education-grid/education-grid.component';
 import { ExperienceGridComponent } from '@agency/candidates/add-edit-candidate/experience-grid/experience-grid.component';
-import { AgencyFileViewerModule } from '@agency/candidates/add-edit-candidate/file-viewer/agency-file-viewer.module';
+import { CredentialFileViewerModule } from '@shared/components/credential-file-viewer/credential-file-viewer.module';
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
@@ -70,7 +70,7 @@ import { CredentialsGridModule } from '@shared/components/credentials-grid/crede
     CommonModule,
     ReactiveFormsModule,
     CredentialsGridModule,
-    AgencyFileViewerModule,
+    CredentialFileViewerModule,
     DropDownListModule,
     ValidateDirectiveModule,
     TabModule,

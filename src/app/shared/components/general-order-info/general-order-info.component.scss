@@ -106,6 +106,12 @@ section {
       grid-column: 4;
       grid-row-start: 1;
       grid-row-end: 3;
+
+      &.second-row {
+        grid-row: 3;
+        grid-row-start: 3;
+        grid-row-end: 5;
+      }
     }
 
     .empty-column {

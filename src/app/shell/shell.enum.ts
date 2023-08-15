@@ -4,8 +4,7 @@ export enum THEME {
 }
 
 export enum ProfileMenuItem {
-  // TODO: edit profile
-  /*edit_profile = 0,*/
+  my_profile = 0,
   theme = 1,
   log_out = 3,
   light_theme = 4,
