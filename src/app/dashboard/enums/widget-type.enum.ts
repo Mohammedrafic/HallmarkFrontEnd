@@ -11,8 +11,6 @@ export enum WidgetTypeEnum {
   AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM = 'Average_Day_Of_Active_Positions_Custom',
   TASKS = 'Tasks_widget',
   FILLED_POSITIONS_TREND = 'Filled_Positions_Trend',
-  CHAT = 'Chat_widget',
-  INVOICES = 'Invoces_widget',
   OPEN_POSITIONS_TREND = 'Open_Positions_Trend',
   IN_PROGRESS_POSITIONS_TREND = 'In_Progress_Positions_Trend',
   LTA_ORDER_ENDING = 'LTA_Order_Ending',

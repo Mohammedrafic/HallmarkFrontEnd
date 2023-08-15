@@ -25,7 +25,7 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitment
       },
       {
         field: 'workCommitments',
-        title: 'WorkCommitment',
+        title: 'Work Commitment',
         disabled: false,
         required: false,
         type: FieldType.MultiSelectDropdown,

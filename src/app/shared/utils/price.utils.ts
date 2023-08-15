@@ -47,9 +47,10 @@ export default class PriceUtils {
   }
 
   static formatNumbers(value: number | string | null): string {
-    if (value) {
+    if (value || (typeof value === 'number')) {
       const updatedValue = parseFloat(value.toString()).toFixed(2);
-      return Math.trunc(+updatedValue) >= 10 ? updatedValue : `0${updatedValue}`;
+      const truncatedValue = Math.trunc(+updatedValue);
+      return truncatedValue >= 10 || truncatedValue === 0 ? updatedValue : `0${updatedValue}`;
     }
 
     return '';

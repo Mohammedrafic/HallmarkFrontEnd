@@ -28,7 +28,7 @@
         <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
-        <div class="column last-column" *ngIf="regularRates.regularLocal">
+        <div class="column last-column second-row" *ngIf="regularRates.regularLocal">
           <div class="cost">${{ regularRates.regularLocal | number: '1.2-2' }}</div>
           <div class="sup-title">Regular Local Bill Rate</div>
         </div>

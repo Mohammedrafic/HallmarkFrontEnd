@@ -46,6 +46,8 @@ export interface CredentialFile {
   candidateCredentialId: number;
   name: string;
   fileId: string;
+  size: number;
+  uploadedDate: string;
 }
 
 export interface CredentialGroupedFiles {

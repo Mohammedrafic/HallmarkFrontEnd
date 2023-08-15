@@ -6,6 +6,6 @@ import { ErrorMessageComponent } from "./error-message.component";
 @NgModule({
   declarations: [ErrorMessageComponent],
   exports: [ErrorMessageComponent],
-  imports: [CommonModule, ValidationErrorModule] 
+  imports: [CommonModule, ValidationErrorModule],
 })
 export class ErrorMessageModule {}

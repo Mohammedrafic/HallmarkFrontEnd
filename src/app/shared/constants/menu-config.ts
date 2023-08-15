@@ -495,6 +495,11 @@ export const MENU_CONFIG: any = {
       icon: 'pie-chart',
       route: '/analytics/financial-time-sheet-beta',
     },
+    114: {
+      // department-spend-and-hours-report
+      icon: '',
+      route: '/analytics/department-spend-and-hours-report',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -1203,6 +1208,11 @@ export const MENU_CONFIG: any = {
       // financial-time-sheet-beta
       icon: 'pie-chart',
       route: '/analytics/financial-time-sheet-beta',
+    },
+    114: {
+      // department-spend-and-hours-report
+      icon: '',
+      route: '/analytics/department-spend-and-hours-report',
     },
   },
 
