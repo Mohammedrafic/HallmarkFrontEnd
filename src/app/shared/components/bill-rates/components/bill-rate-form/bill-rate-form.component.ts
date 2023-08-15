@@ -18,7 +18,7 @@ import {
 import PriceUtils from '@shared/utils/price.utils';
 import { OtBillRatesConfiguration } from '@shared/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { DateTimeHelper } from '@core/helpers';
+import { DateTimeHelper, distinctByKey } from '@core/helpers';
 import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 
 @Component({
@@ -34,7 +34,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   @Input() set billRatesData (rates: BillRate[]) {
     if (rates) {
       this.jobBillRates = rates;
-      this.jobBillRatesOptions = rates.map((rate) => rate.billRateConfig);
+      this.jobBillRatesOptions = distinctByKey(rates.map((rate) => rate.billRateConfig), 'id');
     }
   }
 
