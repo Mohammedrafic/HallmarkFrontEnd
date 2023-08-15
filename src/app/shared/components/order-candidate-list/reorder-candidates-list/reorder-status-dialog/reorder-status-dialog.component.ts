@@ -237,7 +237,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   public onAccept(): void {
-    if(this.isCandidatePayRateVisible && this.acceptForm.invalid) {
+    if(this.acceptForm.invalid) {
       this.acceptForm.markAllAsTouched();
       return;
     }

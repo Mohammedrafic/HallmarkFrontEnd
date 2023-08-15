@@ -80,6 +80,21 @@ export class ScheduleGridService {
     return `${this.getSelectedListDates(selectedCandidatesSlot)[0]}T00:00:00+00:00`;
   }
 
+  public clearDaysForSchedule(scheduleData: ScheduleModelPage): ScheduleModelPage {
+    return {
+    ...scheduleData,
+      items: scheduleData?.items.map((item: ScheduleModel) => {
+      return {
+        ...item,
+        candidate: {
+          ...item.candidate,
+          days: [],
+        },
+      };
+    }),
+    };
+  }
+
   private updateScheduleDays(days: ScheduleDay[], createdDays: ScheduleDay[]): ScheduleDay[] {
     const daysIds = days.map((day: ScheduleDay) => day.id);
     const hasDuplicate = createdDays.some((createdDay: ScheduleDay) => daysIds.includes(createdDay.id));

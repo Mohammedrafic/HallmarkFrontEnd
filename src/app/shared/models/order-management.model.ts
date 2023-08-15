@@ -512,6 +512,7 @@ export class Order {
   isLockedIRP?: boolean;
   linkedId: string | null;
   documentsCount: number;
+  fromTemplateId?: number;
 }
 
 export class ReOrder {

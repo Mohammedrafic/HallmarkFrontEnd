@@ -483,14 +483,20 @@ export class OrderManagementContentState {
         const groupedCredentials = getGroupedCredentials(payload.credentials ?? payload.reOrderFrom?.credentials);
         payload.groupedCredentials = groupedCredentials;
         patchState({ selectedOrder: payload });
-
         const { orderType, departmentId, jobStartDate, jobEndDate } = payload;
-        const skill = payload.irpOrderMetadata ? payload.irpOrderMetadata.skillId : payload.skillId;
+        let skillId = payload.skillId;
+
+        if (payload.irpOrderMetadata ) {
+          skillId = payload.irpOrderMetadata.skillId;
+        } else if (payload.reOrderFromId && payload.reOrderFrom) {
+          skillId = payload.reOrderFrom.skillId;
+        }
+
         dispatch(
           new SetPredefinedBillRatesData(
             orderType,
             departmentId,
-            skill,
+            skillId,
             jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : jobStartDate,
             jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : jobEndDate
           )
