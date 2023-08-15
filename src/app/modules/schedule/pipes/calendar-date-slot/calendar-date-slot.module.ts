@@ -5,7 +5,7 @@ import { CalendarDateSlotPipe } from './calendar-date-slot.pipe';
 
 @NgModule({
   declarations: [
-    CalendarDateSlotPipe,
+    CalendarDateSlotPipe
   ],
   imports: [
     CommonModule,
