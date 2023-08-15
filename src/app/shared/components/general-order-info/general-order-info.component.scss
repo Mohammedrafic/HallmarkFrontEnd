@@ -112,6 +112,12 @@ section {
         grid-row-start: 3;
         grid-row-end: 5;
       }
+
+      &.third-row {
+        grid-row: 5;
+        grid-row-start: 5;
+        grid-row-end: 7;
+      }
     }
 
     .empty-column {
