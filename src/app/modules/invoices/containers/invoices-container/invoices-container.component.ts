@@ -98,6 +98,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<Interfaces.InvoicesFilterState>>;
 
+  @Select(InvoicesState.selectedOrgId)
+  public selectedOrg$: Observable<number>;
+
   public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
 
   public selectedTabId: Interfaces.InvoiceTabId = 0;
@@ -105,6 +108,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public appliedFiltersAmount = 0;
 
   public readonly organizationControl: FormControl = new FormControl(null);
+  public readonly organizationMultiSelectControl: FormControl = new FormControl(null);
 
   public organizationId$: Observable<number>;
 
@@ -166,6 +170,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public recordsPerPageOptions = InvoicesPerPageOptions;
 
   public organizationId: number;
+  public agencyId: number;
 
   public populateFilterForm$: BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>
     = new BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>(null);
@@ -179,6 +184,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   private filterState: Interfaces.InvoicesFilterState = {};
   public userPermission: Permission = {};
   public readonly userPermissions = UserPermissions;
+  public allOption: string = "All";
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -259,27 +265,57 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         .pipe(
           filter(Boolean),
           distinctUntilChanged(),
-          tap(() => {
-            this.organizationId = 0;
+          tap((agencyId: number) => {
+            this.agencyId = agencyId;
             this.organizationControl.reset();
+            this.organizationMultiSelectControl.reset();
             this.organizationsList = [];
-            this.store.dispatch(new Invoices.SelectOrganization(0));
+            this.store.dispatch(new Invoices.GetOrganizations());
           }),
-          switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
+          switchMap(() => this.selectedOrg$),
+          tap((orgId: number) => {
+            console.log('selectedOrg',orgId);
+            this.organizationId = orgId;
+            this.store.dispatch(new PreservedFilters.ResetPageFilters());
+            if(orgId != 0){
+              this.store.dispatch(new Invoices.SelectOrganization(this.organizationId));
+              let filters : Interfaces.InvoicesFilterState = {};
+              filters.organizationId = this.organizationId
+              this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(
+                this.getPageName(),
+                filters),
+              );
+            }
+          }),          
           switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) => !!organizations.length),
           tap((organizations: DataSourceItem[]) => {
             this.organizationsList = organizations;
           }),
-          map(([firstOrganization]: DataSourceItem[]) => firstOrganization.id),
+          switchMap(() => this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()))),
+          switchMap(() => this.preservedFiltersByPageName$),          
           takeUntil(this.componentDestroy()),
         )
-        .subscribe((orgId: number) => {
+        .subscribe((filterState: any) => {          
+          console.log('filterState',filterState);
+          if(this.organizationId == 0 && filterState.isNotPreserved){
+            this.organizationId = this.organizationsList[0].id;  
+            // this.store.dispatch(new Invoices.SelectOrganization(this.organizationId));     
+          }else if(filterState.state != null &&  filterState.state.organizationId != null){
+            this.organizationId = filterState.state.organizationId;            
+          }
+          // this.store.dispatch(new Invoices.SelectOrganization(this.organizationId));
           const value = this.businessUnitId
             ? (this.organizationsList || []).filter(org => org.id === this.businessUnitId)[0].id
-            : orgId;
+            : this.organizationId;
 
           this.organizationControl.setValue(this.navigatedOrgId || value, { emitEvent: true, onlySelf: false });
+          if(this.navigatedOrgId){
+            this.organizationMultiSelectControl.setValue([this.navigatedOrgId]);
+          }else{
+            this.organizationMultiSelectControl.setValue([value]);
+          }
+
         });
     }
   }
@@ -309,9 +345,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     )
     .subscribe((id) => {
       this.clearStructure();
-      this.store.dispatch(new PreservedFilters.ResetPageFilters());
-      this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
-      this.organizationId = id;
+      // this.store.dispatch(new PreservedFilters.ResetPageFilters());
+      //this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
+      //this.organizationId = id;
       this.store.dispatch(new Invoices.SelectOrganization(id));
       this.resetFilters(true);
       this.navigatedInvoiceId = null;
