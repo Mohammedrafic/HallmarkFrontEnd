@@ -24,6 +24,24 @@
       <input class="e-input" type="text" value={{orgAgencyName}} [attr.disabled]="!isAgency"/>
     </div>
   </div>
+  <div class="input-container bootstrap" *ngIf="!isAgency">
+    <label>Agency</label>
+    <div class="input-group dropdown">
+      <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  appValidateWithMessage
+                       [allowFiltering]="true" [showDropDownIcon]="true" 
+                       [dataSource]="filterColumns.agencyIds.dataSource"
+                       [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true placeholder="All"  >
+      </ejs-multiselect>
+    </div>
+  </div>
+
+   
+  <div class="input-container bootstrap" hidden ="true"  *ngIf="isAgency">
+    <label>Agency</label>
+    <div class="input-group dropdown">
+      <input class="e-input" type="text" value={{orgAgencyName}} [attr.disabled]="isAgency" />
+    </div>
+  </div>
   <div class="input-container">
     <label>Region</label>
     <div class="input-group multiselect bootstrap">
@@ -115,24 +133,7 @@
       </ejs-multiselect>
     </div>
   </div>
-  <div class="input-container bootstrap" *ngIf="!isAgency">
-    <label>Agency</label>
-    <div class="input-group dropdown">
-      <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  appValidateWithMessage
-                       [allowFiltering]="true" [showDropDownIcon]="true" 
-                       [dataSource]="filterColumns.agencyIds.dataSource"
-                       [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true placeholder="All"  >
-      </ejs-multiselect>
-    </div>
-  </div>
-
-   
-  <div class="input-container bootstrap" hidden ="true"  *ngIf="isAgency">
-    <label>Agency</label>
-    <div class="input-group dropdown">
-      <input class="e-input" type="text" value={{orgAgencyName}} [attr.disabled]="isAgency" />
-    </div>
-  </div>
+ 
 
   <div class="input-container">
     <label>Order Type</label>
