@@ -2635,10 +2635,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       candidateStatuses = data.candidateStatuses.filter((status) => ReorderCandidateStatuses.includes(status.status));
     } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
       statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
-        !PerDiemDefaultStatuses.includes(status.status)
+        ![PerDiemDefaultStatuses,FilterOrderStatusText.OrdersOpenPositions].includes(status.status)
       );
       candidateStatuses = data.candidateStatuses.filter((status) => StatusesByDefault.includes(status.status));
-    } else if (this.orgpendingOrderapproval === LocalStorageStatus.OrdersforApproval) {
+    }
+    else if (this.activeTab === OrganizationOrderManagementTabs.PermPlacement || this.activeTab === OrganizationOrderManagementTabs.Incomplete) {
+      statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
+        ![FilterOrderStatusText.OrdersOpenPositions].includes(status.status)
+      );
+      candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
+    }
+     else if (this.orgpendingOrderapproval === LocalStorageStatus.OrdersforApproval) {
       if (this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
         statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
           !AllOrdersDefaultStatuses.includes(status.status)
