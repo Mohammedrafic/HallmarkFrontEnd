@@ -215,7 +215,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           CandidatStatus.Cancelled,
         ];
         if (this.activeTab === AgencyOrderManagementTabs.ReOrders) {
-          statuses = orderStatuses;
+          statuses = orderStatuses.filter((status) =>
+          [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled, FilterOrderStatusText.Closed].includes(status.status)
+          ).map(data => data.status);
           candidateStatusesData = candidateStatuses.filter((status) =>
             [
               CandidatesStatusText['Bill Rate Pending'],
@@ -231,7 +233,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           ).map(data => data.status);
           candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
-          statuses = orderStatuses;
+          statuses = orderStatuses.map(data => data.status);
           candidateStatusesData = candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
         }
 

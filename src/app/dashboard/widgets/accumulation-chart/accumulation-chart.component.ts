@@ -74,7 +74,6 @@ export class AccumulationChartComponent
   }
 
   public redirectToSourceContent(status: string): void {
-    let candidatesStatusDataSet:any = []
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
     let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
     if (filteredList.length > 0) {
@@ -93,28 +92,8 @@ export class AccumulationChartComponent
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
-        if(OrderStatus[OrderStatus.Open] ===  status){
-          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
+        this.dashboardService.redirectToUrl('client/order-management', undefined, status);
         }
-        else if(status === 'In Progress'){
-          candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
-          candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
-          candidatesStatusDataSet.push({"value":CandidatStatus['Pre Offer Custom']});
-        }
-        else if(status === 'In Progress (Pending)'){
-          candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
-        }
-        else if(status === 'In Progress (Accepted)'){
-          candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
-        }
-        else if(OrderStatus[OrderStatus.Filled] === status){
-          candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
-        }
-      }
-      if(status !=  OrderStatus[OrderStatus.Open]){
-        window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
-        this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
-      }
     }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status"){
         let candidatesDataset:any = [];
         let candidatesOrderDataSet = [];
@@ -137,6 +116,7 @@ export class AccumulationChartComponent
           candidatesOrderDataSet.push({"value":OrderStatus.Closed, "name": PositionTrendTypeEnum.CLOSED});
         }
         window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(candidatesOrderDataSet));
+      
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {         
             this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
         }else{
