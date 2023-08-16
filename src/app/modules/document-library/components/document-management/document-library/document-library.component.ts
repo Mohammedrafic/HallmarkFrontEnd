@@ -810,6 +810,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.dialogWidth = '600px'
       this.shareDocumentIds = selectedIds;
       this.isShowSharedWith=false;
+      if(this.businessFilterForm.get('filterBusinessUnit')?.value === this.businessUnitTypes.Organization)
+      {
+        this.onAgencyChanges();
+      }
+      if(this.businessFilterForm.get('filterBusinessUnit')?.value === this.businessUnitTypes.Agency)
+      {
+        this.onOrganizationChanges();
+      }
       this.store.dispatch(new ShowSideDialog(true));
     }
     else {
