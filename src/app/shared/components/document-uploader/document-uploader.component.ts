@@ -56,17 +56,7 @@ export class DocumentUploaderComponent implements OnInit, OnChanges {
     const allFiles: FileInfo[] = filesData.concat(args.filesData);
 
     args.isModified = true;
-    allFiles.forEach((file, index) => this.addFilesValidationMessage(file, index));
-    const allFilesReadyToUpload: Blob[] = this.validateFileAmount(allFiles)
-      .filter((f) => f.statusCode === FileStatusCode.Valid)
-      .map((f) => f.rawFile as Blob);
-
-    this.selectDocuments.emit(allFilesReadyToUpload);
-  }
-
-  public onDocumentRemove(): void {
-    this.uploadObj.clearAll();
-    this.selectDocuments.emit([]);
+    this.emitSelectedDocuments(allFiles);
   }
 
   public onDelete(document: Document): void {
@@ -84,16 +74,15 @@ export class DocumentUploaderComponent implements OnInit, OnChanges {
     this.documents = [...this.documents];
     this.deleteDocument.emit(document);
 
-    const fileAmount = this.uploadObj.getFilesData().length + (this.documents?.length ?? 0);
-    this.checkMaxFilesReached(fileAmount);
+    const uploadedFiles = this.uploadObj.getFilesData();
+    this.emitSelectedDocuments(uploadedFiles);
   }
 
   public removeUplodedFile(args: RemovingEventArgs): void {
     const filesData: FileInfo[] = this.uploadObj.getFilesData();
     const allFiles: FileInfo[] = filesData.filter((file) => file.id !== args.filesData[0].id);
-    const fileAmount = allFiles.length + (this.documents?.length ?? 0);
 
-    this.checkMaxFilesReached(fileAmount);
+    this.emitSelectedDocuments(allFiles);
   }
 
   private addFilesValidationMessage(file: FileInfo, fileIndex: number) {
@@ -110,13 +99,22 @@ export class DocumentUploaderComponent implements OnInit, OnChanges {
     });
   }
 
+  private emitSelectedDocuments(allFiles: FileInfo[]): void {
+    allFiles.forEach((file, index) => this.addFilesValidationMessage(file, index));
+    const allFilesReadyToUpload: Blob[] = this.validateFileAmount(allFiles)
+      .filter((file) => file.statusCode === FileStatusCode.Valid)
+      .map((file) => file.rawFile as Blob);
+    
+    this.selectDocuments.emit(allFilesReadyToUpload);
+  }
+
   private validateFileAmount(uplodedFiles: FileInfo[]): FileInfo[] {
     const fileAmount = uplodedFiles.length + (this.documents?.length ?? 0);
     this.checkMaxFilesReached(fileAmount);
 
     if (fileAmount > this.maxFileAmount) {
       const spliceIndex = this.maxFileAmount - fileAmount;
-      return [...uplodedFiles].splice(spliceIndex);
+      return [...uplodedFiles].slice(0, spliceIndex);
     } else {
       return uplodedFiles;
     }

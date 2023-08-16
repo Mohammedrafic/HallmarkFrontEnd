@@ -5,9 +5,12 @@ import {
   ScheduleDateItem,
   ScheduleDateSlot,
   ScheduleDay,
+  ScheduleExport,
+  ScheduleExportPage,
   ScheduleItem,
   ScheduleModel,
   ScheduleModelPage,
+  Schedules
 } from '../../interface';
 
 @Injectable()
@@ -17,6 +20,14 @@ export class ScheduleGridService {
       .filter((item: ScheduleModel) => !!item.schedule.length)
       .map((item: ScheduleModel) => {
         return item.schedule.map((scheduleItem: ScheduleDateItem) => scheduleItem.date);
+      }).flat();
+  }
+
+  public getSlotsWithDateforExport(scheduleData:ScheduleExport[]): string[] {
+    return scheduleData
+      .filter((item: ScheduleExport) => item.employeeSchedules !== null ? (!!item.employeeSchedules?.schedules?.length) : '')
+      .map((item: ScheduleExport) => {
+        return item.employeeSchedules?.schedules?.map((scheduleItem: Schedules) => scheduleItem.date);
       }).flat();
   }
 

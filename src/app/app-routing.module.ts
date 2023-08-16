@@ -22,6 +22,12 @@ const routes: Routes = [
         component: ClearCacheComponent,
       },
       {
+        path: 'schedule-export',
+        loadChildren: () =>
+          import('./schedule-export/schedule-export.module').then((m) => m.ScheduleExportModule),
+          data: { skipAuthentication: true },
+      },
+      {
         path: 'document-viewer',
         loadChildren: () =>
           import('./document-viewer/document-viewer.module').then((m) => m.DocumentViewerModule),

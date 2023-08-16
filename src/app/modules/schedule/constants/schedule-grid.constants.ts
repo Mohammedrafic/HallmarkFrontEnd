@@ -3,9 +3,9 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 import { DatesRangeType, WeekDays } from '@shared/enums';
 import { IrpOrderType } from '@shared/enums/order-type';
 import { isCandidateOriented } from '../components/candidate-card/candidate-card.helper';
-import { CardTitle, CreateScheduleAttributes, HasMultipleFilters } from '../helpers';
+import { CardTitle, CardTitleforExport, CreateScheduleAttributes, HasMultipleFilters } from '../helpers';
 import { DatePeriodId, EmployeeIcons, ScheduleType } from '../enums';
-import { ScheduleCandidate, ScheduleDateItem, ScheduleEventConfig, ScheduleFilters } from '../interface';
+import { ScheduleCandidate, ScheduleDateItem, ScheduleEventConfig, ScheduleFilters, Schedules } from '../interface';
 
 export const DatesPeriods: ItemModel[] = [
   {
@@ -72,5 +72,32 @@ export const GetScheduleEventConfig = (scheduleItem: ScheduleDateItem, eventInde
 
   return config;
 };
+
+export const GetScheduleEventConfigforExport = (scheduleItem: Schedules, eventIndex: number): ScheduleEventConfig => {
+  const event = scheduleItem.daySchedules[eventIndex];
+  const config = { startDate: event.startDate, endDate: event.endDate } as unknown as ScheduleEventConfig;
+
+  if (event.scheduleType === ScheduleType.Book) {
+    config.title = CardTitleforExport(event);
+    config.additionalAttributes = event.attributes ? CreateScheduleAttributes(event.attributes) : '';
+    config.color = '#060715';
+    config.ltaOrder = event.orderMetadata?.orderType === IrpOrderType.LongTermAssignment;
+  }
+
+  if (event.scheduleType === ScheduleType.Unavailability) {
+    config.title = 'UNAVAIL';
+    config.shortTitle = 'UNAV';
+    config.color = '#FF5858' ;
+  }
+
+  if (event.scheduleType === ScheduleType.Availability) {
+    config.title = 'AVAIL';
+    config.shortTitle = 'AV';
+    config.color = '#5AA658' ;
+  }
+
+  return config;
+};
+
 
 export const WeekList = [WeekDays.Sun, WeekDays.Mon, WeekDays.Tue, WeekDays.Wed, WeekDays.Thu, WeekDays.Fri, WeekDays.Sat];
