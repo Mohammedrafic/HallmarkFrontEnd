@@ -93,7 +93,7 @@ export class AccumulationChartComponent
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
         this.dashboardService.redirectToUrl('client/order-management', undefined, status);
-        }
+      }
     }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status"){
         let candidatesDataset:any = [];
         let candidatesOrderDataSet = [];
@@ -116,7 +116,7 @@ export class AccumulationChartComponent
           candidatesOrderDataSet.push({"value":OrderStatus.Closed, "name": PositionTrendTypeEnum.CLOSED});
         }
         window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(candidatesOrderDataSet));
-      
+
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {         
             this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
         }else{
