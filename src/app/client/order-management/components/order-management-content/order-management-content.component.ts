@@ -528,7 +528,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
     this.OrderJourneyFilterFormGroup = this.orderManagementService.createOrderJourneyFilterForm();
-    this.ltaOrder = JSON.parse(localStorage.getItem('ltaorderending') || 'false') as boolean;
+    this.ltaOrder = JSON.parse(localStorage.getItem('ltaorderending') || '"false"') as boolean;
   }
 
   public get isActiveSystemIRP(): boolean {
@@ -2244,6 +2244,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     filters.orderStatuses = this.orderPositionStatus
       ? [this.orderPositionStatus.replace(/\s*\([^)]*\)\s*|\s+/g, '')]
       : [];
+
     const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
     const items = JSON.parse(dashboardFilterState) as FilteredItem[] || [];
     let pendingApprovalOrders = this.globalWindow.localStorage.getItem('pendingApprovalOrders') || 'null';
@@ -2666,14 +2667,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
     this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
     const candidatesOrderStatusList = this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') ? JSON.parse(this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') || '') :'';
-    if(candidatesOrderStatusList != ''){
-      const candstatuses = this.filterColumns.candidateStatuses.dataSource.filter((f: { status: any; })=>candidatesOrderStatusList.map((m: { value: any; })=>m.value).includes(f.status))
-      const candidateStatuses = candstatuses.map((m: { filterStatus: any; })=>m.filterStatus);
-      candidateStatuses.forEach((candidateStatuses:any)=>{
-        this.candidateStatusIds.push(candidateStatuses)
-      })
-      this.documentEle.defaultView?.localStorage.setItem('candidateStatusListFromDashboard', JSON.stringify(''));
-    }
   }
 
   private prepareFiltersToDispatch(state: OrderFilter): void {
@@ -2890,43 +2883,5 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     setTimeout(() => {
       this.gridApi?.selectIndex(0, false, false);
     }, 300);
-  }
-  public onSelect(args:any) {
-    if (args.itemData.status == 'OrdersOpenPositions') {
-      var liCollections = document.querySelectorAll(
-        '.e-popup.custom .e-list-item'
-      );
-      for (var i = 0; i < liCollections.length; i++) {
-        if ((liCollections[i] as any).innerText != 'Order(s) - Open Positions') {
-          liCollections[i].classList.add('e-disabled');
-          liCollections[i].classList.add('e-overlay');
-        }
-      }
-    }
-    else{
-      var liCollections = document.querySelectorAll(
-        '.e-popup.custom .e-list-item'
-      );
-      for (var i = 0; i < liCollections.length; i++) {
-        if ((liCollections[i] as any).innerText == 'Order(s) - Open Positions') {
-          liCollections[i].classList.add('e-disabled');
-          liCollections[i].classList.add('e-overlay');
-        }
-      }
-    }
-  }
-  public orderStatusSelect(){
-    let orderStatus = this.OrderFilterFormGroup.get("orderStatuses")?.value;
-    if (orderStatus == 'OrdersOpenPositions') {
-      var liCollections = document.querySelectorAll(
-        '.e-popup.custom .e-list-item'
-      );
-      for (var i = 0; i < liCollections.length; i++) {
-        if ((liCollections[i] as any).innerText != 'Order(s) - Open Positions') {
-          liCollections[i].classList.add('e-disabled');
-          liCollections[i].classList.add('e-overlay');
-        }
-      }
-    }
   }
 }
