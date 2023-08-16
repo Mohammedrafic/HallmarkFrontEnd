@@ -160,6 +160,7 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     ProgressBarAllModule,
     TextBoxModule,
     SwitchModule,
+    AgGridModule,
     NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState,useractivityReportState]),
   ],
   providers:[

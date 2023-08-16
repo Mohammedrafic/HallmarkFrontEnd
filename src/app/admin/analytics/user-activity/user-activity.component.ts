@@ -125,10 +125,11 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
+
     {
-      headerName: 'Date',
+      headerName: ' Date',
       field: 'utcDate',
-      minWidth: 100,
+      minWidth: 175,
       filter: 'agDateColumnFilter',
       filterParams: {
         buttons: ['reset'],
@@ -155,13 +156,8 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        if(!Number.isNaN(Date.parse(params.data?.creationDate)))
-        {
-          const str = this.datePipe?.transform(params.data.creationDate, 'MM/dd/yyyy') as string
-          return str?.length > 0 ? str : "";
-        }else{
-          return params.data.creationDate;
-        }
+        const str = this.datePipe?.transform(params.data.utcDate, 'MM/dd/yyyy') as string
+        return str?.length > 0 ? str : "";
       },
       sortable: true,
       resizable: true
