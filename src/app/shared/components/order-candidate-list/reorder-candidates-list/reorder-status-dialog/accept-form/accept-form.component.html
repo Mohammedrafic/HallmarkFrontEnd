@@ -35,7 +35,9 @@
     </div>
     <div>
      <div class="input-container bootstrap">
-        <label>Candidate Bill Rate</label>
+        <label>Candidate Bill Rate
+          <span *ngIf="formGroup.get('candidateBillRate')?.enabled" class="required">*</span>
+        </label>
         <div class="input-group">
           <input
             formControlName="candidateBillRate"
@@ -56,10 +58,10 @@
         <input appValidateWithMessage formControlName="departmentName" class="e-input" type="text" />
       </div>
     </div>
-    <div class="input-container bootstrap" *ngIf="!isReorder">
+    <div class="input-container bootstrap">
       <label class="input-group">Clock ID</label>
       <div>
-        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" maxlength="50"/>
+        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" [disabled]="isReorder" maxlength="50"/>
       </div>
     </div>
     <div *ngIf="showHourlyRate">

@@ -1,13 +1,26 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import { Observable } from 'rxjs';
+
 import { CustomFormGroup } from '@core/interface';
 import { CredentialFilter } from '@shared/models/credential.model';
 import { CredentialDTO } from '@shared/components/credentials-list/interfaces';
+import { BaseObservable } from '@core/helpers';
 
 @Injectable()
 export class CredentialListService {
+  private readonly assignCredentialModalState: BaseObservable<boolean> = new BaseObservable<boolean>(false);
+
   constructor(private formBuilder: FormBuilder) {}
+
+  setAssignCredentialModalState(state: boolean): void {
+    this.assignCredentialModalState.set(state);
+  }
+
+  getAssignCredentialModalStateStream(): Observable<boolean> {
+    return this.assignCredentialModalState.getStream();
+  }
 
   public createFiltersForm(isIncludeIrp: boolean): CustomFormGroup<CredentialFilter> {
     let filtersForm = this.formBuilder.group({

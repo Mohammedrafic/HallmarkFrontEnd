@@ -1,0 +1,106 @@
+@import 'colors';
+
+.employee-profile-form-container {
+  padding: 12px;
+
+  .form-title {
+    margin-bottom: 12px;
+    color: $title-black;
+    line-height: 28px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .input-group.input-readonly {
+      .e-input[readonly] {
+        background-color: $secondary-dark-blue-50;
+        color: $secondary-dark-blue-30;
+        border: 1px solid $secondary-dark-blue-40 !important;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  & .schedule-custom-tooltip-container {
+    margin: 0 !important;
+    font-family: 'Open Sans', 'sans-serif';
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  app-tooltip-container {
+    display: contents;
+  }
+}
+
+.demographics {
+  margin-bottom: 12px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  grid-auto-rows: 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-areas: 'firstName middleName lastName dob';
+  gap: 12px;
+}
+
+.firstName { grid-area: firstName; }
+.middleName { grid-area: middleName; }
+.lastName { grid-area: lastName; }
+.dob { grid-area: dob; }
+
+.professional-details {
+  margin-bottom: 24px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  grid-auto-rows: 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-areas: 'primarySkillId secondarySkills hireDate employeeId';
+  gap: 12px;
+}
+
+.primarySkillId { grid-area: primarySkillId; }
+.secondarySkills { grid-area: secondarySkills; }
+.hireDate { grid-area: hireDate; }
+.employeeId { grid-area: employeeId; }
+
+.contact-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-auto-columns: 1fr;
+  grid-auto-rows: 1fr;
+  gap: 12px;
+  grid-auto-flow: column;
+  grid-template-areas:
+    'country address1 location location'
+    'personalEmail workEmail phone1 phone2';
+}
+
+.address1 { grid-area: address1; }
+.country { grid-area: country; }
+.personalEmail { grid-area: personalEmail; }
+.workEmail { grid-area: workEmail; }
+.phone1 { grid-area: phone1; }
+.phone2 { grid-area: phone2; }
+
+.location {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 12px;
+  grid-auto-flow: column;
+  grid-template-areas: 'city state zipCode';
+  grid-area: location;
+}
+
+.city { grid-area: city; }
+.state { grid-area: state; }
+.zipCode { grid-area: zipCode; }

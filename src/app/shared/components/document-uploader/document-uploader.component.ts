@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 
-import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { SelectedEventArgs, UploaderComponent, RemovingEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { FileInfo } from '@syncfusion/ej2-inputs/src/uploader/uploader';
 
 import { FileSize } from "@core/enums";
@@ -12,12 +12,13 @@ import { Document } from '@shared/models/document.model';
   templateUrl: './document-uploader.component.html',
   styleUrls: ['./document-uploader.component.scss'],
 })
-export class DocumentUploaderComponent implements OnInit {
+export class DocumentUploaderComponent implements OnInit, OnChanges {
   @Input() uploaderTitle: string;
   @Input() allowedExtensions = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
   @Input() maxFileSize = FileSize.MB_5;
   @Input() documents: Document[] | undefined | null;
   @Input() disabled = false;
+  @Input() maxFileAmount = 500;
 
   @Output() selectDocuments = new EventEmitter<Blob[]>();
   @Output() deleteDocument = new EventEmitter<Document>();
@@ -26,9 +27,16 @@ export class DocumentUploaderComponent implements OnInit {
   public uploadObj: UploaderComponent;
   public uploaderErrorMessageElement: HTMLElement;
   public dropElement: HTMLElement;
+  public isMaxFilesReached = false;
 
   ngOnInit(): void {
     this.dropElement = document.getElementById('droparea') as HTMLElement;
+  }
+
+  ngOnChanges(simple: SimpleChanges): void {
+    if (simple['documents'].currentValue) {
+      this.checkMaxFilesReached(this.documents?.length ?? 0);
+    }
   }
 
   public browse(): void {
@@ -48,17 +56,7 @@ export class DocumentUploaderComponent implements OnInit {
     const allFiles: FileInfo[] = filesData.concat(args.filesData);
 
     args.isModified = true;
-    allFiles.forEach((file, index) => this.addFilesValidationMessage(file, index));
-    const allFilesReadyToUpload: Blob[] = allFiles
-      .filter((f) => f.statusCode === FileStatusCode.Valid)
-      .map((f) => f.rawFile as Blob);
-
-    this.selectDocuments.emit(allFilesReadyToUpload);
-  }
-
-  public onDocumentRemove(): void {
-    this.uploadObj.clearAll();
-    this.selectDocuments.emit([]);
+    this.emitSelectedDocuments(allFiles);
   }
 
   public onDelete(document: Document): void {
@@ -75,6 +73,16 @@ export class DocumentUploaderComponent implements OnInit {
     this.documents.splice(index, 1);
     this.documents = [...this.documents];
     this.deleteDocument.emit(document);
+
+    const uploadedFiles = this.uploadObj.getFilesData();
+    this.emitSelectedDocuments(uploadedFiles);
+  }
+
+  public removeUplodedFile(args: RemovingEventArgs): void {
+    const filesData: FileInfo[] = this.uploadObj.getFilesData();
+    const allFiles: FileInfo[] = filesData.filter((file) => file.id !== args.filesData[0].id);
+
+    this.emitSelectedDocuments(allFiles);
   }
 
   private addFilesValidationMessage(file: FileInfo, fileIndex: number) {
@@ -89,5 +97,30 @@ export class DocumentUploaderComponent implements OnInit {
             : 'The file should be in pdf, doc, docx, xls, xlsx, jpg, jpeg, png format.';
       }
     });
+  }
+
+  private emitSelectedDocuments(allFiles: FileInfo[]): void {
+    allFiles.forEach((file, index) => this.addFilesValidationMessage(file, index));
+    const allFilesReadyToUpload: Blob[] = this.validateFileAmount(allFiles)
+      .filter((file) => file.statusCode === FileStatusCode.Valid)
+      .map((file) => file.rawFile as Blob);
+    
+    this.selectDocuments.emit(allFilesReadyToUpload);
+  }
+
+  private validateFileAmount(uplodedFiles: FileInfo[]): FileInfo[] {
+    const fileAmount = uplodedFiles.length + (this.documents?.length ?? 0);
+    this.checkMaxFilesReached(fileAmount);
+
+    if (fileAmount > this.maxFileAmount) {
+      const spliceIndex = this.maxFileAmount - fileAmount;
+      return [...uplodedFiles].slice(0, spliceIndex);
+    } else {
+      return uplodedFiles;
+    }
+  }
+
+  private checkMaxFilesReached(fileAmount: number): void {
+    this.isMaxFilesReached = fileAmount >= this.maxFileAmount;
   }
 }

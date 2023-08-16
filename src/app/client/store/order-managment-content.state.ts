@@ -2,7 +2,7 @@ import { SaveLastSelectedOrganizationAgencyId } from '../../store/user.actions';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { catchError, debounceTime, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, Observable, of, switchMap, tap } from 'rxjs';
 import {
   ApproveOrder,
   CancelOrganizationCandidateJob,
@@ -70,6 +70,7 @@ import {
   sendOnboardCandidateEmailMessage,
   GetOrderComments,
   ApproveOrderSucceeded,
+  ClearCandidateCancellationReason,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -107,6 +108,8 @@ import {
   PerDiemReOrdersErrorMessage,
   TravelerContracttoPermOrdersSucceedMessage,
   RECORD_DELETE,
+  RECORD_MODIFIED_SUCCESS_WITH_ORDERID,
+  RECORD_SAVED_SUCCESS_WITH_ORDERID,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -137,7 +140,7 @@ import { ScheduleShift } from '@shared/models/schedule-shift.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
+import { ChangeInternalDistributionSuccess } from '@client/order-management/components/irp-tabs/order-details/constants';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -168,7 +171,7 @@ export interface OrderManagementContentStateModel {
   contactDetails: Department | null;
   extensions: any;
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
-  candidateCancellationReasons:CandidateCancellationReason[]|null;
+  candidateCancellationReasons: CandidateCancellationReason[] | null;
   allShifts:ScheduleShift[]|null;
   sendOnboardCandidateEmail:OnboardCandidateEmail | null;
   orderComments: Comment[]
@@ -209,7 +212,7 @@ export interface OrderManagementContentStateModel {
     contactDetails: null,
     extensions: null,
     irpCandidates: null,
-    candidateCancellationReasons:null,
+    candidateCancellationReasons: null,
     allShifts:null,
     sendOnboardCandidateEmail:null,
     orderComments : []
@@ -480,14 +483,20 @@ export class OrderManagementContentState {
         const groupedCredentials = getGroupedCredentials(payload.credentials ?? payload.reOrderFrom?.credentials);
         payload.groupedCredentials = groupedCredentials;
         patchState({ selectedOrder: payload });
-
         const { orderType, departmentId, jobStartDate, jobEndDate } = payload;
-        const skill = payload.irpOrderMetadata ? payload.irpOrderMetadata.skillId : payload.skillId;
+        let skillId = payload.skillId;
+
+        if (payload.irpOrderMetadata ) {
+          skillId = payload.irpOrderMetadata.skillId;
+        } else if (payload.reOrderFromId && payload.reOrderFrom) {
+          skillId = payload.reOrderFrom.skillId;
+        }
+
         dispatch(
           new SetPredefinedBillRatesData(
             orderType,
             departmentId,
-            skill,
+            skillId,
             jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : jobStartDate,
             jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : jobEndDate
           )
@@ -786,7 +795,7 @@ export class OrderManagementContentState {
   @Action(SaveIrpOrder)
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents,inActivedatestr,isLocation,isLocationAndDepartment }: SaveIrpOrder
+    { order, documents, inActivedatestr,isLocation,isLocationAndDepartment }: SaveIrpOrder
   ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
@@ -825,7 +834,7 @@ export class OrderManagementContentState {
   ): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
-        let TOAST_MESSAGE = 'Record has been created';
+        let TOAST_MESSAGE = RECORD_ADDED;
         let MESSAGE_TYPE = MessageTypes.Success;
         const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
         const hasntOrderBillRates =
@@ -852,7 +861,7 @@ export class OrderManagementContentState {
                 payload.organizationPrefix,
                 payload.publicId
               )
-            : new ShowToast(MessageTypes.Success, 'Order '+ payload.organizationPrefix?.toString()+'-'+payload.publicId?.toString()+' has been added'),
+            : new ShowToast(MessageTypes.Success, RECORD_SAVED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
           new SaveLastSelectedOrganizationAgencyId(
@@ -873,12 +882,15 @@ export class OrderManagementContentState {
   @Action(EditIrpOrder)
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: EditIrpOrder
+    { order, documents, internalDistributionChanged }: EditIrpOrder
   ): Observable<void | Blob[] | Order[]> {
     return this.orderManagementService.editIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
+        const successMessage = internalDistributionChanged ? ChangeInternalDistributionSuccess
+        : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(order[0]?.organizationPrefix??'',order[0]?.publicId?.toString()??'');
+
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+          new ShowToast(MessageTypes.Success, successMessage),
           new SaveIrpOrderSucceeded(),
         ]);
         if (documents.length) {
@@ -899,7 +911,7 @@ export class OrderManagementContentState {
     return this.orderManagementService.editOrder(order, documents).pipe(
       tap((payload: Order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, message ?? RECORD_MODIFIED),
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')??message),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
@@ -1178,13 +1190,22 @@ export class OrderManagementContentState {
 
   @Action(GetCandidateCancellationReason)
   GetCandidateCancellationReason(
-    { patchState } : StateContext<OrderManagementContentStateModel>, { payload } : GetCandidateCancellationReason
-    ) : Observable<CandidateCancellationReason[] |null>{
-      return this.orderManagementService.GetCandidateCancellationReasons(payload).pipe(tap((payload: CandidateCancellationReason[]) => {
-        patchState({ candidateCancellationReasons: payload });
-        return payload;
-      }));
-    }
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderId }: GetCandidateCancellationReason
+  ): Observable<CandidateCancellationReason[] | null> {
+    return this.orderManagementService.getCandidateCancellationReasons(orderId)
+      .pipe(
+        tap((payload: CandidateCancellationReason[]) => {
+          patchState({ candidateCancellationReasons: payload });
+        }));
+  }
+
+  @Action(ClearCandidateCancellationReason)
+  ClearCandidateCancellationReason(
+    { patchState }: StateContext<OrderManagementContentStateModel>
+  ): void {
+    patchState({ candidateCancellationReasons: null });
+  }
 
     @Action(GetOrderComments)
     GetOrderComments(
