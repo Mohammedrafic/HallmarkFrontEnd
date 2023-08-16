@@ -102,8 +102,8 @@ export class DocumentUploaderComponent implements OnInit, OnChanges {
   private emitSelectedDocuments(allFiles: FileInfo[]): void {
     allFiles.forEach((file, index) => this.addFilesValidationMessage(file, index));
     const allFilesReadyToUpload: Blob[] = this.validateFileAmount(allFiles)
-      .filter((f) => f.statusCode === FileStatusCode.Valid)
-      .map((f) => f.rawFile as Blob);
+      .filter((file) => file.statusCode === FileStatusCode.Valid)
+      .map((file) => file.rawFile as Blob);
     
     this.selectDocuments.emit(allFilesReadyToUpload);
   }
