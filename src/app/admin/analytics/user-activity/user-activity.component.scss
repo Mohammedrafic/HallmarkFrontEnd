@@ -40,10 +40,9 @@
     }
 }
 
-.accrual-report-section {
-  display: flex;
-  height: 65%;
-  padding-top: 20px !important;
+.useractivity-report-section{
+  height: calc( 100% - 70px );
+  overflow: auto;
 }
 
 .form-line {

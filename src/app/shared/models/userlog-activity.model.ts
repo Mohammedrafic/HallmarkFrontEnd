@@ -12,38 +12,23 @@ export class useractivitlogreportPage {
   export class userActivity {
 
     id: string;
-
-    message: string;
-
-    utcDate: DateTime;
-
+    message: any;
+    utcDate: any;
     eventType: string;
-
     eventTargetType: string;
     eventTarget: string;
-
     eventValue: string;
-
     screenUrl: string;
-
     screenName: string;
-
     client: string;
-
     userIP: string;
-
-    userId: string
-
-
+    userId: string;
+    businessUnitId:string;
     isHallmark: boolean;
-
     userName: string;
-
     userEmailId: string;
-
     businessUnitName: string;
-
-    dateTime: DateTime;
+    dateTime: any;
   }
   
   

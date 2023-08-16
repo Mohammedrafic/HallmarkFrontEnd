@@ -21,7 +21,7 @@
     </section>
   </section>
 
-  <section class="credential-expiry-section">
+  <section class="useractivity-report-section">
     <section class="app-grid table-wrapper controls-container" >
       <div class="custom-grid">
         <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
@@ -35,6 +35,7 @@
                             [allowFiltering]="true"
                             [dataSource]="rowsPerPageDropDown"
                             [(value)]="activeRowsPerPageDropDown"
+                            (change)="onPageSizeChanged($event)"
                             >
           </ejs-dropdownlist>
           <div class="total-rows">
