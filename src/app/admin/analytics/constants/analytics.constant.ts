@@ -30,7 +30,9 @@ export const analyticsConstants = {
     BeginStartDate: 'beginStartDate',
     EndStartDate: 'endStartDate',
     jobId: 'jobId',
-    jobStatuses: 'jobStatuses'
+    jobStatuses: 'jobStatuses',
+    opcredFlag: 'opcredFlag',
+    IsOptionalRequred:'IsOptionalRequred'
 
   }
 }
@@ -223,6 +225,18 @@ export const shiftBreakdownConstants = {
     startMonth: 'startMonth',
     endYear: 'endYear',
     endMonth: 'endMonth'
+  }
+}
+export const departmentSpendHourReportConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',    
+    skillCategoryIds: 'skillCategoryIds',
+    skillIds: 'skillIds',
+    StartDate: 'startDate',
+    EndDate: 'endDate',
   }
 }
 

@@ -1,4 +1,10 @@
-import {  CandidateStatusAndReasonFilterOptionsDto, CommonReportFilterOptions, SearchCandidate, SearchCredential, StaffScheduleReportFilterOptions} from "@admin/analytics/models/common-report.model";
+import {
+  CandidateStatusAndReasonFilterOptionsDto,
+  CommonReportFilterOptions,
+  SearchCandidate,
+  SearchCredential,
+  StaffScheduleReportFilterOptions,
+} from "@admin/analytics/models/common-report.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
@@ -10,7 +16,6 @@ import { regionsPage } from "@shared/models/region.model";
 import { map, Observable } from "rxjs";
 import { AgencyCommonFilterReportOptions } from "../../agency/agency-reports/models/agency-common-report.model";
 import { DataSourceItem } from "../../core/interface/common.interface";
-import { AssociateAgencyDto } from "../models/logi-report-file";
 import { OrganizationStructure } from "../models/organization.model";
 
 @Injectable({ providedIn: 'root' })

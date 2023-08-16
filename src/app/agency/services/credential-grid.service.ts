@@ -2,9 +2,12 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { FilesPropModel } from '@syncfusion/ej2-angular-inputs';
 
-import { AddCredentialForm, SearchCredentialForm } from '@shared/components/credentials-grid/credentials-grid.interface';
+import {
+  AddCredentialForm,
+  CredentialFiles,
+  SearchCredentialForm,
+} from '@shared/components/credentials-grid/credentials-grid.interface';
 import { CustomFormGroup } from '@core/interface';
 import { CredentialStatus } from '@shared/enums/status';
 import { CandidateCredential, CredentialFile, CredentialRequestParams } from '@shared/models/candidate-credential.model';
@@ -33,13 +36,14 @@ export class CredentialGridService {
     });
   }
 
-  public getExistingFile(credentialFile: CredentialFile): FilesPropModel {
+  public getExistingFile(credentialFile: CredentialFile): CredentialFiles {
     const [name, type] = credentialFile.name.split(/\./);
 
     return {
       name,
       type,
-      size: 0,
+      size: credentialFile.size,
+      uploadedDate: credentialFile.uploadedDate,
     };
   }
 

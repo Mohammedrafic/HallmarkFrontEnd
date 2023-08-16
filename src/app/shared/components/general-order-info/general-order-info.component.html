@@ -28,16 +28,12 @@
         <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
-        <div class="column last-column" *ngIf="regularRates.regularLocal">
+        <div class="column last-column second-row" *ngIf="regularRates.regularLocal">
           <div class="cost">${{ regularRates.regularLocal | number: '1.2-2' }}</div>
           <div class="sup-title">Regular Local Bill Rate</div>
         </div>
+        <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
         <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
-        <div></div>
-        <div></div>
-        <div class="column links">
-          <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
-        </div>
       </ng-container>
     </div>
   </section>
@@ -315,13 +311,15 @@
 </ng-template>
 
 <ng-template #orderInfo>
-  <div class="column link-wrapper" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
-    <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
-      Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionInitialOrderPublicId }}
-    </div>
-    <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
-      Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
-    </div>
+  <div class="column links" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension || orderInformation.hasParentExtension">
+    <div class="column link-wrapper" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
+      <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
+        Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionInitialOrderPublicId }}
+      </div>
+      <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
+        Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
+      </div>
+    </div>      
   </div>
 </ng-template>
 

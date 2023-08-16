@@ -10,39 +10,42 @@ import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inp
 import { TabAllModule, TabModule } from '@syncfusion/ej2-angular-navigations';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { FeatherModule } from 'angular-feather';
-import { Edit, Sliders, Trash2, Upload } from 'angular-feather/icons';
+import { Edit, Info, Sliders, Trash2, Upload } from 'angular-feather/icons';
 
 import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { IrpSystemGridTextPipeModule } from '@shared/pipes/irp-system-grid-text/irp-system-grid-text.module';
 import { SharedModule } from '@shared/shared.module';
-
-import { CredentialsSetupComponent } from './credentials-setup/credentials-setup.component';
-import { FilteredCredentialsComponent } from './credentials-setup/filtered-credentials/filtered-credentials.component';
-import { MapCredentialsFormComponent } from './credentials-setup/map-credentials-form/map-credentials-form.component';
-import { CredentialsSetupService } from './services/credentials-setup.service';
-import { MapCredentialsService } from './services/map-credentials.service';
 import { CredentialsComponent } from './credentials.component';
-import { CredentialsRoutingModule } from './credentials-routing.module';
+import {
+  CredentialGroupsModule,
+} from '@organization-management/credentials/components/credential-groups/credential-groups.module';
+import {
+  CredentialsSetupService,
+  MapCredentialsService,
+} from '@organization-management/credentials/services';
+import { CredentialRoutingModule } from '@organization-management/credentials/credential-routing.module';
+import { CredentialListService } from '@shared/components/credentials-list/services';
+import {
+  CredentialSetupModule,
+} from '@organization-management/credentials/components/credentials-setup/credential-setup.module';
 
 const icons = {
   Upload,
   Sliders,
   Edit,
   Trash2,
+  Info,
 };
 
 @NgModule({
   declarations: [
     CredentialsComponent,
-    CredentialsSetupComponent,
-    MapCredentialsFormComponent,
-    FilteredCredentialsComponent,
   ],
   imports: [
     CommonModule,
-    CredentialsRoutingModule,
     FormsModule,
+    CredentialRoutingModule,
     ReactiveFormsModule,
     SharedModule,
     PagerModule,
@@ -60,11 +63,14 @@ const icons = {
     TooltipContainerModule,
     CredentialListModule,
     IrpSystemGridTextPipeModule,
+    CredentialGroupsModule,
+    CredentialSetupModule,
     FeatherModule.pick(icons),
   ],
   providers: [
     MapCredentialsService,
     CredentialsSetupService,
+    CredentialListService,
   ],
 })
 export class CredentialsModule { }

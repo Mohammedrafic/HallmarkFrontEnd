@@ -471,7 +471,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   public orderLockList = orderLockList;
-  private ltaOrder: boolean|null = false;
+  private ltaOrderFlag: boolean|null = false;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -528,7 +528,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
     this.OrderJourneyFilterFormGroup = this.orderManagementService.createOrderJourneyFilterForm();
-    this.ltaOrder = JSON.parse(localStorage.getItem('ltaorderending') || '"false"') as boolean;
+    this.ltaOrderFlag = JSON.parse(localStorage.getItem('ltaorderending') || 'false') as boolean;
   }
 
   public get isActiveSystemIRP(): boolean {
@@ -915,8 +915,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
         this.filters.includeReOrders = true;
-        if(this.ltaOrder){
+        if(this.ltaOrderFlag){
           this.filters.ltaOrder = true;
+          this.globalWindow.localStorage.setItem("ltaorderending", JSON.stringify(false));
         }
         this.hasOrderAllOrdersId();
         let filtersAllOrders = {...this.filters};
@@ -1056,6 +1057,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private clearFilters(): void {
+    if(this.ltaOrderFlag){
+      this.filters.ltaOrder = true;
+    }
     this.OrderFilterFormGroup.reset();
     this.OrderFilterFormGroup.controls['agencyType'].setValue('0');
     this.filteredItems = [];
@@ -1117,6 +1121,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public onFilterClearAll(): void {
+    this.ltaOrderFlag = false;
     this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
     this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
@@ -1125,7 +1130,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public onFilterApply(): void {
-    this.ltaOrder = false;
+    this.filters.ltaOrder = false;
     if (this.OrderFilterFormGroup.dirty) {
       this.currentPage = 1;
       this.refreshFilterState();
@@ -1840,9 +1845,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if(this.activeSystem != OrderManagementIRPSystemId.OrderJourney){
         this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
         this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
-        if(this.ltaOrder){
-          this.clearFilters();
-        }
+      }
+      if(this.ltaOrderFlag){
+        this.clearFilters();
       }
     }
   }
@@ -2234,8 +2239,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       })
       this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard', '');
     }
-    if(this.ltaOrder){
-      this.filters.ltaOrder = this.ltaOrder;
+    if(this.ltaOrderFlag){
+      this.filters.ltaOrder = this.ltaOrderFlag;
       this.clearFilters();
     }
     filters.orderStatuses = this.numberArr;
@@ -2396,7 +2401,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private initMenuItems(): void {
     this.threeDotsMenuOptions = ThreeDotsMenuOptions(this.canCreateOrder, this.canCloseOrder, this.activeSystem);
-    this.threeDotsMenuOptionsIRP = ThreeDotsMenuOptionsIRP(this.CanEditOrderBillRateIRP, this.canCloseOrderIRP, this.activeSystem);
+    this.threeDotsMenuOptionsIRP = ThreeDotsMenuOptionsIRP(this.canCreateOrderIRP, this.canCloseOrderIRP, this.activeSystem);
   }
 
   private watchForPermissions(): void {

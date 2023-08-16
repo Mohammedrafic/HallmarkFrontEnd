@@ -73,6 +73,8 @@ import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
 import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential-expiry-irp.component';
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
+import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
+import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
 
 @NgModule({
   declarations: [
@@ -130,7 +132,8 @@ import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/fin
     AgencySpendComponent,
     ShiftBreakdownComponent,
     CredentialExpiryIrpComponent,
-    FinancialTimeSheetBetaComponent],
+    FinancialTimeSheetBetaComponent,
+    DepartmentSpendAndHoursComponent],
   exports: [
     CandidateListComponent
   ],
@@ -151,6 +154,7 @@ import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/fin
     LogiReportModule,
     ProgressBarAllModule,
     TextBoxModule,
+    SwitchModule,
     NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState]),
   ],
   providers:[

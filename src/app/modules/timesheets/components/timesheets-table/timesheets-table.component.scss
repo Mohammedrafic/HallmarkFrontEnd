@@ -1,4 +1,4 @@
-@import '../../../../styles/variables/colors';
+@import 'colors';
 @import 'adaptive-response';
 
 :host::ng-deep {
@@ -24,7 +24,7 @@
   :host {
     ::ng-deep {
       app-grid .app-grid {
-        height: calc(100% - 60px);
+        height: calc(100%);
       }
     }
   }
