@@ -2,10 +2,11 @@
   #candidateCancellationDialog
   cssClass="candidate-cancellation-dialog"
   isModal="true"
-  [visible]="false"
   showCloseIcon="true"
   width="448"
   height="402"
+  [visible]="false"
+  (close)="clearReasons()"
 >
   <ng-template #header>
     <section class="header-container">

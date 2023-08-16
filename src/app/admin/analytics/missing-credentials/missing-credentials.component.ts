@@ -28,8 +28,10 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, 
-  MasterSkillDto, SearchCandidate, SkillCategoryDto ,OrderTypeOptionsForReport, CommonCredentialSearchFilter, SearchCredential} from '../models/common-report.model';
+import {
+  CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions,
+  MasterSkillDto, SearchCandidate, SkillCategoryDto, OrderTypeOptionsForReport, CommonCredentialSearchFilter, SearchCredential
+} from '../models/common-report.model';
 import { OutsideZone } from "@core/decorators";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
@@ -38,7 +40,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
   templateUrl: './missing-credentials.component.html',
   styleUrls: ['./missing-credentials.component.scss']
 })
-export class MissingCredentialsComponent implements OnInit ,OnDestroy{
+export class MissingCredentialsComponent implements OnInit, OnDestroy {
 
   public paramsData: any = {
     "OrganizationParamMSR": "",
@@ -46,15 +48,16 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
     "EndDateParamMSR": "",
     "RegionParamMSR": "",
     "LocationParamMSR": "",
-    "DepartmentParamMSR": "", 
-    "CredentialParamMSR": "",   
+    "DepartmentParamMSR": "",
+    "CredentialParamMSR": "",
     "CandidateNameParamMSR": "",
-    "CandidateStatusesParamMSR": "",   
+    "CandidateStatusesParamMSR": "",
     "JobIdParamMSR": "",
     "BearerParamMSR": "",
     "BusinessUnitIdParamMSR": "",
     "HostName": "",
-    "TodayMSR":"",
+    "TodayMSR": "",
+    "IsOptionalRequred": "",
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/MissingCredentials/MissingCredentials.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/MissingCredentials/MissingCredentials.cat" };
@@ -62,16 +65,17 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
   public allOption: string = "All";
+  public IsOptionalRequred?: boolean = false;
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegions: Region[]=[];
+  selectedRegions: Region[] = [];
 
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocations: Location[]=[];
+  selectedLocations: Location[] = [];
 
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
@@ -89,7 +93,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
-  selectedOrganizations: Organisation[]=[];
+  selectedOrganizations: Organisation[] = [];
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -99,13 +103,13 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
   credentialWaterMark: string = 'BLS';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  selectedDepartments: Department[]=[];
+  selectedDepartments: Department[] = [];
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   private agencyOrganizationId: number;
-  private fixedCanidateStatusesTypes:number[]=[4,5];
+  private fixedCanidateStatusesTypes: number[] = [4, 5, 10, 12];
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   public organizationFields = ORGANIZATION_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
@@ -135,7 +139,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
-  public isInitialLoad: boolean = false;
+  public isDefaultLoad: boolean = false;
   public baseUrl: string = '';
   public user: User | null;
   public filterOptionsData: CommonReportFilterOptions;
@@ -175,14 +179,13 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
-      this.orderFilterColumnsSetup();      
+      this.orderFilterColumnsSetup();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
         }
       });
       this.agencyOrganizationId = data;
-      this.isInitialLoad = true;
 
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
@@ -202,11 +205,12 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
         endDate: new FormControl(new Date(Date.now())),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
-        departmentIds: new FormControl([]),        
+        departmentIds: new FormControl([]),
         candidateName: new FormControl(null),
         candidateStatuses: new FormControl([]),
         jobId: new FormControl(''),
         credentialName: new FormControl(null),
+        IsOptionalRequred: new FormControl(false),
       }
     );
   }
@@ -230,6 +234,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.missingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (typeof data === 'number' && data != this.previousOrgId) {
+        this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
           let orgList = this.organizations?.filter((x) => data == x.organizationId);
@@ -255,6 +260,12 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
 
+          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          }
+          else {
+            this.isResetFilter = true;
+          }
           let businessIdData = [];
           businessIdData.push(data);
           let filter: CommonReportFilter = {
@@ -263,28 +274,17 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
-              this.isAlive = false;
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.
                 filter(i => this.fixedCanidateStatusesTypes.includes(i.status));
-              this.changeDetectorRef.detectChanges();
+
+              this.isDefaultLoad = true;
+              this.SearchReport()
             }
           });
-
-          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-          }
-          else {
-            this.isResetFilter = true;
-          }
-
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          if (this.isInitialLoad) {
-         this.SearchReport() ;
-            this.isInitialLoad = false;
-          }
-          this.changeDetectorRef.detectChanges();
         }
         else {
           this.isClearAll = false;
@@ -297,11 +297,10 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
   public onFilterRegionChangedHandler(): void {
     this.regionIdControl = this.missingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.missingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-      this.missingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       this.locations = [];
       this.departments = [];
-
+      this.missingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.missingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.regionIdControl.value.length > 0) {
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
@@ -348,8 +347,8 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { candidateName, candidateStatuses, departmentIds, jobId,locationIds, 
-      regionIds, startDate, endDate,credentialName } = this.missingCredentialReportForm.getRawValue();
+    let { candidateName, candidateStatuses, departmentIds, jobId, locationIds,
+      regionIds, startDate, endDate, credentialName, IsOptionalRequred } = this.missingCredentialReportForm.getRawValue();
     if (!this.missingCredentialReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
     }
@@ -361,16 +360,16 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
     //locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
     //departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",")  : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",") :  "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
 
 
     this.paramsData =
     {
-      "OrganizationParamMSR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
+      "OrganizationParamMSR": this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
       "StartDateParamMSR": formatDate(startDate, this.dateFormat, this.culture),
-      "EndDateParamMSR": endDate==null?"01/01/0001":formatDate(endDate, this.dateFormat, this.culture),
+      "EndDateParamMSR": endDate == null ? "01/01/0001" : formatDate(endDate, this.dateFormat, this.culture),
       "RegionParamMSR": regionIds.length == 0 ? "null" : regionIds,
       "LocationParamMSR": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamMSR": departmentIds.length == 0 ? "null" : departmentIds,
@@ -384,7 +383,8 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "TodayMSR":formatDate(new Date(),this.dateFormat,this.culture)
+      "TodayMSR": formatDate(new Date(), this.dateFormat, this.culture),
+      "ISOptionalRequired": IsOptionalRequred
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -419,7 +419,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
         valueField: 'name',
         valueId: 'id',
       },
-      
+
       candidateName: {
         type: ControlTypes.Dropdown,
         valueType: ValueType.Id,
@@ -443,17 +443,16 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
       },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      
+
       jobId: {
         type: ControlTypes.Text,
         valueType: ValueType.Text
       },
-      
+
     }
   }
-  private GetFixedCandidateStatusTypes():any
-  {
-    return [4,5];
+  private GetFixedCandidateStatusTypes(): any {
+    return [4, 5];
   }
   private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
@@ -491,6 +490,7 @@ export class MissingCredentialsComponent implements OnInit ,OnDestroy{
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.CredentialName)?.setValue([]);
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.IsOptionalRequred)?.setValue(false);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

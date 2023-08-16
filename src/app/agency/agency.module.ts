@@ -39,7 +39,7 @@ import {
   X,
   XCircle,
   ZoomIn,
-  ZoomOut
+  ZoomOut,
 } from 'angular-feather/icons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -65,9 +65,7 @@ import { OrderManagementGridComponent } from './order-management/order-managemen
 import { PreviewOrderDialogComponent } from './order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { ProfileComponent } from './profile/profile.component';
 import { OrderCandidatesComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/candidates/order-candidates.component';
-import { CandidatDialogComponent } from './order-management/order-management-grid/candidat-dialog/candidat-dialog.component';
 import { OrderManagementState } from './store/order-management.state';
-import { CandidatDetailsComponent } from './order-management/order-management-grid/candidat-dialog/candidat-details/candidat-details.component';
 import { NgxMaskModule } from 'ngx-mask';
 import { AgencyOrderFiltersComponent } from './order-management/order-management-grid/agency-order-filters/agency-order-filters.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
@@ -99,6 +97,7 @@ import { ScrollRestorationService } from '@core/services/scroll-restoration.serv
 import { AgencyReportsModule } from '@agency/agency-reports/agency-reports.module';
 import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
 import { AgencySettingsModule } from './settings/agency-settings.module';
+import { EmployeeImportService } from '@client/candidates/services/employee-import.service';
 
 
 
@@ -154,8 +153,6 @@ const sidebarIcons = {
     PreviewOrderDialogComponent,
     ProfileComponent,
     OrderCandidatesComponent,
-    CandidatDialogComponent,
-    CandidatDetailsComponent,
     AgencyOrderFiltersComponent,
     AgencyListFiltersComponent,
 
@@ -218,6 +215,7 @@ const sidebarIcons = {
     CandidateGeneralInfoService,
     AgencySettingsService,
     ScrollRestorationService,
+    EmployeeImportService,
   ],
 })
 export class AgencyModule {}

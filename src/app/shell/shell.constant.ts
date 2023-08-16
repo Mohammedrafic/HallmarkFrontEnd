@@ -2,8 +2,7 @@ import { ProfileMenuItem } from './shell.enum';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 export const MenuItemNames = {
-  // TODO: edit profile
-  /* [profileMenuItem.edit_profile]: 'Edit Profile',*/
+  [ProfileMenuItem.my_profile]: 'My Profile',
   [ProfileMenuItem.theme]: 'Theme',
   [ProfileMenuItem.log_out]: 'LogOut',
   [ProfileMenuItem.light_theme]: 'Light',
@@ -12,10 +11,8 @@ export const MenuItemNames = {
   [ProfileMenuItem.contact_us]: 'Contact Us',
 };
 
-export const GetProfileMenuItems = (isDarkTheme: boolean) => {
-  return [
-    // TODO: edit profile
-    /*{ text: this.ProfileMenuItemNames[ProfileMenuItem.edit_profile], id: ProfileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },*/
+export const GetProfileMenuItems = (isDarkTheme: boolean, isEmployee = false) => {
+  let menuItems = [
     {
       text: MenuItemNames[ProfileMenuItem.manage_notifications],
       id: ProfileMenuItem.manage_notifications.toString(),
@@ -42,11 +39,22 @@ export const GetProfileMenuItems = (isDarkTheme: boolean) => {
       iconCss: 'e-ddb-icons e-contactus',
     },
     {
+      text: MenuItemNames[ProfileMenuItem.my_profile],
+      id: ProfileMenuItem.my_profile.toString(),
+      iconCss: 'e-ddb-icons e-profile',
+    },
+    {
       text: MenuItemNames[ProfileMenuItem.log_out],
       id: ProfileMenuItem.log_out.toString(),
       iconCss: 'e-ddb-icons e-logout',
     },
   ];
+
+  if (!isEmployee) {
+    menuItems = menuItems.filter((item) => item.id !== ProfileMenuItem.my_profile.toString());
+  }
+
+  return menuItems;
 };
 
 export const AllBusinessTypeRoles: BusinessUnitType[] = [

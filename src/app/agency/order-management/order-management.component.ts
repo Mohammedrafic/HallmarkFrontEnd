@@ -64,7 +64,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
           this.documentEle.defaultView?.localStorage.setItem('candidatesOrderStatusListFromDashboard','');
         }
       }
-      const ltaOrderFlag = JSON.parse(localStorage.getItem('ltaorderending') || '"false"') as boolean;
+      const ltaOrderFlag = JSON.parse(localStorage.getItem('ltaorderending') || 'false') as boolean;
       if(ltaOrderFlag){
         this.ltaOrder = ltaOrderFlag;
         this.globalWindow.localStorage.setItem("ltaorderending", JSON.stringify(false));

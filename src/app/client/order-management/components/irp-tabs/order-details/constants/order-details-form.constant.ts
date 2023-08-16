@@ -115,7 +115,7 @@ export const GeneralInformationConfigLTA = (): OrderFormsConfig  => ({
   ],
 });
 
-export const GeneralInformationConfigPO = ():OrderFormsConfig => ({
+export const GeneralInformationConfigPO = (): OrderFormsConfig => ({
   title: 'General Information',
   formName: 'generalInformationForm',
   cssClass: 'general-information-po-wrapper',
@@ -216,7 +216,7 @@ export const JobDistributionConfigLTA = (selectedSystem: SelectSystem): OrderFor
       title: 'Job Distribution',
       required: true,
       type: FieldType.MultiCheckBoxDropdown,
-      dataSource: getDataSourceForJobDistribution(selectedSystem),
+      dataSource: getDataSourceForJobDistribution(selectedSystem, false),
     },
     {
       field: 'agencyId',
@@ -247,7 +247,7 @@ export const JobDistributionConfigPO = (selectedSystem: SelectSystem): OrderForm
       title: 'Job Distribution',
       required: true,
       type: FieldType.MultiCheckBoxDropdown,
-      dataSource: getDataSourceForJobDistribution(selectedSystem),
+      dataSource: getDataSourceForJobDistribution(selectedSystem, false),
     },
     {
       field: 'agencyId',

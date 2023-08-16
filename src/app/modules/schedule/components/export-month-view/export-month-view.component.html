@@ -1,0 +1,39 @@
+<tr
+  *ngFor="let scheduleItem of scheduleData"
+  class="table-row"
+>
+  <ng-container *ngFor="let item of dateList; trackBy: trackByDateList">
+    <td class="table-cell">
+      <div class="date-cell" *ngFor="let dateItem of item; trackBy: trackByDateItem">
+        <div
+          *ngIf="dateItem.dateSlot | calendarDateSlotExport: scheduleItem.employeeSchedules.schedules as dateSchedule; else emptyCell"
+          class="date-slot"
+          canSchedule
+          [dragDate]="dateSchedule.date"
+          [candidateId]="scheduleItem?.employeeId"
+        >
+          <ng-container>
+            <app-export-month-card
+              [dateSchedule]="dateSchedule"
+              [isDateActive]="!dateItem.active"
+              [currentDate]="dateItem.dateSlot"
+            ></app-export-month-card>
+          </ng-container>
+        </div>
+
+        <ng-template #emptyCell>
+          <div
+            class="date-slot empty-cell"
+            canSchedule
+            [dragDate]="dateItem.dateSlot"
+            [candidateId]="scheduleItem?.employeeId"
+          >
+            <div class="day">
+              {{dateItem.dateSlot | date: 'd'}}
+            </div>
+          </div>
+        </ng-template>
+        </div>
+    </td>
+  </ng-container>
+</tr>

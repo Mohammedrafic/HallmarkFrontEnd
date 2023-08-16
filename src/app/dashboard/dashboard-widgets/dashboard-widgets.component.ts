@@ -16,7 +16,6 @@ import { AppState } from 'src/app/store/app.state';
 @Component({
   selector: 'app-dashboard-widgets',
   templateUrl: './dashboard-widgets.component.html',
-  styleUrls: ['./dashboard-widgets.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardWidgetsComponent extends AbstractSFComponentDirective<DashboardLayoutComponent>{

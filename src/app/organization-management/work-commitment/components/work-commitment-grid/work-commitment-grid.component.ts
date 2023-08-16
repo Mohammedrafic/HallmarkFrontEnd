@@ -21,7 +21,6 @@ import { UserState } from 'src/app/store/user.state';
 @Component({
   selector: 'app-work-commitment-grid',
   templateUrl: './work-commitment-grid.component.html',
-  styleUrls: ['./work-commitment-grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkCommitmentGridComponent extends DestroyableDirective implements OnInit {

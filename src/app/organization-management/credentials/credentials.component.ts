@@ -1,31 +1,31 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+import { combineLatest, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { SelectEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
-import { CredentialsState } from '../store/credentials.state';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
+
 import { CredentialsNavigationTabs } from '@shared/enums/credentials-navigation-tabs';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { COMPONENT_PERMISSIONS } from '@organization-management/credentials/constants';
+import { CredentialPermissions } from '@organization-management/credentials/interfaces';
+import { ShowExportDialog, ShowSideDialog } from '../../store/app.actions';
+import { PermissionService } from 'src/app/security/services/permission.service';
+import { GetOrganizationStructure } from '../../store/user.actions';
 import {
   SetCredentialsFilterCount,
-  SetNavigationTab,
   ShowExportCredentialListDialog,
 } from '../store/credentials.actions';
-import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { GetOrganizationStructure } from '../../store/user.actions';
-import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
-import { PermissionService } from 'src/app/security/services/permission.service';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
-import { AbstractPermissionGrid } from "@shared/helpers/permissions";
-
-type ComponentPermissionTitle = 'canAddManual' | 'canManageOrganizationCredential';
-type Permisions = Record<ComponentPermissionTitle, boolean>;
-
-const COMPONENT_PERMISSIONS: Record<ComponentPermissionTitle, PermissionTypes> = {
-  canAddManual: PermissionTypes.ManuallyAddCredential,
-  canManageOrganizationCredential: PermissionTypes.ManageOrganizationCredential
-};
+import { CredentialFiltersService, CredentialListService } from '@shared/components/credentials-list/services';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { CredentialPage } from '@shared/models/credential.model';
+import { CredentialSkillGroupPage } from '@shared/models/skill-group.model';
+import {
+  GetCredential,
+  GetCredentialForSettings,
+  GetCredentialTypes,
+} from '@organization-management/store/organization-management.actions';
 
 @Component({
   selector: 'app-credentials',
@@ -33,51 +33,43 @@ const COMPONENT_PERMISSIONS: Record<ComponentPermissionTitle, PermissionTypes> =
   styleUrls: ['./credentials.component.scss'],
 })
 export class CredentialsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
-  @ViewChild('navigationTabs') navigationTabs: TabComponent;
-  @ViewChild(RouterOutlet) outlet: RouterOutlet;
+  @Select(OrganizationManagementState.credentialSettingPage)
+  private credentialsPage$: Observable<CredentialPage>;
+  @Select(OrganizationManagementState.skillGroups)
+  private skillGroups$: Observable<CredentialSkillGroupPage>;
 
-  @Select(CredentialsState.activeTab)
-  activeTab$: Observable<number>;
-
-  @Select(CredentialsState.setupFilter)
-  setupFilter$: Observable<CredentialSetupFilter>;
-
-  public isCredentialListToolButtonsShown = true;
-  public isCredentialListActive = true;
+  public readonly tabs = CredentialsNavigationTabs;
+  public activeTab: CredentialsNavigationTabs = CredentialsNavigationTabs.Setup;
+  public showCredentialMessage = true;
   public filteredItemsCount = 0;
-  public permissions$: Observable<Permisions>;
+  public permissions$: Observable<CredentialPermissions>;
 
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(
-    private router: Router,
     private route: ActivatedRoute,
     protected override store: Store,
     private actions$: Actions,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private credentialListService: CredentialListService,
+    private cdr: ChangeDetectorRef,
+    private credentialFiltersService: CredentialFiltersService
   ) {
     super(store);
-    actions$
-      .pipe(
-        ofActionDispatched(SetCredentialsFilterCount),
-        takeUntil(this.unsubscribe$)
-      ).subscribe((count) => (this.filteredItemsCount = count.payload));
+
+    this.watchForCredentialsFilterCount();
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.store.dispatch(new GetOrganizationStructure());
-    this.permissions$ = this.permissionService.checkPermisionFor<Permisions>(COMPONENT_PERMISSIONS);
+    this.getStructureAndPermission();
+    this.watchForSkillGroupAndCredentials();
+    this.getCredentialForPage();
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-    this.store.dispatch(new SetNavigationTab(CredentialsNavigationTabs.Setup));
-  }
-
-  public showFilters(): void {
-    this.store.dispatch(new ShowFilterDialog(true));
   }
 
   public override customExport(): void {
@@ -85,43 +77,61 @@ export class CredentialsComponent extends AbstractPermissionGrid implements OnIn
   }
 
   public override defaultExport(fileType: ExportedFileType): void {
-    if (this.isCredentialListActive) {
+    if (this.activeTab === CredentialsNavigationTabs.CredentialsList) {
       this.store.dispatch(new ShowExportCredentialListDialog(fileType));
     }
   }
 
-  public onAddCredentialClick(): void {
+  public showCredentialMappingModal(): void {
+    this.store.dispatch([
+      new GetCredential(),
+      new GetCredentialTypes(),
+      new ShowSideDialog(true),
+    ]);
+  }
+
+  public showCredentialDialogs(): void {
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onTabSelected(selectedTab: any): void {
-    if (selectedTab.selectedIndex === CredentialsNavigationTabs['Setup']) {
-      this.navigationTabs.selectedItem = CredentialsNavigationTabs['Setup'];
-      this.router.navigate(['setup'], { relativeTo: this.route });
-      this.isCredentialListActive = false;
-    } else {
-      this.navigationTabs.selectedItem = CredentialsNavigationTabs['CredentialsList'];
-      this.router.navigate(['list'], { relativeTo: this.route });
-      this.isCredentialListActive = true;
-    }
-
-    this.isCredentialListToolButtonsShown = selectedTab.selectedIndex !== CredentialsNavigationTabs.Setup;
+  public selectTab(selectedTab: SelectEventArgs): void {
+    this.activeTab = selectedTab.selectedIndex;
     this.store.dispatch(new ShowSideDialog(false));
   }
 
-  public onTabsCreated(): void {
-    this.activeTab$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((activeTab) => this.onTabSelected({ selectedIndex: activeTab }));
+  public showAssignCredential(): void {
+    this.credentialListService.setAssignCredentialModalState(true);
   }
 
-  public onGroupsSetupClick(): void {
-    this.router.navigate(['groups-setup'], { relativeTo: this.route });
+  private getStructureAndPermission(): void {
+    this.store.dispatch(new GetOrganizationStructure());
+    this.permissions$ = this.permissionService.checkPermisionFor<CredentialPermissions>(COMPONENT_PERMISSIONS);
   }
 
-  public onAssignCredentialClick(): void {
-    const credentialListComponent = this.outlet.component as CredentialsListComponent;
-    credentialListComponent.showAssignSiderbar();
+  private watchForSkillGroupAndCredentials(): void {
+    combineLatest([
+      this.credentialsPage$,
+      this.skillGroups$,
+    ]).pipe(
+      filter(() => this.activeTab === CredentialsNavigationTabs.Setup),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(([credential, skillGroup]) => {
+      this.showCredentialMessage = !credential?.items?.length || !skillGroup?.items?.length;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private watchForCredentialsFilterCount(): void {
+    this.actions$.pipe(
+      ofActionDispatched(SetCredentialsFilterCount),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((count) => {
+      this.filteredItemsCount = count.payload;
+    });
+  }
+
+  private getCredentialForPage(): void {
+    this.store.dispatch( new GetCredentialForSettings(this.credentialFiltersService.filtersState));
   }
 }
 

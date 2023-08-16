@@ -156,9 +156,7 @@
 
 <app-candidate-cancellation-dialog
   [openEvent]="openCandidateCancellationDialog"
-  [orderType]="orderCandidateJob?.order?.orderType"
   [candidateJob]="orderCandidateJob"
-  [candidateCancellation]="candidateCancellationReasons"
   (submitCandidateCancellation)="cancelCandidate($event)"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
 ></app-candidate-cancellation-dialog>

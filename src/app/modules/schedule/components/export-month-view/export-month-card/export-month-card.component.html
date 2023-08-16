@@ -1,0 +1,53 @@
+<div class="day">
+  {{currentDate | date: 'd'}}
+</div>
+
+<div
+  *ngIf="bigCardConfig || firstSmallCardConfig"
+  [ngClass]="{ 'selected': isSelected, 'third-event': !!thirdEventColor, 'inactive-date': isDateActive }"
+  [ngStyle]="{ 'border-color': thirdEventColor }"
+  class="card-wrapper"
+>
+    <ng-container *ngIf="bigCardConfig; else multipleEventsView">
+      <div class="big-card">
+        <div class="time">
+          <span class="time__text">{{ bigCardConfig.startDate | date: 'HH:mm': 'UTC' }}</span>
+          <span class="time__text"> - </span>
+          <span class="time__text">{{ bigCardConfig.endDate | date: 'HH:mm': 'UTC' }}</span>
+          <span *ngIf="bigCardConfig.ltaOrder" class="time__text"> L </span>
+        </div>
+        <div class="title">
+          <span class="title__text">{{ bigCardConfig.title }}</span>
+        </div>
+        <div class="additional-attributes" *ngIf="bigCardConfig.additionalAttributes">
+          <span>{{bigCardConfig.additionalAttributes}}</span>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #multipleEventsView>
+      <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: firstSmallCardConfig }"></ng-container>
+      <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: secondSmallCardConfig }"></ng-container>
+    </ng-template>
+</div>
+
+<ng-template #smallCard let-item="item">
+  <div
+    class="small-card"
+    [ngStyle]="{ 'margin-bottom': !!thirdEventColor ? '3px' : '9px' }">
+    <div class="time">
+      <span class="time__text">{{ item.startDate | date: 'HH:mm': 'UTC' }}</span>
+      <span class="time__text"> - </span>
+      <span class="time__text">{{ item.endDate | date: 'HH:mm': 'UTC' }}</span>
+      <span *ngIf="item.ltaOrder" class="time__text"> L </span>
+    </div>
+    <div class="title">
+      <span class="title__text">{{ item.title }}</span>
+    </div>
+    <div class="additional-attributes" *ngIf="item.additionalAttributes">
+      <span>{{item.additionalAttributes}}</span>
+    </div>
+
+  </div>
+</ng-template>
+
