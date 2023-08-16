@@ -1,119 +1,95 @@
 <section class="flex-column">
-    <section class="toolbar">
-      <section class="toolbar-header">
-        <div class="toolbar-header-div">{{title }}
-        </div>     
-      </section>
-      <section class="toolbar-message">
-        <div class="toolbar-message-div">{{message}}
-        </div> 
-      </section>
-      <section class="toolbar-buttons">
-        <button ejs-button
-                id="filterButton"
-               (click)="showFilters()"
-                cssClass="e-outline button-filter">
-          <div class="filter-button-content">
-            Filters <i-feather name="sliders" class="icon"></i-feather>
-          </div>
-        </button>
-      </section>
+  <section class="toolbar">
+    <section class="toolbar-header">
+      <div class="toolbar-header-div">{{title }}
+      </div>
+    </section>
+    <section class="toolbar-message">
+      <div class="toolbar-message-div">{{message}}
+      </div>
+    </section>
+    <section class="toolbar-buttons">
+      <button ejs-button id="filterButton" (click)="showFilters()" cssClass="e-outline button-filter">
+        <div class="filter-button-content">
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
     </section>
   </section>
+</section>
 
-  <section class="useractivity-report-section">
-    <section class="app-grid table-wrapper controls-container" >
-      <div class="custom-grid">
-        <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
-                         [gridOptions]="gridOptions"
-                         (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                         [headerHeight]="52"></ag-grid-angular>
-    
-        <div class="grid-pagination">
-          <ejs-dropdownlist id="rowsPerPage"
-                            class="dropdown-no-border"
-                            [allowFiltering]="true"
-                            [dataSource]="rowsPerPageDropDown"
-                            [(value)]="activeRowsPerPageDropDown"
-                            (change)="onPageSizeChanged($event)"
-                            >
-          </ejs-dropdownlist>
-          <div class="total-rows">
-            Total Rows: {{totalRecordsCount$ | async}}
-          </div>
+<section class="useractivity-report-section">
+  <section class="app-grid table-wrapper controls-container">
+    <div class="custom-grid">
+      <ag-grid-angular class="ag-theme-alpine grid app-grid__component" [gridOptions]="gridOptions"
+        (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
+        [headerHeight]="52"></ag-grid-angular>
+
+      <div class="grid-pagination">
+        <ejs-dropdownlist id="rowsPerPage" class="dropdown-no-border" [allowFiltering]="true"
+          [dataSource]="rowsPerPageDropDown" [(value)]="activeRowsPerPageDropDown" (change)="onPageSizeChanged($event)">
+        </ejs-dropdownlist>
+        <div class="total-rows">
+          Total Rows: {{totalRecordsCount$ | async}}
         </div>
       </div>
-    
-     
-  
-    </section>
-  </section>
+    </div>
 
-  <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
-  (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
-  <div [formGroup]="userActivityForm"  class="filter-form-dialog form-container bootstrap">
-    
-    <!-- validation errors-->  
+
+
+  </section>
+</section>
+
+<app-filter-dialog [items]="filteredItems" (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()">
+  <div [formGroup]="userActivityForm" class="filter-form-dialog form-container bootstrap">
+
+    <!-- validation errors-->
 
     <div class="form-elemet">
-        <div class="input-container bootstrap">
-              <label>Business Unit Type<span class="required">*</span></label>
-              <ejs-dropdownlist appValidateWithMessage
-              formControlName="businessunitType"
-              [fields]="unitFields"
-              [dataSource]="businessUnits"
-              [allowFiltering]="true"
-              placeholder="Business Unit">
-              </ejs-dropdownlist>
-            </div>
-          </div>
-          <div class="form-elemet">
-            <div class="input-container bootstrap">
-              <label>Business Unit<span class="required">*</span></label>
-              <ejs-dropdownlist
-              appValidateWithMessage
-              formControlName="businessunitName"
-              [allowFiltering]="true"
-              [fields]="bussinesDataFields"
-              [dataSource]="bussinesUserData$ | async"
-              placeholder="Business"
-            ></ejs-dropdownlist>
-            </div>
-          </div>
+      <div class="input-container bootstrap">
+        <label>Business Unit Type<span class="required">*</span></label>
+        <ejs-dropdownlist appValidateWithMessage formControlName="businessunitType" [fields]="unitFields"
+          [dataSource]="businessUnits" [allowFiltering]="true" placeholder="Business Unit">
+        </ejs-dropdownlist>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
+        <label>Business Unit<span class="required">*</span></label>
+        <ejs-dropdownlist appValidateWithMessage formControlName="businessunitName" [allowFiltering]="true"
+          [fields]="bussinesDataFields" [dataSource]="bussinesUserData$ | async"
+          placeholder="Business"></ejs-dropdownlist>
+      </div>
+    </div>
 
-          <div class="form-elemet">
-            <div class="input-container bootstrap">
-              <label>User<span class="required">*</span></label>
-              <ejs-dropdownlist
-              formControlName="userName"
-              [allowFiltering]="true"
-              [fields]="userDataFields"
-              [dataSource]="userData"
-              placeholder="User"
-            ></ejs-dropdownlist>
-            </div>
-          </div>
-          <div class="form-elemet">
-            <div class="input-container bootstrap">
-            <label>Start Date<span class="required"></span></label>
-            <div class="input-group datepicker">
-              <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                appValidateWithMessage formControlName="startDate">
-              </ejs-datepicker>
-            </div>
-          </div>
-          </div>
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
+        <label>User<span class="required">*</span></label>
+        <ejs-dropdownlist formControlName="userName" [allowFiltering]="true" [fields]="userDataFields"
+          [dataSource]="userData" placeholder="User"></ejs-dropdownlist>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
+        <label>Start Date<span class="required"></span></label>
+        <div class="input-group datepicker">
+          <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+            appValidateWithMessage formControlName="startDate">
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
 
- <div class="form-elemet">
-        <div class="input-container bootstrap">
-                        <label>End Date<span class="required"></span></label>
-            <div class="input-group datepicker">
-              <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                appValidateWithMessage formControlName="endDate"
-               >
-              </ejs-datepicker>
-            </div>
-          </div>
-       </div>
-</div>
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
+        <label>End Date<span class="required"></span></label>
+        <div class="input-group datepicker">
+          <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+            appValidateWithMessage formControlName="endDate">
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+  </div>
 </app-filter-dialog>

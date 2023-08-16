@@ -1,4 +1,4 @@
-import {  User_DATA_FIELDS } from '@admin/alerts/alerts.constants';
+import { User_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { GetuserlogReportPage } from '@admin/store/userlog-activity.actions';
 import { useractivityReportState } from '@admin/store/userlog-activity.state';
 import { ColDef, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
@@ -52,6 +52,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   paginationPageSize: number;
   defaultColDef: ColDef = DefaultUserGridColDef;
   cacheBlockSize: any;
+  itemList: Array<userActivity> = [];
 
   @Select(SecurityState.allUsersPage)
   public userData$: Observable<UsersPage>;
@@ -64,24 +65,24 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   isBusinessFormDisabled = false;
 
   private unsubscribe$: Subject<void> = new Subject();
-  
+
   public paramsData: any = {
-    "businessUnitType":'',
-    "id":  ''  ,  
-    "userId":  ''  ,
+    "businessUnitType": '',
+    "id": '',
+    "userId": '',
     "periodFrom": '',
     "periodTo": '',
   };
   public totalRecordsCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
-  constructor(private store: Store,private formBuilder: FormBuilder, private datePipe: DatePipe,
+  constructor(private store: Store, private formBuilder: FormBuilder, private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef,
     @Inject(APP_SETTINGS) private appSettings: AppSettings
 
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
-   }
+  }
   get businessUnitControl(): AbstractControl {
     return this.userActivityForm.get('businessunitType') as AbstractControl;
   }
@@ -93,14 +94,14 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   get userControl(): AbstractControl {
     return this.userActivityForm.get('userName') as AbstractControl;
   }
-  isInitialloadCalled=false
+  isInitialloadCalled = false
   public readonly columnDefs: ColumnDefinitionModel[] = [
     {
       field: 'id',
       hide: true,
       filter: false,
     },
-   
+
     {
       headerName: 'Name',
       field: 'userName',
@@ -194,7 +195,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     }
-  
+
   ];
 
   ngOnInit(): void {
@@ -209,12 +210,6 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   get bussinesUserData$(): Observable<BusinessUnit[]> {
     return this.businessUserData$.pipe(map((fn) => fn(this.businessUnitControl?.value)));
   }
-  getLastWeek() {
-    var today = new Date(Date.now());
-    var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
-    return lastWeek;
-  }
-
 
   private initForm(): void {
     let startDate = new Date(Date.now());
@@ -242,17 +237,11 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
     startDate.setDate(startDate.getDate() - 7);
     this.userActivityForm.controls['startDate'].setValue(startDate);
     this.userActivityForm.controls['endDate'].setValue(new Date(Date.now()));
-
-
   }
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
-  onFilterDelete(value: any) {
 
-
-    
-  }
   private onBusinesstypeValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       value && this.store.dispatch(new GetBusinessByUnitType(value));
@@ -266,34 +255,32 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   private onBusinesunitValueChanged(): void {
 
     this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-        if(value==0)
-        {        
+      if (value == 0) {
 
-          this.dispatchUserPage([]);
-        }
-        else{
-          this.dispatchUserPage([value]);
-          this.userData=[];
+        this.dispatchUserPage([]);
+      }
+      else {
+        this.dispatchUserPage([value]);
+        this.userData = [];
 
-        }
-        if(!this.isInitialloadCalled)
-        {
+      }
+      if (!this.isInitialloadCalled) {
         this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           if (data != undefined && data != null) {
             this.userData = data.items;
             this.userControl.patchValue(this.userData[0]?.id)
-            if (!this.isInitialloadCalled) { 
-              this.isInitialload(); 
-              this.isInitialloadCalled = true; 
+            if (!this.isInitialloadCalled) {
+              this.isInitialload();
+              this.isInitialloadCalled = true;
               this.changeDetectorRef.detectChanges();
 
-          }
+            }
           }
         })
       }
-        
+
     })
-  
+
   }
 
 
@@ -316,17 +303,17 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   }
 
 
-  public SearchReport(): void {   
+  public SearchReport(): void {
 
-    let { businessunitType,businessunitName,userName,startDate,endDate } = this.userActivityForm.getRawValue();
+    let { businessunitType, businessunitName, userName, startDate, endDate } = this.userActivityForm.getRawValue();
     this.paramsData =
     {
-      "businessUnitType":businessunitType,
-      "id":  businessunitName  ,  
-      "userId":  userName  ,
-      "periodFrom": startDate,
-      "periodTo": endDate,
-  
+      'businessUnitType': businessunitType,
+      'id': businessunitName,
+      'userId': userName,
+      'periodFrom': startDate,
+      'periodTo': endDate,
+
     };
 
     this.logInterfacePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
@@ -343,13 +330,14 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
 
     this.store.dispatch(new GetuserlogReportPage(this.paramsData));
   }
-  isInitialload(){
+
+  isInitialload() {
     this.SearchReport()
   }
+
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
   };
-  itemList: Array<userActivity> = [];
 
   public gridOptions: GridOptions = {
     pagination: true,
