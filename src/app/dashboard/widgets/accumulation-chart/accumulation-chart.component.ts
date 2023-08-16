@@ -116,7 +116,7 @@ export class AccumulationChartComponent
           candidatesOrderDataSet.push({"value":OrderStatus.Closed, "name": PositionTrendTypeEnum.CLOSED});
         }
         window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(candidatesOrderDataSet));
-        
+
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {         
             this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
         }else{
