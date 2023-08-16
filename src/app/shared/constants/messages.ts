@@ -138,3 +138,5 @@ export const RECORD_SAVED_SUCCESS_WITH_ORDERID=(organizationPrefix: string,publi
 `Order ${organizationPrefix}-${publicId} has been added`;
 export const RECORD_MODIFIED_SUCCESS_WITH_ORDERID=(organizationPrefix: string,publicId:string)=>
 `Order ${organizationPrefix}-${publicId} has been modified`
+export const ManageOrderIRP_PERMISSION = 'User missing required permissions (CanOrganizationEditOrdersIRP)';
+export const CloseOrderIRP_PERMISSION = 'User missing required permissions (CanCloseOrdersIRP)';

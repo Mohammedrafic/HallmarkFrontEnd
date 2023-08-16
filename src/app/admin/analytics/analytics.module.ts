@@ -1,3 +1,4 @@
+import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { ScheduleApiService } from 'src/app/modules/schedule/services/schedule-api.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -74,6 +75,7 @@ import { UserActivityComponent } from './user-activity/user-activity.component';
 import { useractivityReportState } from '@admin/store/userlog-activity.state';
 import { AgGridModule } from '@ag-grid-community/angular';
 
+import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential-expiry-irp.component';
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
 import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
@@ -134,8 +136,9 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     AgencySpendComponent,
     ShiftBreakdownComponent,
     UserActivityComponent,
+    CredentialExpiryIrpComponent,
     FinancialTimeSheetBetaComponent,
-    DepartmentSpendAndHoursComponent  ],
+    DepartmentSpendAndHoursComponent],
   exports: [
     CandidateListComponent
   ],
@@ -155,9 +158,9 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     RadioButtonModule,
     LogiReportModule,
     ProgressBarAllModule,
+    TextBoxModule,
     SwitchModule,
-    AgGridModule,
-    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState,useractivityReportState])
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState,useractivityReportState]),
   ],
   providers:[
     ScheduleApiService,

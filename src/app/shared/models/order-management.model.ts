@@ -569,8 +569,8 @@ export interface EditOrderDto extends Omit
 }
 
 export type AcceptJobDTO = {
-  actualEndDate?: string;
-  actualStartDate?: string;
+  actualEndDate?: string | null;
+  actualStartDate?: string | null;
   allowDeployWoCredentials?: boolean;
   candidateBillRate?: number;
   clockId?: number;
