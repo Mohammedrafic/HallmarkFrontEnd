@@ -8,7 +8,7 @@
     display: none;
   }
 
-  @media #{$max-tablet} {
+  @media #{$max-desktop-small} {
     margin-top: 7px;
   }
 
@@ -22,6 +22,12 @@
 
     .datepicker-mobile {
       display: inline-block;
+      width: 100%;
+    }
+
+    .datepicker-timesheet,
+    .org-selector {
+      flex: 1;
     }
   }
 }
@@ -35,6 +41,10 @@
   & > *:not(:first-child) {
     margin-left: 12px;
   }
+
+  @media #{$max-mobile} {
+    width: unset;
+  }
 }
 
 .datepicker-mobile {
@@ -45,7 +55,7 @@
   min-width: 180px;
 
   @media #{$max-mobile} {
-    width: calc(100vw - 110px) !important;
+    min-width: unset;
   }
 }
 
@@ -65,6 +75,26 @@
 
 .top-margin {
   margin-left: 0;
+}
+
+@media #{$max-desktop-small} {
+  .table-wrapper {
+    height: calc(100% - 150px);
+  }
+}
+
+@media #{$max-tablet} {
+  .filter-button-content {
+    &:has(.hide-text) {
+      .icon {
+        margin: 0;
+      }
+    }
+
+    .hide-text {
+      display: none;
+    }
+  }
 }
 
 @media #{$max-mobile} {

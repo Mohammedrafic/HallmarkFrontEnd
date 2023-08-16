@@ -58,7 +58,6 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 import { AgencyPositionModel } from '../models/agency-position.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
-import { RnUtilizationModel } from '../models/rnutilization.model';
 import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetWorkCommitment } from '../models/rn-utilization.model';
 import { AvailableEmployeeModel } from '../models/available-employee.model';
 
@@ -80,9 +79,6 @@ export class DashboardService {
     [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getPositionsByTypes(filters, timeSelection),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboartFilterDto) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.OPEN_POSITIONS]: (filters) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
-    [WidgetTypeEnum.INVOICES]: () => this.getInvocesWidgetData(),
-    [WidgetTypeEnum.TASKS]: () => this.getTasksWidgetData(),
-    [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
     [WidgetTypeEnum.OPEN_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getOpenPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getInProgressPositionTrendWidgetData(filters),
     [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
@@ -449,10 +445,6 @@ export class DashboardService {
 
 
 
-  private getChatWidgetData(): Observable<string> {
-    return of('assets/icons/temporary-widget-chat.png');
-  }
-
   private getFilledPositionTrendWidgetData(filter: DashboartFilterDto): Observable<PositionTrend> {
     return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/filledpositionstrend`, { ...filter }).pipe(
       map((data: PositionTrendDto) => {
@@ -508,10 +500,6 @@ export class DashboardService {
         };
       })
     );
-  }
-
-  private getInvocesWidgetData(): Observable<any> {
-    return of('temporary-widget-invoices');
   }
 
   public getAllSkills(): Observable<AllOrganizationsSkill[]> {

@@ -1,5 +1,5 @@
-@import "../../../../styles/variables/colors";
-@import "adaptive-response";
+@import 'colors';
+@import 'adaptive-response';
 
 .job-info-container {
   display: flex;
@@ -32,14 +32,8 @@
 
 @media #{$max-desktop-small} {
   .job-info-container {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-}
-
-@media #{$max-mobile} {
-  .job-info-container {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
   }
 }

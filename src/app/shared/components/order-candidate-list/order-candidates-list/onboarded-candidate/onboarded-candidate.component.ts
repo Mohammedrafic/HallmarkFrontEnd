@@ -17,13 +17,13 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged, switchMap } from 'rxjs';
 import {
   OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order,
+import { ApplicantStatus, Order,
   OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { formatDate, formatNumber } from '@angular/common';
@@ -32,7 +32,6 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
-  GetCandidateCancellationReason,
   GetRejectReasonsForOrganisation,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
@@ -97,9 +96,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Select(UserState.orderPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
 
-  @Select(OrderManagementContentState.getCandidateCancellationReasons)
-  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
-
   @Output() closeModalEvent = new EventEmitter<never>();
 
   @Input() candidate: OrderCandidatesList;
@@ -143,7 +139,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canClose = false;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
-  public candidateCancellationReasons: CandidateCancellationReason[] | null;
   public readonly reorderType: OrderType = OrderType.ReOrder;
   public canCreateOrder:boolean;
   public saveStatus: number = 0;
@@ -235,7 +230,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.subscribeOnGetStatus();
     this.observeCandidateJob();
     this.observeStartDate();
-
+    this.subscribeOnJobUpdate();
   }
 
   ngOnDestroy(): void {
@@ -392,6 +387,39 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     return billRates as BillRate[];
   }
 
+  private displayMessageConfirmation(): Observable<boolean> {
+    const options = {
+      title: ONBOARD_CANDIDATE,
+      okButtonLabel: 'Yes',
+      okButtonClass: 'ok-button',
+      cancelButtonLabel: 'No',
+    };
+    if (this.saveStatus === ApplicantStatusEnum.OnBoarded) {
+      return this.confirmService.confirm(onBoardCandidateMessage, options)
+        .pipe(take(1));
+    }
+    return of(false);
+  }
+
+  private subscribeOnJobUpdate(): void {
+    this.actions$
+      .pipe(
+        ofActionSuccessful(UpdateOrganisationCandidateJobSucceed),
+        switchMap(() => this.displayMessageConfirmation()),
+        takeUntil(this.unsubscribe$),
+      )
+      .subscribe((isConfirm) => {
+        if (isConfirm) {
+          this.onboardEmailTemplateForm.rteCreated();
+          this.onboardEmailTemplateForm.disableControls(true);
+          this.store.dispatch(new ShowGroupEmailSideDialog(true));
+        } else {
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+          this.closeDialog();
+        }
+      });
+  }
+
   private onAccept(): void {
     if (!this.form.errors && this.candidateJob) {
       this.shouldChangeCandidateStatus()
@@ -425,32 +453,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   candidatePayRate: this.candidateJob.candidatePayRate,
                 })
               );
-              this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
-                if(this.saveStatus === ApplicantStatusEnum.OnBoarded){
-                      const options = {
-                        title: ONBOARD_CANDIDATE,
-                        okButtonLabel: 'Yes',
-                        okButtonClass: 'ok-button',
-                        cancelButtonLabel: 'No'
-                      };
-                      this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
-                          .subscribe((isConfirm) => {
-                            if(isConfirm){
-                              this.onboardEmailTemplateForm.rteCreated();
-                              this.onboardEmailTemplateForm.disableControls(true);
-                              this.store.dispatch(new ShowGroupEmailSideDialog(true));
-                            }else{
-                              this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-                              this.closeDialog();
-                            }
-                          });
-                }else{
-                  this.closeDialog();
-                  this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-                }
-
-              });
-              // this.closeDialog();
             } else {
               this.jobStatusControl.reset();
               this.selectedApplicantStatus = null;
@@ -529,7 +531,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           this.switchFormState();
           this.configureCandidatePayRateField();
-          this.subscribeCandidateCancellationReasons();
         }
 
         this.changeDetectorRef.markForCheck();
@@ -659,7 +660,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   onGroupEmailAddCancel(){
     this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
-    // console.log('this.candidateJob at cancel',this.candidateJob);
     this.saveCandidateJob();
     this.isSend =  false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
@@ -670,7 +670,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
     if(this.sendOnboardMessageEmailFormGroup.valid){
       const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();
-      // console.log('emailvalue',emailvalue);
       this.saveCandidateJob();
       this.store.dispatch(new sendOnboardCandidateEmailMessage({
             subjectMail : emailvalue.emailSubject,
@@ -692,7 +691,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           this.closeDialog();
         });
     }
-   /*   */
   }
 
   private handleOnboardedCandidate(event: { itemData: ApplicantStatus | null }): void {
@@ -766,21 +764,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
-  }
-
-  private subscribeCandidateCancellationReasons() {
-    if (this.candidateJob) {
-      const payload: CandidateCancellationReasonFilter = {
-        locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId,
-      };
-      this.store.dispatch(new GetCandidateCancellationReason(payload));
-      this.candidateCancellationReasons$
-        .pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
-          this.candidateCancellationReasons =value;
-        });
-
-    }
   }
 
   private getRecalculateActualEndDate(

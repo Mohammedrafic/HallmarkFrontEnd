@@ -35,7 +35,7 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
     },
     {
       field: 'startDate',
-      headerName: 'START DATE',
+      headerName: 'ACTUAL START DATE',
       width: 150,
       valueFormatter: (params: { data: CandidatesDetailsModel }) =>
         `${valueHelper.formatDate(params.data.startDate, 'MM/dd/yyyy')}`,
@@ -43,7 +43,7 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
     },
     {
       field: 'endDate',
-      headerName: 'END DATE',
+      headerName: 'ACTUAL END DATE',
       width: 140,
       valueFormatter: (params: { data: CandidatesDetailsModel }) =>
         `${valueHelper.formatDate(params.data.endDate, 'MM/dd/yyyy')}`,
@@ -80,7 +80,7 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
     },
     {
       field: 'billRate',
-      headerName: 'Candidate RATE',
+      headerName: 'CURRENT CANDIDATE RATE',
       type: 'rightAligned',
       width: 140,
       sortable: true,
@@ -112,37 +112,37 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
     },
   ];
 };
-export const CandidateAgencyExportColumns : CandidateExportColumn[] = [
+export const CandidateAgencyExportColumns: CandidateExportColumn[] = [
   { text: 'Name', column: 'Name' },
-{ text: 'Status', column: 'Status' },
-{ text: 'Classification', column: 'Classification' },
-{text: 'Start Date',column:'StartDate'},
-{text: 'End Date',column:'EndDate'},
-{ text: 'Scheduled Date', column: 'ScheduledDate' },
-{ text: 'Region', column: 'Region' },
-{ text: 'Location/Department', column: 'LocationDepartment' },
-{ text: 'Initial Rate', column: 'InitialRate' },
-{ text: 'Candidate Rate', column: 'BillRate' },
-{ text: 'Position ID', column: 'PositionId' },
-{ text: 'Assignment', column: 'Assignment' },
-{ text: 'Organization Name', column: 'Organizationname' },
-{ text: 'Skill', column: 'Skill' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Classification', column: 'Classification' },
+  { text: 'Actual Start Date', column: 'StartDate' },
+  { text: 'Actual End Date', column: 'EndDate' },
+  { text: 'Scheduled Date', column: 'ScheduledDate' },
+  { text: 'Region', column: 'Region' },
+  { text: 'Location/Department', column: 'LocationDepartment' },
+  { text: 'Initial Rate', column: 'InitialRate' },
+  { text: 'Current Candidate Rate', column: 'BillRate' },
+  { text: 'Position ID', column: 'PositionId' },
+  { text: 'Assignment', column: 'Assignment' },
+  { text: 'Organization Name', column: 'Organizationname' },
+  { text: 'Skill', column: 'Skill' },
 ];
 
-export const CandidateOrgExportColumns : CandidateExportColumn[] = [
+export const CandidateOrgExportColumns: CandidateExportColumn[] = [
   { text: 'Name', column: 'Name' },
-{ text: 'Status', column: 'Status' },
-{ text: 'Classification', column: 'Classification' },
-{text: 'Start Date',column:'StartDate'},
-{text: 'End Date',column:'EndDate'},
-{ text: 'Scheduled Date', column: 'ScheduledDate' },
-{ text: 'Region', column: 'Region' },
-{ text: 'Location/Department', column: 'LocationDepartment' },
-{ text: 'Initial Rate', column: 'InitialRate' },
-{ text: 'Candidate Rate', column: 'BillRate' },
-{ text: 'Position ID', column: 'PositionId' },
-{ text: 'Assignment', column: 'Assignment' },
-{ text: 'Agency Name', column: 'Agencyname' },
-{ text: 'Skill', column: 'Skill' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Classification', column: 'Classification' },
+  { text: 'Actual Start Date', column: 'StartDate' },
+  { text: 'Actual End Date', column: 'EndDate' },
+  { text: 'Scheduled Date', column: 'ScheduledDate' },
+  { text: 'Region', column: 'Region' },
+  { text: 'Location/Department', column: 'LocationDepartment' },
+  { text: 'Initial Rate', column: 'InitialRate' },
+  { text: 'Current Candidate Rate', column: 'BillRate' },
+  { text: 'Position ID', column: 'PositionId' },
+  { text: 'Assignment', column: 'Assignment' },
+  { text: 'Agency Name', column: 'Agencyname' },
+  { text: 'Skill', column: 'Skill' },
 ];
 

@@ -249,9 +249,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   onSelectProfileMenu(event: any): void {
     switch (Number(event.item.properties.id)) {
-      // TODO: edit profile
-      //case ProfileMenuItem.edit_profile:
-      //  break;
+      case ProfileMenuItem.my_profile:
+        this.navigateToEmployeeProfile();
+        break;
       case ProfileMenuItem.manage_notifications:
         this.manageNotifications();
         break;
@@ -695,7 +695,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         this.profileData = [
           {
             text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
-            items: GetProfileMenuItems(this.isDarkTheme),
+            items: GetProfileMenuItems(this.isDarkTheme, user.isEmployee),
             iconCss: this.isMobile ? '' : 'e-icons e-chevron-down',
           },
         ];
@@ -812,5 +812,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   private saveMainContentElement(): void {
     this.store.dispatch(new SaveMainContentElement(this.mainContainer.nativeElement));
+  }
+
+  private navigateToEmployeeProfile(): void {
+    this.router.navigate(['employee/profile/information']);
   }
 }
