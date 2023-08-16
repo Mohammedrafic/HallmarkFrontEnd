@@ -1,3 +1,4 @@
+import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential-expiry-irp.component';
 import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { StaffAvailabilityComponent } from './staff-availability/staff-availability.component';
 import { HoursByDepartmentComponent } from './hours-by-department/hours-by-department.component';
@@ -424,8 +425,14 @@ const routes: Routes = [
         data: {
           isOrganizationArea: true,
         }
-      }
-      ,
+      },
+      {
+        path: 'credential-expiry-irp',
+        component: CredentialExpiryIrpComponent,
+        data: {
+          isOrganizationArea: true,
+        },
+      },      
       {
         path: 'department-spend-and-hours-report',
         component: DepartmentSpendAndHoursComponent,

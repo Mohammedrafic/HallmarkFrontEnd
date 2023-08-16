@@ -1,3 +1,4 @@
+import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { ScheduleApiService } from 'src/app/modules/schedule/services/schedule-api.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -70,6 +71,7 @@ import { StaffAvailabilityComponent } from './staff-availability/staff-availabil
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
+import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential-expiry-irp.component';
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
 import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
@@ -129,8 +131,9 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     PositionSummaryComponent,
     AgencySpendComponent,
     ShiftBreakdownComponent,
+    CredentialExpiryIrpComponent,
     FinancialTimeSheetBetaComponent,
-    DepartmentSpendAndHoursComponent  ],
+    DepartmentSpendAndHoursComponent],
   exports: [
     CandidateListComponent
   ],
@@ -150,8 +153,9 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     RadioButtonModule,
     LogiReportModule,
     ProgressBarAllModule,
+    TextBoxModule,
     SwitchModule,
-    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState])
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState]),
   ],
   providers:[
     ScheduleApiService,
