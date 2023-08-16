@@ -505,6 +505,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/department-spend-and-hours-report',
     },
+    116: {
+      // Useractivity Log report
+      icon: '',
+      route: '/analytics/user-activity',
+    },
   },
 
   [BusinessUnitType.MSP]: {

@@ -71,6 +71,10 @@ import { StaffAvailabilityComponent } from './staff-availability/staff-availabil
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
+import { UserActivityComponent } from './user-activity/user-activity.component';
+import { useractivityReportState } from '@admin/store/userlog-activity.state';
+import { AgGridModule } from '@ag-grid-community/angular';
+
 import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential-expiry-irp.component';
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
@@ -131,6 +135,7 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     PositionSummaryComponent,
     AgencySpendComponent,
     ShiftBreakdownComponent,
+    UserActivityComponent,
     CredentialExpiryIrpComponent,
     FinancialTimeSheetBetaComponent,
     DepartmentSpendAndHoursComponent],
@@ -155,7 +160,8 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     ProgressBarAllModule,
     TextBoxModule,
     SwitchModule,
-    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState]),
+    AgGridModule,
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState,useractivityReportState]),
   ],
   providers:[
     ScheduleApiService,

@@ -54,6 +54,7 @@ import { GrantReportComponent } from './grant-report/grant-report.component';
 import { VmsInvoiceReportBetaComponent } from './vms-invoice-report-beta/vms-invoice-report-beta.component';
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
+import { UserActivityComponent } from './user-activity/user-activity.component';
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
 
@@ -425,7 +426,15 @@ const routes: Routes = [
         data: {
           isOrganizationArea: true,
         }
-      },
+      },{
+
+        path: 'user-activity',
+        component: UserActivityComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      }
+      ,
       {
         path: 'credential-expiry-irp',
         component: CredentialExpiryIrpComponent,
