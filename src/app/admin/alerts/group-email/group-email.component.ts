@@ -246,8 +246,10 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.sendGroupEmailFormGroup.markAllAsTouched();
     if (this.sendGroupEmailFormGroup.invalid) {
       this.groupEmailTemplateForm.isFormInvalid = true;
-      if(this.sendGroupEmailFormGroup?.controls['emailBody'].errors!['required']){
+      if(this.sendGroupEmailFormGroup?.controls['emailBody'].errors){
         this.emailBodyRequiredFlag$.next(true);
+      }else{
+        this.emailBodyRequiredFlag$.next(false);
       }
       return;
     }

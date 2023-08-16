@@ -1,3 +1,5 @@
+import { FilesPropModel } from '@syncfusion/ej2-angular-inputs';
+
 export interface AddCredentialForm {
   status: string;
   insitute: string;
@@ -12,4 +14,9 @@ export interface AddCredentialForm {
 export interface SearchCredentialForm {
   searchTerm: string;
   credentialTypeId: number;
+}
+
+export interface CredentialFiles extends FilesPropModel {
+  size: number;
+  uploadedDate: string;
 }

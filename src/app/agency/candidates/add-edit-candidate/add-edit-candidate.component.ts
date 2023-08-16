@@ -419,6 +419,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     const location = navigationState ? Object.assign(locationState, navigationState) : locationState;
     this.globalWindow.localStorage.removeItem('navigationState');
 
+    const selectedTab = this.store.selectSnapshot(CandidateDetailsState.navigationTab);
     switch (true) {
       case location.orderId && !location.isNavigateFromCandidateDetails:
         this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderManagementPagerState: location.orderManagementPagerState } });
@@ -427,9 +428,12 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         break;
       case location.orderId && location.isNavigateFromCandidateDetails:
         this.router.navigate([location.pageToBack]);
-        const selectedTab = this.store.selectSnapshot(CandidateDetailsState.navigationTab);
         this.store.dispatch(new SelectNavigation(selectedTab.active, null, true));
         break;
+      case location.orderId && location.isNavigatedFromOrganizationArea:
+          this.router.navigate([location.pageToBack]);
+          this.store.dispatch(new SelectNavigation(selectedTab.active, null, true));
+          break;
       default:
         this.router.navigate(['/agency/candidates']);
     }

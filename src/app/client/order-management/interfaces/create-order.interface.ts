@@ -11,6 +11,7 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { IrpOrderType } from '@shared/enums/order-type';
+import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 
 export interface TabsConfig {
   id: number;
@@ -116,6 +117,7 @@ export interface ListOfKeyForms {
   workLocationList: FormGroup[];
   specialProjectForm: FormGroup;
   orderType: FormGroup;
+  internalDistributionChanged: boolean;
 }
 
 export interface StateList {
@@ -166,4 +168,10 @@ export interface SelectedStructureState {
   locationId: number | null;
   departmentId: number | null;
   skillId: number | null;
+}
+
+
+export interface JobDistributionOption {
+  id: IrpOrderJobDistribution;
+  name: string;
 }

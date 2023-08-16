@@ -197,6 +197,12 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/aging-details',
     },
+    44: {
+      // Organization Profile
+      icon: 'organization',
+      custom: true,
+      route: '/admin/profile',
+    },
     48: {
       // Client Finance Report
       icon: '',
@@ -488,6 +494,11 @@ export const MENU_CONFIG: any = {
       // financial-time-sheet-beta
       icon: 'pie-chart',
       route: '/analytics/financial-time-sheet-beta',
+    },
+    114: {
+      // department-spend-and-hours-report
+      icon: '',
+      route: '/analytics/department-spend-and-hours-report',
     },
   },
 
@@ -1197,6 +1208,11 @@ export const MENU_CONFIG: any = {
       // financial-time-sheet-beta
       icon: 'pie-chart',
       route: '/analytics/financial-time-sheet-beta',
+    },
+    114: {
+      // department-spend-and-hours-report
+      icon: '',
+      route: '/analytics/department-spend-and-hours-report',
     },
   },
 

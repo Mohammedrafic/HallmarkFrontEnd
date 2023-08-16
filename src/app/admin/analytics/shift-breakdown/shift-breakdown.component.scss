@@ -44,9 +44,19 @@
   }
 }
 
-.agency-spend-report-section {
-  display: flex;
-  height: 65%;
+.shift-breakdown-report-section {
+  width: 100%;
+  height: calc(100% - 75px);
+  position: relative;
+}
+
+:host {
+  ::ng-deep {
+    div#reportIframe {
+      width: 100% !important;
+      height: 90% !important;
+    }
+  }
 }
 
 .form-line {

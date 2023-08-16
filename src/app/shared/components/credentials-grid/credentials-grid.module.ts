@@ -10,7 +10,7 @@ import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NumericTextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
 import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
-import { AgencyFileViewerModule } from '@agency/candidates/add-edit-candidate/file-viewer/agency-file-viewer.module';
+import { CredentialFileViewerModule } from '@shared/components/credential-file-viewer/credential-file-viewer.module';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CredentialGridService } from '@agency/services/credential-grid.service';
@@ -19,6 +19,7 @@ import { CredentialStorageFacadeService } from '@agency/services/credential-stor
 import { DepartmentMatchCellComponent } from './department-match-cell/department-match-cell.component';
 import { GridPaginationModule } from '../grid/grid-pagination/grid-pagination.module';
 import { ScrollToTopModule } from '../scroll-to-top/scroll-to-top.module';
+import { FormatBytesModule } from '@shared/pipes/format-bytes/format-bytes.module';
 
 
 @NgModule({
@@ -41,11 +42,12 @@ import { ScrollToTopModule } from '../scroll-to-top/scroll-to-top.module';
     ChipListModule,
     TooltipContainerModule,
     ButtonModule,
-    AgencyFileViewerModule,
+    CredentialFileViewerModule,
     ValidateDirectiveModule,
     ReactiveFormsModule,
     GridPaginationModule,
     ScrollToTopModule,
+    FormatBytesModule,
   ],
   providers: [CredentialGridService, CredentialStorageService, CredentialStorageFacadeService,
   ],

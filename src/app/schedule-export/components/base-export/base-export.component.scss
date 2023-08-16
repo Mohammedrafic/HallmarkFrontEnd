@@ -1,0 +1,80 @@
+//import bootstrap reboot
+@import "~/../../../styles/bootstrap-reboot";
+@import "~/../../../styles/bootstrap-grid";
+@import "~/../../../styles/bootstrap-utilities";
+
+//define vairables for colors
+$homeDept: #060715;
+$otherDept: #2368EE;
+$available: #5AA658;
+$unavailable: #E24D4D;
+
+@media print {
+  html {
+    font-size: 14px;
+  }
+}
+
+.text-home-dept {
+  color: $homeDept;
+}
+
+.text-other-dept {
+  color: $otherDept;
+}
+
+.text-available {
+  color: $available;
+}
+
+.text-unavailable {
+  color: $unavailable;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.pt_30 {
+  padding: 30px;
+}
+
+.f-14 {
+  font-size: 14px;
+}
+
+.float_right {
+  float: right;
+}
+
+.headerdata {
+  word-break: break-all;
+}
+
+table {
+  span {
+    display: block;
+  }
+
+  tbody {
+    vertical-align: top;
+    font-weight: 500;
+
+    tr {
+      border-top: 1px solid gainsboro;
+      border-bottom: 1px solid gainsboro;
+    }
+
+    td {
+      padding: 10px;
+    }
+  }
+
+  thead {
+    background: gainsboro;
+
+    th {
+      padding: 10px;
+    }
+  }
+}

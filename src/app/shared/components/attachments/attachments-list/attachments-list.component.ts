@@ -6,7 +6,7 @@ import { Attachment, AttachmentsListConfig, AttachmentsListParams } from '@share
   selector: 'app-attachments-list',
   templateUrl: './attachments-list.component.html',
   styleUrls: ['./attachments-list.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttachmentsListComponent implements AttachmentsListParams {
   @Input()
@@ -19,7 +19,7 @@ export class AttachmentsListComponent implements AttachmentsListParams {
   public deleteIconColor: '#FF5858' | 'initial' = 'initial';
 
   @Input()
-  public disableDelete: boolean = false;
+  public disableDelete = false;
 
   public agInit(params: AttachmentsListParams): void {
     this.attachments = params.attachments;

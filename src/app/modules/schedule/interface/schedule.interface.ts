@@ -133,6 +133,7 @@ export interface ScheduleSelectedSlots {
 
 export type ScheduleCandidatesPage = PageOfCollections<ScheduleCandidate>;
 export type ScheduleModelPage = PageOfCollections<ScheduleModel>;
+export type ScheduleExportPage = PageOfCollections<ScheduleExport>;
 
 export interface ScheduleEventConfig {
   title: string;
@@ -319,3 +320,55 @@ export interface DepartmentChipsStructureState {
   departmentIds: number[];
   departments: OrganizationDepartment[];
 }
+
+
+export interface ScheduleExport {
+  employeeId : number;
+  displayId : number;
+  firstName : string;
+  lastName : string;
+  skill : string;
+  workCommitments :  string[];
+  employeeSchedules : EmployeeSchedules;
+}
+
+export interface EmployeeSchedules {
+  employeeId : number;
+  workHours : number;
+  schedules : Schedules[];
+}
+
+export interface Schedules {
+  date : string;
+  daySchedules : DaySchedules[];
+}
+
+export interface DaySchedules {
+  employeeId : number;
+  shiftName : number;
+  date : Date;
+  startDate : Date;
+  endDate : Date;
+  scheduleType : string;
+  scheduleTypeId : number;
+  orderMetadata : OrderMetaData;
+  attributes : ScheduleAttributes;
+}
+
+export interface OrderMetaData {
+  orderPublicId : number;
+  orderType : number;
+  region : string;
+  location : string;
+  department : string;
+}
+
+export interface ScheduleAttributes {
+  orientated : boolean;
+  critical : boolean;
+  onCall : boolean;
+  charge : boolean;
+  preceptor : boolean;
+  meal : boolean; 
+}
+

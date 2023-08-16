@@ -7,16 +7,28 @@
   ::ng-deep {
     .controls-container {
       flex-direction: row;
+
+      .left-content {
+        @media #{$max-mobile} {
+          align-items: center;
+        }
+      }
       
       .right-content {
         justify-content: flex-end;
+        width: unset;
       }
     }
   }
 }
 
+.employee-title {
+  display: flex;
+  flex-direction: row;
+  column-gap: 10px;
+}
+
 .candidate-name-title {
-  margin-left: 10px;
   font-weight: 700;
 }
 
@@ -41,5 +53,10 @@
   :host {
     display: block;
     margin-top: 16px;
+  }
+
+  .employee-title {
+    display: flex;
+    flex-direction: column;
   }
 }

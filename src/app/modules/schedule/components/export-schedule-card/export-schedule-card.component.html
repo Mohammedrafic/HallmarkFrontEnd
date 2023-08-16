@@ -1,0 +1,83 @@
+<ng-container *ngIf="activePeriod !== dayPeriod; else dayTemplate">
+    <div
+      *ngIf="bigCardConfig || firstSmallCardConfig"
+      [ngClass]="{ 'selected': isSelected, 'third-event': !!thirdEventColor }"
+      [ngStyle]="{ 'border-color': thirdEventColor }"
+      class="card-wrapper"
+    >
+        <ng-container *ngIf="bigCardConfig; else multipleEventsView">
+          <div class="event-wrapper" [style.color]="bigCardConfig.color">
+            <div class="time">
+              <span class="time__text">{{ bigCardConfig.startDate | date: 'HH:mm': 'UTC' }}</span>
+              <span class="time__text"> - </span>
+              <span class="time__text">{{ bigCardConfig.endDate | date: 'HH:mm': 'UTC' }}</span>
+              <span *ngIf="bigCardConfig.ltaOrder" class="time__text"> L </span>
+            </div>
+            <div class="title">
+              <span class="title__text">{{ bigCardConfig.title }}</span>
+            </div>
+            <div 
+              *ngIf="bigCardConfig.additionalAttributes"
+              class="additional-attributes">
+              <span>{{bigCardConfig.additionalAttributes}}</span>
+            </div>
+          </div>
+        </ng-container>
+  
+        <ng-template #multipleEventsView>
+          <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: firstSmallCardConfig }"></ng-container>
+          <ng-container [ngTemplateOutlet]="smallCard" [ngTemplateOutletContext]="{ item: secondSmallCardConfig }"></ng-container>
+        </ng-template>
+    </div>
+  </ng-container>
+  
+  <ng-template #dayTemplate>
+    <div class="day-wrapper">
+      <ng-container *ngFor="let card of dateSchedule.daySchedules; let i = index">
+        <div
+          [ngClass]="{ 'selected': isSelected, 'third-event': !!thirdEventColor }"
+          [ngStyle]="{ 'border-color': thirdEventColor }"
+          class="card-wrapper"
+          *ngIf="dayCardConfig.source[i]"
+        >
+            <div class="event-wrapper" [style.color]="dayCardConfig.source[i].color">
+              <div class="time">
+                <span class="time__text">{{ dayCardConfig.source[i].startDate | date: 'HH:mm': 'UTC' }}</span>
+                <span class="time__text"> - </span>
+                <span class="time__text">{{ dayCardConfig.source[i].endDate | date: 'HH:mm': 'UTC' }}</span>
+                <span *ngIf="dayCardConfig.source[i].ltaOrder" class="time__text"> L </span>
+              </div>
+              <div class="title">
+                <span class="title__text">{{ dayCardConfig.source[i].title }}</span>
+              </div>
+              <div class="additional-attributes" *ngIf="dayCardConfig.source[i].additionalAttributes">
+                <span>{{dayCardConfig.source[i].additionalAttributes}}</span>
+              </div>
+            </div>
+        </div>
+      </ng-container>
+    </div>
+  </ng-template>
+  
+  <ng-template #smallCard let-item="item">
+    <div
+      class="event-wrapper small-card"
+      [ngStyle]="{ 'margin-bottom': !!thirdEventColor ? '3px' : '8px' }">
+      <div class="time">
+        <span class="time__text">{{ item.startDate | date: 'HH:mm': 'UTC' }}</span>
+        <span class="time__text"> - </span>
+        <span class="time__text">{{ item.endDate | date: 'HH:mm': 'UTC' }}</span>
+        <span *ngIf="item.ltaOrder" class="time__text"> L </span>
+      </div>
+      <div class="title">
+        <span class="title__text">{{ item.title }}</span>
+      </div>
+      <div 
+        *ngIf="item.additionalAttributes"
+        class="additional-attributes">
+        <span>{{item.additionalAttributes}}</span>
+      </div>
+
+    </div>
+  </ng-template>
+  

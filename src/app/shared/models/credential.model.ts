@@ -101,3 +101,7 @@ export interface MissingCredentialsResponse {
   onboardingPercentage: number;
   missingCredentials: MissingCredential[];
 }
+export interface CredentialTypeFilter{
+  id:number;
+  name:string;
+}

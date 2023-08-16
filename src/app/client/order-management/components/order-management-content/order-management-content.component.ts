@@ -2396,7 +2396,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private initMenuItems(): void {
     this.threeDotsMenuOptions = ThreeDotsMenuOptions(this.canCreateOrder, this.canCloseOrder, this.activeSystem);
-    this.threeDotsMenuOptionsIRP = ThreeDotsMenuOptionsIRP(this.CanEditOrderBillRateIRP, this.canCloseOrderIRP, this.activeSystem);
+    this.threeDotsMenuOptionsIRP = ThreeDotsMenuOptionsIRP(this.canCreateOrderIRP, this.canCloseOrderIRP, this.activeSystem);
   }
 
   private watchForPermissions(): void {

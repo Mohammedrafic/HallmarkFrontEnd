@@ -10,7 +10,6 @@ import {
   AgencyOrderManagementPage,
   ApplicantStatus,
   CandidateCancellationReason,
-  CandidateCancellationReasonFilter,
   CreateOrderDto,
   EditOrderDto,
   IrpCandidatesParams,
@@ -547,8 +546,10 @@ export class OrderManagementContentService {
     );
   }
 
-  public GetCandidateCancellationReasons(filter: CandidateCancellationReasonFilter): Observable<CandidateCancellationReason[]> {
-    return this.http.post<CandidateCancellationReason[]>(`/api/CandidateCancellationSettings/getCandidateCancellationReason`, filter);
+  public getCandidateCancellationReasons(orderId: number): Observable<CandidateCancellationReason[]> {
+    return this.http.get<CandidateCancellationReason[]>(
+      `/api/CandidateCancellationSettings/orders/${orderId}`
+    );
   }
 
   public getAllShifts(): Observable<ScheduleShift[]> {

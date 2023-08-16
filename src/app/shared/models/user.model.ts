@@ -15,6 +15,7 @@ export class User {
   isEmployee?: boolean;
   roleNames?: string;
   roles?: any;
+  candidateProfileId?: number;
 }
 
 export class UsersPage {
