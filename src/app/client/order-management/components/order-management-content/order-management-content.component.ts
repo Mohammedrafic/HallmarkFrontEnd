@@ -2666,7 +2666,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filterColumns.reorderStatuses.dataSource = data.reorderStatuses;
     this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
     this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-    const candidatesOrderStatusList = this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') ? JSON.parse(this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') || '') :'';
   }
 
   private prepareFiltersToDispatch(state: OrderFilter): void {

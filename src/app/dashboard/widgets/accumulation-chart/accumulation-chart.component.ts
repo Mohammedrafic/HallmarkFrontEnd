@@ -74,7 +74,6 @@ export class AccumulationChartComponent
   }
 
   public redirectToSourceContent(status: string): void {
-    let candidatesStatusDataSet:any = []
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
     let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
     if (filteredList.length > 0) {
