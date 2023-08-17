@@ -907,6 +907,10 @@ export class SendGroupEmailComponent
       }
   }
 
+  public onSwitcher(event: { checked: boolean }): void {
+    console.log('event.checked',event.checked);
+  }
+
   private onUserTypeValueChanged(): void {
     this.userTypeControl.valueChanges.pipe(distinctUntilChanged(),takeWhile(() => this.isAlive)).subscribe((value) => {
       if(this.isSend == true){

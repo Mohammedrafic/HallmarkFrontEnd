@@ -136,6 +136,11 @@ h5{
 .attachmentdiv{
   display: inline-flex;
 }
+.button-group{
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
 
 ::ng-deep {
   .invalidRichTextEditorDiv{

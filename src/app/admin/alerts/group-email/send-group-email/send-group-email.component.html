@@ -4,8 +4,8 @@
     <div class="section-container">
 
       <div class="left-section">
-        <div class="bootstrap business-dropdowns">
-          <div class="dropdown-container">
+        <div class="business-dropdowns">
+          <div class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Business Unit Type<span class="required">*</span></label>
               <ejs-dropdownlist appValidateWithMessage
@@ -18,7 +18,7 @@
               </ejs-dropdownlist>
             </div>
           </div>
-          <div class="dropdown-container" *ngIf="!isBusinessUnitTypeAgency">
+          <div class="bootstrap dropdown-container" *ngIf="!isBusinessUnitTypeAgency">
             <div class="input-group dropdown">
               <label>Business Unit<span class="required">*</span></label>
               <ejs-dropdownlist appValidateWithMessage
@@ -31,7 +31,7 @@
               </ejs-dropdownlist>
             </div>
           </div>
-          <div class="dropdown-container" *ngIf="isBusinessUnitTypeAgency">
+          <div class="bootstrap dropdown-container" *ngIf="isBusinessUnitTypeAgency">
             <div class="input-group dropdown">
               <label>Business Unit<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" appValidateWithMessage
@@ -46,7 +46,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div class="dropdown-container" *ngIf="!hideUserTypeControl">
+          <div class="bootstrap dropdown-container" *ngIf="!hideUserTypeControl">
             <div class="input-group dropdown">
               <label>User Type<span class="required">*</span></label>
               <ejs-dropdownlist appValidateWithMessage
@@ -60,7 +60,7 @@
               </ejs-dropdownlist>
             </div>
           </div>
-          <div *ngIf="isOrgCandidatesType" class="dropdown-container">
+          <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Agencies<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" appValidateWithMessage
@@ -75,7 +75,7 @@
               </ejs-multiselect>
             </div>
           </div>               
-          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType" class="dropdown-container">
+          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Skills<span class="required">*</span></label>
               <ejs-multiselect  mode="CheckBox" appValidateWithMessage
@@ -90,7 +90,7 @@
               </ejs-multiselect>
             </div>
           </div>          
-          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="dropdown-container">
+          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Region<span *ngIf="!isEmployeeType" class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" formControlName="region"
@@ -105,7 +105,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="dropdown-container">
+          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Location<span *ngIf="!isEmployeeType" class="required">*</span></label>
               <ejs-multiselect mode="CheckBox" formControlName="location"
@@ -120,7 +120,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isEmployeeType" class="dropdown-container">
+          <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
             <div class="input-container bootstrap">
               <label>Department<span *ngIf="!isEmployeeType" class="required">*</span></label>
               <div class="input-group dropdown">
@@ -137,7 +137,7 @@
               </div>
             </div>
           </div>
-          <div *ngIf="isOrgCandidatesType" class="dropdown-container">
+          <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Order Type</label>
               <ejs-multiselect mode="CheckBox" formControlName="orderTypes"
@@ -152,7 +152,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isOrgCandidatesType" class="dropdown-container">
+          <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Candidate Status</label>
               <ejs-multiselect mode="CheckBox" formControlName="candidateStatus"
@@ -167,7 +167,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isOrgCandidatesType" class="dropdown-container">
+          <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
             <div class="input-container bootstrap">
               <label>Job ID</label>
               <input class="e-input"
@@ -178,7 +178,7 @@
                    (keyup.enter)="onJobIdStatusValueChanged()"/>
             </div>
           </div>
-          <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="dropdown-container">
+          <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Role<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox"
@@ -194,7 +194,7 @@
               </ejs-multiselect>
             </div>
           </div>    
-          <div *ngIf="isEmployeeType" class="dropdown-container">
+          <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Skills</label>
               <ejs-multiselect  mode="CheckBox" appValidateWithMessage
@@ -209,7 +209,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isEmployeeType" class="dropdown-container">
+          <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>Work Commitment</label>
               <ejs-multiselect  mode="CheckBox" appValidateWithMessage
@@ -224,7 +224,7 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isEmployeeType" class="dropdown-container">
+          <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">    
               <div style="height: 25px;"></div>
               <label for="chkOrientationComplete">
@@ -233,7 +233,7 @@
               </label>
             </div>
           </div>
-          <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="dropdown-container">
+          <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label>User<span class="required">*</span></label>
               <ejs-multiselect mode="CheckBox"
@@ -249,7 +249,11 @@
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType || isEmployeeType" class="dropdown-container">
+          <div class="button-group"  *ngIf="isOrgInternalUserType || isAgencyUserType">
+              <ejs-switch id="switcher" [checked]="true" (change)="onSwitcher($event);"></ejs-switch>
+              <label for="switcher" class="switch-text">Show Only Active Users</label>  
+          </div>
+          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
             <div class="input-group dropdown">
               <label *ngIf="!isEmployeeType">Candidate<span class="required">*</span></label>
               <label *ngIf="isEmployeeType">Employee<span class="required">*</span></label>
