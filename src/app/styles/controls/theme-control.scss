@@ -1,0 +1,29 @@
+@import 'colors';
+
+body.light {
+  --background: #{$background};
+  --secondary-background: #{$secondary-dark-blue-50};
+
+  --bg-primary-button: #{$primary-active-blue-70};
+
+  --text: #{$black};
+  --description: #{$pure-black};
+  --title: #{$secondary-dark-blue-10};
+  --sub-title: #{$secondary-dark-blue-15};
+  --sub-title-2: #{$secondary-dark-blue-15};
+  --secondary-title: #{$title-black};
+}
+
+body.dark {
+  --background: #{$sidebar-background};
+  --secondary-background: #{$secondary-dark-blue-10-2};
+
+  --bg-primary-button: #{$grid-detail-row-bgcolor};
+
+  --text: #{$white};
+  --description: #{$white};
+  --title: #{$white};
+  --sub-title: #{$secondary-dark-blue-40};
+  --sub-title-2: #{$secondary-dark-blue-30};
+  --secondary-title: #{$white};
+}
