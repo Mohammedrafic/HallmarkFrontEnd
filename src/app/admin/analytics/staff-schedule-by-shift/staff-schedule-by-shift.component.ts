@@ -102,6 +102,7 @@ export class StaffScheduleByShiftComponent implements OnInit, OnDestroy {
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
+  public customCSSName = 'logi-Custom-report-iframe-div';
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 

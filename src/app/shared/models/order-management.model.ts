@@ -511,6 +511,8 @@ export class Order {
   activeCandidatesCount?: number;
   isLockedIRP?: boolean;
   linkedId: string | null;
+  documentsCount: number;
+  fromTemplateId?: number;
 }
 
 export class ReOrder {
@@ -547,20 +549,28 @@ export class ReOrder {
   shiftEndTime: string;
 }
 
-export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {
+export interface CreateOrderDto extends Omit
+<
+  Order,
+  'id' | 'billRates' | 'status' | 'statusText' | 'documents' | 'documentsCount'
+> {
   billRates: OrderBillRateDto[];
   jobDistribution?: number[];
   removeLinkedSchedulesFromLta?: boolean;
 }
 
-export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'statusText' | 'documents'> {
+export interface EditOrderDto extends Omit
+<
+  Order,
+  'billRates' | 'status' | 'statusText' | 'documents' | 'documentsCount'
+> {
   billRates: OrderBillRateDto[];
   deleteDocumentsGuids: string[];
 }
 
 export type AcceptJobDTO = {
-  actualEndDate?: string;
-  actualStartDate?: string;
+  actualEndDate?: string | null;
+  actualStartDate?: string | null;
   allowDeployWoCredentials?: boolean;
   candidateBillRate?: number;
   clockId?: number;
@@ -840,12 +850,6 @@ export class CandidateCancellationReason{
   id: number;
   name: string;
 }
-
-export class CandidateCancellationReasonFilter{
-  regionId?:number;
-  locationId?:number;
-}
-
 
 export class OrderJourneyFilter {
   orderBy?: string;

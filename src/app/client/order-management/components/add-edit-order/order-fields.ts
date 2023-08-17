@@ -18,6 +18,8 @@ enum CommonInfo {
   id,
   isQuickOrder,
   linkedId,
+  deleteDocumentsGuids,
+  fromTemplateId,
 }
 
 enum ContactToPermTravelerGeneralInfo {

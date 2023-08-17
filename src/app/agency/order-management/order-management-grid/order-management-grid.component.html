@@ -70,6 +70,17 @@
               data.unreadComments
             }}</span>
           </button>
+          <button 
+            ejs-button 
+            cssClass="default-icon-button e-flat e-primary with-badge"
+            [disabled]="!data.documentsCount"
+            (click)="openDetailsTab = true"
+          >
+            <span><i-feather name="paperclip" class="icon"></i-feather></span>
+            <span *ngIf="data.documentsCount" class="e-badge e-badge-success e-badge-pill right-overflow">
+              {{data.documentsCount}}
+            </span>
+          </button>
         </div>
       </ng-template>
     </e-column>
@@ -315,12 +326,9 @@
   [orderPositionSelected$]="orderPositionSelected$"
   [openDetailsTab]="openDetailsTab"
   [openCandidateTab]="!!previousSelectedOrderId"
-  (compareEvent)="onCompare()"
   (selectReOrder)="selectReOrder($event)"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-preview-order-dialog>
-
-<app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>
 
 <app-child-order-dialog
   [order]="$any(selectedOrder)"

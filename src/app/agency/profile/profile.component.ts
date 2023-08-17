@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { UserState } from "../../store/user.state";
-import { Store } from "@ngxs/store";
 import { Router } from "@angular/router";
+
+import { Store } from "@ngxs/store";
+
+import { UserState } from "../../store/user.state";
 
 @Component({
   selector: 'app-profile',
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  template: '',
 })
 export class ProfileComponent implements OnInit {
 
@@ -17,7 +18,6 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    this.router.navigate([`agency/agency-list/edit/${user?.businessUnitId}`])
+    this.router.navigate([`agency/agency-list/edit/${user?.businessUnitId}`]);
   }
-
 }

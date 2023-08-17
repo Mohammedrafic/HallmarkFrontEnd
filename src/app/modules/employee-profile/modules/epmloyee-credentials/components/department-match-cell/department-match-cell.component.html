@@ -1,0 +1,8 @@
+<div
+  *ngIf="config"
+  [ngStyle]="{ color: config.color }"
+  class="department-match"
+>
+  <span class="icon"><i-feather [name]="config.icon" class="icon"></i-feather></span>
+  <span>{{ config.status }}</span>
+</div>

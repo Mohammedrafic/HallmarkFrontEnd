@@ -85,7 +85,7 @@ export const getFormsList = (list: ListOfKeyForms): FormGroup[] => {
       (list[form as keyof ListOfKeyForms]! as FormGroup[]).forEach((item: FormGroup) => {
         formList.push(item);
       });
-    } else {
+    } else if (list[form as keyof ListOfKeyForms] && typeof form !== 'boolean') {
       formList.push(list[form as keyof ListOfKeyForms]);
     }
   }

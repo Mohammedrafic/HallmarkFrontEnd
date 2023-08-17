@@ -166,3 +166,7 @@ $headerHeight: 19px;
   align-items: flex-start;
   gap: 10px;
 }
+.height_update {
+  max-height: calc( 100% - 51px);
+  overflow: auto;
+}

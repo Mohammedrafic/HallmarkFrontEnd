@@ -36,8 +36,10 @@
     <div *ngIf="agency_count" class="app-widget-wrapper__agency_count">
       <ng-container [ngTemplateOutlet]="agency_count"></ng-container>
     </div>
-    <div *ngIf="RNUtilizationChart" class="app-widget-wrapper__RNUtilization-chart">
-      <ng-container [ngTemplateOutlet]="RNUtilizationChart"></ng-container>
+    <div class="height_update">
+      <div *ngIf="RNUtilizationChart" class="app-widget-wrapper__RNUtilization-chart">
+        <ng-container [ngTemplateOutlet]="RNUtilizationChart"></ng-container>
+      </div>  
     </div>
     <div *ngIf="already_expired_credentials" class="app-widget-wrapper__expired-chart">
       <ng-container [ngTemplateOutlet]="already_expired_credentials"></ng-container>
@@ -45,8 +47,10 @@
     <div *ngIf="upcoming_exp_creds" class="app-widget-wrapper__upcoming-chart">
       <ng-container [ngTemplateOutlet]="upcoming_exp_creds"></ng-container>
     </div>
-    <div *ngIf="available_employee" class="app-widget-wrapper__available_employee">
-      <ng-container [ngTemplateOutlet]="available_employee"></ng-container>
+    <div class="height_update">
+      <div *ngIf="available_employee" class="app-widget-wrapper__available_employee">
+        <ng-container [ngTemplateOutlet]="available_employee"></ng-container>
+      </div>  
     </div>
     <div *ngIf="positions_count_day_range" class="app-widget-wrapper__positions_count_day_range">
       <ng-container [ngTemplateOutlet]="positions_count_day_range"></ng-container>

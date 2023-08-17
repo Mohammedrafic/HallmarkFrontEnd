@@ -34,13 +34,7 @@ const routes: Routes = [
         loadChildren: () => import('./credentials/credentials.module').then((m) => m.CredentialsModule),
         data: {
           isOrganizationArea: true,
-        },
-      },
-      {
-        path: 'credentials/groups-setup',
-        loadChildren: () => import('./credential-groups/credential-groups.module').then((m) => m.CredentialGroupsModule),
-        data: {
-          isOrganizationArea: true,
+          isCredentialSettings: true,
         },
       },
       {

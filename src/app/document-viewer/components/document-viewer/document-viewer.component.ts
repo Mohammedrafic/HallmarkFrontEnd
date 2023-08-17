@@ -1,5 +1,5 @@
 /* eslint-disable no-plusplus */
-import { DEFAULT_ZOOM } from '@agency/candidates/add-edit-candidate/file-viewer/file-viewer.constant';
+import { DEFAULT_ZOOM } from '@shared/components/credential-file-viewer/file-viewer.constant';
 
 import { getInstance } from '@syncfusion/ej2-base';
 import {

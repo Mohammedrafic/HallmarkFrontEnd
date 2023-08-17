@@ -1,0 +1,56 @@
+@import 'colors';
+
+.file-container {
+  padding: 16px;
+  background-color: $secondary-dark-blue-50;
+  margin-top: 12px;
+  border-radius: 8px;
+
+  .file-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .file-list {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+
+    .wrapper {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .size,
+    .createdAt {
+      font-weight: 400;
+      color: $secondary-dark-blue-30;
+    }
+
+    .file {
+      display: flex;
+      align-self: center;
+      justify-content: space-between;
+      width: 100%;
+      padding-bottom: 7px;
+      border-bottom: 1px solid $secondary-dark-blue-45;
+    }
+
+    .default-icon-button {
+      width: 40px;
+      padding: 8px 10px;
+
+      .icon {
+        margin: 0;
+      }
+    }
+
+    .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+}

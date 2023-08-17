@@ -53,7 +53,7 @@
                 <div class="input-container bootstrap">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
-                  <div class="input-group">
+                  <div class="input-group bootstrap">
                     <ejs-numerictextbox
                       class="numeric-input"
                       appValidateWithMessage
@@ -69,11 +69,11 @@
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.MultiSelectDropdown">
-                <div class="input-container">
+                <div class="input-container bootstrap">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="dropdown-wrapper">
-                    <div class="input-group bootstrap">
+                    <div class="input-group">
                       <ejs-multiselect
                         appValidateWithMessage
                         selectAllText="Select All"
