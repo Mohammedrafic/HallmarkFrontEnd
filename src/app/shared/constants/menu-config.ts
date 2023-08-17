@@ -490,6 +490,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/agency-spend',
     },
+    104: {
+      // credential-expiry-irp
+      icon: '',
+      route: '/analytics/credential-expiry-irp',
+    },
     112: {
       // financial-time-sheet-beta
       icon: 'pie-chart',
@@ -499,6 +504,11 @@ export const MENU_CONFIG: any = {
       // department-spend-and-hours-report
       icon: '',
       route: '/analytics/department-spend-and-hours-report',
+    },
+    116: {
+      // Useractivity Log report
+      icon: '',
+      route: '/analytics/user-activity',
     },
   },
 
@@ -755,6 +765,11 @@ export const MENU_CONFIG: any = {
       // Agency-Spend
       icon: '',
       route: '/analytics/agency-spend',
+    },
+    104: {
+      // credential-expiry-irp
+      icon: '',
+      route: '/analytics/credential-expiry-irp',
     },
   },
 
@@ -1203,6 +1218,11 @@ export const MENU_CONFIG: any = {
       // Agency-Spend
       icon: '',
       route: '/analytics/agency-spend',
+    },
+    104: {
+      // credential-expiry-irp
+      icon: '',
+      route: '/analytics/credential-expiry-irp',
     },
     112: {
       // financial-time-sheet-beta
