@@ -162,6 +162,7 @@ export class BillRateSetup {
   regularLocal: boolean;
   displayInTimesheet: boolean;
   displayInJob: boolean;
+  considerForHoliday: boolean;
   editAllowed: boolean;
   billType: number;
 }
@@ -182,6 +183,7 @@ export class BillRateSetupPost {
   considerForDailyOT: boolean;
   considerFor7thDayOT: boolean;
   displayInJob: boolean;
+  considerForHoliday: boolean;
   forceUpsert?: boolean;
   billType: number;
 }

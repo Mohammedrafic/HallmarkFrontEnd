@@ -1,14 +1,18 @@
 export const OtBillRatesConfiguration: { title: string; formKey: string }[] = [
   {
     title: 'Consider for Weekly OT:',
-    formKey: 'weeklyOtEnabled'
+    formKey: 'weeklyOtEnabled',
   },
   {
     title: 'Consider for Daily OT:',
-    formKey: 'dailyOtEnabled'
+    formKey: 'dailyOtEnabled',
   },
   {
     title: 'Consider for 7th Day OT:',
-    formKey: 'seventhDayOtEnabled'
-  }
+    formKey: 'seventhDayOtEnabled',
+  },
+  {
+    title: 'Consider for Holiday calculation:',
+    formKey: 'holidayCalculationEnabled',
+  },
 ];
