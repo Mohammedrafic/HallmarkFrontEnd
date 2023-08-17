@@ -204,6 +204,7 @@
                               (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
                               (updateTable)="updateTable($event)"
                               [payButton]="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] &&  !isAgency) ||( userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)"
+                              [isDarkTheme]="isDarkTheme$ | async"
                               ></app-invoice-detail-container>
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>

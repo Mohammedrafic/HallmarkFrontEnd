@@ -85,7 +85,6 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: white;
 
   .e-avatar {
     margin-right: 16px;
@@ -295,7 +294,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
       .ag-header-cell-text {
         font-weight: 600 !important;
-        color: $secondary-dark-blue-15 !important;
+        color: $secondary-dark-blue-15;
       }
 
       .inactive {
@@ -383,7 +382,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   width: 40px;
   border: 1px solid $primary-active-blue-40 !important;
   padding: 0 !important;
-  
+
   i-feather.icon {
     margin: 0;
   }
@@ -391,6 +390,17 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
 .mobile-change-status-btn {
   @include flex-center;
+}
+
+.dark-mode {
+  .grouped {
+    background-color: $secondary-dark-blue-10-2;
+  }
+
+  .profile-table-block__title,
+  .table-footer .total__value {
+    color: $white;
+  }
 }
 
 @media #{$max-mobile} {
