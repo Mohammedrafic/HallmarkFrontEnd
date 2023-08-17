@@ -37,7 +37,7 @@ export class PositionChartComponent {
 
   public toSourceContent(event: MouseEvent): void {
     this.globalWindow.localStorage.setItem("ltaorderending", JSON.stringify(true));
-    this.ltaorderending = JSON.parse(localStorage.getItem('ltaorderending') || '"false"') as boolean;
+    this.ltaorderending = JSON.parse(localStorage.getItem('ltaorderending') || 'false') as boolean;
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
       const user = this.store.selectSnapshot(UserState.user);
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
