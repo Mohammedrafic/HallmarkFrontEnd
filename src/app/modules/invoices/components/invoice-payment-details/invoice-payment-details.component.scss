@@ -1,8 +1,8 @@
-@import "colors.scss";
-@import "mixins";
-@import "@ag-grid-community/core/dist/styles/ag-grid.scss";
-@import "@ag-grid-community/core/dist/styles/ag-theme-alpine";
-@import "adaptive-response";
+@import 'colors';
+@import 'mixins';
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+@import 'adaptive-response';
 
 .dialog-container {
   padding: 24px;
@@ -94,6 +94,12 @@
     .custom-scroll {
       overflow-y: auto;
     }
+  }
+}
+
+.dark-theme {
+  .header-block {
+    color: $white;
   }
 }
 

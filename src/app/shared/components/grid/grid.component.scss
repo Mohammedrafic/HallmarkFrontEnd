@@ -161,6 +161,10 @@ app-grid {
   .ag-center-cols-container {
     background-color: $sidebar-background !important;
   }
+
+  .app-grid__header {
+    background-color: $sidebar-background !important;
+  }
 }
 
 @media #{$max-mobile} {

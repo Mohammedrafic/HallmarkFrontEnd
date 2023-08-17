@@ -26,6 +26,8 @@ import { UserPermissions } from '@core/enums';
 export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnInit {
   @Input() public container: HTMLElement;
 
+  @Input() isDarkTheme: boolean | null;
+
   @Output() addPayment: EventEmitter<void> = new EventEmitter();
 
   @Output() editPaymentCheck: EventEmitter<string> = new EventEmitter();

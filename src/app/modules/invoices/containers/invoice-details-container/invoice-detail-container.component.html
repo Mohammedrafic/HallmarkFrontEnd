@@ -13,7 +13,7 @@
     <section
       *ngIf="invoiceDetail"
       class="container"
-      [class.dark-mode]="isDarkTheme"
+      [class.dark-theme]="isDarkTheme"
     >
       <div class="profile-details-header">
         <h3 class="username">Invoice ID {{ invoiceDetail.meta.formattedInvoiceNumber }}</h3>
@@ -167,6 +167,7 @@
 <app-invoice-payment-details
   *ngIf="invoiceDetailsConfig.paymentDetailsOpen"
   [container]="sideDialog.element"
+  [isDarkTheme]="isDarkTheme"
   (destroyDialog)="closePaymentDetails()"
   (editPaymentCheck)="openEditPayment($event)"
   (addPayment)="openAddPayment()"
@@ -179,6 +180,7 @@
   [checkNumber]="editCheckNumber"
   [dialogTitle]="paymentDialogTitle"
   [container]="sideDialog.element"
+  [isDarkTheme]="isDarkTheme"
   (destroyDialog)="closeAddPayment()"
 >
 </app-invoice-add-payment>

@@ -221,5 +221,6 @@
 
 <app-invoice-add-payment *ngIf="invoiceContainerConfig.addPaymentOpen"
                          [invoicesToPay]="paymentRecords"
+                         [isDarkTheme]="isDarkTheme$ | async"
                          (destroyDialog)="closeAddPayment()">
 </app-invoice-add-payment>

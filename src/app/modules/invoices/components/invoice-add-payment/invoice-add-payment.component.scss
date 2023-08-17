@@ -146,6 +146,16 @@
   color: $black;
 }
 
+.dark-theme {
+  .toggle-header {
+    color: $secondary-dark-blue-40;
+  }
+
+  .amount-text {
+    color: $white;
+  }
+}
+
 @media #{$max-mobile} {
   .grid {
     grid-template-columns: 1fr;

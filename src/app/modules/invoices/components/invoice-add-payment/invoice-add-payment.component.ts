@@ -13,7 +13,7 @@ import { InvoicePaymentData } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { AddPaymentFormConfig, CheckPaymentsDefs, PaymentMessages } from './invoice-add-payment.constant';
-import { CheckForm, PaymentForm, PaymentFormConfig, PaymentsTableData } from './invoice-add-payment.interface';
+import { CheckForm, PaymentForm, PaymentsTableData } from './invoice-add-payment.interface';
 import { InvoiceAddPaymentService } from './invoice-add-payment.service';
 import { InvoicesApiService } from '../../services';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -36,6 +36,8 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
   @Input() dialogTitle = PaymentDialogTitle.Add;
 
   @Input() public container: HTMLElement;
+
+  @Input() isDarkTheme: boolean | null;
 
   paymentsForm: Record<string, CustomFormGroup<PaymentForm>>;
 
