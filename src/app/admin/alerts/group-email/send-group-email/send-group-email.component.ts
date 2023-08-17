@@ -194,6 +194,8 @@ export class SendGroupEmailComponent
   private listboxEle: HTMLElement;
   private editArea: HTMLElement;
   public userData: User[];
+  public masterUserData: User[];
+  public allowActiveUsers:boolean = true;
   public agencyData: AgencyDto[];
   public businessData: BusinessUnit[];
   public roleData: GroupEmailRole[];
@@ -454,6 +456,7 @@ export class SendGroupEmailComponent
     this.emailBodyRequired$.pipe(takeUntil(this.unsubscribe$)).subscribe(val=>{
       this.emailBodyRequired = val;
     })
+    this.allowActiveUsers = true;
   }
 
   CheckBusinessIRPEnabled(businessId:number): void{
@@ -900,15 +903,28 @@ export class SendGroupEmailComponent
         }
         this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           if (data != undefined) {
-            this.userData = data.items.filter(i => i.isDeleted == false);
-            this.userData = this.userData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
+            this.masterUserData = data.items;
+            if(this.allowActiveUsers){
+              this.userData = data.items.filter(i => i.isDeleted == false);
+              this.userData = this.userData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
+            }else{
+              this.userData = this.masterUserData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
+            }
+           
           }
         });
       }
   }
 
   public onSwitcher(event: { checked: boolean }): void {
-    console.log('event.checked',event.checked);
+    this.groupEmailTemplateForm.controls['emailTo'].setValue('');
+    this.usersControl.reset();
+    this.allowActiveUsers = event.checked;
+    if(event.checked){
+      this.userData = this.masterUserData.filter(i => i.isDeleted == false && (i.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)));
+    }else{
+      this.userData = this.masterUserData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
+    }
   }
 
   private onUserTypeValueChanged(): void {
@@ -977,7 +993,7 @@ export class SendGroupEmailComponent
         } else if (businessUnit == 4) {
           if (value == 1) {
             this.onFormvalidation(['roles', 'user']);
-           
+
             this.isAgencyUserType = true;
             this.roleData = [];
             if(this.isOrgUser){

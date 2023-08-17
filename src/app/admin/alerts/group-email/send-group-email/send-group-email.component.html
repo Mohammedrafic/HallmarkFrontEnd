@@ -250,7 +250,7 @@
             </div>
           </div>
           <div class="button-group"  *ngIf="isOrgInternalUserType || isAgencyUserType">
-              <ejs-switch id="switcher" [checked]="true" (change)="onSwitcher($event);"></ejs-switch>
+              <ejs-switch id="switcher" [checked]="allowActiveUsers" (change)="onSwitcher($event);"></ejs-switch>
               <label for="switcher" class="switch-text">Show Only Active Users</label>  
           </div>
           <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
