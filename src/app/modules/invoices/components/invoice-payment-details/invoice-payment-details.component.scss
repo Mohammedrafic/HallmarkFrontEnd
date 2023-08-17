@@ -28,7 +28,7 @@
   font-size: 16px;
   font-weight: 700;
   line-height: 28px;
-  color: $title-black;
+  color: var(--secondary-title);
 }
 
 .header-block:last-of-type {
@@ -94,12 +94,6 @@
     .custom-scroll {
       overflow-y: auto;
     }
-  }
-}
-
-.dark-theme {
-  .header-block {
-    color: $white;
   }
 }
 

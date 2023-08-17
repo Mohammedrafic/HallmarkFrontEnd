@@ -98,10 +98,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<Interfaces.InvoicesFilterState>>;
 
-  @Select(AppState.isDarkTheme)
-  private readonly isDarkTheme$: Observable<boolean>;
-
-
   public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
 
   public selectedTabId: Interfaces.InvoiceTabId = 0;
@@ -174,8 +170,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public populateFilterForm$: BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>
     = new BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>(null);
 
-  public isDarkTheme: boolean;
-
   private navigatedOrgId: number | null;
 
   private previousSelectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab;
@@ -246,7 +240,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForSavePaymentAction();
     this.watchForPreservedFilters();
     this.getuserPermission();
-    this.subscribeOnTheme();
   }
 
   ngAfterViewInit(): void {
@@ -769,13 +762,5 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     ).subscribe((permissions: Permission) => {
       this.userPermission = permissions;
     });
-  }
-
-  private subscribeOnTheme(): void {
-    this.isDarkTheme$
-      .pipe(takeUntil(this.componentDestroy()))
-      .subscribe((theme) => {
-        this.isDarkTheme = !!theme;
-      });
   }
 }

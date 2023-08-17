@@ -37,8 +37,6 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
 
   @Input() public container: HTMLElement;
 
-  @Input() isDarkTheme: boolean;
-
   paymentsForm: Record<string, CustomFormGroup<PaymentForm>>;
 
   checkForm: CustomFormGroup<CheckForm>;

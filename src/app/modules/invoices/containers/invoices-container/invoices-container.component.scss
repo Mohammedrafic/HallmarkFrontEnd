@@ -59,6 +59,16 @@
   }
 }
 
+.invoices-page-toolbar {
+  .pay-button,
+  .main-button,
+  .dropdown-button {
+    &:disabled {
+      background-color: var(--bg-primary-button);
+    }
+  }
+}
+
 .tab-navigation {
   &.e-badge {
     margin-left: 0.3rem;
@@ -155,17 +165,6 @@
     i-feather {
       margin-left: 0;
       font-weight: 700;
-    }
-  }
-}
-
-.dark-theme {
-  .pay-button,
-  .main-button,
-  .dropdown-button {
-    &:disabled {
-      background-color: $grid-detail-row-bgcolor;
-      color: $secondary-dark-blue-30;
     }
   }
 }

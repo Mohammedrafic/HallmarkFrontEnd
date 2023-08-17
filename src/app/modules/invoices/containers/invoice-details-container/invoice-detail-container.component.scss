@@ -39,7 +39,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
-  background: $secondary-dark-blue-50;
+  background: var(--secondary-background);
 }
 
 .print-btn {
@@ -311,7 +311,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
     font-weight: 700;
     line-height: 28px;
     letter-spacing: 0.015em;
-    color: $black;
+    color: var(--text);
   }
 
   .table-footer {
@@ -332,7 +332,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
       font-weight: 700;
       line-height: 16px;
       text-align: right;
-      color: $black;
+      color: var(--text);
     }
 
     &__text {
@@ -390,17 +390,6 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
 .mobile-change-status-btn {
   @include flex-center;
-}
-
-.dark-theme {
-  .grouped {
-    background-color: $secondary-dark-blue-10-2;
-  }
-
-  .profile-table-block__title,
-  .table-footer .total__value {
-    color: $white;
-  }
 }
 
 @media #{$max-mobile} {

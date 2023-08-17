@@ -1,8 +1,4 @@
-<div
-  [ngClass]="{
-    'invoices-page-toolbar': true,
-    'dark-theme': isDarkTheme
-  }"
+<div class="invoices-page-toolbar"
 >
   <app-page-toolbar>
     <ng-container left>
@@ -204,7 +200,6 @@
                               (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
                               (updateTable)="updateTable($event)"
                               [payButton]="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] &&  !isAgency) ||( userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)"
-                              [isDarkTheme]="isDarkTheme"
                               ></app-invoice-detail-container>
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>
@@ -216,7 +211,6 @@
 </app-invoices-filters-dialog>
 
 <app-reject-reason-input-dialog
-  [isDarkTheme]="isDarkTheme"
   (rejectReasonChange)="handleInvoiceRejection($event)"
 ></app-reject-reason-input-dialog>
 
@@ -224,6 +218,5 @@
 
 <app-invoice-add-payment *ngIf="invoiceContainerConfig.addPaymentOpen"
                          [invoicesToPay]="paymentRecords"
-                         [isDarkTheme]="isDarkTheme"
                          (destroyDialog)="closeAddPayment()">
 </app-invoice-add-payment>
