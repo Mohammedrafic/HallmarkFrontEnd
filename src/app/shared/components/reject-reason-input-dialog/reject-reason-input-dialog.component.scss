@@ -57,3 +57,14 @@
     }
   }
 }
+
+.dark-theme {
+  .title,
+  .description {
+    color: $white;
+  }
+
+  .input-title {
+    color: $secondary-dark-blue-30;
+  }
+}

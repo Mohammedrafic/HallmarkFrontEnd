@@ -9,8 +9,12 @@
   (close)="handleDialogClose()"
 >
   <ng-template #content>
-    <form class="reject-reason-dialog-content-container" [formGroup]="form">
-      <h2>Reason for Rejection</h2>
+    <form
+      class="reject-reason-dialog-content-container"
+      [class.dark-theme]="isDarkTheme"
+      [formGroup]="form"
+    >
+      <h2 class="title">Reason for Rejection</h2>
       <div class="content">
         <div class="description">Please specify reason for rejection</div>
         <div class="reason-title"></div>

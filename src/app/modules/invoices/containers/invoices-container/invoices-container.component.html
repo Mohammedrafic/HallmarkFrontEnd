@@ -1,7 +1,7 @@
 <div
   [ngClass]="{
     'invoices-page-toolbar': true,
-    'dark-mode': isDarkTheme$ | async
+    'dark-theme': isDarkTheme
   }"
 >
   <app-page-toolbar>
@@ -204,7 +204,7 @@
                               (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
                               (updateTable)="updateTable($event)"
                               [payButton]="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] &&  !isAgency) ||( userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)"
-                              [isDarkTheme]="isDarkTheme$ | async"
+                              [isDarkTheme]="isDarkTheme"
                               ></app-invoice-detail-container>
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>
@@ -215,12 +215,15 @@
                              (updateTableByFilters)="updateTableByFilters($event)">
 </app-invoices-filters-dialog>
 
-<app-reject-reason-input-dialog (rejectReasonChange)="handleInvoiceRejection($event)"></app-reject-reason-input-dialog>
+<app-reject-reason-input-dialog
+  [isDarkTheme]="isDarkTheme"
+  (rejectReasonChange)="handleInvoiceRejection($event)"
+></app-reject-reason-input-dialog>
 
 <app-file-viewer></app-file-viewer>
 
 <app-invoice-add-payment *ngIf="invoiceContainerConfig.addPaymentOpen"
                          [invoicesToPay]="paymentRecords"
-                         [isDarkTheme]="isDarkTheme$ | async"
+                         [isDarkTheme]="isDarkTheme"
                          (destroyDialog)="closeAddPayment()">
 </app-invoice-add-payment>
