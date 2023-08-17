@@ -12,7 +12,6 @@ export enum OrderStatus {
   NoOrder = -1,
   Offboard = 90,
   Cancelled = 110,
-  OrdersOpenPositions = 70,
 }
 
 export enum CandidateJobStatus {

@@ -436,18 +436,6 @@ export class DashboardService {
   public redirect_to_expiring_credentials(url : string,startDate? : Date,  endDate? : Date, type? : number) : void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true ,startDate: startDate, endDate: endDate, type : type} });
   }
-  public redirectToUrlWithActivePositions(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string,xtraCandidateStatus? :string,xtraCandidateStatustext? : string,): void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus, xtraCandidateStatus: xtraCandidateStatus,xtraCandidateStatustext: xtraCandidateStatustext} });
-  }
-  private getTasksWidgetData(): Observable<string> {
-    return of('temporary-collapsed-widget-tasks');
-  }
-
-
-
-  private getChatWidgetData(): Observable<string> {
-    return of('assets/icons/temporary-widget-chat.png');
-  }
 
   private getFilledPositionTrendWidgetData(filter: DashboartFilterDto): Observable<PositionTrend> {
     return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/filledpositionstrend`, { ...filter }).pipe(
