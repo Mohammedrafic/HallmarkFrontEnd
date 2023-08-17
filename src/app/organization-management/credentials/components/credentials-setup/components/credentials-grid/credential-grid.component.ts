@@ -165,7 +165,7 @@ export class CredentialGridComponent extends AbstractGridConfigurationComponent 
     this.organizationId$.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      this.credentialSetupFilter.pageNumber = 1;
+      this.credentialSetupFilter = { pageNumber: 1, pageSize: this.pageSize };
       this.dispatchNewPage();
     });
   }

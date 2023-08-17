@@ -456,9 +456,7 @@ export class CreateScheduleService {
   }
 
   private hasDifferentTypeSchedule(candidates: ScheduleCandidate[]): boolean {
-    const candidateDays = candidates?.map((candidate: ScheduleCandidate) => candidate.days).flat();
     const isDatesEqualForSingleCandidate = candidates.length === 1 &&
-      candidateDays.length === 1 &&
       candidates[0].ltaAssignment &&
       this.isSelectedDateEqualAssigmentDate(candidates);
 

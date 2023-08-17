@@ -512,6 +512,7 @@ export class Order {
   isLockedIRP?: boolean;
   linkedId: string | null;
   documentsCount: number;
+  fromTemplateId?: number;
 }
 
 export class ReOrder {
@@ -568,8 +569,8 @@ export interface EditOrderDto extends Omit
 }
 
 export type AcceptJobDTO = {
-  actualEndDate?: string;
-  actualStartDate?: string;
+  actualEndDate?: string | null;
+  actualStartDate?: string | null;
   allowDeployWoCredentials?: boolean;
   candidateBillRate?: number;
   clockId?: number;
