@@ -3,17 +3,17 @@
 .droparea {
   border: 1px dashed $primary-active-blue-10;
   border-radius: 4px;
-  background-color: $primary-active-blue-90;
+  background-color: var(--bg-upload-area);
 
   &:hover {
-    border: 1px dashed $primary-active-blue;
+    border-color: $primary-active-blue;
     background-color: $primary-active-blue-80;
   }
 
   &.disabled {
-    background-color: $secondary-dark-blue-50;
-    color: $secondary-dark-blue-30 !important;
-    border-color: $secondary-dark-blue-40;
+    background-color: var(--bg-disable-upload-area);
+    color: var(--disabled-drop-area-text) !important;
+    border-color: var(--border-drop-area);
   }
 }
 
@@ -29,7 +29,7 @@
 
 .e-file-container {
   .e-file-name, .e-file-type {
-    color: $black !important;
+    color: var(--text) !important;
   }
 }
 
@@ -54,20 +54,3 @@
   }
 }
 
-body.dark {
-  .droparea {
-    background-color: $widget-dark-tooltip;
-  
-    &.disabled {
-      background-color: $secondary-dark-blue-15;
-      color: $white !important;
-      border-color: $secondary-dark-blue-50;
-    }
-  }
-
-  .e-file-container {
-    .e-file-name, .e-file-type {
-      color: $white !important;
-    }
-  }
-}

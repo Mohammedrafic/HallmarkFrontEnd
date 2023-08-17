@@ -3,8 +3,12 @@
 body.light {
   --background: #{$background};
   --secondary-background: #{$secondary-dark-blue-50};
+  --bg-upload-area: #{$primary-active-blue-90};
+  --bg-disable-upload-area: #{$secondary-dark-blue-50};
 
   --bg-primary-button: #{$primary-active-blue-70};
+
+  --border-drop-area: #{$secondary-dark-blue-40};
 
   --text: #{$black};
   --description: #{$pure-black};
@@ -12,13 +16,19 @@ body.light {
   --sub-title: #{$secondary-dark-blue-15};
   --sub-title-2: #{$secondary-dark-blue-15};
   --secondary-title: #{$title-black};
+  --disabled-drop-area-text: #{$secondary-dark-blue-30};
 }
 
 body.dark {
   --background: #{$sidebar-background};
   --secondary-background: #{$secondary-dark-blue-10-2};
+  --bg-upload-area: #{$widget-dark-tooltip};
+  --bg-disable-upload-area: #{$secondary-dark-blue-15};
+
 
   --bg-primary-button: #{$grid-detail-row-bgcolor};
+
+  --border-drop-area: #{$secondary-dark-blue-50};
 
   --text: #{$white};
   --description: #{$white};
@@ -26,4 +36,5 @@ body.dark {
   --sub-title: #{$secondary-dark-blue-40};
   --sub-title-2: #{$secondary-dark-blue-30};
   --secondary-title: #{$white};
+  --disabled-drop-area-text: #{$white};
 }
