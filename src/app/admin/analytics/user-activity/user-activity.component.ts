@@ -1,7 +1,7 @@
 import { User_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { GetuserlogReportPage } from '@admin/store/userlog-activity.actions';
 import { useractivityReportState } from '@admin/store/userlog-activity.state';
-import { ColDef, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
+import { ColDef, ExcelStyle, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { DatePipe } from '@angular/common';
@@ -131,6 +131,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       headerName: ' Date',
       field: 'utcDate',
       minWidth: 175,
+      cellClass: 'date',
       filter: 'agDateColumnFilter',
       filterParams: {
         buttons: ['reset'],
@@ -194,7 +195,24 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       filter: true,
       sortable: true,
       resizable: true
+    },
+    {
+      headerName: 'Screen Name',
+      field: 'screenName',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Screen Url',
+      field: 'screenUrl',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
     }
+
 
   ];
 
@@ -318,7 +336,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
 
     this.logInterfacePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
       this.itemList = data;
-      this.totalRecordsCount$.next(data.length);
+      this.totalRecordsCount$.next(data?.length);
       if (!data || !data?.length) {
         this.gridApi?.showNoRowsOverlay();
       }
@@ -371,6 +389,25 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       this.gridApi.setRowData(this.itemList);
     }
   }
+  onBtExport() {
+    const params = {
+      fileName: 'User Audit Log Report',
+      sheetName:'User Audit Log Report'
+    };
+    this.gridApi.exportDataAsExcel(params);
+  }
+
+  public excelStyles: ExcelStyle[] = [
+
+    {
+      id: 'date',
+      dataType: 'DateTime',
+      numberFormat: {
+        format: 'mm/dd/yyyy',
+      },
+    },
+   
+  ];
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();

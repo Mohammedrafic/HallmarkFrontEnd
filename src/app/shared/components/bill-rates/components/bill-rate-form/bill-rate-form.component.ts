@@ -73,6 +73,10 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     return this.billRateForm.get('billRateConfig');
   }
 
+  get isOnCallSelected(): boolean {
+    return this.billRateForm.get('billRateConfigId')?.value !== BillRateTitleId.Oncall;
+  }
+
   get isInternalsEnabled(): boolean {
     return this.billRateForm.get('billRateConfigId')?.value !== BillRateTitleId.Mileage;
   }

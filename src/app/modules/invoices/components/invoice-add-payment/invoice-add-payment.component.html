@@ -120,6 +120,9 @@
             [gridTitle]="'Invoices'"
             (gridReadyEmitter)="setGridApi($event)"
           ></app-grid>
+          <div class="total-row-counter">
+            Total Rows: {{ tableData?.length ?? 0 }}
+          </div>
         </div>
       </div>
     </div>
