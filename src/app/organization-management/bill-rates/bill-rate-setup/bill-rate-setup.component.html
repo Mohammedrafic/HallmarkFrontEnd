@@ -537,6 +537,12 @@
             <ejs-checkbox id="displayInJob" label="Display in Job" formControlName="displayInJob"></ejs-checkbox>
           </div>
         </div>
+
+        <div class="input-container" *ngIf="isConsiderForHolidayShown">
+          <div class="input-group">
+            <ejs-checkbox id="considerForHoliday" label="Consider for Holiday calculation" formControlName="considerForHoliday"></ejs-checkbox>
+          </div>
+        </div>
       </div>
     </form>
   </app-side-dialog>
