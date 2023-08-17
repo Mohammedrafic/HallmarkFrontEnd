@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -89,6 +89,7 @@ export class DashboardService {
     [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
+    [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -527,6 +528,28 @@ export class DashboardService {
 
   public getAvailableEmployee(): Observable<AvailableEmployeeModel[]> {
     return this.httpClient.get<AvailableEmployeeModel[]>(`/api/Schedules/AvailableEmployee`);
+  }
+
+  public getPositionsCountByDayRange(filter: DashboartFilterDto): Observable<PositionsCountByDayRangeDataset>{
+    return this.httpClient.post<any>(`${this.baseUrl}/GetPositionsCountByDayRange`, { ...filter }).pipe(
+      map(({ orderStatusesAvgDetails }: PositionsCountByDayRange) => {
+        return {
+          id: WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE,
+          title: 'Count Of Positions By Day Range',
+          chartData: lodashMapPlain(
+            orderStatusesAvgDetails,
+            ({ count3Positions,count7Positions,count15Positions,count30PlusPositions,count30Positions,totalCount, statusName }: StatusesAvgDetails, index: number) => ({
+              label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
+              value: totalCount,
+              count30: count30Positions,
+              count30Plus: count30PlusPositions,
+              count15: count15Positions,
+              count7: count7Positions,
+              count3: count3Positions,
+            })
+          ),
+        };
+      }))
   }
 
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
