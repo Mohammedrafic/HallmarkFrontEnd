@@ -159,6 +159,17 @@
   }
 }
 
+.dark-mode {
+  .pay-button,
+  .main-button,
+  .dropdown-button {
+    &:disabled {
+      background-color: $grid-detail-row-bgcolor;
+      color: $secondary-dark-blue-30;
+    }
+  }
+}
+
 ::ng-deep {
   .invoices-table-container {
     .ag-row {

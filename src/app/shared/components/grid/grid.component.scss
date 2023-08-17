@@ -156,6 +156,11 @@ app-grid {
   .ag-side-buttons {
     color: $secondary-dark-blue-30 !important;
   }
+
+  .ag-center-cols-viewport,
+  .ag-center-cols-container {
+    background-color: $sidebar-background !important;
+  }
 }
 
 @media #{$max-mobile} {

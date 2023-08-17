@@ -166,4 +166,12 @@ app-grid {
   .ag-side-buttons {
     color: $secondary-dark-blue-30 !important;
   }
+  .ag-checkbox-input-wrapper {
+    background-color: $bg-dark-checkbox !important;
+  }
+
+  .ag-icon-tree-open,
+  .ag-icon-tree-closed {
+    color: $secondary-dark-blue-30;
+  }
 }

@@ -57,6 +57,7 @@ import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 import { InvoiceFiltersAdapter } from '../../adapters';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-invoices-container',
@@ -95,8 +96,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   @Select(UserState.lastSelectedAgencyId)
   public readonly agencyId$: Observable<number>;
 
+  @Select(AppState.isDarkTheme)
+  public readonly isDarkTheme$: Observable<boolean>;
+
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<Interfaces.InvoicesFilterState>>;
+
+
 
   public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
 
