@@ -52,5 +52,8 @@
         <ng-container [ngTemplateOutlet]="available_employee"></ng-container>
       </div>  
     </div>
+    <div *ngIf="positions_count_day_range" class="app-widget-wrapper__positions_count_day_range">
+      <ng-container [ngTemplateOutlet]="positions_count_day_range"></ng-container>
+    </div>
   </div> 
 </ng-template>
