@@ -403,7 +403,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       id: 'date',
       dataType: 'DateTime',
       numberFormat: {
-        format: 'MM/dd/yyyy',
+        format: 'mm/dd/yyyy',
       },
     },
    
