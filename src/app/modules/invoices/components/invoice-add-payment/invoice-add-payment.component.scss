@@ -52,6 +52,7 @@
 .table-container {
   display: flex;
   flex-direction: column;
+  min-height: 625px;
 
   .grid-table-container {
     padding-bottom: 0;
@@ -74,6 +75,16 @@
         }
       }
     }
+
+    .total-row-counter {
+      border-radius: 0 0 12px 12px;
+      border: 1px solid $secondary-dark-blue-45;
+      padding: 16px 24px;
+      color: $secondary-dark-blue-15;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+    }
   }
 }
 
@@ -81,6 +92,11 @@
   .ag-cell-focus,
   .ag-cell {
     border: none !important;
+  }
+
+  .app-grid__component .ag-root-wrapper {
+    border-left: 1px solid $secondary-dark-blue-45 !important;
+    border-right: 1px solid $secondary-dark-blue-45 !important;
   }
 
   .ag-cell-value {

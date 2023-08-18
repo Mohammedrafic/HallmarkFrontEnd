@@ -13,7 +13,7 @@ import { InvoicePaymentData } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { AddPaymentFormConfig, CheckPaymentsDefs, PaymentMessages } from './invoice-add-payment.constant';
-import { CheckForm, PaymentForm, PaymentFormConfig, PaymentsTableData } from './invoice-add-payment.interface';
+import { CheckForm, PaymentForm, PaymentsTableData } from './invoice-add-payment.interface';
 import { InvoiceAddPaymentService } from './invoice-add-payment.service';
 import { InvoicesApiService } from '../../services';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -244,7 +244,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
       const tableRecords = this.paymentService.mergeTableData(this.tableData, response.payments, this.paymentsForm);
 
       this.invoicesToPay = this.paymentService.createInitialInvoicesData(response, this.invoicesToPay);
-      this.gridApi.setRowData(tableRecords);
+      this.tableData = tableRecords;
       this.calcLeftAmount();
       this.cd.markForCheck();
     });

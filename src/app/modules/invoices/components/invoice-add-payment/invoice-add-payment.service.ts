@@ -27,7 +27,7 @@ export class InvoiceAddPaymentService {
     const formGroups: Record<string, FormGroup> = {};
 
     records.forEach((record) => {
-      formGroups[record.invoiceNumber] = this.createPaymentGroup();
+      formGroups[record.invoiceNumber] = this.createPaymentGroup(record.amount, 0);
     });
 
     return formGroups as Record<string, CustomFormGroup<PaymentForm>>;
@@ -35,23 +35,22 @@ export class InvoiceAddPaymentService {
 
   createTableData(
     payments: InvoicePaymentData[],
-    
     forms: Record<string, CustomFormGroup<PaymentForm>>): PaymentsTableData[] {
     return payments.map((record) => {
       return ({
         id: record.invoiceId,
         invoiceNumber: record.invoiceNumber,
         amount: record.amount,
-        payment: 0,
-        balance: record.amount,
+        payment: record.amount,
+        balance: 0,
         group: forms[record.invoiceNumber],
       });
-    });  
+    });
   }
 
   /**
    * This method is used for merging data from existing check with payment
-   * and new invoices that were selected for table. 
+   * and new invoices that were selected for table.
    */
   mergeTableData(
     tableData: PaymentsTableData[],
@@ -62,12 +61,12 @@ export class InvoiceAddPaymentService {
     if (!payments || !payments.length) {
       return tableData;
     }
-    
+
     payments.forEach((payment) => {
       const initialAmount = (payment.amountToPay as number) + payment.payment;
       const form = this.createPaymentGroup(initialAmount, payment.amountToPay);
       paymentsForm[payment.formattedInvoiceId as string] = form;
-      
+
       form.get('amount')?.patchValue(payment.payment);
       form.get('balance')?.patchValue(payment.amountToPay);
 
@@ -82,11 +81,12 @@ export class InvoiceAddPaymentService {
 
       paymentsForm[payment.formattedInvoiceId as string].get('id')?.patchValue(payment.id,
         { emitEvent: false, onlySelf: true });
+    });
 
-      tableData.filter((data) => !mergeData.find((record) => data.invoiceNumber === record.invoiceNumber))
-      .forEach((record) => {
+    tableData.filter((data) => {
+      return !mergeData.find((record) => data.invoiceNumber === record.invoiceNumber);
+    }).forEach((record) => {
         mergeData.push(record);
-      });
     });
 
     return mergeData;

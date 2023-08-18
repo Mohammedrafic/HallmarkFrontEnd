@@ -11,9 +11,12 @@ export const OrganizationTabsToExport: OrganizationInvoicesGridTab[] = [
   OrganizationInvoicesGridTab.PendingPayment,
   OrganizationInvoicesGridTab.Paid,
   OrganizationInvoicesGridTab.All,
+  OrganizationInvoicesGridTab.Manual,
 ];
 
-export const AgencyTabsToExport: AgencyInvoicesGridTab[] = [AgencyInvoicesGridTab.All];
+export const AgencyTabsToExport: AgencyInvoicesGridTab[] = [
+  AgencyInvoicesGridTab.All,
+AgencyInvoicesGridTab.Manual];
 
 export const InvoiceExportCols : ExportColumn[] = [
   { text:'Invoice ID', column: 'invoiceId' },
@@ -34,6 +37,28 @@ export const InvoiceExportCols : ExportColumn[] = [
   { text:'Status', column: 'Status' },
   { text:'LocationID', column: 'LocationID' },
   { text:'Comment', column: 'Comment' },
+];
+export const AgencyManualInvoicePendingExportCols : ExportColumn[] = [
+  { text:'CandidateFullName', column: 'candidateFullName' },
+  { text:'Status ', column: 'status' },
+  { text:'locationName', column: 'locationName' },
+  { text:'FormattedOrderIdFull', column: 'formattedOrderIdFull' },
+  { text:'regionName', column: 'regionName' },
+  { text:'DepartmentName', column: 'departmentName' },
+  { text:'SkillName', column: 'skillName' },
+  { text:'WeekStartDate', column: 'weekStartDate' },
+  { text:'VendorFeeApplicable', column: 'vendorFeeApplicable' },
+  { text:'Comment', column: 'comment' },
+  { text:'ReasonCode', column: 'reasonCode' },
+  { text:'RejectionReason', column: 'rejectionReason' },
+  { text:'Amount', column: 'amount' },
+  { text:'ServiceDate', column: 'serviceDate' },
+  { text:'LinkedInvoiceId', column: 'linkedInvoiceId' },
+  {text:'Submitted Date',column:'submittedDate'},
+  {text:'Review Status',column:'reviewStatus'},
+  {text:' Approved Date',column:' approvedDate'},
+  {text:'agencyName',column:'agencyName'},
+
 ];
 
 export const PendingInvoiceExportCols : ExportColumn[] = [
