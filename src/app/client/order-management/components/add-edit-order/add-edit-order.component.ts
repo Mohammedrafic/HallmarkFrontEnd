@@ -586,6 +586,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         seventhDayOtEnabled,
         weeklyOtEnabled,
         dailyOtEnabled,
+        holidayCalculationEnabled,
       } = billRate;
       return {
         id: id || 0,
@@ -600,6 +601,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         seventhDayOtEnabled,
         weeklyOtEnabled,
         dailyOtEnabled,
+        holidayCalculationEnabled,
       };
     });
 
