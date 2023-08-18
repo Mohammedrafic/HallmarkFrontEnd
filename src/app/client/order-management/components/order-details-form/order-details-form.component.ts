@@ -576,7 +576,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     const openPositionsControl = this.generalInformationForm.controls['openPositions'];
     openPositionsControl.patchValue(order.openPositions);
 
-    if (order.status === OrderStatus.Filled) {
+    if (order.status === OrderStatus.Filled || order.disableNumberOfOpenPositions) {
       openPositionsControl.disable();
     }
   }
