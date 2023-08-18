@@ -621,6 +621,14 @@ body.dark {
         background-color: $grid-active-row-bgcolor;
       }
     }
+
+    .e-gridcontent {
+      .e-table {
+        .e-emptyrow {
+          background-color: $sidebar-background !important;
+        }
+      }
+    }
   }
 
   thead tr,

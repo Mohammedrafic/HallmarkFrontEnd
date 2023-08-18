@@ -59,6 +59,16 @@
   }
 }
 
+.invoices-page-toolbar {
+  .pay-button,
+  .main-button,
+  .dropdown-button {
+    &:disabled {
+      background-color: var(--bg-primary-button);
+    }
+  }
+}
+
 .tab-navigation {
   &.e-badge {
     margin-left: 0.3rem;

@@ -818,11 +818,21 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.isShowSharedWith=false;
       if(this.businessFilterForm.get('filterBusinessUnit')?.value === this.businessUnitTypes.Organization)
       {
-        this.onAgencyChanges();
+        let showSharedDoc = false;
+        if(selectedIds.length == 1){
+          this.documentId = selectedIds[0];
+          showSharedDoc = true;   
+        }
+        this.onAgencyChanges(showSharedDoc);
       }
       if(this.businessFilterForm.get('filterBusinessUnit')?.value === this.businessUnitTypes.Agency)
       {
-        this.onOrganizationChanges();
+        let showSharedDoc = false;
+        if(selectedIds.length == 1){
+          this.documentId = selectedIds[0];     
+          showSharedDoc = true;     
+        }
+        this.onOrganizationChanges(showSharedDoc);
       }
       this.store.dispatch(new ShowSideDialog(true));
     }
@@ -1337,15 +1347,17 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
     this.changeDetectorRef.markForCheck();
   }
-public onAgencyChanges()
+public onAgencyChanges(showSharedDoc=true)
 {
   this.agencySwitch = !this.agencySwitch;
     this.allAgencies = false;
     this.documentLibraryform.get(FormControlNames.AllAgencies)?.setValue(this.allAgencies);
     if (this.agencySwitch) {
       this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
-      this.isShowSharedWith=true;
-      this.getSharedDocumentInformation(this.documentId,BusinessUnitType.Agency)
+      if(showSharedDoc){
+        this.isShowSharedWith=true;
+        this.getSharedDocumentInformation(this.documentId,BusinessUnitType.Agency)
+      }
       this.getAssociateAgencyData();
       this.isShare = true;
       this.halmarkSwitch = false;
@@ -1395,14 +1407,16 @@ public onAgencyChanges()
       });
   }
 
-  public onOrganizationChanges()  {
+  public onOrganizationChanges(showSharedDoc=true)  {
     this.organizationSwitch = !this.organizationSwitch;
     this.allOrgnizations = false;
     this.documentLibraryform.get(FormControlNames.AllOrgnizations)?.setValue(this.allOrgnizations);
     if (this.organizationSwitch) {
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
-      this.isShowSharedWith=true;
-      this.getSharedDocumentInformation(this.documentId,BusinessUnitType.Organization)
+      if(showSharedDoc){
+        this.isShowSharedWith=true;
+        this.getSharedDocumentInformation(this.documentId,BusinessUnitType.Organization)
+      }
       this.getShareOrganizationsData();
       this.isShare = true;
       this.halmarkSwitch = false;

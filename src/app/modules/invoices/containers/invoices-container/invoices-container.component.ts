@@ -56,7 +56,7 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
-import { InvoiceFiltersAdapter } from '../../adapters';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-invoices-container',
@@ -245,7 +245,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForOpenPayment();
     this.watchForSavePaymentAction();
     this.watchForPreservedFilters();
-    this.getuserPermission()
+    this.getuserPermission();
   }
 
   ngAfterViewInit(): void {

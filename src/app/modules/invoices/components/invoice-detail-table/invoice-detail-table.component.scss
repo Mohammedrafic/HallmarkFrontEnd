@@ -1,4 +1,4 @@
-@import "../../../../styles/variables/colors.scss";
+@import 'colors';
 
 .table-container {
   height: 304px;
@@ -8,6 +8,11 @@
 .table-block {
   display: flex;
   flex-direction: column;
+
+  .e-rowcell.e-templatecell:last-child {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 .table-header {
@@ -51,12 +56,5 @@
         color: $secondary-dark-blue-30;
       }
     }
-  }
-}
-
-.table-block {
-  .e-rowcell.e-templatecell:last-child {
-    padding-left: 0;
-    padding-right: 0;
   }
 }

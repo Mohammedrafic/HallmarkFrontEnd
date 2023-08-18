@@ -152,14 +152,14 @@
 
 .toggle-header {
   font-weight: 400;
-  color: $secondary-dark-blue-15;
+  color: var(--sub-title);
 }
 
 .amount-text {
   max-width: 150px;
   overflow: hidden;
   font-weight: 700;
-  color: $black;
+  color: var(--text);
 }
 
 @media #{$max-mobile} {
