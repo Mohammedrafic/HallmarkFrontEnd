@@ -253,6 +253,16 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
     headerName: 'Work Commitment',
     width: 140,
   },
+  {
+    field: 'actualStartDate',
+    headerName: 'Actual start date',
+    width: 140,
+  },
+  {
+    field: 'actualEndDate',
+    headerName: 'Actual end date',
+    width: 140,
+  },
 ];
 
 export const OrderManagementVMSSubGridCells: ColDef[] = [
