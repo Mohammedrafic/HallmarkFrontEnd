@@ -46,7 +46,7 @@ $chip-margin: 8px;
     }
 
     .username {
-      color: $black;
+      color: var(--text);
       font-weight: 700;
       font-size: 24px;
       margin: 0;

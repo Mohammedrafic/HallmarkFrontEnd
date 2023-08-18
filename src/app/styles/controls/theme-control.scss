@@ -5,16 +5,20 @@ body.light {
   --secondary-background: #{$secondary-dark-blue-50};
   --bg-upload-area: #{$primary-active-blue-90};
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
+  --bg-empty-grid: #{$secondary-dark-blue-45};
+  --bg-grid: #{$white};
 
   --bg-primary-button: #{$primary-active-blue-70};
 
   --border-drop-area: #{$secondary-dark-blue-40};
 
   --text: #{$black};
+  --secondary-text: {$black};
   --description: #{$pure-black};
   --title: #{$secondary-dark-blue-10};
   --sub-title: #{$secondary-dark-blue-15};
   --sub-title-2: #{$secondary-dark-blue-15};
+  --sub-title-3: #{$secondary-dark-blue-20};
   --secondary-title: #{$title-black};
   --disabled-drop-area-text: #{$secondary-dark-blue-30};
 }
@@ -24,16 +28,20 @@ body.dark {
   --secondary-background: #{$secondary-dark-blue-10-2};
   --bg-upload-area: #{$widget-dark-tooltip};
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
+  --bg-empty-grid: #{$sidebar-background};
+  --bg-grid: #{$sidebar-background};
 
   --bg-primary-button: #{$grid-detail-row-bgcolor};
 
   --border-drop-area: #{$secondary-dark-blue-50};
 
   --text: #{$white};
+  --secondary-text: #{$secondary-dark-blue-30};
   --description: #{$white};
   --title: #{$white};
   --sub-title: #{$secondary-dark-blue-40};
   --sub-title-2: #{$secondary-dark-blue-30};
+  --sub-title-3: #{$secondary-dark-blue-40};
   --secondary-title: #{$white};
   --disabled-drop-area-text: #{$white};
 }
