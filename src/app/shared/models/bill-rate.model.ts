@@ -83,6 +83,7 @@ export interface BillRate {
   seventhDayOtEnabled?: boolean;
   weeklyOtEnabled?: boolean;
   dailyOtEnabled?: boolean;
+  holidayCalculationEnabled?: boolean;
   isUpdated?: boolean;
 }
 
