@@ -34,8 +34,8 @@ import {
 } from '@shared/constants';
 import { WorkflowWithDetails } from '@shared/models/workflow.model';
 import {
-  RolesByPermission,
-  UsersByPermission,
+  RoleListsByPermission,
+  UserListsByPermission,
   WorkflowMappingPage,
   WorkflowMappingPost,
 } from '@shared/models/workflow-mapping.model';
@@ -46,8 +46,8 @@ import { GetWorkflowFlags, PrepareWorkflowMapping } from '@organization-manageme
 export interface WorkflowStateModel {
   workflows: WorkflowWithDetails[] | null;
   workflowMappingPages: WorkflowMappingPage | null;
-  rolesPerUsers: RolesByPermission[] | null;
-  users: UsersByPermission[];
+  rolesPerUsers: RoleListsByPermission;
+  users: UserListsByPermission;
 }
 
 @State<WorkflowStateModel>({
@@ -55,8 +55,14 @@ export interface WorkflowStateModel {
   defaults: {
     workflows: [],
     workflowMappingPages: null,
-    rolesPerUsers: [],
-    users: [],
+    rolesPerUsers: {
+      irpRoles: [],
+      vmsRoles: [],
+    },
+    users: {
+      vmsUsers: [],
+      irpUsers: [],
+    },
   },
 })
 @Injectable()
@@ -72,12 +78,12 @@ export class WorkflowState {
   }
 
   @Selector()
-  static rolesPerUsers(state: WorkflowStateModel): RolesByPermission[] | null {
+  static rolesPerUsers(state: WorkflowStateModel): RoleListsByPermission {
     return state.rolesPerUsers;
   }
 
   @Selector()
-  static users(state: WorkflowStateModel): UsersByPermission[] | [] {
+  static users(state: WorkflowStateModel): UserListsByPermission {
     return state.users;
   }
 
@@ -235,7 +241,7 @@ export class WorkflowState {
   GetRolesForWorkflowMapping(
     { patchState }: StateContext<WorkflowStateModel>,
     {}: GetRolesForWorkflowMapping
-  ): Observable<RolesByPermission[]> {
+  ): Observable<RoleListsByPermission> {
     return this.workflowService.getRolesForWorkflowMapping().pipe(
       tap((payload) => {
         patchState({ rolesPerUsers: payload });
@@ -248,7 +254,7 @@ export class WorkflowState {
   GetUsersForWorkflowMapping(
     { patchState }: StateContext<WorkflowStateModel>,
     {}: GetUsersForWorkflowMapping
-  ): Observable<UsersByPermission[]> {
+  ): Observable<UserListsByPermission> {
     return this.workflowService.getUsersForWorkflowMapping().pipe(
       tap((payload) => {
         patchState({ users: payload });
