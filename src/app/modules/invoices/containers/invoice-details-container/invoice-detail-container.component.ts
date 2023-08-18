@@ -52,7 +52,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   @Input() actionAllowed = true;
   @Input() approveAllowed = false;
   @Input() payAllowed = false;
-  @Input() payButton: boolean = false;
+  @Input() payButton = false;
+
 
   @Output() updateTable: EventEmitter<InvoiceUpdateEmmit> = new EventEmitter<InvoiceUpdateEmmit>();
 

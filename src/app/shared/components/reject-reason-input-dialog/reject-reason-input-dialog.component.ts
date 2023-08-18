@@ -22,8 +22,7 @@ export class RejectReasonInputDialogComponent {
   @Input()
   public container: HTMLElement | null = null;
 
-  @Input()
-  public visible: boolean = false;
+  @Input() public visible = false;
 
   @Output()
   public readonly visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();

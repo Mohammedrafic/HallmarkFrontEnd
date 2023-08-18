@@ -1,7 +1,7 @@
-<div *ngIf="group" [formGroup]="group" class="amount-container">
+<div *ngIf="group" [formGroup]="group" class="amount-container bootstrap">
   <span>
     <input
-      class="amount-input"
+      class="amount-input e-input"
       [ngClass]="{ 'errored': group.invalid && group.touched}"
       [formControlName]="controlName"
       (change)="changePayment()"

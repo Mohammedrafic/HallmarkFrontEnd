@@ -175,6 +175,7 @@ body.dark {
   .bootstrap {
     input.e-input {
       background: $sidebar-background;
+      color: $white !important;
     }
 
     input.e-input[disabled] {

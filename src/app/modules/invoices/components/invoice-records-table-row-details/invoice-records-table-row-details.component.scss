@@ -1,12 +1,24 @@
+@import 'colors';
+
 :host {
   ::ng-deep {
     .app-grid {
       .ag-row {
-        background-color: #F7F8FC !important;
+        background-color: $secondary-dark-blue-50 !important;
       }
 
       .ag-row.ag-row-level-1 {
         background-color: transparent !important;
+      }
+    }
+
+    .app-grid-dark {
+      .ag-row {
+        background-color: $sidebar-background !important;
+
+        .cell-value {
+          color: $white !important;
+        }
       }
     }
 

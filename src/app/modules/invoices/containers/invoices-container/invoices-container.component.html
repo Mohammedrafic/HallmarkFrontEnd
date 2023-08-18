@@ -1,4 +1,5 @@
-<div class="invoices-page-toolbar">
+<div class="invoices-page-toolbar"
+>
   <app-page-toolbar>
     <ng-container left>
       <app-invoices-table-tabs *ngIf="tabsConfig$ | async as tabsConfig"
@@ -59,8 +60,9 @@
               !gridSelections.selectedInvoiceIds ||
               !gridSelections.selectedInvoiceIds.length
             "
-                    cssClass="e-primary relative"
-                    (click)="openAddPayment(true)">
+                    cssClass="e-primary relative pay-button"
+                    (click)="openAddPayment(true)"
+                    appHideBeforeSyncfusionLoad>
               Pay
             </button>
           </div>
@@ -208,7 +210,9 @@
                              (updateTableByFilters)="updateTableByFilters($event)">
 </app-invoices-filters-dialog>
 
-<app-reject-reason-input-dialog (rejectReasonChange)="handleInvoiceRejection($event)"></app-reject-reason-input-dialog>
+<app-reject-reason-input-dialog
+  (rejectReasonChange)="handleInvoiceRejection($event)"
+></app-reject-reason-input-dialog>
 
 <app-file-viewer></app-file-viewer>
 
