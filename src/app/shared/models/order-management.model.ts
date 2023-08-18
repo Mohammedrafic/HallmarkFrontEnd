@@ -513,6 +513,7 @@ export class Order {
   linkedId: string | null;
   documentsCount: number;
   fromTemplateId?: number;
+  disableNumberOfOpenPositions?: boolean | null;
 }
 
 export class ReOrder {
