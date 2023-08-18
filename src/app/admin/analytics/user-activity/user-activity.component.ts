@@ -119,15 +119,6 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       resizable: true
     },
     {
-      headerName: 'Screen Name',
-      field: 'screenName',
-      minWidth: 250,
-      filter: true,
-      sortable: true,
-      resizable: true
-    },
-
-    {
       headerName: ' Date',
       field: 'utcDate',
       minWidth: 175,
@@ -165,6 +156,23 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       resizable: true
     },
     {
+      headerName: 'Screen Name',
+      field: 'screenName',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Screen Url',
+      field: 'screenUrl',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+  
+    {
       headerName: 'Browser',
       field: 'client',
       minWidth: 250,
@@ -196,22 +204,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
-    {
-      headerName: 'Screen Name',
-      field: 'screenName',
-      minWidth: 250,
-      filter: true,
-      sortable: true,
-      resizable: true
-    },
-    {
-      headerName: 'Screen Url',
-      field: 'screenUrl',
-      minWidth: 250,
-      filter: true,
-      sortable: true,
-      resizable: true
-    }
+ 
 
 
   ];
@@ -403,7 +396,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       id: 'date',
       dataType: 'DateTime',
       numberFormat: {
-        format: 'mm/dd/yyyy',
+        format: 'mm-dd-yyyy',
       },
     },
    
