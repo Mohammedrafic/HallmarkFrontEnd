@@ -221,7 +221,7 @@ export class DashboardService {
              chartData: lodashMapPlain(
               orderStatusesAvgDetails,
               ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
-                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || statusName,
+                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +statusName +')',
                 value: average,
                 average: count,
                 color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses] ||
