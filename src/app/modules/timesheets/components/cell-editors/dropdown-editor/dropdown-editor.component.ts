@@ -21,6 +21,8 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
   public options: DropdownOption[] = [];
 
   public editable = false;
+  
+  public filterType: string = 'Contains';
 
   public control: AbstractControl;
 
