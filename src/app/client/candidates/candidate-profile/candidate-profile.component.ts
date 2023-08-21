@@ -93,7 +93,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   private isEmployeeTerminated(): boolean {
     const profileStatusControl = this.candidateProfileFormService.candidateForm.get('profileStatus');
     return !!(this.candidateService.employeeId &&
-      (profileStatusControl?.dirty && profileStatusControl?.value === ProfileStatusesEnum.Terminated));
+      (profileStatusControl?.dirty && profileStatusControl?.value === ProfileStatusesEnum.Terminated ||profileStatusControl?.value === ProfileStatusesEnum.FallOffOnboarding));
   }
 
   private profileStatusTerminatedConfirmation(): Observable<void | CandidateModel> {
