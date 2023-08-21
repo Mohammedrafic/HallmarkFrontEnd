@@ -547,8 +547,8 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
       endDate
     }
       = this.VendorActivityReportForm.getRawValue();
-    let startChkDate: string = formatDate(startDate, this.dateFormat, this.culture);
-    let endDateChk: string = formatDate(endDate, this.dateFormat, this.culture);
+    const startChkDate: string = formatDate(startDate, this.dateFormat, this.culture);
+    const  endDateChk: string = formatDate(endDate, this.dateFormat, this.culture);
     if (endDateChk < startChkDate) {
       //this.message = "";
       //let error: any = "Start Date should be Gretaer Than or Equal to Current Date";
