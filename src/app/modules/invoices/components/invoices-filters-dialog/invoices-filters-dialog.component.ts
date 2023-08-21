@@ -96,7 +96,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   public filterType: string = 'Contains';
 
   private regions: OrganizationRegion[] = [];
-
+  public agencyOrganizationIds:Array<number> = [];
   constructor(
     private filterService: FilterService,
     private cdr: ChangeDetectorRef,
@@ -243,13 +243,19 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     )
       .subscribe((filters) => {
         this.applyPreservedFilters(filters?.state || {});
-
+        if(filters?.state?.agencyOrganizationIds != null){
+          this.agencyOrganizationIds = filters?.state?.agencyOrganizationIds;
+          this.formGroup.get('locationIds')?.setValue([]);
+          this.formGroup.get('departmentIds')?.setValue([]);
+          this.formGroup.get('regionIds')?.setValue([]);
+          this.initFormConfig();
+        }
         this.cdr.detectChanges();
       });
   }
 
   private initFormConfig(): void {
-    this.filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency);
+    this.filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency, this.agencyOrganizationIds.length);
     this.cdr.detectChanges();
   }
 

@@ -42,6 +42,7 @@ export class TimesheetsFilterDialogComponent
   @Input() isAgency: boolean;
 
   public showStatuses = true;
+  public filterType: string = 'Contains';
 
   private activeTab$: Subject<void> = new Subject();
 

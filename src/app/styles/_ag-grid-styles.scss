@@ -130,14 +130,15 @@ app-grid {
     column-gap: 20px;
 
     .total-rows {
-      font-size:  14px;
+      font-size: 14px;
     }
   }
 }
 
 .app-grid-dark {
 
-  .ag-header, .ag-root-wrapper {
+  .ag-header,
+  .ag-root-wrapper {
     background-color: $sidebar-background !important;
   }
 
@@ -151,7 +152,9 @@ app-grid {
     color: $black !important;
   }
 
-  .ag-root-wrapper, .ag-row, .ag-header {
+  .ag-root-wrapper,
+  .ag-row,
+  .ag-header {
     border-color: $grid-border-color !important;
   }
 
@@ -176,6 +179,7 @@ app-grid {
   .ag-side-buttons {
     color: $secondary-dark-blue-30 !important;
   }
+
   .ag-checkbox-input-wrapper {
     background-color: $secondary-dark-blue-10-2 !important;
 

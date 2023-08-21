@@ -3,6 +3,7 @@
 body.light {
   --background: #{$background};
   --secondary-background: #{$secondary-dark-blue-50};
+  --bg-default: #{$white};
   --bg-upload-area: #{$primary-active-blue-90};
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
   --bg-empty-grid: #{$secondary-dark-blue-45};
@@ -13,6 +14,7 @@ body.light {
   --color-primary-btn-disabled: #{$white};
 
   --border-drop-area: #{$secondary-dark-blue-40};
+  --grid-row-border: #{$grid-row-border};
   --border-upload-file: #{$white};
   --input-bourder: #{$primary-active-blue-40};
 
@@ -30,6 +32,7 @@ body.light {
 body.dark {
   --background: #{$sidebar-background};
   --secondary-background: #{$secondary-dark-blue-10-2};
+  --bg-default: #{$sidebar-background};
   --bg-upload-area: #{$widget-dark-tooltip};
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
   --bg-empty-grid: #{$sidebar-background};
@@ -40,6 +43,7 @@ body.dark {
   --color-primary-btn-disabled: #{$secondary-dark-blue-30};
 
   --border-drop-area: #{$secondary-dark-blue-50};
+  --grid-row-border: #{$sidebar-background};
   --border-upload-file: #{$secondary-dark-blue-30};
   --input-bourder: #{$primary-active-blue-40};
 

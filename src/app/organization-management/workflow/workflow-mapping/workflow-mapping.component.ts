@@ -25,14 +25,15 @@ import {
   SaveWorkflowMappingSucceed,
 } from '../../store/workflow.actions';
 import { UserState } from '../../../store/user.state';
-import { User } from '@shared/models/user-managment-page.model';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import {
-  RolesByPermission,
+  RoleListsByPermission,
   RoleWithUser,
   StepMapping,
   StepRoleUser,
-  UsersByPermission,
+  UserListsByPermission,
+  UsersWithRolesList,
+  UserWithRole,
   WorkflowMappingPage,
   WorkflowMappingPost,
 } from '@shared/models/workflow-mapping.model';
@@ -47,7 +48,6 @@ import {
 } from '@shared/models/organization.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { isEmpty } from 'lodash';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Query } from "@syncfusion/ej2-data";
@@ -59,9 +59,6 @@ import {
 } from '@organization-management/workflow/workflow-mapping/constants';
 import { WorkflowMappingService } from '@organization-management/workflow/workflow-mapping/services';
 import { SystemFlags } from '@organization-management/workflow/interfaces';
-
-type RoleWithUserModel = { [key: number]: { [workflowType: number]: RoleWithUser[] } };
-type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermission)[] };
 
 @Component({
   selector: 'app-workflow-mapping',
@@ -83,7 +80,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   public workflowMappings$: Observable<WorkflowMappingPage>;
 
   @Select(WorkflowState.rolesPerUsers)
-  private rolesPerUsers$: Observable<RolesByPermission[]>;
+  private rolesPerUsers$: Observable<RoleListsByPermission>;
 
   @Select(UserState.organizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
@@ -95,7 +92,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   private workflows$: Observable<WorkflowWithDetails[]>;
 
   @Select(WorkflowState.users)
-  private users$: Observable<UsersByPermission[]>;
+  private users$: Observable<UserListsByPermission>;
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
@@ -119,7 +116,11 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   public optionFields = { text: 'name', value: 'id' };
   public orderWorkflowSteps: Step[] = [];
   public applicationWorkflowSteps: Step[] = [];
-  public rolesWithUsers: RoleWithUserModel;
+  public usersWithRolesList: UsersWithRolesList = {
+    [WorkflowGroupType.VMSOrderWorkflow]: [],
+    [WorkflowGroupType.IRPOrderWorkflow]: [],
+  };
+  public usersWithRoles: UserWithRole;
   public isEdit = false;
   public workflowMappingFormGroup: FormGroup;
   public editedRecordId?: number;
@@ -185,36 +186,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     this.watchForWorkflowSources();
     this.watchForChangePage();
     this.watchForOrganizationChange();
-
-    combineLatest([this.users$, this.rolesPerUsers$])
-      .pipe(
-        filter(([usersP, rolesP]) => !isEmpty(usersP) && !isEmpty(rolesP)),
-        first(),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe((response) => {
-        const [usersP, rolesP] = response;
-
-        if (usersP && usersP.length > 0) {
-          const workFlowAsKey = usersP
-            .filter(({ users }: UsersByPermission) => users?.length)
-            .reduce(this.mapByWorkflowType, {});
-
-          this.rolesWithUsers = Object.entries(workFlowAsKey).reduce((acc: {}, [key, value]) => {
-            return { ...acc, [key]: this.mapUserPermissions(value, +key) };
-          }, {});
-        }
-
-        if (rolesP && rolesP.length > 0) {
-          const workFlowAsKey = rolesP
-            .filter(({ roles }: RolesByPermission) => roles?.length)
-            .reduce(this.mapByWorkflowType, {});
-
-          this.rolesWithUsers = Object.entries(workFlowAsKey).reduce((acc: {}, [key, value]) => {
-            return { ...acc, [key]: this.mapRolePermissions(value, +key) };
-          }, {});
-        }
-      });
+    this.watchForUsersAndRolesWithPermissions();
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetWorkflowsSucceed)).subscribe((workflows) => {
       this.workflows = workflows.payload;
@@ -399,67 +371,6 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
         ? query.where('name', 'contains', e.text, true).take(char * 15)
         : query;
     e.updateData(this.departments as [], query);
-  };
-
-  mapByWorkflowType(acc: WorkflowAsKeyModel, value: UsersByPermission | RolesByPermission) {
-    if (acc?.[value.workflowType]) {
-      return { ...acc, [value.workflowType]: [...acc[value.workflowType], value] };
-    } else {
-      return {
-        ...acc,
-        [value.workflowType]: [value],
-      };
-    }
-  }
-
-  mapRolePermissions(listOfPermissions: any, key: number): { [key: number]: RoleWithUser[] } {
-    return listOfPermissions.reduce((acc: any, { type, roles }: any) => {
-      if (!isEmpty(this.rolesWithUsers?.[key]?.[type])) {
-        return {
-          ...acc,
-          [type]: [
-            ...this.rolesWithUsers[key][type],
-            ...roles.map(({ id, name }: RoleWithUser) => ({
-              id: id!.toString(),
-              name,
-            })),
-          ],
-        };
-      } else {
-        return {
-          ...acc,
-          [type]: roles.map(({ id, name }: RoleWithUser) => ({
-            id: id!.toString(),
-            name,
-          })),
-        };
-      }
-    }, {});
-  }
-
-  mapUserPermissions(listOfPermissions: any, key: number): { [key: number]: RoleWithUser[] } {
-    return listOfPermissions.reduce((acc: any, { type, users }: any) => {
-      if (!isEmpty(this.rolesWithUsers?.[key]?.[type])) {
-        return {
-          ...acc,
-          [type]: [
-            ...this.rolesWithUsers[key][type],
-            ...users.map(({ id, firstName, lastName }: User) => ({
-              id,
-              name: `${firstName} ${lastName}`,
-            })),
-          ],
-        };
-      } else {
-        return {
-          ...acc,
-          [type]: users.map(({ id, firstName, lastName }: User) => ({
-            id,
-            name: `${firstName} ${lastName}`,
-          })),
-        };
-      }
-    }, {});
   }
 
   ngOnDestroy(): void {
@@ -682,7 +593,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
             (st) => st.id === stepMap.workflowStepId
           );
           // @ts-ignore
-          const foundUserRole = this.rolesWithUsers[workflowType][stepMap.workflowType];
+          const foundUserRole = this.usersWithRoles[workflowType][stepMap.workflowType];
           if (foundStep && foundUserRole) {
             stepDetails.push({ step: foundStep, roleUser: foundUserRole });
           }
@@ -713,7 +624,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       if (foundMatchedSteps.length) {
         foundMatchedSteps.forEach((foundMatchedStep: StepMapping) => {
           if (foundMatchedStep.workflowStepId) {
-            const foundUserRole = this.rolesWithUsers[foundMatchedStep.workflowType!]?.[step.type]?.find(
+            const foundUserRole = this.usersWithRoles[foundMatchedStep.workflowType!]?.[step.type]?.find(
               (r: RoleWithUser) => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString()
             );
             if (foundUserRole) {
@@ -799,6 +710,30 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     this.workflowMappingFormGroup = this.workflowMappingService.createWorkflowMappingForm();
   }
 
+  private watchForUsersAndRolesWithPermissions(): void {
+    combineLatest([this.users$, this.rolesPerUsers$]).pipe(
+      filter(([usersPermission, rolesPermission]) => {
+        return this.workflowMappingService.hasUsersAndRolesWithPermissions(
+          [usersPermission, rolesPermission]
+        );
+      }),
+      first(),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((lists) => {
+      const [usersPermission, rolesPermission] = lists;
+      this.usersWithRolesList = this.workflowMappingService.getUsersBaseOnWorkflow(
+        usersPermission,
+        this.usersWithRolesList,
+      );
+      this.usersWithRolesList = this.workflowMappingService.getRolesBaseOnWorkflow(
+        rolesPermission,
+        this.usersWithRolesList,
+      );
+
+      this.usersWithRoles = this.usersWithRolesList[WorkflowGroupType.VMSOrderWorkflow];
+    });
+  }
+
   private watchForWorkflowSources(): void {
     this.workflows$.pipe(
       filter(Boolean),
@@ -853,6 +788,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       filter(Boolean),
       takeUntil(this.unsubscribe$)
     ).subscribe((value: WorkflowGroupType) => {
+      this.usersWithRoles = this.usersWithRolesList[value];
       this.workflowMappingService.resetControls(
         ['regions', 'locations', 'departments', 'skills', 'workflowName'],
         this.workflowMappingFormGroup

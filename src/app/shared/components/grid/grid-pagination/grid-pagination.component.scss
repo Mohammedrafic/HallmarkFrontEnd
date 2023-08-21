@@ -3,7 +3,7 @@
 
 .app-grid-pagination {
   background-color: #fff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--grid-row-border);
   padding: 5px 0 5px 16px;
   border-bottom-left-radius: var(--grid-border-radius);
   border-bottom-right-radius: var(--grid-border-radius);
@@ -88,6 +88,7 @@
 
     & .approve-button {
       margin-right: 16px;
+      color: $white;
 
       &:disabled {
         color: $white;

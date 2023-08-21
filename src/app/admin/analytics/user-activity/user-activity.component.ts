@@ -2,15 +2,12 @@ import { User_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { GetuserlogReportPage } from '@admin/store/userlog-activity.actions';
 import { useractivityReportState } from '@admin/store/userlog-activity.state';
 import { ColDef, ExcelStyle, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, Inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Actions, Select, Store } from '@ngxs/store';
+import {  Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
-import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { GRID_CONFIG } from '@shared/constants';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
@@ -23,10 +20,10 @@ import { APP_SETTINGS, AppSettings } from 'src/app.settings';
 import { BUSSINES_DATA_FIELDS } from 'src/app/security/roles-and-permissions/roles-and-permissions.constants';
 import { GetAllUsersPage, GetBusinessByUnitType, GetUsersPage } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
-import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { UNIT_FIELDS } from 'src/app/security/user-list/user-list.constants';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
+import { DefaultUseractivityGridColDef, SideBarConfig } from './user-activity.constant';
 
 @Component({
   selector: 'app-user-activity',
@@ -50,7 +47,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   sideBar = SideBarConfig;
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   paginationPageSize: number;
-  defaultColDef: ColDef = DefaultUserGridColDef;
+  defaultColDef: ColDef = DefaultUseractivityGridColDef;
   cacheBlockSize: any;
   itemList: Array<userActivity> = [];
 
@@ -96,11 +93,6 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   }
   isInitialloadCalled = false
   public readonly columnDefs: ColumnDefinitionModel[] = [
-    {
-      field: 'id',
-      hide: true,
-      filter: false,
-    },
 
     {
       headerName: 'Name',
@@ -118,15 +110,6 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
-    {
-      headerName: 'Screen Name',
-      field: 'screenName',
-      minWidth: 250,
-      filter: true,
-      sortable: true,
-      resizable: true
-    },
-
     {
       headerName: ' Date',
       field: 'utcDate',
@@ -165,6 +148,23 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       resizable: true
     },
     {
+      headerName: 'Screen Name',
+      field: 'screenName',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Screen Url',
+      field: 'screenUrl',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+  
+    {
       headerName: 'Browser',
       field: 'client',
       minWidth: 250,
@@ -196,22 +196,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
-    {
-      headerName: 'Screen Name',
-      field: 'screenName',
-      minWidth: 250,
-      filter: true,
-      sortable: true,
-      resizable: true
-    },
-    {
-      headerName: 'Screen Url',
-      field: 'screenUrl',
-      minWidth: 250,
-      filter: true,
-      sortable: true,
-      resizable: true
-    }
+ 
 
 
   ];
@@ -403,7 +388,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       id: 'date',
       dataType: 'DateTime',
       numberFormat: {
-        format: 'mm/dd/yyyy',
+        format: 'mm-dd-yyyy',
       },
     },
    

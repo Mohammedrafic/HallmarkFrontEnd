@@ -69,6 +69,7 @@
             [fields]="filterOptionFields"
             [dataSource]="filterColumns.locationIds?.dataSource"
             [showDropDownIcon]="true"
+            [filterType]="filterType"
             [noRecordsTemplate]="'Please select the Region'"
             formControlName="locationIds"
             placeholder=""></ejs-multiselect>
@@ -86,6 +87,7 @@
             [fields]="filterOptionFields"
             [dataSource]="filterColumns.departmentIds?.dataSource"
             [showDropDownIcon]="true"
+            [filterType]="filterType"
             formControlName="departmentIds"
             [noRecordsTemplate]="'Please select the Region and Location'"
             placeholder=""></ejs-multiselect>

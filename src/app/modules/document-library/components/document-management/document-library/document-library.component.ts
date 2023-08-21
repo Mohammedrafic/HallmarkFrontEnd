@@ -1330,6 +1330,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       let unShareDocumentsFilter: UnShareDocumentsFilter = { documentIds: [data.id] };
       this.store.dispatch(new UnShareDocuments(unShareDocumentsFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
         this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
+        this.store.dispatch(new GetDocuments(this.getDocumentFilter(this.filterSelectedBusinesUnitId)));
       });
     }
   }

@@ -2,6 +2,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { Step } from '@shared/models/workflow.model';
 import { User } from '@shared/models/user-managment-page.model';
 import { WorkflowType } from '@shared/enums/workflow-type';
+import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 
 export interface WorkflowMappingGet {
   mappingId: number;
@@ -57,10 +58,47 @@ export class WorkflowByDepartmentAndSkill {
   workflowGroupName: string;
 }
 
+export interface RoleListsByPermission {
+  irpRoles: RolesByPermission[]
+  vmsRoles: RolesByPermission[]
+}
+
 export interface RolesByPermission {
   type: number;
   roles: RoleWithUser[];
   workflowType: WorkflowType;
+}
+
+export interface RolesByType {
+  [WorkflowGroupType.IRPOrderWorkflow]: RolesByPermission[],
+  [WorkflowGroupType.VMSOrderWorkflow]: RolesByPermission[]
+}
+
+export interface UsersByType {
+  [WorkflowGroupType.IRPOrderWorkflow]: UsersByPermission[],
+  [WorkflowGroupType.VMSOrderWorkflow]: UsersByPermission[]
+}
+
+export interface UserWithRole {
+  [key: number]: { [workflowType: number]: RoleWithUser[] };
+}
+
+export interface MappedUserRolePermissions {
+  [key: number]: RoleWithUser[]
+}
+
+export interface WorkflowAsKey {
+  [key: number]: (UsersByPermission | RolesByPermission)[];
+}
+
+export interface UsersWithRolesList {
+  [WorkflowGroupType.VMSOrderWorkflow]: UserWithRole;
+  [WorkflowGroupType.IRPOrderWorkflow]: UserWithRole;
+}
+
+export interface UserListsByPermission {
+  vmsUsers: UsersByPermission[],
+  irpUsers: UsersByPermission[]
 }
 
 export interface UsersByPermission {
