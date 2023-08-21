@@ -3,5 +3,6 @@ import { FilteredDataByOrganizationId } from "./group-by-organization-filter-dat
 
 export interface DashboartFilterDto {
   organizationFilter : FilteredDataByOrganizationId[];
-  skillIds?: Skill[]
+  skillIds?: Skill[],
+  type?:string
 }

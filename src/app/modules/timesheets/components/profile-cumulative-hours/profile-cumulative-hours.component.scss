@@ -98,7 +98,7 @@
 
           &.name {
             font-size: 12px;
-            color: $title-black;
+            color: var(--secondary-title);
             font-weight: 400;
             padding-left: 10px;
             padding-right: 25px;
@@ -108,7 +108,7 @@
           &.cumulative-hours-value {
             font-weight: 700;
             font-size: 12px;
-            color: $title-black;
+            color: var(--secondary-title);
           }
 
           &.week-hours-value {
@@ -135,6 +135,13 @@
   justify-content: center;
   align-items: center;
   min-width: 100px;
+}
+
+.annotation-value {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--secondary-title);
 }
 
 @media (max-width: $tablet-max) {
