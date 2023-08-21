@@ -13,7 +13,7 @@ import { Organization, OrganizationLocation, OrganizationRegion, OrganizationStr
 import { FilterService } from '@shared/services/filter.service';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { delay, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetDirtyState } from 'src/app/admin/store/admin.actions';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -274,6 +274,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
         if (this.selectedSystem.isVMS && this.selectedSystem.isIRP)
           this.holidayItems = data.items
         this.holidayItems = [...this.holidayItems];
+        this.grid.refresh()
         this.cd.detectChanges();
       });
     this.filterColumns = {
@@ -299,11 +300,13 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       this.yearsList.push(prevYear + i);
     }
     this.filterColumns.years.dataSource = this.yearsList;
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$),delay(100)).subscribe((id) => {
       this.currentPage = 1;
-      this.clearFilters();
-      this.store.dispatch([new GetAllMasterHolidays(), new GetHolidayDataSources()]);
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+      this.store.dispatch(new GetOrganizationStructure()).pipe(takeUntil(this.unsubscribe$)).subscribe(()=>{
+        this.clearFilters();
+        this.store.dispatch([new GetAllMasterHolidays(), new GetHolidayDataSources()]);
+        this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+      })
     });
     this.masterHolidays$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((holidays: Holiday[]) => {
       this.masterHolidays = sortByField(holidays, 'holidayName');
@@ -712,6 +715,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
         isIRP: !!organization.preferences.isIRPEnabled,
         isVMS: !!organization.preferences.isVMCEnabled,
       };
+      this.grid.refresh()
     });
   }
 }
