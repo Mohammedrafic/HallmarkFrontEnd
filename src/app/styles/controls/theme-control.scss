@@ -7,10 +7,14 @@ body.light {
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
   --bg-empty-grid: #{$secondary-dark-blue-45};
   --bg-grid: #{$white};
+  --bg-button: #{$white};
 
-  --bg-primary-button: #{$primary-active-blue-70};
+  --bg-primary-btn-disabled: #{$primary-active-blue-70};
+  --color-primary-btn-disabled: #{$white};
 
   --border-drop-area: #{$secondary-dark-blue-40};
+  --border-upload-file: #{$white};
+  --input-bourder: #{$primary-active-blue-40};
 
   --text: #{$black};
   --secondary-text: {$black};
@@ -30,10 +34,14 @@ body.dark {
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
   --bg-empty-grid: #{$sidebar-background};
   --bg-grid: #{$sidebar-background};
+  --bg-button: #{$sidebar-background};
 
-  --bg-primary-button: #{$grid-detail-row-bgcolor};
+  --bg-primary-btn-disabled: #{$secondary-dark-blue-10-2};
+  --color-primary-btn-disabled: #{$secondary-dark-blue-30};
 
   --border-drop-area: #{$secondary-dark-blue-50};
+  --border-upload-file: #{$secondary-dark-blue-30};
+  --input-bourder: #{$primary-active-blue-40};
 
   --text: #{$white};
   --secondary-text: #{$secondary-dark-blue-30};

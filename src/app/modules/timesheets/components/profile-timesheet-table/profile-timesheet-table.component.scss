@@ -78,7 +78,12 @@
     .custom-wrap {
       .ag-header-cell-text {
         white-space: pre-wrap;
+        color: var(--sub-title-2) !important;
       }
+    }
+
+    .amount-input {
+      width: 190px !important;
     }
 
     .ag-center-cols-clipper,
