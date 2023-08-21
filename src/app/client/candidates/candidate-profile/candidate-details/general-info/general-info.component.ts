@@ -147,7 +147,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
           [ProfileStatusesEnum.ClearedForOrientation]: () => this.handleSourceStatus(),
           [ProfileStatusesEnum.OrientationScheduled]: () => this.handleSourceStatus(),
           [ProfileStatusesEnum.DoNotHire]: () => this.handleSourceStatus(),
-          [ProfileStatusesEnum.FallOffOnboarding]: () => this.handleSourceStatus(),
+          [ProfileStatusesEnum.FallOffOnboarding]: () => this.handleTerminatedProfileStatus(),
         };
 
         handlers[profileStatus]();
