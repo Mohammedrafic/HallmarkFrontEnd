@@ -1,4 +1,4 @@
-@import '../../styles/variables/colors';
+@import 'colors';
 
 ejs-timepicker.e-timepicker.ng-invalid.ng-touched {
   .e-clear-icon {
@@ -51,7 +51,7 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
   .e-input-group.e-control-wrapper.e-datetime-wrapper,
   .e-input-group.e-control-wrapper.e-date-range-wrapper {
     border-radius: 8px !important;
-    border: 1px solid $secondary-dark-blue-40 !important;
+    border: 1px solid $input-border-color !important;
     height: 40px;
     align-items: center;
 
