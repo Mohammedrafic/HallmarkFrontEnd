@@ -3,13 +3,13 @@
 ::ng-deep {
   .custom-tooltip.e-tooltip-wrap.e-popup.e-popup-open {
     left: 0 !important;
-    top: 45px !important;
-    background-color: #fff !important;
-    border-color: #fff !important;
+    top: 50px !important;
+    background-color: var(--bg-grid) !important;
+    border: none !important;
     opacity: 1;
 
     h2 {
-      color: $title-black;
+      color: var(--secondary-title);
       margin-top: 0;
       font-weight: 700;
       font-size: 16px;
@@ -17,6 +17,7 @@
 
     .e-tip-content {
       box-shadow: rgb(0 0 0 / 30%) 0 24px 50px;
+      border: 1px solid var(--border-upload-file);
       border-radius: 10px;
       padding: 0;
     }
@@ -26,5 +27,6 @@
     display: flex;
     flex-direction: column;
     padding: 25px 24px;
+    background-color: var(--bg-grid);
   }
 }
