@@ -65,15 +65,15 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
     }
   }
 
-  public getRowData(tab: AgencyInvoicesGridTab, organizationId: number | null): Observable<void> {
+  public getRowData(tab: AgencyInvoicesGridTab, organizationId: number | null, agencyOrganizationIds: number[] | null): Observable<void> {
     let action;
 
     switch (tab) {
       case AgencyInvoicesGridTab.Manual:
-        action = new Invoices.GetManualInvoices(organizationId);
+        action = new Invoices.GetManualInvoices(organizationId,agencyOrganizationIds);
         break;
       case AgencyInvoicesGridTab.All:
-        action = new Invoices.GetPendingApproval({ organizationId });
+        action = new Invoices.GetPendingApproval({ organizationId,agencyOrganizationIds });
         break;
     }
 
