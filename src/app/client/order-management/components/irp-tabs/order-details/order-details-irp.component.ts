@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { combineLatest, filter, map, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
+import { combineLatest, filter, map, Observable, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -128,6 +128,12 @@ import {
 
   GetOrganizationSettings,
 } from '@organization-management/store/organization-management.actions';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
+enum SubmitButtonItem {
+  SaveForLater = '0',
+  Save = '1',
+  SaveAsTemplate = '2',
+}
 @Component({
   selector: 'app-order-details-irp',
   templateUrl: './order-details-irp.component.html',
@@ -143,6 +149,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.setConfigDataSources();
     }
   }
+  public saveEvents: Subject<void | MenuEventArgs> = new Subject<void | MenuEventArgs>();
   public userPermission: Permission = {};
   public readonly userPermissions = UserPermissions;
   public orderTypeForm: FormGroup;
@@ -158,6 +165,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public readonly orderTypesDataSource: OrderTypes[] = OrderTypeList;
   public readonly FieldTypes = FieldType;
   public readonly priceUtils = PriceUtils;
+  public order: Order | null;
   public readonly dateFormat = DateFormat;
   public readonly dateMask = DateMask;
   public readonly timeMask = TimeMask;
@@ -359,6 +367,20 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionPOForm();
       this.jobDescriptionForm = this.orderDetailsService.createJobDescriptionPOForm();
     }
+  }
+
+  public onSplitButtonSelect(args: MenuEventArgs): void {
+    switch (args.item.id) {
+      case SubmitButtonItem.Save:
+        break;
+      case SubmitButtonItem.SaveForLater:
+        break;
+      case SubmitButtonItem.SaveAsTemplate:
+        break;
+    }
+  }
+  public selectTypeSave(saveType: MenuEventArgs): void {
+    this.saveEvents.next(saveType);
   }
 
   private watchForOrderTypeControl(): void {

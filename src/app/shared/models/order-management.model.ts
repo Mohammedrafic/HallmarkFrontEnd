@@ -64,6 +64,7 @@ export class OrderManagement {
   irpCandidatesCount?: number;
   activeCandidatesCount?: number;
   isLockedIRP: boolean;
+  isIRP?: boolean;
   menuItems?: ItemModel[]; // use only in UI for context menu datasource
 }
 
@@ -103,6 +104,7 @@ export interface IRPOrderManagement {
   isMoreMenuWithDeleteButton?: boolean;
   children: OrderManagementChild[];
   isLockedIRP: boolean;
+  isTemplate?: boolean;
 }
 
 export interface GetOrdersJourney{

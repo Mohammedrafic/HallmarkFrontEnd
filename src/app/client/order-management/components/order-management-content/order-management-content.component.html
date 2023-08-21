@@ -724,7 +724,7 @@
 ></app-export-dialog>
 
 <app-filter-dialog
-  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates && activeSystem != OrderManagementIRPSystemId.OrderJourney"
+  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates && activeSystem != OrderManagementIRPSystemId.OrderJourney && activeIRPtabs != OrganizationIRPTabs.OrderTemplates"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   [targetElement]="targetElement"
@@ -1400,7 +1400,7 @@
   </form>
 </app-filter-dialog>
 <app-filter-dialog
-  *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates"
+  *ngIf="(activeTab == OrganizationOrderManagementTabs.OrderTemplates) || (activeIRPtabs == OrganizationIRPTabs.OrderTemplates)"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   (deleteFilter)="onFilterDelete($event)"

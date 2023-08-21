@@ -88,8 +88,12 @@ export class OrderManagementContentService {
    * Get the orders
    @param payload filter with details we need to get
    */
-  public getOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
-    return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
+   public getOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
+      return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
+  }
+
+  public getIRPTemplates(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
+      return this.http.post<OrderManagementPage>(`/api/IRPOrders/filtered`, payload);
   }
 
     /**

@@ -210,6 +210,7 @@ export class SaveIrpOrder {
     public inActivedatestr?:string,
     public isLocation? :boolean | undefined,
     public isLocationAndDepartment? :boolean | undefined,
+    public isTemplate? : boolean | undefined
   ) {}
 }
 

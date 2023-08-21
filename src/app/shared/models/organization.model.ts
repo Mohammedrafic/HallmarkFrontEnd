@@ -149,7 +149,13 @@ export class OrganizationLocation {
   reactivateDate?: string;
 }
 
+export class templateLocation {
+  locationname?: string;
+}
 
+export class templateDepartment {
+  departmentname?: string;
+}
 
 export class OrganizationLocationInactivate {
   inActiveDate?: string;
