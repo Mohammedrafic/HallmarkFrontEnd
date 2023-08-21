@@ -11,7 +11,9 @@ button.e-control.e-btn {
   &.e-primary,
   &.e-primary:active,
   &.e-primary:hover {
-    color: $white !important;
+    &:not(.default-icon-button) {
+      color: $white !important;
+    }
   }
 
   &.e-primary:hover {
