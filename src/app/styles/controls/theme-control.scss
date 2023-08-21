@@ -3,12 +3,14 @@
 body.light {
   --background: #{$background};
   --secondary-background: #{$secondary-dark-blue-50};
+  --bg-default: #{$white};
   --bg-upload-area: #{$primary-active-blue-90};
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
 
   --bg-primary-button: #{$primary-active-blue-70};
 
   --border-drop-area: #{$secondary-dark-blue-40};
+  --grid-row-border: #{$grid-row-border};
 
   --text: #{$black};
   --description: #{$pure-black};
@@ -22,12 +24,14 @@ body.light {
 body.dark {
   --background: #{$sidebar-background};
   --secondary-background: #{$secondary-dark-blue-10-2};
+  --bg-default: #{$sidebar-background};
   --bg-upload-area: #{$widget-dark-tooltip};
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
 
   --bg-primary-button: #{$grid-detail-row-bgcolor};
 
   --border-drop-area: #{$secondary-dark-blue-50};
+  --grid-row-border: #{$sidebar-background};
 
   --text: #{$white};
   --description: #{$white};
