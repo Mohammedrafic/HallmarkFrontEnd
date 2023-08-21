@@ -84,6 +84,16 @@ app-grid {
     padding-bottom: 10px;
   }
 
+  .ag-cell-focus,
+  .ag-cell-no-focus {
+    border-color: transparent !important;
+  }
+
+  .no-border.ag-cell:focus {
+    border-color: transparent !important;
+    outline-color: transparent !important;
+  }
+
   .ag-row {
     background-color: inherit;
   }
@@ -168,6 +178,33 @@ app-grid {
   }
   .ag-checkbox-input-wrapper {
     background-color: $secondary-dark-blue-10-2 !important;
+
+    &::after {
+      color: $secondary-dark-blue-40 !important;
+    }
+
+    &.ag-checked::after {
+      background-color: $white !important;
+    }
+  }
+
+  .ag-checkbox {
+
+    &:has(.ag-checked) {
+      .ag-checkbox-input-wrapper {
+        background-color: $secondary-dark-blue-40 !important;
+
+        &::after {
+          color: $primary-active-blue-10 !important;
+          box-shadow: 0px 0px 0px 2px $secondary-dark-blue-45;
+          border-radius: 1px;
+          font-size: 12px;
+          line-height: 12px;
+          left: 2px;
+          top: 2px;
+        }
+      }
+    }
   }
 
   .ag-icon-tree-open,
