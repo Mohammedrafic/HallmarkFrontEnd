@@ -12,8 +12,15 @@
     </ng-container>
 
     <ng-container right>
-      <div *ngIf="isAgency" class="bootstrap">
-        <div class="input-container">
+      <div *ngIf="isAgency" class="bootstrap agency-multiSelect">
+          <div class="input-container">
+            <ejs-multiselect  id="regionIds" mode="CheckBox" [formControl]="organizationMultiSelectControl"
+              placeholder="All" [fields]="unitOrganizationsFields" [allowFiltering]="true" [showDropDownIcon]="true"
+              [dataSource]="organizations$ | async" [selectAllText]='allOption'
+              [showSelectAll]="true" tabindex="2">
+            </ejs-multiselect>
+        </div>
+        <div class="input-container agency-dropDown" [class.hidden]="true">
          <!-- --> <ejs-dropdownlist *ngIf="organizations$ | async as organizations"
                             placeholder="Select organization"
                             [allowFiltering]="true"
@@ -22,14 +29,6 @@
                             [formControl]="organizationControl">
           </ejs-dropdownlist>
         </div>
-        <div class="input-container">
-           <ejs-multiselect  id="regionIds" mode="CheckBox" [formControl]="organizationMultiSelectControl"
-              placeholder="All" [fields]="unitOrganizationsFields" [allowFiltering]="true" [showDropDownIcon]="true"
-              [dataSource]="organizations$ | async" [selectAllText]='allOption'
-              [showSelectAll]="true" tabindex="2">
-            </ejs-multiselect>
-        </div>
-
       </div>
       <div class="buttons-group" [class.top-margin]="!isAgency">
         <div class="buttons-container">

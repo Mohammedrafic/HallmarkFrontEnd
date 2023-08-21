@@ -58,6 +58,7 @@ export const AgencyManualInvoicePendingExportCols : ExportColumn[] = [
   {text:'Review Status',column:'reviewStatus'},
   {text:' Approved Date',column:' approvedDate'},
   {text:'agencyName',column:'agencyName'},
+  {text:'Organization Name',column:'organizationName'},
 
 ];
 
@@ -103,6 +104,7 @@ export const AgencyInvoiceExportCols : ExportColumn[] = [
   { text:'LocationID', column: 'LocationID' },
   { text:'Comment', column: 'Comment' },
   { text:'Fee', column: 'Fee' },
+  {text:'Organization Name',column:'organizationName'},
 ];
 
 export const GetTabLists = (isAgency: boolean): InvoicesTabItem[] => {
