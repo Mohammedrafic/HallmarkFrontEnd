@@ -2,6 +2,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
 import {
   AcceptJobDTO,
+  AuditLogPayload,
   CreateOrderDto,
   EditOrderDto,
   OnboardCandidateEmail,
@@ -449,4 +450,44 @@ export class sendOnboardCandidateEmailMessageSucceed {
 export class GetOrderComments {
   static readonly type = '[agency order management] Get Order Comments';
   constructor(public commentContainerId: number) {}
+}
+
+export class GetOrderAuditHistory {
+  static readonly type = '[order management] Get Order AuditHistory Details';
+  constructor(public payload: AuditLogPayload) {}
+}
+
+export class GetOrderCredentialAuditHistory {
+  static readonly type = '[order management] Get Order Credential AuditHistory Details';
+  constructor(public payload: AuditLogPayload) {}
+}
+
+export class GetOrderBillRatesAuditHistory {
+  static readonly type = '[order management] Get Order Bill Rates AuditHistory Details';
+  constructor(public payload: AuditLogPayload) {}
+}
+
+export class GetOrderContactAuditHistory {
+  static readonly type = '[order management] Get Order Contact AuditHistory Details';
+  constructor(public payload: AuditLogPayload) {}
+}
+
+export class GetOrderWorkLocationAuditHistory {
+  static readonly type = '[order management] Get Order Work Location AuditHistory Details';
+  constructor(public payload: AuditLogPayload) {}
+}
+
+export class GetOrderJobDistributionAuditHistory {
+  static readonly type = '[order management] Get Order Job Distribution AuditHistory Details';
+  constructor(public payload: AuditLogPayload) {}
+}
+
+export class GetOrderClassificationAuditHistory {
+  static readonly type = '[order management] Get Order Classification AuditHistory Details';
+  constructor(public payload: AuditLogPayload) {}
+}
+
+export class GetOrderHistoryDetailSucceeded {
+  static readonly type = '[order management] Get Order Order History Detail Succeeded';
+  constructor() {}
 }
