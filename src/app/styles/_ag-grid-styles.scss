@@ -86,12 +86,12 @@ app-grid {
 
   .ag-cell-focus,
   .ag-cell-no-focus {
-    border: none !important;
+    border-color: transparent !important;
   }
 
   .no-border.ag-cell:focus {
-    border: none !important;
-    outline: none;
+    border-color: transparent !important;
+    outline-color: transparent !important;
   }
 
   .ag-row {
@@ -197,11 +197,15 @@ app-grid {
     &:has(.ag-checked) {
       .ag-checkbox-input-wrapper {
         background-color: $secondary-dark-blue-40 !important;
-        border-radius: 2px !important;
 
         &::after {
           color: $primary-active-blue-10 !important;
-          border-radius: 2px !important;
+          box-shadow: 0px 0px 0px 2px $secondary-dark-blue-45;
+          border-radius: 1px;
+          font-size: 12px;
+          line-height: 12px;
+          left: 2px;
+          top: 2px;
         }
       }
     }
