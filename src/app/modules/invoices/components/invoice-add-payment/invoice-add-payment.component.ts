@@ -5,9 +5,9 @@ import { GridApi, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Store } from '@ngxs/store';
 import { debounceTime, filter, of, switchMap, take, takeUntil } from 'rxjs';
 
-import { FieldType } from '@core/enums';
+import { FieldType, UserPermissions } from '@core/enums';
 import { DateTimeHelper, DestroyDialog } from '@core/helpers';
-import { CustomFormGroup } from '@core/interface';
+import { CustomFormGroup, Permission } from '@core/interface';
 import { PaymentsAdapter } from '../../helpers/payments.adapter';
 import { InvoicePaymentData } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -20,6 +20,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { PaymentDialogTitle } from '../../enums';
+import { UserState } from '../../../../store/user.state';
 
 
 @Component({
@@ -64,6 +65,10 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
   private organizationId: number;
 
   private initialAmount: number;
+  public isAgency: boolean;
+
+  public userPermission: Permission = {};
+  public readonly userPermissions = UserPermissions;
 
   constructor(
     private paymentService: InvoiceAddPaymentService,
@@ -73,6 +78,8 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
     private cd: ChangeDetectorRef,
   ) {
     super();
+    this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
+
     this.checkForm = this.paymentService.createCheckForm();
     this.organizationId = (this.store.snapshot().invoices as InvoicesModel).selectedOrganizationId;
     this.tableContext = {
@@ -89,6 +96,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
     if (this.checkNumber) {
       this.checkForm.patchValue({ checkNumber: this.checkNumber });
     }
+    this.getuserPermission();
   }
 
   savePayment(): void {
@@ -275,6 +283,13 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       this.closeDialog();
+    });
+  }
+  private getuserPermission(): void {
+    this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length), take(1)
+    ).subscribe((permissions: Permission) => {
+      this.userPermission = permissions;
     });
   }
 }
