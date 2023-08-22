@@ -1,5 +1,5 @@
-@import "../../../styles/variables/colors.scss";
-@import "../../../styles/variables/mixins.scss";
+@import 'colors';
+@import 'mixins';
 @import 'adaptive-response';
 
 :host {
@@ -9,6 +9,16 @@
     ejs-tab {
       .e-content.e-lib.e-touch {
         height: 100% !important;
+      }
+    }
+
+    .controls-container {
+      flex-direction: row;
+      justify-content: space-between;
+
+      .right-content {
+        width: 50%;
+        justify-content: flex-end;
       }
     }
   }
@@ -27,13 +37,6 @@
 
   .tooltip-icon {
     padding: 4px 15px 0 5px;
-  }
-}
-
-@media #{$max-tablet} {
-  .restriction-message {
-    margin: 21px 0 0 0;
-    max-width: 100%;
   }
 }
 
@@ -87,4 +90,29 @@
 
 .back-button {
   margin-right: 28px;
+}
+
+@media #{$max-desktop-small} {
+  .candidate-profile {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .candidate-profile-container {
+    flex-direction: column;
+
+    .left,
+    .right {
+      width: 100%;
+      padding-bottom: 24px;
+      padding-right: 0px;
+    }
+  }
+}
+
+@media #{$max-tablet} {
+  .restriction-message {
+    margin: 21px 0 0 0;
+    max-width: 100%;
+  }
 }

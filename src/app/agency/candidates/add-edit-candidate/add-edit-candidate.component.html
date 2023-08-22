@@ -41,7 +41,11 @@
           <div class="left">
             <div class="e-card">
               <div class="e-card-content">
-                <form [formGroup]="candidateForm" id="candidateProfile">
+                <form
+                  id="candidateProfile"
+                  class="candidate-profile"
+                  [formGroup]="candidateForm"
+                >
                   <app-candidate-general-info [formGroup]="$any(candidateForm.get('generalInfo'))" [isCandidateCreated]="!readonlyMode && (isCandidateCreated$ | async)"
                    [selectedSkills]="fetchedCandidate?.candidateProfileSkills" [maskSSNPattern]="maskSSNPattern" [maskedSSN]="maskedSSN" (changedSSN)="updatedSSNValue($event)"></app-candidate-general-info>
                   <app-candidate-contact-details [formGroup]="$any(candidateForm.get('contactDetails'))"  [customMaskChar]="customMaskChar"></app-candidate-contact-details>
