@@ -11,9 +11,7 @@ button.e-control.e-btn {
   &.e-primary,
   &.e-primary:active,
   &.e-primary:hover {
-    &:not(.default-icon-button) {
-      color: $white !important;
-    }
+    color: $white !important;
   }
 
   &.e-primary:hover {
@@ -112,6 +110,15 @@ button.e-control.e-btn {
   &.e-primary:disabled {
     background-color: var(--bg-primary-btn-disabled) !important;
     color: var(--color-primary-btn-disabled);
+  }
+
+  &.e-primary.default-icon-button {
+    color: $primary-active-blue-10 !important;
+
+    &:disabled {
+      background-color: transparent !important;
+      color: $secondary-dark-blue-30 !important;
+    }
   }
 }
 

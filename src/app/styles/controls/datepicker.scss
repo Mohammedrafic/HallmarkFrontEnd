@@ -51,7 +51,7 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
   .e-input-group.e-control-wrapper.e-datetime-wrapper,
   .e-input-group.e-control-wrapper.e-date-range-wrapper {
     border-radius: 8px !important;
-    border: 1px solid $input-border-color !important;
+    border: 1px solid var(--input-border-color) !important;
     height: 40px;
     align-items: center;
 
@@ -60,7 +60,7 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
     }
 
     .e-input {
-      color: $black !important;
+      color: $secondary-dark-blue-30 !important;
       padding-left: 16px !important;
     }
 
@@ -164,6 +164,15 @@ body.dark {
       &.e-disabled {
         background-color: $secondary-dark-blue-20 !important;
       }
+    }
+  }
+}
+
+body.dark .e-datepicker.e-popup-wrapper.e-lib.e-popup.e-control.e-popup-open {
+  .e-day {
+    &:hover {
+      background-color: $primary-active-blue-80 !important;
+      color: $black;
     }
   }
 }
