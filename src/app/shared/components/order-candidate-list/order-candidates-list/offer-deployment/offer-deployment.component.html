@@ -15,7 +15,7 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isReadOnly && !isClosedPosition">
+        <div class="input-group dropdown bootstrap" *ngIf="!isReadOnly && !isClosedPosition">
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
                             [formControl]="statusesFormControl"
