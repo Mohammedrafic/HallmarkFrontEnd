@@ -104,13 +104,20 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
       filterQuery.organizationId = this.organizationId;
       filterQuery.agencyOrganizationIds = this.agencyOrganizationIds;
     }
+    let allTabIds:any = [];
+    if(this.isAgency && this.selectedTabIndex === AgencyInvoicesGridTab.All){
+      this.selectedRows.rowNodes.forEach(ele=>{        
+        allTabIds.push([ele.data.invoiceId,ele.data.organizationId]);
+      })
+      filterQuery.ids = allTabIds;
+    }
 
     this.getDefaultFileName();
     this.store.dispatch(new Invoices.ExportInvoices(new ExportPayload(
       fileType,
       filterQuery,
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      ids,
+      this.isAgency && this.selectedTabIndex === AgencyInvoicesGridTab.All ? allTabIds : ids,
       options?.fileName || this.defaultFileName,
     ), this.isAgency,this.selectedTabIndex)); 
 

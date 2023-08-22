@@ -93,6 +93,7 @@ import {
   OrderManagementChild,
   ApplicantStatus as ApplicantStatusModel,
   MergedOrder,
+  OrderManagement,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
@@ -140,6 +141,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
   @Input() orderComments: Comment[] = [];
   @Output() saveEmitter = new EventEmitter<void>();
+  @Output() updateOrderData = new EventEmitter<{ order: OrderManagement, candidate: OrderManagementChild }>();
 
   // TODO: Delete it when we will have re-open sidebar
   @Output() private reOpenPositionSuccess: EventEmitter<OrderManagementChild> =
@@ -286,6 +288,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     private changeDetectorRef: ChangeDetectorRef,
     private childOrderDialogService: ChildOrderDialogService,
     private settingService: SettingsViewService,
+    private cd: ChangeDetectorRef,
   ) {
     super(store);
   }
@@ -318,6 +321,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   ngOnChanges(changes: SimpleChanges): void {
     const candidate = changes['candidate']?.currentValue;
+
     if (candidate) {
       this.isClosedOrder = this.isClosedOrderPosition;
       this.setCloseOrderButtonState();
@@ -387,6 +391,32 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.saveExtensionChanges().pipe(takeWhile(() => this.isAlive)).subscribe(() => this.closeSideDialog());
     } else {
       this.closeSideDialog();
+    }
+  }
+
+  public updateDetails(): void {
+    if (this.isOrganization) {
+      this.reOpenPositionSuccess.emit(this.candidate);
+    } else {
+      const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Applied, ApplicantStatus.Shortlisted];
+      const allowedAcceptStatuses = [
+        ApplicantStatus.Offered,
+        ApplicantStatus.Accepted,
+        ApplicantStatus.Rejected,
+        ApplicantStatus.OnBoarded,
+        ApplicantStatus.Cancelled,
+        ApplicantStatus.Offboard,
+      ];
+
+      if (allowedApplyStatuses.includes(this.candidate.candidateStatus)) {
+        this.store.dispatch(
+          new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId)
+        );
+        this.selectedTemplate = Template.apply;
+      } else if (allowedAcceptStatuses.includes(this.candidate.candidateStatus)) {
+        this.store.dispatch(new GetCandidateJob(this.order.organizationId, this.candidate.jobId));
+        this.selectedTemplate = Template.accept;
+      }
     }
   }
 
@@ -709,6 +739,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
         }
+        this.cd.detectChanges();
       });
     }
     if (this.isAgency) {

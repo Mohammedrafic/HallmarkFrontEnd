@@ -96,6 +96,7 @@ export const AgencyInvoiceExportCols : ExportColumn[] = [
   { text:'Job ID', column: 'jobId' },
   { text:'Candidate Name', column: 'candidateName' },
   { text:'Agency', column: 'agency' },
+  { text:'Organization Name',column:'organizationName'},
   { text:'Skill', column: 'skill' },
   { text:'Hours / Miles', column: 'hoursMiles' },
   { text:'Bill Rate', column: 'billRate' },
@@ -104,7 +105,6 @@ export const AgencyInvoiceExportCols : ExportColumn[] = [
   { text:'LocationID', column: 'LocationID' },
   { text:'Comment', column: 'Comment' },
   { text:'Fee', column: 'Fee' },
-  {text:'Organization Name',column:'organizationName'},
 ];
 
 export const GetTabLists = (isAgency: boolean): InvoicesTabItem[] => {

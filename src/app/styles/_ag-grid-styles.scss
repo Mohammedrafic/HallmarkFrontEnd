@@ -24,6 +24,13 @@
       cursor: pointer;
     }
 
+    &.no-link-name {
+      font-weight: 700;
+      display: inline-flex;
+      color: $black;
+      cursor: pointer;
+    }
+
     &.approve-cell {
       padding: 0 !important;
       border: none !important;

@@ -13,7 +13,7 @@ export class AddEditOrganizationService {
   createPreferencesForm(organization?: Organization): FormGroup {
     return this.fb.group({
       id: new FormControl(organization?.preferences.id || 0),
-      weekStartsOn: new FormControl(isNaN(organization?.preferences.weekStartsOn as number) 
+      weekStartsOn: new FormControl(isNaN(organization?.preferences.weekStartsOn as number)
       ? '' : organization?.preferences.weekStartsOn , [Validators.required]),
       paymentOptions: new FormControl(organization?.preferences.paymentOptions.toString() || '0', [
         Validators.required,

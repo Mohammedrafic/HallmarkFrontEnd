@@ -1,7 +1,7 @@
 <section class="flex-column">
   <section class="toolbar">
     <section>
-      <h3>Holidays</h3>
+      <h3 class="title-settings">Holidays</h3>
     </section>
     <section [class.hidden]="!isLoaded">
       <button
@@ -201,8 +201,8 @@
         id="addEditHolidaysForm"
         [formGroup]="HolidayFormGroup">
 
-  
-        
+
+
     <ng-container *ngIf="title === 'Assign'">
 
       <div class="input-container" *ngIf="selectedSystem.isIRP && selectedSystem.isVMS">

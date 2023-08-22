@@ -13,7 +13,7 @@ import {
   SetPageNumber,
   SetPageSize,
 } from '@shared/components/candidate-details/store/candidate.actions';
-import { CandidateDetailsPage } from '@shared/components/candidate-details/models/candidate.model';
+import { CandidateDetailsPage, FiltersModal } from '@shared/components/candidate-details/models/candidate.model';
 import { ColDef } from '@ag-grid-community/core';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
 import { ShowExportDialog } from 'src/app/store/app.actions';
@@ -32,7 +32,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
   @Input() public candidatesPage: CandidateDetailsPage;
   @Input() public pageNumber: number;
   @Input() public override pageSize: number;
-  @Input() public filters: any | null;
+  @Input() public filters: FiltersModal |  null;
   @Input() public activeTab: CandidateDetailsFilterTab;
   @ViewChild('grid') grid: GridComponent;
 
@@ -74,6 +74,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
     if(!this.filters){
       this.filters ={}
     }
+    this.filters!.orderBy = this.orderBy;
     this.columnsToExport = this.isAgency ? CandidateAgencyExportColumns : CandidateOrgExportColumns;
     let tab= this.activeTab;
     this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab] + ' '+ this.generateDateTime(this.datePipe);
@@ -115,4 +116,9 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
         this.fileName = this.defaultFileName;
       });
   }
+
+  public sortByColumn(order: string): void {
+  this.orderBy =order
+    }
+  
 }

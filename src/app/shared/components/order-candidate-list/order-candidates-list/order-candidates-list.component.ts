@@ -105,7 +105,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   private readonly permissions = UserPermissions;
 
   get isShowDropdown(): boolean {
-    return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
+    return [ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
   }
 
   get canEditClosedBillRates(): boolean {

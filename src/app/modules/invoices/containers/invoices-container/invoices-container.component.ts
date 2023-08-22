@@ -777,7 +777,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
           this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
         }
-        if(this.organizationMultiSelectControl.value.length > 1){
+        if(this.organizationMultiSelectControl?.value?.length > 1){
           delete filterState.state?.locationIds;
           delete filterState.state?.regionIds;
           delete filterState.state?.departmentIds;

@@ -16,6 +16,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import {
   OrderManagementIRPSystemId,
   OrderManagementIRPTabs,
+  OrderManagementIRPTabsIndex,
   OrganizationOrderManagementTabs,
 } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
@@ -348,9 +349,9 @@ export class DuplicateOrderSuccess {
 export class SelectNavigationTab {
   static readonly type = '[order management] Select Navigation Tab';
   constructor(
-    public pending: OrganizationOrderManagementTabs | null,
-    public active?: OrganizationOrderManagementTabs | null,
-    public current?: OrganizationOrderManagementTabs
+    public pending: OrganizationOrderManagementTabs | OrderManagementIRPTabs | null,
+    public active?: OrganizationOrderManagementTabs | OrderManagementIRPTabs | null,
+    public current?: OrganizationOrderManagementTabs | OrderManagementIRPTabs,
   ) {}
 }
 
