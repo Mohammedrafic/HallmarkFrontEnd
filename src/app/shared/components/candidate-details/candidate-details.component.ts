@@ -739,7 +739,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           applicantStatuses: state?.applicantStatuses || [],
           locationIds: (state?.locationIds && [...state.locationIds]) || [],
           departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
-          candidateNames: state.candidateNames,
+          candidateNames: state?.candidateNames,
+          orderId:state?.orderId
         };
 
         dispatchPatch = true;
@@ -779,6 +780,10 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           ...this.filters,
           departmentIds: filterValues?.departmentIds,
         };
+        this.filters = {
+          ...this.filters,
+          orderId: filterValues?.orderId,
+        };
         dispatchPatch = true;
         if (dispatchPatch) {
           this.patchFormValue();
@@ -798,6 +803,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
           candidateNames: state.candidateNames,
           agencyIds: (state?.agencyIds && [...state.agencyIds]) || [],
+          orderId: (state?.orderId ),
         };
 
         dispatchPatch = true;
