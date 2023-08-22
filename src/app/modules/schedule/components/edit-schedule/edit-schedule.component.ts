@@ -862,11 +862,18 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private setScheduleTypes(): void {
+    const candidates = [{
+      ...this.scheduledItem.candidate,
+      dates: [
+        formatDate(this.scheduledItem.schedule.date, 'yyyy-MM-dd','en-US', 'UTC'),
+      ],
+     }];
+
     this.scheduleTypes = this.createScheduleService.getScheduleTypesWithPermissions(
       this.scheduleTypes,
       this.userPermission,
       this.needToDisableBooking(),
-      [this.scheduledItem.candidate]
+      candidates,
     );
     this.scheduleItemType = this.createScheduleService.getFirstAllowedScheduleType(this.scheduleTypes);
   }

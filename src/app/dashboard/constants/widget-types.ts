@@ -9,9 +9,6 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   8: WidgetTypeEnum.IN_PROGRESS_POSITIONS,
   9: WidgetTypeEnum.FILLED_POSITIONS,
   10: WidgetTypeEnum.FILLED_POSITIONS_TREND,
-  11: WidgetTypeEnum.INVOICES,
-  12: WidgetTypeEnum.CHAT,
-  13: WidgetTypeEnum.TASKS,
   14: WidgetTypeEnum.APPLICANTS_BY_POSITIONS,
   15: WidgetTypeEnum.OPEN_POSITIONS_TREND,
   16: WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND,
@@ -25,4 +22,6 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   24: WidgetTypeEnum.AVAILABLE_EMPLOYEE,
   25: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS,
   26: WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS,
+  28: WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE,
+  27: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM,
 };

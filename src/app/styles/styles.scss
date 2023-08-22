@@ -357,6 +357,7 @@ body {
 
     .container-row,
     .comments-container.background,
+    .file-container,
     .credentials,
     .credentials .e-accordion, .credentials .e-acrdn-item,
     .contacts,
@@ -480,6 +481,7 @@ hr {
 @import './controls/menu.scss';
 @import './controls/open-positions';
 @import 'text';
+@import 'controls/theme-control';
 
 a, a:hover, a:focus, a:active {
   text-decoration: none;
@@ -715,4 +717,8 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
   {
     display: none;
   }
+}
+.userActivity .ag-body-viewport {
+  max-height: calc( 100vh - 263px)!important;
+  overflow: auto;
 }

@@ -47,7 +47,6 @@ import {
   ClearOrderCandidatePage,
   ClearOrganisationCandidateJob,
   GetAvailableSteps,
-  GetCandidateCancellationReason,
   GetOrganisationCandidateJob,
   GetOrganizationExtensions,
   ReloadOrganisationOrderCandidatesLists,
@@ -93,8 +92,6 @@ import {
   OrderFilter,
   OrderManagementChild,
   ApplicantStatus as ApplicantStatusModel,
-  CandidateCancellationReason,
-  CandidateCancellationReasonFilter,
   MergedOrder,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
@@ -176,8 +173,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Select(OrderManagementState.deployedCandidateOrderInfo)
   public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
 
-  @Select(OrderManagementContentState.getCandidateCancellationReasons)
-  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
 
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -207,7 +202,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public isClosedOrder = false;
   public selectedApplicantStatus: ApplicantStatusModel | null = null;
   public isCandidatePayRateVisible: boolean;
-  public candidateCancellationReasons: CandidateCancellationReason[] | null;
 
   public readonly nextApplicantStatuses = [
     {
@@ -714,7 +708,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
-          this.subscribeCandidateCancellationReasons();
         }
       });
     }
@@ -725,7 +718,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
-          this.subscribeCandidateCancellationReasons();
         }
       });
     }
@@ -849,7 +841,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private getDeployedCandidateOrders(): void {
-    if (!!this.candidate.deployedCandidateInfo) {
+    if (this.candidate.deployedCandidateInfo) {
       const candidateId = this.candidate.candidateId;
       const organizationId = this.candidate.organizationId || this.candidate.deployedCandidateInfo.organizationId;
       const orderId = this.candidate.orderId;
@@ -910,9 +902,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     const value = this.acceptForm.getRawValue();
 
     const candidateJob: AcceptJobDTO = {
-      orderId: this.candidateJob?.orderId!,
-      organizationId: this.candidateJob?.organizationId!,
-      jobId: this.candidateJob?.jobId!,
+      orderId: this.candidateJob?.orderId as number,
+      organizationId: this.candidateJob?.organizationId as number,
+      jobId: this.candidateJob?.jobId as number,
       candidateBillRate: value.candidateBillRate,
       candidatePayRate: value.candidatePayRate,
       offeredBillRate: value.offeredBillRate,
@@ -936,23 +928,5 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
     return rates.some((rate) => !!rate.isUpdated);
-  }
-
-
-  private subscribeCandidateCancellationReasons() {
-    if (this.candidateJob) {
-      const payload: CandidateCancellationReasonFilter = {
-        locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId,
-      };
-      this.store.dispatch(new GetCandidateCancellationReason(payload));
-      this.candidateCancellationReasons$
-        .pipe(
-          takeUntil(this.componentDestroy())
-        ).subscribe((value) => {
-          this.candidateCancellationReasons =value;
-        });
-
-    }
   }
 }

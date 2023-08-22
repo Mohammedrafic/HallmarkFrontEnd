@@ -751,6 +751,7 @@ export class TimesheetsState {
           ctx.dispatch([
             new TimesheetDetails.AddTimesheetRecordSucceed(),
             new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency),
+            new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency),
           ]);
         }),
         catchError((err: HttpErrorResponse) => {

@@ -586,6 +586,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         seventhDayOtEnabled,
         weeklyOtEnabled,
         dailyOtEnabled,
+        holidayCalculationEnabled,
       } = billRate;
       return {
         id: id || 0,
@@ -600,6 +601,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         seventhDayOtEnabled,
         weeklyOtEnabled,
         dailyOtEnabled,
+        holidayCalculationEnabled,
       };
     });
 
@@ -647,6 +649,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     };
 
     if (this.orderDetailsFormComponent.order?.isTemplate) {
+      const selectedOrder = this.store.selectSnapshot(OrderManagementContentState.selectedOrder);
+      order.fromTemplateId = selectedOrder?.id;
       order.contactDetails = order.contactDetails.map((contact) => ({ ...contact, id: 0 }));
       order.jobDistributions = order.jobDistributions.map((job) => ({ ...job, orderId: 0, id: 0 }));
       order.workLocations = order.workLocations.map((workLocation) => ({ ...workLocation, id: 0 }));

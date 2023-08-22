@@ -29,17 +29,19 @@ export class CredentialSetupPost {
 
 export class CredentialSetupMappingPost {
   credentionSetupMappingId?: number;
-  regionIds?: number[];
-  locationIds?: number[];
-  departmentIds?: number[];
+  regionIds?: number[] | number;
+  locationIds?: number[] | number;
+  departmentIds?: number[] | number;
   skillGroupIds?: number[];
   credentials: CredentialSetupDetails[];
+  credentialType?: number[];
   forceUpsert?: boolean;
 }
 
 export class CredentialSetupDetails {
   masterCredentialId: number;
   optional?: boolean;
+  isActive?: boolean;
   reqSubmission?: boolean;
   reqOnboard?: boolean;
   inactiveDate?: string;
@@ -83,6 +85,8 @@ export class CredentialSetupFilterGet {
   skillGroups?: CredentialSkillGroup[];
   includeInIRP?: boolean;
   includeInVMS?: boolean;
+  credentialType?: number[];
+  credentials?: CredentialSetupGet[];
 }
 
 export type CredentialSetupPage = PageOfCollections<CredentialSetupFilterGet>;

@@ -10,21 +10,20 @@ import { AgencyPositionModel } from './agency-position.model';
 import { RnUtilizationModel } from './rnutilization.model';
 import { ExpiryDetailsModel } from './expiry.model';
 import { AvailableEmployeeModel } from './available-employee.model';
+import { PositionsCountByDayRangeDataset } from './active-positions-dto.model';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
   [WidgetTypeEnum.APPLICANTS_BY_POSITIONS]: CandidatesByStateWidgetAggregatedDataModel;
   [WidgetTypeEnum.CANDIDATES]: ChartAccumulation;
   [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]: ChartAccumulation;
+  [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM]: ChartAccumulation;
   [WidgetTypeEnum.POSITIONS_BY_TYPES]: PositionsByTypeAggregatedModel;
   [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: CandidatesPositionDataModel;
   [WidgetTypeEnum.OPEN_POSITIONS]: CandidatesPositionDataModel;
   [WidgetTypeEnum.FILLED_POSITIONS]: CandidatesPositionDataModel;
   [WidgetTypeEnum.ACTIVE_POSITIONS]: ChartAccumulation;
-  [WidgetTypeEnum.TASKS]: string;
   [WidgetTypeEnum.FILLED_POSITIONS_TREND]: PositionTrend;
-  [WidgetTypeEnum.CHAT]: string;
-  [WidgetTypeEnum.INVOICES]: string;
   [WidgetTypeEnum.OPEN_POSITIONS_TREND]: PositionTrend;
   [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: PositionTrend;
   [WidgetTypeEnum.LTA_ORDER_ENDING]: CandidatesPositionDataModel;
@@ -36,4 +35,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.UPCOMING_EXP_CREDS] : ExpiryDetailsModel[];
   [WidgetTypeEnum.AVAILABLE_EMPLOYEE] : AvailableEmployeeModel[];
   [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: ChartAccumulation;
+  [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE] : PositionsCountByDayRangeDataset;
 }

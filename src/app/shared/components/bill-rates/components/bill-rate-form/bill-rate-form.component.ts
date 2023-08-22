@@ -18,7 +18,7 @@ import {
 import PriceUtils from '@shared/utils/price.utils';
 import { OtBillRatesConfiguration } from '@shared/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { DateTimeHelper } from '@core/helpers';
+import { DateTimeHelper, distinctByKey } from '@core/helpers';
 import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 
 @Component({
@@ -34,7 +34,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   @Input() set billRatesData (rates: BillRate[]) {
     if (rates) {
       this.jobBillRates = rates;
-      this.jobBillRatesOptions = rates.map((rate) => rate.billRateConfig);
+      this.jobBillRatesOptions = distinctByKey(rates.map((rate) => rate.billRateConfig), 'id');
     }
   }
 
@@ -71,6 +71,10 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
 
   get billRateConfigControl(): AbstractControl | null {
     return this.billRateForm.get('billRateConfig');
+  }
+
+  get isOnCallSelected(): boolean {
+    return this.billRateForm.get('billRateConfigId')?.value !== BillRateTitleId.Oncall;
   }
 
   get isInternalsEnabled(): boolean {
@@ -165,11 +169,12 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
       const idx = DateTimeHelper.findPreviousNearestDateIndex(billRatesDates, date);
 
       if (idx !== null && billRates[idx]) {
-        const { seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled } = billRates[idx];
+        const { seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled, holidayCalculationEnabled } = billRates[idx];
 
         this.billRateForm?.get('seventhDayOtEnabled')?.setValue(seventhDayOtEnabled);
         this.billRateForm?.get('weeklyOtEnabled')?.setValue(weeklyOtEnabled);
         this.billRateForm?.get('dailyOtEnabled')?.setValue(dailyOtEnabled);
+        this.billRateForm?.get('holidayCalculationEnabled')?.setValue(holidayCalculationEnabled);
       }
     } else {
       BillRateFormComponent.calculateOTSFlags = true;
@@ -301,6 +306,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
       seventhDayOtEnabled: new FormControl(false),
       weeklyOtEnabled: new FormControl(false),
       dailyOtEnabled: new FormControl(false),
+      holidayCalculationEnabled: new FormControl(false),
       billRateConfig: new FormGroup({
         id: new FormControl(),
         category: new FormControl(),

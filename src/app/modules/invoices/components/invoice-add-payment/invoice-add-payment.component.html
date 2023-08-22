@@ -13,10 +13,10 @@
       <div class="dialog-header">
         <h3 class="title">{{dialogTitle}} Payment</h3>
         <div class="controls">
-          <button ejs-button cssClass="e-outline button-cancel" (click)="closePaymentDialog()">Cancel</button>
-          <button (click)="savePayment()" ejs-button [isPrimary]="true">Save</button>
+          <button ejs-button cssClass="e-outline button-cancel" (click)="closePaymentDialog()">Cancel</button> 
+            <button (click)="savePayment()" ejs-button [isPrimary]="true" *ngIf="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] && !isAgency)|| (userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)">Save</button>     
+          </div>
         </div>
-      </div>
 
       <div class="form-container">
         <form [formGroup]="checkForm" autocomplete="off" class="bootstrap grid">
@@ -120,6 +120,9 @@
             [gridTitle]="'Invoices'"
             (gridReadyEmitter)="setGridApi($event)"
           ></app-grid>
+          <div class="total-row-counter">
+            Total Rows: {{ tableData?.length ?? 0 }}
+          </div>
         </div>
       </div>
     </div>

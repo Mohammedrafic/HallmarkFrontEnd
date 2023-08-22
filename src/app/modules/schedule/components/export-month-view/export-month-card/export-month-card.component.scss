@@ -1,0 +1,104 @@
+@import "colors";
+
+::ng-deep {
+  & .schedule-custom-tooltip-container {
+    margin: 0 !important;
+    font-family: 'Open Sans', 'sans-serif';
+    font-size: 11px;
+    line-height: 16px;
+  }
+}
+
+:host {
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  & * {
+    box-sizing: border-box;
+  }
+}
+
+.card-wrapper {
+  width: 100%;
+  border-radius: 4px;
+
+  &.third-event {
+    border-bottom: 4px solid;
+    border-radius: 4px;
+  }
+
+  .title {
+    .title__text {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      text-align: left;
+      text-transform: uppercase;
+    }
+  }
+
+
+  .time {
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
+    position: relative;
+    display: flex;
+    &__attributes {
+      position: absolute;
+      margin-left: 2px;
+    }
+
+    &__text {
+      font-weight: 700;
+    }
+  }
+
+  .additional-attributes {
+    line-height: 18px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  ejs-tooltip {
+    margin-top: auto;
+  }
+}
+
+.inactive-date {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.big-card {
+  width: 100%;
+  border-radius: 4px;
+  padding: 8px;
+  background: inherit;
+  border: 1px solid $secondary-dark-blue-50;
+  color: $black;
+
+  .day {
+    padding: unset;
+    border-bottom: 1px solid gainsboro;
+  }
+}
+
+.day{
+  border-bottom: 1px solid gainsboro;
+}
+
+.small-card {
+  border-radius: 4px;
+  background: inherit;
+  border: 1px solid $secondary-dark-blue-50;
+  color: $black;
+  padding: 2px 8px;
+}
+
+.day {
+  font-weight: 400;
+  font-size: 12px;
+  padding: 8px 12px 2px;
+}

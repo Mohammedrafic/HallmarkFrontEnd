@@ -1,4 +1,4 @@
-@import "../variables/colors.scss";
+@import 'colors.scss';
 
 button.e-control.e-btn {
   text-transform: initial;
@@ -6,6 +6,19 @@ button.e-control.e-btn {
   padding: 8px 15px;
   box-shadow: none !important;
   height: 40px;
+
+
+  &.e-primary,
+  &.e-primary:active,
+  &.e-primary:hover {
+    &:not(.default-icon-button) {
+      color: $white !important;
+    }
+  }
+
+  &.e-primary:hover {
+     background-color: $primary-active-blue-20;
+  }
 
   &.e-primary:active:not([disabled]) {
     background-color: $primary-active-blue;
@@ -97,8 +110,8 @@ button.e-control.e-btn {
   }
 
   &.e-primary:disabled {
-    background-color: $primary-active-blue-70;
-    color: $white;
+    background-color: var(--bg-primary-btn-disabled) !important;
+    color: var(--color-primary-btn-disabled);
   }
 }
 
@@ -124,8 +137,25 @@ button.e-control.e-btn.e-dropdown-btn {
 .dark {
   .e-control.e-btn.e-outline {
     color: $primary-active-blue-10 !important;
+    border-color: $primary-active-blue-40;
+    background-color: $sidebar-background;
+
+    &:hover {
+      background-color: $primary-active-blue-70;
+    }
+
+    &:active {
+      border-color: $primary-active-blue !important;
+      background-color: $sidebar-background;
+      color: $primary-active-blue !important;
+    }
+
+    &:disabled {
+      background-color: $secondary-dark-blue-15;
+      color: $secondary-dark-blue-30 !important;
     }
   }
+}
 
 .light {
   .e-control.e-btn.e-outline {
@@ -183,6 +213,7 @@ button.e-control.e-btn.e-dropdown-btn {
   .primary-icon-button {
     padding: 10px;
     border: none;
+
     &.e-ripple {
       overflow: initial;
       position: initial;

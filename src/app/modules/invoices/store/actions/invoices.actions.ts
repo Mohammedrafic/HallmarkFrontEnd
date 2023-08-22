@@ -14,7 +14,8 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.GET_MANUAL_INVOICES;
 
     constructor(
-      public readonly organizationId: number | null
+      public readonly organizationId: number | null,
+      public readonly agencyOrganizationIds?: number[] | null
     ) {
     }
   }

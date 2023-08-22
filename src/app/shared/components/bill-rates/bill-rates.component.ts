@@ -13,7 +13,7 @@ import {
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 import { AbstractPermission } from '@shared/helpers/permissions';
-import { BillRate, BillRateOption, BillRateUnit } from '@shared/models/bill-rate.model';
+import { BillRate, BillRateCalculationType, BillRateOption, BillRateUnit } from '@shared/models/bill-rate.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -25,13 +25,13 @@ import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 @Component({
   selector: 'app-bill-rates',
   templateUrl: './bill-rates.component.html',
-  styleUrls: ['./bill-rates.component.scss'],
 })
 export class BillRatesComponent extends AbstractPermission implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.predefinedBillRatesOptions)
   billRatesOptions$: Observable<BillRateOption[]>;
 
   @Input() isActive: boolean | null = false;
+  @Input() isLocal = false;
   @Input() readOnlyMode = false;
   @Input() isOrderPage = false;
   @Input() isExtension = false;
@@ -99,6 +99,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       seventhDayOtEnabled: false,
       weeklyOtEnabled: false,
       dailyOtEnabled: false,
+      holidayCalculationEnabled: false,
       isUpdated: true,
     });
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
@@ -137,6 +138,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
         seventhDayOtEnabled: value.seventhDayOtEnabled,
         weeklyOtEnabled: value.weeklyOtEnabled,
         dailyOtEnabled: value.dailyOtEnabled,
+        holidayCalculationEnabled: value.holidayCalculationEnabled,
         isUpdated: true,
       }
     );
@@ -208,7 +210,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
 
     if (this.billRateForm.valid) {
       const value: BillRate = this.billRateForm.getRawValue();
-      this.syncBillRateHourlyRate(value);
+      this.syncBillRateHourlyRate(value, this.isLocal);
 
       value.id = value.id ? value.id : 0;
 
@@ -271,12 +273,11 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     }
   }
 
-  public syncBillRateHourlyRate(billRate: BillRate): void {
-    if (billRate.billRateConfig.id !== 1) {
-      return;
+  public syncBillRateHourlyRate(billRate: BillRate, isLocal = false): void {
+    const billRateType = isLocal ? BillRateCalculationType.RegularLocal : BillRateCalculationType.Regular;
+    if (billRate.billRateConfig.id === billRateType) {
+      this.hourlyRateSync.emit({ value: billRate.rateHour.toString(), billRate });
     }
-
-    this.hourlyRateSync.emit({ value: billRate.rateHour.toString(), billRate });
   }
 
   private fromValueToBillRate(value: BillRate): FormGroup {

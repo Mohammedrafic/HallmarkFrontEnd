@@ -1,4 +1,5 @@
 import { FormGroup } from '@angular/forms';
+
 import {
   CredentialSetupDetails, CredentialSetupFilterDto, CredentialSetupFilterGet,
   CredentialSetupGet,
@@ -51,8 +52,8 @@ export class CredentialSetupAdapter {
     };
 
     return Object.keys(preparedFormValue).reduce((acc: CredentialSetupFilterDto, el: string) => {
-      if (formValue[el] !== null && formValue[el] !== undefined) {
-        acc[el as keyof CredentialSetupFilterDto] = formValue[el];
+      if (preparedFormValue[el] !== null && preparedFormValue[el] !== undefined) {
+        acc[el as keyof CredentialSetupFilterDto] = preparedFormValue[el];
       }
 
       return acc;

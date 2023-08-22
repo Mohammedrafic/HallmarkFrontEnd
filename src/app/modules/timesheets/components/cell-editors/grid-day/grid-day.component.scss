@@ -9,14 +9,14 @@
 .cell-value {
   font-size: 14px;
   font-weight: 400;
-  color: $black;
+  color: var(--text);
   display: inline-block;
   line-height: 20px;
 
   &.main {
     font-size: 12px;
     font-weight: 700;
-    color: $secondary-dark-blue-20;
+    color: var(--sub-title-2);
     line-height: 16px;
   }
 }

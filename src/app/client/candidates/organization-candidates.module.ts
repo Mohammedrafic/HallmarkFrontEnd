@@ -16,6 +16,7 @@ import { ScrollRestorationService } from '@core/services/scroll-restoration.serv
 import {
   ReplacementOrderConfirmationModule,
 } from '@shared/components/replacement-order-confirmation/replacement-order-confirmation.module';
+import { EmployeeImportService } from './services/employee-import.service';
 
 @NgModule({
   declarations: [CandidateProfileComponent, AddEditCandidateComponent],
@@ -32,6 +33,6 @@ import {
     CredentialsModule,
     ReplacementOrderConfirmationModule,
   ],
-  providers: [CandidatesService, ScrollRestorationService],
+  providers: [CandidatesService, ScrollRestorationService,EmployeeImportService],
 })
 export class OrganizationCandidatesModule {}

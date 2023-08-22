@@ -892,6 +892,7 @@
       uploaderTitle="Documents"
       [disabled]="!settings[SettingsKeys.AllowDocumentUpload]?.value"
       [documents]="order?.documents"
+      [maxFileAmount]="5"
       (selectDocuments)="onDocumentsSelected($event)"
       (deleteDocument)="onDocumentDeleted($event)"
     >

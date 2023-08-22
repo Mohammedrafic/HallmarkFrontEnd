@@ -10,6 +10,19 @@
           Scheduling
         </div>
         <div>
+
+          <button
+          ejs-button
+          appHideBeforeSyncfusionLoad
+          id="importButton"
+          cssClass="e-outline button-export"
+          (click)="exportTable()"
+          target="_blank"
+        >
+          <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
+        </button>
+
+        
           <app-tooltip-container [showToolTip]="!hasViewPermission">
             <button
               *ngIf="!isEmployee"
@@ -39,11 +52,13 @@
           [hasSchedulePermission]="hasSchedulePermission"
           [initScheduleData]="scheduleData"
           [selectedFilters]="scheduleFilters"
+          (activeTimePeriod)="activePeriod($event)"
           (changeFilter)="changeFilters($event)"
           (loadMoreData)="loadMoreData($event)"
           (selectedCells)="setSelectedCells($event)"
           (editCell)="editScheduledItem($event)"
           (selectCandidate)="selectCandidate($event)"
+          (dateRange)="datesRanges($event)"
         ></app-schedule-grid>
     </div>
   </div>

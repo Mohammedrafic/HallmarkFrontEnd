@@ -71,6 +71,7 @@ export class ManualInvoicesGridHelper {
       weekPeriod,
       statusText,
       orderId,
+      unitName,
     } = InvoicesContainerGridHelper.getColDefsMap(true);
     return [
       {
@@ -137,6 +138,7 @@ export class ManualInvoicesGridHelper {
         ...commonColumn,
       },
       amountColDef,
+      unitName,
     ];
   }
 

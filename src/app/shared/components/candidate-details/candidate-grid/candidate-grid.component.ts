@@ -2,25 +2,30 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { CandidateStatus } from '@shared/enums/status';
 import { Actions, Store, ofActionDispatched } from '@ngxs/store';
-import { CandidateAgencyExportColumns, CandidateOrgExportColumns, CandidatesColumnsDefinition } from '@shared/components/candidate-details/candidate-grid/candidate-grid.constant';
+import {
+  CandidateAgencyExportColumns,
+  CandidateOrgExportColumns,
+  CandidatesColumnsDefinition,
+} from '@shared/components/candidate-details/candidate-grid/candidate-grid.constant';
 import { Router } from '@angular/router';
-import { ExportCandidateAssignment, SetPageNumber, SetPageSize } from '@shared/components/candidate-details/store/candidate.actions';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { CandidateDetailsPage, FiltersModal } from '@shared/components/candidate-details/models/candidate.model';
-import { ColDef, RowNode } from '@ag-grid-community/core';
+import {
+  ExportCandidateAssignment,
+  SetPageNumber,
+  SetPageSize,
+} from '@shared/components/candidate-details/store/candidate.actions';
+import { CandidateDetailsPage } from '@shared/components/candidate-details/models/candidate.model';
+import { ColDef } from '@ag-grid-community/core';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
 import { ShowExportDialog } from 'src/app/store/app.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { Subject, filter, takeUntil } from 'rxjs';
 import { DatePipe } from '@angular/common';
-import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { CandidateDetailsFilterTab } from '@shared/enums/candidate-assignment.enum';
 
 @Component({
   selector: 'app-candidate-grid',
   templateUrl: './candidate-grid.component.html',
-  styleUrls: ['./candidate-grid.component.scss'],
 })
 export class CandidateGridComponent extends AbstractPermissionGrid implements OnInit {
   @Input() public CandidateStatus: number;

@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Order } from '@shared/models/order-management.model';
+import { Order, RegularRatesData } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { Select, Store } from '@ngxs/store';
 import { AppState } from '../../../store/app.state';
@@ -11,6 +11,7 @@ import { Observable } from 'rxjs';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { getAgencyNameList } from '@shared/components/general-reorder-info/general-reoder-info.helper';
+import { BillRate } from '@shared/models';
 
 @Component({
   selector: 'app-general-reorder-info',
@@ -18,7 +19,10 @@ import { getAgencyNameList } from '@shared/components/general-reorder-info/gener
   styleUrls: ['../general-order-info/general-order-info.component.scss'],
 })
 export class GeneralReorderInfoComponent extends DestroyableDirective implements OnChanges {
-  @Input() public orderInformation: Order;
+  @Input() public set order(order: Order) {
+    this.orderInformation = order;
+    this.setRegularRates(order.billRates);
+  }
 
   @Input() system: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
 
@@ -29,6 +33,11 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
   public agencies: { name: string; tooltip: string };
   public orderPerDiemId: number;
   public readonly systemType = OrderManagementIRPSystemId;
+  public regularRates: RegularRatesData = {
+    regular: null,
+    regularLocal: null,
+  };
+  public orderInformation: Order;
 
   constructor(
     private store: Store,
@@ -60,5 +69,9 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
       this.orderManagementService.orderPerDiemId$
       .next({id: this.orderInformation.reOrderFrom?.publicId!, prefix: this.orderInformation.organizationPrefix!});
     }
+  }
+
+  private setRegularRates(rates: BillRate[]): void {
+    this.regularRates = this.orderManagementService.setRegularRates(rates);
   }
 }

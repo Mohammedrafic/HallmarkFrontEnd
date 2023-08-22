@@ -5,9 +5,12 @@ import {
   ScheduleDateItem,
   ScheduleDateSlot,
   ScheduleDay,
+  ScheduleExport,
+  ScheduleExportPage,
   ScheduleItem,
   ScheduleModel,
   ScheduleModelPage,
+  Schedules
 } from '../../interface';
 
 @Injectable()
@@ -17,6 +20,14 @@ export class ScheduleGridService {
       .filter((item: ScheduleModel) => !!item.schedule.length)
       .map((item: ScheduleModel) => {
         return item.schedule.map((scheduleItem: ScheduleDateItem) => scheduleItem.date);
+      }).flat();
+  }
+
+  public getSlotsWithDateforExport(scheduleData:ScheduleExport[]): string[] {
+    return scheduleData
+      .filter((item: ScheduleExport) => item.employeeSchedules !== null ? (!!item.employeeSchedules?.schedules?.length) : '')
+      .map((item: ScheduleExport) => {
+        return item.employeeSchedules?.schedules?.map((scheduleItem: Schedules) => scheduleItem.date);
       }).flat();
   }
 
@@ -78,6 +89,21 @@ export class ScheduleGridService {
 
   public getFirstSelectedDate(selectedCandidatesSlot: Map<number, ScheduleDateSlot>): string {
     return `${this.getSelectedListDates(selectedCandidatesSlot)[0]}T00:00:00+00:00`;
+  }
+
+  public clearDaysForSchedule(scheduleData: ScheduleModelPage): ScheduleModelPage {
+    return {
+    ...scheduleData,
+      items: scheduleData?.items.map((item: ScheduleModel) => {
+      return {
+        ...item,
+        candidate: {
+          ...item.candidate,
+          days: [],
+        },
+      };
+    }),
+    };
   }
 
   private updateScheduleDays(days: ScheduleDay[], createdDays: ScheduleDay[]): ScheduleDay[] {

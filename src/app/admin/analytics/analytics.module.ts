@@ -1,3 +1,4 @@
+import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { ScheduleApiService } from 'src/app/modules/schedule/services/schedule-api.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -70,7 +71,14 @@ import { StaffAvailabilityComponent } from './staff-availability/staff-availabil
 import { PositionSummaryComponent } from './Position-Summary/Position-Summary.component';
 import { AgencySpendComponent } from './agency-spend/agency-spend.component';
 import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.component';
+import { UserActivityComponent } from './user-activity/user-activity.component';
+import { useractivityReportState } from '@admin/store/userlog-activity.state';
+import { AgGridModule } from '@ag-grid-community/angular';
+
+import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential-expiry-irp.component';
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
+import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
+import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
 
 @NgModule({
   declarations: [
@@ -127,7 +135,10 @@ import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/fin
     PositionSummaryComponent,
     AgencySpendComponent,
     ShiftBreakdownComponent,
-    FinancialTimeSheetBetaComponent  ],
+    UserActivityComponent,
+    CredentialExpiryIrpComponent,
+    FinancialTimeSheetBetaComponent,
+    DepartmentSpendAndHoursComponent],
   exports: [
     CandidateListComponent
   ],
@@ -147,7 +158,10 @@ import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/fin
     RadioButtonModule,
     LogiReportModule,
     ProgressBarAllModule,
-    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState])
+    TextBoxModule,
+    SwitchModule,
+    AgGridModule,
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState,useractivityReportState]),
   ],
   providers:[
     ScheduleApiService,

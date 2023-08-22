@@ -12,6 +12,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 import { Select, Store } from '@ngxs/store';
 import {
   ClearLogiReportState,
+  GetCommonReportFilterOptions,
   GetStaffScheduleReportFilterOptions,
 } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
@@ -39,6 +40,7 @@ import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { analyticsConstants } from '../constants/analytics.constant';
 import {
   CommonReportFilter,
+  CommonReportFilterOptions,
   StaffScheduleReportFilterOptions,
 } from '../models/common-report.model';
 import { YEARANDMONTH_Validation } from '@shared/constants/messages';
@@ -115,7 +117,7 @@ export class ShiftBreakdownComponent implements OnInit {
   public organizationFields = ORGANIZATION_DATA_FIELDS;
   public candidateFilterData: { [key: number]: ScheduleCandidate }[] = [];
   candidateSearchData: ScheduleCandidate[] = [];
-  public filterOptionData: StaffScheduleReportFilterOptions;
+  public filterOptionData: CommonReportFilterOptions;
 
   private unsubscribe$: Subject<void> = new Subject();
   private agencyOrganizationId: number;
@@ -124,6 +126,9 @@ export class ShiftBreakdownComponent implements OnInit {
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
+
+  @Select(LogiReportState.commonReportFilterData)
+  public CommonReportFilterData$: Observable<CommonReportFilterOptions>;
 
   get startMonthControl(): AbstractControl { 
     return this.shiftBreakdownForm.get('startMonth') as AbstractControl; 
@@ -383,9 +388,8 @@ export class ShiftBreakdownComponent implements OnInit {
     const filterObj: CommonReportFilter = {
       businessUnitIds: businessIdData,
     };
-    this.store.dispatch(new GetStaffScheduleReportFilterOptions(filterObj))
-      .pipe(filter((data) => data !== null), takeWhile(() => this.isAlive))                    
-      .subscribe((data: StaffScheduleReportFilterOptions) => {        
+    this.store.dispatch(new GetCommonReportFilterOptions(filterObj));
+    this.CommonReportFilterData$.pipe(filter((data) => data !== null), takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions) => {
         this.isAlive = false;
         this.filterOptionData = data;
         this.filterColumns.skillIds.dataSource = [];
@@ -395,8 +399,8 @@ export class ShiftBreakdownComponent implements OnInit {
         if (this.isInitialLoad) {
           this.searchReport();          
           this.isInitialLoad = false;
-        }        
-      });          
+        } 
+    });
   }
 
   public showToastMessage(regionsLength: number, locationsLength: number, departmentsLength: number) {

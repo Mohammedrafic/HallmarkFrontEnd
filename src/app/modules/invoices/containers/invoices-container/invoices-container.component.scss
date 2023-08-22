@@ -59,6 +59,16 @@
   }
 }
 
+.invoices-page-toolbar {
+  .pay-button,
+  .main-button,
+  .dropdown-button {
+    &:disabled {
+      background-color: var(--bg-primary-button);
+    }
+  }
+}
+
 .tab-navigation {
   &.e-badge {
     margin-left: 0.3rem;
@@ -104,7 +114,7 @@
 
     top: 45px;
     right: 0;
-    background-color: #fff;
+    background-color: var(--bg-default);
     border-radius: 8px;
     box-shadow: 0 3px 28px rgba(0, 0, 0, 0.04);
     overflow: hidden;
@@ -133,7 +143,7 @@
         font-size: 16px;
         line-height: 22px;
         letter-spacing: 0.015em;
-        color: $black;
+        color: var(--text);
       }
     }
   }
@@ -179,6 +189,14 @@
 
 .relative {
   position: relative;
+}
+
+.agency-multiSelect{
+  width: 20%;
+}
+
+.agency-dropDown{
+  position: absolute;
 }
 
 .tooltip {

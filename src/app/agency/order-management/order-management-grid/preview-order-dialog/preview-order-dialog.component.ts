@@ -46,7 +46,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
   @Input() openCandidateTab: boolean;
   @Input() openDetailsTab: boolean;
 
-  @Output() compareEvent = new EventEmitter<never>();
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
@@ -215,13 +214,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   public onExcludeDeployed(event: boolean): void {
     this.excludeDeployed = event;
-  }
-
-  public onCompare(): void {
-    disabledBodyOverflow(false);
-    this.compareEvent.emit();
-    // TODO temp solution for opening add reorder dialog
-    // this.store.dispatch(new ShowSideDialog(true));
   }
 
   private checkForAgencyStatus(): void {

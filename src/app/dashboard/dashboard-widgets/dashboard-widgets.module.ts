@@ -9,10 +9,7 @@ import { MapsChartModule } from '../widgets/maps-chart/maps-chart.module';
 import { WidgetWrapperModule } from '../widgets/widget-wrapper/widget-wrapper.module';
 import { LineChartModule } from '../widgets/line-chart/line-chart.module';
 import { PositionChartModule } from '../widgets/position-chart/position-chart.module';
-import { TasksModule } from '../widgets/tasks/tasks.module';
 import { TrendChartModule } from '../widgets/trend-chart/trend-chart.module';
-import { ChatModule } from '../widgets/chat/chat.module';
-import { InvoicesChartModule } from '../widgets/invoices-chart/invoices-chart.module';
 import { OrgWidgetModule } from '../widgets/org-widget/org-widget.module';
 import { AgencypositionWidgetModule } from '../widgets/agencyposition-widget/agencyposition-widget.module';
 import { UserState } from '../../store/user.state';
@@ -21,6 +18,7 @@ import { RnUtilizationWidgetModule } from '../widgets/rn-utilization-widget/rn-u
 import { AlreadyExpiredCredsModule } from '../widgets/already-expired-creds/already-expired-creds.module';
 import { UpcomingExpCredsModule } from '../widgets/upcoming-exp-creds/upcoming-exp-creds.module';
 import { AvailableEmployeeModule } from '../widgets/available-employee/available-employee.module'
+import { PositionsCountDayRangeModule } from '../widgets/positions-count-day-range/positions-count-day-range.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -33,10 +31,7 @@ import { AvailableEmployeeModule } from '../widgets/available-employee/available
     WidgetWrapperModule,
     LineChartModule,
     PositionChartModule,
-    TasksModule,
     TrendChartModule,
-    ChatModule,
-    InvoicesChartModule,
     CandidateChartModule,
     OrgWidgetModule,
     AgencypositionWidgetModule,
@@ -44,7 +39,8 @@ import { AvailableEmployeeModule } from '../widgets/available-employee/available
     AlreadyExpiredCredsModule,
     UpcomingExpCredsModule,
     AvailableEmployeeModule,
-    NgxsModule.forFeature([ UserState])
-  ]
+    PositionsCountDayRangeModule,
+    NgxsModule.forFeature([ UserState]),
+  ],
 })
 export class DashboardWidgetsModule { }
