@@ -1510,6 +1510,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (orderData.node && orderData.data) {
       this.openIrpDetails(orderData);
       this.preservedOrderService.resetPreservedOrder();
+      this.gridApi.ensureNodeVisible(orderData.node);
     }
   }
 
