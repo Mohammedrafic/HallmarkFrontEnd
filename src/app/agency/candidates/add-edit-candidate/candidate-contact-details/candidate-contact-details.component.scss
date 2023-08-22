@@ -5,6 +5,7 @@
     display: grid;
     gap: 10px;
     grid-template-columns: repeat(5, 1fr);
+    padding-bottom: 16px;
 
     .address-1 {
       grid-column: 1/4;
@@ -46,7 +47,6 @@
   @media #{$max-mobile} {
     .form-group {
       grid-template-columns: 1fr;
-      padding-bottom: 16px;
 
       .address-1,
       .address-2,

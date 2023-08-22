@@ -92,6 +92,28 @@
   margin-right: 28px;
 }
 
+.mobile-buttons {
+  display: flex;
+  justify-content: space-between;
+  column-gap: 16px;
+  position: fixed;
+  bottom: 0;
+  padding: 12px 24px;
+  background-color: $white;
+  margin-left: -15px;
+  width: calc(100% - 50px);
+  box-shadow: 0px 4px 4px 4px rgba(0, 0, 0, 0.25);
+
+  button,
+  app-tooltip-container {
+    width: 100%;
+
+    ::ng-deep .tooltip-container {
+      width: 100%;
+    }
+  }
+}
+
 @media #{$max-desktop-small} {
   .candidate-profile {
     display: flex;
@@ -114,5 +136,15 @@
   .restriction-message {
     margin: 21px 0 0 0;
     max-width: 100%;
+  }
+}
+
+@media #{$max-mobile} {
+  .candidate-profile-container {
+    padding-bottom: 65px;
+  }
+
+  .candidate-left-container {
+    padding-top: 18px;
   }
 }
