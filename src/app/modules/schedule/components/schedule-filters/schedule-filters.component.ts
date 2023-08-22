@@ -536,7 +536,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterService.deleteInlineChip(event);
   }
 
-  getSkillsIds(skillOption: DropdownOption[]): number[] {
+  private getSkillsIds(skillOption: DropdownOption[]): number[] {
     if(this.isPreservedFilters) {
       return this.filters.skillIds as number[];
     }
@@ -556,11 +556,6 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       return selectedFilterSkills;
     }
 
-    const departments: number[] = this.scheduleFilterFormGroup.get('departmentsIds')?.value;
-
-    if (departments.length < 2) {
-      return skillIds;
-    }
     return skillIds;
   }
 }
