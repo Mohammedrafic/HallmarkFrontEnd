@@ -107,6 +107,7 @@
                         [isTab]="true"
                         appUnsavedForm
                         (closeModalEvent)="onClose()"
+                        (updateDetails)="updateDetails()"
                         [orderDuration]="(selectedOrder$ | async)?.duration!"
                         [canEditClosedBillRate]="canEditClosedBillRates"
                         [actionsAllowed]="agencyActionsAllowed"
@@ -126,6 +127,7 @@
                         [candidate]="$any(candidate)"
                         [isTab]="true"
                         (closeModalEvent)="onClose()"
+                        (updateDetails)="updateDetails()"
                         [isAgency]="isAgency"
                         [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
                         [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
@@ -173,6 +175,7 @@
                         [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
                         [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
                         [currentOrder]="order"
+                        (updateDetails)="updateDetails()"
                       >
                       </app-extension-candidate>
                     </section>

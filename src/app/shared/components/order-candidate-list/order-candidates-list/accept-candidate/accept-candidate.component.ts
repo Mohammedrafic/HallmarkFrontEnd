@@ -67,6 +67,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Output() closeModalEvent: EventEmitter<void> = new EventEmitter();
+  @Output() updateDetails = new EventEmitter<void>();
 
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
@@ -305,7 +306,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         .subscribe((isConfirm) => {
           if (isConfirm) {
             this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
-            this.closeDialog();
+            this.updateDetails.emit();
           }
         });
     }
@@ -348,7 +349,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       this.form.patchValue({ rejectReason: value });
       this.store.dispatch(new RejectCandidateJob(payload));
 
-      this.closeDialog();
+      this.updateDetails.emit();
     }
   }
 
@@ -395,7 +396,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       ).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
       });
-    this.closeDialog();
+      this.updateDetails.emit();
   }
 
   private createForm(): void {
