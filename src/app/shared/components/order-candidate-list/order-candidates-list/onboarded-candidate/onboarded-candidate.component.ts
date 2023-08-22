@@ -4,9 +4,11 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import {
@@ -97,6 +99,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   orderPermissions$: Observable<CurrentUserPermission[]>;
 
   @Output() closeModalEvent = new EventEmitter<never>();
+  @Output() updateDetails = new EventEmitter<void>();
 
   @Input() candidate: OrderCandidatesList;
   @Input() isTab = false;
@@ -277,7 +280,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.form.disable();
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
-      this.closeDialog();
+      this.updateDetails.emit();
     }
   }
 
@@ -289,7 +292,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         jobCancellationDto,
         candidatePayRate: this.candidateJob.candidatePayRate,
       }));
-      this.closeDialog();
+      this.updateDetails.emit();
     }
   }
 
@@ -345,7 +348,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           takeUntil(this.unsubscribe$)
         ).subscribe(() => {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-          this.closeDialog();
+          this.updateDetails.emit();
           this.deleteUpdateFieldInRate();
           this.store.dispatch(new SetIsDirtyOrderForm(true));
         });
@@ -415,7 +418,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           this.store.dispatch(new ShowGroupEmailSideDialog(true));
         } else {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-          this.closeDialog();
+          this.updateDetails.emit();
         }
       });
   }
@@ -663,7 +666,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.saveCandidateJob();
     this.isSend =  false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
-    this.closeDialog();
+    this.updateDetails.emit();
   }
 
   onGroupEmailSend(){
@@ -688,7 +691,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           this.isSend =  false;
           this.store.dispatch(new ShowGroupEmailSideDialog(false));
           this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
-          this.closeDialog();
+          this.updateDetails.emit();
         });
     }
   }

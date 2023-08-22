@@ -166,6 +166,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           ApplicantStatus.OnBoarded,
           ApplicantStatus.Cancelled,
           ApplicantStatus.PreOfferCustom,
+          ApplicantStatus.Offboard,
         ];
 
         if (allowedApplyStatuses.includes(this.candidate.status)) {
