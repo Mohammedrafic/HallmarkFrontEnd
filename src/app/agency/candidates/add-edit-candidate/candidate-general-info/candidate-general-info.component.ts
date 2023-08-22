@@ -14,6 +14,7 @@ import { CandidateListState } from '@shared/components/candidate-list/store/cand
 import { Classifications, DefaultOptionFields, SkillFields } from "./candidate-general-info.constants";
 import { CandidateGeneralInfoService } from "./candidate-general-info.service";
 import { ssnValidator } from '../../../../shared/validators/ssn.validator';
+import { datepickerMask } from '@shared/constants';
 
 @Component({
   selector: 'app-candidate-general-info',
@@ -45,6 +46,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   public readonly optionFields = DefaultOptionFields;
   public readonly skillsFields = SkillFields;
   public readonly classifications = Classifications;
+  public readonly maskPlaceholder = datepickerMask;
 
   @Input() maskSSNPattern: string = '000-00-0000';
   @Input() maskedSSN: string = '';

@@ -2,138 +2,152 @@
   <div class="e-card-title-wrapper">
     <div class="e-card-title">General Info</div>
   </div>
-  <form [formGroup]="formGroup">
-    <div class="d-flex bootstrap">
-      <div class="left-column">
-        <div class="d-flex">
-          <div class="input-container f-grow-2">
-            <label>First Name<span class="required">*</span></label>
-            <div class="input-group">
-              <input appValidateWithMessage
-                     formControlName="firstName"
-                     class="e-input"
-                     type="text"
-                     maxlength="50"/>
-            </div>
-          </div>
-          <div class="input-container">
-            <label>Middle Name</label>
-            <div class="input-group">
-              <input appValidateWithMessage
-                     formControlName="middleName"
-                     class="e-input"
-                     type="text"
-                     maxlength="10"/>
-            </div>
-          </div>
-        </div>
-        <div class="d-flex">
-          <div class="dropdown-container">
-            <label>Skills<span class="required">*</span></label>
-            <div class="input-group">
-              <ejs-multiselect appValidateWithMessage
-                               mode="CheckBox"
-                               popupWidth="auto"
-                               formControlName="candidateProfileSkills"
-                               [allowFiltering]="true"
-                               [fields]="skillsFields"
-                               [dataSource]="skills">
-              </ejs-multiselect>
-            </div>
-          </div>
-          <div class="dropdown-container">
-            <label>Profile Status<span class="required">*</span></label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage
-                                [enabled]="enableStatusFields"
-                                [fields]="optionFields"
-                                formControlName="profileStatus"
-                                [allowFiltering]="true"
-                                [dataSource]="statuses"
-                                placeholder="Status">
-              </ejs-dropdownlist>
-            </div>
-          </div>
-          <div class="dropdown-container">
-            <label>Cand. Agency Status<span class="required">*</span></label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage
-                                [enabled]="enableStatusFields"
-                                [fields]="optionFields"
-                                formControlName="candidateAgencyStatus"
-                                [allowFiltering]="true"
-                                [dataSource]="statuses"
-                                placeholder="Status">
-              </ejs-dropdownlist>
-            </div>
-          </div>
-        </div>
-        <div class="d-flex">
-          <div class="input-container f-grow-2">
-            <label>SSN</label>
-            <div class="input-group">
-              <input appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" />
-            </div>
-          </div>
-          <div class="input-container"></div>
-        </div>
+  <form
+    [formGroup]="formGroup"
+    class="form-group"
+  >
+    <div class="input-container bootstrap extend-cell">
+      <label>First Name<span class="required">*</span></label>
+      <div class="input-group">
+        <input
+          appValidateWithMessage
+          formControlName="firstName"
+          class="e-input"
+          type="text"
+          maxlength="50"
+        />
       </div>
-      <div class="right-column">
-        <div class="d-flex">
-          <div class="input-container">
-            <label>Last Name<span class="required">*</span></label>
-            <div class="input-group">
-              <input appValidateWithMessage
-                     formControlName="lastName"
-                     class="e-input"
-                     type="text"
-                     maxlength="50"/>
-            </div>
-          </div>
-          <div class="datepicker-container">
-            <label>DOB<span class="required">*</span></label>
-            <div class="input-group datepicker">
-              <ejs-datepicker appValidateWithMessage
-                              id="inactiveDate"
-                              class="datepicker"
-                              format="MM/dd/yyyy"
-                              placeholder="MM/DD/YYYY"
-                              [max]="limitDate"
-                              [enableMask]="true"
-                              [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                              formControlName="dob">
-              </ejs-datepicker>
-            </div>
-          </div>
-        </div>
-        <div class="d-flex">
-          <div class="dropdown-container">
-            <label>Classification</label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage
-                                [fields]="optionFields"
-                                formControlName="classification"
-                                [allowFiltering]="true"
-                                [dataSource]="classifications">
-              </ejs-dropdownlist>
-            </div>
-          </div>
-          <div class="dropdown-container">
-            <label>Region<span class="required">*</span></label>
-            <div class="input-group dropdown">
-              <ejs-multiselect appValidateWithMessage
-                               mode="CheckBox"
-                               [allowFiltering]="true"
-                               formControlName="candidateProfileRegions"
-                               [dataSource]="regions$ | async"
-                               selectAllText="Select all"
-                               [showSelectAll]="true">
-              </ejs-multiselect>
-            </div>
-          </div>
-        </div>
+    </div>
+
+    <div class="input-container bootstrap">
+      <label>Middle Name</label>
+      <div class="input-group">
+        <input
+          appValidateWithMessage
+          formControlName="middleName"
+          class="e-input"
+          type="text"
+          maxlength="10"
+        />
+      </div>
+    </div>
+
+    <div class="input-container bootstrap">
+      <label>Last Name<span class="required">*</span></label>
+      <div class="input-group">
+        <input
+          appValidateWithMessage
+          formControlName="lastName"
+          class="e-input"
+          type="text"
+          maxlength="50"
+        />
+      </div>
+    </div>
+
+    <div class="datepicker-container bootstrap">
+      <label>DOB<span class="required">*</span></label>
+      <div class="input-group datepicker">
+        <ejs-datepicker 
+          appValidateWithMessage
+          id="inactiveDate"
+          class="datepicker"
+          format="MM/dd/yyyy"
+          placeholder="MM/DD/YYYY"
+          formControlName="dob"
+          [max]="limitDate"
+          [enableMask]="true"
+          [maskPlaceholder]="maskPlaceholder"
+        >
+        </ejs-datepicker>
+      </div>
+    </div>
+    <div class="dropdown-container bootstrap">
+      <label>Skills<span class="required">*</span></label>
+      <div class="input-group">
+        <ejs-multiselect
+          appValidateWithMessage
+          ode="CheckBox"
+          popupWidth="auto"
+          formControlName="candidateProfileSkills"
+          [allowFiltering]="true"
+          [fields]="skillsFields"
+          [dataSource]="skills"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="dropdown-container bootstrap">
+      <label>Profile Status<span class="required">*</span></label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          appValidateWithMessage
+          formControlName="profileStatus"
+          placeholder="Status"
+          [enabled]="enableStatusFields"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [dataSource]="statuses"
+        >
+        </ejs-dropdownlist>
+      </div>
+    </div>
+    <div class="dropdown-container bootstrap">
+      <label>Cand. Agency Status<span class="required">*</span></label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          appValidateWithMessage
+          formControlName="candidateAgencyStatus"
+          placeholder="Status"
+          [enabled]="enableStatusFields"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [dataSource]="statuses"
+        >
+        </ejs-dropdownlist>
+      </div>
+    </div>
+
+    <div class="dropdown-container bootstrap">
+      <label>Classification</label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          appValidateWithMessage
+          formControlName="classification"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [dataSource]="classifications"
+        >
+        </ejs-dropdownlist>
+      </div>
+    </div>
+    <div class="dropdown-container bootstrap">
+      <label>Region<span class="required">*</span></label>
+      <div class="input-group dropdown">
+        <ejs-multiselect appValidateWithMessage
+          mode="CheckBox"
+          formControlName="candidateProfileRegions"
+          selectAllText="Select all"
+          [allowFiltering]="true"
+          [dataSource]="regions$ | async"
+          [showSelectAll]="true"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container bootstrap extend-cell">
+      <label>SSN</label>
+      <div class="input-group">
+        <input 
+          appValidateWithMessage 
+          formControlName="ssn" 
+          class="e-input" 
+          type="text" 
+          mask="{{maskSSNPattern}}"
+          (focus)="onSSNFocus()"
+          (blur)="onSSNBlur()"
+        />
       </div>
     </div>
   </form>
 </div>
-
