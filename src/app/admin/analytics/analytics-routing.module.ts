@@ -57,6 +57,7 @@ import { ShiftBreakdownComponent } from './shift-breakdown/shift-breakdown.compo
 import { UserActivityComponent } from './user-activity/user-activity.component';
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
+import { OrderStatusSummaryComponent } from './order-status-summary/order-status-summary.component';
 
 const routes: Routes = [
   {
@@ -445,6 +446,13 @@ const routes: Routes = [
       {
         path: 'department-spend-and-hours-report',
         component: DepartmentSpendAndHoursComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'order-status-summary-report',
+        component: OrderStatusSummaryComponent,
         data: {
           isOrganizationArea: true,
         }

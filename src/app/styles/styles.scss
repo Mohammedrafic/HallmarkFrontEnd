@@ -722,3 +722,7 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
   max-height: calc( 100vh - 263px)!important;
   overflow: auto;
 }
+.orderStatusSummaryReport .ag-body-viewport {
+  max-height: calc( 68vh ) !important;
+  overflow: auto;
+}
