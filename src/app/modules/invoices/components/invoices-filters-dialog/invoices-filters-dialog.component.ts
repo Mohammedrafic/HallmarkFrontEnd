@@ -245,9 +245,11 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
         this.applyPreservedFilters(filters?.state || {});
         if(filters?.state?.agencyOrganizationIds != null){
           this.agencyOrganizationIds = filters?.state?.agencyOrganizationIds;
-          this.formGroup.get('locationIds')?.setValue([]);
-          this.formGroup.get('departmentIds')?.setValue([]);
-          this.formGroup.get('regionIds')?.setValue([]);
+          if(filters?.state?.agencyOrganizationIds.length > 1){
+            this.formGroup.get('locationIds')?.setValue([]);
+            this.formGroup.get('departmentIds')?.setValue([]);
+            this.formGroup.get('regionIds')?.setValue([]);
+          }
           this.initFormConfig();
         }
         this.cdr.detectChanges();
