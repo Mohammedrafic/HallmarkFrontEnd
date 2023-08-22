@@ -601,6 +601,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.selectedFile = file;
     const fileData: any = file;
     this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(fileData?.name);
+    if(this.businessFilterForm.get('filterBusinessUnit')?.value===3 && !this.isEditDocument){
+      this.onAgencyChanges();
+      this.changeDetectorRef.markForCheck();
+    }
+    if(this.businessFilterForm.get('filterBusinessUnit')?.value===4 && !this.isEditDocument){
+      this.onOrganizationChanges();
+      this.changeDetectorRef.markForCheck();
+    }
   }
 
 
