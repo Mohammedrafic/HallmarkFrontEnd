@@ -78,10 +78,6 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   }
 
   public onEdit(data: OrderCandidatesList): void {
-    if (this.order?.isClosed) {
-      return;
-    }
-
     this.candidate = { ...data };
     this.getCandidatePayRateSetting();
     if (this.order && this.candidate) {
