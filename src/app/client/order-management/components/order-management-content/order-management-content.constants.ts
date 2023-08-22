@@ -12,6 +12,7 @@ export enum MoreMenuType {
   'Delete',
   'Re-Open',
   'Add Re-Order',
+  'View history'
 }
 
 export const allOrdersColumnsToExport: ExportColumn[] = [

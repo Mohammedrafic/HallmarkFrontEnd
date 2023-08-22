@@ -97,6 +97,8 @@ import {
   UpdateRegRateSucceeded,
   GetOrderComments,
   ClearPredefinedBillRates,
+  GetOrderAuditHistory,
+  GetOrderHistoryDetailSucceeded,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -138,6 +140,7 @@ import { ButtonModel } from '@shared/models/buttons-group.model';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
+  AuditLogPayload,
   FilterOrderStatus,
   FilterStatus,
   IRPOrderManagement,
@@ -481,7 +484,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
   }
   public filterType: string = 'Contains';
-
+  public orderDetail =new Subject<OrderManagement>();
+  
   constructor(
     protected override store: Store,
     private router: Router,
@@ -1625,6 +1629,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         break;
       case MoreMenuType['Add Re-Order']:
         this.createReorder(data);
+        break;
+      case MoreMenuType['View history']:  
+        this.OpenOrderHistoryDialog(data);        
         break;
     }
   }
@@ -2869,6 +2876,18 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
         this.systemGroup.selectButton({ id: orderLinkDetails?.system as OrderManagementIRPSystemId } as ButtonModel);
       });
+  }
+
+  private OpenOrderHistoryDialog(data:OrderManagement): void{
+    const orderHistoryPayload: AuditLogPayload =
+          {           
+            entityType: "order",
+            searchValue:data.id.toString()
+          };   
+          this.store.dispatch(new GetOrderAuditHistory(orderHistoryPayload));
+          this.actions$
+            .pipe(ofActionDispatched(GetOrderHistoryDetailSucceeded), take(1))
+            .subscribe(() =>this.orderDetail.next(data));   
   }
 
   @OutsideZone
