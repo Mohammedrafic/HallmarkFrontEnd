@@ -571,4 +571,19 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  public colorCodeBasedOnPercentage(vendorPercentage:any){
+    switch (true) {
+      case Math.round(parseInt(vendorPercentage)) >= 80:
+        return '#15ce48';
+      case Math.round(parseInt(vendorPercentage)) >= 60:
+        return '#0f82bf';
+        case Math.round(parseInt(vendorPercentage)) >= 40:
+        return '#36b3ef';
+        case Math.round(parseInt(vendorPercentage)) >= 20:
+        return '#f9c679';
+      default:
+        return '#f5602e';
+    }
+  }
 }
