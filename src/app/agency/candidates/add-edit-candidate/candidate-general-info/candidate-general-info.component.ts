@@ -14,6 +14,8 @@ import { CandidateListState } from '@shared/components/candidate-list/store/cand
 import { Classifications, DefaultOptionFields, SkillFields } from "./candidate-general-info.constants";
 import { CandidateGeneralInfoService } from "./candidate-general-info.service";
 import { ssnValidator } from '../../../../shared/validators/ssn.validator';
+import { datepickerMask } from '@shared/constants';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-candidate-general-info',
@@ -37,6 +39,9 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   @Select(CandidateState.skills)
   private skills$: Observable<MasterSkill[]>;
 
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
+
   public skills: MasterSkill[];
   public statuses: { text: string, id: number }[];
   public enableStatusFields = false;
@@ -45,6 +50,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   public readonly optionFields = DefaultOptionFields;
   public readonly skillsFields = SkillFields;
   public readonly classifications = Classifications;
+  public readonly maskPlaceholder = datepickerMask;
 
   @Input() maskSSNPattern: string = '000-00-0000';
   @Input() maskedSSN: string = '';

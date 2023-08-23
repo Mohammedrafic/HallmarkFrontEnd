@@ -1,6 +1,6 @@
 <ejs-dialog
   #sideDialog
-  cssClass="dialog"
+  cssClass="dialog responsive"
   [width]="width"
   [target]="targetElement"
   [visible]="false"
@@ -13,13 +13,7 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title">Import Candidates</h3>
           </div>
-          <div class="e-card-content">
-            <button ejs-button cssClass="e-outline" (click)="onCancel()">Cancel</button>
-            <ng-container *ngIf="!activeErrorTab"><ng-container *ngTemplateOutlet="importBtn"></ng-container></ng-container>
-            <ejs-tooltip *ngIf="activeErrorTab" id="tooltip" content="Invalid data cannot be imported" [showTipPointer]="false" position="BottomCenter">
-              <div><ng-container *ngTemplateOutlet="importBtn"></ng-container></div>
-            </ejs-tooltip>
-          </div>
+          <ng-container *ngIf="!(isMobile$ | async)" [ngTemplateOutlet]="actionButtons"></ng-container>
         </div>
       </section>
       <section class="import-candidates-container">
@@ -121,8 +115,21 @@
       </section>
     </section>
   </ng-template>
+  <ng-template #footerTemplate>
+    <ng-container *ngIf="isMobile$ | async" [ngTemplateOutlet]="actionButtons"></ng-container>
+  </ng-template>
 </ejs-dialog>
 
 <ng-template #importBtn>
-  <button ejs-button cssClass="e-primary" [disabled]="!enabledImportButton" (click)="onImport()">Import</button>
+  <button ejs-button cssClass="e-primary action-btn" [disabled]="!enabledImportButton" (click)="onImport()">Import</button>
+</ng-template>
+
+<ng-template #actionButtons>
+  <div class="e-card-content">
+    <button ejs-button cssClass="e-outline action-btn" (click)="onCancel()">Cancel</button>
+    <ng-container *ngIf="!activeErrorTab" [ngTemplateOutlet]="importBtn"></ng-container>
+    <ejs-tooltip *ngIf="activeErrorTab" id="tooltip" content="Invalid data cannot be imported" [showTipPointer]="false" position="BottomCenter">
+      <div><ng-container *ngTemplateOutlet="importBtn"></ng-container></div>
+    </ejs-tooltip>
+  </div>
 </ng-template>

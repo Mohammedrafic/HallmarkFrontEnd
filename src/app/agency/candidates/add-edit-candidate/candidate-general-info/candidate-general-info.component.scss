@@ -1,20 +1,16 @@
+@import 'adaptive-response';
+
 .general-info {
-  .d-flex {
-    display: flex;
-  }
+  .form-group {
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: end;
+    padding-bottom: 16px;
 
-  .left-column {
-    width: 60%;
-  }
-
-  .right-column {
-    width: 40%;
-  }
-
-  .input-container, .dropdown-container, .datepicker-container {
-    margin-bottom: 10px;
-    margin-right: 10px;
-    flex: 1 1 0px;
+    .extend-cell {
+      grid-column: 1 / 3;
+    }
   }
 
   .input-container label,
@@ -24,7 +20,25 @@
     display: block;
   }
 
-  .f-grow-2 {
-    flex-grow: 2;
+  @media #{$max-tablet} {
+    .form-group {
+      grid-template-columns: repeat(4, 1fr);
+
+      .extend-cell {
+        grid-column: unset !important;
+      }
+    }
+  }
+
+  @media (max-width: 800px) {
+    .form-group {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media #{$max-mobile} {
+    .form-group {
+      grid-template-columns: 1fr;
+    }
   }
 }
