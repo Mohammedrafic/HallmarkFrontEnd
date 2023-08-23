@@ -7,7 +7,18 @@
       <h3>Education</h3>
     </div>
     <div class="actions">
-      <button ejs-button *ngIf="!readonlyMode" [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditEducation]" class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Education</button>
+      <button
+        ejs-button
+        class="action-link"
+        *ngIf="!readonlyMode"
+        [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditEducation]"
+        (click)="addNew()"
+      >
+        <i-feather name="plus" class="icon"></i-feather>
+        <span class="text-btn">
+          Add Education
+        </span>
+      </button>
     </div>
   </div>
   <ejs-grid #grid class="e-gridwithheader"

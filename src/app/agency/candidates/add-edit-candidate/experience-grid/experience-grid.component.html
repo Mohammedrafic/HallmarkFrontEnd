@@ -7,7 +7,18 @@
       <h3>Experience</h3>
     </div>
     <div class="actions">
-      <button ejs-button [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditExperience]" class="action-link" *ngIf="!readonlyMode" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Experience</button>
+      <button
+        ejs-button
+        class="action-link"
+        *ngIf="!readonlyMode"
+        [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditExperience]"
+        (click)="addNew()"
+      >
+        <i-feather name="plus" class="icon"></i-feather>
+        <span class="text-btn">
+          Add Experience
+        </span>
+      </button>
     </div>
   </div>
   <ejs-grid #grid class="e-gridwithheader"
