@@ -29,6 +29,7 @@ export class useractivitlogreportPage {
     userEmailId: string;
     businessUnitName: string;
     dateTime: any;
+    userStatus:boolean;
   }
   
   

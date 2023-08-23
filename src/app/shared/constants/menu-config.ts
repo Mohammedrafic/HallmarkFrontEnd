@@ -781,6 +781,11 @@ export const MENU_CONFIG: any = {
       icon: 'pie-chart',
       route: '/analytics/order-status-summary-report',
     },
+    116: {
+      // Useractivity Log report
+      icon: '',
+      route: '/analytics/user-activity',
+    },
   },
 
   [BusinessUnitType.Organization]: {
@@ -1249,6 +1254,11 @@ export const MENU_CONFIG: any = {
       icon: 'pie-chart',
       route: '/analytics/order-status-summary-report',
     },
+    116: {
+      // Useractivity Log report
+      icon: '',
+      route: '/analytics/user-activity',
+    },
   },
 
   [BusinessUnitType.Agency]: {
@@ -1498,6 +1508,11 @@ export const MENU_CONFIG: any = {
       icon: 'twitch',
       route: '',
     },
+    116: {
+      // Useractivity Log report
+      icon: '',
+      route: '/analytics/user-activity',
+    },  
   },
 
   [BusinessUnitType.Employee]: {
