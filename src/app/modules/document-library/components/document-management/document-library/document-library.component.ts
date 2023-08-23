@@ -1301,6 +1301,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       });
     }
     else {
+      if(!allFlag && this.sharedDocumentInformation.length == 1 && this.sharedDocumentInformation[0].id === -1 && this.sharedDocumentInformation[0].name === 'All'){
+        this.UnShareDocumewnt(this.currentDocumentData);
+      }
       this.documentLibraryform.reset();
       this.closeDialog();
       this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
