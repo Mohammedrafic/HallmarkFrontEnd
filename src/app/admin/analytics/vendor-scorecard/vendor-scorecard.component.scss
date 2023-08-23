@@ -156,8 +156,10 @@
   text-transform: capitalize;
 }
 .graphgrid{
-  display: flex !important;
-  flex-direction: column;
+  // display: flex !important;
+  // flex-direction: column;
+  display : grid !important;
+  overflow-x: auto;
 }
 
 .graph-heading {
@@ -219,7 +221,7 @@
 }
 
 .graphalign{
-  width: 13% !important;
+  width: 14% !important;
     text-align: center !important;
 }
 .Toplayer{
@@ -248,6 +250,9 @@ background:white;
   width:20px !important;
   height: 20px  !important;
   border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .Rating{
   text-align: center !important;
