@@ -153,7 +153,7 @@ export class CandidateService {
     ]);
     const formData = new FormData();
     if (file) {
-      formData.append('files', file);
+      formData.append('documents', file);
     }
     for (const key in credential) {
       formData.append(key, credential[key as keyof CandidateCredential]?.toString() || '');
