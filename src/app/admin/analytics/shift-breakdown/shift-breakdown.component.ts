@@ -343,12 +343,14 @@ export class ShiftBreakdownComponent implements OnInit {
             regionsList.push(...value.regions);
             locationsList = regionsList
               .map((obj) => {
-                return obj.locations.filter((location) => location.regionId === obj.id);
+                return obj.locations.filter(
+                  (location) => location.regionId === obj.id && this.checkInactiveDate(location.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
             departmentsList = locationsList
               .map((obj) => {
-                return obj.departments.filter((department) => department.locationId === obj.id);
+                return obj.departments.filter(
+                  (department) => department.locationId === obj.id && this.checkInactiveDate(department.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
           });
@@ -381,6 +383,19 @@ export class ShiftBreakdownComponent implements OnInit {
       }
     });
   }
+
+  private checkInactiveDate(dateStr?:string) : boolean {
+    if(dateStr == null || dateStr == undefined) {
+      return true;
+    }
+    const date = new Date(dateStr);
+    const today = new Date();
+    if(date < today) {
+      return false;
+    }
+    return true;
+  }
+
 
   private loadShiftData(businessUnitId: number) {
     const businessIdData = [];
