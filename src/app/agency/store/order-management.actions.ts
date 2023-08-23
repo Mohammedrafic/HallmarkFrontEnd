@@ -130,3 +130,9 @@ export class ClearAgencyOrderCandidatesList {
 export class ClearOrganizationStructure {
   static readonly type = '[agency order management] Clear Organization Structure';
 }
+
+export class GetAgencyAvailableSteps {
+  static readonly type = '[agency order management] Get agency available steps';
+
+  constructor(public readonly organizationId: number, public readonly jobId: number) {}
+}
