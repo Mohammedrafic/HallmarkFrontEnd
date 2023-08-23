@@ -56,7 +56,7 @@ export enum OrderContactAuditHistoryTableColumns {
   title = "Title",
   email = "Email",
   mobilePhone = "Mobile Phone",
-  isPrimaryContact = "Is PrimaryContact",
+  isPrimaryContact = "Primary Contact",
   changeType = "Change Type",
   modifiedOn = "Modified Date",
   modifiedBy = "Modified By"

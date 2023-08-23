@@ -560,7 +560,15 @@ export const OrderContactAuditHistoryTableColumnsDefinition = (): ColumnDefiniti
       filter: true,
       sortable: true,
       resizable: true
-    },      
+    },   
+    {
+      headerName: OrderContactAuditHistoryTableColumns.isPrimaryContact,
+      field: 'isPrimaryContact',
+      minWidth: 120,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },   
     {
       headerName: OrderCredentialAuditHistoryTableColumns.changeType,
       field: 'changeType',
