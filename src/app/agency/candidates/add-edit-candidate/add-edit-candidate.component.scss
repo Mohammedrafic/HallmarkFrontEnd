@@ -5,6 +5,10 @@
 :host {
   height: calc(100% - 240px);
 
+  @media #{$max-mobile} {
+    height: calc(100% - 268px);
+  }
+
   ::ng-deep {
     ejs-tab {
       .e-content.e-lib.e-touch {
@@ -17,7 +21,7 @@
       justify-content: space-between;
 
       .right-content {
-        width: 50%;
+        width: auto;
         justify-content: flex-end;
       }
     }
@@ -146,5 +150,9 @@
 
   .candidate-left-container {
     padding-top: 18px;
+  }
+
+  :host {
+    padding-right: 16px;
   }
 }

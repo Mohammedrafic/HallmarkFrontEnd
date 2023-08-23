@@ -15,6 +15,7 @@ import { Classifications, DefaultOptionFields, SkillFields } from "./candidate-g
 import { CandidateGeneralInfoService } from "./candidate-general-info.service";
 import { ssnValidator } from '../../../../shared/validators/ssn.validator';
 import { datepickerMask } from '@shared/constants';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-candidate-general-info',
@@ -37,6 +38,9 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
 
   @Select(CandidateState.skills)
   private skills$: Observable<MasterSkill[]>;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public skills: MasterSkill[];
   public statuses: { text: string, id: number }[];

@@ -1,4 +1,7 @@
-<section class="grid-component">
+<section
+  class="grid-component"
+  [class.mobile-login-on]="isMobileLoginOn"
+>
   <div class="e-gridcustomheader">
     <div class="title">
       <h3>Education</h3>
@@ -15,7 +18,7 @@
             [allowResizing]="allowResizing"
             [pageSettings]="pageSettings"
             [allowSelection]="false"
-            [height]="fullScreenGridHeight"
+            [height]="(isMobile$ | async) ? mobileGridHeight : fullScreenGridHeight"
             [enableVirtualization]="false"
             (dataBound)="dataBound()">
     <e-columns>

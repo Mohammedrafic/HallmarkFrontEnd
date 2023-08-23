@@ -73,6 +73,7 @@
           [allowFiltering]="true"
           [fields]="skillsFields"
           [dataSource]="skills"
+          [changeOnBlur]="!(isMobile$ | async)"
         >
         </ejs-multiselect>
       </div>
@@ -131,6 +132,7 @@
           [allowFiltering]="true"
           [dataSource]="regions$ | async"
           [showSelectAll]="true"
+          [changeOnBlur]="!(isMobile$ | async)"
         >
         </ejs-multiselect>
       </div>

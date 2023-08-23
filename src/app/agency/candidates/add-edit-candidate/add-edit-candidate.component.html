@@ -67,7 +67,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-experience-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed" [userPermission]="userPermission"></app-experience-grid>
+        <app-experience-grid
+          [readonlyMode]="readonlyMode"
+          [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed"
+          [userPermission]="userPermission"
+          [isMobileLoginOn]="!isNavigatedFromOrganizationArea && isMobileLoginOn"
+        ></app-experience-grid>
       </ng-template>
     </e-tabitem >
     <e-tabitem *ngIf="userPermission[userPermissions.CanViewEducation]">
@@ -77,7 +82,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-education-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed" [userPermission]="userPermission"></app-education-grid>
+        <app-education-grid
+          [readonlyMode]="readonlyMode"
+          [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed"
+          [userPermission]="userPermission"
+          [isMobileLoginOn]="!isNavigatedFromOrganizationArea && isMobileLoginOn"
+        ></app-education-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem *ngIf="userPermission[userPermissions.CanViewCandidateCredentials]">
@@ -93,6 +103,7 @@
           [isCandidateAssigned]="isCandidateAssigned"
           [orderId]="orderId"
           [userPermission]="userPermission"
+          [isMobileLoginOn]="!isNavigatedFromOrganizationArea && isMobileLoginOn"
         ></app-credentials-grid>
       </ng-template>
     </e-tabitem>
