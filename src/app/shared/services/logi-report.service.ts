@@ -155,6 +155,10 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
     }));
   }
 
+  public getskillsbyDepartment(id: number[]): Observable<any> {
+    return this.http.post('/api/PayRates/skillsByDepartment', {departmentIds : id});
+  }
+
   public getCredentialTypes(): Observable<CredentialType[]> {
     return this.http.get<CredentialType[]>(`/api/CredentialTypes/all`);
   }
