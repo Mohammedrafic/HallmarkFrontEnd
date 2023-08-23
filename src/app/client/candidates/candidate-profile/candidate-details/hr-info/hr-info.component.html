@@ -1,5 +1,5 @@
 <h2 class="title">HR Info</h2>
-<form class="hr-info__form">
+<form class="hr-info__form" [formGroup]="candidateForm">
   <div class="hr-info__form_first">
     <app-dropdown
       [dataSource]="hrCompanyCodes"
