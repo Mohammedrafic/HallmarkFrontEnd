@@ -17,6 +17,7 @@ import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { OrderAuditHistoryTableColumnsDefinition, OrderBillRatesAuditHistoryTableColumnsDefinition, OrderClassificationAuditHistoryTableColumnsDefinition, OrderContactAuditHistoryTableColumnsDefinition, OrderCredentialAuditHistoryTableColumnsDefinition, OrderJobDistributionAuditHistoryTableColumnsDefinition, OrderWorkLocationAuditHistoryTableColumnsDefinition } from './order-history-details.constant';
 import { orderMatchColorClasses } from '@shared/components/credentials-grid/order-match-column/order-match-column.constants';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-order-history-details',
@@ -56,7 +57,8 @@ import { orderMatchColorClasses } from '@shared/components/credentials-grid/orde
 
   @Select(OrderManagementContentState.getOrderClassificationAuditHistory)
   OrderClassificationAuditHistory$: Observable<OrderClassificationAuditHistory[]>;
-
+  
+  @Select(AppState.getMainContentElement)
   public readonly targetElement$: Observable<HTMLElement | null>;
   public targetElement: HTMLElement = document.body;
   public optionFields = OPTION_FIELDS;
@@ -125,7 +127,7 @@ import { orderMatchColorClasses } from '@shared/components/credentials-grid/orde
           }),
           new GetOrderWorkLocationAuditHistory({           
             entityType: "OrderWorkLocation",
-            searchValue:data.toString()
+            searchValue:data.id.toString()
           }),
           new GetOrderJobDistributionAuditHistory({           
             entityType: "OrderJobDistribution",
