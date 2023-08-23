@@ -130,7 +130,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   get isBillRatePending(): boolean {
     return (
-      [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard]
+      [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard, CandidatStatus.Rejected]
       .includes(this.currentCandidateApplicantStatus) && !this.isAgency);
   }
 
