@@ -82,4 +82,7 @@ export class GetCredentialTypes {
   static readonly type = '[candidate] Get Credential Types';
 }
 
-
+export class GetSkillsbyDepartment {
+  static readonly type = '[LogiReport] Get Skills by department';
+  constructor(public payload: number[]) { }
+}

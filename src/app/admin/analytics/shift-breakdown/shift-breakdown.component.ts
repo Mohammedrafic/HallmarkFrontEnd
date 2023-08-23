@@ -13,6 +13,7 @@ import { Select, Store } from '@ngxs/store';
 import {
   ClearLogiReportState,
   GetCommonReportFilterOptions,
+  GetSkillsbyDepartment,
   GetStaffScheduleReportFilterOptions,
 } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
@@ -129,6 +130,9 @@ export class ShiftBreakdownComponent implements OnInit {
   @Select(LogiReportState.commonReportFilterData)
   public CommonReportFilterData$: Observable<CommonReportFilterOptions>;
 
+  @Select(LogiReportState.skillbydepartment)
+  skillbydepartment$: Observable<any>;
+
   get startMonthControl(): AbstractControl { 
     return this.shiftBreakdownForm.get('startMonth') as AbstractControl; 
   }
@@ -174,6 +178,7 @@ export class ShiftBreakdownComponent implements OnInit {
       this.handleFilterControlValueChange();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
+      this.onFilterDepartmentChangedHandler();
 
       this.user?.businessUnitType == BusinessUnitType.Hallmark
         ? this.shiftBreakdownForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
@@ -391,8 +396,6 @@ export class ShiftBreakdownComponent implements OnInit {
     this.CommonReportFilterData$.pipe(filter((data) => data !== null), takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions) => {
         this.isAlive = false;
         this.filterOptionData = data;
-        this.filterColumns.skillIds.dataSource = [];
-        this.filterColumns.skillIds.dataSource = data.masterSkills;
         this.changeDetectorRef.detectChanges();
 
         if (this.isInitialLoad) {
@@ -459,6 +462,32 @@ export class ShiftBreakdownComponent implements OnInit {
       this.changeDetectorRef.detectChanges();
     });
   }
+
+  public onFilterDepartmentChangedHandler(): void {
+    this.departmentIdControl = this.shiftBreakdownForm.get(
+      analyticsConstants.formControlNames.DepartmentIds
+    ) as AbstractControl;
+    this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.shiftBreakdownForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
+      if (this.departmentIdControl.value.length > 0) {
+        this.store.dispatch(new GetSkillsbyDepartment(data))
+        this.skillbydepartment$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills: any[]) => {
+          if(skills && skills.length > 0){
+            this.filterColumns.skillIds.dataSource = sortByField(skills, "name");
+          } else {
+            this.filterColumns.skillIds.dataSource = [];
+            this.shiftBreakdownForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(null);
+          }
+          this.changeDetectorRef.markForCheck();
+        });
+      } else {
+        this.filterColumns.skillIds.dataSource = [];
+        this.shiftBreakdownForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
+      }
+      this.changeDetectorRef.detectChanges();
+    });
+  }
+
 
   public onFilterClearAll(): void {
     const currentYear = new Date().getFullYear();    
