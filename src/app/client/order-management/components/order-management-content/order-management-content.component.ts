@@ -1091,6 +1091,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           : allOrdersColumnsToExport;
         break;
       case OrganizationOrderManagementTabs.PerDiem:
+        this.openregrateupdate = false
         if (this.selectedItems.length === 0) {
           this.columnsToExport = [...perDiemColumnsToExport, ...perDiemChildColumnsToExport];
           return;
