@@ -111,7 +111,7 @@
           </div>
           <div class="graph-cards">
             <div class="graphalign">
-              <ejs-progressbar id='determinate1{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
+              <ejs-progressbar id='determinate1{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.submissionQualityPercent)}} [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value="{{agencies.submissionQualityPercent}}" width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -120,7 +120,7 @@
               <span></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate2{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
+              <ejs-progressbar id='determinate2{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.complianceRatingPercent)}} [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.complianceRatingPercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -129,7 +129,7 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate3{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
+              <ejs-progressbar id='determinate3{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.fillRatePercent)}} [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.fillRatePercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -138,7 +138,7 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate4{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
+              <ejs-progressbar id='determinate4{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.costAdjustmentPercent)}} [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.costAdjustmentPercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -147,7 +147,7 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate5{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
+              <ejs-progressbar id='determinate5{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.onTimeStartPercent)}} [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.onTimeStartPercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -156,7 +156,7 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate6{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
+              <ejs-progressbar id='determinate6{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.candidatesStartPercent)}} [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.candidatesStartPercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -165,7 +165,7 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate7{{i}}' progressColor='#ffa500' [startAngle]="startAngle"
+              <ejs-progressbar id='determinate7{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.candidateRemainingonAssignmentPercent)}} [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.candidateRemainingonAssignmentPercent}}
                                width="120" progressThickness="15" trackThickness="15">
               </ejs-progressbar>

@@ -249,9 +249,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       const settingValue = this.settings[SettingsKeys.AllowDocumentUpload]?.children?.find(f => f.isIRPConfigurationValue == true)?.value;
 
-      if (!settingValue) {
-        this.disabledIrp = true;
-      }
+      settingValue=="false"?  this.disabledIrp = true : this.disabledIrp = false;
     });
   }
 
@@ -1111,7 +1109,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private checkIfInternalDistributionChanged(): boolean {
     const internalTieringWasSelected = this.selectedOrder
     && this.selectedOrder.jobDistributionValue?.includes(TierInternal.id);
-    const allInternalSelected = this.jobDistributionForm.get('jobDistribution')?.value.includes(AllInternalJob.id);
+    const allInternalSelected = this.jobDistributionForm.get('jobDistribution')?.value?.includes(AllInternalJob.id);
 
     return internalTieringWasSelected && allInternalSelected;
   }

@@ -139,7 +139,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
-  public isInitialLoad: boolean = false;
+  public isDefaultLoad: boolean = false;
   public baseUrl: string = '';
   public user: User | null;
   public filterOptionsData: CommonReportFilterOptions;
@@ -186,7 +186,6 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
         }
       });
       this.agencyOrganizationId = data;
-      this.isInitialLoad = true;
 
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
@@ -235,6 +234,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.missingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (typeof data === 'number' && data != this.previousOrgId) {
+        this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
           let orgList = this.organizations?.filter((x) => data == x.organizationId);
@@ -260,6 +260,12 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
 
+          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          }
+          else {
+            this.isResetFilter = true;
+          }
           let businessIdData = [];
           businessIdData.push(data);
           let filter: CommonReportFilter = {
@@ -268,28 +274,17 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
-              this.isAlive = false;
+              this.isAlive = true;
               this.filterOptionsData = data;
               this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.
                 filter(i => this.fixedCanidateStatusesTypes.includes(i.status));
-              this.changeDetectorRef.detectChanges();
+
+              this.isDefaultLoad = true;
+              this.SearchReport()
             }
           });
-
-          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-          }
-          else {
-            this.isResetFilter = true;
-          }
-
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          if (this.isInitialLoad) {
-            this.SearchReport();
-            this.isInitialLoad = false;
-          }
-          this.changeDetectorRef.detectChanges();
         }
         else {
           this.isClearAll = false;
@@ -302,11 +297,10 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
   public onFilterRegionChangedHandler(): void {
     this.regionIdControl = this.missingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.missingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-      this.missingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       this.locations = [];
       this.departments = [];
-
+      this.missingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.missingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.regionIdControl.value.length > 0) {
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;

@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
-import { Actions, ofActionSuccessful, Store } from "@ngxs/store";
+import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { ListBox, ListBoxChangeEventArgs, SelectionSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
 import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 import { SelectEventArgs, TabComponent } from "@syncfusion/ej2-angular-navigations";
@@ -28,6 +28,7 @@ import {
   UploadCandidateProfileFileSucceeded,
 } from "@agency/store/candidate.actions";
 import { ShowToast } from "src/app/store/app.actions";
+import { AppState } from 'src/app/store/app.state';
 
 interface ListBoxItem {
   name: string;
@@ -48,6 +49,9 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
   @Input() public openEvent: Observable<void>;
 
   @Output() public reloadCandidateList: EventEmitter<void> = new EventEmitter<void>();
+
+  @Select(AppState.isMobileScreen)
+  public isMobile$: Observable<boolean>;
 
   public width = `${window.innerWidth * 0.6}px`;
   public targetElement: HTMLElement = document.body;

@@ -13,7 +13,28 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content">
+        <div class="input-group dropdown bootstrap" *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length">
+          <ejs-dropdownlist [fields]="optionFields"
+                            [dataSource]="(applicantStatuses$ | async)"
+                            [itemTemplate]="itemTemplate"
+                            [allowFiltering]="true"
+                            placeholder="Select Status"
+                            (select)="setRevertedStatus($event)">
+            <ng-template #itemTemplate let-data>
+              <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
+            </ng-template>
+          </ejs-dropdownlist>
+        </div>
         <div *ngIf="!isCancelled" class="status-actions">
+          <button
+            *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length"
+            ejs-button
+            [isPrimary]="true"
+            [disabled]="!revertStatusSelected"
+            class="apply-button"
+            (click)="revertStatus()">
+            Save
+          </button>
           <app-tooltip-container [showToolTip]="!actionsAllowed">
             <button *ngIf="showRejectButton" ejs-button cssClass="e-outline"
                     [disabled]="!actionsAllowed"

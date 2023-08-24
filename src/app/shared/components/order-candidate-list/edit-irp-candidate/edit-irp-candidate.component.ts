@@ -46,6 +46,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
+import { ManageOrderIRP_PERMISSION, CloseOrderIRP_PERMISSION } from '@shared/constants';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -86,6 +87,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public availableStartDate:string | Date;
   public candidateJobId:number;
   public candidateCommentContainerId: number;
+  public canCloseOrderIRP: boolean;
+  public canManageOrderIRP:boolean;
 
 
   public comments: Comment[] = [];
@@ -211,7 +214,17 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.orderManagementService.setCandidate(true);
       });
     } else {
-      this.closeIrpPosition(createReplacement);
+      if (this.canManageOrderIRP && this.canCloseOrderIRP) {
+        this.closeIrpPosition(createReplacement);
+      }
+      else {
+        if (!this.canManageOrderIRP) {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, ManageOrderIRP_PERMISSION));
+        }
+        else if (!this.canCloseOrderIRP) {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, CloseOrderIRP_PERMISSION));
+        }
+      }
     }
   }
 
@@ -393,9 +406,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions().pipe(
       takeUntil(this.componentDestroy()),
-    ).subscribe(({ canOnboardCandidateIRP,canRejectCandidateIRP }) => {
+    ).subscribe(({ canOnboardCandidateIRP,canRejectCandidateIRP,canCloseOrderIRP,canManageOrderIRP }) => {
       this.canOnboardCandidateIRP=canOnboardCandidateIRP;
       this.canRejectedCandidateIRP=canRejectCandidateIRP;
+      this.canCloseOrderIRP=canCloseOrderIRP;
+      this.canManageOrderIRP=canManageOrderIRP;
     });
   }
 

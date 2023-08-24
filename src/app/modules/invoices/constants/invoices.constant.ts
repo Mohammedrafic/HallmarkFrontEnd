@@ -163,7 +163,7 @@ export const ApproveInvoiceConfirmDialogConfig = {
 };
 
 // eslint-disable-next-line max-lines-per-function
-export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilterFieldConfig[] => [
+export const ManualInvoicesFiltersFormConfig = (isAgency: boolean, agencyOrganizationIds?:number): InvoiceFilterFieldConfig[] => [
   ...(isAgency ? [{
     type: ControlTypes.Multiselect,
     title: 'Status',
@@ -190,6 +190,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilte
     field: InvoicesTableFiltersColumns.RegionIds,
     isShort: true,
     showSelectAll: true,
+    isDisable: agencyOrganizationIds &&  agencyOrganizationIds > 1 ? true : false
   },
   {
     type: ControlTypes.Multiselect,
@@ -197,6 +198,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilte
     field: InvoicesTableFiltersColumns.LocationIds,
     isShort: true,
     showSelectAll: true,
+    isDisable: agencyOrganizationIds &&  agencyOrganizationIds > 1 ? true : false
   },
   {
     type: ControlTypes.Multiselect,
@@ -204,6 +206,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilte
     field: InvoicesTableFiltersColumns.DepartmentIds,
     isShort: true,
     showSelectAll: true,
+    isDisable: agencyOrganizationIds &&  agencyOrganizationIds > 1 ? true : false
   },
   {
     type: ControlTypes.Multiselect,
@@ -249,7 +252,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean): InvoiceFilte
 ];
 
 // eslint-disable-next-line max-lines-per-function
-export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: InvoiceTabId): InvoiceFilterFieldConfig[] => [
+export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: InvoiceTabId, agencyOrganizationIds?:number): InvoiceFilterFieldConfig[] => [
   {
     type: ControlTypes.Text,
     title: 'Invoice ID',
@@ -299,6 +302,7 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
     field: InvoicesTableFiltersColumns.RegionIds,
     isShort: true,
     showSelectAll: true,
+    isDisable: agencyOrganizationIds &&  agencyOrganizationIds > 1 ? true : false
   },
   {
     type: ControlTypes.Multiselect,
@@ -306,6 +310,7 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
     field: InvoicesTableFiltersColumns.LocationIds,
     isShort: true,
     showSelectAll: true,
+    isDisable: agencyOrganizationIds &&  agencyOrganizationIds > 1 ? true : false
   },
   {
     type: ControlTypes.Multiselect,
@@ -313,6 +318,7 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
     field: InvoicesTableFiltersColumns.DepartmentIds,
     isShort: false,
     showSelectAll: true,
+    isDisable: agencyOrganizationIds &&  agencyOrganizationIds > 1 ? true : false
   },
   {
     type: ControlTypes.Date,
@@ -428,19 +434,19 @@ export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] =
 ];
 
 export const DetectFormConfigBySelectedType = (selectedTabId: InvoiceTabId,
-                                               isAgency: boolean): InvoiceFilterFieldConfig[] => {
+                                               isAgency: boolean, agencyOrganizationIds?: number): InvoiceFilterFieldConfig[] => {
   if (
     selectedTabId !== InvoicesAgencyTabId.ManualInvoicePending
     && selectedTabId !== InvoicesOrgTabId.PendingInvoiceRecords
     && selectedTabId !== InvoicesOrgTabId.ManualInvoicePending
   ) {
-    return AllInvoicesFiltersFormConfig(isAgency, selectedTabId);
+    return AllInvoicesFiltersFormConfig(isAgency, selectedTabId,agencyOrganizationIds);
   }
 
   if (selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
     return PendingInvoicesFiltersFormConfig();
   }
-  return ManualInvoicesFiltersFormConfig(isAgency);
+  return ManualInvoicesFiltersFormConfig(isAgency,agencyOrganizationIds);
 };
 
 

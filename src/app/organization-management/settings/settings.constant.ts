@@ -75,6 +75,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
   'OvertimeCalculation',
+  'AutomatedDistributionToVMS',
 ];
 
 export const DisabledSettingsByDefault = [

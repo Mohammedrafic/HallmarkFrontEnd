@@ -11,7 +11,6 @@ import { AbstractControl, FormControl } from '@angular/forms';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
-  GetCandidateCancellationReason,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
@@ -24,27 +23,44 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   CancellationReasonsMap,
-  PenaltiesMap
+  PenaltiesMap,
 } from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
 import { CandidateADDRESSRequired, CandidatePHONE1Required, SET_READONLY_STATUS } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from
+'@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderType } from '@shared/enums/order-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { CandidatesStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
-import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import {
+  ApplicantStatus,
+  Order,
+  OrderCandidateJob,
+  OrderCandidatesList,
+} from'@shared/models/order-management.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { BehaviorSubject, combineLatest, filter, merge, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  filter,
+  merge,
+  mergeMap,
+  Observable,
+  of,
+  Subject,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -70,13 +86,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
-  @Select(OrderManagementContentState.getCandidateCancellationReasons)
-  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
-
   @Input() openEvent: Subject<boolean>;
   @Input() candidate: OrderCandidatesList;
-  @Input() isAgency: boolean = false;
-  @Input() isTab: boolean = false;
+  @Input() isAgency = false;
+  @Input() isTab = false;
   @Input() dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob) {
     if (orderCandidateJob) {
@@ -117,7 +130,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   get isBillRatePending(): boolean {
     return (
-      [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard]
+      [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard, CandidatStatus.Rejected]
       .includes(this.currentCandidateApplicantStatus) && !this.isAgency);
   }
 
@@ -181,7 +194,6 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   private statuses: ApplicantStatus[];
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
-  public candidateCancellationReasons: CandidateCancellationReason[] | null;
 
   constructor(
     private store: Store,
@@ -225,7 +237,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   public onAccept(): void {
-    if(this.isCandidatePayRateVisible && this.acceptForm.invalid) {
+    if(this.acceptForm.invalid) {
       this.acceptForm.markAllAsTouched();
       return;
     }
@@ -461,7 +473,6 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       clockId: clockId,
     });
     this.enableFields();
-    this.subscribeCandidateCancellationReasons();
   }
 
   private getNewApplicantStatus(): ApplicantStatus {
@@ -719,25 +730,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     return rates.some((rate) => !!rate.isUpdated);
   }
 
-  private subscribeCandidateCancellationReasons() {
-    if (this.orderCandidateJob) {
-      let payload: CandidateCancellationReasonFilter = {
-        locationId: this.orderCandidateJob?.order.locationId,
-        regionId: this.orderCandidateJob?.order.regionId
-      };
-      this.store.dispatch(new GetCandidateCancellationReason(payload));
-      this.candidateCancellationReasons$
-        .pipe(takeUntil(this.destroy$)).subscribe((value) => {
-          this.candidateCancellationReasons =value;
-        });
-
-    }
-  }
-
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
     });
   }
-
 }

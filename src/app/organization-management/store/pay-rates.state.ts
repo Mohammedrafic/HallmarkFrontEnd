@@ -28,10 +28,11 @@ import { DateTimeHelper } from '@core/helpers';
 import { PayRateSetup, PayRateSetupPage } from '@shared/models/pay-rate.model';
 import { CommitmentStateModel } from '@admin/store/commitment.state';
 import { MasterCommitmentsPage } from '@shared/models/commitment.model';
+import { SkillsByDepartments } from '@shared/models/skill.model';
 
 export interface PayRateStateModel {
   payRatesPage: PayRateSetupPage | null,
-  skillbydepartment: any,
+  skillbydepartment: SkillsByDepartments[],
   workCommitmentsPage: MasterCommitmentsPage | null
 }
 
@@ -119,7 +120,7 @@ export class PayRatesState {
   };
 
   @Action(GetSkillsbyDepartment)
-  GetSkillsbyDepartment({ patchState }: StateContext<PayRateStateModel>, { payload }: GetSkillsbyDepartment): Observable<any> {
+  GetSkillsbyDepartment({ patchState }: StateContext<PayRateStateModel>, { payload }: GetSkillsbyDepartment): Observable<SkillsByDepartments[]> {
     return this.payRateService.getskillsbyDepartment(payload).pipe(tap((payload) => {
       patchState({ skillbydepartment : payload });
       return payload;

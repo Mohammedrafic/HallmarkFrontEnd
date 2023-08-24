@@ -24,6 +24,6 @@ export class FormatBytesPipe implements PipeTransform {
       }
     }
 
-    return `${result.toFixed(2) + unit}`;
+    return `${result.toFixed(2)} ${unit}`;
   }
 }

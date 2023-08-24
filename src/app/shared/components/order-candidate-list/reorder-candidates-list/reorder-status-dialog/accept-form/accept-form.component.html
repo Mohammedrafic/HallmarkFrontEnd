@@ -35,7 +35,9 @@
     </div>
     <div>
      <div class="input-container bootstrap">
-        <label>Candidate Bill Rate</label>
+        <label>Candidate Bill Rate
+          <span *ngIf="formGroup.get('candidateBillRate')?.enabled" class="required">*</span>
+        </label>
         <div class="input-group">
           <input
             formControlName="candidateBillRate"

@@ -6,16 +6,24 @@ import {
   Inject,
   Input,
   NgZone,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
-import { OutsideZone } from '@core/decorators';
 
+import { Actions, ofActionDispatched } from '@ngxs/store';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { filter, takeUntil } from 'rxjs';
+
+
 import { TabConfig } from '@client/candidates/interface';
-import { OrderManagementIRPTabsIndex } from '@shared/enums/order-management-tabs.enum';
+import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
+import { OutsideZone } from '@core/decorators';
+import { Destroyable } from '@core/helpers';
 import { GlobalWindow } from '@core/tokens';
+import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { OrderManagementIRPTabs, OrderManagementIRPTabsIndex } from '@shared/enums/order-management-tabs.enum';
+import { NavigationTabModel } from '@shared/models/navigation-tab.model';
 
 @Component({
   selector: 'app-tabs-list',
@@ -23,7 +31,7 @@ import { GlobalWindow } from '@core/tokens';
   styleUrls: ['./tabs-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TabsListComponent implements AfterViewInit {
+export class TabsListComponent extends Destroyable implements OnInit, AfterViewInit  {
   @ViewChild('timesheetTabs') tab: TabComponent;
 
   @Input()
@@ -32,8 +40,17 @@ export class TabsListComponent implements AfterViewInit {
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
 
-  constructor(private readonly ngZone: NgZone,  
-  @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,) {}
+  constructor(
+    private readonly ngZone: NgZone,  
+    @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
+    private actions$: Actions,
+  ) {
+    super();
+  }
+
+  ngOnInit(): void {
+    this.listenTabChanges();
+  }
 
   public ngAfterViewInit(): void {
     this.asyncRefresh();
@@ -72,5 +89,19 @@ export class TabsListComponent implements AfterViewInit {
         this.tab.selectedItem =IRPActiveTab;
       }
     }, 1000);
+  }
+
+  private listenTabChanges(): void {
+    this.actions$
+      .pipe(
+        ofActionDispatched(SelectNavigationTab),
+        filter(({ active }: NavigationTabModel) => !!active),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(({ active }: NavigationTabModel) => {
+        const tabList = Object.values(OrderManagementIRPTabs);
+        const index = tabList.findIndex((tabName: string) => tabName === active);
+        this.tab.selectedItem = index;
+      });
   }
 }

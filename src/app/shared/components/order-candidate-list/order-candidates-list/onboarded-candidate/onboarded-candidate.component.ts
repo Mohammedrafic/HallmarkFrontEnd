@@ -4,9 +4,11 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import {
@@ -23,7 +25,7 @@ import {
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, CandidateCancellationReason, CandidateCancellationReasonFilter, Order,
+import { ApplicantStatus, Order,
   OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { formatDate, formatNumber } from '@angular/common';
@@ -32,7 +34,6 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
-  GetCandidateCancellationReason,
   GetRejectReasonsForOrganisation,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
@@ -97,10 +98,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Select(UserState.orderPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
 
-  @Select(OrderManagementContentState.getCandidateCancellationReasons)
-  candidateCancellationReasons$: Observable<CandidateCancellationReason[]>;
-
   @Output() closeModalEvent = new EventEmitter<never>();
+  @Output() updateDetails = new EventEmitter<void>();
 
   @Input() candidate: OrderCandidatesList;
   @Input() isTab = false;
@@ -143,7 +142,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canClose = false;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
-  public candidateCancellationReasons: CandidateCancellationReason[] | null;
   public readonly reorderType: OrderType = OrderType.ReOrder;
   public canCreateOrder:boolean;
   public saveStatus: number = 0;
@@ -282,7 +280,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.form.disable();
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
-      this.closeDialog();
+      this.updateDetails.emit();
     }
   }
 
@@ -294,7 +292,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         jobCancellationDto,
         candidatePayRate: this.candidateJob.candidatePayRate,
       }));
-      this.closeDialog();
+      this.updateDetails.emit();
     }
   }
 
@@ -350,7 +348,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           takeUntil(this.unsubscribe$)
         ).subscribe(() => {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-          this.closeDialog();
+          this.updateDetails.emit();
           this.deleteUpdateFieldInRate();
           this.store.dispatch(new SetIsDirtyOrderForm(true));
         });
@@ -420,7 +418,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           this.store.dispatch(new ShowGroupEmailSideDialog(true));
         } else {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-          this.closeDialog();
+          this.updateDetails.emit();
         }
       });
   }
@@ -536,7 +534,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
           this.switchFormState();
           this.configureCandidatePayRateField();
-          this.subscribeCandidateCancellationReasons();
         }
 
         this.changeDetectorRef.markForCheck();
@@ -669,7 +666,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.saveCandidateJob();
     this.isSend =  false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
-    this.closeDialog();
+    this.updateDetails.emit();
   }
 
   onGroupEmailSend(){
@@ -694,7 +691,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           this.isSend =  false;
           this.store.dispatch(new ShowGroupEmailSideDialog(false));
           this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
-          this.closeDialog();
+          this.updateDetails.emit();
         });
     }
   }
@@ -770,21 +767,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
-  }
-
-  private subscribeCandidateCancellationReasons() {
-    if (this.candidateJob) {
-      const payload: CandidateCancellationReasonFilter = {
-        locationId: this.candidateJob?.order.locationId,
-        regionId: this.candidateJob?.order.regionId,
-      };
-      this.store.dispatch(new GetCandidateCancellationReason(payload));
-      this.candidateCancellationReasons$
-        .pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
-          this.candidateCancellationReasons =value;
-        });
-
-    }
   }
 
   private getRecalculateActualEndDate(

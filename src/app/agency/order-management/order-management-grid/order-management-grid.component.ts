@@ -871,6 +871,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onFilterClearAll(): void {
+    this.ltaOrder = false;
     this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
     this.store.dispatch(new ClearPageFilters(this.getPageName()));
     this.clearFilters();

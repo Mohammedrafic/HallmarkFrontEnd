@@ -92,42 +92,42 @@ export const MapSystemWithTabs: Map<OrderManagementIRPSystemId, TabsListConfig[]
     .set(OrderManagementIRPSystemId.IRP, IRPTabsConfig);
 
 export const ThreeDotsMenuOptionsIRP = (
-      CanEditOrderBillRateIRP: boolean,
+      CanCreateOrderIRP: boolean,
       CanCloseOrdersIRP: boolean,
       isIrpSystem: OrderManagementIRPSystemId,
     ): Record<string, ItemModel[]> => ({
       moreMenuWithDeleteButton: [
-        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
-        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
-        { text: MoreMenuType[3], id: '3', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[0], id: '0', disabled: !CanCreateOrderIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanCreateOrderIRP },
+        { text: MoreMenuType[3], id: '3', disabled: !CanCreateOrderIRP },
       ],
       moreMenuWithCloseButton: [
-        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
-        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[0], id: '0', disabled: !CanCreateOrderIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanCreateOrderIRP },
         { text: MoreMenuType[2], id: '2', disabled: !CanCloseOrdersIRP },
       ],
       moreMenuWithReOpenButton: [
-        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
-        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
-        { text: MoreMenuType[4], id: '4', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[0], id: '0', disabled: !CanCreateOrderIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanCreateOrderIRP },
+        { text: MoreMenuType[4], id: '4', disabled: !CanCreateOrderIRP },
       ],
       moreMenu: [
-        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
-        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[0], id: '0', disabled: !CanCreateOrderIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanCreateOrderIRP },
       ],
       reOrdersMenu: [
-        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[0], id: '0', disabled: !CanCreateOrderIRP },
         { text: MoreMenuType[2], id: '2', disabled: !CanCloseOrdersIRP },
       ],
       filledReOrdersMenu: [
-        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[0], id: '0', disabled: !CanCreateOrderIRP },
       ],
       closedOrderMenu: [
-        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanCreateOrderIRP },
       ],
       irpIncompleteMenu: [
-        { text: MoreMenuType[0], id: '0', disabled: !CanEditOrderBillRateIRP },
-        { text: MoreMenuType[1], id: '1', disabled: !CanEditOrderBillRateIRP },
+        { text: MoreMenuType[0], id: '0', disabled: !CanCreateOrderIRP },
+        { text: MoreMenuType[1], id: '1', disabled: !CanCreateOrderIRP },
       ],
     });
 
@@ -141,20 +141,24 @@ export const ThreeDotsMenuOptions = (
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
     { text: MoreMenuType[3], id: '3', disabled: !canCreateOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   moreMenuWithCloseButton: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
     { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   moreMenuWithReOpenButton: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
     { text: MoreMenuType[4], id: '4', disabled: !canCreateOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   moreMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   reOrdersMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
@@ -251,6 +255,16 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
   {
     field: 'workCommitment',
     headerName: 'Work Commitment',
+    width: 240,
+  },
+  {
+    field: 'actualStartDate',
+    headerName: 'Actual start date',
+    width: 140,
+  },
+  {
+    field: 'actualEndDate',
+    headerName: 'Actual end date',
     width: 140,
   },
 ];

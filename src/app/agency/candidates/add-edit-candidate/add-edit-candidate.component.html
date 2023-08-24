@@ -16,14 +16,10 @@
     </div>
   </ng-container>
   <ng-container right>
-    <ng-container *ngIf="!readonlyMode && showSaveProfileButtons">
-      <button ejs-button [disabled]="!candidateForm?.dirty" cssClass="e-outline"  (click)="clearForm()">Clear</button>
-      <app-tooltip-container
-        [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]">
-        <button ejs-button [isPrimary]="true" id="saveCandidateDetails" #saveCandidateDetails (click)="save()" [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">Save</button>
-      </app-tooltip-container>
-    </ng-container>
+    <ng-container
+      *ngIf="!readonlyMode && showSaveProfileButtons && !(isMobile$ | async)"
+      [ngTemplateOutlet]="actionButtons"
+    ></ng-container>
   </ng-container>
 </app-page-toolbar>
 <!-- Candidate Profile step -->
@@ -41,7 +37,11 @@
           <div class="left">
             <div class="e-card">
               <div class="e-card-content">
-                <form [formGroup]="candidateForm" id="candidateProfile">
+                <form
+                  id="candidateProfile"
+                  class="candidate-profile"
+                  [formGroup]="candidateForm"
+                >
                   <app-candidate-general-info [formGroup]="$any(candidateForm.get('generalInfo'))" [isCandidateCreated]="!readonlyMode && (isCandidateCreated$ | async)"
                    [selectedSkills]="fetchedCandidate?.candidateProfileSkills" [maskSSNPattern]="maskSSNPattern" [maskedSSN]="maskedSSN" (changedSSN)="updatedSSNValue($event)"></app-candidate-general-info>
                   <app-candidate-contact-details [formGroup]="$any(candidateForm.get('contactDetails'))"  [customMaskChar]="customMaskChar"></app-candidate-contact-details>
@@ -67,7 +67,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-experience-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed" [userPermission]="userPermission"></app-experience-grid>
+        <app-experience-grid
+          [readonlyMode]="readonlyMode"
+          [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed"
+          [userPermission]="userPermission"
+          [isMobileLoginOn]="!isNavigatedFromOrganizationArea && isMobileLoginOn"
+        ></app-experience-grid>
       </ng-template>
     </e-tabitem >
     <e-tabitem *ngIf="userPermission[userPermissions.CanViewEducation]">
@@ -77,7 +82,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-education-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed" [userPermission]="userPermission"></app-education-grid>
+        <app-education-grid
+          [readonlyMode]="readonlyMode"
+          [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed"
+          [userPermission]="userPermission"
+          [isMobileLoginOn]="!isNavigatedFromOrganizationArea && isMobileLoginOn"
+        ></app-education-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem *ngIf="userPermission[userPermissions.CanViewCandidateCredentials]">
@@ -93,8 +103,46 @@
           [isCandidateAssigned]="isCandidateAssigned"
           [orderId]="orderId"
           [userPermission]="userPermission"
+          [isMobileLoginOn]="!isNavigatedFromOrganizationArea && isMobileLoginOn"
         ></app-credentials-grid>
       </ng-template>
     </e-tabitem>
   </e-tabitems>
 </ejs-tab>
+
+<div
+  *ngIf="(isMobile$ | async) && !readonlyMode && showSaveProfileButtons"
+  class="mobile-buttons"
+>
+  <ng-container
+    [ngTemplateOutlet]="actionButtons"
+  ></ng-container>
+</div>
+
+<ng-template #actionButtons>
+  <button
+    ejs-button 
+    cssClass="e-outline"
+    [disabled]="!candidateForm?.dirty"
+    (click)="clearForm()"
+  >
+    Clear
+  </button>
+
+  <app-tooltip-container
+    [message]="toolTipMessage"
+    [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]"
+  >
+    <button
+      ejs-button
+      cssClass="action-btn"
+      id="saveCandidateDetails"
+      #saveCandidateDetails
+      [isPrimary]="true"
+      [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]"
+      (click)="save()"
+    >
+      Save
+    </button>
+  </app-tooltip-container>
+</ng-template>

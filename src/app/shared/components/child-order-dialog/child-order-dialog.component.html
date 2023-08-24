@@ -8,7 +8,7 @@
 >
   <ng-template #content>
     <section class="container preview-dialog">
-      <section class="header-container">
+      <section class="header-container dialog-header">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
             <h3 class="e-card-title preview-title">
@@ -107,6 +107,7 @@
                         [isTab]="true"
                         appUnsavedForm
                         (closeModalEvent)="onClose()"
+                        (updateDetails)="updateDetails()"
                         [orderDuration]="(selectedOrder$ | async)?.duration!"
                         [canEditClosedBillRate]="canEditClosedBillRates"
                         [actionsAllowed]="agencyActionsAllowed"
@@ -126,6 +127,7 @@
                         [candidate]="$any(candidate)"
                         [isTab]="true"
                         (closeModalEvent)="onClose()"
+                        (updateDetails)="updateDetails()"
                         [isAgency]="isAgency"
                         [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
                         [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
@@ -173,6 +175,7 @@
                         [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
                         [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
                         [currentOrder]="order"
+                        (updateDetails)="updateDetails()"
                       >
                       </app-extension-candidate>
                     </section>
@@ -212,7 +215,7 @@
 >
   <ng-template #content>
     <section class="container preview-dialog">
-      <section class="header-container">
+      <section class="header-container dialog-header">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
             <h3 class="e-card-title preview-title">Add Extension</h3>
@@ -342,9 +345,7 @@
 
 <app-candidate-cancellation-dialog
   [openEvent]="openCandidateCancellationDialog"
-  [orderType]="candidateJob?.order?.orderType"
   [candidateJob]="candidateJob"
   (submitCandidateCancellation)="cancelCandidate($event)"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
-  [candidateCancellation]="candidateCancellationReasons"
 ></app-candidate-cancellation-dialog>

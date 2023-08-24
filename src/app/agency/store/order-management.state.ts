@@ -16,6 +16,7 @@ import {
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
+  ApplicantStatus as ApStatus,
 } from '@shared/models/order-management.model';
 import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
 import { OrderApplicantsService } from '@shared/services/order-applicants.service';
@@ -50,6 +51,7 @@ import {
   UpdateAgencyCandidateJob,
   ClearOrganizationStructure,
   ReloadOrderCandidatesLists,
+  GetAgencyAvailableSteps,
 } from './order-management.actions';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { OrderFilteringOptionsService } from '@shared/services/order-filtering-options.service';
@@ -79,6 +81,7 @@ export interface OrderManagementModel {
   ordersTab: AgencyOrderManagementTabs;
   extensions: any;
   deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
+  applicantStatuses: ApStatus[];
 }
 
 @State<OrderManagementModel>({
@@ -100,6 +103,7 @@ export interface OrderManagementModel {
     ordersTab: AgencyOrderManagementTabs.MyAgency,
     extensions: null,
     deployedCandidateOrderInfo: [],
+    applicantStatuses: [],
   },
 })
 @Injectable()
@@ -195,6 +199,11 @@ export class OrderManagementState {
   @Selector()
   static deployedCandidateOrderInfo(state: OrderManagementModel): DeployedCandidateOrderInfo[] {
     return state.deployedCandidateOrderInfo;
+  }
+
+  @Selector()
+  static availableSteps(state: OrderManagementModel): ApStatus[] {
+    return state.applicantStatuses;
   }
 
   constructor(
@@ -438,5 +447,17 @@ export class OrderManagementState {
   @Action(ClearDeployedCandidateOrderInfo)
   ClearDeployedCandidateOrderInfo({ patchState }: StateContext<OrderManagementModel>): OrderManagementModel {
     return patchState({ deployedCandidateOrderInfo: [] });
+  }
+
+  @Action(GetAgencyAvailableSteps)
+  GetAvailableSteps(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { organizationId, jobId }: GetAgencyAvailableSteps
+  ): Observable<ApStatus[]> {
+    return this.orderManagementContentService.getAvailableSteps(organizationId, jobId).pipe(
+      tap((payload) => {
+        patchState({ applicantStatuses: payload });
+      }),
+    );
   }
 }

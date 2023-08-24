@@ -3,9 +3,9 @@
 </div>
 
 <ng-template #editMode>
-  <div *ngIf="group" [formGroup]="group">
+  <div *ngIf="group" [formGroup]="group" class="field boststrap">
     <input
-    class="amount-input"
+    class="amount-input e-input"
     [formControl]="formControl"
     [formControlName]="controlName"
     type="text"

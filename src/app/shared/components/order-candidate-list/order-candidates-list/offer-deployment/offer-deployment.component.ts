@@ -122,7 +122,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get isReadOnly(): boolean {
-    return this.isRejected || this.readOnlyMode;
+    return this.readOnlyMode;
   }
 
   get isReadOnlyBillRates(): boolean {
@@ -146,6 +146,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
+  
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
@@ -178,10 +179,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['candidate']?.currentValue) {
-      this.readOnlyMode =
-        this.candidateStatus === ApplicantStatusEnum.Withdraw || this.candidateStatus === ApplicantStatusEnum.Rejected;
+      this.readOnlyMode = this.candidateStatus === ApplicantStatusEnum.Withdraw;
       this.isClosedPosition = this.candidateStatus === ApplicantStatusEnum.Offboard;
-      this.showCandidatePayRate = ![ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Applied, ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom, ApplicantStatusEnum.Withdraw].includes(this.candidateStatus);
+      this.showCandidatePayRate = ![ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Applied,
+        ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom,
+        ApplicantStatusEnum.Withdraw].includes(this.candidateStatus);
     }
 
     this.checkRejectReason();
@@ -387,17 +389,19 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   private subscribeOnInitialData(): void {
     this.candidateJobState$
-    .pipe(takeUntil(this.unsubscribe$))
+    .pipe(
+      filter((data) => !!data),
+      takeUntil(this.unsubscribe$),
+      )
     .subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
-      if (data) {
-        this.getComments();
-        this.currentApplicantStatus = data.applicantStatus;
-        this.billRatesData = [...data.billRates];
-        this.setFormValue(data);
-        if (!this.isAgency) {
-          this.getOrderPermissions(data.orderId);
-        }
+      
+      this.getComments();
+      this.currentApplicantStatus = data.applicantStatus;
+      this.billRatesData = [...data.billRates];
+      this.setFormValue(data);
+      if (!this.isAgency) {
+        this.getOrderPermissions(data.orderId);
       }
     });
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {

@@ -1,10 +1,12 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, ChangeDetectorRef } from
+  '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { AbstractGridConfigurationComponent } from
+  '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { ShowCustomExportDialog, ShowExportDialog } from '../../../../store/app.actions';
+import { ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { ShowCustomExportDialog } from '../../../../store/app.actions';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { TimesheetGridSelections } from '../../interface/timesheet.interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
@@ -14,7 +16,7 @@ import { GetExportFileName, TimesheetsExportColsOrg, TimesheetsExportColsAgency 
 @Component({
   selector: 'app-timesheet-grid-export',
   templateUrl: './timesheet-grid-export.component.html',  
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimesheetGridExportComponent extends AbstractGridConfigurationComponent{
   @Input() public selectedRows: TimesheetGridSelections;

@@ -153,6 +153,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
   public filterType: string = 'Contains';
+  public isConsiderForHolidayShown = false;
+  
   constructor(
     private store: Store,
     private actions$: Actions,
@@ -368,6 +370,9 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         displayInJob: this.billRatesFormGroup.controls['displayInJob'].value
           ? this.billRatesFormGroup.controls['displayInJob'].value
           : false,
+        considerForHoliday: this.billRatesFormGroup.controls['considerForHoliday'].value
+          ? this.billRatesFormGroup.controls['considerForHoliday'].value
+          : false,
       };
 
       this.billRateToPost = billRate;
@@ -392,7 +397,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onRemoveRecordButtonClick(data: BillRateSetup, event: any): void {
+  public onRemoveRecordButtonClick(data: BillRateSetup, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
@@ -546,6 +551,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       considerForDailyOt: [null],
       considerFor7thDayOt: [null],
       displayInJob: [null],
+      considerForHoliday: [null],
     });
 
     this.billRateFilterFormGroup = this.formBuilder.group({
@@ -619,6 +625,15 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       });
   }
 
+  private handleOnCallBillRateType(typeId: BillRateTitleId): void {
+    if (typeId === BillRateTitleId.Oncall) {
+      this.isConsiderForHolidayShown = true;
+    } else {
+      this.billRatesFormGroup.get('considerForHoliday')?.setValue(false);
+      this.isConsiderForHolidayShown = false;
+    }
+  }
+
   // eslint-disable-next-line max-lines-per-function
   private billRatesTitleChangedHandler(): void {
     this.billRatesFormGroup
@@ -672,6 +687,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           intervalMaxControl?.reset();
           intervalMaxControl?.disable();
         }
+
+        this.handleOnCallBillRateType(typeId);
 
         if (typeId === BillRateTitleId.MissedMeal) {
           this.billRatesFormGroup.get('billRateValueRateTimes')?.patchValue(1);
@@ -759,7 +776,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     } else {
       const locations: OrganizationLocation[] = [];
       const selectedRegion = this.orgRegions.find((region) => region.id === data.regionId);
-      locations.push(...(selectedRegion?.locations as any));
+      locations.push(...(selectedRegion?.locations as OrganizationLocation[]));
       this.locations = sortByField(locations, 'name');
       this.billRatesFormGroup.controls['regionIds'].setValue([data.regionId], {emitEvent: false});
     }
@@ -813,6 +830,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup.controls['considerFor7thDayOt'].setValue(data.considerFor7thDayOT);
     this.billRatesFormGroup.controls['displayInJob'].setValue(data.displayInJob);
     this.billRatesFormGroup.controls['billRatesType'].setValue(data.billType);
+    this.billRatesFormGroup.controls['considerForHoliday'].setValue(data.considerForHoliday);
   }
 
   private setFormatDecimalsValues(): void {

@@ -1,6 +1,7 @@
-@import '../variables/colors.scss';
+@import 'colors';
 
-body.light, body.dark {
+body.light,
+body.dark {
   .e-pager {
     .e-pagercontainer {
       display: flex;
@@ -17,72 +18,75 @@ body.light, body.dark {
       }
     }
   }
-}
 
-body.light .e-pager .e-currentitem, body.light .e-pager .e-currentitem:hover {
-  background: $white !important;
-  color: $primary-active-blue-10;
-  border: 2px solid $primary-active-blue-10;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 20px;
-  opacity: 1;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-}
+  .e-pager .e-currentitem,
+  .e-pager .e-currentitem:hover {
+    background: $white !important;
+    color: $primary-active-blue-10;
+    border: 2px solid $primary-active-blue-10;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+    opacity: 1;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+  }
 
-body.light .e-pager div.e-icons.e-disable {
-  display: none;
-}
+  .e-pager div.e-icons.e-disable {
+    display: none;
+  }
 
-body.light .e-pager .e-icon-first::before, body.light .e-grid-menu .e-icon-first::before {
-  display: none;
-}
+  .e-pager .e-icon-first::before,
+  .e-grid-menu .e-icon-first::before {
+    display: none;
+  }
 
-body.light .e-pager .e-icon-last::before, body.light .e-grid-menu .e-icon-last::before {
-  display: none;
-}
+  .e-pager .e-icon-last::before,
+  .e-grid-menu .e-icon-last::before {
+    display: none;
+  }
 
-body.light .e-pager .e-numericitem.e-pager-default {
-  color: $black;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 20px;
-  width: 24px;
-  height: 24px;
-  padding-top: 0;
-}
+  .e-pager .e-numericitem.e-pager-default {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+    width: 24px;
+    height: 24px;
+    padding-top: 0;
+  }
 
-body.light .e-pager .e-spacing.e-numericitem:not(.e-active):not(.e-np):not(.e-pp):hover {
-  color: $primary-active-blue-10;
-  background-color: $primary-active-blue-90;
-  padding-top: 2px;
-}
+  .e-pager .e-spacing.e-numericitem:not(.e-active):not(.e-np):not(.e-pp):hover {
+    color: $primary-active-blue-10;
+    background-color: $primary-active-blue-90;
+    padding-top: 2px;
+  }
 
-body.light .e-pager .e-icon-next::before, body.light .e-grid-menu .e-icon-next::before {
-  content: '\e7f9';
-  color: $primary-active-blue-10;
-  font-weight: 700;
-  font-size: 14px;
-  width: 16px;
-  height: 16px;
-}
+  .e-pager .e-icon-next::before,
+  .e-grid-menu .e-icon-next::before {
+    content: '\e7f9';
+    color: $primary-active-blue-10;
+    font-weight: 700;
+    font-size: 14px;
+    width: 16px;
+    height: 16px;
+  }
 
-body.light .e-pager .e-icon-prev::before, body.light .e-grid-menu .e-icon-prev::before {
-  content: '\e773';
-  color: $primary-active-blue-10;
-  font-weight: 700;
-  font-size: 14px;
-  width: 16px;
-  height: 16px;
-}
+  .e-pager .e-icon-prev::before,
+  .e-grid-menu .e-icon-prev::before {
+    content: '\e773';
+    color: $primary-active-blue-10;
+    font-weight: 700;
+    font-size: 14px;
+    width: 16px;
+    height: 16px;
+  }
 
-body.light .e-grid .e-focused:not(.e-menu-item) {
-  box-shadow: none;
-}
+  .e-grid .e-focused:not(.e-menu-item) {
+    box-shadow: none;
+  }
 
-body.light, body.dark {
   .with-selected-rows {
     .e-pager {
       border-color: transparent;

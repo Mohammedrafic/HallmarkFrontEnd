@@ -13,6 +13,7 @@ import { Select, Store } from '@ngxs/store';
 import {
   ClearLogiReportState,
   GetCommonReportFilterOptions,
+  GetSkillsbyDepartment,
   GetStaffScheduleReportFilterOptions,
 } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
@@ -43,6 +44,7 @@ import {
   CommonReportFilterOptions,
   StaffScheduleReportFilterOptions,
 } from '../models/common-report.model';
+import { YEARANDMONTH_Validation } from '@shared/constants/messages';
 
 @Component({
   selector: 'app-shift-breakdown',
@@ -129,6 +131,9 @@ export class ShiftBreakdownComponent implements OnInit {
   @Select(LogiReportState.commonReportFilterData)
   public CommonReportFilterData$: Observable<CommonReportFilterOptions>;
 
+  @Select(LogiReportState.skillbydepartment)
+  skillbydepartment$: Observable<any>;
+
   get startMonthControl(): AbstractControl { 
     return this.shiftBreakdownForm.get('startMonth') as AbstractControl; 
   }
@@ -174,6 +179,7 @@ export class ShiftBreakdownComponent implements OnInit {
       this.handleFilterControlValueChange();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
+      this.onFilterDepartmentChangedHandler();
 
       this.user?.businessUnitType == BusinessUnitType.Hallmark
         ? this.shiftBreakdownForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
@@ -342,12 +348,14 @@ export class ShiftBreakdownComponent implements OnInit {
             regionsList.push(...value.regions);
             locationsList = regionsList
               .map((obj) => {
-                return obj.locations.filter((location) => location.regionId === obj.id);
+                return obj.locations.filter(
+                  (location) => location.regionId === obj.id && this.checkInactiveDate(location.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
             departmentsList = locationsList
               .map((obj) => {
-                return obj.departments.filter((department) => department.locationId === obj.id);
+                return obj.departments.filter(
+                  (department) => department.locationId === obj.id && this.checkInactiveDate(department.inactiveDate));
               })
               .reduce((a, b) => a.concat(b), []);
           });
@@ -381,6 +389,19 @@ export class ShiftBreakdownComponent implements OnInit {
     });
   }
 
+  private checkInactiveDate(dateStr?:string) : boolean {
+    if(dateStr == null || dateStr == undefined) {
+      return true;
+    }
+    const date = new Date(dateStr);
+    const today = new Date();
+    if(date < today) {
+      return false;
+    }
+    return true;
+  }
+
+
   private loadShiftData(businessUnitId: number) {
     const businessIdData = [];
     businessIdData.push(businessUnitId);
@@ -391,8 +412,6 @@ export class ShiftBreakdownComponent implements OnInit {
     this.CommonReportFilterData$.pipe(filter((data) => data !== null), takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions) => {
         this.isAlive = false;
         this.filterOptionData = data;
-        this.filterColumns.skillIds.dataSource = [];
-        this.filterColumns.skillIds.dataSource = data.masterSkills;
         this.changeDetectorRef.detectChanges();
 
         if (this.isInitialLoad) {
@@ -459,6 +478,32 @@ export class ShiftBreakdownComponent implements OnInit {
       this.changeDetectorRef.detectChanges();
     });
   }
+
+  public onFilterDepartmentChangedHandler(): void {
+    this.departmentIdControl = this.shiftBreakdownForm.get(
+      analyticsConstants.formControlNames.DepartmentIds
+    ) as AbstractControl;
+    this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.shiftBreakdownForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
+      if (this.departmentIdControl.value.length > 0) {
+        this.store.dispatch(new GetSkillsbyDepartment(data))
+        this.skillbydepartment$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills: any[]) => {
+          if(skills && skills.length > 0){
+            this.filterColumns.skillIds.dataSource = sortByField(skills, "name");
+          } else {
+            this.filterColumns.skillIds.dataSource = [];
+            this.shiftBreakdownForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(null);
+          }
+          this.changeDetectorRef.markForCheck();
+        });
+      } else {
+        this.filterColumns.skillIds.dataSource = [];
+        this.shiftBreakdownForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
+      }
+      this.changeDetectorRef.detectChanges();
+    });
+  }
+
 
   public onFilterClearAll(): void {
     const currentYear = new Date().getFullYear();    
@@ -528,8 +573,26 @@ export class ShiftBreakdownComponent implements OnInit {
       StartYear: startYear,
       EndYear: endYear,
     };
+    if(startYear > endYear){
+      this.showErrorMessage();
+    } else if(startYear === endYear){
+      if(startMonth <= endMonth){
+        this.filterCall();  
+      } else {
+        this.showErrorMessage();
+      }
+    } else if(startYear < endYear){
+      this.filterCall();
+    }
+  }
+
+  showErrorMessage() {
+    this.store.dispatch(new ShowToast(MessageTypes.Error, YEARANDMONTH_Validation));
+  }
+
+  filterCall() {
     this.logiReportComponent.paramsData = this.paramsData;
-    this.logiReportComponent.RenderReport();
+    this.logiReportComponent.RenderReport();  
   }
 
   getLastWeek() {

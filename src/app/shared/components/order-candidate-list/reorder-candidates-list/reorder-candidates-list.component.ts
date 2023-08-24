@@ -135,7 +135,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
         this.store.dispatch(new GetCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
       } else if (this.isOrganization) {
         const isGetAvailableSteps = [CandidatStatus.BillRatePending,
-          CandidatStatus.OfferedBR, CandidatStatus.OnBoard].includes(
+          CandidatStatus.OfferedBR, CandidatStatus.OnBoard, CandidatStatus.Rejected].includes(
           this.candidate.status
         );
 

@@ -3,6 +3,7 @@
   [rowData]="candidatesPage?.items"
   (navigateToPageEmitter)="onGoToClick($event)"
   (pageSizeChangeEmitter)="onRowsDropDownChanged($event)"
+  (sortChanged)="sortByColumn($event)"
   [isLoading]="isLoading"
   [pageSize]="pageSize"
   [currentPage]="pageNumber"

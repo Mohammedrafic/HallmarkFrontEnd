@@ -120,6 +120,10 @@ $headerHeight: 19px;
     background-color: #fff;
     border: 2px solid #000;
   }
+  &__positions_count_day_range {
+    display: flex;
+    overflow: auto;
+  }
 }
 .with-position{
     padding: 8% !important;
@@ -164,5 +168,8 @@ $headerHeight: 19px;
 }
 .app-widget-wrapper__available_employee{
   height: inherit;
+}
+.height_update {
+  max-height: calc( 100% - 51px);
   overflow: auto;
 }

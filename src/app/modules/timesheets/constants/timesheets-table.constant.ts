@@ -48,7 +48,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       headerName: 'NAME',
       width: 158,
       minWidth: 158,
-      cellClass: 'name',
+      cellClass: isAgency ? 'name' : 'no-link-name',
       ...commonColumn,
       cellRenderer: TimesheetTableLinkComponent,
       valueFormatter: (params: ValueFormatterParams) => `${params.data.candidateFirstName} ${params.data.candidateLastName}`,

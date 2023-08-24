@@ -78,4 +78,11 @@ export class GetAgencyCommonFilterReportOptions {
   static readonly type = '[LogiReport] Get Agency Common Report Filter Options';
   constructor(public filter: AgencyCommonReportFilter) { }
 }
+export class GetCredentialTypes {
+  static readonly type = '[candidate] Get Credential Types';
+}
 
+export class GetSkillsbyDepartment {
+  static readonly type = '[LogiReport] Get Skills by department';
+  constructor(public payload: number[]) { }
+}

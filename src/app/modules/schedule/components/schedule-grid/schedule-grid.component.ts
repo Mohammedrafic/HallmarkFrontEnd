@@ -21,7 +21,7 @@ import { AutoCompleteComponent } from '@syncfusion/ej2-angular-dropdowns/src/aut
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { catchError, debounceTime, EMPTY, fromEvent, Observable, scheduled, switchMap, take, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, EMPTY, fromEvent, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { DatesRangeType, WeekDays } from '@shared/enums';
@@ -57,7 +57,6 @@ import { GetPreservedFiltersByPage, ResetPageFilters } from 'src/app/store/prese
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 import { BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
-import { ScheduleType } from '../../enums';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -86,12 +85,14 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.emitAvailableEmp(availableEmployeeData);
   }
 
+  @Output() dateRange: EventEmitter<ScheduleInt.DateRangeOption[]> = new EventEmitter<ScheduleInt.DateRangeOption[]>();
   @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
   @Output() loadMoreData: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectedCells: EventEmitter<SelectedCells> = new EventEmitter<SelectedCells>();
   @Output() selectCandidate: EventEmitter<ScheduleInt.ScheduleCandidate | null>
     = new EventEmitter<ScheduleInt.ScheduleCandidate | null>();
   @Output() editCell: EventEmitter<ScheduleInt.ScheduledItem> = new EventEmitter<ScheduleInt.ScheduledItem>();
+  @Output() activeTimePeriod: EventEmitter<DatesRangeType> = new EventEmitter<DatesRangeType>();
 
   datesPeriods: ItemModel[] = DatesPeriods;
 
@@ -291,6 +292,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.datesPeriods = candidate ? [...DatesPeriods, ...MonthPeriod] : DatesPeriods;
     this.activePeriod = this.datesPeriods.includes(MonthPeriod[0]) ? DatesRangeType.Month : DatesRangeType.TwoWeeks;
     this.selectCandidate.emit(candidate);
+    this.activeTimePeriod.emit(this.activePeriod);
     this.cdr.markForCheck();
   }
 
@@ -376,10 +378,17 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     ).subscribe();
   }
 
+  private clearDaysForScheduleDate(): void {
+    if (this.scheduleData) {
+      this.scheduleData = this.scheduleGridService.clearDaysForSchedule(this.scheduleData);
+    }
+  }
+
   private watchForSideBarAction(): void {
     this.createScheduleService.closeSideBarEvent.pipe(
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
+      this.clearDaysForScheduleDate();
       this.selectedCandidatesSlot = new Map<number, ScheduleInt.ScheduleDateSlot>();
       this.cdr.markForCheck();
     });
@@ -418,6 +427,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       filter(([startDate, endDate]: [string, string]) => !!startDate && !!endDate),
       tap(([startDate, endDate]: [string, string]) => {
         this.datesRanges = this.scheduleItemsService.createRangeOptions(DateTimeHelper.getDatesBetween(startDate, endDate));
+        this.dateRange.emit(this.datesRanges);
         this.changeFilter.emit({ startDate, endDate });
         this.scrollArea.nativeElement.scrollTo(0, 0);
 

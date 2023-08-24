@@ -26,7 +26,8 @@ export abstract class InvoicesContainerService {
 
   public abstract getRowData(
     tabIndex: AgencyInvoicesGridTab | OrganizationInvoicesGridTab,
-    organizationId: number | null
+    organizationId: number | null,
+    agencyOrganizationIds: number[] | null
   ): Observable<void>;
 
   public abstract getAllTabId(): number;

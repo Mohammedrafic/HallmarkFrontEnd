@@ -3,13 +3,13 @@
 ::ng-deep {
   .amount-input {
     width: 95%!important;
-    border: 1px solid $secondary-dark-blue-40!important;
+    border: 1px solid var(--border-drop-area)!important;
     height: 40px!important;
     padding: 0!important;
     border-radius: 8px!important;
     padding-left: 15px!important;
     font-size: 14px!important;
-    color: $secondary-dark-blue-15!important;
+    color: var(--text)!important;
   }
 
   .e-input-group {

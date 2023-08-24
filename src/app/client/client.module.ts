@@ -55,7 +55,7 @@ import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule, Switch
 import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { AutoCompleteAllModule, DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
-import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
+import { AccordionModule, MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, MaskedDateTimeService, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NgxMaskModule } from 'ngx-mask';
 import { ClientRoutingModule } from './client-routing.module';
@@ -120,7 +120,7 @@ import { ImportDnrComponent } from './do-not-return/import-dnr/import-dnr.compon
 import { CreateEditOrderResolver } from '@client/order-management/resolvers/create-edit-order.resolver';
 import { ImportEmployeeComponent } from './candidates/import-employee/import-employee.component';
 import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
-
+import { OrderHistoryDetailsComponent } from './order-management/components/order-history-details/order-history-details.component';
 
 const gridIcons = {
   MessageSquare,
@@ -175,6 +175,7 @@ const gridIcons = {
     DoNotReturnGridComponent,
     ImportDnrComponent,
     ImportEmployeeComponent,
+    OrderHistoryDetailsComponent
   ],
   imports: [
     CommonModule,
@@ -244,6 +245,7 @@ const gridIcons = {
     AutoCompleteAllModule,
     OrderReOrdersContainerModule,
     DocumentUploaderModule,
+    AccordionModule
   ],
   providers: [
     ResizeService,

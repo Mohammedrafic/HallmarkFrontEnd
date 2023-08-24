@@ -97,6 +97,7 @@ import { ScrollRestorationService } from '@core/services/scroll-restoration.serv
 import { AgencyReportsModule } from '@agency/agency-reports/agency-reports.module';
 import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
 import { AgencySettingsModule } from './settings/agency-settings.module';
+import { EmployeeImportService } from '@client/candidates/services/employee-import.service';
 
 
 
@@ -214,6 +215,7 @@ const sidebarIcons = {
     CandidateGeneralInfoService,
     AgencySettingsService,
     ScrollRestorationService,
+    EmployeeImportService,
   ],
 })
 export class AgencyModule {}

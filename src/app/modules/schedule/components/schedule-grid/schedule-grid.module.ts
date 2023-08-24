@@ -24,6 +24,7 @@ import { MonthViewGridModule } from '../month-view-grid/month-view-grid.module';
 import { ScheduleGridService } from './schedule-grid.service';
 import { CanScheduleModule } from '../../directives/can-schedule/can-schedule.module';
 import { ReplacementOrderDialogModule } from '../replacement-order-dialog/replacement-order-dialog.module';
+import { ExportCalendarDateSlotModule } from '../../pipes/calendar-date-slot/export-calendar-date-slot.module';
 
 const icons = {
   Search,
@@ -43,6 +44,7 @@ const icons = {
         CandidateCardModule,
         ScheduleCardModule,
         CalendarDateSlotModule,
+        ExportCalendarDateSlotModule,
         AutoCompleteModule,
         CalendarTooltipSlotModule,
         PeriodPickerModule,

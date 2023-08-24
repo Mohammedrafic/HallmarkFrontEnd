@@ -11,193 +11,197 @@
 >
   <ng-template #content>
     <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate" #resize>
-      <div class="profile-details">
-        <div class="profile-details__wraper">
-          <div class="profile-details__info-container">
-            <div class="profile-details__info">
-              <img
-                class="e-avatar e-avatar-xlarge"
-                alt="avatar"
-                [src]="timesheetDetails.candidateId | candidateAvatar"
-              />
+      <div class="header-container">
+        <div class="profile-details">
+          <div class="profile-details__wraper">
+            <div class="profile-details__info-container">
+              <div class="profile-details__info">
+                <img
+                  class="e-avatar e-avatar-xlarge"
+                  alt="avatar"
+                  [src]="timesheetDetails.candidateId | candidateAvatar"
+                />
 
-              <div class="profile-details__user-name">
-                <h3 class="username">
-                  {{ timesheetDetails.candidateLastName }}, {{ timesheetDetails.candidateFirstName }}
-                </h3>
-                <ng-container *ngIf="!isMobile">
-                  <ng-container
-                    [ngTemplateOutlet]="chipListTmplt"
-                    [ngTemplateOutletContext]="{ timesheetDetails }"
-                  ></ng-container>
-                </ng-container>
+                <div class="profile-details__user-name">
+                  <h3 class="username">
+                    {{ timesheetDetails.candidateLastName }}, {{ timesheetDetails.candidateFirstName }}
+                  </h3>
+                  <ng-container *ngIf="!isMobile">
+                    <ng-container
+                      [ngTemplateOutlet]="chipListTmplt"
+                      [ngTemplateOutletContext]="{ timesheetDetails }"
+                    ></ng-container>
+                  </ng-container>
+                </div>
+              </div>
+              <div *ngIf="isMobile" class="profile-details__chip-list">
+                <ng-container [ngTemplateOutlet]="chipListTmplt" [ngTemplateOutletContext]="{ timesheetDetails }"></ng-container>
               </div>
             </div>
-            <div *ngIf="isMobile" class="profile-details__chip-list">
-              <ng-container [ngTemplateOutlet]="chipListTmplt" [ngTemplateOutletContext]="{ timesheetDetails }"></ng-container>
-            </div>
-          </div>
 
-          <div class="profile-details__header-controls">
-            <div class="profile-details__upload-container" #uploadContainer>
-              <app-date-week-picker
-                *ngIf="!isMobile"
-                [initDates]="weekPeriod"
-                [availibleDates]="workWeeks"
-                [isAbleToChange]="isChangesSaved"
-                [rangeType]="rangeType"
-                [firstDayOfWeek]="weekPeriod[0].getDay()"
-              >
-              </app-date-week-picker>
-
-              <app-tooltip-container
-                [showToolTip]="!hasEditTimesheetRecordsPermission"
-                [class.hide-elem]="isSmallTabletScreen"
-              >
-                <button
-                  #uploadBtn
-                  ejs-button
-                  cssClass="e-outline"
-                  class="profile-details__upload-button"
-                  [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
-                  (click)="openFileUploadArea()"
+            <div class="profile-details__header-controls">
+              <div class="profile-details__upload-container" #uploadContainer>
+                <app-date-week-picker
+                  *ngIf="!isMobile"
+                  [initDates]="weekPeriod"
+                  [availibleDates]="workWeeks"
+                  [isAbleToChange]="isChangesSaved"
+                  [rangeType]="rangeType"
+                  [firstDayOfWeek]="weekPeriod[0].getDay()"
                 >
-                  Upload
-                  <i-feather name="upload" class="icon"></i-feather>
-                </button>
-              </app-tooltip-container>
+                </app-date-week-picker>
 
-              <app-tooltip-container *ngIf="isSmallTabletScreen" [showToolTip]="!hasEditTimesheetRecordsPermission">
-                <button
-                  ejs-dropdownbutton
-                  iconCss="e-icons"
-                  cssClass="e-caret-hide primary-icon-button menu-mobile"
-                  [items]="mobileMenu"
-                  [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
-                  (select)="onMobileMenuSelect($event)"
+                <app-tooltip-container
+                  [showToolTip]="!hasEditTimesheetRecordsPermission"
+                  [class.hide-elem]="isSmallTabletScreen"
                 >
-                  <i-feather name="more-vertical" class="icon"></i-feather>
-                </button>
-              </app-tooltip-container>
+                  <button
+                    #uploadBtn
+                    ejs-button
+                    cssClass="e-outline"
+                    class="profile-details__upload-button"
+                    [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
+                    (click)="openFileUploadArea()"
+                  >
+                    Upload
+                    <i-feather name="upload" class="icon"></i-feather>
+                  </button>
+                </app-tooltip-container>
 
-              <app-upload-file-area
-                [container]="uploadContainer"
-                [excludeElement]="uploadBtn.element"
-                [maxFileSize]="maxFileSize"
-                [allowedFileExtensions]="allowedFileExtensions"
-                [isMobile]="!!(isMobileScreen$ | async)"
-                (filesSelected)="onFilesSelected($event)"
-              >
-              </app-upload-file-area>
+                <app-tooltip-container *ngIf="isSmallTabletScreen" [showToolTip]="!hasEditTimesheetRecordsPermission">
+                  <button
+                    ejs-dropdownbutton
+                    iconCss="e-icons"
+                    cssClass="e-caret-hide primary-icon-button menu-mobile"
+                    [items]="mobileMenu"
+                    [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
+                    (select)="onMobileMenuSelect($event)"
+                  >
+                    <i-feather name="more-vertical" class="icon"></i-feather>
+                  </button>
+                </app-tooltip-container>
 
-              <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
-              <app-export-button
-                style="display: none"
-                (csvExport)="exportProfileDetails(exportedFileType.csv)"
-                (excelExport)="exportProfileDetails(exportedFileType.excel)"
-                (customExport)="showCustomExportDialog()"
-              ></app-export-button>
-            </div>
+                <app-upload-file-area
+                  [container]="uploadContainer"
+                  [excludeElement]="uploadBtn.element"
+                  [maxFileSize]="maxFileSize"
+                  [allowedFileExtensions]="allowedFileExtensions"
+                  [isMobile]="!!(isMobileScreen$ | async)"
+                  (filesSelected)="onFilesSelected($event)"
+                >
+                </app-upload-file-area>
 
-            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
-              <i-feather name="x" class="icon"></i-feather>
-            </button>
-          </div>
-        </div>
-        <div *ngIf="isMobile" class="profile-details__mobile-date-picker">
-          <app-date-week-picker
-            [initDates]="weekPeriod"
-            [availibleDates]="workWeeks"
-            [rangeType]="rangeType"
-            [isAbleToChange]="isChangesSaved">
-          </app-date-week-picker>
-        </div>
-      </div>
+                <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
+                <app-export-button
+                  style="display: none"
+                  (csvExport)="exportProfileDetails(exportedFileType.csv)"
+                  (excelExport)="exportProfileDetails(exportedFileType.excel)"
+                  (customExport)="showCustomExportDialog()"
+                ></app-export-button>
+              </div>
 
-      <div class="order-header">
-        <div class="order-meta">
-          <h2 class="order-id">Job ID: {{ timesheetDetails?.formattedId }}</h2>
-        </div>
-
-        <div class="controls-wrapper">
-          <div class="reject-reason-block" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
-            <span class="reason-header">Reject Reason:</span>
-            <ejs-tooltip [content]="rejectReason" class="reject-tooltip">
-              <span class="reason-text">{{ rejectReason }}</span>
-            </ejs-tooltip>
-          </div>
-
-          <div class="controls-block">
-            <div class="checkbox-block">
-              <ejs-switch
-                #dnwSwitch
-                class="toggle"
-                [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission || !isDNWEnabled"
-                [checked]="timesheetDetails.noWorkPerformed"
-                (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
-              ></ejs-switch>
-              <span>DNW</span>
+              <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
+                <i-feather name="x" class="icon"></i-feather>
+              </button>
             </div>
           </div>
+          <div *ngIf="isMobile" class="profile-details__mobile-date-picker">
+            <app-date-week-picker
+              [initDates]="weekPeriod"
+              [availibleDates]="workWeeks"
+              [rangeType]="rangeType"
+              [isAbleToChange]="isChangesSaved">
+            </app-date-week-picker>
+          </div>
         </div>
       </div>
 
-      <div class="job-general-info tile-dark-blue">
-        <app-profile-details-job-info [isAgency]="isAgency" [jobData]="timesheetDetails"></app-profile-details-job-info>
-      </div>
+      <div class="content-container">
+        <div class="order-header">
+          <div class="order-meta">
+            <h2 class="order-id">Job ID: {{ timesheetDetails?.formattedId }}</h2>
+          </div>
 
-      <div class="profile-hours-statistics">
-        <div class="tile-dark-blue statistic-wrapper">
-          <app-profile-cumulative-hours
-            [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
-          ></app-profile-cumulative-hours>
+          <div class="controls-wrapper">
+            <div class="reject-reason-block" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
+              <span class="reason-header">Reject Reason:</span>
+              <ejs-tooltip [content]="rejectReason" class="reject-tooltip">
+                <span class="reason-text">{{ rejectReason }}</span>
+              </ejs-tooltip>
+            </div>
+
+            <div class="controls-block">
+              <div class="checkbox-block">
+                <ejs-switch
+                  #dnwSwitch
+                  class="toggle"
+                  [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission || !isDNWEnabled"
+                  [checked]="timesheetDetails.noWorkPerformed"
+                  (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
+                ></ejs-switch>
+                <span>DNW</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
-          <app-profile-miles [milesData]="milesData"></app-profile-miles>
+        <div class="job-general-info tile-dark-blue">
+          <app-profile-details-job-info [isAgency]="isAgency" [jobData]="timesheetDetails"></app-profile-details-job-info>
         </div>
 
-        <div
-          class="tile-dark-blue profile-attachments"
-          *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length"
-        >
-          <h3 class="attachments-title">Attachments</h3>
+        <div class="profile-hours-statistics">
+          <div class="tile-dark-blue statistic-wrapper">
+            <app-profile-cumulative-hours
+              [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
+            ></app-profile-cumulative-hours>
+          </div>
 
-          <app-attachments-list
-            [attachments]="timesheetDetails.attachments"
-            [attachmentsListConfig]="attachmentsListConfig$ | async"
-            [deleteIconColor]="'#FF5858'"
-            [disableDelete]="disableAnyAction || !hasEditTimesheetRecordsPermission"
-          ></app-attachments-list>
+          <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
+            <app-profile-miles [milesData]="milesData"></app-profile-miles>
+          </div>
+
+          <div
+            class="tile-dark-blue profile-attachments"
+            *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length"
+          >
+            <h3 class="attachments-title">Attachments</h3>
+
+            <app-attachments-list
+              [attachments]="timesheetDetails.attachments"
+              [attachmentsListConfig]="attachmentsListConfig$ | async"
+              [deleteIconColor]="'#FF5858'"
+              [disableDelete]="disableAnyAction || !hasEditTimesheetRecordsPermission"
+            ></app-attachments-list>
+          </div>
+
+          <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
+            <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
+          </div>
         </div>
 
-        <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
-          <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
-        </div>
-      </div>
-
-      <section class="profile-table-container">
-        <app-profile-timesheet-table
-          [isAgency]="isAgency"
-          [timesheetDetails]="timesheetDetails"
-          [actionsDisabled]="timesheetDetails.noWorkPerformed"
-          [disableAnyAction]="disableAnyAction"
-          [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
-          [hasApproveRejectRecordsPermission]="hasApproveRejectTimesheetRecordsPermission"
-          [hasApproveRejectMileagesPermission]="
+        <section class="profile-table-container">
+          <app-profile-timesheet-table
+            [isAgency]="isAgency"
+            [timesheetDetails]="timesheetDetails"
+            [actionsDisabled]="timesheetDetails.noWorkPerformed"
+            [disableAnyAction]="disableAnyAction"
+            [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
+            [hasApproveRejectRecordsPermission]="hasApproveRejectTimesheetRecordsPermission"
+            [hasApproveRejectMileagesPermission]="
             isAgency ? true : userPermission[userPermissions.CanOrganizationApproveRejectMileages]
           "
-          [canRecalculateTimesheet]="canRecalculateTimesheet"
-          (openAddSideDialog)="openAddDialog($event)"
-          (uploadSideDialog)="openUploadSideDialog($event)"
-          (changesSaved)="handleEditChanges($event)"
-          (rejectEvent)="onRejectButtonClick($event)"
-          (approveEvent)="handleApprove($event)"
-          (orgSubmitting)="orgSubmit()"
-          [disableEditButton]="disableEditButton"
-        >
-        </app-profile-timesheet-table>
-      </section>
+            [canRecalculateTimesheet]="canRecalculateTimesheet"
+            (openAddSideDialog)="openAddDialog($event)"
+            (uploadSideDialog)="openUploadSideDialog($event)"
+            (changesSaved)="handleEditChanges($event)"
+            (rejectEvent)="onRejectButtonClick($event)"
+            (approveEvent)="handleApprove($event)"
+            (orgSubmitting)="orgSubmit()"
+            [disableEditButton]="disableEditButton"
+          >
+          </app-profile-timesheet-table>
+        </section>
+      </div>
     </section>
     <ng-template #closeTemplate>
       <section class="container d-flex justify-end">

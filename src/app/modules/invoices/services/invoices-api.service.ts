@@ -37,7 +37,7 @@ import { ChangeStatusData } from '../../timesheets/interface';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { GetQueryParams } from '@core/helpers/functions.helper';
-import { InvoicesAggregationType, OrganizationInvoicesGridTab } from '../enums';
+import { AgencyInvoicesGridTab, InvoicesAggregationType, OrganizationInvoicesGridTab } from '../enums';
 
 @Injectable()
 export class InvoicesApiService {
@@ -211,7 +211,10 @@ export class InvoicesApiService {
   }
 
   public exportInvoices(payload: ExportPayload, isAgency: boolean,selectedTabIndex:number): Observable<Blob> {
-    const url = isAgency ? '/api/Invoices/agency/export' : selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords ? '/api/PendingInvoices/export' : '/api/Invoices/export';
+    const url = isAgency ?  selectedTabIndex === AgencyInvoicesGridTab.Manual?  '/api/Invoices/agency/export/manualinvoicepending' : '/api/Invoices/agency/export' :
+     selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords ? '/api/PendingInvoices/export' : 
+     selectedTabIndex === OrganizationInvoicesGridTab.Manual ? '/api/Invoices/agency/export/manualinvoicepending' 
+     :'/api/Invoices/export';
     return this.http.post(url, payload, { responseType: 'blob' });
   }
 
