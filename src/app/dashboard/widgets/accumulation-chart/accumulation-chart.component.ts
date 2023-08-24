@@ -75,6 +75,7 @@ export class AccumulationChartComponent
 
   public redirectToSourceContent(status: string): void {
     let candidatesStatusDataSet:any = []
+    let activeOrderStatus:any = []
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
     let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
     if (filteredList.length > 0) {
@@ -99,7 +100,6 @@ export class AccumulationChartComponent
         else if(status === 'In Progress'){
           candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
           candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
-          candidatesStatusDataSet.push({"value":CandidatStatus['Pre Offer Custom']});
         }
         else if(status === 'In Progress (Pending)'){
           candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
@@ -109,6 +109,8 @@ export class AccumulationChartComponent
         }
         else if(OrderStatus[OrderStatus.Filled] === status){
           candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
+          activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
+          window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(activeOrderStatus));
         }
       }
       if(status !=  OrderStatus[OrderStatus.Open]){
