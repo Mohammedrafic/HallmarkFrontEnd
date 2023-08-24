@@ -111,7 +111,11 @@
           </div>
           <div class="graph-cards">
             <div class="graphalign">
-              <ejs-progressbar id='determinate1{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.submissionQualityPercent)}} [startAngle]="startAngle"
+              <ejs-progressbar id='determinate1{{i}}' progressColor="{{agencies.submissionQualityPercent>80 ?'#15ce48':
+                agencies.submissionQualityPercent>60?'#0f82bf':
+                agencies.submissionQualityPercent>40?'#36b3ef':
+                agencies.submissionQualityPercent>20?'#f9c679':
+                '#f5602e'}}" [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value="{{agencies.submissionQualityPercent}}" width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -120,7 +124,11 @@
               <span></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate2{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.complianceRatingPercent)}} [startAngle]="startAngle"
+              <ejs-progressbar id='determinate2{{i}}' progressColor="{{agencies.complianceRatingPercent>80 ?'#15ce48':
+                agencies.complianceRatingPercent>60?'#0f82bf':
+                agencies.complianceRatingPercent>40?'#36b3ef':
+                agencies.complianceRatingPercent>20?'#f9c679':
+                '#f5602e'}}" [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.complianceRatingPercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -129,7 +137,11 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate3{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.fillRatePercent)}} [startAngle]="startAngle"
+              <ejs-progressbar id='determinate3{{i}}' progressColor="{{agencies.fillRatePercent>80 ?'#15ce48':
+                agencies.fillRatePercent>60?'#0f82bf':
+                agencies.fillRatePercent>40?'#36b3ef':
+                agencies.fillRatePercent>20?'#f9c679':
+                '#f5602e'}}" [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.fillRatePercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -138,7 +150,11 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate4{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.costAdjustmentPercent)}} [startAngle]="startAngle"
+              <ejs-progressbar id='determinate4{{i}}' progressColor="{{agencies.costAdjustmentPercent>80 ?'#15ce48':
+                agencies.costAdjustmentPercent>60?'#0f82bf':
+                agencies.costAdjustmentPercent>40?'#36b3ef':
+                agencies.costAdjustmentPercent>20?'#f9c679':
+                '#f5602e'}}" [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.costAdjustmentPercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -147,7 +163,11 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate5{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.onTimeStartPercent)}} [startAngle]="startAngle"
+              <ejs-progressbar id='determinate5{{i}}' progressColor="{{agencies.onTimeStartPercent>80 ?'#15ce48':
+                agencies.onTimeStartPercent>60?'#0f82bf':
+                agencies.onTimeStartPercent>40?'#36b3ef':
+                agencies.onTimeStartPercent>20?'#f9c679':
+                '#f5602e'}}" [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.onTimeStartPercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -156,7 +176,11 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate6{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.candidatesStartPercent)}} [startAngle]="startAngle"
+              <ejs-progressbar id='determinate6{{i}}' progressColor="{{agencies.candidatesStartPercent>80 ?'#15ce48':
+                agencies.candidatesStartPercent>60?'#0f82bf':
+                agencies.candidatesStartPercent>40?'#36b3ef':
+                agencies.candidatesStartPercent>20?'#f9c679':
+                '#f5602e'}}" [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.candidatesStartPercent}} width="120"
                                progressThickness="15" trackThickness="15">
               </ejs-progressbar>
@@ -165,7 +189,11 @@
               <span class="spantag"></span>
             </div>
             <div class="graphalign">
-              <ejs-progressbar id='determinate7{{i}}' progressColor={{colorCodeBasedOnPercentage(agencies.candidateRemainingonAssignmentPercent)}} [startAngle]="startAngle"
+              <ejs-progressbar id='determinate7{{i}}' progressColor="{{agencies.candidateRemainingonAssignmentPercent>80 ?'#15ce48':
+                agencies.candidateRemainingonAssignmentPercent>60?'#0f82bf':
+                agencies.candidateRemainingonAssignmentPercent>40?'#36b3ef':
+                agencies.candidateRemainingonAssignmentPercent>20?'#f9c679':
+                '#f5602e'}}" [startAngle]="startAngle"
                                [endAngle]="endAngle" type='Circular' height='120' value={{agencies.candidateRemainingonAssignmentPercent}}
                                width="120" progressThickness="15" trackThickness="15">
               </ejs-progressbar>
