@@ -23,6 +23,7 @@ import { CreateScheduleService, ScheduleApiService, ScheduleFiltersService } fro
 import { ScheduledItem, SelectedCells, SideBarSettings } from '../../interface';
 import { GetScheduleFilterByEmployees, HasNotMandatoryFilters, HasMultipleFilters, GetScheduledShift } from '../../helpers';
 import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-schedule-container',
@@ -60,8 +61,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     isOpen: false,
     isEditMode: false,
   };
+  showSingleEmp: boolean = false;
 
   selectedCandidate: ScheduleInt.ScheduleCandidate | null;
+  routeData: any;
+  availableEmp: ScheduleInt.ScheduleCandidate | null;
 
   constructor(
     protected override store: Store,
@@ -71,9 +75,14 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     private scheduleFiltersService: ScheduleFiltersService,
     private createScheduleService: CreateScheduleService,
     private settingService: SettingsViewService,
+    private router : Router
   ) {
     super(store);
-
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    if(routerState?.["EmpId"]){
+      this.showSingleEmp = true;
+      this.routeData = routerState?.["EmpId"];
+    }
     store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'calendar' }));
   }
 
@@ -185,6 +194,20 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.detectWhatDataNeeds();
   }
 
+  private availableCandidates(): void {
+    this.setDateLimitation();
+    if(this.routeData){
+      const selectedCandidates = {
+        ...this.routeData,
+        id : this.routeData.employeeId
+      }
+      this.selectedCandidate = selectedCandidates;
+      this.availableEmp = this.selectedCandidate;
+      this.getEmployeeOrganizationStructure(this.routeData.employeeId);
+      this.detectWhatDataNeeds();  
+    }
+  }
+
   deleteFilterItem(event: ChipDeleteEventType): void {
     this.filterService.deleteInlineChip(event);
   }
@@ -225,6 +248,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
       this.updateScheduledShift();
       this.totalCount = scheduleData.totalCount;
+      this.availableCandidates();
       this.cdr.detectChanges();
     });
   }

@@ -44,6 +44,7 @@
           (selectedCells)="setSelectedCells($event)"
           (editCell)="editScheduledItem($event)"
           (selectCandidate)="selectCandidate($event)"
+          [redirectFromWidget] = "availableEmp"
         ></app-schedule-grid>
     </div>
   </div>

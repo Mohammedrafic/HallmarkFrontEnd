@@ -162,3 +162,7 @@ $headerHeight: 19px;
   align-items: flex-start;
   gap: 10px;
 }
+.app-widget-wrapper__available_employee{
+  height: inherit;
+  overflow: auto;
+}

@@ -436,6 +436,9 @@ export class DashboardService {
   public redirect_to_expiring_credentials(url : string,startDate? : Date,  endDate? : Date, type? : number) : void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true ,startDate: startDate, endDate: endDate, type : type} });
   }
+  public redirect_to_schedule(url : string, EmpId : Object) : void{
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , EmpId : EmpId} });
+  }
 
   private getFilledPositionTrendWidgetData(filter: DashboartFilterDto): Observable<PositionTrend> {
     return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/filledpositionstrend`, { ...filter }).pipe(
