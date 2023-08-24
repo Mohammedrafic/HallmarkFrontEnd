@@ -220,8 +220,8 @@ export class DashboardService {
              title: ' Average Days of Active Positions with Custom Workflow',
              chartData: lodashMapPlain(
               orderStatusesAvgDetails,
-              ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
-                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +statusName +')',
+              ({ count, statusName,average,customStatusName }: OrderStatusesAvgDetailsInfo, index: number) => ({
+                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +customStatusName +')',
                 value: average,
                 average: count,
                 color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses] ||
@@ -464,11 +464,10 @@ export class DashboardService {
   public redirectToUrlWithActivePositions(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string,xtraCandidateStatus? :string,xtraCandidateStatustext? : string,): void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus, xtraCandidateStatus: xtraCandidateStatus,xtraCandidateStatustext: xtraCandidateStatustext} });
   }
-  private getTasksWidgetData(): Observable<string> {
-    return of('temporary-collapsed-widget-tasks');
+
+  public redirect_to_schedule(url : string, EmpId : Object) : void{
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , EmpId : EmpId} });
   }
-
-
 
   private getFilledPositionTrendWidgetData(filter: DashboartFilterDto): Observable<PositionTrend> {
     return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/filledpositionstrend`, { ...filter }).pipe(

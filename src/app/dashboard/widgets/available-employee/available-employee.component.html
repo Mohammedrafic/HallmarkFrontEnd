@@ -1,19 +1,25 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
     <ng-template #header>
       <div class="app-accumulation-chart__title w-100">
-        <h3 class="widget-header__title d-inline title"><i-feather name="grid" class="icon"></i-feather>{{description}}</h3> 
+        <h3 class="widget-header__title d-inline title">{{description}}</h3> 
       </div>
     </ng-template>
     <ng-template #available_employee>
       <div class="shared-with-grid" *ngIf="(chartData)">
-        <ag-grid-angular #availableEmployees  style="border:none"
-                         [rowHeight]="50"
-                         domLayout="autoHeight"
-                         [headerHeight]="50"
-                         [columnDefs]="columnDefs"
-                         [rowData]="chartData"
-                         class="ag-theme-alpine grid app-grid__component">
-        </ag-grid-angular>
+        <table>
+          <thead>
+            <th>EMPLOYEE</th>
+            <th>DATE</th>
+            <th>TIME</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let empDetails of chartData">
+              <td><a (click)="EmpScheduleRedirect(empDetails)">{{empDetails.fullName}}</a></td>
+              <td>{{empDetails.startDate}}</td>
+              <td class="shiftTime">{{empDetails.shiftTime}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
         </ng-template>
   </app-widget-wrapper>
