@@ -7,7 +7,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { FileInfo, FilesPropModel, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest, EMPTY } from 'rxjs';
 
 import { CustomFormGroup, Permission } from '@core/interface';
@@ -87,6 +87,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() employee: string | null;
   @Input() isIRP = false;
   @Input() isActive = true;
+  @Input() isMobileLoginOn = false;
   @Input() set employeeId(value: number | null | undefined) {
     if (value) {
       this.candidateProfileId = value;

@@ -138,7 +138,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
     },
   
     {
-      headerName: ' Date',
+      headerName: 'UTC Date & Time',
       field: 'utcDate',
       minWidth: 175,
       cellClass: 'date',
@@ -151,7 +151,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
           if (cellValue == null) {
             return 0;
           }
-          const dateAsString = this.datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateAsString = this.datePipe?.transform(cellValue, 'MM/dd/yyyy hh:mm:ss') as string
           const dateParts = dateAsString.split('/');
           const year = Number(dateParts[2]);
           const month = Number(dateParts[0]) - 1;
@@ -168,7 +168,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = this.datePipe?.transform(params.data.utcDate, 'MM/dd/yyyy') as string
+        const str = this.datePipe?.transform(params.data.utcDate, 'MM/dd/yyyy & hh:mm:ss') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,
@@ -430,7 +430,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       id: 'date',
       dataType: 'DateTime',
       numberFormat: {
-        format: 'mm-dd-yyyy',
+        format: 'mm-dd-yyyy hh:mm:ss',
       },
     },
    
