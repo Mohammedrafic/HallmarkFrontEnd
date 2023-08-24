@@ -134,6 +134,22 @@
     </div>
   </div>
  
+  <div class="input-container bootstrap"  *ngIf="isAgency">
+    <label>Candidate Name</label>
+    <div class="input-group dropdown">          
+      <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
+       filterType='StartsWith' [fields]='candidateNameFields'  [htmlAttributes]="htmlAttributes"
+              [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='filterCandidateName($event)'></ejs-autocomplete>
+    </div>
+  </div>
+  <div class="input-container bootstrap"  *ngIf="!isAgency">
+    <label>Candidate Name</label>
+    <div class="input-group dropdown">          
+      <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
+       filterType='StartsWith' [fields]='candidateNameFields' [htmlAttributes]="htmlAttributes"
+              [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='filterCandidateName($event)'></ejs-autocomplete>
+    </div>
+  </div>
 
   <div class="input-container">
     <label>Order Type</label>
@@ -170,22 +186,6 @@
     </div>
   </div>
 
-      <div class="input-container bootstrap"  *ngIf="isAgency">
-        <label>Candidate Name</label>
-        <div class="input-group dropdown">          
-          <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
-           filterType='StartsWith' [fields]='candidateNameFields'
-                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='filterCandidateName($event)'></ejs-autocomplete>
-        </div>
-      </div>
-      <div class="input-container bootstrap"  *ngIf="!isAgency">
-        <label>Candidate Name</label>
-        <div class="input-group dropdown">          
-          <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
-           filterType='StartsWith' [fields]='candidateNameFields'
-                  [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='filterCandidateName($event)'></ejs-autocomplete>
-        </div>
-      </div>
       <div class="input-container" *ngIf="!isAgency">
         <label>Candidate Status</label>
         <div class="input-group multiselect bootstrap">
