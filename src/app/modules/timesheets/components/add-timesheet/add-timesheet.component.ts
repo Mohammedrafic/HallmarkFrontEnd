@@ -38,6 +38,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
   public dialogConfig: DialogConfig = GetRecordAddDialogConfig(false);
 
   public formType: RecordFields = RecordFields.Time;
+  public filterType: string = 'Contains';
 
   public onCallId: number;
 
