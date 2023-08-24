@@ -1106,10 +1106,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           : perDiemColumnsToExport;
         break;
       case OrganizationOrderManagementTabs.ReOrders:        
-        if(this.selectedItems.filter(ele=> ele.statusText == "Filled").length == this.selectedItems.length){
+        if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length == this.selectedItems.length){
           this.openregrateupdate = false;
         }
-        if(this.selectedItems.filter(ele=> ele.statusText == "Filled").length >0){
+        if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length >0){
           this.reorderFilledStatus = true;
         }
         if (this.selectedItems.length === 0) {

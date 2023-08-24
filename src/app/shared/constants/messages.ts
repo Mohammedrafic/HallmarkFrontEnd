@@ -96,10 +96,10 @@ export const PerDiemReOrdersErrorMessage = 'Bill Rate cannot be updated for Open
 export const UpdateRegularRatesucceedcount = (count: number) =>
   ` ${count} Order(s) updated , ` + TravelerContracttoPermOrdersSucceedMessage;
 export const UpdateRegularRateReordersucceedcount = (count: number) =>
-  ` ${count} Re-Order(s) successfully updated. `;
+  ` ${count} Re-Order(s) Regular Bill Rate successfully updated. `;
 export const UpdateRegularRateReorderOpensucceedcount = (count: number) =>
   ` ${count} Re-Orders with open positions is successfully updated. `;
-export const UpdateReorderFilled = 'FILLED Re-Orders cannot be updated.';
+export const UpdateReorderFilled = 'FILLED or Closed Re-Orders cannot be updated.';
 export const DOCUMENT_DOWNLOAD_SUCCESS = 'Document downloaded successfully';
 export const SubmissionsLimitReached = 'The order has reached its submission limit';
 export const EDIT_MULTIPLE_RECORDS_TEXT = 'Are you sure you want to edit multiple records? It may affect existing schedules and orders.';
