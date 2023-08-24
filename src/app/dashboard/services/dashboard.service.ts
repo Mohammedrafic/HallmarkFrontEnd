@@ -220,8 +220,8 @@ export class DashboardService {
              title: ' Average Days of Active Positions with Custom Workflow',
              chartData: lodashMapPlain(
               orderStatusesAvgDetails,
-              ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
-                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +statusName +')',
+              ({ count, statusName,average,customStatusName }: OrderStatusesAvgDetailsInfo, index: number) => ({
+                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +customStatusName +')',
                 value: average,
                 average: count,
                 color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses] ||
