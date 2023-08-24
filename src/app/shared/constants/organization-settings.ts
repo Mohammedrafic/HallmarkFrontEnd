@@ -55,7 +55,8 @@ export enum OrganizationSettingKeys {
   CreatePartialOrder,
   DepartmentSkillRequired,
   TimesheetSubmissionProcess,
-  OvertimeCalculation
+  OvertimeCalculation,
+  AutomatedDistributionToVMS
 }
 
 export enum OrganizationalHierarchy {

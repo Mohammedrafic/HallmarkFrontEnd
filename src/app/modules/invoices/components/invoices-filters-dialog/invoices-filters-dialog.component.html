@@ -29,7 +29,7 @@
             <label [for]="fieldConfig.field">{{ fieldConfig.title }}</label>
             <div class="input-group dropdown">
               <ejs-multiselect
-                [id]="fieldConfig.field"
+                [id]="fieldConfig.field"  [enabled]="!fieldConfig.isDisable"
                 mode="CheckBox"
                 [allowFiltering]="true"
                 [showSelectAll]="fieldConfig.showSelectAll"

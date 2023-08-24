@@ -56,8 +56,8 @@ export class HolidaysState {
           if (item.organizationId) {
             const region = organizationStructure?.regions.find(region => region.id === item.regionId);
             const location = region?.locations?.find(location => location.id === item.locationId);
-            item.locationName = location?.name;
-            item.regionName = region?.name;
+            item.locationName = item.locationId ? location?.name : "All";
+            item.regionName =  item.regionId ? region?.name : "All";
           }
           item.foreignKey = item.id + '-' + item.masterHolidayId;
         });
@@ -118,10 +118,10 @@ export class HolidaysState {
   DeleteHoliday({ patchState, dispatch }: StateContext<HolidaysStateModel>, { payload }: DeleteHoliday): Observable<any> {
     patchState({ isHolidayLoading: true });
     return this.holidaysService.removeOrganizationHoliday(payload).pipe(tap((payload) => {
-        patchState({ isHolidayLoading: false });
-        dispatch(new DeleteHolidaySucceeded(payload));
-        return payload;
-      }),
+      patchState({ isHolidayLoading: false });
+      dispatch(new DeleteHolidaySucceeded(payload));
+      return payload;
+    }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Holiday cannot be deleted')))));
   }
 

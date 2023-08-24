@@ -10,7 +10,10 @@
   (open)="onOpen($event)"
 >
   <ng-template #content>
-    <section *ngIf="invoiceDetail" class="container">
+    <section
+      *ngIf="invoiceDetail"
+      class="container"
+    >
       <div class="profile-details-header">
         <h3 class="username">Invoice ID {{ invoiceDetail.meta.formattedInvoiceNumber }}</h3>
         <div class="spacer"></div>

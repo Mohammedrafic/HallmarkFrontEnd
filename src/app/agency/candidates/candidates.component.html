@@ -1,24 +1,29 @@
 <app-page-toolbar>
   <ng-container left>
-    <h3>Candidates</h3>
+    <div class="header-wrapper">
+      <h3>Candidates</h3>
+      <div class="mobile-toggle">
+        <ng-container [ngTemplateOutlet]="switcher"></ng-container>
+      </div>
+    </div>
   </ng-container>
   <ng-container right>
-    <div class="button-group" >
-      <ejs-switch
-        id="switcher"
-        (change)="onSwitcher($event);"
-        [(checked)]="includeDeployed"
-        (created)="observeIncludeDeployed()"
-      ></ejs-switch>
-      <label for="switcher" class="switch-text">Include Deployed Candidates</label>
+    <div class="button-group">
+      <div class="desktop-toggle">
+        <ng-container [ngTemplateOutlet]="switcher"></ng-container>
+      </div>
       <app-tooltip-container [showToolTip]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">
         <button
           ejs-button
           appHideBeforeSyncfusionLoad
-          cssClass="e-outline"
+          cssClass="e-outline import-button"
           (click)="onImport()"
-          [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">
-          Import <span><i-feather name="download" class="icon"></i-feather></span>
+          [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]"
+        >
+        <span class="text-btn">
+          Import 
+        </span>
+        <span><i-feather name="download" class="icon"></i-feather></span>
         </button>
       </app-tooltip-container>
       <button
@@ -26,23 +31,39 @@
         appHideBeforeSyncfusionLoad
         cssClass="e-outline button-export"
         [items]="exportOptions"
-        (select)="exportSelected($event)">
+        (select)="exportSelected($event)"
+      >
         <div class="button-export-container">
-          Export <i-feather name="upload" class="icon"></i-feather>
+          <span class="text-btn">
+            Export 
+          </span>
+          <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
       <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
         <div class="filter-button-content">
-          <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill">{{
-            filteredItems
-            }}</span>
-          Filters <i-feather name="sliders" class="icon"></i-feather>
+          <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill">
+            {{filteredItems}}
+          </span>
+          <span class="text-btn">
+            Filters 
+          </span>
+          <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
       <app-tooltip-container
         [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]">
-          <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToCandidateForm()" [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]" class="noResponsive">Add Candidates</button>
+        [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]"
+      >
+        <button
+          ejs-button
+          appHideBeforeSyncfusionLoad
+          [isPrimary]="true"
+          (click)="navigateToCandidateForm()"
+          [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]"
+        >
+          Add Candidates
+        </button>
       </app-tooltip-container>
     </div>
   </ng-container>
@@ -57,8 +78,20 @@
     [search$]="search$"
     [includeDeployedCandidates$]="includeDeployedCandidates$"
     [isAgency]="true"
+    [isIRP]="false"
     [agencyActionsAllowed]="agencyActionsAllowed"
   ></app-candidate-list>
 </section>
 
 <app-import-candidates [openEvent]="openImportDialog$" (reloadCandidateList)="reloadCandidatesList()"></app-import-candidates>
+
+
+<ng-template #switcher>
+  <ejs-switch
+    id="switcher" 
+    [(checked)]="includeDeployed"
+    (change)="onSwitcher($event)"
+    (created)="observeIncludeDeployed()"
+  ></ejs-switch>
+  <label for="switcher" class="switch-text">Include Deployed Candidates</label>
+</ng-template>

@@ -8,6 +8,7 @@ export enum WidgetTypeEnum {
   FILLED_POSITIONS = 'Filled_Positions',
   ACTIVE_POSITIONS = 'Active_Positions',
   AVERAGE_DAY_ACTIVE_POSITIONS = 'Average_Day_Of_Active_Positions',
+  AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM = 'Average_Day_Of_Active_Positions_Custom',
   FILLED_POSITIONS_TREND = 'Filled_Positions_Trend',
   OPEN_POSITIONS_TREND = 'Open_Positions_Trend',
   IN_PROGRESS_POSITIONS_TREND = 'In_Progress_Positions_Trend',
@@ -20,4 +21,5 @@ export enum WidgetTypeEnum {
   UPCOMING_EXP_CREDS = 'Upcoming_exp_creds',
   AVAILABLE_EMPLOYEE = 'Available_Employee',
   CANDIDATES_ACTIVE_POSITIONS="Candidates_Active_Positions",
+  POSITIONS_COUNT_DAY_RANGE="Positions_Count_Day_Range",
 }

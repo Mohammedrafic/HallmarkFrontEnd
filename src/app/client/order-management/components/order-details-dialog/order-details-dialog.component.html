@@ -163,7 +163,6 @@
                 ejs-button
                 cssClass="e-outline lock-btn"
                 [class.custom-order-btn]="showApproveAndCancel"
-                [isPrimary]="true"
                 (click)="lockOrder()"
                 [disabled]="disabledLock || !canCreateOrder || !hasCreateEditOrderPermission"
               >

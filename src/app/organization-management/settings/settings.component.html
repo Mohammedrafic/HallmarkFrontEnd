@@ -1,7 +1,7 @@
 <section class="grid flex-column">
   <section class="toolbar">
     <section>
-      <h3>Configurations</h3>
+      <h3 class="title-settings">Configurations</h3>
     </section>
     <section>
       <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter"
@@ -165,7 +165,7 @@
             <ejs-switch name="allLocations" [disabled]="isParentEdit" [checked]="allLocationsSelected" (change)="allLocationsChange($event)" label="All"></ejs-switch>
             <label for="allLocations" class="switch-text">All</label>
           </div>
-      
+
         </div>
       </div>
       <div class="input-container" *ngIf="IsSettingKeyCreatePartialOrder">
@@ -180,7 +180,7 @@
             <ejs-switch name="allLocations" [disabled]="isParentEdit" [checked]="allDepartmentSelected" (change)="allDepartmentChange($event)" label="All"></ejs-switch>
             <label for="allLocations" class="switch-text">All</label>
           </div>
-      
+
         </div>
       </div>
     </form>

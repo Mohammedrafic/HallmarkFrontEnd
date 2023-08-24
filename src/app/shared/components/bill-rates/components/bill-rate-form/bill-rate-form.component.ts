@@ -73,6 +73,10 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     return this.billRateForm.get('billRateConfig');
   }
 
+  get isOnCallSelected(): boolean {
+    return this.billRateForm.get('billRateConfigId')?.value !== BillRateTitleId.Oncall;
+  }
+
   get isInternalsEnabled(): boolean {
     return this.billRateForm.get('billRateConfigId')?.value !== BillRateTitleId.Mileage;
   }
@@ -165,11 +169,12 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
       const idx = DateTimeHelper.findPreviousNearestDateIndex(billRatesDates, date);
 
       if (idx !== null && billRates[idx]) {
-        const { seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled } = billRates[idx];
+        const { seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled, holidayCalculationEnabled } = billRates[idx];
 
         this.billRateForm?.get('seventhDayOtEnabled')?.setValue(seventhDayOtEnabled);
         this.billRateForm?.get('weeklyOtEnabled')?.setValue(weeklyOtEnabled);
         this.billRateForm?.get('dailyOtEnabled')?.setValue(dailyOtEnabled);
+        this.billRateForm?.get('holidayCalculationEnabled')?.setValue(holidayCalculationEnabled);
       }
     } else {
       BillRateFormComponent.calculateOTSFlags = true;
@@ -301,6 +306,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
       seventhDayOtEnabled: new FormControl(false),
       weeklyOtEnabled: new FormControl(false),
       dailyOtEnabled: new FormControl(false),
+      holidayCalculationEnabled: new FormControl(false),
       billRateConfig: new FormGroup({
         id: new FormControl(),
         category: new FormControl(),

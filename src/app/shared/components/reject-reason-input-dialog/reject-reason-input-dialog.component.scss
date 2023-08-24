@@ -19,16 +19,20 @@
       .description {
         font-weight: 400;
         font-size: 16px;
-        color: $pure-black;
+        color: var(--description);
         margin-bottom: 18px;
       }
 
       .input-title {
         font-weight: 400;
         font-size: 14px;
-        color: $secondary-dark-blue-15;
+        color: var(--sub-title-2);
         margin-bottom: 2px;
       }
+
+      .title {
+        color: var(--secondary-title);
+      } 
     }
 
     h2, .content {

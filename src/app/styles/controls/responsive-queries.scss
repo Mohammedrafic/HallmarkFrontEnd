@@ -1,0 +1,7 @@
+@import 'adaptive-response';
+
+@media #{$max-mobile} {
+  .text-btn {
+    display: none;
+  }
+}

@@ -52,6 +52,16 @@ ejs-checkbox.e-checkbox-wrapper.e-wrapper {
   line-height: 20px;
 }
 
+.table-container {
+  height: 100%;
+}
+
+@media #{$max-tablet} {
+  .table-container {
+    height: 95%;
+  }
+}
+
 @media #{$max-mobile} {
   .input-container {
     &.candidate-id,
@@ -63,14 +73,9 @@ ejs-checkbox.e-checkbox-wrapper.e-wrapper {
   .row {
     flex-direction: column;
   }
-}
 
-.table-container {
-  height: 100%;
-}
-
-@media #{$max-tablet} {
   .table-container {
-    height: 95%;
+    height: auto;
+    padding-bottom: 24px;
   }
 }

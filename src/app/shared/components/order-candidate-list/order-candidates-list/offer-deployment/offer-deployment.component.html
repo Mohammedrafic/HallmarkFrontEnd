@@ -15,7 +15,7 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isReadOnly && !isClosedPosition">
+        <div class="input-group dropdown bootstrap" *ngIf="!isReadOnly && !isClosedPosition && !!nextApplicantStatuses && !!nextApplicantStatuses.length">
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
                             [formControl]="statusesFormControl"
@@ -29,7 +29,7 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-primary" (click)="onSave()" *ngIf="!isRejected && !isReadOnly">
+        <button ejs-button cssClass="e-primary" (click)="onSave()" *ngIf="!isReadOnly">
           Save
         </button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">

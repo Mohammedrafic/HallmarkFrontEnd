@@ -1,8 +1,8 @@
-@import "colors.scss";
-@import "mixins";
-@import "@ag-grid-community/core/dist/styles/ag-grid.scss";
-@import "@ag-grid-community/core/dist/styles/ag-theme-alpine";
-@import "adaptive-response";
+@import 'colors';
+@import 'mixins';
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+@import 'adaptive-response';
 
 .dialog-container {
   padding: 24px;
@@ -28,7 +28,7 @@
   font-size: 16px;
   font-weight: 700;
   line-height: 28px;
-  color: $title-black;
+  color: var(--secondary-title);
 }
 
 .header-block:last-of-type {

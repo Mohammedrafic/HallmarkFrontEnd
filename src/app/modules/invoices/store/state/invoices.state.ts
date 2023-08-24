@@ -560,13 +560,14 @@ export class InvoicesState {
   @Action(Invoices.GetManualInvoices)
   GetManualInvoices(
     { patchState, getState, dispatch }: StateContext<InvoicesModel>,
-    { organizationId }: Invoices.GetManualInvoices
+    { organizationId,agencyOrganizationIds }: Invoices.GetManualInvoices
   ): Observable<ManualInvoicesData | void> {
     const state = getState();
 
     return this.invoicesAPIService.getManualInvoices({
       ...state.invoicesFilters,
       organizationId,
+      agencyOrganizationIds
     }).pipe(
       tap((data: ManualInvoicesData) => {
         patchState({

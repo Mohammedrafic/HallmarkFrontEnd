@@ -124,6 +124,12 @@ export class AllInvoicesGridHelper {
         valueFormatter: monthDayYearDateFormatter,
         ...commonColumn,
       },
+      {
+        field: 'organizationName',
+        headerName: 'Organization',
+        minWidth: 200,
+        ...commonColumn,
+      },
     ];
   }
 

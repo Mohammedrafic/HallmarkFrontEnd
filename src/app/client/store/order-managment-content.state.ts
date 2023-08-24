@@ -71,6 +71,14 @@ import {
   GetOrderComments,
   ApproveOrderSucceeded,
   ClearCandidateCancellationReason,
+  GetOrderAuditHistory,
+  GetOrderCredentialAuditHistory,
+  GetOrderBillRatesAuditHistory,
+  GetOrderContactAuditHistory,
+  GetOrderJobDistributionAuditHistory,
+  GetOrderWorkLocationAuditHistory,
+  GetOrderClassificationAuditHistory,
+  GetOrderHistoryDetailSucceeded
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -81,13 +89,20 @@ import {
   IrpOrderCandidate,
   OnboardCandidateEmail,
   Order,
+  OrderAuditHistory,
+  OrderBillRateAuditHistory,
   OrderCandidateJob,
   OrderCandidatesListPage,
+  OrderClassificationAuditHistory,
+  OrderContactAuditHistory,
+  OrderCredentialAuditHistory,
   OrderFilterDataSource,
+  OrderJobDistributionAuditHistory,
   OrderManagement,
   OrderManagementPage,
+  OrderWorkLocationAuditHistory,
   OrdersJourneyPage,
-  SuggestedDetails,
+  SuggestedDetails,  
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -174,7 +189,14 @@ export interface OrderManagementContentStateModel {
   candidateCancellationReasons: CandidateCancellationReason[] | null;
   allShifts:ScheduleShift[]|null;
   sendOnboardCandidateEmail:OnboardCandidateEmail | null;
-  orderComments: Comment[]
+  orderComments: Comment[];
+  OrderAuditHistory: OrderAuditHistory[];
+  OrderCredentialAuditHistory: OrderCredentialAuditHistory[];
+  OrderBillRatesAuditHistory:OrderBillRateAuditHistory[];
+  OrderContactAuditHistory:OrderContactAuditHistory[];
+  OrderWorkLocationAuditHistory:OrderWorkLocationAuditHistory[];
+  OrderJobDistributionAuditHistory:OrderJobDistributionAuditHistory[],
+  OrderClassificationAuditHistory:OrderClassificationAuditHistory[]  
 }
 
 @State<OrderManagementContentStateModel>( {
@@ -215,7 +237,14 @@ export interface OrderManagementContentStateModel {
     candidateCancellationReasons: null,
     allShifts:null,
     sendOnboardCandidateEmail:null,
-    orderComments : []
+    orderComments : [],
+    OrderAuditHistory: [],
+    OrderCredentialAuditHistory: [],
+    OrderBillRatesAuditHistory:[],
+    OrderContactAuditHistory:[],
+    OrderWorkLocationAuditHistory:[],
+    OrderJobDistributionAuditHistory:[],
+    OrderClassificationAuditHistory:[]
   },
 
 })
@@ -402,6 +431,42 @@ export class OrderManagementContentState {
   @Selector()
   static orderComments(state: OrderManagementContentStateModel): Comment[] {
     return state.orderComments;
+  }
+
+  @Selector()
+  static getOrderAuditHistoryDetails(state: OrderManagementContentStateModel): OrderAuditHistory[] {
+    return state.OrderAuditHistory;
+  }
+
+  @Selector()
+  static getOrderCredentialAuditHistory(state: OrderManagementContentStateModel): OrderCredentialAuditHistory[] {
+    return state.OrderCredentialAuditHistory;
+  }
+
+
+  @Selector()
+  static getOrderBillRatesAuditHistory(state: OrderManagementContentStateModel): OrderBillRateAuditHistory[] {
+    return state.OrderBillRatesAuditHistory;
+  }
+
+  @Selector()
+  static getOrderContactAuditHistory(state: OrderManagementContentStateModel): OrderContactAuditHistory[] {
+    return state.OrderContactAuditHistory;
+  }
+
+  @Selector()
+  static getOrderWorkLocationAuditHistory(state: OrderManagementContentStateModel): OrderWorkLocationAuditHistory[] {
+    return state.OrderWorkLocationAuditHistory;
+  }
+
+  @Selector()
+  static getOrderJobDistributionAuditHistory(state: OrderManagementContentStateModel): OrderJobDistributionAuditHistory[] {
+    return state.OrderJobDistributionAuditHistory;
+  }
+
+  @Selector()
+  static getOrderClassificationAuditHistory(state: OrderManagementContentStateModel): OrderClassificationAuditHistory[] {
+    return state.OrderClassificationAuditHistory;
   }
 
   constructor(
@@ -1030,22 +1095,24 @@ export class OrderManagementContentState {
   }
 
   @Action(ExportOrders)
-  ExportOrders({}: StateContext<OrderManagementContentStateModel>, { payload, tab }: ExportOrders): Observable<any> {
+  ExportOrders({dispatch}: StateContext<OrderManagementContentStateModel>, { payload, tab }: ExportOrders): Observable<any> {
     return this.orderManagementService.export(payload, tab).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
-      })
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
     );
   }
 
   @Action(ExportIRPOrders)
-  ExportIRPOrders({}: StateContext<OrderManagementContentStateModel>, { payload, tab}: ExportIRPOrders): Observable<any> {
+  ExportIRPOrders({dispatch}: StateContext<OrderManagementContentStateModel>, { payload, tab}: ExportIRPOrders): Observable<any> {
     return this.orderManagementService.irpexport(payload,tab).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
-      })
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
     );
   }
 
@@ -1241,4 +1308,78 @@ export class OrderManagementContentState {
           })
         );
       }
+
+      @Action(GetOrderAuditHistory)
+  GetOrderAuditHistory({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderAuditHistory): Observable<OrderAuditHistory[]> {
+    return this.orderManagementService.getOrderAuditHistory(payload).pipe(
+      tap((payloads) => {
+        patchState({ OrderAuditHistory: payloads });
+        dispatch(new GetOrderHistoryDetailSucceeded());
+        return payloads;
+      }));
+  }
+
+  @Action(GetOrderCredentialAuditHistory)
+  GetOrderCredentialAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderCredentialAuditHistory): Observable<OrderCredentialAuditHistory[]> {
+    return this.orderManagementService.getOrderCredentialAuditHistory(payload).pipe(
+      tap((payloads) => {
+        patchState({ OrderCredentialAuditHistory: payloads });
+        return payloads;
+      }));
+  }
+
+
+  @Action(GetOrderBillRatesAuditHistory)
+  GetOrderBillRatesAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderBillRatesAuditHistory): Observable<OrderBillRateAuditHistory[]> {
+    return this.orderManagementService.getOrderBillRatesAuditHistory(payload).pipe(
+      tap((payloads) => {
+        patchState({ OrderBillRatesAuditHistory: payloads });
+        return payloads;
+      }));
+  }
+
+
+  @Action(GetOrderContactAuditHistory)
+  GetOrderContactAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderContactAuditHistory): Observable<OrderContactAuditHistory[]> {
+    return this.orderManagementService.getOrderContactAuditHistory(payload).pipe(
+      tap((payloads) => {
+        patchState({ OrderContactAuditHistory: payloads });
+        return payloads;
+      }));
+  }
+
+  @Action(GetOrderWorkLocationAuditHistory)
+  GetOrderWorkLocationAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderWorkLocationAuditHistory): Observable<OrderWorkLocationAuditHistory[]> {
+    return this.orderManagementService.GetOrderWorkLocationAuditHistory(payload).pipe(
+      tap((payloads) => {
+        patchState({ OrderWorkLocationAuditHistory: payloads });
+        return payloads;
+      }));
+  }
+
+
+  @Action(GetOrderJobDistributionAuditHistory)
+  GetOrderJobDistributionAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderJobDistributionAuditHistory): Observable<OrderJobDistributionAuditHistory[]> {
+    return this.orderManagementService.getOrderJobDistributionAuditHistory(payload).pipe(
+      tap((payloads) => {
+        patchState({ OrderJobDistributionAuditHistory: payloads });
+        return payloads;
+      }));
+  }
+
+  @Action(GetOrderClassificationAuditHistory)
+  GetOrderClassificationAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderClassificationAuditHistory): Observable<OrderClassificationAuditHistory[]> {
+    return this.orderManagementService.getOrderClassificationAuditHistory(payload).pipe(
+      tap((payloads) => {
+        patchState({ OrderClassificationAuditHistory: payloads });
+        return payloads;
+      }));
+  }
 }

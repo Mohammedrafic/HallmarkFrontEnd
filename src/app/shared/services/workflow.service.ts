@@ -5,8 +5,8 @@ import { Observable } from 'rxjs';
 
 import { WorkflowFilters, WorkflowFlags, WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
 import {
-  RolesByPermission,
-  UsersByPermission,
+  RoleListsByPermission,
+  UserListsByPermission,
   WorkflowMappingPage,
   WorkflowMappingPost,
 } from '@shared/models/workflow-mapping.model';
@@ -49,11 +49,11 @@ export class WorkflowService {
     return this.http.delete<void>(`/api/WorkflowMapping/${mappingId}`);
   }
 
-  public getUsersForWorkflowMapping(): Observable<UsersByPermission[]> {
-    return this.http.get<any>(`/api/WorkflowMapping/usersByPermission`);
+  public getUsersForWorkflowMapping(): Observable<UserListsByPermission> {
+    return this.http.get<UserListsByPermission>(`/api/WorkflowMapping/usersByPermission`);
   }
 
-  public getRolesForWorkflowMapping(): Observable<RolesByPermission[]> {
-    return this.http.get<any>(`/api/WorkflowMapping/rolesByPermission`);
+  public getRolesForWorkflowMapping(): Observable<RoleListsByPermission> {
+    return this.http.get<RoleListsByPermission>(`/api/WorkflowMapping/rolesByPermission`);
   }
 }

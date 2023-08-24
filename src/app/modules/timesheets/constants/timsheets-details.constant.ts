@@ -4,19 +4,19 @@ import { Validators } from '@angular/forms';
 import { ColDef } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
-import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { EditFieldTypes } from '@core/enums';
+import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { AttachmentsListComponent } from '@shared/components/attachments';
+import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
+import { BillRateCalculationType } from '@shared/models';
 import { InvoiceRecordState } from 'src/app/modules/timesheets/enums';
-import { TabConfig } from '../interface';
 import { ActionsCellComponent } from '../components/cell-editors/actions-cell/actions-cell.component';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
 import { GridDateEditorComponent } from '../components/cell-editors/grid-date-editor/grid-date-editor.component';
 import { GridDayComponent } from '../components/cell-editors/grid-day/grid-day.component';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { RecordStatusCellComponent } from '../components/cell-editors/record-status-cell/record-status-cell.component';
-import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
-import { BillRateCalculationType } from '@shared/models';
+import { TabConfig } from '../interface';
 
 const commonColumn: ColDef = {
   filter: true,
@@ -27,6 +27,7 @@ const commonColumn: ColDef = {
 export const dayColDef: ColDef = {
   field: 'day',
   headerName: 'Day',
+  headerClass: 'custom-wrap',
   ...commonColumn,
   width: 80,
   minWidth: 80,
@@ -244,7 +245,7 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     width: 400,
     minWidth: 200,
     type: 'leftAligned',
-    headerClass: 'custom-wrap',
+    headerClass: 'custom-wrap input-editor',
     cellRenderer: InputEditorComponent,
     cellRendererParams: {
       editMode: true,

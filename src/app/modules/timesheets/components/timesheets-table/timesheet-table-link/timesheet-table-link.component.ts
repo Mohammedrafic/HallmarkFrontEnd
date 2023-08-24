@@ -41,7 +41,6 @@ export class TimesheetTableLinkComponent implements ICellRendererAngularComp {
 
   public navigateTo(event: MouseEvent): void {
     event.stopImmediatePropagation();
-
     if (this.isAgency) {
       if (this.params.colDef?.field === TimesheetsTableColumns.Name) {
         this.router.navigate(['agency/candidates/edit', this.cellValue.candidateId]);

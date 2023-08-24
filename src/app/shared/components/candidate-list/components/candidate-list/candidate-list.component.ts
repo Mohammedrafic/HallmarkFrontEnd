@@ -429,15 +429,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public dispatchNewPage(firstDispatch = false): void {
     const candidateListRequest: CandidateListRequest = {
-      profileStatuses: [],
-      skillsIds: [],
-      regionsNames: [],
-      candidateName: null,
-      includeDeployedCandidates: false,
+      ...this.getFilterValues(),
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
       orderBy: this.orderBy,
-      tab: 0
     };
 
     this.store.dispatch(

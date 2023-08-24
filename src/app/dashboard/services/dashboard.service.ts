@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -73,6 +73,7 @@ export class DashboardService {
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getActivePositionWidgetData(filters),
       [WidgetTypeEnum.CANDIDATES]: (filters: DashboartFilterDto) => this.getCandidatesWidgetData(filters),
       [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivePositionsWidgetData(filters),
+      [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM]: (filters: DashboartFilterDto) => this.getAvergaeDayCUSTOMActivePositionsWidgetData(filters),
       [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getFilledPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboartFilterDto) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
@@ -89,6 +90,7 @@ export class DashboardService {
     [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
+    [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -209,6 +211,29 @@ export class DashboardService {
         })
       );
     }
+
+    private getAvergaeDayCUSTOMActivePositionsWidgetData(filter: DashboartFilterDto): Observable<any> {
+      return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter, type : 'Custom' }).pipe(
+        map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
+          return {
+            id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM,
+             title: ' Average Days of Active Positions with Custom Workflow',
+             chartData: lodashMapPlain(
+              orderStatusesAvgDetails,
+              ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
+                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +statusName +')',
+                value: average,
+                average: count,
+                color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses] ||
+                        activePositionsLegendPalette[ActivePositionsChartStatuses.CUSTOM]
+              })
+              ),
+            };
+          })
+        );
+      }
+
+    
 
   private getApplicantsByRegionWidgetData(
     filters: DashboartFilterDto
@@ -535,6 +560,28 @@ export class DashboardService {
 
   public getAvailableEmployee(): Observable<AvailableEmployeeModel[]> {
     return this.httpClient.get<AvailableEmployeeModel[]>(`/api/Schedules/AvailableEmployee`);
+  }
+
+  public getPositionsCountByDayRange(filter: DashboartFilterDto): Observable<PositionsCountByDayRangeDataset>{
+    return this.httpClient.post<any>(`${this.baseUrl}/GetPositionsCountByDayRange`, { ...filter }).pipe(
+      map(({ orderStatusesAvgDetails }: PositionsCountByDayRange) => {
+        return {
+          id: WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE,
+          title: 'Count Of Positions By Day Range',
+          chartData: lodashMapPlain(
+            orderStatusesAvgDetails,
+            ({ count3Positions,count7Positions,count15Positions,count30PlusPositions,count30Positions,totalCount, statusName }: StatusesAvgDetails, index: number) => ({
+              label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
+              value: totalCount,
+              count30: count30Positions,
+              count30Plus: count30PlusPositions,
+              count15: count15Positions,
+              count7: count7Positions,
+              count3: count3Positions,
+            })
+          ),
+        };
+      }))
   }
 
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{

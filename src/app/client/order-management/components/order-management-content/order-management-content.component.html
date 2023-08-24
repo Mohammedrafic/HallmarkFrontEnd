@@ -143,6 +143,7 @@
       (gridReady)="setGridApi($event)"
       (sortChanged)="gridSortHandler($event)"
       (rowClicked)="openIrpDetails($event)"
+      (rowDataChanged)="openEditedIrpOrder()"
     >
     </ag-grid-angular>
   </div>
@@ -875,9 +876,6 @@
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.orderStatuses.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
-            (select)="onSelect($event)"
-            cssClass="custom"
-            (click)="orderStatusSelect()"
           >
           </ejs-multiselect>
         </div>
@@ -1583,3 +1581,5 @@
 <app-order-import [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-order-import>
 
 <app-scroll-to-top *ngIf="isMobile"></app-scroll-to-top>
+
+<app-order-history-details #historyDetailsDialog [order]="orderDetail"></app-order-history-details>

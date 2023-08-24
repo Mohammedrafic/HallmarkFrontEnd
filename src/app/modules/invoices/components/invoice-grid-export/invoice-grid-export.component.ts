@@ -9,9 +9,9 @@ import { ShowExportDialog } from '../../../../store/app.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { InvoiceGridSelections } from '../../interfaces';
-import { AgencyInvoiceExportCols, GetExportFileName, GetInvoiceState, GetTabsToExport, InvoiceExportCols, PendingInvoiceExportCols } from './invoice-export.constant';
+import { AgencyInvoiceExportCols,AgencyManualInvoicePendingExportCols,  GetExportFileName, GetInvoiceState, GetTabsToExport, InvoiceExportCols, PendingInvoiceExportCols } from './invoice-export.constant';
 import { InvoicesState } from '../../store/state/invoices.state';
-import { InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
+import { AgencyInvoicesGridTab, InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 
@@ -23,6 +23,7 @@ import { InvoicesModel } from '../../store/invoices.model';
 export class InvoiceGridExportComponent extends AbstractGridConfigurationComponent {
   @Input() public selectedRows: InvoiceGridSelections;
   @Input() public organizationId: number;
+  @Input() public agencyOrganizationIds:Array<number> = [];
   @Input() set selectedTab(selectedTabIdx: number | never) {
    this.setSelectedTab(selectedTabIdx);
   }
@@ -67,12 +68,19 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
 
   public exportColumns():void{    
     if (this.isAgency)
-    {
-      this.columnsToExport=AgencyInvoiceExportCols;
+    { 
+      if(this.selectedTabIndex === AgencyInvoicesGridTab.Manual)
+      this.columnsToExport=AgencyManualInvoicePendingExportCols;
+    else
+    this.columnsToExport=AgencyInvoiceExportCols;
+  
+     
     }
     else
     {
-      if(this.selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords)
+      if(this.selectedTabIndex === OrganizationInvoicesGridTab.Manual)
+      this.columnsToExport=AgencyManualInvoicePendingExportCols;
+      else if(this.selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords)
         this.columnsToExport=PendingInvoiceExportCols;
       else
         this.columnsToExport=InvoiceExportCols;
@@ -94,6 +102,14 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
 
     if (this.isAgency) {
       filterQuery.organizationId = this.organizationId;
+      filterQuery.agencyOrganizationIds = this.agencyOrganizationIds;
+    }
+    let allTabIds:any = [];
+    if(this.isAgency && this.selectedTabIndex === AgencyInvoicesGridTab.All){
+      this.selectedRows.rowNodes.forEach(ele=>{        
+        allTabIds.push([ele.data.invoiceId,ele.data.organizationId]);
+      })
+      filterQuery.ids = allTabIds;
     }
 
     this.getDefaultFileName();
@@ -101,7 +117,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
       fileType,
       filterQuery,
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      ids,
+      this.isAgency && this.selectedTabIndex === AgencyInvoicesGridTab.All ? allTabIds : ids,
       options?.fileName || this.defaultFileName,
     ), this.isAgency,this.selectedTabIndex)); 
 

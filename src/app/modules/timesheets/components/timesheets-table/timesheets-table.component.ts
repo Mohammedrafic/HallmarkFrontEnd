@@ -15,7 +15,6 @@ import { TimesheetsColumnsDefinition } from '../../constants';
 import { TimesheetsTableColumns } from '../../enums';
 import { GRID_CONFIG } from '@shared/constants';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
-import { ExportDataModel } from '@shared/models/export.model';
 import { RowNode } from '@ag-grid-community/core';
 
 @Component({
@@ -65,7 +64,7 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
     this.isAgency = this.router.url.includes('agency');
     this.bulkActionConfig = {
       approve: !this.isAgency,
-    }
+    };
   }
 
   override ngOnInit(): void {

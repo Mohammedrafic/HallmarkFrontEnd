@@ -154,8 +154,10 @@
   <!-- OT flags -->
   <div *ngIf="billRateForm.get('billRateConfigId')?.value">
     <div *ngFor="let item of configOT; trackBy: trackByFn" class="ot-label">
-      <h4 class="ot-label__title">{{ item.title }}</h4>
-      <h4 class="ot-label__value">{{ !!billRateForm?.get(item.formKey)?.value }}</h4>
+      <ng-container *ngIf="!isOnCallSelected || item.formKey !=='holidayCalculationEnabled'">
+        <h4 class="ot-label__title">{{ item.title }}</h4>
+        <h4 class="ot-label__value">{{ !!billRateForm?.get(item.formKey)?.value }}</h4>
+      </ng-container>
     </div>
   </div>
 </form>

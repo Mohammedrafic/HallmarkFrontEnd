@@ -18,6 +18,7 @@ import { RnUtilizationWidgetModule } from '../widgets/rn-utilization-widget/rn-u
 import { AlreadyExpiredCredsModule } from '../widgets/already-expired-creds/already-expired-creds.module';
 import { UpcomingExpCredsModule } from '../widgets/upcoming-exp-creds/upcoming-exp-creds.module';
 import { AvailableEmployeeModule } from '../widgets/available-employee/available-employee.module'
+import { PositionsCountDayRangeModule } from '../widgets/positions-count-day-range/positions-count-day-range.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -38,6 +39,7 @@ import { AvailableEmployeeModule } from '../widgets/available-employee/available
     AlreadyExpiredCredsModule,
     UpcomingExpCredsModule,
     AvailableEmployeeModule,
+    PositionsCountDayRangeModule,
     NgxsModule.forFeature([ UserState]),
   ],
 })

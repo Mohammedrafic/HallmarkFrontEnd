@@ -100,17 +100,19 @@
   </section>
 
   <ng-template #weekChartAnnotation>
-    <ng-container [ngTemplateOutlet]="chartAnnotation"
-                  [ngTemplateOutletContext]="{value: totalWeekHours === 0
-                    ? 'No Data' : totalWeekHours  | number: '1.2-2'}"
-    ></ng-container>
+    <ng-container [ngTemplateOutlet]="chartAnnotation">
+      <div class="annotation-value">
+        {{totalWeekHours === 0 ? 'No Data' : totalWeekHours  | number: '1.2-2'}}
+      </div>
+    </ng-container>
   </ng-template>
 
   <ng-template #cumulativeChartAnnotation>
-    <ng-container [ngTemplateOutlet]="chartAnnotation"
-                  [ngTemplateOutletContext]="{value: totalCumulativeHours === 0
-                    ? 'No Data' : totalCumulativeHours  | number: '1.2-2'}"
-    ></ng-container>
+    <ng-container [ngTemplateOutlet]="chartAnnotation">
+      <div class="annotation-value">
+        {{totalCumulativeHours === 0 ? 'No Data' : totalCumulativeHours  | number: '1.2-2'}}
+      </div>
+    </ng-container>
   </ng-template>
 
   <ng-template #chartAnnotation let-value="value">

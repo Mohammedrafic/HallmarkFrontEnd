@@ -49,6 +49,7 @@ import { GlobalWindow } from "@core/tokens";
 import { Country } from "@shared/enums/states";
 import { GetRegionList } from "@shared/components/candidate-list/store/candidate-list.actions";
 import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -91,6 +92,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   @Select(CandidateState.isCandidateCreated)
   public isCandidateCreated$: Observable<boolean>;
+
+  @Select(AppState.isMobileScreen)
+  public isMobile$: Observable<boolean>;
 
   @Select(CandidateState.candidateCredential)
   private candidateCredentialResponse$: Observable<CandidateCredentialResponse>;
