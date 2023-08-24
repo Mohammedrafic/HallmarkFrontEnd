@@ -475,6 +475,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   public orderLockList = orderLockList;
   private ltaOrderFlag: boolean|null = false;
+  public reorderFilledStatus:boolean = false
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -1079,9 +1080,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children?.length !== 0);
     const hasSelectedChildReorders = this.selectedItems.some((itm) => itm.reOrders?.length !== 0);
     this.selectedItems.length > 0 ? this.openregrateupdate = true : this.openregrateupdate = false;
-
+    console.log('reorder this.selectedItems',this.selectedItems);
+    this.reorderFilledStatus = false;
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
+        if(this.selectedItems.filter(ele=> ele.orderType == 1).length == this.selectedItems.length){
+          this.openregrateupdate = false;
+        }
         if (this.selectedItems.length === 0) {
           this.columnsToExport = [...allOrdersColumnsToExport, ...allOrdersChildColumnsToExport];
           return;
@@ -1100,7 +1105,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           ? [...perDiemColumnsToExport, ...perDiemChildColumnsToExport]
           : perDiemColumnsToExport;
         break;
-      case OrganizationOrderManagementTabs.ReOrders:
+      case OrganizationOrderManagementTabs.ReOrders:        
+        if(this.selectedItems.filter(ele=> ele.statusText == "Filled").length == this.selectedItems.length){
+          this.openregrateupdate = false;
+        }
+        if(this.selectedItems.filter(ele=> ele.statusText == "Filled").length >0){
+          this.reorderFilledStatus = true;
+        }
         if (this.selectedItems.length === 0) {
           this.columnsToExport = [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport];
           return;

@@ -21,6 +21,7 @@ export class UpdateRegRateComponent extends DestroyableDirective implements OnIn
   @Output() public reloadItemsListforupdate: EventEmitter<void> = new EventEmitter<void>();
   @Input() public orderdatas: any;
   @Input() public perdiemOrderData: any;
+  @Input() reorderFilledStatus:boolean = false;
   constructor(
         private formBuilder: FormBuilder,
         private updateregrateservice : UpdateRegRateService,
@@ -59,7 +60,7 @@ export class UpdateRegRateComponent extends DestroyableDirective implements OnIn
       "hourlyRate": this.updateform.value.updaterate,
       "perDiemIds": this.getperdiemorderdatas
     };
-    this.store.dispatch(new UpdateRegRateorder(payload)).pipe(
+    this.store.dispatch(new UpdateRegRateorder(payload,this.reorderFilledStatus)).pipe(
       delay(500),
       takeUntil(this.destroy$)
     ).subscribe(() => {

@@ -125,6 +125,9 @@ import {
   RECORD_DELETE,
   RECORD_MODIFIED_SUCCESS_WITH_ORDERID,
   RECORD_SAVED_SUCCESS_WITH_ORDERID,
+  UpdateRegularRateReordersucceedcount,
+  UpdateRegularRateReorderOpensucceedcount,
+  UpdateReorderFilled,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -1237,7 +1240,7 @@ export class OrderManagementContentState {
   @Action(UpdateRegRateorder)
   UpdateRegRateorder(
     { dispatch } : StateContext<OrderManagementContentStateModel>,
-    { payload } : UpdateRegRateorder
+    { payload,reorderFilled } : UpdateRegRateorder
   ) : Observable<UpdateRegrateModel | Observable<void>>{
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
       tap((data) => {
@@ -1246,7 +1249,11 @@ export class OrderManagementContentState {
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
         else if(count==0 && payload.perDiemIds.length===0)
           dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersSucceedMessage));
-        else if(payload.perDiemIds.length===payload.orderIds.length)
+        else if(payload.perDiemIds.length===payload.orderIds.length && count === payload.perDiemIds.length)
+          dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReordersucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReordersucceedcount(count)));
+        else if(payload.perDiemIds.length===payload.orderIds.length && count >0)
+          dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReorderOpensucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReorderOpensucceedcount(count)));
+        else if(count==0 && payload.perDiemIds.length===payload.orderIds.length)
           dispatch(new ShowToast(MessageTypes.Error, PerDiemReOrdersErrorMessage));
         else if(count>0 && payload.perDiemIds.length>0)
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
