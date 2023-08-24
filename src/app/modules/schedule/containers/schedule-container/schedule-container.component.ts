@@ -63,8 +63,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     isOpen: false,
     isEditMode: false,
   };
+  showSingleEmp: boolean = false;
 
   selectedCandidate: ScheduleInt.ScheduleCandidate | null;
+  routeData: any;
+  availableEmp: ScheduleInt.ScheduleCandidate | null;
   candidateDetails: ScheduleInt.ScheduleCandidatesPage;
   dateRange: ScheduleInt.DateRangeOption[];
   activeTimePeriod = DatesRangeType.TwoWeeks;
@@ -77,10 +80,15 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     private scheduleFiltersService: ScheduleFiltersService,
     private createScheduleService: CreateScheduleService,
     private settingService: SettingsViewService,
+    private router : Router,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
-
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    if(routerState?.["EmpId"]){
+      this.showSingleEmp = true;
+      this.routeData = routerState?.["EmpId"];
+    }
     store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'calendar' }));
   }
 
@@ -192,6 +200,19 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.detectWhatDataNeeds();
   }
 
+  private availableCandidates(): void {
+    this.setDateLimitation();
+    if(this.routeData){
+      const selectedCandidates = {
+        ...this.routeData,
+        id : this.routeData.employeeId
+      }
+      this.selectedCandidate = selectedCandidates;
+      this.availableEmp = this.selectedCandidate;
+      this.getEmployeeOrganizationStructure(this.routeData.employeeId);
+      this.detectWhatDataNeeds();  
+    }
+  }
   datesRanges(date : ScheduleInt.DateRangeOption[]): void {
     this.dateRange = date;
   }
@@ -237,6 +258,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
       this.updateScheduledShift();
       this.totalCount = scheduleData.totalCount;
+      this.availableCandidates();
       this.cdr.detectChanges();
     });
   }

@@ -81,6 +81,9 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @Input() selectedFilters: ScheduleInt.ScheduleFilters;
   @Input() hasViewPermission = false;
   @Input() hasSchedulePermission = false;
+  @Input() set redirectFromWidget(availableEmployeeData : ScheduleInt.ScheduleCandidate | null){
+    this.emitAvailableEmp(availableEmployeeData);
+  }
 
   @Output() dateRange: EventEmitter<ScheduleInt.DateRangeOption[]> = new EventEmitter<ScheduleInt.DateRangeOption[]>();
   @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
@@ -291,6 +294,15 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.selectCandidate.emit(candidate);
     this.activeTimePeriod.emit(this.activePeriod);
     this.cdr.markForCheck();
+  }
+
+  emitAvailableEmp(candidate : ScheduleInt.ScheduleCandidate | null): void {
+    if(candidate !== undefined){
+      this.datesPeriods = [...DatesPeriods,...MonthPeriod];
+      this.activePeriod = DatesRangeType.Month;
+      this.selectCandidate.emit(candidate);
+      this.cdr.markForCheck();  
+    }
   }
 
   handleMonthClick({date, candidate, cellDate }: CardClickEvent): void {

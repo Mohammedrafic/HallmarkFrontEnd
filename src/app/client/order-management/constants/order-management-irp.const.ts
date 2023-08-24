@@ -255,7 +255,7 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
   {
     field: 'workCommitment',
     headerName: 'Work Commitment',
-    width: 140,
+    width: 240,
   },
   {
     field: 'actualStartDate',

@@ -18,6 +18,7 @@ export interface OrderStatusesAvgDetailsInfo {
   statusName: string;
   count: number;
   average: number;
+  customStatusName: string;
 }
 
 export interface PositionsCountByDayRange {

@@ -23,4 +23,9 @@ export class ChildMenuItem {
   route?: string;
   icon?: string;
   count?: number;
+  id?: any;
+}
+export class overallMenuItems{
+  id: any;
+  title: string;
 }

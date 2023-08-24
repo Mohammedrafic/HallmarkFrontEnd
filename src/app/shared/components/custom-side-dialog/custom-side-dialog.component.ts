@@ -12,7 +12,7 @@ import { DestroyableDirective } from '../../directives/destroyable.directive';
   styleUrls: ['./custom-side-dialog.component.scss']
 })
 export class CustomSideDialogComponent extends DestroyableDirective implements OnInit {
-  @ViewChildren('customSideDialog') customSideDialog: DialogComponent;
+  @ViewChild('customSideDialog') customSideDialog: DialogComponent;
   targetElement: HTMLElement = document.body;
 
   @Input() header: string | null;
