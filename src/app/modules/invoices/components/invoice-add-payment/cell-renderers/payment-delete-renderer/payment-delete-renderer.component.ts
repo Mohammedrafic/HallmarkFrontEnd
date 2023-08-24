@@ -32,8 +32,7 @@ export class PaymentDeleteRendererComponent implements ICellRendererAngularComp 
 
   constructor(
     private store: Store
-  ) {
-    console.log((this.store.snapshot().invoices as InvoicesModel).isAgencyArea);
+  ) {    
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.getuserPermission();
   }
