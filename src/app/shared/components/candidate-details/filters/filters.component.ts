@@ -33,7 +33,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
     text: 'name',
     value: 'id',
   };
-  public maxlengh: Number = 10;
+  
   public typeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public skillFields: FieldSettingsModel = { text: 'skillDescription', value: 'masterSkillId' };
   public orgid:number|null|undefined;
