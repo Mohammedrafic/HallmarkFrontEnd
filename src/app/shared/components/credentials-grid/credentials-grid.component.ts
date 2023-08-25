@@ -131,7 +131,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private file: CredentialFile | null;
   private candidateProfileId: number;
   private credentialType: CredentialType;
-  private isOrgOnlyIRPEnabled:boolean=false;
+  public isOrgOnlyIRPEnabled:boolean=false;
   private isOrgVMSEnabled:boolean=false;
 
   @Select(CandidateState.candidateCredential)
