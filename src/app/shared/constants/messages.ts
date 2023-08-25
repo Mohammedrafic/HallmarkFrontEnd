@@ -92,7 +92,8 @@ export const CandidateDOBRequired= 'DOB of Candidate is mandatory to accept the 
 export const CandidatePHONE1Required = (place:any) => 'Phone 1 of the Candidate is mandatory to '+place+' the position.';
 export const CandidateADDRESSRequired = (place:any) => 'Address 1, Country, State, City and Zipcode of the Candidate in the Candidate profile are mandatory to '+place+' the position.';
 export const TravelerContracttoPermOrdersSucceedMessage = 'LTA/Cont. to Perm orders with all positions offered and above status will not be updated. Per- Diem/Closed orders will not be updated.';
-export const PerDiemReOrdersErrorMessage = 'Bill Rate cannot be updated for Open Re-Orders.';
+export const ReOrdersErrorMessage = 'Bill Rate is not updated for the Re-Orders.';
+export const PerDiemErrorMessage = 'Bill Rate cannot be updated for Open Per Diems.';
 export const UpdateRegularRatesucceedcount = (count: number) =>
   ` ${count} Order(s) updated , ` + TravelerContracttoPermOrdersSucceedMessage;
 export const UpdateRegularRateReordersucceedcount = (count: number) =>

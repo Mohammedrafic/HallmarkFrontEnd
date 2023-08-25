@@ -1080,7 +1080,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children?.length !== 0);
     const hasSelectedChildReorders = this.selectedItems.some((itm) => itm.reOrders?.length !== 0);
     this.selectedItems.length > 0 ? this.openregrateupdate = true : this.openregrateupdate = false;
-    console.log('reorder this.selectedItems',this.selectedItems);
     this.reorderFilledStatus = false;
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
