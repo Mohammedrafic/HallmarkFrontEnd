@@ -60,7 +60,7 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
     }
 
     .e-input {
-      color: $secondary-dark-blue-30 !important;
+      color: var(--secondary-text) !important;
       padding-left: 16px !important;
     }
 
