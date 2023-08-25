@@ -8,7 +8,9 @@ import { GridClassificationRendererComponent } from './grid-classification-rende
 import { CandidateExportColumn } from './candidate-grid.interface';
 
 const valueHelper = new GridHelper();
-
+const customComparator = (valueA: string, valueB: string) => {
+  return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+};
 // eslint-disable-next-line max-lines-per-function
 export const CandidatesColumnsDefinition = (isAgency: boolean) => {
   return [
@@ -18,6 +20,7 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
       width: 160,
       cellRenderer: GridNameRendererComponent,
       sortable: true,
+      comparator: customComparator
     },
     {
       field: 'status',
