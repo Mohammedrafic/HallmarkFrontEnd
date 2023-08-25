@@ -78,7 +78,8 @@ import {
   GetOrderJobDistributionAuditHistory,
   GetOrderWorkLocationAuditHistory,
   GetOrderClassificationAuditHistory,
-  GetOrderHistoryDetailSucceeded
+  GetOrderHistoryDetailSucceeded,
+  GetOrderClassificationDetailSucceeded
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -1374,12 +1375,18 @@ export class OrderManagementContentState {
   }
 
   @Action(GetOrderClassificationAuditHistory)
-  GetOrderClassificationAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
-    GetOrderClassificationAuditHistory): Observable<OrderClassificationAuditHistory[]> {
+  GetOrderClassificationAuditHistory({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderClassificationAuditHistory): Observable<OrderClassificationAuditHistory[]|void> {
     return this.orderManagementService.getOrderClassificationAuditHistory(payload).pipe(
       tap((payloads) => {
         patchState({ OrderClassificationAuditHistory: payloads });
+        dispatch(new GetOrderClassificationDetailSucceeded());
         return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+       console.log(error)
+        return dispatch(new ShowToast(MessageTypes.Error, error.error));
       }));
-  }
+  }  
 }
+

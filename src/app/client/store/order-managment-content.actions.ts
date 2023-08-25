@@ -491,3 +491,8 @@ export class GetOrderHistoryDetailSucceeded {
   static readonly type = '[order management] Get Order Order History Detail Succeeded';
   constructor() {}
 }
+
+export class GetOrderClassificationDetailSucceeded {
+  static readonly type = '[order management] Get Order Order Classification Detail Succeeded';
+  constructor() {}
+}
