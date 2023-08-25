@@ -527,7 +527,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private updateOrganizationCandidateJob(status: ApplicantStatus): void {
     this.acceptForm.markAllAsTouched();
-    if (this.acceptForm.valid && this.orderCandidateJob && status) {
+    /**
+     * Due to the fact that rejected candidate disabled form has fields valid, invalid set to false by angular,
+     * we need additional variable to check if it's for candidate revert.
+     */
+    const isCandidateRevert = this.orderCandidateJob.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected;
+
+    if ((this.acceptForm.valid || isCandidateRevert) && this.orderCandidateJob && status) {
       const value = this.acceptForm.getRawValue();
       const actualDates = this.setCorrectActualDates(
         this.orderCandidateJob.reOrderDate as string,

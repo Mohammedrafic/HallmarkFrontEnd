@@ -416,7 +416,7 @@ export class SaveOrderImportResultSucceeded {
 
 export class UpdateRegRateorder {
   static readonly type = '[order management] Update Reg Rate Order';
-  constructor(public payload: UpdateRegrateModel) {}
+  constructor(public payload: UpdateRegrateModel,public reorderFilled?:boolean) {}
 }
 
 export class UpdateRegRateSucceeded {

@@ -217,13 +217,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select atleast one Organization'));
             return; 
           }
-          this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));          
+          this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
         }),
-        map(val => {
-          return val[val.length - 1];
-        })
       );
-
       this.recordsPerPageOptions = InvoiceDefaulPerPageOptions;
     } else {
       this.organizationId$ = this.organizationChangeId$;
@@ -274,7 +270,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.agencyId$
         .pipe(
           filter(Boolean),
-          distinctUntilChanged(),
           tap(() => {
             this.organizationId = 0;
             this.organizationControl.reset();
@@ -318,6 +313,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public startFiltersWatching(): void {
     this.organizationId$
     .pipe(
+      distinctUntilChanged(),
       filter((id) => {
         if (this.navigatedOrgId) {
           return id === this.navigatedOrgId;
@@ -331,8 +327,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.clearStructure();
       this.store.dispatch(new PreservedFilters.ResetPageFilters());
       this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
-      this.organizationId = id;
-      this.store.dispatch(new Invoices.SelectOrganization(id));
+      if (this.isAgency) {
+        this.organizationId = id[id.length - 1];
+        this.store.dispatch(new Invoices.SelectOrganization(id[id.length - 1]));
+      }else{
+        this.organizationId = id;
+        this.store.dispatch(new Invoices.SelectOrganization(id));
+      }
       this.resetFilters(true);
       this.navigatedInvoiceId = null;
       this.navigatedOrgId = null;
@@ -340,6 +341,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     });
     this.invoicesFilters$
       .pipe(
+        distinctUntilChanged(),
         filter(() => !!this.organizationId),
         skip(1),
         takeUntil(this.componentDestroy()),

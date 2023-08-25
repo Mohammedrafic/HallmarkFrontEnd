@@ -6,9 +6,6 @@ import { filter, Observable, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import {
-  GetRolesForWorkflowMapping,
-  GetUsersForWorkflowMapping,
-  GetWorkflowMappingPages,
   GetWorkflows,
   GetWorkflowsSucceed,
   RemoveWorkflow,
@@ -20,7 +17,6 @@ import { ActivatedRoute } from '@angular/router';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { UserState } from '../../../store/user.state';
 import {
-  GetAssignedSkillsByOrganization,
   GetOrganizationById,
 } from '@organization-management/store/organization-management.actions';
 import { AbstractPermission } from '@shared/helpers/permissions';
@@ -103,7 +99,6 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
     this.store.dispatch(new ShowSideDialog(false));
 
     this.orderWorkflowTab();
-    this.orderMappingTab();
   }
 
   public saveWorkflowSteps(): void {
@@ -293,21 +288,5 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
     ).subscribe((card: WorkflowWithDetails | null) => {
       this.selectedIrpCard = card;
     });
-  }
-
-  private orderMappingTab(): void {
-    // triggers refresh grid and other data if tab changed
-    if (this.activeTab === WorkflowNavigationTabs.WorkflowMapping) {
-      this.store.dispatch([
-        new GetAssignedSkillsByOrganization(),
-        new GetWorkflowMappingPages(),
-        new GetRolesForWorkflowMapping(),
-        new GetUsersForWorkflowMapping(),
-        new GetWorkflows({
-          includeInVMS: false,
-          includeInIRP: false,
-        }),
-      ]);
-    }
   }
 }
