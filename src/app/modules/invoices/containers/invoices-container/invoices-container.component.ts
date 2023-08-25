@@ -269,6 +269,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     if (this.isAgency) {
       this.agencyId$
         .pipe(
+          distinctUntilChanged(),
           filter(Boolean),
           tap(() => {
             this.organizationId = 0;
@@ -286,6 +287,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           takeUntil(this.componentDestroy()),
         )
         .subscribe((orgId: number) => {
+          this.agencyOrganizationIds = [];
           const value = this.businessUnitId
             ? (this.organizationsList || []).filter(org => org.id === this.businessUnitId)[0].id
             : orgId;
@@ -319,7 +321,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           return id === this.navigatedOrgId;
         }
 
-        return !!id;
+        return this.isAgency ? id.length > 0 ? true : false : !!id;
       }),
       takeUntil(this.componentDestroy()),
     )
@@ -772,10 +774,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             filters.agencyOrganizationIds =  this.organizationMultiSelectControl.value;
             this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
       }else if(filterState.state != null){
-        if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null){
+        if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){
           this.agencyOrganizationIds = filterState.state.agencyOrganizationIds;
           this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);
-        }else if(filterState.state.agencyOrganizationIds != null && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
+        }else if(filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0 && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
           filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
           this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
         }
