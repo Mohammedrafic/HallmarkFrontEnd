@@ -47,7 +47,7 @@ export const GridCellsSystemIRPTabAll = (
               params.context.componentParent.openIrpDetails(params);
             },
             iconName: 'message-square',
-            buttonClass: 'e-flat e-primary with-badge',
+            buttonClass: 'e-flat e-primary with-badge default-icon-button',
             useBadge: true,
             badgeValue: params.data.unreadComments,
             disabled: false,
