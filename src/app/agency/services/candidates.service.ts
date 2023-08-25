@@ -145,20 +145,13 @@ export class CandidateService {
       }); 
     }
 
-  public saveCredential(credential: CandidateCredential, file: Blob | null): Observable<CandidateCredential> {
+  public saveCredential(credential: CandidateCredential): Observable<CandidateCredential> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const endpoint = new Map<boolean, string>([
       [true, '/api/CandidateCredentials'],
       [false, '/api/EmployeeCredentials'],
     ]);
-    const formData = new FormData();
-    if (file) {
-      formData.append('documents', file);
-    }
-    for (const key in credential) {
-      formData.append(key, credential[key as keyof CandidateCredential]?.toString() || '');
-    }
-    return this.http[credential.id ? 'put' : 'post']<CandidateCredential>(endpoint.get(isAgencyArea) as string, formData);
+    return this.http[credential.id ? 'put' : 'post']<CandidateCredential>(endpoint.get(isAgencyArea) as string, credential);
   }
 
   public verifyCandidatesCredentials(credentials: BulkVerifyCandidateCredential): Observable<CandidateCredential[]> {
