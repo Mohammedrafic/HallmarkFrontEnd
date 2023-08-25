@@ -103,6 +103,7 @@ export class OrderManagementService extends DestroyableDirective {
       shiftIds: new FormControl([]),
       shift: new FormControl([]),
       orderLocked: new FormControl(null),
+      orderDistributionType: new FormControl(['0']),
     });
   }
 

@@ -42,3 +42,8 @@ export const orderLockList: { name: string; id: any }[] = [
   { name: 'Locked', id: 'true' },
   { name: 'Unlocked', id: 'false' }
 ];
+export const orderDistributionList: { name: string; id: any }[] = [
+  { name: 'All', id: 0 },
+  { name: 'VMS and IRP', id: 1 },
+  { name: 'VMS only', id: 2 }
+];

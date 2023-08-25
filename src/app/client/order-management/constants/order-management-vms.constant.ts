@@ -55,6 +55,11 @@ export const filterOrderLockList: { text: string; value: any }[] = [
   { text: 'Locked', value: 'true' },
   { text: 'Unlocked', value: 'false' }
 ];
+export const filterOrderDistributionList: { text: string; value: any }[] = [
+  { text: 'All', value: 0 },
+  { text: 'VMS and IRP', value: 1 },
+  { text: 'VMS only', value: 2 }
+];
 
 export const initOrderManagementFilterColumns = () => ({
   orderPublicId: { type: ControlTypes.Text, valueType: ValueType.Text },
@@ -190,6 +195,13 @@ export const initOrderManagementFilterColumns = () => ({
     type: ControlTypes.Dropdown,
     valueType: ValueType.Id,
     dataSource: filterOrderLockList,
+    valueField: 'name',
+    valueId: 'id',
+  },
+  orderDistributionType: {
+    type: ControlTypes.Dropdown,
+    valueType: ValueType.Id,
+    dataSource: filterOrderDistributionList,
     valueField: 'name',
     valueId: 'id',
   },

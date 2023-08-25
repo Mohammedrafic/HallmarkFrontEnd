@@ -111,6 +111,17 @@ export const GridCellsSystemIRPTabAll = (
     cellRenderer: TableStatusCellComponent,
     cellClass: 'status-cell',
   },
+  ...(!isIncompleteTab && isIRPEnabled && isVMSEnabled? [{
+    ...DefaultOrderCol,
+    field: 'system',
+    headerName: 'System',
+    cellClass: 'name',
+    onCellClicked:(params: ValueFormatterParams)=>
+    params.context.componentParent.openIrpDetailsEmployee(),
+    width: 125,
+    minWidth: 100,
+    maxWidth: 200,
+  }] : []),
   {
     ...DefaultOrderCol,
     field: 'criticalOrder',

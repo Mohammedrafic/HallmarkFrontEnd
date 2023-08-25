@@ -478,3 +478,9 @@
 .order-type-text-cell {
   @include order-type-text-cell;
 }
+.vms-system {
+  font-weight: 700;
+  display: inline-flex;
+  color: $primary-active-blue-10;
+  cursor: pointer;
+}

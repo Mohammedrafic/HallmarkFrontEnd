@@ -45,6 +45,7 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Candidate Agency', column: 'CandidateAgency' },
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
+  { text: 'System', column: 'System' },
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
@@ -102,6 +103,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Offered Date', column: 'OfferedDate' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
   { text: 'Linked ID', column: 'LinkedId' },
+  { text: 'System', column: 'System' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -188,6 +190,7 @@ export const irpAllOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Creation date', column: 'CreationDate' },
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
+  { text: 'System', column: 'System' },
 ];
 
 export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
@@ -209,6 +212,7 @@ export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Creation date', column: 'CreationDate' },
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
+  { text: 'System', column: 'System' },
 ];
 
 export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
@@ -231,6 +235,7 @@ export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Creation date', column: 'CreationDate' },
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
+  { text: 'System', column: 'System' },
 ];
 
 export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
@@ -273,6 +278,10 @@ export const orderJourneyColumnsToExport: ExportColumn[] = [
 export const ReOrdersColumnsConfig = [
   {
     fieldName: 'reOrderFromId',
+    visible: true,
+  },
+  {
+    fieldName: 'system',
     visible: true,
   },
   {
@@ -351,6 +360,10 @@ export const AllOrdersColumnsConfig = [
     visible: true,
   },
   {
+    fieldName: 'system',
+    visible: true,
+  },
+  {
     fieldName: 'orderType',
     visible: true,
   },
@@ -426,6 +439,10 @@ export const PerDiemColumnsConfig = [
     visible: true,
   },
   {
+    fieldName: 'system',
+    visible: false,
+  },
+  {
     fieldName: 'orderType',
     visible: false,
   },
@@ -495,6 +512,10 @@ export const orderTemplateColumnsConfig = [
   {
     fieldName: 'id',
     visible: true,
+  },
+  {
+    fieldName: 'system',
+    visible: false,
   },
   {
     fieldName: 'templateTitle',
@@ -570,6 +591,10 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'id',
     visible: true,
+  },
+  {
+    fieldName: 'system',
+    visible: false,
   },
   {
     fieldName: 'orderType',

@@ -125,6 +125,7 @@ import {
   OrderManagementIRPTabsIndex,
   OrganizationOrderManagementTabs,
   orderLockList,
+  orderDistributionList
 } from '@shared/enums/order-management-tabs.enum';
 import { FilterIrpOrderTypes, OrderType, OrderTypeOptions, VmsOrderTypeTooltipMessage } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
@@ -474,8 +475,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   public orderLockList = orderLockList;
+  public orderDistributionList = orderDistributionList;
   private ltaOrderFlag: boolean|null = false;
   public reorderFilledStatus:boolean = false
+  private isShowVMSPositions:boolean=false;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -858,6 +861,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
     this.isIncomplete = false;
+    this.filters.orderDistributionType?this.filters.orderDistributionType:null;
 
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
       let IsLTAOrders=  JSON.parse(localStorage.getItem('IsLTAOrders') || '"false"') as boolean;
@@ -1052,6 +1056,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       reorderStatuses: this.filters.reorderStatuses || null,
       shift:this.filters.shift || null,
       orderLocked:this.filters.orderLocked || null,
+      orderDistributionType:this.filters.orderDistributionType || null
     });
 
     if (!prepopulate) {
@@ -1196,6 +1201,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         }
       }
     }
+    if(this.isShowVMSPositions)
+    {
+      if (this.gridWithChildRow && this.gridWithChildRow.dataSource){
+      let filteredvmsrowindex:number=0;
+      this.gridWithChildRow.detailRowModule.expand(filteredvmsrowindex);
+      this.isShowVMSPositions=!this.isShowVMSPositions;
+    }
+  }
 
     this.openPerDiemDetails();
     this.selectNavigationTab();
@@ -1284,7 +1297,21 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.selectedRowRef = event;
     this.selectedRowIndex = event.rowIndex || null;
   }
-
+  openIrpDetailsEmployee(){
+    this.OrderFilterFormGroup.markAsDirty();
+    this.OrderFilterFormGroup.get('orderPublicId')?.setValue(this.selectedDataRow.publicId?.toString());
+    this.onFilterApply();
+    this.globalWindow.localStorage.setItem("IsEmployeeTab", JSON.stringify(true));
+    
+  }
+  openvmspositions(publicId: number)
+  {
+    this.OrderFilterFormGroup.markAsDirty();
+    this.OrderFilterFormGroup.get('orderPublicId')?.setValue(publicId.toString());
+    this.onFilterApply();
+    this.isShowVMSPositions=true;
+    
+  }
   setGridApi(params: GridReadyEvent): void {
     this.gridApi = params.api;
   }
@@ -1329,6 +1356,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.orderPositionSelected$.next({ state: false });
 
         if (!isArray(data)) {
+          this.globalWindow.localStorage.setItem("IsEmployeeTab", JSON.stringify(true));
           this.openDetails.next(true);
           this.selectedRowRef = event;
           this.selectedRowIndex = event.rowIndex || null;
@@ -2688,6 +2716,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filters.openPositions = this.filters.openPositions || null;
     this.filters.orderTypes = this.filters.orderTypes || [];
     this.filters.irpOnly = !!this.filters.irpOnly;
+    this.filters.orderDistributionType=this.filters.orderDistributionType || null;
   }
 
   private getPageName(): FilterPageName {
