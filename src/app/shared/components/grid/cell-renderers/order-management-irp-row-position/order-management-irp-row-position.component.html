@@ -54,6 +54,20 @@
               <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
             </ng-container>
 
+            <ng-container *ngSwitchCase="'actualStartDate'">
+              <ng-container *ngIf="row.system === irpSystem && params.data.orderType === 3">
+                <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
+              <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
+              </ng-container>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'actualEndDate'">
+              <ng-container *ngIf="row.system === irpSystem && params.data.orderType === 3">
+                <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
+              <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
+              </ng-container>
+            </ng-container>
+
             <ng-container *ngSwitchDefault>
               <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
               <h3 class="custom-cell__title">{{ cell.headerName }}</h3>

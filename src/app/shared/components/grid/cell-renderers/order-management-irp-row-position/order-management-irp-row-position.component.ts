@@ -50,6 +50,7 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
   public isBothSystemsEnabled = false;
 
   public readonly vmsSystem = OrderManagementIrpCandidateSystem[OrderManagementIrpCandidateSystem.VMS];
+  public readonly irpSystem = OrderManagementIrpCandidateSystem[OrderManagementIrpCandidateSystem.IRP];
 
   constructor(
     private cdr: ChangeDetectorRef,
