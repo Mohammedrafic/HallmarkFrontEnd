@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'adaptive-response';
 
 .extension {
   display: flex;
@@ -21,9 +22,10 @@
         row-gap: 12px;
 
         .durations {
-          display: flex;
-          align-items: flex-end;
-          column-gap: 12px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          align-items: end;
         }
 
         .row {
@@ -41,4 +43,39 @@
 
 .form-line-item-50 {
   width: 50%;
+}
+
+@media #{$max-mobile} {
+  .extension {
+    &__info {
+      flex-direction: column;
+      row-gap: 20px;
+    }
+
+    &__details {
+      width: 100% !important;
+
+      .durations {
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: auto;
+
+        .itm1 {
+          grid-column: 1/3;
+        }
+      }
+
+      .row {
+        flex-direction: column;
+        row-gap: 12px;
+      }
+    }
+
+    &__comments {
+      width: 100%;
+    }
+  }
+
+  .form-line-item-50 {
+    width: 100%;
+  }
 }

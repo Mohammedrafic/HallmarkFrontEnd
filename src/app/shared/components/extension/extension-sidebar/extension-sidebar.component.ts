@@ -13,7 +13,7 @@ import { Comment } from '@shared/models/comment.model';
 import { Store } from '@ngxs/store';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { ExtensionStartDateValidation, RECORD_ADDED } from '@shared/constants';
+import { ExtensionStartDateValidation } from '@shared/constants';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { BillRate } from '@shared/models';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
