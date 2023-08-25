@@ -1,7 +1,7 @@
 <section class="flex-column">
   <section class="toolbar" [class.hidden]="!isLoaded">
     <section>
-      <h3>Skills</h3>
+      <h3 class="title-settings">Skills</h3>
     </section>
     <section>
       <button (click)="showFilters()" ejs-button id="filterButton" cssClass="e-outline button-filter">
@@ -32,7 +32,7 @@
       </app-tooltip-container>
     </section>
   </section>
-  
+
   <ejs-grid class="grid grid-component"
     #grid
     [dataSource]="(skills$ | async)?.items"
@@ -52,7 +52,7 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      
+
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
@@ -213,7 +213,7 @@
           <div class="input-container">
             <span class="controls-group-title">{{control.title}}</span>
             <span class="required" *ngIf="control.required"> *</span>
-            
+
               <div class="input-group checkboxes">
                 <div class="control-block" *ngFor="let checkbox of control.checkBoxes; trackBy: trackByField">
                   <ejs-tooltip content="At least one system should be selected">

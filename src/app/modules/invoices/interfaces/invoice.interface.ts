@@ -67,6 +67,7 @@ export interface InvoicesFilterState {
   pageNumber?: number;
   pageSize?: number;
   organizationId?: number | null;
+  agencyOrganizationIds?: number[] | null;
   invoiceState?: number;
   amountFrom?: number;
   amountTo?: number;
@@ -329,6 +330,7 @@ export interface InvoiceFilterFieldConfig {
   field: InvoicesTableFiltersColumns;
   isShort?: boolean;
   showSelectAll?: boolean;
+  isDisable?: boolean;
 }
 
 export type InvoiceFilterValue = string | string[] | number | number[];

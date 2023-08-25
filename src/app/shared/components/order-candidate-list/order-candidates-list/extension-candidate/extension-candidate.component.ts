@@ -1,5 +1,5 @@
 import { formatDate, formatNumber } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -109,6 +109,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Input() isTab = false;
   @Input() actionsAllowed = true;
   @Input() hasCanEditOrderBillRatePermission: boolean;
+  @Output() updateDetails = new EventEmitter<void>();
 
   candidate$: Observable<OrderCandidatesList>;
 
@@ -348,7 +349,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       };
 
       this.store.dispatch(this.isAgency ? [new RejectCandidateJobAgency(payload)] : [new RejectCandidateJob(payload)]);
-      this.dialogEvent.next(false);
+      this.updateDetails.emit();
     }
   }
 
@@ -362,7 +363,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           candidatePayRate: this.candidateJob.candidatePayRate,
         })
       );
-      this.dialogEvent.next(false);
+      this.updateDetails.emit();
     }
   }
 
@@ -664,7 +665,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
           );
           if (statusChanged) {
-            this.dialogEvent.next(false);
+            this.updateDetails.emit();
           } else {
             this.resetStatusesFormControl();
             this.adjustCandidatePayRateField();

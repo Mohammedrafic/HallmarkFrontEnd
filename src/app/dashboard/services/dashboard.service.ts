@@ -73,6 +73,7 @@ export class DashboardService {
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getActivePositionWidgetData(filters),
       [WidgetTypeEnum.CANDIDATES]: (filters: DashboartFilterDto) => this.getCandidatesWidgetData(filters),
       [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivePositionsWidgetData(filters),
+      [WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM]: (filters: DashboartFilterDto) => this.getAvergaeDayCUSTOMActivePositionsWidgetData(filters),
       [WidgetTypeEnum.Candidate_Applied_In_Last_N_Days]: (filters: DashboartFilterDto) => this.getCandidateAppliedInLastNDays(filters, ApplicantStatus.Applied),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getFilledPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboartFilterDto) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
@@ -210,6 +211,29 @@ export class DashboardService {
         })
       );
     }
+
+    private getAvergaeDayCUSTOMActivePositionsWidgetData(filter: DashboartFilterDto): Observable<any> {
+      return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter, type : 'Custom' }).pipe(
+        map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
+          return {
+            id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM,
+             title: ' Average Days of Active Positions with Custom Workflow',
+             chartData: lodashMapPlain(
+              orderStatusesAvgDetails,
+              ({ count, statusName,average,customStatusName }: OrderStatusesAvgDetailsInfo, index: number) => ({
+                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +customStatusName +')',
+                value: average,
+                average: count,
+                color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses] ||
+                        activePositionsLegendPalette[ActivePositionsChartStatuses.CUSTOM]
+              })
+              ),
+            };
+          })
+        );
+      }
+
+    
 
   private getApplicantsByRegionWidgetData(
     filters: DashboartFilterDto
@@ -436,6 +460,9 @@ export class DashboardService {
   }
   public redirect_to_expiring_credentials(url : string,startDate? : Date,  endDate? : Date, type? : number) : void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true ,startDate: startDate, endDate: endDate, type : type} });
+  }
+  public redirect_to_schedule(url : string, EmpId : Object) : void{
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , EmpId : EmpId} });
   }
 
   private getFilledPositionTrendWidgetData(filter: DashboartFilterDto): Observable<PositionTrend> {

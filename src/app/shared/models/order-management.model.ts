@@ -893,3 +893,96 @@ export interface RegularRatesData {
   regular: number | null;
   regularLocal: number | null;
 }
+
+export interface AuditLogPayload{
+  entityType: string;
+  searchValue:string;
+}
+
+export interface OrderAuditHistory{  
+    orderId: number
+    orderType: string
+    orderStatus: string
+    title: string
+    regionName: string
+    locationName: string
+    departmentName: string
+    skill: string
+    hourlyRate: number
+    openPositions: number
+    duration: string
+    jobStartDate: string
+    jobEndDate: string
+    shiftStartTime: string
+    shiftEndTime: string
+    onCallRequired: boolean
+    asapStart: boolean
+    criticalOrder: boolean
+    orderRequisitionReasonName: any
+    changeType: string
+    modifiedOn: string
+    modifiedBy: string
+  }
+
+  export interface OrderCredentialAuditHistory {
+    credentialType: string
+    credentialName: string
+    reqForSubmission: boolean
+    reqForOnboard: boolean
+    optional: boolean
+    comment: string
+    changeType: string
+    modifiedOn: string
+    modifiedBy: string
+  }
+
+  export interface OrderBillRateAuditHistory {
+    bIllRateTitle: string
+    billRateCategory: string
+    payRateType: string
+    rateHour: number
+    effectiveDate: string
+    dailyOtEnabled: boolean
+    seventhDayOtEnabled: boolean
+    weeklyOtEnabled: boolean
+    isPredefined: any
+    changeType: string
+    modifiedOn: string
+    modifiedBy: string
+  }
+
+  export interface OrderContactAuditHistory {
+    name: string
+    title: string
+    email: string
+    mobilePhone: string
+    isPrimaryContact: boolean
+    changeType: string
+    modifiedOn: string
+    modifiedBy: string
+  }
+  
+  export interface OrderWorkLocationAuditHistory {
+    address: string
+    state: string
+    city: string
+    zipCode: string
+    changeType: string
+    modifiedOn: string
+    modifiedBy: string
+  }
+
+  export interface OrderJobDistributionAuditHistory {
+    jobDistributionOption: string
+    agency: string
+    changeType: string
+    modifiedOn: string
+    modifiedBy: string
+  }
+
+  export interface OrderClassificationAuditHistory {
+    classification: string
+    changeType: string
+    modifiedOn: string
+    modifiedBy: string
+  }

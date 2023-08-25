@@ -427,8 +427,9 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
         this.saveOrder(formState, saveType);
       } else if ((savetypes != undefined || savetypes != null) && SubmitButton.SaveAsTemplate == savetypes.item.id) {
         if (this.isSaveForTemplate) {
-          this.saveAsTemplate();
+          
         }
+        this.saveAsTemplate();
        } else {
         showInvalidFormControl(getControlsList(formGroupList));
         formGroupList.forEach((form: FormGroup) => {

@@ -1,7 +1,7 @@
 <section class="flex-column">
   <app-page-toolbar>
     <ng-container left>
-      <h3>Manual invoice reasons</h3>
+      <h3 class="title-settings">Manual Invoice Reasons</h3>
     </ng-container>
     <ng-container right>
       <div class="tools-button-group">
@@ -125,7 +125,7 @@
     <div class="input-container bootstrap">
       <label>Vendor Fee Applicable<span class="required">*</span></label>
       <div class="input-container long flexed">
-        <ejs-switch [checked]="agencyFeeApplicableSwitch" 
+        <ejs-switch [checked]="agencyFeeApplicableSwitch"
                     [disabled]="canUpdateAgencyFeeApplicable"
                     class="toggle"
                     onLabel="Yes"

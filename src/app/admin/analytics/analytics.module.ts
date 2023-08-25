@@ -79,6 +79,9 @@ import { CredentialExpiryIrpComponent } from './credential-expiry-irp/credential
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
 import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { OrderStatusSummaryComponent } from './order-status-summary/order-status-summary.component';
+import { OrderStatusSummaryCustomReportState } from '../../modules/custom-reports/store/state/order-status-summary-report.state';
+
 
 @NgModule({
   declarations: [
@@ -138,6 +141,7 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     UserActivityComponent,
     CredentialExpiryIrpComponent,
     FinancialTimeSheetBetaComponent,
+    OrderStatusSummaryComponent,
     DepartmentSpendAndHoursComponent],
   exports: [
     CandidateListComponent
@@ -161,7 +165,7 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
     TextBoxModule,
     SwitchModule,
     AgGridModule,
-    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,VendorSCorecardState,useractivityReportState]),
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState, VendorSCorecardState, useractivityReportState, OrderStatusSummaryCustomReportState]),
   ],
   providers:[
     ScheduleApiService,

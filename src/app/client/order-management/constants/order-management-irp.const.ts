@@ -144,20 +144,24 @@ export const ThreeDotsMenuOptions = (
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
     { text: MoreMenuType[3], id: '3', disabled: !canCreateOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   moreMenuWithCloseButton: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
     { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   moreMenuWithReOpenButton: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
     { text: MoreMenuType[4], id: '4', disabled: !canCreateOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   moreMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   reOrdersMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
@@ -254,7 +258,7 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
   {
     field: 'workCommitment',
     headerName: 'Work Commitment',
-    width: 140,
+    width: 240,
   },
   {
     field: 'actualStartDate',

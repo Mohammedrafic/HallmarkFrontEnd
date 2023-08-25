@@ -1,9 +1,9 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { GridComponent, ValueAccessor } from '@syncfusion/ej2-angular-grids';
-import { delay, filter, Observable, takeUntil } from 'rxjs';
+import { delay, filter, Observable, takeUntil, switchMap } from 'rxjs';
 
 import {
   GetEducationByCandidateId,
@@ -31,6 +31,7 @@ import { UserPermissions } from '@core/enums';
 import { Permission } from '@core/interface';
 import { DateTimeHelper } from '@core/helpers';
 import { TakeUntilDestroy } from '@core/decorators';
+import { AppState } from 'src/app/store/app.state';
 
 @TakeUntilDestroy
 @Component({
@@ -39,15 +40,19 @@ import { TakeUntilDestroy } from '@core/decorators';
   styleUrls: ['./education-grid.component.scss'],
   providers: [MaskedDateTimeService],
 })
-export class EducationGridComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class EducationGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() readonlyMode = false;
   @Input() areAgencyActionsAllowed: boolean;
   @Input() userPermission: Permission;
+  @Input() isMobileLoginOn: boolean;
 
   @ViewChild('grid') grid: GridComponent;
 
   @Select(CandidateState.educations)
   educations$: Observable<Education[]>;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   public today = new Date();
   public title = '';
@@ -73,11 +78,16 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     super();
   }
 
+  ngOnDestroy(): void {
+    /* @TakeUntilDestroy */
+  }
+
   ngOnInit(): void {
     this.store.dispatch(new GetEducationByCandidateId());
     this.createEducationForm();
     this.watchForSaveEducation();
     this.watchForRemoveEducation();
+    this.setMobileGridHeight();
   }
 
   public dataBound(): void {
@@ -190,6 +200,16 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
       this.store.dispatch(new GetEducationByCandidateId());
       this.educationForm.markAsPristine();
       this.closeDialog();
+    });
+  }
+
+  private setMobileGridHeight(): void {
+    this.isMobile$.pipe(
+      filter((isMobile) => !!isMobile),
+      switchMap(() => this.educations$),
+      takeUntil(this.componentDestroy())
+    ).subscribe((data) => {
+      super.setHeightForMobileGrid(data?.length);
     });
   }
 }

@@ -601,6 +601,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.selectedFile = file;
     const fileData: any = file;
     this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(fileData?.name);
+    if(this.businessFilterForm.get('filterBusinessUnit')?.value===3 && !this.isEditDocument){
+      this.onAgencyChanges();
+      this.changeDetectorRef.markForCheck();
+    }
+    if(this.businessFilterForm.get('filterBusinessUnit')?.value===4 && !this.isEditDocument){
+      this.onOrganizationChanges();
+      this.changeDetectorRef.markForCheck();
+    }
   }
 
 
@@ -1293,6 +1301,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       });
     }
     else {
+      if(!allFlag && this.sharedDocumentInformation.length == 1 && this.sharedDocumentInformation[0].id === -1 && this.sharedDocumentInformation[0].name === 'All'){
+        this.UnShareDocumewnt(this.currentDocumentData);
+      }
       this.documentLibraryform.reset();
       this.closeDialog();
       this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
@@ -1330,6 +1341,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       let unShareDocumentsFilter: UnShareDocumentsFilter = { documentIds: [data.id] };
       this.store.dispatch(new UnShareDocuments(unShareDocumentsFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
         this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
+        this.store.dispatch(new GetDocuments(this.getDocumentFilter(this.filterSelectedBusinesUnitId)));
       });
     }
   }

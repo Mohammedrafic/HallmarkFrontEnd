@@ -23,6 +23,7 @@ import { InvoicesModel } from '../../store/invoices.model';
 export class InvoiceGridExportComponent extends AbstractGridConfigurationComponent {
   @Input() public selectedRows: InvoiceGridSelections;
   @Input() public organizationId: number;
+  @Input() public agencyOrganizationIds:Array<number> = [];
   @Input() set selectedTab(selectedTabIdx: number | never) {
    this.setSelectedTab(selectedTabIdx);
   }
@@ -101,6 +102,14 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
 
     if (this.isAgency) {
       filterQuery.organizationId = this.organizationId;
+      filterQuery.agencyOrganizationIds = this.agencyOrganizationIds;
+    }
+    let allTabIds:any = [];
+    if(this.isAgency && this.selectedTabIndex === AgencyInvoicesGridTab.All){
+      this.selectedRows.rowNodes.forEach(ele=>{        
+        allTabIds.push([ele.data.invoiceId,ele.data.organizationId]);
+      })
+      filterQuery.ids = allTabIds;
     }
 
     this.getDefaultFileName();
@@ -108,7 +117,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
       fileType,
       filterQuery,
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      ids,
+      this.isAgency && this.selectedTabIndex === AgencyInvoicesGridTab.All ? allTabIds : ids,
       options?.fileName || this.defaultFileName,
     ), this.isAgency,this.selectedTabIndex)); 
 

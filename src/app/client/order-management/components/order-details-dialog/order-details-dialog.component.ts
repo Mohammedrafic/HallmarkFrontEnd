@@ -289,7 +289,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         this.chipList.text = status?(status).toUpperCase():"";
       }
     }
-
   }
 
   ngOnDestroy(): void {

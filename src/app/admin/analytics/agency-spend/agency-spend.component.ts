@@ -12,6 +12,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 import { Select, Store } from '@ngxs/store';
 import {
   ClearLogiReportState,
+  GetSkillsbyDepartment,
   GetStaffScheduleReportFilterOptions,
 } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
@@ -104,6 +105,10 @@ export class AgencySpendComponent implements OnInit {
 
   @Select(LogiReportState.getEmployeesSearchFromScheduling)
   public employeesSearchFromScheduling$: Observable<ScheduleCandidatesPage>;
+
+  @Select(LogiReportState.skillbydepartment)
+  skillbydepartment$: Observable<any>;
+
   public bussinessControl: AbstractControl;
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
@@ -166,6 +171,7 @@ export class AgencySpendComponent implements OnInit {
       this.handleFilterControlValueChange();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
+      this.onFilterDepartmentChangedHandler();
 
       this.user?.businessUnitType == BusinessUnitType.Hallmark
         ? this.agentSpendReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
@@ -397,8 +403,6 @@ export class AgencySpendComponent implements OnInit {
     this.staffScheduleReportFilterData$.subscribe((data: StaffScheduleReportFilterOptions) => {        
         this.isAlive = false;
         this.filterOptionData = data;
-        this.filterColumns.skillIds.dataSource = [];
-        this.filterColumns.skillIds.dataSource = data.masterSkills;
         this.changeDetectorRef.detectChanges();
 
         if (this.isInitialLoad) {
@@ -461,6 +465,31 @@ export class AgencySpendComponent implements OnInit {
       } else {
         this.filterColumns.departmentIds.dataSource = [];
         this.agentSpendReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      }
+      this.changeDetectorRef.detectChanges();
+    });
+  }
+
+  public onFilterDepartmentChangedHandler(): void {
+    this.departmentIdControl = this.agentSpendReportForm.get(
+      analyticsConstants.formControlNames.DepartmentIds
+    ) as AbstractControl;
+    this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.agentSpendReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
+      if (this.departmentIdControl.value.length > 0) {
+        this.store.dispatch(new GetSkillsbyDepartment(data))
+        this.skillbydepartment$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills: any[]) => {
+          if(skills && skills.length > 0){
+            this.filterColumns.skillIds.dataSource = sortByField(skills, "name");
+          } else {
+            this.filterColumns.skillIds.dataSource = [];
+            this.agentSpendReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(null);
+          }
+          this.changeDetectorRef.markForCheck();
+        });
+      } else {
+        this.filterColumns.skillIds.dataSource = [];
+        this.agentSpendReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
       }
       this.changeDetectorRef.detectChanges();
     });

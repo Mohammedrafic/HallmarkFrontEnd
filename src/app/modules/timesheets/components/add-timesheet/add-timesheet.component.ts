@@ -38,6 +38,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
   public dialogConfig: DialogConfig = GetRecordAddDialogConfig(false);
 
   public formType: RecordFields = RecordFields.Time;
+  public filterType: string = 'Contains';
 
   public onCallId: number;
 
@@ -60,7 +61,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
 
     // If bill rate mustn't count hours - time should be null
     const recordTimeNull = selectedBillRate?.disableTime || false;
-    
+
     if (this.form?.valid) {
       const { organizationId, id } = this.store.snapshot().timesheets.timesheetDetails;
       const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType, recordTimeNull);
@@ -98,6 +99,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
         )
         .subscribe();
     } else {
+      this.form?.markAllAsTouched();
       this.form?.updateValueAndValidity();
       this.cd.detectChanges();
     }
@@ -226,7 +228,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
       }),
     ) as Observable<number>;
   }
-  
+
   private checkFieldsVisibility(rate: AddRecordBillRate): void {
     const mealField = this.dialogConfig.timesheets.fields
     .find((field) => field.field === MealBreakeName) as DialogConfigField;
@@ -249,7 +251,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
     } else if (!timeInField.visible && !rate.disableTime) {
       timeInField.visible = true;
       timeOutField.visible = true;
-      
+
       this.addService.addTimeValidators(this.form);
     }
 
@@ -279,7 +281,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
           const notReqAndStartExist = rate?.timeNotRequired && start;
           const timeRequired = !rate?.timeNotRequired && !timeOutField.required;
           const notReqAndStartNotExist = rate?.timeNotRequired && !start;
-        
+
           if (notReqAndStartExist || timeRequired) {
             this.addService.addTimeOutValidator(this.form);
             timeOutField.required = true;

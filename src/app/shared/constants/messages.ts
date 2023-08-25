@@ -134,6 +134,7 @@ export const HaveScheduleBooking =
 export const N_FAILED_RECORDS = (count: number) => `${count} failed to process.`;
 export const N_SUCCESS_RECORDS = (count: number) => `${count} records successfully processed.`;
 export const ExtensionStartDateValidation = 'Extension may not be created with more than a 14 day gap from initial order to extension order.';
+export const YEARANDMONTH_Validation = 'Start Year and month should be less than End year and month';
 export const RECORD_SAVED_SUCCESS_WITH_ORDERID=(organizationPrefix: string,publicId:string)=>
 `Order ${organizationPrefix}-${publicId} has been added`;
 export const RECORD_MODIFIED_SUCCESS_WITH_ORDERID=(organizationPrefix: string,publicId:string)=>

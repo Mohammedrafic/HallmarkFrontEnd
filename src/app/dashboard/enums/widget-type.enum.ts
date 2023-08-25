@@ -8,6 +8,7 @@ export enum WidgetTypeEnum {
   FILLED_POSITIONS = 'Filled_Positions',
   ACTIVE_POSITIONS = 'Active_Positions',
   AVERAGE_DAY_ACTIVE_POSITIONS = 'Average_Day_Of_Active_Positions',
+  AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM = 'Average_Day_Of_Active_Positions_Custom',
   FILLED_POSITIONS_TREND = 'Filled_Positions_Trend',
   OPEN_POSITIONS_TREND = 'Open_Positions_Trend',
   IN_PROGRESS_POSITIONS_TREND = 'In_Progress_Positions_Trend',

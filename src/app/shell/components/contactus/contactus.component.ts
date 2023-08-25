@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { Topics } from '@shared/enums/contact-topics';
@@ -6,13 +6,17 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { User } from '../../../shared/models/user.model';
 import { UserState } from 'src/app/store/user.state';
 import { Observable } from 'rxjs/internal/Observable';
-import { Subject, filter, takeUntil } from 'rxjs';
+import { Subject, delay, filter, takeUntil } from 'rxjs';
 import { ContactUs } from '../../../shared/models/contact-us.model';
 import { SaveContactUsForm } from 'src/app/store/contact-us.actions';
 import { ContactusState } from 'src/app/store/contact-us.state';
 import { ShowCustomSideDialog } from 'src/app/store/app.actions';
 import { ContactUsStatus } from '@shared/enums/contact-us-status';
 import { OutsideZone } from '@core/decorators';
+import { Menu, overallMenuItems } from '@shared/models/menu.model';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { GetUserMenuConfig } from 'src/app/store/user.actions';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -28,13 +32,13 @@ export class ContactusComponent implements OnInit,AfterViewInit {
   public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
   public disableSaveButton = false;
   public ContactFormGroup: FormGroup;
+  public commonFields: FieldSettingsModel = { text: 'title', value: 'id' };
 
   private uploaderErrorMessageElement: HTMLElement;
   private file: any;
   private files: File[] = [];
   private hasFiles = false;
   private unsubscribe$: Subject<void> = new Subject();
-
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
 
   @Select(UserState.user)
@@ -42,9 +46,16 @@ export class ContactusComponent implements OnInit,AfterViewInit {
 
   @Select(ContactusState.contactSupportEntity)
   contact$: Observable<ContactUs>;
+  
+  @Select(UserState.menu)
+  menu$: Observable<Menu>;
+
+  public menuItems :overallMenuItems[] = [];
+
 
   constructor(
     private store: Store,
+    private router: Router,
     private fb: FormBuilder,
     private cd: ChangeDetectorRef,
     private ngZone: NgZone,
@@ -59,6 +70,7 @@ export class ContactusComponent implements OnInit,AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.manageNotifications();
     this.observeUser();
   }
 
@@ -92,7 +104,23 @@ export class ContactusComponent implements OnInit,AfterViewInit {
       this.ContactFormGroup.controls['file']?.setErrors(null);
     }
   }
-
+private manageNotifications(): void {
+    this.menu$
+    .pipe(takeUntil(this.unsubscribe$),delay(100))
+    .subscribe((menu: Menu) => {    
+      if (menu.menuItems.length) {
+       //this.menuItems=[];
+        menu.menuItems.forEach(element => {
+          this.menuItems.push({"id":element.id,"title":element.title})
+          if(element.children.length>0){
+            element.children.forEach(element => {
+              this.menuItems.push({"id":element.id,"title":element.title});
+            });
+          }
+        });
+      }
+    });
+  }
   public clearFiles(): void {
     this.hasFiles = false;
     this.uploadObj.clearAll();

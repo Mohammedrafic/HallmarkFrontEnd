@@ -257,9 +257,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       const settingValue = this.settings[SettingsKeys.AllowDocumentUpload]?.children?.find(f => f.isIRPConfigurationValue == true)?.value;
 
-      if (!settingValue) {
-        this.disabledIrp = true;
-      }
+      settingValue=="false"?  this.disabledIrp = true : this.disabledIrp = false;
     });
   }
 

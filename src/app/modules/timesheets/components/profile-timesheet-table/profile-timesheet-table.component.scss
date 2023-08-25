@@ -1,8 +1,8 @@
-@import "colors.scss";
-@import "mixins";
-@import "adaptive-response";
-@import "@ag-grid-community/core/dist/styles/ag-grid.scss";
-@import "@ag-grid-community/core/dist/styles/ag-theme-alpine";
+@import 'colors';
+@import 'mixins';
+@import 'adaptive-response';
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 
 .table-container {
   margin-bottom: 25px;
@@ -65,52 +65,68 @@
   height: auto;
 }
 
-::ng-deep {
-  .align-right {
-    text-align: right;
-  }
-
-  .align-left {
-    text-align: left !important;
-  }
-
-  .custom-wrap {
-    .ag-header-cell-text {
-      white-space: pre-wrap;
+:host {
+  ::ng-deep {
+    .align-right {
+      text-align: right;
     }
-  }
 
-  .ag-center-cols-clipper,
-  .ag-center-cols-container {
-    min-height: 64px;
-  }
+    .align-left {
+      text-align: left !important;
+    }
 
-  .ag-overlay-no-rows-wrapper {
-    margin-top: 24px;
-  }
+    .custom-wrap {
+      .ag-header-cell-text {
+        white-space: pre-wrap;
+        color: var(--sub-title-2) !important;
+      }
+    }
 
-  .ag-cell-focus,
-  .ag-cell {
-    border: none !important;
-  }
+    .amount-input {
+      width: 190px !important;
+    }
 
-  .ag-cell-value {
-    padding-left: 5px !important;
-    padding-right: 5px !important;
-  }
+    .ag-center-cols-clipper,
+    .ag-center-cols-container {
+      min-height: 0px;
+    }
 
-  .common-cell {
-    padding-left: 17px !important;
-    padding-right: 17px !important;
-    text-align: right;
-  }
+    .ag-overlay-no-rows-wrapper {
+      margin-top: 24px;
+    }
 
-  .custom-scroll {
-    overflow-y: auto;
-  }
+    .ag-cell-focus,
+    .ag-cell {
+      border: none !important;
+    }
 
-  .bold {
-    font-weight: bold;
+    .ag-cell-value {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+    }
+
+    .common-cell {
+      padding-left: 17px !important;
+      padding-right: 17px !important;
+      text-align: right;
+    }
+
+    .custom-scroll {
+      overflow-y: auto;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .ag-center-cols-viewport,
+    .ag-center-cols-container {
+      background-color: var(--bg-grid);
+    }
+
+    .ag-cell-value {
+      color: var(--text) !important;
+    }
   }
 }
 

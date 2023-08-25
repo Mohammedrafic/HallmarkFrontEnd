@@ -22,25 +22,25 @@ export class VendorScorecardresponse {
   email: string
   qualifiedCandidates: Double
   totalCandidates: Double
-  submissionQualityPercent: Double
+  submissionQualityPercent: number
   completedCredentials: Double
   totalCredentials: Double
-  complianceRatingPercent: Double
+  complianceRatingPercent: number
   filledOrders: Double
   totalOrders: Double
-  fillRatePercent: Double
+  fillRatePercent: number
   valueAddSubmissions: Double
   totalSubmissions: Double
-  costAdjustmentPercent: Double
+  costAdjustmentPercent: number
   onTimeStart: Double
   filledOrdersOnTimeStart: Double
-  onTimeStartPercent: Double
+  onTimeStartPercent: number
   candidatesOnboarded: Double
   totalAcceptedOffers: Double
-  candidatesStartPercent: Double
+  candidatesStartPercent: number
   contractTermination: Double
   onboardOrders: Double
-  candidateRemainingonAssignmentPercent: Double
+  candidateRemainingonAssignmentPercent: number
   ordersDistributed: Double
   timetoSubmit: Double
   timetoStart: Double

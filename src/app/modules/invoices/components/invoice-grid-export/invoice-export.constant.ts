@@ -58,6 +58,7 @@ export const AgencyManualInvoicePendingExportCols : ExportColumn[] = [
   {text:'Review Status',column:'reviewStatus'},
   {text:' Approved Date',column:' approvedDate'},
   {text:'agencyName',column:'agencyName'},
+  {text:'Organization Name',column:'organizationName'},
 
 ];
 
@@ -95,6 +96,7 @@ export const AgencyInvoiceExportCols : ExportColumn[] = [
   { text:'Job ID', column: 'jobId' },
   { text:'Candidate Name', column: 'candidateName' },
   { text:'Agency', column: 'agency' },
+  { text:'Organization Name',column:'organizationName'},
   { text:'Skill', column: 'skill' },
   { text:'Hours / Miles', column: 'hoursMiles' },
   { text:'Bill Rate', column: 'billRate' },

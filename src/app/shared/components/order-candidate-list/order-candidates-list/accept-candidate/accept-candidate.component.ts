@@ -36,6 +36,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
+  GetAgencyAvailableSteps,
   GetRejectReasonsForAgency,
   RejectCandidateForAgencySuccess,
   RejectCandidateJob,
@@ -55,6 +56,7 @@ import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-s
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { formatNumber } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -67,10 +69,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Output() closeModalEvent: EventEmitter<void> = new EventEmitter();
+  @Output() updateDetails = new EventEmitter<void>();
 
   @Input() candidate: OrderCandidatesList;
-  @Input() isTab: boolean = false;
-  @Input() isAgency: boolean = false;
+  @Input() isTab = false;
+  @Input() isAgency = false;
   @Input() actionsAllowed: boolean;
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
@@ -84,6 +87,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Select(OrderManagementState.rejectionReasonsList)
   rejectionReasonsList$: Observable<RejectReason[]>;
 
+  @Select(OrderManagementState.availableSteps)
+  applicantStatuses$: Observable<ApplicantStatus[]>;
+
   form: FormGroup;
 
   public candidateJob: OrderCandidateJob;
@@ -93,16 +99,18 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public isReadOnly = false;
   public openRejectDialog = new Subject<boolean>();
   public priceUtils = PriceUtils;
-  public showHoursControl: boolean = false;
-  public showPercentage: boolean = false;
-  public verifyNoPenalty: boolean = false;
+  public showHoursControl = false;
+  public showPercentage = false;
+  public verifyNoPenalty = false;
   public candidatePayRateRequired: boolean;
-  public candidateSSNRequired: boolean=false;
+  public candidateSSNRequired = false;
   public candidateDOBRequired: boolean;
   public payRateSetting = CandidatePayRateSettings;
-  public candidatePhone1RequiredValue : string = '';
-  public candidateAddressRequiredValue : string = '';
+  public candidatePhone1RequiredValue = '';
+  public candidateAddressRequiredValue = '';
   public canCreateOrder : boolean;
+  public optionFields = { text: 'statusText', value: 'statusText' };
+  public comments: Comment[] = [];
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -113,7 +121,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showCandidatePayRate(): boolean {
-    return ![ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Applied, ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(this.candidateStatus);
+    return ![ApplicantStatusEnum.NotApplied,ApplicantStatusEnum.Applied, ApplicantStatusEnum.Shortlisted,
+      ApplicantStatusEnum.PreOfferCustom].includes(this.candidateStatus);
   }
 
   get isOffered(): boolean {
@@ -157,7 +166,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showAccepteAction(): boolean {
-    return this.candidate?.candidateStatus !== ApplicantStatusEnum.Accepted && this.candidate?.candidateStatus !== ApplicantStatusEnum.Offboard && !this.isReadOnly;
+    return this.candidate?.candidateStatus !== ApplicantStatusEnum.Accepted
+    && this.candidate?.candidateStatus !== ApplicantStatusEnum.Offboard && !this.isReadOnly;
   }
 
   get isAgencyAndOnboard(): boolean {
@@ -165,13 +175,17 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showRejectButton(): boolean {
-    return (!this.isRejected && !this.showWithdrawAction && !this.isAgencyAndOnboard && this.candidate?.candidateStatus !== ApplicantStatusEnum.Offboard) || !this.isReadOnly;
+    return (!this.isRejected && !this.showWithdrawAction && !this.isAgencyAndOnboard
+      && this.candidate?.candidateStatus !== ApplicantStatusEnum.Offboard) || !this.isReadOnly;
+  }
+
+  get revertStatusSelected(): boolean {
+    return !!this.revertedStatus;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
   private isWithdraw: boolean;
-
-  public comments: Comment[] = [];
+  private revertedStatus: ApplicantStatus;
 
   constructor(
     private store: Store,
@@ -305,7 +319,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         .subscribe((isConfirm) => {
           if (isConfirm) {
             this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
-            this.closeDialog();
+            this.updateDetails.emit();
           }
         });
     }
@@ -348,14 +362,22 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       this.form.patchValue({ rejectReason: value });
       this.store.dispatch(new RejectCandidateJob(payload));
 
-      this.closeDialog();
+      this.updateDetails.emit();
     }
   }
 
-  calculateActualEndDate(startDate: Date, daysToAdd: number): Date { 
+  public calculateActualEndDate(startDate: Date, daysToAdd: number): Date { 
     const actualEndDate = new Date(startDate); actualEndDate.setDate(startDate.getDate() + daysToAdd);
      return actualEndDate; 
-    } 
+  }
+
+  public setRevertedStatus(event: SelectEventArgs): void {
+    this.revertedStatus = event.itemData as ApplicantStatus;
+  }
+
+  public revertStatus(): void {
+    this.updateAgencyCandidateJob( this.revertedStatus);
+  }
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
@@ -395,7 +417,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       ).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
       });
-    this.closeDialog();
+      this.updateDetails.emit();
   }
 
   private createForm(): void {
@@ -437,61 +459,68 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private patchForm(): void {
-    this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
+    this.candidateJobState$
+    .pipe(
+      filter((job) => !!job),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((value) => {
       this.candidateJob = value;
+      const agencyCanRevert = this.isAgency && value.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected;
 
-      if (value) {
-        this.candidateSSNRequired = value.candidateSSNRequired;
-        this.candidateDOBRequired = value.candidateDOBRequired;
-        if(value.candidatePhone1Required != null){
-          let phone1Configuration = JSON.parse(value.candidatePhone1Required);
-          if(phone1Configuration.isEnabled){
-            this.candidatePhone1RequiredValue = phone1Configuration.value;
-          }
-        }
-        if(value.candidateAddressRequired != null){
-          let addressConfiguration = JSON.parse(value.candidateAddressRequired);
-          if(addressConfiguration.isEnabled){
-            this.candidateAddressRequiredValue = addressConfiguration.value;
-          }
-        }
-        
-        const jobStartDate = value.actualStartDate || value.order.jobStartDate as unknown as string;
-        const jobEndDate = value.actualEndDate || value.order.jobEndDate as unknown as string;
-
-        this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
-        this.getComments();
-        this.billRatesData = [...value.billRates];
-        this.form.patchValue({
-          jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [DateTimeHelper.setCurrentTimeZone(jobStartDate), DateTimeHelper.setCurrentTimeZone(jobEndDate)],
-          billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
-          availableStartDate: value.availableStartDate ?
-            DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
-          candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
-          locationName: value.order.locationName,
-          yearExp: value.yearsOfExperience,
-          expAsTravelers: value.expAsTravelers,
-          offeredBillRate: formatNumber(CheckNumberValue(value.offeredBillRate), 'en-US', '0.2-2'),
-          comments: value.requestComment,
-          rejectReason: value.rejectReason,
-          guaranteedWorkWeek: value.guaranteedWorkWeek,
-          offeredStartDate: value.offeredStartDate ? DateTimeHelper.formatDateUTC(
-            DateTimeHelper.setUtcTimeZone(value.offeredStartDate).toString(), 'MM/dd/yyyy') : '',
-          clockId: value.clockId,
-          actualStartDate: value.actualStartDate ? DateTimeHelper.formatDateUTC(
-            DateTimeHelper.setUtcTimeZone(value.actualStartDate).toString(), 'MM/dd/yyyy') : '',
-          actualEndDate: value.actualEndDate ? DateTimeHelper.formatDateUTC(
-            DateTimeHelper.setUtcTimeZone(value.actualEndDate).toString(), 'MM/dd/yyyy') : '',
-          jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
-          penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
-          rate: value.jobCancellation?.rate,
-          hours: value.jobCancellation?.hours,
-          dob: value.candidateProfile.dob,
-          ssn: value.candidateProfile.ssn,
-          candidatePayRate: this.candidateJob.candidatePayRate,
-        });
+      if (agencyCanRevert) {
+        this.store.dispatch(new GetAgencyAvailableSteps(value.organizationId, value.jobId));
       }
+      
+      this.candidateSSNRequired = value.candidateSSNRequired;
+      this.candidateDOBRequired = value.candidateDOBRequired;
+      if(value.candidatePhone1Required != null){
+        let phone1Configuration = JSON.parse(value.candidatePhone1Required);
+        if(phone1Configuration.isEnabled){
+          this.candidatePhone1RequiredValue = phone1Configuration.value;
+        }
+      }
+      if(value.candidateAddressRequired != null){
+        let addressConfiguration = JSON.parse(value.candidateAddressRequired);
+        if(addressConfiguration.isEnabled){
+          this.candidateAddressRequiredValue = addressConfiguration.value;
+        }
+      }
+      
+      const jobStartDate = value.actualStartDate || value.order.jobStartDate as unknown as string;
+      const jobEndDate = value.actualEndDate || value.order.jobEndDate as unknown as string;
+
+      this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
+      this.getComments();
+      this.billRatesData = [...value.billRates];
+      this.form.patchValue({
+        jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
+        date: [DateTimeHelper.setCurrentTimeZone(jobStartDate), DateTimeHelper.setCurrentTimeZone(jobEndDate)],
+        billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
+        availableStartDate: value.availableStartDate ?
+          DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
+        candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
+        locationName: value.order.locationName,
+        yearExp: value.yearsOfExperience,
+        expAsTravelers: value.expAsTravelers,
+        offeredBillRate: formatNumber(CheckNumberValue(value.offeredBillRate), 'en-US', '0.2-2'),
+        comments: value.requestComment,
+        rejectReason: value.rejectReason,
+        guaranteedWorkWeek: value.guaranteedWorkWeek,
+        offeredStartDate: value.offeredStartDate ? DateTimeHelper.formatDateUTC(
+          DateTimeHelper.setUtcTimeZone(value.offeredStartDate).toString(), 'MM/dd/yyyy') : '',
+        clockId: value.clockId,
+        actualStartDate: value.actualStartDate ? DateTimeHelper.formatDateUTC(
+          DateTimeHelper.setUtcTimeZone(value.actualStartDate).toString(), 'MM/dd/yyyy') : '',
+        actualEndDate: value.actualEndDate ? DateTimeHelper.formatDateUTC(
+          DateTimeHelper.setUtcTimeZone(value.actualEndDate).toString(), 'MM/dd/yyyy') : '',
+        jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
+        penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
+        rate: value.jobCancellation?.rate,
+        hours: value.jobCancellation?.hours,
+        dob: value.candidateProfile.dob,
+        ssn: value.candidateProfile.ssn,
+        candidatePayRate: this.candidateJob.candidatePayRate,
+      });
       this.changeDetectionRef.detectChanges();
     });
   }

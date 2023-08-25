@@ -11,7 +11,7 @@ import { LogiReportService } from "@shared/services/logi-report.service";
 import { catchError, filter, Observable, tap } from "rxjs";
 import { JobDetailSummaryReportFilterOptions } from "../../admin/analytics/models/jobdetail-summary.model";
 import { AssociateAgencyDto } from "../../shared/models/logi-report-file";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch, GetCommonReportCandidateStatusOptions, GetStaffScheduleReportFilterOptions, GetCandidateSearchFromScheduling, GetStaffListReportCandidateSearch, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions, GetCommonReportAgencyCandidateSearch, GetCredentialTypes} from "./logi-report.action";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetCommonReportCredentialSearch, GetCommonReportCandidateStatusOptions, GetStaffScheduleReportFilterOptions, GetCandidateSearchFromScheduling, GetStaffListReportCandidateSearch, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions, GetCommonReportAgencyCandidateSearch, GetCredentialTypes, GetSkillsbyDepartment} from "./logi-report.action";
 import { ScheduleCandidate, ScheduleCandidatesPage } from 'src/app/modules/schedule/interface/schedule.interface';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { ShowToast } from '../../store/app.actions';
@@ -22,6 +22,7 @@ import { OrganizationStructure } from '../../shared/models/organization.model';
 import { OrderManagementModel } from '../../agency/store/order-management.state';
 import { AgencyCommonFilterReportOptions } from '../../agency/agency-reports/models/agency-common-report.model';
 import { CredentialType } from '@shared/models/credential-type.model';
+import { SkillsByDepartments } from '@shared/models/skill.model';
 export interface LogiReportStateModel {
 
     departments: Department[] | DepartmentsPage;
@@ -39,6 +40,7 @@ export interface LogiReportStateModel {
   organizationsStructure: OrganizationStructure[];
   agencyCommonFilterReportOptions: AgencyCommonFilterReportOptions | null;
   credentialTypes:CredentialType[];
+    skillbydepartment: SkillsByDepartments[],
 }
 @State<LogiReportStateModel>({
     name: 'LogiReport',
@@ -58,6 +60,7 @@ export interface LogiReportStateModel {
       organizationsStructure: [],
       agencyCommonFilterReportOptions:null,
       credentialTypes: [],
+      skillbydepartment: [],
     },
 })
 @Injectable()
@@ -118,6 +121,9 @@ export class LogiReportState {
   static credentialTypes(state: LogiReportStateModel): CredentialType[] {
     return state.credentialTypes;
   }
+
+  @Selector()
+  static skillbydepartment(state: LogiReportStateModel): any | null { return state.skillbydepartment; }
 
     @Action(GetRegionsByOrganizations)
     GetRegionsByOrganizations({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<Region[]> {
@@ -292,6 +298,14 @@ export class LogiReportState {
         return payload;
       })
     );
+  }
+
+  @Action(GetSkillsbyDepartment)
+  GetSkillsbyDepartment({ patchState }: StateContext<LogiReportStateModel>, { payload }: GetSkillsbyDepartment): Observable<SkillsByDepartments[]> {
+    return this.logiReportService.getskillsbyDepartment(payload).pipe(tap((payload) => {
+      patchState({ skillbydepartment : payload });
+      return payload;
+    }));
   }
 }
 

@@ -1,7 +1,7 @@
 <section class="flex-column">
   <section class="toolbar">
     <section>
-      <h3>Holidays</h3>
+      <h3 class="title-settings">Holidays</h3>
     </section>
     <section [class.hidden]="!isLoaded">
       <button
@@ -68,26 +68,8 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="regionId" headerText="region" width="100%">
-        <ng-template #template let-data>
-          <ng-container *ngIf="!data.regionId">
-            All
-          </ng-container>
-          <ng-container *ngIf="data.regionId">
-            {{ data.regionName }}
-          </ng-container>
-        </ng-template>
-      </e-column>
-      <e-column field="locationId" headerText="location" type="location" width="100%">
-        <ng-template #template let-data>
-          <ng-container *ngIf="!data.locationId">
-            All
-          </ng-container>
-          <ng-container *ngIf="data.locationId">
-            {{ data.locationName }}
-          </ng-container>
-        </ng-template>
-      </e-column>
+      <e-column field="regionName" headerText="region" width="100%"></e-column>
+      <e-column field="locationName" headerText="location" type="location" width="100%"></e-column>
       <e-column *ngIf="selectedSystem.isIRP && selectedSystem.isVMS" field="system" headerText="System" width="100%"></e-column>
       <e-column field="holidayName" headerText="holiday name" width="100%"></e-column>
       <e-column field="startDateTime" headerText="start date & time" width="100%">
@@ -219,8 +201,8 @@
         id="addEditHolidaysForm"
         [formGroup]="HolidayFormGroup">
 
-  
-        
+
+
     <ng-container *ngIf="title === 'Assign'">
 
       <div class="input-container" *ngIf="selectedSystem.isIRP && selectedSystem.isVMS">

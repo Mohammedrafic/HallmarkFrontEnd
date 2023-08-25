@@ -12,6 +12,7 @@
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 @import "adaptive-response.scss";
 @import 'controls/responsive-container.scss';
+@import 'controls/responsive-queries';
 
 html {
   height: 100%;
@@ -717,4 +718,12 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
   {
     display: none;
   }
+}
+.userActivity .ag-body-viewport {
+  max-height: calc( 100vh - 263px)!important;
+  overflow: auto;
+}
+.orderStatusSummaryReport .ag-body-viewport {
+  max-height: calc( 68vh ) !important;
+  overflow: auto;
 }

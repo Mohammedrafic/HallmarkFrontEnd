@@ -2,15 +2,12 @@ import { User_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { GetuserlogReportPage } from '@admin/store/userlog-activity.actions';
 import { useractivityReportState } from '@admin/store/userlog-activity.state';
 import { ColDef, ExcelStyle, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, Inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Actions, Select, Store } from '@ngxs/store';
+import {  Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
-import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { GRID_CONFIG } from '@shared/constants';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
@@ -23,10 +20,12 @@ import { APP_SETTINGS, AppSettings } from 'src/app.settings';
 import { BUSSINES_DATA_FIELDS } from 'src/app/security/roles-and-permissions/roles-and-permissions.constants';
 import { GetAllUsersPage, GetBusinessByUnitType, GetUsersPage } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
-import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { UNIT_FIELDS } from 'src/app/security/user-list/user-list.constants';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
+import { DefaultUseractivityGridColDef, SideBarConfig } from './user-activity.constant';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-user-activity',
@@ -50,10 +49,9 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   sideBar = SideBarConfig;
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   paginationPageSize: number;
-  defaultColDef: ColDef = DefaultUserGridColDef;
+  defaultColDef: ColDef = DefaultUseractivityGridColDef;
   cacheBlockSize: any;
   itemList: Array<userActivity> = [];
-
   @Select(SecurityState.allUsersPage)
   public userData$: Observable<UsersPage>;
 
@@ -94,16 +92,11 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   get userControl(): AbstractControl {
     return this.userActivityForm.get('userName') as AbstractControl;
   }
-  isInitialloadCalled = false
+  isInitialloadCalled = false;
   public readonly columnDefs: ColumnDefinitionModel[] = [
-    {
-      field: 'id',
-      hide: true,
-      filter: false,
-    },
 
     {
-      headerName: 'Name',
+      headerName: 'User Name',
       field: 'userName',
       minWidth: 250,
       filter: true,
@@ -111,15 +104,41 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       resizable: true
     },
     {
-      headerName: 'IP',
-      field: 'userIP',
+      headerName: 'User Email Id',
+      field: 'userEmailId',
       minWidth: 250,
       filter: true,
       sortable: true,
       resizable: true
     },
     {
-      headerName: ' Date',
+      headerName: 'Business Unit Name',
+      field: 'businessUnitName',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'User Status',
+      field: 'userStatus',
+      minWidth: 200,
+      filter: true,
+      sortable: true,
+      resizable: true,
+      valueFormatter: params => (params.value ? 'Active' : 'Inactive'),
+    },
+    {
+      headerName: 'User IP',
+      field: 'userIP',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+  
+    {
+      headerName: 'UTC Date & Time',
       field: 'utcDate',
       minWidth: 175,
       cellClass: 'date',
@@ -132,7 +151,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
           if (cellValue == null) {
             return 0;
           }
-          const dateAsString = this.datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateAsString = this.datePipe?.transform(cellValue, 'MM/dd/yyyy hh:mm:ss') as string
           const dateParts = dateAsString.split('/');
           const year = Number(dateParts[2]);
           const month = Number(dateParts[0]) - 1;
@@ -149,7 +168,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = this.datePipe?.transform(params.data.utcDate, 'MM/dd/yyyy') as string
+        const str = this.datePipe?.transform(params.data.utcDate, 'MM/dd/yyyy & hh:mm:ss') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,
@@ -176,6 +195,14 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       headerName: 'Browser',
       field: 'client',
       minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
+    {
+      headerName: 'Event Type',
+      field: 'eventType',
+      minWidth: 200,
       filter: true,
       sortable: true,
       resizable: true
@@ -216,6 +243,11 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
     const user = this.store.selectSnapshot(UserState.user) as User;
     this.businessUnitControl.patchValue(user?.businessUnitType);
     this.businessControl.patchValue(user?.businessUnitId || 0);
+    const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    if(businessUnitType == BusinessUnitType.Agency || businessUnitType == BusinessUnitType.Organization) {
+      this.businessUnitControl.disable();
+    }
+
 
   }
   get bussinesUserData$(): Observable<BusinessUnit[]> {
@@ -278,10 +310,12 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       if (!this.isInitialloadCalled) {
         this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           if (data != undefined && data != null) {
-            this.userData = data.items;
+            this.userData = sortByField(data.items,'name');
             this.userControl.patchValue(this.userData[0]?.id)
             if (!this.isInitialloadCalled) {
-              this.isInitialload();
+              setTimeout(()=>{
+                this.isInitialload();
+              }, 0);
               this.isInitialloadCalled = true;
               this.changeDetectorRef.detectChanges();
 
@@ -396,7 +430,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       id: 'date',
       dataType: 'DateTime',
       numberFormat: {
-        format: 'mm-dd-yyyy',
+        format: 'mm-dd-yyyy hh:mm:ss',
       },
     },
    

@@ -25,7 +25,7 @@
 
 <section class="useractivity-report-section">
   <section class="app-grid table-wrapper controls-container">
-    <div class="custom-grid">
+    <div class="custom-grid userActivity ">
       <ag-grid-angular class="ag-theme-alpine grid app-grid__component" [gridOptions]="gridOptions"
         (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
         [headerHeight]="52" [excelStyles]="excelStyles"
@@ -45,6 +45,8 @@
 
   </section>
 </section>
+
+
 
 <app-filter-dialog [items]="filteredItems" (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()">

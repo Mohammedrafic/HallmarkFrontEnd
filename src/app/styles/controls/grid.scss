@@ -543,7 +543,7 @@ body.dark {
       width: 100%;
 
       .ag-header {
-        background-color: var(--grid-background-color);
+        background-color: var(--bg-grid);
       }
 
       .ag-root-wrapper {
@@ -586,7 +586,7 @@ body.dark {
     .empty-table {
       .ag-body-viewport {
         height: 100px;
-        background: $secondary-dark-blue-45;
+        background: var(--bg-empty-grid);
       }
 
       & .ag-overlay-wrapper.ag-overlay-no-rows-wrapper {

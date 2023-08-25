@@ -150,6 +150,8 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+  private dateFormat = 'MM/dd/yyyy';
+  private culture = 'en-US';
 
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
@@ -540,6 +542,16 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
   }
 
   public onFilterApply(): void {
+    const {
+      startDate,
+      endDate
+    }
+      = this.VendorActivityReportForm.getRawValue();
+    const startChkDate: string = formatDate(startDate, this.dateFormat, this.culture);
+    const  endDateChk: string = formatDate(endDate, this.dateFormat, this.culture);
+    if (endDateChk < startChkDate) {
+      return;
+    }
     this.VendorActivityReportForm.markAllAsTouched();
     if (this.VendorActivityReportForm?.invalid) {
       return;

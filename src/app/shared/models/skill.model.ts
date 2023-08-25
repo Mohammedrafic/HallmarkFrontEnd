@@ -147,3 +147,9 @@ export interface MasterSkill {
   includeInIRP: boolean;
   includeInVMS: boolean;
 }
+
+
+export class SkillsByDepartments {
+  id : number;
+  name : string;
+}

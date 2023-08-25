@@ -510,6 +510,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/user-activity',
     },
+    117: {
+      // Order-Status-Summary
+      icon: '',
+      route: '/analytics/order-status-summary-report',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -770,6 +775,16 @@ export const MENU_CONFIG: any = {
       // credential-expiry-irp
       icon: '',
       route: '/analytics/credential-expiry-irp',
+    },
+    117: {
+      // Order-Status-Summary
+      icon: 'pie-chart',
+      route: '/analytics/order-status-summary-report',
+    },
+    116: {
+      // Useractivity Log report
+      icon: '',
+      route: '/analytics/user-activity',
     },
   },
 
@@ -1234,6 +1249,16 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/department-spend-and-hours-report',
     },
+    117: {
+      // Order-Status-Summary
+      icon: 'pie-chart',
+      route: '/analytics/order-status-summary-report',
+    },
+    116: {
+      // Useractivity Log report
+      icon: '',
+      route: '/analytics/user-activity',
+    },
   },
 
   [BusinessUnitType.Agency]: {
@@ -1483,6 +1508,11 @@ export const MENU_CONFIG: any = {
       icon: 'twitch',
       route: '',
     },
+    116: {
+      // Useractivity Log report
+      icon: '',
+      route: '/analytics/user-activity',
+    },  
   },
 
   [BusinessUnitType.Employee]: {

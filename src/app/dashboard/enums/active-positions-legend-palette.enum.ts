@@ -6,4 +6,5 @@ export enum ActivePositionsChartStatuses {
   FILLED = 'Filled',
   CLOSED = 'Closed',
   INCOMPLETE = 'Incomplete',
+  CUSTOM = 'Custom',
 }

@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   HostListener,
@@ -8,6 +7,7 @@ import {
   ViewChild,
   Inject,
   NgZone,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DOCUMENT, DatePipe, Location } from '@angular/common';
@@ -97,6 +97,8 @@ import {
   UpdateRegRateSucceeded,
   GetOrderComments,
   ClearPredefinedBillRates,
+  GetOrderAuditHistory,
+  GetOrderHistoryDetailSucceeded,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -138,6 +140,7 @@ import { ButtonModel } from '@shared/models/buttons-group.model';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
+  AuditLogPayload,
   FilterOrderStatus,
   FilterStatus,
   IRPOrderManagement,
@@ -481,7 +484,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
   }
   public filterType: string = 'Contains';
-
+  public orderDetail =new Subject<OrderManagement>();
+  
   constructor(
     protected override store: Store,
     private router: Router,
@@ -647,10 +651,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.currentPage = pagerState.page;
       this.pageSize = pagerState.pageSize;
       this.filters = pagerState.filters;
+
       this.activeTab = this.preservedOrderService.getActiveTab();
+      this.activeIRPtabs = this.preservedOrderService.getIrpActiveTab();
+      this.activeIRPTabIndex = this.preservedOrderService.findIrpTabIndex(this.activeIRPtabs);
     }
 
-    this.preservedOrderService.getPreserveOrder()
+    this.preservedOrderService.getPreserveOrderStream()
       .pipe(skip(1), filter(() => !!this.gridWithChildRow.dataSource), debounceTime(1000), takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.preservedOrderService.applyGridState(this.gridWithChildRow);
@@ -1222,8 +1229,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   /* Check if some pending tab is present and set it as active */
   private selectNavigationTab(): void {
     const { pending } = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
+
     if (pending && this.ordersPage?.items) {
       this.store.dispatch(new SelectNavigationTab(null, pending));
+    }
+
+    if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      this.initGridColumns();
     }
   }
 
@@ -1325,6 +1337,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.checkSelectedChildrenItem();
   }
 
+
   public onRowDeselect(event: any, grid: any) {
     this.rowDeselected(event, grid);
     this.checkSelectedChildrenItem();
@@ -1417,6 +1430,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public irpTabSelected(tabIndex: OrderManagementIRPTabsIndex) {
+    if (tabIndex === this.activeIRPTabIndex) {
+      return;
+    }
+
     this.activeIRPTabIndex = tabIndex;
     this.filterApplied = false;
     this.clearFilters();
@@ -1428,9 +1445,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.selectedIndex = this.selectedRowIndex = null;
 
       this.initGridColumns();
-
       this.dispatchPreservedFilters();
-
       this.pageSubject.next(1);
     }
     this.cd$.next(true);
@@ -1438,7 +1453,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
-
     // Don’t need reload orders if we go back from the candidate page
     if (!this.previousSelectedOrderId) {
       const { selectedOrderAfterRedirect } = this.orderManagementService;
@@ -1487,6 +1501,31 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.dispatchPreservedFilters();
     }
     this.cd$.next(true);
+  }
+
+  public openEditedIrpOrder(): void {
+    const preservedOrderId = this.preservedOrderService.getPreservedOrderId();
+    if (!preservedOrderId) {
+      return;
+    }
+
+    const orderData: Partial<RowSelectedEvent> = {
+      node: undefined,
+      data: null,
+    };
+
+    this.gridApi.forEachNode((node) => {
+      if ((node.data as OrderManagement).id === preservedOrderId) {
+        orderData.data = node.data;
+        orderData.node = node;
+      }
+    });
+
+    if (orderData.node && orderData.data) {
+      this.openIrpDetails(orderData);
+      this.preservedOrderService.resetPreservedOrder();
+      this.gridApi.ensureNodeVisible(orderData.node);
+    }
   }
 
   private setOrderTypesFilterDataSource(): void {
@@ -1636,6 +1675,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       case MoreMenuType['Add Re-Order']:
         this.createReorder(data);
         break;
+      case MoreMenuType['View history']:  
+        this.OpenOrderHistoryDialog(data);        
+        break;
     }
   }
 
@@ -1694,9 +1736,16 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public preserveOrder(id: number): void {
     const pagerState = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
-    this.preservedOrderService.setActiveTab(this.activeTab);
+
+    if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      this.preservedOrderService.setIrpActiveTab(this.activeIRPtabs);
+    } else {
+      this.preservedOrderService.setActiveTab(this.activeTab);
+    }
+    
     this.preservedOrderService.preserveOrder(id, pagerState);
-    this.store.dispatch([new SelectNavigationTab(this.activeTab), new ClearOrders(), new ClearOrderFilterDataSources()]);
+    const tab = this.activeSystem === OrderManagementIRPSystemId.VMS ? this.activeTab : this.activeIRPtabs;
+    this.store.dispatch([new SelectNavigationTab(tab), new ClearOrders(), new ClearOrderFilterDataSources()]);
   }
 
   private openReOrderDialog(orderId: number, organizationId: number): void {
@@ -1781,6 +1830,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (data?.items.length && this.isRedirectedFromVmsSystem) {
         this.openFirstIrpOrderDetails();
       }
+
+      this.selectNavigationTab();
     });
   }
 
@@ -2005,8 +2056,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onSelectedOrderDataLoadHandler(): void {
-    this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
+    this.selectedOrder$
+    .pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((order: Order) => {
       this.selectedOrder = order;
+      
       if (this.selectedOrder?.commentContainerId) {
         this.getOrderComments();
       }
@@ -2054,7 +2109,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           if (!this.preservedOrderService.isOrderPreserved()) {
             this.prepareFiltersToDispatch(state);
           }
-
+          
           if (!isNotPreserved) {
             this.getOrders(true);
           }
@@ -2879,6 +2934,18 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
         this.systemGroup.selectButton({ id: orderLinkDetails?.system as OrderManagementIRPSystemId } as ButtonModel);
       });
+  }
+
+  private OpenOrderHistoryDialog(data:OrderManagement): void{
+    const orderHistoryPayload: AuditLogPayload =
+          {           
+            entityType: "order",
+            searchValue:data.id.toString()
+          };   
+          this.store.dispatch(new GetOrderAuditHistory(orderHistoryPayload));
+          this.actions$
+            .pipe(ofActionDispatched(GetOrderHistoryDetailSucceeded), take(1))
+            .subscribe(() =>this.orderDetail.next(data));   
   }
 
   @OutsideZone

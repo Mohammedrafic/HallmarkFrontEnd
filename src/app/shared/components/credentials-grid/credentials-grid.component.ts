@@ -7,7 +7,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { FileInfo, FilesPropModel, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest, EMPTY } from 'rxjs';
 
 import { CustomFormGroup, Permission } from '@core/interface';
@@ -70,6 +70,8 @@ import { AddCredentialForm, CredentialFiles, SearchCredentialForm } from './cred
 import { AppState } from '../../../store/app.state';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { CandidateService } from '@agency/services/candidates.service';
+import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 
 @Component({
   selector: 'app-credentials-grid',
@@ -87,6 +89,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() employee: string | null;
   @Input() isIRP = false;
   @Input() isActive = true;
+  @Input() isMobileLoginOn = false;
   @Input() set employeeId(value: number | null | undefined) {
     if (value) {
       this.candidateProfileId = value;
@@ -127,6 +130,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private file: CredentialFile | null;
   private candidateProfileId: number;
   private credentialType: CredentialType;
+  private isOrgOnlyIRPEnabled:boolean=false;
+  private isOrgVMSEnabled:boolean=false;
 
   @Select(CandidateState.candidateCredential)
   candidateCredential$: Observable<CandidateCredentialResponse>;
@@ -242,6 +247,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.watchForDownloadCredentialFiles();
     this.watchWorkingArea();
     this.watchForCertifiedOnUntilControls();
+    this.getOrganizationSettings();
   }
 
   ngOnDestroy(): void {
@@ -730,13 +736,24 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         this.addCredentialForm.patchValue({ status: this.credentialStatus });
       });
   }
+  private getOrganizationSettings() {
+    const id = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
 
+    this.store.dispatch(new GetOrganizationById(id)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      const { isIRPEnabled, isVMCEnabled } =
+        this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+        this.isOrgOnlyIRPEnabled=isIRPEnabled!&&!isVMCEnabled!;
+        this.isOrgVMSEnabled=isVMCEnabled!;
+    })
+  }
   private setDisableAddCredentialButton(): void {
     this.disableAddCredentialButton =
       !this.areAgencyActionsAllowed
-      || !this.hasPermissions()
+      || (this.isOrgVMSEnabled && !this.hasPermissions())
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
-      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile]);
+      || (this.isOrgOnlyIRPEnabled && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile]);
   }
 
   private setGridItems(response: CandidateCredentialResponse): void {
