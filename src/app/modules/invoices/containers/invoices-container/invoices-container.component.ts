@@ -777,7 +777,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){
           this.agencyOrganizationIds = filterState.state.agencyOrganizationIds;
           this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);
-        }else if(filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0 && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
+        }else if(filterState.state.agencyOrganizationIds != null && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
           filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
           this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
         }
