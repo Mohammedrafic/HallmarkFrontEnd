@@ -120,11 +120,15 @@ import {
   RECORD_MODIFIED,
   updateCandidateJobMessage,
   UpdateRegularRatesucceedcount,
-  PerDiemReOrdersErrorMessage,
   TravelerContracttoPermOrdersSucceedMessage,
   RECORD_DELETE,
   RECORD_MODIFIED_SUCCESS_WITH_ORDERID,
   RECORD_SAVED_SUCCESS_WITH_ORDERID,
+  UpdateRegularRateReordersucceedcount,
+  UpdateRegularRateReorderOpensucceedcount,
+  UpdateReorderFilled,
+  PerDiemErrorMessage,
+  ReOrdersErrorMessage,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -1237,7 +1241,7 @@ export class OrderManagementContentState {
   @Action(UpdateRegRateorder)
   UpdateRegRateorder(
     { dispatch } : StateContext<OrderManagementContentStateModel>,
-    { payload } : UpdateRegRateorder
+    { payload,reorderFilled } : UpdateRegRateorder
   ) : Observable<UpdateRegrateModel | Observable<void>>{
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
       tap((data) => {
@@ -1246,10 +1250,18 @@ export class OrderManagementContentState {
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
         else if(count==0 && payload.perDiemIds.length===0)
           dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersSucceedMessage));
-        else if(payload.perDiemIds.length===payload.orderIds.length)
-          dispatch(new ShowToast(MessageTypes.Error, PerDiemReOrdersErrorMessage));
+        else if(payload.perDiemIds.length===payload.orderIds.length && count === payload.perDiemIds.length)
+          dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReordersucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReordersucceedcount(count)));
+        else if(payload.perDiemIds.length===payload.orderIds.length && count >0)
+          dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReorderOpensucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReorderOpensucceedcount(count)));
+        else if(count==0 && payload.perDiemIds.length===payload.orderIds.length)
+          dispatch(new ShowToast(MessageTypes.Error, ReOrdersErrorMessage));
         else if(count>0 && payload.perDiemIds.length>0)
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
+        else if(count==0 && payload.perDiemIds.length!==payload.orderIds.length && payload.perDiemIds.length>0)
+          dispatch(new ShowToast(MessageTypes.Error, PerDiemErrorMessage));
+        else
+          dispatch(new ShowToast(MessageTypes.Error,'Bill rate is not updated'));
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rate is not updated'))))
     );
