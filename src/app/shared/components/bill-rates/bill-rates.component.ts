@@ -189,6 +189,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
+          zIndex: 1020,
         })
         .pipe(
           filter((confirm) => !!confirm),
