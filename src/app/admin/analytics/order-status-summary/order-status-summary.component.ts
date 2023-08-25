@@ -4,25 +4,19 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, Inject, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { GRID_CONFIG } from '@shared/constants';
-import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
-import { FilteredItem } from '@shared/models/filter.model';
-import { User } from '@shared/models/user.model';
-import { User_DATA_FIELDS } from '@admin/alerts/alerts.constants';
-import { BUSSINES_DATA_FIELDS } from 'src/app/security/roles-and-permissions/roles-and-permissions.constants';
-import { UNIT_FIELDS } from 'src/app/security/user-list/user-list.constants';
-import { ColDef, FilterChangedEvent, GridOptions, ExcelStyle, ICellRendererParams } from '@ag-grid-community/core';
+import { ColDef, FilterChangedEvent, GridOptions, IAggFuncParams, ICellRendererParams } from '@ag-grid-community/core';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { BehaviorSubject, Observable, Subject, map, takeUntil, takeWhile, filter, switchMap } from 'rxjs';
 import { ColumnDefinitionModel } from '../../../shared/components/grid/models/column-definition.model';
 import { DatePipe } from '@angular/common';
 import { ControlTypes, ValueType } from '../../../shared/enums/control-types.enum';
 import { CustomNoRowsOverlayComponent } from '../../../shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
-import { OrderStatusSummaryCustomReport, OrderType, OrderStatusSummaryReportFilters } from '../../../modules/custom-reports/store/model/order-status-summary-report.model';
+import { OrderStatusSummaryCustomReport, OrderType, OrderStatusSummaryReportFilters, Region, Department, Skills, Location } from '../../../modules/custom-reports/store/model/order-status-summary-report.model';
 import { OrderStatusSummaryCustomReportState } from '../../../modules/custom-reports/store/state/order-status-summary-report.state';
 import * as OrderStatusSummaryReportActions from '../../../modules/custom-reports/store/actions/order-status-summary-report.actions';
-import { DateTimeHelper } from '../../../core/helpers';
 import { OrderStatusSummaryReportService } from '../../../modules/custom-reports/services/order-status-summary-report.services';
 import { SideBarConfig, DefaultOrdersStatusSummaryGridColDef } from './order-status-summary.constants';
+import { UserState } from '../../../store/user.state';
 
 @Component({
   selector: 'app-order-status-summary',
@@ -32,17 +26,9 @@ import { SideBarConfig, DefaultOrdersStatusSummaryGridColDef } from './order-sta
 })
 export class OrderStatusSummaryComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
 
-  public title: string = "Order Status Summary";
+  public title: string = "Order/Position Status Summary";
   public message: string = ''
   orderStatusSummaryReportForm: FormGroup;
-  public businessUnits = BUSINESS_UNITS_VALUES;
-  public bussinesDataFields = BUSSINES_DATA_FIELDS;
-  public userDataFields = User_DATA_FIELDS;
-  public unitFields = UNIT_FIELDS;
-  public override filteredItems: FilteredItem[] = [];
-  private isAlive = true;
-  public userData: User[];
-  public baseUrl: string = '';
   public gridApi: any;
   sideBar = SideBarConfig;
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
@@ -55,28 +41,33 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   private unsubscribe$: Subject<void> = new Subject();
   public filterColumns: any;
   public totalRecordsCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
-  public lastOrgId: number;
 
   @Select(OrderStatusSummaryCustomReportState.CustomReportPage)
   public data$: Observable<OrderStatusSummaryCustomReport[]>;
 
   @Select(OrderStatusSummaryCustomReportState.OrderStatusSummaryFilters)
-  public filters$: Observable<OrderStatusSummaryReportFilters[]>;
+  public filters$: Observable<OrderStatusSummaryReportFilters>;
 
-  regions$: { name: string }[] = [];
-  regionFields: FieldSettingsModel = { text: 'name', value: 'name' };
+  @Select(UserState.lastSelectedOrganizationId)
+  public organizationId$: Observable<string | null>;
 
-  locations$: { name: string }[] = [];
-  locationFields: FieldSettingsModel = { text: 'name', value: 'name' };
+  regions$: Region[] = [];
+  regionFields: FieldSettingsModel = { text: 'region', value: 'regionId' };
 
-  departments$: { name: string }[] = [];
-  departmentFields: FieldSettingsModel = { text: 'name', value: 'name' };
+  locations$: Location[] = [];
+  filteredLocations$: Location[] = [];
+  locationFields: FieldSettingsModel = { text: 'location', value: 'locationId' };
 
-  skills$: { name: string }[] = [];
-  skillFields: FieldSettingsModel = { text: 'name', value: 'name' };
+  departments$: Department[] = [];
+  filteredDepartments$: Department[] = [];
+  departmentFields: FieldSettingsModel = { text: 'department', value: 'departmentId' };
+
+  skills$: Skills[] = [];
+  skillFields: FieldSettingsModel = { text: 'skill', value: 'skillId' };
 
   orderStatus$: { name: string }[] = [];
   orderStatuseFields: FieldSettingsModel = { text: 'name', value: 'name' };
+
   orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   private orderFilterColumnsSetup(): void {
@@ -86,35 +77,35 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
         valueType: ValueType.Text,
         dataSource: this.orderStatus$,
         valueField: 'name',
-        valueId: 'id',
+        valueId: 'name',
       },
       region: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
         dataSource: this.regions$,
-        valueField: 'name',
-        valueId: 'id',
+        valueField: 'region',
+        valueId: 'regionId',
       },
       location: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
-        dataSource: this.locations$,
-        valueField: 'name',
-        valueId: 'id',
+        dataSource: this.filteredLocations$,
+        valueField: 'location',
+        valueId: 'locationId',
       },
       department: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
-        dataSource: this.departments$,
-        valueField: 'name',
-        valueId: 'id',
+        dataSource: this.filteredDepartments$,
+        valueField: 'department',
+        valueId: 'departmentId',
       },
       skills: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
         dataSource: this.skills$,
-        valueField: 'name',
-        valueId: 'id',
+        valueField: 'skill',
+        valueId: 'skillId',
       },
       orderType: {
         type: ControlTypes.Dropdown,
@@ -123,9 +114,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
         valueField: 'name',
         valueId: 'id',
       },
-      orderstartdate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      orderenddate: { type: ControlTypes.Date, valueType: ValueType.Text },
-
     }
   }
 
@@ -148,7 +136,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'Location Id',
+      headerName: 'Location ID',
       field: 'locationId',
       minWidth: 250,
       filter: true,
@@ -164,7 +152,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'Department Id',
+      headerName: 'Department ID',
       field: 'departmentId',
       minWidth: 250,
       filter: true,
@@ -180,52 +168,117 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
-      headerName: 'Total Positions',
-      field: 'totalPosition',
+      headerName: 'Order ID',
+      field: 'orderID',
       minWidth: 250,
       filter: true,
       sortable: true,
       resizable: true
+    },
+    {
+      headerName: 'Total Positions',
+      field: 'totalPositions',
+      minWidth: 100,
+      filter: true,
+      sortable: true,
+      resizable: true,
+      aggFunc: this.customAggregate,
+      valueFormatter: (params) => {
+        if (params.node && params.node.footer) {
+          return 'Total:' + params.value;
+        }
+        return params.value;
+      },
     },
     {
       headerName: 'Open',
       field: 'openPositions',
-      minWidth: 250,
+      minWidth: 100,
       filter: true,
       sortable: true,
-      resizable: true
+      resizable: true,
+      aggFunc: this.customAggregate,
+      valueFormatter: (params) => {
+        if (params.node && params.node.footer) {
+          return 'Total:' + params.value;
+        }
+        return params.value;
+      },
     },
     {
       headerName: 'InProgress',
       field: 'inProgress',
-      minWidth: 250,
+      minWidth: 100,
       filter: true,
       sortable: true,
-      resizable: true
+      resizable: true,
+      aggFunc: this.customAggregate,
+      valueFormatter: (params) => {
+        if (params.node && params.node.footer) {
+          return 'Total:' + params.value;
+        }
+        return params.value;
+      },
     },
     {
       headerName: 'Offered',
       field: 'offered',
-      minWidth: 250,
+      minWidth: 100,
       filter: true,
       sortable: true,
-      resizable: true
+      resizable: true,
+      aggFunc: this.customAggregate,
+      valueFormatter: (params) => {
+        if (params.node && params.node.footer) {
+          return 'Total:' + params.value;
+        }
+        return params.value;
+      },
     },
     {
       headerName: 'Accepted',
       field: 'accepted',
-      minWidth: 250,
+      minWidth: 100,
       filter: true,
       sortable: true,
-      resizable: true
+      resizable: true,
+      aggFunc: this.customAggregate,
+      valueFormatter: (params) => {
+        if (params.node && params.node.footer) {
+          return 'Total:' + params.value;
+        }
+        return params.value;
+      },
     },
     {
       headerName: 'Filled',
       field: 'filled',
-      minWidth: 250,
+      minWidth: 100,
       filter: true,
       sortable: true,
-      resizable: true
+      resizable: true,
+      aggFunc: this.customAggregate,
+      valueFormatter: (params) => {
+        if (params.node && params.node.footer) {
+          return 'Total:' + params.value;
+        }
+        return params.value;
+      },
+    },
+    {
+      headerName: 'Closed',
+      field: 'closed',
+      minWidth: 100,
+      filter: true,
+      sortable: true,
+      resizable: true,
+      aggFunc: this.customAggregate,
+      valueFormatter: (params) => {
+        if (params.node && params.node.footer) {
+          return 'Total:' + params.value;
+        }
+        return params.value;
+      },
     }
   ]
   constructor(private store: Store, private formBuilder: FormBuilder, private datePipe: DatePipe,
@@ -236,21 +289,26 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   }
 
   ngOnInit(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.store.dispatch([new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage({}),
+          new OrderStatusSummaryReportActions.GetOrderStatusSummaryFiltersByOrganization()]);
+        this.onFilterClearAll();
+        this.setFilters();
+      });
     this.getGridData();
     this.initForm();
-    //this.getFilters();
-    //this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage({}));
-    //this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryFiltersByOrganization());
-    this.store.dispatch([new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage({}), new OrderStatusSummaryReportActions.GetOrderStatusSummaryFiltersByOrganization()]);
-    
     this.setFilters();
     this.orderFilterColumnsSetup();
+    this.watchForReason();
+    this.watchForLocation();
   }
 
+  customAggregate(params: IAggFuncParams): any {
+    return params.values.reduce((sum, value) => sum + value, 0);
+  }
 
   private initForm(): void {
-    let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 7);
     this.orderStatusSummaryReportForm = this.formBuilder.group(
       {
         region: new FormControl([], []),
@@ -259,8 +317,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
         skills: new FormControl([], []),
         orderType: new FormControl([], []),
         orderStatus: new FormControl([], []),
-        orderstartdate: new FormControl(startDate),
-        orderenddate: new FormControl(new Date(Date.now())),
       }
     );
   }
@@ -268,12 +324,40 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   public setFilters(): void {
     this.dataService.getFiltersByOrganizationId().pipe(takeUntil(this.unsubscribe$))
       .subscribe(data => {
-        this.regions$ = data.region.map(item => ({ name: item }));
-        this.locations$ = data.location.map(item => ({ name: item }));
-        this.departments$ = data.department.map(item => ({ name: item }));
-        this.skills$ = data.skills.map(item => ({ name: item }));
+        this.regions$ = data.region.map(item => ({ region: item.region, regionId: item.regionId }));
+        this.locations$ = data.location.map(item => ({ locationId: item.locationId, location: item.location, regionId: item.regionId }));
+        this.departments$ = data.department.map(item => ({ departmentId: item.departmentId, department: item.department, locationId: item.locationId }));
+        this.skills$ = data.skills.map(item => ({ skillId: item.skillId, skill: item.skill }));
         this.orderStatus$ = data.orderStatus.map(item => ({ name: item }));
       });
+  }
+
+  private watchForReason(): void {
+    this.orderStatusSummaryReportForm?.controls['region'].valueChanges
+      .subscribe((regionid: number[]) => {
+        this.filterLocations(regionid);
+      });
+  }
+
+  public filterLocations(regionid: number[]): void {
+    this.filteredLocations$ = this.locations$.filter(items => regionid.includes(items.regionId));
+    this.orderStatusSummaryReportForm.controls['location'].setValue([]);
+    this.filterColumns.location.dataSource = this.filteredLocations$;
+    this.changeDetectorRef.detectChanges();
+  }
+
+  private watchForLocation(): void {
+    this.orderStatusSummaryReportForm?.controls['location'].valueChanges
+      .subscribe((locationid: number[]) => {
+        this.filterDepartments(locationid);
+      });
+  }
+
+  public filterDepartments(locationid: number[]): void {
+    this.filteredDepartments$ = this.departments$.filter(items => locationid.includes(items.locationId));
+    this.orderStatusSummaryReportForm.controls['department'].setValue([]);
+    this.filterColumns.department.dataSource = this.filteredDepartments$;
+    this.changeDetectorRef.detectChanges();
   }
 
   public onFilterApply(): void {
@@ -283,8 +367,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     const payload = {
       ...this.orderStatusSummaryReportForm.value
     };
-    payload.orderstartdate = DateTimeHelper.setUtcTimeZone(this.orderStatusSummaryReportForm.value.orderstartdate);
-    payload.orderenddate = DateTimeHelper.setUtcTimeZone(this.orderStatusSummaryReportForm.value.orderenddate);
     payload.orderType = this.orderStatusSummaryReportForm.value.orderType.map((type: string) => OrderType[type as keyof typeof OrderType]).toString();
     this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(payload));
     this.resetForm();
@@ -301,8 +383,8 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
 
   onBtExport() {
     const params = {
-      fileName: 'Order Status Summary Report',
-      sheetName: 'Order Status Summary Report'
+      fileName: 'Order/Position Status Summary Report',
+      sheetName: 'Order/Position Status Summary Report'
     };
     this.gridApi.exportDataAsExcel(params);
   }
@@ -314,23 +396,19 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     let skills: [] = [];
     let orderType: [] = [];
     let orderStatus: [] = [];
-    let orderstartdate = new Date(Date.now());
-    orderstartdate.setDate(orderstartdate.getDate() - 7);
     this.orderStatusSummaryReportForm.controls['region'].setValue(region);
     this.orderStatusSummaryReportForm.controls['location'].setValue(location);
     this.orderStatusSummaryReportForm.controls['department'].setValue(department);
     this.orderStatusSummaryReportForm.controls['skills'].setValue(skills);
     this.orderStatusSummaryReportForm.controls['orderType'].setValue(orderType);
     this.orderStatusSummaryReportForm.controls['orderStatus'].setValue(orderStatus);
-    this.orderStatusSummaryReportForm.controls['orderstartdate'].setValue(orderstartdate);
-    this.orderStatusSummaryReportForm.controls['orderenddate'].setValue(new Date(Date.now()));
   }
 
   public showFilters(): void {
     this.orderFilterColumnsSetup();
     this.store.dispatch(new ShowFilterDialog(true));
   }
-  
+
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
   };
@@ -352,6 +430,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     rowData: this.itemList,
     sideBar: this.sideBar,
     detailRowAutoHeight: true,
+    groupIncludeTotalFooter: true,
     noRowsOverlayComponent: CustomNoRowsOverlayComponent,
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
