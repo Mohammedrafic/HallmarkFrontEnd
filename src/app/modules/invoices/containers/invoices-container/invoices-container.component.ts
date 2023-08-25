@@ -412,7 +412,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         PreservedFiltersState.preservedFiltersByPageName) as
         PreservedFiltersByPage<Interfaces.InvoicesFilterState>;
 
-      const filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency,this.agencyOrganizationIds.length);
+      const filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency,this.agencyOrganizationIds?.length);
       this.filterState = this.filterService.composeFilterState(
         filtersFormConfig,
         preservedFilters.state as Record<string, unknown>

@@ -52,13 +52,10 @@ export const AgencyManualInvoicePendingExportCols : ExportColumn[] = [
   { text:'ReasonCode', column: 'reasonCode' },
   { text:'RejectionReason', column: 'rejectionReason' },
   { text:'Amount', column: 'amount' },
-  { text:'ServiceDate', column: 'serviceDate' },
   { text:'LinkedInvoiceId', column: 'linkedInvoiceId' },
-  {text:'Submitted Date',column:'submittedDate'},
-  {text:'Review Status',column:'reviewStatus'},
-  {text:' Approved Date',column:' approvedDate'},
-  {text:'agencyName',column:'agencyName'},
   {text:'Organization Name',column:'organizationName'},
+  { text:'Type', column: 'type' },
+  { text:'Attachment', column: 'attachment' },
 
 ];
 
@@ -77,10 +74,10 @@ export const PendingInvoiceExportCols : ExportColumn[] = [
   { text:'Candidate Name', column: 'candidateName' },
   { text:'Agency', column: 'agency' },
   { text:'Skill', column: 'skill' },
-  { text:'Hours / Miles', column: 'hoursMiles' },  
+  { text:'Hours / Miles', column: 'hoursMiles' },
   { text:'Bill Rate Type / Expenses Code Reason', column: 'billRateTypeCodeReason' },
   { text:'Bill Rate', column: 'billRate' },
-  { text:'Amount', column: 'amount' },   
+  { text:'Amount', column: 'amount' },
   { text:'Comment', column: 'Comment' },
 ];
 
