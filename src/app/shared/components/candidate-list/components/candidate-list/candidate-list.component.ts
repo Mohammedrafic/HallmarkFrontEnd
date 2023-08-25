@@ -407,7 +407,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    debugger
     const columnMap = this.isIRP ? this.isSourcingEnabled ? this.columnsToExportIrpSourcing : this.columnsToExportIrp : this.columnsToExport;
     this.selecteditmesids = this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : [];
     const requestBody: CandidateListExport = {
