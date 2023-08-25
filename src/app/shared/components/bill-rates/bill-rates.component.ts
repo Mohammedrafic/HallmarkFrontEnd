@@ -258,6 +258,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
             title: 'Warning',
             okButtonLabel: 'Yes',
             okButtonClass: 'ok-button',
+            zIndex: 1020,
           })
           .pipe(
             filter((confirm) => confirm),

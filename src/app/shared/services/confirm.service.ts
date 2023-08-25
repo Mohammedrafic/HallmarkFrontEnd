@@ -12,7 +12,9 @@ export class ConfirmService {
     okButtonLabel:string,
     okButtonClass: string,
     cancelButtonLabel?: string,
-    customStyleClass?: string }): Observable<boolean> {
+    customStyleClass?: string,
+    zIndex?: number,
+  }): Observable<boolean> {
       
     const isAllowed$ = new Subject<boolean>();
     const dialogClass = options?.customStyleClass
@@ -48,6 +50,7 @@ export class ConfirmService {
       position: { X: 'center', Y: 'center' },
       animationSettings: { effect: 'Zoom' },
       cssClass: dialogClass,
+      zIndex: options?.zIndex,
     });
 
     const [ok, cencel] = dialog.buttons;
