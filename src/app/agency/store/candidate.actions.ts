@@ -141,19 +141,8 @@ export class GetCredentialStatusesSucceeded {
 
 export class SaveCandidatesCredential {
   static readonly type = '[candidate] Save Candidates Credential';
-  constructor(public payload: CandidateCredential, public file: Blob | null) {}
+  constructor(public payload: CandidateCredential) {}
 }
-
-export class UploadCredentialFiles {
-  static readonly type = '[candidate] Upload Credential Files';
-  constructor(public files: Blob[], public candidateCredentialId: number) {}
-}
-
-export class UploadCredentialFilesSucceeded {
-  static readonly type = '[candidate] Upload Credential Files Succeeded';
-  constructor() {}
-}
-
 export class VerifyCandidatesCredentials {
   static readonly type = '[candidate] Verify Candidates Credentials';
   constructor(public payload: BulkVerifyCandidateCredential) {}
@@ -189,6 +178,11 @@ export class GetCredentialTypes {
   static readonly type = '[candidate] Get Credential Types';
 }
 
+export class UploadCredentialFiles {
+  static readonly type = '[candidate] Upload Credential Files';
+  constructor(public files: Blob[], public candidateCredentialId: number) {}
+}
+
 export class GetCredentialFiles {
   static readonly type = '[candidate] Get Credential Files';
   constructor(public payload: number) {}
@@ -213,6 +207,10 @@ export class GetGroupedCredentialsFiles {
   static readonly type = '[candidate] Get Grouped Credentials Files';
   constructor(public candidateId: number) {}
 
+}
+
+export class UploadCredentialFilesSucceeded {
+  static readonly type = '[candidate] Upload Credential Files Succeeded';
 }
 
 export class GetCandidateProfileTemplate {
