@@ -5,12 +5,13 @@ import { Router } from '@angular/router';
 import { filter, take } from 'rxjs';
 
 import { GlobalWindow } from '@core/tokens';
+import { Location } from '@angular/common';
 
 @Injectable()
 export class CustomErrorHandler extends ErrorHandler {
   constructor(
-    private router: Router,
     private http: HttpClient,
+    private location: Location,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     super();
@@ -27,12 +28,12 @@ export class CustomErrorHandler extends ErrorHandler {
         filter((flagEnabled) => flagEnabled),
       ).subscribe(() => {
         if (confirm('Application new version available. Load New Version?')) {
-          this.router.navigate(['/']).then(() => {
-            this.globalWindow.location.reload();
-          });
+          this.location.go('/');
+          this.globalWindow.location.reload();
         }
       });
     }
     console.error(error);
   }
 }
+ 
