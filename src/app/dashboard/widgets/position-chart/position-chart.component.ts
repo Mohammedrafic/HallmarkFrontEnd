@@ -5,6 +5,8 @@ import { UserState } from '../../../store/user.state';
 import { CandidatesPositionDataModel } from '../../models/candidates-positions.model';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalWindow } from '@core/tokens';
+import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
+import { DASHBOARD_FILTER_STATE } from '@shared/constants';
 
 @Component({
   selector: 'app-position-chart',
@@ -36,6 +38,19 @@ export class PositionChartComponent {
   }
 
   public toSourceContent(event: MouseEvent): void {
+    let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
+    let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
+    if (filteredList.length > 0) {
+      let organizations = filteredList.filter((ele: any) => ele.column == "organizationIds").sort((a: any, b: any) => a.value - b.value);
+      if (organizations.length > 0 && organizations[0].value != lastSelectedOrganizationId) {
+        this.store.dispatch(
+          new SetLastSelectedOrganizationAgencyId({
+            lastSelectedAgencyId: null,
+            lastSelectedOrganizationId: organizations[0].value
+          })
+        );
+      }
+    }
     this.globalWindow.localStorage.setItem("ltaorderending", JSON.stringify(true));
     this.ltaorderending = JSON.parse(localStorage.getItem('ltaorderending') || 'false') as boolean;
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
