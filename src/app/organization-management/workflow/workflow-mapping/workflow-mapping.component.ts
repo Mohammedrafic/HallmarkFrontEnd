@@ -1,6 +1,6 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, filter, first, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
+import { combineLatest, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
@@ -712,15 +712,18 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
 
   private watchForUsersAndRolesWithPermissions(): void {
     combineLatest([this.users$, this.rolesPerUsers$]).pipe(
-      filter(([usersPermission, rolesPermission]) => {
+     filter(([usersPermission, rolesPermission]) => {
         return this.workflowMappingService.hasUsersAndRolesWithPermissions(
           [usersPermission, rolesPermission]
         );
       }),
-      first(),
       takeUntil(this.unsubscribe$)
     ).subscribe((lists) => {
       const [usersPermission, rolesPermission] = lists;
+      this.usersWithRolesList = {
+        [WorkflowGroupType.VMSOrderWorkflow]: [],
+        [WorkflowGroupType.IRPOrderWorkflow]: [],
+      };
       this.usersWithRolesList = this.workflowMappingService.getUsersBaseOnWorkflow(
         usersPermission,
         this.usersWithRolesList,
