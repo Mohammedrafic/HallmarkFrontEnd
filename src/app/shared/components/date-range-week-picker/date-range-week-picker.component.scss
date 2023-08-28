@@ -8,7 +8,7 @@
 
     .e-day {
       background-color: $primary-active-blue !important;
-      color: $white !important;
+      color: var(--selected-date-range-color) !important;
       font-weight: 700 !important;
     }
   }

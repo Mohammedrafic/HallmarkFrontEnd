@@ -29,6 +29,7 @@ body.light {
   --secondary-title: #{$title-black};
   --selector-title: #{$secondary-dark-blue-15};
   --disabled-drop-area-text: #{$secondary-dark-blue-30};
+  --selected-date-range-color: #{$white};
 }
 
 body.dark {
@@ -60,4 +61,5 @@ body.dark {
   --secondary-title: #{$white};
   --selector-title: #{$white};
   --disabled-drop-area-text: #{$white};
+  --selected-date-range-color: #{$black};
 }
