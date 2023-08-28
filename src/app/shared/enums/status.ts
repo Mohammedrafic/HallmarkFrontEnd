@@ -146,6 +146,7 @@ export enum FilterOrderStatusText {
   Closed = 'Closed',
   NoRecordsFound = "No Pending Orders",
   Incomplete = 'Incomplete',
+  OrdersOpenPositions = 'OrdersOpenPositions',
 }
 
 export enum LocalStorageStatus {
