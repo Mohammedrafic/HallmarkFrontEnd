@@ -4,13 +4,17 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { ColDef, ValueGetterParams } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
-import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns,
-  TIMETHEETS_STATUSES } from '../enums';
+import {
+  FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns,
+  TIMETHEETS_STATUSES
+} from '../enums';
 import { FilterColumns, TimesheetsFilterState } from '../interface';
-import { TimesheetTableApproveCellComponent,
+import {
+  TimesheetTableApproveCellComponent,
 } from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
-import { TimesheetTableLinkComponent,
+import {
+  TimesheetTableLinkComponent,
 } from '../components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { GridValuesHelper } from '../helpers';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
@@ -139,6 +143,31 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       ...commonColumn,
     },
     {
+      field: TimesheetsTableColumns.TimesheetApprover,
+      headerName: 'Timesheet Approver',
+      width: 250,
+      minWidth: 158,
+      hide: true,
+      valueGetter: (params) => {
+        let listLength = 0;
+        if (params.data.approverNameList) {
+          listLength = (params.data.approverNameList).length;
+        }
+        if (listLength > 0) {
+          if (listLength > 1) {
+            return params.data.approverName + ' +' + (listLength-1);
+          }
+          return params.data.approverName;
+        }
+        else {
+          return '';
+        }
+      },
+      tooltipField: TimesheetsTableColumns.TimesheetApproverList,
+      wrapText: true,
+      ...commonColumn,
+    },
+    {
       field: TimesheetsTableColumns.TotalDays,
       headerName: 'TOTAL DAYS',
       width: 160,
@@ -178,7 +207,7 @@ export const DefaultFilterColumns: FilterColumns = {
   searchTerm: defaultInputMapping,
   orderIds: defaultInputMapping,
   statusIds: defaultColumnMapping,
-  skillIds: skillsColumnMapping ,
+  skillIds: skillsColumnMapping,
   departmentIds: defaultColumnMapping,
   agencyIds: defaultColumnMapping,
   regionsIds: defaultColumnMapping,
