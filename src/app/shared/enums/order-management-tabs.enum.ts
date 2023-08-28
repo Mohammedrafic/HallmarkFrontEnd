@@ -12,13 +12,15 @@ export enum OrderManagementIRPTabs {
   PerDiem = 'Per Diem',
   LTA = 'LTA',
   Incomplete = 'Incomplete',
+  OrderTemplates = 'Order Templates',
 }
 
 export enum OrderManagementIRPTabsIndex {
   AllOrders,
   PerDiem,
   Lta,
-  Incomplete
+  Incomplete,
+  OrderTemplates
 }
 
 export enum OrderManagementIRPSystemId {

@@ -1,12 +1,11 @@
 import { AbstractControl, FormGroup } from '@angular/forms';
-
 import { ToastUtility } from '@syncfusion/ej2-notifications';
 
 import { FieldName, OrderSystem } from '@client/order-management/enums';
 import { FormArrayList } from '@client/order-management/containers/irp-container/irp-container.constant';
 import { OrderDetailsValidationMessage } from '@client/order-management/constants';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
-import { JobDistributionList, ListControls, ListOfKeyForms, SelectSystem } from '@client/order-management/interfaces';
+import { JobDistributionList, ListControls, ListOfKeyForms, SaveAsTemplateListOfKeyForms, SelectSystem } from '@client/order-management/interfaces';
 import { Order } from '@shared/models/order-management.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { ButtonModel } from '@shared/models/buttons-group.model';
@@ -23,7 +22,7 @@ export const collectInvalidFieldsFromForm = (controls: { [key: string]: Abstract
 
 export const createJobDistributionList = (distributionForm: FormGroup): JobDistributionList[] => {
   const jobDistributionList: JobDistributionList[] = [];
-
+  if (distributionForm.value.jobDistribution) {
   distributionForm.value.jobDistribution.forEach((value: number) => {
     if (value === IrpOrderJobDistribution.SelectedExternal) {
       distributionForm.value.agencyId.forEach((agencyId: number) => {
@@ -33,7 +32,7 @@ export const createJobDistributionList = (distributionForm: FormGroup): JobDistr
       jobDistributionList.push(createDistribution(value));
     }
   });
-
+  }
   return jobDistributionList;
 };
 
@@ -61,7 +60,20 @@ export const showInvalidFormControl = (controls: ListControls[]): void => {
     cssClass: OrderDetailsValidationMessage.cssClass,
   });
 };
+export const getSaveasTemplateFormsList = (list: SaveAsTemplateListOfKeyForms): FormGroup[] => {
+  const formList = [];
+  for (const form in list) {
+    if (FormArrayList.includes(form)) {
+      (list[form as keyof SaveAsTemplateListOfKeyForms]! as FormGroup)//.forEach((item: FormGroup) => {
+        formList.push(list);
+      //});
+    } else {
+      formList.push(list[form as keyof SaveAsTemplateListOfKeyForms]);
+    }
+  }
 
+  return formList as FormGroup[];
+};
 export const collectInvalidFields = (formControlList: ListControls[]): string[] => {
   const fields: string[] = [];
   formControlList.forEach((form: ListControls) => collectInvalidFieldsFromForm(form, fields));

@@ -320,7 +320,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
   public readonly shiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
+  public OrganizationIRPTabs = OrderManagementIRPTabs;
   public settings: { [key in SettingsKeys]?: Configuration };
   public SettingsKeys = SettingsKeys;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
@@ -892,6 +892,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.activeIRPtabs = OrderManagementIRPTabs.PerDiem
         this.columnsToExport = irpPerDiemOrdersColumnsToExport;
       }
+      if (this.activeIRPTabIndex == OrderManagementIRPTabsIndex.OrderTemplates) {
+        this.activeIRPtabs = OrderManagementIRPTabs.OrderTemplates
+        this.filters.isTemplate=true;
+      }
       this.isIncomplete = (this.activeIRPTabIndex === OrderManagementIRPTabsIndex.Incomplete);
       this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.IRP);
       cleared ? this.store.dispatch(new GetIRPOrders(this.filters)).pipe(takeUntil(this.unsubscribe$)).subscribe(()=>{
@@ -1272,17 +1276,22 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   openIrpDetails(event: RowSelectedEvent | Partial<RowSelectedEvent>) {
     const orderData = event.data as IRPOrderManagement;
-    this.gridApi.selectNode(event.node as RowNode);
-    this.selectedDataRow = orderData;
-    const options = this.getDialogNextPreviousOption(orderData, true);
-    this.store.dispatch(new GetOrderById(orderData.id, orderData.organizationId, options, true));
-    this.dispatchAgencyOrderCandidatesList(orderData.id, orderData.organizationId, true);
-    this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
-    this.openChildDialog.next(false);
-    this.orderPositionSelected$.next({ state: false });
-    this.openDetails.next(true);
-    this.selectedRowRef = event;
-    this.selectedRowIndex = event.rowIndex || null;
+    if (orderData.statusText == 'Incomplete') {
+      this.store.dispatch(new GetSelectedOrderById(orderData.id, true));
+      this.navigateToOrderTemplateForm(orderData.id, true);
+    } else {
+      this.gridApi.selectNode(event.node as RowNode);
+      this.selectedDataRow = orderData;
+      const options = this.getDialogNextPreviousOption(orderData, true);
+      this.store.dispatch(new GetOrderById(orderData.id, orderData.organizationId, options, true));
+      this.dispatchAgencyOrderCandidatesList(orderData.id, orderData.organizationId, true);
+      this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
+      this.openChildDialog.next(false);
+      this.orderPositionSelected$.next({ state: false });
+      this.openDetails.next(true);
+      this.selectedRowRef = event;
+      this.selectedRowIndex = event.rowIndex || null;
+    }
   }
 
   setGridApi(params: GridReadyEvent): void {
@@ -1315,7 +1324,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         if (!this.canCreateOrder || this.preservedOrderService.isOrderPreserved()) {
           return;
         }
-        this.navigateToOrderTemplateForm(rowData.id);
+        this.navigateToOrderTemplateForm(rowData.id,false);
         this.store.dispatch(new GetSelectedOrderById(rowData.id));
       } else {
         const data = isArray(rowData) ? rowData[0] as OrderManagement : rowData as OrderManagement;
@@ -1394,9 +1403,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderManagementService.setOrderTypeToPrePopulate(this.activeTab, this.activeIRPTabIndex, this.activeSystem);
   }
 
-  public navigateToOrderTemplateForm(id: number): void {
+  public navigateToOrderTemplateForm(id: number,isIRP?:boolean): void {
     this.preserveOrder(id);
-    this.router.navigate(['./add/fromTemplate'], { relativeTo: this.route });
+    this.router.navigate(['./add/fromTemplate'],{state:
+      {isIRP:isIRP},relativeTo:this.route} );
   }
 
   public onRowScaleUpClick(): void {

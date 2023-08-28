@@ -79,6 +79,9 @@ export const IRPTabsConfig: TabsListConfig[] = [
   {
     title: OrderManagementIRPTabs.Incomplete,
   },
+  {
+    title: OrderManagementIRPTabs.OrderTemplates,
+  }
 ];
 
 export const IRPTabRequestTypeMap: Map<number, number | null> = new Map<number, number | null>()

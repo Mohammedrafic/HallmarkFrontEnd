@@ -204,11 +204,11 @@ export interface OrderManagementContentStateModel {
   OrderClassificationAuditHistory:OrderClassificationAuditHistory[]  
 }
 
-@State<OrderManagementContentStateModel>( {
+@State<OrderManagementContentStateModel>({
   name: 'orderManagement',
   defaults: {
     ordersPage: null,
-    ordersJourneyPage:null,
+    ordersJourneyPage: null,
     selectedOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
@@ -249,9 +249,8 @@ export interface OrderManagementContentStateModel {
     OrderContactAuditHistory:[],
     OrderWorkLocationAuditHistory:[],
     OrderJobDistributionAuditHistory:[],
-    OrderClassificationAuditHistory:[]
+    OrderClassificationAuditHistory:[],
   },
-
 })
 @Injectable()
 export class OrderManagementContentState {
@@ -261,7 +260,7 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static ordersJourneyPage(state:OrderManagementContentStateModel): OrdersJourneyPage | null {
+  static ordersJourneyPage(state: OrderManagementContentStateModel): OrdersJourneyPage | null {
     return state.ordersJourneyPage;
   }
 
@@ -424,12 +423,14 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static getCandidateCancellationReasons(state: OrderManagementContentStateModel): CandidateCancellationReason[]|null {
+  static getCandidateCancellationReasons(
+    state: OrderManagementContentStateModel
+  ): CandidateCancellationReason[] | null {
     return state.candidateCancellationReasons || null;
   }
 
   @Selector()
-  static getAllShifts(state: OrderManagementContentStateModel): ScheduleShift[]|null {
+  static getAllShifts(state: OrderManagementContentStateModel): ScheduleShift[] | null {
     return state.allShifts || null;
   }
 
@@ -482,8 +483,8 @@ export class OrderManagementContentState {
     private rejectReasonService: RejectReasonService,
     private extensionSidebarService: ExtensionSidebarService,
     private orderImportService: OrderImportService,
-    private UpdateRegRateService : UpdateRegRateService,
-    private commentService : CommentsService
+    private UpdateRegRateService: UpdateRegRateService,
+    private commentService: CommentsService
   ) {}
 
   @Action(GetOrders, { cancelUncompleted: true })
@@ -508,37 +509,29 @@ export class OrderManagementContentState {
   }
 
   @Action(GetIRPOrders, { cancelUncompleted: true })
-  GetIRPOrders(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
-    { payload }: GetIRPOrders
-  ) {
+  GetIRPOrders({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }: GetIRPOrders) {
     patchState({ ordersPage: null });
 
     return this.orderManagementIrpApiService.getOrders(payload).pipe(
       tap((orders) => {
         patchState({ ordersPage: orders as unknown as OrderManagementPage });
-      }),
+      })
     );
   }
 
   @Action(GetOrdersJourney, { cancelUncompleted: true })
-  GetOrdersJourney(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
-    { payload }: GetOrdersJourney
-  ) {
+  GetOrdersJourney({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }: GetOrdersJourney) {
     patchState({ ordersJourneyPage: null });
 
     return this.orderManagementService.getOrdersJourney(payload).pipe(
       tap((orders) => {
         patchState({ ordersJourneyPage: orders as unknown as OrdersJourneyPage });
-      }),
+      })
     );
   }
 
   @Action(ClearOrders)
-  ClearOrders(
-    { patchState }: StateContext<OrderManagementContentStateModel>
-  ): OrderManagementContentStateModel {
+  ClearOrders({ patchState }: StateContext<OrderManagementContentStateModel>): OrderManagementContentStateModel {
     return patchState({ ordersPage: null });
   }
 
@@ -556,7 +549,7 @@ export class OrderManagementContentState {
         const { orderType, departmentId, jobStartDate, jobEndDate } = payload;
         let skillId = payload.skillId;
 
-        if (payload.irpOrderMetadata ) {
+        if (payload.irpOrderMetadata) {
           skillId = payload.irpOrderMetadata.skillId;
         } else if (payload.reOrderFromId && payload.reOrderFrom) {
           skillId = payload.reOrderFrom.skillId;
@@ -581,12 +574,22 @@ export class OrderManagementContentState {
   @Action(SetLock)
   SetLock(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, lockStatus,lockStatusIRP, filters, prefixId,isIrp, updateOpened,  }: SetLock
+    { id, lockStatus, lockStatusIRP, filters, prefixId, isIrp, updateOpened }: SetLock
   ): Observable<boolean | void> {
-    return this.orderManagementService.setLock(id, lockStatus,lockStatusIRP).pipe(
+    return this.orderManagementService.setLock(id, lockStatus, lockStatusIRP).pipe(
       tap(() => {
-        const message = isIrp?lockStatusIRP ? `The Order ${prefixId} is locked` : `The Order ${prefixId} is unlocked`: lockStatus ? `The Order ${prefixId} is locked` : `The Order ${prefixId} is unlocked`;
-        const actions = [new LockUpdatedSuccessfully(), new ShowToast(MessageTypes.Success, message),isIrp ? new GetIRPOrders(filters): new GetOrders(filters)];
+        const message = isIrp
+          ? lockStatusIRP
+            ? `The Order ${prefixId} is locked`
+            : `The Order ${prefixId} is unlocked`
+          : lockStatus
+          ? `The Order ${prefixId} is locked`
+          : `The Order ${prefixId} is unlocked`;
+        const actions = [
+          new LockUpdatedSuccessfully(),
+          new ShowToast(MessageTypes.Success, message),
+          isIrp ? new GetIRPOrders(filters) : new GetOrders(filters),
+        ];
         dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
       }),
       catchError((error: any) => {
@@ -619,16 +622,15 @@ export class OrderManagementContentState {
       PageSize: pageSize,
       PageNumber: pageNumber,
       isAvailable,
-      searchTerm
+      searchTerm,
     };
 
-    return this.orderManagementService.getIrpCandidates(orderId, params)
-    .pipe(
+    return this.orderManagementService.getIrpCandidates(orderId, params).pipe(
       tap((response) => {
         patchState({
           irpCandidates: response,
         });
-      }),
+      })
     );
   }
 
@@ -816,9 +818,16 @@ export class OrderManagementContentState {
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate }: SetPredefinedBillRatesData
   ): OrderManagementContentStateModel {
-    return patchState({ getPredefinedBillRatesData: {
-      orderType, departmentId, skillId, jobStartDate, jobEndDate, ignoreUpdateBillRate,
-    } });
+    return patchState({
+      getPredefinedBillRatesData: {
+        orderType,
+        departmentId,
+        skillId,
+        jobStartDate,
+        jobEndDate,
+        ignoreUpdateBillRate,
+      },
+    });
   }
 
   @Action(GetPredefinedBillRates)
@@ -865,33 +874,43 @@ export class OrderManagementContentState {
   @Action(SaveIrpOrder)
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents, inActivedatestr,isLocation,isLocationAndDepartment }: SaveIrpOrder
+    { order, documents, inActivedatestr, isLocation, isLocationAndDepartment, isTemplate }: SaveIrpOrder
   ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
         dispatch([
           new ShowToast(
             MessageTypes.Success,
-            order.length == 1 && !(inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined)
-              ? 'Order ' +
+            !isTemplate
+              ? order.length == 1 && !(inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined)
+                ? 'Order ' +
+                  order[0].organizationPrefix?.toString() +
+                  '-' +
+                  order[0].publicId?.toString() +
+                  ' has been added'
+                : inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined
+                ? isLocationAndDepartment
+                  ? RECORD_ADDED +
+                    ' Due to location and Department Expiry ' +
+                    inActivedatestr +
+                    ' Dates orders not added.'
+                  : isLocation
+                  ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr + ' Dates orders not added.'
+                  : RECORD_ADDED + ' Due to Department Expiry ' + inActivedatestr + ' Dates orders not added.'
+                : RECORD_ADDED
+              : 'Template ' +
                 order[0].organizationPrefix?.toString() +
                 '-' +
                 order[0].publicId?.toString() +
                 ' has been added'
-              : inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined
-              ?  isLocationAndDepartment ?  RECORD_ADDED +' Due to location and Department Expiry ' + inActivedatestr + ' Dates orders not added.'
-              : isLocation
-                ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr + ' Dates orders not added.'
-                : RECORD_ADDED + ' Due to Department Expiry ' + inActivedatestr + ' Dates orders not added.'
-              : RECORD_ADDED
           ),
           new SaveIrpOrderSucceeded(),
         ]);
-          if (documents.length) {
-            return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
-          } else {
-            return order;
-          }
+        if (documents.length) {
+          return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
+        } else {
+          return order;
+        }
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
@@ -931,7 +950,13 @@ export class OrderManagementContentState {
                 payload.organizationPrefix,
                 payload.publicId
               )
-            : new ShowToast(MessageTypes.Success, RECORD_SAVED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')),
+            : new ShowToast(
+                MessageTypes.Success,
+                RECORD_SAVED_SUCCESS_WITH_ORDERID(
+                  payload?.organizationPrefix ?? '',
+                  payload?.publicId?.toString() ?? ''
+                )
+              ),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
           new SaveLastSelectedOrganizationAgencyId(
@@ -956,13 +981,14 @@ export class OrderManagementContentState {
   ): Observable<void | Blob[] | Order[]> {
     return this.orderManagementService.editIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
-        const successMessage = internalDistributionChanged ? ChangeInternalDistributionSuccess
-        : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(order[0]?.organizationPrefix??'',order[0]?.publicId?.toString()??'');
+        const successMessage = internalDistributionChanged
+          ? ChangeInternalDistributionSuccess
+          : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(
+              order[0]?.organizationPrefix ?? '',
+              order[0]?.publicId?.toString() ?? ''
+            );
 
-        dispatch([
-          new ShowToast(MessageTypes.Success, successMessage),
-          new SaveIrpOrderSucceeded(),
-        ]);
+        dispatch([new ShowToast(MessageTypes.Success, successMessage), new SaveIrpOrderSucceeded()]);
         if (documents.length) {
           return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
         } else {
@@ -981,7 +1007,13 @@ export class OrderManagementContentState {
     return this.orderManagementService.editOrder(order, documents).pipe(
       tap((payload: Order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_MODIFIED_SUCCESS_WITH_ORDERID(payload?.organizationPrefix??'',payload?.publicId?.toString()??'')??message),
+          new ShowToast(
+            MessageTypes.Success,
+            RECORD_MODIFIED_SUCCESS_WITH_ORDERID(
+              payload?.organizationPrefix ?? '',
+              payload?.publicId?.toString() ?? ''
+            ) ?? message
+          ),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
@@ -1036,7 +1068,7 @@ export class OrderManagementContentState {
       tap(() => {
         dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new CancelOrganizationCandidateJobSuccess()]);
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error,getAllErrors(error.error))))
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
 
@@ -1045,23 +1077,21 @@ export class OrderManagementContentState {
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { id, isIRPTab, updateOpenedOrder }: ApproveOrder
   ): Observable<string | void> {
-    return this.orderManagementService
-      .approveOrder(id, isIRPTab)
-      .pipe(
-        tap(() => {
-          if (updateOpenedOrder) {
-            dispatch([new GetSelectedOrderById(id, isIRPTab), new ApproveOrderSucceeded()]);
-          }
-        }),
-        catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
-      );
+    return this.orderManagementService.approveOrder(id, isIRPTab).pipe(
+      tap(() => {
+        if (updateOpenedOrder) {
+          dispatch([new GetSelectedOrderById(id, isIRPTab), new ApproveOrderSucceeded()]);
+        }
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error)))
+    );
   }
 
   @Action(GetOrderFilterDataSources)
-  GetOrderFilterDataSources({
-    patchState,
-  }: StateContext<OrderManagementContentStateModel>,
-  { isIRP }: GetOrderFilterDataSources): Observable<OrderFilterDataSource> {
+  GetOrderFilterDataSources(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { isIRP }: GetOrderFilterDataSources
+  ): Observable<OrderFilterDataSource> {
     return this.orderManagementService.getOrderFilterDataSources(isIRP).pipe(
       tap((payload) => {
         patchState({ orderFilterDataSources: payload });
@@ -1071,9 +1101,9 @@ export class OrderManagementContentState {
   }
 
   @Action(ClearOrderFilterDataSources)
-  ClearOrderFilterDataSources(
-    { patchState }: StateContext<OrderManagementContentStateModel>
-  ): OrderManagementContentStateModel {
+  ClearOrderFilterDataSources({
+    patchState,
+  }: StateContext<OrderManagementContentStateModel>): OrderManagementContentStateModel {
     return patchState({ orderFilterDataSources: null });
   }
 
@@ -1100,7 +1130,10 @@ export class OrderManagementContentState {
   }
 
   @Action(ExportOrders)
-  ExportOrders({dispatch}: StateContext<OrderManagementContentStateModel>, { payload, tab }: ExportOrders): Observable<any> {
+  ExportOrders(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload, tab }: ExportOrders
+  ): Observable<any> {
     return this.orderManagementService.export(payload, tab).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
@@ -1111,8 +1144,11 @@ export class OrderManagementContentState {
   }
 
   @Action(ExportIRPOrders)
-  ExportIRPOrders({dispatch}: StateContext<OrderManagementContentStateModel>, { payload, tab}: ExportIRPOrders): Observable<any> {
-    return this.orderManagementService.irpexport(payload,tab).pipe(
+  ExportIRPOrders(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload, tab }: ExportIRPOrders
+  ): Observable<any> {
+    return this.orderManagementService.irpexport(payload, tab).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
@@ -1122,7 +1158,10 @@ export class OrderManagementContentState {
   }
 
   @Action(ExportOrdersJourney)
-  ExportOrdersJourney({}: StateContext<OrderManagementContentStateModel>, { payload}: ExportOrdersJourney): Observable<any> {
+  ExportOrdersJourney(
+    {}: StateContext<OrderManagementContentStateModel>,
+    { payload }: ExportOrdersJourney
+  ): Observable<any> {
     return this.orderManagementService.orderJourneyexport(payload).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
@@ -1247,9 +1286,9 @@ export class OrderManagementContentState {
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
       tap((data) => {
         const count = data.length;
-        if(count>0 && payload.perDiemIds.length===0)
+        if (count > 0 && payload.perDiemIds.length === 0)
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
-        else if(count==0 && payload.perDiemIds.length===0)
+        else if (count == 0 && payload.perDiemIds.length === 0)
           dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersSucceedMessage));
         else if(payload.perDiemIds.length===payload.orderIds.length && count === payload.perDiemIds.length)
           dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReordersucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReordersucceedcount(count)));
@@ -1273,38 +1312,40 @@ export class OrderManagementContentState {
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { orderId }: GetCandidateCancellationReason
   ): Observable<CandidateCancellationReason[] | null> {
-    return this.orderManagementService.getCandidateCancellationReasons(orderId)
-      .pipe(
-        tap((payload: CandidateCancellationReason[]) => {
-          patchState({ candidateCancellationReasons: payload });
-        }));
+    return this.orderManagementService.getCandidateCancellationReasons(orderId).pipe(
+      tap((payload: CandidateCancellationReason[]) => {
+        patchState({ candidateCancellationReasons: payload });
+      })
+    );
   }
 
   @Action(ClearCandidateCancellationReason)
-  ClearCandidateCancellationReason(
-    { patchState }: StateContext<OrderManagementContentStateModel>
-  ): void {
+  ClearCandidateCancellationReason({ patchState }: StateContext<OrderManagementContentStateModel>): void {
     patchState({ candidateCancellationReasons: null });
   }
 
-    @Action(GetOrderComments)
-    GetOrderComments(
-      { patchState }: StateContext<OrderManagementContentStateModel>,
-      { commentContainerId }: GetOrderComments
-    ): Observable<Comment[]> {
-      return this.commentService.getComments(commentContainerId, null)
-        .pipe(tap((payload) => patchState({ orderComments: payload })));
-    }
+  @Action(GetOrderComments)
+  GetOrderComments(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { commentContainerId }: GetOrderComments
+  ): Observable<Comment[]> {
+    return this.commentService
+      .getComments(commentContainerId, null)
+      .pipe(tap((payload) => patchState({ orderComments: payload })));
+  }
 
-    @Action(GetAllShifts)
-    GetAllShifts(
-      { patchState } : StateContext<OrderManagementContentStateModel>, {  } : GetAllShifts
-      ) : Observable<ScheduleShift[] |null>{
-        return this.orderManagementService.getAllShifts().pipe(tap((payload:ScheduleShift[]) => {
-          patchState({ allShifts: payload });
-          return payload
-        }));
-      }
+  @Action(GetAllShifts)
+  GetAllShifts(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    {}: GetAllShifts
+  ): Observable<ScheduleShift[] | null> {
+    return this.orderManagementService.getAllShifts().pipe(
+      tap((payload: ScheduleShift[]) => {
+        patchState({ allShifts: payload });
+        return payload;
+      })
+    );
+  }
 
       @Action(sendOnboardCandidateEmailMessage)
       sendOnboardCandidateEmailMessage(
