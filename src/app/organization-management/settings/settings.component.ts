@@ -155,6 +155,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   IsSettingKeyAvailabiltyOverLap: boolean = false;
   IsSettingKeyCreatePartialOrder: boolean = false;
   IsSettingKeyAutomatedDistributedToVMS: boolean = false;
+  IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition: boolean = false;
   SettingKeyAutomatedDistributedToVMS: string = '';
   systemButtons: ButtonModel[] = [];
   isEdit = false;
@@ -285,6 +286,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey;
     this.SettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey?data.settingKey:'';
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == data.settingKey;
+    this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == data.settingKey;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
     this.formControlType = data.controlType;
@@ -297,10 +299,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.payPeriodFormGroup.reset();
     this.store.dispatch(new ClearLocationList());
     this.store.dispatch(new ClearDepartmentList());
-    this.setFormValidation(data);
+  
     this.setFormValuesForOverride(data);
     this.store.dispatch(new ShowSideDialog(true));
-    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition) {
       this.switchedValueForm.controls["value"].setValue(4)
       this.switchedValueForm.controls['isEnabled'].setValue(true)
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
@@ -318,6 +320,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.switchedValueForm.get('value')?.clearValidators();
       this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     }
+    this.setFormValidation(data);
   }
 
   openEditSettingDialog(
@@ -340,6 +343,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.setNumericValueLabel(parentRecord.settingKey);
     this.IsSettingKeyCreatePartialOrder = OrganizationSettingKeys[OrganizationSettingKeys['CreatePartialOrder']].toString() == parentRecord.settingKey;
     this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == parentRecord.settingKey;
+    this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == parentRecord.settingKey;
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -356,10 +360,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.setChildRecordData(childRecord);
     this.setFormValuesForEdit(parentRecord, childRecord || null);
     this.store.dispatch(new ShowSideDialog(true));
-    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition) {
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    } else {
+    }     
+    else {
       this.switchedValueForm.get('value')?.clearValidators();
     }
     if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyOtHours || this.IsSettingKeyCreatePartialOrder)) {
