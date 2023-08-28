@@ -265,8 +265,9 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       result = permission && this.payAllowed ? AgencyActionBtnOnStatus.get(status) as string : '';
     } else {
       result = ActionBtnOnStatus.get(status) as string;
-    }   
-    if (result.trim() !== InvoicesActionBtn.Approve || result === undefined) {
+    }
+    const invoiceActionBtn = result.trim() === InvoicesActionBtn.Approve;
+    if (!invoiceActionBtn) {
       if (!this.payButton) {
         result = '';
       }
