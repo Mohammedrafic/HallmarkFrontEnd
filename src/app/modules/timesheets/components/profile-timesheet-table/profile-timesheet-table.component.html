@@ -1,7 +1,7 @@
 <section class="table-container">
   <div class="table-block">
     <div class="table-header">
-      <div [ngClass]="{ 'first-tab': isFirstSelected }" class="tab-wrapper">
+      <div class="tab-wrapper">
         <ejs-tab id="tab_default" #tabs (selected)="onTabSelect($event)">
           <e-tabitems>
             <e-tabitem *ngFor="let tab of tabsConfig; trackBy: trackByTitle">
