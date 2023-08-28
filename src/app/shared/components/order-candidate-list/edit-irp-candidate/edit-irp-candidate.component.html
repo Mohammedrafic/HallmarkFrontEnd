@@ -59,7 +59,8 @@
                 <ejs-datepicker
                   [id]="field.field"
                   class="datepicker"
-                  appValidateWithMessage
+                  [max]="field.maxDate"
+                  [min]="field.minDate"
                   format="MM/dd/yyyy"
                   placeholder="MM/DD/YYYY"
                   [formControlName]="field.field"

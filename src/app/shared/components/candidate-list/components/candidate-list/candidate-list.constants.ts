@@ -249,3 +249,17 @@ export const IrpCandidateExportCols: ExportColumn[] = [
   { text: 'Work Commitment', column: 'WorkCommitment' },
   { text: 'Hire Date', column: 'HireDate' },
 ];
+
+export const IrpSourcingCandidateExportCols: ExportColumn[] = [
+  { text: 'Emp Id', column: 'EmpId' },
+  { text: 'Emp Name', column: 'EmpName' },
+  { text: 'Profile Status', column: 'ProfileStatus' },
+  { text: 'Primary Skill', column: 'PrimarySkill' },
+  { text: 'Secondary Skill', column: 'SecondarySkill' },
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
+  { text: 'Work Commitment', column: 'WorkCommitment' },
+  { text: 'Hire Date', column: 'HireDate' },
+  { text: 'Source', column: 'Source' },
+  { text: 'Recruiter', column: 'Recruiter' },
+];

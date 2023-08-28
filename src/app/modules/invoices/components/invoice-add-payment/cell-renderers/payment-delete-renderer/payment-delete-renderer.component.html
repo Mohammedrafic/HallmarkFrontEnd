@@ -1,4 +1,4 @@
-<button
+<button *ngIf="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] && !isAgency)|| (userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)"
   ejs-button
   cssClass="e-flat secondary-icon-button custom-btn"
   (click)="deleteRecord()"

@@ -1,5 +1,5 @@
 <ejs-dialog
-  id="dialog"
+  id="dialog responsive"
   #sideDialog
   cssClass="dialog order-details-dialog"
   [target]="targetElement"
@@ -206,8 +206,7 @@
 <ejs-dialog
   id="extension-sidebar"
   #extensionSidebar
-  cssClass="dialog"
-  width="45%"
+  cssClass="dialog extension-dialog"
   [target]="targetElement"
   [visible]="isExtensionSidebarShown"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -220,18 +219,8 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title preview-title">Add Extension</h3>
           </div>
-          <div class="e-card-content dialog-controls">
-            <app-button
-              (clickEmitter)="closeExtensionSidebar()"
-              [type]="buttonTypeEnum.OUTLINED"
-              text="Cancel"
-            ></app-button>
-            <app-button
-              (clickEmitter)="saveExtension()"
-              [type]="buttonTypeEnum.PRIMARY"
-              [disabled]="candidate?.orderStatus === orderStatus.InProgressOfferAccepted"
-              text="Save"
-            ></app-button>
+          <div class="e-card-content dialog-controls desktop-action-btn">
+            <ng-container [ngTemplateOutlet]="actionButtons"></ng-container>
           </div>
         </div>
       </section>
@@ -240,10 +229,14 @@
       <app-extension-sidebar
         *ngIf="isExtensionSidebarShown"
         [order]="order"
-        [candidateJob]="candidateJob!"
         [orderPosition]="candidate"
         (saveEmitter)="updateGrid()"
       ></app-extension-sidebar>
+    </div>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <div class="mobile-action-btn">
+      <ng-container [ngTemplateOutlet]="actionButtons"></ng-container>
     </div>
   </ng-template>
 </ejs-dialog>
@@ -349,3 +342,22 @@
   (submitCandidateCancellation)="cancelCandidate($event)"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
 ></app-candidate-cancellation-dialog>
+
+<ng-template #actionButtons>
+  <button
+    ejs-button
+    cssClass="e-outline button-cancel action-btn"
+    (click)="closeExtensionSidebar()"
+  >
+    Cancel
+  </button>
+
+  <button
+    ejs-button
+    type="submit"
+    cssClass="e-primary action-btn"
+    (click)="saveExtension()"
+  >
+    Save
+  </button>
+</ng-template>

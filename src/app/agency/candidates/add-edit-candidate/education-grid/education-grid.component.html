@@ -1,10 +1,24 @@
-<section class="grid-component">
+<section
+  class="grid-component"
+  [class.mobile-login-on]="isMobileLoginOn"
+>
   <div class="e-gridcustomheader">
     <div class="title">
       <h3>Education</h3>
     </div>
     <div class="actions">
-      <button ejs-button *ngIf="!readonlyMode" [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditEducation]" class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Education</button>
+      <button
+        ejs-button
+        class="action-link"
+        *ngIf="!readonlyMode"
+        [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditEducation]"
+        (click)="addNew()"
+      >
+        <i-feather name="plus" class="icon"></i-feather>
+        <span class="text-btn">
+          Add Education
+        </span>
+      </button>
     </div>
   </div>
   <ejs-grid #grid class="e-gridwithheader"
@@ -15,7 +29,7 @@
             [allowResizing]="allowResizing"
             [pageSettings]="pageSettings"
             [allowSelection]="false"
-            [height]="fullScreenGridHeight"
+            [height]="(isMobile$ | async) ? mobileGridHeight : fullScreenGridHeight"
             [enableVirtualization]="false"
             (dataBound)="dataBound()">
     <e-columns>

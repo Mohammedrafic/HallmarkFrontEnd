@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy,Input, ViewChild } from '@angular/core';
+import { Component, ChangeDetectionStrategy,Input, ViewChild } from '@angular/core';
 import { AvailableEmployeeModel } from '../../models/available-employee.model';
-import { ColDef } from '@ag-grid-community/core';
 import { AgGridAngular } from '@ag-grid-community/angular';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-available-employee',
@@ -9,24 +9,20 @@ import { AgGridAngular } from '@ag-grid-community/angular';
   styleUrls: ['./available-employee.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AvailableEmployeeComponent  implements OnInit {
+export class AvailableEmployeeComponent {
   @Input() public chartData:AvailableEmployeeModel[] | undefined ;
   @Input() isDarkTheme: boolean | false;
   @Input() description: string;
   @Input() public isLoading: boolean;
   @ViewChild('availableEmployees') availableEmployees:AgGridAngular
 
-  ngOnInit(): void {
-     this.columnDefs.forEach(c => (c.menuTabs = []));
+  constructor(private readonly dashboardService: DashboardService){
   }
 
-  public rowData: AvailableEmployeeModel[] ;
-  public columnDefs:ColDef[] = [
-    { field: 'fullName', headerName:"Name of Employee",width:180},
-    { field: 'startDate', headerName:"Start Date",width:120},
-    { field: 'shiftTime', headerName:"Start Time-End Time",width:190},
-  ];
 
 
+  EmpScheduleRedirect(RowData: Object) {
+    this.dashboardService.redirect_to_schedule("/client/scheduling", RowData);
+  }
 
 }

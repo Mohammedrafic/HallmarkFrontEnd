@@ -58,6 +58,7 @@
           (selectedCells)="setSelectedCells($event)"
           (editCell)="editScheduledItem($event)"
           (selectCandidate)="selectCandidate($event)"
+          [redirectFromWidget] = "availableEmp"
           (dateRange)="datesRanges($event)"
         ></app-schedule-grid>
     </div>

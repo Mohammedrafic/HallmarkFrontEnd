@@ -18,3 +18,30 @@
 .title i-feather.icon{
     margin-right: 10px;
 }
+
+.shared-with-grid table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+.shared-with-grid table th {
+    padding: 15px;
+    border-bottom: 2px solid #e5e8ee;
+    color: #757575;
+    font-size: 12px;
+}
+.shared-with-grid table td {
+    padding: 15px;
+    border-bottom: 1px solid #e5e8ee;
+    font-size: 13px;
+}
+
+.shared-with-grid table td a {
+    font-weight: 700;
+    color: #3e7fff;
+    cursor: pointer;
+}
+
+.shared-with-grid table td.shiftTime {
+    font-weight: bold;
+}

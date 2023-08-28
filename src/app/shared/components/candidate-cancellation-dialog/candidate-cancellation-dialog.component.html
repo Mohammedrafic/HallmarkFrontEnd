@@ -4,9 +4,9 @@
   isModal="true"
   showCloseIcon="true"
   width="448"
-  height="402"
+  height="474"
   [visible]="false"
-  (close)="clearReasons()"
+  (close)="cancel()"
 >
   <ng-template #header>
     <section class="header-container">
@@ -19,7 +19,7 @@
   </ng-template>
 
   <ng-template #content>
-    <form [formGroup]="form">
+    <form *ngIf="form" [formGroup]="form">
       <div class="dropdown-container bootstrap">
         <label>Reason<span class="required">*</span></label>
         <div class="input-group dropdown">
@@ -82,6 +82,18 @@
           </div>
         </div>
       </div>
+      <div *ngIf="!isStartDateInFuture && !isReorder" class="input-container calendar">
+        <label for="actualEndDate">Actual End Date <span class="required">*</span></label>
+        <ejs-datepicker
+          id="actualEndDate"
+          class="datepicker"
+          format="MM/dd/yyyy"
+          [max]="endDateMax"
+          [min]="endDateMin"
+          placeholder="MM/DD/YYYY"
+          formControlName="actualEndDate"
+        ></ejs-datepicker>
+      </div>
     </form>
   </ng-template>
 
@@ -90,13 +102,13 @@
       <button
         ejs-button
         cssClass="e-outline"
-        (click)="onCancel()"
+        (click)="cancel()"
       >Cancel</button>
       <button
         ejs-button
         cssClass="e-danger"
         class="submit-btn"
-        (click)="onSubmit()"
+        (click)="submit()"
       >Submit</button>
     </div>
   </ng-template>

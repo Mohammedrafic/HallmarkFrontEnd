@@ -2,123 +2,126 @@
   <div class="e-card-title-wrapper">
     <div class="e-card-title">Contact Details</div>
   </div>
-  <form [formGroup]="formGroup">
-    <div class="d-flex bootstrap">
-      <div class="left-column">
-        <div class="d-flex">
-          <div class="input-container">
-            <label>Address 1</label>
-            <div class="input-group">
-              <input appValidateWithMessage
-                     formControlName="address1"
-                     class="e-input"
-                     type="text"
-                     maxlength="100"/>
-            </div>
-          </div>
-        </div>
-        <div class="d-flex">
-          <div class="dropdown-container">
-            <label>Country</label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage
-                                [fields]="optionFields"
-                                formControlName="country"
-                                [allowFiltering]="true"
-                                [dataSource]="countries">
-              </ejs-dropdownlist>
-            </div>
-          </div>
-          <div class="dropdown-container">
-            <label>State</label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage
-                                [fields]="optionFields"
-                                formControlName="state"
-                                [allowFiltering]="true"
-                                [dataSource]="states$ | async">
-              </ejs-dropdownlist>
-            </div>
-          </div>
-          <div class="input-container">
-            <label>City</label>
-            <div class="input-group">
-              <input appValidateWithMessage
-                     formControlName="city"
-                     class="e-input"
-                     type="text"
-                     maxlength="20"/>
-            </div>
-          </div>
-        </div>
-        <div class="d-flex">
-          <div class="input-container f-grow-2">
-            <label>Email<span class="required">*</span></label>
-            <div class="input-group">
-              <input appValidateWithMessage
-                     formControlName="email"
-                     class="e-input"
-                     type="text"
-                     maxlength="100"/>
-            </div>
-          </div>
-          <div class="input-container">
-            <label>Phone 1</label>
-            <div class="input-group">
-              <ejs-maskedtextbox
-                class="e-input"
-                promptChar="_"
-                mask="000-000-0000"
-                appValidateWithMessage
-                formControlName="phone1"
-                placeholder=" "
-                maxlength="10"
-              ></ejs-maskedtextbox>
-            </div>
-          </div>
-        </div>
+  <form [formGroup]="formGroup" class="form-group">
+    <div class="input-container bootstrap address-1">
+      <label>Address 1</label>
+      <div class="input-group">
+        <input
+          appValidateWithMessage
+          formControlName="address1"
+          class="e-input"
+          type="text"
+          maxlength="100"
+        />
       </div>
-      <div class="right-column">
-        <div class="d-flex">
-          <div class="input-container">
-            <label>Address 2</label>
-            <div class="input-group">
-              <input appValidateWithMessage
-                     formControlName="address2"
-                     class="e-input"
-                     type="text"
-                     maxlength="100"/>
-            </div>
-          </div>
-        </div>
-        <div class="d-flex">
-          <div class="input-container">
-            <label>Zipcode</label>
-            <div class="input-group" *ngIf="customMaskChar != ''">
-              <ejs-maskedtextbox  appValidateWithMessage type="text" mask='{{customMaskChar}}' class="e-input" formControlName="zip"></ejs-maskedtextbox>
-            </div>
-          </div>
-          <div class="input-container"></div>
-        </div>
-        <div class="d-flex">
-          <div class="input-container">
-            <label>Phone 2</label>
-            <div class="input-group">
-              <ejs-maskedtextbox
-                class="e-input"
-                promptChar="_"
-                mask="000-000-0000"
-                appValidateWithMessage
-                formControlName="phone2"
-                placeholder=" "
-                maxlength="10"
-              ></ejs-maskedtextbox>
-            </div>
-          </div>
-          <div class="input-container"></div>
-        </div>
+    </div>
+
+    <div class="input-container bootstrap address-2">
+      <label>Address 2</label>
+      <div class="input-group">
+        <input
+        appValidateWithMessage
+        formControlName="address2"
+        class="e-input"
+        type="text"
+        maxlength="100"
+      />
+      </div>
+    </div>
+
+    <div class="dropdown-container bootstrap">
+      <label>Country</label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          appValidateWithMessage
+          formControlName="country"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [dataSource]="countries"
+        ></ejs-dropdownlist>
+      </div>
+    </div>
+
+    <div class="dropdown-container bootstrap">
+      <label>State</label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          appValidateWithMessage
+          formControlName="state"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [dataSource]="states$ | async"
+        ></ejs-dropdownlist>
+      </div>
+    </div>
+
+    <div class="input-container bootstrap">
+      <label>City</label>
+      <div class="input-group">
+        <input
+          appValidateWithMessage
+          formControlName="city"
+          class="e-input"
+          type="text"
+          maxlength="20"
+        />
+      </div>
+    </div>
+
+    <div class="input-container bootstrap">
+      <label>Zipcode</label>
+      <div class="input-group" *ngIf="customMaskChar != ''">
+        <ejs-maskedtextbox
+          appValidateWithMessage
+          type="text"
+          mask="{{customMaskChar}}"
+          class="e-input"
+          formControlName="zip"
+        ></ejs-maskedtextbox>
+      </div>
+    </div>
+
+    <div class="input-container bootstrap email">
+      <label>Email<span class="required">*</span></label>
+      <div class="input-group">
+        <input
+          appValidateWithMessage
+          formControlName="email"
+          class="e-input"
+          type="text"
+          maxlength="100"
+        />
+      </div>
+    </div>
+
+    <div class="input-container bootstrap">
+      <label>Phone 1</label>
+      <div class="input-group">
+        <ejs-maskedtextbox
+          class="e-input"
+          promptChar="_"
+          mask="000-000-0000"
+          appValidateWithMessage
+          formControlName="phone1"
+          placeholder=" "
+          maxlength="10"
+        ></ejs-maskedtextbox>
+      </div>
+    </div>
+
+    <div class="input-container bootstrap">
+      <label>Phone 2</label>
+      <div class="input-group">
+        <ejs-maskedtextbox
+          class="e-input"
+          promptChar="_"
+          mask="000-000-0000"
+          appValidateWithMessage
+          formControlName="phone2"
+          placeholder=" "
+          maxlength="10"
+        ></ejs-maskedtextbox>
       </div>
     </div>
   </form>
 </div>
-

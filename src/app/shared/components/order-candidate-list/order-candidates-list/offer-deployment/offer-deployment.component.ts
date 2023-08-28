@@ -146,6 +146,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
+  
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 

@@ -130,7 +130,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   get isBillRatePending(): boolean {
     return (
-      [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard]
+      [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard, CandidatStatus.Rejected]
       .includes(this.currentCandidateApplicantStatus) && !this.isAgency);
   }
 
@@ -191,9 +191,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public comments: Comment[] = [];
   public canCreateOrder:boolean;
   private defaultApplicantStatuses: ApplicantStatus[];
-  private statuses: ApplicantStatus[];
-  public candidatePhone1RequiredValue : string = '';
-  public candidateAddressRequiredValue : string = '';
+  public candidatePhone1RequiredValue = '';
+  public candidateAddressRequiredValue = '';
 
   constructor(
     private store: Store,
@@ -212,6 +211,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.createJobStatusControl();
     this.subscribeForOrderPermissions();
     this.subscribeForJobStatus();
+
     combineLatest([
       this.onOpenEvent(),
       this.onUpdateSuccess(),
@@ -527,7 +527,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private updateOrganizationCandidateJob(status: ApplicantStatus): void {
     this.acceptForm.markAllAsTouched();
-    if (this.acceptForm.valid && this.orderCandidateJob && status) {
+    /**
+     * Due to the fact that rejected candidate disabled form has fields valid, invalid set to false by angular,
+     * we need additional variable to check if it's for candidate revert.
+     */
+    const isCandidateRevert = this.orderCandidateJob.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected;
+
+    if ((this.acceptForm.valid || isCandidateRevert) && this.orderCandidateJob && status) {
       const value = this.acceptForm.getRawValue();
       const actualDates = this.setCorrectActualDates(
         this.orderCandidateJob.reOrderDate as string,
@@ -541,7 +547,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             orderId: this.orderCandidateJob.orderId,
             jobId: this.orderCandidateJob.jobId,
             skillName: value.skillName,
-            offeredBillRate: value.hourlyRate,
+            offeredBillRate: isCandidateRevert ? this.orderCandidateJob?.candidateBillRate : value.hourlyRate,
             candidateBillRate: value.candidateBillRate,
             billRates: this.orderCandidateJob.billRates,
             ...actualDates,
@@ -569,7 +575,12 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       tap((statuses: ApplicantStatus[]) => {
         this.defaultApplicantStatuses = this.candidate?.status !== CandidatStatus.OnBoard ?
           statuses : statuses.filter(status => status.applicantStatus !== CandidatStatus.OnBoard);
-        this.jobStatus$.next(this.excludeSelectedStatus(CandidatStatus.OfferedBR));
+
+        if (this.orderCandidateJob?.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected) {
+          this.jobStatus$.next(statuses);
+        } else {
+          this.jobStatus$.next(this.excludeSelectedStatus(CandidatStatus.OfferedBR));
+        }
       })
     );
   }

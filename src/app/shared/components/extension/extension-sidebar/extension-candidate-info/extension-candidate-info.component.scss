@@ -1,4 +1,5 @@
-@import "../../../../../styles/variables/colors";
+@import 'colors';
+@import 'adaptive-response';
 
 .common-info {
   background-color: $secondary-dark-blue-50;
@@ -8,6 +9,11 @@
   grid-template-columns: 1fr 1fr;
   grid-gap: 30px;
   padding: 20px;
+
+  @media #{$max-mobile} {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
 
   .section {
     .title {

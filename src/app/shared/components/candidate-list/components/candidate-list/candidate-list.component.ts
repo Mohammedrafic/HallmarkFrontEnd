@@ -83,7 +83,7 @@ import {
 } from '../../types/candidate-list.model';
 import {
   CandidatesExportCols, CandidatesTableFilters, filterColumns,
-  IrpCandidateExportCols, IRPCandidates, IRPFilterColumns, VMSCandidates,
+  IrpCandidateExportCols, IRPCandidates, IRPFilterColumns, IrpSourcingCandidateExportCols, VMSCandidates,
 } from './candidate-list.constants';
 import { CandidateListScroll } from './candidate-list.enum';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -179,6 +179,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public selecteditmesids: any[] = [];
   public columnsToExport = CandidatesExportCols;
   public columnsToExportIrp = IrpCandidateExportCols;
+  public columnsToExportIrpSourcing = IrpSourcingCandidateExportCols;
   public exportUsers$ = new Subject<ExportedFileType>();
   public defaultFileName: string;
   public fileName: string;
@@ -406,7 +407,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    const columnMap = this.isIRP ? this.columnsToExportIrp : this.columnsToExport;
+    const columnMap = this.isIRP ? this.isSourcingEnabled ? this.columnsToExportIrpSourcing : this.columnsToExportIrp : this.columnsToExport;
     this.selecteditmesids = this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : [];
     const requestBody: CandidateListExport = {
       filterQuery: this.getFilterValues(),
@@ -429,15 +430,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public dispatchNewPage(firstDispatch = false): void {
     const candidateListRequest: CandidateListRequest = {
-      profileStatuses: [],
-      skillsIds: [],
-      regionsNames: [],
-      candidateName: null,
-      includeDeployedCandidates: false,
+      ...this.getFilterValues(),
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
       orderBy: this.orderBy,
-      tab: 0
     };
 
     this.store.dispatch(

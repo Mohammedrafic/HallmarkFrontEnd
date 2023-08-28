@@ -57,6 +57,7 @@ import { GetPreservedFiltersByPage, ResetPageFilters } from 'src/app/store/prese
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 import { BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
+import { ScheduleType } from '../../enums/schedule.enum';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -81,6 +82,9 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @Input() selectedFilters: ScheduleInt.ScheduleFilters;
   @Input() hasViewPermission = false;
   @Input() hasSchedulePermission = false;
+  @Input() set redirectFromWidget(availableEmployeeData : ScheduleInt.ScheduleCandidate | null){
+    this.emitAvailableEmp(availableEmployeeData);
+  }
 
   @Output() dateRange: EventEmitter<ScheduleInt.DateRangeOption[]> = new EventEmitter<ScheduleInt.DateRangeOption[]>();
   @Output() changeFilter: EventEmitter<ScheduleInt.ScheduleFilters> = new EventEmitter<ScheduleInt.ScheduleFilters>();
@@ -291,6 +295,15 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.selectCandidate.emit(candidate);
     this.activeTimePeriod.emit(this.activePeriod);
     this.cdr.markForCheck();
+  }
+
+  emitAvailableEmp(candidate : ScheduleInt.ScheduleCandidate | null): void {
+    if(candidate !== undefined){
+      this.datesPeriods = [...DatesPeriods,...MonthPeriod];
+      this.activePeriod = DatesRangeType.Month;
+      this.selectCandidate.emit(candidate);
+      this.cdr.markForCheck();  
+    }
   }
 
   handleMonthClick({date, candidate, cellDate }: CardClickEvent): void {
@@ -516,6 +529,10 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
 
   private setScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null): void {
+    if(scheduleData != null && this.selectedFilters?.isOnlySchedulatedCandidate === true){
+      scheduleData.items = scheduleData?.items?.filter(schedule_Data => schedule_Data.schedule?.find(day_Schedule => (day_Schedule.daySchedules?.find(schedule_Type => schedule_Type.scheduleType === ScheduleType.Book) || (day_Schedule.daySchedules.length == 0))));
+    }
+
     this.scheduleData = scheduleData;
     this.employeesTitle = scheduleData?.totalCount && scheduleData.totalCount > 1 ? 'Employees' : 'Employee';
 

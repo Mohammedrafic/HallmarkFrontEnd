@@ -56,7 +56,8 @@ export enum OrganizationSettingKeys {
   DepartmentSkillRequired,
   TimesheetSubmissionProcess,
   OvertimeCalculation,
-  AutomatedDistributionToVMS
+  AutomatedDistributionToVMS,
+  Sourcing
 }
 
 export enum OrganizationalHierarchy {

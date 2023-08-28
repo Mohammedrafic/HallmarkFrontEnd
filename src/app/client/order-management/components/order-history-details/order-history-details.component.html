@@ -25,7 +25,7 @@
       </section>      
       <div class="order-tabs">
         <ng-container>
-          <ejs-accordion expandMode='Single'>
+          <ejs-accordion expandMode='Single' (expanding)="expanding($event)">
             <e-accordionitems>              
               <e-accordionitem expanded='true'>
                 <ng-template #header>

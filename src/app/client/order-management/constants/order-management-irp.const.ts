@@ -169,6 +169,7 @@ export const ThreeDotsMenuOptions = (
   ],
   closedOrderMenu: [
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   irpIncompleteMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
@@ -255,7 +256,7 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
   {
     field: 'workCommitment',
     headerName: 'Work Commitment',
-    width: 140,
+    width: 240,
   },
   {
     field: 'actualStartDate',

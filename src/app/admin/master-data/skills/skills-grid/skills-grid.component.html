@@ -17,7 +17,7 @@
 >
   <e-columns>
     <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
-    <e-column textAlign="Right" width="60">
+    <e-column textAlign="Right" width="80">
       <ng-template #template let-data>
         <div class="row-tool-buttons" [class.hidden]=!isLoaded>
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">

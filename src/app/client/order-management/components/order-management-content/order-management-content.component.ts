@@ -475,6 +475,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   public orderLockList = orderLockList;
   private ltaOrderFlag: boolean|null = false;
+  public reorderFilledStatus:boolean = false
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -1079,9 +1080,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children?.length !== 0);
     const hasSelectedChildReorders = this.selectedItems.some((itm) => itm.reOrders?.length !== 0);
     this.selectedItems.length > 0 ? this.openregrateupdate = true : this.openregrateupdate = false;
-
+    this.reorderFilledStatus = false;
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
+        if(this.selectedItems.filter(ele=> ele.orderType == 1).length == this.selectedItems.length){
+          this.openregrateupdate = false;
+        }
         if (this.selectedItems.length === 0) {
           this.columnsToExport = [...allOrdersColumnsToExport, ...allOrdersChildColumnsToExport];
           return;
@@ -1091,6 +1095,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           : allOrdersColumnsToExport;
         break;
       case OrganizationOrderManagementTabs.PerDiem:
+        this.openregrateupdate = false
         if (this.selectedItems.length === 0) {
           this.columnsToExport = [...perDiemColumnsToExport, ...perDiemChildColumnsToExport];
           return;
@@ -1099,7 +1104,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           ? [...perDiemColumnsToExport, ...perDiemChildColumnsToExport]
           : perDiemColumnsToExport;
         break;
-      case OrganizationOrderManagementTabs.ReOrders:
+      case OrganizationOrderManagementTabs.ReOrders:        
+        if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length == this.selectedItems.length){
+          this.openregrateupdate = false;
+        }
+        if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length >0){
+          this.reorderFilledStatus = true;
+        }
         if (this.selectedItems.length === 0) {
           this.columnsToExport = [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport];
           return;
@@ -1666,7 +1677,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.createReorder(data);
         break;
       case MoreMenuType['View history']:  
-        this.OpenOrderHistoryDialog(data);        
+      this.orderDetail.next(data);      
         break;
     }
   }
@@ -2924,18 +2935,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
         this.systemGroup.selectButton({ id: orderLinkDetails?.system as OrderManagementIRPSystemId } as ButtonModel);
       });
-  }
-
-  private OpenOrderHistoryDialog(data:OrderManagement): void{
-    const orderHistoryPayload: AuditLogPayload =
-          {           
-            entityType: "order",
-            searchValue:data.id.toString()
-          };   
-          this.store.dispatch(new GetOrderAuditHistory(orderHistoryPayload));
-          this.actions$
-            .pipe(ofActionDispatched(GetOrderHistoryDetailSucceeded), take(1))
-            .subscribe(() =>this.orderDetail.next(data));   
   }
 
   @OutsideZone

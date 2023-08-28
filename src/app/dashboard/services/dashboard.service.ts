@@ -220,8 +220,8 @@ export class DashboardService {
              title: ' Average Days of Active Positions with Custom Workflow',
              chartData: lodashMapPlain(
               orderStatusesAvgDetails,
-              ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
-                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +statusName +')',
+              ({ count, statusName,average,customStatusName }: OrderStatusesAvgDetailsInfo, index: number) => ({
+                label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +customStatusName +')',
                 value: average,
                 average: count,
                 color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses] ||
@@ -460,6 +460,9 @@ export class DashboardService {
   }
   public redirect_to_expiring_credentials(url : string,startDate? : Date,  endDate? : Date, type? : number) : void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true ,startDate: startDate, endDate: endDate, type : type} });
+  }
+  public redirect_to_schedule(url : string, EmpId : Object) : void{
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , EmpId : EmpId} });
   }
 
   private getFilledPositionTrendWidgetData(filter: DashboartFilterDto): Observable<PositionTrend> {

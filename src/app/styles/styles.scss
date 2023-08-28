@@ -12,6 +12,7 @@
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 @import "adaptive-response.scss";
 @import 'controls/responsive-container.scss';
+@import 'controls/responsive-queries';
 
 html {
   height: 100%;

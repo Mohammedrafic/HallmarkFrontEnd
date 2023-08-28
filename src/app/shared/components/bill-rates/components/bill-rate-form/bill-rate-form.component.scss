@@ -1,4 +1,5 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 form {
   margin-top: 20px;
@@ -9,7 +10,8 @@ form {
   display: flex;
   align-items: center;
 
-  &__title, &__value {
+  &__title,
+  &__value {
     margin: 0;
     font-size: 14px;
     font-weight: normal;
@@ -29,10 +31,12 @@ form {
   &:not(:last-child) {
     margin-bottom: 12px;
   }
+
   .input-container,
   .dropdown-container,
   .datepicker-container {
     width: 100%;
+
     + .input-container,
     + .datepicker-container {
       margin-left: 10px;
@@ -44,4 +48,17 @@ label {
   display: inline-block;
   margin-bottom: 2px;
   line-height: 20px;
+}
+
+@media #{$max-mobile} {
+  .form-line {
+    flex-direction: column;
+    row-gap: 12px;
+
+    .input-container,
+    .dropdown-container,
+    .datepicker-container {
+      margin-left: 0 !important;
+    }
+  }
 }

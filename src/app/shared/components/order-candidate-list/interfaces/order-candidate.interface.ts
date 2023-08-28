@@ -25,6 +25,7 @@ export interface CancelIrpCandidateDto {
   organizationId: number;
   jobId: number;
   createReplacement: boolean;
+  actualEndDate: string | null
 }
 
 export interface CandidateDetails {

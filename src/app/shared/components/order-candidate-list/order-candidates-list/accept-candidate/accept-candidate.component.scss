@@ -150,3 +150,11 @@
   @include candidateMessage;
 }
 
+.dropdown {
+  display: flex;
+  align-items: center;
+
+  .e-primary {
+    margin-left: 10px;
+  }
+}
