@@ -9,6 +9,8 @@ export interface CandidateField {
   type: FieldType;
   cssClass: string;
   dataSource?: DropdownOption[];
+  maxDate?: Date | null;
+  minDate?: Date | null;
 }
 
 export interface CandidateForm {

@@ -275,4 +275,14 @@ export class DateTimeHelper {
     //get timezone from ISO string. example: "2023-01-30T09:43:32.2300926-05:00" => "-0500"
     return date.slice(-6).split(':').join('');
   }
+
+  public static isFutureDate(date: string): boolean {
+    const currentDate = new Date();
+    const inputDate = new Date(date);
+
+    currentDate.setHours(0, 0, 0, 0);
+    inputDate.setHours(0, 0, 0, 0);
+
+    return inputDate > currentDate;
+  }
 }

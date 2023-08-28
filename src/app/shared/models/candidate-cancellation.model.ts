@@ -12,4 +12,5 @@ export type JobCancellation = {
   penaltyCriteria: PenaltyCriteria;
   rate: number;
   hours: number;
+  actualEndDate: string | null;
 }

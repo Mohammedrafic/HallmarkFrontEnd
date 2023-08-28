@@ -400,6 +400,31 @@ describe('DateTimeHelper', () => {
       expect(result).toEqual(expectedResult);
     });
   });
+
+  describe('DateTimeHelper.isFutureDate', () => {
+    it('should return true for a future date', () => {
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 1);
+
+      const isFuture = DateTimeHelper.isFutureDate(futureDate.toISOString());
+
+      expect(isFuture).toBeTrue();
+    });
+
+    it('should return false for a past date', () => {
+      const isFuture = DateTimeHelper.isFutureDate('2022-08-16T00:00:00+00:00');
+
+      expect(isFuture).toBeFalse();
+    });
+
+    it('should return false for the current date', () => {
+      const currentDate = new Date();
+
+      const isFuture = DateTimeHelper.isFutureDate(currentDate.toISOString());
+
+      expect(isFuture).toBeFalse();
+    });
+  });
 });
 
 function getDateDiff(date: string, weekStartDay: Date, firstWeekDay: number): number {
