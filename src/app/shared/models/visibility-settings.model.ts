@@ -41,6 +41,7 @@ export type Department = {
   organizationId: number;
   uniqId?: string | number;
   inactiveDate?:string;
+  reactivateDate?:string;
 };
 
 export type Location = {
@@ -52,6 +53,7 @@ export type Location = {
   organizationId: number;
   uniqId?: string | number;
   inactiveDate?:string;
+  reactivateDate?:string;
 };
 
 export type Region = {
