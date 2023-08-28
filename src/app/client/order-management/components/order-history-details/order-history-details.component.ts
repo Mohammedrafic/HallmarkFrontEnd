@@ -382,7 +382,7 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
       case 6:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
-            this.store.dispatch(new GetOrderClassificationAuditHistory({ entityType: "OrderClassification", searchValue: this.orderDetail.toString() }));
+            this.store.dispatch(new GetOrderClassificationAuditHistory({ entityType: "OrderClassification", searchValue: this.orderDetail.id.toString() }));
             this.actions$.pipe(ofActionDispatched(GetOrderClassificationDetailSucceeded), take(1))
               .subscribe(() =>
                 this.viewedTab.push(expandData?.index!)
