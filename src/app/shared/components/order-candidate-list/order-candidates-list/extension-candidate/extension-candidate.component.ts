@@ -615,8 +615,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   private rewriteActualDatesWithOrder(value: AcceptJobDTO): void {
     value.actualStartDate = new Date(this.candidateJob.order.jobStartDate).toISOString();
     value.actualEndDate = new Date(this.candidateJob.order.jobEndDate).toISOString();
-    console.log(value.actualStartDate);
-    console.log(value.actualEndDate);
   }
   
   // eslint-disable-next-line max-lines-per-function
