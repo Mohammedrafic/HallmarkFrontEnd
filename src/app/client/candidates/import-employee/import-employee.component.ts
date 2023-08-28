@@ -15,8 +15,8 @@ const employeeImportConfig = {
   uploadFile: UploadEmployeeFile,
   saveImportResult:SaveEmployeeImportResult,
   uploadFileSucceeded: { instance: UploadEmployeeFileSucceeded, message: 'There are no records in the file' },
-  importTemplateSucceeded: { instance:GetEmployeeImportTemplateSucceeded, fileName: 'employee.xlsx' },
-  importErrorsSucceeded: { instance: GetEmployeeImportErrorsSucceeded, fileName: 'employee_errors.xlsx' },
+  importTemplateSucceeded: { instance:GetEmployeeImportTemplateSucceeded, fileName: 'Employee.xlsx' },
+  importErrorsSucceeded: { instance: GetEmployeeImportErrorsSucceeded, fileName: 'Employee_errors.xlsx' },
   saveImportResultSucceeded: { instance: SaveEmployeeImportResultSucceeded, message: '<n> records successfully processed.' },
   saveImportResultFailAndSucess : { instance: SaveEmployeeImportResultFailAndSucceeded, message: '<sn> records successfully processed. <fn> failed to process.' }
 };
