@@ -43,7 +43,7 @@ export const GridCellsSystemIRPTabOrderTemplate = (
         actionsConfig: [
           {
             action: () => {
-              params.context.componentParent.deleteOrder(params.data);
+              params.context.componentParent.deleteOrder(params.data.id);
             },
             iconName: 'trash-2',
             iconClass: 'color-supportive-red',
