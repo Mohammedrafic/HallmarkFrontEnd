@@ -97,7 +97,7 @@
   <div class="extension__bill-rates">
     <app-bill-rates
       #billRates
-      [billRates]="candidateJob?.billRates!"
+      [billRates]="candidateRates"
       [isActive]="true"
       [isLocal]="candidateJob?.isLocal!"
       (hourlyRateSync)="hourlyRateToOrderSync($event)"></app-bill-rates>
