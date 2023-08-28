@@ -201,6 +201,10 @@ export class SettingsDataAdapter {
         displayValue = SettingsDataAdapter
           .getPayPeriodDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, orgSystems.IRP));
         break;
+        case OrganizationSettingControlType.ATPRateCalculation:
+          displayValue=SettingsDataAdapter
+          .geATPRateCalculationdisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
+          break;
       default:
         displayValue = '';
     }
@@ -346,7 +350,11 @@ export class SettingsDataAdapter {
 
     return result;
   }
-
+  private static geATPRateCalculationdisplayValue(value: string): string {
+    const items = SettingsDataAdapter.getParsedValue(value);
+     const result=`${items.benefitPercent? items.benefitPercent : 0} , ${items.wagePercent ? items.wagePercent : 0} , ${items.costSavings ?  items.costSavings : 0}`;
+    return result;
+  }
   private static getSwitchedDisplayValue(parsedValue: any): string {
     const result = parsedValue != null && parsedValue.value && parsedValue.isEnabled ? parsedValue.value : CheckboxValue.No;
 
