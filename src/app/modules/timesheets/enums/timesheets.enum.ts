@@ -92,7 +92,9 @@ export enum TimesheetsTableColumns {
   StartDate = 'startDate',
   Department = 'department',
   BillRate = 'billRate',
-  AgencyName = 'agencyName',
+  AgencyName = 'agencyName',  
+  TimesheetApprover = 'approverName',
+  TimesheetApproverList = 'approverNameList',
   TotalDays = 'totalDays',
   Controls = 'controls',
 }
