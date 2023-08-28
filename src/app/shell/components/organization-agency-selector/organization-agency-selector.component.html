@@ -3,12 +3,12 @@
     <ejs-dropdownlist
       id="organization-agency-dropdown"
       cssClass="organization-agency-dropdown-popup"
-      [allowFiltering]="true"
       filterBarPlaceholder="Search"
+      popupHeight="402px"
+      [allowFiltering]="true"
       [fields]="optionFields"
       [dataSource]="organizationsAgencies$ | async"
       [formControl]="organizationAgencyControl"
-      popupHeight="402px"
       (select)="selectBusinesUnitType()"
     >
       <ng-template #itemTemplate let-data>
@@ -34,7 +34,7 @@
             />
           </div>
 
-          <p class="title" [ngClass]="{inactive: data.status === agencyStatuses.Terminated}">{{ data.name }}</p>
+          <p class="organization-agency-title" [ngClass]="{inactive: data.status === agencyStatuses.Terminated}">{{ data.name }}</p>
         </div>
       </ng-template>
     </ejs-dropdownlist>

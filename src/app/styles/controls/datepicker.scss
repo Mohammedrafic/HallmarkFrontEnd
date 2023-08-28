@@ -85,7 +85,7 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
       .e-input-group-icon.e-range-icon.e-icons::before,
       .e-input-group-icon.e-range-icon.e-icons::after,
       .e-input-group-icon.e-date-icon.e-icons::before,
-      .e-input-group-icon.e-date-icon.e-icons::after{
+      .e-input-group-icon.e-date-icon.e-icons::after {
         background-color: transparent;
         color: $primary-active-blue-10;
       }
@@ -98,7 +98,7 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
       .e-input-group-icon.e-range-icon.e-icons::before,
       .e-input-group-icon.e-range-icon.e-icons::after,
       .e-input-group-icon.e-date-icon.e-icons::before,
-      .e-input-group-icon.e-date-icon.e-icons::after{
+      .e-input-group-icon.e-date-icon.e-icons::after {
         background-color: transparent;
         color: $primary-active-blue-10;
       }
@@ -117,14 +117,14 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
     background: transparent !important;
   }
 
-  .e-input-group.e-control-wrapper.e-float-input .e-float-text::after{
+  .e-input-group.e-control-wrapper.e-float-input .e-float-text::after {
     content: "*";
     color: $supportive-red;
   }
 
   &.ng-touched.ng-invalid {
-    span.e-input-group  {
-      border-color: $supportive-red  !important;
+    span.e-input-group {
+      border-color: $supportive-red !important;
     }
   }
 
@@ -152,8 +152,16 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
 }
 
 body.dark {
-  ejs-datepicker.datepicker, ejs-daterangepicker.e-daterangepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-datetimepicker {
-    .e-input-group.e-control-wrapper.e-date-wrapper, .e-input-group.e-control-wrapper.e-time-wrapper, .e-input-group.e-control-wrapper.e-datetime-wrapper, .e-input-group.e-control-wrapper.e-date-range-wrapper {
+  ejs-datepicker.datepicker,
+  ejs-daterangepicker.e-daterangepicker,
+  ejs-timepicker.e-timepicker,
+  ejs-datetimepicker.e-datetimepicker {
+
+    .e-input-group.e-control-wrapper.e-date-wrapper,
+    .e-input-group.e-control-wrapper.e-time-wrapper,
+    .e-input-group.e-control-wrapper.e-datetime-wrapper,
+    .e-input-group.e-control-wrapper.e-date-range-wrapper {
+
       .e-input[readonly],
       .e-input[readonly] ~ span.e-input-group-icon {
         background-color: transparent !important;
@@ -166,13 +174,14 @@ body.dark {
       }
     }
   }
-}
 
-body.dark .e-datepicker.e-popup-wrapper.e-lib.e-popup.e-control.e-popup-open {
-  .e-day {
-    &:hover {
-      background-color: $primary-active-blue-80 !important;
-      color: $black;
+  .e-datepicker.e-popup-wrapper.e-lib.e-popup.e-control.e-popup-open,
+  .e-daterangepicker.e-popup.e-control.e-lib.e-popup-open.e-keyboard {
+    .e-cell:hover {
+      .e-day {
+        background-color: $primary-active-blue-80 !important;
+        color: $black;
+      }
     }
   }
 }

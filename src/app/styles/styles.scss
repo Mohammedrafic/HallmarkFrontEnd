@@ -319,16 +319,6 @@ body {
       }
     }
 
-    #organization-agency-dropdown .e-input-group {
-      background: $background !important;
-      color: $white;
-    }
-
-    #organization-agency-dropdown .e-input-group:hover {
-      background: $primary-active-blue-70 !important;
-      color: $primary-active-blue-10;
-    }
-
     .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
       &:hover {
         background: transparent !important;

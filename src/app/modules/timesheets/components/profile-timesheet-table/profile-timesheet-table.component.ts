@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef,
-  EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
+  EventEmitter, Input, NgZone, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, of, Subject, takeUntil } from 'rxjs';
@@ -40,6 +40,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { UserState } from 'src/app/store/user.state';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { SettingsViewService } from '@shared/services';
+import { OutsideZone } from '@core/decorators';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -112,8 +113,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   public currentTab: RecordFields = RecordFields.Time;
 
   public readonly tableTypes = RecordFields;
-
-  public isFirstSelected = true;
 
   public readonly modeValues = RecordsMode;
 
@@ -217,6 +216,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     private breakpointObserver: BreakpointObserver,
     private settingsViewService: SettingsViewService,
     private actions$: Actions,
+    private ngZone: NgZone,
   ) {
     super();
     this.context = {
@@ -247,6 +247,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.adjustColumnWidth();
     this.initResizeObserver();
     this.listenResizeContent();
+    this.asyncRefresh();
   }
 
   public override ngOnDestroy(): void {
@@ -255,8 +256,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public onTabSelect(selectEvent: SelectingEventArgs): void {
-    this.isFirstSelected = false;
-
     if (!this.isChangesSaved && (this.slectingindex !== selectEvent.selectedIndex)) {
       this.confirmService.confirm(TimesheetConfirmMessages.confirmTabChange, {
         title: 'Unsaved Progress',
@@ -432,6 +431,14 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.store.dispatch(new TimesheetDetails.RecalculateTimesheets(this.timesheetDetails.jobId));
     });
   }
+
+  @OutsideZone
+  private asyncRefresh(): void {
+    setTimeout(() => {
+      this.tabs.refreshActiveTabBorder();
+    });
+  }
+
 
   private selectTab(index: number): void {
     this.changeColDefs(index);
