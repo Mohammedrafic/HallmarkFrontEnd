@@ -2733,7 +2733,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filterColumns.reorderStatuses.dataSource = data.reorderStatuses;
     this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
     this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-    const candidatesOrderStatusList = JSON.parse(this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') || '');
+    const candidatesOrderStatusList =  this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') ? JSON.parse(this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') || '') :'';
     if(candidatesOrderStatusList != ''){
       const candstatuses = this.filterColumns.candidateStatuses.dataSource.filter((f: { status: any; })=>candidatesOrderStatusList.map((m: { value: any; })=>m.value).includes(f.status))
       const candidateStatuses = candstatuses.map((m: { filterStatus: any; })=>m.filterStatus);
@@ -2743,6 +2743,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.candidateStatusIds.push(candidateStatuses)
       })
       this.documentEle.defaultView?.localStorage.setItem('candidateStatusListFromDashboard', JSON.stringify(''));
+    }
+    const orderTypeInWidget = this.globalWindow.localStorage.getItem('orderTypeFromDashboard') ? JSON.parse(this.globalWindow.localStorage.getItem('orderTypeFromDashboard') || '') :'';
+    if(orderTypeInWidget != ''){
+      this.filters.orderTypes = [OrderType.LongTermAssignment,OrderType.ContractToPerm];
+      this.documentEle.defaultView?.localStorage.setItem('orderTypeFromDashboard', '');
     }
   }
 
@@ -3005,6 +3010,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       );
       for (var i = 0; i < liCollections.length; i++) {
         if ((liCollections[i] as any).innerText != 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+    else if(orderStatus != 'OrdersOpenPositions' && orderStatus.length != 0){
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText == 'Order(s) - Open Positions') {
           liCollections[i].classList.add('e-disabled');
           liCollections[i].classList.add('e-overlay');
         }

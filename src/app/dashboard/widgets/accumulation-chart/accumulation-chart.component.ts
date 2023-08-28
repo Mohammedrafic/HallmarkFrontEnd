@@ -94,10 +94,11 @@ export class AccumulationChartComponent
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
+        window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
         if(OrderStatus[OrderStatus.Open] ===  status){
           this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
         }
-        else if(status === 'In Progress'){
+        else if(status === PositionTrendTypeEnum.IN_PROGRESS){
           candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
           candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
         }
