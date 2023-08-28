@@ -2719,10 +2719,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       candidateStatuses = data.candidateStatuses.filter((status) => ReorderCandidateStatuses.includes(status.status));
     } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
       statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
-        !PerDiemDefaultStatuses.includes(status.status)
+        ![PerDiemDefaultStatuses,FilterOrderStatusText.OrdersOpenPositions].includes(status.status)
       );
       candidateStatuses = data.candidateStatuses.filter((status) => StatusesByDefault.includes(status.status));
-    } else if (this.orgpendingOrderapproval === LocalStorageStatus.OrdersforApproval) {
+    }
+    else if (this.activeTab === OrganizationOrderManagementTabs.PermPlacement || this.activeTab === OrganizationOrderManagementTabs.Incomplete) {
+      statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
+        ![FilterOrderStatusText.OrdersOpenPositions].includes(status.status)
+      );
+      candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
+    }
+     else if (this.orgpendingOrderapproval === LocalStorageStatus.OrdersforApproval) {
       if (this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
         statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
           !AllOrdersDefaultStatuses.includes(status.status)
@@ -2749,6 +2756,22 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filterColumns.reorderStatuses.dataSource = data.reorderStatuses;
     this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
     this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
+    const candidatesOrderStatusList =  this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') ? JSON.parse(this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') || '') :'';
+    if(candidatesOrderStatusList != ''){
+      const candstatuses = this.filterColumns.candidateStatuses.dataSource.filter((f: { status: any; })=>candidatesOrderStatusList.map((m: { value: any; })=>m.value).includes(f.status))
+      const candidateStatuses = candstatuses.map((m: { filterStatus: any; })=>m.filterStatus);
+      this.numberArr = [];
+      candidateStatuses.forEach((candidateStatuses:any)=>{
+        this.numberArr.push(candidateStatuses);
+        this.candidateStatusIds.push(candidateStatuses)
+      })
+      this.documentEle.defaultView?.localStorage.setItem('candidateStatusListFromDashboard', JSON.stringify(''));
+    }
+    const orderTypeInWidget = this.globalWindow.localStorage.getItem('orderTypeFromDashboard') ? JSON.parse(this.globalWindow.localStorage.getItem('orderTypeFromDashboard') || '') :'';
+    if(orderTypeInWidget != ''){
+      this.filters.orderTypes = [OrderType.LongTermAssignment,OrderType.ContractToPerm];
+      this.documentEle.defaultView?.localStorage.setItem('orderTypeFromDashboard', '');
+    }
   }
 
   private prepareFiltersToDispatch(state: OrderFilter): void {
@@ -2965,5 +2988,54 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     setTimeout(() => {
       this.gridApi?.selectIndex(0, false, false);
     }, 300);
+  }
+  public onSelect(args:any) {
+    if (args.itemData.status == 'OrdersOpenPositions') {
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText != 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+    else{
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText == 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+  }
+  public orderStatusSelect(){
+    let orderStatus = this.OrderFilterFormGroup.get("orderStatuses")?.value;
+    if (orderStatus == 'OrdersOpenPositions') {
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText != 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+    else if(orderStatus != 'OrdersOpenPositions' && orderStatus.length != 0){
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText == 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
   }
 }
