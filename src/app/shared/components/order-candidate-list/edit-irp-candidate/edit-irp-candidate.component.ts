@@ -9,6 +9,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { FormControl, Validators } from '@angular/forms';
 
 import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -26,7 +27,12 @@ import {
 import { FieldType } from '@core/enums';
 import { EditIrpCandidateService } from '@shared/components/order-candidate-list/edit-irp-candidate/services';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CANCEL_CONFIRM_TEXT, CLOSE_IRP_POSITION, DELETE_CONFIRM_TITLE, RECORD_MODIFIED } from '@shared/constants';
+import {
+  CANCEL_CONFIRM_TEXT,
+  CLOSE_IRP_POSITION,
+  DELETE_CONFIRM_TITLE,
+  RECORD_MODIFIED,
+} from '@shared/constants';
 import { CandidateField, CandidateForm } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -97,6 +103,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   @Input() CanOrganizationEditOrdersIRP: boolean;
 
   private candidateModelState: EditCandidateDialogState;
+  private endDateFormControlValue: Date;
+  private candidateDetails: CandidateDetails;
 
   constructor(
     private editIrpCandidateService: EditIrpCandidateService,
@@ -253,6 +261,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     .pipe(
         filter(Boolean),
         tap((candidateDetails: CandidateDetails) => {
+          this.candidateDetails = candidateDetails;
           this.candidateCommentContainerId = candidateDetails.commentContainerId;
           this.getComments();
           const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
@@ -317,7 +326,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private watchForActualDateValues(): void {
     this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
       filter((value: string) => {
-        return !!value && this.candidateModelState.order.orderType === OrderType.LongTermAssignment;
+        return !!value && this.candidateModelState.order.orderType === OrderType.LongTermAssignment
+          && this.candidateForm.get('status')?.value !== CandidatStatus.Cancelled;
       }),
       skip(1),
       distinctUntilChanged(),
@@ -335,12 +345,24 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
       this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
     });
+
+    this.candidateForm.get('actualEndDate')?.valueChanges.pipe(
+      distinctUntilChanged(),
+      takeUntil(this.componentDestroy()),
+    ).subscribe((date: Date) => {
+      this.setIsClosedFormControlState(this.candidateForm.get('status')?.value, date);
+      this.cdr.markForCheck();
+    });
   }
 
   private hideDialog(): void {
     this.handleCloseModal.emit(false);
     this.candidateDialog.hide();
     this.disableSaveButton = false;
+    this.removeEndDateControlLimitations(
+      this.candidateForm.get('actualEndDate') as FormControl,
+      this.getConfigField('actualEndDate')
+    );
     this.candidateForm.reset();
   }
 
@@ -362,6 +384,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.cdr.markForCheck();
     });
   }
+
   private observeStatusControl(): void {
     this.candidateForm.get('status')?.valueChanges
     .pipe(
@@ -370,15 +393,15 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     )
     .subscribe((value) => {
      this.isAppliedorShortlisted = value === CandidatStatus.Applied || value === CandidatStatus.Shortlisted;
-     this.showactualStartEndDate= value === CandidatStatus.OnBoard;
+     this.showactualStartEndDate = value === CandidatStatus.OnBoard
+       || value === CandidatStatus.Cancelled ||value === CandidatStatus.Offboard;
      this.candidateForm.get('availableStartDate')?.patchValue(
        DateTimeHelper.setCurrentTimeZone(this.availableStartDate as string), { emitEvent: false, onlySelf: true }
      );
-      this.cdr.markForCheck();
+     this.handleCancelledStatus(value);
+     this.cdr.markForCheck();
   });
   }
-
-
 
   private setStatusSourceForDisabled(jobStatus: {
     applicantStatus: number;
@@ -426,5 +449,65 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private disableDialogControls(): void {
     this.disableSaveButton = true;
     this.candidateForm.disable();
+  }
+
+  private handleCancelledStatus(status: CandidatStatus): void {
+    if (!status) {
+      return;
+    }
+
+    const endDateFormControl = this.candidateForm.get('actualEndDate');
+    const startDateFormControl = this.candidateForm.get('actualStartDate');
+    const endDateConfigField = this.getConfigField('actualEndDate');
+
+    if (status === CandidatStatus.Cancelled) {
+      startDateFormControl?.disable();
+      endDateConfigField.required = true;
+      endDateConfigField.minDate = this.candidateDetails?.actualStartDate
+        ? new Date(this.candidateDetails.actualStartDate) : null;
+      endDateConfigField.maxDate = this.candidateDetails?.actualEndDate
+        ? new Date(this.candidateDetails.actualEndDate) : null;
+      this.endDateFormControlValue = endDateFormControl?.value;
+      endDateFormControl?.reset();
+      endDateFormControl?.setValidators([Validators.required]);
+    } else {
+      this.removeEndDateControlLimitations(endDateFormControl as FormControl, endDateConfigField);
+      endDateFormControl?.setValue(this.endDateFormControlValue);
+      startDateFormControl?.enable();
+    }
+
+    endDateFormControl?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+  }
+
+  private setIsClosedFormControlState(status: CandidatStatus, endDate: Date): void {
+    if (!status) {
+      return;
+    }
+
+    const isClosedFormControl = this.candidateForm.get('isClosed');
+    const closeDateConfigField = this.getConfigField('closeDate');
+    if (status === CandidatStatus.Cancelled && (!endDate || !DateTimeHelper.isFutureDate(endDate.toISOString()))) {
+      isClosedFormControl?.setValue(false);
+      isClosedFormControl?.disable();
+    } else {
+      isClosedFormControl?.enable();
+    }
+
+    if (status === CandidatStatus.Cancelled && endDate && DateTimeHelper.isFutureDate(endDate.toISOString())) {
+      closeDateConfigField.maxDate = endDate;
+    } else {
+      closeDateConfigField.maxDate = null;
+    }
+  }
+
+  private removeEndDateControlLimitations(endDateFormControl: FormControl, endDateConfigField: CandidateField): void {
+    endDateConfigField.required = false;
+    endDateConfigField.minDate = null;
+    endDateConfigField.maxDate = null;
+    endDateFormControl.setValidators([]);
+  }
+
+  private getConfigField(field: string): CandidateField {
+    return this.dialogConfig.find((item) => item.field === field) as CandidateField;
   }
 }

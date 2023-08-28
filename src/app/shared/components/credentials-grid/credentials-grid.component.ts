@@ -40,9 +40,8 @@ import { CandidateState } from '@agency/store/candidate.state';
 import { CredentialGridService } from '@agency/services/credential-grid.service';
 import { AbstractGridConfigurationComponent } from
   '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { 
-  DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED, RECORD_MODIFIED
-} from '@shared/constants/messages';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED, RECORD_MODIFIED } from
+  '@shared/constants/messages';
 import { optionFields } from '@shared/constants';
 import { FileStatusCode } from '@shared/enums/file.enum';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -461,7 +460,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  public removeCredential(event: MouseEvent, data: CandidateCredential) {
+  public removeCredential(event: MouseEvent, data: any) {
     event.stopPropagation();
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
@@ -536,14 +535,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       });
   }
 
-  private getFileToUpload(): Blob | null {
-    if (this.uploadObj.filesData[0]?.statusCode === FileStatusCode.Valid) {
-      return this.uploadObj.filesData[0].rawFile as Blob;
-    }
-
-    return null;
-  }
-
   private saveCredential({
     status,
     number,
@@ -563,45 +554,37 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         createdUntil = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdUntil));
       }
 
-      const file = this.getFileToUpload();
-
       if (this.isOrganizationAgencyArea.isAgencyArea) {
         this.store.dispatch(
-          new SaveCandidatesCredential(
-            {
-              status,
-              number,
-              insitute,
-              experience,
-              createdOn,
-              createdUntil,
-              completedDate,
-              rejectReason,
-              masterCredentialId: this.masterCredentialId,
-              id: this.credentialId as number,
-              orderId: this.orderId,
-              organizationId: this.organizatonId,
-            },
-            file,
-          )
+          new SaveCandidatesCredential({
+            status,
+            number,
+            insitute,
+            experience,
+            createdOn,
+            createdUntil,
+            completedDate,
+            rejectReason,
+            masterCredentialId: this.masterCredentialId,
+            id: this.credentialId as number,
+            orderId: this.orderId,
+            organizationId: this.organizatonId,
+          })
         );
       } else {
         this.store.dispatch(
-          new SaveCandidatesCredential(
-            {
-              candidateProfileId: this.candidateProfileId,
-              masterCredentialId: this.masterCredentialId,
-              id: this.credentialId as number,
-              status,
-              rejectReason,
-              credentialNumber: number,
-              certifiedOn: createdOn,
-              certifiedUntil: createdUntil,
-              completedDate,
-              credentialType: this.credentialType,
-            },
-            file,
-          )
+          new SaveCandidatesCredential({
+            candidateProfileId: this.candidateProfileId,
+            masterCredentialId: this.masterCredentialId,
+            id: this.credentialId as number,
+            status,
+            rejectReason,
+            credentialNumber: number,
+            certifiedOn: createdOn,
+            certifiedUntil: createdUntil,
+            completedDate,
+            credentialType: this.credentialType,
+          })
         );
       }
     }
@@ -689,6 +672,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         this.credentialId = credential.payload.id as number;
         this.disabledCopy = false;
         this.selectedItems = [];
+        if (this.uploadObj.filesData[0]?.statusCode === FileStatusCode.Valid) {
+          this.store.dispatch(
+            new UploadCredentialFiles([this.uploadObj.filesData[0].rawFile as Blob], this.credentialId)
+          );
+          return;
+        }
 
         if (this.removeExistingFiles) {
           this.store.dispatch(new UploadCredentialFiles([], this.credentialId));

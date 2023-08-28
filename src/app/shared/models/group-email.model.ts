@@ -1,6 +1,4 @@
 import { GroupMailStatus } from "@admin/alerts/group-email.enum";
-import { StringMap } from "@angular/compiler/src/compiler_facade_interface";
-import { type } from "os";
 import { PageOfCollections } from "./page.model";
 
 export type GroupEmail = {
@@ -24,7 +22,7 @@ export type GroupEmail = {
   export type GroupEmailByBusinessUnitIdPage = PageOfCollections<GroupEmail>;
   export type GroupEmailFilters = {
   };
-  export type SendGroupEmailRequest = {  
+  export type SendGroupEmailRequest = {
     subjectMail:string,
     bodyMail:string,
     toList:string |null,

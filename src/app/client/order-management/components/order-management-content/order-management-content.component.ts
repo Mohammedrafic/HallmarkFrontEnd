@@ -1677,7 +1677,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.createReorder(data);
         break;
       case MoreMenuType['View history']:  
-        this.OpenOrderHistoryDialog(data);        
+      this.orderDetail.next(data);      
         break;
     }
   }
@@ -1794,6 +1794,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast && !this.preservedOrderService.isOrderPreserved()) {
         this.clearFilters();
       }
+
+      this.openDetails.next(false);
 
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
@@ -2935,18 +2937,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
         this.systemGroup.selectButton({ id: orderLinkDetails?.system as OrderManagementIRPSystemId } as ButtonModel);
       });
-  }
-
-  private OpenOrderHistoryDialog(data:OrderManagement): void{
-    const orderHistoryPayload: AuditLogPayload =
-          {           
-            entityType: "order",
-            searchValue:data.id.toString()
-          };   
-          this.store.dispatch(new GetOrderAuditHistory(orderHistoryPayload));
-          this.actions$
-            .pipe(ofActionDispatched(GetOrderHistoryDetailSucceeded), take(1))
-            .subscribe(() =>this.orderDetail.next(data));   
   }
 
   @OutsideZone

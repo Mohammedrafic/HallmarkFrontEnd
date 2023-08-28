@@ -512,7 +512,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   private getRealBusinessUnitType(businessUnit: BusinessUnitType) {
     businessUnit = (this.activeSystem == OrderManagementIRPSystemId.IRP && 
-    businessUnit === BusinessUnitType.Candidates) ? BusinessUnitType.Organization : businessUnit;
+    businessUnit === BusinessUnitType.Candidates) ?businessUnit : BusinessUnitType.Organization ;
     return businessUnit;
   }
 

@@ -191,9 +191,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public comments: Comment[] = [];
   public canCreateOrder:boolean;
   private defaultApplicantStatuses: ApplicantStatus[];
-  private statuses: ApplicantStatus[];
-  public candidatePhone1RequiredValue : string = '';
-  public candidateAddressRequiredValue : string = '';
+  public candidatePhone1RequiredValue = '';
+  public candidateAddressRequiredValue = '';
 
   constructor(
     private store: Store,
@@ -212,6 +211,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.createJobStatusControl();
     this.subscribeForOrderPermissions();
     this.subscribeForJobStatus();
+
     combineLatest([
       this.onOpenEvent(),
       this.onUpdateSuccess(),
@@ -547,7 +547,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             orderId: this.orderCandidateJob.orderId,
             jobId: this.orderCandidateJob.jobId,
             skillName: value.skillName,
-            offeredBillRate: value.hourlyRate,
+            offeredBillRate: isCandidateRevert ? this.orderCandidateJob?.candidateBillRate : value.hourlyRate,
             candidateBillRate: value.candidateBillRate,
             billRates: this.orderCandidateJob.billRates,
             ...actualDates,
@@ -575,7 +575,12 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       tap((statuses: ApplicantStatus[]) => {
         this.defaultApplicantStatuses = this.candidate?.status !== CandidatStatus.OnBoard ?
           statuses : statuses.filter(status => status.applicantStatus !== CandidatStatus.OnBoard);
-        this.jobStatus$.next(this.excludeSelectedStatus(CandidatStatus.OfferedBR));
+
+        if (this.orderCandidateJob?.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected) {
+          this.jobStatus$.next(statuses);
+        } else {
+          this.jobStatus$.next(this.excludeSelectedStatus(CandidatStatus.OfferedBR));
+        }
       })
     );
   }

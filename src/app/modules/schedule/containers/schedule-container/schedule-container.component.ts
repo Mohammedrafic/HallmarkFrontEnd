@@ -413,7 +413,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
         startDate : this.scheduleFilters.startDate
       };
       this.globalWindow.localStorage.setItem('Schedule_Export',JSON.stringify(state));
-      window.open(window.location.origin + '/schedule-export', '_blank');
+      if(window.location.pathname.includes("ui")){
+        window.open(window.location.origin + '/ui/schedule-export', '_blank');
+      } else {
+        window.open(window.location.origin + '/schedule-export', '_blank');
+      }
     });
   }
 

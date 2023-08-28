@@ -1,10 +1,10 @@
 import { ColDef, FilterChangedEvent, GridOptions } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { GetOrderBillRatesAuditHistory, GetOrderClassificationAuditHistory, GetOrderContactAuditHistory, GetOrderCredentialAuditHistory, GetOrderJobDistributionAuditHistory, GetOrderWorkLocationAuditHistory } from '@client/store/order-managment-content.actions';
+import { GetOrderAuditHistory, GetOrderBillRatesAuditHistory, GetOrderClassificationAuditHistory, GetOrderClassificationDetailSucceeded, GetOrderContactAuditHistory, GetOrderCredentialAuditHistory, GetOrderHistoryDetailSucceeded, GetOrderJobDistributionAuditHistory, GetOrderWorkLocationAuditHistory } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { GlobalWindow } from '@core/tokens';
-import { Actions, Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
@@ -13,11 +13,12 @@ import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { ExportColumn } from '@shared/models/export.model';
 import { AuditLogPayload, OrderAuditHistory, OrderBillRateAuditHistory, OrderClassificationAuditHistory, OrderContactAuditHistory, OrderCredentialAuditHistory, OrderJobDistributionAuditHistory, OrderManagement, OrderWorkLocationAuditHistory } from '@shared/models/order-management.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { Observable, Subject, take, takeUntil, takeWhile } from 'rxjs';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { OrderAuditHistoryTableColumnsDefinition, OrderBillRatesAuditHistoryTableColumnsDefinition, OrderClassificationAuditHistoryTableColumnsDefinition, OrderContactAuditHistoryTableColumnsDefinition, OrderCredentialAuditHistoryTableColumnsDefinition, OrderJobDistributionAuditHistoryTableColumnsDefinition, OrderWorkLocationAuditHistoryTableColumnsDefinition } from './order-history-details.constant';
 import { orderMatchColorClasses } from '@shared/components/credentials-grid/order-match-column/order-match-column.constants';
 import { AppState } from 'src/app/store/app.state';
+import { ExpandEventArgs } from '@syncfusion/ej2-angular-navigations';
 
 @Component({
   selector: 'app-order-history-details',
@@ -25,18 +26,19 @@ import { AppState } from 'src/app/store/app.state';
   styleUrls: ['./order-history-details.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-  export class OrderHistoryDetailsComponent extends AbstractPermissionGrid implements OnInit,OnDestroy {
-  @ViewChild('sideDialog') sideDialog: DialogComponent; 
+export class OrderHistoryDetailsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
+  @ViewChild('sideDialog') sideDialog: DialogComponent;
   @Input() order: Subject<OrderManagement>;
   private unsubscribe$: Subject<void> = new Subject();
   public gridApi: any;
-  public CredentialAuditGridApi:any;
-  public BillRatesAuditGridApi:any;
-  public OrderContactAuditHistoryApi:any;
-  public OrderWorkLocationAuditHistoryApi:any;
-  public OrderJobDistributionAuditHistoryApi:any;
-  public OrderClassificationAuditHistoryApi:any;
+  public CredentialAuditGridApi: any;
+  public BillRatesAuditGridApi: any;
+  public OrderContactAuditHistoryApi: any;
+  public OrderWorkLocationAuditHistoryApi: any;
+  public OrderJobDistributionAuditHistoryApi: any;
+  public OrderClassificationAuditHistoryApi: any;
   private isAlive: boolean = true;
+  viewedTab: number[] = [];
   @Select(OrderManagementContentState.getOrderAuditHistoryDetails)
   orderHistoryDetails$: Observable<OrderAuditHistory[]>;
 
@@ -57,153 +59,88 @@ import { AppState } from 'src/app/store/app.state';
 
   @Select(OrderManagementContentState.getOrderClassificationAuditHistory)
   OrderClassificationAuditHistory$: Observable<OrderClassificationAuditHistory[]>;
-  
+
   @Select(AppState.getMainContentElement)
   public readonly targetElement$: Observable<HTMLElement | null>;
   public targetElement: HTMLElement = document.body;
   public optionFields = OPTION_FIELDS;
-  public orderDetail:any;
+  public orderDetail: any;
   OrderAuditHistoryDetails: Array<OrderAuditHistory> = [];
-  OrderCredentialAuditHistoryDetails:Array<OrderCredentialAuditHistory>=[];
-  OrderBillRatesAuditHistoryDetails:Array<OrderBillRateAuditHistory>=[];
-  OrderContactAuditHistoryDetails:Array<OrderContactAuditHistory>=[];
-  OrderWorkLocationAuditHistoryDetails:Array<OrderWorkLocationAuditHistory>=[];
-  OrderJobDistributionAuditHistoryDetails:Array<OrderJobDistributionAuditHistory>=[];
-  OrderClassificationAuditHistoryDetails:Array<OrderClassificationAuditHistory>=[];
+  OrderCredentialAuditHistoryDetails: Array<OrderCredentialAuditHistory> = [];
+  OrderBillRatesAuditHistoryDetails: Array<OrderBillRateAuditHistory> = [];
+  OrderContactAuditHistoryDetails: Array<OrderContactAuditHistory> = [];
+  OrderWorkLocationAuditHistoryDetails: Array<OrderWorkLocationAuditHistory> = [];
+  OrderJobDistributionAuditHistoryDetails: Array<OrderJobDistributionAuditHistory> = [];
+  OrderClassificationAuditHistoryDetails: Array<OrderClassificationAuditHistory> = [];
   public columnsToExport: ExportColumn[];
   sideBar = SideBarConfig;
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
-  };  
+  };
 
   public readonly OrdercolumnDefinitions: ColumnDefinitionModel[] = OrderAuditHistoryTableColumnsDefinition();
   public readonly CredentialcolumnDefinitions: ColumnDefinitionModel[] = OrderCredentialAuditHistoryTableColumnsDefinition();
   public readonly BillRatecolumnDefinitions: ColumnDefinitionModel[] = OrderBillRatesAuditHistoryTableColumnsDefinition();
   public readonly ContactcolumnDefinitions: ColumnDefinitionModel[] = OrderContactAuditHistoryTableColumnsDefinition();
   public readonly WorkLocationcolumnDefinitions: ColumnDefinitionModel[] = OrderWorkLocationAuditHistoryTableColumnsDefinition();
-  public readonly JobDistributioncolumnDefinitions:ColumnDefinitionModel[]=OrderJobDistributionAuditHistoryTableColumnsDefinition();
-  public readonly ClassificationcolumnDefinitions:ColumnDefinitionModel[]=OrderClassificationAuditHistoryTableColumnsDefinition();
-  
-  defaultColDef: ColDef = DefaultUserGridColDef; 
+  public readonly JobDistributioncolumnDefinitions: ColumnDefinitionModel[] = OrderJobDistributionAuditHistoryTableColumnsDefinition();
+  public readonly ClassificationcolumnDefinitions: ColumnDefinitionModel[] = OrderClassificationAuditHistoryTableColumnsDefinition();
+
+  defaultColDef: ColDef = DefaultUserGridColDef;
 
   constructor(
     private actions$: Actions,
     private datePipe: DatePipe,
     protected override store: Store,
-    private _detector: ChangeDetectorRef ,
+    private _detector: ChangeDetectorRef,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
-  ) { 
-    super(store);    
-   }
-
-   public override ngOnInit(): void {
-    super.ngOnInit();
-    this.onOpenEvent();      
+  ) {
+    super(store);
   }
 
-  private onOpenEvent(): void {    
-    this.order.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {      
-      if(data?.id>0){       
-        this.orderDetail=data;     
+  public override ngOnInit(): void {
+    super.ngOnInit();
+    this.onOpenEvent();
+  }
+
+  private onOpenEvent(): void {
+    this.order.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (data?.id > 0) {
+        this.gridApi?.setRowData([]);
+        this.orderDetail = data;
         this.sideDialog.refresh();
-        this.orderHistoryDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((state) => {   
-          this.OrderAuditHistoryDetails=state;             
-          this.gridApi.setRowData(this.OrderAuditHistoryDetails);           
-          
-          this.store.dispatch([
-            new GetOrderCredentialAuditHistory({           
-            entityType: "OrderCredential",
-            searchValue:data.id.toString()
-          }),
-          new GetOrderBillRatesAuditHistory({           
-            entityType: "BillRate",
-            searchValue:data.id.toString()
-          }),
-          new GetOrderContactAuditHistory({           
-            entityType: "OrderContactDetails",
-            searchValue:data.id.toString()
-          }),
-          new GetOrderWorkLocationAuditHistory({           
-            entityType: "OrderWorkLocation",
-            searchValue:data.id.toString()
-          }),
-          new GetOrderJobDistributionAuditHistory({           
-            entityType: "OrderJobDistribution",
-            searchValue:data.id.toString()
-          }),
-          new GetOrderClassificationAuditHistory({           
-            entityType: "OrderClassification",
-            searchValue:data.id.toString()
-          })        
-        ]);
-
-          this.OrderCredentialAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {            
-            this.OrderCredentialAuditHistoryDetails=order;   
-            console.log(this.OrderCredentialAuditHistoryDetails)    
-            if(this.OrderCredentialAuditHistoryDetails.length>0)      
-                this.CredentialAuditGridApi.setRowData(this.OrderCredentialAuditHistoryDetails);             
-          });         
-          
-          this.OrderBillRateAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderBillRatesAuditHistoryDetails=order;  
-            if(this.OrderBillRatesAuditHistoryDetails.length>0)             
-            this.BillRatesAuditGridApi.setRowData(this.OrderBillRatesAuditHistoryDetails);  
-          });
-          
-          this.OrderContactAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderContactAuditHistoryDetails=order;  
-            if(this.OrderContactAuditHistoryDetails.length>0)             
-            this.OrderContactAuditHistoryApi.setRowData(this.OrderContactAuditHistoryDetails);  
-          });
-
-          this.OrderWorkLocationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderWorkLocationAuditHistoryDetails=order;  
-            if(this.OrderWorkLocationAuditHistoryDetails.length>0)             
-            this.OrderWorkLocationAuditHistoryApi.setRowData(this.OrderWorkLocationAuditHistoryDetails);  
-          });
-
-          this.OrderJobDistributionAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderJobDistributionAuditHistoryDetails=order;  
-            if(this.OrderWorkLocationAuditHistoryDetails.length>0)             
-            this.OrderJobDistributionAuditHistoryApi.setRowData(this.OrderJobDistributionAuditHistoryDetails);  
-          });
-
-          this.OrderClassificationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderClassificationAuditHistoryDetails=order;  
-            if(this.OrderClassificationAuditHistoryDetails.length>0)             
-            this.OrderJobDistributionAuditHistoryApi.setRowData(this.OrderClassificationAuditHistoryDetails);  
-          });
-          this.sideDialog.show();  
-        });  
-      }    
-      else{
-        this.orderDetail=new OrderManagement;
-        this.gridApi.setRowData([]); 
-        this.sideDialog.hide(); 
+        this.sideDialog.show();
       }
-      this._detector.detectChanges(); 
+      else {
+        this.orderDetail = new OrderManagement;
+        this.gridApi.setRowData([]);
+        this.sideDialog.hide();
+      }
+      this._detector.detectChanges();
     });
-    this.actions$.pipe(takeWhile(() => this.isAlive));
   }
 
   ngOnDestroy(): void {
     this.sideDialog.hide();
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-    this.isAlive=false;
-  }   
- 
-  public onClose(): void {     
-    this.orderDetail=new OrderManagement; 
-    this.sideDialog.hide(); 
-    this.order.next(new OrderManagement);     
+    this.isAlive = false;
+  }
+
+  public onClose(): void {
+    this.viewedTab = [];
+    this.gridApi?.setRowData([]);
+    this.orderDetail = new OrderManagement;
+    this.OrderAuditHistoryDetails = [];
+    this.sideDialog.hide();
+    this.order.next(new OrderManagement);
   }
 
   onGridReady(params: any) {
     this.gridApi = params.api;
-    this.gridApi.setRowData(this.OrderAuditHistoryDetails);    
+    this.gridApi.setRowData(this.OrderAuditHistoryDetails);
   }
 
   public gridOptions: GridOptions = {
@@ -211,7 +148,7 @@ import { AppState } from 'src/app/store/app.state';
     cacheBlockSize: this.pageSize,
     paginationPageSize: this.pageSize,
     columnDefs: this.OrdercolumnDefinitions,
-     rowData: this.OrderAuditHistoryDetails,
+    rowData: this.OrderAuditHistoryDetails,
     noRowsOverlayComponent: CustomNoRowsOverlayComponent,
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
@@ -224,7 +161,7 @@ import { AppState } from 'src/app/store/app.state';
     }
   };
 
-   public OrderCredentialAuditHistoryGridOptions: GridOptions = {
+  public OrderCredentialAuditHistoryGridOptions: GridOptions = {
     pagination: true,
     cacheBlockSize: this.pageSize,
     paginationPageSize: this.pageSize,
@@ -252,7 +189,7 @@ import { AppState } from 'src/app/store/app.state';
     cacheBlockSize: this.pageSize,
     paginationPageSize: this.pageSize,
     columnDefs: this.BillRatecolumnDefinitions,
-    rowData: this.OrderBillRatesAuditHistoryDetails,    
+    rowData: this.OrderBillRatesAuditHistoryDetails,
     noRowsOverlayComponent: CustomNoRowsOverlayComponent,
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
@@ -314,7 +251,7 @@ import { AppState } from 'src/app/store/app.state';
   onOrderWorkLocationAuditGridReady(params: any) {
     this.OrderWorkLocationAuditHistoryApi = params.api;
     this.OrderWorkLocationAuditHistoryApi.setRowData(this.OrderWorkLocationAuditHistoryDetails);
-  }  
+  }
 
 
   public OrderJobDistributionDetailsGridOptions: GridOptions = {
@@ -322,7 +259,7 @@ import { AppState } from 'src/app/store/app.state';
     cacheBlockSize: this.pageSize,
     paginationPageSize: this.pageSize,
     columnDefs: this.JobDistributioncolumnDefinitions,
-    rowData: this.OrderJobDistributionAuditHistoryDetails,    
+    rowData: this.OrderJobDistributionAuditHistoryDetails,
     noRowsOverlayComponent: CustomNoRowsOverlayComponent,
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
@@ -338,14 +275,14 @@ import { AppState } from 'src/app/store/app.state';
   onOrderJobDistributionAuditGridReady(params: any) {
     this.OrderJobDistributionAuditHistoryApi = params.api;
     this.OrderJobDistributionAuditHistoryApi.setRowData(this.OrderJobDistributionAuditHistoryDetails);
-  }  
+  }
 
   public OrderClassificationDetailsGridOptions: GridOptions = {
     pagination: true,
     cacheBlockSize: this.pageSize,
     paginationPageSize: this.pageSize,
     columnDefs: this.ClassificationcolumnDefinitions,
-    rowData: this.OrderClassificationAuditHistoryDetails,    
+    rowData: this.OrderClassificationAuditHistoryDetails,
     noRowsOverlayComponent: CustomNoRowsOverlayComponent,
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
@@ -361,5 +298,103 @@ import { AppState } from 'src/app/store/app.state';
   onOrderClassificationAuditGridReady(params: any) {
     this.OrderClassificationAuditHistoryApi = params.api;
     this.OrderClassificationAuditHistoryApi.setRowData(this.OrderClassificationAuditHistoryDetails);
-  }  
+  }
+
+  public expanding(e: ExpandEventArgs) {
+    const expandData: ExpandEventArgs = e;
+    switch (e.index) {
+      case 0:
+        if (e.isExpanded) {
+          if (!this.viewedTab.some(a => a == e.index)) {
+            this.store.dispatch(new GetOrderAuditHistory({ entityType: "order", searchValue: this.orderDetail.id.toString() }));
+            this.viewedTab.push(e.index);
+          }
+          this.orderHistoryDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+            this.OrderAuditHistoryDetails = order;
+            this.gridApi?.setRowData(this.OrderAuditHistoryDetails);
+          });
+        }
+        break;
+      case 1:
+        if (e.isExpanded) {
+          if (!this.viewedTab.some(a => a == e.index)) {
+            this.store.dispatch(new GetOrderCredentialAuditHistory({ entityType: "OrderCredential", searchValue: this.orderDetail.id.toString() }));
+            this.viewedTab.push(e.index);
+          }
+          this.OrderCredentialAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+            this.OrderCredentialAuditHistoryDetails = order;
+            if (this.OrderCredentialAuditHistoryDetails.length > 0)
+              this.CredentialAuditGridApi?.setRowData(this.OrderCredentialAuditHistoryDetails);
+          });
+        }
+        break;
+      case 2:
+        if (e.isExpanded) {
+          if (!this.viewedTab.some(a => a == e.index)) {
+            this.store.dispatch(new GetOrderBillRatesAuditHistory({ entityType: "BillRate", searchValue: this.orderDetail.id.toString() }));
+            this.viewedTab.push(e.index);
+          }
+          this.OrderBillRateAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+            this.OrderBillRatesAuditHistoryDetails = order;
+            if (this.OrderBillRatesAuditHistoryDetails.length > 0)
+              this.BillRatesAuditGridApi?.setRowData(this.OrderBillRatesAuditHistoryDetails);
+          });
+        }
+        break;
+      case 3:
+        if (e.isExpanded) {
+          if (!this.viewedTab.some(a => a == e.index)) {
+            this.store.dispatch(new GetOrderContactAuditHistory({ entityType: "OrderContactDetails", searchValue: this.orderDetail.id.toString() }));
+            this.viewedTab.push(e.index);
+          }
+          this.OrderContactAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+            this.OrderContactAuditHistoryDetails = order;
+            if (this.OrderContactAuditHistoryDetails.length > 0)
+              this.OrderContactAuditHistoryApi?.setRowData(this.OrderContactAuditHistoryDetails);
+          });
+        }
+        break;
+      case 4:
+        if (e.isExpanded) {
+          if (!this.viewedTab.some(a => a == e.index)) {
+            this.store.dispatch(new GetOrderWorkLocationAuditHistory({ entityType: "OrderWorkLocation", searchValue: this.orderDetail.id.toString() }));
+          }
+          this.OrderWorkLocationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+            this.OrderWorkLocationAuditHistoryDetails = order;
+            if (this.OrderWorkLocationAuditHistoryDetails.length > 0)
+              this.OrderWorkLocationAuditHistoryApi?.setRowData(this.OrderWorkLocationAuditHistoryDetails);
+          });
+        }
+        break;
+      case 5:
+        if (e.isExpanded) {
+          if (!this.viewedTab.some(a => a == e.index)) {
+            this.store.dispatch(new GetOrderJobDistributionAuditHistory({ entityType: "OrderJobDistribution", searchValue: this.orderDetail.id.toString() }));
+            this.viewedTab.push(e.index);
+          }
+          this.OrderJobDistributionAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+            this.OrderJobDistributionAuditHistoryDetails = order;
+            if (this.OrderWorkLocationAuditHistoryDetails.length > 0)
+              this.OrderJobDistributionAuditHistoryApi?.setRowData(this.OrderJobDistributionAuditHistoryDetails);
+          });
+        }
+        break;
+      case 6:
+        if (e.isExpanded) {
+          if (!this.viewedTab.some(a => a == e.index)) {
+            this.store.dispatch(new GetOrderClassificationAuditHistory({ entityType: "OrderClassification", searchValue: this.orderDetail.toString() }));
+            this.actions$.pipe(ofActionDispatched(GetOrderClassificationDetailSucceeded), take(1))
+              .subscribe(() =>
+                this.viewedTab.push(expandData?.index!)
+              );
+          }
+          this.OrderClassificationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+            this.OrderClassificationAuditHistoryDetails = order;
+            if (this.OrderClassificationAuditHistoryDetails.length > 0)
+              this.OrderClassificationAuditHistoryApi?.setRowData(this.OrderClassificationAuditHistoryDetails);
+          });
+        }
+        break;
+    }
+  }
 }

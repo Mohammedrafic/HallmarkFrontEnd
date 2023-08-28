@@ -1,39 +1,52 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { extensionDurationPrimary, extensionDurationSecondary } from '@shared/components/extension/extension-sidebar/config';
+import {
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input,
+  OnInit, Output, ViewChild,
+} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Duration } from '@shared/enums/durations';
-import { catchError, combineLatest, distinctUntilChanged, filter, startWith, takeUntil, tap } from 'rxjs';
-import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
-import isNil from 'lodash/fp/isNil';
-import { addDays } from '@shared/utils/date-time.utils';
-import { MergedOrder, OrderCandidateJob, OrderManagementChild } from '@shared/models/order-management.model';
-import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
-import { Comment } from '@shared/models/comment.model';
-import { Store } from '@ngxs/store';
-import { ShowToast } from 'src/app/store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
-import { ExtensionStartDateValidation, RECORD_ADDED } from '@shared/constants';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { BillRate } from '@shared/models';
-import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
-import { getAllErrors } from '@shared/utils/error.utils';
+import isNil from 'lodash/fp/isNil';
+import {
+  Observable, catchError, combineLatest, distinctUntilChanged, filter, startWith, switchMap,
+  takeUntil, tap,
+} from 'rxjs';
+
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
+import { extensionDurationPrimary, extensionDurationSecondary } from '@shared/components/extension/extension-sidebar/config';
+import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
+import { ExtensionStartDateValidation } from '@shared/constants';
+import { Duration } from '@shared/enums/durations';
+import { MessageTypes } from '@shared/enums/message-types';
+import { BillRate } from '@shared/models';
+import { Comment } from '@shared/models/comment.model';
+import { MergedOrder, OrderCandidateJob, OrderManagementChild } from '@shared/models/order-management.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
+import { BillRatesService } from '@shared/services/bill-rates.service';
+import { addDays } from '@shared/utils/date-time.utils';
+import { getAllErrors } from '@shared/utils/error.utils';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { ShowToast } from 'src/app/store/app.actions';
 import { ExtenstionResponseModel } from './models/extension.model';
 
 @Component({
   selector: 'app-extension-sidebar',
   templateUrl: './extension-sidebar.component.html',
   styleUrls: ['./extension-sidebar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExtensionSidebarComponent extends Destroyable implements OnInit {
-  @Input() public candidateJob: OrderCandidateJob;
   @Input() public orderPosition: OrderManagementChild;
   @Input() public order: MergedOrder;
   
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('billRates') billRatesComponent: BillRatesComponent;
+
+  @Select(OrderManagementContentState.candidatesJob)
+  candidateJobState$: Observable<OrderCandidateJob>;
 
   public readonly extensionDurationPrimary = extensionDurationPrimary;
   public readonly extensionDurationSecondary = extensionDurationSecondary;
@@ -48,6 +61,8 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public startDate: Date;
   public maxEndDate: Date;
   public extensionStartDateValidation = false;
+  public candidateJob: OrderCandidateJob;
+  public candidateRates: BillRate[];
 
   private get billRateControl(): FormControl {
     return this.extensionForm?.get('billRate') as FormControl;
@@ -58,12 +73,15 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     private extensionSidebarService: ExtensionSidebarService,
     private store: Store,
     private billRatesSyncService: BillRatesSyncService,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private billRatesApiService: BillRatesService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.getJobData();
     this.subscribeOnPermissions();
     const minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
     this.minDate = DateTimeHelper.setCurrentTimeZone(minDate.toString());
@@ -86,6 +104,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     }
 
     this.billRateControl.patchValue(value, { emitEvent: false, onlySelf: true });
+    this.cd.markForCheck();
   }
 
   public saveExtension(positionDialog: DialogComponent, ignoreMissingCredentials: boolean): void  {
@@ -157,8 +176,8 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         );
 
         billRateToUpdate.rateHour = value || '0.00';
-
         this.billRatesComponent.billRatesControl.patchValue([billRateToUpdate, ...restBillRates]);
+        this.cd.markForCheck();
       });
   }
 
@@ -201,6 +220,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         durationSecondary?.setValue(this.extensionSidebarService.getSecondaryDuration(duration));
         durationTertiary?.setValue(this.extensionSidebarService.getTertiaryDuration(duration));
       }
+      this.cd.markForCheck();
     });
   }
 
@@ -217,6 +237,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         const { value: startDate } = this.extensionForm.get('startDate')!;
         const endDate = this.extensionSidebarService.getEndDate(startDate, durationSecondary, durationTertiary);
         this.extensionForm.patchValue({ endDate });
+        this.cd.markForCheck();
       });
   }
 
@@ -244,12 +265,33 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
           this.extensionForm.get('endDate')?.setErrors({incorrect: true});
         }
         this.extensionForm.get('durationPrimary')?.setValue(Duration.Other);
+        this.cd.markForCheck();
       });
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+    this.permissionService.getPermissions()
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
+      this.cd.markForCheck();
+    });
+  }
+
+  private getJobData(): void {
+    this.candidateJobState$
+    .pipe(
+      tap((job) => {
+        this.candidateJob = job;
+      }),
+      switchMap((job) => this.billRatesApiService.getCandidateBillRates(job.jobId, job.organizationId, false)),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((rates) => {
+      this.candidateRates = rates;
+      this.cd.markForCheck();
     });
   }
 }
