@@ -266,7 +266,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     } else {
       result = ActionBtnOnStatus.get(status) as string;
     }   
-    if (result.trim() != InvoicesActionBtn.Approve || result === undefined) {
+    if (result.trim() !== InvoicesActionBtn.Approve || result === undefined) {
       if (!this.payButton) {
         result = '';
       }
