@@ -177,6 +177,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Total Positions',
+      headerTooltip: 'Total Positions created',
       field: 'totalPositions',
       minWidth: 100,
       filter: true,
@@ -192,6 +193,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Open',
+      headerTooltip: 'Positions not yet in progress',
       field: 'openPositions',
       minWidth: 100,
       filter: true,
@@ -207,6 +209,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'InProgress',
+      headerTooltip: 'Positions with applied or Offered Candidates',
       field: 'inProgress',
       minWidth: 100,
       filter: true,
@@ -222,6 +225,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Offered',
+      headerTooltip: 'Positions with offers made to candidates',
       field: 'offered',
       minWidth: 100,
       filter: true,
@@ -237,6 +241,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Accepted',
+      headerTooltip: 'Positions with offers accepted by Candidates',
       field: 'accepted',
       minWidth: 100,
       filter: true,
@@ -252,6 +257,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Filled',
+      headerTooltip: 'Positions with confirmed selections',
       field: 'filled',
       minWidth: 100,
       filter: true,
@@ -267,6 +273,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Closed',
+      headerTooltip: 'Closed and Cancelled Positions',
       field: 'closed',
       minWidth: 100,
       filter: true,
