@@ -85,7 +85,7 @@
             [form]="reasonForm"></app-category-note>
         </ng-template>
       </e-tabitem>
-      <e-tabitem *ngIf="selectedSystem.isIRP">
+      <e-tabitem *ngIf="selectedSystem.isIRP && isSourcingConfig">
         <ng-template #headerText><div>Sourcing Reason</div></ng-template>
         <ng-template #content>
           <app-sourcing-reason
@@ -93,7 +93,7 @@
             [form]="reasonForm"></app-sourcing-reason>
         </ng-template>
       </e-tabitem>
-      <e-tabitem *ngIf="selectedSystem.isIRP">
+      <e-tabitem *ngIf="selectedSystem.isIRP && isSourcingConfig">
         <ng-template #headerText><div>Recuriter Reason</div></ng-template>
         <ng-template #content>
           <app-recuriter-reason
