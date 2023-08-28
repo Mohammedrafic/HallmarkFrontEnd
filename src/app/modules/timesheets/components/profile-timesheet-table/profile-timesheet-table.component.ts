@@ -256,7 +256,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public onTabSelect(selectEvent: SelectingEventArgs): void {
     this.isFirstSelected = false;
-
+    
     if (!this.isChangesSaved && (this.slectingindex !== selectEvent.selectedIndex)) {
       this.confirmService.confirm(TimesheetConfirmMessages.confirmTabChange, {
         title: 'Unsaved Progress',

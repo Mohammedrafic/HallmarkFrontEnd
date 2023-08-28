@@ -1795,6 +1795,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.clearFilters();
       }
 
+      this.openDetails.next(false);
+
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
       this.orderManagementService.setPreviousOrganizationId(id);

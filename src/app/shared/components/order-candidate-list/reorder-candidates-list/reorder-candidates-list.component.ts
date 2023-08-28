@@ -139,9 +139,15 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
           this.candidate.status
         );
 
-        this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
-        isGetAvailableSteps &&
-          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+        this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId))
+        .pipe(
+          tap(() => {
+            if (isGetAvailableSteps) {
+              this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+            }
+          }),
+          take(1),
+        ).subscribe();
       }
     }
   }
@@ -247,7 +253,6 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   private setPreviousSelectedSystem(): void {
     this.previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
   }
-
 
   private getOrganization(businessUnitId: number) {
 
