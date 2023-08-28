@@ -27,6 +27,7 @@ body.light {
   --sub-title-2: #{$secondary-dark-blue-15};
   --sub-title-3: #{$secondary-dark-blue-20};
   --secondary-title: #{$title-black};
+  --selector-title: #{$secondary-dark-blue-15};
   --disabled-drop-area-text: #{$secondary-dark-blue-30};
 }
 
@@ -57,5 +58,6 @@ body.dark {
   --sub-title-2: #{$secondary-dark-blue-30};
   --sub-title-3: #{$secondary-dark-blue-40};
   --secondary-title: #{$white};
+  --selector-title: #{$white};
   --disabled-drop-area-text: #{$white};
 }
