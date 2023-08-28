@@ -213,3 +213,7 @@ export class OrganizationDataSource {
   cities: string[];
   contacts: string[];
 }
+
+export class GetSourcingConfigModel{
+  issourcing:boolean;
+}
