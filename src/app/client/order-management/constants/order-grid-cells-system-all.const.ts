@@ -125,7 +125,7 @@ export const GridCellsSystemAll = (
   {
     ...DefaultOrderCol,
     field: 'system',
-    headerName: 'SYSTEM',
+    headerName: 'SYSTEM CONFIGURATION',
     width: 125,
     cellClass: 'name',
     valueFormatter: (params: ValueFormatterParams) => {
