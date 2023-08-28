@@ -36,7 +36,7 @@ export const GetProfileMenuItems = (isDarkTheme: boolean, isEmployee = false) =>
     {
       text: MenuItemNames[ProfileMenuItem.contact_us],
       id: ProfileMenuItem.contact_us.toString(),
-      iconCss: 'e-ddb-icons e-contactus',
+      iconCss: 'e-menu-icon e-comment-2 e-icons',
     },
     {
       text: MenuItemNames[ProfileMenuItem.my_profile],
