@@ -87,7 +87,7 @@ export class ManualInvoicesGridHelper {
                 action: edit,
                 iconName: 'edit',
                 iconClass: 'color-primary-active-blue-10',
-                disabled: [PendingInvoiceStatus.Approved].includes(status),
+                disabled: [PendingInvoiceStatus.Approved,PendingInvoiceStatus.Rejected].includes(status),
               },
               {
                 action: deleteInvoice,
