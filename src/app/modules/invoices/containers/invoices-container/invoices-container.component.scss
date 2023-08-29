@@ -222,15 +222,29 @@
   display: none !important;
 }
 
-.top-margin {
-  margin: 10px 0 0;
-}
-
 @media #{$min-desktop-large} {
   .invoices-page-toolbar{
     ::ng-deep{
       .left-content{
         max-width: 40% !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 1415px) {
+  .top-margin {
+    margin: 10px 0 0;
+  }
+
+  :host {
+    ::ng-deep {
+      .controls-container {
+        flex-direction: column;
+
+        .right-content {
+          justify-content: flex-start !important;
+        }
       }
     }
   }
