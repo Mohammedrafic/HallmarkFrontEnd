@@ -778,26 +778,40 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       takeUntil(this.componentDestroy())
     )
     .subscribe((filterState) => {
-      let filters: Interfaces.InvoicesFilterState = {};
-      if(filterState.isNotPreserved && filterState.state === null){
-            filters.agencyOrganizationIds =  this.organizationMultiSelectControl.value;
-            this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
-      }else if(filterState.state != null){
-        if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){
-          this.agencyOrganizationIds = filterState.state.agencyOrganizationIds;
-          this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);
-        }else if(filterState.state.agencyOrganizationIds != null && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
-          filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
-          filterState.state.agencyOrganizationIds = filters.agencyOrganizationIds;
-          this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filterState.state),);
+      if(this.isAgency){      
+        let filters: Interfaces.InvoicesFilterState = {};
+        if(filterState.isNotPreserved && filterState.state === null){
+              filters.agencyOrganizationIds =  this.organizationMultiSelectControl.value;
+              this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
+        }else if(filterState.state != null){
+          if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){
+            this.agencyOrganizationIds = filterState.state.agencyOrganizationIds;
+            let agencyOrganizationIds= [];
+            this.agencyOrganizationIds.forEach(element => {
+              if(this.organizationsList.find((item)=> item.id == element)){
+                agencyOrganizationIds.push(element);
+              }
+            }); 
+            if(agencyOrganizationIds.length > 0){
+              this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);
+            }else{
+              this.resetFilters(true);
+            }
+          }else if(filterState.state.agencyOrganizationIds != null && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
+            filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
+            filterState.state.agencyOrganizationIds = filters.agencyOrganizationIds;
+            this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filterState.state),);
+          }else{
+            this.resetFilters(true);
+          }
+          if(this.organizationMultiSelectControl?.value?.length > 1){
+            delete filterState.state?.locationIds;
+            delete filterState.state?.regionIds;
+            delete filterState.state?.departmentIds;
+          }
         }
-        if(this.organizationMultiSelectControl?.value?.length > 1){
-          delete filterState.state?.locationIds;
-          delete filterState.state?.regionIds;
-          delete filterState.state?.departmentIds;
-        }
+        this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
       }
-      this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
       this.store.dispatch(new Invoices.UpdateFiltersState({ ...filterState.state }));
     });
   }
