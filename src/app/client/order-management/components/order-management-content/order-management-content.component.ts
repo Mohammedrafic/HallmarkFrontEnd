@@ -1173,12 +1173,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (this.gridWithChildRow && this.gridWithChildRow.dataSource) {
       this.gridDataBound(this.gridWithChildRow, this.cd);
     }
+   
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
       this.currentPage = this.orderManagementPagerState?.page ?? this.currentPage;
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
+
       if (data && !isUndefined(index)) {
         this.gridWithChildRow.selectRow(index);
         this.onRowClick({ data });
@@ -1191,13 +1193,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     this.preservedOrderService.setPreservedOrder();
 
-    if (this.selectedCandidate) {
-      if (this.selectedCandidateMeta) {
-        this.selectedCandidate.selected = this.selectedCandidateMeta;
-        const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedCandidateMeta.order);
-        if (rowIndex) {
-          this.gridWithChildRow.detailRowModule.expand(rowIndex);
-        }
+    if (this.selectedCandidate && this.selectedCandidateMeta) {
+      this.selectedCandidate.selected = this.selectedCandidateMeta;
+      const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedCandidateMeta.order);
+
+      if (rowIndex !== -1) {
+        this.gridWithChildRow.selectRow(rowIndex);
+        this.gridWithChildRow.detailRowModule.expand(rowIndex);
+
       }
     }
 
