@@ -631,7 +631,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     }
   }
 
-  public toggleList(): void {
+  public toggleDropdownList(): void {
     if (this.invoiceContainerConfig.groupInvoicesOverlayVisible) {
       this.hideGroupingOverlay();
     } else {
