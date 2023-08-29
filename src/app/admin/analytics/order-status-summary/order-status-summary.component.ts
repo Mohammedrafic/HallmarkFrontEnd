@@ -382,7 +382,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     };
     payload.orderType = this.orderStatusSummaryReportForm.value.orderType.map((type: string) => OrderType[type as keyof typeof OrderType]).toString();
     this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(payload));
-    this.resetForm();
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
@@ -391,7 +390,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   }
 
   public onFilterClose() {
-    this.resetForm();
   }
 
   onBtExport() {
