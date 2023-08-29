@@ -718,7 +718,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       ).subscribe((result) => {
 
         this.CandidateNames = result.candidateDetails.searchCandidates;
-        this.filterColumns.candidateNames.dataSource = this.CandidateNames;
+        this.filterColumns.candidateNames.dataSource = this.CandidateNames
+        this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
       });
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns);
   }
