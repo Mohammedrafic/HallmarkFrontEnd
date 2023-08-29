@@ -6,7 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { catchError, distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, map, Observable, takeUntil } from 'rxjs';
 
 import { CloseOrderService } from '@client/order-management/components/close-order/close-order.service';
 import { CloseOrderPayload } from '@client/order-management/components/close-order/models/closeOrderPayload.model';
@@ -28,7 +28,6 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { UserState } from 'src/app/store/user.state';
 import { ShowCloseOrderDialog, ShowToast } from '../../../../store/app.actions';
-import { OrderManagementService } from '../order-management-content/order-management.service';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { formatDate } from '@angular/common';
 
@@ -64,6 +63,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public comments: Comment[] = [];
   public closureReasons: RejectReasonwithSystem[];
   public canCreateOrder: boolean;
+  public isDialogShown = false;
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -73,7 +73,6 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private cd: ChangeDetectorRef,
-    private orderManagementService: OrderManagementService,
     private permissionService: PermissionService
   ) {
     super();
@@ -98,20 +97,6 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.onOrganizationChangedClosureReasons();
     this.initForm();
     this.subscribeOnCloseSideBar();
-  }
-
-  subscribeToReasons() {
-    this.closureReasonsPage$.pipe(
-      filter(x => x != undefined && x != null), 
-      takeUntil(this.destroy$)
-    ).subscribe((data) => {
-      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.IRP) {        
-        this.closureReasons = data.items.filter(f => f.includeInIRP == true);
-      }
-      if (this.orderManagementService.getOrderManagementSystem() === OrderManagementIRPSystemId.VMS) {
-        this.closureReasons = data.items.filter(f => f.includeInVMS == true);
-      }
-    });
   }
 
   public onCancel(): void {
@@ -139,6 +124,27 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     } else {
       this.submit();
     }
+  }
+
+  private mapReasonsBySystem(data: RejectReasonPage): RejectReasonwithSystem[] {
+    if (this.currentSystem === OrderManagementIRPSystemId.IRP) {        
+      return data.items.filter(f => f.includeInIRP == true);
+    }
+    if (this.currentSystem === OrderManagementIRPSystemId.VMS) {
+      return data.items.filter(f => f.includeInVMS == true);
+    }
+    return [];
+  }
+
+  private subscribeToReasons() {
+    this.closureReasonsPage$.pipe(
+      filter((data: RejectReasonPage) => !!data),
+      map((data: RejectReasonPage) => this.mapReasonsBySystem(data)),
+      takeUntil(this.destroy$)
+    ).subscribe((data: RejectReasonwithSystem[]) => {
+      this.closureReasons = data;
+      this.cd.markForCheck();
+    });
   }
 
   private onOrganizationChangedClosureReasons(): void {
@@ -270,8 +276,11 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   private subscribeOnCloseSideBar(): void {
     this.actions.pipe(ofActionSuccessful(ShowCloseOrderDialog), takeUntil(this.destroy$)).subscribe((res) => {
+      this.isDialogShown = res.isDialogShown;
       if (!res.isDialogShown) {
         this.closeForm.reset();
+      } else {
+        this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true, true));
       }
     });
   }
