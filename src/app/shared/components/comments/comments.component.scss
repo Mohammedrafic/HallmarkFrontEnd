@@ -47,6 +47,10 @@
     color: $secondary-dark-blue-30;
     margin-top: 45px;
     text-align: center;
+
+    @media #{$max-mobile} {
+      margin-top: 0;
+    }
   }
 
   .comments-controls {
