@@ -246,7 +246,6 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       ),
       takeUntil(this.componentDestroy()),
     ).subscribe((scheduleData: ScheduleInt.ScheduleModelPage) => {
-      scheduleData.items = scheduleData.items.filter(filledSchedules => filledSchedules.schedule.length !== 0);
       if (isLoadMore) {
         this.scheduleData = {
           ...scheduleData,
