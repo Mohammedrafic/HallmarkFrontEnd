@@ -58,7 +58,8 @@ export enum OrganizationSettingKeys {
   OvertimeCalculation,
   AutomatedDistributionToVMS,
   Sourcing,
-  ATPRateCalculation
+  ATPRateCalculation,
+  LimitNumberOfCandidateanAgencycansubmitToaPosition
 }
 
 export enum OrganizationalHierarchy {
