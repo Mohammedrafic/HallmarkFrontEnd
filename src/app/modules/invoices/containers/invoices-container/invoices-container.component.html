@@ -1,4 +1,6 @@
-<div class="invoices-page-toolbar"
+<div
+  class="invoices-page-toolbar"
+  [ngClass]="[isAgency ? 'agency-area' : 'organization-area']"
 >
   <app-page-toolbar>
     <ng-container left>
@@ -42,6 +44,7 @@
                 appliedFiltersAmount
                 }}
               </span>
+              <span [class.button-text]="!isAgency">Filters</span>
               <i-feather name="sliders" class="icon"></i-feather>
             </div>
           </button>
