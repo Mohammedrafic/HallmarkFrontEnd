@@ -56,7 +56,6 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
-import { AppState } from 'src/app/store/app.state';
 import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
@@ -629,6 +628,14 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public handleBulkAction(event: BulkActionDataModel): void {
     if (event.type === BulkTypeAction.APPROVE) {
       this.bulkApprove(event.items);
+    }
+  }
+
+  public toggleDropdownList(): void {
+    if (this.invoiceContainerConfig.groupInvoicesOverlayVisible) {
+      this.hideGroupingOverlay();
+    } else {
+      this.showGroupingOverlay();
     }
   }
 

@@ -34,7 +34,7 @@
         <div class="buttons-container">
           <button ejs-button
                   appHideBeforeSyncfusionLoad
-                  cssClass="e-outline button-filter button--no-wrap"
+                  cssClass="e-outline button-filter button--no-wrap button-only-icon"
                   (click)="showFilters()">
             <div class="filter-button-content">
               <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">
@@ -42,7 +42,7 @@
                 appliedFiltersAmount
                 }}
               </span>
-              Filters <i-feather name="sliders" class="icon"></i-feather>
+              <i-feather name="sliders" class="icon"></i-feather>
             </div>
           </button>
 
@@ -55,12 +55,11 @@
           <button ejs-button
                   *ngIf="(!isAgency  && selectedTabIdx !== 1) || (isAgency && selectedTabIdx !== 0)"
                   [disabled]="!gridSelections.selectedInvoiceIds || !gridSelections.selectedInvoiceIds.length"
-                  cssClass="e-outline button-filter button--no-wrap"
+                  cssClass="e-outline button-filter button--no-wrap button-only-icon"
                   (click)="printInvoices()">
-            <span>Print</span>
             <i-feather name="printer" class="icon"></i-feather>
           </button>
-          <div *ngIf="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] && !isAgency) || (userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)">
+          <ng-container *ngIf="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] && !isAgency) || (userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)">
             <button ejs-button
                     *ngIf="(!isAgency && (selectedTabIdx === 3 || selectedTabIdx === 5)) || (isAgency && selectedTabIdx !== 0)"
                     [disabled]="
@@ -73,7 +72,7 @@
                     appHideBeforeSyncfusionLoad>
               Pay
             </button>
-          </div>
+          </ng-container>
           <button ejs-button
                   appHideBeforeSyncfusionLoad
                   class="e-primary relative"
@@ -124,7 +123,7 @@
                     cssClass="e-primary"
                     class="dropdown-button"
                     [disabled]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled"
-                    (click)="showGroupingOverlay()">
+                    (click)="toggleDropdownList()">
               <i-feather name="chevron-down" class="icon"></i-feather>
             </button>
           </div>
