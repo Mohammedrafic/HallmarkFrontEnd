@@ -62,15 +62,9 @@
       max-height: 60px;
 
       textarea {
-        padding-top: 9px;
+        padding-top: 19px;
         padding-right: 65px;
         height: auto;
-
-        &::placeholder { 
-          @media #{$max-mobile} {
-            padding-top: 8px;
-          }
-        }
       }
     }
 
@@ -111,9 +105,7 @@
           background-color: $primary-active-blue-70;
         }
 
-        @media #{$max-mobile} {
-          margin-top: 3px;
-        }
+        margin-top: 3px;
       }
 
       i-feather {
