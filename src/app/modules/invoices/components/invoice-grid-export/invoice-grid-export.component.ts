@@ -16,6 +16,7 @@ import {
   GetInvoiceState,
   GetTabsToExport,
   InvoiceExportCols,
+  OrgManualInvoicePendingExportCols,
   PendingInvoiceExportCols,
 } from './invoice-export.constant';
 import { InvoicesState } from '../../store/state/invoices.state';
@@ -87,7 +88,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
     else
     {
       if(this.selectedTabIndex === OrganizationInvoicesGridTab.Manual)
-      this.columnsToExport=AgencyManualInvoicePendingExportCols;
+      this.columnsToExport=OrgManualInvoicePendingExportCols;
       else if(this.selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords)
         this.columnsToExport=PendingInvoiceExportCols;
       else
