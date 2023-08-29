@@ -1,5 +1,3 @@
-import { DateTime } from "@syncfusion/ej2-angular-charts";
-
 export enum OrderType {
   'Contract to Perm' = 0,
   'Open Per Diem' = 1,
@@ -8,44 +6,63 @@ export enum OrderType {
   'Reorder' = 10
 }
 export class OrderStatusSummaryReportRequest {
-
   Region?: string;
   Location?: string;
   Department?: string;
   Skills?: string;
   OrderType?: string;
   OrderStatus?: string;
-  OrderStartDate?: DateTime;
-  OrderEndDate?: DateTime;
 }
 
 export class OrderStatusSummaryReportFilters {
-  region: string[];
-  location: string[];
-  department: string[];
-  skills: string[];
+  region: Region[];
+  location: Location[];
+  department: Department[];
+  skills: Skills[];
   orderStatus: string[];
 }
 
-export class OrderStatusSummaryCustomReport {
-  region: string;
+export class Region {
+  regionId: number;
+  region: string
+}
+
+export class Location {
+  locationId: number;
   location: string;
-  locationId: string;
+  regionId: number
+}
+
+export class Department {
+  departmentId: number;
+  department: string;
+  locationId: number
+}
+
+export class Skills {
+  skillId: number;
+  skill: string
+}
+
+export class OrderStatusSummaryCustomReport {
+  totalPositions: number;
+  openPositions: number;
+  closed: number;
+  filled: number;
+  accepted: number;
+  applied: number;
+  offered: number;
+  inProgress: number;
+  organizationID: number;
+  orderID: number;
+  orderType: string;
+  region: string;
+  regionId: number;
+  location: string;
+  locationId: number;
   department: string;
   departmentId: number;
+  calculatedStatus: string;
   skill: string;
-  orderType: string;
-  totalPosition: number;
-  openPositions: number;
-  onboard: number;
-  closed: number;
-  applied: number;
-  shortlisted: number;
-  offered: number;
-  accepted: number;
-  cancelled: number;
-  withdrawn: number;
-  rejected: number;
-  inProgress: number;
-  filled: number;
+  skillId: number;
 }

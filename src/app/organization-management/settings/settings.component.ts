@@ -158,6 +158,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   IsSettingKeyAutomatedDistributedToVMS: boolean = false;
   isRequired:boolean=true;
   IsSettingATPRateCalculation:boolean=false;
+  IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition: boolean = false;
   SettingKeyAutomatedDistributedToVMS: string = '';
   systemButtons: ButtonModel[] = [];
   isEdit = false;
@@ -289,7 +290,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.SettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey?data.settingKey:'';
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == data.settingKey;
     this.IsSettingATPRateCalculation = OrganizationSettingKeys[OrganizationSettingKeys['ATPRateCalculation']].toString() == data.settingKey;
-     this.handleShowToggleMessage(data.settingKey);
+     this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == data.settingKey;
+    this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
     this.formControlType = data.controlType;
     this.disableDepForInvoiceGeneration();
@@ -302,10 +304,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.aTPRateCalculationFormGroup.reset();
     this.store.dispatch(new ClearLocationList());
     this.store.dispatch(new ClearDepartmentList());
-    this.setFormValidation(data);
+  
     this.setFormValuesForOverride(data);
     this.store.dispatch(new ShowSideDialog(true));
-    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingATPRateCalculation) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
       this.switchedValueForm.controls["value"].setValue(4)
       this.switchedValueForm.controls['isEnabled'].setValue(true)
       this.aTPRateCalculationFormGroup.controls['isEnabled'].setValue(true);
@@ -324,6 +326,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.switchedValueForm.get('value')?.clearValidators();
       this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     }
+    this.setFormValidation(data);
   }
 
   openEditSettingDialog(
@@ -347,6 +350,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyCreatePartialOrder = OrganizationSettingKeys[OrganizationSettingKeys['CreatePartialOrder']].toString() == parentRecord.settingKey;
     this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == parentRecord.settingKey;
     this.IsSettingATPRateCalculation = OrganizationSettingKeys[OrganizationSettingKeys['ATPRateCalculation']].toString() == parentRecord.settingKey;
+    this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == parentRecord.settingKey;
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -363,10 +367,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.setChildRecordData(childRecord);
     this.setFormValuesForEdit(parentRecord, childRecord || null);
     this.store.dispatch(new ShowSideDialog(true));
-    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition) {
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    } else {
+    }     
+    else {
       this.switchedValueForm.get('value')?.clearValidators();
     }
     if (this.isParentEdit && (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyScheduleOnlyWithAvailability || this.IsSettingKeyOtHours || this.IsSettingKeyCreatePartialOrder)) {

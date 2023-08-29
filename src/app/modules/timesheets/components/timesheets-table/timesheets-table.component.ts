@@ -104,6 +104,9 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
     this.gridInstance$
       .getValue()
       ?.columnApi.setColumnVisible(TimesheetsTableColumns.Approve, !this.isAgency && this.activeTabIdx === 1);
+    this.gridInstance$
+      .getValue()
+      ?.columnApi.setColumnVisible(TimesheetsTableColumns.TimesheetApprover, !this.isAgency);
   }
 
   private startCurrentPageWatching(): void {
