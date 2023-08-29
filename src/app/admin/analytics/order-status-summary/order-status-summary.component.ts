@@ -173,7 +173,13 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       minWidth: 250,
       filter: true,
       sortable: true,
-      resizable: true
+      resizable: true,
+      cellRenderer: (params: any) => {
+        if (params.node && params.node.rowPinned) {
+          return `<strong> GrandTotal: </strong>`;
+        }
+        return params.value;
+      },
     },
     {
       headerName: 'Total Positions',
@@ -186,7 +192,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       aggFunc: this.customAggregate,
       cellRenderer: (params: any) => {
         if (params.node && params.node.rowPinned) {
-          return `<strong>Total: ${params.value} </strong>`;
+          return `<strong> ${params.value} </strong>`;
         }
         return params.value ?? 0;
       },
@@ -202,7 +208,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       aggFunc: this.customAggregate,
       cellRenderer: (params: any) => {
         if (params.node && params.node.rowPinned) {
-          return `<strong>Total: ${params.value} </strong>`;
+          return `<strong> ${params.value} </strong>`;
         }
         return params.value ?? 0;
       },
@@ -218,7 +224,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       aggFunc: this.customAggregate,
       cellRenderer: (params: any) => {
         if (params.node && params.node.rowPinned) {
-          return `<strong>Total: ${params.value} </strong>`;
+          return `<strong> ${params.value} </strong>`;
         }
         return params.value ?? 0;
       },
@@ -234,7 +240,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       aggFunc: this.customAggregate,
       cellRenderer: (params: any) => {
         if (params.node && params.node.rowPinned) {
-          return `<strong>Total: ${params.value} </strong>`;
+          return `<strong> ${params.value} </strong>`;
         }
         return params.value ?? 0;
       },
@@ -250,7 +256,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       aggFunc: this.customAggregate,
       cellRenderer: (params: any) => {
         if (params.node && params.node.rowPinned) {
-          return `<strong>Total: ${params.value} </strong>`;
+          return `<strong> ${params.value} </strong>`;
         }
         return params.value ?? 0;
       },
@@ -266,7 +272,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       aggFunc: this.customAggregate,
       cellRenderer: (params: any) => {
         if (params.node && params.node.rowPinned) {
-          return `<strong>Total: ${params.value} </strong>`;
+          return `<strong> ${params.value} </strong>`;
         }
         return params.value ?? 0;
       },
@@ -282,7 +288,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       aggFunc: this.customAggregate,
       cellRenderer: (params: any) => {
         if (params.node && params.node.rowPinned) {
-          return `<strong>Total: ${params.value} </strong>`;
+          return `<strong> ${params.value} </strong>`;
         }
         return params.value ?? 0;
       },
@@ -299,7 +305,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     this.organizationId$.pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.store.dispatch([new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage({}),
-          new OrderStatusSummaryReportActions.GetOrderStatusSummaryFiltersByOrganization()]);
+        new OrderStatusSummaryReportActions.GetOrderStatusSummaryFiltersByOrganization()]);
         this.onFilterClearAll();
         this.setFilters();
       });
