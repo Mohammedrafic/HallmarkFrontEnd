@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input,
   OnInit, Output, ViewChild,
 } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -242,15 +242,15 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   }
 
   private listenStartEndDatesChanges(): void {
-    const startDateControl = this.extensionForm.get('startDate');
-    const endDateControl = this.extensionForm.get('endDate');
+    const startDateControl = this.extensionForm.get('startDate') as AbstractControl;
+    const endDateControl = this.extensionForm.get('endDate') as AbstractControl;
 
     combineLatest([
-      startDateControl?.valueChanges.pipe(startWith(null))!,
-      endDateControl?.valueChanges.pipe(startWith(null))!
+      startDateControl.valueChanges.pipe(startWith(null)),
+      endDateControl.valueChanges.pipe(startWith(null)),
     ])
       .pipe(
-        filter(() => startDateControl?.dirty! || endDateControl?.dirty!),
+        filter(() => startDateControl.dirty || endDateControl.dirty),
         takeUntil(this.componentDestroy())
       )
       .subscribe(([startDate, endDate]) => {
@@ -264,7 +264,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         if (startDate > endDate) {
           this.extensionForm.get('endDate')?.setErrors({incorrect: true});
         }
-        this.extensionForm.get('durationPrimary')?.setValue(Duration.Other);
+        this.extensionForm.get('durationPrimary')?.setValue(Duration.Other, {emitEvent: false});
         this.cd.markForCheck();
       });
   }
@@ -286,7 +286,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       tap((job) => {
         this.candidateJob = job;
       }),
-      switchMap((job) => this.billRatesApiService.getCandidateBillRates(job.jobId, job.organizationId, false)),
+      switchMap((job) => this.billRatesApiService.getExtensionRates(job.jobId)),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((rates) => {

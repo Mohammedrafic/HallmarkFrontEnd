@@ -27,6 +27,7 @@ import { SaveTemplateDialogService } from '@client/order-management/components/s
 })
 export class SaveTemplateDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() order: Order;
+  @Input() public isIRPtab ?: boolean | null;
   @Output() closeEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() createEmitter: EventEmitter<{ templateTitle: string }> = new EventEmitter<{ templateTitle: string }>();
   @ViewChild('saveTemplate', { static: false }) saveTemplateElement: ElementRef<HTMLElement>;
@@ -69,7 +70,7 @@ export class SaveTemplateDialogComponent implements OnInit, AfterViewInit, OnDes
   }
 
   private getTemplates(): void {
-    this.templates$ = this.saveTemplateDialogService.getFilteredTemplates(this.order);
+    this.templates$ = this.saveTemplateDialogService.getFilteredTemplates(this.order,this.isIRPtab);
   }
 
   private initDialog(): void {

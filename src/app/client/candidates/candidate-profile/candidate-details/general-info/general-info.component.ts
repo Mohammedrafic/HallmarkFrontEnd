@@ -73,6 +73,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   public override ngOnInit(): void {
     let Status =[ProfileStatusesEnum.Sourcing,ProfileStatusesEnum.Prospect,ProfileStatusesEnum.Onboarding,ProfileStatusesEnum.ClearedForOrientation,ProfileStatusesEnum.OrientationScheduled,ProfileStatusesEnum.DoNotHire,ProfileStatusesEnum.FallOffOnboarding,ProfileStatusesEnum.VerbalOfferMade]
     this.profileStatuses = this.profileStatuses.filter(f => !Status.includes(f.id));
+    this.profileStatuses =this.profileStatuses.sort((a, b) => a.name.localeCompare(b.name))
     super.ngOnInit();
     this.listenProfileStatusChanges();
     this.listenSkillsChanges();
@@ -106,6 +107,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
 
       if (this.isSourceValidated) {
         this.profileStatuses = ProfileStatuses
+        this.profileStatuses =this.profileStatuses.sort((a, b) => a.name.localeCompare(b.name))
       }
 
       this.cdr.markForCheck();

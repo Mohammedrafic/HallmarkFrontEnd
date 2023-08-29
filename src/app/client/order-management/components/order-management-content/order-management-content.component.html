@@ -725,7 +725,7 @@
 ></app-export-dialog>
 
 <app-filter-dialog
-  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates && activeSystem != OrderManagementIRPSystemId.OrderJourney"
+  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates && activeSystem != OrderManagementIRPSystemId.OrderJourney && activeIRPtabs != OrganizationIRPTabs.OrderTemplates"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   [targetElement]="targetElement"
@@ -876,6 +876,9 @@
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.orderStatuses.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
+            (select)="onSelect($event)"
+            cssClass="custom"
+            (click)="orderStatusSelect()"
           >
           </ejs-multiselect>
         </div>
@@ -1401,7 +1404,7 @@
   </form>
 </app-filter-dialog>
 <app-filter-dialog
-  *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates"
+  *ngIf="(activeTab == OrganizationOrderManagementTabs.OrderTemplates) || (activeIRPtabs == OrganizationIRPTabs.OrderTemplates)"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   (deleteFilter)="onFilterDelete($event)"

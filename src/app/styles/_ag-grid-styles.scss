@@ -20,14 +20,14 @@
     &.name {
       font-weight: 700;
       display: inline-flex;
-      color: $primary-active-blue-10;
+      color: $primary-active-blue-10 !important;
       cursor: pointer;
     }
 
     &.no-link-name {
       font-weight: 700;
       display: inline-flex;
-      color: $black;
+      color: var(--text);
       cursor: pointer;
     }
 
@@ -107,6 +107,10 @@ app-grid {
 
   .ag-row-hover {
     background-color: var(--grid-row-background-color-hover);
+
+    .no-link-name {
+      color: $black !important;
+    }
   }
 
   .ag-header-cell-text {

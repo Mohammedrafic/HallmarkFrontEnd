@@ -6,7 +6,7 @@ import { ShowToast } from "src/app/store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
 import { GetOrderStatusSummaryReportPage, GetOrderStatusSummaryFiltersByOrganization } from "../actions/order-status-summary-report.actions";
 /*import { Department, DepartmentsPage } from "@shared/models/department.model";*/
-import { OrderStatusSummaryCustomReport } from "../model/order-status-summary-report.model";
+import { OrderStatusSummaryCustomReport, OrderStatusSummaryReportFilters } from "../model/order-status-summary-report.model";
 import { OrderStatusSummaryReportService } from "../../services/order-status-summary-report.services";
 /*import { GetLocationsByOrganizationId } from "../../../../organization-management/store/organization-management.actions";*/
 
@@ -15,7 +15,7 @@ import { OrderStatusSummaryReportService } from "../../services/order-status-sum
 interface OrderStatusSummaryCustomReportStateModel {
 
   reports: OrderStatusSummaryCustomReport[];
-  filters: { region: string[], location: string[], department: string[], skills: string[], orderStatus: string[] };
+  filters: OrderStatusSummaryReportFilters;
 }
 
 @State<OrderStatusSummaryCustomReportStateModel>({
@@ -35,7 +35,7 @@ export class OrderStatusSummaryCustomReportState {
   }
 
   @Selector()
-  static OrderStatusSummaryFilters(state: OrderStatusSummaryCustomReportStateModel): { region: string[], location: string[], department: string[], skills: string[], orderStatus: string[] } | null {
+  static OrderStatusSummaryFilters(state: OrderStatusSummaryCustomReportStateModel): OrderStatusSummaryReportFilters | null {
     return state.filters;
   }
   constructor(
@@ -64,7 +64,7 @@ export class OrderStatusSummaryCustomReportState {
   @Action(GetOrderStatusSummaryFiltersByOrganization)
   GetOrderStatusSummaryFiltersByOrganization(
     { dispatch, patchState }: StateContext<OrderStatusSummaryCustomReportStateModel>
-  ): Observable<{ region: string[], location: string[], department: string[], skills: string[], orderStatus: string[] } | void> {
+  ): Observable<OrderStatusSummaryReportFilters | void> {
 
     return this.orderStatusSummaryReportService
       .getFiltersByOrganizationId()

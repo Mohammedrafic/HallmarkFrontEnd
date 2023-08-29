@@ -82,7 +82,7 @@ export enum SpecilaProjectCategoryTableColumns {
   IsDeleted = 'isDeleted',
   IncludeInIRP ='includeInIRP',
   IncludeInVMS ='includeInVMS',
-  System ='system'
+  System ='system configuration'
 }
 
 export enum SpecilaProjectCategoryHeaderText {
@@ -90,7 +90,7 @@ export enum SpecilaProjectCategoryHeaderText {
   OrganizationId = 'Organization Id',
   Name = 'Category',
   IsDeleted = 'IsDeleted',
-  System ='system'
+  System ='system configuration'
 }
 
 export enum FormControlNames {

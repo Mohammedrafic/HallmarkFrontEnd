@@ -79,7 +79,7 @@ import {
   TextOptionFields,
   TierSettingsKey,
 } from './settings.constant';
-import { AutoGenerationPayload, PayPeriodPayload, SwitchValuePayload } from '../../shared/models/settings.interface';
+import { ATPRateCalculationPayload, AutoGenerationPayload, PayPeriodPayload, SwitchValuePayload } from '../../shared/models/settings.interface';
 import { MessageTypes } from '@shared/enums/message-types';
 
 /**
@@ -139,6 +139,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   checkboxValueForm: FormGroup;
   RegionLocationSettingsMultiFormGroup: FormGroup;
   payPeriodFormGroup: FormGroup;
+  aTPRateCalculationFormGroup : FormGroup;
 
   dropdownDataSource: OrganizationSettingValueOptions[];
   allRegions: OrganizationRegion[] = [];
@@ -155,6 +156,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   IsSettingKeyAvailabiltyOverLap: boolean = false;
   IsSettingKeyCreatePartialOrder: boolean = false;
   IsSettingKeyAutomatedDistributedToVMS: boolean = false;
+  isRequired:boolean=true;
+  IsSettingATPRateCalculation:boolean=false;
   IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition: boolean = false;
   SettingKeyAutomatedDistributedToVMS: string = '';
   systemButtons: ButtonModel[] = [];
@@ -286,7 +289,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey;
     this.SettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey?data.settingKey:'';
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == data.settingKey;
-    this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == data.settingKey;
+    this.IsSettingATPRateCalculation = OrganizationSettingKeys[OrganizationSettingKeys['ATPRateCalculation']].toString() == data.settingKey;
+     this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == data.settingKey;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
     this.formControlType = data.controlType;
@@ -297,14 +301,16 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.locationFormGroup.reset();
     this.departmentFormGroup.reset();
     this.payPeriodFormGroup.reset();
+    this.aTPRateCalculationFormGroup.reset();
     this.store.dispatch(new ClearLocationList());
     this.store.dispatch(new ClearDepartmentList());
   
     this.setFormValuesForOverride(data);
     this.store.dispatch(new ShowSideDialog(true));
-    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
       this.switchedValueForm.controls["value"].setValue(4)
       this.switchedValueForm.controls['isEnabled'].setValue(true)
+      this.aTPRateCalculationFormGroup.controls['isEnabled'].setValue(true);
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
       this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
@@ -343,6 +349,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.setNumericValueLabel(parentRecord.settingKey);
     this.IsSettingKeyCreatePartialOrder = OrganizationSettingKeys[OrganizationSettingKeys['CreatePartialOrder']].toString() == parentRecord.settingKey;
     this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == parentRecord.settingKey;
+    this.IsSettingATPRateCalculation = OrganizationSettingKeys[OrganizationSettingKeys['ATPRateCalculation']].toString() == parentRecord.settingKey;
     this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == parentRecord.settingKey;
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
@@ -385,7 +392,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.pushStartDateFormGroup.touched ||
       this.invoiceGeneratingFormGroup.touched ||
       this.RegionLocationSettingsMultiFormGroup.touched ||
-      this.payPeriodFormGroup.touched
+      this.payPeriodFormGroup.touched||
+      this.aTPRateCalculationFormGroup.touched
+
     ) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -632,6 +641,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       case OrganizationSettingControlType.PayPeriod:
         dynamicValue = JSON.stringify(this.createPayPeriodPayload());
         break;
+        case OrganizationSettingControlType.ATPRateCalculation:
+        dynamicValue = JSON.stringify(this.createATPRateConfigurationdPayload());
+        break;
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
         break;
@@ -698,6 +710,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.formControlType === OrganizationSettingControlType.CheckboxValue) {
       this.checkboxValueForm.get('value')?.addValidators(validators);
       this.observeCheckboxValueToggleControl();
+    }
+    if (this.formControlType === OrganizationSettingControlType.ATPRateCalculation) {
+      this.observeATPRateToggleControl();
     }
 
     if (validators.length > 0) {
@@ -789,6 +804,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
       dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isPayPeriod: true };
     }
+    if (this.formControlType === OrganizationSettingControlType.ATPRateCalculation) {
+      const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
+      dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isATPRateCalculation: true };
+      
+    }
 
     if (dynamicValue?.isCheckboxValue) {
       this.checkboxValueForm.setValue({
@@ -801,6 +821,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.payPeriodFormGroup.setValue({
         date: dynamicValue.date || dynamicValue.Date,
         noOfWeek: dynamicValue.noOfWeek || dynamicValue.NoOfWeek,
+      });
+    }
+    if (dynamicValue?.isATPRateCalculation) {
+      this.aTPRateCalculationFormGroup.setValue({
+        benefitPercent:dynamicValue.benefitPercent === 0 || dynamicValue.BenefitPercent === 0 ?'':dynamicValue.benefitPercent,
+        wagePercent:dynamicValue.wagePercent===0 || dynamicValue.WagePercent === 0 ?'':dynamicValue.wagePercent,
+        costSavings:dynamicValue.costSavings === 0 || dynamicValue.CostSavings === 0?'':dynamicValue.costSavings,
+        isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : dynamicValue.IsEnabled ? dynamicValue.IsEnabled : false ,
       });
     }
 
@@ -868,6 +896,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.payPeriodFormGroup.reset();
     this.switchedValueForm.reset();
     this.checkboxValueForm.reset();
+    this.aTPRateCalculationFormGroup.reset();
     this.setEditMode(false);
     this.isParentEdit = false;
     this.dropdownDataSource = [];
@@ -926,6 +955,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       isEnabled: [false],
       value: [null],
     });
+    this.aTPRateCalculationFormGroup=this.formBuilder.group({
+      isEnabled: [true],
+      benefitPercent:[null],
+      wagePercent:[null],
+      costSavings:[null]
+    })
   }
 
   private getActiveRowsPerPage(): number {
@@ -1084,6 +1119,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       date: this.payPeriodFormGroup.controls['date'].value
     });
   }
+  private createATPRateConfigurationdPayload(): ATPRateCalculationPayload {
+    return ({
+      isEnabled: !!this.aTPRateCalculationFormGroup.controls['isEnabled'].value,
+      benefitPercent: this.aTPRateCalculationFormGroup.controls['benefitPercent'].value,
+      wagePercent: this.aTPRateCalculationFormGroup.controls['wagePercent'].value,
+      costSavings:this.aTPRateCalculationFormGroup.controls['costSavings'].value,
+    });
+  }
 
   private observeToggleControl(): void {
     this.switchedValueForm.get('isEnabled')?.valueChanges
@@ -1099,7 +1142,28 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.switchedValueForm.get('value')?.updateValueAndValidity();
       });
   }
-
+  private observeATPRateToggleControl(): void {
+    this.aTPRateCalculationFormGroup.get('isEnabled')?.valueChanges
+      .pipe(
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((value: boolean) => {
+        if (value) {
+          this.isRequired=true;
+          this.aTPRateCalculationFormGroup.get('benefitPercent')?.addValidators(Validators.required);
+          this.aTPRateCalculationFormGroup.get('wagePercent')?.addValidators(Validators.required);
+          this.aTPRateCalculationFormGroup.get('costSavings')?.addValidators(Validators.required);
+        } else {
+          this.isRequired=false;
+          this.aTPRateCalculationFormGroup.get('benefitPercent')?.removeValidators(Validators.required);
+          this.aTPRateCalculationFormGroup.get('wagePercent')?.removeValidators(Validators.required);
+          this.aTPRateCalculationFormGroup.get('costSavings')?.removeValidators(Validators.required);
+        }
+        this.aTPRateCalculationFormGroup.get('benefitPercent')?.updateValueAndValidity();
+        this.aTPRateCalculationFormGroup.get('wagePercent')?.updateValueAndValidity();
+        this.aTPRateCalculationFormGroup.get('costSavings')?.updateValueAndValidity();
+      });
+  }
   private observeCheckboxValueToggleControl(): void {
     this.checkboxValueForm.get('isEnabled')?.valueChanges
       .pipe(
@@ -1403,7 +1467,16 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
         return
       }
-    } else if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
+    }
+    else if (this.IsSettingATPRateCalculation) {
+      if (this.aTPRateCalculationFormGroup.valid) {
+        this.sendForm();
+      } else {
+        this.aTPRateCalculationFormGroup.markAllAsTouched();
+        return;
+      }
+    }
+     else if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
       if (this.allLocationsSelected && this.allRegionsSelected) {
         this.organizationHierarchy = OrganizationHierarchy.Organization;
         this.organizationHierarchyId = this.organizationId;
@@ -1432,9 +1505,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.invoiceAutoGeneratingValid()
       && this.switchedValueForm.valid
       && this.checkboxValueForm.valid
+      && this.aTPRateCalculationFormGroup.valid
     ) {
       this.sendForm();
-    } else {
+    }
+     else {
       this.organizationSettingsFormGroup.markAllAsTouched();
       this.validatePushStartDateForm();
       this.validateInvoiceGeneratingForm();

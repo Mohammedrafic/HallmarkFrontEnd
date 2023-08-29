@@ -23,16 +23,27 @@ export class SaveTemplateDialogService {
   constructor(private orderService: OrderManagementContentService) {}
 
   /** Filter out templates witch match with selected region, location, department and skill */
-  getFilteredTemplates(order: Order): Observable<OrderManagement[]> {
+  getFilteredTemplates(order: Order,isIRP? : boolean|null): Observable<OrderManagement[]> {
     const propsToPick = ['regionId', 'locationId', 'departmentId', 'skillId'];
-    return this.orderService.getOrders({ isTemplate: true }).pipe(
-      map((orderManagementPage: OrderManagementPage) =>
-        orderManagementPage?.items.filter((template: OrderManagement) =>
-          isEqual(pick(propsToPick, order), pick(propsToPick, template))
-        )
-      ),
-      shareReplay()
-    );
+    if (isIRP) {
+      return this.orderService.getIRPTemplates({ isTemplate: true }).pipe(
+        map((orderManagementPage: OrderManagementPage) =>
+          orderManagementPage?.items.filter((template: OrderManagement) =>
+            isEqual(pick(propsToPick, order), pick(propsToPick, template))
+          )
+        ),
+        shareReplay()
+      );
+    } else {
+      return this.orderService.getOrders({ isTemplate: true }).pipe(
+        map((orderManagementPage: OrderManagementPage) =>
+          orderManagementPage?.items.filter((template: OrderManagement) =>
+            isEqual(pick(propsToPick, order), pick(propsToPick, template))
+          )
+        ),
+        shareReplay()
+      );
+    }
   }
 
   /* When created order need to save as template ids for some properties have to be 0 */

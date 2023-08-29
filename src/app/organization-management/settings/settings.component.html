@@ -31,7 +31,7 @@
                    (closeDialogClicked)="closeFilters()">
   <form class="bootstrap" [formGroup]="SettingsFilterFormGroup">
     <div class="input-container" *ngIf="orgSystems.IRPAndVMS">
-      <label>Select System</label>
+      <label>System Configuration</label>
       <div class="bootstrap checkbox-container">
         <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>
         <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
@@ -91,7 +91,7 @@
       </div>
     </div>
 
-    <form [formGroup]="regionFormGroup" *ngIf="isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder ||  IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
+    <form [formGroup]="regionFormGroup" *ngIf="isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder ||  IsSettingKeyScheduleOnlyWithAvailability || IsSettingATPRateCalculation) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="region">Region</label>
         <div class="input-group dropdown">
@@ -103,7 +103,7 @@
       </div>
     </form>
 
-    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap  || IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
+    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap  || IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability || IsSettingATPRateCalculation) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="regionRequired">Region <span class="required">*</span></label>
         <div class="input-group dropdown">
@@ -115,7 +115,7 @@
       </div>
     </form>
 
-    <form [formGroup]="locationFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
+    <form [formGroup]="locationFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability || IsSettingATPRateCalculation) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="location">Location</label>
         <div class="input-group dropdown">
@@ -127,7 +127,7 @@
       </div>
     </form>
 
-    <form [formGroup]="departmentFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap ||  IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability) && !IsSettingKeyPayPeriod">
+    <form [formGroup]="departmentFormGroup" *ngIf="!(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap ||  IsSettingKeyCreatePartialOrder || IsSettingKeyScheduleOnlyWithAvailability || IsSettingATPRateCalculation) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
         <label for="department">Department</label>
         <div class="input-group dropdown">
@@ -310,6 +310,48 @@
 
 
   </div>
+ </form>
+
+ <form [formGroup]="aTPRateCalculationFormGroup"
+    *ngIf="formControlType === organizationSettingControlType.ATPRateCalculation">
+  <div class="row">
+    <div class="input-container bootstrap">
+      <label for="numeric">Benefit Percent of SW<span   *ngIf="isRequired" class="required">*</span></label>
+      <div class="input-group">
+        <ejs-numerictextbox id="numeric" class="numeric-input" min="0" [maxlength]="maxFieldLength"
+        (keydown)="onlyNumerics($event)" [validateDecimalOnType]='true' decimals='0' format="#" [showSpinButton]="false" appValidateWithMessage
+          formControlName="benefitPercent"></ejs-numerictextbox>
+      </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="input-container bootstrap">
+      <label for="numeric">Wage Percent(Non-Benefit Only)<span  *ngIf="isRequired" class="required">*</span></label>
+      <div class="input-group">
+        <ejs-numerictextbox id="numeric" class="numeric-input" min="0" [maxlength]="maxFieldLength"
+        (keydown)="onlyNumerics($event)" [validateDecimalOnType]='true' decimals='0' format="#" [showSpinButton]="false" appValidateWithMessage
+          formControlName="wagePercent"></ejs-numerictextbox>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-container bootstrap">
+      <label for="numeric">Cost Savings<span *ngIf="isRequired" class="required">*</span></label>
+      <div class="input-group">
+        <ejs-numerictextbox id="numeric" class="numeric-input" min="0" [maxlength]="maxFieldLength"
+        (keydown)="onlyNumerics($event)" [validateDecimalOnType]='true' decimals='0' format="#" [showSpinButton]="false" appValidateWithMessage
+          formControlName="costSavings"></ejs-numerictextbox>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-container">
+      <div class="input-group switch">
+        <ejs-switch id="switcher" class="switch" formControlName="isEnabled" (change)="disableSettingsValue($event,undefined)"></ejs-switch>
+        <label class="switch-label">Turned {{ aTPRateCalculationFormGroup.get('isEnabled')?.value ? 'on' : 'off' }}</label>
+      </div>
+    </div>
+    </div>
  </form>
 
     <div [ngSwitch]="formControlType">

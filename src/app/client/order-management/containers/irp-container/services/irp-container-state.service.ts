@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable, Subject } from 'rxjs';
 
-import { ListOfKeyForms} from '@client/order-management/interfaces';
+import { ListOfKeyForms, SaveAsTemplateListOfKeyForms} from '@client/order-management/interfaces';
 import { CreateOrderDto } from '@shared/models/order-management.model';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { HaveScheduleBooking } from '@shared/constants';
@@ -43,6 +43,10 @@ export class IrpContainerStateService {
     return this.deleteDocumentsGuids;
   }
 
+  public getOrderTemplateFormState(): SaveAsTemplateListOfKeyForms {
+    return this.formState;
+  }
+  
   public getIncludedExternalLogic(order: CreateOrderDto): boolean {
     return order.jobDistribution?.some((distribution: number) => [
       IrpOrderJobDistribution.AllExternal,

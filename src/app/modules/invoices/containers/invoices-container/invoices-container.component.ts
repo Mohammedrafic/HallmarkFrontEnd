@@ -173,6 +173,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public organizationId: number;
   public agencyId: number;
+  public invoicesOrgIds:number[];
 
   public populateFilterForm$: BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>
     = new BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>(null);
@@ -335,8 +336,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       }else{
         this.organizationId = id;
         this.store.dispatch(new Invoices.SelectOrganization(id));
+        this.resetFilters(true);
       }
-      this.resetFilters(true);
       this.navigatedInvoiceId = null;
       this.navigatedOrgId = null;
       this.getGroupingOptions();
@@ -456,14 +457,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       const invoices = this.store.selectSnapshot(InvoicesState.pendingApprovalInvoicesData);
       const prevId: number | null = invoices?.items[selectedRowData.rowIndex - 1]?.invoiceId || null;
       const nextId: number | null = invoices?.items[selectedRowData.rowIndex + 1]?.invoiceId || null;
-
       this.store.dispatch(
         new Invoices.ToggleInvoiceDialog(
           DialogAction.Open,
           this.isAgency,
           {
             invoiceIds: [selectedRowData.data!.invoiceId],
-            organizationIds: [this.organizationId],
+            organizationIds: [this.isAgency ? selectedRowData.data!.organizationId : this.organizationId],
           },
           prevId,
           nextId
@@ -565,10 +565,19 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public printInvoices(): void {
+
+    if(this.isAgency){
+      this.invoicesOrgIds = [];
+      this.gridSelections.rowNodes.forEach(element => {
+        if (!this.invoicesOrgIds.includes(element.data.organizationId)) {
+          this.invoicesOrgIds.push(element.data.organizationId);
+        }
+      });
+    }
     const dto: Interfaces.PrintingPostDto = {
       invoiceIds: this.gridSelections.selectedInvoiceIds,
       ...(this.isAgency ? {
-        organizationIds: [this.organizationId] as number[],
+        organizationIds: this.invoicesOrgIds as number[],
       } : {
         organizationId: this.organizationId as number,
       }),
@@ -779,7 +788,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);
         }else if(filterState.state.agencyOrganizationIds != null && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
           filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
-          this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
+          filterState.state.agencyOrganizationIds = filters.agencyOrganizationIds;
+          this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filterState.state),);
         }
         if(this.organizationMultiSelectControl?.value?.length > 1){
           delete filterState.state?.locationIds;
