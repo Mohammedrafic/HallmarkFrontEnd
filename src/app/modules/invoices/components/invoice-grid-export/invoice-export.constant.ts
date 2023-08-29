@@ -58,6 +58,25 @@ export const AgencyManualInvoicePendingExportCols : ExportColumn[] = [
   { text:'Attachment', column: 'attachment' },
 
 ];
+export const OrgManualInvoicePendingExportCols : ExportColumn[] = [
+  { text:'CandidateFullName', column: 'candidateFullName' },
+  { text:'Status ', column: 'status' },
+  { text:'locationName', column: 'locationName' },
+  { text:'FormattedOrderIdFull', column: 'formattedOrderIdFull' },
+  { text:'regionName', column: 'regionName' },
+  { text:'DepartmentName', column: 'departmentName' },
+  { text:'SkillName', column: 'skillName' },
+  { text:'WeekStartDate', column: 'weekStartDate' },
+  { text:'VendorFeeApplicable', column: 'vendorFeeApplicable' },
+  { text:'Comment', column: 'comment' },
+  { text:'ReasonCode', column: 'reasonCode' },
+  { text:'RejectionReason', column: 'rejectionReason' },
+  { text:'Amount', column: 'amount' },
+  {text:'agencyName',column:'agencyName'},
+  { text:'Type', column: 'type' },
+  { text:'Attachment', column: 'attachment' },
+
+];
 
 export const PendingInvoiceExportCols : ExportColumn[] = [
   { text:'Invoice ID', column: 'invoiceId' },
