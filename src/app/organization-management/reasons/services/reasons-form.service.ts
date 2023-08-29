@@ -84,7 +84,7 @@ export class ReasonsFormsService {
           Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
         agencyFeeApplicable: [true],
       });
-    }else if(formType === ReasonFormType.RecuriterReason){
+    }else if(formType === ReasonFormType.RecruiterReason){
       this.form = this.fb.group({
         id: [],
         reason: ['', [Validators.required, Validators.maxLength(100),
