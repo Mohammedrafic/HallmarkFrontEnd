@@ -783,27 +783,29 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   private watchForPreservedFilters(): void {
     this.preservedFiltersByPageName$.pipe(
+      distinctUntilChanged(),
       filter((filters) => filters.dispatch),
       takeUntil(this.componentDestroy())
     )
     .subscribe((filterState) => {
       if(this.isAgency){      
         let filters: Interfaces.InvoicesFilterState = {};
-        if(filterState.isNotPreserved && filterState.state === null){
+        if(filterState.state === null){
               filters.agencyOrganizationIds =  this.organizationMultiSelectControl.value;
               this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
         }else if(filterState.state != null){
-          if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){
-            this.agencyOrganizationIds = filterState.state.agencyOrganizationIds;
+          if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){            
             let agencyOrganizationIds= [];
-            this.agencyOrganizationIds.forEach(element => {
+            filterState.state.agencyOrganizationIds.forEach(element => {
               if(this.organizationsList.find((item)=> item.id == element)){
                 agencyOrganizationIds.push(element);
               }
             }); 
             if(agencyOrganizationIds.length > 0){
+              this.agencyOrganizationIds = filterState.state.agencyOrganizationIds;
               this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);
             }else{
+              this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
               this.resetFilters(true);
             }
           }else if(filterState.state.agencyOrganizationIds != null && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
