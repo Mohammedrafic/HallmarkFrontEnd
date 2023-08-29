@@ -174,7 +174,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public organizationId: number;
   public agencyId: number;
   public invoicesOrgIds:number[];
-
+  public showmsg:boolean = false;
   public populateFilterForm$: BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>
     = new BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>(null);
 
@@ -276,11 +276,20 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             this.organizationId = 0;
             this.organizationControl.reset();
             this.organizationsList = [];
+            this.showmsg = true;
             this.store.dispatch(new Invoices.SelectOrganization(0));
           }),
          switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
           switchMap(() => this.organizations$),
-          filter((organizations: DataSourceItem[]) => !!organizations.length),
+          filter((organizations: DataSourceItem[]) =>
+            {
+              if(organizations.length == 0 && this.showmsg){
+                this.showmsg = false;
+                this.store.dispatch(new ShowToast(MessageTypes.Error, 'No organization has been mapped for the agency'));
+              } 
+              return !!organizations.length;
+            }           
+          ),
           tap((organizations: DataSourceItem[]) => {
             this.organizationsList = organizations;
           }),
