@@ -565,7 +565,7 @@ export class InvoicesState {
       debounceTime(100),
       tap(() => patchState({
         manualInvoicesData: null,
-        pendingInvoicesData: null
+        pendingApprovalInvoicesData: null
       }))
     );
   }

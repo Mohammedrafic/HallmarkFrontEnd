@@ -290,10 +290,12 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) =>
             {
-              if(organizations.length == 0 && this.showmsg && this.isAgency){
+              if(organizations.length == 0 && this.showmsg){
                 this.store.dispatch(new Invoices.ClearInvoices())
                 this.showmsg = false;
                 this.organizationMultiSelectControl.setValue([]);
+                this.organizationControl.setValue([]);
+                this.agencyOrganizationIds = [];
               } 
               return !!organizations.length;
             }           
