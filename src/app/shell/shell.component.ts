@@ -407,7 +407,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     } else {
       url = this.irpVmsHelpSiteUrl;
     }
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener');
   }
 
   toggleChatDialog(): void {
