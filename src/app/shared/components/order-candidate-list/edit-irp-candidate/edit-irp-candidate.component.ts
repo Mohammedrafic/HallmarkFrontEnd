@@ -341,7 +341,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         actualStartDate, {
           jobStartDate,
           jobEndDate,
-        });
+      });
 
       this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
     });
@@ -467,7 +467,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       isClosedFormControl?.disable();
     } else {
       this.removeEndDateControlLimitations(endDateFormControl as FormControl, endDateConfigField);
-      endDateFormControl?.setValue(this.endDateFormControlValue);
+      endDateFormControl?.setValue(endDateFormControl?.value);
       startDateFormControl?.enable();
       isClosedFormControl?.enable();
     }
