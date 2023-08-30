@@ -1,5 +1,5 @@
 <button
-  *ngIf="showExport"
+  *ngIf="showExport" [disabled]="noorgSelection"
   ejs-dropdownbutton
   id="exportButton"
   [items]="exportOptions"

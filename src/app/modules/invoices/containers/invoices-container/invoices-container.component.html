@@ -34,7 +34,7 @@
       </div>
       <div class="buttons-group" [class.top-margin]="!isAgency">
         <div class="buttons-container">
-          <button ejs-button
+          <button ejs-button  [disabled]="noorgSelection"
                   appHideBeforeSyncfusionLoad
                   cssClass="e-outline button-filter button--no-wrap button-only-icon"
                   (click)="showFilters()">
@@ -53,11 +53,12 @@
                                    [selectedRows]="gridSelections"
                                    [organizationId]="organizationId"
                                    [agencyOrganizationIds]="agencyOrganizationIds"
+                                   [noorgSelection]="noorgSelection"
                                    (resetTableSelection)="resetTableSelection()"></app-invoice-grid-export>
 
           <button ejs-button
                   *ngIf="(!isAgency  && selectedTabIdx !== 1) || (isAgency && selectedTabIdx !== 0)"
-                  [disabled]="!gridSelections.selectedInvoiceIds || !gridSelections.selectedInvoiceIds.length"
+                  [disabled]="!gridSelections.selectedInvoiceIds || !gridSelections.selectedInvoiceIds.length  || noorgSelection"
                   cssClass="e-outline button-filter button--no-wrap button-only-icon"
                   (click)="printInvoices()">
             <i-feather name="printer" class="icon"></i-feather>
@@ -68,7 +69,7 @@
                     [disabled]="
               !canPay ||
               !gridSelections.selectedInvoiceIds ||
-              !gridSelections.selectedInvoiceIds.length
+              !gridSelections.selectedInvoiceIds.length || noorgSelection
             "
                     cssClass="e-primary relative pay-button"
                     (click)="openAddPayment(true)"
@@ -79,7 +80,7 @@
           <button ejs-button
                   appHideBeforeSyncfusionLoad
                   class="e-primary relative"
-                  [disabled]="!invoiceContainerConfig.agencyActionsAllowed || !createManualEnabled"
+                  [disabled]="!invoiceContainerConfig.agencyActionsAllowed || !createManualEnabled || noorgSelection"
                   (click)="openAddDialog()"
                   *ngIf="tabConfig?.manualInvoiceCreationEnabled">
             Add Manual Invoice

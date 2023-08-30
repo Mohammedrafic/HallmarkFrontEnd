@@ -36,7 +36,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
   @Input() set selectedTab(selectedTabIdx: number | never) {
    this.setSelectedTab(selectedTabIdx);
   }
-
+  @Input() public noorgSelection: boolean = false;
   @Output() readonly resetTableSelection: EventEmitter<void> = new EventEmitter<void>();
 
   public showExport = false;
