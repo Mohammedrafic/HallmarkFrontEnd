@@ -247,6 +247,8 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.candidateForm.get('employeeId')?.addValidators(Validators.required);
     this.candidateForm.get('hireDate')?.addValidators(Validators.required);
     this.candidateForm.get('employeeSourceId')?.removeValidators(Validators.required);
+    this.candidateForm.get('employeeId')?.updateValueAndValidity();
+    this.candidateForm.get('employeeSourceId')?.updateValueAndValidity();
     this.employeeIdRequired = true;
     this.sourceIdUpdateListener$?.unsubscribe();
     this.isTerminatedSelected = false;
