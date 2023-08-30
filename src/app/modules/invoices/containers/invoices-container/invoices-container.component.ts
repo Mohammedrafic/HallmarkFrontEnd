@@ -188,6 +188,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public readonly userPermissions = UserPermissions;
   public allOption: string = "All";
   public noorgSelection:boolean = false;
+  public addManualInvoiceDisable:boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -214,12 +215,16 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         distinctUntilChanged(),
         filter(Boolean),
         tap((id) => {
-          if(id.length == 0 && this.isAgency){
+          if(id.length == 0){
             this.noorgSelection = true;
             this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select atleast one Organization'));
             return; 
           }
           this.noorgSelection = false;
+          this.addManualInvoiceDisable = false;
+          if(id.length > 1){
+            this.addManualInvoiceDisable = true;
+          }
           this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
         }),
       );
@@ -408,7 +413,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public openAddDialog(): void {
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
-    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value 
+    this.store.dispatch(new Invoices.GetInvoicesReasons(this.isAgency ?  this.organizationMultiSelectControl?.value?.[0] : this.organizationControl.value 
       || this.store.selectSnapshot(UserState.lastSelectedOrganizationId)));
   }
 
