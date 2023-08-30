@@ -188,6 +188,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public readonly userPermissions = UserPermissions;
   public allOption: string = "All";
   public noorgSelection:boolean = false;
+  public addManualInvoiceDisable:boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -220,6 +221,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             return; 
           }
           this.noorgSelection = false;
+          this.addManualInvoiceDisable = false;
+          if(id.length > 1){
+            this.addManualInvoiceDisable = true;
+          }
           this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
         }),
       );
@@ -286,8 +291,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           filter((organizations: DataSourceItem[]) =>
             {
               if(organizations.length == 0 && this.showmsg){
+                this.store.dispatch(new Invoices.ClearInvoices())
                 this.showmsg = false;
-                this.store.dispatch(new ShowToast(MessageTypes.Error, 'No organization has been mapped for the agency'));
+                this.organizationMultiSelectControl.setValue([]);
+                this.organizationControl.setValue([]);
+                this.agencyOrganizationIds = [];
               } 
               return !!organizations.length;
             }           
@@ -407,7 +415,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public openAddDialog(): void {
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
-    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value 
+    this.store.dispatch(new Invoices.GetInvoicesReasons(this.isAgency ?  this.organizationMultiSelectControl?.value?.[0] : this.organizationControl.value 
       || this.store.selectSnapshot(UserState.lastSelectedOrganizationId)));
   }
 

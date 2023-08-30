@@ -20,6 +20,11 @@ export namespace Invoices {
     }
   }
 
+  export class ClearInvoices{
+    static readonly type = INVOICES_ACTIONS.CLEAR_INVOICES;
+    constructor(){}
+  }
+
   export class DetailExport {
     static readonly type = INVOICES_ACTIONS.DETAIL_EXPORT;
 

@@ -80,13 +80,13 @@
           <button ejs-button
                   appHideBeforeSyncfusionLoad
                   class="e-primary relative"
-                  [disabled]="!invoiceContainerConfig.agencyActionsAllowed || !createManualEnabled || noorgSelection"
+                  [disabled]="!invoiceContainerConfig.agencyActionsAllowed || !createManualEnabled || noorgSelection || addManualInvoiceDisable"
                   (click)="openAddDialog()"
                   *ngIf="tabConfig?.manualInvoiceCreationEnabled">
             Add Manual Invoice
-            <ejs-tooltip *ngIf="!createManualEnabled"
+            <ejs-tooltip *ngIf="!createManualEnabled || addManualInvoiceDisable"
                          class="tooltip"
-                         content="Separate permission right is required"
+                         content="{{addManualInvoiceDisable ? 'Please select single organization to add manual invoice' : 'Separate permission right is required'}}"
                          position="BottomCenter">
             </ejs-tooltip>
           </button>

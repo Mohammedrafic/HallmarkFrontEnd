@@ -557,6 +557,19 @@ export class InvoicesState {
     );
   }
 
+  @Action(Invoices.ClearInvoices)
+  ClearInvoices(
+    { patchState }: StateContext<InvoicesModel>,
+  ): Observable<null> {
+    return of(null).pipe(
+      debounceTime(100),
+      tap(() => patchState({
+        manualInvoicesData: null,
+        pendingApprovalInvoicesData: null
+      }))
+    );
+  }
+
   @Action(Invoices.GetManualInvoices)
   GetManualInvoices(
     { patchState, getState, dispatch }: StateContext<InvoicesModel>,
