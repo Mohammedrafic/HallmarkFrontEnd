@@ -23,6 +23,7 @@ export enum INVOICES_ACTIONS {
   GET_FILTERS_DATA_SOURCE = '[invoices] GET FILTERS DATA SOURCE',
   GET_PENDING_RECORDS_FILTERS_DATA_SOURCE = '[invoices] GET PENDING RECORDS FILTERS DATA SOURCE',
   SET_FILTERS_DATA_SOURCE = '[invoices] SET FILTERS DATA SOURCE',
+  CLEAR_INVOICES = '[invoices] CLEAR MANUAL AND PENDING',
   GetReasons = '[invoices] Get reasons for manual invoices',
   GetMeta = '[invoices] Get manual invoice metadata',
   SaveManualinvoice = '[invoices] Save manual invoice',

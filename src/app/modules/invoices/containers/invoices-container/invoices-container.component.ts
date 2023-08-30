@@ -213,7 +213,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         distinctUntilChanged(),
         filter(Boolean),
         tap((id) => {
-          if(id.length == 0){
+          if(id.length == 0 && this.isAgency){
             this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select atleast one Organization'));
             return; 
           }
@@ -282,9 +282,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           switchMap(() => this.organizations$),
           filter((organizations: DataSourceItem[]) =>
             {
-              if(organizations.length == 0 && this.showmsg){
+              if(organizations.length == 0 && this.showmsg && this.isAgency){
+                this.store.dispatch(new Invoices.ClearInvoices())
                 this.showmsg = false;
-                this.store.dispatch(new ShowToast(MessageTypes.Error, 'No organization has been mapped for the agency'));
+                this.organizationMultiSelectControl.setValue([]);
               } 
               return !!organizations.length;
             }           
