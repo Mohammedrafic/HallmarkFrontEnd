@@ -29,5 +29,5 @@ export enum WidgetDescriptionEnum {
   AVAILABLE_EMPLOYEE='Available Employees in next 24 hrs.',
   CANDIDATES_ACTIVE_POSITIONS="Count of Candidate statuses in Active Orders/Positions.",
   POSITIONS_COUNT_DAY_RANGE="Active Positions by Open Day Range",
-  ORDERS_PENDING_IN_CUSTOM = "Orders Pending for Approval",
+  ORDERS_PENDING_IN_CUSTOM = "Average days positions spending in specific custom status",
 }
