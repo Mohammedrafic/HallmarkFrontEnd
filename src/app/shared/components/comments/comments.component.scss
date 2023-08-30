@@ -15,6 +15,7 @@
     margin-top: 16px;
     padding: 0 12px;
     display: flex;
+    align-items: center;
 
     .title {
       margin-right: auto;
@@ -31,6 +32,10 @@
       .e-input,
       .e-input-group-icon {
         color: $primary-active-blue-10 !important;
+      }
+
+      .e-control-wrapper {
+        height: 24px;
       }
     }
   }

@@ -137,8 +137,8 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.CategoryNote;
     } else if (selectedTab.selectedItem.innerText === "Sourcing Reason") {
       this.selectedTab = ReasonsNavigationTabs.SourcingReason;
-    } else if (selectedTab.selectedItem.innerText === "Recuriter Reason") {
-      this.selectedTab = ReasonsNavigationTabs.RecuriterReason;
+    } else if (selectedTab.selectedItem.innerText === "Recruiter Reason") {
+      this.selectedTab = ReasonsNavigationTabs.RecruiterReason;
     } 
     
     this.formType = ReasonFormsTypeMap[this.selectedTab];
@@ -248,7 +248,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         id: (data as RejectReason).id,
         reason: reason.reason,
         });
-    }else if((this.selectedTab ===ReasonsNavigationTabs.RecuriterReason)){
+    }else if((this.selectedTab ===ReasonsNavigationTabs.RecruiterReason)){
       const reason  = data as RejectReason;
       this.reasonForm.patchValue({
         id: (data as RejectReason).id,

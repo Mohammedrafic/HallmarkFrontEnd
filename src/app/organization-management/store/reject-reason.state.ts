@@ -773,6 +773,9 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new UpdateRecuriterReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
@@ -848,6 +851,8 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new UpdateSourcingReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }

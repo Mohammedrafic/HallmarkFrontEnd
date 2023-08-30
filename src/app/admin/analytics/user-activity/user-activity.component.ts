@@ -231,6 +231,14 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
+    {
+      headerName: 'Message',
+      field: 'message',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
  
 
 

@@ -4,7 +4,11 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, of, tap } from 'rxjs';
 
-import { CandidateCredential, CandidateCredentialResponse, CredentialGroupedFiles } from '@shared/models/candidate-credential.model';
+import {
+  CandidateCredential,
+  CandidateCredentialResponse,
+  CredentialGroupedFiles,
+} from '@shared/models/candidate-credential.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { CandidateImportResult } from '@shared/models/candidate-profile-import.model';
@@ -390,14 +394,33 @@ export class CandidateState {
     );
   }
 
+  @Action(UploadCredentialFiles)
+  UploadCredentialFiles(
+    { patchState, dispatch }: StateContext<CandidateStateModel>,
+    { files, candidateCredentialId }: UploadCredentialFiles
+  ): Observable<void> {
+    patchState({ isCandidateLoading: true });
+    return this.candidateService.saveCredentialFiles(files, candidateCredentialId).pipe(
+      tap((payload) => {
+        patchState({ isCandidateLoading: false });
+        dispatch(new UploadCredentialFilesSucceeded());
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
   @Action(SaveCandidatesCredential)
   SaveCandidatesCredential(
     { patchState, dispatch, getState }: StateContext<CandidateStateModel>,
-    { payload }: SaveCandidatesCredential
+    { payload, file }: SaveCandidatesCredential
   ): Observable<CandidateCredential | void> {
-    payload.candidateProfileId = payload.candidateProfileId ? payload.candidateProfileId : getState().candidate?.id as number;
+    payload.candidateProfileId = 
+      payload.candidateProfileId ? payload.candidateProfileId : getState().candidate?.id as number;
     patchState({ isCandidateLoading: true });
-    return this.candidateService.saveCredential(payload).pipe(
+    return this.candidateService.saveCredential(payload, file).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false });
         dispatch(new SaveCandidatesCredentialSucceeded(payload));
@@ -409,6 +432,7 @@ export class CandidateState {
       })
     );
   }
+
   @Action(VerifyCandidatesCredentials)
   VerifyCandidateCredentials(
     { patchState, dispatch }: StateContext<CandidateStateModel>, //{ patchState, dispatch, getState }
@@ -458,24 +482,6 @@ export class CandidateState {
       tap((payload) => {
         patchState({ credentialTypes: payload });
         return payload;
-      })
-    );
-  }
-
-  @Action(UploadCredentialFiles)
-  UploadCredentialFiles(
-    { patchState, dispatch }: StateContext<CandidateStateModel>,
-    { files, candidateCredentialId }: UploadCredentialFiles
-  ): Observable<any> {
-    patchState({ isCandidateLoading: true });
-    return this.candidateService.saveCredentialFiles(files, candidateCredentialId).pipe(
-      tap((payload) => {
-        patchState({ isCandidateLoading: false });
-        dispatch(new UploadCredentialFilesSucceeded());
-        return payload;
-      }),
-      catchError((error: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
@@ -557,7 +563,7 @@ export class CandidateState {
         dispatch(new UploadCandidateProfileFileSucceeded(payload));
         return payload;
       }),
-      catchError((error: any) =>
+      catchError((error: HttpErrorResponse) =>
         of(
           dispatch(
             new ShowToast(

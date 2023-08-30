@@ -398,6 +398,14 @@
     }
   }
 
+  .e-open {
+    .e-node-focus > .e-text-content {
+      .e-text {
+        color: $primary-active-blue-15;
+      }
+    }
+  }
+
   .icon-container {
     height: 3rem;
     display: flex;

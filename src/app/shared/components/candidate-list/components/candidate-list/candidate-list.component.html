@@ -17,7 +17,7 @@
   (rowDeselected)="rowDeselected($event, grid)">
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      <e-column textAlign="Right" width="80" *ngIf="isAgency">
+      <e-column textAlign="Right" width="95" *ngIf="isAgency">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">

@@ -16,6 +16,7 @@ import {
   GetInvoiceState,
   GetTabsToExport,
   InvoiceExportCols,
+  OrgManualInvoicePendingExportCols,
   PendingInvoiceExportCols,
 } from './invoice-export.constant';
 import { InvoicesState } from '../../store/state/invoices.state';
@@ -35,7 +36,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
   @Input() set selectedTab(selectedTabIdx: number | never) {
    this.setSelectedTab(selectedTabIdx);
   }
-
+  @Input() public noorgSelection: boolean = false;
   @Output() readonly resetTableSelection: EventEmitter<void> = new EventEmitter<void>();
 
   public showExport = false;
@@ -87,7 +88,7 @@ export class InvoiceGridExportComponent extends AbstractGridConfigurationCompone
     else
     {
       if(this.selectedTabIndex === OrganizationInvoicesGridTab.Manual)
-      this.columnsToExport=AgencyManualInvoicePendingExportCols;
+      this.columnsToExport=OrgManualInvoicePendingExportCols;
       else if(this.selectedTabIndex === OrganizationInvoicesGridTab.PendingRecords)
         this.columnsToExport=PendingInvoiceExportCols;
       else

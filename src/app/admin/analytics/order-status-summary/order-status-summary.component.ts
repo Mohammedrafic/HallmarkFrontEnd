@@ -173,7 +173,13 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       minWidth: 250,
       filter: true,
       sortable: true,
-      resizable: true
+      resizable: true,
+      cellRenderer: (params: any) => {
+        if (params.node && params.node.rowPinned) {
+          return `<strong> GrandTotal: </strong>`;
+        }
+        return params.value;
+      },
     },
     {
       headerName: 'Total Positions',
@@ -184,11 +190,11 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       sortable: true,
       resizable: true,
       aggFunc: this.customAggregate,
-      valueFormatter: (params) => {
-        if (params.node && params.node.footer) {
-          return 'Total:' + params.value;
+      cellRenderer: (params: any) => {
+        if (params.node && params.node.rowPinned) {
+          return `<strong> ${params.value} </strong>`;
         }
-        return params.value;
+        return params.value ?? 0;
       },
     },
     {
@@ -200,11 +206,11 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       sortable: true,
       resizable: true,
       aggFunc: this.customAggregate,
-      valueFormatter: (params) => {
-        if (params.node && params.node.footer) {
-          return 'Total:' + params.value;
+      cellRenderer: (params: any) => {
+        if (params.node && params.node.rowPinned) {
+          return `<strong> ${params.value} </strong>`;
         }
-        return params.value;
+        return params.value ?? 0;
       },
     },
     {
@@ -216,11 +222,11 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       sortable: true,
       resizable: true,
       aggFunc: this.customAggregate,
-      valueFormatter: (params) => {
-        if (params.node && params.node.footer) {
-          return 'Total:' + params.value;
+      cellRenderer: (params: any) => {
+        if (params.node && params.node.rowPinned) {
+          return `<strong> ${params.value} </strong>`;
         }
-        return params.value;
+        return params.value ?? 0;
       },
     },
     {
@@ -232,11 +238,11 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       sortable: true,
       resizable: true,
       aggFunc: this.customAggregate,
-      valueFormatter: (params) => {
-        if (params.node && params.node.footer) {
-          return 'Total:' + params.value;
+      cellRenderer: (params: any) => {
+        if (params.node && params.node.rowPinned) {
+          return `<strong> ${params.value} </strong>`;
         }
-        return params.value;
+        return params.value ?? 0;
       },
     },
     {
@@ -248,11 +254,11 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       sortable: true,
       resizable: true,
       aggFunc: this.customAggregate,
-      valueFormatter: (params) => {
-        if (params.node && params.node.footer) {
-          return 'Total:' + params.value;
+      cellRenderer: (params: any) => {
+        if (params.node && params.node.rowPinned) {
+          return `<strong> ${params.value} </strong>`;
         }
-        return params.value;
+        return params.value ?? 0;
       },
     },
     {
@@ -264,11 +270,11 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       sortable: true,
       resizable: true,
       aggFunc: this.customAggregate,
-      valueFormatter: (params) => {
-        if (params.node && params.node.footer) {
-          return 'Total:' + params.value;
+      cellRenderer: (params: any) => {
+        if (params.node && params.node.rowPinned) {
+          return `<strong> ${params.value} </strong>`;
         }
-        return params.value;
+        return params.value ?? 0;
       },
     },
     {
@@ -280,11 +286,11 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       sortable: true,
       resizable: true,
       aggFunc: this.customAggregate,
-      valueFormatter: (params) => {
-        if (params.node && params.node.footer) {
-          return 'Total:' + params.value;
+      cellRenderer: (params: any) => {
+        if (params.node && params.node.rowPinned) {
+          return `<strong> ${params.value} </strong>`;
         }
-        return params.value;
+        return params.value ?? 0;
       },
     }
   ]
@@ -299,7 +305,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     this.organizationId$.pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.store.dispatch([new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage({}),
-          new OrderStatusSummaryReportActions.GetOrderStatusSummaryFiltersByOrganization()]);
+        new OrderStatusSummaryReportActions.GetOrderStatusSummaryFiltersByOrganization()]);
         this.onFilterClearAll();
         this.setFilters();
       });
@@ -376,7 +382,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     };
     payload.orderType = this.orderStatusSummaryReportForm.value.orderType.map((type: string) => OrderType[type as keyof typeof OrderType]).toString();
     this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(payload));
-    this.resetForm();
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
@@ -385,13 +390,13 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   }
 
   public onFilterClose() {
-    this.resetForm();
   }
 
   onBtExport() {
     const params = {
-      fileName: 'Order/Position Status Summary Report',
-      sheetName: 'Order/Position Status Summary Report'
+      skipPinnedBottom: true,
+      fileName: 'Order-Position Status Summary Report',
+      sheetName: 'Order-Position Status Summary Report'
     };
     this.gridApi.exportDataAsExcel(params);
   }
@@ -420,13 +425,45 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     noRowsMessageFunc: () => 'No Rows To Show',
   };
 
+  pinnedBottomRowData: any[] = [];
+
   public getGridData(): void {
     this.data$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-      this.itemList = data;
+      this.itemList = data.map(item => {
+        return {
+          ...item,
+          totalPositions: item.totalPositions ?? 0,
+          openPositions: item.openPositions ?? 0,
+          inProgress: item.inProgress ?? 0,
+          offered: item.offered ?? 0,
+          accepted: item.accepted ?? 0,
+          filled: item.filled ?? 0,
+          closed: item.closed ?? 0,
+
+        }
+      });
       if (this.gridApi) {
         this.gridApi.setRowData(this.itemList);
+        this.updatePinnedBottomRowData();
       }
     });
+  }
+
+  updatePinnedBottomRowData() {
+    const totalPositionsSum = this.itemList.reduce((sum, row) => sum + row.totalPositions, 0);
+    const openPositionsSum = this.itemList.reduce((sum, row) => sum + row.openPositions, 0);
+    const inProgressSum = this.itemList.reduce((sum, row) => sum + row.inProgress, 0);
+    const offeredSum = this.itemList.reduce((sum, row) => sum + row.offered, 0);
+    const acceptedSum = this.itemList.reduce((sum, row) => sum + row.accepted, 0);
+    const filledSum = this.itemList.reduce((sum, row) => sum + row.filled, 0);
+    const closedSum = this.itemList.reduce((sum, row) => sum + row.closed, 0);
+    this.pinnedBottomRowData = [{
+      totalPositions: totalPositionsSum, openPositions: openPositionsSum,
+      inProgress: inProgressSum, offered: offeredSum, accepted: acceptedSum,
+      filled: filledSum, closed: closedSum
+    },
+    ];
+    this.gridApi.setPinnedBottomRowData(this.pinnedBottomRowData);
   }
 
   public gridOptions: GridOptions = {
@@ -437,7 +474,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     rowData: this.itemList,
     sideBar: this.sideBar,
     detailRowAutoHeight: true,
-    groupIncludeTotalFooter: true,
     noRowsOverlayComponent: CustomNoRowsOverlayComponent,
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {

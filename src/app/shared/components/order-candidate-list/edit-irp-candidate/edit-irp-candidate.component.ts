@@ -345,14 +345,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
       this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
     });
-
-    this.candidateForm.get('actualEndDate')?.valueChanges.pipe(
-      distinctUntilChanged(),
-      takeUntil(this.componentDestroy()),
-    ).subscribe((date: Date) => {
-      this.setIsClosedFormControlState(this.candidateForm.get('status')?.value, date);
-      this.cdr.markForCheck();
-    });
   }
 
   private hideDialog(): void {
@@ -458,6 +450,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
     const endDateFormControl = this.candidateForm.get('actualEndDate');
     const startDateFormControl = this.candidateForm.get('actualStartDate');
+    const isClosedFormControl = this.candidateForm.get('isClosed');
     const endDateConfigField = this.getConfigField('actualEndDate');
 
     if (status === CandidatStatus.Cancelled) {
@@ -470,34 +463,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.endDateFormControlValue = endDateFormControl?.value;
       endDateFormControl?.reset();
       endDateFormControl?.setValidators([Validators.required]);
+      isClosedFormControl?.setValue(false);
+      isClosedFormControl?.disable();
     } else {
       this.removeEndDateControlLimitations(endDateFormControl as FormControl, endDateConfigField);
       endDateFormControl?.setValue(this.endDateFormControlValue);
       startDateFormControl?.enable();
-    }
-
-    endDateFormControl?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-  }
-
-  private setIsClosedFormControlState(status: CandidatStatus, endDate: Date): void {
-    if (!status) {
-      return;
-    }
-
-    const isClosedFormControl = this.candidateForm.get('isClosed');
-    const closeDateConfigField = this.getConfigField('closeDate');
-    if (status === CandidatStatus.Cancelled && (!endDate || !DateTimeHelper.isFutureDate(endDate.toISOString()))) {
-      isClosedFormControl?.setValue(false);
-      isClosedFormControl?.disable();
-    } else {
       isClosedFormControl?.enable();
     }
 
-    if (status === CandidatStatus.Cancelled && endDate && DateTimeHelper.isFutureDate(endDate.toISOString())) {
-      closeDateConfigField.maxDate = endDate;
-    } else {
-      closeDateConfigField.maxDate = null;
-    }
+    endDateFormControl?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
   }
 
   private removeEndDateControlLimitations(endDateFormControl: FormControl, endDateConfigField: CandidateField): void {

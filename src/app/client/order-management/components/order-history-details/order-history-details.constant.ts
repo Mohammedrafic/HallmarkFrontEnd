@@ -19,7 +19,7 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
       headerName: 'TYPE',
       field: 'orderType',
       minWidth: 100,
-      maxWidth:100,
+      maxWidth:120,
       filter: true,
       sortable: true,
       resizable: true
@@ -27,8 +27,7 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
     {
       headerName: 'STATUS',
       field: 'orderStatus',
-      minWidth: 120,     
-      maxWidth:200,
+      minWidth: 120, 
       filter: true,
       sortable: true,
       resizable: true
@@ -111,7 +110,7 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
           if (cellValue == null) {
             return 0;
           }
-          const dateAsString =  GridValuesHelper.formatDate(cellValue, 'MM/dd/yyyy') as string
+          const dateAsString = cellValue;
           const dateParts = dateAsString.split('/');
           const year = Number(dateParts[2]);
           const month = Number(dateParts[0]) - 1;
@@ -128,13 +127,12 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str =  GridValuesHelper.formatDate(params.value, 'MM/dd/yyyy') as string 
+        const str = params.data.jobStartDate;
         return str?.length > 0 ? str : "";
       },
       sortable: true,
       resizable: true
     },
-
     {
       headerName: 'END DATE',
       field: 'jobEndDate',
@@ -148,7 +146,7 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
           if (cellValue == null) {
             return 0;
           }
-          const dateAsString =  GridValuesHelper.formatDate(cellValue, 'MM/dd/yyyy') as string
+          const dateAsString = cellValue;
           const dateParts = dateAsString.split('/');
           const year = Number(dateParts[2]);
           const month = Number(dateParts[0]) - 1;
@@ -165,7 +163,7 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = GridValuesHelper.formatDate(params.data.jobEndDate, 'MM/dd/yyyy') as string
+        const str = params.data.jobEndDate;
         return str?.length > 0 ? str : "";
       },
       sortable: true,
@@ -258,7 +256,7 @@ export const OrderCredentialAuditHistoryTableColumnsDefinition = (): ColumnDefin
       headerName: OrderCredentialAuditHistoryTableColumns.credentialName,
       field: 'credentialName',
       minWidth: 100,
-      maxWidth:180,
+      maxWidth:200,
       filter: true,
       sortable: true,
       resizable: true
@@ -267,8 +265,7 @@ export const OrderCredentialAuditHistoryTableColumnsDefinition = (): ColumnDefin
     {
       headerName: OrderCredentialAuditHistoryTableColumns.reqForSubmission,
       field: 'reqForSubmission',
-      minWidth: 100,
-      maxWidth:150,
+      minWidth: 120,      
       filter: true,
       sortable: true,
       resizable: true
@@ -277,7 +274,6 @@ export const OrderCredentialAuditHistoryTableColumnsDefinition = (): ColumnDefin
       headerName: OrderCredentialAuditHistoryTableColumns.reqForOnboard,
       field: 'reqForOnboard',
       minWidth: 100,
-      maxWidth:150,
       filter: true,
       sortable: true,
       resizable: true
@@ -286,7 +282,7 @@ export const OrderCredentialAuditHistoryTableColumnsDefinition = (): ColumnDefin
       headerName: OrderCredentialAuditHistoryTableColumns.optional,
       field: 'optional',
       minWidth: 100,
-      maxWidth:150,
+      maxWidth: 120,
       filter: true,
       sortable: true,
       resizable: true
@@ -295,7 +291,7 @@ export const OrderCredentialAuditHistoryTableColumnsDefinition = (): ColumnDefin
       headerName: OrderCredentialAuditHistoryTableColumns.comment,
       field: 'comment',
       minWidth: 100,
-      maxWidth:150,
+      maxWidth:200,
       filter: true,
       sortable: true,
       resizable: true
@@ -349,7 +345,7 @@ export const OrderCredentialAuditHistoryTableColumnsDefinition = (): ColumnDefin
       headerName: OrderCredentialAuditHistoryTableColumns.modifiedBy,
       field: 'modifiedBy',
       minWidth: 100,
-      maxWidth:150,
+      maxWidth:250,
       filter: true,
       sortable: true,
       resizable: true
@@ -514,7 +510,6 @@ export const OrderBillRatesAuditHistoryTableColumnsDefinition = (): ColumnDefini
       headerName: OrderBillRateAuditHistoryTableColumns.modifiedBy,
       field: 'modifiedBy',
       minWidth: 100,
-      maxWidth:150,
       filter: true,
       sortable: true,
       resizable: true
@@ -547,7 +542,6 @@ export const OrderContactAuditHistoryTableColumnsDefinition = (): ColumnDefiniti
       headerName: OrderContactAuditHistoryTableColumns.email,
       field: 'email',
       minWidth: 100,
-      maxWidth:150,
       filter: true,
       sortable: true,
       resizable: true
@@ -618,7 +612,6 @@ export const OrderContactAuditHistoryTableColumnsDefinition = (): ColumnDefiniti
       headerName: OrderCredentialAuditHistoryTableColumns.modifiedBy,
       field: 'modifiedBy',
       minWidth: 100,
-      maxWidth:150,
       filter: true,
       sortable: true,
       resizable: true
@@ -705,7 +698,6 @@ export const OrderWorkLocationAuditHistoryTableColumnsDefinition = (): ColumnDef
       headerName: OrderCredentialAuditHistoryTableColumns.modifiedBy,
       field: 'modifiedBy',
       minWidth: 100,
-      maxWidth:150,
       filter: true,
       sortable: true,
       resizable: true
@@ -719,7 +711,7 @@ export const OrderJobDistributionAuditHistoryTableColumnsDefinition = (): Column
     {
       headerName: OrderJobDistributionAuditHistoryTableColumns.jobDistributionOption,
       field: 'jobDistributionOption',
-      minWidth: 100,     
+      minWidth: 250,     
       filter: true,
       sortable: true,
       resizable: true      
@@ -782,12 +774,10 @@ export const OrderJobDistributionAuditHistoryTableColumnsDefinition = (): Column
       headerName: OrderCredentialAuditHistoryTableColumns.modifiedBy,
       field: 'modifiedBy',
       minWidth: 100,
-      maxWidth:150,
       filter: true,
       sortable: true,
       resizable: true
-    }
-    
+    }    
   ];
 };
 
@@ -849,7 +839,6 @@ export const OrderClassificationAuditHistoryTableColumnsDefinition = (): ColumnD
       headerName: OrderCredentialAuditHistoryTableColumns.modifiedBy,
       field: 'modifiedBy',
       minWidth: 100,
-      maxWidth:150,
       filter: true,
       sortable: true,
       resizable: true

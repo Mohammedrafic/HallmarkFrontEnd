@@ -1,3 +1,9 @@
+@import 'adaptive-response';
+
+:host {
+  display: none;
+}
+
 .scroll-to-top {
   position: fixed;
   bottom: 16vh;
@@ -17,4 +23,10 @@
 
 .show-scrollTop {
   display: block;
+}
+
+@media #{$max-mobile} {
+  :host {
+    display: block;
+  }
 }
