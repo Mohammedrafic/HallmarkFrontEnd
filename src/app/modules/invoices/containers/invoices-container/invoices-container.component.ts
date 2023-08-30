@@ -187,6 +187,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public userPermission: Permission = {};
   public readonly userPermissions = UserPermissions;
   public allOption: string = "All";
+  public noorgSelection:boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -214,9 +215,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         filter(Boolean),
         tap((id) => {
           if(id.length == 0){
+            this.noorgSelection = true;
             this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select atleast one Organization'));
             return; 
           }
+          this.noorgSelection = false;
           this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
         }),
       );
