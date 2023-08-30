@@ -1924,7 +1924,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
       }
       if(this.ltaOrderFlag){
-        this.clearFilters();
+        this.filters.orderStatuses = [];
+        this.filters.candidateStatuses = [];
       }
     }
   }
