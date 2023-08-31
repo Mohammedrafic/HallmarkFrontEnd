@@ -13,20 +13,22 @@ import { LogiReportState } from '@organization-management/store/logi-report.stat
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { ButtonModule, CheckBoxAllModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { SharedModule } from '@shared/shared.module';
-
+import {SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import { AgencyReportsComponent } from './agency-reports.component';
 import { FinancialTimesheetReportComponent } from './financial-timesheet-report/financial-timesheet-report.component';
 import { AgencyReportsRoutingModule } from './agency-reports-routing.module';
 import { LogiReportModule } from '../../shared/components/logi-report/logi-report.module';
 import { InvoiceSummaryReportComponent } from './invoice-summary-report/invoice-summary-report.component';
+import { MissingCredentialsAgencyComponent } from './missing-credentials-agency/missing-credentials-agency.component';
 
 
 @NgModule({
   declarations: [    
     AgencyReportsComponent,
     FinancialTimesheetReportComponent,
-    InvoiceSummaryReportComponent
+    InvoiceSummaryReportComponent,
+    MissingCredentialsAgencyComponent
   ],
   imports: [
     CommonModule,   
@@ -43,6 +45,7 @@ import { InvoiceSummaryReportComponent } from './invoice-summary-report/invoice-
     AutoCompleteAllModule,
     RadioButtonModule,
     LogiReportModule,
+    SwitchModule,
     NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState]),
   ],
   providers: [
