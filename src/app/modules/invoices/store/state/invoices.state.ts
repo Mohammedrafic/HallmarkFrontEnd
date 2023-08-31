@@ -434,7 +434,7 @@ export class InvoicesState {
         const tabIdx = ctx.getState().selectedTabIdx;
 
         if (isAgency && tabIdx === 0) {
-          ctx.dispatch(new Invoices.GetManualInvoices(payload.organizationId));
+          ctx.dispatch(new Invoices.GetManualInvoices(payload.organizationId,[payload.organizationId]));
         } else {
           ctx.dispatch(new Invoices.GetPendingInvoices(payload.organizationId));
         }
