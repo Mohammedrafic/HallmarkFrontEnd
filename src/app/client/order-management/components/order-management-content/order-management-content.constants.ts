@@ -42,6 +42,8 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Actual Start Date', column: 'ActualStartDate' },
+  { text: 'Actual End Date', column: 'ActualEndDate' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
