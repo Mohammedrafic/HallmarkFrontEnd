@@ -68,7 +68,7 @@
     </div>
   </div>
   <div class="input-container" *ngIf="IsShowIRPVMS">
-    <div class="bootstrap checkbox-container">
+    <div class="bootstrap checkbox-container" *ngIf="!IsEmpBussinessUnit">
       <ejs-checkbox formControlName="IRP" label="IRP"  (change)="OnChangeIRP($event)"></ejs-checkbox>&nbsp;&nbsp;&nbsp;
       <ejs-checkbox formControlName="VMS" label="VMS"  (change)="OnChangeVMS($event)"></ejs-checkbox>
     </div>

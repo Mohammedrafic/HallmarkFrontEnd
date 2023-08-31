@@ -7,7 +7,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 
 export class GetBusinessByUnitType {
   static readonly type = '[security] Get Business By Unit Type';
-  constructor(public type: BusinessUnitType) {}
+  constructor(public type: BusinessUnitType,public isUsers:boolean=false) {}
 }
 
 export class GetRolesPage {
@@ -62,7 +62,7 @@ export class GetIRPPermissionsTree {
 }
 export class GetNewRoleBusinessByUnitType {
   static readonly type = '[security] Get New Role Business By Unit Type';
-  constructor(public type: BusinessUnitType) {}
+  constructor(public type: BusinessUnitType,public isusers : boolean=false) {}
 }
 
 export class GetNewRoleBusinessByUnitTypeSucceeded {
