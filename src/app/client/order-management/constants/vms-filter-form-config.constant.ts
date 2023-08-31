@@ -55,6 +55,7 @@ const AllOrdersFilterFormConfig: CommonFormConfig[] = [
   { field: 'poNumberIds' },
   { field: 'contactEmails' },
   { field: 'orderLocked' },
+  { field: 'orderDistributionType' },
 ];
 
 const PerdiemFormConfig: CommonFormConfig[] = [
@@ -121,6 +122,7 @@ const ReorderFormConfig: CommonFormConfig[] = [
   { field: 'distributedOnFrom' },
   { field: 'distributedOnTo' },
   { field: 'agencyType' },
+  { field: 'orderDistributionType' },
 ];
 
 const IncompleteFilterFormConfig: CommonFormConfig[] = [

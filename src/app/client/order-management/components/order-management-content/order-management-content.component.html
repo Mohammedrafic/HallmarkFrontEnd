@@ -417,6 +417,21 @@
             </div>
           </ng-template>
         </e-column>
+        <e-column
+        field="system"
+        headerText="System"
+        width="125"
+        minWidth="140"
+        maxWidth="200"
+        textAlign="Left"
+        [visible]="isOrgIRPEnabled && isOrgVMSEnabled"
+      >
+      <ng-template #template let-data>
+        <div (click)="openvmspositions(data.publicId)">
+          <span class="vms-system">{{data.system}}</span>
+        </div>
+      </ng-template>
+    </e-column>
         <e-column field="orderType" headerText="TYPE" textAlign="Center" width="85" minWidth="70" maxWidth="110">
           <ng-template #template let-data>
             <div class="order-type-column" *ngIf="orderTypeTooltipMessage[data.orderType] as orderType">
@@ -1198,12 +1213,16 @@
         </div>
       </div>
     </div>
-    <div *ngIf="!isActiveSystemIRP">
-      <div class="radio-container">
-        <label class="radio-label">Internal Agency</label>
-        <ejs-radiobutton formControlName="agencyType" label="Yes" name="agencyType" value="1"></ejs-radiobutton>
-        <ejs-radiobutton formControlName="agencyType" label="No" name="agencyType" value="2"></ejs-radiobutton>
-        <ejs-radiobutton formControlName="agencyType" label="Both" name="agencyType" value="0"></ejs-radiobutton>
+    <div class="filter-row bootstrap">
+      <div class="input-container" *ngIf="!isActiveSystemIRP && 
+      activeTab === OrganizationOrderManagementTabs.ReOrders
+      || activeTab === OrganizationOrderManagementTabs.AllOrders">
+        <label>Order Distribution</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist  formControlName="orderDistributionType" [fields]="optionFields"
+              placeholder="All" [allowFiltering]="true" [dataSource]="orderDistributionList">
+          </ejs-dropdownlist>
+        </div>
       </div>
     </div>
     <div *ngIf="isActiveSystemIRP">
