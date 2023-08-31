@@ -59,6 +59,7 @@ import { ProfileMenuItem, THEME } from './shell.enum';
 import { UserService } from '@shared/services/user.service';
 import { BreakpointObserverService } from '@core/services';
 import { HeaderState } from '@shared/models/header-state.model';
+import { HelpNavigationService } from '@shared/services';
 
 @Component({
   selector: 'app-shell',
@@ -189,7 +190,8 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     private ResizeContentService: ResizeContentService,
     private userService: UserService,
     private breakpointService: BreakpointObserverService,
-    public elementRef: ElementRef
+    public elementRef: ElementRef,
+    private helpService: HelpNavigationService,
   ) {
     super();
 
@@ -401,13 +403,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   onGetHelp(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    let url = '';
-    if (user?.businessUnitType === BusinessUnitType.Agency) {
-      url = 'https://eiiahelp.einsteinii.org/';
-    } else {
-      url = this.irpVmsHelpSiteUrl;
-    }
-    window.open(url, '_blank', 'noopener');
+    this.helpService.navigateHelpPage(user?.businessUnitType === BusinessUnitType.Agency);
   }
 
   toggleChatDialog(): void {

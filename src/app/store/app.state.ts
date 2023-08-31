@@ -18,6 +18,7 @@ import {
   GetDeviceScreenResolution,
   GetAlertsCountForCurrentUser,
   SaveMainContentElement,
+  SetHelpSystem,
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -48,6 +49,7 @@ export interface AppStateModel {
     isDesktopSmall: boolean;
     isDesktopLarge: boolean;
   };
+  isIrpHelp: boolean;
 }
 
 @State<AppStateModel>({
@@ -77,6 +79,7 @@ export interface AppStateModel {
       isDesktopSmall: false,
       isDesktopLarge: false,
     },
+    isIrpHelp: false,
   },
 })
 @Injectable()
@@ -161,6 +164,11 @@ export class AppState {
   @Selector()
   static getMainContentElement(state: AppStateModel): AppStateModel['mainContentElement'] {
     return state.mainContentElement;
+  }
+
+  @Selector()
+  static getHelpSystem(state: AppStateModel): boolean {
+    return state.isIrpHelp;
   }
 
   @Action(ToggleMobileView)
@@ -279,5 +287,13 @@ export class AppState {
     { contentElement }: SaveMainContentElement
   ): void {
     patchState({ mainContentElement: contentElement });
+  }
+
+  @Action(SetHelpSystem)
+  SetHelpSystem(
+    { patchState }: StateContext<AppStateModel>,
+    { isIrpSystem }: SetHelpSystem,
+  ): void {
+    patchState({ isIrpHelp: isIrpSystem });
   }
 }

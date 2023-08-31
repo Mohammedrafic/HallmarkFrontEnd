@@ -130,3 +130,8 @@ export class SaveMainContentElement {
   static readonly type = '[app] Save Main Content Element';
   constructor(public contentElement: HTMLElement) { }
 }
+
+export class SetHelpSystem {
+  static readonly type = '[app] Set help system';
+  constructor(public readonly isIrpSystem: boolean) {}
+}

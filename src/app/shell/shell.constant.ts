@@ -63,3 +63,71 @@ export const AllBusinessTypeRoles: BusinessUnitType[] = [
   BusinessUnitType.MSP,
   BusinessUnitType.Organization,
 ];
+
+export const HelpDomain: Record<keyof BusinessUnitType | string, string> = {
+  [BusinessUnitType.Agency]: 'https://eiiahelp.einsteinii.org/Topics_Agency/',
+  [BusinessUnitType.Organization]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
+  [BusinessUnitType.Candidates]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
+  [BusinessUnitType.Employee]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
+  [BusinessUnitType.Hallmark]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
+  [BusinessUnitType.MSP]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
+  orgFallbackUrl: 'https://eiiohelp.einsteinii.org',
+  agencyFallbackUrl: 'https://eiiahelp.einsteinii.org',
+};
+
+export const HelpNavigationLinks = (isAgency: boolean) => {
+  if (!isAgency) {
+    return ({
+      irpLinks: {
+    
+      },
+      vmsLinks: {
+        'dashboard': 'Dashboard.html',
+        'order-management': 'Order_management.html',
+        'add': {
+          'order-management': 'Create_order.html',
+        },
+        'edit': {
+          'order-management': 'Create_order.html',
+          'candidates': 'Candidate_assignment.html',
+        },
+        'candidate-details': 'Candidate_assignment.html',
+        'candidates': 'Candidate_assignment.html',
+        'associate-list': 'Associated_Organizations.html',
+        'timesheets': 'Timesheets.html',
+        'invoices': 'Invoices.html',
+        'user-list': 'User_List.html',
+        'security': 'Administration.html',
+        'group-email': 'Group_Email.html',
+        'profile': 'Organization_Profile.html',
+        'document-library': 'Document_Library.html',
+      },
+    });
+  }
+
+  return ({
+    irpLinks: {
+  
+    },
+    vmsLinks: {
+      'dashboard': 'Dashboard.html',
+      'order-management': 'Order_management.html',
+      'add': {
+        'candidates': 'Add_Candidate.html',
+      },
+      'edit': {
+        'order-management': 'Create_order.html',
+        'candidates': 'Candidate_assignment.html',
+        'agency-list': 'Profile.html',
+      },
+      'candidate-details': 'Candidate_assignment.html',
+      'candidates': 'Candidates.html',
+      'associate-list': 'Associated_agencies.html',
+      'timesheets': 'Timesheets.html',
+      'invoices': 'Invoices.html',
+      'user-list': 'User_List.html',
+      'document-library': 'Document_Library.html',
+    },
+  });
+};
+
