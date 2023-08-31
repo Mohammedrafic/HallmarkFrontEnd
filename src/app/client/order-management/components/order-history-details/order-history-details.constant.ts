@@ -19,7 +19,6 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
       headerName: 'TYPE',
       field: 'orderType',
       minWidth: 100,
-      maxWidth:120,
       filter: true,
       sortable: true,
       resizable: true
