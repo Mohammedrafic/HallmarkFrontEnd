@@ -598,7 +598,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
               certifiedOn: createdOn,
               certifiedUntil: createdUntil,
               completedDate,
-              credentialType: this.credentialType,
             },
             file,
           )
