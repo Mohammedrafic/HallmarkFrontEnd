@@ -8,7 +8,7 @@ import {
 } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { isDistributionIncludeExternalOptions } from '@client/order-management/components/irp-tabs/order-details/helpers';
 
-export function jobDistributionValidator(controlName: string): ValidatorFn {
+export function jobDistributionValidator(controlName: string,isTemplate? : boolean): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
     const control = formGroup.get(controlName);
     const value = control?.value;
@@ -17,15 +17,15 @@ export function jobDistributionValidator(controlName: string): ValidatorFn {
     const internalNotSelected = !value?.includes(IrpOrderJobDistribution.AllInternal) && 
     !value?.includes(IrpOrderJobDistribution.TieringLogicInternal);
 
-    if (internalNotSelected) {
+    if (internalNotSelected && !isTemplate) {
       control?.setErrors({ errorMessage: InternalNotSelectedError });
     }
 
-    if(allInternalSelected) {
+    if(allInternalSelected && !isTemplate) {
       control?.setErrors({ errorMessage: InternalDistributionError });
     }
 
-    if(value && isDistributionIncludeExternalOptions(value).length > 1) {
+    if(value && isDistributionIncludeExternalOptions(value).length > 1 && !isTemplate) {
       control?.setErrors({ errorMessage: ExternalDistributionError });
     }
 

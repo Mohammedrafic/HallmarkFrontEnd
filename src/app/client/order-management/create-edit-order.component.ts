@@ -59,6 +59,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
 
   public saveEvents: Subject<void | MenuEventArgs> = new Subject<void | MenuEventArgs>();
   public title: string;
+  public system : number;
   public orderSystemConfig:ButtonModel[] = OrderSystemConfig;
   public submitButtonConfig: ItemModel[];
   public selectedOrder: Order;
@@ -248,9 +249,15 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   }
 
   private selectSystemForOrderManagement(): void {
-    const system = this.route.snapshot.data['system'] ?? OrderSystem.VMS;
+    if(this.activetab)
+    {
+      this.system=this.route.snapshot.data['system'] ?? OrderSystem.IRP;
+    }
+    else{
+      this.system = this.route.snapshot.data['system'] ?? OrderSystem.VMS;
+    }
     this.orderManagementService.setOrderManagementSystem(
-      system === OrderSystem.IRP ? OrderManagementIRPSystemId.IRP : OrderManagementIRPSystemId.VMS
+      this.system === OrderSystem.IRP ? OrderManagementIRPSystemId.IRP : OrderManagementIRPSystemId.VMS
     );
   }
 

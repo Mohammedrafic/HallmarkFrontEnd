@@ -7,11 +7,12 @@ import { jobDistributionValidator } from '@client/order-management/components/ir
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { Order } from '@shared/models/order-management.model';
 import { EditablePerDiemFields } from '@client/order-management/components/irp-tabs/order-details/constants';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class OrderDetailsIrpService {
-  constructor(private formBuilder: FormBuilder) {}
-
+  constructor(private router: Router,private formBuilder: FormBuilder) {}
+  public isTemplate : boolean=false;    
   public createOrderTypeForm(): FormGroup {
     return this.formBuilder.group({
       orderType: [IrpOrderType.LongTermAssignment, Validators.required],
@@ -53,22 +54,24 @@ export class OrderDetailsIrpService {
   }
 
   public createJobDistributionForm(): FormGroup {
+    this.isTemplate = this.router.url.includes('fromTemplate');
     return this.formBuilder.group({
       jobDistribution: [null, Validators.required],
       agencyId: [null],
       hourlyRate: [null],
     },{
-      validators: jobDistributionValidator('jobDistribution'),
+      validators: jobDistributionValidator('jobDistribution',this.isTemplate),
     });
   }
 
   public createJobDistributionPOForm(): FormGroup {
+    this.isTemplate = this.router.url.includes('fromTemplate');
     return this.formBuilder.group({
       jobDistribution: [null, Validators.required ],
       agencyId: [null],
       billRate: [null],
     }, {
-        validators: jobDistributionValidator('jobDistribution'),
+        validators: jobDistributionValidator('jobDistribution',this.isTemplate),
     });
   }
 

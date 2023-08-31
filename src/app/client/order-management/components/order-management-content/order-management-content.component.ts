@@ -1279,7 +1279,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   openIrpDetails(event: RowSelectedEvent | Partial<RowSelectedEvent>) {
     const orderData = event.data as IRPOrderManagement;
-    if (orderData.statusText == 'Incomplete') {
+    if (orderData.isTemplate) {
       this.store.dispatch(new GetSelectedOrderById(orderData.id, true));
       this.navigateToOrderTemplateForm(orderData.id, true);
     } else {
@@ -1536,7 +1536,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
 
     if (orderData.node && orderData.data) {
-      this.openIrpDetails(orderData);
+      if (orderData.data != null && !orderData.data.isTemplate) {
+        this.openIrpDetails(orderData);
+      }
       this.preservedOrderService.resetPreservedOrder();
       this.gridApi.ensureNodeVisible(orderData.node);
     }
