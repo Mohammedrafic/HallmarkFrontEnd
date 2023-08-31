@@ -22,7 +22,7 @@ interface OrderStatusSummaryCustomReportStateModel {
   name: 'orderstatussummarycustomreport',
   defaults: {
     reports: [],
-    filters: { region: [], location: [], department: [], skills: [], orderStatus: [] },
+    filters: { region: [], location: [], department: [], skills: [], orderType: [] },
   },
 })
 @Injectable()
