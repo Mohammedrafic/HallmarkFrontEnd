@@ -86,6 +86,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   isVMSChecked: boolean = true;
   isIRPChecked: boolean = true;
   public toggle: boolean = false;
+  IsEmpBussinessUnit: any = false;
   public fields = {
     dataSource: null, id: 'id', text: 'name', parentID: 'parentId', hasChildren: 'hasChild', htmlAttributes: 'htmlAttributes'
   }
@@ -324,6 +325,7 @@ public setTreeFilter()
         this.defaultBusinessValue = this.newRoleBussinesData.filter(x => x.id == this.businessUnitIdControl?.value);
         this.IsIrp = this.defaultBusinessValue[0]?.isIRPEnabled;
         this.IsVMS = this.defaultBusinessValue[0]?.isVMSEnabled;
+        this.IsEmpBussinessUnit = this.form.get('businessUnitType')?.value ==BusinessUnitType.Employee
         this.IsShowIRPVMS = this.IsIrp && this.IsVMS;
         this.defaultBusinessValue = this.defaultBusinessValue[0]?.id;
 
