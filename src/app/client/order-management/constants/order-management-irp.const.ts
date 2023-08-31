@@ -166,6 +166,7 @@ export const ThreeDotsMenuOptions = (
   reOrdersMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[2], id: '2', disabled: !canCloseOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   filledReOrdersMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
@@ -177,6 +178,7 @@ export const ThreeDotsMenuOptions = (
   irpIncompleteMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   moreMenuAddReOrderButton: [
     { text: MoreMenuType[5], id: '5', disabled: !canCreateOrder },
