@@ -13,5 +13,11 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     route: './invoice-summary-report',
     permissionKeys: ['CanViewAgencyInvoiceSummary'],
   },
+  {
+    text: 'Missing Credentials',
+    id: 3,
+    route: './missing-credentials-agency',
+    permissionKeys: ['CanViewAgencymissingcredentials'],
+  },
   
 ];
