@@ -11,7 +11,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, Validators } from '@angular/forms';
 
-import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of, Subscription } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
@@ -70,6 +70,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.isOnboarded = modalState.candidate.status === CandidatStatus.OnBoard;
       this.candidateJobId=this.candidateModelState.candidate.candidateJobId;
       this.getCandidateDetails();
+      this.watchForActualDateValues();
+    } else {
+      this.clearStartDateSubscription();
     }
   }
 
@@ -105,6 +108,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private candidateModelState: EditCandidateDialogState;
   private endDateFormControlValue: Date;
   private candidateDetails: CandidateDetails;
+  private actualStartDateSubscription: Subscription | null;
 
   constructor(
     private editIrpCandidateService: EditIrpCandidateService,
@@ -126,7 +130,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.observeCloseControl();
     this.observeStatusControl();
-    this.watchForActualDateValues();
   }
 
   save(): void {
@@ -324,7 +327,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   private watchForActualDateValues(): void {
-    this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
+    this.actualStartDateSubscription = this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
       filter((value: string) => {
         return !!value && this.candidateModelState.order.orderType === OrderType.LongTermAssignment
           && this.candidateForm.get('status')?.value !== CandidatStatus.Cancelled;
@@ -344,7 +347,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       });
 
       this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
-    });
+    }) || null;
   }
 
   private hideDialog(): void {
@@ -444,7 +447,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   private handleCancelledStatus(status: CandidatStatus): void {
-    if (!status) {
+    if (!status || this.candidateModelState.candidate.status === CandidatStatus.Cancelled) {
       return;
     }
 
@@ -484,5 +487,10 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private getConfigField(field: string): CandidateField {
     return this.dialogConfig.find((item) => item.field === field) as CandidateField;
+  }
+
+  private clearStartDateSubscription(): void {
+    this.actualStartDateSubscription?.unsubscribe();
+    this.actualStartDateSubscription = null;
   }
 }
