@@ -86,7 +86,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   isVMSChecked: boolean = true;
   isIRPChecked: boolean = true;
   public toggle: boolean = false;
-  IsEmpBussinessUnit: any = false;
+  IsEmpBussinessUnit: boolean = false;
   public fields = {
     dataSource: null, id: 'id', text: 'name', parentID: 'parentId', hasChildren: 'hasChild', htmlAttributes: 'htmlAttributes'
   }
