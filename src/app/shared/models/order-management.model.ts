@@ -105,6 +105,7 @@ export interface IRPOrderManagement {
   children: OrderManagementChild[];
   isLockedIRP: boolean;
   isTemplate?: boolean;
+  templateTitle?:string;
 }
 
 export interface GetOrdersJourney{

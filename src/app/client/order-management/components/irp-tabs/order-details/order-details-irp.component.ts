@@ -55,7 +55,7 @@ import {
 } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { FieldType, UserPermissions } from '@core/enums';
 import PriceUtils from '@shared/utils/price.utils';
-import { Destroyable } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Region } from '@shared/models/region.model';
 import { SystemType } from '@shared/enums/system-type.enum';
@@ -129,6 +129,7 @@ import {
   GetOrganizationSettings,
 } from '@organization-management/store/organization-management.actions';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { Router } from '@angular/router';
 enum SubmitButtonItem {
   SaveForLater = '0',
   Save = '1',
@@ -183,6 +184,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public regionsStructure: OrganizationRegion[] = [];
   public comments: Comment[] = [];
   public commentContainerId = 0;
+  public isTemplate : boolean=false;  
   @Input() public externalCommentConfiguration?: boolean | null;
 
   private dataSourceContainer: OrderDataSourceContainer = {};
@@ -220,6 +222,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private organizationSettings$: Observable<Configuration[]>;
 
   constructor(
+    private router: Router,
     private orderDetailsService: OrderDetailsIrpService,
     private changeDetection: ChangeDetectorRef,
     private store: Store,
@@ -235,6 +238,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isTemplate = this.router.url.includes('fromTemplate');
     this.getPermission();
     this.initOrderTypeForm();
     this.initForms(IrpOrderType.LongTermAssignment);
@@ -617,10 +621,11 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       ).subscribe((skills: ListOfSkills[]) => {
         this.setSkillFilters(skills);
 
-        if (!this.selectedOrder && this.selectedStructureState.skillId) {
+        if (!this.selectedOrder && this.selectedStructureState.skillId !=null && this.selectedStructureState.skillId) {
           this.generalInformationForm.controls['skillId'].patchValue(this.selectedStructureState.skillId);
         }
       });
+      
 
     this.generalInformationForm.get('duration')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
@@ -795,7 +800,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
   private showDistributionErrorMessage(): void {
     const distributionControl = this.jobDistributionForm.get('jobDistribution');
-    if (distributionControl?.errors) {
+    if (distributionControl?.errors && !this.isTemplate) {
       distributionControl.markAsTouched();
       this.store.dispatch(new ShowToast(MessageTypes.Error, distributionControl?.errors['errorMessage']));
     }
@@ -902,8 +907,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     setTimeout(() => {
       this.generalInformationForm.patchValue({
         shift: selectedOrder.shift,
-        shiftStartTime: selectedOrder.shiftStartTime,
-        shiftEndTime: selectedOrder.shiftEndTime,
+        shiftStartTime: selectedOrder.shiftStartTime? DateTimeHelper.setCurrentTimeZone(selectedOrder.shiftStartTime.toString()): null,
+        shiftEndTime: selectedOrder.shiftEndTime?  DateTimeHelper.setCurrentTimeZone(selectedOrder.shiftEndTime.toString()) : null,
         duration: selectedOrder.duration,
       }, { emitEvent: false });
     }, 1000);
