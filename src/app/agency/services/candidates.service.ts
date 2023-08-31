@@ -148,8 +148,8 @@ export class CandidateService {
   public saveCredential(credential: CandidateCredential, file: Blob | null): Observable<CandidateCredential> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const endpoint = new Map<boolean, string>([
-      [true, '/api/CandidateCredentials'],
-      [false, '/api/EmployeeCredentials'],
+      [true, '/api/CandidateCredentials/new'],
+      [false, '/api/EmployeeCredentials/new'],
     ]);
     const formData = new FormData();
     if (file) {
