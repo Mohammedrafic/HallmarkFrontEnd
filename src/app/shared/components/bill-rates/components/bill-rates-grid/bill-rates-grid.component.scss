@@ -1,4 +1,5 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 .bill-rates-grid {
   &:hover {
@@ -20,5 +21,13 @@
 
   .e-grid .e-content {
     overflow-y: hidden !important;
+  }
+
+  @media #{$max-mobile} {
+    .actions {
+      .icon {
+        margin: 0;
+      }
+    }
   }
 }

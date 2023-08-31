@@ -43,6 +43,7 @@ import {
 import { GridModule } from '@shared/components/grid/grid.module';
 import { CandidatesRoutingModule } from '@agency/candidates/candidates-routing.module';
 import { CredentialsGridModule } from '@shared/components/credentials-grid/credentials-grid.module';
+import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 
 @NgModule({
   declarations: [
@@ -91,6 +92,7 @@ import { CredentialsGridModule } from '@shared/components/credentials-grid/crede
     GridModule,
     CandidatesRoutingModule,
     MaskedTextBoxModule,
+    ScrollToTopModule,
   ],
 })
 export class CandidatesModule {}

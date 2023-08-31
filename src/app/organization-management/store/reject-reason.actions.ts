@@ -343,3 +343,7 @@ export class SaveSourcingReasonsSuccess {
   static readonly type = '[sourcing reason] Save Sourcing Reason Success';
 }
 
+export class GetSourcingConfig {
+  static readonly type = '[reject reason] Get GetSourcing Config';
+  constructor() { }
+}

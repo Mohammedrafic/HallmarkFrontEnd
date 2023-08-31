@@ -1,7 +1,36 @@
 @import 'adaptive-response';
 
+@media #{$min-mobile} {
+  .desktop-action-btn {
+    display: block;
+  }
+
+  .mobile-action-btn {
+    display: none;
+  }
+}
+
 @media #{$max-mobile} {
   .text-btn {
     display: none;
+  }
+
+  .desktop-action-btn {
+    display: none;
+  }
+
+  .mobile-action-btn {
+    display: flex;
+    column-gap: 12px;
+    padding: 10px 5px;
+
+    .action-btn {
+      width: 50%;
+      margin-left: 0 !important;
+    }
+
+    .e-btn {
+      margin-left: 0;
+    }
   }
 }

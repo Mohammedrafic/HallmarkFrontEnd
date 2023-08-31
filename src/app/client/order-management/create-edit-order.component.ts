@@ -43,6 +43,7 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 import { createSystem, updateSystemConfig } from '@client/order-management/helpers';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { PreservedOrderService } from '@client/order-management/services/preserved-order.service';
+import { OrderManagementContentComponent } from './components/order-management-content/order-management-content.component';
 
 @Component({
   selector: 'app-create-edit-order',
@@ -53,9 +54,12 @@ import { PreservedOrderService } from '@client/order-management/services/preserv
 export class CreateEditOrderComponent extends Destroyable implements OnInit {
   @ViewChild(AddEditOrderComponent) vmsOrder: AddEditOrderComponent;
   @ViewChild(IrpContainerComponent) irpOrder: IrpContainerComponent;
+  @ViewChild(OrderManagementContentComponent) orderManagement : OrderManagementContentComponent;
+
 
   public saveEvents: Subject<void | MenuEventArgs> = new Subject<void | MenuEventArgs>();
   public title: string;
+  public system : number;
   public orderSystemConfig:ButtonModel[] = OrderSystemConfig;
   public submitButtonConfig: ItemModel[];
   public selectedOrder: Order;
@@ -67,7 +71,7 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     isVMS: false,
     isIRPFlag: false,
   };
-
+  public activetab : boolean;
   private orderManagementSystem: OrderManagementIRPSystemId | null;
 
   @Select(OrderManagementContentState.selectedOrder)
@@ -89,6 +93,9 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   ) {
     super();
     this.setPageHeader();
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    this.activetab =  routerState?.['isIRP'];
+    console.log(this.activetab);
   }
 
   ngOnInit(): void {
@@ -193,9 +200,9 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
 
   private setSubmitButtonConfig(): void {
     if(!this.selectedOrder) {
-      this.submitButtonConfig = this.activeSystem === OrderSystem.IRP? [SubmitForLater] : [SubmitForLater, SubmitAsTemplate];
+      this.submitButtonConfig = this.activeSystem === OrderSystem.IRP? [SubmitForLater,SubmitAsTemplate] : [SubmitForLater, SubmitAsTemplate];
     } else {
-      this.submitButtonConfig = this.activeSystem === OrderSystem.IRP? [SaveForLate] : [SaveForLate, SubmitAsTemplate];
+      this.submitButtonConfig = this.activeSystem === OrderSystem.IRP? [SaveForLate,SubmitAsTemplate] : [SaveForLate, SubmitAsTemplate];
     }
   }
 
@@ -226,12 +233,14 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
         this.selectedSystem.isIRP &&
         this.selectedSystem.isVMS &&
         this.selectedSystem.isIRPFlag;
-
       if( this.orderManagementSystem ) {
         this.orderManagementSystem = null;
       }
-
-      this.activeSystem = this.route.snapshot.data['system'] ?? OrderSystem.VMS;
+    if (this.activetab) {
+    this.activeSystem = this.route.snapshot.data['system'] ?? OrderSystem.IRP;
+    } else {
+    this.activeSystem = this.route.snapshot.data['system'] ?? OrderSystem.VMS;
+    }
       this.setSubmitButtonConfig();
       this.getSkillsByActiveSystem();
       updateSystemConfig(this.orderSystemConfig, this.activeSystem);
@@ -240,9 +249,15 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   }
 
   private selectSystemForOrderManagement(): void {
-    const system = this.route.snapshot.data['system'] ?? OrderSystem.VMS;
+    if(this.activetab)
+    {
+      this.system=this.route.snapshot.data['system'] ?? OrderSystem.IRP;
+    }
+    else{
+      this.system = this.route.snapshot.data['system'] ?? OrderSystem.VMS;
+    }
     this.orderManagementService.setOrderManagementSystem(
-      system === OrderSystem.IRP ? OrderManagementIRPSystemId.IRP : OrderManagementIRPSystemId.VMS
+      this.system === OrderSystem.IRP ? OrderManagementIRPSystemId.IRP : OrderManagementIRPSystemId.VMS
     );
   }
 

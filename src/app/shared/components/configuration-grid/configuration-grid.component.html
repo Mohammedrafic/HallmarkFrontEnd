@@ -24,7 +24,7 @@
                 </button>
               </div>
             </td>
-            <td class="e-rowcell e-templatecell attr-td" [style.width.px]="400"> </td>
+            <td class="e-rowcell e-templatecell attr-td" [style.width.px]="450"> </td>
             <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.systemType}}</td>
             <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.regionName}}</td>
             <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.locationName}}</td>
@@ -53,8 +53,8 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="name" headerText="ATTRIBUTE" minWidth="380" width="100%"></e-column>
-      <e-column [visible]="showSystem" field="systemType" headerText="SYSTEM" width=150></e-column>
+      <e-column field="name" headerText="ATTRIBUTE" minWidth="420" width="100%"></e-column>
+      <e-column [visible]="showSystem" field="systemType" headerText="SYSTEM CONFIGURATION" width=150></e-column>
       <e-column [visible]="!hideColumn" field="regionName" headerText="REGION" width=150></e-column>
       <e-column [visible]="!hideColumn" field="locationName" headerText="LOCATION" width=150></e-column>
       <e-column [visible]="!hideColumn" field="departmentName" headerText="DEPARTMENT" width=150></e-column>

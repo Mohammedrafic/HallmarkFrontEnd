@@ -18,9 +18,11 @@ export const GetExportFileName = (tabIndex: number): string => {
     { text:'Skill', column: 'skill'},
     { text:'Location', column: 'location'},
     { text:'Work Week', column: 'workWeek'},
-    { text:'Department', column: 'department'},
+    { text: 'Department', column: 'department' },
+    { text: 'Manager Email', column: 'managerEmailId' },
     { text:'Bill Rate($)', column: 'billRate'},   
-    { text:'Agency Name', column: 'agencyName'},
+    { text: 'Agency Name', column: 'agencyName' },
+    { text: 'Timesheet Approver', column:'approverName' },
     { text:'Total Days', column: 'totalDays'}
   ]
 
@@ -32,7 +34,8 @@ export const GetExportFileName = (tabIndex: number): string => {
     { text:'Skill', column: 'skill'},
     { text:'Location', column: 'location'},
     { text:'Work Week', column: 'workWeek'},
-    { text:'Department', column: 'department'},
+    { text: 'Department', column: 'department' },
+    { text: 'Manager Email', column: 'managerEmailId' },
     { text:'Bill Rate($)', column: 'billRate'},   
     { text:'Organization Name', column: 'organizationName'},
     { text:'Total Days', column: 'totalDays'}

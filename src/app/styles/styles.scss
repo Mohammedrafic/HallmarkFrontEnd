@@ -13,6 +13,15 @@
 @import "adaptive-response.scss";
 @import 'controls/responsive-container.scss';
 @import 'controls/responsive-queries';
+@import '../../../node_modules/@syncfusion/ej2-angular-base/styles/material.css';
+@import '../../../node_modules/@syncfusion/ej2-icons/styles/material.css';
+@import '../../../node_modules/@syncfusion/ej2-buttons/styles/material.css';
+@import '../../../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css';
+@import '../../../node_modules/@syncfusion/ej2-inputs/styles/material.css';
+@import '../../../node_modules/@syncfusion/ej2-lists/styles/material.css';
+@import '../../../node_modules/@syncfusion/ej2-navigations/styles/material.css';
+@import '../../../node_modules/@syncfusion/ej2-popups/styles/material.css';
+@import '../../../node_modules/@syncfusion/ej2-richtexteditor/styles/material.css';
 
 html {
   height: 100%;
@@ -317,16 +326,6 @@ body {
         background-color: var(--tooltip-dark-background);
         transform: rotate(45deg);
       }
-    }
-
-    #organization-agency-dropdown .e-input-group {
-      background: $background !important;
-      color: $white;
-    }
-
-    #organization-agency-dropdown .e-input-group:hover {
-      background: $primary-active-blue-70 !important;
-      color: $primary-active-blue-10;
     }
 
     .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
@@ -724,6 +723,6 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
   overflow: auto;
 }
 .orderStatusSummaryReport .ag-body-viewport {
-  max-height: calc( 68vh ) !important;
+  max-height: calc( 61vh ) !important;
   overflow: auto;
 }

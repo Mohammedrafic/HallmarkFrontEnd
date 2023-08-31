@@ -79,6 +79,9 @@ export const IRPTabsConfig: TabsListConfig[] = [
   {
     title: OrderManagementIRPTabs.Incomplete,
   },
+  {
+    title: OrderManagementIRPTabs.OrderTemplates,
+  }
 ];
 
 export const IRPTabRequestTypeMap: Map<number, number | null> = new Map<number, number | null>()
@@ -169,6 +172,7 @@ export const ThreeDotsMenuOptions = (
   ],
   closedOrderMenu: [
     { text: MoreMenuType[1], id: '1', disabled: !canCreateOrder },
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
   ],
   irpIncompleteMenu: [
     { text: MoreMenuType[0], id: '0', disabled: !canCreateOrder },

@@ -12,9 +12,9 @@ export const adaptOrder = (selectedOrder: Order): Order => {
     ...selectedOrder,
     ...modifyJobDistribution(selectedOrder),
     ...selectedOrder.irpOrderMetadata,
-    jobDates: DateTimeHelper.setCurrentTimeZone(selectedOrder.jobStartDate.toString()),
-    shiftStartTime: DateTimeHelper.setCurrentTimeZone(selectedOrder.shiftStartTime.toString()),
-    shiftEndTime: DateTimeHelper.setCurrentTimeZone(selectedOrder.shiftEndTime.toString()),
+    jobDates: selectedOrder.jobStartDate ? DateTimeHelper.setCurrentTimeZone(selectedOrder.jobStartDate.toString()) : "",
+    // shiftStartTime: DateTimeHelper.setCurrentTimeZone(selectedOrder.shiftStartTime.toString()),
+    // shiftEndTime:  DateTimeHelper.setCurrentTimeZone(selectedOrder.shiftEndTime.toString()),
     jobStartDate: DateTimeHelper.setCurrentTimeZone(startJobDate),
     jobEndDate: DateTimeHelper.setCurrentTimeZone(endJobDate),
   };

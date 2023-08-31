@@ -212,6 +212,7 @@ export class SaveIrpOrder {
     public inActivedatestr?:string,
     public isLocation? :boolean | undefined,
     public isLocationAndDepartment? :boolean | undefined,
+    public isTemplate? : boolean | undefined
   ) {}
 }
 
@@ -489,5 +490,10 @@ export class GetOrderClassificationAuditHistory {
 
 export class GetOrderHistoryDetailSucceeded {
   static readonly type = '[order management] Get Order Order History Detail Succeeded';
+  constructor() {}
+}
+
+export class GetOrderClassificationDetailSucceeded {
+  static readonly type = '[order management] Get Order Order Classification Detail Succeeded';
   constructor() {}
 }

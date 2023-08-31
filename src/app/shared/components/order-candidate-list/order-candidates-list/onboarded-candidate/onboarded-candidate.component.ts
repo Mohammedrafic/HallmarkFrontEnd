@@ -412,6 +412,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         takeUntil(this.unsubscribe$),
       )
       .subscribe((isConfirm) => {
+        // Mark form to prevent showing leave confirm message after saving changes
+        this.form.markAsPristine();
+
         if (isConfirm) {
           this.onboardEmailTemplateForm.rteCreated();
           this.onboardEmailTemplateForm.disableControls(true);

@@ -85,6 +85,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background-color: var(--bg-default);
 
   .e-avatar {
     margin-right: 16px;

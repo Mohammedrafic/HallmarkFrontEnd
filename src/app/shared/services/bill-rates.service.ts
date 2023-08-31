@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import {
+  BillRate,
   BillRateFilters,
   BillRateOption,
   BillRateSetup,
@@ -171,5 +172,16 @@ export class BillRatesService {
 
   public getBillRatesImportTemplate(errorRecords: ImportedBillRate[]): Observable<any> {
     return this.http.post('/api/BillRates/template', errorRecords, { responseType: 'blob' });
+  }
+
+  public getCandidateBillRates(jobId: number, orgId: number, isAgency: boolean): Observable<BillRate[]> {
+    const endpoint = isAgency ?
+    `/api/Jobs/${jobId}/billrates/${orgId}` : `/api/Jobs/${jobId}/billrates`;
+
+    return this.http.get<BillRate[]>(endpoint);
+  }
+  
+  public getExtensionRates(jobId: number): Observable<BillRate[]> {
+    return this.http.get<BillRate[]>(`/api/candidatejobs/${jobId}/billrates`);
   }
 }

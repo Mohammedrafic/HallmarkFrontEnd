@@ -19,7 +19,7 @@
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button id="filterButton" (click)="onBtExport()" cssClass="e-outline button-filter">
+      <button ejs-button id="exportButton" (click)="onBtExport()" cssClass="e-outline button-filter">
         <div class="filter-button-content">
           Export <i-feather name="upload" class="icon"></i-feather>
         </div>
@@ -113,27 +113,6 @@
                            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.orderStatus.dataSource"
                            [fields]="orderStatuseFields" [selectAllText]='allOption' showSelectAll=true>
           </ejs-multiselect>
-        </div>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="group">
-        <div class="input-container calendar">
-          <label>Order Start Date<span class="required">*</span></label>
-          <div class="input-group datepicker">
-            <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="orderstartdate">
-            </ejs-datepicker>
-          </div>
-        </div>
-        <div class="input-container calendar">
-          <label>Order End Date<span class="required">*</span></label>
-          <div class="input-group datepicker">
-            <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="orderenddate"
-                            [min]="orderStatusSummaryReportForm.controls['orderstartdate'].value">
-            </ejs-datepicker>
-          </div>
         </div>
       </div>
     </div>

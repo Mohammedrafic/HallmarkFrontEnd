@@ -25,11 +25,11 @@
       </section>      
       <div class="order-tabs">
         <ng-container>
-          <ejs-accordion expandMode='Single'>
+          <ejs-accordion expandMode='Single' (expanding)="expanding($event)">
             <e-accordionitems>              
               <e-accordionitem expanded='true'>
                 <ng-template #header>
-                  <div>Order AuditHistory</div>
+                  <div>Order Audit History</div>
                 </ng-template>
                 <ng-template #content>   
                   <section class="app-grid">                               
@@ -42,7 +42,7 @@
               </e-accordionitem >
               <e-accordionitem>
                 <ng-template #header>
-                  <div>Order Credential AuditHistory</div>
+                  <div>Order Credential Audit History</div>
                 </ng-template>
                 <ng-template #content>
                   <section class="app-grid"> 
@@ -56,7 +56,7 @@
 
               <e-accordionitem>
                 <ng-template #header>
-                  <div>Order Bill Rates AuditHistory</div>
+                  <div>Order Bill Rates Audit History</div>
                 </ng-template>
                 <ng-template #content>
                   <section class="app-grid"> 
@@ -71,7 +71,7 @@
 
               <e-accordionitem>
                 <ng-template #header>
-                  <div>Order Contacts AuditHistory</div>
+                  <div>Order Contacts Audit History</div>
                 </ng-template>
                 <ng-template #content>
                   <section class="app-grid"> 
@@ -85,7 +85,7 @@
 
               <e-accordionitem>
                 <ng-template #header>
-                  <div>Order Work Location AuditHistory</div>
+                  <div>Order Work Location Audit History</div>
                 </ng-template>
                 <ng-template #content>
                   <section class="app-grid"> 
@@ -98,7 +98,7 @@
               </e-accordionitem>               
               <e-accordionitem>
                 <ng-template #header>
-                  <div>Order JobDistribution AuditHistory</div>
+                  <div>Order JobDistribution Audit History</div>
                 </ng-template>
                 <ng-template #content>
                   <section class="app-grid"> 
@@ -111,7 +111,7 @@
               </e-accordionitem>  
               <e-accordionitem>
                 <ng-template #header>
-                  <div>Order Classification AuditHistory</div>
+                  <div>Order Classification Audit History</div>
                 </ng-template>
                 <ng-template #content>
                   <section class="app-grid"> 

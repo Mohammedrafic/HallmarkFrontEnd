@@ -1,4 +1,6 @@
-<div class="invoices-page-toolbar"
+<div
+  class="invoices-page-toolbar"
+  [ngClass]="[isAgency ? 'agency-area' : 'organization-area']"
 >
   <app-page-toolbar>
     <ng-container left>
@@ -32,9 +34,9 @@
       </div>
       <div class="buttons-group" [class.top-margin]="!isAgency">
         <div class="buttons-container">
-          <button ejs-button
+          <button ejs-button  [disabled]="noorgSelection"
                   appHideBeforeSyncfusionLoad
-                  cssClass="e-outline button-filter button--no-wrap"
+                  cssClass="e-outline button-filter button--no-wrap button-only-icon"
                   (click)="showFilters()">
             <div class="filter-button-content">
               <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">
@@ -42,7 +44,8 @@
                 appliedFiltersAmount
                 }}
               </span>
-              Filters <i-feather name="sliders" class="icon"></i-feather>
+              <span [class.button-text]="!isAgency">Filters</span>
+              <i-feather name="sliders" class="icon"></i-feather>
             </div>
           </button>
 
@@ -50,40 +53,40 @@
                                    [selectedRows]="gridSelections"
                                    [organizationId]="organizationId"
                                    [agencyOrganizationIds]="agencyOrganizationIds"
+                                   [noorgSelection]="noorgSelection"
                                    (resetTableSelection)="resetTableSelection()"></app-invoice-grid-export>
 
           <button ejs-button
                   *ngIf="(!isAgency  && selectedTabIdx !== 1) || (isAgency && selectedTabIdx !== 0)"
-                  [disabled]="!gridSelections.selectedInvoiceIds || !gridSelections.selectedInvoiceIds.length"
-                  cssClass="e-outline button-filter button--no-wrap"
+                  [disabled]="!gridSelections.selectedInvoiceIds || !gridSelections.selectedInvoiceIds.length  || noorgSelection"
+                  cssClass="e-outline button-filter button--no-wrap button-only-icon"
                   (click)="printInvoices()">
-            <span>Print</span>
             <i-feather name="printer" class="icon"></i-feather>
           </button>
-          <div *ngIf="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] && !isAgency) || (userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)">
+          <ng-container *ngIf="(userPermission[this.userPermissions.CanOrganizationSetInvoiceStatusToPaid] && !isAgency) || (userPermission[this.userPermissions.CanAgencySetInvoiceStatusToPaid] && isAgency)">
             <button ejs-button
                     *ngIf="(!isAgency && (selectedTabIdx === 3 || selectedTabIdx === 5)) || (isAgency && selectedTabIdx !== 0)"
                     [disabled]="
               !canPay ||
               !gridSelections.selectedInvoiceIds ||
-              !gridSelections.selectedInvoiceIds.length
+              !gridSelections.selectedInvoiceIds.length || noorgSelection
             "
                     cssClass="e-primary relative pay-button"
                     (click)="openAddPayment(true)"
                     appHideBeforeSyncfusionLoad>
               Pay
             </button>
-          </div>
+          </ng-container>
           <button ejs-button
                   appHideBeforeSyncfusionLoad
                   class="e-primary relative"
-                  [disabled]="!invoiceContainerConfig.agencyActionsAllowed || !createManualEnabled"
+                  [disabled]="!invoiceContainerConfig.agencyActionsAllowed || !createManualEnabled || noorgSelection || addManualInvoiceDisable"
                   (click)="openAddDialog()"
                   *ngIf="tabConfig?.manualInvoiceCreationEnabled">
             Add Manual Invoice
-            <ejs-tooltip *ngIf="!createManualEnabled"
+            <ejs-tooltip *ngIf="!createManualEnabled || addManualInvoiceDisable"
                          class="tooltip"
-                         content="Separate permission right is required"
+                         content="{{addManualInvoiceDisable ? 'Please select single organization to add manual invoice' : 'Separate permission right is required'}}"
                          position="BottomCenter">
             </ejs-tooltip>
           </button>
@@ -124,7 +127,7 @@
                     cssClass="e-primary"
                     class="dropdown-button"
                     [disabled]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled"
-                    (click)="showGroupingOverlay()">
+                    (click)="toggleDropdownList()">
               <i-feather name="chevron-down" class="icon"></i-feather>
             </button>
           </div>
@@ -191,7 +194,7 @@
             [rowData]="itemsData?.items"
             [totalRecordsCount]="itemsData?.totalCount || 0"
             [changeTableSelectedIndex]="currentSelectedTableRowIndex | async"
-            [allowBulkSelection]="true"
+            [allowBulkSelection]="false"
             [rowSelection]="'multiple'"
             [bulkActionConfig]="bulkActionConfig"
             [gridOptions]="gridOptions"

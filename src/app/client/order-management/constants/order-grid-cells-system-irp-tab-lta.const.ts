@@ -64,7 +64,7 @@ export const GridCellsSystemIRPTabLta = (
               params.context.componentParent.menuOptionSelected(itemId, params.data);
             },
             iconName: 'more-vertical',
-            buttonClass: 'e-primary',
+            buttonClass: 'e-flat primary-icon-button',
             disabled: false,
             menuItems: PrepareMenuItems(params.data, threeDotsMenuOptions),
           },

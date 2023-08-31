@@ -14,6 +14,7 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { ApplicantStatus } from '@shared/models/order-management.model';
 import { RejectReason, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { OrderClosureReasonType } from '@shared/enums/order-closure-reason-type.enum';
+import { DateTimeHelper } from '@core/helpers';
 
 @Injectable()
 export class EditIrpCandidateService {
@@ -125,10 +126,11 @@ constructor(
           organizationId: state.order.organizationId as number,
           jobId: state.candidate.candidateJobId,
           createReplacement,
+          actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
         });
       }
       else{
-       
+
         return this.orderCandidateApiService.updateIrpCandidate(
           UpdateCandidateDto(
             state.order.organizationId as number,
@@ -162,6 +164,7 @@ constructor(
         organizationId: state.order.organizationId as number,
         jobId: state.candidate.candidateJobId,
         createReplacement,
+        actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
       });
     } else {
       return this.orderCandidateApiService.createIrpCandidate(

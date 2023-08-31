@@ -46,7 +46,7 @@ import { OnboardCandidateMessageDialogComponent } from '../../order-candidates-l
   selector: 'app-candidates-status-modal',
   templateUrl: './candidates-status-modal.component.html',
   styleUrls: ['./candidates-status-modal.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChanges {
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -64,12 +64,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   @Input() set candidate(value: OrderCandidatesList) {
     this.orderCandidate = value;
     this.comments = [];
-  };
+  }
   public orderCandidate: OrderCandidatesList;
   public payRateSetting = CandidatePayRateSettings;
 
   @Input() openEvent: Subject<boolean>;
-  @Input() isAgency: boolean = false;
+  @Input() isAgency = false;
   @Input() isLocked: boolean | undefined = false;
   @Input() actionsAllowed: boolean;
   @Input() isCandidatePayRateVisible: boolean;

@@ -7,13 +7,13 @@ import {
   OnInit,
   SimpleChanges,
   TrackByFunction,
+  ViewChild,
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup,AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 
 import { IrpTabConfig } from '@client/order-management/containers/irp-container/irp-container.constant';
@@ -21,16 +21,19 @@ import { IrpContainerApiService } from '@client/order-management/containers/irp-
 import {
   IrpContainerStateService,
 } from '@client/order-management/containers/irp-container/services/irp-container-state.service';
-import { IrpTabs } from '@client/order-management/enums';
+import { FieldName, IrpTabs } from '@client/order-management/enums';
 import {
   createOrderDTO,
   getControlsList,
   getFormsList,
+  getSaveasTemplateFormsList,
   getValuesFromList,
   isFormsValid,
   isFormTouched,
   showInvalidFormControl,
 } from '@client/order-management/helpers';
+import some from 'lodash/fp/some';
+import isNil from 'lodash/fp/isNil';
 import { ListOfKeyForms, SelectSystem, TabsConfig } from '@client/order-management/interfaces';
 import { OrderCredentialsService } from '@client/order-management/services';
 import { EditIrpOrder, SaveIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
@@ -45,13 +48,23 @@ import {
   INACTIVEDATE_DEPARTMENT,
 } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
-import { OrderType } from '@shared/enums/order-type';
-import { CreateOrderDto, Order } from '@shared/models/order-management.model';
+import { IrpOrderType, OrderType } from '@shared/enums/order-type';
+import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrganizationStructureService } from '@shared/services/organization-structure.service';
 import { ShowToast } from '../../../../store/app.actions';
 import { set } from 'lodash';
-
+import { SaveTemplateDialogService } from '@client/order-management/components/save-template-dialog/save-template-dialog.service';
+import { Item, MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { ToastUtility } from '@syncfusion/ej2-notifications';
+import { OrderDetailsFormComponent } from '@client/order-management/components/order-details-form/order-details-form.component';
+import { BillRate, OrderBillRateDto } from '@shared/models';
+import { OrderDetailsIrpComponent } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.component';
+export enum SubmitButton {
+  SaveForLater = '0',
+  Save = '1',
+  SaveAsTemplate = '2',
+}
 @Component({
   selector: 'app-irp-container',
   templateUrl: './irp-container.component.html',
@@ -62,6 +75,8 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   @Input('handleSaveEvents') public handleSaveEvents$: Subject<void | MenuEventArgs>;
   @Input() public selectedOrder: Order;
   @Input() selectedSystem: SelectSystem;
+  @ViewChild(OrderDetailsIrpComponent, { static: false }) orderDetailsFormComponent: OrderDetailsIrpComponent;
+  @ViewChild(OrderDetailsIrpComponent, { static: false }) filterco: OrderDetailsIrpComponent;
 
   @Select(OrderCandidatesCredentialsState.predefinedCredentials)
   predefinedCredentials$: Observable<IOrderCredentialItem[]>;
@@ -74,7 +89,11 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public departmentdates: string;
   public isLocation = false;
   public isLocationAndDepartment = false;
+  public isSaveForTemplate = false;
+  public isIRPtab =true;
+  public isAddTemplate=false;
   private isCredentialsChanged = false;
+  private order: Order;
 
 
   constructor(
@@ -84,6 +103,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private actions$: Actions,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private saveTemplateDialogService: SaveTemplateDialogService,
     private confirmService: ConfirmService,
     private irpContainerApiService: IrpContainerApiService,
     private organizationStructureService: OrganizationStructureService,
@@ -131,16 +151,286 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       this.router.navigate(['/client/order-management']);
     });
   }
+  public get generalInformationForm(): Order {
+    return {
+      ...this.orderDetailsFormComponent.generalInformationForm.getRawValue(),
+      title:
+        this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value == IrpOrderType.LongTermAssignment
+          ? IrpOrderType[IrpOrderType.LongTermAssignment]
+          : IrpOrderType[IrpOrderType.PerDiem],
+    };
+  }
+  private saveAsTemplate(): void {
+    const { regionId, locationId, departmentId, skillId } = this.filterco.generalInformationForm.getRawValue();
+    const requiredFields = [regionId, locationId, departmentId, skillId];
+    const isRequiredFieldsFilled = !some(isNil, requiredFields);
 
+    if (isRequiredFieldsFilled) {
+      this.isSaveForTemplate = true;
+    } else {
+      this.markControlsAsRequired();
+      const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId];
+      const invalidFields = fields.filter((field, i) => !requiredFields[i]).join(',\n');
+      this.showOrderFormValidationMessage(invalidFields);
+    }
+  }
+
+  private showOrderFormValidationMessage(fieldsString?: string): void {
+    const fields = fieldsString || this.collectInvalidFields().join(',\n');
+
+    if (fields && fields.length) {
+      ToastUtility.show({
+        title: 'Error',
+        content: 'Please fill in the required fields in Order Details tab:\n' + fields,
+        position: { X: 'Center', Y: 'Top' },
+        cssClass: 'error-toast',
+      });
+    }
+  }
+  private markControlsAsRequired(): void {
+    this.getOrderDetailsControl('regionId')?.markAsTouched();
+    this.getOrderDetailsControl('skillId')?.markAsTouched();
+    if (!this.getOrderDetailsControl('locationId')?.disabled) {
+      this.getOrderDetailsControl('locationId')?.markAsTouched();
+    }
+    if (!this.getOrderDetailsControl('departmentId')?.disabled) {
+      this.getOrderDetailsControl('departmentId')?.markAsTouched();
+    }
+  }
+  private getOrderDetailsControl(name: string): AbstractControl {
+    return this.filterco.generalInformationForm.get(name) as AbstractControl;
+  }
+
+  public closeSaveTemplateDialog(): void {
+    this.isSaveForTemplate = false;
+  }
+
+  public createTemplate(event: { templateTitle: string }): void {
+    const formState = this.irpStateService.getFormState();
+    const saveOrderAstemplate = this.irpStateService.getOrderTemplateFormState();
+    const formGroupList = getFormsList(formState);
+    const saveOrderAsTemplateGrouplist = getSaveasTemplateFormsList(saveOrderAstemplate);
+    let saveType: any;
+    let createdOrder = {
+      ...createOrderDTO(formState, this.orderCredentials),
+      contactDetails: getValuesFromList(formState.contactDetailsList),
+      workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
+      isSubmit: false,
+    };
+    let location = this.organizationStructureService.getTemplateLocationsById(createdOrder.regionId,createdOrder.locationId);
+    let department = this.organizationStructureService.getTemplateDepartment(createdOrder.locationId,createdOrder.departmentId);
+    createdOrder.isTemplate = true;
+    createdOrder.templateTitle = location.locationname + '-' + department.departmentname;
+    this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(),"",undefined,undefined,true));
+    this.closeSaveTemplateDialog();
+  }
+
+  private collectOrderData(isSubmit: boolean): CreateOrderDto {
+    if (this.selectedOrder.orderType == OrderType.OpenPerDiem || this.selectedOrder.orderType == OrderType.ReOrder) {
+    }
+
+    const allValues = {
+      ...this.orderDetailsFormComponent.orderTypeForm.getRawValue(),
+      ...this.orderDetailsFormComponent.generalInformationForm.getRawValue(),
+      ...this.orderDetailsFormComponent.jobDistributionForm.getRawValue(),
+      ...this.orderDetailsFormComponent.jobDescriptionForm.getRawValue(),
+      ...this.orderDetailsFormComponent.contactDetailsForm.getRawValue(),
+      ...this.orderDetailsFormComponent.workLocationForm.getRawValue(),
+      ...{ credentials: this.orderCredentials },
+    };
+
+    const {
+      orderType,
+      title,
+      regionId,
+      locationId,
+      departmentId,
+      skillId,
+      projectTypeId,
+      projectNameId,
+      poNumberId,
+      hourlyRate,
+      openPositions,
+      minYrsRequired,
+      joiningBonus,
+      compBonus,
+      duration,
+      jobStartDate,
+      jobEndDate,
+      shift,
+      shiftStartTime,
+      shiftEndTime,
+      jobDistributions,
+      classifications,
+      onCallRequired,
+      asapStart,
+      criticalOrder,
+      jobDescription,
+      unitDescription,
+      orderRequisitionReasonId,
+      orderRequisitionReasonName,
+      contactDetails,
+      workLocations,
+      credentials,
+      canApprove,
+      annualSalaryRangeFrom,
+      annualSalaryRangeTo,
+      orderPlacementFee,
+      linkedId,
+    } = allValues;
+    const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
+      const {
+        id,
+        billRateConfigId,
+        rateHour,
+        intervalMin,
+        intervalMax,
+        effectiveDate,
+        billType,
+        editAllowed,
+        isPredefined,
+        seventhDayOtEnabled,
+        weeklyOtEnabled,
+        dailyOtEnabled,
+      } = billRate;
+      return {
+        id: id || 0,
+        billRateConfigId,
+        rateHour,
+        intervalMin,
+        intervalMax,
+        effectiveDate,
+        billType,
+        editAllowed,
+        isPredefined,
+        seventhDayOtEnabled,
+        weeklyOtEnabled,
+        dailyOtEnabled,
+      };
+    });
+
+    const order: CreateOrderDto | EditOrderDto = {
+      title,
+      regionId,
+      locationId,
+      departmentId,
+      skillId,
+      orderType,
+      projectTypeId,
+      projectNameId,
+      poNumberId,
+      hourlyRate,
+      openPositions,
+      minYrsRequired,
+      joiningBonus,
+      compBonus,
+      duration,
+      jobStartDate,
+      jobEndDate,
+      shift,
+      shiftStartTime,
+      shiftEndTime,
+      classifications,
+      onCallRequired,
+      asapStart,
+      criticalOrder,
+      jobDescription,
+      unitDescription,
+      orderRequisitionReasonId,
+      orderRequisitionReasonName,
+      billRates,
+      jobDistributions,
+      contactDetails,
+      workLocations,
+      credentials,
+      isSubmit,
+      canApprove,
+      annualSalaryRangeFrom,
+      annualSalaryRangeTo,
+      orderPlacementFee,
+      isTemplate: false,
+      linkedId,
+    };
+
+    if (this.orderDetailsFormComponent.order?.isTemplate) {
+      order.contactDetails = order.contactDetails.map((contact) => ({ ...contact, id: 0 }));
+      order.jobDistributions = order.jobDistributions.map((job) => ({ ...job, orderId: 0, id: 0 }));
+      order.workLocations = order.workLocations.map((workLocation) => ({ ...workLocation, id: 0 }));
+    }
+
+    if (!order.hourlyRate) {
+      order.hourlyRate = null;
+    }
+
+    if (!order.openPositions) {
+      order.openPositions = null;
+    }
+
+    if (!order.minYrsRequired) {
+      order.minYrsRequired = null;
+    }
+
+    if (!order.joiningBonus) {
+      order.joiningBonus = null;
+    }
+
+    if (!order.compBonus) {
+      order.compBonus = null;
+    }
+
+    if (order.jobStartDate) {
+      order.jobStartDate.setHours(0, 0, 0, 0);
+    }
+
+    if (order.jobEndDate) {
+      order.jobEndDate.setHours(0, 0, 0, 0);
+    }
+
+    return order;
+  }
+
+  private collectInvalidFields(): string[] {
+    const forms = [
+      this.filterco.generalInformationForm.controls,
+      this.filterco.jobDistributionForm.controls,
+      this.filterco.jobDescriptionForm.controls,
+      this.filterco.contactDetailsForm.controls,
+      this.filterco.workLocationForm.controls,
+    ];
+
+    const requiredFields = forms
+      .map((controls) => {
+        const invalidaControls = Object.keys(controls).filter((control) => {
+          const filedHasRequiredError = !!(controls[control].invalid && controls[control].errors?.['required']);
+          return filedHasRequiredError;
+        });
+
+        return invalidaControls;
+      })
+      .flat()
+      .map((controlName) => {
+        return `\u2022 ${FieldName[controlName as keyof typeof FieldName]}`;
+      });
+
+    return requiredFields;
+  }
   private watchForSaveEvents(): void {
     this.handleSaveEvents$.pipe(takeUntil(this.componentDestroy())).subscribe((saveType: MenuEventArgs | void) => {
       this.irpStateService.saveEvents.next();
       const formState = this.irpStateService.getFormState();
+      const saveOrderAstemplate = this.irpStateService.getOrderTemplateFormState();
       const formGroupList = getFormsList(formState);
-
+      const saveOrderAsTemplateGrouplist = getSaveasTemplateFormsList(saveOrderAstemplate);
+      let savetypes: any;
+      savetypes = saveType;
       if (isFormsValid(formGroupList)) {
         this.saveOrder(formState, saveType);
-      } else {
+      } else if ((savetypes != undefined || savetypes != null) && SubmitButton.SaveAsTemplate == savetypes.item.id) {
+        if (this.isSaveForTemplate) {
+          
+        }
+        this.saveAsTemplate();
+       } else {
         showInvalidFormControl(getControlsList(formGroupList));
         formGroupList.forEach((form: FormGroup) => {
           form.markAllAsTouched();
@@ -165,7 +455,14 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       let jobEndate = createdOrder.jobEndDate ? createdOrder.jobEndDate : null;
       let jobstartdate = createdOrder.jobStartDate ? createdOrder.jobStartDate : createdOrder.jobDates;
       let departmentID = createdOrder.departmentId;
-
+      this.isAddTemplate = this.router.url.includes('fromTemplate');
+      if(this.isAddTemplate && createdOrder.jobDates)
+      {
+      createdOrder.jobDates = [createdOrder.jobDates];
+      }
+      createdOrder = {
+        ...this.saveTemplateDialogService.resetOrderPropertyIds(createdOrder),
+      }
       const location = this.organizationStructureService.getLocation(regionid, locationid);
       const department = this.organizationStructureService.getDepartment(locationid, departmentID);
       const ltaInactiveAndDweactivatelocations =

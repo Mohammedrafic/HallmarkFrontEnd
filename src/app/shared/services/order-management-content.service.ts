@@ -96,8 +96,12 @@ export class OrderManagementContentService {
    * Get the orders
    @param payload filter with details we need to get
    */
-  public getOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
-    return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
+   public getOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
+      return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
+  }
+
+  public getIRPTemplates(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
+      return this.http.post<OrderManagementPage>(`/api/IRPOrders/filtered`, payload);
   }
 
     /**
@@ -419,12 +423,20 @@ export class OrderManagementContentService {
     return this.http.post<void>('/api/AppliedCandidates/rejectCandidateJob', payload);
   }
 
-  /**
-   * Cancel Candidate Job
-   * @param payload
-   */
   public cancelCandidateJob(payload: CandidateCancellation): Observable<void> {
-    return this.http.post<void>('/api/AppliedCandidates/cancelCandidateJob', payload);
+    const requestBody = {
+      jobId: payload.jobId,
+      organizationId: payload.organizationId,
+      actualEndDate: payload.jobCancellationDto.actualEndDate,
+      jobCancellationDto: {
+        jobCancellationReason: payload.jobCancellationDto.jobCancellationReason,
+        penaltyCriteria: payload.jobCancellationDto.penaltyCriteria,
+        rate: payload.jobCancellationDto.rate,
+        hours: payload.jobCancellationDto.hours,
+      },
+    };
+
+    return this.http.post<void>('/api/AppliedCandidates/cancelCandidateJob', requestBody);
   }
 
   /**
@@ -571,33 +583,32 @@ export class OrderManagementContentService {
     formData.append('content', JSON.stringify(payload))
     return this.http.post<any>(`/api/AppliedCandidates/candidateOnboardemail`, formData);
   }
-  
-  public getOrderAuditHistory(payload: AuditLogPayload): Observable<OrderAuditHistory[]> {      
+
+  public getOrderAuditHistory(payload: AuditLogPayload): Observable<OrderAuditHistory[]> {
     return this.http.post<OrderAuditHistory[]>('/api/Audit/OrderAuditHistory', payload);
    }
- 
-   public getOrderCredentialAuditHistory(payload: AuditLogPayload): Observable<OrderCredentialAuditHistory[]> {  
+
+   public getOrderCredentialAuditHistory(payload: AuditLogPayload): Observable<OrderCredentialAuditHistory[]> {
      return this.http.post<OrderCredentialAuditHistory[]>('/api/Audit/OrderCredentialAuditHistory', payload);
-    } 
- 
-    public getOrderBillRatesAuditHistory(payload: AuditLogPayload): Observable<OrderBillRateAuditHistory[]> { 
-     console.log(payload);    
+    }
+
+    public getOrderBillRatesAuditHistory(payload: AuditLogPayload): Observable<OrderBillRateAuditHistory[]> {
      return this.http.post<OrderBillRateAuditHistory[]>('/api/Audit/OrderBillRateAuditHistory', payload);
     }
- 
-    public getOrderContactAuditHistory(payload: AuditLogPayload): Observable<OrderContactAuditHistory[]> {  
+
+    public getOrderContactAuditHistory(payload: AuditLogPayload): Observable<OrderContactAuditHistory[]> {
      return this.http.post<OrderContactAuditHistory[]>('/api/Audit/OrderContactsAuditHistory', payload);
     }
- 
-    public GetOrderWorkLocationAuditHistory(payload: AuditLogPayload): Observable<OrderWorkLocationAuditHistory[]> {  
+
+    public GetOrderWorkLocationAuditHistory(payload: AuditLogPayload): Observable<OrderWorkLocationAuditHistory[]> {
      return this.http.post<OrderWorkLocationAuditHistory[]>('/api/Audit/OrderWorkLocationAuditHistory', payload);
     }
- 
-    public getOrderJobDistributionAuditHistory(payload: AuditLogPayload): Observable<OrderJobDistributionAuditHistory[]> {  
+
+    public getOrderJobDistributionAuditHistory(payload: AuditLogPayload): Observable<OrderJobDistributionAuditHistory[]> {
      return this.http.post<OrderJobDistributionAuditHistory[]>('/api/Audit/OrderJobDistributionAuditHistory', payload);
     }
- 
-    public getOrderClassificationAuditHistory(payload: AuditLogPayload): Observable<OrderClassificationAuditHistory[]> {  
+
+    public getOrderClassificationAuditHistory(payload: AuditLogPayload): Observable<OrderClassificationAuditHistory[]> {
      return this.http.post<OrderClassificationAuditHistory[]>('/api/Audit/OrderClassificationAuditHistory', payload);
     }
 }

@@ -369,7 +369,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.invoicesFiltersService.setCurrentTimezone(filterState);
 
     this.formGroup.patchValue({
-      ...JSON.parse(JSON.stringify(filterState)),
+      ...filterState
     });
 
     if (filterState.formattedInvoiceIds && Array.isArray(filterState.formattedInvoiceIds)) {

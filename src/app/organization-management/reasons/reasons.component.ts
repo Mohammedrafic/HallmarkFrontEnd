@@ -17,7 +17,7 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { Organization, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import {  GetSourcingConfigModel, Organization, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Penalty } from '@shared/models/penalty.model';
 import { Recuriter, RecuriterReasonPage, RejectReason, Sourcing, SourcingReasonPage } from '@shared/models/reject-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -34,6 +34,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 
 @Component({
   selector: 'app-reasons',
@@ -61,6 +62,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   public dialogConfig: ReasonFormConfig[] | null;
   public readonly inputType = FieldType;
   public isIRPFlagEnabled = false;
+  public isSourcingConfig = false;
   public selectedSystem: SelectedSystemsFlag = SelectedSystems;
 
   private isAllRegionsSelected = false;
@@ -76,6 +78,10 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
 
   @Select(OrganizationManagementState.organization)
   public readonly organization$: Observable<Organization>;
+
+  @Select(RejectReasonState.sourcingConfigs)
+  sourcingConfigs$: Observable<GetSourcingConfigModel>;
+
   public showSystem:boolean = false;
   public system:any;
   constructor(
@@ -107,6 +113,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     this.subscribeOnSaveReasonSuccess();
     this.canRejectOrClosureReason();
     this.getOrganizagionData();
+    this.getSourcingConfig();
   }
 
   selectTab(selectedTab: SelectEventArgs): void {
@@ -130,8 +137,8 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.CategoryNote;
     } else if (selectedTab.selectedItem.innerText === "Sourcing Reason") {
       this.selectedTab = ReasonsNavigationTabs.SourcingReason;
-    } else if (selectedTab.selectedItem.innerText === "Recuriter Reason") {
-      this.selectedTab = ReasonsNavigationTabs.RecuriterReason;
+    } else if (selectedTab.selectedItem.innerText === "Recruiter Reason") {
+      this.selectedTab = ReasonsNavigationTabs.RecruiterReason;
     } 
     
     this.formType = ReasonFormsTypeMap[this.selectedTab];
@@ -241,7 +248,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         id: (data as RejectReason).id,
         reason: reason.reason,
         });
-    }else if((this.selectedTab ===ReasonsNavigationTabs.RecuriterReason)){
+    }else if((this.selectedTab ===ReasonsNavigationTabs.RecruiterReason)){
       const reason  = data as RejectReason;
       this.reasonForm.patchValue({
         id: (data as RejectReason).id,
@@ -438,5 +445,18 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
 
   private setIRPFlag(): void {
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+  }
+  private getSourcingConfig(): void {
+   this.store.dispatch(new ReasonActions.GetSourcingConfig);
+   this.sourcingConfigs$.pipe(
+    filter(Boolean),
+    takeUntil(this.componentDestroy()),
+  )
+  .subscribe((data:GetSourcingConfigModel ) => {
+    if(data !=null){
+      this.isSourcingConfig=data.issourcing;
+      console.log(data)
+    }
+  })
   }
 }

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { catchError, map, Observable, of } from 'rxjs';
 
-import { BillRate } from '@shared/models/bill-rate.model';
+
 import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import {
@@ -14,12 +14,14 @@ import { CostCenterAdapter, RecordsAdapter } from '../helpers';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { ExportPayload } from '@shared/models/export.model';
+import { BillRatesService } from '@shared/services/bill-rates.service';
 
 @Injectable()
 export class TimesheetsApiService {
 
   constructor(
     private http: HttpClient,
+    private billRatesApiService: BillRatesService,
   ) {}
 
   public getTimesheets(filters: TimesheetsFilterState): Observable<TimeSheetsPage> {
@@ -110,9 +112,7 @@ export class TimesheetsApiService {
     orgId: number,
     isAgency: boolean,
     ): Observable<AddRecordBillRate[]> {
-    const endpoint = isAgency ?
-    `/api/Jobs/${jobId}/billrates/${orgId}` : `/api/Jobs/${jobId}/billrates`;
-    return this.http.get<BillRate[]>(endpoint)
+    return this.billRatesApiService.getCandidateBillRates(jobId, orgId, isAgency)
     .pipe(
       map((res) => res.map((item) => {
         return {

@@ -119,7 +119,9 @@ export interface ListOfKeyForms {
   orderType: FormGroup;
   internalDistributionChanged: boolean;
 }
-
+export interface SaveAsTemplateListOfKeyForms {
+  generalInformationForm: FormGroup;
+}
 export interface StateList {
   id?: number;
   name?: string;

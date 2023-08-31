@@ -321,7 +321,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
   public readonly shiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
+  public OrganizationIRPTabs = OrderManagementIRPTabs;
   public settings: { [key in SettingsKeys]?: Configuration };
   public SettingsKeys = SettingsKeys;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
@@ -896,6 +896,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.activeIRPtabs = OrderManagementIRPTabs.PerDiem
         this.columnsToExport = irpPerDiemOrdersColumnsToExport;
       }
+      if (this.activeIRPTabIndex == OrderManagementIRPTabsIndex.OrderTemplates) {
+        this.activeIRPtabs = OrderManagementIRPTabs.OrderTemplates
+        this.filters.isTemplate=true;
+      }
       this.isIncomplete = (this.activeIRPTabIndex === OrderManagementIRPTabsIndex.Incomplete);
       this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.IRP);
       cleared ? this.store.dispatch(new GetIRPOrders(this.filters)).pipe(takeUntil(this.unsubscribe$)).subscribe(()=>{
@@ -1174,12 +1178,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (this.gridWithChildRow && this.gridWithChildRow.dataSource) {
       this.gridDataBound(this.gridWithChildRow, this.cd);
     }
+   
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
       this.currentPage = this.orderManagementPagerState?.page ?? this.currentPage;
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
+
       if (data && !isUndefined(index)) {
         this.gridWithChildRow.selectRow(index);
         this.onRowClick({ data });
@@ -1192,13 +1198,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
     this.preservedOrderService.setPreservedOrder();
 
-    if (this.selectedCandidate) {
-      if (this.selectedCandidateMeta) {
-        this.selectedCandidate.selected = this.selectedCandidateMeta;
-        const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedCandidateMeta.order);
-        if (rowIndex) {
-          this.gridWithChildRow.detailRowModule.expand(rowIndex);
-        }
+    if (this.selectedCandidate && this.selectedCandidateMeta) {
+      this.selectedCandidate.selected = this.selectedCandidateMeta;
+      const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedCandidateMeta.order);
+
+      if (rowIndex !== -1) {
+        this.gridWithChildRow.selectRow(rowIndex);
+        this.gridWithChildRow.detailRowModule.expand(rowIndex);
+
       }
     }
     if(this.isShowVMSPositions)
@@ -1285,17 +1292,22 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   openIrpDetails(event: RowSelectedEvent | Partial<RowSelectedEvent>) {
     const orderData = event.data as IRPOrderManagement;
-    this.gridApi.selectNode(event.node as RowNode);
-    this.selectedDataRow = orderData;
-    const options = this.getDialogNextPreviousOption(orderData, true);
-    this.store.dispatch(new GetOrderById(orderData.id, orderData.organizationId, options, true));
-    this.dispatchAgencyOrderCandidatesList(orderData.id, orderData.organizationId, true);
-    this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
-    this.openChildDialog.next(false);
-    this.orderPositionSelected$.next({ state: false });
-    this.openDetails.next(true);
-    this.selectedRowRef = event;
-    this.selectedRowIndex = event.rowIndex || null;
+    if (orderData.isTemplate) {
+      this.store.dispatch(new GetSelectedOrderById(orderData.id, true));
+      this.navigateToOrderTemplateForm(orderData.id, true);
+    } else {
+      this.gridApi.selectNode(event.node as RowNode);
+      this.selectedDataRow = orderData;
+      const options = this.getDialogNextPreviousOption(orderData, true);
+      this.store.dispatch(new GetOrderById(orderData.id, orderData.organizationId, options, true));
+      this.dispatchAgencyOrderCandidatesList(orderData.id, orderData.organizationId, true);
+      this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
+      this.openChildDialog.next(false);
+      this.orderPositionSelected$.next({ state: false });
+      this.openDetails.next(true);
+      this.selectedRowRef = event;
+      this.selectedRowIndex = event.rowIndex || null;
+    }
   }
   openIrpDetailsEmployee(){
     this.OrderFilterFormGroup.markAsDirty();
@@ -1342,7 +1354,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         if (!this.canCreateOrder || this.preservedOrderService.isOrderPreserved()) {
           return;
         }
-        this.navigateToOrderTemplateForm(rowData.id);
+        this.navigateToOrderTemplateForm(rowData.id,false);
         this.store.dispatch(new GetSelectedOrderById(rowData.id));
       } else {
         const data = isArray(rowData) ? rowData[0] as OrderManagement : rowData as OrderManagement;
@@ -1422,9 +1434,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderManagementService.setOrderTypeToPrePopulate(this.activeTab, this.activeIRPTabIndex, this.activeSystem);
   }
 
-  public navigateToOrderTemplateForm(id: number): void {
+  public navigateToOrderTemplateForm(id: number,isIRP?:boolean): void {
     this.preserveOrder(id);
-    this.router.navigate(['./add/fromTemplate'], { relativeTo: this.route });
+    this.router.navigate(['./add/fromTemplate'],{state:
+      {isIRP:isIRP},relativeTo:this.route} );
   }
 
   public onRowScaleUpClick(): void {
@@ -1551,7 +1564,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
 
     if (orderData.node && orderData.data) {
-      this.openIrpDetails(orderData);
+      if (orderData.data != null && !orderData.data.isTemplate) {
+        this.openIrpDetails(orderData);
+      }
       this.preservedOrderService.resetPreservedOrder();
       this.gridApi.ensureNodeVisible(orderData.node);
     }
@@ -1705,7 +1720,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.createReorder(data);
         break;
       case MoreMenuType['View history']:  
-        this.OpenOrderHistoryDialog(data);        
+      this.orderDetail.next(data);      
         break;
     }
   }
@@ -1823,6 +1838,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.clearFilters();
       }
 
+      this.openDetails.next(false);
+
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
       this.orderManagementService.setPreviousOrganizationId(id);
@@ -1937,7 +1954,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
       }
       if(this.ltaOrderFlag){
-        this.clearFilters();
+        this.filters.orderStatuses = [];
+        this.filters.candidateStatuses = [];
       }
     }
   }
@@ -2736,10 +2754,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       candidateStatuses = data.candidateStatuses.filter((status) => ReorderCandidateStatuses.includes(status.status));
     } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
       statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
-        !PerDiemDefaultStatuses.includes(status.status)
+        ![PerDiemDefaultStatuses,FilterOrderStatusText.OrdersOpenPositions].includes(status.status)
       );
       candidateStatuses = data.candidateStatuses.filter((status) => StatusesByDefault.includes(status.status));
-    } else if (this.orgpendingOrderapproval === LocalStorageStatus.OrdersforApproval) {
+    }
+    else if (this.activeTab === OrganizationOrderManagementTabs.PermPlacement || this.activeTab === OrganizationOrderManagementTabs.Incomplete) {
+      statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
+        ![FilterOrderStatusText.OrdersOpenPositions].includes(status.status)
+      );
+      candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
+    }
+     else if (this.orgpendingOrderapproval === LocalStorageStatus.OrdersforApproval) {
       if (this.activeTab === OrganizationOrderManagementTabs.AllOrders) {
         statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
           !AllOrdersDefaultStatuses.includes(status.status)
@@ -2766,6 +2791,22 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filterColumns.reorderStatuses.dataSource = data.reorderStatuses;
     this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
     this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
+    const candidatesOrderStatusList =  this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') ? JSON.parse(this.globalWindow.localStorage.getItem('candidateStatusListFromDashboard') || '') :'';
+    if(candidatesOrderStatusList != ''){
+      const candstatuses = this.filterColumns.candidateStatuses.dataSource.filter((f: { status: any; })=>candidatesOrderStatusList.map((m: { value: any; })=>m.value).includes(f.status))
+      const candidateStatuses = candstatuses.map((m: { filterStatus: any; })=>m.filterStatus);
+      this.numberArr = [];
+      candidateStatuses.forEach((candidateStatuses:any)=>{
+        this.numberArr.push(candidateStatuses);
+        this.candidateStatusIds.push(candidateStatuses)
+      })
+      this.documentEle.defaultView?.localStorage.setItem('candidateStatusListFromDashboard', JSON.stringify(''));
+    }
+    const orderTypeInWidget = this.globalWindow.localStorage.getItem('orderTypeFromDashboard') ? JSON.parse(this.globalWindow.localStorage.getItem('orderTypeFromDashboard') || '') :'';
+    if(orderTypeInWidget != ''){
+      this.filters.orderTypes = [OrderType.LongTermAssignment,OrderType.ContractToPerm];
+      this.documentEle.defaultView?.localStorage.setItem('orderTypeFromDashboard', '');
+    }
   }
 
   private prepareFiltersToDispatch(state: OrderFilter): void {
@@ -2966,18 +3007,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       });
   }
 
-  private OpenOrderHistoryDialog(data:OrderManagement): void{
-    const orderHistoryPayload: AuditLogPayload =
-          {           
-            entityType: "order",
-            searchValue:data.id.toString()
-          };   
-          this.store.dispatch(new GetOrderAuditHistory(orderHistoryPayload));
-          this.actions$
-            .pipe(ofActionDispatched(GetOrderHistoryDetailSucceeded), take(1))
-            .subscribe(() =>this.orderDetail.next(data));   
-  }
-
   @OutsideZone
   private openFirstIrpOrderDetails(): void {
     setTimeout(() => {
@@ -2994,5 +3023,54 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     setTimeout(() => {
       this.gridApi?.selectIndex(0, false, false);
     }, 300);
+  }
+  public onSelect(args:any) {
+    if (args.itemData.status == 'OrdersOpenPositions') {
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText != 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+    else{
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText == 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+  }
+  public orderStatusSelect(){
+    let orderStatus = this.OrderFilterFormGroup.get("orderStatuses")?.value;
+    if (orderStatus == 'OrdersOpenPositions') {
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText != 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
+    else if(orderStatus != 'OrdersOpenPositions' && orderStatus.length != 0){
+      var liCollections = document.querySelectorAll(
+        '.e-popup.custom .e-list-item'
+      );
+      for (var i = 0; i < liCollections.length; i++) {
+        if ((liCollections[i] as any).innerText == 'Order(s) - Open Positions') {
+          liCollections[i].classList.add('e-disabled');
+          liCollections[i].classList.add('e-overlay');
+        }
+      }
+    }
   }
 }

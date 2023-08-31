@@ -43,7 +43,7 @@ export enum OrderBillRateAuditHistoryTableColumns {
   effectiveDate = "Effective Date",
   dailyOtEnabled = "Daily ot Enabled",
   seventhDayOtEnabled = " 7th Day OT Enabled",
-  weeklyOtEnabled = "Weeklu OT Enabled",
+  weeklyOtEnabled = "Weekly OT Enabled",
   isPredefined = "IsPredefined",
   changeType = "Change Type",
   modifiedOn = "Modified Date",

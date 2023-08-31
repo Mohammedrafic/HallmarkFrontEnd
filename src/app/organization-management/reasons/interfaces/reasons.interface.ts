@@ -73,6 +73,6 @@ export interface ReasonFormConfigMap {
   [ReasonFormType.ManualInvoiceReason] : ReasonFormConfig[];
   [ReasonFormType.TerminatedReason] : ReasonFormConfig[];
   [ReasonFormType.SourcingReason] : ReasonFormConfig[];
-  [ReasonFormType.RecuriterReason] : ReasonFormConfig[];
+  [ReasonFormType.RecruiterReason] : ReasonFormConfig[];
 
 }

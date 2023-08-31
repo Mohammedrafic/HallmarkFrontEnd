@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule, CheckBoxModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
-import { SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
@@ -43,6 +41,8 @@ import {
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
 import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
+import { SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({

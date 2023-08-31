@@ -28,12 +28,14 @@
         <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
-        <div class="column last-column second-row" *ngIf="regularRates.regularLocal">
+        <div class="column last-column second-row" *ngIf="regularRates.regularLocal && regularRates.regular">
           <div class="cost">${{ regularRates.regularLocal | number: '1.2-2' }}</div>
           <div class="sup-title">Regular Local Bill Rate</div>
         </div>
-        <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
+        <ng-container [ngTemplateOutlet]="orderInfo" *ngIf="!regularRates.regularLocal || !regularRates.regular"></ng-container>
+
         <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="orderInfo" *ngIf="regularRates.regularLocal && regularRates.regular"></ng-container>
       </ng-container>
     </div>
   </section>
@@ -306,8 +308,8 @@
 </ng-template>
 
 <ng-template #billRate>
-  <div class="cost">${{ regularRates.regular| number: '1.2-2' }}</div>
-  <div class="sup-title">Regular Bill Rate</div>
+  <div class="cost">${{ regularRates.regular || regularRates.regularLocal | number: '1.2-2' }}</div>
+  <div class="sup-title">{{ regularRates.regular ? 'Regular Bill Rate' : 'Regular Local Bill Rate'}}</div>
 </ng-template>
 
 <ng-template #orderInfo>

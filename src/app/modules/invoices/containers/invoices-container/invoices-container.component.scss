@@ -1,6 +1,19 @@
 @import 'colors';
 @import 'adaptive-response';
 
+@mixin button-group-styles($direction: column, $alignment: flex-start, $top: 10px) {
+  ::ng-deep {
+    .controls-container {
+      flex-direction: $direction !important;
+
+      .right-content {
+        justify-content: $alignment !important;
+        margin: $top 0 0 !important;
+      }
+    }
+  }
+}
+
 :host {
   height: 100%;
   display: flex;
@@ -105,7 +118,6 @@
   position: relative;
   display: flex;
   align-items: center;
-  margin-left: 12px;
 
   .group-invoices-overlay {
     position: absolute;
@@ -192,7 +204,8 @@
 }
 
 .agency-multiSelect{
-  width: 20%;
+  width: 200px;
+  margin: 2px 12px 0 0;
 }
 
 .agency-dropDown{
@@ -222,8 +235,34 @@
   display: none !important;
 }
 
-.top-margin {
-  margin: 10px 0 0;
+.filter-button-content {
+  column-gap: 4px;
+
+  .e-badge {
+    margin-right: 4px;
+  }
+}
+
+.organization-area {
+  @media (min-width: 1376px) {
+    @container main-content (max-width: 1358px) {
+      .button-text {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 1375px) {
+    @include button-group-styles;
+  }
+}
+
+.agency-area {
+  @include button-group-styles(row, flex-end, 0);
+
+  @media (max-width: 1150px) {
+    @include button-group-styles;
+  }
 }
 
 @media #{$min-desktop-large} {
@@ -264,7 +303,6 @@
     }
   }
 }
-
 
 @media (max-width: 688px) {
   .buttons-group {
