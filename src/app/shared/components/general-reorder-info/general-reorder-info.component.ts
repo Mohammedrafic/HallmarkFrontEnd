@@ -21,7 +21,7 @@ import { BillRate } from '@shared/models';
 export class GeneralReorderInfoComponent extends DestroyableDirective implements OnChanges {
   @Input() public set order(order: Order) {
     this.orderInformation = order;
-    this.setRegularRates(order.billRates);
+    this.setRegularRates(order.billRates, order.jobStartDate);
   }
 
   @Input() system: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
@@ -71,7 +71,7 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
     }
   }
 
-  private setRegularRates(rates: BillRate[]): void {
-    this.regularRates = this.orderManagementService.setRegularRates(rates);
+  private setRegularRates(rates: BillRate[], jobStartDate: Date | string): void {
+    this.regularRates = this.orderManagementService.setRegularRates(rates, jobStartDate);
   }
 }

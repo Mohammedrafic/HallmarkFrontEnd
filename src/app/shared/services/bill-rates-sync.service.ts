@@ -8,7 +8,12 @@ import { BillRate, BillRateCalculationType } from '@shared/models';
 export class BillRatesSyncService {
   private rateFormChanged$ = new BaseObservable<boolean>(false);
 
-  public getBillRateForSync(billRates: BillRate[], jobStartDate?: Date, isLocal = false): BillRate | null {
+  public getBillRateForSync(
+    billRates: BillRate[],
+    jobStartDate?: Date,
+    isLocal = false,
+    showWithLongerDate = false
+  ): BillRate | null {
     const jobStartDateTimeStamp = jobStartDate ? jobStartDate.getTime() : new Date().getTime();
     let billRateForSync: BillRate | null = null;
     const billRateType = isLocal ? BillRateCalculationType.RegularLocal : BillRateCalculationType.Regular;
@@ -22,6 +27,11 @@ export class BillRatesSyncService {
         break;
       }
     }
+
+    if (!billRateForSync && showWithLongerDate) {
+      billRateForSync = sortedBillRates[0] || null;
+    }
+
     return billRateForSync;
   }
 

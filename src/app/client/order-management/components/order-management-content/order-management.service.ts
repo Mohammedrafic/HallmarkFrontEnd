@@ -7,7 +7,6 @@ import { BaseObservable } from '@core/helpers';
 import { GlobalWindow } from '@core/tokens';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { RegularRates } from '@shared/enums/order-management';
 import {
   OrderManagementIRPSystemId,
   OrderManagementIRPTabsIndex,
@@ -18,6 +17,7 @@ import { BillRate } from '@shared/models';
 import { RegularRatesData } from '@shared/models/order-management.model';
 import { OrderLinkDetails } from '../../../order-management/interfaces';
 import { ControlsConfig } from '../order-details-form/interfaces';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +50,7 @@ export class OrderManagementService extends DestroyableDirective {
 
   constructor(
     private fb: FormBuilder,
+    private billRatesSyncService: BillRatesSyncService,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super();
@@ -197,10 +198,14 @@ export class OrderManagementService extends DestroyableDirective {
       .some((control) => control.dirty);
   }
 
-  setRegularRates(rates: BillRate[]): RegularRatesData {
+  setRegularRates(rates: BillRate[], startDate: Date | string): RegularRatesData {
+    const jobStartDate = startDate instanceof Date ? startDate : new Date(startDate);
+    const regular = this.billRatesSyncService.getBillRateForSync(rates, jobStartDate, false, true);
+    const regularLocal = this.billRatesSyncService.getBillRateForSync(rates, jobStartDate, true, true);
+
     return ({
-      regular: rates.find((rate) => rate.billRateConfigId === RegularRates.Regular)?.rateHour as number || null,
-      regularLocal: rates.find((rate) => rate.billRateConfigId === RegularRates.RegularLocal)?.rateHour as number || null,
+      regular: regular?.rateHour as number || null,
+      regularLocal: regularLocal?.rateHour as number || null,
     });
   }
 

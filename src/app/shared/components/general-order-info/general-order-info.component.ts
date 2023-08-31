@@ -24,7 +24,7 @@ export class GeneralOrderInfoComponent {
     this.orderInformation = order;
 
     if (order.billRates) {
-      this.setRegularRates(order.billRates);
+      this.setRegularRates(order.billRates, order.jobStartDate);
     }
   }
 
@@ -66,7 +66,7 @@ export class GeneralOrderInfoComponent {
        prefix: this.orderInformation.organizationPrefix!});
   }
 
-  private setRegularRates(rates: BillRate[]): void {
-    this.regularRates = this.orderManagementService.setRegularRates(rates);
+  private setRegularRates(rates: BillRate[], jobStartDate: Date | string): void {
+    this.regularRates = this.orderManagementService.setRegularRates(rates, jobStartDate);
   }
 }
