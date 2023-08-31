@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject, Subject, distinctUntilChanged, pairwise, startWith, takeUntil } from 'rxjs';
-import { ONLY_NUMBER } from '@shared/constants';
+import { EMPTY_SPACE_PATTERN, ONLY_NUMBER } from '@shared/constants';
 
 
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
@@ -61,7 +61,7 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit, 
       state: new FormControl(null),
       city: new FormControl(null, [Validators.maxLength(20)]),
       zip: new FormControl(null, [Validators.minLength(5)]),
-      address1: new FormControl(null, [Validators.maxLength(100)]),
+      address1: new FormControl(null, [Validators.maxLength(100),Validators.pattern(EMPTY_SPACE_PATTERN)]),
       address2: new FormControl(null, [Validators.maxLength(100)]),
       phone1: new FormControl(null, [Validators.minLength(10), Validators.pattern(ONLY_NUMBER)]),
       phone2: new FormControl(null, [Validators.minLength(10), Validators.pattern(ONLY_NUMBER)]),
