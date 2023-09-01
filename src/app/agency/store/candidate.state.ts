@@ -517,10 +517,10 @@ export class CandidateState {
   @Action(GetGroupedCredentialsFiles)
   GetGroupedCredentialsFiles(
     { patchState, getState }: StateContext<CandidateStateModel>,
-    {candidateId}: GetGroupedCredentialsFiles
+    { candidateId, orderId, organizationId }: GetGroupedCredentialsFiles
   ): Observable<CredentialGroupedFiles[]> {
     const id = getState().candidate?.id ? getState().candidate?.id as number : candidateId;
-    return this.candidateService.getCredentialGroupedFiles(id).pipe(
+    return this.candidateService.getCredentialGroupedFiles(id, orderId, organizationId).pipe(
       tap((payload) => {
         patchState({ groupedCandidateCredentialsFiles: payload });
         return payload;
