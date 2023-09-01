@@ -532,7 +532,7 @@ export const OrderContactAuditHistoryTableColumnsDefinition = (): ColumnDefiniti
       headerName: OrderContactAuditHistoryTableColumns.title,
       field: 'title',
       minWidth: 100,
-      maxWidth:180,
+      maxWidth:250,
       filter: true,
       sortable: true,
       resizable: true
@@ -614,8 +614,7 @@ export const OrderContactAuditHistoryTableColumnsDefinition = (): ColumnDefiniti
       filter: true,
       sortable: true,
       resizable: true
-    }
-    
+    }    
   ];
 };
 

@@ -1,7 +1,7 @@
 import { ColDef, FilterChangedEvent, GridOptions } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { GetOrderAuditHistory, GetOrderBillRatesAuditHistory, GetOrderClassificationAuditHistory, GetOrderClassificationDetailSucceeded, GetOrderContactAuditHistory, GetOrderCredentialAuditHistory, GetOrderHistoryDetailSucceeded, GetOrderJobDistributionAuditHistory, GetOrderWorkLocationAuditHistory } from '@client/store/order-managment-content.actions';
+import { GetOrderAuditHistory, GetOrderBillRateDetailSucceeded, GetOrderBillRatesAuditHistory, GetOrderClassificationAuditHistory, GetOrderClassificationDetailSucceeded, GetOrderContactAuditHistory, GetOrderContactDetailSucceeded, GetOrderCredentialAuditHistory, GetOrderCredentialDetailSucceeded, GetOrderHistoryDetailSucceeded, GetOrderJobDistributionAuditHistory, GetOrderJobDistributionDetailSucceeded, GetOrderWorkLocationAuditHistory, GetOrderWorkLocationDetailSucceeded } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { GlobalWindow } from '@core/tokens';
 import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
@@ -134,6 +134,12 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
     this.gridApi?.setRowData([]);
     this.orderDetail = new OrderManagement;
     this.OrderAuditHistoryDetails = [];
+    this.OrderCredentialAuditHistoryDetails=[];
+    this.OrderBillRatesAuditHistoryDetails=[];
+    this.OrderContactAuditHistoryDetails=[];
+    this.OrderWorkLocationAuditHistoryDetails=[];
+    this.OrderJobDistributionAuditHistoryDetails=[];
+    this.OrderClassificationAuditHistoryDetails=[];
     this.sideDialog.hide();
     this.order.next(new OrderManagement);
   }
@@ -304,79 +310,137 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
     const expandData: ExpandEventArgs = e;
     switch (e.index) {
       case 0:
-        if (e.isExpanded) {
+        if (e.isExpanded && this.orderDetail?.id > 0) {
           if (!this.viewedTab.some(a => a == e.index)) {
             this.store.dispatch(new GetOrderAuditHistory({ entityType: "order", searchValue: this.orderDetail.id.toString() }));
-            this.viewedTab.push(e.index);
+            this.actions$.pipe(ofActionDispatched(GetOrderHistoryDetailSucceeded), take(1))
+              .subscribe(() => {
+                this.viewedTab.push(expandData?.index!);
+                this.orderHistoryDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                  this.OrderAuditHistoryDetails = order;
+                  this.gridApi?.setRowData(this.OrderAuditHistoryDetails);
+                });
+              });
+          } else {
+            this.orderHistoryDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+              this.OrderAuditHistoryDetails = order;
+              this.gridApi?.setRowData(this.OrderAuditHistoryDetails);
+            });
           }
-          this.orderHistoryDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderAuditHistoryDetails = order;
-            this.gridApi?.setRowData(this.OrderAuditHistoryDetails);
-          });
         }
         break;
       case 1:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
             this.store.dispatch(new GetOrderCredentialAuditHistory({ entityType: "OrderCredential", searchValue: this.orderDetail.id.toString() }));
-            this.viewedTab.push(e.index);
+            this.actions$.pipe(ofActionDispatched(GetOrderCredentialDetailSucceeded), take(1))
+              .subscribe(() => {
+                this.viewedTab.push(expandData?.index!);
+                this.OrderCredentialAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                  this.OrderCredentialAuditHistoryDetails = order;
+                  if (this.OrderCredentialAuditHistoryDetails?.length > 0)
+                    this.CredentialAuditGridApi?.setRowData(this.OrderCredentialAuditHistoryDetails);
+                });
+              });
           }
-          this.OrderCredentialAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderCredentialAuditHistoryDetails = order;
-            if (this.OrderCredentialAuditHistoryDetails.length > 0)
-              this.CredentialAuditGridApi?.setRowData(this.OrderCredentialAuditHistoryDetails);
-          });
+          else {
+            this.OrderCredentialAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+              this.OrderCredentialAuditHistoryDetails = order;
+              if (this.OrderCredentialAuditHistoryDetails?.length > 0)
+                this.CredentialAuditGridApi?.setRowData(this.OrderCredentialAuditHistoryDetails);
+            });
+          }
         }
         break;
       case 2:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
             this.store.dispatch(new GetOrderBillRatesAuditHistory({ entityType: "BillRate", searchValue: this.orderDetail.id.toString() }));
-            this.viewedTab.push(e.index);
+            this.actions$.pipe(ofActionDispatched(GetOrderBillRateDetailSucceeded), take(1))
+              .subscribe(() => {
+                this.viewedTab.push(expandData?.index!);
+                this.OrderBillRateAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                  this.OrderBillRatesAuditHistoryDetails = order;
+                  if (this.OrderBillRatesAuditHistoryDetails?.length > 0)
+                    this.BillRatesAuditGridApi?.setRowData(this.OrderBillRatesAuditHistoryDetails);
+                });
+              });
           }
-          this.OrderBillRateAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderBillRatesAuditHistoryDetails = order;
-            if (this.OrderBillRatesAuditHistoryDetails.length > 0)
-              this.BillRatesAuditGridApi?.setRowData(this.OrderBillRatesAuditHistoryDetails);
-          });
+          else {
+            this.OrderBillRateAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+              this.OrderBillRatesAuditHistoryDetails = order;
+              if (this.OrderBillRatesAuditHistoryDetails?.length > 0)
+                this.BillRatesAuditGridApi?.setRowData(this.OrderBillRatesAuditHistoryDetails);
+            });
+          }
         }
         break;
       case 3:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
             this.store.dispatch(new GetOrderContactAuditHistory({ entityType: "OrderContactDetails", searchValue: this.orderDetail.id.toString() }));
-            this.viewedTab.push(e.index);
+            this.actions$.pipe(ofActionDispatched(GetOrderContactDetailSucceeded), take(1))
+              .subscribe(() => {
+                this.viewedTab.push(expandData?.index!);
+                this.OrderContactAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                  this.OrderContactAuditHistoryDetails = order;
+                  if (this.OrderContactAuditHistoryDetails?.length > 0)
+                    this.OrderContactAuditHistoryApi?.setRowData(this.OrderContactAuditHistoryDetails);
+                });
+              });
           }
-          this.OrderContactAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderContactAuditHistoryDetails = order;
-            if (this.OrderContactAuditHistoryDetails.length > 0)
-              this.OrderContactAuditHistoryApi?.setRowData(this.OrderContactAuditHistoryDetails);
-          });
+          else {
+            this.OrderContactAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+              this.OrderContactAuditHistoryDetails = order;
+              if (this.OrderContactAuditHistoryDetails?.length > 0)
+                this.OrderContactAuditHistoryApi?.setRowData(this.OrderContactAuditHistoryDetails);
+            });
+          }
         }
         break;
       case 4:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
             this.store.dispatch(new GetOrderWorkLocationAuditHistory({ entityType: "OrderWorkLocation", searchValue: this.orderDetail.id.toString() }));
+            this.actions$.pipe(ofActionDispatched(GetOrderWorkLocationDetailSucceeded), take(1))
+              .subscribe(() => {
+                this.viewedTab.push(expandData?.index!);
+                this.OrderWorkLocationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                  this.OrderWorkLocationAuditHistoryDetails = order;
+                  if (this.OrderWorkLocationAuditHistoryDetails?.length > 0)
+                    this.OrderWorkLocationAuditHistoryApi?.setRowData(this.OrderWorkLocationAuditHistoryDetails);
+                });
+              });
           }
-          this.OrderWorkLocationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderWorkLocationAuditHistoryDetails = order;
-            if (this.OrderWorkLocationAuditHistoryDetails.length > 0)
-              this.OrderWorkLocationAuditHistoryApi?.setRowData(this.OrderWorkLocationAuditHistoryDetails);
-          });
+          else {
+            this.OrderWorkLocationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+              this.OrderWorkLocationAuditHistoryDetails = order;
+              if (this.OrderWorkLocationAuditHistoryDetails?.length > 0)
+                this.OrderWorkLocationAuditHistoryApi?.setRowData(this.OrderWorkLocationAuditHistoryDetails);
+            });
+          }
         }
         break;
       case 5:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
             this.store.dispatch(new GetOrderJobDistributionAuditHistory({ entityType: "OrderJobDistribution", searchValue: this.orderDetail.id.toString() }));
-            this.viewedTab.push(e.index);
+            this.actions$.pipe(ofActionDispatched(GetOrderJobDistributionDetailSucceeded), take(1))
+              .subscribe(() => {
+                this.viewedTab.push(expandData?.index!);
+                this.OrderJobDistributionAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                  this.OrderJobDistributionAuditHistoryDetails = order;
+                  if (this.OrderWorkLocationAuditHistoryDetails?.length > 0)
+                    this.OrderJobDistributionAuditHistoryApi?.setRowData(this.OrderJobDistributionAuditHistoryDetails);
+                });
+              });
+          } else {
+            this.OrderJobDistributionAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+              this.OrderJobDistributionAuditHistoryDetails = order;
+              if (this.OrderWorkLocationAuditHistoryDetails?.length > 0)
+                this.OrderJobDistributionAuditHistoryApi?.setRowData(this.OrderJobDistributionAuditHistoryDetails);
+            });
           }
-          this.OrderJobDistributionAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderJobDistributionAuditHistoryDetails = order;
-            if (this.OrderWorkLocationAuditHistoryDetails.length > 0)
-              this.OrderJobDistributionAuditHistoryApi?.setRowData(this.OrderJobDistributionAuditHistoryDetails);
-          });
         }
         break;
       case 6:
@@ -384,15 +448,21 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
           if (!this.viewedTab.some(a => a == e.index)) {
             this.store.dispatch(new GetOrderClassificationAuditHistory({ entityType: "OrderClassification", searchValue: this.orderDetail.id.toString() }));
             this.actions$.pipe(ofActionDispatched(GetOrderClassificationDetailSucceeded), take(1))
-              .subscribe(() =>
-                this.viewedTab.push(expandData?.index!)
-              );
+              .subscribe(() => {
+                this.viewedTab.push(expandData?.index!);
+                this.OrderClassificationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                  this.OrderClassificationAuditHistoryDetails = order;
+                  if (this.OrderClassificationAuditHistoryDetails?.length > 0)
+                    this.OrderClassificationAuditHistoryApi?.setRowData(this.OrderClassificationAuditHistoryDetails);
+                });
+              });
+          } else {
+            this.OrderClassificationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+              this.OrderClassificationAuditHistoryDetails = order;
+              if (this.OrderClassificationAuditHistoryDetails?.length > 0)
+                this.OrderClassificationAuditHistoryApi?.setRowData(this.OrderClassificationAuditHistoryDetails);
+            });
           }
-          this.OrderClassificationAuditHistory$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-            this.OrderClassificationAuditHistoryDetails = order;
-            if (this.OrderClassificationAuditHistoryDetails.length > 0)
-              this.OrderClassificationAuditHistoryApi?.setRowData(this.OrderClassificationAuditHistoryDetails);
-          });
         }
         break;
     }
