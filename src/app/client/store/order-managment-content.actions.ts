@@ -489,11 +489,35 @@ export class GetOrderClassificationAuditHistory {
 }
 
 export class GetOrderHistoryDetailSucceeded {
-  static readonly type = '[order management] Get Order Order History Detail Succeeded';
+  static readonly type = '[order management] Get Order History Detail Succeeded';
   constructor() {}
 }
 
 export class GetOrderClassificationDetailSucceeded {
-  static readonly type = '[order management] Get Order Order Classification Detail Succeeded';
+  static readonly type = '[order management] Get Order Classification Detail Succeeded';
+  constructor() {}
+}
+
+export class GetOrderCredentialDetailSucceeded {
+  static readonly type = '[order management] Get Order Credential Detail Succeeded';
+  constructor() {}
+}
+export class GetOrderBillRateDetailSucceeded {
+  static readonly type = '[order management] Get Order BillRate Detail Succeeded';
+  constructor() {}
+}
+
+export class GetOrderContactDetailSucceeded {
+  static readonly type = '[order management] Get Order Contact Detail Succeeded';
+  constructor() {}
+}
+
+export class GetOrderJobDistributionDetailSucceeded {
+  static readonly type = '[order management] Get Order JobDistribution Detail Succeeded';
+  constructor() {}
+}
+
+export class GetOrderWorkLocationDetailSucceeded {
+  static readonly type = '[order management] Get Order WorkLocation Detail Succeeded';
   constructor() {}
 }
