@@ -59,7 +59,7 @@ export class OrderStatusSummaryCustomReport {
   offered: number;
   inProgress: number;
   organizationID: number;
-  orderID: number;
+  orderID: string;
   orderType: string;
   region: string;
   regionId: number;
