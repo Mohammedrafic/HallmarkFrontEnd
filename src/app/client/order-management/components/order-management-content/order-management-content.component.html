@@ -1214,9 +1214,8 @@
       </div>
     </div>
     <div class="filter-row bootstrap">
-      <div class="input-container" *ngIf="!isActiveSystemIRP && 
-      activeTab === OrganizationOrderManagementTabs.ReOrders
-      || activeTab === OrganizationOrderManagementTabs.AllOrders">
+      <div class="input-container" *ngIf="(activeSystem === OrderManagementIRPSystemId.VMS) 
+        && (activeTab === OrganizationOrderManagementTabs.ReOrders|| activeTab === OrganizationOrderManagementTabs.AllOrders)">
         <label>Order Distribution</label>
         <div class="input-group dropdown">
           <ejs-dropdownlist  formControlName="orderDistributionType" [fields]="optionFields"
