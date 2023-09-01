@@ -124,6 +124,10 @@ $headerHeight: 19px;
     display: flex;
     overflow: auto;
   }
+  &__orders_pending_in_custom {
+    display: flex;
+    overflow: auto;
+  }
 }
 .with-position{
     padding: 8% !important;

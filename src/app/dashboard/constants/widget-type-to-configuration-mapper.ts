@@ -25,4 +25,5 @@ export const widgetTypeToConfigurationMapper: Record<WidgetTypeEnum, PanelModel>
   [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: { sizeX: 3, sizeY: 3, maxSizeX: 3, maxSizeY: 5, minSizeX: 4, minSizeY: 4 },
   [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: { sizeX: 3, sizeY: 4, maxSizeY: 4, maxSizeX: 3, minSizeX: 3, minSizeY: 4 },
   [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: { sizeX: 5, sizeY: 3, maxSizeX: 5, maxSizeY: 3, minSizeX: 5, minSizeY: 3 },
+  [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM]: { sizeX: 6, sizeY: 4, maxSizeX: 6, maxSizeY: 4, minSizeX: 6, minSizeY: 4 },
 };

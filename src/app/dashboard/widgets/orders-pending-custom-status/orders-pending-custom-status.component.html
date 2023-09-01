@@ -1,0 +1,64 @@
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+    <ng-template #header>
+        <div class="orders-pending-for-custom-chart__title">
+          <h3 class="widget-header__title">{{chartData?.title}}</h3>
+        </div>
+        <div class="orders-pending-for-custom-chart__tooltip" *ngIf="description.length>0">
+          <ejs-tooltip [content]="description" position='TopCenter'>
+            <span class="mytooltip">
+              <i-feather name="info" id="info"
+                         [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+            </span>
+          </ejs-tooltip>
+        </div>
+      </ng-template>
+    <ng-template #orders_pending_custom_status>
+        <section>
+          <header>
+            <div class="col center"><span class="customStatus">Order Status</span></div>
+            <div class="col w-50">
+              <div class="middle-col-header pos-center">
+                <div class="row middle-cell">Initial</div>
+                <div class="row flex-container">
+                  <div>Count</div>
+                  <div>Avg Days</div>
+                </div>
+              </div>
+            </div>
+            <div class="col w-50">
+              <div class="middle-col-header pos-center">
+                <div class="row middle-cell">Extension</div>
+                <div class="row flex-container">
+                  <div>Count</div>
+                  <div>Avg Days</div>
+                </div>
+              </div>
+            </div>
+          </header>
+         <div class="row" *ngFor="let data of chartData?.chartData">
+            <div class="col"><span class="customStatus">{{data.customStatus}}</span></div>
+            <div  class="col">
+              <div class="middle-col">
+                <div class="row flex-container">
+                  <ng-container *ngFor="let initialOrder of data?.initialOrderDtos">
+                    <div>{{initialOrder.orderCount}}</div>
+                    <div>{{initialOrder.avgDays}}</div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+            <div  class="col">
+              <div class="middle-col">
+                <div class="row flex-container">
+                  <ng-container *ngFor="let extensionOrder of data?.extensionOrderDtos">
+                    <div>{{extensionOrder.orderCount}}</div>
+                    <div>{{extensionOrder.avgDays}}</div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+    </ng-template>
+</app-widget-wrapper>
