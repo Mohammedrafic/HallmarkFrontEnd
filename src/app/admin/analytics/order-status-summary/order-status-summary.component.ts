@@ -11,7 +11,7 @@ import { ColumnDefinitionModel } from '../../../shared/components/grid/models/co
 import { DatePipe } from '@angular/common';
 import { ControlTypes, ValueType } from '../../../shared/enums/control-types.enum';
 import { CustomNoRowsOverlayComponent } from '../../../shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
-import { OrderStatusSummaryCustomReport, OrderType, OrderStatusSummaryReportFilters, Region, Department, Skills, Location } from '../../../modules/custom-reports/store/model/order-status-summary-report.model';
+import { OrderStatusSummaryCustomReport, OrderStatusSummaryReportFilters, Region, Department, Skills, Location, OrderTypeDto } from '../../../modules/custom-reports/store/model/order-status-summary-report.model';
 import { OrderStatusSummaryCustomReportState } from '../../../modules/custom-reports/store/state/order-status-summary-report.state';
 import * as OrderStatusSummaryReportActions from '../../../modules/custom-reports/store/actions/order-status-summary-report.actions';
 import { OrderStatusSummaryReportService } from '../../../modules/custom-reports/services/order-status-summary-report.services';
@@ -65,20 +65,11 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   skills$: Skills[] = [];
   skillFields: FieldSettingsModel = { text: 'skill', value: 'skillId' };
 
-  orderStatus$: { name: string }[] = [];
-  orderStatuseFields: FieldSettingsModel = { text: 'name', value: 'name' };
-
-  orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  orderType$: OrderTypeDto[] = [];
+  orderTypeFields: FieldSettingsModel = { text: 'orderTypeName', value: 'orderTypeId' };
 
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
-      orderStatus: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Text,
-        dataSource: this.orderStatus$,
-        valueField: 'name',
-        valueId: 'name',
-      },
       region: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
@@ -110,13 +101,12 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       orderType: {
         type: ControlTypes.Dropdown,
         valueType: ValueType.Text,
-        dataSource: Object.keys(OrderType).filter(type => isNaN(+type)),
+        dataSource: this.orderType$,
         valueField: 'name',
         valueId: 'id',
       },
     }
   }
-
 
   public readonly columnDefs: ColumnDefinitionModel[] = [
     {
@@ -170,6 +160,14 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     {
       headerName: 'Order ID',
       field: 'orderID',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true,
+    },
+    {
+      headerName: 'Order Type',
+      field: 'orderType',
       minWidth: 250,
       filter: true,
       sortable: true,
@@ -294,6 +292,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       },
     }
   ]
+
   constructor(private store: Store, private formBuilder: FormBuilder, private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef, private dataService: OrderStatusSummaryReportService
   ) {
@@ -302,16 +301,16 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   }
 
   ngOnInit(): void {
+    this.initForm();
     this.organizationId$.pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
-        this.store.dispatch([new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage({}),
+        this.setFilterDefaultValues();
+        this.store.dispatch([new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(this.orderStatusSummaryReportForm.value),
         new OrderStatusSummaryReportActions.GetOrderStatusSummaryFiltersByOrganization()]);
         this.onFilterClearAll();
         this.setFilters();
       });
     this.getGridData();
-    this.initForm();
-    this.setFilters();
     this.orderFilterColumnsSetup();
     this.watchForReason();
     this.watchForLocation();
@@ -329,7 +328,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
         department: new FormControl([], []),
         skills: new FormControl([], []),
         orderType: new FormControl([], []),
-        orderStatus: new FormControl([], []),
       }
     );
   }
@@ -341,8 +339,19 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
         this.locations$ = data.location.map(item => ({ locationId: item.locationId, location: item.location, regionId: item.regionId }));
         this.departments$ = data.department.map(item => ({ departmentId: item.departmentId, department: item.department, locationId: item.locationId }));
         this.skills$ = data.skills.map(item => ({ skillId: item.skillId, skill: item.skill }));
-        this.orderStatus$ = data.orderStatus.map(item => ({ name: item }));
+        this.orderType$ = data.orderType.map(item => ({ orderTypeId: item.orderTypeId, orderTypeName: item.orderTypeName }));
       });
+  }
+
+  public setDefaultValues(): void {
+    const orderTypeExists = this.orderStatusSummaryReportForm.controls['orderType'].value.length;
+    if (orderTypeExists === 0) {
+      this.orderStatusSummaryReportForm.get('orderType')?.setValue([0, 3]);
+    }
+  }
+
+  public setFilterDefaultValues(): void {    
+    this.orderStatusSummaryReportForm.get('orderType')?.setValue([0, 3]);      
   }
 
   private watchForReason(): void {
@@ -380,7 +389,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     const payload = {
       ...this.orderStatusSummaryReportForm.value
     };
-    payload.orderType = this.orderStatusSummaryReportForm.value.orderType.map((type: string) => OrderType[type as keyof typeof OrderType]).toString();
     this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(payload));
     this.store.dispatch(new ShowFilterDialog(false));
   }
@@ -394,7 +402,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
 
   onBtExport() {
     const params = {
-      skipPinnedBottom: true,
       fileName: 'Order-Position Status Summary Report',
       sheetName: 'Order-Position Status Summary Report'
     };
@@ -407,18 +414,17 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     let department: [] = [];
     let skills: [] = [];
     let orderType: [] = [];
-    let orderStatus: [] = [];
     this.orderStatusSummaryReportForm.controls['region'].setValue(region);
     this.orderStatusSummaryReportForm.controls['location'].setValue(location);
     this.orderStatusSummaryReportForm.controls['department'].setValue(department);
     this.orderStatusSummaryReportForm.controls['skills'].setValue(skills);
     this.orderStatusSummaryReportForm.controls['orderType'].setValue(orderType);
-    this.orderStatusSummaryReportForm.controls['orderStatus'].setValue(orderStatus);
   }
 
   public showFilters(): void {
     this.orderFilterColumnsSetup();
     this.store.dispatch(new ShowFilterDialog(true));
+    this.setDefaultValues();
   }
 
   public noRowsOverlayComponentParams: any = {
@@ -439,7 +445,6 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
           accepted: item.accepted ?? 0,
           filled: item.filled ?? 0,
           closed: item.closed ?? 0,
-
         }
       });
       if (this.gridApi) {
@@ -460,7 +465,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     this.pinnedBottomRowData = [{
       totalPositions: totalPositionsSum, openPositions: openPositionsSum,
       inProgress: inProgressSum, offered: offeredSum, accepted: acceptedSum,
-      filled: filledSum, closed: closedSum
+      filled: filledSum, closed: closedSum, orderType: 'GrandTotal:',
     },
     ];
     this.gridApi.setPinnedBottomRowData(this.pinnedBottomRowData);
