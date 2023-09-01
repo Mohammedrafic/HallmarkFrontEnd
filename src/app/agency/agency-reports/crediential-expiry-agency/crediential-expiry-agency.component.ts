@@ -62,7 +62,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
     "UserIdCE": "",
   
    };
-  public reportName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiry.wls" };
+  public reportName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiry.cls" };
   public catelogName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiry.cat" };
   public title: string = "Credential Expiry";
   public message: string = "";
