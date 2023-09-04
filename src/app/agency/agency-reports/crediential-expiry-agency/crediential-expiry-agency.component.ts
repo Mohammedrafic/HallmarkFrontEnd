@@ -62,7 +62,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
     "UserIdCE": "",
   
    };
-  public reportName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiry.cls" };
+  public reportName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiryForAgency.cls" };
   public catelogName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiry.cat" };
   public title: string = "Credential Expiry";
   public message: string = "";
@@ -228,8 +228,8 @@ export class CredientialExpiryAgencyComponent implements OnInit {
     this.agencyCredientialExpiryReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        startDate: new FormControl( [Validators.required]),
-        endDate: new FormControl( [Validators.required]),
+        startDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        endDate: new FormControl( new Date(Date.now()),[Validators.required]),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
