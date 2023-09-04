@@ -64,6 +64,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   };
 
   private filesForUpload: FileForUpload[];
+  public agencyOrganizationIds:number[]= [];
 
   private postionSearch: ManualInvoiceMeta | null;
 
@@ -109,11 +110,11 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       return;
     }
 
-    this.selectedOrg$
-      .pipe(
-        takeUntil(this.componentDestroy())
-      )
+    this.selectedOrg$.pipe(takeUntil(this.componentDestroy()))
       .subscribe((orgId: number) => {
+        if(this.invoiceToEdit){
+          orgId = this.invoiceToEdit.organizationId;
+        }
         const dto = this.form?.value ? ManualInvoiceAdapter.adapPostDto(this.form.value, this.searchOptions, orgId) : null;
 
         if (!dto) {
@@ -122,10 +123,10 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         }
 
         if (this.invoiceToEdit) {
-          this.store.dispatch(new Invoices.UpdateManualInvoice({
+          this.store.dispatch(new Invoices.UpdateManualInvoice({            
             ...dto,
             timesheetId: this.invoiceToEdit.id,
-          }, this.filesForUpload, this.filesForDelete, this.isAgency));
+          }, this.agencyOrganizationIds, this.filesForUpload, this.filesForDelete, this.isAgency));
         } else {
           this.store.dispatch(new Invoices.SaveManulaInvoice(dto, this.filesForUpload, this.isAgency));
         }
@@ -208,17 +209,19 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     .pipe(
       ofActionDispatched(Invoices.ToggleManualInvoiceDialog),
       filter((payload: Invoices.ToggleManualInvoiceDialog) => payload.action === DialogAction.Open),
-      tap(({ invoice }) => {
+      tap(({ invoice,agencyOrganizationIds }) => {
         this.invoiceToEdit = invoice || null;
         this.title = invoice ? this.dialogConfig.editTitle : this.dialogConfig.title;
         this.clearFiles = null;
         this.dialogShown = true;
-
+        if(agencyOrganizationIds){
+          this.agencyOrganizationIds = agencyOrganizationIds;
+        }        
         this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
         this.sideAddDialog.show();
         this.cd.markForCheck();
       }),
-      switchMap(() => this.strategy.getMeta(this.form as CustomFormGroup<AddManInvoiceForm>)),
+      switchMap(() => this.strategy.getMeta(this.form as CustomFormGroup<AddManInvoiceForm>,this.invoiceToEdit?.organizationId)),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {

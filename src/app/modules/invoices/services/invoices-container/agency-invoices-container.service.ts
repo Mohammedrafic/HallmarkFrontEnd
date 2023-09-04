@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { DialogAction } from '@core/enums';
 import { InvoicesContainerService } from './invoices-container.service';
 import { ManualInvoicesGridHelper } from '../../helpers';
-import { GridContainerTabConfig, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
+import { GridContainerTabConfig, InvoiceAttachment, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { AgencyInvoicesGridTab } from '../../enums';
 import { invoiceDetailsColumnDefs, invoiceInfoItems,
@@ -19,22 +19,22 @@ import { InvoiceTableType } from '../../enums/invoice-tab.enum';
 export class AgencyInvoicesContainerService extends InvoicesContainerService {
   public getColDefsByTab(
     tab: AgencyInvoicesGridTab,
-    { organizationId, canPay, canEdit }: { organizationId: number, canPay: boolean, canEdit: boolean },
+    { agencyOrganizationIds,organizationId, canPay, canEdit }: { agencyOrganizationIds: number[],organizationId: number, canPay: boolean, canEdit: boolean },
     ): ColDef[] {
     switch (tab) {
       case AgencyInvoicesGridTab.Manual:
         return ManualInvoicesGridHelper.getAgencyColDefs({
           edit: (invoice: ManualInvoice) => this.store.dispatch([
-            new Invoices.ToggleManualInvoiceDialog(DialogAction.Open, invoice),
-            new Invoices.GetInvoicesReasons(organizationId),
+            new Invoices.ToggleManualInvoiceDialog(DialogAction.Open, invoice,agencyOrganizationIds),
+            new Invoices.GetInvoicesReasons(invoice.organizationId),
           ]),
-          delete: ({ id, organizationId }: ManualInvoice) => this.store.dispatch(
-            new Invoices.DeleteManualInvoice(id, organizationId)
+          delete: (invoice: ManualInvoice) => this.store.dispatch(
+            new Invoices.DeleteManualInvoice(invoice.id, invoice.organizationId,agencyOrganizationIds)
           ),
-          previewAttachment: (attachment) => this.store.dispatch(
+          previewAttachment: (organizationId: number) => (attachment: InvoiceAttachment) => this.store.dispatch(
             new Invoices.PreviewAttachment(organizationId, attachment)
           ),
-          downloadAttachment: (attachment) => this.store.dispatch(
+          downloadAttachment: (organizationId: number) => (attachment: InvoiceAttachment) => this.store.dispatch(
             new Invoices.DownloadAttachment(organizationId, attachment),
           ),
           canEdit,

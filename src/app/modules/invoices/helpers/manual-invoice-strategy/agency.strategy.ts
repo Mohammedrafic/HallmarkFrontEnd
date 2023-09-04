@@ -44,10 +44,13 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getMeta(form: CustomFormGroup<AddManInvoiceForm>): Observable<null> {
+  public getMeta(form: CustomFormGroup<AddManInvoiceForm>,organizationId:number): Observable<null> {
     const id = this.store.snapshot().invoices.selectedOrganizationId;
-    this.store.dispatch(new Invoices.GetManInvoiceMeta(id));
-    this.store.dispatch(new Invoices.GetOrganizationStructure(id, true));
+      if(!organizationId){
+        organizationId = id;
+      }
+      this.store.dispatch(new Invoices.GetManInvoiceMeta(organizationId));
+      this.store.dispatch(new Invoices.GetOrganizationStructure(organizationId, true));
 
     return zip(
       this.actions$.pipe(ofActionCompleted(Invoices.GetManInvoiceMeta)),
