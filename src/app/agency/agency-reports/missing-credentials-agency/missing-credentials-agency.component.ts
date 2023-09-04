@@ -20,7 +20,7 @@ import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { accrualReportTypesList, analyticsConstants, ORGANIZATION_DATA_FIELDS } from '../constants/agency-reports.constants';
+import { accrualReportTypesList, AgencyMissingCredientialConstants, ORGANIZATION_DATA_FIELDS } from '../constants/agency-reports.constants';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
@@ -195,7 +195,7 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
                 this.organizations = uniqBy(data, 'organizationId');
                 this.filterColumns.businessIds.dataSource = this.organizations;
                 this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
-                this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
+                this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
                 this.changeDetectorRef.detectChanges();
               }
             });
@@ -210,11 +210,11 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
+      this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.AccrualReportTypes)?.setValue(1);
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
-      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.BusinessIds)?.enable() : this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.BusinessIds)?.disable();
 
     });
 
@@ -247,13 +247,13 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
 
 
   public onFilterControlValueChangedHandler(): void {
-    this.bussinessControl = this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
+    this.bussinessControl = this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.BusinessIds) as AbstractControl;
     this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
 
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+      this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
         this.isAlive = true;
         this.previousOrgId = data;
@@ -314,7 +314,7 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
         }
         else {
           this.isClearAll = false;
-          this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+          this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
     });
@@ -323,12 +323,12 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
 
   public onFilterRegionChangedHandler(): void {
 
-    this.regionIdControl = this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
+    this.regionIdControl = this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = [];
       this.locations = [];
-      this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-      this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.LocationIds)?.setValue([]);
+      this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.regionIdControl.value.length > 0) {
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
@@ -338,26 +338,26 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
       }
       else {
         this.filterColumns.locationIds.dataSource = [];
-        this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-        this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.LocationIds)?.setValue([]);
+        this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
 
   public onFilterLocationChangedHandler(): void {
-    this.locationIdControl = this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
+    this.locationIdControl = this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.DepartmentIds)?.setValue([]);
       if (this.locationIdControl.value.length > 0) {
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
       }
       else {
         this.filterColumns.departmentIds.dataSource = [];
-        this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
-    this.departmentIdControl = this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
+    this.departmentIdControl = this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
@@ -495,16 +495,16 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.CandidateName)?.setValue(null);
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue(null);
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.CredentialName)?.setValue([]);
-    this.agencyMissingCredentialReportForm.get(analyticsConstants.formControlNames.IsOptionalRequred)?.setValue(false);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.RegionIds)?.setValue([]);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.LocationIds)?.setValue([]);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.CandidateName)?.setValue(null);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.CandidateStatuses)?.setValue([]);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.JobId)?.setValue(null);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.CredentialName)?.setValue([]);
+    this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.IsOptionalRequred)?.setValue(false);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

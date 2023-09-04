@@ -47,7 +47,7 @@ export const AgencyInvoiceSummaryConstants = {
 
   }
 }
-export const analyticsConstants = {
+export const AgencyMissingCredientialConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',
     RegionIds: 'regionIds',
