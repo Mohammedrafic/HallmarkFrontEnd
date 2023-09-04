@@ -1,0 +1,47 @@
+<ejs-dialog
+  #destroyableDialog
+  isModal="true"
+  showCloseIcon="true"
+  width="640px"
+  height="440px"
+  cssClass="confirm-dialog"
+  [animationSettings]="animationSettings"
+  (close)="cancel()"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">{{ warningTitle }}</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <section>
+      <p>Would you like to override comments</p>
+
+      <div class="checkbox-wrapper">
+        <ejs-checkbox
+          label="Credential mapping"
+          [(checked)]="credentialMappring"
+        ></ejs-checkbox>
+
+        <ejs-checkbox
+          label="All Open and in Progress Orders"
+          [(checked)]="openInProgressOrders"
+        ></ejs-checkbox>
+    </div>
+    </section>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <div>
+        <button ejs-button cssClass="e-outline" (click)="cancel()">Cancel</button>
+        <button ejs-button cssClass="e-primary" [isPrimary]="true" (click)="submit()">Yes</button>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>
