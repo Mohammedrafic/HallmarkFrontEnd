@@ -104,10 +104,6 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     });
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
-
-    if (!this.isExtension) {
-      this.store.dispatch(new GetPredefinedBillRates());
-    }
   }
 
   public editBillRate({ index, ...value }: BillRatesGridEvent): void {
