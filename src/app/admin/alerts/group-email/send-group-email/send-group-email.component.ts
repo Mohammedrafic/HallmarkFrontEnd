@@ -894,7 +894,14 @@ export class SendGroupEmailComponent
     if(regionId !='' && locationId !='' && roles !=''){
       this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles, businessUnitId, false));
       this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-        this.userData = data;
+          // this.userData = data;
+          this.masterUserData = data;
+          if(this.allowActiveUsers){
+            this.userData = data?.filter(i => i.isDeleted == false);
+          }else{
+            this.userData = data?.filter(i => i.isDeleted == true);
+          }
+
       });
     }else if (this.rolesControl.value.length > 0) {
         const user = this.store.selectSnapshot(UserState.user);
@@ -921,9 +928,9 @@ export class SendGroupEmailComponent
     this.usersControl.reset();
     this.allowActiveUsers = event.checked;
     if(event.checked){
-      this.userData = this.masterUserData.filter(i => i.isDeleted == false && (i.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)));
+      this.userData = this.masterUserData?.filter(i => i.isDeleted == false && (i.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)));
     }else{
-      this.userData = this.masterUserData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
+      this.userData = this.masterUserData?.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
     }
   }
 
