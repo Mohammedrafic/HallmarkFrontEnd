@@ -66,6 +66,7 @@ export namespace Invoices {
     constructor(
       public readonly action: DialogAction,
       public readonly invoice?: ManualInvoice,
+      public readonly agencyOrganizationIds?: number[] | null,
     ) {}
   }
 
@@ -140,6 +141,7 @@ export namespace Invoices {
 
     constructor(
       public readonly payload: ManualInvoicePutDto,
+      public readonly agencyOrganizationIds: number[],
       public readonly files: FileForUpload[],
       public readonly filesToDelete: Attachment[],
       public readonly isAgency: boolean,
@@ -152,6 +154,7 @@ export namespace Invoices {
     constructor(
       public readonly id: number,
       public readonly organizationId: number | null,
+      public readonly agencyOrganizationIds: number[] | null,
     ) {}
   }
 

@@ -1,0 +1,120 @@
+@import "colors";
+
+.orders-pending-for-custom-chart {
+  &__title {
+    width: 95%;
+  }
+
+  &__tooltip {
+    text-align: right;
+    width: 5%;
+  }
+
+}
+
+section {
+    display: table;
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  section > * {
+    display: table-row;
+  }
+
+  header .col {
+    display: table-cell;
+    background-color: #f8f8f8;
+    background-color: var(--ag-header-background-color, #f8f8f8);
+    border-bottom: solid 1px;
+    border-bottom-color: #babfc7;
+    border-bottom-color: var(--ag-border-color, #babfc7);
+  }
+  section .row .col:last-child {
+    text-align: right;
+  }
+  .row .col{
+    display: table-cell;
+    background-color: #fff;
+    background-color: var(--ag-background-color, #fff);
+    color: #181d1f;
+    color: var(--ag-data-color, var(--ag-foreground-color, #181d1f));
+    border-width: 1px;
+    border-color: #dde2eb;
+    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, #dde2eb));
+    border-bottom-style: solid;
+    padding: 6px 2px;
+  }
+
+  section span{
+    font-weight: 800;
+  }
+
+  section .subcol {
+    display: table-cell;
+    border-collapse: collapse;   
+  }
+  .border-top{
+    border-top: 1px solid black;
+  }
+  .middle-col-header{
+    display: table;
+    width: 100%;
+    padding: 6px 2px;
+  }
+  .middle-col{
+    display: table;
+    width: 100%;
+    background-color: #fff;
+    background-color: var(--ag-background-color, #fff);
+    color: #181d1f;
+    color: var(--ag-data-color, var(--ag-foreground-color, #181d1f));
+    border-width: 1px;
+    border-color: #dde2eb;
+    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, #dde2eb));
+    border-bottom-style: solid;
+    padding: 6px 2px;
+  }
+
+  .flex-container {
+    display: table-row;
+  }
+  
+  .flex-container>div {
+    width: 20%;
+    text-align: center;
+    padding-right: 2px;
+    display: table-cell;
+    
+  }
+  .middle-col-header .flex-container div{
+    text-align:center;
+    padding-right: 0px;
+    display: table-cell;
+  }
+
+  header .middle-cell{
+    display: table-caption;
+    font-weight: 800;
+    line-height: 30px;
+    color: #181d1f;
+    color: var(--ag-data-color, var(--ag-foreground-color, #181d1f));
+    border-width: 1px;
+    border-color: #dde2eb;
+    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, #dde2eb));
+    border-bottom-style: solid;
+  }
+  .pos-center{
+    text-align: center;
+  }
+  .center{
+    text-align: center;
+    vertical-align: bottom;
+  }
+
+  .w-50{
+    width: 50%;
+  }
+  .customStatus{
+    white-space: nowrap;
+  }

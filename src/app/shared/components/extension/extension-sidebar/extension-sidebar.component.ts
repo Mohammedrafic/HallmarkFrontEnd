@@ -286,7 +286,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       tap((job) => {
         this.candidateJob = job;
       }),
-      switchMap((job) => this.billRatesApiService.getExtensionRates(job.jobId)),
+      switchMap((job) => this.billRatesApiService.getCalculatedRates(job.jobId)),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((rates) => {

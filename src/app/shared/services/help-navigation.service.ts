@@ -15,7 +15,7 @@ export class HelpNavigationService {
     private store: Store,
   ) {}
 
-  navigateHelpPage(isAgency: boolean): void {
+  navigateHelpPage(isAgency: boolean, orgHelpDomain: string): void {
     const currentUrl = this.router.url;
     const fragments = currentUrl.split('/').filter((fragment) => !!fragment);
 
@@ -37,7 +37,7 @@ export class HelpNavigationService {
         keyFound = true;
         const helpPage = !isComplexUrl ? helpUrls[urlKey] as string
         : (helpUrls[urlKey] as Record<string, string>)[iterator.getNext()];
-        const url = this.constructUrl(isAgency, helpPage);
+        const url = this.constructUrl(isAgency, helpPage, orgHelpDomain);
 
         window.open(url, '_blank', 'noopener');
         break;
@@ -45,19 +45,19 @@ export class HelpNavigationService {
     }
 
     if (!keyFound) {
-      const url = this.constructUrl(isAgency, '');
+      const url = this.constructUrl(isAgency, '', orgHelpDomain);
       window.open(url, '_blank', 'noopener');
     }
   }
 
-  private constructUrl(isAgency: boolean, helpLink: string): string {
+  private constructUrl(isAgency: boolean, helpLink: string, orgDomain?: string): string {
     if (helpLink) {
-      const domain = isAgency ? HelpDomain[BusinessUnitType.Agency] : HelpDomain[BusinessUnitType.Organization];
+      const domain = isAgency ? HelpDomain[BusinessUnitType.Agency] : `${orgDomain}Topics_Org/`;
 
       return `${domain}${helpLink}`;
     }
 
-    const domain = isAgency ? HelpDomain['agencyFallbackUrl'] : HelpDomain['orgFallbackUrl'];
+    const domain = isAgency ? HelpDomain['agencyFallbackUrl'] : `${orgDomain}` as string;
 
     return domain;
   }

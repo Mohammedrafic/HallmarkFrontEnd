@@ -10,7 +10,7 @@ import { AgencyPositionModel } from './agency-position.model';
 import { RnUtilizationModel } from './rnutilization.model';
 import { ExpiryDetailsModel } from './expiry.model';
 import { AvailableEmployeeModel } from './available-employee.model';
-import { PositionsCountByDayRangeDataset } from './active-positions-dto.model';
+import { PositionsCountByDayRangeDataset,OrdersPendingInCustomDataset } from './active-positions-dto.model';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
@@ -36,4 +36,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.AVAILABLE_EMPLOYEE] : AvailableEmployeeModel[];
   [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: ChartAccumulation;
   [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE] : PositionsCountByDayRangeDataset;
+  [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : OrdersPendingInCustomDataset;
 }

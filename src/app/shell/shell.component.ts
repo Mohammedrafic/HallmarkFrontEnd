@@ -19,7 +19,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, filter, map, merge, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, filter, map, merge, take, takeUntil } from 'rxjs';
 
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementService,
@@ -225,7 +225,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.watchForUnreadMessages();
     this.attachElementToResizeObserver();
     this.watchForRouterEvents();
-    this.getSiteHelpUrl();
     this.saveMainContentElement();
     this.alertStateModel$
         .pipe(takeUntil(this.componentDestroy()))
@@ -402,8 +401,17 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   onGetHelp(): void {
-    const user = this.store.selectSnapshot(UserState.user);
-    this.helpService.navigateHelpPage(user?.businessUnitType === BusinessUnitType.Agency);
+    this.userService
+    .getHelpSiteUrl()
+    .pipe(
+      take(1),
+    )
+    .subscribe(({ url }) => {
+      const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+      this.helpService.navigateHelpPage(appArea?.isAgencyArea, url);
+    });
+    
+
   }
 
   toggleChatDialog(): void {
@@ -775,15 +783,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
         this.showCollapseButton = true;
       }
     });
-  }
-
-  private getSiteHelpUrl(): void {
-    this.userService
-      .getHelpSiteUrl()
-      .pipe(takeUntil(this.componentDestroy()))
-      .subscribe(({ url }) => {
-        this.irpVmsHelpSiteUrl = url;
-      });
   }
 
   public onScrollLoadData(){

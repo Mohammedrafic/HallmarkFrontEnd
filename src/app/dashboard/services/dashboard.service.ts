@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -91,6 +91,7 @@ export class DashboardService {
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
+    [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -582,6 +583,24 @@ export class DashboardService {
         };
       }))
   }
+
+  public getOrdersPendingInCustomStatus(filter: DashboartFilterDto): Observable<OrdersPendingInCustomDataset>{
+    return this.httpClient.post<any>(`${this.baseUrl}/GetOrderPendingForApproval`, { ...filter }).pipe(
+      map(({ orderPendingApprovalCustom }: OrdersPendingInCustom) => {
+        return {
+          id: WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM,
+          title: 'Orders Pending for Approval',
+          chartData: lodashMapPlain(
+            orderPendingApprovalCustom,
+            ({ customStatus,initialOrderDtos,extensionOrderDtos }: CustomStatusesAvgDetails, index: number) => ({
+              customStatus: customStatus,
+              initialOrderDtos: initialOrderDtos,
+              extensionOrderDtos: extensionOrderDtos,
+            })
+          )
+        };
+      }))
+    }
 
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
     return this.candidatesForActivePositions$.asObservable();
