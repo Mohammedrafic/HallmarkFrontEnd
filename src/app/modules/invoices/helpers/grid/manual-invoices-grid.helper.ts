@@ -1,7 +1,7 @@
 import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import { TypedValueGetterParams } from '@core/interface';
 
-import { Attachment, AttachmentsListParams } from '@shared/components/attachments';
+import { Attachment, AttachmentAction, AttachmentsListParams } from '@shared/components/attachments';
 import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { AgencyStatus } from '@shared/enums/status';
 import {
@@ -14,7 +14,7 @@ import {
 } from '../../constants';
 import { InvoiceRecordType } from '../../enums';
 import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
-import { ManualInvoice, TypedColDef } from '../../interfaces';
+import { InvoiceAttachment, ManualInvoice, TypedColDef } from '../../interfaces';
 import {
   InvoicesContainerGridHelper,
 } from './invoices-container-grid.helper';
@@ -29,10 +29,12 @@ export interface OrganizationGetManualInvoicesColDefsConfig extends GetManualInv
   reject: (invoice: ManualInvoice) => void,
   canEdit: boolean,
 }
-
-export interface AgencyGetManualInvoicesColDefsConfig extends GetManualInvoicesColDefsConfig {
+type InvoiceAttachmentAction = AttachmentAction<InvoiceAttachment>;
+export interface AgencyGetManualInvoicesColDefsConfig {
   edit: (invoice: ManualInvoice) => void,
   delete: (invoice: ManualInvoice) => void,
+  previewAttachment: (organizationId: number) => InvoiceAttachmentAction;
+  downloadAttachment: (organizationId: number) => InvoiceAttachmentAction;
   canEdit: boolean,
 }
 
@@ -127,13 +129,14 @@ export class ManualInvoicesGridHelper {
       {
         ...attachments,
         cellRendererParams: (params: ICellRendererParams) => {
+          const { attachments, organizationId } = params.data as ManualInvoice;
           return {
-            attachments: (params.data as ManualInvoice).attachments,
+            attachments,
             attachmentsListConfig: {
-              download: downloadAttachment,
-              preview: previewAttachment,
+              download: downloadAttachment(organizationId),
+              preview: previewAttachment(organizationId),
             },
-          } as AttachmentsListParams;
+          }
         },
         ...commonColumn,
       },
