@@ -402,8 +402,8 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   onGetHelp(): void {
-    const user = this.store.selectSnapshot(UserState.user);
-    this.helpService.navigateHelpPage(user?.businessUnitType === BusinessUnitType.Agency);
+    const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    this.helpService.navigateHelpPage(appArea?.isAgencyArea);
   }
 
   toggleChatDialog(): void {
