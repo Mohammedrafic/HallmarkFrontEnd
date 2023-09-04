@@ -44,9 +44,9 @@ export class OverrideCommentsDialogComponent implements AfterViewInit {
     this.closeDialog();
   }
 
-  private getDialogState(isVisible: boolean): ConfirmOverrideComments {
+  private getDialogState(isConfirmed: boolean): ConfirmOverrideComments {
     return ({
-      isVisible,
+      isConfirmed,
       credentialMappring: this.credentialMappring,
       openInProgressOrders: this.openInProgressOrders,
     });

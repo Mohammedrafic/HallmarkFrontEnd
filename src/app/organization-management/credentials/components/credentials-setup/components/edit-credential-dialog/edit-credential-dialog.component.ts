@@ -1,17 +1,17 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { filter, takeUntil } from 'rxjs';
+import { filter, takeUntil, take } from 'rxjs';
 
 import { CredentialsSetupService } from '@organization-management/credentials/services';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { Destroyable } from '@core/helpers';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSetupDetails, CredentialSetupGet } from '@shared/models/credential-setup.model';
-import {
-  UpdateCredentialSetup,
-} from '@organization-management/store/credentials.actions';
+import { OverrideCommentsQuestion, OverrideCommentsTitle } from '../../constants';
+import { UpdateCredentialSetup } from '@organization-management/store/credentials.actions';
+import { revertControlState } from '@shared/utils/form.utils';
 
 @Component({
   selector: 'app-edit-credential-dialog',
@@ -28,6 +28,8 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
 
   public editCredentialForm: FormGroup;
 
+  private selectedCredential: CredentialSetupGet;
+
   constructor(
     private credentialsSetupService: CredentialsSetupService,
     private confirmService: ConfirmService,
@@ -42,7 +44,12 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
   }
 
   public updateCredential(): void {
-    if (this.editCredentialForm.valid) {
+    const isCommentsDirty = this.editCredentialForm.get('comments')?.dirty
+      || this.editCredentialForm.get('irpComments')?.dirty;
+
+    if (this.editCredentialForm.valid && isCommentsDirty) {
+      this.confirmUpdateCredentialSetup();
+    } else if (this.editCredentialForm.valid && !isCommentsDirty) {
       this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()));
       this.closeModal();
     } else {
@@ -57,12 +64,14 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
-        }).pipe(
-        filter(Boolean),
-        takeUntil(this.componentDestroy())
-      ).subscribe(() => {
-        this.closeModal();
-      });
+        })
+        .pipe(
+          filter(Boolean),
+          takeUntil(this.componentDestroy())
+        )
+        .subscribe(() => {
+          this.closeModal();
+        });
     } else {
       this.closeModal();
     }
@@ -73,6 +82,7 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
       filter((credential: CredentialSetupGet | CredentialSetupDetails) => !!Object.keys(credential).length),
       takeUntil(this.componentDestroy())
     ).subscribe((credential: CredentialSetupGet | CredentialSetupDetails) => {
+      this.selectedCredential = credential as CredentialSetupGet;
       this.credentialsSetupService.irpCommentFieldSettings(this.editCredentialForm, this.isCredentialIRP);
       this.credentialsSetupService.populateCredentialSetupForm(
         this.editCredentialForm,
@@ -89,5 +99,30 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
 
   private initEditCredentialForm(): void {
     this.editCredentialForm = this.credentialsSetupService.createCredentialsSetupForm();
+  }
+
+  private confirmUpdateCredentialSetup(): void {
+    this.confirmService
+      .confirm(OverrideCommentsQuestion, {
+        title: OverrideCommentsTitle,
+        okButtonLabel: 'Yes',
+        cancelButtonLabel: 'No',
+        okButtonClass: 'e-primary',
+      })
+      .pipe(take(1))
+      .subscribe((confirm) => {
+        if (confirm) {
+          this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()));
+          this.closeModal();
+        } else {
+          const { comments, irpComments } = this.selectedCredential;
+
+          revertControlState(
+            this.editCredentialForm.get('comments') as AbstractControl, comments);
+
+          revertControlState(
+            this.editCredentialForm.get('irpComments') as AbstractControl, irpComments);
+        }
+      });
   }
 }
