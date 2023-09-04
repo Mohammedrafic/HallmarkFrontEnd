@@ -10,6 +10,7 @@ import { SetHeaderState, ShowExportDialog, ShowSideDialog, ShowToast } from '../
 import {
   ChangeBusinessUnit,
   GetBusinessByUnitType,
+  GetBusinessIdDetails,
   GetRolePerUser,
   ImportUsers,
   SaveUser,
@@ -20,7 +21,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { UserSettingsComponent } from './add-edit-user/user-settings/user-settings.component';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { UserDTO, User } from '@shared/models/user-managment-page.model';
+import { UserDTO, User, GetBusinessUnitIdDetails } from '@shared/models/user-managment-page.model';
 import { take } from 'rxjs/operators';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserGridComponent } from './user-grid/user-grid.component';
@@ -47,6 +48,9 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   @Select(SecurityState.newBusinessDataPerUser)
   public newBusinessDataPerUser$: Observable<(type: number) => BusinessUnit[]>;
 
+  @Select(SecurityState.businessIdDetails)
+  public businessUnitIdDetails$: Observable<GetBusinessUnitIdDetails>;
+
   public exportUsers$ = new Subject<ExportedFileType>();
   public businessForm: FormGroup;
   public userSettingForm: FormGroup;
@@ -59,6 +63,9 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   public agencyActionsAllowed = false;
   public importAllowed = false;
   public dispatch: boolean = false;
+  public isIRPOrg: boolean = false;
+  public isCreateEmp: boolean = false;
+  public user: User;
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -89,11 +96,19 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
     this.businessForm = this.generateBusinessForm();
     this.userSettingForm = UserSettingsComponent.createForm();
     this.onBusinessUnitValueChanged();
+    this.onBusinessIdValueChanged();
 
     const user = this.store.selectSnapshot(UserState.user) as User;
+    this.user =this.store.selectSnapshot(UserState.user) as User;
     this.disableBusinessControls(user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
-    this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
+    if(user?.businessUnitType !=BusinessUnitType.Organization){
+      this.businessControl.patchValue(this.isBusinessFormDisabled  ? user?.businessUnitId :  0);
+    }else{
+      this.businessControl.patchValue(user?.businessUnitId);
+      this.businessForm.get('business')?.disable({emitEvent:false})
+    }
+ 
     this.subscribeOnSucceededUserCreation();
     this.subOnChangeUnit();
   }
@@ -118,6 +133,11 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
       isDeleted: true,
     });
     this.disableBussinesUnitForRole();
+    if(this.user?.businessUnitType == BusinessUnitType.Organization &&this.isIRPOrg){
+      this.userSettingForm.get('businessUnitType')?.enable({emitEvent: false});
+      this.userSettingForm.get('businessUnitId')?.disable({emitEvent: false});
+    }
+   
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -246,8 +266,8 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
       this.businessUnits = this.businessUnits.filter((item) => item.id !== BusinessUnitType.Hallmark);
     }
     if(user?.businessUnitType === BusinessUnitType.Organization){
-      let orgEmpBusinessIDs =[BusinessUnitType.Organization,BusinessUnitType.Employee]
-      this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id));  
+      this.businessForm.get('business')?.setValue(user.businessUnitId);
+    
     }
   }
 
@@ -286,8 +306,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       value && this.store.dispatch(new GetBusinessByUnitType(value));
-
-      if (!this.isBusinessFormDisabled) {
+      if (!this.isBusinessFormDisabled && this.user?.businessUnitType != BusinessUnitType.Organization) {
         this.businessControl.patchValue(0);
       }
     });
@@ -325,5 +344,26 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   private disableMailFormGroup(): void {
     this.userSettingForm.get('email')?.disable();
     this.userSettingForm.get('emailConfirmation')?.disable();
+  }
+
+  private onBusinessIdValueChanged(): void {
+    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      value && this.store.dispatch(new GetBusinessIdDetails(value));
+      this.businessUnitIdDetails$.pipe(takeWhile(() => this.isAlive)).subscribe((value:GetBusinessUnitIdDetails) => {
+      if(value !=null){
+        this.isIRPOrg = value.isIRPEnabled
+        this.isCreateEmp = value.isCreateEmployee
+        if(this.user?.businessUnitType == BusinessUnitType.Organization){
+          if(this.isIRPOrg){
+            let orgEmpBusinessIDs =[BusinessUnitType.Organization,BusinessUnitType.Employee]
+            this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id)); 
+            this.businessForm.get('businessUnit')?.enable({emitEvent:false});
+          }else{
+            this.businessForm.disable({emitEvent:false});
+          }
+        }
+      }
+      })
+    });
   }
 }

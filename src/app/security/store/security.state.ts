@@ -41,6 +41,7 @@ import {
   ExportTimeSheetList,
   GetLogFileDownload,
   GetNonEmployeeUsers,
+  GetBusinessIdDetails,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -51,7 +52,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
-import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
+import { GetBusinessUnitIdDetails, RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -87,6 +88,7 @@ interface SecurityStateModel {
   userData: User[];
   nonEmployeeUserData: User[];
   logFileDownloadDetail:any;
+  businessIdDetails:GetBusinessUnitIdDetails|null;
 }
 
 @State<SecurityStateModel>({
@@ -114,7 +116,8 @@ interface SecurityStateModel {
     logTimeSheetHistoryPage:null,
     userData: [],
     nonEmployeeUserData: [],
-    logFileDownloadDetail:null
+    logFileDownloadDetail:null,
+    businessIdDetails:null
   },
 })
 @Injectable()
@@ -278,6 +281,12 @@ export class SecurityState {
   static logFileDownloadDetail(state: SecurityStateModel): any | null {
     return state.logFileDownloadDetail;
   }
+
+  @Selector()
+  static businessIdDetails(state: SecurityStateModel): GetBusinessUnitIdDetails | null {
+    return state.businessIdDetails;
+  }
+
 
   constructor(
     private businessUnitService: BusinessUnitService,
@@ -765,6 +774,22 @@ export class SecurityState {
     return this.userService.getNonEmployeeUsers(businessUnitId).pipe(
       tap((payload) => {
         patchState({ nonEmployeeUserData: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetBusinessIdDetails)
+  GetBusinessIdDetails(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { id }: GetBusinessIdDetails
+  ): Observable<GetBusinessUnitIdDetails | void> {
+    return this.businessUnitService.getBusinessIdDetails(id).pipe(
+      tap((payload) => {
+        patchState({ businessIdDetails: payload });
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {

@@ -38,6 +38,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   public isEditRole = false;
   public isBusinessFormDisabled = false;
   public isBusinessDisabledForNewRole = false;
+  public isOrgLogin = false;
   public businessUnits = BUSINESS_UNITS_VALUES_USERS_ROLES;
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
@@ -76,7 +77,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     this.onBusinessUnitValueChanged();
     this.businessUnitControl.patchValue(user?.businessUnitType);
 
-    if (user?.businessUnitType !== BusinessUnitType.Hallmark && user?.businessUnitType !== BusinessUnitType.MSP) {
+    if (user?.businessUnitType !== BusinessUnitType.Hallmark && user?.businessUnitType !== BusinessUnitType.MSP && user?.businessUnitType !== BusinessUnitType.Organization) {
       this.isBusinessDisabledForNewRole = true;
       this.businessForm.disable();
     }
@@ -87,6 +88,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     if(user?.businessUnitType === BusinessUnitType.Organization){
       let orgEmpBusinessIDs =[BusinessUnitType.Organization,BusinessUnitType.Employee]
       this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id));  
+      this.isOrgLogin=true
     }
 
     this.actions$
@@ -116,6 +118,10 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
       isShowIRPOnly: false
     });
     this.disableBussinesUnitForRole();
+    if(this.isOrgLogin) {
+      this.businessControl.patchValue([this.userbusinessUnitId]);
+      this.roleFormGroup.get('businessUnitId')?.disable();
+    }
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -190,6 +196,9 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     }
 
     this.roleFormGroup.get('businessUnitType')?.disable();
+    if(this.isOrgLogin) {
+      this.roleFormGroup.get('businessUnitId')?.disable();
+    }
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -214,8 +223,13 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
        takeWhile(() => this.isAlive)
      ).subscribe(() => {
         this.businessControl?.setValue(null);
-        if (this.isBusinessDisabledForNewRole) {
+        if (this.isBusinessDisabledForNewRole||this.isOrgLogin) {
           this.businessControl.patchValue([this.userbusinessUnitId]);
+        }
+        if(this.isOrgLogin) {
+          this.businessControl.patchValue([this.userbusinessUnitId]);
+          this.businessForm.get('business')?.disable();
+          this.roleFormGroup.get('businessUnitId')?.disable();
         }
       });
     });

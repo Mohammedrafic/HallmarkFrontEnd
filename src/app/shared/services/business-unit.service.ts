@@ -5,6 +5,7 @@ import { map, Observable } from 'rxjs';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { GetBusinessUnitIdDetails } from '@shared/models/user-managment-page.model';
 
 @Injectable({
   providedIn: 'root'
@@ -34,5 +35,9 @@ export class BusinessUnitService {
    */
      public getBusinessForEmployeeType(): Observable<BusinessUnit[]> {
       return this.http.get<BusinessUnit[]>(`/api/BusinessUnit/getBusinessForEmployeeType`);
+    }
+
+    public getBusinessIdDetails(id: number): Observable<GetBusinessUnitIdDetails> {
+      return this.http.get<GetBusinessUnitIdDetails>(`/api/BusinessUnit/businessUnitID/${id}`);
     }
 }

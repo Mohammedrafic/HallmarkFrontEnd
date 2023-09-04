@@ -7,7 +7,7 @@ export const UNIT_FIELDS = {
   value: 'id',
 };
 
-export const DISABLED_GROUP = [BusinessUnitType.Agency, BusinessUnitType.Organization];
+export const DISABLED_GROUP = [BusinessUnitType.Agency];
 
 export const BUSSINES_DATA_FIELDS = {
   text: 'name',

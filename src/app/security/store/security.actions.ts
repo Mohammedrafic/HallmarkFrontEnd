@@ -217,3 +217,8 @@ export class GetNonEmployeeUsers {
     public businessUnitId: number
   ) {}
 }
+
+export class GetBusinessIdDetails {
+  static readonly type = '[security] Get Business Id Details';
+  constructor(public id: number) {}
+}

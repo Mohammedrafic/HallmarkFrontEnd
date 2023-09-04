@@ -38,3 +38,9 @@ export type RolesPerUser = {
   id: number;
   name: string;
 };
+
+
+export type GetBusinessUnitIdDetails = {
+  isIRPEnabled: boolean;
+  isCreateEmployee: boolean;
+};

@@ -22,11 +22,12 @@ import {
 import { AdminState } from '@admin/store/admin.state';
 import { CanadaStates, Country, UsaStates } from '@shared/enums/states';
 import { mustMatch } from '@shared/validators/must-match.validators';
-import { RolesPerUser } from '@shared/models/user-managment-page.model';
+import { RolesPerUser, User } from '@shared/models/user-managment-page.model';
 import { SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { AgencyStatus } from '@shared/enums/status';
 import { COUNTRIES } from '@shared/constants/countries-list';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-user-settings',
@@ -126,9 +127,13 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
         takeWhile(() => this.isAlive)
       )
       .subscribe((value) => {
-        if(!this.firstLoadModal) {
-          this.businessUnitIdControl?.reset();
+        const user = this.store.selectSnapshot(UserState.user) as User;
+        if(user?.businessUnitType != BusinessUnitType.Organization){
+          if(!this.firstLoadModal) {
+            this.businessUnitIdControl?.reset();
+          }
         }
+       
         this.firstLoadModal = false;
           this.store.dispatch(new GetNewRoleBusinessByUnitType(value,value == BusinessUnitType.Employee?true:false));
       });

@@ -67,7 +67,7 @@
   <app-user-grid [filterForm]="businessForm" [export$]="exportUsers$" (editUserEvent)="onEdit($event)"></app-user-grid>
 </section>
 
-<app-side-dialog width="832" [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()" [disableSaveButton]="agencyActionsAllowed || !userPermission[userPermissions.CanEditUsers]">
+<app-side-dialog width="832" [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()" [disableSaveButton]="agencyActionsAllowed || !userPermission[userPermissions.CanEditUsers] || !isCreateEmp">
   <section>
     <app-add-edit-user [form]="$any(userSettingForm)" [businessUnits]="businessUnits" [user]="createdUser"></app-add-edit-user>
   </section>
