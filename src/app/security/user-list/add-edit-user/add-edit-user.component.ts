@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { FormGroup } from "@angular/forms";
 
 import { User } from "@shared/models/user-managment-page.model";
@@ -17,6 +17,8 @@ export class AddEditUserComponent implements OnDestroy {
 
   @Input() form: FormGroup;
   @Input() businessUnits: { text: string | BusinessUnitType, id: number }[];
+  
+  @Output() changeBusinessUnitId = new EventEmitter();
 
   @Input() set user (user: User | null) {
     this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
@@ -56,5 +58,10 @@ export class AddEditUserComponent implements OnDestroy {
   private switchVisibilityTab(enable: boolean): void {
     const visibilityTabIndex = 1;
     this.tab?.enableTab(visibilityTabIndex, enable);
+  }
+
+  ChangeBusinessUnitID(){
+    alert("ChangeBusinessUnitType-")
+    this.changeBusinessUnitId.emit();
   }
 }

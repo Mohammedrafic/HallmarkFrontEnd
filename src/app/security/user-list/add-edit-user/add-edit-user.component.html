@@ -4,7 +4,7 @@
       <e-tabitem>
         <ng-template #headerText> User Settings </ng-template>
         <ng-template #content>
-          <app-user-settings [form]="$any(form)" [businessUnits]="businessUnits"></app-user-settings>
+          <app-user-settings [form]="$any(form)" (changeBusinessUnitId)="ChangeBusinessUnitID()"   [businessUnits]="businessUnits"></app-user-settings>
         </ng-template>
       </e-tabitem>
       <e-tabitem disabled="true">

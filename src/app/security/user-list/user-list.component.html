@@ -69,6 +69,6 @@
 
 <app-side-dialog width="832" [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()" [disableSaveButton]="agencyActionsAllowed || !userPermission[userPermissions.CanEditUsers] || !isCreateEmp">
   <section>
-    <app-add-edit-user [form]="$any(userSettingForm)" [businessUnits]="businessUnits" [user]="createdUser"></app-add-edit-user>
+    <app-add-edit-user [form]="$any(userSettingForm)" (changeBusinessUnitId)="ChangeBusinessUnitID()" [businessUnits]="businessUnits" [user]="createdUser"></app-add-edit-user>
   </section>
 </app-side-dialog>

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { BUSSINES_DATA_FIELDS, UNIT_FIELDS } from '../../user-list.constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -38,6 +38,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
   @Input() businessUnits: { text: string | BusinessUnitType; id: number }[];
 
+  @Output() changeBusinessUnitId = new EventEmitter();
   @ViewChild('swithActive')
   public switcher: SwitchComponent;
 
@@ -157,6 +158,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
             this.businessUnitIdControl?.value ? [this.businessUnitIdControl?.value] : []
           )
         );
+
       });
   }
 
@@ -176,6 +178,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
         } else {
           this.store.dispatch(new ChangeBusinessUnit(false));
         }
+        this.changeBusinessUnitId.emit();
       });
   }
 

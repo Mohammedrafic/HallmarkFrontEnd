@@ -366,4 +366,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
       })
     });
   }
+  ChangeBusinessUnitID(){
+    alert("ChangeBusinessUnitType-")
+  }
 }
