@@ -8,7 +8,7 @@ import {
   Output,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 
 import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { filter, Observable, takeUntil } from 'rxjs';
@@ -43,6 +43,8 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { UserState } from '../../../../store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { AppState } from '../../../../store/app.state';
+import { ConfirmOverrideComments } from '@organization-management/credentials/interfaces';
+import { revertControlState } from '@shared/utils/form.utils';
 
 @Component({
   selector: 'app-add-edit-credential',
@@ -85,6 +87,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   public selectedSystem: SelectedSystemsFlag;
   public isMspUser = false;
   public isIrpFlagEnabled = false;
+  public showOverrideDialog = false;
 
   private selectedCredential: Credential;
 
@@ -111,11 +114,42 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   public saveCredential(): void {
+    const isCommentsDirty = this.credentialForm.get('comment')?.dirty || this.credentialForm.get('irpComment')?.dirty;
+
+    if (this.isEdit && isCommentsDirty) {
+      this.showOverrideDialog = true;
+    } else {
+      this.defineSaveStrategy();
+    }
+  }
+
+  private defineSaveStrategy(): void {
     if(this.isCredentialSettings) {
       this.saveCredentialForSettings();
     } else {
       this.saveCredentialForMasterData();
     }
+  }
+
+  public confirmOverrideComments(event: ConfirmOverrideComments): void {
+    const { isConfirmed } = event;
+
+    if (isConfirmed) {
+      this.defineSaveStrategy(); // TODO provide overridable comments flags
+      this.destroyDialog();
+    } else { 
+      const {comment, irpComment} = this.selectedCredential;
+
+      revertControlState(
+        this.credentialForm.get('comment') as AbstractControl, comment);
+
+      revertControlState(
+          this.credentialForm.get('irpComment') as AbstractControl, irpComment);
+    }
+  }
+
+  public destroyDialog() {
+    this.showOverrideDialog = false;
   }
 
   public closeCredentialDialog(): void {
