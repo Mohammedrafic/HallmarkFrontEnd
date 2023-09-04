@@ -66,12 +66,6 @@ export const AllBusinessTypeRoles: BusinessUnitType[] = [
 
 export const HelpDomain: Record<keyof BusinessUnitType | string, string> = {
   [BusinessUnitType.Agency]: 'https://eiiahelp.einsteinii.org/Topics_Agency/',
-  [BusinessUnitType.Organization]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
-  [BusinessUnitType.Candidates]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
-  [BusinessUnitType.Employee]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
-  [BusinessUnitType.Hallmark]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
-  [BusinessUnitType.MSP]: 'https://eiiohelp.einsteinii.org/Topics_Org/',
-  orgFallbackUrl: 'https://eiiohelp.einsteinii.org',
   agencyFallbackUrl: 'https://eiiahelp.einsteinii.org',
 };
 
