@@ -101,6 +101,7 @@ export const HelpNavigationLinks = (isAgency: boolean) => {
         'group-email': 'Group_Email.html',
         'profile': 'Organization_Profile.html',
         'document-library': 'Document_Library.html',
+        'analytics': 'Analytics.html',
       },
     });
   }
