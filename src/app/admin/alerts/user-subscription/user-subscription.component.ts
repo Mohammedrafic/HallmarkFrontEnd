@@ -22,7 +22,7 @@ import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-mo
 import { ToggleSwitchComponent } from '../toggle-switch/toggle-switch.component';
 import { GridReadyEvent } from '@ag-grid-community/core';
 import { AlertChannel, AlertEnum,AlertIdEnum } from 'src/app/admin/alerts/alerts.enum';
-import { GetUserSubscriptionPage, UpdateUserSubscription } from '@admin/store/alerts.actions';
+import { GetGroupEmailRoles, GetUserSubscriptionPage, UpdateUserSubscription } from '@admin/store/alerts.actions';
 import {
   UserSubscription,
   UserSubscriptionFilters,
@@ -47,6 +47,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { GetOrganizationById } from '@admin/store/alerts.actions';
 import { Organization } from '@shared/models/organization.model';
 import { isNumber } from 'lodash';
+import { GroupEmailRole } from '@shared/models/group-email.model';
 
 @Component({
   selector: 'app-user-subscription',
@@ -135,6 +136,12 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public previousSelectedOrderId: number | null;
   private pageSubject = new Subject<number>();
   public filterType: string = 'Contains';
+  public allOption: string = 'All';
+  public placeholderValue: string = 'Select Role';
+  public roleData: GroupEmailRole[];
+  public masterUserData: User[];
+  public allowActiveUsers:boolean = true;
+  public isOrgage: boolean;
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -146,6 +153,11 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   get usersControl(): AbstractControl {
     return this.businessForm.get('user') as AbstractControl;
   }
+  get rolesControl(): AbstractControl {
+    return this.businessForm.get('roles') as AbstractControl;
+  }
+  @Select(AlertsState.GetGroupRolesByOrgId)
+  public roleData$: Observable<GroupEmailRole[]>;
   constructor(private actions$: Actions,
     private readonly ngZone: NgZone,
     private store: Store,
@@ -297,11 +309,18 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.onBusinessValueChanged();
     this.onUserValueChanged();
     this.onOrganizationChangedHandler();
+    this.onRolesValueChanged();
+
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
+    const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    if(businessUnitType == BusinessUnitType.Agency || businessUnitType == BusinessUnitType.Organization) {
+      this.isOrgage=true;
+    }
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
       this.isBusinessFormDisabled && this.businessForm.disable();
+
     }
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
@@ -347,8 +366,11 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         this.businessForm.controls['user'].disable();
         this.businessForm.controls['business'].disable();
         this.businessForm.controls['businessUnit'].disable();
+
       }
     });
+    this.allowActiveUsers = true;
+
   }
 
   public onGridReady(params: GridReadyEvent): void {
@@ -362,7 +384,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     return new FormGroup({
       businessUnit: new FormControl(),
       business: new FormControl(0),
-      user: new FormControl(0)
+      user: new FormControl(0),
+      roles:new FormControl(),
     });
   }
   private onBusinessUnitValueChanged(): void {
@@ -414,6 +437,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         if(userBusinessId !=null && userBusinessId !=undefined)
           value = userBusinessId;
         }
+
         if(isNumber(value)){
           this.store.dispatch(new GetEmployeeUsers(value));
           this.employeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
@@ -440,6 +464,21 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
               });
             }
       } else {
+        var businessId=this.businessControl.value;
+        if (businessId != undefined && businessId > 0) {    
+          if(!this.isOrgage)
+          {
+            this.store.dispatch(new GetGroupEmailRoles([businessId]));
+            this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+              this.roleData = data;
+            });
+          } 
+          else{
+            const user = this.store.selectSnapshot(UserState.user);
+            this.businessForm.controls['roles'].setValue(user?.roleNames);
+
+          } 
+         }
         this.dispatchUserPage(businessUnitIds);
       }
     });
@@ -592,5 +631,41 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       this.businessUnitControl.patchValue(user?.businessUnitType);
       this.businessControl.setValue(user?.businessUnitId, {emitEvent:false});
     }
+  }
+  private onRolesValueChanged(): void {
+    this.rolesControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.usersControl.reset();
+      this.userData = [];
+      if(value && value.length >0){
+        this.getUsersByRole();
+      }
+      else{
+        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+          if (data != undefined) {
+            this.userData = data.items;
+          }
+        });
+      }
+
+    });
+  }
+  private getUsersByRole(): void{
+    this.userData = [];
+     if (this.rolesControl.value.length > 0) {
+        const user = this.store.selectSnapshot(UserState.user);
+        if (user?.businessUnitType != BusinessUnitType.MSP &&   user?.businessUnitType != BusinessUnitType.Hallmark) {
+          this.dispatchUserPage([this.businessControl.value]);
+        }
+        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+          if (data != undefined) {
+            this.masterUserData = data.items;
+            if(this.allowActiveUsers){
+              this.userData = data.items.filter(i => i.isDeleted == false);
+              this.userData = this.userData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
+            }
+           
+          }
+        });
+      }
   }
 }
