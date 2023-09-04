@@ -288,6 +288,12 @@
                 [showDropDownIcon]="true"
                 formControlName="WorkCommitmentIds"
               >
+              <ng-template #itemTemplate let-data>
+                <div  class="region-option-container">
+                  <span class="region-name">{{ data?.name }}</span>
+                  <span class="org-name">{{ data?.regionLocation }}</span>
+                </div>
+              </ng-template>
               </ejs-multiselect>
             </div>
           </div>
