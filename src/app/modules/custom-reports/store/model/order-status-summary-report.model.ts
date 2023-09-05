@@ -65,9 +65,12 @@ export class OrderStatusSummaryCustomReport {
   regionId: number;
   location: string;
   locationId: number;
+  locationExtId: string;
   department: string;
   departmentId: number;
+  departmentExtId: string;
   calculatedStatus: string;
   skill: string;
   skillId: number;
+  skillExtId: string;
 }
