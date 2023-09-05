@@ -229,7 +229,7 @@ export class HeadCountComponent implements OnInit {
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.defaultRegions = this.regionsList.map((list) => list.id);
-          //this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+         //this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
           this.changeDetectorRef.detectChanges();
         }
         else {
