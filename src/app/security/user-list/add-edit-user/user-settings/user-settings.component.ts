@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { BUSSINES_DATA_FIELDS, UNIT_FIELDS } from '../../user-list.constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -22,11 +22,12 @@ import {
 import { AdminState } from '@admin/store/admin.state';
 import { CanadaStates, Country, UsaStates } from '@shared/enums/states';
 import { mustMatch } from '@shared/validators/must-match.validators';
-import { RolesPerUser } from '@shared/models/user-managment-page.model';
+import { RolesPerUser, User } from '@shared/models/user-managment-page.model';
 import { SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { AgencyStatus } from '@shared/enums/status';
 import { COUNTRIES } from '@shared/constants/countries-list';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-user-settings',
@@ -37,6 +38,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
   @Input() businessUnits: { text: string | BusinessUnitType; id: number }[];
 
+  @Output() changeBusinessUnitId = new EventEmitter<boolean>();
   @ViewChild('swithActive')
   public switcher: SwitchComponent;
 
@@ -126,11 +128,15 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
         takeWhile(() => this.isAlive)
       )
       .subscribe((value) => {
-        if(!this.firstLoadModal) {
-          this.businessUnitIdControl?.reset();
+        const user = this.store.selectSnapshot(UserState.user) as User;
+        if(user?.businessUnitType != BusinessUnitType.Organization){
+          if(!this.firstLoadModal) {
+            this.businessUnitIdControl?.reset();
+          }
         }
+       
         this.firstLoadModal = false;
-          this.store.dispatch(new GetNewRoleBusinessByUnitType(value,value == BusinessUnitType.Employee?true:false));
+          this.store.dispatch(new GetNewRoleBusinessByUnitType(value, user?.businessUnitType == BusinessUnitType.Hallmark && value == BusinessUnitType.Employee?true:false));
       });
   }
 
@@ -152,6 +158,14 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
             this.businessUnitIdControl?.value ? [this.businessUnitIdControl?.value] : []
           )
         );
+        const user = this.store.selectSnapshot(UserState.user) as User;
+        if(user?.businessUnitType == BusinessUnitType.Organization && this.businessUnitControl?.value === BusinessUnitType.Employee){
+          this.changeBusinessUnitId.emit(true);
+        }else{
+          this.changeBusinessUnitId.emit(false);
+        }
+
+
       });
   }
 
@@ -170,7 +184,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
           this.store.dispatch(new ChangeBusinessUnit(isAgencyDisable));
         } else {
           this.store.dispatch(new ChangeBusinessUnit(false));
-        }
+        }    
       });
   }
 
