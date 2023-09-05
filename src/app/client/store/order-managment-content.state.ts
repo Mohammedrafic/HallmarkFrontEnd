@@ -79,7 +79,12 @@ import {
   GetOrderWorkLocationAuditHistory,
   GetOrderClassificationAuditHistory,
   GetOrderHistoryDetailSucceeded,
-  GetOrderClassificationDetailSucceeded
+  GetOrderClassificationDetailSucceeded,
+  GetOrderJobDistributionDetailSucceeded,
+  GetOrderWorkLocationDetailSucceeded,
+  GetOrderCredentialDetailSucceeded,
+  GetOrderContactDetailSucceeded,
+  GetOrderBillRateDetailSucceeded
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -103,7 +108,7 @@ import {
   OrderManagementPage,
   OrderWorkLocationAuditHistory,
   OrdersJourneyPage,
-  SuggestedDetails,  
+  SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -164,7 +169,7 @@ import { ChangeInternalDistributionSuccess } from '@client/order-management/comp
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
-  ordersJourneyPage: OrdersJourneyPage |null;
+  ordersJourneyPage: OrdersJourneyPage | null;
   selectedOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
   applicantStatuses: ApplicantStatus[];
@@ -192,16 +197,16 @@ export interface OrderManagementContentStateModel {
   extensions: any;
   irpCandidates: PageOfCollections<IrpOrderCandidate> | null;
   candidateCancellationReasons: CandidateCancellationReason[] | null;
-  allShifts:ScheduleShift[]|null;
-  sendOnboardCandidateEmail:OnboardCandidateEmail | null;
+  allShifts: ScheduleShift[] | null;
+  sendOnboardCandidateEmail: OnboardCandidateEmail | null;
   orderComments: Comment[];
   OrderAuditHistory: OrderAuditHistory[];
   OrderCredentialAuditHistory: OrderCredentialAuditHistory[];
-  OrderBillRatesAuditHistory:OrderBillRateAuditHistory[];
-  OrderContactAuditHistory:OrderContactAuditHistory[];
-  OrderWorkLocationAuditHistory:OrderWorkLocationAuditHistory[];
-  OrderJobDistributionAuditHistory:OrderJobDistributionAuditHistory[],
-  OrderClassificationAuditHistory:OrderClassificationAuditHistory[]  
+  OrderBillRatesAuditHistory: OrderBillRateAuditHistory[];
+  OrderContactAuditHistory: OrderContactAuditHistory[];
+  OrderWorkLocationAuditHistory: OrderWorkLocationAuditHistory[];
+  OrderJobDistributionAuditHistory: OrderJobDistributionAuditHistory[],
+  OrderClassificationAuditHistory: OrderClassificationAuditHistory[]
 }
 
 @State<OrderManagementContentStateModel>({
@@ -240,16 +245,16 @@ export interface OrderManagementContentStateModel {
     extensions: null,
     irpCandidates: null,
     candidateCancellationReasons: null,
-    allShifts:null,
-    sendOnboardCandidateEmail:null,
-    orderComments : [],
+    allShifts: null,
+    sendOnboardCandidateEmail: null,
+    orderComments: [],
     OrderAuditHistory: [],
     OrderCredentialAuditHistory: [],
-    OrderBillRatesAuditHistory:[],
-    OrderContactAuditHistory:[],
-    OrderWorkLocationAuditHistory:[],
-    OrderJobDistributionAuditHistory:[],
-    OrderClassificationAuditHistory:[],
+    OrderBillRatesAuditHistory: [],
+    OrderContactAuditHistory: [],
+    OrderWorkLocationAuditHistory: [],
+    OrderJobDistributionAuditHistory: [],
+    OrderClassificationAuditHistory: [],
   },
 })
 @Injectable()
@@ -485,7 +490,7 @@ export class OrderManagementContentState {
     private orderImportService: OrderImportService,
     private UpdateRegRateService: UpdateRegRateService,
     private commentService: CommentsService
-  ) {}
+  ) { }
 
   @Action(GetOrders, { cancelUncompleted: true })
   GetOrders(
@@ -495,17 +500,17 @@ export class OrderManagementContentState {
     patchState({ ordersPage: null });
     return !isIncomplete
       ? this.orderManagementService.getOrders(payload).pipe(
-          tap((payload) => {
-            this.orderManagementService.countShiftsWithinPeriod(payload);
-            patchState({ ordersPage: payload });
-            return payload;
-          })
-        )
+        tap((payload) => {
+          this.orderManagementService.countShiftsWithinPeriod(payload);
+          patchState({ ordersPage: payload });
+          return payload;
+        })
+      )
       : this.orderManagementService.getIncompleteOrders(payload).pipe(
-          tap((payload) => {
-            patchState({ ordersPage: payload });
-          })
-        );
+        tap((payload) => {
+          patchState({ ordersPage: payload });
+        })
+      );
   }
 
   @Action(GetIRPOrders, { cancelUncompleted: true })
@@ -583,8 +588,8 @@ export class OrderManagementContentState {
             ? `The Order ${prefixId} is locked`
             : `The Order ${prefixId} is unlocked`
           : lockStatus
-          ? `The Order ${prefixId} is locked`
-          : `The Order ${prefixId} is unlocked`;
+            ? `The Order ${prefixId} is locked`
+            : `The Order ${prefixId} is unlocked`;
         const actions = [
           new LockUpdatedSuccessfully(),
           new ShowToast(MessageTypes.Success, message),
@@ -787,7 +792,7 @@ export class OrderManagementContentState {
   @Action(ClearSuggestions)
   ClearSuggestions(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    {}: ClearSuggestions
+    { }: ClearSuggestions
   ): OrderManagementContentStateModel {
     return patchState({ suggestedDetails: null });
   }
@@ -884,25 +889,25 @@ export class OrderManagementContentState {
             !isTemplate
               ? order.length == 1 && !(inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined)
                 ? 'Order ' +
-                  order[0].organizationPrefix?.toString() +
-                  '-' +
-                  order[0].publicId?.toString() +
-                  ' has been added'
-                : inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined
-                ? isLocationAndDepartment
-                  ? RECORD_ADDED +
-                    ' Due to location and Department Expiry ' +
-                    inActivedatestr +
-                    ' Dates orders not added.'
-                  : isLocation
-                  ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr + ' Dates orders not added.'
-                  : RECORD_ADDED + ' Due to Department Expiry ' + inActivedatestr + ' Dates orders not added.'
-                : RECORD_ADDED
-              : 'Template ' +
                 order[0].organizationPrefix?.toString() +
                 '-' +
                 order[0].publicId?.toString() +
                 ' has been added'
+                : inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined
+                  ? isLocationAndDepartment
+                    ? RECORD_ADDED +
+                    ' Due to location and Department Expiry ' +
+                    inActivedatestr +
+                    ' Dates orders not added.'
+                    : isLocation
+                      ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr + ' Dates orders not added.'
+                      : RECORD_ADDED + ' Due to Department Expiry ' + inActivedatestr + ' Dates orders not added.'
+                  : RECORD_ADDED
+              : 'Template ' +
+              order[0].organizationPrefix?.toString() +
+              '-' +
+              order[0].publicId?.toString() +
+              ' has been added'
           ),
           new SaveIrpOrderSucceeded(),
         ]);
@@ -944,19 +949,19 @@ export class OrderManagementContentState {
         dispatch([
           order?.isQuickOrder
             ? new ShowToast(
-                MESSAGE_TYPE,
-                TOAST_MESSAGE,
-                order.isQuickOrder,
-                payload.organizationPrefix,
-                payload.publicId
-              )
+              MESSAGE_TYPE,
+              TOAST_MESSAGE,
+              order.isQuickOrder,
+              payload.organizationPrefix,
+              payload.publicId
+            )
             : new ShowToast(
-                MessageTypes.Success,
-                RECORD_SAVED_SUCCESS_WITH_ORDERID(
-                  payload?.organizationPrefix ?? '',
-                  payload?.publicId?.toString() ?? ''
-                )
-              ),
+              MessageTypes.Success,
+              RECORD_SAVED_SUCCESS_WITH_ORDERID(
+                payload?.organizationPrefix ?? '',
+                payload?.publicId?.toString() ?? ''
+              )
+            ),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
           new SaveLastSelectedOrganizationAgencyId(
@@ -984,9 +989,9 @@ export class OrderManagementContentState {
         const successMessage = internalDistributionChanged
           ? ChangeInternalDistributionSuccess
           : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(
-              order[0]?.organizationPrefix ?? '',
-              order[0]?.publicId?.toString() ?? ''
-            );
+            order[0]?.organizationPrefix ?? '',
+            order[0]?.publicId?.toString() ?? ''
+          );
 
         dispatch([new ShowToast(MessageTypes.Success, successMessage), new SaveIrpOrderSucceeded()]);
         if (documents.length) {
@@ -1159,7 +1164,7 @@ export class OrderManagementContentState {
 
   @Action(ExportOrdersJourney)
   ExportOrdersJourney(
-    {}: StateContext<OrderManagementContentStateModel>,
+    { }: StateContext<OrderManagementContentStateModel>,
     { payload }: ExportOrdersJourney
   ): Observable<any> {
     return this.orderManagementService.orderJourneyexport(payload).pipe(
@@ -1280,9 +1285,9 @@ export class OrderManagementContentState {
 
   @Action(UpdateRegRateorder)
   UpdateRegRateorder(
-    { dispatch } : StateContext<OrderManagementContentStateModel>,
-    { payload,reorderFilled } : UpdateRegRateorder
-  ) : Observable<UpdateRegrateModel | Observable<void>>{
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload, reorderFilled }: UpdateRegRateorder
+  ): Observable<UpdateRegrateModel | Observable<void>> {
     return this.UpdateRegRateService.UpdateRegRate(payload).pipe(
       tap((data) => {
         const count = data.length;
@@ -1290,18 +1295,18 @@ export class OrderManagementContentState {
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
         else if (count == 0 && payload.perDiemIds.length === 0)
           dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersSucceedMessage));
-        else if(payload.perDiemIds.length===payload.orderIds.length && count === payload.perDiemIds.length)
+        else if (payload.perDiemIds.length === payload.orderIds.length && count === payload.perDiemIds.length)
           dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReordersucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReordersucceedcount(count)));
-        else if(payload.perDiemIds.length===payload.orderIds.length && count >0)
+        else if (payload.perDiemIds.length === payload.orderIds.length && count > 0)
           dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReorderOpensucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReorderOpensucceedcount(count)));
-        else if(count==0 && payload.perDiemIds.length===payload.orderIds.length)
+        else if (count == 0 && payload.perDiemIds.length === payload.orderIds.length)
           dispatch(new ShowToast(MessageTypes.Error, ReOrdersErrorMessage));
-        else if(count>0 && payload.perDiemIds.length>0)
+        else if (count > 0 && payload.perDiemIds.length > 0)
           dispatch(new ShowToast(MessageTypes.Success, UpdateRegularRatesucceedcount(count)));
-        else if(count==0 && payload.perDiemIds.length!==payload.orderIds.length && payload.perDiemIds.length>0)
+        else if (count == 0 && payload.perDiemIds.length !== payload.orderIds.length && payload.perDiemIds.length > 0)
           dispatch(new ShowToast(MessageTypes.Error, PerDiemErrorMessage));
         else
-          dispatch(new ShowToast(MessageTypes.Error,'Bill rate is not updated'));
+          dispatch(new ShowToast(MessageTypes.Error, 'Bill rate is not updated'));
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rate is not updated'))))
     );
@@ -1337,7 +1342,7 @@ export class OrderManagementContentState {
   @Action(GetAllShifts)
   GetAllShifts(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    {}: GetAllShifts
+    { }: GetAllShifts
   ): Observable<ScheduleShift[] | null> {
     return this.orderManagementService.getAllShifts().pipe(
       tap((payload: ScheduleShift[]) => {
@@ -1347,89 +1352,112 @@ export class OrderManagementContentState {
     );
   }
 
-      @Action(sendOnboardCandidateEmailMessage)
-      sendOnboardCandidateEmailMessage(
-        { dispatch, patchState }: StateContext<OrderManagementContentStateModel>,
-        { onboardCandidateEmailData }: sendOnboardCandidateEmailMessage
-      ): Observable<any | void> {
-        return this.orderManagementService.sendCandidateOnboardEmail(onboardCandidateEmailData).pipe(
-          tap((payload) => {
-            patchState({ sendOnboardCandidateEmail: payload });
-            return payload;
-          }),
-          catchError((error: HttpErrorResponse) => {
-            return dispatch(new ShowToast(MessageTypes.Error, error.error));
-          })
-        );
-      }
+  @Action(sendOnboardCandidateEmailMessage)
+  sendOnboardCandidateEmailMessage(
+    { dispatch, patchState }: StateContext<OrderManagementContentStateModel>,
+    { onboardCandidateEmailData }: sendOnboardCandidateEmailMessage
+  ): Observable<any | void> {
+    return this.orderManagementService.sendCandidateOnboardEmail(onboardCandidateEmailData).pipe(
+      tap((payload) => {
+        patchState({ sendOnboardCandidateEmail: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error));
+      })
+    );
+  }
 
-      @Action(GetOrderAuditHistory)
+  @Action(GetOrderAuditHistory)
   GetOrderAuditHistory({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
-    GetOrderAuditHistory): Observable<OrderAuditHistory[]> {
+    GetOrderAuditHistory): Observable<OrderAuditHistory[] | void> {
     return this.orderManagementService.getOrderAuditHistory(payload).pipe(
       tap((payloads) => {
         patchState({ OrderAuditHistory: payloads });
         dispatch(new GetOrderHistoryDetailSucceeded());
         return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }));
   }
 
   @Action(GetOrderCredentialAuditHistory)
-  GetOrderCredentialAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
-    GetOrderCredentialAuditHistory): Observable<OrderCredentialAuditHistory[]> {
+  GetOrderCredentialAuditHistory({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderCredentialAuditHistory): Observable<OrderCredentialAuditHistory[]|void> {
     return this.orderManagementService.getOrderCredentialAuditHistory(payload).pipe(
       tap((payloads) => {
         patchState({ OrderCredentialAuditHistory: payloads });
+        dispatch(new GetOrderCredentialDetailSucceeded());
         return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }));
   }
 
 
   @Action(GetOrderBillRatesAuditHistory)
-  GetOrderBillRatesAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
-    GetOrderBillRatesAuditHistory): Observable<OrderBillRateAuditHistory[]> {
+  GetOrderBillRatesAuditHistory({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderBillRatesAuditHistory): Observable<OrderBillRateAuditHistory[]|void> {
     return this.orderManagementService.getOrderBillRatesAuditHistory(payload).pipe(
       tap((payloads) => {
         patchState({ OrderBillRatesAuditHistory: payloads });
+        dispatch(new GetOrderBillRateDetailSucceeded());
         return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }));
   }
 
 
   @Action(GetOrderContactAuditHistory)
-  GetOrderContactAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
-    GetOrderContactAuditHistory): Observable<OrderContactAuditHistory[]> {
+  GetOrderContactAuditHistory({ patchState,dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderContactAuditHistory): Observable<OrderContactAuditHistory[]|void> {
     return this.orderManagementService.getOrderContactAuditHistory(payload).pipe(
       tap((payloads) => {
         patchState({ OrderContactAuditHistory: payloads });
+        dispatch(new GetOrderContactDetailSucceeded());
         return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }));
   }
 
   @Action(GetOrderWorkLocationAuditHistory)
-  GetOrderWorkLocationAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
-    GetOrderWorkLocationAuditHistory): Observable<OrderWorkLocationAuditHistory[]> {
+  GetOrderWorkLocationAuditHistory({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderWorkLocationAuditHistory): Observable<OrderWorkLocationAuditHistory[] | void> {
     return this.orderManagementService.GetOrderWorkLocationAuditHistory(payload).pipe(
       tap((payloads) => {
         patchState({ OrderWorkLocationAuditHistory: payloads });
+        dispatch(new GetOrderWorkLocationDetailSucceeded());
         return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }));
   }
 
 
   @Action(GetOrderJobDistributionAuditHistory)
-  GetOrderJobDistributionAuditHistory({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }:
-    GetOrderJobDistributionAuditHistory): Observable<OrderJobDistributionAuditHistory[]> {
+  GetOrderJobDistributionAuditHistory({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetOrderJobDistributionAuditHistory): Observable<OrderJobDistributionAuditHistory[] | void> {
     return this.orderManagementService.getOrderJobDistributionAuditHistory(payload).pipe(
       tap((payloads) => {
         patchState({ OrderJobDistributionAuditHistory: payloads });
+        dispatch(new GetOrderJobDistributionDetailSucceeded());
         return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }));
   }
 
   @Action(GetOrderClassificationAuditHistory)
   GetOrderClassificationAuditHistory({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
-    GetOrderClassificationAuditHistory): Observable<OrderClassificationAuditHistory[]|void> {
+    GetOrderClassificationAuditHistory): Observable<OrderClassificationAuditHistory[] | void> {
     return this.orderManagementService.getOrderClassificationAuditHistory(payload).pipe(
       tap((payloads) => {
         patchState({ OrderClassificationAuditHistory: payloads });
@@ -1437,9 +1465,7 @@ export class OrderManagementContentState {
         return payloads;
       }),
       catchError((error: HttpErrorResponse) => {
-       console.log(error)
-        return dispatch(new ShowToast(MessageTypes.Error, error.error));
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }));
-  }  
+  }
 }
-

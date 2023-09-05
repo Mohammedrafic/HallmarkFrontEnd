@@ -18,7 +18,7 @@ import { AddRolesDialogTitle, BUSSINES_DATA_FIELDS,
   EditRolesDialogTitle, OPRION_FIELDS } from './roles-and-permissions.constants';
 import { RolesGridComponent } from './roles-grid/roles-grid.component';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
-import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { BUSINESS_UNITS_VALUES, BUSINESS_UNITS_VALUES_USERS_ROLES } from '@shared/constants/business-unit-type-list';
 
 @Component({
   selector: 'app-roles-and-permissions',
@@ -38,7 +38,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   public isEditRole = false;
   public isBusinessFormDisabled = false;
   public isBusinessDisabledForNewRole = false;
-  public businessUnits = BUSINESS_UNITS_VALUES;
+  public businessUnits = BUSINESS_UNITS_VALUES_USERS_ROLES;
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public roleId: number | null;
@@ -83,6 +83,10 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
 
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       this.businessUnits = this.businessUnits.filter((item) => item.id !== BusinessUnitType.Hallmark);
+    }
+    if(user?.businessUnitType === BusinessUnitType.Organization){
+      let orgEmpBusinessIDs =[BusinessUnitType.Organization,BusinessUnitType.Employee]
+      this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id));  
     }
 
     this.actions$

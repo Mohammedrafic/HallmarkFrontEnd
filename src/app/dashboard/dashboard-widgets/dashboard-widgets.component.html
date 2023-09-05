@@ -115,6 +115,12 @@
                                 [description]="widgetDescriptionEnum.POSITIONS_COUNT_DAY_RANGE"
                                 [chartData]="widgetsData?.[widgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]"
                                 [isDarkTheme]="isDarkTheme" ></app-positions-count-day-range>
+          <app-orders-pending-custom-status *ngSwitchCase="widgetTypeEnum.ORDERS_PENDING_IN_CUSTOM"
+                                [isLoading]="isLoading"
+                                [description]="widgetDescriptionEnum.ORDERS_PENDING_IN_CUSTOM"
+                                [chartData]="widgetsData?.[widgetTypeEnum.ORDERS_PENDING_IN_CUSTOM]"
+                                [widgetData]="widgetsData"
+                                [isDarkTheme]="isDarkTheme" ></app-orders-pending-custom-status>
         </ng-template>
       </e-panel>
     </e-panels>

@@ -241,7 +241,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  public cancelRejectCandidate(): void {
+  public resetStatusControl(): void {
     this.statusesFormControl.reset();
     this.selectedApplicantStatus = null;
   }
@@ -312,8 +312,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
               this.closeDialog();
             }
           } else {
-            this.statusesFormControl.reset();
-            this.selectedApplicantStatus = null;
+            this.resetStatusControl();
           }
         });
     }
@@ -483,6 +482,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.candidateJob = null;
     this.isRejected = false;
     this.formGroup.markAsPristine();
+    this.resetStatusControl();
   }
 
   private switchFormState(): void {

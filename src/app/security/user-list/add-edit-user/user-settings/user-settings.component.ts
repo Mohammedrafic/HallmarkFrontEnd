@@ -130,8 +130,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
           this.businessUnitIdControl?.reset();
         }
         this.firstLoadModal = false;
-
-        this.store.dispatch(new GetNewRoleBusinessByUnitType(value));
+          this.store.dispatch(new GetNewRoleBusinessByUnitType(value,value == BusinessUnitType.Employee?true:false));
       });
   }
 

@@ -31,6 +31,30 @@ class="button-group system-buttons"
           </ejs-dropdownlist>
         </div>
       </div>
+      <div class="dropdown-container" *ngIf="!isOrgage">
+        <div class="input-group dropdown">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="roles"
+                           placeholder='placeholderValue'
+                          [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           appValidateWithMessage
+                           [fields]="businessDataFields"
+                           [dataSource]="roleData$ | async"
+                           [selectAllText]='allOption'
+                           showSelectAll=true>
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="dropdown-container bootstrap" *ngIf="isOrgage">
+        <div class="input-group">
+          <input
+            formControlName="roles"
+            class="e-input"
+            type="text"
+          />
+        </div>
+      </div>
       <div class="dropdown-container">
         <div class="input-group dropdown">
           <ejs-dropdownlist appValidateWithMessage

@@ -754,6 +754,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled;
     this.colDefs = this.invoicesContainerService.getColDefsByTab(this.selectedTabIdx,
       {
+        agencyOrganizationIds: this.agencyOrganizationIds,
         organizationId: this.organizationId,
         canPay: this.canPay,
         canEdit: this.invoiceContainerConfig.agencyActionsAllowed && this.approveInvoiceEnabled,

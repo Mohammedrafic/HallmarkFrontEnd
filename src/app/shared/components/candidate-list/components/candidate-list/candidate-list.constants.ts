@@ -260,6 +260,7 @@ export const IrpSourcingCandidateExportCols: ExportColumn[] = [
   { text: 'Department', column: 'Department' },
   { text: 'Work Commitment', column: 'WorkCommitment' },
   { text: 'Hire Date', column: 'HireDate' },
+  { text: 'Emp Source ID', column: 'EmpSourceID' },
   { text: 'Source', column: 'Source' },
   { text: 'Recruiter', column: 'Recruiter' },
 ];

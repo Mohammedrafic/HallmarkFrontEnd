@@ -211,8 +211,7 @@ export class GetCredentialPdfFilesSucceeded {
 
 export class GetGroupedCredentialsFiles {
   static readonly type = '[candidate] Get Grouped Credentials Files';
-  constructor(public candidateId: number) {}
-
+  constructor(public candidateId: number, public orderId?: number | null, public organizationId?: number | null) {}
 }
 
 export class GetCandidateProfileTemplate {

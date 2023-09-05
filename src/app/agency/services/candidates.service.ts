@@ -210,14 +210,17 @@ export class CandidateService {
     return this.http.get(endpoint.get(isAgencyArea) as string, { responseType: 'blob' });
   }
 
-  public getCredentialGroupedFiles(candidateId: number): Observable<CredentialGroupedFiles[]> {
+  public getCredentialGroupedFiles(
+    candidateId: number, orderId?: number | null, organizationId?: number | null
+  ): Observable<CredentialGroupedFiles[]> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const endpoint = new Map<boolean, string>([
       [true, `/api/CandidateCredentials/groupedCandidateCredentialsFiles/${candidateId}`],
       [false, `/api/EmployeeCredentials/groupedCandidateCredentialsFiles/${candidateId}`],
     ]);
+    const params = isAgencyArea && orderId ? GetQueryParams({orderId, organizationId}) : {};
 
-    return this.http.get<CredentialGroupedFiles[]>(endpoint.get(isAgencyArea) as string);
+    return this.http.get<CredentialGroupedFiles[]>(endpoint.get(isAgencyArea) as string, { params: params });
   }
 
   public getCredentialStatuses(

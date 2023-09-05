@@ -18,7 +18,7 @@ export enum WidgetDescriptionEnum {
   INVOICES = 'Invoces_widget',
   OPEN_POSITIONS_TREND = 'Open_Positions_Trend',
   IN_PROGRESS_POSITIONS_TREND = 'In_Progress_Positions_Trend',
-  LTA_ORDER_ENDING = 'LTA order ending in 45 days',
+  LTA_ORDER_ENDING = 'Positions ending in next 45 days',
   Candidate_Applied_In_Last_N_Days ='The number of candidates who are in Applied status for configured or more days',
   ORG = 'Organization Widget Description',
   AGENCY_POSITION_COUNT = 'Count of Open and In Progress positions by Organizations.',
@@ -29,4 +29,5 @@ export enum WidgetDescriptionEnum {
   AVAILABLE_EMPLOYEE='Available Employees in next 24 hrs.',
   CANDIDATES_ACTIVE_POSITIONS="Count of Candidate statuses in Active Orders/Positions.",
   POSITIONS_COUNT_DAY_RANGE="Active Positions by Open Day Range",
+  ORDERS_PENDING_IN_CUSTOM = "Average days positions spending in specific custom status",
 }

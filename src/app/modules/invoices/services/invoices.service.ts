@@ -124,7 +124,7 @@ export class InvoicesService {
   }
 
   public createPaymentRecords(nodes: RowNode[]): InvoicePaymentData[] {
-    return nodes.filter((node) => (node.data as PendingApprovalInvoice).invoiceState === 2)
+    return nodes.filter((node) => (node.data as PendingApprovalInvoice).invoiceState === 2 || (node.data as PendingApprovalInvoice).invoiceState === 4 || (node.data as PendingApprovalInvoice).invoiceState === 5)
     .map((node) => {
       const data = node.data as PendingApprovalInvoice;
       return ({

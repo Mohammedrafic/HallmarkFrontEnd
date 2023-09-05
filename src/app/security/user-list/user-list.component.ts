@@ -25,7 +25,7 @@ import { take } from 'rxjs/operators';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserGridComponent } from './user-grid/user-grid.component';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
-import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { BUSINESS_UNITS_VALUES, BUSINESS_UNITS_VALUES_USERS_ROLES } from '@shared/constants/business-unit-type-list';
 import { MessageTypes } from '@shared/enums/message-types';
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
@@ -52,7 +52,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   public userSettingForm: FormGroup;
   public isEditRole = false;
   public unitFields = UNIT_FIELDS;
-  public businessUnits = BUSINESS_UNITS_VALUES;
+  public businessUnits = BUSINESS_UNITS_VALUES_USERS_ROLES;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public isBusinessFormDisabled = false;
   public createdUser: User | null;
@@ -245,6 +245,10 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       this.businessUnits = this.businessUnits.filter((item) => item.id !== BusinessUnitType.Hallmark);
     }
+    if(user?.businessUnitType === BusinessUnitType.Organization){
+      let orgEmpBusinessIDs =[BusinessUnitType.Organization,BusinessUnitType.Employee]
+      this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id));  
+    }
   }
 
   private subOnChangeUnit(): void {
@@ -313,6 +317,9 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
     this.userSettingForm.reset();
     this.userSettingForm.enable();
     this.createdUser = null;
+    if(this.businessUnitControl.value==BusinessUnitType.Employee){
+      this.store.dispatch(new GetBusinessByUnitType(this.businessUnitControl.value));
+    }
   }
 
   private disableMailFormGroup(): void {

@@ -290,9 +290,9 @@ export class SecurityState {
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType(
     { dispatch, patchState }: StateContext<SecurityStateModel>,
-    { type }: GetBusinessByUnitType
+    { type,isUsers }: GetBusinessByUnitType
   ): Observable<BusinessUnit[] | void> {
-    return this.businessUnitService.getBusinessByUnitType(type).pipe(
+    return this.businessUnitService.getBusinessByUnitType(type,isUsers).pipe(
       tap((payload) => {
         patchState({ newRoleBussinesData: payload });
         patchState({ bussinesData: payload });
@@ -307,10 +307,10 @@ export class SecurityState {
   @Action(GetNewRoleBusinessByUnitType)
   GetNewRoleBusinessByUnitType(
     { patchState, dispatch }: StateContext<SecurityStateModel>,
-    { type }: GetNewRoleBusinessByUnitType
+    { type,isusers }: GetNewRoleBusinessByUnitType
   ): Observable<BusinessUnit[] | void> {
     patchState({ isNewRoleDataLoading: true });
-    return this.businessUnitService.getBusinessByUnitType(type).pipe(
+    return this.businessUnitService.getBusinessByUnitType(type,isusers).pipe(
       tap((payload) => {
         patchState({ isNewRoleDataLoading: false });
         patchState({ newRoleBussinesData: payload });

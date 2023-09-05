@@ -17,8 +17,8 @@ export class BusinessUnitService {
    * Get the list of available business by unit type
    * @return Array of business
    */
-  public getBusinessByUnitType(type: BusinessUnitType): Observable<BusinessUnit[]> {
-    return this.http.get<BusinessUnit[]>(`/api/BusinessUnit/businessUnitType/${type}`).pipe(map((data) => sortByField(data, 'name')));
+  public getBusinessByUnitType(type: BusinessUnitType,isUsers:boolean=false): Observable<BusinessUnit[]> {
+    return this.http.get<BusinessUnit[]>(`/api/BusinessUnit/businessUnitType/${type}/${isUsers}`).pipe(map((data) => sortByField(data, 'name')));
   }
    /**
    * Get the list of available business by unit type
