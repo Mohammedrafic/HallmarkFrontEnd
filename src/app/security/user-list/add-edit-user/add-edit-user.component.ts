@@ -18,7 +18,7 @@ export class AddEditUserComponent implements OnDestroy {
   @Input() form: FormGroup;
   @Input() businessUnits: { text: string | BusinessUnitType, id: number }[];
   
-  @Output() changeBusinessUnitId = new EventEmitter();
+  @Output() changeBusinessUnitId =new EventEmitter<boolean>();
 
   @Input() set user (user: User | null) {
     this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
@@ -60,8 +60,7 @@ export class AddEditUserComponent implements OnDestroy {
     this.tab?.enableTab(visibilityTabIndex, enable);
   }
 
-  ChangeBusinessUnitID(){
-    alert("ChangeBusinessUnitType-")
-    this.changeBusinessUnitId.emit();
+  ChangeBusinessUnitID(event:boolean){
+    this.changeBusinessUnitId.emit(event);
   }
 }

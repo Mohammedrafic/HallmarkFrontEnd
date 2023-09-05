@@ -38,7 +38,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
   @Input() businessUnits: { text: string | BusinessUnitType; id: number }[];
 
-  @Output() changeBusinessUnitId = new EventEmitter();
+  @Output() changeBusinessUnitId = new EventEmitter<boolean>();
   @ViewChild('swithActive')
   public switcher: SwitchComponent;
 
@@ -136,7 +136,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
         }
        
         this.firstLoadModal = false;
-          this.store.dispatch(new GetNewRoleBusinessByUnitType(value,value == BusinessUnitType.Employee?true:false));
+          this.store.dispatch(new GetNewRoleBusinessByUnitType(value, user?.businessUnitType == BusinessUnitType.Hallmark && value == BusinessUnitType.Employee?true:false));
       });
   }
 
@@ -158,6 +158,13 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
             this.businessUnitIdControl?.value ? [this.businessUnitIdControl?.value] : []
           )
         );
+        const user = this.store.selectSnapshot(UserState.user) as User;
+        if(user?.businessUnitType == BusinessUnitType.Organization && this.businessUnitControl?.value === BusinessUnitType.Employee){
+          this.changeBusinessUnitId.emit(true);
+        }else{
+          this.changeBusinessUnitId.emit(false);
+        }
+
 
       });
   }
@@ -177,8 +184,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
           this.store.dispatch(new ChangeBusinessUnit(isAgencyDisable));
         } else {
           this.store.dispatch(new ChangeBusinessUnit(false));
-        }
-        this.changeBusinessUnitId.emit();
+        }    
       });
   }
 

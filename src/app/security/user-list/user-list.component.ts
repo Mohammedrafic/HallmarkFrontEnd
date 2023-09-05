@@ -65,6 +65,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   public dispatch: boolean = false;
   public isIRPOrg: boolean = false;
   public isCreateEmp: boolean = false;
+  public isDisabledEmp: boolean = false;
   public user: User;
 
   get businessUnitControl(): AbstractControl {
@@ -99,16 +100,16 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
     this.onBusinessIdValueChanged();
 
     const user = this.store.selectSnapshot(UserState.user) as User;
-    this.user =this.store.selectSnapshot(UserState.user) as User;
+    this.user = this.store.selectSnapshot(UserState.user) as User;
     this.disableBusinessControls(user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
-    if(user?.businessUnitType !=BusinessUnitType.Organization){
-      this.businessControl.patchValue(this.isBusinessFormDisabled  ? user?.businessUnitId :  0);
-    }else{
+    if (user?.businessUnitType != BusinessUnitType.Organization) {
+      this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
+    } else {
       this.businessControl.patchValue(user?.businessUnitId);
-      this.businessForm.get('business')?.disable({emitEvent:false})
+      this.businessForm.get('business')?.disable({ emitEvent: false })
     }
- 
+
     this.subscribeOnSucceededUserCreation();
     this.subOnChangeUnit();
   }
@@ -133,11 +134,11 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
       isDeleted: true,
     });
     this.disableBussinesUnitForRole();
-    if(this.user?.businessUnitType == BusinessUnitType.Organization &&this.isIRPOrg){
-      this.userSettingForm.get('businessUnitType')?.enable({emitEvent: false});
-      this.userSettingForm.get('businessUnitId')?.disable({emitEvent: false});
+    if (this.user?.businessUnitType == BusinessUnitType.Organization && this.isIRPOrg) {
+      this.userSettingForm.get('businessUnitType')?.enable({ emitEvent: false });
+      this.userSettingForm.get('businessUnitId')?.disable({ emitEvent: false });
     }
-   
+
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -164,24 +165,24 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
     this.userSettingForm.markAllAsTouched();
     if (this.userSettingForm.valid) {
       const value = this.userSettingForm.getRawValue();
-        let userDTO: UserDTO = {
-          businessUnitId: value.businessUnitId || null,
-          metadata: {
-            ...value,
-            isDeleted: !value.isDeleted,
-          },
-          roleIds: value.roles,
+      let userDTO: UserDTO = {
+        businessUnitId: value.businessUnitId || null,
+        metadata: {
+          ...value,
+          isDeleted: !value.isDeleted,
+        },
+        roleIds: value.roles,
+      };
+      if (this.isEditRole) {
+        userDTO = {
+          ...userDTO,
+          userId: value.id,
         };
-        if (this.isEditRole) {
-          userDTO = {
-            ...userDTO,
-            userId: value.id,
-          };
-        }
-      try{
-        value.roles.forEach((x : number) => {
-          if(x == empId){
-            if(value.phoneNumber != null){
+      }
+      try {
+        value.roles.forEach((x: number) => {
+          if (x == empId) {
+            if (value.phoneNumber != null) {
               this.dispatch = true;
               this.store.dispatch(new SaveUser(userDTO));
             } else {
@@ -192,10 +193,10 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
             this.dispatch = true;
           }
         });
-        if(this.dispatch){
+        if (this.dispatch) {
           this.store.dispatch(new SaveUser(userDTO));
         }
-      } catch(e){
+      } catch (e) {
       }
 
     }
@@ -221,11 +222,16 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
         this.userSettingForm.patchValue({
           ...editedUser,
           roles: user.roles?.map((role: any) => role.id),
-        }, {emitEvent: false});
+        }, { emitEvent: false });
       }
 
       this.subscribeOnFieldsChanges(user);
       this.disableBussinesUnitForRole();
+      if (this.user?.businessUnitType == BusinessUnitType.Organization && this.isIRPOrg) {
+        this.userSettingForm.get('businessUnitType')?.disable();
+        this.userSettingForm.get('businessUnitId')?.disable();
+      }
+
       this.store.dispatch(new ShowSideDialog(true));
     });
   }
@@ -265,9 +271,9 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       this.businessUnits = this.businessUnits.filter((item) => item.id !== BusinessUnitType.Hallmark);
     }
-    if(user?.businessUnitType === BusinessUnitType.Organization){
+    if (user?.businessUnitType === BusinessUnitType.Organization) {
       this.businessForm.get('business')?.setValue(user.businessUnitId);
-    
+
     }
   }
 
@@ -284,8 +290,8 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
 
   private disableBussinesUnitForRole(): void {
     if (this.isBusinessFormDisabled) {
-      this.userSettingForm.get('businessUnitType')?.disable({emitEvent: false});
-      this.userSettingForm.get('businessUnitId')?.disable({emitEvent: false});
+      this.userSettingForm.get('businessUnitType')?.disable({ emitEvent: false });
+      this.userSettingForm.get('businessUnitId')?.disable({ emitEvent: false });
     }
   }
 
@@ -300,7 +306,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
         this.userGridComponent.gridApi.setServerSideDatasource(datasource);
         this.closeDialog()
       }
-        );
+      );
   }
 
   private onBusinessUnitValueChanged(): void {
@@ -315,7 +321,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
   private subscribeOnFieldsChanges(user: User) {
     if (user.businessUnitType !== BusinessUnitType.Hallmark) {
       this.newBusinessDataPerUser$.pipe(take(2)).subscribe(() => {
-        this.userSettingForm.get('businessUnitId')?.setValue(user.businessUnitId, {emitEvent: false});
+        this.userSettingForm.get('businessUnitId')?.setValue(user.businessUnitId, { emitEvent: false });
       });
     }
 
@@ -336,7 +342,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
     this.userSettingForm.reset();
     this.userSettingForm.enable();
     this.createdUser = null;
-    if(this.businessUnitControl.value==BusinessUnitType.Employee){
+    if (this.businessUnitControl.value == BusinessUnitType.Employee) {
       this.store.dispatch(new GetBusinessByUnitType(this.businessUnitControl.value));
     }
   }
@@ -348,25 +354,33 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
 
   private onBusinessIdValueChanged(): void {
     this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      value && this.store.dispatch(new GetBusinessIdDetails(value));
-      this.businessUnitIdDetails$.pipe(takeWhile(() => this.isAlive)).subscribe((value:GetBusinessUnitIdDetails) => {
-      if(value !=null){
-        this.isIRPOrg = value.isIRPEnabled
-        this.isCreateEmp = value.isCreateEmployee
-        if(this.user?.businessUnitType == BusinessUnitType.Organization){
-          if(this.isIRPOrg){
-            let orgEmpBusinessIDs =[BusinessUnitType.Organization,BusinessUnitType.Employee]
-            this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id)); 
-            this.businessForm.get('businessUnit')?.enable({emitEvent:false});
-          }else{
-            this.businessForm.disable({emitEvent:false});
+      if (this.user?.businessUnitType == BusinessUnitType.Organization) {
+        value && this.store.dispatch(new GetBusinessIdDetails(value));
+        this.businessUnitIdDetails$.pipe(takeWhile(() => this.isAlive)).subscribe((value: GetBusinessUnitIdDetails) => {
+          if (value != null) {
+            this.isIRPOrg = value.isIRPEnabled
+            this.isCreateEmp = value.isCreateEmployee
+            if (this.user?.businessUnitType == BusinessUnitType.Organization) {
+              if (this.isIRPOrg) {
+                let orgEmpBusinessIDs = [BusinessUnitType.Organization, BusinessUnitType.Employee]
+                this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id));
+                this.businessForm.get('businessUnit')?.enable({ emitEvent: false });
+                this.businessForm.get('business')?.setValue(this.user?.businessUnitId,{ emitEvent: false });
+              } else {
+                this.businessForm.disable({ emitEvent: false });
+              }
+            }
           }
-        }
+        })
       }
-      })
+
     });
   }
-  ChangeBusinessUnitID(){
-    alert("ChangeBusinessUnitType-")
+  ChangeBusinessUnitID(event: boolean) {
+    if (event && this.user?.businessUnitType == BusinessUnitType.Organization && this.isIRPOrg) {
+      this.isDisabledEmp = !(this.isCreateEmp === event)
+    } else {
+      this.isDisabledEmp = false
+    }
   }
 }
