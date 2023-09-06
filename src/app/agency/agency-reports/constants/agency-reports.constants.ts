@@ -29,7 +29,8 @@ export const AgencyCredientialExpiryConstants = {
     EndDate: 'endDate',    
     CandidateStatuses: 'candidateStatuses',
     JobId: 'jobId',
-    CandidateName: 'candidateName',   
+    CandidateName: 'candidateName', 
+    opcredFlag: 'opcredFlag',  
   }
 }
 export const AgencyInvoiceSummaryConstants = {

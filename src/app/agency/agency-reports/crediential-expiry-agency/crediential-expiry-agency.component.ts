@@ -49,20 +49,22 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, Organ
 })
 export class CredientialExpiryAgencyComponent implements OnInit {
   public paramsData: any = {
-    "AgencyIdCE":"",
-    "CandidateNameCE": "",
-    "CandidateStatusCE": "",
-    "DepartmentIdsCE": "",
-    "LocationIdsCE": "",
-    "OrderEndDateCE": "",
-    "OrderStartDateCE": "",
-    "OrganizationIdCE": "",
-    "PositionIdCE": "",
-    "RegionIdsCE": "",
-    "UserIdCE": "",
-  
-   };
-  public reportName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiryForAgency.cls" };
+    "OrganizationParamCREXP": "",
+    "StartDateParamCREXP": "",
+    "EndDateParamCREXP": "",
+    "RegionParamCREXP": "",
+    "LocationParamCREXP": "",
+    "DepartmentParamCREXP": "",
+    "BearerParamCREXP":"",
+    "BusinessUnitIdParamCREXP":"",
+    "HostName": "",
+    "AgencyParamCREXP": "",
+    "CandidateStatusCREXP": "",
+    "JobIdCREXP": "",
+    "OpCredFlagEXP":"",
+    "CandidateNameCREXP":"",
+  };
+  public reportName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiry.cls" };
   public catelogName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiry.cat" };
   public title: string = "Credential Expiry";
   public message: string = "";
@@ -236,6 +238,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
         candidateName: new FormControl(null),
         candidateStatuses: new FormControl([]),
         jobId: new FormControl(''),
+        opcredFlag: new FormControl(false),
        }
     );
   }
@@ -375,7 +378,14 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   
 
   public SearchReport(): void {
-
+    let auth = "Bearer ";
+    for(let x=0;x<window.localStorage.length;x++)
+    { 
+      if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
+      {
+        auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+      }
+    }
 
     this.filteredItems = [];
     // let auth = "Bearer ";
@@ -386,7 +396,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
     // }
 
     let {  businessIds, candidateName, candidateStatuses, departmentIds, jobId, locationIds,
-      regionIds, startDate, endDate } = this.agencyCredientialExpiryReportForm.getRawValue();
+      regionIds, startDate, endDate,opcredFlag } = this.agencyCredientialExpiryReportForm.getRawValue();
     if (!this.agencyCredientialExpiryReportForm.dirty) {
       this.message = "";
     }
@@ -401,18 +411,23 @@ export class CredientialExpiryAgencyComponent implements OnInit {
    
     this.paramsData =
     {
-      "AgencyIdCE":this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
+      "AgencyParamCREXP":this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
       this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
-      "CandidateNameCE": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
-      "CandidateStatusCE": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
-      "DepartmentIdsCE": departmentIds.length == 0 ? "null" : departmentIds,
-      "LocationIdsCE": locationIds.length == 0 ? "null" : locationIds,
-      "OrderEndDateCE": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "OrderStartDateCE":formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "OrganizationIdCE": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "PositionIdCE": jobId == null || jobId == "" ? "null" : jobId,
-      "RegionIdsCE": regionIds.length == 0 ? "null" : regionIds,
+      "CandidateNameCREXP": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
+      "CandidateStatusCREXP": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
+      "DepartmentParamCREXP": departmentIds.length == 0 ? "null" : departmentIds,
+      "LocationParamCREXP": locationIds.length == 0 ? "null" : locationIds,
+      "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "StartDateParamCREXP":formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "OrganizationParamCREXP": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "JobIdCREXP": jobId == null || jobId == "" ? "null" : jobId,
+      "RegionParamCREXP": regionIds.length == 0 ? "null" : regionIds,
       "UserIdCE":  this.user?.id,
+      "OpCredFlagEXP":opcredFlag==""?"false":opcredFlag.toString(),
+      "HostName": this.baseUrl,
+      "BusinessUnitIdParamCREXP": this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
+      this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
+      "BearerParamCREXP":auth,
     };
     console.log( this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
@@ -502,6 +517,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.StartDate)?.setValue([]);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.EndDate)?.setValue([]);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.JobId)?.setValue(null);
+    this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.opcredFlag)?.setValue(false);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
