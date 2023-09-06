@@ -3,7 +3,7 @@
   #candidateDialog
   cssClass="dialog timesheet-details-dialog"
   [target]="targetElement"
-  [width]="'1180px'"
+  [width]="previewAttachemnt ? '99%' : '1180px'"
   [visible]="false"
   [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -115,93 +115,102 @@
           </div>
         </div>
       </div>
-
-      <div class="content-container">
-        <div class="order-header">
-          <div class="order-meta">
-            <h2 class="order-id">Job ID: {{ timesheetDetails?.formattedId }}</h2>
-          </div>
-
-          <div class="controls-wrapper">
-            <div class="reject-reason-block" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
-              <span class="reason-header">Reject Reason:</span>
-              <ejs-tooltip [content]="rejectReason" class="reject-tooltip">
-                <span class="reason-text">{{ rejectReason }}</span>
-              </ejs-tooltip>
-            </div>
-
-            <div class="controls-block">
-              <div class="checkbox-block">
-                <ejs-switch
-                  #dnwSwitch
-                  class="toggle"
-                  [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission || !isDNWEnabled"
-                  [checked]="timesheetDetails.noWorkPerformed"
-                  (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
-                ></ejs-switch>
-                <span>DNW</span>
+      <div style="display: flex;">
+          <div class="content-container">
+            <div class="order-header">
+              <div class="order-meta">
+                <h2 class="order-id">Job ID: {{ timesheetDetails?.formattedId }}</h2>
+              </div>
+    
+              <div class="controls-wrapper">
+                <div class="reject-reason-block" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
+                  <span class="reason-header">Reject Reason:</span>
+                  <ejs-tooltip [content]="rejectReason" class="reject-tooltip">
+                    <span class="reason-text">{{ rejectReason }}</span>
+                  </ejs-tooltip>
+                </div>
+    
+                <div class="controls-block">
+                  <div class="checkbox-block">
+                    <ejs-switch
+                      #dnwSwitch
+                      class="toggle"
+                      [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission || !isDNWEnabled"
+                      [checked]="timesheetDetails.noWorkPerformed"
+                      (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
+                    ></ejs-switch>
+                    <span>DNW</span>
+                  </div>
+                </div>
               </div>
             </div>
+    
+            <div class="job-general-info tile-dark-blue" [ngClass]="{'job-general-scroll':previewAttachemnt}">
+              <app-profile-details-job-info [isAgency]="isAgency" [jobData]="timesheetDetails"></app-profile-details-job-info>
+            </div>
+    
+            <div class="profile-hours-statistics" [ngClass]="{'job-general-scroll':previewAttachemnt}">
+              <div class="tile-dark-blue statistic-wrapper">
+                <app-profile-cumulative-hours
+                  [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
+                ></app-profile-cumulative-hours>
+              </div>
+    
+              <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
+                <app-profile-miles [milesData]="milesData"></app-profile-miles>
+              </div>
+    
+              <div
+                class="tile-dark-blue profile-attachments"
+                *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length && !previewAttachemnt"
+              >
+                <h3 class="attachments-title">Attachments</h3>
+    
+                <app-attachments-list
+                  [attachments]="timesheetDetails.attachments"
+                  [attachmentsListConfig]="attachmentsListConfig$ | async"
+                  [deleteIconColor]="'#FF5858'"
+                  [disableDelete]="disableAnyAction || !hasEditTimesheetRecordsPermission"
+                  (previewAttachmentEvent) = "onPreviewAttchementClick($event)"
+                ></app-attachments-list>
+              
+              </div>
+    
+              <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
+                <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
+              </div>
+            </div>
+    
+            <section class="profile-table-container">
+              <app-profile-timesheet-table
+                [isAgency]="isAgency"
+                [timesheetDetails]="timesheetDetails"
+                [actionsDisabled]="timesheetDetails.noWorkPerformed"
+                [disableAnyAction]="disableAnyAction"
+                [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
+                [hasApproveRejectRecordsPermission]="hasApproveRejectTimesheetRecordsPermission"
+                [hasApproveRejectMileagesPermission]="
+                isAgency ? true : userPermission[userPermissions.CanOrganizationApproveRejectMileages]
+              "
+                [canRecalculateTimesheet]="canRecalculateTimesheet"
+                (openAddSideDialog)="openAddDialog($event)"
+                (uploadSideDialog)="openUploadSideDialog($event)"
+                (changesSaved)="handleEditChanges($event)"
+                (rejectEvent)="onRejectButtonClick($event)"
+                (approveEvent)="handleApprove($event)"
+                (orgSubmitting)="orgSubmit()"
+                [disableEditButton]="disableEditButton"
+              >
+              </app-profile-timesheet-table>
+            </section>
           </div>
+        
+        <div [ngClass]="{'w-100':previewAttachemnt}">
+          <app-timesheet-file-viewer [preViewDoc]="previewAttachemnt" (previewCloseEvent)="onPreviewAttchementClick($event)"></app-timesheet-file-viewer>
         </div>
-
-        <div class="job-general-info tile-dark-blue">
-          <app-profile-details-job-info [isAgency]="isAgency" [jobData]="timesheetDetails"></app-profile-details-job-info>
-        </div>
-
-        <div class="profile-hours-statistics">
-          <div class="tile-dark-blue statistic-wrapper">
-            <app-profile-cumulative-hours
-              [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
-            ></app-profile-cumulative-hours>
-          </div>
-
-          <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
-            <app-profile-miles [milesData]="milesData"></app-profile-miles>
-          </div>
-
-          <div
-            class="tile-dark-blue profile-attachments"
-            *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length"
-          >
-            <h3 class="attachments-title">Attachments</h3>
-
-            <app-attachments-list
-              [attachments]="timesheetDetails.attachments"
-              [attachmentsListConfig]="attachmentsListConfig$ | async"
-              [deleteIconColor]="'#FF5858'"
-              [disableDelete]="disableAnyAction || !hasEditTimesheetRecordsPermission"
-            ></app-attachments-list>
-          </div>
-
-          <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
-            <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
-          </div>
-        </div>
-
-        <section class="profile-table-container">
-          <app-profile-timesheet-table
-            [isAgency]="isAgency"
-            [timesheetDetails]="timesheetDetails"
-            [actionsDisabled]="timesheetDetails.noWorkPerformed"
-            [disableAnyAction]="disableAnyAction"
-            [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
-            [hasApproveRejectRecordsPermission]="hasApproveRejectTimesheetRecordsPermission"
-            [hasApproveRejectMileagesPermission]="
-            isAgency ? true : userPermission[userPermissions.CanOrganizationApproveRejectMileages]
-          "
-            [canRecalculateTimesheet]="canRecalculateTimesheet"
-            (openAddSideDialog)="openAddDialog($event)"
-            (uploadSideDialog)="openUploadSideDialog($event)"
-            (changesSaved)="handleEditChanges($event)"
-            (rejectEvent)="onRejectButtonClick($event)"
-            (approveEvent)="handleApprove($event)"
-            (orgSubmitting)="orgSubmit()"
-            [disableEditButton]="disableEditButton"
-          >
-          </app-profile-timesheet-table>
-        </section>
       </div>
+     
+      
     </section>
     <ng-template #closeTemplate>
       <section class="container d-flex justify-end">
@@ -238,7 +247,6 @@
   (export)="customExport($event)"
 ></app-export-dialog>
 
-<app-file-viewer></app-file-viewer>
 
 <ng-template #chipListTmplt let-timesheetDetails="timesheetDetails">
   <ejs-tooltip id="tooltip" #tooltip target=".e-chip" (beforeRender)="beforeRender($event)">
