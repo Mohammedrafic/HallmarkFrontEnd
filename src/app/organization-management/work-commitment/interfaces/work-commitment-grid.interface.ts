@@ -1,6 +1,6 @@
+import { ICellRendererParams } from '@ag-grid-community/core';
 import { PageOfCollections } from '@shared/models/page.model';
 import { ListOfSkills } from '@shared/models/skill.model';
-import { ICellRendererParams } from '@ag-grid-community/core';
 
 export interface WorkCommitmentFilters {
   orderBy?: string;
@@ -42,10 +42,13 @@ export interface WorkCommitmentDetails {
   workCommitmentOrgHierarchies: WorkCommitmentOrgHierarchies[];
   allRegionsSelected :boolean;
   allLocationsSelected :boolean;
+  isInUse: boolean;
 }
 
 export interface WorkCommitmentGrid {
   availabilityRequirement: number | null;
+  allRegionsSelected :boolean;
+  allLocationsSelected :boolean;
   comments: string;
   criticalOrder: number | null;
   departmentId: number;
@@ -65,8 +68,7 @@ export interface WorkCommitmentGrid {
   skillNames: string[];
   skillIds: number[];
   workCommitmentId: number;
- allRegionsSelected :boolean;
-  allLocationsSelected :boolean;
+  isInUse: boolean;
 }
 
 export type WorkCommitmentsPage = PageOfCollections<WorkCommitmentDetails>;

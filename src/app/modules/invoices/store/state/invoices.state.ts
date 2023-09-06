@@ -449,7 +449,7 @@ export class InvoicesState {
   @Action(Invoices.UpdateManualInvoice)
   UpdateManualInvoice(
     ctx: StateContext<InvoicesModel>,
-    { payload, files, filesToDelete, isAgency }: Invoices.UpdateManualInvoice,
+    { payload,agencyOrganizationIds, files, filesToDelete, isAgency }: Invoices.UpdateManualInvoice,
   ): Observable<number[] | HttpErrorResponse> {
     const organizationId = isAgency ? payload.organizationId : null;
 
@@ -468,7 +468,7 @@ export class InvoicesState {
         map((ids: [number[], number[]]) => ids.flat()),
         tap(() => ctx.dispatch([
           new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successEdit),
-          new Invoices.GetManualInvoices(payload.organizationId),
+          new Invoices.GetManualInvoices(payload.organizationId,agencyOrganizationIds.length > 0 ? agencyOrganizationIds : [payload.organizationId]),
         ])),
         catchError((err: HttpErrorResponse) => {
           ctx.dispatch(
@@ -483,7 +483,7 @@ export class InvoicesState {
   @Action(Invoices.DeleteManualInvoice)
   DeleteManualInvoice(
     ctx: StateContext<InvoicesModel | void>,
-    { id, organizationId }: Invoices.DeleteManualInvoice,
+    { id, organizationId,agencyOrganizationIds }: Invoices.DeleteManualInvoice,
     /**
      * TODO: change return type afte invoice get implementation
      */
@@ -493,7 +493,7 @@ export class InvoicesState {
         tap(() => {
           ctx.dispatch([
             new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successDelete),
-            new Invoices.GetManualInvoices(organizationId),
+            new Invoices.GetManualInvoices(organizationId,agencyOrganizationIds),
           ]);
         }),
         catchError((err: HttpErrorResponse) => {

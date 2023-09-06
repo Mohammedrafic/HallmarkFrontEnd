@@ -34,7 +34,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   @Input() set billRatesData (rates: BillRate[]) {
     if (rates) {
       this.jobBillRates = rates;
-      this.jobBillRatesOptions = distinctByKey(rates.map((rate) => rate.billRateConfig), 'id');
+      this.billRateOptions = distinctByKey(rates.map((rate) => rate.billRateConfig), 'id');
     }
   }
 
@@ -95,7 +95,6 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
 
   private isAlive = true;
   private predefinedBillRates: BillRate[] = [];
-  private jobBillRatesOptions: BillRateOption[];
   private jobBillRates: BillRate[] = [];
 
   constructor(private store: Store, private cdr: ChangeDetectorRef) {}
@@ -105,8 +104,6 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.startBillRatesOptionsWatching();
-
     const intervalMinControl = this.billRateForm.controls['intervalMin'];
     const intervalMaxControl = this.billRateForm.controls['intervalMax'];
 
@@ -131,22 +128,6 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   setBillTypesAndUpdateControl(types: Array<BillRateType>): void {
     this.billRateTypes = BillRateTypes.filter((type) => types.includes(type.id));
     this.billRateForm.get('billType')?.reset();
-  }
-
-  private startBillRatesOptionsWatching(): void {
-    this.store.select(OrderManagementContentState.predefinedBillRatesOptions)
-    .pipe(
-      takeWhile(() => this.isAlive),
-    ).subscribe((options: BillRateOption[]) => {
-      if (this.isExtension) {
-        this.billRateOptions = this.jobBillRatesOptions;
-      } else {
-        this.predefinedBillRates = this.store.selectSnapshot(OrderManagementContentState.predefinedBillRates);
-        this.billRateOptions = options;
-      }
-
-      this.cdr.detectChanges();
-    });
   }
 
   private startEffectiveDateWatching(): void {

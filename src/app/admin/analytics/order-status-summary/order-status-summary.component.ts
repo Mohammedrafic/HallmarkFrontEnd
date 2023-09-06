@@ -127,7 +127,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Location ID',
-      field: 'locationId',
+      field: 'locationExtId',
       minWidth: 250,
       filter: true,
       sortable: true,
@@ -143,7 +143,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Department ID',
-      field: 'departmentId',
+      field: 'departmentExtId',
       minWidth: 250,
       filter: true,
       sortable: true,

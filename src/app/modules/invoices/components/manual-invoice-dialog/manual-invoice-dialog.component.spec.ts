@@ -262,6 +262,7 @@ describe('ManualInvoiceDialogComponent', () => {
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
       new Invoices.UpdateManualInvoice(
         { ...dto, timesheetId: invoiceToEdit.id },
+        [],
         component['filesForUpload'],
         component.filesForDelete,
         component['isAgency'],

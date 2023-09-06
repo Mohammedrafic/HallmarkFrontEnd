@@ -1,11 +1,11 @@
-import { WorkCommitmentDetails, WorkCommitmentGrid } from '../interfaces';
-import { getCorrectLocationValue, getCorrectSkillsValue } from '../helpers';
+import { WorkCommitmentGrid } from '../interfaces';
 import { WorkCommitmentButtonRenderer } from '../components/work-commitment-button-renderer/work-commitment-button-renderer';
 import { ValueFormatterParams } from '@ag-grid-community/core';
 import { formatDate } from '@angular/common';
 import { formatDate as formatDateString } from '@shared/constants/format-date';
 import { MultipleRecordsRendererComponent } from '../components/multiple-records-renderer/multiple-records-renderer.component';
 
+// eslint-disable-next-line max-lines-per-function
 export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkCommitmentGrid) => void) => [
   {
     headerName: '',
@@ -32,7 +32,7 @@ export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkC
     sortable: true,
     cellRenderer: MultipleRecordsRendererComponent,
     cellRendererParams: {
-      field: 'regionName'
+      field: 'regionName',
     },
   },
   {
@@ -42,7 +42,7 @@ export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkC
     sortable: true,
     cellRenderer: MultipleRecordsRendererComponent,
     cellRendererParams: {
-      field: 'locationName'
+      field: 'locationName',
     },
   },
   {
@@ -52,7 +52,7 @@ export const WorkCommitmentColumnsDefinition = (editCallback: (commitment: WorkC
     sortable: true,
     cellRenderer: MultipleRecordsRendererComponent,
     cellRendererParams: {
-      field: 'skillNames'
+      field: 'skillNames',
     },
   },
   {
