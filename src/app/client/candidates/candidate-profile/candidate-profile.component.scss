@@ -2,7 +2,7 @@
 @import 'adaptive-response';
 
 %common-style {
-  background-color: $white;
+  background-color: var(--bg-default);
   border-radius: 12px;
   box-shadow: 0 2px 3px 0 rgb(0 0 0 / 16%);
 
