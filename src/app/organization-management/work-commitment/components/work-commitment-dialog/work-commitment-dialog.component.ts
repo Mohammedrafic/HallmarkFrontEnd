@@ -40,6 +40,7 @@ import { WorkCommitmentAdapter } from '../../adapters/work-commitment.adapter';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
 import { CustomFormGroup } from '@core/interface';
+import { checkCommitmentNotOverride } from '@shared/helpers';
 
 @Component({
   selector: 'app-work-commitment-dialog',
@@ -52,6 +53,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
 
   @Input() set selectedCommitment(commitment: WorkCommitmentGrid) {
     if (commitment) {
+      this.commitment = commitment;
       this.commitmentForm?.patchValue(this.commitmentService.mapStructureForForms(commitment));
     }
   }
@@ -84,6 +86,7 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
   private selectedRegions: OrganizationRegion[] = [];
   private regions: OrganizationRegion[];
   private regionsDTO: RegionsDTO[];
+  private commitment: WorkCommitmentGrid;
 
   constructor(
     private store: Store,
@@ -130,11 +133,13 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
 
   private checkForChanges(): void {
     this.showReplacementCheckbox = !!this.commitmentForm?.get('endDate')?.dirty;
+    const selectedRegions = this.commitmentForm?.get('regions')?.value;
+    const selectedLocations = this.commitmentForm?.get('locations')?.value;
 
     const isRequiredFieldModified = 
-      this.commitmentForm?.get('regions')?.dirty || 
-      this.commitmentForm?.get('locations')?.dirty || 
+      !checkCommitmentNotOverride(this.commitment, selectedRegions, selectedLocations) ||
       this.commitmentForm?.get('endDate')?.dirty;
+
     if (this.isEdit && isRequiredFieldModified) {
       this.showOverridingConfirmation();
     } else {
