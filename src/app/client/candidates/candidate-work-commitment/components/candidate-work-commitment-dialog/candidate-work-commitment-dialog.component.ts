@@ -588,10 +588,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private isLocationChanged(): boolean {
-    const selectedRegions = this.candidateWorkCommitmentForm?.get('regionIds')?.value;
-    const selectedLocations = this.candidateWorkCommitmentForm?.get('locationIds')?.value;
+    if (this.isEdit) {
+      const selectedRegions = this.candidateWorkCommitmentForm?.get('regionIds')?.value;
+      const selectedLocations = this.candidateWorkCommitmentForm?.get('locationIds')?.value;
 
-    return !checkCommitmentNotOverride(this.commitment, selectedRegions, selectedLocations) && this.isEdit;
+      return !checkCommitmentNotOverride(this.commitment, selectedRegions, selectedLocations);
+    }
+
+    return false;
   }
 
   private saveCommitment(): void {
