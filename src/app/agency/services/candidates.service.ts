@@ -214,11 +214,13 @@ export class CandidateService {
     candidateId: number, orderId?: number | null, organizationId?: number | null
   ): Observable<CredentialGroupedFiles[]> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const orgIdParam = organizationId ? { organizationId: organizationId } : {};
+
     const endpoint = new Map<boolean, string>([
       [true, `/api/CandidateCredentials/groupedCandidateCredentialsFiles/${candidateId}`],
       [false, `/api/EmployeeCredentials/groupedCandidateCredentialsFiles/${candidateId}`],
     ]);
-    const params = isAgencyArea && orderId ? GetQueryParams({orderId, organizationId}) : {};
+    const params = isAgencyArea && orderId ? GetQueryParams({ orderId, ...orgIdParam }) : {};
 
     return this.http.get<CredentialGroupedFiles[]>(endpoint.get(isAgencyArea) as string, { params: params });
   }
