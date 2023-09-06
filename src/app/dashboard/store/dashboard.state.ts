@@ -244,9 +244,9 @@ export class DashboardState {
   @Action(GetSkilldata)
   GetSkilldata(
     { patchState }: StateContext<DashboardStateModel>,
-    {  }: GetSkilldata
+    { payload }: GetSkilldata
   ): Observable<GetWorkCommitment[]> {
-    return this.dashboardService.getSkills().pipe(
+    return this.dashboardService.getSkills(payload).pipe(
       tap((payload:GetWorkCommitment[]) => {
         patchState({nursingSkill: payload});
       })
