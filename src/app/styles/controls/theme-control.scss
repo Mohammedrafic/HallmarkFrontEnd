@@ -9,6 +9,7 @@ body.light {
   --bg-empty-grid: #{$secondary-dark-blue-45};
   --bg-grid: #{$white};
   --bg-button: #{$white};
+  --bg-filter-chips: #{$secondary-dark-blue-50};
 
   --bg-primary-btn-disabled: #{$primary-active-blue-70};
   --color-primary-btn-disabled: #{$white};
@@ -17,8 +18,10 @@ body.light {
   --border-drop-area: #{$secondary-dark-blue-40};
   --grid-row-border: #{$grid-row-border};
   --border-upload-file: #{$white};
-  --input-bourder: #{$primary-active-blue-40};
+  --input-border: #{$primary-active-blue-40};
   --header-border: #{$secondary-dark-blue-45};
+
+  --icon-color: #{$secondary-dark-blue-10};
 
   --text: #{$black};
   --secondary-text: {$black};
@@ -27,6 +30,7 @@ body.light {
   --sub-title: #{$secondary-dark-blue-15};
   --sub-title-2: #{$secondary-dark-blue-15};
   --sub-title-3: #{$secondary-dark-blue-20};
+  --sub-title-4: #{$secondary-dark-blue-20};
   --secondary-title: #{$title-black};
   --selector-title: #{$secondary-dark-blue-15};
   --disabled-drop-area-text: #{$secondary-dark-blue-30};
@@ -44,6 +48,7 @@ body.dark {
   --bg-empty-grid: #{$sidebar-background};
   --bg-grid: #{$sidebar-background};
   --bg-button: #{$sidebar-background};
+  --bg-filter-chips: #{$widget-dark-tooltip};
 
   --bg-primary-btn-disabled: #{$secondary-dark-blue-10-2};
   --color-primary-btn-disabled: #{$secondary-dark-blue-30};
@@ -52,8 +57,10 @@ body.dark {
   --border-drop-area: #{$secondary-dark-blue-50};
   --grid-row-border: #{$sidebar-background};
   --border-upload-file: #{$secondary-dark-blue-30};
-  --input-bourder: #{$primary-active-blue-40};
+  --input-border: #{$primary-active-blue-40};
   --header-border: #{$secondary-dark-blue-15};
+
+  --icon-color: #{$secondary-dark-blue-30};
 
   --text: #{$white};
   --secondary-text: #{$secondary-dark-blue-30};
@@ -62,6 +69,7 @@ body.dark {
   --sub-title: #{$secondary-dark-blue-40};
   --sub-title-2: #{$secondary-dark-blue-30};
   --sub-title-3: #{$secondary-dark-blue-40};
+  --sub-title-4: #{$secondary-dark-blue-30};
   --secondary-title: #{$white};
   --selector-title: #{$white};
   --disabled-drop-area-text: #{$white};
