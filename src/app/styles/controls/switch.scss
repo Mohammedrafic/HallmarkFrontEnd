@@ -1,4 +1,4 @@
-@import "../variables/colors.scss";
+@import 'colors';
 
 .e-switch-wrapper.e-wrapper {
   margin-right: 1rem;
@@ -22,4 +22,65 @@
 
 .e-close .e-switch-wrapper.e-wrapper {
   margin-right: initial;
+}
+
+body.dark {
+  .e-switch-wrapper {
+    &.e-wrapper {
+      .e-switch-off {
+        background-color: $secondary-dark-blue-40;
+        color: $bg-gray-200 !important;
+      }
+    }
+
+    &:hover .e-switch-handle:not(.e-switch-active) {
+      background-color: $white !important;
+    }
+
+    .e-switch-handle {
+      background-color: $white;
+    }
+
+    &.e-switch-disabled {
+      .e-switch-inner {
+        opacity: 1;
+        background-color: $secondary-dark-blue-20;
+
+        &.e-switch-active {
+          background-color: $primary-active-blue-90;
+        }
+
+        .e-switch-off,
+        .e-switch-on {
+          background-color: inherit !important;
+        }
+      }
+
+      &:hover .e-switch-handle,
+      .e-switch-handle {
+        background-color: $secondary-dark-blue-20 !important;
+
+        &.e-switch-active {
+          background-color: $primary-active-blue-80 !important;
+        }
+      }
+    }
+
+    &[offLabel] {
+      &:hover .e-switch-inner.e-switch-active,
+      .e-switch-inner.e-switch-active {
+        .e-switch-on {
+          color: $bg-gray-200;
+        }
+      }
+
+      .e-switch-handle {
+        background-color: $white;
+  
+        &.e-switch-active {
+          background-color: $primary-active-blue-10 !important;
+        }
+      }
+    }
+  }
 }
