@@ -58,7 +58,7 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 import { AgencyPositionModel } from '../models/agency-position.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
-import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetWorkCommitment } from '../models/rn-utilization.model';
+import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetSkillsbyByFilters, GetWorkCommitment } from '../models/rn-utilization.model';
 import { AvailableEmployeeModel } from '../models/available-employee.model';
 
 @Injectable()
@@ -550,8 +550,8 @@ export class DashboardService {
   public getAllMasterCommitments(): Observable<GetWorkCommitment[]> {
     return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
   }
-  public getSkills(): Observable<GetWorkCommitment[]> {
-    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllNursingSkills`);
+  public getSkills(data : GetSkillsbyByFilters): Observable<GetWorkCommitment[]> {
+    return this.httpClient.post<GetWorkCommitment[]>(`${this.baseUrl}/GetAllNursingSkills`,data);
   }
 
   public filterNursingWidget(data : GetNursingUtilizationbyByFilters): Observable<GetNursingWidgetData> {
