@@ -1527,7 +1527,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         case OrganizationOrderManagementTabs.ReOrders:
           this.isLockMenuButtonsShown = false;
           if(this.isOrgIRPEnabled && this.isOrgVMSEnabled){
-            const systemcolumnReorders = AllOrdersColumnsConfig.find((d) => d.fieldName ==='system');
+            const systemcolumnReorders = ReOrdersColumnsConfig.find((d) => d.fieldName ==='system');
             systemcolumnReorders!.visible=true;
           !selectedOrderAfterRedirect && this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
           }
