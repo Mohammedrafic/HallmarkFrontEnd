@@ -135,10 +135,10 @@ export class WorkCommitmentDialogComponent extends DestroyableDirective implemen
     this.showReplacementCheckbox = !!this.commitmentForm?.get('endDate')?.dirty;
     const selectedRegions = this.commitmentForm?.get('regions')?.value;
     const selectedLocations = this.commitmentForm?.get('locations')?.value;
-
+    const locationsOverridden = this.isEdit
+    ? !checkCommitmentNotOverride(this.commitment, selectedRegions, selectedLocations) : false;
     const isRequiredFieldModified = 
-      !checkCommitmentNotOverride(this.commitment, selectedRegions, selectedLocations) ||
-      this.commitmentForm?.get('endDate')?.dirty;
+    locationsOverridden || this.commitmentForm?.get('endDate')?.dirty;
 
     if (this.isEdit && isRequiredFieldModified) {
       this.showOverridingConfirmation();
