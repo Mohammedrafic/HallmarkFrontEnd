@@ -69,7 +69,7 @@ export const OrgManualInvoicePendingExportCols : ExportColumn[] = [
   { text:'Week Period', column: 'weekStartDate' },
   { text:'Vendor Fee Applied', column: 'vendorFeeApplicable' },
   { text:'Comment', column: 'comment' },
-  { text:'ReasonC ode', column: 'reasonCode' },
+  { text:'Reason Code', column: 'reasonCode' },
   { text:'Reason For Rejection', column: 'rejectionReason' },
   { text:'Amount', column: 'amount' },
   {text:'Agency',column:'agencyName'},
