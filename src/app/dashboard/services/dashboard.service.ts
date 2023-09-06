@@ -567,7 +567,7 @@ export class DashboardService {
       map(({ orderStatusesAvgDetails }: PositionsCountByDayRange) => {
         return {
           id: WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE,
-          title: 'Active Positions by Open Day Range should be displayed',
+          title: 'Active Positions by Open Day Range',
           chartData: lodashMapPlain(
             orderStatusesAvgDetails,
             ({ count3Positions,count7Positions,count15Positions,count30PlusPositions,count30Positions,totalCount, statusName }: StatusesAvgDetails, index: number) => ({
