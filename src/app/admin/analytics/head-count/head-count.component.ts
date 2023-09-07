@@ -221,8 +221,8 @@ export class HeadCountComponent implements OnInit {
             if (data != null) {
               this.isAlive = false;
               this.filterOptionsData = data;
-              this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.
-                                                                filter(i=>this.fixedCanidateStatusesTypes.includes(i.status));
+              //this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.
+              //                                                  filter(i=>this.fixedCanidateStatusesTypes.includes(i.status));
               this.changeDetectorRef.detectChanges();
             }
           });
@@ -231,12 +231,16 @@ export class HeadCountComponent implements OnInit {
           this.defaultRegions = this.regionsList.map((list) => list.id);
          //this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
           this.changeDetectorRef.detectChanges();
+
+          
         }
         else {
           this.isClearAll = false;
           this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
+      setTimeout(() => { this.SearchReport() }, 6000);
+
     });
     this.regionIdControl = this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -251,10 +255,9 @@ export class HeadCountComponent implements OnInit {
       else {
         this.filterColumns.locationIds.dataSource = [];
         this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);       
-      }
-    this.SearchReport();
+      }     
     });
-     
+   
     this.isInitialLoad = false;
     this.locationIdControl = this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -271,9 +274,9 @@ export class HeadCountComponent implements OnInit {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    
+
     let startDate = new Date(Date.now());
-    let { businessIds, locationIds, regionIds} = this.headCountReportForm.getRawValue();
+    let { businessIds, locationIds, regionIds } = this.headCountReportForm.getRawValue();
     if (!this.headCountReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations";
     }
@@ -281,12 +284,13 @@ export class HeadCountComponent implements OnInit {
       this.isResetFilter = false;
       this.message = ""
     }
+    debugger;
     this.paramsData =
     {
-      "OrganizationParamHCR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
+      "OrganizationParamHCR": this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
       "ReportDateParamHCR": formatDate(startDate, this.dateFormat, this.culture),
-      "RegionParamHCR": regionIds.length==0?this.nullValue : regionIds.join(this.joinString),
-      "LocationParamHCR":locationIds.length==0?this.nullValue : locationIds.join(this.joinString),
+      "RegionParamHCR": regionIds.length == 0 ? this.nullValue : regionIds.join(this.joinString),
+      "LocationParamHCR": locationIds.length == 0 ? this.nullValue : locationIds.join(this.joinString),
       "BearerParamHCR": auth,
       "BusinessUnitIdParamHCR": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
@@ -294,7 +298,7 @@ export class HeadCountComponent implements OnInit {
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl
     };
-   
+
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
@@ -336,9 +340,9 @@ export class HeadCountComponent implements OnInit {
   }
 
   public showFilters(): void {
-    if (this.isResetFilter) {
+   // if (this.isResetFilter) {
       this.onFilterControlValueChangedHandler();
-    }
+    //}
     this.store.dispatch(new ShowFilterDialog(true));
   }
   public onFilterDelete(event: FilteredItem): void {
