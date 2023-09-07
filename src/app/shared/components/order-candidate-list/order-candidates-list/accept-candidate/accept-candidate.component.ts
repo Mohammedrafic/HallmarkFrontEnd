@@ -126,11 +126,15 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get isOffered(): boolean {
-    return this.candidateStatus === ApplicantStatusEnum.Offered
+    return this.candidateStatus === ApplicantStatusEnum.Offered;
   }
 
   get isOnboard(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.OnBoarded;
+  }
+
+  get isAccepted(): boolean {
+    return this.candidateStatus === ApplicantStatusEnum.Accepted;
   }
 
   get isCancelled(): boolean {
@@ -273,11 +277,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     this.shouldChangeCandidateStatus()
-      .pipe(take(1))
-      .subscribe((isConfirm) => {
-        if (isConfirm) {
-          this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
-        }
+      .pipe(
+        take(1),
+        filter((isConfirm) => isConfirm)
+      )
+      .subscribe(() => {
+        this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
       });
   }
 

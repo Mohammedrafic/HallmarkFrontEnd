@@ -1,8 +1,8 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, distinctUntilChanged, filter, merge, takeUntil } from 'rxjs';
+import { Observable, distinctUntilChanged, filter, merge, takeUntil } from 'rxjs';
 
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import {
@@ -33,7 +33,6 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
 
   @Input() system: OrderManagementIRPSystemId;
 
-  public templateState: Subject<any> = new Subject();
   public candidate: OrderCandidatesList;
   public candidateJob: OrderCandidateJob | null;
   public agencyActionsAllowed: boolean;
@@ -56,6 +55,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     protected override router: Router,
     private settingService: SettingsViewService,
     private orderManagementService: OrderManagementService,
+    private cd: ChangeDetectorRef,
     @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
     ) {
     super(store, router, globalWindow);
@@ -106,7 +106,10 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
         filter((candidateJob) => !!candidateJob),
         takeUntil(this.unsubscribe$)
       )
-      .subscribe((candidateJob: OrderCandidateJob) => (this.candidateJob = candidateJob));
+      .subscribe((candidateJob: OrderCandidateJob) => {
+        this.candidateJob = candidateJob;
+        this.cd.markForCheck();
+      });
   }
 
   private isOnboardOrRejectStatus(): boolean {

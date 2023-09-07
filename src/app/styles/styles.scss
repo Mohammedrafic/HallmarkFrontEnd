@@ -328,12 +328,6 @@ body {
       }
     }
 
-    .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
-      &:hover {
-        background: transparent !important;
-      }
-    }
-
     .e-input-group.e-float-icon-left.search-with-icon {
       background: $sidebar-background;
       border: 1px solid $grid-border-color;

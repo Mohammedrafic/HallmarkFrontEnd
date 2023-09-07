@@ -106,6 +106,15 @@ export const GridCellsSystemIRPTabLta = (
     cellRenderer: TableStatusCellComponent,
     cellClass: 'status-cell',
   },
+  ...(isIRPEnabled && isVMSEnabled? [{
+    ...DefaultOrderCol,
+    field: 'system',
+    headerName: 'System',
+    cellClass: 'name',
+    onCellClicked:(params: ValueFormatterParams)=>
+    params.context.componentParent.openIrpDetailsEmployee(),
+    width: 125,
+  }] : []),
   {
     ...DefaultOrderCol,
     field: 'criticalOrder',
@@ -220,6 +229,6 @@ export const GridCellsSystemIRPTabLta = (
     minWidth: 135,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) =>
-      formatDate(params.value, 'MM/dd/YYYY HH:mm', 'en-US', 'UTC'),
+      formatDate(params.value, 'MM/dd/YYYY', 'en-US'),
   },
 ];

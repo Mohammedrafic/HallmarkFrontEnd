@@ -117,6 +117,10 @@ button.e-control.e-btn {
   &.e-primary.default-icon-button {
     color: $primary-active-blue-10 !important;
 
+    &:hover {
+      color: $primary-active-blue-10 !important;
+    }
+
     &:disabled {
       background-color: transparent !important;
       color: $secondary-dark-blue-30 !important;

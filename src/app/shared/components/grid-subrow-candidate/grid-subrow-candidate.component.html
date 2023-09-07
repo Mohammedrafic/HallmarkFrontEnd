@@ -52,5 +52,13 @@
     </div>
     <div class="title">Onboard %</div>
   </div>
+  <div class="info" >
+      <span class="data">{{ candidat.actualStartDate || order.jobStartDate | date: 'MM/dd/yyyy'}}</span>
+      <div class="title">Actual Start Date </div>
+  </div>
+  <div class="info">
+    <span class="data">{{ candidat.actualEndDate || order.jobEndDate | date: 'MM/dd/yyyy'}}</span>
+    <div class="title">Actual End Date </div>
+</div>
 </div>
 

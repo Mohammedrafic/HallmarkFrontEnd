@@ -161,9 +161,9 @@
                   </div>
                 </div>
                 <div class="d-flex">
-                  <div class="input-container bootstrap f-grow-2">
+                  <div class="bootstrap f-grow-2" [class.input-container]="!isAccepted">
                     <label>Available Start Date <span *ngIf="isApplied" class="required">*</span></label>
-                    <div class="input-group datepicker">
+                    <div class="input-group datepicker" [class.input-container]="isAccepted">
                       <ejs-datepicker appValidateWithMessage
                                       class="datepicker"
                                       format="MM/dd/yyyy"
@@ -173,7 +173,12 @@
                                       formControlName="availableStartDate">
                       </ejs-datepicker>
                     </div>
+                    <div *ngIf="isAccepted" class="d-flex">
+                      <ng-container [ngTemplateOutlet]="actualStartDate"></ng-container>
+                      <ng-container [ngTemplateOutlet]="actualEndDate"></ng-container>
+                    </div>
                   </div>
+                  <ng-container *ngIf="isAccepted" [ngTemplateOutlet]="offeredStartDate"></ng-container>
                   <div class="input-container bootstrap" *ngIf="isCandidatePayRateVisible && showCandidatePayRate">
                     <label>Candidate Pay Rate ($) <span *ngIf="candidatePayRateRequired" class="required">*</span></label>
                     <div class="input-group">
@@ -203,12 +208,7 @@
                       <input appValidateWithMessage formControlName="guaranteedWorkWeek" class="e-input" type="text" readonly/>
                     </div>
                   </div>
-                  <div class="input-container bootstrap">
-                    <label>Offered Start Date</label>
-                    <div class="input-group input-readonly">
-                      <input appValidateWithMessage formControlName="offeredStartDate" class="e-input" type="text" readonly/>
-                    </div>
-                  </div>
+                  <ng-container [ngTemplateOutlet]="offeredStartDate"></ng-container>
                 </div>
                 <div *ngIf="isOnboard" class="d-flex">
                   <div class="input-container bootstrap">
@@ -217,18 +217,8 @@
                       <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" readonly/>
                     </div>
                   </div>
-                  <div class="input-container bootstrap">
-                    <label>Actual Start Date</label>
-                    <div class="input-group input-readonly">
-                      <input appValidateWithMessage formControlName="actualStartDate" class="e-input" type="text" readonly/>
-                    </div>
-                  </div>
-                  <div class="input-container bootstrap">
-                    <label>Actual End Date</label>
-                    <div class="input-group input-readonly">
-                      <input appValidateWithMessage formControlName="actualEndDate" class="e-input" type="text" readonly/>
-                    </div>
-                  </div>
+                  <ng-container [ngTemplateOutlet]="actualStartDate"></ng-container>
+                  <ng-container [ngTemplateOutlet]="actualEndDate"></ng-container>
                 </div>
                 <div class="d-flex">
                   <div class="input-container bootstrap" *ngIf="isRejected">
@@ -266,6 +256,33 @@
                     </div>
                   </div>
                 </div>
+
+                <ng-template #actualStartDate>
+                  <div class="input-container bootstrap">
+                    <label>Actual Start Date</label>
+                    <div class="input-group input-readonly">
+                      <input appValidateWithMessage formControlName="actualStartDate" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                </ng-template>
+                
+                <ng-template #actualEndDate>
+                  <div class="input-container bootstrap">
+                    <label>Actual End Date</label>
+                    <div class="input-group input-readonly">
+                      <input appValidateWithMessage formControlName="actualEndDate" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                </ng-template>
+                
+                <ng-template #offeredStartDate>
+                  <div class="input-container bootstrap">
+                    <label>Offered Start Date</label>
+                    <div class="input-group input-readonly">
+                      <input appValidateWithMessage formControlName="offeredStartDate" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                </ng-template>
               </form>
             </ng-template>
           </e-accordionitem>

@@ -64,7 +64,7 @@ export class OrderDetailsService {
       asapStart: [false],
       criticalOrder: [false],
       jobDescription: ['', Validators.maxLength(4000)],
-      unitDescription: ['', Validators.maxLength(500)],
+      unitDescription: ['', Validators.maxLength(2000)],
       orderRequisitionReasonId: [null, Validators.required],
       orderRequisitionReasonName: [null],
     }) as CustomFormGroup<JobDescriptionDTO>;

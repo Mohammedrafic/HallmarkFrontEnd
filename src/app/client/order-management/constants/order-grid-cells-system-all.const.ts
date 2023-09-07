@@ -258,6 +258,6 @@ export const GridCellsSystemAll = (
     minWidth: 135,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) =>
-      GridValuesHelper.formatDate(params.value, 'MM/dd/YYYY HH:mm'),
+      GridValuesHelper.formatDate(params.value, 'MM/dd/YYYY'),
   },
 ];

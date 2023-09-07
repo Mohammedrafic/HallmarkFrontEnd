@@ -42,6 +42,7 @@ import { OrderCandidatesCredentialsState } from '@order-credentials/store/creden
 import { IOrderCredentialItem } from '@order-credentials/types';
 import {
   CONFIRM_REVOKE_ORDER,
+  ERROR_CAN_NOT_Edit_OpenPositions,
   ERROR_CAN_NOT_REVOKED,
   INACTIVE_MESSAGE,
   INACTIVEDATE,
@@ -60,6 +61,17 @@ import { ToastUtility } from '@syncfusion/ej2-notifications';
 import { OrderDetailsFormComponent } from '@client/order-management/components/order-details-form/order-details-form.component';
 import { BillRate, OrderBillRateDto } from '@shared/models';
 import { OrderDetailsIrpComponent } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.component';
+import { SettingsViewService } from '@shared/services';
+import { OrganizationSettingKeys,OrganizationalHierarchy } from '@shared/constants';
+import { UserState } from 'src/app/store/user.state';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { Configuration } from '@shared/models/organization-settings.model';
+import { SettingsHelper } from '@core/helpers/settings.helper';
+import { SettingsKeys } from '@shared/enums/settings';
+import {
+  GetOrganizationSettings,
+} from '@organization-management/store/organization-management.actions';
+import { OrderStatus } from '@shared/enums/order-management';
 export enum SubmitButton {
   SaveForLater = '0',
   Save = '1',
@@ -80,6 +92,8 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   @Select(OrderCandidatesCredentialsState.predefinedCredentials)
   predefinedCredentials$: Observable<IOrderCredentialItem[]>;
+  @Select(OrganizationManagementState.organizationSettings)
+  private organizationSettings$: Observable<Configuration[]>;
 
   public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
@@ -94,6 +108,9 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public isAddTemplate=false;
   private isCredentialsChanged = false;
   private order: Order;
+  public settings: { [key in SettingsKeys]?: Configuration };
+  private IsSettingsEnabledByOrganisation=false;
+  private IsSettingEnabledByRegLocDept=false;
 
 
   constructor(
@@ -107,7 +124,8 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private confirmService: ConfirmService,
     private irpContainerApiService: IrpContainerApiService,
     private organizationStructureService: OrganizationStructureService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private settingsViewService: SettingsViewService
   ) {
     super();
   }
@@ -448,7 +466,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     };
 
     if (this.selectedOrder) {
-      this.showRevokeMessageForEditOrder(createdOrder);
+      this.canOpenPositionsEdited(createdOrder);
     } else {
       let regionid = createdOrder.regionId;
       let locationid = createdOrder.locationId;
@@ -608,6 +626,34 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       }
     }
   }
+private canOpenPositionsEdited(order: CreateOrderDto){
+  const fixedJobStatusesIncluded: number[] = [OrderStatus.Open,OrderStatus.InProgress,OrderStatus.Filled];
+if((this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.LongTermAssignment || this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.PerDiem) && (fixedJobStatusesIncluded.includes(this.selectedOrder.irpOrderMetadata?.status!))){
+    if(order.openPositions !=this.selectedOrder.openPositions){
+  this.getSettings(order);
+      if(this.IsSettingsEnabledByOrganisation || this.IsSettingEnabledByRegLocDept){
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
+      return;
+      }
+    }
+}
+this.showRevokeMessageForEditOrder(order);
+}
+private getSettings(order:CreateOrderDto) {
+  this.store.dispatch(new GetOrganizationSettings());
+  this.organizationSettings$.pipe(filter((settings: Configuration[]) => !!settings.length), takeUntil(this.componentDestroy())).subscribe((settings: Configuration[]) => {
+    
+    this.settings = SettingsHelper.mapSettings(settings);
+   
+   this. IsSettingsEnabledByOrganisation=this.settings[SettingsKeys.DisableNumberOfOpenPositions]?.value === true;
+   
+    this.IsSettingEnabledByRegLocDept = this.settings[SettingsKeys.DisableNumberOfOpenPositions]?.children?.find(f => f.isIRPConfigurationValue == true
+    && f.departmentId === order.departmentId && f.regionId === order.regionId && f.locationId === order.locationId)?.value;
+  
+   
+  });
+}
+
 
   private showRevokeMessageForEditOrder(order: CreateOrderDto): void {
     const isExternalLogicInclude = this.irpStateService.getIncludedExternalLogic(order);

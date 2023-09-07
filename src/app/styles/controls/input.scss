@@ -171,15 +171,35 @@ body.light, body.dark {
     }
   }
 }
+
 body.dark {
   .bootstrap {
     input.e-input {
       background: $sidebar-background;
       color: $white !important;
+
+      &:disabled {
+        background: $bg-gray-200 !important;
+        color: $secondary-dark-blue-30;
+      }
+
+      &.ng-touched.ng-invalid:focus {
+        border-color: $supportive-red !important;
+      }
+
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover, 
+      &:-webkit-autofill:focus, 
+      &:-webkit-autofill:active {
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: $white;
+        transition: background-color 5000s ease-in-out 0s;
+        box-shadow: inset 0 0 20px 20px $sidebar-background;
+      }
     }
 
-    input.e-input[disabled] {
-      background: $secondary-dark-blue-20 !important;
+    label {
+      color: $secondary-dark-blue-30 !important;
     }
   }
 }

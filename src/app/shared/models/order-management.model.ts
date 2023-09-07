@@ -66,6 +66,7 @@ export class OrderManagement {
   isLockedIRP: boolean;
   isIRP?: boolean;
   menuItems?: ItemModel[]; // use only in UI for context menu datasource
+  system:string;
 }
 
 export interface IRPOrderManagement {
@@ -105,6 +106,8 @@ export interface IRPOrderManagement {
   children: OrderManagementChild[];
   isLockedIRP: boolean;
   isTemplate?: boolean;
+  templateTitle?:string;
+  system:string;
 }
 
 export interface GetOrdersJourney{
@@ -746,6 +749,7 @@ export class OrderFilter {
   isQuickLinkWidgetLTA?: boolean | null;
   orderLocked? : any | null;
   ltaOrder? : boolean | null;
+  orderDistributionType? : number | null;
 }
 
 export class SortModel {

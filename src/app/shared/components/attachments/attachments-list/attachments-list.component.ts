@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { Attachment, AttachmentsListConfig, AttachmentsListParams } from '@shared/components/attachments';
 
@@ -21,6 +21,9 @@ export class AttachmentsListComponent implements AttachmentsListParams {
   @Input()
   public disableDelete = false;
 
+  @Output() 
+   previewAttachmentEvent = new EventEmitter<boolean>();
+
   public agInit(params: AttachmentsListParams): void {
     this.attachments = params.attachments;
     this.attachmentsListConfig = params.attachmentsListConfig;
@@ -37,6 +40,7 @@ export class AttachmentsListComponent implements AttachmentsListParams {
   }
 
   public preview(attachment: Attachment): void {
+    this.previewAttachmentEvent.emit(true);
     this.attachmentsListConfig?.preview?.(attachment);
   }
 

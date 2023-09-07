@@ -20,6 +20,7 @@ import { UpcomingExpCredsModule } from '../widgets/upcoming-exp-creds/upcoming-e
 import { AvailableEmployeeModule } from '../widgets/available-employee/available-employee.module'
 import { PositionsCountDayRangeModule } from '../widgets/positions-count-day-range/positions-count-day-range.module';
 import { StackColumnChartModule } from '../widgets/stack-column-chart/stack-column-chart.module';
+import { OrdersPendingCustomStatusModule } from '../widgets/orders-pending-custom-status/orders-pending-custom-status.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -42,6 +43,7 @@ import { StackColumnChartModule } from '../widgets/stack-column-chart/stack-colu
     AvailableEmployeeModule,
     PositionsCountDayRangeModule,
     StackColumnChartModule,
+    OrdersPendingCustomStatusModule,
     NgxsModule.forFeature([ UserState]),
   ],
 })
