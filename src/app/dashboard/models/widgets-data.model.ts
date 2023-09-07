@@ -36,4 +36,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.AVAILABLE_EMPLOYEE] : AvailableEmployeeModel[];
   [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: ChartAccumulation;
   [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE] : PositionsCountByDayRangeDataset;
+  [WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED]: ChartAccumulation;
 }

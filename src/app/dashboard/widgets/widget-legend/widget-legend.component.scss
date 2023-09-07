@@ -57,6 +57,16 @@
     }
   }
 
+  &__initialExtended-legend-text {
+    font-size: 13px;
+    line-height: 17px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    color: $secondary-dark-blue-15;
+    width: 80%;
+  }
+
   &__point {
     //width: 32px;
     width: 24px;
@@ -131,3 +141,9 @@
   align-items: right;
   display: flex;
  }
+.w-70{
+  width: 75% !important;
+}
+.w-30{
+  width: 30% !important;
+}

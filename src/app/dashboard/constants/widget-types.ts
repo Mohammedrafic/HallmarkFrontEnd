@@ -24,4 +24,5 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   26: WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS,
   28: WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE,
   27: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM,
+  29: WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED,
 };

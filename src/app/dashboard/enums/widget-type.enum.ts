@@ -22,4 +22,5 @@ export enum WidgetTypeEnum {
   AVAILABLE_EMPLOYEE = 'Available_Employee',
   CANDIDATES_ACTIVE_POSITIONS="Candidates_Active_Positions",
   POSITIONS_COUNT_DAY_RANGE="Positions_Count_Day_Range",
+  ACTIVE_POSITIONS_INITIAL_EXTENDED="Active_Positions_Initial_Extended"
 }

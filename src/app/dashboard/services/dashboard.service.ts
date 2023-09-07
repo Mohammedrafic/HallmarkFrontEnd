@@ -91,6 +91,7 @@ export class DashboardService {
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
+    [WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED]: (filters: DashboartFilterDto) => this.getActivePositionInitialExtendedWidgetData(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -233,7 +234,25 @@ export class DashboardService {
         );
       }
 
-    
+      private getActivePositionInitialExtendedWidgetData(filter: DashboartFilterDto): Observable<any> {
+        return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter }).pipe(
+          map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
+            return {
+              id: WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED,
+               title: 'Active Positions - Count of Initial & Extended positions',
+               chartData: lodashMapPlain(
+                orderStatusesAvgDetails,
+                ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
+                  label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
+                  value: average,
+                  average: count,
+                  color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
+                })
+                ),
+              };
+            })
+          );
+        }   
 
   private getApplicantsByRegionWidgetData(
     filters: DashboartFilterDto

@@ -1,0 +1,51 @@
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+  <ng-template #header>
+    <div class="app-active-positions-initial-extended__title">
+      <h3 class="widget-header__title">{{ chartData?.title ?? '' }}</h3>
+    </div>
+    <div class="app-active-positions-initial-extended__tooltip" *ngIf="description.length>0">
+      <ejs-tooltip [content]="description" position='TopCenter'>
+        <span class="mytooltip">
+          <i-feather name="info" id="info"
+                     [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+        </span>
+      </ejs-tooltip>
+    </div>
+
+  </ng-template>
+  <ng-template #active_positions_initial_extended>
+    <div class="header">
+      <div class="labels"><span class="color-box initial"></span>Initial</div> <div><span class="color-box extended"></span>Extended</div>
+    </div>
+
+         <ejs-chart 
+    #sfComponent
+    [chartArea]="chartArea"
+    [primaryXAxis]="isDarkTheme ? primaryXAxisDarkTheme : primaryXAxis"
+    [primaryYAxis]="isDarkTheme ? primaryYAxisDarkTheme : primaryYAxis"
+
+    [legendSettings]="legendSettings"
+    [tooltip]="isDarkTheme ? tooltipDarkSettings : tooltipSettings"
+    class="app-active-positions-initial-extended__component"
+    [background]="isDarkTheme ? 'var(--chart-dark-bg)' : 'var(--chart-light-bg)'"
+  >
+              <e-series-collection>
+                  <e-series [dataSource]='filteredChartData$ | async' type='StackingColumn' xName='label' yName='average' [fill]="'var(--primary-active-blue-10)'"  name='Initial' width='2' columnWidth=0.5 > </e-series>
+                  <e-series [dataSource]='filteredChartData$ | async' type='StackingColumn' xName='label' yName='value' [fill]="'var(--supportive-orange)'" name='Extended' width='2' columnWidth=0.5> </e-series>
+                </e-series-collection>
+          </ejs-chart>
+
+  </ng-template>
+
+  <ng-template #legend>
+    <app-widget-legend
+      [isPositionTrend]="false"
+      [legendData]="legendData"
+      [legendPosition]="legendPosition"
+      [averageFlag]="averageFlag"
+      [initialExtended] = "true"
+      (changeCheckbox)="onClickLegend($event)"
+      (onClickLegend)="redirectToSourceContent($event )"
+    ></app-widget-legend>
+  </ng-template>
+</app-widget-wrapper>

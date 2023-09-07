@@ -1,0 +1,37 @@
+@import "colors";
+.app-active-positions-initial-extended {
+    &__component {
+      aspect-ratio: 2.2;
+    }
+  
+ 
+    &__title {
+      width: 95%;
+    }
+  
+    &__tooltip {
+      text-align: right;
+      width: 5%;
+    }
+
+  }
+  .color-box {
+    width: 5px;
+    height: 5px;
+    display: inline-block;
+    margin: 0px 5px;
+  }
+  .initial{
+    background-color: $primary-active-blue-10;
+  }
+  .extended{
+    background-color: $supportive-orange;
+  }
+  .header{
+    padding: 2%;
+    display: flex;
+    justify-content: center;
+    .labels{
+      margin: 0px 5px;
+    }
+  }
