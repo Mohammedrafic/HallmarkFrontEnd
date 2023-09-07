@@ -18,7 +18,8 @@ ejs-datetimepicker.e-datetimepicker {
   }
 }
 
-body.light, body.dark {
+body.light,
+body.dark {
   .bootstrap {
     ejs-datetimepicker.e-datetimepicker,
     ejs-daterangepicker.e-daterangepicker {
@@ -45,7 +46,10 @@ body.light, body.dark {
   }
 }
 
-ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-datetimepicker {
+ejs-datepicker.datepicker,
+ejs-daterangepicker.e-daterangepicker,
+ejs-timepicker.e-timepicker,
+ejs-datetimepicker.e-datetimepicker {
   .e-input-group.e-control-wrapper.e-date-wrapper,
   .e-input-group.e-control-wrapper.e-time-wrapper,
   .e-input-group.e-control-wrapper.e-datetime-wrapper,
@@ -105,6 +109,15 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
     }
   }
 
+  &.ng-touched.ng-invalid {
+    .e-input-group.e-control-wrapper.e-date-wrapper,
+    .e-input-group.e-control-wrapper.e-time-wrapper,
+    .e-input-group.e-control-wrapper.e-datetime-wrapper,
+    .e-input-group.e-control-wrapper.e-date-range-wrapper {
+      border-color: $supportive-red !important;
+    }
+  }
+
   .e-input-group:not(.e-disabled) .e-input-group-icon:hover,
   .e-input-group.e-control-wrapper:not(.e-disabled) .e-input-group-icon:hover {
     background: transparent !important;
@@ -127,7 +140,6 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
       border-color: $supportive-red !important;
     }
   }
-
 
   &.ng-touched.ng-invalid.e-control.e-textbox {
     span.e-input-group {
@@ -166,11 +178,24 @@ body.dark {
       .e-input[readonly] ~ span.e-input-group-icon {
         background-color: transparent !important;
       }
+
+      &.e-disabled {
+        background-color: $bg-gray-200 !important;
+      }
     }
 
-    .e-input-group.e-control-wrapper {
-      &.e-disabled {
-        background-color: $secondary-dark-blue-20 !important;
+    &.ng-dirty {
+      .e-input-group.e-control-wrapper.e-date-wrapper,
+      .e-input-group.e-control-wrapper.e-time-wrapper,
+      .e-input-group.e-control-wrapper.e-datetime-wrapper,
+      .e-input-group.e-control-wrapper.e-date-range-wrapper {
+        .e-input {
+          color: $white !important;
+
+          &.e-disabled {
+            -webkit-text-fill-color: $white !important
+          }
+        }
       }
     }
   }
@@ -181,6 +206,25 @@ body.dark {
       .e-day {
         background-color: $primary-active-blue-80 !important;
         color: $black;
+      }
+    }
+  }
+
+  .e-timepicker.e-popup.e-lib.e-control.e-popup-open {
+    .e-list-parent {
+      background-color: $sidebar-background;
+
+      .e-list-item {
+        &.e-active:hover,
+        &:hover {
+          background-color: $primary-active-blue-80;
+          color: $bg-grey-100;
+        }
+
+        &.e-active {
+          background-color: $primary-active-blue;
+          color: $white;
+        }
       }
     }
   }

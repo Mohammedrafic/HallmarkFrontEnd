@@ -35,6 +35,7 @@ import { RnUtilizationForm } from './rn-utilization.interface';
 import {
   GetNursingUtilizationbyByFilters,
   GetNursingWidgetData,
+  GetSkillsbyByFilters,
   GetWorkCommitment,
 } from '../../models/rn-utilization.model';
 import { ProgressBar } from '@syncfusion/ej2-angular-progressbar';
@@ -56,7 +57,7 @@ export class RnUtilizationWidgetComponent implements OnInit {
 
   @ViewChildren("progressBar")
   public pb: ProgressBar[];
-
+  public skills : DashboartFilterDto;
   @Select(DashboardState.commitmentsPage)
   commitmentsPage$: Observable<GetWorkCommitment[]>;
   @Select(DashboardState.nursingSkill)
@@ -98,6 +99,10 @@ export class RnUtilizationWidgetComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.filterData$.pipe().subscribe((data)=>{
+      this.skills = data;
+       console.log(this.skills);
+     })
     this.getLookups().subscribe(() => {
       this.setupChangeListeners();
       this.cdr.detectChanges();
@@ -114,8 +119,10 @@ export class RnUtilizationWidgetComponent implements OnInit {
       }),
       takeUntil(this.unsubscribe$)
     );
-
-    const skillsLookup = this.store.dispatch(new GetSkillData()).pipe(
+    const data: GetSkillsbyByFilters = {
+      organizationFilter: this.skills.organizationFilter,
+    };
+    const skillsLookup = this.store.dispatch(new GetSkillData(data)).pipe(
       take(1),
       tap((result) => {
         const ids = (result.dashboard.nursingSkill || []).map((m: { id: number }) => m.id);

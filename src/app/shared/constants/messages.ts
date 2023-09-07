@@ -146,3 +146,4 @@ export const RECORD_MODIFIED_SUCCESS_WITH_ORDERID=(organizationPrefix: string,pu
 `Order ${organizationPrefix}-${publicId} has been modified`
 export const ManageOrderIRP_PERMISSION = 'User missing required permissions (CanOrganizationEditOrdersIRP)';
 export const CloseOrderIRP_PERMISSION = 'User missing required permissions (CanCloseOrdersIRP)';
+export const ERROR_CAN_NOT_Edit_OpenPositions = '*# Open Positions* field not editable for this order.';
