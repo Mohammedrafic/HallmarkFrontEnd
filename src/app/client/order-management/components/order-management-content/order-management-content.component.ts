@@ -1511,8 +1511,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         case OrganizationOrderManagementTabs.AllOrders:
           this.isLockMenuButtonsShown = true;
           if(this.isOrgIRPEnabled && this.isOrgVMSEnabled){
-          const systemcolumnAllorders = AllOrdersColumnsConfig.find((d) => d.fieldName ==='system');
-          systemcolumnAllorders!.visible=true;
+            const systemcolumnAllorders = AllOrdersColumnsConfig.find((d) => d.fieldName ==='system');
+            systemcolumnAllorders!.visible=true;
           }
           this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
           break;
