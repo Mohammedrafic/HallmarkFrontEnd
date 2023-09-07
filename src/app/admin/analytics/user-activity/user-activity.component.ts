@@ -126,7 +126,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       filter: true,
       sortable: true,
       resizable: true,
-      valueFormatter: params => (params.value ? 'Active' : 'Inactive'),
+      valueFormatter: params => (params.value ? 'Inactive' : 'Active'),
     },
     {
       headerName: 'User IP',
