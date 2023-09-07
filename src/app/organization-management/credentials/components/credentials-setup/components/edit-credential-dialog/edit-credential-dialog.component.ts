@@ -99,12 +99,14 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
   }
 
   private confirmUpdateCredentialSetup(): void {
-    this.confirmService.confirmActions(OverrideCommentsQuestion, {
-      title: OverrideCommentsTitle,
-      okButtonLabel: 'Yes',
-      okButtonClass: 'e-primary',
-      cancelButtonLabel: 'No',
-    })
+    this.confirmService.confirmActions(
+      OverrideCommentsQuestion,
+      {
+        title: OverrideCommentsTitle,
+        okButtonLabel: 'Yes',
+        okButtonClass: 'e-primary',
+        cancelButtonLabel: 'No',
+      })
       .pipe(
         tap(({ action }) => {
           if (action !== ConfirmEventType.CLOSE) {
