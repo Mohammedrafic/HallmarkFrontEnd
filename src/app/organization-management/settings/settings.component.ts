@@ -321,6 +321,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.IsSettingKeyAutomatedDistributedToVMS){
       this.switchedValueForm.controls["value"].setValue(48)
       this.switchedValueForm.controls['isEnabled'].setValue(true)
+      this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     }
     else {
       this.switchedValueForm.get('value')?.clearValidators();
@@ -1558,7 +1559,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   disableSettingsValue(event?: any, obj?: any) {
-    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingKeyAutomatedDistributedToVMS ) {
       if (event?.checked || obj) {
         this.switchedValueForm.get("value")?.enable();
       } else {
