@@ -1,4 +1,4 @@
-import { AddLogiCustomReportRequest } from "../model/logi-custom-report.model";
+import { AddLogiCustomReportRequest, SharedDocumentPostDto } from "../model/logi-custom-report.model";
 
 export class GetCustomReportPage {
   static readonly type = '[Custom Report] Get Custom Report Page';
@@ -14,4 +14,10 @@ export class SaveCustomReport {
   constructor(
     public addLogiCustomReportRequest: AddLogiCustomReportRequest
   ) { }
+}
+
+export class sharedDocs {
+  static readonly type = '[Sahre Docs] Shared Docs Successfully';
+  constructor(public payload: SharedDocumentPostDto){}
+
 }
