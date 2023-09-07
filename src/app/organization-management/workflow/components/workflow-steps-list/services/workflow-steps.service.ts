@@ -3,7 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Step, Workflow, WorkflowList, WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
 import { WorkflowStateService } from '@organization-management/workflow/services';
-import { CustomStepType } from '@organization-management/workflow/components/create-workflow/constants';
+import {
+  CustomOfferedStep,
+  CustomOfferedStepName,
+  CustomStepType
+} from '@organization-management/workflow/components/create-workflow/constants';
+import { TypeFlow } from '@organization-management/workflow/enumns';
 
 @Injectable()
 export class WorkflowStepsService {
@@ -37,7 +42,7 @@ export class WorkflowStepsService {
 
   public createWorkflowDetailsDto(stepForm: FormGroup): WorkflowWithDetailsPut {
     const {id, name} = this.workflowStateService.getSelectedCard() as WorkflowWithDetails;
-    const customSteps = Object.values(stepForm.value).flat() as Step[];
+    const customSteps = Object.values(stepForm.getRawValue()).flat() as Step[];
 
     return {
       id: id ,
@@ -47,17 +52,35 @@ export class WorkflowStepsService {
     };
   }
 
+  public createCustomOfferedStep(step: Step): Step {
+    return {
+      id: null,
+      name: CustomOfferedStepName,
+      status: CustomOfferedStepName,
+      type: CustomOfferedStep,
+      workflowId: step.workflowId ?? 0,
+      formStepName: step.formStepName,
+      order: 1,
+    };
+  }
+
   public getWorkflowWithCustomSteps(workflow: WorkflowList): Step[] {
-    const orderWorkflowWithCustomSteps = this.getCustomSteps(workflow.orderWorkflow?.steps);
-    const applicationWorkflowWithCustomSteps = this.getCustomSteps(workflow.applicationWorkflow?.steps);
+    const orderWorkflowWithCustomSteps = this.getCustomSteps(
+      TypeFlow.orderWorkflow,
+      workflow.orderWorkflow?.steps,
+    );
+    const applicationWorkflowWithCustomSteps = this.getCustomSteps(
+      TypeFlow.applicationWorkflow,
+      workflow.applicationWorkflow?.steps,
+    );
 
     return [...orderWorkflowWithCustomSteps, applicationWorkflowWithCustomSteps].flat();
   }
 
-  public getDefaultWorkflowList(workflow: Workflow): Workflow {
+  public getDefaultWorkflowList(workflow: Workflow, type: TypeFlow): Workflow {
     return {
       ...workflow,
-      steps: workflow.steps.filter((step: Step) => step.type !== CustomStepType),
+      steps: this.getFilteredDefaultSteps(workflow.steps, type),
     };
   }
 
@@ -85,12 +108,31 @@ export class WorkflowStepsService {
     };
   }
 
-  private getCustomSteps(steps?: Step[]): Step[] {
-    if(steps) {
+  private getCustomSteps(type: TypeFlow, steps?: Step[]): Step[] {
+    if(steps && type === TypeFlow.orderWorkflow) {
       return steps?.filter((step: Step) => {
         return step.type === CustomStepType;
       });
     }
+
+    if(steps && type === TypeFlow.applicationWorkflow) {
+      return steps?.filter((step: Step) => {
+        return step.type === CustomStepType || step.type === CustomOfferedStep;
+      });
+    }
+
     return [] as Step[];
+  }
+
+  private getFilteredDefaultSteps(steps: Step[], type: TypeFlow): Step[] {
+    if(type === TypeFlow.orderWorkflow) {
+      return steps.filter((step: Step) => {
+        return  step.type !== CustomStepType;
+      });
+    }
+
+    return steps.filter((step: Step) => {
+      return  step.type !== CustomStepType && step.type !== CustomOfferedStep;
+    });
   }
 }

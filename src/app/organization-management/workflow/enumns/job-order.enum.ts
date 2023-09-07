@@ -3,3 +3,8 @@ export enum WorkflowNavigationTabs {
   VmsOrderWorkFlow = 1,
   WorkflowMapping= 2
 }
+
+export enum TypeFlow {
+  orderWorkflow = 1,
+  applicationWorkflow = 2
+}

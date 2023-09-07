@@ -24,7 +24,7 @@ export interface Workflow {
 }
 
 export interface Step {
-  id?: number;
+  id?: number | null;
   canBeFollowedByCustomStep?: boolean;
   isAgencyStep?: boolean;
   requirePermission?: boolean;
