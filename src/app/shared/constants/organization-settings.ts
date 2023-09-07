@@ -59,7 +59,8 @@ export enum OrganizationSettingKeys {
   AutomatedDistributionToVMS,
   Sourcing,
   ATPRateCalculation,
-  LimitNumberOfCandidateanAgencycansubmitToaPosition
+  LimitNumberOfCandidateanAgencycansubmitToaPosition,
+  DisableNumberOfOpenPositions
 }
 
 export enum OrganizationalHierarchy {
