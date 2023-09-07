@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset, AveragedayActivecandidateDto, AveragedayActivecandidateInfo } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -92,6 +92,7 @@ export class DashboardService {
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
     [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
+      [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivecandidateStatusWidgetData(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -609,6 +610,29 @@ export class DashboardService {
   public getcandidatesOverallStatus(): Observable<CandidateTypeInfoModel[]>{
     return  this.candidatesOverallStatus$.asObservable();
   }
+
+  
+  private getAvergaeDayActivecandidateStatusWidgetData(filter: DashboartFilterDto): Observable<any> {
+    return this.httpClient.post<AveragedayActivecandidateDto>(`${this.baseUrl}/GetAverageDaysforActiveCandidatesInStatus`, { granulateInProgress: true, ...filter, type : 'Custom' }).pipe(
+      map(({ averagedayActivecandidateDetails }: AveragedayActivecandidateDto) => {
+        return {
+          id: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS,
+           title: ' Average Days for Active Candidates in a Status',
+           chartData: lodashMapPlain(
+            averagedayActivecandidateDetails,
+            ({ count, status,average }: AveragedayActivecandidateInfo, index: number) => ({
+              label: status,
+              value: average,
+              average: count,
+              color: candidateLegendPalette[status as CandidateChartStatuses] ||
+              candidateLegendPalette[CandidateChartStatuses.CUSTOM],
+            })
+            ),
+          };
+        })
+      );
+    } 
+
 
  
 }
