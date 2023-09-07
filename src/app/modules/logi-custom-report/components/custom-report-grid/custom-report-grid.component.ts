@@ -200,7 +200,6 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-        console.log(data)
         if (data != null && data.length > 0) {
           this.organizations = uniqBy(data, 'organizationId');
         }
@@ -291,7 +290,6 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   }
   onSelectionChanged(event: SelectionChangedEvent) {
     const selectedData = this.gridApi.getSelectedRows();
-    console.log('Selection Changed', selectedData);
     this.rowvalues = selectedData.map((list: { id: any; }) => list.id)
   }
 
@@ -319,7 +317,6 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
 
 
   allOrgnizationsChange(value: any) {
-    console.log(value)
     if (value.checked == true) {
       this.organizationSwitch = false;
       const orgId = this.organizations.map((list) => list.organizationId)
