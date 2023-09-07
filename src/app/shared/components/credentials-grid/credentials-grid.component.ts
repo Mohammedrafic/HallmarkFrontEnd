@@ -199,7 +199,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return this.selectedItems.length === this.pageSize;
   }
 
-  private get organizatonId(): number | null {
+  private get organizationId(): number | null {
     return this.isOrganizationSide ? this.store.selectSnapshot(UserState.lastSelectedOrganizationId) : null;
   }
 
@@ -216,7 +216,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.currentPage,
       this.pageSize,
       this.orderId,
-      this.organizatonId,
+      this.organizationId,
       this.candidateProfileId
     );
   }
@@ -372,7 +372,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public viewFiles(event: MouseEvent, id: number) {
     event.stopPropagation();
     this.store
-      .dispatch(new GetGroupedCredentialsFiles(this.candidateProfileId))
+      .dispatch(new GetGroupedCredentialsFiles(this.candidateProfileId, this.orderId, this.organizationId))
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.openFileViewerDialog.emit(id);
@@ -580,7 +580,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
               masterCredentialId: this.masterCredentialId,
               id: this.credentialId as number,
               orderId: this.orderId,
-              organizationId: this.organizatonId,
+              organizationId: this.organizationId,
             },
             file,
           )

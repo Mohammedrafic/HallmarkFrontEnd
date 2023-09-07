@@ -19,5 +19,10 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     route: './missing-credentials-agency',
     permissionKeys: ['CanViewAgencymissingcredentials'],
   },
-  
+  {
+    text: 'Credential Expiry',
+    id: 4,
+    route: './credentials-expiry-agency',
+    permissionKeys: ['CanViewAgencyCredentialExpire'],
+  },
 ];

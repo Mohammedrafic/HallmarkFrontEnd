@@ -1,5 +1,6 @@
-
 import { FilteredDataByOrganizationId } from "./group-by-organization-filter-data.model";
+
+
 
 export interface GetWorkCommitment {
     id: number
@@ -13,7 +14,9 @@ export interface GetNursingUtilizationbyByFilters {
   skillIds: number[];
   organizationFilter: FilteredDataByOrganizationId[] | null;
 }
-
+export interface GetSkillsbyByFilters {
+   organizationFilter: FilteredDataByOrganizationId[] | null;
+ }
 export interface GetNursingWidgetData {
     monthlyTotalHoursSchedule : number,
     noOfPerdiemNursing : number,

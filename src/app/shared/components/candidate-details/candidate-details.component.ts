@@ -23,13 +23,11 @@ import {
   switchMap,
   debounceTime,
   skip, 
-  isEmpty,
   delay,
   distinctUntilChanged} from 'rxjs';
 
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from '../../../store/app.actions';
 import {
-  ExportCandidateAssignment,
   GetAssociateOrganizations,
   GetCandidateDetailsPage,
   GetCandidateRegions,
@@ -40,7 +38,6 @@ import { CandidateDetailsState } from '@shared/components/candidate-details/stor
 import { FilterService } from '@shared/services/filter.service';
 import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import {
   CandidateDetailsPage,
   CandidatesDetailsRegions,
@@ -66,17 +63,19 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { GetAssociateAgencies } from '@client/store/order-managment-content.actions';
 import { CandidateDetailsFilterTab } from '@shared/enums/candidate-assignment.enum';
-import { ExportColumn ,ExportOptions} from '@shared/models/export.model';
+import { ExportColumn } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { GridApi, RowNode } from '@ag-grid-community/core';
+import { GridApi } from '@ag-grid-community/core';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { AssociateOrganizations } from '@shared/models/associate-organizations.model';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { GetOrganizationStructure } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { getDepartmentFromLocations, getLocationsFromRegions } from '@agency/order-management/order-management-grid/agency-order-filters/agency-order-filters.utils';
+import {
+  getDepartmentFromLocations,
+  getLocationsFromRegions,
+} from '@agency/order-management/order-management-grid/agency-order-filters/agency-order-filters.utils';
 import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import { GetUserAgencies, GetUserOrganizations } from 'src/app/store/user.actions';
 import { Organisation } from '@shared/models/visibility-settings.model';

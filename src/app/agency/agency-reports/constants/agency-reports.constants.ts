@@ -19,6 +19,20 @@ export const financialTimesheetConstants = {
     
   }
 }
+export const AgencyCredientialExpiryConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    StartDate: 'startDate',
+    EndDate: 'endDate',    
+    CandidateStatuses: 'candidateStatuses',
+    JobId: 'jobId',
+    CandidateName: 'candidateName', 
+    opcredFlag: 'opcredFlag',  
+  }
+}
 export const AgencyInvoiceSummaryConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',
@@ -34,7 +48,7 @@ export const AgencyInvoiceSummaryConstants = {
 
   }
 }
-export const analyticsConstants = {
+export const AgencyMissingCredientialConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',
     RegionIds: 'regionIds',

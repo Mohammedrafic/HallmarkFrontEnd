@@ -21,6 +21,7 @@ import { AgencyReportsRoutingModule } from './agency-reports-routing.module';
 import { LogiReportModule } from '../../shared/components/logi-report/logi-report.module';
 import { InvoiceSummaryReportComponent } from './invoice-summary-report/invoice-summary-report.component';
 import { MissingCredentialsAgencyComponent } from './missing-credentials-agency/missing-credentials-agency.component';
+import { CredientialExpiryAgencyComponent } from './crediential-expiry-agency/crediential-expiry-agency.component';
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { MissingCredentialsAgencyComponent } from './missing-credentials-agency/
     AgencyReportsComponent,
     FinancialTimesheetReportComponent,
     InvoiceSummaryReportComponent,
-    MissingCredentialsAgencyComponent
+    MissingCredentialsAgencyComponent,
+    CredientialExpiryAgencyComponent
   ],
   imports: [
     CommonModule,   

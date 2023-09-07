@@ -11,14 +11,16 @@ import { filter, Observable, Subject, take, takeWhile } from 'rxjs';
 
 import { SetHeaderState, ShowFilterDialog, ShowSideDialog, ShowExportDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { GetBusinessByUnitType, GetPermissionsTree, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
+import { GetBusinessByUnitType, GetBusinessIdDetails, GetPermissionsTree, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
 import { SecurityState } from '../store/security.state';
 import { RoleFormComponent } from './role-form/role-form.component';
 import { AddRolesDialogTitle, BUSSINES_DATA_FIELDS,
   EditRolesDialogTitle, OPRION_FIELDS } from './roles-and-permissions.constants';
 import { RolesGridComponent } from './roles-grid/roles-grid.component';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
-import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { BUSINESS_UNITS_VALUES, BUSINESS_UNITS_VALUES_USERS_ROLES } from '@shared/constants/business-unit-type-list';
+import { User } from '@shared/models/user.model';
+import { GetBusinessUnitIdDetails } from '@shared/models/user-managment-page.model';
 
 @Component({
   selector: 'app-roles-and-permissions',
@@ -32,19 +34,25 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   @Select(SecurityState.bussinesData)
   public bussinesData$: Observable<BusinessUnit[]>;
 
+  @Select(SecurityState.businessIdDetails)
+  public businessUnitIdDetails$: Observable<GetBusinessUnitIdDetails>;
+
   public exportRoles$ = new Subject<ExportedFileType>();
   public businessForm: FormGroup;
   public roleFormGroup: FormGroup;
   public isEditRole = false;
   public isBusinessFormDisabled = false;
   public isBusinessDisabledForNewRole = false;
-  public businessUnits = BUSINESS_UNITS_VALUES;
+  public isOrgLogin = false;
+  public isIRPEnabled = false;
+  public businessUnits = BUSINESS_UNITS_VALUES_USERS_ROLES;
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public roleId: number | null;
   public filteredItems$ = new Subject<number>();
   public agencyActionsAllowed = false;
   public userbusinessUnitId: number | null;
+  public user: User;
 
   get dialogTitle(): string {
     return this.isEditRole ? EditRolesDialogTitle : AddRolesDialogTitle;
@@ -72,8 +80,10 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     this.businessForm = this.generateBusinessForm();
     this.roleFormGroup = RoleFormComponent.createForm();
     const user = this.store.selectSnapshot(UserState.user);
+    this.user = this.store.selectSnapshot(UserState.user) as User;
     this.userbusinessUnitId = user?.businessUnitId != null ? user?.businessUnitId : 0;
     this.onBusinessUnitValueChanged();
+    this.onBusinessIdValueChanged()
     this.businessUnitControl.patchValue(user?.businessUnitType);
 
     if (user?.businessUnitType !== BusinessUnitType.Hallmark && user?.businessUnitType !== BusinessUnitType.MSP) {
@@ -83,6 +93,11 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
 
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       this.businessUnits = this.businessUnits.filter((item) => item.id !== BusinessUnitType.Hallmark);
+    }
+    if(user?.businessUnitType === BusinessUnitType.Organization){
+      let orgEmpBusinessIDs =[BusinessUnitType.Organization,BusinessUnitType.Employee]
+      this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id));  
+      this.isOrgLogin=true
     }
 
     this.actions$
@@ -112,6 +127,11 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
       isShowIRPOnly: false
     });
     this.disableBussinesUnitForRole();
+    if(this.isOrgLogin && this.isIRPEnabled) {
+      this.businessControl.patchValue([this.userbusinessUnitId]);
+      this.roleFormGroup.get('businessUnitId')?.disable({emitEvent:false});
+      this.roleFormGroup.get('businessUnitType')?.enable({emitEvent:false});
+    }
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -186,6 +206,9 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     }
 
     this.roleFormGroup.get('businessUnitType')?.disable();
+    if(this.isOrgLogin) {
+      this.roleFormGroup.get('businessUnitId')?.disable();
+    }
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -210,8 +233,13 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
        takeWhile(() => this.isAlive)
      ).subscribe(() => {
         this.businessControl?.setValue(null);
-        if (this.isBusinessDisabledForNewRole) {
+        if (this.isBusinessDisabledForNewRole||this.isOrgLogin) {
           this.businessControl.patchValue([this.userbusinessUnitId]);
+        }
+        if(this.isOrgLogin) {
+          this.businessControl.patchValue([this.userbusinessUnitId]);
+          this.businessForm.get('business')?.disable();
+          this.roleFormGroup.get('businessUnitId')?.disable();
         }
       });
     });
@@ -228,5 +256,24 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
 
   public override defaultExport(fileType: ExportedFileType): void {
     this.exportRoles$.next(fileType);
+  }
+
+  private onBusinessIdValueChanged(): void {
+    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if (this.user?.businessUnitType == BusinessUnitType.Organization) {
+        value && this.store.dispatch(new GetBusinessIdDetails(value));
+        this.businessUnitIdDetails$.pipe(takeWhile(() => this.isAlive)).subscribe((value: GetBusinessUnitIdDetails) => {
+          if (value != null) {
+            if(value.isIRPEnabled){
+              this.isIRPEnabled=true;
+              this.businessForm.get("businessUnit")?.enable({emitEvent:false})
+            }else{
+              this.businessForm.get("businessUnit")?.disable({emitEvent:false})
+            }
+          }
+        })
+      }
+
+    });
   }
 }

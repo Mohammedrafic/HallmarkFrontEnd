@@ -19,6 +19,7 @@ import { AlreadyExpiredCredsModule } from '../widgets/already-expired-creds/alre
 import { UpcomingExpCredsModule } from '../widgets/upcoming-exp-creds/upcoming-exp-creds.module';
 import { AvailableEmployeeModule } from '../widgets/available-employee/available-employee.module'
 import { PositionsCountDayRangeModule } from '../widgets/positions-count-day-range/positions-count-day-range.module';
+import { OrdersPendingCustomStatusModule } from '../widgets/orders-pending-custom-status/orders-pending-custom-status.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -40,6 +41,7 @@ import { PositionsCountDayRangeModule } from '../widgets/positions-count-day-ran
     UpcomingExpCredsModule,
     AvailableEmployeeModule,
     PositionsCountDayRangeModule,
+    OrdersPendingCustomStatusModule,
     NgxsModule.forFeature([ UserState]),
   ],
 })

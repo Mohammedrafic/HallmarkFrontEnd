@@ -1,59 +1,60 @@
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { ContextMenuModule, MenuModule, SidebarModule, TreeViewModule } from '@syncfusion/ej2-angular-navigations';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
+import { ContextMenuModule, MenuModule, SidebarModule, TreeViewModule } from '@syncfusion/ej2-angular-navigations';
+import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { FeatherModule } from 'angular-feather';
 import {
-  DollarSign,
-  Clock,
-  FileText,
+  AlertCircle,
+  Bell,
   BookOpen,
+  Clipboard,
+  Clock,
+  DollarSign,
+  File,
+  FileText,
+  HelpCircle,
   Home,
   Info,
-  Sidebar,
-  Users,
-  Clipboard,
-  Settings,
-  User,
-  Package,
-  Trello,
   Lock,
-  Truck,
-  Bell,
-  Search,
-  HelpCircle,
-  PieChart,
-  AlertCircle,
   Mail,
   MessageSquare,
-  File,
-  UserX,
+  Package,
+  PieChart,
+  Search,
   Server,
+  Settings,
+  Sidebar,
+  Trello,
+  TrendingUp,
+  Truck,
   Twitch,
-  TrendingUp
+  User,
+  UserX,
+  Users,
 } from 'angular-feather/icons';
 
-import { ShellRoutingModule } from './shell-routing.module';
-import { ShellPageComponent } from './shell.component';
-import { SharedModule } from '../shared/shared.module';
-
-import { OrganizationAgencySelectorComponent } from './components/organization-agency-selector/organization-agency-selector.component';
-import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
-import { SearchMenuComponent } from './components/search-menu/search-menu.component';
-import { UserChatModule } from '../modules/chat/chat.module';
-import { AnalyticByClickModule } from '@shared/directives/analytics/analytics-by-click/analytic-by-click.module';
-import { ContactusComponent } from './components/contactus/contactus.component';
-import { UploaderModule  } from '@syncfusion/ej2-angular-inputs';
-import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
-import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 import { AdminGuard, AgencyGuard, EmployeeGuard } from '@core/guards';
 import { OrganizationGuard } from '@core/guards/organization.guard';
+import { AnalyticByClickModule } from '@shared/directives/analytics/analytics-by-click/analytic-by-click.module';
+import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
+import { HelpNavigationService } from '@shared/services';
+import { UserChatModule } from '../modules/chat/chat.module';
+import { SharedModule } from '../shared/shared.module';
+import { ContactusComponent } from './components/contactus/contactus.component';
+import {
+  OrganizationAgencySelectorComponent,
+} from './components/organization-agency-selector/organization-agency-selector.component';
+import { SearchMenuComponent } from './components/search-menu/search-menu.component';
+import { ShellRoutingModule } from './shell-routing.module';
+import { ShellPageComponent } from './shell.component';
 
 
 const sidebarIcons = {
@@ -116,6 +117,7 @@ const sidebarIcons = {
     OrganizationGuard,
     AgencyGuard,
     EmployeeGuard,
+    HelpNavigationService,
   ],
 })
 export class ShellModule {}

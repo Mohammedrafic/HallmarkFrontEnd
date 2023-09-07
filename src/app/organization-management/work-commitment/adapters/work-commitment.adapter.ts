@@ -77,6 +77,7 @@ export class WorkCommitmentAdapter {
         workCommitmentOrgHierarchies,
         allLocationsSelected,
         allRegionsSelected,
+        isInUse,
       } = item;
       itemsForGrid.push({
         availabilityRequirement,
@@ -100,7 +101,8 @@ export class WorkCommitmentAdapter {
         skillIds: skills.map((item) => item.id),
         workCommitmentId,
         allLocationsSelected,
-        allRegionsSelected
+        allRegionsSelected,
+        isInUse,
       });
     });
     return itemsForGrid;

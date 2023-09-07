@@ -212,6 +212,7 @@ export enum UserPermissions {
   CanViewAgencyFinancialTimesheet = 7001,
   CanViewAgencyInvoiceSummary = 7002,
   CanViewAgencymissingcredentials=7003,
+  CanViewAgencyCredentialExpire=7004,
   //View Order Journey
   ViewOrderJourney = 8001,
 

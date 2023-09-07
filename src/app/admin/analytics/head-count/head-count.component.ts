@@ -76,7 +76,7 @@ export class HeadCountComponent implements OnInit {
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
-  selectedOrganizations: Organisation[]=[];
+  selectedOrganizations: Organisation[];
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };  
@@ -174,6 +174,7 @@ export class HeadCountComponent implements OnInit {
     this.bussinessControl = this.headCountReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
     this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      
       if (data != null && data.length > 0) {
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
@@ -228,7 +229,7 @@ export class HeadCountComponent implements OnInit {
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.defaultRegions = this.regionsList.map((list) => list.id);
-          this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+         //this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
           this.changeDetectorRef.detectChanges();
         }
         else {
@@ -249,10 +250,11 @@ export class HeadCountComponent implements OnInit {
       }
       else {
         this.filterColumns.locationIds.dataSource = [];
-        this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);       
       }
+    this.SearchReport();
     });
-     this.SearchReport();
+     
     this.isInitialLoad = false;
     this.locationIdControl = this.headCountReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -292,6 +294,7 @@ export class HeadCountComponent implements OnInit {
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl
     };
+   
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }

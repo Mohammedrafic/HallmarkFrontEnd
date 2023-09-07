@@ -85,7 +85,7 @@ export class OrderDetailsIrpService {
       weekend: [false],
       holiday: [false],
       jobDescription: ['', Validators.maxLength(4000)],
-      unitDescription: ['', Validators.maxLength(1000)],
+      unitDescription: ['', Validators.maxLength(2000)],
     });
   }
 
@@ -115,7 +115,7 @@ export class OrderDetailsIrpService {
       holiday: [false],
       contract: [false],
       jobDescription: ['', Validators.maxLength(4000)],
-      unitDescription: ['', Validators.maxLength(1000)],
+      unitDescription: ['', Validators.maxLength(2000)],
     });
   }
 

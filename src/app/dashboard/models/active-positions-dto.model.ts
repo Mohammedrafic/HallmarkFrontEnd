@@ -53,3 +53,29 @@ export interface PositionsCountByDayRangeData {
   count30Plus?: number;
 }
 
+export interface OrdersPendingInCustom {
+  orderPendingApprovalCustom : CustomStatusesAvgDetails[];
+}
+
+export interface CustomStatusesAvgDetails {
+  customStatus: string;
+  initialOrderDtos: InitialOrderDtos[];
+  extensionOrderDtos: extensionOrderDtos[];
+}
+
+export interface OrdersPendingInCustomDataset {
+  id: string;
+  title: string;
+  chartData: CustomStatusesAvgDetails[];
+}
+
+export interface InitialOrderDtos{
+  orderCount?:number,
+  avgDays?:string,
+}
+
+export interface extensionOrderDtos{
+  orderCount?:number,
+  avgDays?:string,
+}
+

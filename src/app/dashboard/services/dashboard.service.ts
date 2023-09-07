@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -58,7 +58,7 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 import { AgencyPositionModel } from '../models/agency-position.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
-import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetWorkCommitment } from '../models/rn-utilization.model';
+import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetSkillsbyByFilters, GetWorkCommitment } from '../models/rn-utilization.model';
 import { AvailableEmployeeModel } from '../models/available-employee.model';
 
 @Injectable()
@@ -91,6 +91,7 @@ export class DashboardService {
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
+    [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -197,7 +198,7 @@ export class DashboardService {
       map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
         return {
           id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS,
-           title: 'Average Days of Active Positions ',
+           title: 'Average Days of Active Positions without Custom Workflow',
            chartData: lodashMapPlain(
             orderStatusesAvgDetails,
             ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
@@ -549,8 +550,8 @@ export class DashboardService {
   public getAllMasterCommitments(): Observable<GetWorkCommitment[]> {
     return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
   }
-  public getSkills(): Observable<GetWorkCommitment[]> {
-    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllNursingSkills`);
+  public getSkills(data : GetSkillsbyByFilters): Observable<GetWorkCommitment[]> {
+    return this.httpClient.post<GetWorkCommitment[]>(`${this.baseUrl}/GetAllNursingSkills`,data);
   }
 
   public filterNursingWidget(data : GetNursingUtilizationbyByFilters): Observable<GetNursingWidgetData> {
@@ -566,7 +567,7 @@ export class DashboardService {
       map(({ orderStatusesAvgDetails }: PositionsCountByDayRange) => {
         return {
           id: WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE,
-          title: 'Count Of Positions By Day Range',
+          title: 'Active Positions by Open Day Range',
           chartData: lodashMapPlain(
             orderStatusesAvgDetails,
             ({ count3Positions,count7Positions,count15Positions,count30PlusPositions,count30Positions,totalCount, statusName }: StatusesAvgDetails, index: number) => ({
@@ -582,6 +583,24 @@ export class DashboardService {
         };
       }))
   }
+
+  public getOrdersPendingInCustomStatus(filter: DashboartFilterDto): Observable<OrdersPendingInCustomDataset>{
+    return this.httpClient.post<any>(`${this.baseUrl}/GetOrderPendingForApproval`, { ...filter }).pipe(
+      map(({ orderPendingApprovalCustom }: OrdersPendingInCustom) => {
+        return {
+          id: WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM,
+          title: 'Orders Pending for Approval',
+          chartData: lodashMapPlain(
+            orderPendingApprovalCustom,
+            ({ customStatus,initialOrderDtos,extensionOrderDtos }: CustomStatusesAvgDetails, index: number) => ({
+              customStatus: customStatus,
+              initialOrderDtos: initialOrderDtos,
+              extensionOrderDtos: extensionOrderDtos,
+            })
+          )
+        };
+      }))
+    }
 
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
     return this.candidatesForActivePositions$.asObservable();
