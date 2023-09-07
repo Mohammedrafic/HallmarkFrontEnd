@@ -1,4 +1,4 @@
-import { ColDef, FilterChangedEvent, GridOptions, ICellRendererParams } from '@ag-grid-community/core';
+import { ColDef, FilterChangedEvent, GridOptions, ICellRendererParams, SelectionChangedEvent } from '@ag-grid-community/core';
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { BehaviorSubject, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
@@ -12,8 +12,7 @@ import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-
 import { GRID_CONFIG } from '@shared/constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 
-import { SetHeaderState } from 'src/app/store/app.actions';
-import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { SetHeaderState, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { DatePipe } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
@@ -21,7 +20,15 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { LogiCustomReportState } from '../../store/state/logi-custom-report.state';
 import { LogiCustomReport, LogiCustomReportPage } from '../../store/model/logi-custom-report.model';
-import { GetCustomReportPage } from '../../store/actions/logi-custom-report.actions';
+import { GetCustomReportPage, sharedDocs } from '../../store/actions/logi-custom-report.actions';
+import { User } from '@shared/models/user.model';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AssociateAgencyDto } from '@shared/models/logi-report-file';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ShareOrganizationsData } from 'src/app/modules/document-library/store/model/document-library.model';
+import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
+import { ORGANIZATION_DATA_FIELDS } from '@admin/analytics/analytics.constant';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-custom-report-grid',
@@ -48,6 +55,10 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
 
   @Select(SecurityState.logFileDownloadDetail)
   logFileDownloadDetail$: Observable<any>;
+  @Select(UserState.lastSelectedOrganizationId)
+  private organizationId$: Observable<number>;
+
+  public organizationFields = ORGANIZATION_DATA_FIELDS;
 
   private isAlive = true;
   public totalRecordsCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
@@ -71,24 +82,33 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   openCustomReportDialogue = new Subject<boolean>();
   private unsubscribe$: Subject<void> = new Subject();
   public organizations: Organisation[] = [];
+  public isHalmarkSelected: boolean = false;
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public downloadedFileName: string = '';
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
+  public user: any;
+  public AssociateAgencyData: AssociateAgencyDto[] = [];
+  organizationSwitch = true;
+
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
   };
-  // public rowData: LogInterfacePage[]=[];
+  public rowSelection: 'single' | 'multiple' = 'multiple';
+  selectedOrgid: any
+
   public readonly columnDefs: ColumnDefinitionModel[] = [
+
     {
       field: 'id',
       hide: true,
       filter: false,
     },
+
     {
       headerName: 'View',
       cellRenderer: ButtonRendererComponent,
-      width: 100,
+      width: 150,
       cellRendererParams: {
         onClick: this.onEdit.bind(this),
         label: 'View',
@@ -97,6 +117,9 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
         sortable: false,
         menuTabs: []
       },
+      headerCheckboxSelection: true,
+      headerCheckboxSelectionFilteredOnly: true,
+      checkboxSelection: true,
       sortable: true,
       resizable: true
     },
@@ -108,7 +131,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
       sortable: true,
       resizable: true
     },
-   
+
     {
       headerName: 'Created Date',
       field: 'createdAt',
@@ -145,26 +168,47 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
       sortable: true,
       resizable: true
     },
- 
-  ];
 
-  constructor(private store: Store, private datePipe: DatePipe) {
+  ];
+  formDailogTitle: string;
+  isShare: boolean;
+  dialogWidth: string;
+  shareDocumentIds: any;
+  rowvalues: number[];
+
+  constructor(private store: Store, private datePipe: DatePipe, private formBuilder: FormBuilder) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Custom Reports', iconName: 'trending-up' }));
+    this.user = this.store.selectSnapshot(UserState.user) as User;
+    if (this.user?.businessUnitType == BusinessUnitType.Hallmark) {
+      this.isHalmarkSelected = true;
+    }
+    this.user = this.store.selectSnapshot(UserState.user);
+    if (this.user?.id != null) {
+      this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
+    }
   }
+  shareForm: FormGroup;
 
   ngOnInit(): void {
+    this.shareForm = this.formBuilder.group(
+      {
+        organizationid: new FormControl([], [Validators.required]),
 
-    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.organizations = [];
-      if (data != null && data.length > 0) {
-        this.organizations = uniqBy(data, 'organizationId');
-        this.organizations.sort((a: any, b: any) => a.name.localeCompare(b.name));
       }
-    });
+    )
 
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        console.log(data)
+        if (data != null && data.length > 0) {
+          this.organizations = uniqBy(data, 'organizationId');
+        }
+      });
+
+    });
     this.logInterfacePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-    
+
       this.itemList = data?.items?.sort(function (a: any, b: any) {
         return b.createdAt.localeCompare(a.createdAt);
       });
@@ -213,11 +257,6 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   }
 
 
-
- 
-
- 
-
   onGridReady(params: any) {
     this.gridApi = params.api;
     this.gridApi.setRowData(this.itemList);
@@ -228,11 +267,11 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
     this.dispatchNewPage({ currentPage: this.currentPage, pageSize: this.pageSize });
   }
   public dispatchNewPage(postData: any): void {
-   
+
     if (localStorage.getItem('lastSelectedOrganizationId') === null) {
       this.store.dispatch(new GetCustomReportPage(this.organizations[0]?.organizationId, postData.currentPage, postData.pageSize));
     } else {
-      this.store.dispatch(new GetCustomReportPage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0')) , postData.currentPage, postData.pageSize));
+      this.store.dispatch(new GetCustomReportPage(JSON.parse((localStorage.getItem('lastSelectedOrganizationId') || '0')), postData.currentPage, postData.pageSize));
     }
   }
 
@@ -249,6 +288,70 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
     this.isAlive = false;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+  onSelectionChanged(event: SelectionChangedEvent) {
+    const selectedData = this.gridApi.getSelectedRows();
+    console.log('Selection Changed', selectedData);
+    this.rowvalues = selectedData.map((list: { id: any; }) => list.id)
+  }
+
+  public shareSelectedDocuments(event: any) {
+    this.formDailogTitle = "";
+    let selectedRows: any;
+    selectedRows = this.gridApi.getSelectedRows();
+    if (selectedRows.length > 0) {
+      let selectedIds = selectedRows.map((item: any) => {
+        return item.id;
+      })
+
+      this.isShare = true;
+      this.dialogWidth = '600px'
+      this.shareDocumentIds = selectedIds;
+
+      this.store.dispatch(new ShowSideDialog(true));
+    }
+    else {
+      this.store.dispatch([
+        new ShowToast(MessageTypes.Warning, "Please select atleast one data."),
+      ]);
+    }
+  }
+
+
+  allOrgnizationsChange(value: any) {
+    console.log(value)
+    if (value.checked == true) {
+      this.organizationSwitch = false;
+      const orgId = this.organizations.map((list) => list.organizationId)
+      this.shareForm.controls['organizationid'].setValue(orgId);
+    }
+    else if (value.checked == false) {
+      this.organizationSwitch = true;
+      this.shareForm.controls['organizationid'].setValue([]);
+
+    }
+
+  }
+  public closeDialog() {
+
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  handleOnSave() {
+
+    this.shareForm.markAllAsTouched();
+    if (this.shareForm.invalid) {
+      return;
+    }
+    let paramsdata = {
+
+      documentId: this.shareForm.value.organizationid,
+      sharedDocumentIds: this.rowvalues
+    }
+    this.store.dispatch(new sharedDocs(paramsdata));
+    this.closeDialog()
+    this.shareForm.reset()
+    this.rowvalues = []
   }
 
 }

@@ -21,7 +21,7 @@ import { TooltipContainerModule } from "@shared/components/tooltip-container/too
 import { InputModule } from '@shared/components/form-controls/input/input.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxMaskModule } from 'ngx-mask';
-import { TrendingUp} from 'angular-feather/icons';
+import { Share2, TrendingUp} from 'angular-feather/icons';
 import { NgxsModule } from '@ngxs/store';
 import { LogiCustomReportState } from './store/state/logi-custom-report.state';
 import { CustomReportDialogComponent } from './components/custom-report-grid/custom-report-dialog/custom-report-dialog.component';
@@ -31,8 +31,11 @@ import { ScheduleApiService } from '../schedule/services/schedule-api.service';
 import { VendorscorecardService } from '../../admin/analytics/vendor-scorecard/vendorscorecard.service';
 
 const sidebarIcons = {
-  TrendingUp
+  TrendingUp,
+  Share2,
+
 };
+
 
 @NgModule({
   declarations: [
