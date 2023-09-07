@@ -104,7 +104,6 @@ export class RnUtilizationWidgetComponent implements OnInit {
      })
     this.getLookups().subscribe(() => {
       this.setupChangeListeners();
-      this.getLookups();
       this.cdr.detectChanges();
       this.rnUtilizationForm.updateValueAndValidity();
     });
