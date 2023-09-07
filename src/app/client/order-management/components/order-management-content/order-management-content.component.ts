@@ -1510,6 +1510,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       switch (tabIndex) {
         case OrganizationOrderManagementTabs.AllOrders:
           this.isLockMenuButtonsShown = true;
+          if(this.isOrgIRPEnabled && this.isOrgVMSEnabled){
+            const systemcolumnAllorders = AllOrdersColumnsConfig.find((d) => d.fieldName ==='system');
+            systemcolumnAllorders!.visible=true;
+          }
           this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
           break;
         case OrganizationOrderManagementTabs.PerDiem:
@@ -1522,13 +1526,19 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           break;
         case OrganizationOrderManagementTabs.ReOrders:
           this.isLockMenuButtonsShown = false;
+          if(this.isOrgIRPEnabled && this.isOrgVMSEnabled){
+            const systemcolumnReorders = ReOrdersColumnsConfig.find((d) => d.fieldName ==='system');
+            systemcolumnReorders!.visible=true;
           !selectedOrderAfterRedirect && this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
+          }
           break;
         case OrganizationOrderManagementTabs.OrderTemplates:
           this.refreshGridColumns(orderTemplateColumnsConfig, this.gridWithChildRow);
           break;
         case OrganizationOrderManagementTabs.Incomplete:
           this.isLockMenuButtonsShown = false;
+          const systemcolumn = AllOrdersColumnsConfig.find((d) => d.fieldName ==='system');
+          systemcolumn!.visible=false;
           this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
           break;
       }
