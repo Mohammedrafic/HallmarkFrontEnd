@@ -57,6 +57,7 @@ export class CredentialsSetupService {
       isActive: [false],
       reqSubmission: [false],
       reqOnboard: [false],
+      updateOrderCredentials: [false],
     });
   }
 
@@ -88,6 +89,7 @@ export class CredentialsSetupService {
       isActive: checkboxName === 'isActive' ? isChecked : credentials.isActive,
       reqSubmission: checkboxName === 'reqSubmission' ? isChecked : credentials.reqSubmission,
       reqOnboard: checkboxName === 'reqOnboard' ? isChecked : credentials.reqOnboard,
+      updateOrderCredentials: false,
     });
   }
 

@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { filter, takeUntil, take } from 'rxjs';
+import { filter, takeUntil, take, tap, switchMap } from 'rxjs';
 
 import { CredentialsSetupService } from '@organization-management/credentials/services';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -11,7 +11,6 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSetupDetails, CredentialSetupGet } from '@shared/models/credential-setup.model';
 import { OverrideCommentsQuestion, OverrideCommentsTitle } from '../../constants';
 import { UpdateCredentialSetup } from '@organization-management/store/credentials.actions';
-import { revertControlState } from '@shared/utils/form.utils';
 
 @Component({
   selector: 'app-edit-credential-dialog',
@@ -27,8 +26,6 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
   @Output() closeEditDialog: EventEmitter<void> = new EventEmitter<void>();
 
   public editCredentialForm: FormGroup;
-
-  private selectedCredential: CredentialSetupGet;
 
   constructor(
     private credentialsSetupService: CredentialsSetupService,
@@ -82,7 +79,6 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
       filter((credential: CredentialSetupGet | CredentialSetupDetails) => !!Object.keys(credential).length),
       takeUntil(this.componentDestroy())
     ).subscribe((credential: CredentialSetupGet | CredentialSetupDetails) => {
-      this.selectedCredential = credential as CredentialSetupGet;
       this.credentialsSetupService.irpCommentFieldSettings(this.editCredentialForm, this.isCredentialIRP);
       this.credentialsSetupService.populateCredentialSetupForm(
         this.editCredentialForm,
@@ -109,20 +105,17 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
         cancelButtonLabel: 'No',
         okButtonClass: 'e-primary',
       })
-      .pipe(take(1))
-      .subscribe((confirm) => {
-        if (confirm) {
-          this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()));
-          this.closeModal();
-        } else {
-          const { comments, irpComments } = this.selectedCredential;
-
-          revertControlState(
-            this.editCredentialForm.get('comments') as AbstractControl, comments);
-
-          revertControlState(
-            this.editCredentialForm.get('irpComments') as AbstractControl, irpComments);
-        }
+      .pipe(
+        take(1),
+        tap((confirm) => {
+          this.editCredentialForm.get('updateOrderCredentials')?.setValue(confirm);
+        }),
+        switchMap(() => {
+          return this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()));
+        }),
+      )
+      .subscribe(() => {
+        this.closeModal();
       });
   }
 }

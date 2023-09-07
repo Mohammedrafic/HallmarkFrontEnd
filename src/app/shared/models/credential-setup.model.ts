@@ -25,6 +25,7 @@ export class CredentialSetupPost {
   reqOnboard: boolean;
   inactiveDate: string;
   comments: string;
+  updateOrderCredentials: boolean;
 }
 
 export class CredentialSetupMappingPost {

@@ -17,7 +17,6 @@ import {
   AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
-  Organization,
   OrganizationDepartment,
   OrganizationLocation,
   OrganizationRegion,
@@ -78,8 +77,6 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   @ViewChild('departmentsDropdown') departmentsDropdown: MultiSelectComponent;
   @ViewChild('groupsDropdown') groupsDropdown: MultiSelectComponent;
 
-  @Select(OrganizationManagementState.organization)
-  private organization$: Observable<Organization>;
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   @Select(OrganizationManagementState.credentials)
