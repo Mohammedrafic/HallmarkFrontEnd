@@ -7,7 +7,6 @@ export interface CredentialTypeSource {
 }
 
 export interface ConfirmOverrideComments {
-  isConfirmed: boolean;
-  credentialMappring: boolean;
-  openInProgressOrders: boolean;
+  updateMappingCredentials: boolean;
+  updateOrderCredentials: boolean;
 }

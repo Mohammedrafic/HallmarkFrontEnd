@@ -6,7 +6,7 @@
   height="440px"
   cssClass="confirm-dialog"
   [animationSettings]="animationSettings"
-  (close)="cancel()"
+  (close)="close()"
 >
   <ng-template #header>
     <section class="header-container">
@@ -39,8 +39,8 @@
   <ng-template #footerTemplate>
     <div class="e-card-content">
       <div>
-        <button ejs-button cssClass="e-outline" (click)="cancel()">Cancel</button>
-        <button ejs-button cssClass="e-primary" [isPrimary]="true" (click)="submit()">Yes</button>
+        <button ejs-button cssClass="e-outline" (click)="confirmOverriding()">Cancel</button>
+        <button ejs-button cssClass="e-primary" [isPrimary]="true" (click)="confirmOverriding()">Yes</button>
       </div>
     </div>
   </ng-template>

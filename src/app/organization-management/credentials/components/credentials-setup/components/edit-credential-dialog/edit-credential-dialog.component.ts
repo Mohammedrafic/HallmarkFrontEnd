@@ -113,6 +113,7 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
         switchMap(() => {
           return this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()));
         }),
+        take(1)
       )
       .subscribe(() => {
         this.closeModal();

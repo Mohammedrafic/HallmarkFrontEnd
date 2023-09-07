@@ -7,11 +7,12 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { of, delay, take } from 'rxjs';
+import { timer } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { ConfirmOverrideComments } from '@organization-management/credentials/interfaces';
 import { OverrideCommentsTitle } from '@organization-management/credentials/components/credentials-setup/constants';
+import { ConfirmDialogEvent } from '@shared/enums/confirm-dialog-events.enum';
 
 
 @Component({
@@ -30,39 +31,41 @@ export class OverrideCommentsDialogComponent implements AfterViewInit {
   public animationSettings = { effect: 'Zoom', duration: 400, delay: 0 };
   public credentialMappring = false;
   public openInProgressOrders = false;
+  public dialogEvents = ConfirmDialogEvent;
+
+  private isConfirmed = false;
 
   public ngAfterViewInit(): void {
     this.destroyableDialog.show();
   }
 
-  public submit(): void {
-    this.confirm.emit(this.getDialogState(true));
+  public close(): void {
+    if (!this.isConfirmed) {
+      this.closeDialog();
+    }
   }
 
-  public cancel(): void {
-    this.confirm.emit(this.getDialogState(false));
+  public confirmOverriding(): void {
+    this.isConfirmed = true;
+    this.confirm.emit(this.getDialogState());
     this.closeDialog();
   }
 
-  private getDialogState(isConfirmed: boolean): ConfirmOverrideComments {
+  private getDialogState(): ConfirmOverrideComments {
     return ({
-      isConfirmed,
-      credentialMappring: this.credentialMappring,
-      openInProgressOrders: this.openInProgressOrders,
-    });
-  }
-
-  private destroyCommentsDialog(): void {
-    of(true).pipe(
-      take(1),
-      delay(400)
-    ).subscribe(() => {
-      this.destroyDialog.emit();
+      updateMappingCredentials: this.credentialMappring,
+      updateOrderCredentials: this.openInProgressOrders,
     });
   }
 
   private closeDialog(): void {
     this.destroyableDialog.hide();
     this.destroyCommentsDialog();
+  }
+
+  private destroyCommentsDialog(): void {
+    timer(400).subscribe(() => {
+      this.destroyDialog.emit();
+    });
   }
 }

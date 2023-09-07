@@ -13,7 +13,11 @@ import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
 import { SharedModule } from '@shared/shared.module';
 import { FiltersComponent } from './filters/filters.component';
-import { CredentialFiltersService, CredentialListApiService, CredentialListService } from '@shared/components/credentials-list/services';
+import {
+  CredentialFiltersService,
+  CredentialListApiService,
+  CredentialListService,
+} from '@shared/components/credentials-list/services';
 import { Icons } from '@shared/components/credentials-list/constants';
 import { AddEditCredentialComponent } from './add-edit-credential/add-edit-credential.component';
 import { CredentialListState } from '@shared/components/credentials-list/store/credential-list.state';
