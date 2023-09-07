@@ -101,10 +101,10 @@ export class RnUtilizationWidgetComponent implements OnInit {
   ngOnInit(): void {
     this.filterData$.pipe().subscribe((data)=>{
       this.skills = data;
-       console.log(this.skills);
      })
     this.getLookups().subscribe(() => {
       this.setupChangeListeners();
+      this.getLookups();
       this.cdr.detectChanges();
       this.rnUtilizationForm.updateValueAndValidity();
     });
@@ -119,6 +119,9 @@ export class RnUtilizationWidgetComponent implements OnInit {
       }),
       takeUntil(this.unsubscribe$)
     );
+    this.filterData$.pipe().subscribe((data)=>{
+      this.skills = data;
+     })
     const data: GetSkillsbyByFilters = {
       organizationFilter: this.skills.organizationFilter,
     };
@@ -142,7 +145,17 @@ export class RnUtilizationWidgetComponent implements OnInit {
         debounceTime(500),
         filter(() => true),
         switchMap(([value, filters]) => {
-          const skillsList = this.nursingSkill$.pipe(take(1), takeUntil(this.unsubscribe$));
+          const data: GetSkillsbyByFilters = {
+            organizationFilter: filters.organizationFilter,
+          };
+          const skillsList =this.store.dispatch(new GetSkillData(data)).pipe(
+            take(1),
+            tap((result) => {
+              const ids = (result.dashboard.nursingSkill || []).map((m: { id: number }) => m.id);
+              this.rnUtilizationForm.controls['skills'].setValue(ids, { emitEvent: false });
+            }),
+            takeUntil(this.unsubscribe$)
+          );
           const workCommitmentList = this.commitmentsPage$.pipe(take(1), takeUntil(this.unsubscribe$));
           return forkJoin([of(value), of(filters), skillsList, workCommitmentList]);
         }),
