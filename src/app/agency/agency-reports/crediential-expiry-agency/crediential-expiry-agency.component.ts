@@ -161,6 +161,8 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   public masterLocationsList: OrganizationLocation[] = [];
   public masterDepartmentsList: OrganizationDepartment[] = [];
   public associatedOrganizations: DataSourceItem[]=[];
+  public canidateStatusControl: AbstractControl;
+  public candidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   selectedCandidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   candidateStatusesData:CandidateStatusAndReasonFilterOptionsDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
@@ -218,6 +220,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
         this.onFilterControlValueChangedHandler();
         this.onFilterRegionChangedHandler();
         this.onFilterLocationChangedHandler();
+        this.onFilterCandidateStatusChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.BusinessIds)?.enable() : this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.BusinessIds)?.disable();
       
       });
@@ -412,7 +415,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
       "AgencyIdCE":this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
       this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
       "CandidateNameCE": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
-      "CandidateStatusCE": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
+      "CandidateStatusCE":  candidateStatuses.length > 0 ? this.candidateStatuses?.map(x => x.statusText).join(",") : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(","),
       "DepartmentIdsCE": departmentIds.length == 0 ? "null" : departmentIds,
       "LocationIdsCE": locationIds.length == 0 ? "null" : locationIds,
       "OrderEndDateCE": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
@@ -481,7 +484,16 @@ export class CredientialExpiryAgencyComponent implements OnInit {
       }
     }
   }
-
+ 
+  public onFilterCandidateStatusChangedHandler(): void {
+    debugger;
+    this.canidateStatusControl = this.agencyCredientialExpiryReportForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
+    this.canidateStatusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.canidateStatusControl.value.length > 0) {
+        this.candidateStatuses = this.filterColumns.candidateStatuses.dataSource?.filter((object: { status: any; }) => data?.includes(object.status));
+      }
+    });
+  }
   private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
     if (logiReportData != null && logiReportData.length == 0) {
