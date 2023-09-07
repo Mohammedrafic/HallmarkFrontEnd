@@ -12,7 +12,6 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { ConfirmOverrideComments } from '@organization-management/credentials/interfaces';
 import { OverrideCommentsTitle } from '@organization-management/credentials/components/credentials-setup/constants';
-import { ConfirmDialogEvent } from '@shared/enums/confirm-dialog-events.enum';
 
 
 @Component({
@@ -31,7 +30,6 @@ export class OverrideCommentsDialogComponent implements AfterViewInit {
   public animationSettings = { effect: 'Zoom', duration: 400, delay: 0 };
   public credentialMappring = false;
   public openInProgressOrders = false;
-  public dialogEvents = ConfirmDialogEvent;
 
   private isConfirmed = false;
 
@@ -43,6 +41,11 @@ export class OverrideCommentsDialogComponent implements AfterViewInit {
     if (!this.isConfirmed) {
       this.closeDialog();
     }
+  }
+
+  public cancel(): void {
+    this.isConfirmed = true;
+    this.closeDialog();
   }
 
   public confirmOverriding(): void {
