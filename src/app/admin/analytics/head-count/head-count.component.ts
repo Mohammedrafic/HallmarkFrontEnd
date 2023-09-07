@@ -284,7 +284,7 @@ export class HeadCountComponent implements OnInit {
       this.isResetFilter = false;
       this.message = ""
     }
-    debugger;
+    
     this.paramsData =
     {
       "OrganizationParamHCR": this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
