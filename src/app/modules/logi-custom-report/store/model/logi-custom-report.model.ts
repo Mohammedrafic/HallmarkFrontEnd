@@ -9,7 +9,7 @@ export class LogiCustomReportPage {
   hasNextPage: boolean;
 }
 export class SharedDocumentPostDto {
-  documentId: number[];
+  organizationId: number[];
   sharedDocumentIds: number[];
 }
 

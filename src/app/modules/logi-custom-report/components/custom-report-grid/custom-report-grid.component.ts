@@ -342,7 +342,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
     }
     let paramsdata = {
 
-      documentId: this.shareForm.value.organizationid,
+      organizationId: this.shareForm.value.organizationid,
       sharedDocumentIds: this.rowvalues
     }
     this.store.dispatch(new sharedDocs(paramsdata));
