@@ -49,22 +49,20 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, Organ
 })
 export class CredientialExpiryAgencyComponent implements OnInit {
   public paramsData: any = {
-    "OrganizationParamCREXP": "",
-    "StartDateParamCREXP": "",
-    "EndDateParamCREXP": "",
-    "RegionParamCREXP": "",
-    "LocationParamCREXP": "",
-    "DepartmentParamCREXP": "",
-    "BearerParamCREXP":"",
-    "BusinessUnitIdParamCREXP":"",
-    "HostName": "",
-    "AgencyParamCREXP": "",
-    "CandidateStatusCREXP": "",
-    "JobIdCREXP": "",
-    "OpCredFlagEXP":"",
-    "CandidateNameCREXP":"",
+    "AgencyIdCE":"",
+    "CandidateNameCE": "",
+    "CandidateStatusCE": "",
+    "DepartmentIdsCE": "",
+    "LocationIdsCE": "",
+    "OrderEndDateCE": "",
+    "OrderStartDateCE": "",
+    "OrganizationIdCE": "",
+    "PositionIdCE": "",
+    "RegionIdsCE": "",
+    "UserIdCE": "",
+    "OptionalCE":"",
   };
-  public reportName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiry.cls" };
+  public reportName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiryForAgency.cls" };
   public catelogName: LogiReportFileDetails = { name: "/AgencyReports/CredentialExpiry/CredentialExpiry.cat" };
   public title: string = "Credential Expiry";
   public message: string = "";
@@ -411,23 +409,20 @@ export class CredientialExpiryAgencyComponent implements OnInit {
    
     this.paramsData =
     {
-      "AgencyParamCREXP":this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
+      "AgencyIdCE":this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
       this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
-      "CandidateNameCREXP": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
-      "CandidateStatusCREXP": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
-      "DepartmentParamCREXP": departmentIds.length == 0 ? "null" : departmentIds,
-      "LocationParamCREXP": locationIds.length == 0 ? "null" : locationIds,
-      "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "StartDateParamCREXP":formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "OrganizationParamCREXP": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "JobIdCREXP": jobId == null || jobId == "" ? "null" : jobId,
-      "RegionParamCREXP": regionIds.length == 0 ? "null" : regionIds,
+      "CandidateNameCE": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
+      "CandidateStatusCE": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
+      "DepartmentIdsCE": departmentIds.length == 0 ? "null" : departmentIds,
+      "LocationIdsCE": locationIds.length == 0 ? "null" : locationIds,
+      "OrderEndDateCE": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "OrderStartDateCE":formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "OrganizationIdCE": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "PositionIdCE": jobId == null || jobId == "" ? "null" : jobId,
+      "RegionIdsCE": regionIds.length == 0 ? "null" : regionIds,
       "UserIdCE":  this.user?.id,
-      "OpCredFlagEXP":opcredFlag==""?"false":opcredFlag.toString(),
-      "HostName": this.baseUrl,
-      "BusinessUnitIdParamCREXP": this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
-      this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
-      "BearerParamCREXP":auth,
+      "OptionalCE":opcredFlag==""?"false":opcredFlag.toString(),
+      
     };
     console.log( this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
