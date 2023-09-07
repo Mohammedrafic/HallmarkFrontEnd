@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter
 import { FormGroup } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { filter, takeUntil, take, tap, switchMap } from 'rxjs';
+import { filter, takeUntil, take, tap, switchMap, of } from 'rxjs';
 
 import { CredentialsSetupService } from '@organization-management/credentials/services';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -11,6 +11,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSetupDetails, CredentialSetupGet } from '@shared/models/credential-setup.model';
 import { OverrideCommentsQuestion, OverrideCommentsTitle } from '../../constants';
 import { UpdateCredentialSetup } from '@organization-management/store/credentials.actions';
+import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
 
 @Component({
   selector: 'app-edit-credential-dialog',
@@ -98,20 +99,25 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
   }
 
   private confirmUpdateCredentialSetup(): void {
-    this.confirmService
-      .confirm(OverrideCommentsQuestion, {
-        title: OverrideCommentsTitle,
-        okButtonLabel: 'Yes',
-        cancelButtonLabel: 'No',
-        okButtonClass: 'e-primary',
-      })
+    this.confirmService.confirmActions(OverrideCommentsQuestion, {
+      title: OverrideCommentsTitle,
+      okButtonLabel: 'Yes',
+      okButtonClass: 'e-primary',
+      cancelButtonLabel: 'No',
+    })
       .pipe(
-        take(1),
-        tap((confirm) => {
-          this.editCredentialForm.get('updateOrderCredentials')?.setValue(confirm);
+        tap(({ action }) => {
+          if (action !== ConfirmEventType.CLOSE) {
+            const isConfirmed = action === ConfirmEventType.YES;
+            this.editCredentialForm.get('updateOrderCredentials')?.setValue(isConfirmed);
+          }
+
         }),
-        switchMap(() => {
-          return this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()));
+        switchMap(({ action }) => {
+          const actionStream$ = action !== ConfirmEventType.CLOSE
+            ? this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()))
+            : of(true);
+          return actionStream$;
         }),
         take(1)
       )
