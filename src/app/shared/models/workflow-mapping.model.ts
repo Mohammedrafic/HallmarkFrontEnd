@@ -18,6 +18,8 @@ export interface WorkflowMappingGet {
   workflowGroupType: number;
   skills: WorkflowSkill[];
   stepMappings: StepMapping[];
+  initialOrders?: boolean;
+  extensions?: boolean;
 }
 
 export class WorkflowSkill {

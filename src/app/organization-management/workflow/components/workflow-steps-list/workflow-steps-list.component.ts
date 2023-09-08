@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
@@ -14,6 +14,11 @@ import { JobOrderService } from '@organization-management/workflow/job-order/ser
 import { UpdateWorkflow } from '@organization-management/store/workflow.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { TypeFlow } from '@organization-management/workflow/enumns';
+import {
+  CustomOfferedStep,
+  CustomOfferedStepName,
+} from '@organization-management/workflow/components/create-workflow/constants';
 
 @Component({
   selector: 'app-workflow-steps-list',
@@ -25,12 +30,14 @@ export class WorkflowStepsListComponent extends Destroyable implements OnInit {
   @Input() userPermission: Permission;
 
   public customStepsForm: FormGroup;
+  public isShortlistedStepAdded = false;
   public workflowsList: WorkflowList = {
     orderWorkflow: null,
     applicationWorkflow: null,
   };
 
   public readonly userPermissions = UserPermissions;
+  public readonly typeFlowList = TypeFlow;
 
   constructor(
     private workflowStateService: WorkflowStateService,
@@ -57,7 +64,7 @@ export class WorkflowStepsListComponent extends Destroyable implements OnInit {
     return step.order as unknown as string;
   }
 
-  public removeCustomStep(index: number, controlName: string): void {
+  public removeCustomStep(index: number, controlName: string, typeFlow: TypeFlow): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
@@ -69,10 +76,25 @@ export class WorkflowStepsListComponent extends Destroyable implements OnInit {
     ).subscribe(() => {
       const control = this.customStepsForm.controls[controlName] as FormArray;
       control.removeAt(index);
+
+      if(typeFlow === TypeFlow.applicationWorkflow) {
+        this.isShortlistedStepAdded = false;
+      }
+
       this.updateSteps(true);
     });
   }
 
+  public createCustomStepForApplication(step: Step): void {
+    this.isShortlistedStepAdded = true;
+
+    const offeredStep = this.workflowStepsService.createCustomOfferedStep(step);
+
+    this.workflowStepsService.createStepControl(this.customStepsForm, offeredStep, true);
+    this.customStepsForm.controls[offeredStep.formStepName as string]?.disable();
+
+    this.cdr.markForCheck();
+  }
 
   public createCustomStep(step: Step, isCustomStep = false): void {
     const stepControl = this.customStepsForm?.controls[step.formStepName as string];
@@ -98,11 +120,10 @@ export class WorkflowStepsListComponent extends Destroyable implements OnInit {
   }
 
   private updateSteps(isRemoveStep = false): void {
-    if(this.customStepsForm.valid) {
+    if (!this.customStepsForm.invalid) {
       const workflowWithDetailsPut: WorkflowWithDetailsPut = this.workflowStepsService.createWorkflowDetailsDto(
         this.customStepsForm
       );
-
       this.store.dispatch(new UpdateWorkflow(workflowWithDetailsPut, isRemoveStep));
       return;
     }
@@ -121,20 +142,39 @@ export class WorkflowStepsListComponent extends Destroyable implements OnInit {
       filter((workflow: WorkflowList | null): workflow is WorkflowList => !!workflow),
       takeUntil(this.componentDestroy())
     ).subscribe((workflow: WorkflowList) => {
-      this.workflowsList = {
-        orderWorkflow: this.workflowStepsService.getDefaultWorkflowList(workflow.orderWorkflow as Workflow),
-        applicationWorkflow: this.workflowStepsService.getDefaultWorkflowList(workflow.applicationWorkflow as Workflow),
-      };
+      this.isShortlistedStepAdded = false;
 
+      this.workflowsList = {
+        orderWorkflow: this.workflowStepsService.getDefaultWorkflowList(
+          workflow.orderWorkflow as Workflow,
+          this.typeFlowList.orderWorkflow
+        ),
+        applicationWorkflow: this.workflowStepsService.getDefaultWorkflowList(
+          workflow.applicationWorkflow as Workflow,
+          this.typeFlowList.applicationWorkflow
+        ),
+      };
       const workflowWithCustomSteps = this.workflowStepsService.getWorkflowWithCustomSteps(workflow);
 
+      this.initStepsForm();
+
       if(workflowWithCustomSteps.length) {
-        this.initStepsForm();
         workflowWithCustomSteps.forEach((step: Step) => {
           this.createCustomStep(step, true);
         });
+
+        this.disableApplicationOfferedStep(workflowWithCustomSteps);
       }
       this.cdr.markForCheck();
+    });
+  }
+
+  private disableApplicationOfferedStep(workflowWithCustomSteps: Step[]): void {
+    const offeredCustomStep = workflowWithCustomSteps.filter((step: Step) => {
+      return step.type === CustomOfferedStep && step.name === CustomOfferedStepName && step.status === CustomOfferedStepName;
+    });
+    offeredCustomStep?.forEach((step: Step) => {
+      this.customStepsForm.controls[step.formStepName as string]?.disable();
     });
   }
 

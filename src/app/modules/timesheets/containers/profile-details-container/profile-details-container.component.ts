@@ -167,6 +167,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   private canRecalculate: boolean;
 
+  previewAttachemnt:boolean = false;
+
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
@@ -202,7 +204,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.setOrgId();
     this.watchForRangeChange();
     this.initResizeObserver();
-    this.listenResizeToolbar();
+    this.listenResizeToolbar();    
   }
 
   public override ngOnDestroy(): void {
@@ -230,6 +232,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     } else {
       this.nextPreviousOrderEvent.emit(next);
     }
+    this.previewAttachemnt = false;
   }
 
   public handleEditChanges(event: boolean): void {
@@ -257,6 +260,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     } else {
       this.closeDialog();
     }
+    this.previewAttachemnt = false;
   }
 
   public onRejectButtonClick(isTimesheetOrMileagesUpdate: boolean): void {
@@ -432,12 +436,14 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public openFileUploadArea(): void {
     this.uploadFileArea.open();
+    this.previewAttachemnt = false;
   }
 
   public onMobileMenuSelect({ item: { text }}: MenuEventArgs): void {
     if(text === MobileMenuItems.Upload) {
       setTimeout(() => this.openFileUploadArea());
     }
+    this.previewAttachemnt = false;
   }
 
   private orgSubmitEmptyTimesheetWarning(): void {
@@ -463,6 +469,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       filter(Boolean),
       switchMap((timesheet: TimesheetInt.Timesheet) => {
         this.countOfTimesheetUpdates = 0;
+        this.previewAttachemnt = false;
         this.store.dispatch(new Timesheets.GetTimesheetDetails(
           timesheet.id, timesheet.organizationId, this.isAgency));
         return this.actions;
@@ -565,6 +572,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       takeUntil(this.componentDestroy()),
     )
     .subscribe((range) => {
+      this.previewAttachemnt = false;
       this.store.dispatch(new TimesheetDetails.GetDetailsByDate(
         this.organizationId as number, range[0], this.jobId, this.isAgency)
       );
@@ -628,5 +636,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   private initResizeObserver(): void {
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
+  }
+
+  onPreviewAttchementClick($event:boolean){
+    console.log('$event',$event);
+    this.previewAttachemnt = $event;
   }
 }

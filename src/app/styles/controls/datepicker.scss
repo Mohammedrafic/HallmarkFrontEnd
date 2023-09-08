@@ -228,4 +228,32 @@ body.dark {
       }
     }
   }
+
+  .e-datepicker.e-popup-wrapper.e-lib.e-popup.e-control.e-popup-open {
+    .e-calendar {
+      .e-content {
+        .e-cell {
+          &.e-focused-date.e-today .e-day {
+            border-color: $primary-active-blue-80;
+            color: $white !important;
+            background-color: $secondary-dark-blue-10-2;
+
+            &:hover {
+              background-color: $primary-active-blue-80;
+              color: $bg-grey-100 !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .e-calendar .e-content td.e-focused-date span.e-day {
+    background: unset;
+    color: $white !important;
+
+    &:hover {
+      color: $bg-grey-100 !important;
+    }
+  }
 }
