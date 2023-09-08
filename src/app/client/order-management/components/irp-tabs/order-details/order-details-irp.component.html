@@ -325,6 +325,7 @@
   <div class="right-section">
     <app-document-uploader
       uploaderTitle="Documents"
+      [maxFileAmount]="5"
       [documents]="selectedOrder?.documents"
       (selectDocuments)="selectDocument($event)"
       (deleteDocument)="deleteSelectDocument($event)"
