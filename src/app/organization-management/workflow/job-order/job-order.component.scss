@@ -49,23 +49,9 @@
   padding-top: 24px;
 }
 
-.e-tab-header {
-  top: 0 !important;
-  position: sticky !important;
-}
-
 :host {
   ::ng-deep {
     ejs-tab {
-     .e-content {
-       #e-content-navigationTabs_0,
-       #e-content-navigationTabs_1 {
-         overflow-y: auto;
-         padding-right: 5px;
-         width: calc(100% - 5px);
-       }
-      }
-
       .e-content.e-lib.e-touch {
         height: 100% !important;
       }

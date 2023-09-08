@@ -85,10 +85,6 @@ export const UpdateFiltersApplicability = (filters: WorkflowFilters): WorkflowFi
     };
   }
 
-  filters.applicability = {
-    initialOrders: false,
-    extensions: false,
-  };
   return filters;
 };
 
