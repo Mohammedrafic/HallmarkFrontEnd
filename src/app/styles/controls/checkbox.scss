@@ -4,6 +4,15 @@ body.light,
 body.dark {
   .bootstrap {
     .e-checkbox-wrapper {
+      .e-checkbox:focus + .e-frame {
+        box-shadow: none !important;
+        border-color: $grey;
+
+        &:hover {
+          border-color: $primary-active-blue-10;
+        }
+      }
+
       .e-label {
         color: $secondary-dark-blue-10;
       }
@@ -27,12 +36,7 @@ body.dark {
   .bootstrap {
     .e-checkbox-wrapper {
       .e-checkbox:focus + .e-frame {
-        box-shadow: none !important;
         border-color: $secondary-dark-blue-30;
-
-        &:hover {
-          border-color: $primary-active-blue-10;
-        }
       }
 
       .e-label {
