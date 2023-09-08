@@ -547,8 +547,8 @@ export class DashboardService {
       );
   }
 
-  public getAllMasterCommitments(): Observable<GetWorkCommitment[]> {
-    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
+  public getAllMasterCommitments(data : GetSkillsbyByFilters): Observable<GetWorkCommitment[]> {
+    return this.httpClient.post<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, data);
   }
   public getSkills(data : GetSkillsbyByFilters): Observable<GetWorkCommitment[]> {
     return this.httpClient.post<GetWorkCommitment[]>(`${this.baseUrl}/GetAllNursingSkills`,data);
