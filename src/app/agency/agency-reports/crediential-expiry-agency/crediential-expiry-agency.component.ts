@@ -45,7 +45,7 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, Organ
   selector: 'app-crediential-expiry-agency',
   templateUrl: './crediential-expiry-agency.component.html',
   styleUrls: ['./crediential-expiry-agency.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CredientialExpiryAgencyComponent implements OnInit {
   public paramsData: any = {
@@ -72,7 +72,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public defaultCandidateStatuses: (number | undefined)[] = [ 4, 5,3];
+  public defaultCandidateStatuses: (number | undefined)[] = [ 4, 5];
   
   private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5,10,13,12];
 
