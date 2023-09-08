@@ -6,7 +6,7 @@ import { WorkflowStateService } from '@organization-management/workflow/services
 import {
   CustomOfferedStep,
   CustomOfferedStepName,
-  CustomStepType
+  CustomStepType,
 } from '@organization-management/workflow/components/create-workflow/constants';
 import { TypeFlow } from '@organization-management/workflow/enumns';
 

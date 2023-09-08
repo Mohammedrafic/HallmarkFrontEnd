@@ -53,6 +53,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Query } from "@syncfusion/ej2-data";
 import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
 import {
+  ApplicabilitySources,
   CreateWorkflowTypeList,
   FiltersColumnsConfig,
   VmsWorkflowType,
@@ -174,6 +175,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       departmentsIds: new FormControl([]),
       skillIds: new FormControl([]),
       types: new FormControl([]),
+      workflowApplicability: new FormControl([]),
     });
   }
 
@@ -187,6 +189,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     this.watchForChangePage();
     this.watchForOrganizationChange();
     this.watchForUsersAndRolesWithPermissions();
+    this.setApplicabilitySources();
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetWorkflowsSucceed)).subscribe((workflows) => {
       this.workflows = workflows.payload;
@@ -391,6 +394,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       skillIds: this.filters.skillIds || [],
       types: this.filters.types || [],
       names: this.filters.names || [],
+      workflowApplicability: this.filters.workflowApplicability || [],
     });
     this.filteredItems = this.filterService.generateChips(this.WorkflowFilterFormGroup, this.filterColumns);
   }
@@ -821,6 +825,10 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
 
   private initFiltersConfig(): void {
     this.filterColumns = FiltersColumnsConfig;
+  }
+
+  private setApplicabilitySources(): void {
+    this.filterColumns.workflowApplicability.dataSource = ApplicabilitySources;
   }
 
   private watchForChangePage(): void {

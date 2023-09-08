@@ -32,7 +32,7 @@ import {
   usedByOrderErrorMessage,
   usedInMappingMessage,
 } from '@shared/constants';
-import { WorkflowWithDetails } from '@shared/models/workflow.model';
+import { WorkflowFilters, WorkflowWithDetails } from '@shared/models/workflow.model';
 import {
   RoleListsByPermission,
   UserListsByPermission,
@@ -41,7 +41,11 @@ import {
 } from '@shared/models/workflow-mapping.model';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { GetWorkflowFlags, PrepareWorkflowMapping } from '@organization-management/workflow/helpers';
+import {
+  GetWorkflowFlags,
+  PrepareWorkflowMapping,
+  UpdateFiltersApplicability,
+} from '@organization-management/workflow/helpers';
 
 export interface WorkflowStateModel {
   workflows: WorkflowWithDetails[] | null;
@@ -185,7 +189,8 @@ export class WorkflowState {
     { patchState }: StateContext<WorkflowStateModel>,
     { filters }: GetWorkflowMappingPages
   ): Observable<WorkflowMappingPage> {
-    return this.workflowService.getWorkflowMappingPages(filters).pipe(
+    const updatedFilters = UpdateFiltersApplicability(filters as WorkflowFilters);
+    return this.workflowService.getWorkflowMappingPages(updatedFilters).pipe(
       map((payload: WorkflowMappingPage) => {
         return PrepareWorkflowMapping(payload);
       }),

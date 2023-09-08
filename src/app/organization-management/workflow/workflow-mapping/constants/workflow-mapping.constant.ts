@@ -18,6 +18,8 @@ export const VmsWorkflowType: WorkflowTypeList = {
   text: WorkflowTabNames.vmsWorkflow,
 };
 
+export const ApplicabilitySources = ['Order', 'Extension'];
+
 export const CreateWorkflowTypeList = (irpFlag: boolean, systemFlags: SystemFlags): WorkflowTypeList[] => {
   const workflowType = [];
 
@@ -68,5 +70,16 @@ export const FiltersColumnsConfig = {
     valueField: 'name',
     valueId: 'id',
   },
-  names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
+  names: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Text,
+    dataSource: [],
+    valueField: 'name',
+  },
+  workflowApplicability: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Text,
+    dataSource: [],
+    valueField: 'workflowApplicability',
+  },
 };
