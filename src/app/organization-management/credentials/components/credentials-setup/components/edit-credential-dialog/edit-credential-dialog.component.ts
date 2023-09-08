@@ -113,7 +113,6 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
             const isConfirmed = action === ConfirmEventType.YES;
             this.editCredentialForm.get('updateOrderCredentials')?.setValue(isConfirmed);
           }
-
         }),
         switchMap(({ action }) => {
           const actionStream$ = action !== ConfirmEventType.CLOSE
