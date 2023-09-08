@@ -18,7 +18,7 @@ export const VmsWorkflowType: WorkflowTypeList = {
   text: WorkflowTabNames.vmsWorkflow,
 };
 
-export const ApplicabilitySources = ['Order', 'Extension'];
+export const ApplicabilitySources = ['Initial Order', 'Extension'];
 
 export const CreateWorkflowTypeList = (irpFlag: boolean, systemFlags: SystemFlags): WorkflowTypeList[] => {
   const workflowType = [];

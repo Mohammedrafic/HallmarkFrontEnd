@@ -5,7 +5,7 @@ export enum WorkflowNavigationTabs {
 }
 
 export enum Applicability {
-  Order = 'Order',
+  Order = 'Initial Order',
   Extension = 'Extension'
 }
 

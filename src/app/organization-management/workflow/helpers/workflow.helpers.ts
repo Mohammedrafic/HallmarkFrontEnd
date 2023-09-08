@@ -68,9 +68,11 @@ export const UpdateFiltersApplicability = (filters: WorkflowFilters): WorkflowFi
      if(value === Applicability.Order) {
        acc.initialOrders = true;
      }
+
      if(value === Applicability.Extension) {
        acc.extensions = true;
      }
+
     return acc;
     }, {
       initialOrders: false,
