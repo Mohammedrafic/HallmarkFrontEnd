@@ -110,7 +110,13 @@ export class RnUtilizationWidgetComponent implements OnInit {
   }
 
   getLookups(): Observable<any> {
-    const commitmentsLookup = this.store.dispatch(new GetAllCommitmentByPage()).pipe(
+    this.filterData$.pipe().subscribe((data)=>{
+      this.skills = data;
+     })
+    const data: GetSkillsbyByFilters = {
+      organizationFilter: this.skills.organizationFilter,
+    };
+    const commitmentsLookup = this.store.dispatch(new GetAllCommitmentByPage(data)).pipe(
       take(1),
       tap((result) => {
         const ids = (result.dashboard.commitmentsPage || []).map((m: { id: number }) => m.id);
@@ -118,12 +124,7 @@ export class RnUtilizationWidgetComponent implements OnInit {
       }),
       takeUntil(this.unsubscribe$)
     );
-    this.filterData$.pipe().subscribe((data)=>{
-      this.skills = data;
-     })
-    const data: GetSkillsbyByFilters = {
-      organizationFilter: this.skills.organizationFilter,
-    };
+   
     const skillsLookup = this.store.dispatch(new GetSkillData(data)).pipe(
       take(1),
       tap((result) => {
@@ -147,7 +148,7 @@ export class RnUtilizationWidgetComponent implements OnInit {
           const data: GetSkillsbyByFilters = {
             organizationFilter: filters.organizationFilter,
           };
-          const skillsList =this.store.dispatch(new GetSkillData(data)).pipe(
+          const skillsList = this.store.dispatch(new GetSkillData(data)).pipe(
             take(1),
             tap((result) => {
               const ids = (result.dashboard.nursingSkill || []).map((m: { id: number }) => m.id);
@@ -155,7 +156,14 @@ export class RnUtilizationWidgetComponent implements OnInit {
             }),
             takeUntil(this.unsubscribe$)
           );
-          const workCommitmentList = this.commitmentsPage$.pipe(take(1), takeUntil(this.unsubscribe$));
+          const workCommitmentList = this.store.dispatch(new GetAllCommitmentByPage(data)).pipe(
+            take(1),
+            tap((result) => {
+              const ids = (result.dashboard.commitmentsPage || []).map((m: { id: number }) => m.id);
+              this.rnUtilizationForm.controls['workCommitment'].setValue(ids, { emitEvent: false });
+            }),
+            takeUntil(this.unsubscribe$)
+          );
           return forkJoin([of(value), of(filters), skillsList, workCommitmentList]);
         }),
         tap(([value,, skillsList, workCommitmentList]) => {

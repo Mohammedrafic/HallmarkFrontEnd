@@ -51,6 +51,7 @@ export class ToggleQuickOrderDialog {
 
 export class GetAllCommitmentByPage {
   static readonly type = `${dashboardStatePrefix} Get Commitment by Page`;
+  constructor(public payload:GetSkillsbyByFilters) {}
 }
 
 export class GetSkilldata {

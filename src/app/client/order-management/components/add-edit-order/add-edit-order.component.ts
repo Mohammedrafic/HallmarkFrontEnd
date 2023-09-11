@@ -727,13 +727,20 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
-        if (this.orderDetailsFormComponent.isEditMode) {
+        if (!this.orderDetailsFormComponent.isEditMode) {
+          this.orderCredentials = predefinedCredentials;
+          this.cd.detectChanges();
+          return;
+        }
+
+        const departmentChanged = this.orderDetailsFormComponent?.generalInformationForm.get('departmentId')?.touched;
+        const skillChanged = this.orderDetailsFormComponent?.generalInformationForm.get('skillId')?.touched;
+
+        if (this.orderDetailsFormComponent.isEditMode && (departmentChanged || skillChanged)) {
           const credentials = this.orderCredentials.filter(cred => !cred.isPredefined);
           this.orderCredentials = unionBy('credentialId', credentials, predefinedCredentials);
-        } else {
-          this.orderCredentials = predefinedCredentials;
+          this.cd.detectChanges();
         }
-        this.cd.detectChanges();
       });
   }
 
@@ -749,7 +756,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
             .getRawValue()
             .filter((billrate) => !billrate.isPredefined);
         }
-        
+
         this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
         this.cd.detectChanges();
       });
