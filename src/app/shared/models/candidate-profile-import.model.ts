@@ -62,3 +62,7 @@ export type ErroredData = {
   [key: string]: string | string [];
   errorProperties: string[];
 }
+
+export type ErroedListData ={
+  errorDescriptions :string[];
+}

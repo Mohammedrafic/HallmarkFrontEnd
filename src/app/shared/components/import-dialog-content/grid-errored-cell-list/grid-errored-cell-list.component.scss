@@ -1,0 +1,13 @@
+@import "colors.scss";
+
+.errored-cell {
+  color: $supportive-red;
+
+  span {
+    margin-right: 12px;
+  }
+
+  i-feather {
+    vertical-align: sub;
+  }
+}
