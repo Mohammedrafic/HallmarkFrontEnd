@@ -451,6 +451,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
           credential.reqSubmission = savedMapping.reqSubmission;
           credential.reqOnboard = savedMapping.reqOnboard;
           credential.comments = this.isEdit ? savedMapping.comments : credential.comments;
+          credential.irpComments = this.isEdit ? savedMapping.irpComments: credential.irpComments;
         }
       });
       this.grid.refresh();
@@ -689,7 +690,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
         this.credentialSetupList,
         credentials
       );
-
+      
       this.updateGridDataSources();
     });
   }

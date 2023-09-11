@@ -47,7 +47,7 @@ export class CredentialSetupDetails {
   reqOnboard?: boolean;
   inactiveDate?: string;
   comments?: string;
-  irpComment?: string;
+  irpComments?: string;
 }
 
 export interface CredentialsSelectedItem {
