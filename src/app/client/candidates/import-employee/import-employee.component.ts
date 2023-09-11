@@ -7,7 +7,7 @@ import {  ListBoxItem, OrderGrid } from '@shared/models/imported-order.model';
 import { FieldSettingsModel,  SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GetEmployeeImportErrors, GetEmployeeImportErrorsSucceeded, GetEmployeeImportTemplate, GetEmployeeImportTemplateSucceeded, SaveEmployeeImportResult, SaveEmployeeImportResultFailAndSucceeded, SaveEmployeeImportResultSucceeded, UploadEmployeeFile, UploadEmployeeFileSucceeded } from '@shared/components/candidate-list/store/candidate-list.actions';
 import { ColDef } from '@ag-grid-community/core';
-import { EmployeesColumnsConfig } from './employee-grid.constants';
+import { EmployeesColumnsConfig, EmployeesErrorColumnsConfig } from './employee-grid.constants';
 
 const employeeImportConfig = {
   importTemplate: GetEmployeeImportTemplate,
@@ -41,6 +41,7 @@ export class ImportEmployeeComponent  extends AbstractImport  {
   public activeErrorTab: boolean;
   
   public columnDefs: ColDef[] = EmployeesColumnsConfig;
+  public errorColumnDefs: ColDef[] = EmployeesErrorColumnsConfig;
 
 
   constructor(
