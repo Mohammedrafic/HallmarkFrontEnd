@@ -450,6 +450,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
           credential.isActive = savedMapping.isActive;
           credential.reqSubmission = savedMapping.reqSubmission;
           credential.reqOnboard = savedMapping.reqOnboard;
+          credential.comments = this.isEdit ? savedMapping.comments : credential.comments;
         }
       });
       this.grid.refresh();
