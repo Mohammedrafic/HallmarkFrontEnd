@@ -427,9 +427,17 @@
         [visible]="isOrgIRPEnabled && isOrgVMSEnabled"
       >
       <ng-template #template let-data>
-        <div (click)="openvmspositions(data.publicId)">
-          <span class="vms-system">{{data.system}}</span>
-        </div>
+        <ng-container *ngIf="data.system != 'IRP, VMS'; else IRPVMS">
+          <div class="subrow-toggle" (click)="RedirecttoVMSorder(data)">
+            <b>{{data.system}}</b>
+            </div>
+        </ng-container>
+        <ng-template #IRPVMS >
+          <div class="subrow-toggle">
+            <b (click)="RedirecttoIRPOrder(data)">IRP,</b>&nbsp;<b (click)="RedirecttoVMSorder(data)">VMS</b>
+          </div>
+        </ng-template>
+
       </ng-template>
     </e-column>
         <e-column field="orderType" headerText="TYPE" textAlign="Center" width="85" minWidth="70" maxWidth="110">

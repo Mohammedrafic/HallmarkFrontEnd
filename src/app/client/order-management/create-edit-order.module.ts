@@ -38,6 +38,10 @@ import {
 import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
+import{
+  TableSystemCellComponent
+}
+from '@client/order-management/components/order-management-content/sub-grid-components/table-system-cell'
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
 import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
@@ -54,6 +58,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     OrderDetailsFormComponent,
     TableTypeCellComponent,
     CriticalCellComponent,
+    TableSystemCellComponent
   ],
   imports: [
     FeatherModule.pick(GridIcons),
