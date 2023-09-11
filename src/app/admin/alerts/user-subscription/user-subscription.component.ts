@@ -432,13 +432,14 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       }
       let userBusinessId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
       let userBusinessType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
-      if(this.businessUnitControl?.value == BusinessUnitType.Candidates){
+      if(this.businessUnitControl?.value == BusinessUnitType.Candidates){        
         if(userBusinessType == BusinessUnitType.Organization){
         if(userBusinessId !=null && userBusinessId !=undefined)
           value = userBusinessId;
         }
 
         if(isNumber(value)){
+          this.loadUserRoles(value); 
           this.store.dispatch(new GetEmployeeUsers(value));
           this.employeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
             if (data != undefined) {
@@ -447,7 +448,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
               if(userBusinessType == BusinessUnitType.Organization)
                 this.businessControl.patchValue(userBusinessId, {emitEvent:false});
             }
-          });
+          });          
         }
        
       } else if(this.businessUnitControl?.value == BusinessUnitType.Organization
