@@ -93,7 +93,7 @@
 
     <form [formGroup]="regionFormGroup" *ngIf="isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder ||  IsSettingKeyScheduleOnlyWithAvailability || IsSettingATPRateCalculation) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
-        <label for="region">Region</label>
+        <label for="region">Region<span *ngIf="IsSettingKeyAutomatedDistributedToVMS" class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="region" [allowFiltering]="true" [dataSource]="regions$ | async"
                             [fields]="optionFields" (select)="changeRegion($event)" [enabled]="!isParentEdit"
