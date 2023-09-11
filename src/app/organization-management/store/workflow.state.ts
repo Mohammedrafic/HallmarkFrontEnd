@@ -14,6 +14,7 @@ import {
   RemoveWorkflowDeclined,
   RemoveWorkflowMapping,
   RemoveWorkflowSucceed,
+  SaveEditedWorkflow,
   SaveWorkflow,
   SaveWorkflowMapping,
   SaveWorkflowMappingSucceed,
@@ -103,6 +104,27 @@ export class WorkflowState {
         patchState({ workflows: payload });
         dispatch(new GetWorkflowsSucceed(payload));
         return payload;
+      })
+    );
+  }
+
+  @Action(SaveEditedWorkflow)
+  SaveEditedWorkflow(
+    { dispatch }: StateContext<WorkflowStateModel>,
+    { payload }: SaveEditedWorkflow
+  ): Observable<WorkflowWithDetails | void> {
+    return this.workflowService.saveEditedWorkflow(payload).pipe(
+      tap((payloadResponse) => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new GetWorkflows(GetWorkflowFlags(payload.isIRP)),
+          new SaveWorkflowSucceed(),
+        ]);
+
+        return payloadResponse;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }

@@ -5,7 +5,7 @@ import { Store } from '@ngxs/store';
 
 import { WorkflowWithDetails } from '@shared/models/workflow.model';
 import { WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
-import { SaveWorkflow } from '@organization-management/store/workflow.actions';
+import { SaveEditedWorkflow, SaveWorkflow } from '@organization-management/store/workflow.actions';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import {
   ApplicabilityValidator,
@@ -55,7 +55,7 @@ export class CreateWorkflowService {
     const workflowType = selectedTab === WorkflowNavigationTabs.IrpOrderWorkFlow ?
       WorkflowGroupType.IRPOrderWorkflow : WorkflowGroupType.VMSOrderWorkflow;
     const {id,workflow, initialOrders, extensions} = workflowForm.value;
-    const workflowWithDetails: WorkflowWithDetails = {
+    const workflowWithDetails = {
       id,
       name: workflow,
       type: workflowType,
@@ -64,7 +64,11 @@ export class CreateWorkflowService {
       isIRP: selectedTab === WorkflowNavigationTabs.IrpOrderWorkFlow,
     };
 
-    this.store.dispatch(new SaveWorkflow(workflowWithDetails));
+    if (id) {
+      this.store.dispatch(new SaveEditedWorkflow(workflowWithDetails));
+    } else {
+      this.store.dispatch(new SaveWorkflow(workflowWithDetails));
+    }
 
     workflowForm.reset();
   }

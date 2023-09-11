@@ -12,6 +12,14 @@ export class WorkflowWithDetails {
   isActive?: boolean; // used only on UI to highlight clicked card
 }
 
+export interface EditedWorkflowDto {
+  id: number;
+  name: string;
+  initialOrders: boolean;
+  extensions: boolean;
+  isIRP: boolean;
+}
+
 export interface WorkflowWithDetailsPut {
   id?: number;
   name: string;

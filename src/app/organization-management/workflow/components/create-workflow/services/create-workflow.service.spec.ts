@@ -6,7 +6,7 @@ import { Store } from '@ngxs/store';
 import { CreateWorkflowService } from '@organization-management/workflow/components/create-workflow/services/create-workflow.service';
 import { ApplicabilityValidator } from '@organization-management/workflow/components/create-workflow/validators';
 import { WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
-import { SaveWorkflow } from '@organization-management/store/workflow.actions';
+import { SaveEditedWorkflow } from '@organization-management/store/workflow.actions';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 
 describe('CreateWorkflowService', () => {
@@ -65,7 +65,7 @@ describe('CreateWorkflowService', () => {
     expect(mockForm.markAllAsTouched).toHaveBeenCalled();
   });
 
-   it('should save workflow when form is valid', () => {
+   it('should save edited workflow when form is valid', () => {
     const mockForm = fb.group({
       id: [1],
       initialOrders: [false],
@@ -76,15 +76,15 @@ describe('CreateWorkflowService', () => {
     const saveDetailsDto = {
       id: 1,
       name: 'Sample Workflow',
+      type: WorkflowGroupType.IRPOrderWorkflow,
       initialOrders: false,
       extensions: false,
-      type: WorkflowGroupType.IRPOrderWorkflow,
       isIRP: true,
     }
 
     service.saveWorkflow(WorkflowNavigationTabs.IrpOrderWorkFlow, mockForm);
 
      expect(resetSpy).toHaveBeenCalled();
-     expect(storeSpy.dispatch).toHaveBeenCalledOnceWith(new SaveWorkflow(saveDetailsDto));
+     expect(storeSpy.dispatch).toHaveBeenCalledOnceWith(new SaveEditedWorkflow(saveDetailsDto));
   });
 });
