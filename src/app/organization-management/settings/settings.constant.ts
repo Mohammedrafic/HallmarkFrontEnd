@@ -77,7 +77,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'OvertimeCalculation',
   'AutomatedDistributionToVMS',
   'Sourcing',
-  'ATPRateCalculation'
+  'ATPRateCalculation',
+  'DisableNumberOfOpenPositions'
 ];
 
 export const DisabledSettingsByDefault = [
@@ -100,7 +101,8 @@ export const DisabledSettingsByDefault = [
   'CreateEmployeeWhenUserCreated',
   'OvertimeCalculation',
   'Sourcing',
-  'ATPRateCalculation'
+  'ATPRateCalculation',
+  'DisableNumberOfOpenPositions'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {
