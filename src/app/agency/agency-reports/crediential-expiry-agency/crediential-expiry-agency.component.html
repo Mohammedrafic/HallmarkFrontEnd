@@ -72,32 +72,6 @@
                 </div>
             </div>
         </div>
-
-
-
-
-        <div class="form-elemet">
-                <div class="group">
-                  <div class="input-container dropdown">
-                    <label>Order Id/Position ID</label>
-                    <div class="input-group">
-                      <input class="e-input"
-                             type="text"
-                             appValidateWithMessage
-                             maxlength="50"
-                             formControlName="jobId" />
-                    </div>
-                  </div>
-                  <div class="input-container bootstrap">
-                    <label>Candidate Name</label>
-                    <div class="input-group dropdown">
-                      <ejs-autocomplete formControlName="candidateName" [dataSource]="filterColumns.candidateName.dataSource"
-                                        filterType='StartsWith' [fields]='candidateNameFields'
-                                        [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
-                    </div>
-                  </div>
-            </div>
-        </div>
         <div class="form-elemet">
             <div class="group">
               <div class="input-container bootstrap">
@@ -111,6 +85,20 @@
               </div>
             </div>
           </div>
+          <div class="form-elemet">
+            <div class="group">
+              <div class="input-container bootstrap">
+                <label>Order Id/Position ID</label>
+                <div class="input-group">
+                  <input class="e-input"
+                         type="text"
+                         appValidateWithMessage
+                         maxlength="50"
+                         formControlName="jobId" />
+                </div>
+              </div>
+            </div>
+          </div>    
         <div class="form-elemet">
             <div class="group">
               <div class="input-container calendar">
@@ -133,6 +121,18 @@
             </div>
           </div>
           <div class="form-elemet">
+            <div class="group">           
+              <div class="input-container bootstrap">
+                <label>Candidate Name</label>
+                <div class="input-group dropdown">
+                  <ejs-autocomplete formControlName="candidateName" [dataSource]="filterColumns.candidateName.dataSource"
+                                    filterType='StartsWith' [fields]='candidateNameFields'
+                                    [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
+                </div>
+              </div>
+        </div>
+    </div>
+          <div class="form-elemet">
             <div class="group">
               <div class="input-container calendar">
                 <label class="switch-label">Optional Credentials </label>
@@ -143,6 +143,6 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div>         
     </form>
 </app-filter-dialog>
