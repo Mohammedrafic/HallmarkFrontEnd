@@ -228,11 +228,15 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   }
 
   private initForm(): void {
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 7);
+    let endate= new Date(Date.now())
+    endate.setDate(endate.getDate()+7);
     this.agencyCredientialExpiryReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        startDate: new FormControl(new Date(Date.now()), [Validators.required]),
-        endDate: new FormControl( new Date(Date.now()),[Validators.required]),
+        startDate: new FormControl(startDate, [Validators.required]),
+        endDate: new FormControl( endate,[Validators.required]),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
@@ -515,14 +519,16 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   }
 
   public onFilterClearAll(): void {
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
     this.isClearAll = true;
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.RegionIds)?.setValue([]);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.LocationIds)?.setValue([]);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.CandidateName)?.setValue(null);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses.filter(f=>f !==90));
-    this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.StartDate)?.setValue([]);
-    this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.EndDate)?.setValue([]);
+    this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.JobId)?.setValue(null);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.opcredFlag)?.setValue(false);
     this.filteredItems = [];
