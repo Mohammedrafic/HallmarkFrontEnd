@@ -121,7 +121,7 @@ import { CreateEditOrderResolver } from '@client/order-management/resolvers/crea
 import { ImportEmployeeComponent } from './candidates/import-employee/import-employee.component';
 import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
 import { OrderHistoryDetailsComponent } from './order-management/components/order-history-details/order-history-details.component';
-
+import { OrderGridSystemStateService } from './order-management/containers/irp-container/services/order-grid-system-state.service';
 const gridIcons = {
   MessageSquare,
   Lock,
@@ -266,6 +266,7 @@ const gridIcons = {
     DoNotReturnFormService,
     PreservedOrderService,
     CreateEditOrderResolver,
+    OrderGridSystemStateService
   ],
 })
 export class ClientModule {}
