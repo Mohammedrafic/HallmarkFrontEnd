@@ -462,23 +462,10 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
                   this.changeDetector.detectChanges();
                 }
               });
+              this.loadUserRoles(this.businessControl.value); 
             }
       } else {
-        var businessId=this.businessControl.value;
-        if (businessId != undefined && businessId > 0) {    
-          if(!this.isOrgage)
-          {
-            this.store.dispatch(new GetGroupEmailRoles([businessId]));
-            this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-              this.roleData = data;
-            });
-          } 
-          else{
-            const user = this.store.selectSnapshot(UserState.user);
-            this.businessForm.controls['roles'].setValue(user?.roleNames);
-
-          } 
-         }
+        this.loadUserRoles(this.businessControl.value); 
         this.dispatchUserPage(businessUnitIds);
       }
     });
@@ -667,5 +654,20 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           }
         });
       }
+  }
+
+  private loadUserRoles(id:any):void{    
+    if (id != undefined && id > 0) {
+      if (!this.isOrgage) {
+        this.store.dispatch(new GetGroupEmailRoles([id]));
+        this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+          this.roleData = data;
+        });
+      }
+      else {
+        const user = this.store.selectSnapshot(UserState.user);
+        this.businessForm.controls['roles'].setValue(user?.roleNames);
+      }
+    }
   }
 }
