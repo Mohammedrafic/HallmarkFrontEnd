@@ -994,11 +994,13 @@ export class OrderManagementContentState {
           );
 
         dispatch([new ShowToast(MessageTypes.Success, successMessage), new SaveIrpOrderSucceeded()]);
-        if (documents.length) {
-          return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
-        } else {
-          return of(order);
-        }
+          if (documents.length) {
+            let orders:any[]=[];
+            orders.push(order);
+            return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(orders, documents));
+          } else {
+            return of(order);
+          }
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
