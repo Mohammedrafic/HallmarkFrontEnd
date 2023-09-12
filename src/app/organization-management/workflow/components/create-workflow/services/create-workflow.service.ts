@@ -54,7 +54,7 @@ export class CreateWorkflowService {
   ): void {
     const workflowType = selectedTab === WorkflowNavigationTabs.IrpOrderWorkFlow ?
       WorkflowGroupType.IRPOrderWorkflow : WorkflowGroupType.VMSOrderWorkflow;
-    const {id,workflow, initialOrders, extensions} = workflowForm.value;
+    const {id,workflow, initialOrders, extensions} = workflowForm.getRawValue();
     const workflowWithDetails = {
       id,
       name: workflow,
