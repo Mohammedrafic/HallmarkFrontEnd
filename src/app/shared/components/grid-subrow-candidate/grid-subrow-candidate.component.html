@@ -54,11 +54,11 @@
   </div>
   <div class="info" >
       <span class="data">{{ candidat.actualStartDate || order.jobStartDate | date: 'MM/dd/yyyy'}}</span>
-      <div class="title">Actual Start Date </div>
+      <div class="title" *ngIf="candidat.actualStartDate!=null">Actual Start Date </div>
   </div>
   <div class="info">
     <span class="data">{{ candidat.actualEndDate || order.jobEndDate | date: 'MM/dd/yyyy'}}</span>
-    <div class="title">Actual End Date </div>
+    <div class="title" *ngIf="candidat.actualEndDate!=null">Actual End Date </div>
 </div>
 </div>
 
