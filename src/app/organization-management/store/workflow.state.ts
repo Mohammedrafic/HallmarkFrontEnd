@@ -33,7 +33,7 @@ import {
   usedByOrderErrorMessage,
   usedInMappingMessage,
 } from '@shared/constants';
-import { WorkflowFilters, WorkflowWithDetails } from '@shared/models/workflow.model';
+import { Workflow, WorkflowFilters, WorkflowWithDetails } from '@shared/models/workflow.model';
 import {
   RoleListsByPermission,
   UserListsByPermission,
@@ -47,6 +47,7 @@ import {
   PrepareWorkflowMapping,
   UpdateFiltersApplicability,
 } from '@organization-management/workflow/helpers';
+import { workflowMapper } from '@shared/helpers';
 
 export interface WorkflowStateModel {
   workflows: WorkflowWithDetails[] | null;
@@ -100,6 +101,9 @@ export class WorkflowState {
     { payload }: GetWorkflows
   ): Observable<WorkflowWithDetails[]> {
     return this.workflowService.getWorkflows(payload).pipe(
+      map((payload) => {
+        return workflowMapper(payload);
+      }),
       tap((payload) => {
         patchState({ workflows: payload });
         dispatch(new GetWorkflowsSucceed(payload));

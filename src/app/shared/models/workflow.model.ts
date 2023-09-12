@@ -9,6 +9,7 @@ export class WorkflowWithDetails {
   isIRP: boolean;
   cardInfo?: string;
   includeInIRP?: boolean;
+  includeInVMS?: boolean;
   isActive?: boolean; // used only on UI to highlight clicked card
 }
 
@@ -30,6 +31,8 @@ export interface WorkflowWithDetailsPut {
 export interface Workflow {
   id?: number;
   type: number;
+  extensions: boolean;
+  initialOrders: boolean;
   workflowId: number;
   steps: Step[];
 }
