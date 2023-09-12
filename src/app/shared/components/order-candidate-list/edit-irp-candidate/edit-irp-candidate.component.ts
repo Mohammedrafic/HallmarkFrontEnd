@@ -475,7 +475,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     } else {
       this.removeEndDateControlLimitations(endDateFormControl as FormControl, endDateConfigField);
       endDateFormControl?.setValue(endDateFormControl?.value);
-      startDateFormControl?.enable();
+      startDateFormControl?.enable({ emitEvent: false, onlySelf: true });
       isClosedFormControl?.enable();
     }
 
