@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { merge, Observable, Subject, take, takeUntil } from 'rxjs';
@@ -73,6 +73,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   @Input() isLocked: boolean | undefined = false;
   @Input() actionsAllowed: boolean;
   @Input() isCandidatePayRateVisible: boolean;
+  @Input() dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
 
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob | null) {
     this.orderCandidateJob = orderCandidateJob;
@@ -82,6 +83,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       this.form?.reset();
     }
   }
+
+  @Output() public changeCandidate = new EventEmitter<boolean>();
 
   get showRejectButton(): boolean {
     return (
@@ -141,7 +144,6 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
 
   public statusesFormControl = new FormControl();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
-  public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public form: FormGroup;
   public openRejectDialog = new Subject<boolean>();
   public rejectReasons: RejectReason[] = [];
@@ -200,6 +202,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
 
   public ngOnChanges(): void {
     this.adjustCandidatePayRateControl();
+  }
+
+  public emitChangeCandidate(isNext: boolean): void {
+    this.changeCandidate.emit(isNext);
   }
 
   public closeDialog(): void {

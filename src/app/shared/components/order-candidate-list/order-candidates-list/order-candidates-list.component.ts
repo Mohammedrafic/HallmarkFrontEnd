@@ -16,7 +16,6 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 import { UserState } from 'src/app/store/user.state';
-import { Duration } from '@shared/enums/durations';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
 import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.component';
@@ -38,6 +37,7 @@ import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { UserPermissions } from '@core/enums';
+import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation.helper';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -98,11 +98,11 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   };
   public commentContainerId = 0;
 
-  private selectedSystem: SelectedSystemsFlag = SelectedSystems;
   private isOrgIRPEnabled = false;
   private previousSelectedSystemId: OrderManagementIRPSystemId | null;
   private isOrgVMSEnabled = false;
   private readonly permissions = UserPermissions;
+  private selectedIndex: number;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -148,12 +148,53 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
   }
 
-  public onEdit(data: OrderCandidatesList): void {
+  public changeCandidate(isNext: boolean): void {
+    const nextIndex = isNext ? this.selectedIndex + 1 : this.selectedIndex - 1;
+    const nextCandidate = (this.grid.dataSource as OrderCandidatesList[])[nextIndex];
+    this.candidate = nextCandidate;
+    this.selectedIndex = nextIndex;
+    this.getDeployedCandidateOrders();
+    this.getCandidateJob(this.candidate);
+    this.dialogNextPreviousOption = 
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
+  }
+
+  public onEdit(data: OrderCandidatesList & { index: string }): void {
+    this.selectedIndex = Number(data.index);
     this.candidate = { ...data };
     this.getDeployedCandidateOrders();
     this.getCandidatePayRateSetting();
-
+    this.dialogNextPreviousOption = 
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
     this.orderCandidateListViewService.setIsCandidateOpened(true);
+    this.getCandidateJob(data);
+  }
+
+  public saveIrpCandidate(): void {
+    this.emitGetCandidatesList();
+  }
+
+  public onCloseDialog(): void {
+    this.clearDeployedCandidateOrderInfo();
+    this.sideDialog.hide();
+  }
+
+  public openEditCandidateModal(candidate: IrpOrderCandidate): void {
+    this.editCandidateDialogState = {
+      isOpen: true,
+      candidate,
+      order: this.selectedOrder,
+    };
+  }
+
+  public closeEditCandidateModal(event: boolean): void {
+    this.editCandidateDialogState = {
+      ...this.editCandidateDialogState,
+      isOpen: event,
+    };
+  }
+
+  private getCandidateJob(data: OrderCandidatesList): void {
     if (this.order && this.candidate) {
       if (this.isAgency) {
         const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Withdraw];
@@ -214,30 +255,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
         }
       }
     }
-  }
-
-  public saveIrpCandidate(): void {
-    this.emitGetCandidatesList();
-  }
-
-  public onCloseDialog(): void {
-    this.clearDeployedCandidateOrderInfo();
-    this.sideDialog.hide();
-  }
-
-  public openEditCandidateModal(candidate: IrpOrderCandidate): void {
-    this.editCandidateDialogState = {
-      isOpen: true,
-      candidate,
-      order: this.selectedOrder,
-    };
-  }
-
-  public closeEditCandidateModal(event: boolean): void {
-    this.editCandidateDialogState = {
-      ...this.editCandidateDialogState,
-      isOpen: event,
-    };
   }
 
   private getDeployedCandidateOrders(): void {

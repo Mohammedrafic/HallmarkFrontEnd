@@ -29,6 +29,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
+import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation.helper';
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -124,7 +125,8 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
 
     this.getCandidateJobData();
     this.getCandidatePayRateSetting();
-    this.dialogNextPreviousOption = this.getDialogNextPreviousOption(this.candidate);
+    this.dialogNextPreviousOption = 
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
     this.orderCandidateListViewService.setIsCandidateOpened(true);
     this.openDetails.next(true);
   }
@@ -166,16 +168,6 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     });
   }
 
-  private getDialogNextPreviousOption(selectedOrder: OrderCandidatesList): DialogNextPreviousOption {
-    const gridData = this.grid.dataSource as OrderCandidatesList[];
-    const [first] = gridData;
-    const last = gridData[gridData.length - 1];
-    return {
-      previous: first.candidateId !== selectedOrder.candidateId,
-      next: last.candidateId !== selectedOrder.candidateId,
-    };
-  }
-
   public changeIrpCandidateStatus(candidate: OrderCandidatesList): void {
     if(candidate.status === this.onboardedCandidate ||
       (this.scheduleAvailabilitySetting && candidate.status === CandidateStatus.NotApplied)) {
@@ -201,7 +193,8 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     this.candidate = nextCandidate;
     this.selectedIndex = nextIndex;
     this.getCandidateJobData();
-    this.dialogNextPreviousOption = this.getDialogNextPreviousOption(this.candidate);
+    this.dialogNextPreviousOption = 
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
   }
 
   private onChangeCandidateJob(): Observable<OrderCandidateJob> {

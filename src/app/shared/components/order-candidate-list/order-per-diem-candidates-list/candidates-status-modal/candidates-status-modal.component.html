@@ -168,7 +168,12 @@
       </div>
       <hr class="mobile" />
     </ng-container>
-    <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
+    <app-dialog-next-previous 
+      title="Candidate" 
+      [options]="dialogNextPreviousOption"
+      (nextEvent)="emitChangeCandidate(true)"
+      (previousEvent)="emitChangeCandidate(false)">
+    </app-dialog-next-previous>
   </ng-template>
 </ejs-dialog>
 
