@@ -82,8 +82,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.candidateJobId=this.candidateModelState.candidate.candidateJobId;
       this.getCandidateDetails();
       this.watchForActualDateValues();
+      this.watchForOfferedDateValue();
     } else {
-      this.clearStartDateSubscription();
+      this.clearDatesSubscription();
     }
   }
 
@@ -120,6 +121,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private endDateFormControlValue: Date;
   private candidateDetails: CandidateDetails;
   private actualStartDateSubscription: Subscription | null;
+  private offeredDateSubscription: Subscription | null;
 
   constructor(
     private editIrpCandidateService: EditIrpCandidateService,
@@ -356,6 +358,23 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     });
   }
 
+  private watchForOfferedDateValue(): void {
+    const offeredStartDate = this.candidateForm.get('offeredStartDate');
+    const offeredEndDate = this.candidateForm.get('offeredEndDate');
+
+    if(offeredStartDate && offeredEndDate) {
+      this.offeredDateSubscription = offeredStartDate.valueChanges.pipe(
+        skip(1),
+        distinctUntilChanged(),
+        takeUntil(this.componentDestroy()),
+      ).subscribe((value: string) => {
+        const actualEndDate = this.calculateEndDate(value);
+
+        offeredEndDate?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
+      });
+    }
+  }
+
   private watchForActualDateValues(): void {
     this.actualStartDateSubscription = this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
       filter((value: string) => {
@@ -366,18 +385,24 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       distinctUntilChanged(),
       takeUntil(this.componentDestroy()),
     ).subscribe((value: string) => {
-      const actualStartDate = new Date(value);
-      const jobStartDate = this.candidateModelState.order.jobStartDate;
-      const jobEndDate = this.candidateModelState.order.jobEndDate;
-      const actualEndDate = this.durationService.getEndDate(
-        this.candidateModelState.order.duration,
-        actualStartDate, {
-          jobStartDate,
-          jobEndDate,
-      });
+      const actualEndDate = this.calculateEndDate(value);
 
       this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
     }) || null;
+  }
+
+  private calculateEndDate(value: string): Date {
+    const actualStartDate = new Date(value);
+    const jobStartDate = this.candidateModelState.order.jobStartDate;
+    const jobEndDate = this.candidateModelState.order.jobEndDate;
+    const endDate = this.durationService.getEndDate(
+      this.candidateModelState.order.duration,
+      actualStartDate, {
+        jobStartDate,
+        jobEndDate,
+      });
+
+    return endDate;
   }
 
   private hideDialog(): void {
@@ -565,9 +590,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     return this.dialogConfig.find((item) => item.field === field) as CandidateField;
   }
 
-  private clearStartDateSubscription(): void {
+  private clearDatesSubscription(): void {
     this.actualStartDateSubscription?.unsubscribe();
     this.actualStartDateSubscription = null;
+    this.offeredDateSubscription?.unsubscribe();
+    this.offeredDateSubscription = null;
   }
 
   private checkActualStartDate(): void {
