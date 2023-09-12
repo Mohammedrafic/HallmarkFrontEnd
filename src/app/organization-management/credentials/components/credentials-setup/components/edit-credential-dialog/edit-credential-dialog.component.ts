@@ -6,9 +6,9 @@ import { filter, takeUntil, take, tap, switchMap, of } from 'rxjs';
 
 import { CredentialsSetupService } from '@organization-management/credentials/services';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { Destroyable } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CredentialSetupDetails, CredentialSetupGet } from '@shared/models/credential-setup.model';
+import { CredentialSetupDetails, CredentialSetupGet, CredentialSetupPost } from '@shared/models/credential-setup.model';
 import { OverrideCommentsQuestion, OverrideCommentsTitle } from '../../constants';
 import { UpdateCredentialSetup } from '@organization-management/store/credentials.actions';
 import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
@@ -48,7 +48,8 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
     if (this.editCredentialForm.valid && isCommentsDirty) {
       this.confirmUpdateCredentialSetup();
     } else if (this.editCredentialForm.valid && !isCommentsDirty) {
-      this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()));
+      const dto = this.setCorrectDate(this.editCredentialForm.getRawValue());
+      this.store.dispatch(new UpdateCredentialSetup(dto));
       this.closeModal();
     } else {
       this.editCredentialForm.markAllAsTouched();
@@ -115,8 +116,9 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
           }
         }),
         switchMap(({ action }) => {
+          const dto = this.setCorrectDate(this.editCredentialForm.getRawValue());
           const actionStream$ = action !== ConfirmEventType.CLOSE
-            ? this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()))
+            ? this.store.dispatch(new UpdateCredentialSetup(dto))
             : of(true);
           return actionStream$;
         }),
@@ -125,5 +127,13 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
       .subscribe(() => {
         this.closeModal();
       });
+  }
+
+  private setCorrectDate(data: CredentialSetupPost): CredentialSetupPost {
+    if (data.inactiveDate) {
+      data.inactiveDate = DateTimeHelper.setUtcTimeZone(data.inactiveDate);
+    }
+
+    return data;
   }
 }
