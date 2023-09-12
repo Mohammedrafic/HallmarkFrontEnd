@@ -623,7 +623,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       } else {
         this.store.dispatch(new GetBusinessByUnitType(value));
       }
-      if (value == 1) {
+      if (value == 1 || (this.userBusinessType == BusinessUnitType.Organization)) {
         this.dispatchNewPage();
       }
     });
