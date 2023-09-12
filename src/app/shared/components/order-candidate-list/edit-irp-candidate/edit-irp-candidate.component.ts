@@ -161,7 +161,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
 
     if (status === CandidatStatus.Cancelled) {
-      this.closingDate = new Date();
+      const actualEndDate = this.candidateForm.get('actualEndDate')?.value;
+
+      this.closingDate = actualEndDate || new Date();
       this.showReplacementPdOrdersDialog();
 
       return;
@@ -457,6 +459,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     const endDateConfigField = this.getConfigField('actualEndDate');
 
     if (status === CandidatStatus.Cancelled) {
+      startDateFormControl?.patchValue(this.candidateDetails?.actualStartDate);
       startDateFormControl?.disable();
       endDateConfigField.required = true;
       endDateConfigField.minDate = this.candidateDetails?.actualStartDate
@@ -468,6 +471,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       endDateFormControl?.setValidators([Validators.required]);
       isClosedFormControl?.setValue(false);
       isClosedFormControl?.disable();
+      this.checkActualStartDate();
     } else {
       this.removeEndDateControlLimitations(endDateFormControl as FormControl, endDateConfigField);
       endDateFormControl?.setValue(endDateFormControl?.value);
@@ -492,5 +496,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private clearStartDateSubscription(): void {
     this.actualStartDateSubscription?.unsubscribe();
     this.actualStartDateSubscription = null;
+  }
+
+  private checkActualStartDate(): void {
+    if (
+      this.candidateDetails?.actualStartDate
+      && DateTimeHelper.isFutureDate(this.candidateDetails.actualStartDate as string)
+    ) {
+      this.candidateForm.get('actualEndDate')?.patchValue(this.candidateDetails.actualStartDate);
+    }
   }
 }
