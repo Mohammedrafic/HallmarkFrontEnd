@@ -136,6 +136,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
+  public candidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   selectedCandidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   candidateStatusesData:CandidateStatusAndReasonFilterOptionsDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
@@ -369,7 +370,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
     //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : this.filterOptionsData.candidateStatuses?.length > 0 ? this.filterOptionsData.candidateStatuses.map(x => x.status).join(",") : "null";
-    candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : "null";
+    //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : "null";
 
       this.paramsData =
       {
@@ -380,7 +381,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       "LocationParamCREXP": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamCREXP": departmentIds.length == 0 ? "null" : departmentIds,
         "AgencyParamCREXP": this.selectedAgencies.length == 0 ? "null" : this.selectedAgencies?.map((list) => list.agencyId).join(","),
-        "CandidateStatusCREXP": candidateStatuses.length > 0 ? this.selectedCandidateStatuses?.map(x => x.statusText).join(",") : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(","),
+        "CandidateStatusCREXP": candidateStatuses.length > 0 ? this.candidateStatuses?.map(x => x.statusText).join(",") : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(","),
       "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
       "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
