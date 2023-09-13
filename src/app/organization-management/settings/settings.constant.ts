@@ -74,7 +74,6 @@ export const SettingsAppliedToPermissions: string[] = [
   'CreatePartialOrder',
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
-  'OvertimeCalculation',
   'AutomatedDistributionToVMS',
   'Sourcing',
   'ATPRateCalculation',
@@ -99,7 +98,6 @@ export const DisabledSettingsByDefault = [
   'SetDefaultCommentsScopeToExternal',
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
-  'OvertimeCalculation',
   'Sourcing',
   'ATPRateCalculation',
   'DisableNumberOfOpenPositions'
