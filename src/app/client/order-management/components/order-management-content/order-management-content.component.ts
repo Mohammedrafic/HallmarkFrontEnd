@@ -245,6 +245,7 @@ import { ReOrderState } from '@shared/components/order-reorders-container/store/
 import { ButtonGroupComponent } from '@shared/components/button-group/button-group.component';
 import { OrderLinkDetails } from '@client/order-management/interfaces';
 import { CurrentUserPermission } from '@shared/models/permission.model';
+import { CandidatesStatusText } from '@shared/enums/status';
 
 @Component({
   selector: 'app-order-management-content',
@@ -786,7 +787,7 @@ public RedirecttoIRPOrder(order:Order)
     this.closeExport();
     this.defaultExport(event.fileType, event);
   }
-
+ 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
       this.defaultFileName = `Order Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
@@ -809,6 +810,13 @@ public RedirecttoIRPOrder(order:Order)
       this.clearSelection(this.gridWithChildRow);
     } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
       let filtersExport = {...this.filters};
+      if(this.activeTab === OrganizationOrderManagementTabs.ReOrders){
+        let reorderCandidateStatuses:CandidatesStatusText[]=[];
+        filtersExport.candidateStatuses?.forEach((candidatestatus:any)=>{
+          reorderCandidateStatuses.push(CandidatesStatusText[candidatestatus] as any);
+        })
+       filtersExport.reorderCandidateStatuses=reorderCandidateStatuses;
+      }
       if(this.filters.orderLocked){
         filtersExport.orderLocked = filtersExport.orderLocked == 'false' ? false : filtersExport.orderLocked == 'true' ? true : null
       }
