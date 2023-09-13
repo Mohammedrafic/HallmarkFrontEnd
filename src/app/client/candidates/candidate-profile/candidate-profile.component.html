@@ -10,7 +10,7 @@
       [logo]="photo$ | async">
     </app-image-uploader>
   </div>
-  <div class="general-notes">
+  <div class="general-notes"  *ngIf="userPermission[userPermissions.ViewNotes]">
     <app-general-notes></app-general-notes>
   </div>
 </div>
