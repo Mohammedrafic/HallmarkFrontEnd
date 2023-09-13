@@ -76,8 +76,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'CreateEmployeeWhenUserCreated',
   'AutomatedDistributionToVMS',
   'Sourcing',
-  'ATPRateCalculation',
-  'DisableNumberOfOpenPositions'
+  'ATPRateCalculation'
 ];
 
 export const DisabledSettingsByDefault = [
