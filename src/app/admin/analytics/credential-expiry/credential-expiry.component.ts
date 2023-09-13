@@ -102,7 +102,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public departmentIdControl: AbstractControl;
   public agencyIdControl: AbstractControl;
   public candidateStatusesIdControl: AbstractControl;
- 
+  public canidateStatusControl: AbstractControl;
 
   public regions: Region[] = [];
   public locations: Location[] = [];
@@ -189,10 +189,26 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
+      this.onFilterCandidateStatusChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
+  public onFilterCandidateStatusChangedHandler(): void {
+
+    this.canidateStatusControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
+
+    this.canidateStatusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+
+      if (this.canidateStatusControl.value.length > 0) {
+
+        this.candidateStatuses = this.filterColumns.candidateStatuses.dataSource?.filter((object: { status: any; }) => data?.includes(object.status));
+
+      }
+
+    });
+
+  }
 
   private initForm(): void {
     let startDate = new Date(Date.now());
