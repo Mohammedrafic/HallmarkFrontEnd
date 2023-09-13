@@ -147,3 +147,5 @@ export const RECORD_MODIFIED_SUCCESS_WITH_ORDERID=(organizationPrefix: string,pu
 export const ManageOrderIRP_PERMISSION = 'User missing required permissions (CanOrganizationEditOrdersIRP)';
 export const CloseOrderIRP_PERMISSION = 'User missing required permissions (CanCloseOrdersIRP)';
 export const ERROR_CAN_NOT_Edit_OpenPositions = '*# Open Positions* field not editable for this order.';
+export const ViewOrderIRP_PERMISSION = 'Additional permission is required (CanOrganizationViewOrdersIRP)';
+export const ViewOrderVMS_PERMISSION = 'Additional permission is required (CanOrganizationViewOrderVMS)';
