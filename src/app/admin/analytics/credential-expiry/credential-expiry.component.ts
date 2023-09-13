@@ -102,7 +102,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public departmentIdControl: AbstractControl;
   public agencyIdControl: AbstractControl;
   public candidateStatusesIdControl: AbstractControl;
- 
+  public canidateStatusControl: AbstractControl;
 
   public regions: Region[] = [];
   public locations: Location[] = [];
@@ -136,6 +136,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
+  public candidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   selectedCandidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   candidateStatusesData:CandidateStatusAndReasonFilterOptionsDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
@@ -188,10 +189,26 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
+      this.onFilterCandidateStatusChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
+  public onFilterCandidateStatusChangedHandler(): void {
+
+    this.canidateStatusControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
+
+    this.canidateStatusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+
+      if (this.canidateStatusControl.value.length > 0) {
+
+        this.candidateStatuses = this.filterColumns.candidateStatuses.dataSource?.filter((object: { status: any; }) => data?.includes(object.status));
+
+      }
+
+    });
+
+  }
 
   private initForm(): void {
     let startDate = new Date(Date.now());
@@ -369,7 +386,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
     //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : this.filterOptionsData.candidateStatuses?.length > 0 ? this.filterOptionsData.candidateStatuses.map(x => x.status).join(",") : "null";
-    candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : "null";
+    //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : "null";
 
       this.paramsData =
       {
@@ -380,7 +397,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       "LocationParamCREXP": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamCREXP": departmentIds.length == 0 ? "null" : departmentIds,
         "AgencyParamCREXP": this.selectedAgencies.length == 0 ? "null" : this.selectedAgencies?.map((list) => list.agencyId).join(","),
-        "CandidateStatusCREXP": candidateStatuses.length > 0 ? this.selectedCandidateStatuses?.map(x => x.statusText).join(",") : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(","),
+        "CandidateStatusCREXP": candidateStatuses.length > 0 ? this.candidateStatuses?.map(x => x.statusText).join(",") : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(","),
       "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
       "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
