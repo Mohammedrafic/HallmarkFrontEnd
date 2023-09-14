@@ -1,5 +1,6 @@
-import { Component, Input, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import {FormGroup } from '@angular/forms';
+import { DOCUMENT } from '@angular/common';
 
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { combineLatestWith, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
@@ -104,6 +105,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   public query: Query = new Query().take(this.maxDepartmentsLength);
   public filterType = 'Contains';
   public credentialTypeSources: CredentialTypeSource[] = [];
+  public targetElement: HTMLElement | null;
 
   public readonly userPermissions = UserPermissions;
   public readonly editCredentialMessage: string = SaveEditCredentialMessage;
@@ -125,8 +127,11 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     private mapCredentialsService: MapCredentialsService,
     private readonly ngZone: NgZone,
     private credentialsSetupService: CredentialsSetupService,
+    @Inject(DOCUMENT) private document: Document
   ) {
     super();
+
+    this.targetElement = this.document.body;
 
     this.createCredentialMappingForm();
   }
@@ -690,7 +695,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
         this.credentialSetupList,
         credentials
       );
-      
+
       this.updateGridDataSources();
     });
   }
