@@ -443,7 +443,7 @@ export class SecurityState {
     { role }: SaveRole
   ): Observable<Role | void> {
     const state = getState();
-    const validationGeneralNote=role.permissions.find(x=>x==UserPermissions.ManageNotes)? (role.permissions.find(x=>x==UserPermissions.ViewNotes)? true:false): false;
+    const validationGeneralNote=role.permissions.find(x=>x==UserPermissions.ManageNotes)? (role.permissions.find(x=>x==UserPermissions.ViewNotes)? true:false): true;
     if(validationGeneralNote){
       return this.roleService.seveRoles(role).pipe(
         tap((payload) => {
