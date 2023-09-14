@@ -451,8 +451,8 @@ export class YtdReportComponent implements OnInit, OnDestroy {
 
 
       OrganizationIdYT: this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      RegionIdsYT: regionIds.length == 0 ? "null" : regionIds,
-      LocationIdsYT: locationIds.length == 0 ? "null" : locationIds,      
+      RegionIdsYT: regionIds.length == 0 ? '' : regionIds,
+      LocationIdsYT: locationIds.length == 0 ? '' : locationIds,      
       YearYT: year,
       MonthsYT: month,
       UserIdYT: this.user?.id
