@@ -149,3 +149,4 @@ export const CloseOrderIRP_PERMISSION = 'User missing required permissions (CanC
 export const ERROR_CAN_NOT_Edit_OpenPositions = '*# Open Positions* field not editable for this order.';
 export const ViewOrderIRP_PERMISSION = 'Additional permission is required (CanOrganizationViewOrdersIRP)';
 export const ViewOrderVMS_PERMISSION = 'Additional permission is required (CanOrganizationViewOrderVMS)';
+export const ERROR_CAN_NOT_ADD_MANAGENOTE_WITHOUT_VIEWNOTE="We can't add the manage note without view note."
