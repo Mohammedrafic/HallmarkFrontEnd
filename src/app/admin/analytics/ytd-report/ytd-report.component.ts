@@ -413,8 +413,8 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     //let { departmentIds, locationIds, regionIds, skillCategoryIds, skillIds, year, month } = this.ytdreportReportForm.getRawValue();
     let {locationIds, regionIds, year, month } = this.ytdreportReportForm.getRawValue();
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : '';
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : '';
     // locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
    // departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     //departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
