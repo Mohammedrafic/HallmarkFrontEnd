@@ -49,7 +49,7 @@ import { PermissionsTree } from '@shared/models/permission.model';
 import { RoleTreeField } from '../roles-and-permissions/role-form/role-form.component';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, ERROR_CAN_NOT_ADD_MANAGENOTE_WITHOUT_VIEWNOTE, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants/messages';
+import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
 import { GetBusinessUnitIdDetails, RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
@@ -63,7 +63,6 @@ import { NodatimeService } from '@shared/services/nodatime.service';
 import { LogInterface, LogInterfacePage, LogTimeSheetHistory, LogTimeSheetHistoryPage, OrgInterface, OrgInterfacePage } from '@shared/models/org-interface.model';
 import { OrgInterfaceService } from '../services/org-interface.service';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { UserPermissions } from '@core/enums';
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
@@ -443,36 +442,30 @@ export class SecurityState {
     { role }: SaveRole
   ): Observable<Role | void> {
     const state = getState();
-    const validationGeneralNote=role.permissions.find(x=>x==UserPermissions.ManageNotes)? (role.permissions.find(x=>x==UserPermissions.ViewNotes)? true:false): false;
-    if(validationGeneralNote){
-      return this.roleService.seveRoles(role).pipe(
-        tap((payload) => {
-          if (state.rolesPage && role.id) {
-            const editedRole = state.rolesPage.items.find(({ id }) => id === role.id) as Role;
-            const items = [
-              ...state.rolesPage.items.filter(({ id }) => id !== editedRole.id),
-              { ...editedRole, ...payload },
-            ];
-            const rolesPage = { ...state.rolesPage, items };
-            patchState({ rolesPage });
-            dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-          } else if (state.rolesPage) {
-            const items = [...state.rolesPage?.items, payload];
-            const rolesPage = { ...state.rolesPage, items };
-            patchState({ rolesPage });
-            dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-          }
-          dispatch(new SaveRoleSucceeded(payload));
-          return payload;
-        }),
-        catchError((error: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
-        })
-      );
-    }
-    else{
-      return dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_ADD_MANAGENOTE_WITHOUT_VIEWNOTE));
-    }
+    return this.roleService.seveRoles(role).pipe(
+      tap((payload) => {
+        if (state.rolesPage && role.id) {
+          const editedRole = state.rolesPage.items.find(({ id }) => id === role.id) as Role;
+          const items = [
+            ...state.rolesPage.items.filter(({ id }) => id !== editedRole.id),
+            { ...editedRole, ...payload },
+          ];
+          const rolesPage = { ...state.rolesPage, items };
+          patchState({ rolesPage });
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        } else if (state.rolesPage) {
+          const items = [...state.rolesPage?.items, payload];
+          const rolesPage = { ...state.rolesPage, items };
+          patchState({ rolesPage });
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        }
+        dispatch(new SaveRoleSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
   }
 
   @Action(SaveUser)
