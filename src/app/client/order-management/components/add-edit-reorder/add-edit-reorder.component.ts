@@ -225,7 +225,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private disablePositionsField(reorder: Order): void {
-    if (reorder.status === OrderStatus.Filled) {
+    if (reorder.status === OrderStatus.Filled || reorder.disableNumberOfOpenPositions == true) {
       this.reorderForm.get('openPosition')?.disable();
     }
   }
