@@ -26,6 +26,7 @@ import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-butt
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { combineLatest, distinctUntilChanged, filter, map, Observable,
+  skip,
   switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { SettingsViewService } from '../../../../shared/services/settings-view.service';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
@@ -569,6 +570,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private watchForRangeChange(): void {
     this.timesheetDetailsService.watchRangeStream()
     .pipe(
+      skip(1),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((range) => {
