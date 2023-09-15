@@ -346,14 +346,14 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
 
 
   public SearchReport(): void {
-    let auth = "Bearer ";
-    for(let x=0;x<window.localStorage.length;x++)
-    { 
-      if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
-      {
-        auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
-      }
-    }
+    //let auth = "Bearer ";
+    //for(let x=0;x<window.localStorage.length;x++)
+    //{ 
+    //  if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
+    //  {
+    //    auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+    //  }
+    //}
     let { departmentIds, locationIds, regionIds, startDate, endDate, jobId, candidateStatuses, opcredFlag, agencyIds } = this.credentialExpiryForm.getRawValue();
 
     if (!this.credentialExpiryForm.dirty) {
@@ -364,12 +364,16 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       this.message = ""
     }
 
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+    //locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
+    //departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
+
+    //regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    //locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    //departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
     //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : this.filterOptionsData.candidateStatuses?.length > 0 ? this.filterOptionsData.candidateStatuses.map(x => x.status).join(",") : "null";
     //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : "null";
 
@@ -384,12 +388,12 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         "AgencyParamCREXP": this.selectedAgencies.length == 0 ? "0" : this.selectedAgencies?.map((list) => list.agencyId).join(","),
         "CandidateStatusCREXP": candidateStatuses.length == 0 ? '' : candidateStatuses.join(this.joinString),
       "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
-      "BearerParamCREXP":auth,
+     // "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
       this.organizations[0].id.toString():"1": 
       window.localStorage.getItem("lastSelectedOrganizationId"),
-      "HostName": this.baseUrl,
+     // "HostName": this.baseUrl,
         "OpCredFlagEXP": opcredFlag == "" ? "false" : opcredFlag.toString(),
         "UserId": this.user?.id,
       };
