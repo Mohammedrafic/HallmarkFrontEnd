@@ -429,17 +429,17 @@ describe('ProfileDetailsContainerComponent', () => {
       }
     );
 
-    expect(store.dispatch).toHaveBeenCalledTimes(6);
-    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
+    expect(store.dispatch).toHaveBeenCalledTimes(5);
+    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual(
       new TimesheetDetails.NoWorkPerformed(true, 1, 1)
     );
-    expect(dispatchSpy.calls.argsFor(3)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
       new Timesheets.GetAll()
     );
-    expect(dispatchSpy.calls.argsFor(4)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(3)[0]).toEqual(
       new Timesheets.GetTimesheetDetails(1,1,false)
     );
-    expect(dispatchSpy.calls.argsFor(5)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(4)[0]).toEqual(
       new Timesheets.ToggleCandidateDialog(DialogAction.Close)
     );
   });
@@ -450,14 +450,15 @@ describe('ProfileDetailsContainerComponent', () => {
     component.organizationId = 1;
 
     component.onDWNCheckboxSelectedChange({ checked: false }, switchComponent as SwitchComponent);
+  
 
+    expect(store.dispatch).toHaveBeenCalledTimes(3);
 
-    expect(store.dispatch).toHaveBeenCalledTimes(4);
-    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual(
       new TimesheetDetails.NoWorkPerformed(false, 1, 1)
     );
-    expect(dispatchSpy.calls.argsFor(3)[0]).toEqual(
-      new Timesheets.GetTimesheetDetails(1,1,false)
+    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
+      new Timesheets.GetTimesheetDetails(1, 1, false)
     );
     expect(dispatchSpy.calls.argsFor(4)[0]).not.toEqual(
       new Timesheets.ToggleCandidateDialog(DialogAction.Close)
@@ -470,8 +471,7 @@ describe('ProfileDetailsContainerComponent', () => {
     component.organizationId = 1;
     component.handleReject(reason);
 
-
-    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual(
       new TimesheetDetails.ChangeTimesheetStatus({
         timesheetId: 1,
         organizationId: 1,
@@ -479,7 +479,7 @@ describe('ProfileDetailsContainerComponent', () => {
         reason
       })
     );
-    expect(dispatchSpy.calls.argsFor(3)[0]).toEqual([
+    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual([
         new ShowToast(
           MessageTypes.Success,
           rejectTimesheetDialogData(true).successMessage
@@ -566,7 +566,7 @@ describe('ProfileDetailsContainerComponent', () => {
 
     component.onFilesSelected(files);
 
-    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual(
       uploadFilesAction
     )
     tick();
@@ -593,10 +593,10 @@ describe('ProfileDetailsContainerComponent', () => {
 
     component.saveFilesOnRecord(uploadData as TimesheetInt.UploadDocumentsModel);
 
-    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual([
+    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual([
         uploadMilesAttachmentsAction,
     ]);
-    expect(dispatchSpy.calls.argsFor(3)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
       getTimesheetDetailsAction
     );
   });
