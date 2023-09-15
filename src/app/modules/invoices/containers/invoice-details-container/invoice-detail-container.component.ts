@@ -102,7 +102,6 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private chipPipe: ChipsCssClass,
     private store: Store,
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
@@ -267,8 +266,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       result = ActionBtnOnStatus.get(status) as string;
     }
     const invoiceActionBtn = result === InvoicesActionBtn.Approve;
-    if (!invoiceActionBtn && !this.payButton) { 
-        result = ''; 
+    if (!invoiceActionBtn && !this.payButton) {
+        result = '';
     }
     this.actionBtnText = result || '';
   }

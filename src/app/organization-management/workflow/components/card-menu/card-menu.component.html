@@ -7,6 +7,11 @@
     >
       <div class="input-container bootstrap">
         <h4>{{card.name}}</h4>
+        <ng-container *ngIf="selectedTab === navigationTabs.VmsOrderWorkFlow">
+          <div class="card-info">
+            {{card?.cardInfo}}
+          </div>
+        </ng-container>
       </div>
     </div>
   </div>

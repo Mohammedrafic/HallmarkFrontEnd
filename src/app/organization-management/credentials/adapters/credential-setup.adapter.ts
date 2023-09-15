@@ -15,7 +15,7 @@ export class CredentialSetupAdapter {
       reqOnboard: credential.reqOnboard,
       comments: credential.comments,
       inactiveDate: credential.inactiveDate,
-      irpComment: credential.irpComments,
+      irpComments: credential.irpComments,
     };
   }
 

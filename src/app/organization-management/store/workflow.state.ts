@@ -14,6 +14,7 @@ import {
   RemoveWorkflowDeclined,
   RemoveWorkflowMapping,
   RemoveWorkflowSucceed,
+  SaveEditedWorkflow,
   SaveWorkflow,
   SaveWorkflowMapping,
   SaveWorkflowMappingSucceed,
@@ -32,7 +33,7 @@ import {
   usedByOrderErrorMessage,
   usedInMappingMessage,
 } from '@shared/constants';
-import { WorkflowWithDetails } from '@shared/models/workflow.model';
+import { Workflow, WorkflowFilters, WorkflowWithDetails } from '@shared/models/workflow.model';
 import {
   RoleListsByPermission,
   UserListsByPermission,
@@ -41,7 +42,12 @@ import {
 } from '@shared/models/workflow-mapping.model';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { GetWorkflowFlags, PrepareWorkflowMapping } from '@organization-management/workflow/helpers';
+import {
+  GetWorkflowFlags,
+  PrepareWorkflowMapping,
+  UpdateFiltersApplicability,
+} from '@organization-management/workflow/helpers';
+import { workflowMapper } from '@shared/helpers';
 
 export interface WorkflowStateModel {
   workflows: WorkflowWithDetails[] | null;
@@ -95,10 +101,34 @@ export class WorkflowState {
     { payload }: GetWorkflows
   ): Observable<WorkflowWithDetails[]> {
     return this.workflowService.getWorkflows(payload).pipe(
+      map((payload) => {
+        return workflowMapper(payload);
+      }),
       tap((payload) => {
         patchState({ workflows: payload });
         dispatch(new GetWorkflowsSucceed(payload));
         return payload;
+      })
+    );
+  }
+
+  @Action(SaveEditedWorkflow)
+  SaveEditedWorkflow(
+    { dispatch }: StateContext<WorkflowStateModel>,
+    { payload }: SaveEditedWorkflow
+  ): Observable<WorkflowWithDetails | void> {
+    return this.workflowService.saveEditedWorkflow(payload).pipe(
+      tap((payloadResponse) => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new GetWorkflows(GetWorkflowFlags(payload.isIRP)),
+          new SaveWorkflowSucceed(),
+        ]);
+
+        return payloadResponse;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
@@ -185,7 +215,8 @@ export class WorkflowState {
     { patchState }: StateContext<WorkflowStateModel>,
     { filters }: GetWorkflowMappingPages
   ): Observable<WorkflowMappingPage> {
-    return this.workflowService.getWorkflowMappingPages(filters).pipe(
+    const updatedFilters = UpdateFiltersApplicability(filters as WorkflowFilters);
+    return this.workflowService.getWorkflowMappingPages(updatedFilters).pipe(
       map((payload: WorkflowMappingPage) => {
         return PrepareWorkflowMapping(payload);
       }),

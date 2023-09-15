@@ -14,6 +14,9 @@ import { Store } from '@ngxs/store';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { EMPLOYEE_SKILL_CHANGE_WARNING, EMPLOYEE_TERMINATED_WARNING } from '@shared/constants/messages';
 import { ProfileStatusesEnum } from './candidate-profile.constants';
+import { UserState } from 'src/app/store/user.state';
+import { Permission } from '@core/interface';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -35,6 +38,8 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   private filesDetails: Blob | null;
   private isRemoveLogo: boolean;
   private candidateId: number;
+  public userPermission: Permission = {};
+  public readonly userPermissions = UserPermissions;
 
   constructor(
     private candidateProfileFormService: CandidateProfileFormService,
@@ -55,6 +60,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     this.listenSaveEvent();
     this.handleEditingCandidate();
     this.initSelectedTab();
+    this.getPermission();
   }
 
   public override ngOnDestroy(): void {
@@ -177,5 +183,13 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
 
   private initSelectedTab(): void {
     this.candidateService.changeTab(CandidateTabsEnum.CandidateProfile);
+  }
+  private getPermission(): void {
+    this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length),
+      take(1)
+    ).subscribe((permissions: Permission) => {
+      this.userPermission = permissions;
+    });
   }
 }

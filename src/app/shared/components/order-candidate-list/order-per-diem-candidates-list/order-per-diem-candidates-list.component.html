@@ -111,4 +111,6 @@
   [isLocked]="order?.isLocked"
   [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
   [isCandidatePayRateVisible]="isCandidatePayRateVisible"
+  [dialogNextPreviousOption]="dialogNextPreviousOption"
+  (changeCandidate)="emitChangeCandidate($event)"
 ></app-candidates-status-modal>

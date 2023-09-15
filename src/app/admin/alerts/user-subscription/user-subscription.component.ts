@@ -432,13 +432,14 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       }
       let userBusinessId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
       let userBusinessType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
-      if(this.businessUnitControl?.value == BusinessUnitType.Candidates){
+      if(this.businessUnitControl?.value == BusinessUnitType.Candidates){        
         if(userBusinessType == BusinessUnitType.Organization){
         if(userBusinessId !=null && userBusinessId !=undefined)
           value = userBusinessId;
         }
 
         if(isNumber(value)){
+          this.loadUserRoles(value); 
           this.store.dispatch(new GetEmployeeUsers(value));
           this.employeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
             if (data != undefined) {
@@ -447,7 +448,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
               if(userBusinessType == BusinessUnitType.Organization)
                 this.businessControl.patchValue(userBusinessId, {emitEvent:false});
             }
-          });
+          });          
         }
        
       } else if(this.businessUnitControl?.value == BusinessUnitType.Organization
@@ -462,23 +463,10 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
                   this.changeDetector.detectChanges();
                 }
               });
+              this.loadUserRoles(this.businessControl.value); 
             }
       } else {
-        var businessId=this.businessControl.value;
-        if (businessId != undefined && businessId > 0) {    
-          if(!this.isOrgage)
-          {
-            this.store.dispatch(new GetGroupEmailRoles([businessId]));
-            this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-              this.roleData = data;
-            });
-          } 
-          else{
-            const user = this.store.selectSnapshot(UserState.user);
-            this.businessForm.controls['roles'].setValue(user?.roleNames);
-
-          } 
-         }
+        this.loadUserRoles(this.businessControl.value); 
         this.dispatchUserPage(businessUnitIds);
       }
     });
@@ -667,5 +655,20 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           }
         });
       }
+  }
+
+  private loadUserRoles(id:any):void{    
+    if (id != undefined && id > 0) {
+      if (!this.isOrgage) {
+        this.store.dispatch(new GetGroupEmailRoles([id]));
+        this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+          this.roleData = data;
+        });
+      }
+      else {
+        const user = this.store.selectSnapshot(UserState.user);
+        this.businessForm.controls['roles'].setValue(user?.roleNames);
+      }
+    }
   }
 }

@@ -11,6 +11,16 @@ export interface CreateIrpCandidateDto {
   workflowStepType:CandidatStatus | null;
  }
 
+export interface CreateOfferedIrpCandidateDto {
+  employeeId: number;
+  orderId: number;
+  offeredStartDate: string | null;
+  offeredEndDate: string | null;
+  availabilityOverlap: OrderAvailabilityOverlap | null;
+  availableStartDate:string | null;
+  workflowStepType:CandidatStatus | null;
+}
+
 export interface UpdateIrpCandidateDto {
   organizationId: number;
   jobId: number;
@@ -19,6 +29,18 @@ export interface UpdateIrpCandidateDto {
   availableStartDate:string | null;
   workflowStepType:CandidatStatus | null;
   orderId:number | null;
+  offeredStartDate?: string | null;
+  offeredEndDate?: string | null;
+}
+
+export interface UpdateOfferedIrpCandidateDto {
+  organizationId: number;
+  jobId: number;
+  offeredStartDate: string | null;
+  offeredEndDate: string | null;
+  availableStartDate:string | null;
+  workflowStepType:CandidatStatus | null;
+  orderId: number | null;
 }
 
 export interface CancelIrpCandidateDto {
@@ -33,6 +55,8 @@ export interface CandidateDetails {
   actualEndDate: string | Date;
   availableStatuses: ApplicantStatus[];
   commentContainerId : number;
+  offeredStartDate: string | Date | null;
+  offeredEndDate: string | Date | null;
 }
 
 export interface EditCandidateDialogState {

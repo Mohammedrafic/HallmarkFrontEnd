@@ -52,11 +52,12 @@ export class CredentialsSetupService {
       masterCredentialId: [null],
       credentialType: [{ value: '', disabled: true }],
       description: [{ value: '', disabled: true }],
-      comments: [{ value: '', disabled: true }, Validators.maxLength(500)],
+      comments: [{ value: '' }, Validators.maxLength(500)],
       inactiveDate: [null],
       isActive: [false],
       reqSubmission: [false],
       reqOnboard: [false],
+      updateOrderCredentials: [false],
     });
   }
 
@@ -88,6 +89,7 @@ export class CredentialsSetupService {
       isActive: checkboxName === 'isActive' ? isChecked : credentials.isActive,
       reqSubmission: checkboxName === 'reqSubmission' ? isChecked : credentials.reqSubmission,
       reqOnboard: checkboxName === 'reqOnboard' ? isChecked : credentials.reqOnboard,
+      updateOrderCredentials: false,
     });
   }
 
@@ -105,7 +107,7 @@ export class CredentialsSetupService {
     if (isAdd) {
       form.addControl(
         'irpComments',
-        this.fb.control({ value: '', disabled: true }, [Validators.maxLength(500)])
+        this.fb.control({ value: '' }, [Validators.maxLength(500)])
       );
     } else {
       form.removeControl('irpComments');

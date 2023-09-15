@@ -4,7 +4,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { Observable, Subject, Subscription, debounceTime, fromEvent, takeUntil } from 'rxjs';
 
-import { ListBox, SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ListBox, ListBoxChangeEventArgs, SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import {
   MagnificationService,
   NavigationService,
@@ -19,11 +19,12 @@ import {
   GetCredentialFiles,
   GetCredentialFilesSucceeded,
   GetCredentialPdfFiles,
-  GetCredentialPdfFilesSucceeded
+  GetCredentialPdfFilesSucceeded,
 } from '@agency/store/candidate.actions';
 
 import { FormControl, Validators } from '@angular/forms';
 import { DEFAULT_ZOOM } from './file-viewer.constant';
+import { PDFDocumentProxy } from 'ng2-pdf-viewer';
 
 interface ListBoxItem {
   name: string;
@@ -52,20 +53,18 @@ export class FileViewerComponent implements OnInit, OnDestroy, AfterViewInit {
   public fields = {
     groupBy: 'category',
     text: 'name',
-    value: 'id'
-  }
+    value: 'id',
+  };
   public selectionSettings: SelectionSettingsModel = { mode: 'Single' };
   public previewFile: ListBoxItem | null;
   public imageSrs = '';
   public imageMode = false;
   public loadedFileUrl = '';
-  public zoom: number = 1.0;
-  public originalSize: boolean = true;
-  public page: number = 1;
-  public totalPages: number = 0;
+  public zoom = 1.0;
+  public originalSize = true;
+  public page = 1;
+  public totalPages = 0;
   public pageSelection: FormControl = new FormControl('');
-
-  public service = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
 
   private unsubscribe$: Subject<void> = new Subject();
   private isDownloading = false;
@@ -129,8 +128,8 @@ export class FileViewerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.sideDialog.show(this.isFullScreen);
   }
 
-  public selectFile(event: any): void {
-    this.previewFile = event.items[0];
+  public selectFile(event: ListBoxChangeEventArgs): void {
+    this.previewFile = event.items[0] as ListBoxItem;
     this.setMode();
     if (this.imageMode) {
       this.getOriginalFileById((this.previewFile as ListBoxItem).id);
@@ -146,7 +145,7 @@ export class FileViewerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public onListBoxCreated(): void {
-    let listBoxObj: ListBox = getInstance(document.getElementById("listBox") as HTMLElement, ListBox) as ListBox;
+    const listBoxObj: ListBox = getInstance(document.getElementById("listBox") as HTMLElement, ListBox) as ListBox;
 
     listBoxObj.selectItems([(this.previewFile as ListBoxItem).name]);
     if (this.imageMode) {
@@ -231,12 +230,14 @@ export class FileViewerComponent implements OnInit, OnDestroy, AfterViewInit {
     reader.onloadend = () => {
       this.imageSrs = reader.result as string;
       this.cdr.markForCheck();
-    }
+    };
   }
 
   incrementZoom(amount: number) {
-    var zoom = this.zoom + amount;
-    if(zoom < 0.1) return;
+    const zoom = this.zoom + amount;
+    if (zoom < 0.1) { 
+      return; 
+    }
     this.zoom = zoom;
   }
 
@@ -245,13 +246,17 @@ export class FileViewerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   nextPage() {
-    if(this.page == this.totalPages) return;
-    this.page++;
+    if (this.page == this.totalPages) { 
+      return; 
+    }
+    this.page = this.page + 1;
   }
 
   prevPage() {
-    if(this.page == 1) return;
-    this.page--;
+    if (this.page == 1){ 
+      return; 
+    }
+    this.page = this.page - 1;
   }
 
   firstPage() {
@@ -262,12 +267,11 @@ export class FileViewerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.page = this.totalPages;
   }
 
-  pagechanging(e: any){
-    this.page = e.pageNumber;
-    this.pageSelection.setValue(e.pageNumber);
+  pagechanging(e: Event){
+    this.pageSelection.setValue((e as Event & { pageNumber: number }).pageNumber, { emitEvent: false });
   }
 
-  afterLoadComplete(pdfData: any) {
+  afterLoadComplete(pdfData: PDFDocumentProxy) {
     this.totalPages = pdfData.numPages;
     this.pageSelection.setValidators([Validators.min(1), Validators.max(this.totalPages)]);
     this.page = 1;

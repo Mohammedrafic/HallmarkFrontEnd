@@ -1,17 +1,17 @@
 import {
-  Component,
-  OnInit,
   ChangeDetectionStrategy,
-  ViewChild,
-  Input,
-  Output,
-  EventEmitter,
   ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, Validators } from '@angular/forms';
 
-import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of, Subscription } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, of, skip, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
@@ -22,7 +22,11 @@ import {
   CandidateDialogConfig,
   CandidateTitle,
   CloseReasonField,
-  OptionField, StatusField,
+  DefaultConfigFieldsToShow,
+  OfferedConfigFieldsToShow,
+  OnboardConfigFieldsToShow,
+  OptionField,
+  StatusField,
 } from '@shared/components/order-candidate-list/edit-irp-candidate/constants/edit-irp-candidate.constant';
 import { FieldType } from '@core/enums';
 import { EditIrpCandidateService } from '@shared/components/order-candidate-list/edit-irp-candidate/services';
@@ -30,16 +34,24 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CANCEL_CONFIRM_TEXT,
   CLOSE_IRP_POSITION,
+  CloseOrderIRP_PERMISSION,
   DELETE_CONFIRM_TITLE,
+  ManageOrderIRP_PERMISSION,
   RECORD_MODIFIED,
 } from '@shared/constants';
 import { CandidateField, CandidateForm } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
+  DisableControls,
   GetConfigField,
+  UpdateVisibilityConfigFields,
 } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
-import { CandidateDetails, ClosePositionDto, EditCandidateDialogState, JobDetailsDto,
+import {
+  CandidateDetails,
+  ClosePositionDto,
+  EditCandidateDialogState,
+  JobDetailsDto,
 } from '@shared/components/order-candidate-list/interfaces';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -52,7 +64,6 @@ import { OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
-import { ManageOrderIRP_PERMISSION, CloseOrderIRP_PERMISSION } from '@shared/constants';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -71,8 +82,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.candidateJobId=this.candidateModelState.candidate.candidateJobId;
       this.getCandidateDetails();
       this.watchForActualDateValues();
+      this.watchForOfferedDateValue();
     } else {
-      this.clearStartDateSubscription();
+      this.clearDatesSubscription();
     }
   }
 
@@ -91,7 +103,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public canRejectedCandidateIRP:boolean;
   public replacementPdOrdersDialogOpen = false;
   public closingDate: Date;
-  public isAppliedorShortlisted:boolean=false;
+  public isAppliedorShortlisted = false;
   public showactualStartEndDate:boolean;
   public availableStartDate:string | Date;
   public candidateJobId:number;
@@ -109,6 +121,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private endDateFormControlValue: Date;
   private candidateDetails: CandidateDetails;
   private actualStartDateSubscription: Subscription | null;
+  private offeredDateSubscription: Subscription | null;
 
   constructor(
     private editIrpCandidateService: EditIrpCandidateService,
@@ -161,7 +174,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
 
     if (status === CandidatStatus.Cancelled) {
-      this.closingDate = new Date();
+      const actualEndDate = this.candidateForm.get('actualEndDate')?.value;
+
+      this.closingDate = actualEndDate || new Date();
       this.showReplacementPdOrdersDialog();
 
       return;
@@ -214,8 +229,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private saveCandidate(createReplacement = false): void {
     if (!this.candidateForm.get('isClosed')?.value) {
-      this.editIrpCandidateService.getCandidateAction(this.candidateForm, this.candidateModelState, createReplacement,this.isIRPLTAOrder)
-      .pipe(
+      this.editIrpCandidateService.getCandidateAction(
+        this.candidateForm,
+        this.candidateModelState,
+        createReplacement,
+        this.isIRPLTAOrder
+      ).pipe(
         catchError((error: HttpErrorResponse) => this.orderCandidateApiService.handleError(error)),
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
@@ -265,6 +284,13 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         filter(Boolean),
         tap((candidateDetails: CandidateDetails) => {
           this.candidateDetails = candidateDetails;
+          this.updateVisibilityConfig(this.candidateModelState.candidate.status, candidateDetails);
+          this.handleOfferedStatus(
+            this.candidateModelState.candidate.status,
+            candidateDetails.offeredStartDate as string,
+            candidateDetails.offeredEndDate as string
+          );
+
           this.candidateCommentContainerId = candidateDetails.commentContainerId;
           this.getComments();
           const statusConfigField = GetConfigField(this.dialogConfig, StatusField);
@@ -313,6 +339,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           }
 
           this.candidateForm.enable();
+          this.editIrpCandidateService.disableOfferedDateForOnboardedCandidate(
+            this.candidateModelState.candidate.status,
+            this.candidateDetails,
+            this.candidateForm
+          );
+
           reasonConfigField.dataSource = this.editIrpCandidateService
             .createReasonsOptions(this.editIrpCandidateService.getClosureReasons(true));
 
@@ -326,6 +358,23 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     });
   }
 
+  private watchForOfferedDateValue(): void {
+    const offeredStartDate = this.candidateForm.get('offeredStartDate');
+    const offeredEndDate = this.candidateForm.get('offeredEndDate');
+
+    if(offeredStartDate && offeredEndDate) {
+      this.offeredDateSubscription = offeredStartDate.valueChanges.pipe(
+        skip(1),
+        distinctUntilChanged(),
+        takeUntil(this.componentDestroy()),
+      ).subscribe((value: string) => {
+        const actualEndDate = this.calculateEndDate(value);
+
+        offeredEndDate?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
+      });
+    }
+  }
+
   private watchForActualDateValues(): void {
     this.actualStartDateSubscription = this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
       filter((value: string) => {
@@ -336,18 +385,24 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       distinctUntilChanged(),
       takeUntil(this.componentDestroy()),
     ).subscribe((value: string) => {
-      const actualStartDate = new Date(value);
-      const jobStartDate = this.candidateModelState.order.jobStartDate;
-      const jobEndDate = this.candidateModelState.order.jobEndDate;
-      const actualEndDate = this.durationService.getEndDate(
-        this.candidateModelState.order.duration,
-        actualStartDate, {
-          jobStartDate,
-          jobEndDate,
-      });
+      const actualEndDate = this.calculateEndDate(value);
 
       this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
     }) || null;
+  }
+
+  private calculateEndDate(value: string): Date {
+    const actualStartDate = new Date(value);
+    const jobStartDate = this.candidateModelState.order.jobStartDate;
+    const jobEndDate = this.candidateModelState.order.jobEndDate;
+    const endDate = this.durationService.getEndDate(
+      this.candidateModelState.order.duration,
+      actualStartDate, {
+        jobStartDate,
+        jobEndDate,
+      });
+
+    return endDate;
   }
 
   private hideDialog(): void {
@@ -387,15 +442,59 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy()),
     )
     .subscribe((value) => {
-     this.isAppliedorShortlisted = value === CandidatStatus.Applied || value === CandidatStatus.Shortlisted;
-     this.showactualStartEndDate = value === CandidatStatus.OnBoard
+      this.updateVisibilityConfig(value, this.candidateDetails);
+      this.isAppliedorShortlisted = value === CandidatStatus.Applied || value === CandidatStatus.Shortlisted;
+      this.showactualStartEndDate = value === CandidatStatus.OnBoard
        || value === CandidatStatus.Cancelled ||value === CandidatStatus.Offboard;
-     this.candidateForm.get('availableStartDate')?.patchValue(
-       DateTimeHelper.setCurrentTimeZone(this.availableStartDate as string), { emitEvent: false, onlySelf: true }
-     );
-     this.handleCancelledStatus(value);
-     this.cdr.markForCheck();
+      this.candidateForm.get('availableStartDate')?.patchValue(
+        DateTimeHelper.setCurrentTimeZone(this.availableStartDate as string), { emitEvent: false, onlySelf: true }
+      );
+      this.handleCancelledStatus(value);
+      this.handleOfferedStatus(
+       value,
+       this.candidateDetails?.offeredStartDate as string,
+       this.candidateDetails?.offeredEndDate as string
+      );
+      this.cdr.markForCheck();
   });
+  }
+
+  private handleOfferedStatus(
+    status: CandidatStatus,
+    startDate?: string,
+    endDate?: string
+  ): void {
+    if(!status || (status !== CandidatStatus.Offered && status !== CandidatStatus.OnBoard)) {
+      return;
+    }
+
+    this.candidateForm.patchValue({
+      offeredStartDate: DateTimeHelper.setCurrentTimeZone(startDate ?? this.candidateDetails.actualStartDate as string),
+      offeredEndDate: DateTimeHelper.setCurrentTimeZone(endDate ?? this.candidateDetails.actualEndDate as string),
+    }, { emitEvent: false, onlySelf: true });
+  }
+
+  private updateVisibilityConfig(status: CandidatStatus, candidateDetails?: CandidateDetails): void {
+    if (!status) {
+      return;
+    }
+
+    const hasOnboardedCandidateOfferedDate = status === CandidatStatus.OnBoard &&
+      candidateDetails?.offeredStartDate &&
+      candidateDetails?.offeredEndDate;
+
+    if (status === CandidatStatus.Offered) {
+      UpdateVisibilityConfigFields(this.dialogConfig, OfferedConfigFieldsToShow);
+      return;
+    }
+
+    if (hasOnboardedCandidateOfferedDate) {
+      UpdateVisibilityConfigFields(this.dialogConfig, OnboardConfigFieldsToShow);
+      DisableControls(['offeredStartDate', 'offeredEndDate'], this.candidateForm);
+      return;
+    }
+
+    UpdateVisibilityConfigFields(this.dialogConfig,  DefaultConfigFieldsToShow);
   }
 
   private setStatusSourceForDisabled(jobStatus: {
@@ -457,6 +556,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     const endDateConfigField = this.getConfigField('actualEndDate');
 
     if (status === CandidatStatus.Cancelled) {
+      startDateFormControl?.patchValue(this.candidateDetails?.actualStartDate);
       startDateFormControl?.disable();
       endDateConfigField.required = true;
       endDateConfigField.minDate = this.candidateDetails?.actualStartDate
@@ -468,10 +568,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       endDateFormControl?.setValidators([Validators.required]);
       isClosedFormControl?.setValue(false);
       isClosedFormControl?.disable();
+      this.checkActualStartDate();
     } else {
       this.removeEndDateControlLimitations(endDateFormControl as FormControl, endDateConfigField);
       endDateFormControl?.setValue(endDateFormControl?.value);
-      startDateFormControl?.enable();
+      startDateFormControl?.enable({ emitEvent: false, onlySelf: true });
       isClosedFormControl?.enable();
     }
 
@@ -489,8 +590,19 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     return this.dialogConfig.find((item) => item.field === field) as CandidateField;
   }
 
-  private clearStartDateSubscription(): void {
+  private clearDatesSubscription(): void {
     this.actualStartDateSubscription?.unsubscribe();
     this.actualStartDateSubscription = null;
+    this.offeredDateSubscription?.unsubscribe();
+    this.offeredDateSubscription = null;
+  }
+
+  private checkActualStartDate(): void {
+    if (
+      this.candidateDetails?.actualStartDate
+      && DateTimeHelper.isFutureDate(this.candidateDetails.actualStartDate as string)
+    ) {
+      this.candidateForm.get('actualEndDate')?.patchValue(this.candidateDetails.actualStartDate);
+    }
   }
 }

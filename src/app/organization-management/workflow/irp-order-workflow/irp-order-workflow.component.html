@@ -4,6 +4,7 @@
       [userPermission]="!userPermission[userPermissions.CanEditWorkflows]"
       (createNewWorkflowAction)="createWorkflow()"
       (selectCardAction)="selectWorkflowCard($event)"
+      [selectedTab]="currentTab"
     ></app-card-menu>
   <div class="steps">
     <app-workflow-steps-list [userPermission]="userPermission"></app-workflow-steps-list>
@@ -13,5 +14,6 @@
 <app-create-workflow
   *ngIf="showDialog"
   [selectedTab]="currentTab"
+  [selectedCard]="selectedCard"
   (destroyDialog)="closeDialog()"
 ></app-create-workflow>

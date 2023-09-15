@@ -4,6 +4,13 @@ import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 export interface CreateWorkflow {
   title: string;
   fields: WorkflowField[];
+  groupFields: GroupWorkflowField[];
+}
+
+export interface GroupWorkflowField {
+  groupName: string;
+  required: boolean;
+  fieldSources: WorkflowField[];
 }
 
 export interface WorkflowField {

@@ -217,8 +217,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         tap((id) => {
           if(id.length == 0){
             this.noorgSelection = true;
-            this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select atleast one Organization'));
-            return; 
+            this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select at least one Organization'));
+            return;
           }
           this.noorgSelection = false;
           this.addManualInvoiceDisable = false;
@@ -296,9 +296,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
                 this.organizationMultiSelectControl.setValue([]);
                 this.organizationControl.setValue([]);
                 this.agencyOrganizationIds = [];
-              } 
+              }
               return !!organizations.length;
-            }           
+            }
           ),
           tap((organizations: DataSourceItem[]) => {
             this.organizationsList = organizations;
@@ -415,7 +415,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public openAddDialog(): void {
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
-    this.store.dispatch(new Invoices.GetInvoicesReasons(this.isAgency ?  this.organizationMultiSelectControl?.value?.[0] : this.organizationControl.value 
+    this.store.dispatch(new Invoices.GetInvoicesReasons(this.isAgency ?  this.organizationMultiSelectControl?.value?.[0] : this.organizationControl.value
       || this.store.selectSnapshot(UserState.lastSelectedOrganizationId)));
   }
 
@@ -600,7 +600,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       } : {
         organizationId: this.organizationId as number,
       }),
-    };    
+    };
     if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords)
     {
       dto.ids = this.gridSelections.selectedInvoiceIds;
@@ -807,19 +807,19 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       takeUntil(this.componentDestroy())
     )
     .subscribe((filterState) => {
-      if(this.isAgency){      
+      if(this.isAgency){
         let filters: Interfaces.InvoicesFilterState = {};
         if(filterState.state === null){
               filters.agencyOrganizationIds =  this.organizationMultiSelectControl.value;
               this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
         }else if(filterState.state != null){
-          if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){            
+          if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){
             let agencyOrganizationIds= [];
             filterState.state.agencyOrganizationIds.forEach(element => {
               if(this.organizationsList.find((item)=> item.id == element)){
                 agencyOrganizationIds.push(element);
               }
-            }); 
+            });
             if(agencyOrganizationIds.length > 0){
               this.agencyOrganizationIds = filterState.state.agencyOrganizationIds;
               this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);

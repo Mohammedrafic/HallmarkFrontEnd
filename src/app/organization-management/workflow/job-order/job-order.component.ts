@@ -2,7 +2,7 @@ import { Component, Inject, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, switchMap, take, takeUntil } from 'rxjs';
+import { filter, map, Observable, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import {
@@ -27,7 +27,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { AppState } from '../../../store/app.state';
 import { WorkflowStateService } from '@organization-management/workflow/services';
 import { Organization } from '@shared/models/organization.model';
-import { GetSelectedCardIndex } from '@organization-management/workflow/helpers';
+import { GetSelectedCardIndex, PrepareCardInfo } from '@organization-management/workflow/helpers';
 import { WorkflowTabNames } from '@organization-management/workflow/workflow-mapping/constants';
 import { SystemFlags, WorkflowTabName } from '@organization-management/workflow/interfaces';
 import { OutsideZone } from '@core/decorators';
@@ -54,6 +54,7 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
   public isIRPFlagEnabled = false;
   public customOrderSteps$: Subject<Step[]> = new Subject<Step[]>();
   public customApplicationSteps$: Subject<Step[]> = new Subject<Step[]>();
+  public isEditWorkflowModal = false;
 
   public readonly workflowTab = WorkflowNavigationTabs;
   public readonly workflowTabNames: WorkflowTabName = WorkflowTabNames;
@@ -110,10 +111,12 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
   }
 
   public closeCreateWorkflowModal(): void {
+    this.isEditWorkflowModal = false;
     this.showCreateWorkflowDialog = false;
   }
 
   public onAddNewWorkflowClick(): void {
+    this.isEditWorkflowModal = false;
     this.showCreateWorkflowDialog = true;
   }
 
@@ -132,6 +135,11 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
 
   public removeCustomStep(): void {
     this.updateVmsWorkflowSteps(true);
+  }
+
+  public editWorkflow(): void {
+    this.isEditWorkflowModal = true;
+    this.showCreateWorkflowDialog = true;
   }
 
   public deleteWorkflow(): void {
@@ -231,10 +239,11 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
   private watchForSucceedActionWorkflow(): void {
     this.actions$.pipe(
       filter(() => this.activeTab === WorkflowNavigationTabs.VmsOrderWorkFlow),
+      ofActionSuccessful(GetWorkflowsSucceed),
+      map((workflows) =>  PrepareCardInfo(workflows.payload)),
       takeUntil(this.unsubscribe$),
-      ofActionSuccessful(GetWorkflowsSucceed)
     ).subscribe((workflows) => {
-      this.workflowsWithDetails = workflows.payload;
+      this.workflowsWithDetails = workflows;
       this.customStepOrderFormGroup.reset();
       this.customStepApplicationFormGroup.reset();
 

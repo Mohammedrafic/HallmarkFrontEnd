@@ -2,11 +2,23 @@ export class WorkflowWithDetails {
   id?: number;
   name: string;
   type: number;
+  initialOrders: boolean;
+  extensions: boolean;
   requireMappingsUpdate?: boolean;
   workflows?: Workflow[];
   isIRP: boolean;
+  cardInfo?: string;
   includeInIRP?: boolean;
+  includeInVMS?: boolean;
   isActive?: boolean; // used only on UI to highlight clicked card
+}
+
+export interface EditedWorkflowDto {
+  id: number;
+  name: string;
+  initialOrders: boolean;
+  extensions: boolean;
+  isIRP: boolean;
 }
 
 export interface WorkflowWithDetailsPut {
@@ -19,12 +31,14 @@ export interface WorkflowWithDetailsPut {
 export interface Workflow {
   id?: number;
   type: number;
+  extensions: boolean;
+  initialOrders: boolean;
   workflowId: number;
   steps: Step[];
 }
 
 export interface Step {
-  id?: number;
+  id?: number | null;
   canBeFollowedByCustomStep?: boolean;
   isAgencyStep?: boolean;
   requirePermission?: boolean;
@@ -38,7 +52,6 @@ export interface Step {
   parentId?: number | null;
 }
 
-
 export class WorkflowFilters {
   holidayNames?: string[];
   pageNumber?: number;
@@ -50,6 +63,13 @@ export class WorkflowFilters {
   skillIds?: number[];
   types?: number[];
   names?: string[];
+  workflowApplicability?: string[];
+  applicability?: FiltersApplicability;
+}
+
+export interface FiltersApplicability {
+  initialOrders: boolean;
+  extensions: boolean;
 }
 
 export interface WorkflowFlags {

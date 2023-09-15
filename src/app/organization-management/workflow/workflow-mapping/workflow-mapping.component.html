@@ -138,6 +138,7 @@
         </ng-template>
       </e-column>
       <e-column field="workflowName" headerText="WORKFLOW NAME" width="180"></e-column>
+      <e-column field="workflowApp" headerText="WORKFLOW APPLICABILITY" width="200"></e-column>
       <e-column headerText="CUSTOM STEP NAME" width="230"></e-column>
       <e-column headerText="ROLE/USER" width="150"></e-column>
     </e-columns>
@@ -286,6 +287,20 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.names.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Workflow Applicability</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="workflowApplicability"
+            placeholder="All"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.workflowApplicability.dataSource"
           >
           </ejs-multiselect>
         </div>

@@ -4,6 +4,15 @@ body.light,
 body.dark {
   .bootstrap {
     .e-checkbox-wrapper {
+      .e-checkbox:focus + .e-frame {
+        box-shadow: none !important;
+        border-color: $grey;
+
+        &:hover {
+          border-color: $primary-active-blue-10;
+        }
+      }
+
       .e-label {
         color: $secondary-dark-blue-10;
       }
@@ -27,7 +36,7 @@ body.dark {
   .bootstrap {
     .e-checkbox-wrapper {
       .e-checkbox:focus + .e-frame {
-        box-shadow: none !important;
+        border-color: $secondary-dark-blue-30;
       }
 
       .e-label {
@@ -51,6 +60,17 @@ body.dark {
         &.e-check {
           border-color: $white !important;
         }
+      }
+    }
+
+    .e-checkbox-disabled {
+      .e-icons.e-frame {
+        border-color: $white !important;
+        background-color: $secondary-dark-blue-40 !important;
+      }
+
+      .e-frame.e-check {
+        background-color: $primary-active-blue-70 !important;
       }
     }
   }

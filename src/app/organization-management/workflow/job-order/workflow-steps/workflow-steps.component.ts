@@ -49,7 +49,8 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   }
 
   get showAddCustomStep(): boolean {
-    return this.shortlistedCanBeFollowedByCustomStep || this.incompleteCanBeFollowedByCustomStep;
+    return (this.shortlistedCanBeFollowedByCustomStep || this.incompleteCanBeFollowedByCustomStep ) &&
+      !this.shortlistedIsAgencyStep;
   }
 
   private formBuilder: FormBuilder;
@@ -175,7 +176,8 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
         this.incompleteShortlistedStepName = shortlistedStep.name;
         this.incompleteShortlistedStepStatus = shortlistedStep.status;
         this.shortlistedCanBeFollowedByCustomStep = shortlistedStep.canBeFollowedByCustomStep as boolean;
-        this.shortlistedIsAgencyStep = shortlistedStep.isAgencyStep as boolean;
+        this.shortlistedIsAgencyStep = shortlistedStep.isAgencyStep as boolean ||
+          (workflow.extensions && !workflow.initialOrders);
       }
 
       const offeredStep = workflow.steps.find(step => step.type === WorkflowStepType.Offered);

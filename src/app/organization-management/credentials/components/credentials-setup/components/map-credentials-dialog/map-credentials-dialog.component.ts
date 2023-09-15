@@ -1,5 +1,6 @@
-import { Component, Input, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import {FormGroup } from '@angular/forms';
+import { DOCUMENT } from '@angular/common';
 
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { combineLatestWith, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
@@ -17,7 +18,6 @@ import {
   AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
-  Organization,
   OrganizationDepartment,
   OrganizationLocation,
   OrganizationRegion,
@@ -78,8 +78,6 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   @ViewChild('departmentsDropdown') departmentsDropdown: MultiSelectComponent;
   @ViewChild('groupsDropdown') groupsDropdown: MultiSelectComponent;
 
-  @Select(OrganizationManagementState.organization)
-  private organization$: Observable<Organization>;
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   @Select(OrganizationManagementState.credentials)
@@ -107,6 +105,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   public query: Query = new Query().take(this.maxDepartmentsLength);
   public filterType = 'Contains';
   public credentialTypeSources: CredentialTypeSource[] = [];
+  public targetElement: HTMLElement | null;
 
   public readonly userPermissions = UserPermissions;
   public readonly editCredentialMessage: string = SaveEditCredentialMessage;
@@ -128,8 +127,11 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     private mapCredentialsService: MapCredentialsService,
     private readonly ngZone: NgZone,
     private credentialsSetupService: CredentialsSetupService,
+    @Inject(DOCUMENT) private document: Document
   ) {
     super();
+
+    this.targetElement = this.document.body;
 
     this.createCredentialMappingForm();
   }
@@ -453,6 +455,8 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
           credential.isActive = savedMapping.isActive;
           credential.reqSubmission = savedMapping.reqSubmission;
           credential.reqOnboard = savedMapping.reqOnboard;
+          credential.comments = this.isEdit ? savedMapping.comments : credential.comments;
+          credential.irpComments = this.isEdit ? savedMapping.irpComments: credential.irpComments;
         }
       });
       this.grid.refresh();

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { WorkflowWithDetails } from '@shared/models/workflow.model';
+import { WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
 
 @Component({
   selector: 'app-card-menu',
@@ -11,9 +12,12 @@ import { WorkflowWithDetails } from '@shared/models/workflow.model';
 export class CardMenuComponent {
   @Input() cards: WorkflowWithDetails[];
   @Input() userPermission = true;
+  @Input() selectedTab: WorkflowNavigationTabs;
 
   @Output() createNewWorkflowAction: EventEmitter<void> = new EventEmitter();
   @Output() selectCardAction: EventEmitter<WorkflowWithDetails> = new EventEmitter();
+
+  public readonly navigationTabs = WorkflowNavigationTabs;
 
   public createNewWorkflow(): void {
     this.createNewWorkflowAction.emit();

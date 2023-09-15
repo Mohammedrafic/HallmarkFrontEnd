@@ -33,6 +33,9 @@ export class ScheduleFiltersService {
   private readonly scheduleFiltersData: BaseObservable<ScheduleFiltersData> = new BaseObservable(InitScheduleFiltersData);
   private readonly employeeOrganizationStructure: BaseObservable<OrganizationStructure>
     = new BaseObservable(InitEmployeeOrganizationStructure);
+  allDepartments: DropdownOption[];
+  firstDepartment: OrganizationDepartment;
+  getallDepartments: any;
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -84,8 +87,15 @@ export class ScheduleFiltersService {
     const selectedLocations = structure.locations
     .filter((location) => selectedIds.includes(location.id));
     const departments = selectedLocations.flatMap((location) => location.departments as OrganizationDepartment[]);
-
-    return ScheduleFilterHelper.adaptDepartmentToOption(sort ? sortByField(departments, 'name') : departments);
+    this.firstDepartment = departments[0];
+    this.allDepartments = ScheduleFilterHelper.adaptDepartmentToOption(sort ? sortByField(departments, 'name') : departments)
+    const depart = {
+      text : this.firstDepartment.name,
+      value : this.firstDepartment.id
+    }
+    this.getallDepartments = this.allDepartments.filter(d => d.value != depart.value);
+    this.getallDepartments.unshift(depart);
+    return this.getallDepartments;
   }
 
   createChipsData(
