@@ -642,10 +642,11 @@ private getSettings(order:CreateOrderDto) {
     
     this.settings = SettingsHelper.mapSettings(settings);
    
-   this. IsSettingsEnabledByOrganisation=this.settings[SettingsKeys.DisableNumberOfOpenPositions]?.value === true;
+    this. IsSettingsEnabledByOrganisation=this.settings[SettingsKeys.DisableNumberOfOpenPositions]?.children?.find(f => f.isIRPConfigurationValue == true
+      && f.departmentId === null && f.regionId === null && f.locationId === null)?.value === 'true' ;
    
     this.IsSettingEnabledByRegLocDept = this.settings[SettingsKeys.DisableNumberOfOpenPositions]?.children?.find(f => f.isIRPConfigurationValue == true
-    && f.departmentId === order.departmentId && f.regionId === order.regionId && f.locationId === order.locationId)?.value;
+    && f.departmentId === order.departmentId && f.regionId === order.regionId && f.locationId === order.locationId)?.value === 'true';
   
    
   });
