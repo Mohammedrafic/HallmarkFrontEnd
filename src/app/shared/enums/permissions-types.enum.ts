@@ -39,6 +39,7 @@ export enum PermissionTypes {
 
   //View Order Journey
   ViewOrderJourney = 8001,
+  EditClosedPositionActualDates = 8123,
   CanOrganizationViewOrdersIRP = 6406,
   CanOrganizationEditOrdersIRP = 6407,
   CanCreateOrdersIRP = 6408,
