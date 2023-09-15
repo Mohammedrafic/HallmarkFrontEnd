@@ -156,3 +156,7 @@ export class GetDocumentsByCognitiveSearch {
   constructor(public keyword: string, public businessUnitType: any, public businessUnitId?: any, public folderId?: any) { }
 }
 
+export class GetSharedDocumentsByCognitiveSearch {
+  static readonly type = '[documentsLibrary] Get shared documents by CognitiveSearch';
+  constructor(public keyword: string, public businessUnitType: any, public businessUnitId?: any, public folderId?: any) { }
+}
