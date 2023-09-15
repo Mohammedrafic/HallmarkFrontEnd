@@ -23,4 +23,5 @@ export enum WidgetTypeEnum {
   CANDIDATES_ACTIVE_POSITIONS="Candidates_Active_Positions",
   POSITIONS_COUNT_DAY_RANGE="Positions_Count_Day_Range",
   ORDERS_PENDING_IN_CUSTOM = "Orders_Pending_In_Custom",
+  AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS="Average_Days_for_Active_Candidates_in_a_Status"
 }
