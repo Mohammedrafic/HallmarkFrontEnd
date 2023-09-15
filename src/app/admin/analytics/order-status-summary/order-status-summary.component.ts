@@ -350,8 +350,8 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     }
   }
 
-  public setFilterDefaultValues(): void {    
-    this.orderStatusSummaryReportForm.get('orderType')?.setValue([0, 3]);      
+  public setFilterDefaultValues(): void {
+    this.orderStatusSummaryReportForm.get('orderType')?.setValue([0, 3]);
   }
 
   private watchForReason(): void {
@@ -447,6 +447,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
           closed: item.closed ?? 0,
         }
       });
+      this.totalRecordsCount$.next(data.length);
       if (this.gridApi) {
         this.gridApi.setRowData(this.itemList);
         this.updatePinnedBottomRowData();
