@@ -80,13 +80,12 @@ export const GridCellsSystemIRPTabOrderTemplate = (
   },
   {
     ...DefaultOrderCol,
-    field: 'orderTypeText',
+    field: 'templateTitle',
     headerName: 'Template Title',
-    cellRenderer: TableTypeCellComponent,
     width: 160,
     minWidth: 160,
     maxWidth: 200,
-    cellClass: 'font-weight-bold',
+    cellClass: 'wrap-cell',
   },
   {
     ...DefaultOrderCol,
