@@ -157,7 +157,7 @@ export class AccumulationChartComponent
     changes['chartData'] && this.handleChartDataChanges();
     this.totalScore = 0;
     this.chartData?.chartData.forEach(obj => {
-      this.totalScore += Number(obj.value);
+      this.totalScore += obj.value;
     });
      }
 
