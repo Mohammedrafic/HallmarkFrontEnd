@@ -157,9 +157,7 @@ export const GridCellsSystemIRPTabOrderTemplate = (
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
       const startShiftTime = GridValuesHelper.formatDate(params.data?.shiftStartDateTime, 'HH:mm');
-      const endShiftTime = GridValuesHelper.formatDate(params.data?.shiftEndDateTime, 'HH:mm');
-
-      return `${startShiftTime}-${endShiftTime}`;
+      return `${startShiftTime}`;
     },
   },
   {
@@ -170,10 +168,8 @@ export const GridCellsSystemIRPTabOrderTemplate = (
     minWidth: 80,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
-      const startShiftTime = GridValuesHelper.formatDate(params.data?.shiftStartDateTime, 'HH:mm');
       const endShiftTime = GridValuesHelper.formatDate(params.data?.shiftEndDateTime, 'HH:mm');
-
-      return `${startShiftTime}-${endShiftTime}`;
+      return `${endShiftTime}`;
     },
   },
   {
