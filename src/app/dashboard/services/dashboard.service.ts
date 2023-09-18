@@ -620,7 +620,7 @@ export class DashboardService {
            title: 'Average Days on Active Candidate Status',
           chartData: lodashMapPlain(candidatesInfo, ({ count, status,averageDays }: AveragedayActivecandidateInfo, index: number) => ({
             label: status,
-            value: averageDays.toFixed(2),
+            value: parseFloat(averageDays.toFixed(2)),
             average: count,
             color: candidateLegendPalette[status as CandidateChartStatuses] ||
             candidateLegendPalette[CandidateChartStatuses.CUSTOM],
