@@ -37,6 +37,7 @@ export class FilterService {
       filterColumns[event.column].type === ControlTypes.Date
       || filterColumns[event.column].type === ControlTypes.Dropdown
       || filterColumns[event.column].type === ControlTypes.Autocomplete
+      || filterColumns[event.column].type === ControlTypes.TextOrNull
       ) {
       form.controls[event.column].setValue(null);
     } else {
