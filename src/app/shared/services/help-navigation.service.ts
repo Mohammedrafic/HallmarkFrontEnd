@@ -51,10 +51,10 @@ export class HelpNavigationService {
   }
 
   private constructUrl(isAgency: boolean, helpLink: string, orgDomain?: string): string {
-    if (helpLink) {
-      const domain = isAgency ? HelpDomain[BusinessUnitType.Agency] : `${orgDomain}Topics_Org/`;
-
-      return `${domain}${helpLink}`;
+    if (helpLink && !isAgency) {
+       return `${orgDomain}/.auth/login/aadb2c?post_login_redirect_uri=${encodeURIComponent(`/Topics_Org/${helpLink}`)}`;
+    } else if (helpLink && isAgency) {
+      return `${HelpDomain[BusinessUnitType.Agency]}${helpLink}`;
     }
 
     const domain = isAgency ? HelpDomain['agencyFallbackUrl'] : `${orgDomain}` as string;

@@ -374,7 +374,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       creationDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
-      candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+      candidateName: { type: ControlTypes.TextOrNull, valueType: ValueType.Text },
       projectTypeIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,

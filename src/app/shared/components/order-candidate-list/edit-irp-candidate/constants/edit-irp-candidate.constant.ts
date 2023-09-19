@@ -12,6 +12,27 @@ export const OptionField: FieldSettingsModel = { text: 'text', value: 'value' };
 export const CandidateTitle = 'Edit Employee';
 export const StatusField = 'status';
 export const CloseReasonField = 'reason';
+export const DefaultConfigFieldsToShow: string[] = [
+  'status',
+  'actualStartDate',
+  'actualEndDate',
+  'availableStartDate',
+  'isClosed',
+  'reason',
+  'closeDate',
+];
+export const OfferedConfigFieldsToShow: string[] = ['status','offeredStartDate', 'offeredEndDate'];
+export const OnboardConfigFieldsToShow: string[] = [
+  'status',
+  'actualStartDate',
+  'actualEndDate',
+  'offeredStartDate',
+  'offeredEndDate',
+  'availableStartDate',
+  'isClosed',
+  'reason',
+  'closeDate',
+];
 
 export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
   {
@@ -20,8 +41,27 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     disabled: false,
     required: true,
     type: FieldType.Dropdown,
+    showField: true,
     cssClass: 'status',
     dataSource: [],
+  },
+  {
+    field: 'offeredStartDate',
+    title: 'Offered Start Date',
+    disabled: false,
+    required: false,
+    type: FieldType.Date,
+    showField: false,
+    cssClass: 'date-field',
+  },
+  {
+    field: 'offeredEndDate',
+    title: 'Offered End Date',
+    disabled: false,
+    required: false,
+    type: FieldType.Date,
+    showField: false,
+    cssClass: 'date-field',
   },
   {
     field: 'actualStartDate',
@@ -29,6 +69,7 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     disabled: false,
     required: false,
     type: FieldType.Date,
+    showField: true,
     cssClass: 'date-field',
   },
   {
@@ -37,6 +78,7 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     disabled: false,
     required: false,
     type: FieldType.Date,
+    showField: true,
     cssClass: 'date-field',
   },
   {
@@ -45,6 +87,7 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     disabled: false,
     required: false,
     type: FieldType.Toggle,
+    showField: true,
     cssClass: 'close-switch',
   },
   {
@@ -53,6 +96,7 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     disabled: false,
     required: true,
     type: FieldType.Dropdown,
+    showField: true,
     cssClass: 'reason',
     dataSource: [],
   },
@@ -62,6 +106,7 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     disabled: false,
     required: true,
     type: FieldType.Date,
+    showField: true,
     cssClass: 'close-date',
   },
   {
@@ -70,6 +115,7 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     disabled: false,
     required: false,
     type: FieldType.Date,
+    showField: true,
     cssClass: 'date-field',
   },
 ];

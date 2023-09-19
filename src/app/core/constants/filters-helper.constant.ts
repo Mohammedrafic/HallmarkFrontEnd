@@ -16,4 +16,5 @@ export const ExcludeSpinnerUrls = [
   'financialtimesheet/candidatesearch',
   '/api/Audit/uiaction',
   'Alerts/GetAlertsForUser',
+  'Timesheets/tabcounters',
 ];

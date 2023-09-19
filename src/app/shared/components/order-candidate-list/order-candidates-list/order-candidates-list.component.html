@@ -333,6 +333,11 @@
   </ng-template>
 
   <ng-template #footerTemplate>
-    <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
+    <app-dialog-next-previous 
+      title="Candidate" 
+      [options]="dialogNextPreviousOption"
+      (nextEvent)="changeCandidate(true)"
+      (previousEvent)="changeCandidate(false)">
+    </app-dialog-next-previous>
   </ng-template>
 </ejs-dialog>

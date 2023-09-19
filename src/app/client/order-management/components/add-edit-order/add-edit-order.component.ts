@@ -36,6 +36,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { OrderJobDistribution } from '@shared/enums/job-distibution';
 import {
+  ExtensionStartDateValidation,
   JOB_DISTRIBUTION_TITLE,
   ORDER_DISTRIBUTED_TO_ALL,
   PROCEED_FOR_ALL_AGENCY,
@@ -45,6 +46,8 @@ import { OrderCredentialsService } from "@client/order-management/services";
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage, IsStartEndDateOverlapWithInactivePeriod } from '@core/helpers';
 import { FieldName } from '@client/order-management/enums';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ShowToast } from 'src/app/store/app.actions';
 
 enum SelectedTab {
   OrderDetails,
@@ -98,6 +101,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private manuallyAddedBillRates: BillRate[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private order: Order;
+  public startDate: Date;
 
   public isPerDiem = false;
   public isPermPlacementOrder = false;
@@ -727,13 +731,20 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
-        if (this.orderDetailsFormComponent.isEditMode) {
+        if (!this.orderDetailsFormComponent.isEditMode) {
+          this.orderCredentials = predefinedCredentials;
+          this.cd.detectChanges();
+          return;
+        }
+
+        const departmentChanged = this.orderDetailsFormComponent?.generalInformationForm.get('departmentId')?.touched;
+        const skillChanged = this.orderDetailsFormComponent?.generalInformationForm.get('skillId')?.touched;
+
+        if (this.orderDetailsFormComponent.isEditMode && (departmentChanged || skillChanged)) {
           const credentials = this.orderCredentials.filter(cred => !cred.isPredefined);
           this.orderCredentials = unionBy('credentialId', credentials, predefinedCredentials);
-        } else {
-          this.orderCredentials = predefinedCredentials;
+          this.cd.detectChanges();
         }
-        this.cd.detectChanges();
       });
   }
 
@@ -749,7 +760,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
             .getRawValue()
             .filter((billrate) => !billrate.isPredefined);
         }
-        
+
         this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
         this.cd.detectChanges();
       });
@@ -823,6 +834,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
+      
+      this.startDate = order.jobStartDate;
+      let actualEndDate = new Date(this.order?.jobStartDate);
+      let twoWeekDate = new Date(actualEndDate.setDate(actualEndDate.getDate() + 14));
+      if(this.startDate && this.startDate > twoWeekDate && this.order.extensionFromId != null){
+          this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
+          return;
+       }
 
       const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
       if (this.needToShowConfirmPopup(order, hourlyRate)) {

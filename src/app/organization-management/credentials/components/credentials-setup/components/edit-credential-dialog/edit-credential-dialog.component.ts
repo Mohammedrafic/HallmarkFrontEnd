@@ -2,16 +2,16 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter
 import { FormGroup } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { filter, takeUntil } from 'rxjs';
+import { filter, takeUntil, take, tap, switchMap, of } from 'rxjs';
 
 import { CredentialsSetupService } from '@organization-management/credentials/services';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { Destroyable } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CredentialSetupDetails, CredentialSetupGet } from '@shared/models/credential-setup.model';
-import {
-  UpdateCredentialSetup,
-} from '@organization-management/store/credentials.actions';
+import { CredentialSetupDetails, CredentialSetupGet, CredentialSetupPost } from '@shared/models/credential-setup.model';
+import { OverrideCommentsQuestion, OverrideCommentsTitle } from '../../constants';
+import { UpdateCredentialSetup } from '@organization-management/store/credentials.actions';
+import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
 
 @Component({
   selector: 'app-edit-credential-dialog',
@@ -42,8 +42,14 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
   }
 
   public updateCredential(): void {
-    if (this.editCredentialForm.valid) {
-      this.store.dispatch(new UpdateCredentialSetup(this.editCredentialForm.getRawValue()));
+    const isCommentsDirty = this.editCredentialForm.get('comments')?.dirty
+      || this.editCredentialForm.get('irpComments')?.dirty;
+
+    if (this.editCredentialForm.valid && isCommentsDirty) {
+      this.confirmUpdateCredentialSetup();
+    } else if (this.editCredentialForm.valid && !isCommentsDirty) {
+      const dto = this.setCorrectDate(this.editCredentialForm.getRawValue());
+      this.store.dispatch(new UpdateCredentialSetup(dto));
       this.closeModal();
     } else {
       this.editCredentialForm.markAllAsTouched();
@@ -57,12 +63,14 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
-        }).pipe(
-        filter(Boolean),
-        takeUntil(this.componentDestroy())
-      ).subscribe(() => {
-        this.closeModal();
-      });
+        })
+        .pipe(
+          filter(Boolean),
+          takeUntil(this.componentDestroy())
+        )
+        .subscribe(() => {
+          this.closeModal();
+        });
     } else {
       this.closeModal();
     }
@@ -89,5 +97,43 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
 
   private initEditCredentialForm(): void {
     this.editCredentialForm = this.credentialsSetupService.createCredentialsSetupForm();
+  }
+
+  private confirmUpdateCredentialSetup(): void {
+    this.confirmService.confirmActions(
+      OverrideCommentsQuestion,
+      {
+        title: OverrideCommentsTitle,
+        okButtonLabel: 'Yes',
+        okButtonClass: 'e-primary',
+        cancelButtonLabel: 'No',
+      })
+      .pipe(
+        tap(({ action }) => {
+          if (action !== ConfirmEventType.CLOSE) {
+            const isConfirmed = action === ConfirmEventType.YES;
+            this.editCredentialForm.get('updateOrderCredentials')?.setValue(isConfirmed);
+          }
+        }),
+        switchMap(({ action }) => {
+          const dto = this.setCorrectDate(this.editCredentialForm.getRawValue());
+          const actionStream$ = action !== ConfirmEventType.CLOSE
+            ? this.store.dispatch(new UpdateCredentialSetup(dto))
+            : of(true);
+          return actionStream$;
+        }),
+        take(1)
+      )
+      .subscribe(() => {
+        this.closeModal();
+      });
+  }
+
+  private setCorrectDate(data: CredentialSetupPost): CredentialSetupPost {
+    if (data.inactiveDate) {
+      data.inactiveDate = DateTimeHelper.setUtcTimeZone(data.inactiveDate);
+    }
+
+    return data;
   }
 }

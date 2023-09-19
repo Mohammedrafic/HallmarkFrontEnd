@@ -358,10 +358,28 @@ body.dark {
   }
 
   .e-checkbox-wrapper {
+    .e-frame.e-icons {
+      background-color: $secondary-dark-blue-10-2;
+
+      &:hover {
+        background-color: $secondary-dark-blue-10-2;
+        border-color: $primary-active-blue-10;
+      }
+    }
+
     &:hover {
       .e-frame.e-check {
         color: $white !important;
         border-color: $white !important;
+      }
+    }
+  }
+
+  .e-ddl.e-popup.e-lib.e-control.e-popup-open,
+  .e-multi-select-list-wrapper.e-checkbox.e-popup.e-control.e-popup-open {
+    .e-content.e-dropdownbase {
+      &::-webkit-scrollbar-track {
+        background-color: $sidebar-background;
       }
     }
   }

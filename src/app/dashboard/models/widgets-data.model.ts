@@ -37,4 +37,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: ChartAccumulation;
   [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE] : PositionsCountByDayRangeDataset;
   [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : OrdersPendingInCustomDataset;
+  [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]: ChartAccumulation;
 }

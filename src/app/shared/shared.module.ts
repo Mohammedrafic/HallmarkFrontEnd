@@ -181,6 +181,7 @@ import {
     EligibilityMessageModule
 } from '@shared/components/order-candidate-list/components/eligibility-message/eligibility-message.module';
 import { FileListModule } from './components/file-list/file-list.module';
+import { GridErroredCellListComponent } from './components/import-dialog-content/grid-errored-cell-list/grid-errored-cell-list.component';
 
 const icons = {
   AlertCircle,
@@ -360,6 +361,7 @@ const COMPONENTS = [
     AcceptFormComponent,
     CustomNoRowsOverlayComponent,
     GridErroredCellComponent,
+    GridErroredCellListComponent,
     ImportDialogContentComponent,
     OrderHistoricalEventsComponent,
     SendEmailSideDialogComponent,

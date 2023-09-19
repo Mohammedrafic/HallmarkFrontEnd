@@ -45,6 +45,7 @@ export class AccumulationChartComponent
   @Input() public isDarkTheme: boolean;
   @Input() public description: string;
   @Input() public averageFlag: boolean =false;
+  @Input() public averageactiveFlag:boolean=false;
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
@@ -74,6 +75,7 @@ export class AccumulationChartComponent
   }
 
   public redirectToSourceContent(status: string): void {
+    console.log("status",status)
     let candidatesStatusDataSet:any = []
     let activeOrderStatus:any = []
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
@@ -118,10 +120,10 @@ export class AccumulationChartComponent
         window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
         this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
       }
-    }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status"){
+    }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status" ||  this.chartData?.title==="Average Days on Active Candidate Status"){
         let candidatesDataset:any = [];
         let candidatesOrderDataSet = [];
-        if(this.chartData?.title == "Candidates for Active Positions"){
+        if(this.chartData?.title == "Candidates for Active Positions" ||  this.chartData?.title==="Average Days on Active Candidate Status"){
           this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
             candidatesDataset = data;
           }); 
@@ -157,7 +159,7 @@ export class AccumulationChartComponent
     this.chartData?.chartData.forEach(obj => {
       this.totalScore += obj.value;
     });
-  }
+     }
 
   public ngOnInit(): void {
     this.datalabel = { visible: true, position: 'Outside' };

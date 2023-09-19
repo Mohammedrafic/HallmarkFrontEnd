@@ -38,12 +38,25 @@
       <button
         ejs-button
         appHideBeforeSyncfusionLoad
+        cssClass="e-outline button-filter"
+        [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
+       (click)="editWorkflow()">Edit
+      </button>
+    </app-tooltip-container>
+
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
         cssClass="e-danger delete-button"
         *ngIf="workflowsWithDetails.length !== 0"
         [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
         (click)="deleteWorkflow()">Delete
       </button>
     </app-tooltip-container>
+
     <app-tooltip-container
       [message]="toolTipMessage"
       [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
@@ -57,6 +70,7 @@
       </button>
     </app-tooltip-container>
   </div>
+
   <ejs-tab
     id="navigationTabs"
     (selected)="selectTab($event)"
@@ -85,6 +99,7 @@
                 [cards]="workflowsWithDetails"
                 [userPermission]="!userPermission[userPermissions.CanEditWorkflows]"
                 (createNewWorkflowAction)="onAddNewWorkflowClick()"
+                [selectedTab]="activeTab"
                 (selectCardAction)="selectCard($event)"
               ></app-card-menu>
               <section class="workflow-details-container" *ngIf="workflowsWithDetails.length > 0">
@@ -118,6 +133,8 @@
             <app-create-workflow
               *ngIf="activeTab === workflowTab.VmsOrderWorkFlow && showCreateWorkflowDialog"
               [selectedTab]="activeTab"
+              [isEditModal]="isEditWorkflowModal"
+              [selectedCard]="selectedCard"
               (destroyDialog)="closeCreateWorkflowModal()"
             ></app-create-workflow>
           </section>

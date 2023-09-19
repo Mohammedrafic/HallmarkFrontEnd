@@ -54,7 +54,8 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     "AgencyParamCREXP": "",
     "CandidateStatusCREXP": "",
     "JobIdCREXP": "",
-    "OpCredFlagEXP":"",
+    "OpCredFlagEXP": "",
+    "UserId": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cat" };
@@ -101,8 +102,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public locationIdControl: AbstractControl;
   public departmentIdControl: AbstractControl;
   public agencyIdControl: AbstractControl;
-  public candidateStatusesIdControl: AbstractControl;
- 
+  public candidateStatusesIdControl: AbstractControl;  
 
   public regions: Region[] = [];
   public locations: Location[] = [];
@@ -113,7 +113,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public defaultLocations:(number|undefined)[]=[];
   public defaultDepartments: (number | undefined)[] = [];
   public defaultAgencys: (number | undefined)[] = [];
-  public defaultCandidateStatuses: (number | undefined)[] = [ 4, 5];
+  public defaultCandidateStatuses: (string | undefined)[] = ['Accepted','Onboard'];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
@@ -128,14 +128,15 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public regionsList: Region[] = [];
   public locationsList: Location[] = [];
   public departmentsList: Department[] = [];
-
+  private joinString = ",";
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
   private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5,10,13,12];
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
-  candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
+  candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'statusText' };
+  public candidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   selectedCandidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   candidateStatusesData:CandidateStatusAndReasonFilterOptionsDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
@@ -146,6 +147,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
       this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
+    this.user = this.store.selectSnapshot(UserState.user);
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
@@ -163,13 +165,13 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
           this.isAlive = false;
           this.filterOptionsData = data;
           //let notLoadingStatuses :string[]= ['Applied','Shortlisted','Rejected','Bill Rate Pending','Offered Bill Rate','Offboard','Withdraw','Cancelled','Not Applied'];
-          debugger;
           this.candidateStatusesData=data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
             this.filterColumns.candidateStatuses.dataSource =this.candidateStatusesData;
               this.filterColumns.agencyIds.dataSource = data.agencies;
              //this.defaultCandidateStatuses = (this.candidateStatusesData||[]).map((list) => list.status);
              this.defaultAgencys = data.agencies.map((list) => list.agencyId);
-              this.credentialExpiryForm.controls["candidateStatuses"].setValue(this.defaultCandidateStatuses.filter(f=>f !==90));
+          //this.credentialExpiryForm.controls["candidateStatuses"].setValue(this.defaultCandidateStatuses.filter(f => f !== 90));
+          this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
           if (this.isInitialLoad) {
             setTimeout(() => { this.SearchReport(); }, 3000)
             this.isInitialLoad = false;
@@ -344,15 +346,15 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
 
 
   public SearchReport(): void {
-    let auth = "Bearer ";
-    for(let x=0;x<window.localStorage.length;x++)
-    { 
-      if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
-      {
-        auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
-      }
-    }
-    let { departmentIds, locationIds,  regionIds, startDate, endDate, jobId,candidateStatuses ,opcredFlag} = this.credentialExpiryForm.getRawValue();
+    //let auth = "Bearer ";
+    //for(let x=0;x<window.localStorage.length;x++)
+    //{ 
+    //  if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
+    //  {
+    //    auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+    //  }
+    //}
+    let { departmentIds, locationIds, regionIds, startDate, endDate, jobId, candidateStatuses, opcredFlag, agencyIds } = this.credentialExpiryForm.getRawValue();
 
     if (!this.credentialExpiryForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
@@ -362,14 +364,18 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       this.message = ""
     }
 
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
+    //locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
+    //departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
+
+    //regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
+    //locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
+    //departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
     //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : this.filterOptionsData.candidateStatuses?.length > 0 ? this.filterOptionsData.candidateStatuses.map(x => x.status).join(",") : "null";
-    candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : "null";
+    //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : "null";
 
       this.paramsData =
       {
@@ -379,16 +385,17 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       "RegionParamCREXP": regionIds.length == 0 ? "null" : regionIds,
       "LocationParamCREXP": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamCREXP": departmentIds.length == 0 ? "null" : departmentIds,
-      "AgencyParamCREXP": this.selectedAgencies.length ==0?"null":this.selectedAgencies?.map((list) => list.agencyId).join(","),
-      "CandidateStatusCREXP": candidateStatuses.length == 0 ? "null" : candidateStatuses,
+        "AgencyParamCREXP": this.selectedAgencies.length == 0 ? "0" : this.selectedAgencies?.map((list) => list.agencyId).join(","),
+        "CandidateStatusCREXP": candidateStatuses.length == 0 ? '' : candidateStatuses.join(this.joinString),
       "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
-      "BearerParamCREXP":auth,
+     // "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
       this.organizations[0].id.toString():"1": 
       window.localStorage.getItem("lastSelectedOrganizationId"),
-      "HostName": this.baseUrl,
-      "OpCredFlagEXP":opcredFlag==""?"false":opcredFlag.toString(),
+     // "HostName": this.baseUrl,
+        "OpCredFlagEXP": opcredFlag == "" ? "false" : opcredFlag.toString(),
+        "UserId": this.user?.id,
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
@@ -477,7 +484,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
-    this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.JobId)?.setValue('');
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.opcredFlag)?.setValue(false);
     this.filteredItems = [];

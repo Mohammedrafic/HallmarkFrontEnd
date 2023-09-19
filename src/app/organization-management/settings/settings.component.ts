@@ -1082,6 +1082,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private disableDepForInvoiceGeneration(): void {
     if (this.organizationSettingKey === OrganizationSettingKeys.InvoiceAutoGeneration
       || this.organizationSettingKey === OrganizationSettingKeys.PayHigherBillRates
+      || this.organizationSettingKey === OrganizationSettingKeys.OvertimeCalculation
       || this.organizationSettingKey === OrganizationSettingKeys.OTHours
       || this.organizationSettingKey === OrganizationSettingKeys.AutomatedDistributionToVMS) {
       this.departmentFormGroup.get('departmentId')?.disable();

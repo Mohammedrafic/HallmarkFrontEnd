@@ -230,11 +230,11 @@ export class DashboardState {
   @Action(GetAllCommitmentByPage)
   GetAllCommitmentByPage(
     { patchState }: StateContext<DashboardStateModel>,
-    {  }: GetAllCommitmentByPage
+    { payload }: GetAllCommitmentByPage
   ): Observable<GetWorkCommitment[]> {
     //patchState({ isCommitmentLoading: true });
 
-    return this.dashboardService.getAllMasterCommitments().pipe(
+    return this.dashboardService.getAllMasterCommitments(payload).pipe(
       tap((payload:GetWorkCommitment[]) => {
         patchState({commitmentsPage: payload});
       })

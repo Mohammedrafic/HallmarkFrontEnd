@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
 
+import { Observable, Subject } from 'rxjs';
 import { DialogUtility } from '@syncfusion/ej2-angular-popups';
+
+import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
+import { ModalActions } from '@shared/models/confirm-modal-events.model';
 
 @Injectable({
   providedIn: 'root',
@@ -9,16 +12,16 @@ import { DialogUtility } from '@syncfusion/ej2-angular-popups';
 export class ConfirmService {
   confirm(content: string, options?: {
     title: string,
-    okButtonLabel:string,
+    okButtonLabel: string,
     okButtonClass: string,
     cancelButtonLabel?: string,
     customStyleClass?: string,
     zIndex?: number,
   }): Observable<boolean> {
-      
+
     const isAllowed$ = new Subject<boolean>();
     const dialogClass = options?.customStyleClass
-    ? `unsaved-changes-dialog ${options?.customStyleClass}`: 'unsaved-changes-dialog';
+      ? `unsaved-changes-dialog ${options?.customStyleClass}` : 'unsaved-changes-dialog';
 
     const dialog = DialogUtility.confirm({
       title: options?.title ? options.title : '',
@@ -58,5 +61,56 @@ export class ConfirmService {
     cencel.isFlat = false;
 
     return isAllowed$;
+  }
+
+  public confirmActions(content: string, options?: {
+    title: string,
+    okButtonLabel: string,
+    okButtonClass: string,
+    cancelButtonLabel?: string,
+    customStyleClass?: string,
+    zIndex?: number,
+  }): Observable<ModalActions> {
+
+    const isConfirmed$ = new Subject<ModalActions>();
+    const dialog = DialogUtility.confirm(
+      {
+        title: options?.title ?? '',
+        content,
+        showCloseIcon: true,
+        closeOnEscape: true,
+        position: { X: 'center', Y: 'center' },
+        animationSettings: { effect: 'Zoom' },
+
+        cssClass: 'unsaved-changes-dialog',
+        okButton: {
+          text: options?.okButtonLabel ?? '',
+          cssClass: options?.okButtonClass ?? '',
+          click: () => {
+            isConfirmed$.next({ action: ConfirmEventType.YES });
+            isConfirmed$.complete();
+            dialog.close();
+          },
+        },
+        cancelButton: {
+          text: options?.cancelButtonLabel ?? '',
+          cssClass: 'e-outline',
+          click: () => {
+            isConfirmed$.next({ action: ConfirmEventType.NO });
+            isConfirmed$.complete();
+            dialog.close();
+          },
+        },
+        close: () => {
+          isConfirmed$.next({ action: ConfirmEventType.CLOSE });
+          isConfirmed$.complete();
+        },
+      });
+
+    const [ok, cancel] = dialog.buttons;
+    ok.isFlat = false;
+    cancel.isFlat = false;
+
+    return isConfirmed$;
   }
 }
