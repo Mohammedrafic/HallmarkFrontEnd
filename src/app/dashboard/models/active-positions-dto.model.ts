@@ -79,3 +79,12 @@ export interface extensionOrderDtos{
   avgDays?:string,
 }
 
+
+export interface AveragedayActivecandidateInfo
+{
+  applicantStatus: number;
+  count: number;
+  status: string;
+  averageDays: any;
+
+}

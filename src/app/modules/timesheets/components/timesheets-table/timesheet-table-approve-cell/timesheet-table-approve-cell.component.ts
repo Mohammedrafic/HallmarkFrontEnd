@@ -56,6 +56,7 @@ export class TimesheetTableApproveCellComponent extends AbstractPermission imple
       this.store.dispatch([
         new ShowToast(MessageTypes.Success, successMessage),
         new Timesheets.GetAll(),
+        new Timesheets.GetTabsCounts(),
       ]);
     });
   }

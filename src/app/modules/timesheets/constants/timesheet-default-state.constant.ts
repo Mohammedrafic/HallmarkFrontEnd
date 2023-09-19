@@ -1,10 +1,10 @@
 import { RecordFields } from './../enums/timesheet-common.enum';
 import { TimesheetsModel } from '../store/model/timesheets.model';
-import { DefaultFilterColumns } from './timesheets-table.constant';
+import { DefaultFilterColumns, DefaultTimesheetCollection } from './timesheets-table.constant';
 
 export const DefaultTimesheetState: TimesheetsModel = {
   loading: false,
-  timesheets: null,
+  timesheets: DefaultTimesheetCollection,
   timesheetsFilters: null,
   tabCounts: null,
   timeSheetRecords: {

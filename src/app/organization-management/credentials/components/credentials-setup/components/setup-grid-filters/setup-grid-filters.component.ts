@@ -134,17 +134,18 @@ export class SetupGridFiltersComponent extends Destroyable implements OnInit {
     });
 
     this.filterForm.controls['regionId']?.valueChanges.pipe(
-      filter((regionId: number) => !!regionId),
       takeUntil(this.componentDestroy())
     ).subscribe((regionId: number) => {
       this.locations = [];
       this.departments = [];
 
-      const selectedRegion = this.orgRegions.find(region => region.id === regionId);
-      this.locations.push(...sortByField(selectedRegion?.locations ?? [], 'name') as []);
-      const departments: OrganizationDepartment[] = [];
-      this.locations.forEach(location => departments.push(...location.departments));
-      this.departments = sortByField(departments, 'name');
+      if (regionId) {
+        const selectedRegion = this.orgRegions.find(region => region.id === regionId);
+        this.locations.push(...sortByField(selectedRegion?.locations ?? [], 'name') as []);
+        const departments: OrganizationDepartment[] = [];
+        this.locations.forEach(location => departments.push(...location.departments));
+        this.departments = sortByField(departments, 'name');
+      }
 
       this.filterForm.controls['locationId'].setValue(null, { emitEvent: false, onlySelf: false });
       this.filterForm.controls['departmentId'].setValue(null, { emitEvent: false, onlySelf: false });
@@ -152,24 +153,28 @@ export class SetupGridFiltersComponent extends Destroyable implements OnInit {
     });
 
     this.filterForm.get('locationId')?.valueChanges.pipe(
-      filter((locationId: number) => !!locationId),
       takeUntil(this.componentDestroy())
     ).subscribe((locationId: number) => {
       this.departments = [];
-      const selectedLocation = this.locations.find(location => location.id === locationId);
-      this.departments.push(...sortByField(selectedLocation?.departments ?? [], 'name') as []);
+
+      if (locationId) {
+        const selectedLocation = this.locations.find(location => location.id === locationId);
+        this.departments.push(...sortByField(selectedLocation?.departments ?? [], 'name') as []);
+      }
 
       this.filterForm.controls['departmentId'].setValue(null, { emitEvent: false, onlySelf: false });
       this.cdr.markForCheck();
     });
 
     this.filterForm.get('groupId')?.valueChanges.pipe(
-      filter((groupId: number) => !!groupId),
       takeUntil(this.componentDestroy())
     ).subscribe((groupId: number) => {
       this.skills = [];
-      const selectedGroup = this.groups.find(group => group.id === groupId);
-      this.skills.push(...sortByField(selectedGroup?.skills ?? [], 'name') as []);
+
+      if (groupId) {
+        const selectedGroup = this.groups.find(group => group.id === groupId);
+        this.skills.push(...sortByField(selectedGroup?.skills ?? [], 'name') as []);
+      }
 
       this.filterForm.controls['skillId'].setValue(null, { emitEvent: false, onlySelf: false });
       this.cdr.markForCheck();

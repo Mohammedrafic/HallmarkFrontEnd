@@ -31,6 +31,7 @@ export class OrderManagement {
   locationName: string;
   departmentId: number;
   departmentName: string;
+  shiftname?:string;
   shiftStartTime?: string;
   shiftEndTime?: string;
   shift?: string; // used only in UI to group and show shiftStartTime - shiftEndTime range

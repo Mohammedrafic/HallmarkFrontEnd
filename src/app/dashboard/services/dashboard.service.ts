@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset, AveragedayActivecandidateInfo } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -85,13 +85,14 @@ export class DashboardService {
     [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
     [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
     [WidgetTypeEnum.AGENCY_POSITION_COUNT]: (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
-      [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
+    [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
     [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: (filters: DashboartFilterDto) => this.getalreadyExpiredCredentials(filters),
     [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
     [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
+    [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivecandidateStatusWidgetData(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -609,6 +610,26 @@ export class DashboardService {
   public getcandidatesOverallStatus(): Observable<CandidateTypeInfoModel[]>{
     return  this.candidatesOverallStatus$.asObservable();
   }
+
+  
+  private getAvergaeDayActivecandidateStatusWidgetData(filter: DashboartFilterDto): Observable<any> {
+    return this.httpClient.post<AveragedayActivecandidateInfo[]>(`${this.baseUrl}/GetAverageDaysforActiveCandidatesInStatus`, { ...filter }).pipe(
+      map((candidatesInfo: AveragedayActivecandidateInfo[]) => {
+        return {
+          id: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS,
+           title: 'Average Days on Active Candidate Status',
+          chartData: lodashMapPlain(candidatesInfo, ({ count, status,averageDays }: AveragedayActivecandidateInfo, index: number) => ({
+            label: status,
+            value: parseFloat(averageDays.toFixed(2)),
+            average: count,
+            color: candidateLegendPalette[status as CandidateChartStatuses] ||
+            candidateLegendPalette[CandidateChartStatuses.CUSTOM],
+          })),
+        };
+      })
+    );
+    } 
+
 
  
 }

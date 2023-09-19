@@ -1,4 +1,4 @@
-import { GetDocumentsByCognitiveSearch, GetSharedDocumentInformation } from '../../../store/actions/document-library.actions';
+import { GetDocumentsByCognitiveSearch, GetSharedDocumentInformation, GetSharedDocumentsByCognitiveSearch } from '../../../store/actions/document-library.actions';
 import { CellClickedEvent, ColDef, FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
@@ -225,7 +225,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   @ViewChild('wordDocPreview', { static: true })
   public documentEditor!: DocumentEditorComponent;
 
-
+  
+  public searchText: string = "";
 
   @Select(SecurityState.businessUserData)
   public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
@@ -333,12 +334,28 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             this.selectedNodeText = (this.selectedDocumentNode?.fileType != undefined && this.selectedDocumentNode?.fileType == 'folder') ? this.selectedDocumentNode?.text : '';
             setTimeout(() => {
               if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
+              {
+                if(this.searchText.length>=2){
+                  const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
+                  const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
+                  let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
+                  this.store.dispatch(new GetDocumentsByCognitiveSearch(this.searchText, businessUnitType, businessUnitId, folderId));
+                }                              
+                else
                 this.getDocuments(this.filterSelectedBusinesUnitId);
+              }
               else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID == -1) {
                 this.isSharedFolderClick = true;
                 this.store.dispatch(new IsDeleteEmptyFolder(false));
-                this.getSharedDocuments(this.filterSelectedBusinesUnitId);
-              }
+                if(this.searchText.length>=2){
+                  const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
+                  const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
+                  let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
+                  this.store.dispatch(new GetSharedDocumentsByCognitiveSearch(this.searchText, businessUnitType, businessUnitId, folderId));       
+                }else{
+                  this.getSharedDocuments(this.filterSelectedBusinesUnitId);
+                }  
+              }            
             }, 1000);
           }
           else {
@@ -1468,14 +1485,19 @@ public onAgencyChanges(showSharedDoc=true)
       )
       .subscribe((q) => {
         this.IsSearchDone = false;
+        this.searchText=q;
         const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
         const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
         if (q.length >= 2) {
           this.IsSearchDone = true;
           let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
+          if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
           this.store.dispatch(new GetDocumentsByCognitiveSearch(q, businessUnitType, businessUnitId, folderId));
+          else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID == -1) {
+            this.store.dispatch(new GetSharedDocumentsByCognitiveSearch(q, businessUnitType, businessUnitId, folderId));       
+          }
         }
-        if(q.length === 0){
+        if(q.length === 0){          
           if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
             this.getDocuments(this.filterSelectedBusinesUnitId);
           else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID == -1) {

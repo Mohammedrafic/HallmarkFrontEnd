@@ -1,7 +1,7 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
   <ng-template #header>
     <div class="app-accumulation-chart__title">
-      <h3 class="widget-header__title">{{ chartData?.title ?? '' }}</h3>
+      <h3 class="widget-header__title" title="{{chartData?.title ?? ''}}">{{ chartData?.title ?? '' }}</h3>
     </div>
     <div class="app-accumulation-chart__tooltip" *ngIf="description.length>0">
       <ejs-tooltip [content]="description" position='TopCenter'>
@@ -38,7 +38,9 @@
       
       <div class="widget-legend__row-container" >
         <div class="widget-legend__row_Text" >
-          <div class="app-accumulation-chart__legend-Total-score">{{totalScore}}</div>
+          <div class="app-accumulation-chart__legend-Total-score" *ngIf="chartData?.title=='Average Days on Active Candidate Status'">{{totalScore  | number: '1.2-2'}}</div>
+          <div class="app-accumulation-chart__legend-Total-score" *ngIf="chartData?.title!='Average Days on Active Candidate Status'" >{{totalScore}}</div>
+
         </div>
        
       </div>
@@ -51,6 +53,7 @@
       [legendData]="legendData"
       [legendPosition]="legendPosition"
       [averageFlag]="averageFlag"
+      [averageactiveFlag]="averageactiveFlag"
       (changeCheckbox)="onClickLegend($event)"
       (onClickLegend)="redirectToSourceContent($event )"
     ></app-widget-legend>

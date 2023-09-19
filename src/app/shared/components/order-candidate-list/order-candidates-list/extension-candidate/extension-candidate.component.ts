@@ -296,7 +296,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         jobId: this.candidateJob.jobId,
         skillName: value.skillName,
         offeredBillRate: this.candidateJob?.offeredBillRate,
-        offeredStartDate: this.candidateJob ? DateTimeHelper.setUtcTimeZone(this.candidateJob.offeredStartDate) : undefined,
+        offeredStartDate: this.candidateJob?.offeredStartDate ? 
+          DateTimeHelper.setUtcTimeZone(this.candidateJob.offeredStartDate) : undefined,
         candidateBillRate: this.candidateJob.candidateBillRate,
         nextApplicantStatus: {
           applicantStatus: this.candidateJob.applicantStatus.applicantStatus,

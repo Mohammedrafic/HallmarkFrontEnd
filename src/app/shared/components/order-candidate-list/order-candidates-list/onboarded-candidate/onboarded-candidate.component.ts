@@ -140,6 +140,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
+  public canEditStartEndDate = false;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
   public readonly reorderType: OrderType = OrderType.ReOrder;
@@ -618,6 +619,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.canOffer = false;
     this.canOnboard = false;
     this.canClose = false;
+    this.canEditStartEndDate = false;
     this.orderPermissions.forEach((permission) => {
       this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
       this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
@@ -625,6 +627,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
       this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
       this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
+      this.canEditStartEndDate = permission.permissionId === PermissionTypes.EditClosedPositionActualDates;
     });
     this.disableControlsBasedOnPermissions();
     this.changeDetectorRef.detectChanges();
@@ -661,7 +664,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.form.controls['allow'].enable();
     }
 
-    this.disableDatesForClosedPostition();
+    this.disableDatesForClosedPosition();
   }
 
   onGroupEmailAddCancel(){
@@ -789,10 +792,20 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     );
   }
 
-  private disableDatesForClosedPostition(): void {
-    if (this.candidateJob?.closeDate) {
-      this.form.get('startDate')?.disable();
-      this.form.get('endDate')?.disable();
+  private disableDatesForClosedPosition(): void {
+    if (!this.candidateJob?.closeDate) {
+      return;
+    }
+
+    const startDateControl = this.form.get('startDate');
+    const endDateControl = this.form.get('endDate');
+
+    if (this.canEditStartEndDate && this.candidateJob.applicantStatus?.applicantStatus === CandidatStatus.Offboard) {
+      startDateControl?.enable();
+      endDateControl?.enable();
+    } else {
+      startDateControl?.disable();
+      endDateControl?.disable();
     }
   }
 

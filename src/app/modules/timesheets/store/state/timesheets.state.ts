@@ -206,8 +206,6 @@ export class TimesheetsState {
             timesheets: res,
             loading: false,
           });
-
-          dispatch(new Timesheets.GetTabsCounts());
         }),
         catchError((err: HttpErrorResponse) => {
           return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
@@ -280,6 +278,17 @@ export class TimesheetsState {
     );
   }
 
+  @Action(Timesheets.ResetTimesheets)
+  ResetTimesheets(
+    { setState }: StateContext<TimesheetsModel>,
+  ): Observable<null> {
+    return of(null).pipe(
+      tap(() => setState(patch<TimesheetsModel>({
+        timesheets: DefaultTimesheetCollection,
+      })))
+    );
+  }
+
   @Action(TimesheetDetails.GetTimesheetRecords)
   GetTimesheetRecords(
     { patchState, dispatch }: StateContext<TimesheetsModel>,
@@ -301,21 +310,27 @@ export class TimesheetsState {
   @Action(TimesheetDetails.PutTimesheetRecords)
   PutTimesheetRecords(
     ctx: StateContext<TimesheetsModel>,
-    { body, isAgency }: TimesheetDetails.PutTimesheetRecords,
+    { body, isAgency, updateAfterLoad }: TimesheetDetails.PutTimesheetRecords,
   ): Observable<TimesheetRecordsDto | void> {
     return this.timesheetsApiService.putTimesheetRecords(body)
     .pipe(
       switchMap(() => {
         const state = ctx.getState();
         const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
+
+        if (updateAfterLoad) {
+          ctx.dispatch(new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency));
+        }
         /**
          * TODO: make all messages for toast in one constant.
          */
         ctx.dispatch([
           new ShowToast(MessageTypes.Success, PutSuccess.successMessage),
-          new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency),
           new TimesheetDetails.ForceUpdateRecord(false),
+          new Timesheets.GetAll(),
+          new Timesheets.GetTabsCounts(),
         ]);
+        
 
         return ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
@@ -458,6 +473,9 @@ export class TimesheetsState {
   ): Observable<void> {
     return this.timesheetDetailsApiService.changeTimesheetStatus(payload)
     .pipe(
+      tap(() => {
+        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+      }),
       catchError((err: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
