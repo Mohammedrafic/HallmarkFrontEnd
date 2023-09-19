@@ -278,6 +278,17 @@ export class TimesheetsState {
     );
   }
 
+  @Action(Timesheets.ResetTimesheets)
+  ResetTimesheets(
+    { setState }: StateContext<TimesheetsModel>,
+  ): Observable<null> {
+    return of(null).pipe(
+      tap(() => setState(patch<TimesheetsModel>({
+        timesheets: DefaultTimesheetCollection,
+      })))
+    );
+  }
+
   @Action(TimesheetDetails.GetTimesheetRecords)
   GetTimesheetRecords(
     { patchState, dispatch }: StateContext<TimesheetsModel>,

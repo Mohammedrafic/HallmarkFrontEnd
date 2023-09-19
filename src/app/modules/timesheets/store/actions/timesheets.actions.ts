@@ -153,6 +153,10 @@ export namespace Timesheets {
     }
   }
 
+  export class ResetTimesheets {
+    static readonly type = TIMESHEETS_ACTIONS.RESET_TIMESHEETS;
+  }
+
   export class ResetFiltersState {
     static readonly type = TIMESHEETS_ACTIONS.RESET_FILTERS_STATE;
   }
