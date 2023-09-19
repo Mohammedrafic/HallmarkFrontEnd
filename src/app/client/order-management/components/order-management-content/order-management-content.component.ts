@@ -409,7 +409,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public threeDotsMenuOptions: Record<string, ItemModel[]>;
   public context: { componentParent: OrderManagementContentComponent };
   public gridOptions: GridOptions;
-  public canViewOrderVMS: boolean;
   public readonly modules: Module[] = [ClientSideRowModelModule];
   public readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
 
