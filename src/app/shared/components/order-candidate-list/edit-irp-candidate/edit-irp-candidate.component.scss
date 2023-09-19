@@ -1,13 +1,12 @@
-@import "colors";
-@import "mixins";
+@import 'colors';
+@import 'mixins';
 
 .dialog {
-  padding: 24px;
-
   .header-candidate {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 24px 24px 0;
 
     .title {
       font-size: 24px;
@@ -32,29 +31,29 @@
 
   .form-wrapper {
     margin-top: 24px;
+    padding: 0 24px 24px;
 
     .form {
       display: grid;
       grid-auto-columns: 1fr;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
       gap: 10px;
-      grid-template-areas:
-    "status status"
-    ". ."
-    ". ."
-    "close-switch close-switch"
-    "reason reason"
-    "close-date close-date";
     }
 
-    .status { grid-area: status; }
-    .close-switch { grid-area: close-switch; }
-    .reason { grid-area: reason; }
-    .close-date { grid-area: close-date; }
+    .status,
+    .reason,
+    .close-date,
+    .close-switch {
+      grid-column: 1/3;
+    }
   }
 }
 
 .switch {
   @include toggle;
+}
+
+app-comments-irp {
+  display: block;
+  margin-top: 16px;
 }
