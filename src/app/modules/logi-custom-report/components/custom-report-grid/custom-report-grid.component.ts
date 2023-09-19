@@ -90,6 +90,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   public user: any;
   public AssociateAgencyData: AssociateAgencyDto[] = [];
   organizationSwitch = true;
+  public isInitial=true;
 
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
@@ -253,6 +254,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
   public onEdit(data: any): void {
     this.selectedCustomReportItem$.next(data.rowData);
     this.isCRPopup = true;
+    this.isInitial=false;
   }
 
 
@@ -263,6 +265,7 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
 
   public refreshParentComponent() {
     this.isCRPopup = false;
+    this.isInitial=true;
     this.dispatchNewPage({ currentPage: this.currentPage, pageSize: this.pageSize });
   }
   public dispatchNewPage(postData: any): void {
@@ -343,7 +346,8 @@ export class CustomReportGridComponent extends AbstractGridConfigurationComponen
     let paramsdata = {
 
       organizationId: this.shareForm.value.organizationid,
-      sharedDocumentIds: this.rowvalues
+      sharedDocumentIds: this.rowvalues,
+      businessUnitType:this.user?.businessUnitType
     }
     this.store.dispatch(new sharedDocs(paramsdata));
     this.closeDialog()

@@ -620,7 +620,7 @@ export class DashboardService {
       map((candidatesInfo: AveragedayActivecandidateInfo[]) => {
         return {
           id: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS,
-           title: 'Average Days on Active Candidate Status',
+           title: 'Average Days for Active Candidates in a Status',
           chartData: lodashMapPlain(candidatesInfo, ({ count, status,averageDays }: AveragedayActivecandidateInfo, index: number) => ({
             label: status,
             value: parseFloat(averageDays.toFixed(2)),

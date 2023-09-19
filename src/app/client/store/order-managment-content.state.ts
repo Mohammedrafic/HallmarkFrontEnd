@@ -983,14 +983,14 @@ export class OrderManagementContentState {
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents, internalDistributionChanged }: EditIrpOrder
-  ): Observable<void | Blob[] | Order[]> {
+  ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.editIrpOrder(order).pipe(
-      switchMap((order: Order[]) => {
+      switchMap((order: Order) => {
         const successMessage = internalDistributionChanged
           ? ChangeInternalDistributionSuccess
           : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(
-            order[0]?.organizationPrefix ?? '',
-            order[0]?.publicId?.toString() ?? ''
+            order?.organizationPrefix ?? '',
+            order?.publicId?.toString() ?? ''
           );
 
         dispatch([new ShowToast(MessageTypes.Success, successMessage), new SaveIrpOrderSucceeded()]);
