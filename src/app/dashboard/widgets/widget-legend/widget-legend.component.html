@@ -40,7 +40,7 @@
 </div>
 <div class="widget-legend" *ngIf="isPositionTrend">
   <div *ngFor="let legend of legendData; trackBy: trackByHandler">
-    <div class="widget-legend__item-content">
+    <div class="widget-legend__item-content" *ngIf="isPositionTrend && !isBillRateTrend">
       <div id="widget_left" class="widget_left">
         <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
         <div class="widget-legend__row-container" [ngClass]="slideBar ? 'container-mar' : ''"  (click)="onClickLegendRow($event,legend.label)" (mousedown)="defineMousePosition($event)">
@@ -51,14 +51,27 @@
         </div>
       </div>
       <div id="center" class="widget_center">
-        <div class="widget-item-count"><span>{{ legend.totalCount }}</span></div>
+        <div class="widget-item-count"><span>{{ legend.totalCount}}</span></div>
       </div>
       <div id="right" class="widget_right">
         <div *ngIf="!showPercentRatio" class="widget-legend__score">{{ legend.value }}</div>
-        <app-percentage-ratio-indicator *ngIf="showPercentRatio"
-                                        [slideBar]="slideBar"
-                                        [percentageRatio]="legend.value"
-                                        class="widget-legend__percentage-ratio"></app-percentage-ratio-indicator>
+        <app-percentage-ratio-indicator *ngIf="showPercentRatio" [slideBar]="slideBar" [percentageRatio]="legend.value"
+          class="widget-legend__percentage-ratio"></app-percentage-ratio-indicator>
+      </div>
+    </div>
+    <div class="widget-legend__item-content" *ngIf="isBillRateTrend">
+      <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
+      <div class="widget-legend__row-container" [ngClass]="slideBar ? 'container-mar' : ''"
+        (click)="onClickLegendRow($event,legend.label)" (mousedown)="defineMousePosition($event)">
+        <div class="widget-legend__row">
+          <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"
+            [ngClass]="slideBar ? 'trend-marright' : averageFlag ? 'pointSize' : ''"></div>
+          <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
+
+          <div class="widget-item-count mr-1" style="margin-right: 20px;"><span>{{ legend.totalCount}}</span></div>
+          <app-percentage-ratio-indicator *ngIf="showPercentRatio" [percentageRatio]="legend.value"
+            class="widget-legend__percentage-ratio"></app-percentage-ratio-indicator>
+        </div>
       </div>
     </div>
   </div>

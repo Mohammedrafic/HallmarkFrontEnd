@@ -18,7 +18,7 @@ export class WidgetLegendComponent {
   @Input() public slideBar: any = false;
   @Input() public averageFlag: boolean =false;
   @Input() public averageactiveFlag:boolean=false;
-
+  @Input() public isBillRateTrend: boolean =false;
   @Output() onClickLegend: EventEmitter<string> = new EventEmitter();
   @Output() changeCheckbox: EventEmitter<string> = new EventEmitter();
 
