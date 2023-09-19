@@ -5,7 +5,7 @@ import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, Subject, takeUntil, takeWhile, delay } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile,delay } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -34,10 +34,10 @@ import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 // import { ExportOrientation } from '@organization-management/orientation/components/orientation-historical-data/orientation.action';
 import { VendorScorePayload } from '@shared/models/vendorscorecard.model';
 import { Filtervendorscorecard } from './vendorscorecard.action';
-import { VendorScorecardresponse, VendorScorecardresponsepayload } from "@shared/models/vendorscorecard.model";
+import {VendorScorecardresponse, VendorScorecardresponsepayload } from "@shared/models/vendorscorecard.model";
 import { VendorSCorecardState } from './vendorscorecard.state';
 import { DatePipe } from '@angular/common'
-import { jsPDF } from 'jspdf'
+import {jsPDF}from 'jspdf'
 import html2canvas from 'html2canvas';
 
 @Component({
@@ -299,7 +299,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
               this.filterColumns.agencyIds.dataSource = data?.agencies;
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-              this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+              // this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
               this.filterColumns.orderTypes.dataSource = data?.orderStatuses;
               let masterSkills = this.filterOptionsData.masterSkills;
               let skills = masterSkills.filter((i) => this.defaultSkillCategories?.includes(i.skillCategoryId));
@@ -308,7 +308,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
               this.defaultSkills = skills.map((list) => list.id);
               this.defaultOrderTypes = this.orderTypesList.map((list) => list.id);
               this.filterColumns.orderTypes.dataSource = this.orderTypesList;
-              this.SearchReport();
+              this.SearchReport() ;
             }
           });
           this.regions = this.regionsList;
@@ -529,6 +529,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     }
     else {
       this.filtergraphdata();
+      this.store.dispatch(new ShowFilterDialog(false));
     }
   }
   public showToastMessage(regionsLength: number, locationsLength: number, departmentsLength: number) {
@@ -572,8 +573,8 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
         this.VendorScorecardresponse = data["VendorScoreCard"]["VendorScorecardEntity"];
       }
     });
-  }
-  public captureScreen() {
+  } 
+   public captureScreen() {
     var data = document.getElementById('contentToConvert')!;
     html2canvas(data).then((canvas) => {
       var imgWidth = 200;
@@ -585,22 +586,23 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       console.log(contentDataURL);
       let pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
       var position = 0;
-      let graphCount = Number(this.VendorScorecardresponse.length);
-      let pageCount = Number(graphCount / 2.5);
-      for (let i = 0; i < pageCount; i++) {
-        if (i != 0)
-          pdf.addPage();
+      let graphCount=Number(this.VendorScorecardresponse.length);
+      let pageCount=Number(graphCount/2.5);
+      for(let i =0;i<pageCount;i++)
+      {
+           if(i!=0)
+        pdf.addPage();
         pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
-
-        position -= 300;
+    
+       position-=300;
       }
-      //   pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
-      //   pdf.addPage();
-      //  pdf.addImage(contentDataURL, 'PNG', 5, -300, imgWidth, imgHeight);
-      //  pdf.addPage();
-      //  pdf.addImage(contentDataURL, 'PNG', 5, -600, imgWidth, imgHeight);
-      //  pdf.addPage();
-      //  pdf.addImage(contentDataURL, 'PNG', 5, -900, imgWidth, imgHeight);
+    //   pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
+    //   pdf.addPage();
+    //  pdf.addImage(contentDataURL, 'PNG', 5, -300, imgWidth, imgHeight);
+    //  pdf.addPage();
+    //  pdf.addImage(contentDataURL, 'PNG', 5, -600, imgWidth, imgHeight);
+    //  pdf.addPage();
+    //  pdf.addImage(contentDataURL, 'PNG', 5, -900, imgWidth, imgHeight);
       pdf.save('VendorScoreReport.pdf'); // Generated PDF
     });
   }
