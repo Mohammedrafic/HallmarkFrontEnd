@@ -1,0 +1,60 @@
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+
+  <ng-template #header>
+    <div class="widget-header">
+
+      <div class="app-bill-rate-widget__title" [ngClass]="slideBar ? 'slideBarWidth' : ''">
+        <h3 class="widget-header__title">{{ 'Monthly Avg Bill Rate by Skill Category' }}</h3>
+      </div>
+      <div class="app-bill-rate-widget__tooltip" [ngClass]="slideBar ? 'slideTooltipMar' : ''"
+        *ngIf="description.length>0">
+        <ejs-tooltip [content]="description" position='TopCenter'>
+          <span class="mytooltip">
+            <i-feather name="info" id="info"
+              [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+          </span>
+        </ejs-tooltip>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #lineChart>   
+    <ejs-chart #sfComponent [chartArea]="chartArea" [primaryXAxis]="isDarkTheme ? primaryXAxisDarkTheme : primaryXAxis"
+      [primaryYAxis]="isDarkTheme ? primaryYAxisDarkTheme : primaryYAxis" [crosshair]="crosshairSettings"
+      [legendSettings]="legendSettings" [tooltip]="isDarkTheme ? tooltipDarkSettings : tooltipSettings"
+      class="app-bill-rate-widget__component" [palettes]="palettes"
+      [background]="isDarkTheme ? 'var(--chart-dark-bg)' : 'var(--chart-light-bg)'">
+
+      <e-series-collection>       
+        <e-series [dataSource]="(filteredChartData$ | async)?.[skillCategoryTypeEnum.Allied] ?? []"
+        [name]="skillCategoryTypeEnum.Allied" [width]="lineWidthInPixels" [xName]="xAxisName"
+        [yName]="yAxisName" [legendShape]="legendShape" [type]="type"></e-series>
+
+        <e-series [dataSource]="(filteredChartData$ | async)?.[skillCategoryTypeEnum.Interim_Management] ?? []"
+        [name]="skillCategoryTypeEnum.Interim_Management" [width]="lineWidthInPixels" [xName]="xAxisName"
+        [yName]="yAxisName" [legendShape]="legendShape" [type]="type"></e-series>
+
+        <e-series [dataSource]="(filteredChartData$ | async)?.[skillCategoryTypeEnum.Locums] ?? []"
+        [name]="skillCategoryTypeEnum.Locums" [width]="lineWidthInPixels" [xName]="xAxisName"
+        [yName]="yAxisName" [legendShape]="legendShape" [type]="type"></e-series>
+
+        <e-series [dataSource]="(filteredChartData$ | async)?.[skillCategoryTypeEnum.Non_Clinical] ?? []"
+        [name]="skillCategoryTypeEnum.Non_Clinical" [width]="lineWidthInPixels" [xName]="xAxisName"
+        [yName]="yAxisName" [legendShape]="legendShape" [type]="type"></e-series>
+
+        <e-series [dataSource]="(filteredChartData$ | async)?.[skillCategoryTypeEnum.Nursing] ?? []"
+        [name]="skillCategoryTypeEnum.Nursing" [width]="lineWidthInPixels" [xName]="xAxisName"
+        [yName]="yAxisName" [legendShape]="legendShape" [type]="type"></e-series>
+
+        <e-series [dataSource]="(filteredChartData$ | async)?.[skillCategoryTypeEnum.Others] ?? []"
+        [name]="skillCategoryTypeEnum.Others" [width]="lineWidthInPixels" [xName]="xAxisName"
+        [yName]="yAxisName" [legendShape]="legendShape" [type]="type"></e-series>
+
+      </e-series-collection>
+    </ejs-chart>
+  </ng-template>
+  <ng-template #legend>
+    <app-widget-legend [slideBar]="slideBar" [isPositionTrend]="true" [legendData]="chartLegend"
+      (changeCheckbox)="onClickLegend($event)" [showPercentRatio]="false" [isBillRateTrend]="true"></app-widget-legend>
+  </ng-template>
+</app-widget-wrapper>

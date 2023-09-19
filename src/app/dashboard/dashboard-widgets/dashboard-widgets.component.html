@@ -127,6 +127,12 @@
                                 [chartData]="widgetsData?.[widgetTypeEnum.ORDERS_PENDING_IN_CUSTOM]"
                                 [widgetData]="widgetsData"
                                 [isDarkTheme]="isDarkTheme" ></app-orders-pending-custom-status>
+          <app-bill-rate-widget *ngSwitchCase="widgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY" [slideBar]="isSideBarDocked$ | async"
+                          [chartData]="widgetsData?.[widgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]"
+                          [isLoading]="isLoading"
+                          [timeSelection]="timeSelection" [isDarkTheme]="isDarkTheme"
+                          [description]="widgetDescriptionEnum.BILL_RATE_BY_SKILL_CATEGORY"></app-bill-rate-widget>
+
         </ng-template>
       </e-panel>
     </e-panels>

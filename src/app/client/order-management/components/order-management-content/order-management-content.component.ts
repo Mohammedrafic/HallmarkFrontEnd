@@ -409,7 +409,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public threeDotsMenuOptions: Record<string, ItemModel[]>;
   public context: { componentParent: OrderManagementContentComponent };
   public gridOptions: GridOptions;
-  public canViewOrderVMS: boolean;
   public readonly modules: Module[] = [ClientSideRowModelModule];
   public readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
 
@@ -492,6 +491,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public eliteOrderPublicId:number;
   public redirecttovmsfromIRP:boolean=true;
   public redirecttoIRPfromVMS:boolean=true;
+  public isOrderDetailsTab: boolean = false;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -661,8 +661,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
     this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     if (Object.values(AlertIdEnum).includes(this.alertTitle)) {
+      if((this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim().toLowerCase()){
+        this.isOrderDetailsTab=true;
+      }
+      else
+      {
       this.isCondidateTab = true;
     }
+  }
   }
 private watchForOrderGridSystemClickEvent()
 {
@@ -957,6 +963,7 @@ public RedirecttoIRPOrder(order:Order)
         this.filters.orderPublicId=this.eliteOrderPublicId.toString();
         this.redirectedfromnotification=!this.redirectedfromnotification;
         this.eliteOrderPublicId=0;
+        this.isOrderDetailsTab=false;
       }
       this.filters.orderBy = this.orderBy;
       this.filters.pageNumber = this.currentPage;

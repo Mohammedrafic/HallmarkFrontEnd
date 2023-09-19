@@ -60,6 +60,8 @@ import { AgencyPositionModel } from '../models/agency-position.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
 import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetSkillsbyByFilters, GetWorkCommitment } from '../models/rn-utilization.model';
 import { AvailableEmployeeModel } from '../models/available-employee.model';
+import { BillRateResponse } from '../models/bill-rate-by-skill-category-response.model';
+import { BillRateBySkillCategoryTypeAggregatedModel } from '../models/bill-rate-by-skill-category-type-aggregated.model';
 
 @Injectable()
 export class DashboardService {
@@ -93,6 +95,7 @@ export class DashboardService {
     [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
     [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
     [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivecandidateStatusWidgetData(filters),
+    [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getSkillCategoryByTypes(filters, timeSelection),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -617,7 +620,7 @@ export class DashboardService {
       map((candidatesInfo: AveragedayActivecandidateInfo[]) => {
         return {
           id: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS,
-           title: 'Average Days on Active Candidate Status',
+           title: 'Average Days for Active Candidates in a Status',
           chartData: lodashMapPlain(candidatesInfo, ({ count, status,averageDays }: AveragedayActivecandidateInfo, index: number) => ({
             label: status,
             value: parseFloat(averageDays.toFixed(2)),
@@ -630,6 +633,28 @@ export class DashboardService {
     );
     } 
 
-
+    private getSkillCategoryByTypes(filter: DashboartFilterDto, timeSelection: TimeSelectionEnum): Observable<BillRateBySkillCategoryTypeAggregatedModel> {
+      const timeRanges = this.calculateTimeRanges(timeSelection);    
+      var data = this.httpClient      
+        .post<BillRateResponse>(`${this.baseUrl}/GetAverageBillRateBySkillCategory`, { ...timeRanges, ...filter, rangeType: timeSelection})     
+        .pipe(
+          map((positions: BillRateResponse) => {             
+            let obj: any = {}           
+            var keysOfData = Object.keys(positions.data[0]);            
+            keysOfData.forEach((eachVAlue, index) => {              
+              if (eachVAlue) {                
+                var objValues: any[] = Object.values(positions.data[0])[index];
+                var formattedValue = objValues.map(a => ({
+                  month: MONTHS[a.dateIndex],
+                  value: a.value
+                }));
+                var objKey = eachVAlue.charAt(0).toUpperCase() + eachVAlue.slice(1);
+                obj[objKey] = formattedValue;
+              }
+            });       
+            return obj;            
+          }));          
+      return data;
+    } 
  
 }

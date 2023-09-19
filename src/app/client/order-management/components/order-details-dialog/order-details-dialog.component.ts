@@ -15,7 +15,7 @@ import {
 import { catchError, distinctUntilChanged, EMPTY, filter, map, Observable, Subject, take, takeUntil, zip } from 'rxjs';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
-import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { SelectEventArgs, TabComponent} from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
@@ -102,6 +102,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Output() updateOrders = new EventEmitter();
   @Output() editOrderPressed = new EventEmitter<number>();
   @Input() activeIRPtabs: OrderManagementIRPTabsIndex;
+  @Input() isOrderDetailsTab: boolean;
 
   // TODO: Delete it when we will have re-open sidebar
   @Output() private reOpenOrderSuccess: EventEmitter<Order> = new EventEmitter<Order>();
@@ -545,6 +546,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       if(IsEmployeeTab){
         this.tab.select(1);
         this.globalWindow.localStorage.setItem("IsEmployeeTab",JSON.stringify(""));
+      }
+      else if(this.isOrderDetailsTab){
+        this.tab.select(0);
+        this.isOrderDetailsTab=false;
       }
     },1000)
   }
