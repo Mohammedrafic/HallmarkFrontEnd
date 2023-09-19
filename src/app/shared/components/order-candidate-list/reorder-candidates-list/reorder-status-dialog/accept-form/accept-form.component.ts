@@ -62,6 +62,10 @@ export class AcceptFormComponent implements OnChanges{
     return this.status === CandidatStatus.Cancelled;
   }
 
+  ngOnInit(): void {
+    this.disableClockId();
+  }
+
   public ngOnChanges(): void {
       this.configureCandidatePayRateField();
   }
@@ -75,6 +79,16 @@ export class AcceptFormComponent implements OnChanges{
       candidatePayRateControl?.enable();   
     } else {
       candidatePayRateControl?.disable();
+    }
+  }
+
+  private disableClockId(): void {
+    const candidateClockId = this.formGroup.get('clockId');
+
+    if (this.isReorder) {
+      candidateClockId?.disable();
+    } else {
+      candidateClockId?.enable();
     }
   }
 
