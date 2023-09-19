@@ -405,7 +405,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public threeDotsMenuOptions: Record<string, ItemModel[]>;
   public context: { componentParent: OrderManagementContentComponent };
   public gridOptions: GridOptions;
-
+  public canViewOrderVMS: boolean;
   public readonly modules: Module[] = [ClientSideRowModelModule];
   public readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
 
@@ -2606,6 +2606,7 @@ public RedirecttoIRPOrder(order:Order)
     this.getPermissionStream().pipe(takeUntil(this.unsubscribe$)).subscribe((permissions: Permission) => {
       this.hasCreateEditOrderPermission = permissions[this.userPermissions.CanCreateOrders]
         || permissions[this.userPermissions.CanOrganizationEditOrders];
+      this.canViewOrderVMS = permissions[this.userPermissions.CanOrganizationViewOrders];
       this.canViewOrderIRP=permissions[this.userPermissions.CanOrganizationViewOrdersIRP]
       this.canEditOrderIRP=permissions[this.userPermissions.CanOrganizationEditOrdersIRP]
       this.cd$.next(true);
@@ -2671,6 +2672,24 @@ public RedirecttoIRPOrder(order:Order)
         this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
       }
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
+      for(let i=0 ; i<this.systemGroupConfig.length; i++){
+        if(this.systemGroupConfig[i].title === "IRP"){
+          if(!this.canViewOrderIRP){
+            this.systemGroupConfig.splice(i, 1)
+          }
+        } else if(this.systemGroupConfig[i].title === "VMS"){
+          if(!this.canViewOrderVMS){
+            this.systemGroupConfig.splice(i,1);
+          }
+        }
+        if(this.canViewOrderIRP && !this.canViewOrderVMS){
+          this.activeSystem = OrderManagementIRPSystemId.IRP;
+        } else {
+          this.activeSystem = OrderManagementIRPSystemId.VMS
+        }
+      }
+      this.systemGroupConfig = SystemGroupConfig(this.canViewOrderIRP, this.canViewOrderVMS, this.activeSystem,this.canOrderJourney);
+      this.cd.detectChanges();
       this.setOrderTypesFilterDataSource();
       this.initMenuItems();
       this.initGridColumns();
