@@ -75,7 +75,6 @@ export class AccumulationChartComponent
   }
 
   public redirectToSourceContent(status: string): void {
-    console.log("status",status)
     let candidatesStatusDataSet:any = []
     let activeOrderStatus:any = []
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
@@ -120,10 +119,10 @@ export class AccumulationChartComponent
         window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
         this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
       }
-    }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status" ||  this.chartData?.title==="Average Days on Active Candidate Status"){
+    }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status" ||  this.chartData?.title==="Average Days for Active Candidates in a Status"){
         let candidatesDataset:any = [];
         let candidatesOrderDataSet = [];
-        if(this.chartData?.title == "Candidates for Active Positions" ||  this.chartData?.title==="Average Days on Active Candidate Status"){
+        if(this.chartData?.title == "Candidates for Active Positions" ||  this.chartData?.title==="Average Days for Active Candidates in a Status"){
           this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
             candidatesDataset = data;
           }); 
@@ -135,9 +134,9 @@ export class AccumulationChartComponent
 
         let candidatesChartInfo = candidatesDataset.find((ele:any)=>ele.status == status);
         candidatesOrderDataSet.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
-        if(candidatesChartInfo.applicantStatus === OrderStatus.Onboard){
+        if(candidatesChartInfo?.applicantStatus === OrderStatus.Onboard){
           candidatesOrderDataSet.push({"value":OrderStatus.Filled, "name": PositionTrendTypeEnum.FILLED});
-        }else if(candidatesChartInfo.applicantStatus === OrderStatus.Cancelled || candidatesChartInfo.applicantStatus === OrderStatus.Offboard){ // "Cancelled" "Offboard"
+        }else if(candidatesChartInfo?.applicantStatus === OrderStatus.Cancelled || candidatesChartInfo?.applicantStatus === OrderStatus.Offboard){ // "Cancelled" "Offboard"
           candidatesOrderDataSet.push({"value":OrderStatus.Filled, "name": PositionTrendTypeEnum.FILLED});
           candidatesOrderDataSet.push({"value":OrderStatus.Closed, "name": PositionTrendTypeEnum.CLOSED});
         }
