@@ -556,18 +556,10 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   private dispatchNewPage(user: any, sortModel: any = null, filterModel: any = null): void {
     const { businessUnit } = this.businessForm?.getRawValue();
     if (user != 0) {
-      const buT = this.getRealBusinessUnitType(businessUnit);
       this.userGuid = user;
-      this.getdata = this.store.dispatch(new GetUserSubscriptionPage(buT || null, user, this.currentPage, this.pageSize, sortModel, filterModel, this.filters, this.activeSystem == OrderManagementIRPSystemId.IRP));
+      this.getdata = this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, user, this.currentPage, this.pageSize, sortModel, filterModel, this.filters, this.activeSystem == OrderManagementIRPSystemId.IRP));
     }
   }
-
-  private getRealBusinessUnitType(businessUnit: BusinessUnitType) {
-    businessUnit = (this.activeSystem == OrderManagementIRPSystemId.IRP && 
-    businessUnit === BusinessUnitType.Candidates) ?businessUnit : BusinessUnitType.Organization ;
-    return businessUnit;
-  }
-
   private dispatchUserPage(businessUnitIds: number[]) {
     this.store.dispatch(new GetAllUsersPage(this.businessUnitControl.value, businessUnitIds, this.currentPage, this.pageSize, null, null, true));
   }
@@ -590,8 +582,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       }
       if(this.activeSystem == OrderManagementIRPSystemId.IRP){
         const { businessUnit } = this.businessForm?.getRawValue();
-        const buT = this.getRealBusinessUnitType(businessUnit);
-        updateUserSubscription.businessUnitType = buT;
+        updateUserSubscription.businessUnitType = businessUnit;
         updateUserSubscription.isIRP = true;
       }
       this.store.dispatch(new UpdateUserSubscription(updateUserSubscription));
