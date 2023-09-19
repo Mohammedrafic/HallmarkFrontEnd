@@ -61,6 +61,7 @@ export namespace TimesheetDetails {
     constructor(
       public readonly body: PutRecordDto,
       public readonly isAgency: boolean,
+      public readonly updateAfterLoad = true,
       ) {}
   }
 

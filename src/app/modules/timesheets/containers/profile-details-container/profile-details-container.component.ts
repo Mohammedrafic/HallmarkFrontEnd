@@ -147,8 +147,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public isMileageStatusAvailable = true;
 
-  public countOfTimesheetUpdates = 0;
-
   public disableAnyAction = false;
 
   public hasEditTimesheetRecordsPermission: boolean;
@@ -202,10 +200,11 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.watchForPermissions();
     this.startSelectedTimesheetWatching();
     this.closeDialogOnNavigationStart();
-    this.setOrgId();
     this.watchForRangeChange();
     this.initResizeObserver();
-    this.listenResizeToolbar();    
+    this.listenResizeToolbar();
+    this.observeRecordsLoad();
+    this.observeDetails();
   }
 
   public override ngOnDestroy(): void {
@@ -293,7 +292,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         ))
       )
       .subscribe(() => {
-        this.store.dispatch(new Timesheets.GetAll());
+        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
         this.refreshData();
         this.closeDialog();
       }) : this.store.dispatch(
@@ -314,6 +313,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         this.store.dispatch([
           new ShowToast(MessageTypes.Success, rejectTimesheetDialogData(this.isTimesheetOrMileagesUpdate).successMessage),
           new Timesheets.GetAll(),
+          new Timesheets.GetTabsCounts(),
         ]);
 
         this.handleProfileClose();
@@ -346,7 +346,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       )
       .subscribe(() => {
         this.handleProfileClose();
-        this.store.dispatch(new Timesheets.GetAll());
+        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
       });
   }
 
@@ -447,6 +447,15 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.previewAttachemnt = false;
   }
 
+  public closeDialog(): void {
+    this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
+    .pipe(
+      take(1),
+    ).subscribe(() => {
+      this.candidateDialog.hide();
+    });
+  }
+
   private orgSubmitEmptyTimesheetWarning(): void {
     this.timesheetDetailsService.orgSubmitEmptyTimesheet().pipe(take(1), takeUntil(this.componentDestroy())).subscribe();
   }
@@ -460,58 +469,19 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       this.handleProfileClose();
-      this.store.dispatch(new Timesheets.GetAll());
+      this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
     });
   }
 
   private startSelectedTimesheetWatching(): void {
     this.selectedTimeSheet$.pipe(
       throttleTime(100),
-      filter(Boolean),
-      switchMap((timesheet: TimesheetInt.Timesheet) => {
-        this.countOfTimesheetUpdates = 0;
-        this.previewAttachemnt = false;
-        this.store.dispatch(new Timesheets.GetTimesheetDetails(
-          timesheet.id, timesheet.organizationId, this.isAgency));
-        return this.actions;
-      }),
-      ofActionCompleted(Timesheets.GetTimesheetDetails),
-      switchMap(() => {
-        return this.timesheetDetails$;
-      }),
-      filter(Boolean),
-      filter((details) => !details.isNotExist),
-      switchMap((details) => {
-        const currentStatus = details.status;
-        const isTimesheetSubmitted = currentStatus === this.timesheetStatus.Approved
-        || currentStatus === this.timesheetStatus.PendingApproval
-        || currentStatus === this.timesheetStatus.PendingApprovalAsterix;
-        this.canRecalculateTimesheet = isTimesheetSubmitted && this.canRecalculate;
-        this.timesheetId = details.id;
-        this.mileageTimesheetId = details.mileageTimesheetId;
-        this.isMileageStatusAvailable = details.mileageStatusText
-        .toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
-        this.costCenterId = details.departmentId;
-
-        this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
-          details.id, details.organizationId, this.isAgency));
-
-        return this.actions;
-      }),
-      ofActionCompleted(TimesheetDetails.GetTimesheetRecords),
-      tap(() => {
-        // eslint-disable-next-line no-plusplus
-        this.countOfTimesheetUpdates++;
-        this.chipList?.refresh();
-        this.cd.detectChanges();
-      }),
-      tap(() => {
-        this.chipList?.refresh();
-      }),
-      filter(() => this.store.selectSnapshot(TimesheetsState.isTimesheetOpen)),
+      filter((timesheet) => !!timesheet),
       takeUntil(this.componentDestroy()),
-    ).subscribe(() => {
-      this.candidateDialog?.show();
+    ).subscribe((timesheet) => {
+      this.previewAttachemnt = false;
+      this.store.dispatch(new Timesheets.GetTimesheetDetails(
+        timesheet.id, timesheet.organizationId, this.isAgency));
     });
   }
 
@@ -529,48 +499,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     );
   }
 
-  private closeDialog(): void {
-    this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
-    .pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.candidateDialog.hide();
-      if (this.countOfTimesheetUpdates > 1) {
-        this.store.dispatch(new Timesheets.GetAll());
-      }
-    });
-  }
-
-  private setOrgId(): void {
-    this.timesheetDetails$
-    .pipe(
-      filter(Boolean),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId,
-      candidateWorkPeriods, canEditTimesheet, allowDNWInTimesheets, agencyStatus }) => {
-      this.organizationId = this.isAgency ? organizationId : null;
-      this.orgId =  organizationId;
-      this.jobId = jobId;
-      this.weekPeriod = [
-        DateTimeHelper.setCurrentTimeZone(weekStartDate),
-        DateTimeHelper.setCurrentTimeZone(weekEndDate),
-      ];
-      this.workWeeks = candidateWorkPeriods.map((el: TimesheetInt.WorkWeek<string>): TimesheetInt.WorkWeek<Date> => ({
-        weekStartDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekStartDate)),
-        weekEndDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekEndDate)),
-      }));
-      this.setDNWBtnState(canEditTimesheet, !!allowDNWInTimesheets);
-      this.checkForAllowActions(agencyStatus);
-      this.allowEditButtonEnabled();
-      this.cd.markForCheck();
-    });
-  }
-
   private watchForRangeChange(): void {
     this.timesheetDetailsService.watchRangeStream()
     .pipe(
-      skip(1),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((range) => {
@@ -643,5 +574,59 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   onPreviewAttchementClick($event:boolean){
     console.log('$event',$event);
     this.previewAttachemnt = $event;
+  }
+
+  private observeDetails(): void {
+    this.timesheetDetails$
+    .pipe(
+      filter((details) => !!details && !details.isNotExist),
+      takeUntil(this.componentDestroy())
+    ).subscribe((details) => {
+      const currentStatus = details.status;
+      const isTimesheetSubmitted = currentStatus === this.timesheetStatus.Approved
+      || currentStatus === this.timesheetStatus.PendingApproval
+      || currentStatus === this.timesheetStatus.PendingApprovalAsterix;
+      this.canRecalculateTimesheet = isTimesheetSubmitted && this.canRecalculate;
+      this.timesheetId = details.id;
+      this.mileageTimesheetId = details.mileageTimesheetId;
+      this.isMileageStatusAvailable = details.mileageStatusText
+      .toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
+      this.costCenterId = details.departmentId;
+
+      this.organizationId = this.isAgency ? details.organizationId : null;
+      this.orgId =  details.organizationId;
+      this.jobId = details.jobId;
+      this.weekPeriod = [
+        DateTimeHelper.setCurrentTimeZone(details.weekStartDate),
+        DateTimeHelper.setCurrentTimeZone(details.weekEndDate),
+      ];
+      this.workWeeks = details.candidateWorkPeriods
+      .map((el: TimesheetInt.WorkWeek<string>): TimesheetInt.WorkWeek<Date> => ({
+        weekStartDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekStartDate)),
+        weekEndDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekEndDate)),
+      }));
+      this.setDNWBtnState(details.canEditTimesheet, !!details.allowDNWInTimesheets);
+      this.checkForAllowActions(details.agencyStatus);
+      this.allowEditButtonEnabled();
+      this.cd.markForCheck();
+
+      this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
+        details.id, details.organizationId, this.isAgency));
+    });
+  }
+
+  private observeRecordsLoad(): void {
+    this.actions
+    .pipe(
+      ofActionCompleted(TimesheetDetails.GetTimesheetRecords),
+      tap(() => {
+        this.chipList?.refresh();
+        this.cd.detectChanges();
+      }),
+      filter(() => this.store.selectSnapshot(TimesheetsState.isTimesheetOpen)),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => {
+      this.candidateDialog?.show();
+    });
   }
 }
