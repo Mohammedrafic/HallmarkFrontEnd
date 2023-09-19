@@ -1,6 +1,6 @@
-@import "colors";
-@import "mixins";
-@import "adaptive-response";
+@import 'colors';
+@import 'mixins';
+@import 'adaptive-response';
 
 $chip-margin: 8px;
 
@@ -28,7 +28,8 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 .chip-container {
   display: flex;
   align-items: center;
-  padding-bottom: 24px;
+  padding-bottom: 16px;
+  @include stickyTabsPosition(77px);
 }
 
 .grouped {
@@ -187,6 +188,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
 .job-general-info {
   margin-bottom: 16px;
+  margin-top: 16px;
   padding: 17px 23px 17px 17px;
 }
 
