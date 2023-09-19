@@ -157,13 +157,20 @@ export class AccumulationChartComponent
     changes['chartData'] && this.handleChartDataChanges();
     this.totalScore = 0;
     this.chartData?.chartData.forEach(obj => {
-      this.totalScore += obj.value;
+      if(this.averageFlag){
+        this.totalScore += obj.average ? obj.average : 0;
+      }else{
+        this.totalScore += obj.value;
+      }
     });
-     }
+  }
 
   public ngOnInit(): void {
     this.datalabel = { visible: true, position: 'Outside' };
     this.filteredChartData$ = this.getFilteredChartData();
+    if(this.averageFlag){
+      this.tooltipSettings.template = '<div class="widget-tooltip"><div>${x} - <b>${tooltip}</b></div></div>';
+    }    
   }
 
   public onClickLegend(label: string): void {
@@ -177,7 +184,11 @@ export class AccumulationChartComponent
     this.totalScore = 0;
     this.chartData?.chartData.forEach(obj => {
       if (includes(obj.label, this.selectedEntries$.value)) {
-        this.totalScore += obj.value;
+        if(this.averageFlag){
+          this.totalScore += obj.average ? obj.average : 0;
+        }else{
+          this.totalScore += obj.value;
+        }
       }
     });
   }
@@ -190,10 +201,14 @@ export class AccumulationChartComponent
     this.chartDatachanges = this.chartData;
     this.totalval=0;
     this.chartDatachanges?.chartData.forEach(obj => {
-      this.totalval += obj.value;
+      this.totalval += obj.value;      
     });
     this.chartDatachanges?.chartData.forEach(obj => {
-      obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString():"0";
+      if(this.averageFlag){
+        obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString()+'% <br>'+obj.average+' Positions':"0";
+      }else{
+        obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString():"0";
+      }      
     });  
 
 
