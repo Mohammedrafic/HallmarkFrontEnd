@@ -126,7 +126,7 @@ export const GetConfigField = (config: ReadonlyArray<CandidateField>, field: str
 
 export const DisableControls = (controlList: string[], form: FormGroup): void => {
   controlList.forEach((control: string) => {
-    form.get(control)?.disable();
+    form.get(control)?.disable({ emitEvent: false, onlySelf: true });
   });
 };
 
