@@ -800,7 +800,11 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     const startDateControl = this.form.get('startDate');
     const endDateControl = this.form.get('endDate');
 
-    if (this.canEditStartEndDate && this.candidateJob.applicantStatus?.applicantStatus === CandidatStatus.Offboard) {
+    if (
+      this.canEditStartEndDate
+      && this.candidateJob.applicantStatus?.applicantStatus === CandidatStatus.Offboard
+      && this.order?.orderType === OrderType.LongTermAssignment
+    ) {
       startDateControl?.enable();
       endDateControl?.enable();
     } else {
