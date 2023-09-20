@@ -43,6 +43,7 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
+  endDate: string;
   isLocked?: boolean;
   isTemplate?: boolean;
   reOrderCount?: number;
