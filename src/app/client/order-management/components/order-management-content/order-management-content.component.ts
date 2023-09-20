@@ -2735,15 +2735,15 @@ public RedirecttoIRPOrder(order:Order)
       }
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       if(!this.canViewOrderIRP){
-        var index = this.systemGroupConfig.findIndex(ordertab => ordertab.title === "IRP");
-        if(index){
-          this.systemGroupConfig.splice(index, 1)
+        let irpIndex = this.systemGroupConfig.findIndex(ordertab => ordertab.title === "IRP");
+        if(irpIndex){
+          this.systemGroupConfig.splice(irpIndex, 1);
         }
       }
       if(!this.canViewOrderVMS){
-        var index = this.systemGroupConfig.findIndex(ordertab => ordertab.title === "VMS");
-        if(index){
-          this.systemGroupConfig.splice(index,1);
+        let vmsIndex = this.systemGroupConfig.findIndex(ordertab => ordertab.title === "VMS");
+        if(vmsIndex){
+          this.systemGroupConfig.splice(vmsIndex,1);
         }
       }
       if(this.canViewOrderIRP && !this.canViewOrderVMS){
