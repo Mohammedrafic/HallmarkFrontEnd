@@ -2027,7 +2027,6 @@ public RedirecttoIRPOrder(order:Order)
 
         }
       }
-      super.setHeightForMobileGrid(this.ordersPage?.items?.length);
 
       if (data?.items.length && this.isRedirectedFromVmsSystem) {
         this.openFirstIrpOrderDetails();

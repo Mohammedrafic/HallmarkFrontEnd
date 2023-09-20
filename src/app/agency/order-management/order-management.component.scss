@@ -61,5 +61,14 @@
     padding: 10px 24px 6px 24px;
     z-index: 100;
     top: 81px;
+    width: 100%;
+  }
+
+  .grid-component {
+    height: auto;
+  }
+
+  :host{
+    height: auto;
   }
 }

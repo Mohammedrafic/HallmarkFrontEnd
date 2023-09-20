@@ -227,7 +227,7 @@
       (rowDataBound)="setRowHighlight($event)"
       [dataSource]="(ordersPage$ | async)?.items"
       [pageSettings]="pageSettings"
-      [height]="isMobile ? mobileGridHeight : fullScreenGridHeight"
+      [height]="fullScreenGridHeight"
       [rowHeight]="rowHeight"
       [resizeSettings]="resizeSettings"
       [allowSorting]="allowSorting"
