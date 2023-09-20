@@ -40,6 +40,11 @@
     width: 14px !important;
     height: 14px !important;
     padding-left: 5px;
+
+    &.small {
+      width: 16px!important;
+      height: 16px!important;
+    }
   }
 
   .sort-header {
@@ -123,4 +128,18 @@
       }
     }
   }
+}
+.agency-text{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.error-text {
+  color: $supportive-red;
+}
+
+.tooltip-with-icon {
+  width: 16px;
+  height: 16px;
 }

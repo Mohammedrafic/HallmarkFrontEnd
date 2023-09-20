@@ -1,7 +1,7 @@
 <div class="associated-grid">
   <ejs-grid
     #grid
-    [dataSource]="(associateListPage$ | async)?.items"
+    [dataSource]="agencyData.items"
     [allowSorting]="true"
     [allowResizing]="true"
     [allowSelection]="false"
@@ -34,6 +34,22 @@
         </ng-template>
       </e-column>
       <e-column field="businessUnitName" headerText="{{headerText}}" textAlign="Left"></e-column>
+      <e-column field="partnershipStatus" headerText="Partnership Status" textAlign="left">
+        <ng-template #template let-data>
+          <div class="status-cell">
+            <app-tooltip-container
+            [message]="data.suspensionMessage"
+            [showToolTip]="!!data.suspensionMessage"
+            >
+              <ejs-chiplist>
+                <e-chips>
+                  <e-chip [text]="partnershipStatuses[data.partnershipStatus]" [cssClass]="partnershipStatuses[data.partnershipStatus] | chipsCssClass"></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+            </app-tooltip-container>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="baseFee" headerText="Base Fee %" width="130" textAlign="left">
         <ng-template #template let-data>
           {{ priceUtils.formatNumbers(data.baseFee) }}
@@ -42,7 +58,6 @@
       <e-column field="tierName" headerText="Tier" width="150" textAlign="left"></e-column>
       <e-column field="exeptionFee" headerText="Exception Fee" width="150" textAlign="left"></e-column>
       <e-column headerText="Job Distribution" [columns]="jobDistributionColumns" textAlign="left"></e-column>
-      <e-column field="partnershipStatus" headerText="Partnership Status" textAlign="left" [valueAccessor]="partnershipStatusValueAccess"></e-column>
     </e-columns>
 
     <ng-template #pagerTemplate let-data>

@@ -1,3 +1,6 @@
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import { AgencyPartnershipStatus } from '@shared/enums/status';
+
 export const JOB_DISTRIBUTION_COLUMNS = [
     {
         field: 'region',
@@ -36,3 +39,9 @@ export const JOB_DISTRIBUTION_COLUMNS = [
         }
     },
 ];
+
+export const AgencyStatusText = {
+  [PartnershipStatus.Active]: 'Active',
+  [PartnershipStatus.Suspended]: 'Suspended',
+  [PartnershipStatus.Inactive]: 'Inactive',
+};

@@ -113,7 +113,14 @@
         <ng-template #agencyColumn>
           <e-column field="agency" textAlign="Left" headerText="Agency" width="200" *ngIf="!isAgency">
             <ng-template #template let-data>
-              {{ data.agencyName }}
+              <div class="agency-text" [ngClass]="{ 'error-text': data.partnershipStatus === partnershipStatus.Suspended }">
+                {{ data.agencyName }}
+                <app-tooltip-container class="tooltip-with-icon"
+                  *ngIf="data.partnershipStatus === partnershipStatus.Suspended"
+                  [message]="getPartnershipMessage(data)" [showToolTip]="true">
+                  <i-feather class="icon small" name="alert-circle"></i-feather>
+                </app-tooltip-container>
+              </div>
             </ng-template>
           </e-column>
         </ng-template>

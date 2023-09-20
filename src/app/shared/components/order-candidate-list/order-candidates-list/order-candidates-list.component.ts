@@ -38,6 +38,8 @@ import {
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { UserPermissions } from '@core/enums';
 import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation.helper';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -97,6 +99,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     order: {} as Order,
   };
   public commentContainerId = 0;
+  public readonly partnershipStatus = PartnershipStatus;
 
   private isOrgIRPEnabled = false;
   private previousSelectedSystemId: OrderManagementIRPSystemId | null;
@@ -193,6 +196,11 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       isOpen: event,
     };
   }
+
+  public getPartnershipMessage(data: OrderCandidatesList): string {
+    return `Partnership was suspended on ${DateTimeHelper.formatDateUTC(data.suspentionDate, 'MM/dd/yyyy')}`;
+  }
+
 
   private getCandidateJob(data: OrderCandidatesList): void {
     if (this.order && this.candidate) {
