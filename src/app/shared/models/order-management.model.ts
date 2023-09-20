@@ -805,6 +805,7 @@ export type CandidateListEvent = {
   pageSize: number;
   excludeDeployed: boolean;
   isAvailable: boolean;
+  includeDeployed?: boolean;
   searchTerm?: string;
 };
 
@@ -829,6 +830,9 @@ export interface IrpOrderCandidateDto {
   lastShiftTo: string;
   nextShiftFrom: string;
   nextShiftTo: string;
+  isDeployed: boolean;
+  deployedUntil: string;
+  isDeployedInSameDepartment: boolean;
   candidateJobId: number;
   weeklyHoursSchedule: number;
   weekOvertime: number;
@@ -852,6 +856,7 @@ export interface IrpCandidatesParams {
   PageSize: number;
   PageNumber: number;
   isAvailable: boolean;
+  includeDeployed?: boolean;
   searchTerm?: string;
 }
 
@@ -905,7 +910,7 @@ export interface AuditLogPayload{
   searchValue:string;
 }
 
-export interface OrderAuditHistory{  
+export interface OrderAuditHistory{
     orderId: number
     orderType: string
     orderStatus: string
@@ -967,7 +972,7 @@ export interface OrderAuditHistory{
     modifiedOn: string
     modifiedBy: string
   }
-  
+
   export interface OrderWorkLocationAuditHistory {
     address: string
     state: string

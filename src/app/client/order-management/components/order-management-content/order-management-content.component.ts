@@ -98,8 +98,6 @@ import {
   UpdateRegRateSucceeded,
   GetOrderComments,
   ClearPredefinedBillRates,
-  GetOrderAuditHistory,
-  GetOrderHistoryDetailSucceeded,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -142,7 +140,6 @@ import { ButtonModel } from '@shared/models/buttons-group.model';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
-  AuditLogPayload,
   FilterOrderStatus,
   FilterStatus,
   IRPOrderManagement,
@@ -250,6 +247,7 @@ import {
   ViewOrderIRP_PERMISSION,
   ViewOrderVMS_PERMISSION
 } from '@shared/constants';
+import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/interfaces';
 
 @Component({
   selector: 'app-order-management-content',
@@ -470,6 +468,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private orderPositionWidgetStatus: string | null;
   private orderPositionXtraStatus: string | null;
   private organizationId: number;
+  private employeeToggleState: IrpEmployeeToggleState;
   public isCondidateTab: boolean = false;
   public OrderJourney: any[] = [];
   public canCreateOrderIRP:boolean;
@@ -502,7 +501,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
   public filterType: string = 'Contains';
   public orderDetail =new Subject<OrderManagement>();
-  
+
   constructor(
     protected override store: Store,
     private router: Router,
@@ -586,6 +585,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     window.localStorage.setItem("OrderId", JSON.stringify(""));
     this.getalerttitle();
     super.ngOnInit();
+
+    this.watchForEmployeeToggleState();
 
     this.getDeviceScreen();
     this.initResizeObserver();
@@ -703,12 +704,12 @@ public RedirecttoVMSorder(order:Order)
   if(order.orderType === OrderType.ReOrder)
   {
     this.activeTab = OrganizationOrderManagementTabs.ReOrders;
-  }  
+  }
   this.OrderFilterFormGroup.markAsDirty();
   this.OrderFilterFormGroup.get('orderPublicId')?.setValue(order.publicId!.toString());
   this.onFilterApply();
   this.redirectedvmsorderfromsystemcolumn=order.id;
-  
+
   this.isShowVMSPositions=true;
 }
 public RedirecttoIRPOrder(order:Order)
@@ -822,7 +823,7 @@ public RedirecttoIRPOrder(order:Order)
     this.closeExport();
     this.defaultExport(event.fileType, event);
   }
- 
+
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
       this.defaultFileName = `Order Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
@@ -1017,6 +1018,14 @@ public RedirecttoIRPOrder(order:Order)
     this.cd$.next(true);
   }
 
+  private watchForEmployeeToggleState(): void {
+    this.orderManagementService.getEmployeeToggleStateStream().pipe(
+      takeUntil(this.unsubscribe$),
+    ).subscribe((state: IrpEmployeeToggleState) => {
+      this.employeeToggleState = {...state};
+    })
+  }
+
   private getVmsOrders(cleared?: boolean): void {
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
@@ -1204,7 +1213,7 @@ public RedirecttoIRPOrder(order:Order)
           ? [...perDiemColumnsToExport, ...perDiemChildColumnsToExport]
           : perDiemColumnsToExport;
         break;
-      case OrganizationOrderManagementTabs.ReOrders:        
+      case OrganizationOrderManagementTabs.ReOrders:
         if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length == this.selectedItems.length){
           this.openregrateupdate = false;
         }
@@ -1269,7 +1278,7 @@ public RedirecttoIRPOrder(order:Order)
     if (this.gridWithChildRow && this.gridWithChildRow.dataSource) {
       this.gridDataBound(this.gridWithChildRow, this.cd);
     }
-   
+
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
       this.currentPage = this.orderManagementPagerState?.page ?? this.currentPage;
@@ -1312,7 +1321,7 @@ public RedirecttoIRPOrder(order:Order)
       if (this.gridWithChildRow && this.gridWithChildRow.dataSource){
       let filteredvmsrowindex:number=0;
       this.gridWithChildRow.detailRowModule.expand(filteredvmsrowindex);
-     
+
       this.isShowVMSPositions=!this.isShowVMSPositions;
     }
   }
@@ -1402,7 +1411,7 @@ public RedirecttoIRPOrder(order:Order)
       this.navigateToOrderTemplateForm(orderData.id, true);
     }
     else {
-      
+
       this.gridApi.selectNode(event.node as RowNode);
       this.selectedDataRow = orderData;
       const options = this.getDialogNextPreviousOption(orderData, true);
@@ -1421,7 +1430,7 @@ public RedirecttoIRPOrder(order:Order)
     this.OrderFilterFormGroup.get('orderPublicId')?.setValue(this.selectedDataRow.publicId?.toString());
     this.onFilterApply();
     this.globalWindow.localStorage.setItem("IsEmployeeTab", JSON.stringify(true));
-    
+
   }
   openvmspositions(publicId: number)
   {
@@ -1429,7 +1438,7 @@ public RedirecttoIRPOrder(order:Order)
     this.OrderFilterFormGroup.get('orderPublicId')?.setValue(publicId.toString());
     this.onFilterApply();
     this.isShowVMSPositions=true;
-    
+
   }
   setGridApi(params: GridReadyEvent): void {
     this.gridApi = params.api;
@@ -1687,7 +1696,7 @@ public RedirecttoIRPOrder(order:Order)
         this.redirectedIrporder=null;
       }
    }
-   
+
   }
   else{
     const preservedOrderId = this.preservedOrderService.getPreservedOrderId();
@@ -1859,8 +1868,8 @@ public RedirecttoIRPOrder(order:Order)
       case MoreMenuType['Add Re-Order']:
         this.createReorder(data);
         break;
-      case MoreMenuType['View history']:  
-      this.orderDetail.next(data);      
+      case MoreMenuType['View history']:
+      this.orderDetail.next(data);
         break;
     }
   }
@@ -1926,7 +1935,7 @@ public RedirecttoIRPOrder(order:Order)
     } else {
       this.preservedOrderService.setActiveTab(this.activeTab);
     }
-    
+
     this.preservedOrderService.preserveOrder(id, pagerState);
     const tab = this.activeSystem === OrderManagementIRPSystemId.VMS ? this.activeTab : this.activeIRPtabs;
     this.store.dispatch([new SelectNavigationTab(tab), new ClearOrders(), new ClearOrderFilterDataSources()]);
@@ -2015,7 +2024,7 @@ public RedirecttoIRPOrder(order:Order)
             this.gridWithChildRow.dataSource = data;
             this.onRowClick({ data });
           }
-          
+
         }
       }
       super.setHeightForMobileGrid(this.ordersPage?.items?.length);
@@ -2255,7 +2264,7 @@ public RedirecttoIRPOrder(order:Order)
       takeUntil(this.unsubscribe$)
     ).subscribe((order: Order) => {
       this.selectedOrder = order;
-      
+
       if (this.selectedOrder?.commentContainerId) {
         this.getOrderComments();
       }
@@ -2303,7 +2312,7 @@ public RedirecttoIRPOrder(order:Order)
           if (!this.preservedOrderService.isOrderPreserved()) {
             this.prepareFiltersToDispatch(state);
           }
-          
+
           if (!isNotPreserved ) {
             this.getOrders(true);
           }
@@ -2689,18 +2698,28 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number, isIrp = false): void {
-    const Action = isIrp ? GetIrpOrderCandidates : GetAgencyOrderCandidatesList;
-
-    this.store.dispatch(
-      new Action(
+    if (isIrp) {
+      this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
         organizationId,
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
-        isIrp ? this.orderManagementService.getIsAvailable() : this.orderManagementService.excludeDeployed,
+        this.employeeToggleState?.isAvailable,
+        this.employeeToggleState?.includeDeployed,
         ""
-      )
-    );
+      ));
+
+      return;
+    }
+
+    this.store.dispatch(new GetAgencyOrderCandidatesList(
+        orderId,
+        organizationId,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
+        this.orderManagementService.excludeDeployed,
+        ""
+      ));
   }
 
   private getOrganization(businessUnitId: number) {
@@ -2952,7 +2971,7 @@ public RedirecttoIRPOrder(order:Order)
       statuses = data.orderStatuses;
       candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
     }
-    
+
     this.filterColumns.orderStatuses.dataSource = statuses;
     this.filterOrderJourneyColumns.orderStatuses.dataSource = statuses;
     this.filterColumns.reorderStatuses.dataSource = data.reorderStatuses;

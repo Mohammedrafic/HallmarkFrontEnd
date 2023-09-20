@@ -2,6 +2,11 @@
 @import 'adaptive-response';
 
 .candidates-list {
+  .btn-group {
+    display: flex;
+    gap: 15px;
+  }
+
   .link {
     cursor: pointer;
     color: $primary-active-blue-10;
@@ -19,6 +24,12 @@
 
     .link-name {
       margin-bottom: 4px;
+
+      span {
+        i-feather {
+          color: $primary-active-blue-10;
+        }
+      }
     }
 
     i-feather {

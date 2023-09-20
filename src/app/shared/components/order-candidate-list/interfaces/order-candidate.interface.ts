@@ -76,3 +76,8 @@ export interface JobDetailsDto {
   OrganizationId: number;
   JobId: number;
 }
+
+export interface IrpEmployeeToggleState {
+  isAvailable: boolean;
+  includeDeployed: boolean;
+}

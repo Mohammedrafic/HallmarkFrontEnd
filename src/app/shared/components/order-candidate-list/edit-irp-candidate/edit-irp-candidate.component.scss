@@ -33,6 +33,19 @@
     margin-top: 24px;
     padding: 0 24px 24px;
 
+    .info-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
+
+      .message {
+        color: $primary-active-blue-10;
+        font-size: 14px;
+        font-weight: 400;
+      }
+    }
+
     .form {
       display: grid;
       grid-auto-columns: 1fr;

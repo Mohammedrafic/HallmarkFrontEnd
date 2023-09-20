@@ -33,6 +33,7 @@ export const AdaptIrpCandidates = (
         lastShiftTime: candidate.lastShiftFrom ? `${lastTimeFrom} - ${lastTimeTo}` : '',
         nextShiftTime: candidate.nextShiftFrom ? `${nextTimeFrom} - ${nextTimeTo}` : '',
         departmentOrientationDate: getOrientationDate(candidate.departmentOrientationDate),
+        deployedUntil: candidate.deployedUntil ? formatDate(candidate.deployedUntil, 'MM/dd/yyyy', 'en-US', 'UTC'): candidate.deployedUntil,
         availabilityOverlap: availabilityOverlap,
       };
 

@@ -28,6 +28,14 @@
     </div>
   </div>
   <div class="form-wrapper irp-candidate" *ngIf="candidateForm">
+    <div class="info-content">
+      <div class="message" *ngIf="candidateModelState?.candidate?.deployedUntil">
+        Employee is already working on an assignment till {{candidateModelState?.candidate?.deployedUntil}}.
+      </div>
+      <div class="message" *ngIf="candidateModelState?.candidate?.isDeployedInSameDepartment">
+        That Employee is already deployed in that Department in scope of another Order.
+      </div>
+    </div>
     <div>
       <form [formGroup]="candidateForm" class="form bootstrap">
         <ng-container *ngFor="let field of dialogConfig; trackBy: trackByCandidateField">

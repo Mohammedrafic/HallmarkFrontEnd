@@ -621,11 +621,12 @@ export class OrderManagementContentState {
   @Action(GetIrpOrderCandidates)
   GetIrpOrderCandidates(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, pageNumber, pageSize, isAvailable, searchTerm }: GetIrpOrderCandidates
+    { orderId, pageNumber, pageSize, isAvailable, includeDeployed, searchTerm }: GetIrpOrderCandidates
   ): Observable<PageOfCollections<IrpOrderCandidate>> {
     const params: IrpCandidatesParams = {
       PageSize: pageSize,
       PageNumber: pageNumber,
+      includeDeployed,
       isAvailable,
       searchTerm,
     };

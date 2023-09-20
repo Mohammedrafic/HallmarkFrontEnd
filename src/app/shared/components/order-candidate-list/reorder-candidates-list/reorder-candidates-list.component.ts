@@ -30,6 +30,7 @@ import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfa
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation.helper';
+import {IrpEmployeeToggleState} from "@shared/components/order-candidate-list/interfaces";
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -97,6 +98,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     super.ngOnInit();
     this.onChangeCandidateJob().pipe(takeUntil(this.unsubscribe$)).subscribe();
     this.subscribeOnReloadAction();
+    this.watchForEmployeeToggleState();
 
     if (this.isAgency) {
       this.checkForAgencyStatus();
@@ -125,10 +127,20 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
 
     this.getCandidateJobData();
     this.getCandidatePayRateSetting();
-    this.dialogNextPreviousOption = 
+    this.dialogNextPreviousOption =
       getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
     this.orderCandidateListViewService.setIsCandidateOpened(true);
     this.openDetails.next(true);
+  }
+
+  private watchForEmployeeToggleState(): void {
+    this.orderManagementService.getEmployeeToggleStateStream().pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((state: IrpEmployeeToggleState) => {
+      this.isAvailable = state.isAvailable;
+      this.includeDeployed = state.includeDeployed;
+      this.cdr.markForCheck();
+    });
   }
 
   private getCandidateJobData(): void {
@@ -193,7 +205,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     this.candidate = nextCandidate;
     this.selectedIndex = nextIndex;
     this.getCandidateJobData();
-    this.dialogNextPreviousOption = 
+    this.dialogNextPreviousOption =
       getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
   }
 

@@ -30,7 +30,7 @@ import {
   IrpContainerStateService,
 } from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import { OrderCredentialsService } from "@client/order-management/services";
-import { OrganizationStructureService } from '@shared/services';
+import {OrganizationStructureService, SettingsViewService} from '@shared/services';
 import { PartialSearchService } from '@shared/services/partial-search.service';
 import {
   TableTypeCellComponent,
@@ -91,6 +91,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     OrganizationStructureService,
     PartialSearchService,
     IrpContainerApiService,
+    SettingsViewService,
   ],
 })
 export class CreateEditOrderModule { }

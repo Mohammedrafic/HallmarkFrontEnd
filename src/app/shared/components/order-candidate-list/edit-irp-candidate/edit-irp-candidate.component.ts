@@ -110,14 +110,13 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public candidateCommentContainerId: number;
   public canCloseOrderIRP: boolean;
   public canManageOrderIRP:boolean;
-
+  public candidateModelState: EditCandidateDialogState;
 
   public comments: Comment[] = [];
   @Input() public externalCommentConfiguration ?: boolean | null;
   @Input() CanOrganizationViewOrdersIRP: boolean;
   @Input() CanOrganizationEditOrdersIRP: boolean;
 
-  private candidateModelState: EditCandidateDialogState;
   private endDateFormControlValue: Date;
   private candidateDetails: CandidateDetails;
   private actualStartDateSubscription: Subscription | null;
