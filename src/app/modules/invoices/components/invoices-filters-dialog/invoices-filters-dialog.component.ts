@@ -177,6 +177,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       takeUntil(this.componentDestroy()),
     )
     .subscribe((id) => {
+      if(typeof id =='number'){
       const orgId = this.isAgency ? null : id;
 
       if (this.selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
@@ -196,6 +197,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
           this.clearAllFilters(true)
         }
       }
+    }
     });
   }
 

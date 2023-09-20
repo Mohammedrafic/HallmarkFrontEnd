@@ -217,6 +217,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         tap((id) => {
           if(id.length == 0){
             this.noorgSelection = true;
+            this.store.dispatch(new Invoices.SelectOrganization(id));
             this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select at least one Organization'));
             return;
           }
