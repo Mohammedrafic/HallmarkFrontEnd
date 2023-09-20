@@ -830,7 +830,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.showOrderFormValidationMessage();
       this.showInvalidValueMessage();
     }
-    if(this.order.disableNumberOfOpenPositions && this.order.openPositions != this.orderDetailsFormComponent.generalInformationForm.getRawValue().openPositions){
+    if(this.orderDetailsFormComponent.isEditMode && this.order.disableNumberOfOpenPositions && this.order.openPositions != this.orderDetailsFormComponent.generalInformationForm.getRawValue().openPositions){
       this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
       return;
     }
