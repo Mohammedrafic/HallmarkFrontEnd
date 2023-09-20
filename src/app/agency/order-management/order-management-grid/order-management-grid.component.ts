@@ -80,7 +80,6 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
-import { BreakpointObserverService } from '@core/services';
 import { GlobalWindow } from '@core/tokens';
 import { FilterPageName } from '@core/enums';
 import { PreservedFiltersByPage } from '@core/interface';
@@ -170,8 +169,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public selectedRowRef: any;
   public openDetailsTab = false;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
-  public isMobile = false;
-  public isSmallDesktop = false;
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
@@ -191,7 +188,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private datePipe: DatePipe,
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
-    private breakpointService: BreakpointObserverService,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
     private router: Router
   ) {
@@ -201,7 +197,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   ngOnInit(): void {
     this.getAlertOrderId();
-    this.getDeviceScreen();
     this.onOrderPreviewChange();
     this.onAgencyChange();
     this.onChildDialogChange();
@@ -222,7 +217,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
-      super.setHeightForMobileGrid(data?.items.length);
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
       if(this.ordersPage?.items){
         this.alertOrderId= this.ordersPage.items.find((i) => i.orderId === this.alertOrderId)
@@ -1055,16 +1049,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.pageSize = perPage;
     this.pageSubject.next(1);
     this.isSubrowDisplay = false;
-  }
-
-  private getDeviceScreen(): void {
-    this.breakpointService
-      .getBreakpointMediaRanges()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((screen) => {
-        this.isMobile = screen.isMobile;
-        this.isSmallDesktop = screen.isDesktopSmall;
-      });
   }
 
   private getLocationState(): void {

@@ -132,9 +132,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(AppState.getMainContentElement)
   public readonly targetElement$: Observable<HTMLElement | null>;
 
-  @Select(AppState.isMobileScreen)
-  public readonly isMobile$: Observable<boolean>;
-
   @Select(CandidateListState.listOfCredentialTypes)
   credentialTypes$: Observable<CredentialType[]>;
 
@@ -466,9 +463,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
             items: this.addEmployeeSkillEllipsis(value?.items),
           };
         }),
-        tap((data) => {
-          super.setHeightForMobileGrid(data.items?.length);
-        }),
       );
     } else {
       this.candidates$ = this._candidates$.pipe(
@@ -477,9 +471,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
             ...value,
             items: this.addSkillRegionEllipsis(value?.items),
           };
-        }),
-        tap((data) => {
-          super.setHeightForMobileGrid(data.items?.length);
         }),
       );
     }
