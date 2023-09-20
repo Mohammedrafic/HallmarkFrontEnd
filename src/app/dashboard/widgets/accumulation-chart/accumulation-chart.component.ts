@@ -45,7 +45,6 @@ export class AccumulationChartComponent
   @Input() public isDarkTheme: boolean;
   @Input() public description: string;
   @Input() public averageFlag: boolean =false;
-  @Input() public averageactiveFlag:boolean=false;
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
@@ -122,11 +121,16 @@ export class AccumulationChartComponent
     }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status" ||  this.chartData?.title==="Average Days for Active Candidates in a Status"){
         let candidatesDataset:any = [];
         let candidatesOrderDataSet = [];
-        if(this.chartData?.title == "Candidates for Active Positions" ||  this.chartData?.title==="Average Days for Active Candidates in a Status"){
+        if(this.chartData?.title == "Candidates for Active Positions"){
           this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
             candidatesDataset = data;
           }); 
-        }else{
+        }else if(this.chartData?.title==="Average Days for Active Candidates in a Status"){
+          this.dashboardService.candidatesavgForActivePositions$.subscribe(data=>{
+            candidatesDataset = data;
+          });
+        }
+        else{
           this.dashboardService.candidatesOverallStatus$.subscribe(data=>{
             candidatesDataset = data;
           }); 
@@ -145,7 +149,10 @@ export class AccumulationChartComponent
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {         
             this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
         }else{
+          if(candidatesChartInfo.status!=='Others')
+          {
             this.dashboardService.redirectToUrlWithStatus('client/order-management/',candidatesChartInfo.status);
+          }
         }
         
     }

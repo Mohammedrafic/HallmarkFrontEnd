@@ -102,6 +102,7 @@ export class DashboardService {
 
   candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
+  candidatesavgForActivePositions$:BehaviorSubject<AveragedayActivecandidateInfo[]> = new BehaviorSubject<AveragedayActivecandidateInfo[]>([]);
 
   constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
 
@@ -618,12 +619,13 @@ export class DashboardService {
   private getAvergaeDayActivecandidateStatusWidgetData(filter: DashboartFilterDto): Observable<any> {
     return this.httpClient.post<AveragedayActivecandidateInfo[]>(`${this.baseUrl}/GetAverageDaysforActiveCandidatesInStatus`, { ...filter }).pipe(
       map((candidatesInfo: AveragedayActivecandidateInfo[]) => {
+         this.candidatesavgForActivePositions$.next(candidatesInfo);
         return {
           id: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS,
            title: 'Average Days for Active Candidates in a Status',
           chartData: lodashMapPlain(candidatesInfo, ({ count, status,averageDays }: AveragedayActivecandidateInfo, index: number) => ({
             label: status,
-            value: parseFloat(averageDays.toFixed(2)),
+            value: Number(averageDays.toFixed(1)),
             average: count,
             color: candidateLegendPalette[status as CandidateChartStatuses] ||
             candidateLegendPalette[CandidateChartStatuses.CUSTOM],
