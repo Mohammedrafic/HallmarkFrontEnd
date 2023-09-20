@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset, AveragedayActivecandidateInfo } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -60,6 +60,8 @@ import { AgencyPositionModel } from '../models/agency-position.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
 import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetSkillsbyByFilters, GetWorkCommitment } from '../models/rn-utilization.model';
 import { AvailableEmployeeModel } from '../models/available-employee.model';
+import { BillRateResponse, SkillCategoryName } from '../models/bill-rate-by-skill-category-response.model';
+import { BillRateBySkillCategoryTypeAggregatedModel } from '../models/bill-rate-by-skill-category-type-aggregated.model';
 
 @Injectable()
 export class DashboardService {
@@ -85,19 +87,22 @@ export class DashboardService {
     [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
     [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
     [WidgetTypeEnum.AGENCY_POSITION_COUNT]: (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
-      [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
+    [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
     [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: (filters: DashboartFilterDto) => this.getalreadyExpiredCredentials(filters),
     [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
     [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
+    [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivecandidateStatusWidgetData(filters),
+    [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getSkillCategoryByTypes(filters, timeSelection),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
 
   candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
+  candidatesavgForActivePositions$:BehaviorSubject<AveragedayActivecandidateInfo[]> = new BehaviorSubject<AveragedayActivecandidateInfo[]>([]);
 
   constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
 
@@ -610,5 +615,48 @@ export class DashboardService {
     return  this.candidatesOverallStatus$.asObservable();
   }
 
+  
+  private getAvergaeDayActivecandidateStatusWidgetData(filter: DashboartFilterDto): Observable<any> {
+    return this.httpClient.post<AveragedayActivecandidateInfo[]>(`${this.baseUrl}/GetAverageDaysforActiveCandidatesInStatus`, { ...filter }).pipe(
+      map((candidatesInfo: AveragedayActivecandidateInfo[]) => {
+         this.candidatesavgForActivePositions$.next(candidatesInfo);
+        return {
+          id: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS,
+           title: 'Average Days for Active Candidates in a Status',
+          chartData: lodashMapPlain(candidatesInfo, ({ count, status,averageDays }: AveragedayActivecandidateInfo, index: number) => ({
+            label: status,
+            value: Number(averageDays.toFixed(1)),
+            average: count,
+            color: candidateLegendPalette[status as CandidateChartStatuses] ||
+            candidateLegendPalette[CandidateChartStatuses.CUSTOM],
+          })),
+        };
+      })
+    );
+    } 
+
+    private getSkillCategoryByTypes(filter: DashboartFilterDto, timeSelection: TimeSelectionEnum): Observable<BillRateBySkillCategoryTypeAggregatedModel> {
+      const timeRanges = this.calculateTimeRanges(timeSelection);    
+      var data = this.httpClient      
+        .post<BillRateResponse>(`${this.baseUrl}/GetAverageBillRateBySkillCategory`, { ...timeRanges, ...filter, rangeType: timeSelection})     
+        .pipe(
+          map((positions: BillRateResponse) => {             
+            let obj: any = {}           
+            var keysOfData = Object.keys(positions.data[0]);            
+            keysOfData.forEach((eachVAlue, index) => {              
+              if (eachVAlue) {                
+                var objValues: any[] = Object.values(positions.data[0])[index];
+                var formattedValue = objValues.map(a => ({
+                  month: MONTHS[a.dateIndex],
+                  value: a.value
+                }));
+                var objKey = eachVAlue.charAt(0).toUpperCase() + eachVAlue.slice(1);
+                obj[SkillCategoryName(objKey)] = formattedValue;
+              }
+            });       
+            return obj;            
+          }));          
+      return data;
+    } 
  
 }

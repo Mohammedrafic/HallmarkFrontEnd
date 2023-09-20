@@ -15,9 +15,10 @@ import {
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models';
 import { RegularRatesData } from '@shared/models/order-management.model';
-import { OrderLinkDetails } from '../../../order-management/interfaces';
+import { OrderLinkDetails } from '@client/order-management/interfaces';
 import { ControlsConfig } from '../order-details-form/interfaces';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
+import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -43,7 +44,10 @@ export class OrderManagementService extends DestroyableDirective {
   private orderManagementSystem: OrderManagementIRPSystemId | null;
   private orderTypeToPrePopulate: OrderType | IrpOrderType | null;
   private previousSelectedOrganizationId: number;
-  private readonly isAvailable: BaseObservable<boolean> = new BaseObservable<boolean>(false);
+  private readonly irpEmployeeToggleState: BaseObservable<IrpEmployeeToggleState> = new BaseObservable<IrpEmployeeToggleState>({
+    isAvailable: false,
+    includeDeployed: false
+  });
   private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
   private readonly orderFromAnotherSystem: BaseObservable<OrderLinkDetails | null> =
     new BaseObservable<OrderLinkDetails | null>(null);
@@ -165,12 +169,18 @@ export class OrderManagementService extends DestroyableDirective {
     this.previousSelectedOrganizationId = id;
   }
 
-  setIsAvailable(state: boolean): void {
-    this.isAvailable.set(state);
+  updateEmployeeToggleState(value: IrpEmployeeToggleState): void {
+    this.irpEmployeeToggleState.set({
+      ...value,
+    })
   }
 
-  getIsAvailable(): boolean {
-    return this.isAvailable.get();
+  getEmployeeToggleState(): IrpEmployeeToggleState {
+    return this.irpEmployeeToggleState.get();
+  }
+
+  getEmployeeToggleStateStream(): Observable<IrpEmployeeToggleState> {
+    return this.irpEmployeeToggleState.getStream();
   }
 
   setCandidate(edit: boolean): void {

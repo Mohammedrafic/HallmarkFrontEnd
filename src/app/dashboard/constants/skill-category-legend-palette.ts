@@ -1,0 +1,1 @@
+export const skillCategoryTrendLegendPalette = ['#79b392', '#8cb3ff','#9daac9', '#e0bd82', '#e48192', '#8190b2', '#9b85c6', '#8cb3ff', '#558bf4', '#d99de3', '#a77c91', '#707fa4'];

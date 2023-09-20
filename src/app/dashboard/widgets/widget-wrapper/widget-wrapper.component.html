@@ -58,5 +58,8 @@
     <div *ngIf="orders_pending_custom_status" class="app-widget-wrapper__orders_pending_in_custom">
       <ng-container [ngTemplateOutlet]="orders_pending_custom_status"></ng-container>
     </div>
+    <div *ngIf="bill_rate_by_skill_category" class="app-widget-wrapper__line-chart">
+      <ng-container [ngTemplateOutlet]="bill_rate_by_skill_category"></ng-container>
+    </div>
   </div> 
 </ng-template>

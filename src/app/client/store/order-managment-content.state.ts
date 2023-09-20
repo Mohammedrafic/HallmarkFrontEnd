@@ -621,11 +621,12 @@ export class OrderManagementContentState {
   @Action(GetIrpOrderCandidates)
   GetIrpOrderCandidates(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, pageNumber, pageSize, isAvailable, searchTerm }: GetIrpOrderCandidates
+    { orderId, pageNumber, pageSize, isAvailable, includeDeployed, searchTerm }: GetIrpOrderCandidates
   ): Observable<PageOfCollections<IrpOrderCandidate>> {
     const params: IrpCandidatesParams = {
       PageSize: pageSize,
       PageNumber: pageNumber,
+      includeDeployed,
       isAvailable,
       searchTerm,
     };
@@ -983,14 +984,14 @@ export class OrderManagementContentState {
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents, internalDistributionChanged }: EditIrpOrder
-  ): Observable<void | Blob[] | Order[]> {
+  ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.editIrpOrder(order).pipe(
-      switchMap((order: Order[]) => {
+      switchMap((order: Order) => {
         const successMessage = internalDistributionChanged
           ? ChangeInternalDistributionSuccess
           : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(
-            order[0]?.organizationPrefix ?? '',
-            order[0]?.publicId?.toString() ?? ''
+            order?.organizationPrefix ?? '',
+            order?.publicId?.toString() ?? ''
           );
 
         dispatch([new ShowToast(MessageTypes.Success, successMessage), new SaveIrpOrderSucceeded()]);

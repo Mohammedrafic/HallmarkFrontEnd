@@ -11,6 +11,7 @@ export class LogiCustomReportPage {
 export class SharedDocumentPostDto {
   organizationId: number[];
   sharedDocumentIds: number[];
+  businessUnitType:number;
 }
 
 export class LogiCustomReport {

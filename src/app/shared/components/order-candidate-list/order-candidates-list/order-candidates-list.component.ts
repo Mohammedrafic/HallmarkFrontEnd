@@ -1,7 +1,7 @@
 import { ClearDeployedCandidateOrderInfo, GetCandidateJob,
   GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import {ChangeDetectorRef, Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob,
   GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
@@ -13,7 +13,7 @@ import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.
 import { IrpOrderCandidate, Order, OrderCandidatesList } from '@shared/models/order-management.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { combineLatest, Observable, Subject } from 'rxjs';
+import {combineLatest, map, Observable, Subject, switchMap} from 'rxjs';
 import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 import { UserState } from 'src/app/store/user.state';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
@@ -26,12 +26,10 @@ import { AppState } from 'src/app/store/app.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
-import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
+import {EditCandidateDialogState, IrpEmployeeToggleState} from '@shared/components/order-candidate-list/interfaces';
 import { OrderStatus } from '@shared/enums/order-management';
 import { GlobalWindow } from '@core/tokens';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
-import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import {
   OrderManagementService,
@@ -100,6 +98,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   };
   public commentContainerId = 0;
   public readonly partnershipStatus = PartnershipStatus;
+  public showDeployedControl = false;
 
   private isOrgIRPEnabled = false;
   private previousSelectedSystemId: OrderManagementIRPSystemId | null;
@@ -122,6 +121,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     private settingService: SettingsViewService,
     @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
     private orderManagementService: OrderManagementService,
+    private settingsViewService: SettingsViewService,
+    private cdr: ChangeDetectorRef
   ) {
     super(store, router, globalWindow);
     this.setIrpFeatureFlag();
@@ -140,12 +141,10 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.checkForAgencyStatus();
       this.subscribeToDeployedCandidateOrdersInfo();
     }
-    this.organizationId$.pipe(
-      filter(Boolean),
-      takeUntil(this.unsubscribe$),
-    ).subscribe((id) => {
-      this.getOrganization(id);
-    });
+
+    this.setOrganizationId();
+    this.watchForEmployeeToggleState();
+
     if(this.orderDetails?.commentContainerId != undefined){
     this.commentContainerId = this.orderDetails.commentContainerId;
     }
@@ -158,7 +157,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     this.selectedIndex = nextIndex;
     this.getDeployedCandidateOrders();
     this.getCandidateJob(this.candidate);
-    this.dialogNextPreviousOption = 
+    this.dialogNextPreviousOption =
       getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
   }
 
@@ -167,7 +166,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     this.candidate = { ...data };
     this.getDeployedCandidateOrders();
     this.getCandidatePayRateSetting();
-    this.dialogNextPreviousOption = 
+    this.dialogNextPreviousOption =
       getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
     this.orderCandidateListViewService.setIsCandidateOpened(true);
     this.getCandidateJob(data);
@@ -201,6 +200,39 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     return `Partnership was suspended on ${DateTimeHelper.formatDateUTC(data.suspentionDate, 'MM/dd/yyyy')}`;
   }
 
+  private setOrganizationId(): void {
+    this.organizationId$.pipe(
+      filter(Boolean),
+      map((id: number) => {
+        this.getOrganization(id);
+        return id;
+      }),
+      switchMap((id: number) => {
+        return this.settingsViewService.getViewSettingKey(
+          OrganizationSettingKeys.ShowDeployedEmployees,
+          OrganizationalHierarchy.Organization,
+          id,
+          id
+        );
+      }),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((setting) => {
+      this.showDeployedControl = JSON.parse(
+        setting[OrganizationSettingKeys[OrganizationSettingKeys.ShowDeployedEmployees]]
+      );
+      this.cdr.markForCheck();
+    });
+  }
+
+  private watchForEmployeeToggleState(): void {
+    this.orderManagementService.getEmployeeToggleStateStream().pipe(
+      takeUntil(this.unsubscribe$),
+    ).subscribe((state: IrpEmployeeToggleState) => {
+      this.isAvailable = state.isAvailable;
+      this.includeDeployed = state.includeDeployed;
+      this.cdr.markForCheck();
+    })
+  }
 
   private getCandidateJob(data: OrderCandidatesList): void {
     if (this.order && this.candidate) {

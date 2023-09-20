@@ -384,8 +384,8 @@ export class OrderManagementContentService {
     return this.http.post<Blob[]>(`/api/IRPOrders/documents`, formData) as Observable<Blob[]>;
   }
 
-  public editIrpOrder(order: EditOrderDto): Observable<Order[]> {
-    return this.http.put<Order[]>('/api/IRPOrders', this.changeDateToUtc(order));
+  public editIrpOrder(order: EditOrderDto): Observable<Order> {
+    return this.http.put<Order>('/api/IRPOrders', this.changeDateToUtc(order));
   }
 
   /**

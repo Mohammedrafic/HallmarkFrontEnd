@@ -54,8 +54,7 @@
         <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
         <button
           *ngIf="
-            activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
-            activeTab !== OrganizationOrderManagementTabs.Incomplete &&
+            activeTab !== OrganizationOrderManagementTabs.OrderTemplates && OrganizationOrderManagementTabs.Incomplete &&
             !isActiveSystemIRP &&
             !(isContentSmallDesktop || isMiddleTabletWidth)
           "
@@ -70,7 +69,7 @@
           <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
 
-        <button *ngIf="isActiveSystemIRP" ejs-dropdownbutton appHideBeforeSyncfusionLoad [items]="exportOptions" (select)="exportSelected($event)"
+        <button *ngIf="isActiveSystemIRP && activeIRPtabs != OrganizationIRPTabs.OrderTemplates" ejs-dropdownbutton appHideBeforeSyncfusionLoad [items]="exportOptions" (select)="exportSelected($event)"
           id="importButton" cssClass="e-outline button-export" [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]">
           <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
@@ -1548,6 +1547,7 @@
   [settings]="settings"
   [openEvent]="openDetails"
   [isCondidateTab]="isCondidateTab"
+  [isOrderDetailsTab]="isOrderDetailsTab"
   [activeSystem]="activeSystem"
   [orderPositionSelected$]="orderPositionSelected$"
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"

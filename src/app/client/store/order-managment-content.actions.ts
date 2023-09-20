@@ -94,6 +94,7 @@ export class GetIrpOrderCandidates {
     public pageNumber: number,
     public pageSize: number,
     public isAvailable: boolean,
+    public includeDeployed?: boolean,
     public searchTerm?: string
   ) {}
 }

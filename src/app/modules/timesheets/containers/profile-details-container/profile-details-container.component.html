@@ -44,6 +44,7 @@
                 <app-date-week-picker
                   *ngIf="!isMobile"
                   [initDates]="weekPeriod"
+                  [emitOnSetInit]="false"
                   [availibleDates]="workWeeks"
                   [isAbleToChange]="isChangesSaved"
                   [rangeType]="rangeType"
@@ -198,6 +199,7 @@
                 (changesSaved)="handleEditChanges($event)"
                 (rejectEvent)="onRejectButtonClick($event)"
                 (approveEvent)="handleApprove($event)"
+                (closeDetails)="closeDialog()"
                 (orgSubmitting)="orgSubmit()"
                 [disableEditButton]="disableEditButton"
               >

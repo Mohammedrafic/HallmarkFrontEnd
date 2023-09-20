@@ -68,7 +68,10 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
 
   public onGetCandidatesList(event: CandidateListEvent): void {
     this.orderManagementService.excludeDeployed = event.excludeDeployed;
-    this.orderManagementService.setIsAvailable(event.isAvailable);
+    this.orderManagementService.updateEmployeeToggleState({
+      isAvailable: event.isAvailable,
+      includeDeployed: event.includeDeployed ?? false
+    })
 
     if (this.order.irpOrderMetadata) {
       this.store.dispatch(new GetIrpOrderCandidates(
@@ -77,6 +80,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
         event.currentPage,
         event.pageSize,
         event.isAvailable,
+        event.includeDeployed,
         event.searchTerm||""
       ));
     } else {

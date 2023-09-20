@@ -138,7 +138,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public override ngOnDestroy() {
     super.ngOnDestroy();
-    this.store.dispatch(new PreservedFilters.ResetPageFilters());
+    this.store.dispatch([new PreservedFilters.ResetPageFilters(), new Timesheets.ResetTimesheets()]);
   }
 
   public handleChangeTab(tabIndex: number): void {
@@ -289,7 +289,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         filter(Boolean),
         debounceTime(300),
         filter((filters) => (this.isAgency ? !isNaN(filters.organizationId as number) : true)),
-        switchMap(() => this.store.dispatch(new Timesheets.GetAll())),
+        switchMap(() => this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()])),
         takeUntil(this.componentDestroy())
       )
       .subscribe();

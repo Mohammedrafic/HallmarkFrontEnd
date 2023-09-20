@@ -52,6 +52,7 @@ export class TimesheetDetailsService {
           this.store.dispatch([
             new ShowToast(MessageTypes.Success, successMessage),
             new Timesheets.GetAll(),
+            new Timesheets.GetTabsCounts(),
           ]);
         })
       );
@@ -75,6 +76,7 @@ export class TimesheetDetailsService {
           this.store.dispatch([
             new ShowToast(MessageTypes.Success, successMessage),
             new Timesheets.GetAll(),
+            new Timesheets.GetTabsCounts(),
           ]);
         }),
         catchError((err: HttpErrorResponse) =>

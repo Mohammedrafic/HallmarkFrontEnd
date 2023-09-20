@@ -88,6 +88,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Output() readonly orgSubmitting: EventEmitter<void> = new EventEmitter<void>();
 
+  @Output() readonly closeDetails: EventEmitter<void> = new EventEmitter();
+
   @Select(TimesheetsState.tmesheetRecords)
   public readonly timesheetRecords$: Observable<TimesheetRecordsDto>;
 
@@ -339,7 +341,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         filter(Boolean),
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
-        this.saveRecords();
+        this.saveRecords(false);
+        this.closeDetails.emit();
       });
     } else {
       this.saveRecords();
@@ -623,7 +626,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     );
   }
 
-  private saveRecords(): void {
+  private saveRecords(updateDetailsAfter = true): void {
     const diffs = this.timesheetRecordsService.findDiffs(
       this.records[this.currentTab][this.currentMode], this.formControls, this.timesheetColDef);
 
@@ -648,7 +651,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         this.idsToDelete,
       );
 
-      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency));
+      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency, updateDetailsAfter));
 
       this.actions$
       .pipe(
@@ -673,7 +676,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
               switchMap(() => {
                 dto.forceUpdate = true;
 
-                return this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency));
+                return this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency, updateDetailsAfter));
               }),
             );
           }
