@@ -31,7 +31,7 @@
             <div class="col center"><span>Total<br> Positions</span></div>
           </header>
          <div class="row" *ngFor="let data of chartData?.chartData">
-            <div class="col"><span>{{data.label}}</span></div>
+            <div class="col"><span *ngIf="data" [ngStyle]="{ background: data.color }">{{data.label}}</span></div>
             <div class="middle-col">
               <div class="row flex-container">
                 <div>{{data.count3}}</div>

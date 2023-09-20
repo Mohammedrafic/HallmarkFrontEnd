@@ -576,13 +576,14 @@ export class DashboardService {
           chartData: lodashMapPlain(
             orderStatusesAvgDetails,
             ({ count3Positions,count7Positions,count15Positions,count30PlusPositions,count30Positions,totalCount, statusName }: StatusesAvgDetails, index: number) => ({
-              label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
+              label: statusName,
               value: totalCount,
               count30: count30Positions,
               count30Plus: count30PlusPositions,
               count15: count15Positions,
               count7: count7Positions,
               count3: count3Positions,
+              color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
             })
           ),
         };

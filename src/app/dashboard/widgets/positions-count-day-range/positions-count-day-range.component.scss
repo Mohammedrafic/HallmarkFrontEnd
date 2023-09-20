@@ -44,6 +44,23 @@ section {
     border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, #dde2eb));
     border-bottom-style: solid;
     padding: 6px 2px;
+    span{
+      text-transform: uppercase;
+     // background-color: #4d841d;
+      border-color: transparent;
+      color: #fff;
+      align-items: center;
+      border: 0 solid;
+      border-radius: 14px;
+      box-shadow: none;
+      box-sizing: border-box;
+      cursor: pointer;
+      justify-content: center;
+      overflow: hidden;
+      padding: 2px 20px;
+      -webkit-user-select: none;
+      user-select: none;
+    }
   }
 
   section span{

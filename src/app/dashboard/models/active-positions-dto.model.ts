@@ -51,6 +51,7 @@ export interface PositionsCountByDayRangeData {
   count15?: number;
   count30?: number;
   count30Plus?: number;
+  color: string;
 }
 
 export interface OrdersPendingInCustom {
