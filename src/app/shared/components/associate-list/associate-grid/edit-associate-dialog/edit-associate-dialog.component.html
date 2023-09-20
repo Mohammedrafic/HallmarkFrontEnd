@@ -51,7 +51,10 @@
             <e-tabitem *ngIf="userPermission[userPermissions.CanViewPartnershipSettings]">
               <ng-template #headerText> {{partnershipText}} </ng-template>
               <ng-template #content>
-                <app-partnership-settings [partnershipForm]="$any(partnershipForm)" [activeTab]="activeTab"></app-partnership-settings>
+                <app-partnership-settings
+                  [partnershipForm]="$any(partnershipForm)"
+                  [activeTab]="activeTab"
+                  [isAgency]="isAgency"></app-partnership-settings>
               </ng-template>
             </e-tabitem>
           </e-tabitems>

@@ -35,12 +35,13 @@ import { Comment } from '@shared/models/comment.model';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired, ONBOARD_CANDIDATE, onBoardCandidateMessage, SEND_EMAIL } from '@shared/constants';
+import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired, ONBOARD_CANDIDATE, onBoardCandidateMessage, SEND_EMAIL, REQUIRED_PERMISSIONS } from '@shared/constants';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { OnboardCandidateMessageDialogComponent } from '../../order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -139,6 +140,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     return this.showAcceptButton && this.isAgency && this.isCandidatePayRateVisible;
   }
 
+  get applyBtnTooltipText(): string {
+    return this.candidate.partnershipStatus === PartnershipStatus.Suspended ? 
+    'Agency Partnership is suspended' : REQUIRED_PERMISSIONS;
+  }
+
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
 
@@ -160,6 +166,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
   public saveStatus:number =0;
+  public partnershipStatus = PartnershipStatus;
   get templateEmailTitle(): string {
     return "Onboarding Email";
   }

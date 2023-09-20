@@ -27,6 +27,7 @@ import { createDepartmentsTier } from '@shared/helpers';
 import { SettingsViewService } from '@shared/services';
 import { TierLogic } from '@shared/enums/tier-logic.enum';
 import { GetOrgTierStructure } from '../../../../../store/user.actions';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-edit-associate-dialog',
@@ -72,11 +73,11 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     private settingsViewService: SettingsViewService,
   ) {
     super(store);
+    this.isAgency = this.router.url.includes('agency');
   }
 
   override ngOnInit(): void {
-    super.ngOnInit()
-    this.isAgency = this.router.url.includes('agency');
+    super.ngOnInit();
     this.onOpenEvent();
     this.width = this.getDialogWidth();
     this.feeSettingsForm = FeeSettingsComponent.createFormGroup();
@@ -119,15 +120,28 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   }
 
   public onSave(): void {
+    if (this.partnershipForm.invalid) {
+      this.partnershipForm.markAllAsTouched();
+      return;
+    }
+      
     let switchTabVal=this.activeTab;
+
     switch (switchTabVal) {
       case Tabs.JobDistribution:
         this.partnershipForm.markAllAsTouched();
         if (this.partnershipForm.valid) {
           const jobDistributionFormValue = this.partnershipForm.getRawValue();
+
+          if (jobDistributionFormValue.suspentionDate) {
+            jobDistributionFormValue.suspentionDate = DateTimeHelper.setUtcTimeZone(jobDistributionFormValue.suspentionDate);
+          }
+
           this.store.dispatch(
-            new TiersException.SavePartnershipSettings({ ...jobDistributionFormValue, associateOrganizationId: this.editAgencyOrg.id })
+            new TiersException.SavePartnershipSettings({
+              ...jobDistributionFormValue, associateOrganizationId: this.editAgencyOrg.id })
           );
+
         }
         break;
       case Tabs.TierException:

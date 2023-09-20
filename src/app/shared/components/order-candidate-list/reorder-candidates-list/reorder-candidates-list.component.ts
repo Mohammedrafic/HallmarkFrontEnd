@@ -30,6 +30,8 @@ import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfa
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation.helper';
+import { DateTimeHelper } from '@core/helpers';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import {IrpEmployeeToggleState} from "@shared/components/order-candidate-list/interfaces";
 
 enum ReorderCandidateStatuses {
@@ -65,6 +67,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public readonly onboardedCandidate: CandidateStatus = CandidateStatus.OnBoarded;
   public readonly cancelledCandidate: CandidateStatus = CandidateStatus.Cancelled;
   public readonly notAppliedCandidate: CandidateStatus = CandidateStatus.NotApplied;
+  public readonly partnershipStatus = PartnershipStatus;
 
   private selectedIndex: number;
 
@@ -133,6 +136,10 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     this.openDetails.next(true);
   }
 
+  public getPartnershipMessage(data: OrderCandidatesList): string {
+    return `Partnership was suspended on ${DateTimeHelper.formatDateUTC(data.suspentionDate, 'MM/dd/yyyy')}`;
+  }
+  
   private watchForEmployeeToggleState(): void {
     this.orderManagementService.getEmployeeToggleStateStream().pipe(
       takeUntil(this.unsubscribe$)

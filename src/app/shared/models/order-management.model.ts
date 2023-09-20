@@ -6,7 +6,7 @@ import { Duration } from '@shared/enums/durations';
 import { JobClassification } from '@shared/enums/job-classification';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
-import { CandidatesStatusText, FilterOrderStatusText } from '@shared/enums/status';
+import { AgencyStatus, CandidatesStatusText, FilterOrderStatusText } from '@shared/enums/status';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { Document } from '@shared/models/document.model';
 import { PageOfCollections } from '@shared/models/page.model';
@@ -14,6 +14,7 @@ import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { IrpPrimarySkill } from './skill.model';
 import { CandidateProfileContactDetail } from './candidate.model';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
 /**
  * TODO: rework classes with interfaces.
  */
@@ -305,9 +306,12 @@ export type OrderCandidatesList = {
   };
   candidateStatus?: CandidateStatus;
   agencyName?: string;
+  agencyStatus?: AgencyStatus;
   organizationId?: number;
   workflowStepType: WorkflowStepType;
   availabilityOverlap?: OrderAvailabilityOverlap;
+  partnershipStatus: PartnershipStatus;
+  suspentionDate: string;
 };
 
 export interface WorkflowStepType {
@@ -669,6 +673,9 @@ export type OrderCandidateJob = {
   candidateAddressRequired:any;
   candidateProfileContactDetails: CandidateProfileContactDetail;
   wasActualStartDateChanged?: boolean;
+  agencyStatus: AgencyStatus;
+  partnershipStatus: PartnershipStatus;
+  suspentionDate?: string;
 };
 
 export type CandidatesBasicInfo = {

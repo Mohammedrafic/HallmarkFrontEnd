@@ -40,9 +40,15 @@
                       [disabled]="!actionsAllowed"
                       (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
             </app-tooltip-container>
-            <app-tooltip-container [showToolTip]="!actionsAllowed">
-              <button ejs-button cssClass="e-primary" (click)="onApply()"
-                      [disabled]="isLocked || !actionsAllowed" *ngIf="showApplyButton">Apply</button>
+            <app-tooltip-container
+              [showToolTip]="!actionsAllowed || orderCandidate.partnershipStatus === partnershipStatus.Suspended"
+              [message]="applyBtnTooltipText">
+              <button
+                ejs-button cssClass="e-primary"
+                *ngIf="showApplyButton"
+                [disabled]="isLocked || !actionsAllowed || orderCandidate.partnershipStatus === partnershipStatus.Suspended"
+                (click)="onApply()"
+              >Apply</button>
             </app-tooltip-container>
             <app-tooltip-container [showToolTip]="!actionsAllowed">
               <button ejs-button cssClass="e-primary" (click)="onAccept()"
