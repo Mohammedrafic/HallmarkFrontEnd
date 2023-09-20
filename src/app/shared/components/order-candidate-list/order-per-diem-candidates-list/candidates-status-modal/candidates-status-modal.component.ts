@@ -141,8 +141,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   }
 
   get applyBtnTooltipText(): string {
-    return this.candidate.partnershipStatus === PartnershipStatus.Suspended ? 
-    'Agency Partnership is suspended' : REQUIRED_PERMISSIONS;
+    if (this.candidate) {
+      return this.candidate.partnershipStatus === PartnershipStatus.Suspended ? 
+      'Agency Partnership is suspended' : REQUIRED_PERMISSIONS;
+    }
+
+    return REQUIRED_PERMISSIONS;
   }
 
   @Select(OrderManagementState.orderApplicantsInitialData)
