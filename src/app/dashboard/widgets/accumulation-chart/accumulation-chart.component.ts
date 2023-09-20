@@ -121,11 +121,16 @@ export class AccumulationChartComponent
     }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status" ||  this.chartData?.title==="Average Days for Active Candidates in a Status"){
         let candidatesDataset:any = [];
         let candidatesOrderDataSet = [];
-        if(this.chartData?.title == "Candidates for Active Positions" ||  this.chartData?.title==="Average Days for Active Candidates in a Status"){
+        if(this.chartData?.title == "Candidates for Active Positions"){
           this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
             candidatesDataset = data;
           }); 
-        }else{
+        }else if(this.chartData?.title==="Average Days for Active Candidates in a Status"){
+          this.dashboardService.candidatesavgForActivePositions$.subscribe(data=>{
+            candidatesDataset = data;
+          });
+        }
+        else{
           this.dashboardService.candidatesOverallStatus$.subscribe(data=>{
             candidatesDataset = data;
           }); 
