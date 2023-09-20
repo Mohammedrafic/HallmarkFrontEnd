@@ -18,7 +18,9 @@
       <div class="col-2">
         <div class="pe-4">
           <p class="mb-1 text-bold">
-            <span class="headerdata">{{regions}}</span>
+            <span class="headerdata" *ngIf="regions.length == 0">All</span>
+            <span class="headerdata" *ngIf="regions.length == 1">{{regions}}</span>
+            <span class="headerdata" *ngIf="regions.length >= 2">Multiple</span>
           </p>
           <p class="text-muted">Region</p>
         </div>
@@ -26,7 +28,9 @@
       <div class="col-2">
         <div class="pe-4">
           <p class="mb-1 text-bold">
-            <span class="headerdata">{{locations}}</span>
+            <span class="headerdata" *ngIf="locations.length == 0">All</span>
+            <span class="headerdata" *ngIf="locations.length == 1">{{locations}}</span>
+            <span class="headerdata" *ngIf="locations.length >= 2">Multiple</span>
           </p>
           <p class="text-muted">Location</p>
         </div>
@@ -34,7 +38,9 @@
       <div class="col-2">
         <div class="pe-4">
           <p class="mb-1 text-bold">
-            <span class="headerdata">{{departments}}</span>
+            <span class="headerdata" *ngIf="departments.length == 0">All</span>
+            <span class="headerdata" *ngIf="departments.length == 1">{{departments}}</span>
+            <span class="headerdata" *ngIf="departments.length >= 2">Multiple</span>
           </p>
           <p class="text-muted">Department</p>
         </div>
