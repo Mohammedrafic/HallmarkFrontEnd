@@ -60,7 +60,7 @@ import { AgencyPositionModel } from '../models/agency-position.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
 import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetSkillsbyByFilters, GetWorkCommitment } from '../models/rn-utilization.model';
 import { AvailableEmployeeModel } from '../models/available-employee.model';
-import { BillRateResponse } from '../models/bill-rate-by-skill-category-response.model';
+import { BillRateResponse, SkillCategoryName } from '../models/bill-rate-by-skill-category-response.model';
 import { BillRateBySkillCategoryTypeAggregatedModel } from '../models/bill-rate-by-skill-category-type-aggregated.model';
 
 @Injectable()
@@ -651,7 +651,7 @@ export class DashboardService {
                   value: a.value
                 }));
                 var objKey = eachVAlue.charAt(0).toUpperCase() + eachVAlue.slice(1);
-                obj[objKey] = formattedValue;
+                obj[SkillCategoryName(objKey)] = formattedValue;
               }
             });       
             return obj;            
