@@ -36,6 +36,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { OrderJobDistribution } from '@shared/enums/job-distibution';
 import {
+  ERROR_CAN_NOT_Edit_OpenPositions,
   ExtensionStartDateValidation,
   JOB_DISTRIBUTION_TITLE,
   ORDER_DISTRIBUTED_TO_ALL,
@@ -828,6 +829,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!orderValid) {
       this.showOrderFormValidationMessage();
       this.showInvalidValueMessage();
+    }
+    if(this.order.disableNumberOfOpenPositions && this.order.openPositions != this.orderDetailsFormComponent.generalInformationForm.getRawValue().openPositions){
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
+      return;
     }
 
     if (orderValid && billRatesValid && credentialsValid) {
