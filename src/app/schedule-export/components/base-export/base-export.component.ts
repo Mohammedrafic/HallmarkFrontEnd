@@ -71,28 +71,13 @@ export class BaseExportComponent implements OnInit {
     if(this.scheduleFilters){
       for(let i=0; i<this.scheduleFilters.length; i++){
         if(this.scheduleFilters[i].groupTitle === 'Region'){
-          this.regions = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: string }) => {
-            if (combinedObj !== '') {
-              combinedObj += ',';
-            }
-            return combinedObj + obj;
-          }, '');
+          this.regions = this.scheduleFilters[i].data;
         }
         if(this.scheduleFilters[i].groupTitle === 'Location'){
-          this.locations = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: string; }) => {
-            if (combinedObj !== '') {
-              combinedObj += ',';
-            }
-            return combinedObj + obj;
-          }, '');
+          this.locations = this.scheduleFilters[i].data;
         }
         if(this.scheduleFilters[i].groupTitle === 'Department'){
-          this.departments = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: {value : string}) => {
-            if (combinedObj !== '') {
-              combinedObj += ',';
-            }
-            return combinedObj + obj;
-          }, '');
+          this.departments = this.scheduleFilters[i].data;
         }
       }
     }
