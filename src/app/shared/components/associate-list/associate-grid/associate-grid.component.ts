@@ -59,7 +59,6 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
     return PartnershipStatus[partnershipStatus];
   };
   public openEditDialog = new EventEmitter<AssociateOrganizationsAgency>();
-  public statusText = AgencyStatusText;
 
   private isAlive = true;
   private pageSubject = new Subject<number>();
