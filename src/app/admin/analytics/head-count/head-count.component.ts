@@ -224,6 +224,8 @@ export class HeadCountComponent implements OnInit {
               //this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.
               //                                                  filter(i=>this.fixedCanidateStatusesTypes.includes(i.status));
               this.changeDetectorRef.detectChanges();
+
+              setTimeout(() => { this.SearchReport() }, 6000);
             }
           });
           this.regions = this.regionsList;
@@ -239,7 +241,7 @@ export class HeadCountComponent implements OnInit {
           this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
-      setTimeout(() => { this.SearchReport() }, 6000);
+      /*setTimeout(() => { this.SearchReport() }, 6000);*/
 
     });
     this.regionIdControl = this.headCountReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;

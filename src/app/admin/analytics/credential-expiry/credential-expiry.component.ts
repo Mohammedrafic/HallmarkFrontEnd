@@ -132,17 +132,15 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-  private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5,10,13,12];
+  private fixedCandidateStatusesIncluded: string[] = ['Accepted','Onboard','Applied','Cancelled','Custom','Offboard','Offered','Shortlisted'];
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'statusText' };
-  public candidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
-  selectedCandidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
-  candidateStatusesData:CandidateStatusAndReasonFilterOptionsDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
     message: string;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
+    private changeDetectorRef: ChangeDetectorRef,
     private filterService: FilterService  ,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
       this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
       this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
@@ -154,24 +152,25 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     }   
     //this.SetReportData();    
   }
-
   ngOnInit(): void {
 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
+      this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
+      this.credentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
+
       this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
           this.isAlive = false;
           this.filterOptionsData = data;
+          this.defaultCandidateStatuses = ['Accepted', 'Onboard']
           //let notLoadingStatuses :string[]= ['Applied','Shortlisted','Rejected','Bill Rate Pending','Offered Bill Rate','Offboard','Withdraw','Cancelled','Not Applied'];
-          this.candidateStatusesData=data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
-            this.filterColumns.candidateStatuses.dataSource =this.candidateStatusesData;
-              this.filterColumns.agencyIds.dataSource = data.agencies;
-             //this.defaultCandidateStatuses = (this.candidateStatusesData||[]).map((list) => list.status);
-             this.defaultAgencys = data.agencies.map((list) => list.agencyId);
-          //this.credentialExpiryForm.controls["candidateStatuses"].setValue(this.defaultCandidateStatuses.filter(f => f !== 90));
+          this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.statusText));
+          this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
           this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
+          this.filterColumns.agencyIds.dataSource = data.agencies;
+          this.defaultAgencys = data.agencies.map((list) => list.agencyId);
           if (this.isInitialLoad) {
             setTimeout(() => { this.SearchReport(); }, 3000)
             this.isInitialLoad = false;
@@ -234,7 +233,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.credentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
-        /*this.isAlive = true;*/
+        this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
           let orgList = this.organizations?.filter((x) => data == x.organizationId);
@@ -272,6 +271,23 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
             businessUnitIds: businessIdData
           };
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+            if (data != null) {
+              this.isAlive = true;
+              this.filterOptionsData = data;
+              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              this.filterColumns.skillIds.dataSource = data.masterSkills;
+              this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
+              this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.statusText));
+              this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
+              this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
+              this.filterColumns.agencyIds.dataSource = data.agencies;
+              
+              
+              this.changeDetectorRef.detectChanges();
+              this.SearchReport();
+            }
+          });
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           setTimeout(() => { this.SearchReport() }, 3000);
@@ -289,13 +305,6 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       if (this.agencyIdControl.value.length > 0) {
         let agencyData = this.filterOptionsData.agencies;
         this.selectedAgencies = agencyData?.filter((object) => data?.includes(object.agencyId));
-      }
-    });
-
-    this.candidateStatusesIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
-    this.candidateStatusesIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (this.candidateStatusesIdControl.value.length > 0) {       
-        this.selectedCandidateStatuses = this.candidateStatusesData?.filter((object) => data?.includes(object.status));
       }
     });
 
@@ -368,15 +377,6 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
 
-    //locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
-    //departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
-
-    //regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
-    //locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
-    //departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
-    //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : this.filterOptionsData.candidateStatuses?.length > 0 ? this.filterOptionsData.candidateStatuses.map(x => x.status).join(",") : "null";
-    //candidateStatuses = candidateStatuses.length > 0 ? candidateStatuses.join(",") : "null";
-
       this.paramsData =
       {
       "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
@@ -388,12 +388,10 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         "AgencyParamCREXP": this.selectedAgencies.length == 0 ? "0" : this.selectedAgencies?.map((list) => list.agencyId).join(","),
         "CandidateStatusCREXP": candidateStatuses.length == 0 ? '' : candidateStatuses.join(this.joinString),
       "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
-     // "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
       this.organizations[0].id.toString():"1": 
       window.localStorage.getItem("lastSelectedOrganizationId"),
-     // "HostName": this.baseUrl,
         "OpCredFlagEXP": opcredFlag == "" ? "false" : opcredFlag.toString(),
         "UserId": this.user?.id,
       };
@@ -448,7 +446,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         valueType: ValueType.Text,
         dataSource: [],
         valueField: 'statusText',
-        valueId: 'status',
+        valueId: 'statusText',
       },
     }
   }
