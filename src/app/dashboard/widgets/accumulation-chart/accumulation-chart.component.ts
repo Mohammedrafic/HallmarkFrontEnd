@@ -144,7 +144,10 @@ export class AccumulationChartComponent
         if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {         
             this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
         }else{
+          if(candidatesChartInfo.status!=='Others')
+          {
             this.dashboardService.redirectToUrlWithStatus('client/order-management/',candidatesChartInfo.status);
+          }
         }
         
     }
