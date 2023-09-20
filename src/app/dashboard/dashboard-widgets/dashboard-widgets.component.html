@@ -46,7 +46,7 @@
           <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS"
                                   [chartData]="widgetsData?.[widgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]"
                                   [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
-                                  [description]="widgetDescriptionEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS" [averageactiveFlag]="true">               
+                                  [description]="widgetDescriptionEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS" [averageFlag]="true">               
          </app-accumulation-chart>
           <app-maps-chart *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
                           [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"

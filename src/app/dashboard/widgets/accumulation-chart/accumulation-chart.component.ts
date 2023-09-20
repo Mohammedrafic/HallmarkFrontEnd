@@ -45,7 +45,6 @@ export class AccumulationChartComponent
   @Input() public isDarkTheme: boolean;
   @Input() public description: string;
   @Input() public averageFlag: boolean =false;
-  @Input() public averageactiveFlag:boolean=false;
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
