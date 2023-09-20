@@ -48,8 +48,8 @@
   
       <div class="col-2">
         <div class="pe-4">
-          <p class="mb-1 text-bold">{{startDate | date: 'MM/dd/yyy':'UTC'}}</p>
-          <p class="text-muted">Start Date</p>
+          <p class="mb-1 text-bold">{{startDate | date: 'MM/dd/yyy':'UTC'}} - {{endDate | date: 'MM/dd/yyy':'UTC'}}</p>
+          <p class="text-muted">Start Date - End Date</p>
         </div>
       </div>
     </div>
@@ -132,7 +132,7 @@
         <tr *ngFor="let scheduleItem of scheduleData" class="table-row">
           <td>
             <span>{{scheduleItem.lastName}} {{scheduleItem.firstName}}</span>
-            <span>ID : {{scheduleItem.employeeId}}</span>
+            <span>ID : {{scheduleItem.displayId}}</span>
           </td>
           <td>{{scheduleItem.skill}}</td>
           <td>{{scheduleItem.employeeSchedules?.workHours}}</td>
