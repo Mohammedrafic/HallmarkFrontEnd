@@ -16,10 +16,11 @@
         class="datepicker"
         format="MM/dd/yyyy"
         placeholder="MM/DD/YYYY"
-        appValidateWithMessage
         formControlName="suspentionDate"
         [min]="minDate"
         [serverTimezoneOffset]="0"
+        [enableMask]="true"
+        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }">
       >
       </ejs-datepicker>
     </div>
