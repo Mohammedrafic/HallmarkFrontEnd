@@ -8,7 +8,8 @@
           class="datepicker"
           format="{{formatInput}}"
           placeholder="{{placeholderInput}}"
-          appValidateWithMessage formControlName="startDate"
+          appValidateWithMessage
+          formControlName="startDate"
           [enableMask]="true"
           [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
         >
@@ -25,7 +26,9 @@
           class="datepicker"
           format="{{formatInput}}"
           placeholder="{{placeholderInput}}"
-          appValidateWithMessage formControlName="endDate" [enableMask]="true"
+          appValidateWithMessage
+          formControlName="endDate"
+          [enableMask]="true"
           [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
         >
         </ejs-datepicker>
