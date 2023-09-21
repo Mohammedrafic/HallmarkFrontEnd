@@ -2,7 +2,7 @@
   <div class="radio-button payment-mode bootstrap">
     <label>Mode<span class="required">*</span></label>
     <div>
-      <ul>
+      <ul class="bootstrap">
         <li *ngFor="let payment of paymentModeList">
           <ejs-radiobutton
             (change)="onChangePaymentMode($event)"

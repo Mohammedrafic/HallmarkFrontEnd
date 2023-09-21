@@ -1,19 +1,40 @@
 <app-page-toolbar>
   <ng-container left>
-    <button *ngIf="!agencyConfig.isAgencyUser" ejs-button cssClass="e-outline" (click)="onBack()">Back</button>
+    <button
+      *ngIf="!agencyConfig.isAgencyUser"
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      cssClass="e-outline back-btn"
+      (click)="onBack()"
+    >
+      Back
+    </button>
     <h3>{{ title }} Agency</h3>
   </ng-container>
   <ng-container right>
     <ng-container *ngIf="!isSeccondStepActive">
-      <button [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
+      <button
+        appHideBeforeSyncfusionLoad
+        [disabled]="!agencyForm?.dirty"
+        ejs-button cssClass="e-outline"
+        (click)="onClear()"
+      >
+        Clear
+      </button>
       <app-tooltip-container
         [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanEditAgencyProfile]">
+        [showToolTip]="!userPermission[userPermissions.CanEditAgencyProfile]"
+        class="save-btn"
+      >
         <button
           ejs-button
+          appHideBeforeSyncfusionLoad
           [disabled]="(activeUser.businessUnitType === businessUnitType.Agency && (activeUser.agencyStatus === agencyStatus.Inactive || activeUser.agencyStatus === agencyStatus.Terminated))|| !userPermission[userPermissions.CanEditAgencyProfile]"
           [isPrimary]="true"
-          (click)="onSave()">Save</button>
+          (click)="onSave()"
+        >
+          Save
+        </button>
       </app-tooltip-container>
     </ng-container>
   </ng-container>
@@ -22,12 +43,7 @@
 <ejs-tab class="stepper" #stepper (created)="onStepperCreated()">
   <e-tabitems>
     <e-tabitem>
-      <ng-template #headerText>
-        <div class="stepper-header required">
-          <div class="stepper-title">General Info</div>
-          <div class="stepper-sub-title">Overall Agency Info</div>
-        </div>
-      </ng-template>
+      <ng-template #headerText></ng-template>
       <ng-template #content>
         <!-- General info step -->
         <form [formGroup]="agencyForm" id="agencyFormFirstStep">

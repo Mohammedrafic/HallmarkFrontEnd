@@ -78,4 +78,8 @@ ejs-checkbox.e-checkbox-wrapper.e-wrapper {
     height: auto;
     padding-bottom: 24px;
   }
+
+  .table-container:has(.e-emptyrow) {
+    height: 140px;
+  }
 }

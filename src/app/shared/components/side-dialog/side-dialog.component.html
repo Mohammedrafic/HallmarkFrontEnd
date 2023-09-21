@@ -16,6 +16,9 @@
             <h3 class="e-card-title">{{header}}</h3>
           </div>
           <ng-container *ngIf="!(isMobile$ | async)" [ngTemplateOutlet]="actionButtons"></ng-container>
+          <button tabindex="-1" ejs-button cssClass="e-flat close-button" (click)="onFormCancelClick()">
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
         </div>
       </section>
       <ng-content></ng-content>

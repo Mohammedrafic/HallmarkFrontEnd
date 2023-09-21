@@ -401,6 +401,10 @@
     margin-top: 145px;
   }
 
+  .grid-component:has(.e-emptyrow) {
+    height: 145px;
+  }
+
   :host {
     .table-tabs {
       margin-bottom: 8px;

@@ -283,10 +283,4 @@ export abstract class AbstractGridConfigurationComponent {
       this.subrowsState.clear();
     }
   }
-
-  public setHeightForMobileGrid(itemsLength: number | undefined): void {
-    const padding = 60;
-    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.rowHeight;
-    this.mobileGridHeight = String(height);
-  }
 }

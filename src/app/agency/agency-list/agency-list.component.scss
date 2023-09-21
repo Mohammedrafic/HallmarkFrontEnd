@@ -45,6 +45,10 @@
 
     .grid-component {
       height: auto;
+
+      &:has(.e-emptyrow) {
+        height: 145px;
+      }
     }
 
     .button-export {

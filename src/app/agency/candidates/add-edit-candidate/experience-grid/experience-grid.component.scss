@@ -12,6 +12,10 @@
     @media #{$max-tablet} {
       height: calc(100% - 70px);
     }
+
+    @media #{$max-mobile} {
+      height: auto;
+    }
   }
 }
 
@@ -39,6 +43,19 @@
   ejs-textbox {
     textarea.e-textbox.e-input {
       height: 100px;
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  :host {
+    display: block;
+    height: auto;
+
+    .grid-component:has(.e-emptyrow) {
+      &.mobile-login-on {
+        height: 140px;
+      }
     }
   }
 }
