@@ -989,6 +989,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.organizationId$.pipe(
       distinctUntilChanged(),
       tap((id: number) => {
+        console.log('id', id)
         this.organizationId = id || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
         this.clearFilters();
         this.store.dispatch(new GetOrganizationSettingsFilterOptions());
