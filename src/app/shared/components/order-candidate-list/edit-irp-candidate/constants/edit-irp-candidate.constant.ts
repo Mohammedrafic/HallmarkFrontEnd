@@ -3,6 +3,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import { FieldType } from '@core/enums';
 import { CandidateField } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 export const Icon = {
   X,
@@ -32,6 +33,13 @@ export const OnboardConfigFieldsToShow: string[] = [
   'isClosed',
   'reason',
   'closeDate',
+];
+
+export const OfferedStatusFlow = [
+  CandidatStatus.Offered,
+  CandidatStatus.OnBoard,
+  CandidatStatus.Offboard,
+  CandidatStatus.Cancelled
 ];
 
 export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [

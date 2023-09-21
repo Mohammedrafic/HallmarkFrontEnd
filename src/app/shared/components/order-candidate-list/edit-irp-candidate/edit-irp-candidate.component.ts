@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild, } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, Validators } from '@angular/forms';
 
@@ -24,6 +15,7 @@ import {
   CloseReasonField,
   DefaultConfigFieldsToShow,
   OfferedConfigFieldsToShow,
+  OfferedStatusFlow,
   OnboardConfigFieldsToShow,
   OptionField,
   StatusField,
@@ -464,7 +456,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     startDate?: string,
     endDate?: string
   ): void {
-    if(!status || (status !== CandidatStatus.Offered && status !== CandidatStatus.OnBoard)) {
+    if(!status || !OfferedStatusFlow.includes(status)) {
       return;
     }
 
@@ -483,12 +475,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       candidateDetails?.offeredStartDate &&
       candidateDetails?.offeredEndDate;
 
+    const hasCancelledOffboardCandidate = (status === CandidatStatus.Cancelled || status === CandidatStatus.Offboard) &&
+      candidateDetails?.offeredStartDate &&
+      candidateDetails?.offeredEndDate;
+
     if (status === CandidatStatus.Offered) {
       UpdateVisibilityConfigFields(this.dialogConfig, OfferedConfigFieldsToShow);
       return;
     }
 
-    if (hasOnboardedCandidateOfferedDate) {
+    if (hasOnboardedCandidateOfferedDate || hasCancelledOffboardCandidate) {
       UpdateVisibilityConfigFields(this.dialogConfig, OnboardConfigFieldsToShow);
       DisableControls(['offeredStartDate', 'offeredEndDate'], this.candidateForm);
       return;
