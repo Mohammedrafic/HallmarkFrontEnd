@@ -547,7 +547,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         this.tab.select(1);
         this.globalWindow.localStorage.setItem("IsEmployeeTab",JSON.stringify(""));
       }
-      else if(this.isOrderDetailsTab){
+      if(this.isOrderDetailsTab){
         this.tab.select(0);
         this.isOrderDetailsTab=false;
       }
