@@ -2597,8 +2597,9 @@ public RedirecttoIRPOrder(order:Order)
     if (selectedOrderAfterRedirect) {
       this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
-      this.filters.contactEmails = this.filters.contactEmails ;
-
+      if (!Array.isArray(this.filters.contactEmails)) {
+        this.filters.contactEmails = this.filters.contactEmails ? [this.filters.contactEmails] : this.filters.contactEmails;
+      }
       this.filters.orderPublicId = selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId;
       this.filters.agencyType = null;
       this.filters.includeReOrders = false;
@@ -2903,8 +2904,11 @@ public RedirecttoIRPOrder(order:Order)
   private refreshFilterState(): void {
     this.filterApplied = true;
     this.filters = this.OrderFilterFormGroup.getRawValue();
-
-    this.filters.contactEmails = this.filters.contactEmails || null;
+    if (!Array.isArray(this.filters.contactEmails)) {
+      this.filters.contactEmails = this.filters.contactEmails
+        ? [this.filters.contactEmails]
+        : this.filters.contactEmails;
+    }
     this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
