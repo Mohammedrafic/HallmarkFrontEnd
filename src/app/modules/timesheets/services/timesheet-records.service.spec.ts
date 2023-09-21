@@ -2,7 +2,9 @@ import {TestBed} from '@angular/core/testing';
 import {FormBuilder} from '@angular/forms';
 
 import {ColDef} from '@ag-grid-community/core';
+import { Store } from '@ngxs/store';
 
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {TimesheetRecordsService} from './timesheet-records.service';
 import {RecordValue, TimesheetRecordsDto} from '../interface';
 import { RecordFields, RecordsMode, RecordStatus, TableTabIndex } from '../enums';
@@ -19,10 +21,16 @@ describe('TimesheetRecordsService', () => {
   const tabComponent = {
     hideTab: () => {},
   } as unknown as TabComponent;
+  const storeSpy: jasmine.SpyObj<Store> = jasmine.createSpyObj('Store', ['selectSnapshot']);
+  storeSpy.selectSnapshot.and.returnValue({ user: { businessUnitType: BusinessUnitType.MSP } });
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [FormBuilder, TimesheetRecordsService],
+      providers: [
+        FormBuilder,
+        TimesheetRecordsService,
+        { provide: Store, useValue: storeSpy },
+      ],
     });
 
     service = TestBed.inject(TimesheetRecordsService);
@@ -191,9 +199,10 @@ describe('TimesheetRecordsService', () => {
 
     service.controlTabsVisibility(rates, tabComponent, records);
 
-    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).toHaveBeenCalledTimes(3);
     expect(spy).toHaveBeenCalledWith(TableTabIndex.Miles, true);
     expect(spy).toHaveBeenCalledWith(TableTabIndex.Expenses, true);
+    expect(spy).toHaveBeenCalledWith(TableTabIndex.HistoricalData, false);
   });
 
   it('controlTabsVisibility should show mileage and expenses tabs', () => {
@@ -203,9 +212,10 @@ describe('TimesheetRecordsService', () => {
 
     service.controlTabsVisibility(rates, tabComponent, records);
 
-    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).toHaveBeenCalledTimes(3);
     expect(spy).toHaveBeenCalledWith(TableTabIndex.Miles, false);
     expect(spy).toHaveBeenCalledWith(TableTabIndex.Expenses, false);
+    expect(spy).toHaveBeenCalledWith(TableTabIndex.HistoricalData, false);
   });
 
   it('checkForStatus should return true for record with Deleted status', () => {

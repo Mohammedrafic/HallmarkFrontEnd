@@ -9,7 +9,7 @@ import { RowNode } from '@ag-grid-community/core';
 import { ExportPayload } from '@shared/models/export.model';
 
 export namespace Timesheets {
-  
+
   export class GetAll {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEETS;
   }
@@ -207,5 +207,10 @@ export namespace Timesheets {
 
   export class ResetFilterOptions {
     static readonly type = TIMESHEETS_ACTIONS.RESET_FILTER_OPTIONS;
+  }
+
+  export class SetDisplayTimesheetHistoricalData {
+    static readonly type = '[app] Set Display TimesheetHistorical Data';
+    constructor(public readonly displayTimesheetHistoricalData: boolean) { }
   }
 }

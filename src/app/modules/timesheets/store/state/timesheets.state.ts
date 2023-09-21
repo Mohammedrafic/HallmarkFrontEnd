@@ -188,6 +188,11 @@ export class TimesheetsState {
     return state.selectedOrganizationId;
   }
 
+  @Selector()
+  static displayTimesheetHistoricalData(state: TimesheetsModel): boolean {
+    return state.displayTimesheetHistoricalData;
+  }
+
   @Action(Timesheets.GetAll)
   GetTimesheets(
     { patchState, getState, dispatch }: StateContext<TimesheetsModel>,
@@ -330,7 +335,7 @@ export class TimesheetsState {
           new Timesheets.GetAll(),
           new Timesheets.GetTabsCounts(),
         ]);
-        
+
 
         return ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
@@ -909,4 +914,12 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.ForceAddRecord)
   ForceAddRecord(): void {}
+
+  @Action(Timesheets.SetDisplayTimesheetHistoricalData)
+  SetFeaturesConfiguration(
+    { patchState }: StateContext<TimesheetsModel>,
+    { displayTimesheetHistoricalData }: Timesheets.SetDisplayTimesheetHistoricalData
+  ): void {
+    patchState({ displayTimesheetHistoricalData });
+  }
 }
