@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   ClearPredefinedBillRates,
   EditOrder,
+  GetParentOrderById,
   GetPredefinedBillRates,
   SaveOrder,
   SaveOrderSucceeded,
@@ -78,6 +79,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
 
+  @Select(OrderManagementContentState.selectedParentOrder)
+  selectedParentOrder$: Observable<Order>;
+
   @Select(OrderManagementContentState.getPredefinedBillRatesData)
   getPredefinedBillRatesData$: Observable<GetPredefinedBillRatesData | null>;
 
@@ -102,6 +106,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private manuallyAddedBillRates: BillRate[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private order: Order;
+  public parentOrder: Order;
   public startDate: Date;
 
   public isPerDiem = false;
@@ -161,6 +166,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
           this.removeMenuItem(SubmitButtonItem.SaveForLater);
         }
+        if(order?.extensionFromId != null){
+          this.store.dispatch(new GetParentOrderById(order?.extensionFromId))
+        }
+      });
+
+      this.selectedParentOrder$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((parentOrder: Order) => {
+        this.parentOrder = parentOrder;
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
@@ -841,8 +853,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const documents = this.orderDetailsFormComponent.documents;
       
       this.startDate = order.jobStartDate;
-      let actualEndDate = new Date(this.order?.jobStartDate);
-      let twoWeekDate = new Date(actualEndDate.setDate(actualEndDate.getDate() + 14));
+      let parentOrderEndDate = new Date(this.parentOrder?.jobEndDate);
+      let twoWeekDate = new Date(parentOrderEndDate.setDate(parentOrderEndDate.getDate() + 14));
       if(this.startDate && this.startDate > twoWeekDate && this.order.extensionFromId != null){
           this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
           return;

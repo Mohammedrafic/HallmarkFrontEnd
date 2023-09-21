@@ -107,6 +107,13 @@ export class GetSelectedOrderById {
   ) {}
 }
 
+export class GetParentOrderById {
+  static readonly type = '[order management] Get Parent Order By ParentId';
+  constructor(
+    public payload: number,
+  ) {}
+}
+
 export class GetOrganizationStatesWithKeyCode {
   static readonly type = '[order management] Get Organizations States With Key Code';
   constructor() {}

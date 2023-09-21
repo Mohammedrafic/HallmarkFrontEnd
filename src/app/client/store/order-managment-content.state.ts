@@ -84,7 +84,8 @@ import {
   GetOrderWorkLocationDetailSucceeded,
   GetOrderCredentialDetailSucceeded,
   GetOrderContactDetailSucceeded,
-  GetOrderBillRateDetailSucceeded
+  GetOrderBillRateDetailSucceeded,
+  GetParentOrderById
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -171,6 +172,7 @@ export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
   ordersJourneyPage: OrdersJourneyPage | null;
   selectedOrder: Order | null;
+  selectedParentOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
   applicantStatuses: ApplicantStatus[];
   orderCandidatesListPage: OrderCandidatesListPage | null;
@@ -215,6 +217,7 @@ export interface OrderManagementContentStateModel {
     ordersPage: null,
     ordersJourneyPage: null,
     selectedOrder: null,
+    selectedParentOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
     applicantStatuses: [],
@@ -272,6 +275,11 @@ export class OrderManagementContentState {
   @Selector()
   static selectedOrder(state: OrderManagementContentStateModel): Order | null {
     return state.selectedOrder;
+  }
+
+  @Selector()
+  static selectedParentOrder(state: OrderManagementContentStateModel): Order | null {
+    return state.selectedParentOrder;
   }
 
   @Selector()
@@ -669,6 +677,19 @@ export class OrderManagementContentState {
           );
         }
 
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetParentOrderById)
+  GetParentOrderById(
+    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: GetParentOrderById
+  ): Observable<Order> {
+    return this.orderManagementService.getOrderById(payload, false).pipe(
+      tap((payload) => {
+        patchState({ selectedParentOrder: payload });
         return payload;
       })
     );
