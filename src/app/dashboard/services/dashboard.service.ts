@@ -395,7 +395,7 @@ export class DashboardService {
     } else {
       return this.getMonthTimeRanges(5);
     }
-  }
+  }  
 
   private getOrderPositionWidgetData(filter: DashboartFilterDto, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
     return this.httpClient
@@ -637,7 +637,7 @@ export class DashboardService {
     } 
 
     private getSkillCategoryByTypes(filter: DashboartFilterDto, timeSelection: TimeSelectionEnum): Observable<BillRateBySkillCategoryTypeAggregatedModel> {
-      const timeRanges = this.calculateTimeRanges(timeSelection);    
+      const timeRanges = this.getLastSixMonthTimeRanges();    
       var data = this.httpClient      
         .post<BillRateResponse>(`${this.baseUrl}/GetAverageBillRateBySkillCategory`, { ...timeRanges, ...filter, rangeType: timeSelection})     
         .pipe(
@@ -659,5 +659,18 @@ export class DashboardService {
           }));          
       return data;
     } 
+
+    private getLastSixMonthTimeRanges(): ITimeSlice {
+      const date = new Date();
+      const  timeRanges  = this.getLastSixMonthFirstLastMonthDay(new Date(date.setMonth(date.getMonth() - 5)));
+      return { ...timeRanges };
+    }
+
+    private getLastSixMonthFirstLastMonthDay(startDate: Date): ITimeSlice {
+      const today = new Date();
+      const dateFrom = DateTimeHelper.setUtcTimeZone(new Date(new Date(startDate.getFullYear(), startDate.getMonth()-1, 1)));
+      const dateTo =  DateTimeHelper.setUtcTimeZone(new Date(new Date(today.getFullYear(), today.getMonth(), 0)));
+      return { dateFrom, dateTo };
+    }
  
 }
