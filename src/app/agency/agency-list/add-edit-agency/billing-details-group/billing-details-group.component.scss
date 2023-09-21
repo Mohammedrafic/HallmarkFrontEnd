@@ -1,36 +1,49 @@
+@import 'adaptive-response';
+
 .billing-details {
-  .billing-details-section,
-  .billing-address-section,
-  .billing-country-section,
-  .billing-phone-section {
-    display: flex;
+  .billing-details-section {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(4, 1fr);
 
-    .left-column {
-      flex: 1 0 80%;
+    .name {
+      grid-column: 1/3;
     }
 
-    .website {
-      flex: 1 0 74%;
+    .address {
+      grid-column: 3/5;
     }
-
-    .right-column {
-      flex: 1 0 20%;
-    }
-
-    .ext {
-      flex: 1 0 24%;
-    }
-  }
-
-  .input-container, .dropdown-container {
-    margin-bottom: 15px;
-    margin-right: 10px;
-    flex: 1 1 0px
   }
 
   .input-container label,
   .dropdown-container label {
     margin-bottom: 5px !important;
     display: block;
+  }
+}
+
+@media (max-width: 880px) {
+  .billing-details {
+    .billing-details-section {
+      grid-auto-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
+
+      .address {
+        grid-column: 1/3;
+      }
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .billing-details {
+    .billing-details-section {
+      grid-template-columns: 1fr;
+
+      .name,
+      .address {
+        grid-column: unset;
+      }
+    }
   }
 }
