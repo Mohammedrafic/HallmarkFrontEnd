@@ -37,7 +37,7 @@ export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRenderer
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: function (params: any) {
-        if (params.data.isSharedWithMe) {
+        if (params.data.isSharedWithMe || params.data.status == 'Inactive') {
           return false;
         }
         return true;
@@ -193,7 +193,7 @@ export const DocumentLibraryColumnsAgencyDefinition = (actionCellParams: ICellRe
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: function (params: any) {
-        if (params.data.isSharedWithMe) {
+        if (params.data.isSharedWithMe || params.data.status == 'Inactive') {
           return false;
         }
         return true;
