@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { Attachment, AttachmentsListConfig, AttachmentsListParams } from '@shared/components/attachments';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-attachments-list',
@@ -8,7 +9,7 @@ import { Attachment, AttachmentsListConfig, AttachmentsListParams } from '@share
   styleUrls: ['./attachments-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AttachmentsListComponent implements AttachmentsListParams {
+export class AttachmentsListComponent implements AttachmentsListParams, OnInit {
   @Input()
   public attachments: Attachment[] = [];
 
@@ -20,13 +21,23 @@ export class AttachmentsListComponent implements AttachmentsListParams {
 
   @Input()
   public disableDelete = false;
+  @Input()
+  public openTheAttachment$?:Subject<number> = new Subject<number>();
 
   @Output() 
-   previewAttachmentEvent = new EventEmitter<boolean>();
+   previewAttachmentEvent = new EventEmitter<number>();
 
   public agInit(params: AttachmentsListParams): void {
     this.attachments = params.attachments;
     this.attachmentsListConfig = params.attachmentsListConfig;
+  }
+  
+  public ngOnInit(): void {
+    this.openTheAttachment$?.subscribe((index)=>{
+      if(index != null && index != undefined){
+        this.attachmentsListConfig?.preview?.(this.attachments[index]);
+      }      
+    })
   }
 
   public refresh(params: AttachmentsListParams): boolean {
@@ -39,8 +50,8 @@ export class AttachmentsListComponent implements AttachmentsListParams {
     return item.id;
   }
 
-  public preview(attachment: Attachment): void {
-    this.previewAttachmentEvent.emit(true);
+  public preview(attachment: Attachment,index:number): void {
+    this.previewAttachmentEvent.emit(index);
     this.attachmentsListConfig?.preview?.(attachment);
   }
 
