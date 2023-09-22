@@ -24,11 +24,9 @@ import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 })
 export class TimesheetFileViewerComponent extends Destroyable implements OnInit {
 
-  @ViewChild('timesheetPdfViewer')
+  @ViewChild('PdfViewer')
   public readonly pdfViewerControl: PdfViewerComponent;
 
-  /*@ViewChild('sideDialog')
-  public readonly sideDialog: DialogComponent;*/
 
   @Output() 
   previewCloseEvent = new EventEmitter<boolean>();

@@ -37,9 +37,8 @@ export const OnboardConfigFieldsToShow: string[] = [
 
 export const OfferedStatusFlow = [
   CandidatStatus.Offered,
-  CandidatStatus.OnBoard,
   CandidatStatus.Offboard,
-  CandidatStatus.Cancelled
+  CandidatStatus.Cancelled,
 ];
 
 export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [

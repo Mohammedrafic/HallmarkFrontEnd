@@ -1,4 +1,4 @@
-<div class="attachment" *ngFor="let attachment of attachments; trackBy: trackById">
+<div class="attachment" *ngFor="let attachment of attachments;let ind = index; trackBy: trackById">
     <i-feather *ngIf="attachmentsListConfig?.download"
                (click)="$event.stopPropagation(); $event.preventDefault(); download(attachment)"
                name="download"
@@ -7,7 +7,7 @@
 
     <ejs-tooltip [content]="attachment.fileName"
                  [class.preview-enabled]="!!attachmentsListConfig?.preview"
-                 (click)="preview(attachment)"
+                 (click)="preview(attachment,ind)"
                  position="BottomCenter"
                  class="file-name"
     >

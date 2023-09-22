@@ -1,9 +1,10 @@
-<section [style.display]="preViewDoc ? 'block' : 'none'" >
+<section [style.display]="preViewDoc ? 'block' : 'none'" class="main-body">
     <section class="container">
         <section class="header-container">
             <div class="e-card-header">
                 <div class="e-card-header-caption">
-                    <h3 class="e-card-title">Document Preview</h3>
+                    <h3 class="e-card-title" *ngIf="fileName" title="{{fileName}}">{{fileName}}</h3>
+                    <p>Document Preview</p>
                 </div>
                 <div class="e-card-content">
                     <button ejs-button cssClass="e-outline" class="download-button" (click)="downloadFile()">
@@ -18,10 +19,10 @@
         <section class="file-viewer-container">
             <div class="right">
                 <div class="file-viewer">
-                    <ejs-pdfviewer id="timesheetPdfViewer"
+                    <ejs-pdfviewer id="PdfViewer"
                                 style="display: block; height: 100%"
                                 *ngIf="!isImage"
-                                #timesheetPdfViewer
+                                #PdfViewer
                                 [serviceUrl]="service"
                                 [enableTextSelection]="false"
                     ></ejs-pdfviewer>

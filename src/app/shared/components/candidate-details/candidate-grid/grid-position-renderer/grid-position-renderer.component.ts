@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { AppState } from '../../../../../store/app.state';
@@ -12,21 +12,34 @@ import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
+import { AbstractPermission } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-grid-position-renderer',
   templateUrl: './grid-position-renderer.component.html',
   styleUrls: ['./grid-position-renderer.component.scss'],
 })
-export class GridPositionRendererComponent implements ICellRendererAngularComp {
+export class GridPositionRendererComponent extends AbstractPermission implements ICellRendererAngularComp, OnInit {
   public cellValue: CandidatesDetailsModel;
+  public canViewOrder: boolean;
+  private isAgencyArea: boolean; 
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private router: Router,
     private orderManagementAgencyService: OrderManagementAgencyService,
     private orderManagementService: OrderManagementService
-  ) {}
+  ) {
+    super(store);
+  }
+
+  public override ngOnInit(): void {
+    super.ngOnInit();
+    this.isAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea)?.isAgencyArea;
+    this.canViewOrder = this.isAgencyArea ? 
+      this.userPermission[this.userPermissions.CanAgencyViewOrders] : 
+      this.userPermission[this.userPermissions.CanOrganizationViewOrders];
+  }
 
   public agInit(params: ICellRendererParams): void {
     this.cellValue = params.data;
@@ -38,10 +51,13 @@ export class GridPositionRendererComponent implements ICellRendererAngularComp {
   }
 
   public onCandidateNavigation(): void {
-    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-    this.setBusinessUnit(isAgencyArea);
+    if (!this.canViewOrder) {
+      return;
+    }
 
-    if (isAgencyArea) {
+    this.setBusinessUnit(this.isAgencyArea);
+
+    if (this.isAgencyArea) {
       this.router.navigate(['/agency/order-management']);
       this.orderManagementAgencyService.selectedOrderAfterRedirect$.next({
         orderId: this.cellValue.publicId,
