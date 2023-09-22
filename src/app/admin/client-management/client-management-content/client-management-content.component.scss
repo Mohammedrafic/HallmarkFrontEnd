@@ -1,4 +1,20 @@
-@import "../../../styles/variables/colors.scss";
+@import 'colors';
+@import 'adaptive-response';
+
+.flex-column {
+  row-gap: 8px;
+
+  ::ng-deep {
+    .controls-container {
+      flex-direction: row;
+
+      .right-content {
+        justify-content: flex-end;
+        width: auto;
+      }
+    }
+  }
+}
 
 .page-title {
   display: flex;
@@ -14,14 +30,10 @@
 }
 
 .org-controls-container {
-
-  &>div {
+  .button-group {
     display: flex;
     flex-direction: row-reverse;
-
-    button {
-      margin-left: 10px;
-    }
+    column-gap: 10px;
   }
 }
 
@@ -34,7 +46,39 @@
 }
 
 .grid-component {
-  height: 100%;
-  margin-bottom: 25px;
-  overflow-y: auto;
+  height: calc(100% - 155px);
+}
+
+@media (max-width: 850px) {
+  .flex-column {
+    ::ng-deep {
+      .controls-container {
+        flex-direction: column;
+        row-gap: 10px;
+  
+        .right-content {
+          justify-content: flex-start;
+        }
+      }
+    }
+
+    .grid-component {
+      height: calc(100% - 200px);
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .flex-column {
+    height: auto;
+    padding-bottom: 24px;
+
+    .grid-component {
+      height: auto;
+
+      &:has(.e-emptyrow) {
+        height: 140px;
+      }
+    }
+  }
 }
