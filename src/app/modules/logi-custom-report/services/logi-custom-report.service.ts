@@ -52,7 +52,7 @@ export class LogiCustomReportService {
   
   public saveShare(data: SharedDocumentPostDto): Observable<SharedDocumentPostDto> {
     
-    return this.http.post<SharedDocumentPostDto>(`/api/CustomReport/ShareCustomReports`, data);
+    return this.http.post<SharedDocumentPostDto>(`/api/Reporting/ShareCustomReports`, data);
 }
 
 }
