@@ -1,6 +1,5 @@
 import { GridHelper } from '@shared/helpers/grid.helper';
 import { GridStatusRendererComponent } from '@shared/components/candidate-details/candidate-grid/grid-status-renderer/grid-status-renderer.component';
-import { JobClassification } from '@shared/enums/job-classification';
 import { GridNameRendererComponent } from '@shared/components/candidate-details/candidate-grid/grid-name-renderer/grid-name-renderer.component';
 import { GridPositionRendererComponent } from '@shared/components/candidate-details/candidate-grid/grid-position-renderer/grid-position-renderer.component';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
