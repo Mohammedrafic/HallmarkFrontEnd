@@ -48,9 +48,7 @@ import {
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CustomFormGroup } from '@core/interface';
-import {
-  OrderManagementService,
-} from '@client/order-management/components/order-management-content/order-management.service';
+import { OrderManagementService, } from '@client/order-management/components/order-management-content/order-management.service';
 import { DurationService } from '@shared/services/duration.service';
 import { OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
@@ -456,13 +454,20 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     startDate?: string,
     endDate?: string
   ): void {
-    if(!status || !OfferedStatusFlow.includes(status)) {
+    const isStatusEqualCandidateStatus = status === CandidatStatus.OnBoard && this.candidateModelState.candidate.status === CandidatStatus.OnBoard;
+
+    if(!status || (!OfferedStatusFlow.includes(status) && !(isStatusEqualCandidateStatus))) {
       return;
     }
 
+    const actualStartDate = isStatusEqualCandidateStatus && !startDate ? startDate : this.candidateDetails.actualStartDate;
+    const actualEndDate = isStatusEqualCandidateStatus && !endDate ? endDate : this.candidateDetails.actualStartDate;
+    const offeredStartDate = startDate || actualStartDate ? DateTimeHelper.setCurrentTimeZone(startDate ?? actualStartDate as string) : null;
+    const offeredEndDate = endDate || actualEndDate ? DateTimeHelper.setCurrentTimeZone(endDate ?? actualEndDate as string) : null;
+
     this.candidateForm.patchValue({
-      offeredStartDate: DateTimeHelper.setCurrentTimeZone(startDate ?? this.candidateDetails.actualStartDate as string),
-      offeredEndDate: DateTimeHelper.setCurrentTimeZone(endDate ?? this.candidateDetails.actualEndDate as string),
+      offeredStartDate,
+      offeredEndDate,
     }, { emitEvent: false, onlySelf: true });
   }
 
