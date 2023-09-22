@@ -852,7 +852,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
       
-      if(this.order.extensionFromId != null){
+      if(this.orderDetailsFormComponent.isEditMode && this.order?.extensionFromId != null){
         let positionOrder = this.parentOrder?.candidates?.find((current) => current.id == this.order?.candidates?.[0].id);
         if(positionOrder && positionOrder?.actualEndDate){
           this.startDate = order.jobStartDate;
