@@ -56,6 +56,11 @@
   .dropdown-container {
     margin-bottom: 12px;
 
+
+    &.status-container {
+      display: flex;
+    }
+
     .input-group.input-readonly {
       .e-input[readonly], ejs-multiselect .e-input-group {
         background-color: $secondary-dark-blue-50;
@@ -72,4 +77,13 @@
   .submission {
     max-width: 80%;
   }
+}
+
+.horizontal-flex {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.status-selector-container {
+  margin-right: 15px;
 }

@@ -127,7 +127,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Location ID',
-      field: 'locationId',
+      field: 'locationExtId',
       minWidth: 250,
       filter: true,
       sortable: true,
@@ -143,7 +143,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     },
     {
       headerName: 'Department ID',
-      field: 'departmentId',
+      field: 'departmentExtId',
       minWidth: 250,
       filter: true,
       sortable: true,
@@ -350,8 +350,8 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     }
   }
 
-  public setFilterDefaultValues(): void {    
-    this.orderStatusSummaryReportForm.get('orderType')?.setValue([0, 3]);      
+  public setFilterDefaultValues(): void {
+    this.orderStatusSummaryReportForm.get('orderType')?.setValue([0, 3]);
   }
 
   private watchForReason(): void {
@@ -447,6 +447,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
           closed: item.closed ?? 0,
         }
       });
+      this.totalRecordsCount$.next(data.length);
       if (this.gridApi) {
         this.gridApi.setRowData(this.itemList);
         this.updatePinnedBottomRowData();

@@ -260,7 +260,6 @@ export abstract class AbstractGridConfigurationComponent {
       this.subrowsState.add(index);
     }
 
-    this.calculateOpenedSubrow();
   }
 
   public refreshGridColumns(columns: GridColumn[], grid: GridComponent): void {
@@ -283,20 +282,5 @@ export abstract class AbstractGridConfigurationComponent {
       this.gridWithChildRow.detailRowModule.collapseAll();
       this.subrowsState.clear();
     }
-  }
-
-  private calculateOpenedSubrow(): void {
-    this.openedChildRows = 0;
-    this.subrowsState.forEach((item) => {
-      const currentViewData = this.gridWithChildRow.currentViewData[item] as OrderManagement;
-      this.openedChildRows += currentViewData?.reOrderCount || (currentViewData?.children?.length ?? 0);
-    });
-    this.setHeightForMobileGrid(this.gridWithChildRow.currentViewData.length + this.openedChildRows);
-  }
-
-  public setHeightForMobileGrid(itemsLength: number | undefined): void {
-    const padding = 60;
-    const height = itemsLength ? itemsLength * this.rowHeight + padding : this.rowHeight;
-    this.mobileGridHeight = String(height);
   }
 }

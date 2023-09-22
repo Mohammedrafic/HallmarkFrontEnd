@@ -29,6 +29,10 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
+import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation.helper';
+import { DateTimeHelper } from '@core/helpers';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import {IrpEmployeeToggleState} from "@shared/components/order-candidate-list/interfaces";
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -63,6 +67,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public readonly onboardedCandidate: CandidateStatus = CandidateStatus.OnBoarded;
   public readonly cancelledCandidate: CandidateStatus = CandidateStatus.Cancelled;
   public readonly notAppliedCandidate: CandidateStatus = CandidateStatus.NotApplied;
+  public readonly partnershipStatus = PartnershipStatus;
 
   private selectedIndex: number;
 
@@ -96,6 +101,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     super.ngOnInit();
     this.onChangeCandidateJob().pipe(takeUntil(this.unsubscribe$)).subscribe();
     this.subscribeOnReloadAction();
+    this.watchForEmployeeToggleState();
 
     if (this.isAgency) {
       this.checkForAgencyStatus();
@@ -124,9 +130,24 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
 
     this.getCandidateJobData();
     this.getCandidatePayRateSetting();
-    this.dialogNextPreviousOption = this.getDialogNextPreviousOption(this.candidate);
+    this.dialogNextPreviousOption =
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
     this.orderCandidateListViewService.setIsCandidateOpened(true);
     this.openDetails.next(true);
+  }
+
+  public getPartnershipMessage(data: OrderCandidatesList): string {
+    return `Partnership was suspended on ${DateTimeHelper.formatDateUTC(data.suspentionDate, 'MM/dd/yyyy')}`;
+  }
+  
+  private watchForEmployeeToggleState(): void {
+    this.orderManagementService.getEmployeeToggleStateStream().pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((state: IrpEmployeeToggleState) => {
+      this.isAvailable = state.isAvailable;
+      this.includeDeployed = state.includeDeployed;
+      this.cdr.markForCheck();
+    });
   }
 
   private getCandidateJobData(): void {
@@ -166,16 +187,6 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     });
   }
 
-  private getDialogNextPreviousOption(selectedOrder: OrderCandidatesList): DialogNextPreviousOption {
-    const gridData = this.grid.dataSource as OrderCandidatesList[];
-    const [first] = gridData;
-    const last = gridData[gridData.length - 1];
-    return {
-      previous: first.candidateId !== selectedOrder.candidateId,
-      next: last.candidateId !== selectedOrder.candidateId,
-    };
-  }
-
   public changeIrpCandidateStatus(candidate: OrderCandidatesList): void {
     if(candidate.status === this.onboardedCandidate ||
       (this.scheduleAvailabilitySetting && candidate.status === CandidateStatus.NotApplied)) {
@@ -201,7 +212,8 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     this.candidate = nextCandidate;
     this.selectedIndex = nextIndex;
     this.getCandidateJobData();
-    this.dialogNextPreviousOption = this.getDialogNextPreviousOption(this.candidate);
+    this.dialogNextPreviousOption =
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
   }
 
   private onChangeCandidateJob(): Observable<OrderCandidateJob> {

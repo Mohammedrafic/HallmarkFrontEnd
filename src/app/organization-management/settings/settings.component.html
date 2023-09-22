@@ -93,7 +93,7 @@
 
     <form [formGroup]="regionFormGroup" *ngIf="isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder ||  IsSettingKeyScheduleOnlyWithAvailability || IsSettingATPRateCalculation) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
-        <label for="region">Region</label>
+        <label for="region">Region<span *ngIf="IsSettingKeyAutomatedDistributedToVMS" class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="region" [allowFiltering]="true" [dataSource]="regions$ | async"
                             [fields]="optionFields" (select)="changeRegion($event)" [enabled]="!isParentEdit"
@@ -165,7 +165,6 @@
             <ejs-switch name="allLocations" [disabled]="isParentEdit" [checked]="allLocationsSelected" (change)="allLocationsChange($event)" label="All"></ejs-switch>
             <label for="allLocations" class="switch-text">All</label>
           </div>
-
         </div>
       </div>
       <div class="input-container" *ngIf="IsSettingKeyCreatePartialOrder">
@@ -278,8 +277,6 @@
             [fields]="dropdownFields" appValidateWithMessage formControlName="value"></ejs-dropdownlist>
         </div>
       </ng-container>
-
-
     </form>
 
     <form [formGroup]="payPeriodFormGroup"
@@ -305,10 +302,7 @@
           [fields]="textOptionFields" formControlName="noOfWeek">
         </ejs-dropdownlist>
       </div>
-
     </div>
-
-
   </div>
  </form>
 
@@ -455,8 +449,6 @@
         </div>
       </div>
 
-
-
       <ng-container *ngIf="showBillingMessage">
         <div class="toggle-message">
           Please make sure to align Billing contact e-mail recipients configuration with group by set in Auto-generation
@@ -464,9 +456,5 @@
         </div>
       </ng-container>
     </div>
-
-
-
   </form>
-
 </app-side-dialog>

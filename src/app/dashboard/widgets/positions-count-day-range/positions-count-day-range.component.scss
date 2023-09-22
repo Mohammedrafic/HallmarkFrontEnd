@@ -24,30 +24,45 @@ section {
 
   header .col {
     display: table-cell;
-    background-color: #f8f8f8;
-    background-color: var(--ag-header-background-color, #f8f8f8);
     border-bottom: solid 1px;
     border-bottom-color: #babfc7;
     border-bottom-color: var(--ag-border-color, #babfc7);
+    color: $secondary-dark-blue-15;
   }
   section .row .col:last-child {
-    text-align: right;
+    text-align: center;
+    color: $black;
+    font-weight: 800;
   }
+  
   .row .col{
     display: table-cell;
-    background-color: #fff;
-    background-color: var(--ag-background-color, #fff);
-    color: #181d1f;
-    color: var(--ag-data-color, var(--ag-foreground-color, #181d1f));
+    background-color: $white;
+    background-color: var(--ag-background-color, $white);
+    color: $black-pearl;
+    color: var(--ag-data-color, var(--ag-foreground-color, $black-pearl));
     border-width: 1px;
-    border-color: #dde2eb;
-    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, #dde2eb));
+    border-color: $primary-active-blue-90;
+    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, $primary-active-blue-90));
     border-bottom-style: solid;
     padding: 6px 2px;
+   .label{
+        height: 20px;
+        text-transform: uppercase;
+        border-color: transparent;
+        color: $white;
+        align-items: center;
+        border: 0 solid;
+        border-radius: 14px;
+        box-shadow: none;
+        box-sizing: border-box;     
+        line-height: 20px;
+    }
   }
 
   section span{
     font-weight: 800;
+    text-transform: uppercase;
   }
 
   section .subcol {
@@ -55,7 +70,7 @@ section {
     border-collapse: collapse;   
   }
   .border-top{
-    border-top: 1px solid black;
+    border-top: 1px solid $pure-black;
   }
   .middle-col-header{
     display: table;
@@ -65,15 +80,15 @@ section {
   .middle-col{
     display: table;
     width: 100%;
-    background-color: #fff;
-    background-color: var(--ag-background-color, #fff);
-    color: #181d1f;
-    color: var(--ag-data-color, var(--ag-foreground-color, #181d1f));
+    background-color: $white;
+    background-color: var(--ag-background-color, $white);
+    color: $black-pearl;
+    color: var(--ag-data-color, var(--ag-foreground-color, $black-pearl));
     border-width: 1px;
-    border-color: #dde2eb;
-    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, #dde2eb));
+    border-color: $primary-active-blue-90;
+    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, $primary-active-blue-90));
     border-bottom-style: solid;
-    padding: 6px 2px;
+    padding: 10px 2px;
   }
 
   .flex-container {
@@ -85,7 +100,13 @@ section {
     text-align: center;
     padding-right: 2px;
     display: table-cell;
-    
+  }
+  .range{
+    border-left-style: solid;
+    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, $primary-active-blue-90));
+    border-width: 1px;
+    font-weight: 800;
+    color: $secondary-dark-blue-15;
   }
   .middle-col-header .flex-container div{
     text-align:center;
@@ -97,11 +118,11 @@ section {
     display: table-caption;
     font-weight: 800;
     line-height: 30px;
-    color: #181d1f;
-    color: var(--ag-data-color, var(--ag-foreground-color, #181d1f));
+    color: $black-pearl;
+    color: var(--ag-data-color, var(--ag-foreground-color, $black-pearl));
     border-width: 1px;
-    border-color: #dde2eb;
-    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, #dde2eb));
+    border-color: $primary-active-blue-90;
+    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, $primary-active-blue-90));
     border-bottom-style: solid;
   }
   .pos-center{
@@ -114,4 +135,15 @@ section {
 
   .w-50{
     width: 50%;
+  }
+
+  .w-30{
+    width: 30%;
+  }
+  .ml-20{
+    margin-left: 20px;
+  }
+  .mlr-20{
+    margin: 0px 20px;
+    text-align: center;
   }

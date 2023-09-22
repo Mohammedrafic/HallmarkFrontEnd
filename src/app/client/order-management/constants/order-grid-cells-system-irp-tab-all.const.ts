@@ -19,6 +19,10 @@ import {
 import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
+import{
+  TableSystemCellComponent
+}
+from '@client/order-management/components/order-management-content/sub-grid-components/table-system-cell/table-system-cell.component'
 import { OrderStatus } from '@shared/enums/order-management';
 
 export const GridCellsSystemIRPTabAll = (
@@ -116,8 +120,7 @@ export const GridCellsSystemIRPTabAll = (
     field: 'system',
     headerName: 'System',
     cellClass: 'name',
-    onCellClicked:(params: ValueFormatterParams)=>
-    params.context.componentParent.openIrpDetailsEmployee(),
+    cellRenderer: TableSystemCellComponent,
     width: 125,
     minWidth: 100,
     maxWidth: 200,
@@ -246,6 +249,6 @@ export const GridCellsSystemIRPTabAll = (
     minWidth: 135,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) =>
-      formatDate(params.value, 'MM/dd/YYYY HH:mm', 'en-US', 'UTC'),
+      formatDate(params.value, 'MM/dd/YYYY', 'en-US',),
   },
 ];

@@ -67,6 +67,7 @@ import {
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
+  formatDate,
   OrganizationalHierarchy,
   OrganizationSettingKeys,
   SET_READONLY_STATUS,
@@ -114,6 +115,7 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SettingsViewService } from '@shared/services';
 import { UserPermissions } from '@core/enums';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
 
 enum Template {
   accept,
@@ -204,6 +206,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public isClosedOrder = false;
   public selectedApplicantStatus: ApplicantStatusModel | null = null;
   public isCandidatePayRateVisible: boolean;
+  public partnershipStatus = PartnershipStatus;
 
   public readonly nextApplicantStatuses = [
     {
@@ -273,6 +276,15 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       Boolean(this.candidate?.positionClosureReasonId) &&
       !this.isAgency
     );
+  }
+
+  get isAgencySuspended(): boolean {
+    return this.candidateJob?.partnershipStatus === PartnershipStatus.Suspended;
+  }
+
+  get getPartnershipMessage(): string {
+    return `Partnership with Agency is suspended on ${DateTimeHelper.formatDateUTC(
+      this.candidateJob?.suspentionDate as string, 'MM/dd/yyyy')}. You cannot add extensions.`;
   }
 
   constructor(

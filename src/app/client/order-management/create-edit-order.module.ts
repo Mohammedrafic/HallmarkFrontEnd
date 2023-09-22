@@ -30,7 +30,7 @@ import {
   IrpContainerStateService,
 } from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import { OrderCredentialsService } from "@client/order-management/services";
-import { OrganizationStructureService } from '@shared/services';
+import {OrganizationStructureService, SettingsViewService} from '@shared/services';
 import { PartialSearchService } from '@shared/services/partial-search.service';
 import {
   TableTypeCellComponent,
@@ -38,6 +38,10 @@ import {
 import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
+import{
+  TableSystemCellComponent
+}
+from '@client/order-management/components/order-management-content/sub-grid-components/table-system-cell'
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
 import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
@@ -54,6 +58,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     OrderDetailsFormComponent,
     TableTypeCellComponent,
     CriticalCellComponent,
+    TableSystemCellComponent
   ],
   imports: [
     FeatherModule.pick(GridIcons),
@@ -86,6 +91,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     OrganizationStructureService,
     PartialSearchService,
     IrpContainerApiService,
+    SettingsViewService,
   ],
 })
 export class CreateEditOrderModule { }

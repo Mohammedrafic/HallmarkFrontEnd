@@ -9,4 +9,5 @@ export interface DonutChartData {
   value: number;
   text: string;
   color?: string;
+  average?: number;
 }

@@ -1,4 +1,4 @@
-import { GetDocumentsByCognitiveSearch, GetSharedDocumentInformation } from './../actions/document-library.actions';
+import { GetDocumentsByCognitiveSearch, GetSharedDocumentInformation, GetSharedDocumentsByCognitiveSearch } from './../actions/document-library.actions';
 import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
@@ -408,13 +408,26 @@ export class DocumentLibraryState {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
-  }
+  }  
 
   @Action(GetDocumentsByCognitiveSearch)
-  GetDocumentsByCognitiveSearch({ dispatch,patchState }: StateContext<DocumentLibraryStateModel>, { keyword, businessUnitType, businessUnitId, folderId }: GetDocumentsByCognitiveSearch): Observable<DocumentsLibraryPage | void> {
+  GetDocumentsByCognitiveSearch({ dispatch,patchState }: StateContext<DocumentLibraryStateModel>, { keyword, businessUnitType, businessUnitId, folderId}: GetDocumentsByCognitiveSearch): Observable<DocumentsLibraryPage | void> {
     return this.documentLibraryService.GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId, folderId).pipe(
       tap((payload) => {
-        patchState({ documentsPage: payload });
+        patchState({ documentsPage: payload });     
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetSharedDocumentsByCognitiveSearch)
+  GetSharedDocumentsByCognitiveSearch({ dispatch, patchState }: StateContext<DocumentLibraryStateModel>, { keyword, businessUnitType, businessUnitId, folderId, }: GetSharedDocumentsByCognitiveSearch): Observable<ShareDocumentInfoPage | void> {
+    return this.documentLibraryService.GetSharedDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId, folderId).pipe(
+      tap((payload) => {
+        console.log(payload);
+        patchState({ shareDocumentInfoPage: payload });
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));

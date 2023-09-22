@@ -1,12 +1,72 @@
 @import 'adaptive-response';
+
 :host {
-  height: calc(100% - 95px);
+  height: calc(100% - 145px);
 
   .grid-component {
     height: 100%;
+  }
 
-    @media #{$max-desktop-small} {
-      height: calc(100% - 60px);
+  ::ng-deep {
+    .controls-container {
+      flex-direction: row;
+      
+      .right-content {
+        justify-content: flex-end;
+        width: auto;
+      }
+    }
+  }
+
+  @media (max-width: 738px) {
+    .grid-component {
+      height: calc(100% - 55px);
+    }
+
+    .page-title {
+      display: none;
+    }
+
+    ::ng-deep {
+      .controls-container {
+        flex-direction: column;
+        row-gap: 12px;
+
+        .right-content {
+          justify-content: flex-start;
+        }
+      }
+    }
+  }
+
+  @media #{$max-mobile} {
+    height: auto;
+    padding-bottom: 24px;
+
+    .grid-component {
+      height: auto;
+
+      &:has(.e-emptyrow) {
+        height: 145px;
+      }
+    }
+
+    .button-export {
+      padding: 8px 12px;
+
+      .icon {
+        margin: 0;
+      }
+    }
+
+    ::ng-deep {
+      .controls-container {
+        row-gap: 24px;
+
+        .right-content {
+          justify-content: flex-start;
+        }
+      }
     }
   }
 }

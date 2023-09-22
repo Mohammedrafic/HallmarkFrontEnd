@@ -80,7 +80,16 @@ export const GridCellsSystemIRPTabOrderTemplate = (
   },
   {
     ...DefaultOrderCol,
-    field: 'orderTypeText',
+    field: 'templateTitle',
+    headerName: 'Template Title',
+    width: 160,
+    minWidth: 160,
+    maxWidth: 200,
+    cellClass: 'wrap-cell',
+  },
+  {
+    ...DefaultOrderCol,
+    field: 'templateTitle',
     headerName: 'TYPE',
     cellRenderer: TableTypeCellComponent,
     width: 85,
@@ -148,9 +157,7 @@ export const GridCellsSystemIRPTabOrderTemplate = (
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
       const startShiftTime = GridValuesHelper.formatDate(params.data?.shiftStartDateTime, 'HH:mm');
-      const endShiftTime = GridValuesHelper.formatDate(params.data?.shiftEndDateTime, 'HH:mm');
-
-      return `${startShiftTime}-${endShiftTime}`;
+      return `${startShiftTime}`;
     },
   },
   {
@@ -161,10 +168,8 @@ export const GridCellsSystemIRPTabOrderTemplate = (
     minWidth: 80,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
-      const startShiftTime = GridValuesHelper.formatDate(params.data?.shiftStartDateTime, 'HH:mm');
       const endShiftTime = GridValuesHelper.formatDate(params.data?.shiftEndDateTime, 'HH:mm');
-
-      return `${startShiftTime}-${endShiftTime}`;
+      return `${endShiftTime}`;
     },
   },
   {
@@ -175,6 +180,6 @@ export const GridCellsSystemIRPTabOrderTemplate = (
     minWidth: 135,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) =>
-      formatDate(params.value, 'MM/dd/YYYY HH:mm', 'en-US', 'UTC'),
+      formatDate(params.value, 'MM/dd/YYYY', 'en-US'),
   },
 ];

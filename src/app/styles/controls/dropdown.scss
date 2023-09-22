@@ -1,22 +1,28 @@
 @import "colors.scss";
 @import "adaptive-response.scss";
 
-body.light, body.dark {
+body.light,
+body.dark {
   .bootstrap {
-    ejs-dropdownlist.e-control, ejs-multiselect.e-control, ejs-autocomplete.e-control {
-      span.e-input-group, .e-multiselect.e-input-group {
+    ejs-dropdownlist.e-control,
+    ejs-multiselect.e-control,
+    ejs-autocomplete.e-control {
+      span.e-input-group,
+      .e-multiselect.e-input-group {
         border-radius: 8px;
         height: 40px;
         align-items: center;
 
-        &.e-input-focus, &:active {
+        &.e-input-focus,
+        &:active {
           box-shadow: none !important;
           border-width: 2px !important;
           border-radius: 8px !important;
           border-color: $primary-active-blue-10 !important;
           padding-left: 5px;
 
-          &::after, &::before {
+          &::after,
+          &::before {
             display: none;
           }
         }
@@ -35,7 +41,8 @@ body.light, body.dark {
           }
         }
 
-        input.e-input, input.e-dropdownbase {
+        input.e-input,
+        input.e-dropdownbase {
           padding-left: 15px;
 
           &::placeholder {
@@ -62,11 +69,16 @@ body.light, body.dark {
             color: $secondary-dark-blue-10 !important;
             border-left: none;
           }
+
+          &::before {
+            color: var(--icon-color) !important;
+          }
         }
       }
 
       &.ng-touched.ng-invalid {
-        span.e-input-group, .e-multiselect.e-input-group {
+        span.e-input-group,
+        .e-multiselect.e-input-group {
           border-color: $supportive-red !important;
         }
       }
@@ -147,6 +159,7 @@ body.light, body.dark {
       background-color: $primary-active-blue;
       color: $white;
     }
+
     &.e-input-focus {
       padding-left: 0;
     }
@@ -205,8 +218,11 @@ body.light, body.dark {
 
 body.dark {
   .bootstrap {
-    ejs-dropdownlist.e-control, ejs-multiselect.e-control, ejs-autocomplete.e-control {
-      span.e-input-group, .e-multiselect.e-input-group {
+    ejs-dropdownlist.e-control,
+    ejs-multiselect.e-control,
+    ejs-autocomplete.e-control {
+      span.e-input-group,
+      .e-multiselect.e-input-group {
         .e-input-group-icon {
           &.e-search-icon {
             color: $white !important;
@@ -214,7 +230,23 @@ body.dark {
         }
 
         &.e-disabled {
-          background-color: $secondary-dark-blue-20 !important;
+          background-color: $secondary-dark-blue-10-2 !important;
+          border-color: $secondary-dark-blue-15 !important;
+        }
+      }
+
+      .e-chips-close.e-close-hooker {
+        color: $secondary-dark-blue-30 !important;
+
+        &:hover {
+          color: $secondary-dark-blue-45 !important;
+        }
+      }
+
+      .e-icon-anim {
+        .e-input-group-icon::before,
+        .e-down-icon .e-input-group-icon {
+          color: $primary-active-blue-10 !important;
         }
       }
     }
@@ -222,6 +254,22 @@ body.dark {
     .e-down-icon {
       .e-input-group-icon {
         color: $secondary-dark-blue-30 !important;
+      }
+    }
+
+    .e-multiselect {
+      .e-input-group {
+        &.e-icon-anim {
+          color: $primary-active-blue !important;
+        }
+      }
+    }
+
+    .e-dropdownlist {
+      .e-disabled {
+        .e-disabled {
+          background-color: $secondary-dark-blue-10-2 !important;
+        }
       }
     }
   }
@@ -242,5 +290,97 @@ body.dark {
   .e-nodata,
   .e-filter-parent {
     background-color: $sidebar-background !important;
+  }
+
+  .e-ddl .e-popup .e-multi-select-list-wrapper .e-checkbox .e-lib .e-control .e-popup-open {
+    .e-list-item {
+      &.e-item-focus {
+        background-color: $primary-active-blue !important;
+      }
+    }
+  }
+
+  .e-dropdownbase .e-list-item {
+    &.e-item-focus {
+      background-color: $primary-active-blue;
+
+      &:hover {
+        background-color: $primary-active-blue-80;
+      }
+    }
+
+    &:hover {
+      background-color: $primary-active-blue-80;
+      color: $bg-grey-100;
+    }
+  }
+
+  .e-multi-select-list-wrapper {
+    .e-selectall-parent {
+      background-color: $sidebar-background !important;
+
+      .e-frame.e-check {
+        border-color: $white;
+        color: $white;
+      }
+    }
+    
+    .e-list-item {
+      &.e-item-focus {
+        background-color: $sidebar-background !important;
+
+        &:hover {
+          background-color: $primary-active-blue-80 !important;
+          color: $bg-grey-100 !important;
+        }
+      }
+
+      &.e-active {
+        background-color: $primary-active-blue !important;
+
+        .e-frame.e-check {
+          border-color: $white;
+          color: $white;
+        }
+
+        &:hover {
+          background-color: $primary-active-blue-80 !important;
+          color: $bg-grey-100 !important;
+        }
+
+        .region-option-container {
+          .org-name {
+            color: $secondary-dark-blue-50;
+          }
+        }
+      }
+    }
+  }
+
+  .e-checkbox-wrapper {
+    .e-frame.e-icons {
+      background-color: $secondary-dark-blue-10-2;
+
+      &:hover {
+        background-color: $secondary-dark-blue-10-2;
+        border-color: $primary-active-blue-10;
+      }
+    }
+
+    &:hover {
+      .e-frame.e-check {
+        color: $white !important;
+        border-color: $white !important;
+      }
+    }
+  }
+
+  .e-ddl.e-popup.e-lib.e-control.e-popup-open,
+  .e-multi-select-list-wrapper.e-checkbox.e-popup.e-control.e-popup-open {
+    .e-content.e-dropdownbase {
+      &::-webkit-scrollbar-track {
+        background-color: $sidebar-background;
+      }
+    }
   }
 }

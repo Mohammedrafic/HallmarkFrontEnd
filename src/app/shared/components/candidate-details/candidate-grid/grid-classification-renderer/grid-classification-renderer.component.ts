@@ -32,6 +32,6 @@ export class GridClassificationRendererComponent implements ICellRendererAngular
         value += ', ';
       }
     });
-    return `${value}`
+    return `${value}`;
   } 
 }

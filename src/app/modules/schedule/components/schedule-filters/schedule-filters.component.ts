@@ -344,8 +344,8 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   private updateFiltersStructure(event: ChipDeleteEvent): ChipsFilterStructure {
     const { regionIds, locationIds, departmentsIds, skillIds } = this.scheduleFilterFormGroup.getRawValue();
-    const initialState: ChipsInitialState = ChipsStructureState;
-    const filterStructure: ChipsFilterStructure = FilterChipsStructure;
+    const initialState: ChipsInitialState = {...ChipsStructureState};
+    const filterStructure: ChipsFilterStructure = {...FilterChipsStructure};
 
     if(event.field === ScheduleFilterFormSourceKeys.Regions) {
       const regionStructureState = this.scheduleFiltersService.getRegionChipsStructureState(

@@ -1,0 +1,48 @@
+.app-bill-rate-widget {
+    &__component {
+      aspect-ratio: 2.2;
+    }
+  
+    &__title {
+      width: 95%;
+    }
+  
+    &__tooltip {
+      text-align: right;
+      width: 5%;
+      margin-left:15px;
+    }
+  
+    &__actions {
+      display: flex;
+      width: 40%;
+  
+      & button {
+        height: 28px;
+  
+        &:nth-child(odd) {
+          border-radius: 8px 0px 0px 8px;
+        }
+  
+        &:nth-child(even) {
+          border-radius: 0px 8px 8px 0px;
+        }
+      }
+    }
+  }
+  
+  .widget-header {
+    display: flex;
+    justify-content: space-between;
+    width:100%;
+    .slideBarWidth{
+      width: 35% !important;
+    }
+    .slideTooltipMar{
+      margin-left:30px !important;
+    }   
+  }
+  .app-bill-rate-widget__component{
+    overflow: unset !important;
+  }
+  

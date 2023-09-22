@@ -43,6 +43,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { UserState } from '../../../../store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { AppState } from '../../../../store/app.state';
+import { ConfirmOverrideComments } from '@organization-management/credentials/interfaces';
 
 @Component({
   selector: 'app-add-edit-credential',
@@ -85,6 +86,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   public selectedSystem: SelectedSystemsFlag;
   public isMspUser = false;
   public isIrpFlagEnabled = false;
+  public showOverrideDialog = false;
 
   private selectedCredential: Credential;
 
@@ -111,11 +113,26 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   public saveCredential(): void {
-    if(this.isCredentialSettings) {
-      this.saveCredentialForSettings();
+    const isCommentsDirty = this.credentialForm.get('comment')?.dirty || this.credentialForm.get('irpComment')?.dirty;
+
+    if (this.isEdit && isCommentsDirty) {
+      this.showOverrideDialog = true;
     } else {
-      this.saveCredentialForMasterData();
+      this.defineSaveStrategy();
     }
+  }
+
+  public confirmOverrideComments(event: ConfirmOverrideComments): void {
+    const { updateMappingCredentials, updateOrderCredentials } = event;
+
+    this.credentialForm.get('updateMappingCredentials')?.setValue(updateMappingCredentials);
+    this.credentialForm.get('updateOrderCredentials')?.setValue(updateOrderCredentials);
+
+    this.defineSaveStrategy();
+  }
+
+  public destroyDialog() {
+    this.showOverrideDialog = false;
   }
 
   public closeCredentialDialog(): void {
@@ -145,6 +162,14 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
 
   public trackByIndex(index: number, config: CredentialInputConfig): string {
     return config.field;
+  }
+
+  private defineSaveStrategy(): void {
+    if(this.isCredentialSettings) {
+      this.saveCredentialForSettings();
+    } else {
+      this.saveCredentialForMasterData();
+    }
   }
 
   private watchForCredentialSaveSucceeded(): void {

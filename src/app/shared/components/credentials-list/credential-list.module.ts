@@ -13,13 +13,19 @@ import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
 import { SharedModule } from '@shared/shared.module';
 import { FiltersComponent } from './filters/filters.component';
-import { CredentialFiltersService, CredentialListApiService, CredentialListService } from '@shared/components/credentials-list/services';
+import {
+  CredentialFiltersService,
+  CredentialListApiService,
+  CredentialListService,
+} from '@shared/components/credentials-list/services';
 import { Icons } from '@shared/components/credentials-list/constants';
 import { AddEditCredentialComponent } from './add-edit-credential/add-edit-credential.component';
 import { CredentialListState } from '@shared/components/credentials-list/store/credential-list.state';
+import { OverrideCommentsDialogComponent } from './override-comments-dialog/override-comments-dialog.component';
+import { DialogModule } from '@syncfusion/ej2-angular-popups';
 
 @NgModule({
-  declarations: [CredentialsListComponent, FiltersComponent, AddEditCredentialComponent],
+  declarations: [CredentialsListComponent, FiltersComponent, AddEditCredentialComponent, OverrideCommentsDialogComponent],
   imports: [
     FeatherModule.pick(Icons),
     CommonModule,
@@ -34,9 +40,10 @@ import { CredentialListState } from '@shared/components/credentials-list/store/c
     FormsModule,
     ReactiveFormsModule,
     ButtonModule,
+    DialogModule,
 
     //STORE
-    NgxsModule.forFeature([CredentialListState])
+    NgxsModule.forFeature([CredentialListState]),
   ],
   exports: [CredentialsListComponent],
   providers: [CredentialListService, CredentialFiltersService, CredentialListApiService]

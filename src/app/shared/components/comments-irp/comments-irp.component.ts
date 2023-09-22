@@ -29,6 +29,7 @@ export class CommentsIrpComponent {
   @Input() orderId: number;
   @Input() candidateJobId : number;
   @Input() CanOrganizationEditOrdersIRP:boolean;
+  @Input() CanOrganizationViewOrdersIRP:boolean;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
     this.commentdata = value;

@@ -1,3 +1,5 @@
+@import 'adaptive-response';
+
 .form-container {
   display: flex;
   gap: 10px;
@@ -20,6 +22,26 @@
 
       .city {
         width: 65%;
+      }
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .form-container {
+    flex-direction: column;
+    gap: 0;
+
+    .column {
+      width: 100%;
+
+      .d-flex {
+        flex-direction: column;
+        gap: 0;
+
+        .city {
+          width: 100%;
+        }
       }
     }
   }

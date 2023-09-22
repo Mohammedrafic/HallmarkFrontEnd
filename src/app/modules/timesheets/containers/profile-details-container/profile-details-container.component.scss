@@ -52,6 +52,7 @@ $chip-margin: 8px;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   &__info {
@@ -333,4 +334,32 @@ app-navigation-panel {
       padding-top: 6px;
     }
   }
+}
+
+.w-100{
+  width: 100%;
+}
+.w-50{
+  width: 50%;
+}
+.w-60{
+  width: 60%;
+}
+.w-40{
+  width: 40%;
+}
+.job-general-scroll{
+  width: auto;
+  overflow: scroll;
+}
+.preview-content-container{
+  max-height: 51.5vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.closeButton{
+  position: absolute;
+  right: 30px;
+  top: 35px;
 }

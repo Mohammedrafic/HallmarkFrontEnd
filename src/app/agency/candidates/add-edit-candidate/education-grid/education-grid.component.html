@@ -29,7 +29,7 @@
             [allowResizing]="allowResizing"
             [pageSettings]="pageSettings"
             [allowSelection]="false"
-            [height]="(isMobile$ | async) ? mobileGridHeight : fullScreenGridHeight"
+            [height]="fullScreenGridHeight"
             [enableVirtualization]="false"
             (dataBound)="dataBound()">
     <e-columns>

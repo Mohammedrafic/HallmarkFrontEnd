@@ -29,7 +29,7 @@ export class BillRatesSyncService {
     }
 
     if (!billRateForSync && showWithLongerDate) {
-      billRateForSync = sortedBillRates[0] || null;
+      billRateForSync = sortedBillRates[sortedBillRates.length - 1] || null;
     }
 
     return billRateForSync;

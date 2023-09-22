@@ -581,7 +581,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     )
     .subscribe((options) => {
       this.filterColumns.externalIds.dataSource = options.externalIds;
-      this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds;
+      this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds.filter((id) => !!id);
       this.filterColumns.names.dataSource = options.locationNames;
       this.filterColumns.addresses1.dataSource = options.addresses1;
       this.filterColumns.cities.dataSource = options.cities;

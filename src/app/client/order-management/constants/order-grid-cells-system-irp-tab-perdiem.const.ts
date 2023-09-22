@@ -15,6 +15,10 @@ import { GridValuesHelper } from '@core/helpers';
 import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
+import{
+  TableSystemCellComponent
+}
+from '@client/order-management/components/order-management-content/sub-grid-components/table-system-cell/table-system-cell.component'
 
 export const GridCellsSystemIRPTabPerDiem = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
@@ -107,8 +111,7 @@ export const GridCellsSystemIRPTabPerDiem = (
     field: 'system',
     headerName: 'System',
     cellClass: 'name',
-    onCellClicked:(params: ValueFormatterParams)=>
-    params.context.componentParent.openIrpDetailsEmployee(),
+    cellRenderer: TableSystemCellComponent,
     width: 125,
   }] : []),
   {
@@ -215,6 +218,6 @@ export const GridCellsSystemIRPTabPerDiem = (
     minWidth: 135,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) =>
-      formatDate(params.value, 'MM/dd/YYYY HH:mm', 'en-US', 'UTC'),
+      formatDate(params.value, 'MM/dd/YYYY', 'en-US'),
   },
 ];

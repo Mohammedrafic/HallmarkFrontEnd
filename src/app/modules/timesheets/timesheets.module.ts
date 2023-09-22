@@ -103,6 +103,8 @@ import { TimesheetDetailsTableService } from './services';
 import { UploadFileAreaModule } from '@shared/components/upload-file-area/upload-file-area.module';
 import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
 import { TimesheetGridExportComponent } from './components/timesheet-grid-export/timesheet-grid-export.component';
+import { TimesheetFileViewerComponent } from './components/timesheet-file-viewer/timesheet-file-viewer.component';
+import { TimesheetHistoricalDataResolver } from './resolvers/timesheet-historical-data.resolver';
 
 const gridIcons = {
   MessageSquare,
@@ -156,6 +158,7 @@ const gridIcons = {
     RecordStatusCellComponent,
     UploadDocumentsComponent,
     TimesheetGridExportComponent,
+    TimesheetFileViewerComponent,
   ],
   imports: [
     CommonModule,
@@ -203,6 +206,7 @@ const gridIcons = {
   ],
   exports: [TimesheetsContainerComponent],
   providers: [
+    TimesheetHistoricalDataResolver,
     TimesheetsApiService,
     AddRecordService,
     MaskedDateTimeService,

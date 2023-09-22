@@ -51,6 +51,7 @@ export interface PositionsCountByDayRangeData {
   count15?: number;
   count30?: number;
   count30Plus?: number;
+  color: string;
 }
 
 export interface OrdersPendingInCustom {
@@ -79,3 +80,12 @@ export interface extensionOrderDtos{
   avgDays?:string,
 }
 
+
+export interface AveragedayActivecandidateInfo
+{
+  applicantStatus: number;
+  count: number;
+  status: string;
+  averageDays: any;
+
+}

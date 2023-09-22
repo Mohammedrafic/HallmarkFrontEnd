@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -37,6 +37,8 @@ import { Filtervendorscorecard } from './vendorscorecard.action';
 import {VendorScorecardresponse, VendorScorecardresponsepayload } from "@shared/models/vendorscorecard.model";
 import { VendorSCorecardState } from './vendorscorecard.state';
 import { DatePipe } from '@angular/common'
+import {jsPDF}from 'jspdf'
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-vendor-scorecard',
@@ -297,7 +299,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
               this.filterColumns.agencyIds.dataSource = data?.agencies;
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-              this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+              // this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
               this.filterColumns.orderTypes.dataSource = data?.orderStatuses;
               let masterSkills = this.filterOptionsData.masterSkills;
               let skills = masterSkills.filter((i) => this.defaultSkillCategories?.includes(i.skillCategoryId));
@@ -527,6 +529,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     }
     else {
       this.filtergraphdata();
+      this.store.dispatch(new ShowFilterDialog(false));
     }
   }
   public showToastMessage(regionsLength: number, locationsLength: number, departmentsLength: number) {
@@ -570,5 +573,38 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
         this.VendorScorecardresponse = data["VendorScoreCard"]["VendorScorecardEntity"];
       }
     });
+  } 
+   public captureScreen() {
+    var data = document.getElementById('contentToConvert')!;
+    html2canvas(data).then((canvas) => {
+      var imgWidth = 200;
+      var pageHeight = 295;
+      var imgHeight = (canvas.height * imgWidth) / canvas.width;
+      var heightLeft = imgHeight;
+      debugger;
+      const contentDataURL = canvas.toDataURL('image/png');
+      console.log(contentDataURL);
+      let pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
+      var position = 0;
+      let graphCount=Number(this.VendorScorecardresponse.length);
+      let pageCount=Number(graphCount/2.5);
+      for(let i =0;i<pageCount;i++)
+      {
+           if(i!=0)
+        pdf.addPage();
+        pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
+    
+       position-=300;
+      }
+    //   pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
+    //   pdf.addPage();
+    //  pdf.addImage(contentDataURL, 'PNG', 5, -300, imgWidth, imgHeight);
+    //  pdf.addPage();
+    //  pdf.addImage(contentDataURL, 'PNG', 5, -600, imgWidth, imgHeight);
+    //  pdf.addPage();
+    //  pdf.addImage(contentDataURL, 'PNG', 5, -900, imgWidth, imgHeight);
+      pdf.save('VendorScoreReport.pdf'); // Generated PDF
+    });
   }
+
 }

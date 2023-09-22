@@ -125,8 +125,13 @@ export const initOrderManagementFilterColumns = () => ({
     valueField: 'filterStatus',
     valueId: 'filterStatus',
   },
-  contactEmails: { type: ControlTypes.Text, valueType: ValueType.Text },
-
+  contactEmails: {
+    type: ControlTypes.Autocomplete,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'fullName',
+    valueId: 'email',
+  },
   candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
   candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
   agencyIds: {

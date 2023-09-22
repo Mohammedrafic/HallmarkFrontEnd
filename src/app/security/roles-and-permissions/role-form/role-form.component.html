@@ -92,6 +92,7 @@
     #tree
     [disabled]="(isNewRoleDataLoading$ | async) || form.disabled"
     [fields]="fields"
+    [allowTextWrap]="true"
     [showCheckBox]="true"
     (nodeClicked)="onSelecting()"
     (drawNode)="drawNode($event)"

@@ -264,7 +264,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         if (startDate > endDate) {
           this.extensionForm.get('endDate')?.setErrors({incorrect: true});
         }
-        this.extensionForm.get('durationPrimary')?.setValue(Duration.Other, {emitEvent: false});
+        this.extensionForm.get('durationPrimary')?.setValue(Duration.Other);
         this.cd.markForCheck();
       });
   }
@@ -286,7 +286,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       tap((job) => {
         this.candidateJob = job;
       }),
-      switchMap((job) => this.billRatesApiService.getExtensionRates(job.jobId)),
+      switchMap((job) => this.billRatesApiService.getCalculatedRates(job.jobId)),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((rates) => {

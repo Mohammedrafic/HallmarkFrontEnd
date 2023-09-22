@@ -119,15 +119,13 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.grid.hideScroll();
   }
 
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+  public changeGridSize(page: number): void {
+    this.pageSize = page;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
+  public changeGridPage(page: number): void {
+    this.pageSubject.next(page);
   }
 
   public getChipCssClass(status: string): string {

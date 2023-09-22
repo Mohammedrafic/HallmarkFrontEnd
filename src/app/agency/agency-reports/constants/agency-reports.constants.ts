@@ -29,7 +29,8 @@ export const AgencyCredientialExpiryConstants = {
     EndDate: 'endDate',    
     CandidateStatuses: 'candidateStatuses',
     JobId: 'jobId',
-    CandidateName: 'candidateName',   
+    CandidateName: 'candidateName', 
+    opcredFlag: 'opcredFlag',  
   }
 }
 export const AgencyInvoiceSummaryConstants = {
@@ -47,7 +48,7 @@ export const AgencyInvoiceSummaryConstants = {
 
   }
 }
-export const analyticsConstants = {
+export const AgencyMissingCredientialConstants = {
   formControlNames: {
     BusinessIds: 'businessIds',
     RegionIds: 'regionIds',

@@ -24,7 +24,7 @@
     ejs-button
     id="addNoteButton"
     cssClass="e-action-button"
-    [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageIrpCandidateProfile]"
+    [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageNotes]"
     (click)="addNote()"
   >
     <i-feather name="plus" class="icon"></i-feather>
