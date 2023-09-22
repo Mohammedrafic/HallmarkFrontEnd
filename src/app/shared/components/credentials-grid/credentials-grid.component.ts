@@ -783,7 +783,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       };
     });
 
-    super.setHeightForMobileGrid(this.gridItems?.length);
   }
  private disableViewDocument(item:CandidateCredential):boolean{
   let length= item.credentialFiles==null?0:item.credentialFiles?.length;

@@ -52,4 +52,5 @@ export const DefaultTimesheetState: TimesheetsModel = {
   organizations: [],
   selectedOrganizationId: 0,
   filterOptions: null,
+  displayTimesheetHistoricalData: false,
 };

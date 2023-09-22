@@ -43,4 +43,5 @@ export interface TimesheetsModel {
   organizations: DataSourceItem[];
   selectedOrganizationId: number;
   filterOptions: TimesheetsFilteringOptions | null;
+  displayTimesheetHistoricalData: boolean;
 }

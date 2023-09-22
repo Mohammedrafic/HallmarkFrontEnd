@@ -220,6 +220,10 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.showDeployedControl = JSON.parse(
         setting[OrganizationSettingKeys[OrganizationSettingKeys.ShowDeployedEmployees]]
       );
+      this.orderManagementService.updateEmployeeToggleState({
+        ...this.orderManagementService.getEmployeeToggleState(),
+        includeDeployed: this.showDeployedControl
+      });
       this.cdr.markForCheck();
     });
   }

@@ -52,7 +52,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   public candidateSearchPlaceholder = CandidateSearchPlaceholder;
   public employeeSearchPlaceholder = EmployeeSearchPlaceholder;
   public isAvailable = false;
-  public includeDeployed = false;
+  public includeDeployed = true;
 
   public isMobileScreen = false;
 

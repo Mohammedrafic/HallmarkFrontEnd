@@ -134,7 +134,9 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
           const jobDistributionFormValue = this.partnershipForm.getRawValue();
 
           if (jobDistributionFormValue.suspentionDate) {
-            jobDistributionFormValue.suspentionDate = DateTimeHelper.setUtcTimeZone(jobDistributionFormValue.suspentionDate);
+            jobDistributionFormValue.suspentionDate = DateTimeHelper.setUtcTimeZone(
+              DateTimeHelper.setInitDateHours(jobDistributionFormValue.suspentionDate)
+            );
           }
 
           this.store.dispatch(

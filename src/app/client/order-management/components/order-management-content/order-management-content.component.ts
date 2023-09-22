@@ -688,7 +688,7 @@ public watchForOrderFromNotification(){
     this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
     this.activeSystem = OrderManagementIRPSystemId.IRP;
     this.redirectedfromnotification=true;
-    this.onFilterClearAll();
+     this.onFilterClearAll();
   }
 }
 public RedirecttoVMSorder(order:Order)
@@ -2012,12 +2012,12 @@ public RedirecttoIRPOrder(order:Order)
       if (this.ordersPage?.items) {
         this.eliteOrderId = this.ordersPage.items.find((i) => i.id === this.eliteOrderId)
           ? this.eliteOrderId
-          : 0;
-        if (this.eliteOrderId > 0) {
+          : this.redirectedfromnotification ? this.eliteOrderId : 0;
+        if (this.eliteOrderId > 0 ) {
           this.ordersPage.items = this.ordersPage.items.filter(x => x.id == this.eliteOrderId);
           const data = this.ordersPage.items;
           if(this.gridApi && data){
-            this.eliteOrderPublicId=data[0].publicId!;
+            this.eliteOrderPublicId=data[0]?.publicId!;
             this.redirectedIrporder=this.eliteOrderId;
           }
           if(this.gridWithChildRow){
@@ -2242,7 +2242,9 @@ public RedirecttoIRPOrder(order:Order)
           table.style.transform = 'translate(0px, 0px)';
         }
       }
-      this.eliteOrderId = 0;
+      if(!this.redirectedfromnotification){
+       this.eliteOrderId = 0;
+      }
       this.cd$.next(true);
     });
   }
@@ -2263,11 +2265,10 @@ public RedirecttoIRPOrder(order:Order)
       takeUntil(this.unsubscribe$)
     ).subscribe((order: Order) => {
       this.selectedOrder = order;
-
+     
       if (this.selectedOrder?.commentContainerId) {
         this.getOrderComments();
       }
-
       if (this.isRedirectedFromVmsSystem) {
         this.selectFirstRow();
         this.isRedirectedFromVmsSystem = false;
@@ -2597,8 +2598,9 @@ public RedirecttoIRPOrder(order:Order)
     if (selectedOrderAfterRedirect) {
       this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
-      this.filters.contactEmails = this.filters.contactEmails ;
-
+      if (!Array.isArray(this.filters.contactEmails)) {
+        this.filters.contactEmails = this.filters.contactEmails ? [this.filters.contactEmails] : this.filters.contactEmails;
+      }
       this.filters.orderPublicId = selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId;
       this.filters.agencyType = null;
       this.filters.includeReOrders = false;
@@ -2903,8 +2905,11 @@ public RedirecttoIRPOrder(order:Order)
   private refreshFilterState(): void {
     this.filterApplied = true;
     this.filters = this.OrderFilterFormGroup.getRawValue();
-
-    this.filters.contactEmails = this.filters.contactEmails || null;
+    if (!Array.isArray(this.filters.contactEmails)) {
+      this.filters.contactEmails = this.filters.contactEmails
+        ? [this.filters.contactEmails]
+        : this.filters.contactEmails;
+    }
     this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;

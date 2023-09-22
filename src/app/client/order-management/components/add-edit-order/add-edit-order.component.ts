@@ -852,14 +852,19 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
       
-      this.startDate = order.jobStartDate;
-      let parentOrderEndDate = new Date(this.parentOrder?.jobEndDate);
-      let twoWeekDate = new Date(parentOrderEndDate.setDate(parentOrderEndDate.getDate() + 14));
-      if(this.startDate && this.startDate > twoWeekDate && this.order.extensionFromId != null){
-          this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
-          return;
-       }
-
+      if(this.orderDetailsFormComponent.isEditMode && this.order?.extensionFromId != null){
+        let positionOrder = this.parentOrder?.candidates?.find((current) => current.id == this.order?.candidates?.[0].id);
+        if(positionOrder && positionOrder?.actualEndDate){
+          this.startDate = order.jobStartDate;
+          let parentOrderEndDate = new Date(positionOrder?.actualEndDate);
+          let twoWeekDate = new Date(parentOrderEndDate.setDate(parentOrderEndDate.getDate() + 14));
+          if(this.startDate && this.startDate > twoWeekDate ){
+              this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
+              return;
+           }
+        }
+      }
+      
       const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
       if (this.needToShowConfirmPopup(order, hourlyRate)) {
         this.showConfirmPopupForZeroRate(order, documents);

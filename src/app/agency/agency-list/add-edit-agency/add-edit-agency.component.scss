@@ -1,9 +1,11 @@
-@import "../../../styles/variables/colors.scss";
-@import "../../../styles/variables/mixins.scss";
+@import 'colors';
+@import 'mixins';
+@import 'adaptive-response';
 
 .general-info-container {
   display: flex;
   padding-bottom: 12px;
+
   .e-card {
     .e-card-header {
       .e-card-header-caption {
@@ -53,6 +55,15 @@
   }
 }
 
+.button-group {
+  display: flex;
+  column-gap: 12px;
+}
+
+.mobile-button-group {
+  display: none;
+}
+
 .create-under {
   max-width: calc(70% - 14px);
 
@@ -66,4 +77,98 @@
 
 .payment-section {
   margin-top: 12px;
+}
+
+:host ::ng-deep {
+  .e-tab-header {
+    display: none !important;
+  }
+}
+
+@media #{$max-desktop-small} {
+  .create-under {
+    max-width: unset;
+  }
+
+  .general-info-container {
+    flex-direction: column;
+    row-gap: 24px;
+
+    .left {
+      width: 100%;
+    }
+
+    .right {
+      width: 100%;
+    }
+  }
+
+  :host ::ng-deep {
+    .controls-container {
+      flex-direction: row;
+
+      .left-content {
+        max-width: unset;
+        width: 100%;
+      }
+
+      .right-content {
+        justify-content: flex-end;
+      }
+    }
+  }
+}
+
+@media #{$max-tablet} {
+  .payment-section,
+  .create-under,
+  .general-info-container {
+    padding-right: 16px;
+  }
+}
+
+@media #{$max-mobile} {
+  :host {
+
+    ::ng-deep .controls-container {
+      padding-bottom: 0;
+    }
+
+    .stepper {
+      width: 99%;
+      padding-bottom: 70px;
+    }
+
+    .mobile-button-group {
+      display: grid;
+      place-items: center;
+      grid-template-columns: auto 30% 40%;
+      gap: 12px;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      padding: 16px 24px;
+      background-color: var(--bg-default);
+      box-shadow: 0px 4px 4px 4px rgba(0, 0, 0, 0.25);
+
+      .item {
+        justify-self: stretch;
+      }
+
+      .save-btn {
+        width: 100%;
+      }
+
+      ::ng-deep {
+        .tooltip-container {
+          display: block;
+        }
+      }
+    }
+
+    .button-group {
+      display: none;
+    }
+  }
 }

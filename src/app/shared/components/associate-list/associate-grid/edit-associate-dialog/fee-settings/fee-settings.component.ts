@@ -130,6 +130,7 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
 
   private subscribeOnIdChanges(): void {
     this.form.get('id')?.valueChanges.pipe(
+      filter((id) => id !== null),
       takeUntil(this.componentDestroy())
     ).subscribe((organizationAgencyId) => {
       this.organizationAgencyId = organizationAgencyId;

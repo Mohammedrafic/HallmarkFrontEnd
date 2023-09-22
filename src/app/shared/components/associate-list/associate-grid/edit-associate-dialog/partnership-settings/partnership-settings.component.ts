@@ -19,7 +19,7 @@ import {
 } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
 import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
-import { Destroyable } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 
 @Component({
   selector: 'app-partnership-settings',
@@ -47,7 +47,7 @@ export class PartnershipSettingsComponent extends Destroyable implements OnInit 
   public optionFields = OPTION_FIELDS;
   public optionRegions = REGION_OPTION;
   public partnerStatuses = PartnershipStatus;
-  public minDate = new Date(new Date().setHours(0, 0, 0));
+  public minDate: Date;
 
   public classification = Object.values(FeeSettingsClassification)
     .filter(valuesOnly)
@@ -97,9 +97,13 @@ export class PartnershipSettingsComponent extends Destroyable implements OnInit 
       this.partnershipForm.reset();
       this.partnershipForm.patchValue({ ...settings });
 
-      if (this.isAgency && settings.status === PartnershipStatus.Suspended) {
+      if (this.isAgency) {
         this.partnershipForm.get('status')?.disable();
         this.partnershipForm.get('suspentionDate')?.disable();
+      } else if (!this.isAgency && settings.status === PartnershipStatus.Suspended) {
+        this.minDate = DateTimeHelper.setInitDateHours(settings.suspentionDate);
+      } else {
+        this.minDate = DateTimeHelper.setInitDateHours(new Date());
       }
     });
   }
