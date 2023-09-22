@@ -55,6 +55,15 @@
   }
 }
 
+.button-group {
+  display: flex;
+  column-gap: 12px;
+}
+
+.mobile-button-group {
+  display: none;
+}
+
 .create-under {
   max-width: calc(70% - 14px);
 
@@ -71,7 +80,7 @@
 }
 
 :host ::ng-deep {
-  .e-tab-header  {
+  .e-tab-header {
     display: none !important;
   }
 }
@@ -120,24 +129,46 @@
 
 @media #{$max-mobile} {
   :host {
-    margin-top: 16px;
 
-    ::ng-deep {
-      .controls-container {
-        .left-content {
-          padding-right: 0;
+    ::ng-deep .controls-container {
+      padding-bottom: 0;
+    }
 
-          .back-btn {
-            margin-right: 10px;
-          }
-        }
-  
-        .right-content {
-          .save-btn {
-            margin-left: 10px;
-          }
+    .stepper {
+      width: 99%;
+      padding-bottom: 70px;
+    }
+
+    .mobile-button-group {
+      display: grid;
+      place-items: center;
+      grid-template-columns: auto 30% 40%;
+      gap: 12px;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      padding: 16px 24px;
+      background-color: var(--bg-default);
+      box-shadow: 0px 4px 4px 4px rgba(0, 0, 0, 0.25);
+
+      .item {
+        justify-self: stretch;
+      }
+
+      .save-btn {
+        width: 100%;
+      }
+
+      ::ng-deep {
+        .tooltip-container {
+          display: block;
         }
       }
+    }
+
+    .button-group {
+      display: none;
     }
   }
 }

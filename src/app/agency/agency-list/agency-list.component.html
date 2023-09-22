@@ -103,8 +103,8 @@
     [currentPage]="currentPage"
     [pageSize]="pageSize"
     [totalRecordsCount]="(agencies$ | async)?.totalCount ?? 0"
-    (navigateToPageEmitter)="changeGridSize($event)"
-    (pageSizeChangeEmitter)="changeGridPage($event)"
+    (navigateToPageEmitter)="changeGridPage($event)"
+    (pageSizeChangeEmitter)="changeGridSize($event)"
   ></app-grid-pagination>
 </section>
 
