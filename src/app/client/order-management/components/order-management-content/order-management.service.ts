@@ -46,7 +46,7 @@ export class OrderManagementService extends DestroyableDirective {
   private previousSelectedOrganizationId: number;
   private readonly irpEmployeeToggleState: BaseObservable<IrpEmployeeToggleState> = new BaseObservable<IrpEmployeeToggleState>({
     isAvailable: false,
-    includeDeployed: false
+    includeDeployed: true,
   });
   private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
   private readonly orderFromAnotherSystem: BaseObservable<OrderLinkDetails | null> =
