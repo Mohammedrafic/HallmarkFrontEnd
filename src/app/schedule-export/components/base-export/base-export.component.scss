@@ -12,7 +12,14 @@ $unavailable: #E24D4D;
 @media print {
   html {
     font-size: 14px;
+    width: 100%;
+    height: 100%;
   }
+    @page {
+      size: 16in 14in; /* Set the paper size to "Legal" */
+      margin: 0; /* Remove margins */
+    }
+    
 }
 
 .text-home-dept {
