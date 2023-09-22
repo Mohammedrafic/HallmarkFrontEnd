@@ -77,7 +77,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'AutomatedDistributionToVMS',
   'Sourcing',
   'ATPRateCalculation',
-  'DisableNumberOfOpenPositions'
+  'DisableNumberOfOpenPositions',
+  'ShowDeployedEmployees',
 ];
 
 export const DisabledSettingsByDefault = [
@@ -99,7 +100,8 @@ export const DisabledSettingsByDefault = [
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
   'Sourcing',
-  'ATPRateCalculation'
+  'ATPRateCalculation',
+  'ShowDeployedEmployees',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {
