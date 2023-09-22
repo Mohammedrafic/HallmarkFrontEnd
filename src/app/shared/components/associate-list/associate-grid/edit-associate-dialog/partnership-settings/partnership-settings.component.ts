@@ -97,7 +97,7 @@ export class PartnershipSettingsComponent extends Destroyable implements OnInit 
       this.partnershipForm.reset();
       this.partnershipForm.patchValue({ ...settings });
 
-      if (this.isAgency && settings.status === PartnershipStatus.Suspended) {
+      if (this.isAgency) {
         this.partnershipForm.get('status')?.disable();
         this.partnershipForm.get('suspentionDate')?.disable();
       } else if (!this.isAgency && settings.status === PartnershipStatus.Suspended) {
