@@ -27,6 +27,7 @@ import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popup
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { combineLatest, distinctUntilChanged, filter, map, Observable,
   skip,
+  Subject,
   switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { SettingsViewService } from '../../../../shared/services/settings-view.service';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
@@ -167,6 +168,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private canRecalculate: boolean;
 
   previewAttachemnt:boolean = false;
+  currentSelectedAttachmentIndex:number = 0;
+  navigateTheAttachment$:Subject<number> = new Subject<number>();
+  
 
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
@@ -195,6 +199,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     return this.maxRowIndex - 1 === this.currentSelectedRowIndex;
   }
 
+
   public override ngOnInit(): void {
     super.ngOnInit();
     this.watchForPermissions();
@@ -221,6 +226,19 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       filter((e) => e instanceof NavigationStart),
       takeUntil(this.componentDestroy()),
     ).subscribe(() => this.closeDialog());
+  }
+
+  public isAttachmentNextDisabled(attachments:Attachment[]):boolean{
+    return attachments.length == this.currentSelectedAttachmentIndex + 1;
+  }
+
+  public onNextPreviousAttachments(next: boolean): void {
+      if(next){
+        this.currentSelectedAttachmentIndex = this.currentSelectedAttachmentIndex + 1;
+      }else{
+        this.currentSelectedAttachmentIndex = this.currentSelectedAttachmentIndex - 1;
+      }
+      this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);      
   }
 
   public onNextPreviousOrder(next: boolean): void {
@@ -571,9 +589,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
   }
 
-  onPreviewAttchementClick($event:boolean){
-    console.log('$event',$event);
-    this.previewAttachemnt = $event;
+  onPreviewAttchementClick($event:number){
+    this.currentSelectedAttachmentIndex = $event;
+    this.previewAttachemnt = true;
   }
 
   private observeDetails(): void {
