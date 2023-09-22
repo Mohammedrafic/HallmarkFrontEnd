@@ -141,3 +141,9 @@
 .w-25{
   width: 28% !important;
 }
+.widget-legend__item-content.legent-sticky-header {
+  position: sticky !important;
+  background: #fff !important;
+  z-index: 99 !important;
+  top: 0 !important;
+}

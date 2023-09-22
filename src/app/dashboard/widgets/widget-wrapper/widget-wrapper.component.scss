@@ -177,3 +177,6 @@ $headerHeight: 19px;
   max-height: calc( 100% - 51px);
   overflow: auto;
 }
+.app-widget-wrapper__legend {
+  padding-top: 0 !important;
+}
