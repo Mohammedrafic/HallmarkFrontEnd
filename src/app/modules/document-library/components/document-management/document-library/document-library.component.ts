@@ -169,6 +169,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public gridApi!: GridApi;
   public rowData: DocumentLibraryDto[] = [];
   public rowSelection: 'single' | 'multiple' = 'multiple';
+  public editMenuActiveItems: ItemModel[] = [
+    { text: MoreMenuType[0], id: '0' },
+    { text: MoreMenuType[1], id: '1' },
+  ];
   public editMenuItems: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[1], id: '1' },
@@ -189,6 +193,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public actionCellrenderParams: any = {
     editMenuITems: this.editMenuItems,
     editMoreMenuITems: this.editMoreMenuItems,
+    editMenuActiveItems: this.editMenuActiveItems,
     select: (event: any, params: DocumentLibraryDto) => {
       this.menuOptionSelected(event, params)
     },
@@ -227,6 +232,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   
   public searchText: string = "";
+  editLocationIds:any = [];
 
   @Select(SecurityState.businessUserData)
   public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
@@ -307,8 +313,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       }
     });
 
-    this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe((locations: any) => {
+    this.locations$.pipe(takeUntil(this.unsubscribe$),distinctUntilChanged()).subscribe((locations: any) => {
       if(locations != null && locations.length > 0){
+        if(this.editLocationIds.length > 0){
+          this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(this.editLocationIds);
+          this.changeDetectorRef.markForCheck();
+        }
         const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
         if (selectedLoactions != null && selectedLoactions.length > 0) {
           let difference = locations.filter((x:any) => selectedLoactions.includes(x.id));
@@ -514,25 +524,28 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public onRegionSelect(event: any) {
     this.regionIdControl = this.documentLibraryform.get(FormControlNames.RegionIds) as AbstractControl;
     this.regionIdControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-      if (this.regionIdControl?.value?.length > 0) {
-        let locationFilter: LocationsByRegionsFilter = {
-          ids: data,
-          getAll: true,
-          businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
-          orderBy:'Name'
-        };
-        this.store.dispatch(new GetLocationsByRegions(locationFilter));
-        this.changeDetectorRef.markForCheck();
+      if(data){
+        if (this.regionIdControl?.value?.length > 0) {
+          let locationFilter: LocationsByRegionsFilter = {
+            ids: data,
+            getAll: true,
+            businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
+            orderBy:'Name'
+          };
+          this.store.dispatch(new GetLocationsByRegions(locationFilter));
+          this.changeDetectorRef.markForCheck();
+        }
+        else{
+          let locationFilter: LocationsByRegionsFilter = {
+            ids: [data?.length],
+            getAll: true,
+            businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
+          };
+          this.store.dispatch(new GetLocationsByRegions(locationFilter));
+          this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
+        }
       }
-      else{
-        let locationFilter: LocationsByRegionsFilter = {
-          ids: [data.length],
-          getAll: true,
-          businessUnitId: this.filterSelectedBusinesUnitId != null ? this.filterSelectedBusinesUnitId : 0,
-        };
-        this.store.dispatch(new GetLocationsByRegions(locationFilter));
-        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
-      }
+      
     });
   }
 
@@ -1021,6 +1034,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public handleOnUploadBtnClick() {
+    this.editLocationIds = [];
     this.isAddNewFolder = false;
     this.isUpload = true;
     this.documentId = 0;
@@ -1040,7 +1054,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   private editDocument(docItem: DocumentLibraryDto) {
-    if (docItem) {
+    if (docItem) { 
+      this.editLocationIds = [];     
       this.currentDocumentData = docItem;
       this.isEditDocument = true;
       this.formDailogTitle = FormDailogTitle.EditDocument;
@@ -1055,7 +1070,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       let status = this.statusItems.find((x) => x.text == docItem.status);
       this.startDate = docItem.startDate != null ? new Date(docItem.startDate.toString()) : this.startDate;
       this.store.dispatch(new GetDocumentById(docItem.id));
-      this.documentLibraryDto$.pipe(takeUntil(this.unsubscribe$))
+      this.documentLibraryDto$.pipe(takeUntil(this.unsubscribe$),distinctUntilChanged())
         .subscribe((data: DocumentLibraryDto) => {
           if (data) {
             this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(data.name);
@@ -1065,15 +1080,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             this.documentLibraryform.get(FormControlNames.StartDate)?.setValue(data.startDate != null ? new Date(data.startDate.toString()) : null);
             this.documentLibraryform.get(FormControlNames.EndDate)?.setValue(data.endDate != null ? new Date(data.endDate.toString()) : null);
             this.documentLibraryform.get(FormControlNames.Comments)?.setValue(data.comments);
-            setTimeout(() => {
               const editRegionIds = data?.regionId?.split(',').map(Number) != undefined ? data?.regionId?.split(',').map(Number) : [];
               this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
-              const editLocationIds = data?.locationId?.split(',').map(Number) != undefined ? data?.locationId?.split(',').map(Number) : [];
-              setTimeout(() => {
-                this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
-              }, 500);
-              this.changeDetectorRef.markForCheck();
-            }, 500)
+              this.editLocationIds = data?.locationId?.split(',').map(Number) != undefined ? data?.locationId?.split(',').map(Number) : [];
             this.store.dispatch(new ShowSideDialog(true));
           }
         });
@@ -1083,7 +1092,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public setRegionsOnEdit(editRegionIds: any) {
 
     if (editRegionIds.length > 0) {
-      this.regions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.regions$.pipe(takeUntil(this.unsubscribe$),distinctUntilChanged()).subscribe((data) => {
         this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
       });
     } else {
@@ -1182,7 +1191,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       selectedRegions.forEach((regionItem: any) => {
         let mappingLocItems: number[] = [];
         const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
-        let x = this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+        let x = this.locations$.pipe(takeUntil(this.unsubscribe$),distinctUntilChanged()).subscribe((data: any) => {
           if (selectedLoactions.length > 0) {
             selectedLoactions.forEach((selLocItem: any) => {
               let selectedLocation = data.filter((locItem: any) => { return locItem.id == selLocItem && locItem.regionId == regionItem });
@@ -1318,7 +1327,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       });
     }
     else {
-      if(!allFlag && this.sharedDocumentInformation.length == 1 && this.sharedDocumentInformation[0].id === -1 && this.sharedDocumentInformation[0].name === 'All'){
+      if(!allFlag && this.sharedDocumentInformation && this.sharedDocumentInformation?.length == 1 && this.sharedDocumentInformation[0].id === -1 && this.sharedDocumentInformation[0].name === 'All'){
         this.UnShareDocumewnt(this.currentDocumentData);
       }
       this.documentLibraryform.reset();

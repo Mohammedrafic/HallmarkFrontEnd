@@ -5,7 +5,7 @@
   <button 
   *ngIf="!params.data.isSharedWithMe"
    ejs-dropdownbutton cssClass="e-flat ellipsis-icon" 
-   [items]="params.data.isSharedByMe ? params.editMoreMenuITems : params.editMenuITems"
+   [items]="params.data.status == 'Inactive' ? params.editMenuActiveItems : params.data.isSharedByMe ? params.editMoreMenuITems : params.editMenuITems"
    (select)="menuOptionSelected($event)">
     <span><i-feather name="more-vertical" class="icon"></i-feather></span>
   </button>
