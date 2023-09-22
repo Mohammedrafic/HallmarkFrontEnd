@@ -264,7 +264,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         if (startDate > endDate) {
           this.extensionForm.get('endDate')?.setErrors({incorrect: true});
         }
-        this.extensionForm.get('durationPrimary')?.setValue(Duration.Other, {emitEvent: false});
+        this.extensionForm.get('durationPrimary')?.setValue(Duration.Other);
         this.cd.markForCheck();
       });
   }
