@@ -288,6 +288,10 @@
     height: calc(98vh - 350px);
   }
 
+  @media #{$max-mobile} {
+    height: auto;
+  }
+
   &::ng-deep {
     & .e-checkbox-wrapper .e-frame.e-check {
       background: $primary-active-blue-70 !important;
@@ -330,6 +334,10 @@
 
   @media #{$max-tablet} {
     height: calc(100% - 290px);
+  }
+
+  @media #{$max-mobile} {
+    height: auto;
   }
 }
 
@@ -391,6 +399,10 @@
   .grid-table-container {
     height: auto;
     margin-top: 145px;
+  }
+
+  .grid-component:has(.e-emptyrow) {
+    height: 145px;
   }
 
   :host {

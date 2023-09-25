@@ -13,11 +13,13 @@
           </e-chips>
         </ejs-chiplist>
       <div class="e-card-content">
-        <app-tooltip-container [showToolTip]="!actionsAllowed || !canApplyCandidate" [message]="applyRestrictionMessage">
+        <app-tooltip-container
+          [showToolTip]="!actionsAllowed || !canApplyCandidate || candidate?.partnershipStatus === partnershipStatus.Suspended"
+          [message]="candidate?.partnershipStatus === partnershipStatus.Suspended ? agencyStatusMessage : applyRestrictionMessage">
           <button
             ejs-button
             [isPrimary]="true"
-            [disabled]="isLocked || !actionsAllowed || !canApplyCandidate"
+            [disabled]="isLocked || !actionsAllowed || !canApplyCandidate || candidate?.partnershipStatus === partnershipStatus.Suspended"
             class="apply-button"
             (click)="applyOrderApplicants()">
             Apply

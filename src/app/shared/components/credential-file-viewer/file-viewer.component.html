@@ -81,7 +81,7 @@
               <e-item *ngIf="!imageMode">
                 <ng-template #template>
                   <button mat-stroked-button (click)="prevPage()">
-                    <i-feather name="chevrons-left" class="icon"></i-feather>
+                    <i-feather name="chevron-left" class="icon"></i-feather>
                   </button>
                 </ng-template>
               </e-item>
@@ -97,7 +97,7 @@
               <e-item *ngIf="!imageMode">
                 <ng-template #template>
                   <button mat-stroked-button (click)="lastPage()">
-                    <i-feather name="chevron-right" class="icon"></i-feather>
+                    <i-feather name="chevrons-right" class="icon"></i-feather>
                   </button>
                 </ng-template>
               </e-item>
@@ -143,8 +143,10 @@
                 [render-text]="true"
                 [fit-to-page]="true"
                 [original-size]="false"
-                [page]="page"
+                [(page)]="page"
                 [zoom]="zoom"
+                [stick-to-page]="true"
+                [show-all]="true"
                 (pagechanging)="pagechanging($event)"
                 (after-load-complete)="afterLoadComplete($event)"
               ></pdf-viewer>

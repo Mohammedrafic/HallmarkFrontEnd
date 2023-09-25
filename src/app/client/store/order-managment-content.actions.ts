@@ -94,6 +94,7 @@ export class GetIrpOrderCandidates {
     public pageNumber: number,
     public pageSize: number,
     public isAvailable: boolean,
+    public includeDeployed?: boolean,
     public searchTerm?: string
   ) {}
 }
@@ -103,6 +104,13 @@ export class GetSelectedOrderById {
   constructor(
     public payload: number,
     public isIRP?: boolean
+  ) {}
+}
+
+export class GetParentOrderById {
+  static readonly type = '[order management] Get Parent Order By ParentId';
+  constructor(
+    public payload: number,
   ) {}
 }
 

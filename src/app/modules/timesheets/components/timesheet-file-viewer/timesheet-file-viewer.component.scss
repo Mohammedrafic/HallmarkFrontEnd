@@ -6,8 +6,20 @@
   flex-direction: column;
   box-sizing: border-box;
   padding: 24px 0px 0px 0px !important;
+  P{
+    margin: 5px;
+    font-weight: 400;
+    font-size: 12px;
+    color: #9198ac;
+  }
   .header-container {
     margin-bottom: 24px;
+    .e-card-title{
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 500px;
+    }
 
     .download-button {
       margin: 0 12px;
@@ -49,4 +61,9 @@
       }
     }
   }
+}
+
+.main-body{
+    max-height: 79vh;
+    overflow-y: hidden;
 }

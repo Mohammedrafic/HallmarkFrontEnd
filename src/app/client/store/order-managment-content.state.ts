@@ -84,7 +84,8 @@ import {
   GetOrderWorkLocationDetailSucceeded,
   GetOrderCredentialDetailSucceeded,
   GetOrderContactDetailSucceeded,
-  GetOrderBillRateDetailSucceeded
+  GetOrderBillRateDetailSucceeded,
+  GetParentOrderById
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -171,6 +172,7 @@ export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
   ordersJourneyPage: OrdersJourneyPage | null;
   selectedOrder: Order | null;
+  selectedParentOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
   applicantStatuses: ApplicantStatus[];
   orderCandidatesListPage: OrderCandidatesListPage | null;
@@ -215,6 +217,7 @@ export interface OrderManagementContentStateModel {
     ordersPage: null,
     ordersJourneyPage: null,
     selectedOrder: null,
+    selectedParentOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
     applicantStatuses: [],
@@ -272,6 +275,11 @@ export class OrderManagementContentState {
   @Selector()
   static selectedOrder(state: OrderManagementContentStateModel): Order | null {
     return state.selectedOrder;
+  }
+
+  @Selector()
+  static selectedParentOrder(state: OrderManagementContentStateModel): Order | null {
+    return state.selectedParentOrder;
   }
 
   @Selector()
@@ -621,11 +629,12 @@ export class OrderManagementContentState {
   @Action(GetIrpOrderCandidates)
   GetIrpOrderCandidates(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, pageNumber, pageSize, isAvailable, searchTerm }: GetIrpOrderCandidates
+    { orderId, pageNumber, pageSize, isAvailable, includeDeployed, searchTerm }: GetIrpOrderCandidates
   ): Observable<PageOfCollections<IrpOrderCandidate>> {
     const params: IrpCandidatesParams = {
       PageSize: pageSize,
       PageNumber: pageNumber,
+      includeDeployed,
       isAvailable,
       searchTerm,
     };
@@ -668,6 +677,19 @@ export class OrderManagementContentState {
           );
         }
 
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetParentOrderById)
+  GetParentOrderById(
+    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: GetParentOrderById
+  ): Observable<Order> {
+    return this.orderManagementService.getOrderById(payload, false).pipe(
+      tap((payload) => {
+        patchState({ selectedParentOrder: payload });
         return payload;
       })
     );
@@ -983,22 +1005,24 @@ export class OrderManagementContentState {
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents, internalDistributionChanged }: EditIrpOrder
-  ): Observable<void | Blob[] | Order[]> {
+  ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.editIrpOrder(order).pipe(
-      switchMap((order: Order[]) => {
+      switchMap((order: Order) => {
         const successMessage = internalDistributionChanged
           ? ChangeInternalDistributionSuccess
           : RECORD_MODIFIED_SUCCESS_WITH_ORDERID(
-            order[0]?.organizationPrefix ?? '',
-            order[0]?.publicId?.toString() ?? ''
+            order?.organizationPrefix ?? '',
+            order?.publicId?.toString() ?? ''
           );
 
         dispatch([new ShowToast(MessageTypes.Success, successMessage), new SaveIrpOrderSucceeded()]);
-        if (documents.length) {
-          return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
-        } else {
-          return of(order);
-        }
+          if (documents.length) {
+            let orders:any[]=[];
+            orders.push(order);
+            return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(orders, documents));
+          } else {
+            return of(order);
+          }
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );

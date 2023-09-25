@@ -21,6 +21,7 @@ import { AvailableEmployeeModule } from '../widgets/available-employee/available
 import { PositionsCountDayRangeModule } from '../widgets/positions-count-day-range/positions-count-day-range.module';
 import { StackColumnChartModule } from '../widgets/stack-column-chart/stack-column-chart.module';
 import { OrdersPendingCustomStatusModule } from '../widgets/orders-pending-custom-status/orders-pending-custom-status.module';
+import { BillrateWidgetModule } from '../widgets/bill-rate-widget/bill-rate-widget.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -44,6 +45,7 @@ import { OrdersPendingCustomStatusModule } from '../widgets/orders-pending-custo
     PositionsCountDayRangeModule,
     StackColumnChartModule,
     OrdersPendingCustomStatusModule,
+    BillrateWidgetModule,
     NgxsModule.forFeature([ UserState]),
   ],
 })

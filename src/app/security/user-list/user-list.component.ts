@@ -139,6 +139,13 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
       this.userSettingForm.get('businessUnitId')?.disable({ emitEvent: false });
     }
 
+    if (this.user?.businessUnitType == BusinessUnitType.Hallmark && this.businessUnitControl.value == BusinessUnitType.Employee) {
+      this.userSettingForm.patchValue({
+        businessUnitType: this.businessUnitControl.value,
+        businessUnitId: null,
+      });
+    }
+
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -230,6 +237,17 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
       if (this.user?.businessUnitType == BusinessUnitType.Organization && this.isIRPOrg) {
         this.userSettingForm.get('businessUnitType')?.disable();
         this.userSettingForm.get('businessUnitId')?.disable();
+      }
+
+      if (this.user?.businessUnitType == BusinessUnitType.Hallmark && this.businessUnitControl.value == BusinessUnitType.Employee) {
+        this.store.dispatch(new GetBusinessIdDetails(user.businessUnitId || 0));
+        this.businessUnitIdDetails$.pipe(takeWhile(() => this.isAlive)).subscribe((value: GetBusinessUnitIdDetails) => {
+          if (value != null) {
+            this.isDisabledEmp = !value.isCreateEmployee
+            this.userSettingForm.get('businessUnitType')?.disable({ emitEvent: false });
+            this.userSettingForm.get('businessUnitId')?.disable({ emitEvent: false });
+          }
+        })
       }
 
       this.store.dispatch(new ShowSideDialog(true));
@@ -365,7 +383,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
                 let orgEmpBusinessIDs = [BusinessUnitType.Organization, BusinessUnitType.Employee]
                 this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id));
                 this.businessForm.get('businessUnit')?.enable({ emitEvent: false });
-                this.businessForm.get('business')?.setValue(this.user?.businessUnitId,{ emitEvent: false });
+                this.businessForm.get('business')?.setValue(this.user?.businessUnitId, { emitEvent: false });
               } else {
                 this.businessForm.disable({ emitEvent: false });
               }

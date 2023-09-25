@@ -11,9 +11,9 @@ import {
   CancelIrpCandidateDto,
   CandidateDetails,
   ClosePositionDto,
-  CreateIrpCandidateDto,
+  CreateIrpCandidateDto, CreateOfferedIrpCandidateDto,
   JobDetailsDto,
-  UpdateIrpCandidateDto,
+  UpdateIrpCandidateDto, UpdateOfferedIrpCandidateDto,
 } from '@shared/components/order-candidate-list/interfaces';
 import { ShowToast } from '../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -48,11 +48,11 @@ export class OrderCandidateApiService {
     return this.http.post<void>('/api/IRPApplicants/cancel', payload);
   }
 
-  updateIrpCandidate(payload: UpdateIrpCandidateDto): Observable<void> {
+  updateIrpCandidate(payload: UpdateIrpCandidateDto | UpdateOfferedIrpCandidateDto): Observable<void> {
     return this.http.put<void>('/api/IRPApplicants/update', payload);
   }
 
-  createIrpCandidate(payload: CreateIrpCandidateDto): Observable<void> {
+  createIrpCandidate(payload: CreateIrpCandidateDto | CreateOfferedIrpCandidateDto): Observable<void> {
     return this.http.post<void>('/api/IRPApplicants/create', payload);
   }
 

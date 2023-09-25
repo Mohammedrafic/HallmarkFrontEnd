@@ -52,13 +52,15 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   public candidateSearchPlaceholder = CandidateSearchPlaceholder;
   public employeeSearchPlaceholder = EmployeeSearchPlaceholder;
   public isAvailable = false;
+  public includeDeployed = true;
+
   public isMobileScreen = false;
 
   private readonly searchByCandidateName$: Subject<string> = new Subject();
   private searchTermByCandidateName: string;
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();
-  
+
   constructor(
     protected override store: Store,
     protected router: Router,
@@ -80,6 +82,11 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public showDeployedEmployee(event: { checked: boolean }): void {
+    this.includeDeployed = event.checked;
+    this.emitGetCandidatesList();
   }
 
   public onSwitcher(event: { checked: boolean }): void {
@@ -121,8 +128,8 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
   }
   else {
 
-    
-   
+
+
     if(this.isMobileScreen){
       return;
     }
@@ -219,6 +226,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
       pageSize: this.pageSize,
       excludeDeployed: !this.includeDeployedCandidates,
       isAvailable: this.isAvailable,
+      includeDeployed: this.includeDeployed,
       searchTerm: this.searchTermByCandidateName,
     });
   }

@@ -16,7 +16,7 @@ import PriceUtils from '@shared/utils/price.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CandidateSSNRequired,CandidatePHONE1Required,CandidateADDRESSRequired, deployedCandidateMessage, DEPLOYED_CANDIDATE, REQUIRED_PERMISSIONS, SubmissionsLimitReached, APPLICATION_DISABLED } from '@shared/constants';
+import { CandidateSSNRequired,CandidatePHONE1Required,CandidateADDRESSRequired, deployedCandidateMessage, DEPLOYED_CANDIDATE, REQUIRED_PERMISSIONS, SubmissionsLimitReached, APPLICATION_DISABLED, AgencyPartnershipSuspended } from '@shared/constants';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
 import { MessageTypes } from '../../../../enums/message-types';
@@ -24,6 +24,7 @@ import { ShowToast } from '../../../../../store/app.actions';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { OrderStatus } from '@shared/enums/order-management';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -55,15 +56,18 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public priceUtils = PriceUtils;
   public orderId: number;
   public canApplyCandidate = true;
+  public agencyStatusMessage = AgencyPartnershipSuspended;
   public applyRestrictionMessage = REQUIRED_PERMISSIONS;
   public candidateSSNRequired: boolean;
   public billRatesData: BillRate[] = [];
+  public readonly partnershipStatus = PartnershipStatus;
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
+
   public candidateJob: OrderCandidateJob;
 
   public comments: Comment[] = [];
@@ -261,12 +265,16 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   private subscribeOnInitialData(): void {
     this.candidateJobState$
-    .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: OrderCandidateJob) => {
-      this.candidateJob = data;
-      if (data?.candidateProfile.id === this.candidate.candidateId) {
-        this.getComments();
-      }
+    .pipe(
+      filter((job) => !!job),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((data: OrderCandidateJob) => {
+    this.candidateJob = data;
+    if (data?.candidateProfile.id === this.candidate.candidateId) {
+      this.getComments();
+    }
+      
       this.changeDetectorRef.markForCheck();
     });
 

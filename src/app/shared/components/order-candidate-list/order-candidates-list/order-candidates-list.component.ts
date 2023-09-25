@@ -1,7 +1,7 @@
 import { ClearDeployedCandidateOrderInfo, GetCandidateJob,
   GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import {ChangeDetectorRef, Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob,
   GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
@@ -13,10 +13,9 @@ import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.
 import { IrpOrderCandidate, Order, OrderCandidatesList } from '@shared/models/order-management.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { combineLatest, Observable, Subject } from 'rxjs';
+import {combineLatest, map, Observable, Subject, switchMap} from 'rxjs';
 import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 import { UserState } from 'src/app/store/user.state';
-import { Duration } from '@shared/enums/durations';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
 import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.component';
@@ -27,17 +26,18 @@ import { AppState } from 'src/app/store/app.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
-import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
+import {EditCandidateDialogState, IrpEmployeeToggleState} from '@shared/components/order-candidate-list/interfaces';
 import { OrderStatus } from '@shared/enums/order-management';
 import { GlobalWindow } from '@core/tokens';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
-import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import {
   OrderManagementService,
 } from '@client/order-management/components/order-management-content/order-management.service';
 import { UserPermissions } from '@core/enums';
+import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation.helper';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -97,12 +97,14 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     order: {} as Order,
   };
   public commentContainerId = 0;
+  public readonly partnershipStatus = PartnershipStatus;
+  public showDeployedControl = false;
 
-  private selectedSystem: SelectedSystemsFlag = SelectedSystems;
   private isOrgIRPEnabled = false;
   private previousSelectedSystemId: OrderManagementIRPSystemId | null;
   private isOrgVMSEnabled = false;
   private readonly permissions = UserPermissions;
+  private selectedIndex: number;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -119,6 +121,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     private settingService: SettingsViewService,
     @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
     private orderManagementService: OrderManagementService,
+    private settingsViewService: SettingsViewService,
+    private cdr: ChangeDetectorRef
   ) {
     super(store, router, globalWindow);
     this.setIrpFeatureFlag();
@@ -137,23 +141,104 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.checkForAgencyStatus();
       this.subscribeToDeployedCandidateOrdersInfo();
     }
-    this.organizationId$.pipe(
-      filter(Boolean),
-      takeUntil(this.unsubscribe$),
-    ).subscribe((id) => {
-      this.getOrganization(id);
-    });
+
+    this.setOrganizationId();
+    this.watchForEmployeeToggleState();
+
     if(this.orderDetails?.commentContainerId != undefined){
     this.commentContainerId = this.orderDetails.commentContainerId;
     }
   }
 
-  public onEdit(data: OrderCandidatesList): void {
+  public changeCandidate(isNext: boolean): void {
+    const nextIndex = isNext ? this.selectedIndex + 1 : this.selectedIndex - 1;
+    const nextCandidate = (this.grid.dataSource as OrderCandidatesList[])[nextIndex];
+    this.candidate = nextCandidate;
+    this.selectedIndex = nextIndex;
+    this.getDeployedCandidateOrders();
+    this.getCandidateJob(this.candidate);
+    this.dialogNextPreviousOption =
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
+  }
+
+  public onEdit(data: OrderCandidatesList & { index: string }): void {
+    this.selectedIndex = Number(data.index);
     this.candidate = { ...data };
     this.getDeployedCandidateOrders();
     this.getCandidatePayRateSetting();
-
+    this.dialogNextPreviousOption =
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
     this.orderCandidateListViewService.setIsCandidateOpened(true);
+    this.getCandidateJob(data);
+  }
+
+  public saveIrpCandidate(): void {
+    this.emitGetCandidatesList();
+  }
+
+  public onCloseDialog(): void {
+    this.clearDeployedCandidateOrderInfo();
+    this.sideDialog.hide();
+  }
+
+  public openEditCandidateModal(candidate: IrpOrderCandidate): void {
+    this.editCandidateDialogState = {
+      isOpen: true,
+      candidate,
+      order: this.selectedOrder,
+    };
+  }
+
+  public closeEditCandidateModal(event: boolean): void {
+    this.editCandidateDialogState = {
+      ...this.editCandidateDialogState,
+      isOpen: event,
+    };
+  }
+
+  public getPartnershipMessage(data: OrderCandidatesList): string {
+    return `Partnership was suspended on ${DateTimeHelper.formatDateUTC(data.suspentionDate, 'MM/dd/yyyy')}`;
+  }
+
+  private setOrganizationId(): void {
+    this.organizationId$.pipe(
+      filter(Boolean),
+      map((id: number) => {
+        this.getOrganization(id);
+        return id;
+      }),
+      switchMap((id: number) => {
+        return this.settingsViewService.getViewSettingKey(
+          OrganizationSettingKeys.ShowDeployedEmployees,
+          OrganizationalHierarchy.Organization,
+          id,
+          id
+        );
+      }),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((setting) => {
+      this.showDeployedControl = JSON.parse(
+        setting[OrganizationSettingKeys[OrganizationSettingKeys.ShowDeployedEmployees]]
+      );
+      this.orderManagementService.updateEmployeeToggleState({
+        ...this.orderManagementService.getEmployeeToggleState(),
+        includeDeployed: this.showDeployedControl
+      });
+      this.cdr.markForCheck();
+    });
+  }
+
+  private watchForEmployeeToggleState(): void {
+    this.orderManagementService.getEmployeeToggleStateStream().pipe(
+      takeUntil(this.unsubscribe$),
+    ).subscribe((state: IrpEmployeeToggleState) => {
+      this.isAvailable = state.isAvailable;
+      this.includeDeployed = state.includeDeployed;
+      this.cdr.markForCheck();
+    })
+  }
+
+  private getCandidateJob(data: OrderCandidatesList): void {
     if (this.order && this.candidate) {
       if (this.isAgency) {
         const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Withdraw];
@@ -214,30 +299,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
         }
       }
     }
-  }
-
-  public saveIrpCandidate(): void {
-    this.emitGetCandidatesList();
-  }
-
-  public onCloseDialog(): void {
-    this.clearDeployedCandidateOrderInfo();
-    this.sideDialog.hide();
-  }
-
-  public openEditCandidateModal(candidate: IrpOrderCandidate): void {
-    this.editCandidateDialogState = {
-      isOpen: true,
-      candidate,
-      order: this.selectedOrder,
-    };
-  }
-
-  public closeEditCandidateModal(event: boolean): void {
-    this.editCandidateDialogState = {
-      ...this.editCandidateDialogState,
-      isOpen: event,
-    };
   }
 
   private getDeployedCandidateOrders(): void {

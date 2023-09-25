@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   ClearPredefinedBillRates,
   EditOrder,
+  GetParentOrderById,
   GetPredefinedBillRates,
   SaveOrder,
   SaveOrderSucceeded,
@@ -36,6 +37,8 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { OrderJobDistribution } from '@shared/enums/job-distibution';
 import {
+  ERROR_CAN_NOT_Edit_OpenPositions,
+  ExtensionStartDateValidation,
   JOB_DISTRIBUTION_TITLE,
   ORDER_DISTRIBUTED_TO_ALL,
   PROCEED_FOR_ALL_AGENCY,
@@ -45,6 +48,8 @@ import { OrderCredentialsService } from "@client/order-management/services";
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage, IsStartEndDateOverlapWithInactivePeriod } from '@core/helpers';
 import { FieldName } from '@client/order-management/enums';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ShowToast } from 'src/app/store/app.actions';
 
 enum SelectedTab {
   OrderDetails,
@@ -74,6 +79,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
 
+  @Select(OrderManagementContentState.selectedParentOrder)
+  selectedParentOrder$: Observable<Order>;
+
   @Select(OrderManagementContentState.getPredefinedBillRatesData)
   getPredefinedBillRatesData$: Observable<GetPredefinedBillRatesData | null>;
 
@@ -98,6 +106,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private manuallyAddedBillRates: BillRate[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private order: Order;
+  public parentOrder: Order;
+  public startDate: Date;
 
   public isPerDiem = false;
   public isPermPlacementOrder = false;
@@ -156,6 +166,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
           this.removeMenuItem(SubmitButtonItem.SaveForLater);
         }
+        if(order?.extensionFromId != null){
+          this.store.dispatch(new GetParentOrderById(order?.extensionFromId))
+        }
+      });
+
+      this.selectedParentOrder$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((parentOrder: Order) => {
+        this.parentOrder = parentOrder;
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
@@ -727,13 +744,20 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
-        if (this.orderDetailsFormComponent.isEditMode) {
+        if (!this.orderDetailsFormComponent.isEditMode) {
+          this.orderCredentials = predefinedCredentials;
+          this.cd.detectChanges();
+          return;
+        }
+
+        const departmentChanged = this.orderDetailsFormComponent?.generalInformationForm.get('departmentId')?.touched;
+        const skillChanged = this.orderDetailsFormComponent?.generalInformationForm.get('skillId')?.touched;
+
+        if (this.orderDetailsFormComponent.isEditMode && (departmentChanged || skillChanged)) {
           const credentials = this.orderCredentials.filter(cred => !cred.isPredefined);
           this.orderCredentials = unionBy('credentialId', credentials, predefinedCredentials);
-        } else {
-          this.orderCredentials = predefinedCredentials;
+          this.cd.detectChanges();
         }
-        this.cd.detectChanges();
       });
   }
 
@@ -749,7 +773,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
             .getRawValue()
             .filter((billrate) => !billrate.isPredefined);
         }
-        
+
         this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
         this.cd.detectChanges();
       });
@@ -818,12 +842,29 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.showOrderFormValidationMessage();
       this.showInvalidValueMessage();
     }
+    if(this.orderDetailsFormComponent.isEditMode && this.order.disableNumberOfOpenPositions && this.order.openPositions != this.orderDetailsFormComponent.generalInformationForm.getRawValue().openPositions){
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
+      return;
+    }
 
     if (orderValid && billRatesValid && credentialsValid) {
 
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
-
+      
+      if(this.orderDetailsFormComponent.isEditMode && this.order?.extensionFromId != null){
+        let positionOrder = this.parentOrder?.candidates?.find((current) => current.id == this.order?.candidates?.[0].id);
+        if(positionOrder && positionOrder?.actualEndDate){
+          this.startDate = order.jobStartDate;
+          let parentOrderEndDate = new Date(positionOrder?.actualEndDate);
+          let twoWeekDate = new Date(parentOrderEndDate.setDate(parentOrderEndDate.getDate() + 14));
+          if(this.startDate && this.startDate > twoWeekDate ){
+              this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
+              return;
+           }
+        }
+      }
+      
       const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
       if (this.needToShowConfirmPopup(order, hourlyRate)) {
         this.showConfirmPopupForZeroRate(order, documents);

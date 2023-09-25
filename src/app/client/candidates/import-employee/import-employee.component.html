@@ -23,7 +23,7 @@
       gridName="Employee"
       *ngIf="importResponse?.errorRecords?.length"
       [importedItems]="importResponse?.errorRecords || []"
-      [columnDefs]="columnDefs"
+      [columnDefs]="errorColumnDefs"
     ></app-import-grid>
   </div>
 </app-import-dialog-content>

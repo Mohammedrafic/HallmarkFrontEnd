@@ -6,7 +6,7 @@ import { Duration } from '@shared/enums/durations';
 import { JobClassification } from '@shared/enums/job-classification';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
-import { FilterOrderStatusText } from '@shared/enums/status';
+import { AgencyStatus, CandidatesStatusText, FilterOrderStatusText } from '@shared/enums/status';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { Document } from '@shared/models/document.model';
 import { PageOfCollections } from '@shared/models/page.model';
@@ -14,6 +14,7 @@ import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { IrpPrimarySkill } from './skill.model';
 import { CandidateProfileContactDetail } from './candidate.model';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
 /**
  * TODO: rework classes with interfaces.
  */
@@ -31,6 +32,7 @@ export class OrderManagement {
   locationName: string;
   departmentId: number;
   departmentName: string;
+  shiftname?:string;
   shiftStartTime?: string;
   shiftEndTime?: string;
   shift?: string; // used only in UI to group and show shiftStartTime - shiftEndTime range
@@ -42,6 +44,7 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
+  endDate: string;
   isLocked?: boolean;
   isTemplate?: boolean;
   reOrderCount?: number;
@@ -304,9 +307,12 @@ export type OrderCandidatesList = {
   };
   candidateStatus?: CandidateStatus;
   agencyName?: string;
+  agencyStatus?: AgencyStatus;
   organizationId?: number;
   workflowStepType: WorkflowStepType;
   availabilityOverlap?: OrderAvailabilityOverlap;
+  partnershipStatus: PartnershipStatus;
+  suspentionDate: string;
 };
 
 export interface WorkflowStepType {
@@ -668,6 +674,9 @@ export type OrderCandidateJob = {
   candidateAddressRequired:any;
   candidateProfileContactDetails: CandidateProfileContactDetail;
   wasActualStartDateChanged?: boolean;
+  agencyStatus: AgencyStatus;
+  partnershipStatus: PartnershipStatus;
+  suspentionDate?: string;
 };
 
 export type CandidatesBasicInfo = {
@@ -721,6 +730,7 @@ export class OrderFilter {
   jobEndDate?: Date | null;
   orderStatuses?: (string | number)[];
   candidateStatuses?: string[];
+  reorderCandidateStatuses?:CandidatesStatusText[];
   candidatesCountFrom?: number | null;
   candidatesCountTo?: number | null;
   agencyIds?: number[];
@@ -741,7 +751,7 @@ export class OrderFilter {
   projectNameIds?: number | null;
   poNumberIds?: number | null;
   orderType?: number | null;
-  contactEmails?: string | null;
+  contactEmails?: string[] | string;
   irpOnly?: boolean | null;
   shiftIds?: number[];
   reorderStatuses?: (string | number)[];
@@ -803,6 +813,7 @@ export type CandidateListEvent = {
   pageSize: number;
   excludeDeployed: boolean;
   isAvailable: boolean;
+  includeDeployed?: boolean;
   searchTerm?: string;
 };
 
@@ -827,6 +838,9 @@ export interface IrpOrderCandidateDto {
   lastShiftTo: string;
   nextShiftFrom: string;
   nextShiftTo: string;
+  isDeployed: boolean;
+  deployedUntil: string;
+  isDeployedInSameDepartment: boolean;
   candidateJobId: number;
   weeklyHoursSchedule: number;
   weekOvertime: number;
@@ -850,6 +864,7 @@ export interface IrpCandidatesParams {
   PageSize: number;
   PageNumber: number;
   isAvailable: boolean;
+  includeDeployed?: boolean;
   searchTerm?: string;
 }
 
@@ -903,7 +918,7 @@ export interface AuditLogPayload{
   searchValue:string;
 }
 
-export interface OrderAuditHistory{  
+export interface OrderAuditHistory{
     orderId: number
     orderType: string
     orderStatus: string
@@ -965,7 +980,7 @@ export interface OrderAuditHistory{
     modifiedOn: string
     modifiedBy: string
   }
-  
+
   export interface OrderWorkLocationAuditHistory {
     address: string
     state: string

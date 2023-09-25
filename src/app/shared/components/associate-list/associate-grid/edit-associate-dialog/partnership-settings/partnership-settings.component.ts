@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select } from '@ngxs/store';
 import { delay, Observable, takeUntil } from 'rxjs';
 import {
@@ -17,17 +17,18 @@ import { AssociateListState } from '@shared/components/associate-list/store/asso
 import {
   REGION_OPTION,
 } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 
 @Component({
   selector: 'app-partnership-settings',
   templateUrl: './partnership-settings.component.html',
   styleUrls: ['./partnership-settings.component.scss'],
 })
-export class PartnershipSettingsComponent extends DestroyableDirective implements OnInit {
+export class PartnershipSettingsComponent extends Destroyable implements OnInit {
   @Input() partnershipForm: FormGroup;
+
   @Input() set activeTab(tab: number | string) {
     if (tab === Tabs.JobDistribution || tab === Tabs[Tabs.JobDistribution]) {
       this.partnershipForm.reset();
@@ -35,12 +36,19 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
     }
   }
 
+  @Input() isAgency: boolean;
+
   @Select(AssociateListState.partnershipSettings)
   public partnershipSettings$: Observable<PartnershipSettings>;
+
   @Select(AssociateListState.jobDistributionInitialData)
   public jobDistributionInitialData$: Observable<JobDistributionInitialData>;
+
   public optionFields = OPTION_FIELDS;
   public optionRegions = REGION_OPTION;
+  public partnerStatuses = PartnershipStatus;
+  public minDate: Date;
+
   public classification = Object.values(FeeSettingsClassification)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
@@ -56,12 +64,9 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
 
   private partnershipSettings: PartnershipSettings;
 
-  constructor() {
-    super();
-  }
-
   ngOnInit(): void {
     this.subscribeOnPartnershipSettings();
+    this.observePartnerStatus();
   }
 
   static createForm(): FormGroup {
@@ -79,14 +84,43 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
       loadAgencyCandidateDetails: new FormControl(false),
       applyProhibited: new FormControl(false),
       submissionPercentageOverrideRestriction: new FormControl(),
+      suspentionDate: new FormControl(),
     });
   }
 
   private subscribeOnPartnershipSettings(): void {
-    this.partnershipSettings$.pipe(takeUntil(this.destroy$), delay(300)).subscribe((settings: PartnershipSettings) => {
+    this.partnershipSettings$.pipe(
+      delay(300),
+      takeUntil(this.componentDestroy()),
+    ).subscribe((settings: PartnershipSettings) => {
       this.partnershipSettings = settings;
       this.partnershipForm.reset();
       this.partnershipForm.patchValue({ ...settings });
+
+      if (this.isAgency) {
+        this.partnershipForm.get('status')?.disable();
+        this.partnershipForm.get('suspentionDate')?.disable();
+      } else if (!this.isAgency && settings.status === PartnershipStatus.Suspended) {
+        this.minDate = DateTimeHelper.setInitDateHours(settings.suspentionDate);
+      } else {
+        this.minDate = DateTimeHelper.setInitDateHours(new Date());
+      }
+    });
+  }
+
+  private observePartnerStatus(): void {
+    this.partnershipForm.get('status')?.valueChanges
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((status) => {
+      if (status === PartnershipStatus.Suspended) {
+        this.partnershipForm.get('suspentionDate')?.addValidators(Validators.required);
+      } else {
+        const dateControl = this.partnershipForm.get('suspentionDate');
+        dateControl?.removeValidators(Validators.required);
+        dateControl?.patchValue(null);
+      }
     });
   }
 }

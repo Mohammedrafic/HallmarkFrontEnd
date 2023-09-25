@@ -41,15 +41,26 @@
       <div class="title">
         <h3>Employees</h3>
       </div>
-      <div class="input-container">
-        <div class="input-group switch">
-          <ejs-switch
-            id="switcher"
-            class="switch"
-            (change)="onSwitcher($event)"
-            [checked]="isAvailable"
-          ></ejs-switch>
-          <label class="switch-label" for="switcher">is Available</label>
+      <div class="btn-group">
+        <div class="input-container" *ngIf="showDeployedControl">
+          <div class="input-group switch">
+            <ejs-switch
+              class="switch"
+              (change)="showDeployedEmployee($event)"
+              [checked]="includeDeployed"
+            ></ejs-switch>
+            <label class="switch-label" for="switcher">Include Deployed</label>
+          </div>
+        </div>
+        <div class="input-container">
+          <div class="input-group switch">
+            <ejs-switch
+              class="switch"
+              (change)="onSwitcher($event)"
+              [checked]="isAvailable"
+            ></ejs-switch>
+            <label class="switch-label" for="switcher">is Available</label>
+          </div>
         </div>
       </div>
     </div>
@@ -113,7 +124,14 @@
         <ng-template #agencyColumn>
           <e-column field="agency" textAlign="Left" headerText="Agency" width="200" *ngIf="!isAgency">
             <ng-template #template let-data>
-              {{ data.agencyName }}
+              <div class="agency-text" [ngClass]="{ 'error-text': data.partnershipStatus === partnershipStatus.Suspended }">
+                {{ data.agencyName }}
+                <app-tooltip-container class="tooltip-with-icon"
+                  *ngIf="data.partnershipStatus === partnershipStatus.Suspended"
+                  [message]="getPartnershipMessage(data)" [showToolTip]="true">
+                  <i-feather class="icon small" name="alert-circle"></i-feather>
+                </app-tooltip-container>
+              </div>
             </ng-template>
           </e-column>
         </ng-template>
@@ -197,7 +215,10 @@
         <e-column field="firstName" headerText="Name" textAlign="Left" width="170">
           <ng-template #template let-data>
             <div class="candidate-link" (click)="onViewNavigation(data)">
-              <div class="link-name">{{ data.lastName }}, {{ data.firstName }}</div>
+              <div class="link-name">
+                {{ data.lastName }}, {{ data.firstName }}
+                <span *ngIf="data.isDeployed"><i-feather name="briefcase" class="icon"></i-feather></span>
+              </div>
               <div>
                 <ng-container *ngIf="!data.isOriented">
                   <ejs-tooltip
@@ -333,6 +354,11 @@
   </ng-template>
 
   <ng-template #footerTemplate>
-    <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
+    <app-dialog-next-previous
+      title="Candidate"
+      [options]="dialogNextPreviousOption"
+      (nextEvent)="changeCandidate(true)"
+      (previousEvent)="changeCandidate(false)">
+    </app-dialog-next-previous>
   </ng-template>
 </ejs-dialog>

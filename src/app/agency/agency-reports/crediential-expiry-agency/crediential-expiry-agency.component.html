@@ -72,32 +72,6 @@
                 </div>
             </div>
         </div>
-
-
-
-
-        <div class="form-elemet">
-                <div class="group">
-                  <div class="input-container dropdown">
-                    <label>Order Id/Position ID</label>
-                    <div class="input-group">
-                      <input class="e-input"
-                             type="text"
-                             appValidateWithMessage
-                             maxlength="50"
-                             formControlName="jobId" />
-                    </div>
-                  </div>
-                  <div class="input-container bootstrap">
-                    <label>Candidate Name</label>
-                    <div class="input-group dropdown">
-                      <ejs-autocomplete formControlName="candidateName" [dataSource]="filterColumns.candidateName.dataSource"
-                                        filterType='StartsWith' [fields]='candidateNameFields'
-                                        [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
-                    </div>
-                  </div>
-            </div>
-        </div>
         <div class="form-elemet">
             <div class="group">
               <div class="input-container bootstrap">
@@ -111,10 +85,24 @@
               </div>
             </div>
           </div>
+          <div class="form-elemet">
+            <div class="group">
+              <div class="input-container bootstrap">
+                <label>Order Id/Position ID</label>
+                <div class="input-group">
+                  <input class="e-input"
+                         type="text"
+                         appValidateWithMessage
+                         maxlength="50"
+                         formControlName="jobId" />
+                </div>
+              </div>
+            </div>
+          </div>    
         <div class="form-elemet">
             <div class="group">
               <div class="input-container calendar">
-                <label>Order Start Date<span class="required">*</span></label>
+                <label>Actual Start Date<span class="required">*</span></label>
                 <div class="input-group datepicker">
                   <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                                   appValidateWithMessage formControlName="startDate">
@@ -122,7 +110,7 @@
                 </div>
               </div>
               <div class="input-container calendar">
-                <label>Order End Date<span class="required">*</span></label>
+                <label>Actual End Date<span class="required">*</span></label>
                 <div class="input-group datepicker">
                   <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                                   appValidateWithMessage formControlName="endDate"
@@ -132,6 +120,18 @@
               </div>
             </div>
           </div>
+          <div class="form-elemet">
+            <div class="group">           
+              <div class="input-container bootstrap">
+                <label>Candidate Name</label>
+                <div class="input-group dropdown">
+                  <ejs-autocomplete formControlName="candidateName" [dataSource]="filterColumns.candidateName.dataSource"
+                                    filterType='StartsWith' [fields]='candidateNameFields'
+                                    [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
+                </div>
+              </div>
+        </div>
+    </div>
           <div class="form-elemet">
             <div class="group">
               <div class="input-container calendar">
@@ -143,6 +143,6 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div>         
     </form>
 </app-filter-dialog>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -7,8 +7,11 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { filter, take } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { AddOrderCredentialFormComponent } from './components/add-order-credential-form/add-order-credential-form.component';
-import { EditOrderCredentialFormComponent } from './components/edit-order-credential-form/edit-order-credential-form.component';
+import {
+  EditOrderCredentialFormComponent,
+} from './components/edit-order-credential-form/edit-order-credential-form.component';
 import { IOrderCredential, IOrderCredentialItem } from './types';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-order-credentials',
@@ -30,8 +33,16 @@ export class OrderCredentialsComponent {
   public CredentialForm: FormGroup;
   public formSubmitted = false;
   public showForm = false;
+  public targetElement: HTMLElement | null;
 
-  constructor(private store: Store, private fb: FormBuilder, private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private fb: FormBuilder,
+    private confirmService: ConfirmService,
+    @Inject(DOCUMENT) private document: Document
+  ) {
+    this.targetElement = this.document.body;
+
     this.CredentialForm = this.fb.group({
       credentialId: new FormControl(0),
       credentialType: new FormControl('', [Validators.required]),
@@ -111,7 +122,7 @@ export class OrderCredentialsComponent {
     } else {
       this.addNewCred();
     }
-    
+
     this.resetToDefault();
     this.formSubmitted = false;
     this.showForm = false;
@@ -133,7 +144,7 @@ export class OrderCredentialsComponent {
 
   private editExistedCred(data?: IOrderCredentialItem): void {
     const cred = data || (this.CredentialForm.getRawValue() as IOrderCredentialItem);
-    
+
     this.credentialChanged.emit(Object.assign({}, { ...cred }));
     this.isEditMode = false;
   }

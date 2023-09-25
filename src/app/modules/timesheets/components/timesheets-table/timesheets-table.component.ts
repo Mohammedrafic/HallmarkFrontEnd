@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnI
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 
-import { BehaviorSubject, distinctUntilChanged, Observable, takeUntil, throttleTime } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, filter, Observable, takeUntil, throttleTime } from 'rxjs';
 
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
@@ -78,11 +78,19 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
   }
 
   public onRowsDropDownChanged(pageSize: number): void {
+    if (this.pageSize === pageSize) {
+      return;
+    }
+
     this.pageSize = pageSize;
     this.changePerPage.emit(pageSize);
   }
 
   public onGoToClick(pageNumber: number): void {
+    if (this.currentPageSubj.get() === pageNumber) {
+      return;
+    }
+
     this.currentPageSubj.set(pageNumber);
   }
 
@@ -111,7 +119,12 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
 
   private startCurrentPageWatching(): void {
     this.currentPage$
-      .pipe(distinctUntilChanged(), throttleTime(100), takeUntil(this.componentDestroy()))
+      .pipe(
+        distinctUntilChanged(),
+        filter((pageNumber) => this.currentPageSubj.get() !== pageNumber),
+        throttleTime(100),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe((pageNumber) => {
         this.changePage.emit(pageNumber);
       });

@@ -235,4 +235,8 @@ export enum UserPermissions {
   //Candidate Assignment
   CandidateAssigment=850,
   CanViewCandidateAssigment=851,
+
+  //General Note
+  ViewNotes=8121,
+  ManageNotes=8122
 }

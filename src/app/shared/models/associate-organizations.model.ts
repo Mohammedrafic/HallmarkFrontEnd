@@ -24,6 +24,8 @@ export type AssociateOrganizationsAgency = {
   businessUnitName: string;
   agencyStatus: number;
   tierId: number;
+  suspentionDate: string;
+  suspensionMessage?: string;
 };
 
 export type AssociateOrganizationsAgencyPage = PageOfCollections<AssociateOrganizationsAgency>;
@@ -103,6 +105,7 @@ export type PartnershipSettings = {
   loadAgencyCandidateDetails: boolean;
   applyProhibited: boolean;
   submissionPercentageOverrideRestriction: SubmissionPercentageOverrideRestriction;
+  suspentionDate: string;
 };
 
 export interface DepartmentsTierDTO {

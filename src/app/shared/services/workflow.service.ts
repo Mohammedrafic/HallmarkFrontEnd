@@ -3,7 +3,13 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { WorkflowFilters, WorkflowFlags, WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
+import {
+  EditedWorkflowDto,
+  WorkflowFilters,
+  WorkflowFlags,
+  WorkflowWithDetails,
+  WorkflowWithDetailsPut,
+} from '@shared/models/workflow.model';
 import {
   RoleListsByPermission,
   UserListsByPermission,
@@ -20,10 +26,14 @@ export class WorkflowService {
     return this.http.get<WorkflowWithDetails[]>(`/api/Workflows/byBusinessUnit`, { params: { includeInIRP, includeInVMS } });
   }
 
+  public saveEditedWorkflow(workflow: EditedWorkflowDto): Observable<WorkflowWithDetails | void> {
+    return this.http.post<WorkflowWithDetails | void>(`/api/workflows/edit`, workflow);
+  }
+
   public saveWorkflow(workflow: WorkflowWithDetails): Observable<WorkflowWithDetails | void> {
     return workflow.id
       ? this.http.put<WorkflowWithDetails | void>(`/api/Workflows`, workflow)
-      : this.http.post<WorkflowWithDetails | void>(`/api/Workflows`, workflow);
+      : this.http.post<WorkflowWithDetails | void>(`/api/workflows/create`, workflow);
   }
 
   public updateWorkflow(workflow: WorkflowWithDetailsPut): Observable<WorkflowWithDetails | void> {

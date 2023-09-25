@@ -321,6 +321,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.IsSettingKeyAutomatedDistributedToVMS){
       this.switchedValueForm.controls["value"].setValue(48)
       this.switchedValueForm.controls['isEnabled'].setValue(true)
+      this.disableSettingsValue(undefined, this.switchedValueForm.get('isEnabled')?.value);
     }
     else {
       this.switchedValueForm.get('value')?.clearValidators();
@@ -988,6 +989,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.organizationId$.pipe(
       distinctUntilChanged(),
       tap((id: number) => {
+        console.log('id', id)
         this.organizationId = id || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
         this.clearFilters();
         this.store.dispatch(new GetOrganizationSettingsFilterOptions());
@@ -1081,6 +1083,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private disableDepForInvoiceGeneration(): void {
     if (this.organizationSettingKey === OrganizationSettingKeys.InvoiceAutoGeneration
       || this.organizationSettingKey === OrganizationSettingKeys.PayHigherBillRates
+      || this.organizationSettingKey === OrganizationSettingKeys.OvertimeCalculation
       || this.organizationSettingKey === OrganizationSettingKeys.OTHours
       || this.organizationSettingKey === OrganizationSettingKeys.AutomatedDistributionToVMS) {
       this.departmentFormGroup.get('departmentId')?.disable();
@@ -1558,7 +1561,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   disableSettingsValue(event?: any, obj?: any) {
-    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
+    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingKeyAutomatedDistributedToVMS ) {
       if (event?.checked || obj) {
         this.switchedValueForm.get("value")?.enable();
       } else {

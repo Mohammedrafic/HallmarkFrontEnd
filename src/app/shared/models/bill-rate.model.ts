@@ -27,23 +27,34 @@ export enum BillRateUnit
   Multiplier = 3
 }
 
-export enum BillRateCalculationType
-{
-    Regular = 1,
-    RegularLocal,
-    GuaranteedHours,
-    Callback,
-    Charge,
-    Holiday,
-    Oncall,
-    Orientation = 9,
-    Preceptor,
-    Mileage,
-    DailyOT,
-    DailyPremiumOT,
-    WeeklyOT,
-    SevenDayOT,
-    SevenDayPremiumOT,
+export enum BillRateCalculationType {
+  Regular = 1,
+  RegularLocal = 2,
+  GuaranteedHours = 3,
+  Callback = 4,
+  Charge = 5,
+  Holiday = 6,
+  Oncall = 7,
+  Orientation = 9,
+  Preceptor = 10,
+  Mileage = 11,
+  DailyOT = 12,
+  DailyPremiumOT = 13,
+  WeeklyOT = 14,
+  SevenDayOT = 15,
+  SevenDayPremiumOT = 16,
+  HolidayExt = 17,
+  DailyOtExt = 18,
+  DailyPremiumOTExt = 19,
+  OTExt = 20,
+  SeventhDayOTExt = 21,
+  SeventhDayPremiumOTExt = 22,
+  CallbackMinimum = 23,
+  Meeting = 24,
+  Education = 25,
+  MissedMeal = 26,
+  FacilityCalledOff = 27,
+  ResourceCalledOff = 28,
 }
 
 export type BillRateOption = {

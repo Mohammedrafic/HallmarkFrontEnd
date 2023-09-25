@@ -172,10 +172,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public get generalInformationForm(): Order {
     return {
       ...this.orderDetailsFormComponent.generalInformationForm.getRawValue(),
-      title:
-        this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value == IrpOrderType.LongTermAssignment
-          ? IrpOrderType[IrpOrderType.LongTermAssignment]
-          : IrpOrderType[IrpOrderType.PerDiem],
+      title:'',
     };
   }
   private saveAsTemplate(): void {
@@ -238,7 +235,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     let location = this.organizationStructureService.getTemplateLocationsById(createdOrder.regionId,createdOrder.locationId);
     let department = this.organizationStructureService.getTemplateDepartment(createdOrder.locationId,createdOrder.departmentId);
     createdOrder.isTemplate = true;
-    createdOrder.templateTitle = location.locationname + '-' + department.departmentname;
+    createdOrder.templateTitle = event.templateTitle;
     this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(),"",undefined,undefined,true));
     this.closeSaveTemplateDialog();
   }
@@ -645,10 +642,11 @@ private getSettings(order:CreateOrderDto) {
     
     this.settings = SettingsHelper.mapSettings(settings);
    
-   this. IsSettingsEnabledByOrganisation=this.settings[SettingsKeys.DisableNumberOfOpenPositions]?.value === true;
+    this. IsSettingsEnabledByOrganisation=this.settings[SettingsKeys.DisableNumberOfOpenPositions]?.children?.find(f => f.isIRPConfigurationValue == true
+      && f.departmentId === null && f.regionId === null && f.locationId === null)?.value === 'true' ;
    
     this.IsSettingEnabledByRegLocDept = this.settings[SettingsKeys.DisableNumberOfOpenPositions]?.children?.find(f => f.isIRPConfigurationValue == true
-    && f.departmentId === order.departmentId && f.regionId === order.regionId && f.locationId === order.locationId)?.value;
+    && f.departmentId === order.departmentId && f.regionId === order.regionId && f.locationId === order.locationId)?.value === 'true';
   
    
   });

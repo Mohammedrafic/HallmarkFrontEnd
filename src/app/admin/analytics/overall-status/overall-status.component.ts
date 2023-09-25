@@ -5,7 +5,7 @@ import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department, Organisation } from '@shared/models/visibility-settings.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -14,7 +14,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { ClearLogiReportState, GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { ClearLogiReportState, GetCommonReportFilterOptions, GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -28,6 +28,7 @@ import { User } from '@shared/models/user.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
+import { CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
 @Component({
   selector: 'app-overall-status',
   templateUrl: './overall-status.component.html',
@@ -67,6 +68,11 @@ export class OverallStatusComponent implements OnInit, OnDestroy {
   isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedDepartments: Department[];
+
+  @Select(LogiReportState.commonReportFilterData)
+  public OverallstatusFilterData$: Observable<CommonReportFilterOptions>;
+
+
 
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
@@ -108,6 +114,7 @@ export class OverallStatusComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+  public filterOptionsData: CommonReportFilterOptions;
 
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
@@ -218,8 +225,22 @@ export class OverallStatusComponent implements OnInit, OnDestroy {
           else {
             this.isResetFilter = true;
           }
-
-
+          //let businessIdData = [];
+          //businessIdData.push(data);
+          //let filter: CommonReportFilter = {
+          //  businessUnitIds: businessIdData
+          //};
+          //this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          //this.OverallstatusFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+          //  if (data != null) {
+          //    this.isAlive = true;
+          //    this.filterOptionsData = data;            
+          //    //this.overallStatusReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue(this.defaultTimesheetStatuses);
+          //    this.isDefaultLoad = true;
+          //    this.SearchReport()
+          //  }
+          //});
+         
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.isDefaultLoad = true;
@@ -286,8 +307,18 @@ export class OverallStatusComponent implements OnInit, OnDestroy {
       }
     }
     let { regionIds, locationIds, departmentIds, startDate, endDate } = this.overallStatusReportForm.getRawValue();
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
+
+    if (!this.overallStatusReportForm.dirty) {
+      this.message = "Default filter selected with all regions, locations";
+    }
+    else {
+      this.isResetFilter = false;
+      this.message = ""
+    }
+
+
+    ///locationIds = locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
+    //departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
@@ -345,6 +376,16 @@ export class OverallStatusComponent implements OnInit, OnDestroy {
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
     }
   }
+  private SetReportData() {
+    const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
+    if (logiReportData != null && logiReportData.length == 0) {
+      this.store.dispatch(new GetLogiReportData());
+    }
+    else {
+      this.logiReportComponent?.SetReportData(logiReportData);
+    }
+  }
+
   public showFilters(): void {
     if (this.isResetFilter) {
       this.onFilterControlValueChangedHandler();

@@ -5,3 +5,8 @@ export interface CredentialTypeSource {
   name: string;
   id: number;
 }
+
+export interface ConfirmOverrideComments {
+  updateMappingCredentials: boolean;
+  updateOrderCredentials: boolean;
+}

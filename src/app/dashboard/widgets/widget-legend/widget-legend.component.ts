@@ -19,6 +19,7 @@ export class WidgetLegendComponent {
   @Input() public averageFlag: boolean =false;
   @Input() public initialExtended: boolean =false;
 
+  @Input() public isBillRateTrend: boolean =false;
   @Output() onClickLegend: EventEmitter<string> = new EventEmitter();
   @Output() changeCheckbox: EventEmitter<string> = new EventEmitter();
 

@@ -1042,7 +1042,19 @@ export class OrganizationManagementState {
         dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
         return payload;
       }),
-      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, 'Skill already exists')))
+      catchError((error) => {
+        const errorObj = error.error;
+        if (errorObj.errors?.IncompleteOpenOrdersExist && errorObj.errors?.InProgressOrdersExist) {
+          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has Open/ Incomplete Orders please re-assign or close them before inactivating the Skill. Skill has Orders In Progress past the inactivation date, please review them before inactivating the Skill'));
+        }
+        if (errorObj.errors?.IncompleteOpenOrdersExist) {
+          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has Open/Incomplete Orders, please re-assign or close them before inactivating the Skill'));
+        }
+        if (errorObj.errors?.InProgressOrdersExist) {
+          return dispatch(new SaveLocationConfirm());
+        }
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
+      })
     );
   }
 

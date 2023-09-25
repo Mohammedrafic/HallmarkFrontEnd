@@ -9,7 +9,7 @@
   class="card-wrapper"
 >
     <ng-container *ngIf="bigCardConfig; else multipleEventsView">
-      <div class="big-card">
+      <div class="big-card" [style.color]="bigCardConfig.color">
         <div class="time">
           <span class="time__text">{{ bigCardConfig.startDate | date: 'HH:mm': 'UTC' }}</span>
           <span class="time__text"> - </span>

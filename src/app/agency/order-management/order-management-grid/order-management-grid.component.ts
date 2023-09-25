@@ -80,7 +80,6 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { GetIrpOrderCandidates } from '@client/store/order-managment-content.actions';
-import { BreakpointObserverService } from '@core/services';
 import { GlobalWindow } from '@core/tokens';
 import { FilterPageName } from '@core/enums';
 import { PreservedFiltersByPage } from '@core/interface';
@@ -96,6 +95,7 @@ import { OrganizationStructure } from '@shared/models/organization.model';
 import { GetAgencyFilterFormConfig } from './constants';
 import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
   '@shared/components/order-reorders-container/store/re-order.actions';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -112,7 +112,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() public orderStatus: string[];
   @Input() public candidateStatuses: string[];
   @Input() public ltaOrder: boolean | null = false;
-  
+
   @Output() selectTab = new EventEmitter<number>();
   @Input() public Organizations: number[];
 
@@ -170,8 +170,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public selectedRowRef: any;
   public openDetailsTab = false;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
-  public isMobile = false;
-  public isSmallDesktop = false;
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
@@ -191,9 +189,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private datePipe: DatePipe,
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
-    private breakpointService: BreakpointObserverService,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
-    private router: Router
+    private router: Router,
+    private orderManagementService: OrderManagementService,
   ) {
     super();
     this.listenRedirectFromExtension();
@@ -201,7 +199,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   ngOnInit(): void {
     this.getAlertOrderId();
-    this.getDeviceScreen();
     this.onOrderPreviewChange();
     this.onAgencyChange();
     this.onChildDialogChange();
@@ -222,7 +219,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
-      super.setHeightForMobileGrid(data?.items.length);
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
       if(this.ordersPage?.items){
         this.alertOrderId= this.ordersPage.items.find((i) => i.orderId === this.alertOrderId)
@@ -448,7 +444,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     } else {
       this.setDefaultStatuses(statuses, preservedFiltes.dispatch);
     }
-    
+
   }
 
   private prepopulateFilterFormStructure(): void {
@@ -650,20 +646,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const options = this.getDialogNextPreviousOption(rowData);
       this.store.dispatch(new GetOrderById(rowData.orderId, rowData.organizationId, options));
       this.openPreview.next(true);
-      const Action = rowData.irpOrderMetadata ? GetIrpOrderCandidates : GetAgencyOrderCandidatesList;
-
-      this.store.dispatch(
-        new Action(
-          rowData.orderId,
-          rowData.organizationId,
-          GRID_CONFIG.initialPage,
-          GRID_CONFIG.initialRowsPerPage,
-          rowData.irpOrderMetadata
-            ? this.orderManagementAgencyService.getIsAvailable()
-            : this.orderManagementAgencyService.excludeDeployed,
-          ""
-        )
-      );
+      this.getCandidatesList(rowData);
 
       this.orderPositionSelected$.next(false);
       this.selectedIndex = Number(event.rowIndex);
@@ -790,6 +773,29 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       includeReOrders: true,
     };
     this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  private getCandidatesList(rowData: AgencyOrderManagement): void {
+    if (rowData.irpOrderMetadata) {
+      this.store.dispatch(new GetIrpOrderCandidates(
+        rowData.orderId,
+        rowData.organizationId,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
+        this.orderManagementAgencyService.getIsAvailable(),
+        this.orderManagementService.getEmployeeToggleState()?.includeDeployed,
+        ""
+      ));
+    } else {
+      this.store.dispatch(new GetAgencyOrderCandidatesList(
+        rowData.orderId,
+        rowData.organizationId,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
+        this.orderManagementAgencyService.excludeDeployed,
+        ""
+      ));
+    }
   }
 
   private patchFilterForm(prepopulate = false): void {
@@ -1055,16 +1061,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.pageSize = perPage;
     this.pageSubject.next(1);
     this.isSubrowDisplay = false;
-  }
-
-  private getDeviceScreen(): void {
-    this.breakpointService
-      .getBreakpointMediaRanges()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((screen) => {
-        this.isMobile = screen.isMobile;
-        this.isSmallDesktop = screen.isDesktopSmall;
-      });
   }
 
   private getLocationState(): void {

@@ -1,4 +1,4 @@
-@import '../../styles/variables/colors';
+@import 'colors';
 
 .toolbar {
   display: flex;
@@ -51,6 +51,7 @@ app-configuration-grid {
     }
 
     .input-group.switch {
+      padding-top: 10px;
       display: flex;
       align-items: center;
 

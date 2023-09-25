@@ -409,7 +409,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
         dateRange : this.dateRange, 
         scheduleFilters : this.chipsData, 
         activePeriod : this.activeTimePeriod, 
-        startDate : this.scheduleFilters.startDate
+        startDate : this.scheduleFilters.startDate,
+        endDate : this.scheduleFilters.endDate
       };
       this.globalWindow.localStorage.setItem('Schedule_Export',JSON.stringify(state));
       if(window.location.pathname.includes("ui")){

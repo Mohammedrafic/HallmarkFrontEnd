@@ -15,7 +15,7 @@ export class ScrollToTopComponent {
 
   private window: Window;
   constructor(@Inject(DOCUMENT) private readonly document: Document) {
-    this.window = this.document.defaultView!;
+    this.window = this.document.defaultView as Window;
   }
   @HostListener('window:scroll', [])
   onWindowScroll(): void {

@@ -47,6 +47,12 @@
                                   [chartData]="widgetsData?.[widgetTypeEnum.ACTIVE_POSITIONS]"
                                   [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
                                   [description]="widgetDescriptionEnum.ACTIVE_POSITIONS"></app-accumulation-chart>
+
+          <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS"
+                                  [chartData]="widgetsData?.[widgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]"
+                                  [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
+                                  [description]="widgetDescriptionEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS" [averageFlag]="true">               
+         </app-accumulation-chart>
           <app-maps-chart *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
                           [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"
                           [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
@@ -126,6 +132,12 @@
                                 [chartData]="widgetsData?.[widgetTypeEnum.ORDERS_PENDING_IN_CUSTOM]"
                                 [widgetData]="widgetsData"
                                 [isDarkTheme]="isDarkTheme" ></app-orders-pending-custom-status>
+          <app-bill-rate-widget *ngSwitchCase="widgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY" [slideBar]="isSideBarDocked$ | async"
+                          [chartData]="widgetsData?.[widgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]"
+                          [isLoading]="isLoading"
+                          [timeSelection]="timeSelection" [isDarkTheme]="isDarkTheme"
+                          [description]="widgetDescriptionEnum.BILL_RATE_BY_SKILL_CATEGORY"></app-bill-rate-widget>
+
         </ng-template>
       </e-panel>
     </e-panels>

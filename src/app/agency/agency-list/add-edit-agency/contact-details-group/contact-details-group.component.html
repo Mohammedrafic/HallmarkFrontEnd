@@ -1,5 +1,5 @@
 <div [formGroup]="formGroup">
-  <div class="contact-item">
+  <div class="contact-items">
     <div class="input-container bootstrap">
       <label>Title</label>
       <div class="input-group">
@@ -29,7 +29,7 @@
       </div>
     </div>
     <div class="remove-button-container" *ngIf="isRemovable">
-      <button *ngIf="true" ejs-button cssClass="e-outline" class="icon-button" (click)="removeContact()">
+      <button appHideBeforeSyncfusionLoad ejs-button cssClass="e-outline" class="icon-button" (click)="removeContact()">
         <i-feather name="trash2" class="icon"></i-feather>
       </button>
     </div>

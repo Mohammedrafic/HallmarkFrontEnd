@@ -45,7 +45,7 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, Organ
   selector: 'app-crediential-expiry-agency',
   templateUrl: './crediential-expiry-agency.component.html',
   styleUrls: ['./crediential-expiry-agency.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CredientialExpiryAgencyComponent implements OnInit {
   public paramsData: any = {
@@ -72,7 +72,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public defaultCandidateStatuses: (number | undefined)[] = [ 4, 5,3];
+  public defaultCandidateStatuses: (number | undefined)[] = [ 4, 5];
   
   private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5,10,13,12];
 
@@ -161,6 +161,8 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   public masterLocationsList: OrganizationLocation[] = [];
   public masterDepartmentsList: OrganizationDepartment[] = [];
   public associatedOrganizations: DataSourceItem[]=[];
+  public canidateStatusControl: AbstractControl;
+  public candidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   selectedCandidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   candidateStatusesData:CandidateStatusAndReasonFilterOptionsDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
@@ -218,6 +220,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
         this.onFilterControlValueChangedHandler();
         this.onFilterRegionChangedHandler();
         this.onFilterLocationChangedHandler();
+        this.onFilterCandidateStatusChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.BusinessIds)?.enable() : this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.BusinessIds)?.disable();
       
       });
@@ -225,11 +228,15 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   }
 
   private initForm(): void {
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 7);
+    let endate= new Date(Date.now())
+    endate.setDate(endate.getDate()+7);
     this.agencyCredientialExpiryReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        startDate: new FormControl(new Date(Date.now()), [Validators.required]),
-        endDate: new FormControl( new Date(Date.now()),[Validators.required]),
+        startDate: new FormControl(startDate, [Validators.required]),
+        endDate: new FormControl( endate,[Validators.required]),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
@@ -412,7 +419,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
       "AgencyIdCE":this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
       this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
       "CandidateNameCE": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
-      "CandidateStatusCE": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
+      "CandidateStatusCE":  candidateStatuses.length > 0 ? this.candidateStatuses?.map(x => x.statusText).join(",") : this.filterColumns.candidateStatuses.dataSource.map((x: { statusText: any; }) => x.statusText).join(","),
       "DepartmentIdsCE": departmentIds.length == 0 ? "null" : departmentIds,
       "LocationIdsCE": locationIds.length == 0 ? "null" : locationIds,
       "OrderEndDateCE": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
@@ -481,7 +488,16 @@ export class CredientialExpiryAgencyComponent implements OnInit {
       }
     }
   }
-
+ 
+  public onFilterCandidateStatusChangedHandler(): void {
+    debugger;
+    this.canidateStatusControl = this.agencyCredientialExpiryReportForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
+    this.canidateStatusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.canidateStatusControl.value.length > 0) {
+        this.candidateStatuses = this.filterColumns.candidateStatuses.dataSource?.filter((object: { status: any; }) => data?.includes(object.status));
+      }
+    });
+  }
   private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
     if (logiReportData != null && logiReportData.length == 0) {
@@ -503,14 +519,16 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   }
 
   public onFilterClearAll(): void {
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
     this.isClearAll = true;
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.RegionIds)?.setValue([]);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.LocationIds)?.setValue([]);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.CandidateName)?.setValue(null);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses.filter(f=>f !==90));
-    this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.StartDate)?.setValue([]);
-    this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.EndDate)?.setValue([]);
+    this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.JobId)?.setValue(null);
     this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.opcredFlag)?.setValue(false);
     this.filteredItems = [];

@@ -629,6 +629,31 @@ body.dark {
         }
       }
     }
+
+    .e-gridchkbox,
+    .e-headercell {
+      .e-checkbox-wrapper {
+        vertical-align: middle;
+
+        &:hover .e-frame {
+          border-color: $primary-active-blue-10;
+        }
+
+        .e-frame {
+          border-color: $secondary-dark-blue-40;
+
+          &.e-check {
+            background-color: $primary-active-blue-10 !important;
+            color: $white !important;
+            border-color: $white;
+          }
+
+          &.e-check::before {
+            line-height: 13px;
+          }
+        }
+      }
+    }
   }
 
   thead tr,

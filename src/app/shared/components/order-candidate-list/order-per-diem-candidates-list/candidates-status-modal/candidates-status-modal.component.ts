@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { merge, Observable, Subject, take, takeUntil } from 'rxjs';
@@ -35,12 +35,13 @@ import { Comment } from '@shared/models/comment.model';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired, ONBOARD_CANDIDATE, onBoardCandidateMessage, SEND_EMAIL } from '@shared/constants';
+import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired, ONBOARD_CANDIDATE, onBoardCandidateMessage, SEND_EMAIL, REQUIRED_PERMISSIONS, AgencyPartnershipSuspended } from '@shared/constants';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { OnboardCandidateMessageDialogComponent } from '../../order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -73,6 +74,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   @Input() isLocked: boolean | undefined = false;
   @Input() actionsAllowed: boolean;
   @Input() isCandidatePayRateVisible: boolean;
+  @Input() dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
 
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob | null) {
     this.orderCandidateJob = orderCandidateJob;
@@ -82,6 +84,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       this.form?.reset();
     }
   }
+
+  @Output() public changeCandidate = new EventEmitter<boolean>();
 
   get showRejectButton(): boolean {
     return (
@@ -136,12 +140,20 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     return this.showAcceptButton && this.isAgency && this.isCandidatePayRateVisible;
   }
 
+  get applyBtnTooltipText(): string {
+    if (this.candidate) {
+      return this.candidate.partnershipStatus === PartnershipStatus.Suspended ? 
+      'Agency Partnership is suspended' : REQUIRED_PERMISSIONS;
+    }
+
+    return REQUIRED_PERMISSIONS;
+  }
+
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
 
   public statusesFormControl = new FormControl();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
-  public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public form: FormGroup;
   public openRejectDialog = new Subject<boolean>();
   public rejectReasons: RejectReason[] = [];
@@ -158,6 +170,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public candidatePhone1RequiredValue : string = '';
   public candidateAddressRequiredValue : string = '';
   public saveStatus:number =0;
+  public partnershipStatus = PartnershipStatus;
+  public agencyStatusMessage = AgencyPartnershipSuspended;
+  
   get templateEmailTitle(): string {
     return "Onboarding Email";
   }
@@ -200,6 +215,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
 
   public ngOnChanges(): void {
     this.adjustCandidatePayRateControl();
+  }
+
+  public emitChangeCandidate(isNext: boolean): void {
+    this.changeCandidate.emit(isNext);
   }
 
   public closeDialog(): void {

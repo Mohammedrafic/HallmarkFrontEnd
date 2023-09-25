@@ -30,7 +30,7 @@
               *ngIf="showAddExtension"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
-              [disabled]="disableAddExtension"
+              [disabled]="disableAddExtension || isAgencySuspended"
               text="Add Extension"
             ></app-button>
             <button
@@ -59,6 +59,10 @@
               <i-feather name="x" class="icon"></i-feather>
             </button>
           </div>
+        </div>
+        <div class="candidate-message" *ngIf="showAddExtension && !disableAddExtension && isAgencySuspended">
+          <i-feather name="info" class="icon"></i-feather>
+          {{ getPartnershipMessage }}
         </div>
       </section>
       <div class="order-tabs">

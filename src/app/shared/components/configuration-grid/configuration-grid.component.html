@@ -9,7 +9,7 @@
     [allowSorting]="allowSorting" 
     [allowResizing]="allowResizing"
     (dataBound)="gridDataBound(grid)" 
-    (actionBegin)="actionBegin($event, grid)" 
+    (actionBegin)="actionBegin($event, grid)"
     class="grid-component">
     <ng-template #detailTemplate let-data>
       <table class="detailtable" width="100%">
