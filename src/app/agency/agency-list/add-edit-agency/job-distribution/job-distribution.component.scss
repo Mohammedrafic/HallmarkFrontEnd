@@ -1,3 +1,5 @@
+@import 'adaptive-response';
+
 .flex-wrapper {
   display: flex;
   justify-content: space-between;
@@ -5,6 +7,14 @@
 
   .flex-50 {
     width: 50%;
+  }
+  
+  @media #{$max-mobile} {
+    flex-direction: column;
+
+    .flex-50 {
+      width: 100%;
+    }
   }
 
   .dropdown-container {

@@ -2,7 +2,14 @@
   <div class="e-card-header">
     <div class="e-card-header-caption">
       <div class="e-card-title">{{ uploaderTitle }}</div>
-      <div class="upload-btn" [class.disable]="disabled" (click)="browse()">
+      <div
+        class="upload-btn"
+        [ngClass]="{
+          hidden: logoSrc,
+          disable: disabled
+        }"
+        (click)="browse()"
+      >
         <i-feather name="upload" class="icon"></i-feather>
         <div class="add-contact-link" >Upload</div>
       </div>
