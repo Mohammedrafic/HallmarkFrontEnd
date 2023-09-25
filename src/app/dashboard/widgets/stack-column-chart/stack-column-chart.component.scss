@@ -35,3 +35,79 @@
       margin: 0px 5px;
     }
   }
+
+  .widget-legend {
+    &__item,
+    &__item-content {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+  
+    &__score {
+      font-size: 14px;
+      line-height: 24px;
+      width: 100%;
+      text-align: center
+    }
+    &__head {
+      font-weight: 700;
+      width: 100%;
+      text-align: center
+    }
+  
+    &__row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+  
+    &__row-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 5px;
+      margin: 5px 0 5px 8px;
+  
+      &:hover {
+        background-color: $primary-active-blue-70;
+        border-radius: 4px;
+      }
+    }
+  
+ 
+    &__initialExtended-legend-text {
+      font-size: 13px;
+      font-weight: 800;
+      width: 75%;
+      text-align: center;
+      height: 20px;
+      text-transform: uppercase;
+      border-color: transparent;
+      color: $white;
+      align-items: center;
+      border: 0 solid;
+      border-radius: 14px;
+      box-shadow: none;
+      box-sizing: border-box;     
+      line-height: 20px;
+    }  
+  }
+  
+  .e-custom {
+    &.e-checkbox-wrapper {
+      .e-frame {
+        height: 16px;
+        width: 16px;
+      }
+  
+      .e-check {
+        font-size: 10px;
+        line-height: 8px;
+      }
+    }
+  }
+
+  .w-30{
+    width: 30%;
+  }

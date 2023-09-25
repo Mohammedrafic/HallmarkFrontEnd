@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset, AveragedayActivecandidateInfo } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset, AveragedayActivecandidateInfo, ActivePositionsInitiaExtendedDetailsInfo, OrderInitiaExtendeDto } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -241,17 +241,18 @@ export class DashboardService {
       }
 
       private getActivePositionInitialExtendedWidgetData(filter: DashboartFilterDto): Observable<any> {
-        return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter }).pipe(
-          map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
+        return this.httpClient.post<OrderInitiaExtendeDto>(`${this.baseUrl}/ActivePositionsInitiaExtended`, { granulateInProgress: true, ...filter }).pipe(
+          map(({ activePositionsInitiaExtendedDetails }: OrderInitiaExtendeDto) => {
             return {
               id: WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED,
                title: 'Active Positions - Count of Initial & Extended positions',
                chartData: lodashMapPlain(
-                orderStatusesAvgDetails,
-                ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
-                  label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
-                  value: average,
-                  average: count,
+                activePositionsInitiaExtendedDetails,
+                ({ initialPositions, statusName,extendedPositions,totalCount }: ActivePositionsInitiaExtendedDetailsInfo, index: number) => ({
+                  label: statusName,
+                  value: extendedPositions,
+                  average: initialPositions,
+                  totalCount: totalCount,
                   color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
                 })
                 ),

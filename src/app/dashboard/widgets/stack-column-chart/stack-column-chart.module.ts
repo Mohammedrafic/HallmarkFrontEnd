@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { StackColumnChartComponent } from './stack-column-chart.component';
 import { ChartModule } from '@syncfusion/ej2-angular-charts';
 import { WidgetWrapperModule } from '../widget-wrapper/widget-wrapper.module';
-import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { WidgetLegendModule } from '../widget-legend/widget-legend.module';
 import { TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
@@ -18,7 +18,7 @@ import { BrowserModule } from '@angular/platform-browser';
   exports: [StackColumnChartComponent],
   imports: [
     CommonModule,
-    ChartAllModule, RangeNavigatorAllModule,  ButtonModule, AccumulationChartAllModule,
+    ChartAllModule, RangeNavigatorAllModule,CheckBoxModule,  ButtonModule, AccumulationChartAllModule,
     WidgetWrapperModule,
     ButtonModule,
     WidgetLegendModule,

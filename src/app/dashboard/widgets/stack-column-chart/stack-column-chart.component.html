@@ -1,7 +1,7 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
   <ng-template #header>
     <div class="app-active-positions-initial-extended__title">
-      <h3 class="widget-header__title">{{ chartData?.title ?? '' }}</h3>
+      <h3 class="widget-header__title" title="{{chartData?.title}}">{{ chartData?.title ?? '' }}</h3>
     </div>
     <div class="app-active-positions-initial-extended__tooltip" *ngIf="description.length>0">
       <ejs-tooltip [content]="description" position='TopCenter'>
@@ -38,14 +38,30 @@
   </ng-template>
 
   <ng-template #legend>
-    <app-widget-legend
-      [isPositionTrend]="false"
-      [legendData]="legendData"
-      [legendPosition]="legendPosition"
-      [averageFlag]="averageFlag"
-      [initialExtended] = "true"
-      (changeCheckbox)="onClickLegend($event)"
-      (onClickLegend)="redirectToSourceContent($event )"
-    ></app-widget-legend>
+    <div class="widget-legend">
+      <div class="widget-legend__item-content legent-sticky-header">
+        <div class="widget-legend__row-container">
+          <div class="widget-legend__row">
+            <div class="widget-legend__head">Status</div>
+            <div class="widget-legend__head">Initial Positions</div>
+            <div class="widget-legend__head">Extended Positions</div>
+            <div class="widget-legend__head w-30">Total</div>
+          </div>
+        </div>
+      </div>
+      <div *ngFor="let legend of legendData; trackBy: trackByHandler">
+        <div class="widget-legend__item-content">
+          <ejs-checkbox [checked]="true" [cssClass]="'e-custom'"  (change)="onClickLegend(legend.label)"></ejs-checkbox>
+          <div class="widget-legend__row-container"  (click)="redirectToSourceContent(legend.label)" (mousedown)="defineMousePosition($event)">
+            <div class="widget-legend__row">
+              <div class="widget-legend__initialExtended-legend-text" [ngStyle]="{ background: legend.color }">{{ legend.label }}</div>
+              <div class="widget-legend__score">{{ legend.average }}</div> 
+              <div class="widget-legend__score">{{ legend.value }}</div>
+              <div class="widget-legend__score w-30">{{ legend.totalCount }}</div>     
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </ng-template>
 </app-widget-wrapper>

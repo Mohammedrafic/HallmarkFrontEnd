@@ -16,6 +16,12 @@ import { LegendPositionEnum } from '../../enums/legend-position.enum';
 import { Store } from '@ngxs/store';
 import { AlertService } from '@shared/services/alert.service';
 import { ChartComponent } from '@syncfusion/ej2-angular-charts';
+import { DASHBOARD_FILTER_STATE } from '@shared/constants';
+import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
+import { OrderStatus } from '@shared/enums/order-management';
+import { PositionTrendTypeEnum } from '../../enums/position-trend-type.enum';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ActivePositionsChartStatuses } from '../../enums/active-positions-legend-palette.enum';
 
 @Component({
   selector: 'app-stack-column-chart',
@@ -104,7 +110,46 @@ public readonly legendSettings: Object = { visible: false };
 
   }
 
-  public redirectToSourceContent(status: string): void {    
+  public redirectToSourceContent(status: any): void {    
+    let candidatesStatusDataSet:any = []
+    let activeOrderStatus:any = []
+    let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
+    let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
+    if (filteredList.length > 0) {
+      let organizations = filteredList.filter((ele: any) => ele.column == "organizationIds").sort((a: any, b: any) => a.value - b.value);
+      if (organizations.length > 0 && organizations[0].value != lastSelectedOrganizationId) {
+        this.store.dispatch(
+          new SetLastSelectedOrganizationAgencyId({
+            lastSelectedAgencyId: null,
+            lastSelectedOrganizationId: organizations[0].value
+          })
+        );
+      }
+    }
+      window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
+
+      if(status === PositionTrendTypeEnum.IN_PROGRESS){
+        candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
+        candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
+      }
+      else if(status === ActivePositionsChartStatuses.PENDING){
+        status = 'In Progress (Pending)';
+        candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
+      }
+      else if(status === ActivePositionsChartStatuses.ACCEPTED){
+        status = 'In Progress (Accepted)';
+        candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
+      }
+      else if(OrderStatus[OrderStatus.Filled] === status){
+        candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
+        activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
+        window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(activeOrderStatus));
+      }
+      if(status !=  OrderStatus[OrderStatus.Open]){
+        window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+      }
+      
+      this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -166,4 +211,16 @@ public readonly legendSettings: Object = { visible: false };
       distinctUntilChanged((previous: DonutChartData[], current: DonutChartData[]) => isEqual(previous, current))
     );
   }
+  
+  private mousePosition = {
+    x: 0,
+    y: 0,
+  }
+
+  public defineMousePosition($event: MouseEvent): void {
+    this.mousePosition.x = $event.screenX;
+    this.mousePosition.y = $event.screenY;
+  }
+
+
 }
