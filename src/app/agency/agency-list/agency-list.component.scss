@@ -1,3 +1,4 @@
+@import 'colors';
 @import 'adaptive-response';
 
 :host {
@@ -5,6 +6,17 @@
 
   .grid-component {
     height: 100%;
+
+    .inactive-btn {
+      &:focus {
+        background-color: $primary-active-blue-70 !important;
+        color: $supportive-red !important;
+      }
+
+      &:focus:hover {
+        background-color: $primary-active-blue-50 !important;
+      }
+    }
   }
 
   ::ng-deep {

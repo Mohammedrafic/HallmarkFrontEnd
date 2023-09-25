@@ -54,6 +54,7 @@ import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { formatNumber } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -174,7 +175,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private changeDetectorRef: ChangeDetectorRef,
-    private permissionService : PermissionService
+    private permissionService : PermissionService,
+    private orderManagementService: OrderManagementService,
   ) { }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -355,12 +357,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setFormValue(data: OrderCandidateJob): void {
+    const regularRates = this.orderManagementService.setRegularRates(data.billRates, data.order.jobStartDate);
+    const billRate = regularRates.regular || regularRates.regularLocal || data.order.hourlyRate;
     this.formGroup.setValue({
       jobId: `${data.organizationPrefix}-${data.orderPublicId}`,
       jobDate: [DateTimeHelper.formatDateUTC(data.order.jobStartDate.toString(),'MM/dd/yyyy'),
       data.order.jobEndDate ? DateTimeHelper.formatDateUTC(data.order.jobEndDate.toString(), 'MM/dd/yyyy') : null],
       offeredBillRate: formatNumber(CheckNumberValue(data.offeredBillRate ?? data.initialBillRate), 'en-US', '0.2-2'),
-      orderBillRate: data.order.hourlyRate && PriceUtils.formatNumbers(data.order.hourlyRate),
+      orderBillRate: billRate && PriceUtils.formatNumbers(billRate),
       locationName: data.order.locationName,
       availableStartDate: DateTimeHelper.formatDateUTC(data.availableStartDate, 'MM/dd/yyyy'),
       candidateBillRate: PriceUtils.formatNumbers(data.candidateBillRate),

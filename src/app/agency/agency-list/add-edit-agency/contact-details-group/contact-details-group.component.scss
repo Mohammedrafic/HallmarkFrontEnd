@@ -2,9 +2,13 @@
 
 .contact-items {
   display: grid;
-  grid-template-columns: repeat(4, 1fr) fit-content(40px);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   place-items: end;
+
+  &:has(.remove-button-container) {
+    grid-template-columns: repeat(4, 1fr) 40px;
+  }
 
   .remove-button-container {
     button {
@@ -13,9 +17,13 @@
     }
   }
 
-  .input-container label {
-    margin-bottom: 5px !important;
-    display: block;
+  .input-container {
+    width: 100%;
+
+    label {
+      margin-bottom: 5px !important;
+      display: block;
+    }
   }
 }
 
