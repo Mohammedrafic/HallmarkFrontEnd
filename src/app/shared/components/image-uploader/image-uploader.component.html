@@ -2,7 +2,7 @@
   <div class="e-card-header">
     <div class="e-card-header-caption">
       <div class="e-card-title">{{ uploaderTitle }}</div>
-      <div
+      <div *ngIf="!logoSrc; else deleteLogo"
         class="upload-btn"
         [ngClass]="{
           hidden: logoSrc,
@@ -14,6 +14,17 @@
         <div class="add-contact-link" >Upload</div>
       </div>
     </div>
+
+    <ng-template #deleteLogo>
+      <div
+        *ngIf="isImageSelected || logoSrc"
+        class="delete-logo"
+        (click)="onImageRemove()"
+      >
+        <i-feather name="trash-2" class="icon"></i-feather>
+        <span>Delete</span>
+    </div>
+    </ng-template>
   </div>
   <div id="image-uploader" class="e-card-content">
     <div class="logo-container" *ngIf="logoSrc">
@@ -36,10 +47,5 @@
       (removing)="onImageRemove()"
     >
     </ejs-uploader>
-    <ng-container *ngIf="!disabled">
-      <button *ngIf="isImageSelected || logoSrc" ejs-button class="clear-logo-button" cssClass="e-outline" (click)="onImageRemove()">
-        Clear
-      </button>
-    </ng-container>
   </div>
 </div>
