@@ -53,7 +53,12 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button [disabled]="data.agencyDetails.status === statusEnum.Inactive || !userPermission[userPermissions.CanEditAgencyProfile]" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
+            <button
+              ejs-button
+              cssClass="e-flat secondary-icon-button inactive-btn"
+              [disabled]="data.agencyDetails.status === statusEnum.Inactive || !userPermission[userPermissions.CanEditAgencyProfile]"
+              (click)="onRemove(data)"
+            >
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
