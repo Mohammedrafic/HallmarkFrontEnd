@@ -30,7 +30,8 @@
             cssClass="e-outline button-export"
           >
             <div class="button-export-container">
-              Export <i-feather name="upload" class="icon"></i-feather>
+              <span class="text-btn">Export</span>
+              <i-feather name="upload" class="icon"></i-feather>
             </div>
           </button>
           <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
@@ -112,6 +113,8 @@
       (pageSizeChangeEmitter)="changeGridSize($event)"
     ></app-grid-pagination>
   </section>
+
+  <app-scroll-to-top></app-scroll-to-top>
 </section>
 
 <app-filter-dialog

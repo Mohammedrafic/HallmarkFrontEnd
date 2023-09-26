@@ -77,6 +77,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DonotReturnState } from './store/donotreturn.state';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
+import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 
 const sidebarIcons = {
   Download,
@@ -168,6 +169,7 @@ const sidebarIcons = {
         ]),
         ValidateDirectiveModule,
         GridPaginationModule,
+        ScrollToTopModule,
     ],
   providers: [
     ResizeService,

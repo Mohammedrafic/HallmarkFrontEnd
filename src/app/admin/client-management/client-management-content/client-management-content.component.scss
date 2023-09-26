@@ -69,6 +69,16 @@
 }
 
 @media #{$max-mobile} {
+  .button-export {
+    padding: 8px 11px !important;
+  }
+
+  .button-export-container {
+    .icon {
+      margin: 0;
+    }
+  }
+
   .flex-column {
     height: auto;
     padding-bottom: 24px;

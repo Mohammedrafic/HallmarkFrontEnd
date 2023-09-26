@@ -227,6 +227,7 @@ export class ClientManagementContentComponent
   public changeGridSize(size: number): void {
     this.pageSize = size;
     this.grid.pageSettings.pageSize = this.pageSize;
+    this.currentPage = 1;
   }
 
   public changeGridPage(page: number): void {

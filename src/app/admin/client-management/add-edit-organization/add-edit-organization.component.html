@@ -1,16 +1,6 @@
 <section class="controls-container">
   <ng-container *ngIf="!profileMode">
-    <div>
-      <button
-        ejs-button
-        appHideBeforeSyncfusionLoad
-        cssClass="e-outline"
-        id="backButton"
-        (click)="navigateBack()"
-      >
-        Back
-      </button>
-    </div>
+    <ng-container [ngTemplateOutlet]="backButton"></ng-container>
     <div class="form-title">
       <h3>{{ title }} Organization</h3>
     </div>
@@ -20,31 +10,7 @@
       <h3>Edit Organization Profile</h3>
     </div>
   </ng-container>
-  <div class="controls-form stick-right">
-    <button
-      *ngIf="!profileMode"
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      id="clearButton"
-      cssClass="e-outline"
-      (click)="clearForm()"
-    >
-      Clear
-    </button>
-    <app-tooltip-container [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
-      <button
-        ejs-button
-        appHideBeforeSyncfusionLoad
-        class="save-button"
-        id="saveButton"
-        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
-        [isPrimary]="true"
-        (click)="save()"
-      >
-        Save
-      </button>
-    </app-tooltip-container>
-  </div>
+  <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
 </section>
 <!---General information section--->
 <section class="organization-form">
@@ -526,7 +492,7 @@
                     ></ejs-maskedtextbox>
                   </div>
                 </div>
-                <div class="input-container bootstrap">
+                <div class="input-container bootstrap email-item">
                   <label>Email</label>
                   <div class="input-group">
                     <input
@@ -545,6 +511,7 @@
                     [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
                     <button
                       ejs-button
+                      appHideBeforeSyncfusionLoad
                       cssClass="e-outline"
                       class="icon-button"
                       [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
@@ -597,7 +564,7 @@
             </div>
           </div>
           <ng-container *ngIf="!profileMode">
-            <div class="dropdown-container bootstrap">
+            <div class="dropdown-container bootstrap week-start-on">
               <label>Week Starts On<span class="required">*</span></label>
               <div class="input-group dropdown">
                 <ejs-dropdownlist
@@ -638,4 +605,53 @@
       </div>
     </div>
   </div>
+  <div class="mobile-button-group">
+    <ng-container [ngTemplateOutlet]="backButton"></ng-container>
+    <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
+  </div>
 </section>
+
+
+<ng-template #backButton>
+  <div class="item">
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      cssClass="e-outline"
+      id="backButton"
+      (click)="navigateBack()"
+    >
+      Back
+    </button>
+  </div>
+</ng-template>
+<ng-template #actionBtn>
+  <div class="controls-form stick-right item">
+    <button
+      *ngIf="!profileMode"
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      id="clearButton"
+      cssClass="e-outline item clear-button"
+      (click)="clearForm()"
+    >
+      Clear
+    </button>
+    <app-tooltip-container
+      class="tooltip"
+      [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+    >
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        class="save-button"
+        id="saveButton"
+        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+        [isPrimary]="true"
+        (click)="save()"
+      >
+        Save
+      </button>
+    </app-tooltip-container>
+  </div>
+</ng-template>
