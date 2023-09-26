@@ -1,9 +1,10 @@
 import { formatDate } from '@angular/common';
 
-import { ColDef, ValueFormatterParams } from '@ag-grid-community/core';
+import { ColDef, ICellRendererParams, ValueFormatterParams } from '@ag-grid-community/core';
 
 import { formatTime } from '@shared/constants';
 import { LikeActionComponent } from '../like-action/like-action.component';
+import { UnlikeActionComponent } from '../unlike-action/unlike-action/unlike-action.component';
 
 const commonCell: ColDef = {
   resizable: true,
@@ -18,7 +19,9 @@ export const JobGridConfig: ColDef[] = [
     resizable: false,
     sortable: false,
     maxWidth: 140,
-    cellRenderer: LikeActionComponent,
+    cellRendererSelector: (params: ICellRendererParams) => {
+      return { component: params.data.isApplySelected ? UnlikeActionComponent : LikeActionComponent };
+    },
   },
   {
     field: 'skillName',

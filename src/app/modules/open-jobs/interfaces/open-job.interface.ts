@@ -35,6 +35,7 @@ export interface OpenJob {
   isApplyEnabled: boolean;
   isDeprtmentVisible: boolean;
   orderTypeName: string;
+  jobId?: number | null;
 }
 
 export interface OpenJobFilter {
@@ -84,6 +85,19 @@ export interface LtaEmployeeDto {
   employeeId: number | string;
   orderId: number;
   workflowStepType: number;
+}
+
+export interface UpdateLtaEmployeeDTO {
+  jobId: number;
+  orderId: number | null;
+  organizationId: number;
+  workflowStepType: number;
+  actualStartDate?: string | null;
+  actualEndDate?: string | null;
+  availableStartDate?: string | null;
+  offeredStartDate?: string | null;
+  offeredEndDate?: string | null;
+  employeeTime?: string | null;
 }
 
 export interface EmployeeScheduledDays {

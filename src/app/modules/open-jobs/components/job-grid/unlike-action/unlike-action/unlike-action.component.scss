@@ -1,0 +1,22 @@
+@import "colors";
+
+.action {
+  width: 100%;
+  text-align: center;
+
+  button {
+    color: $primary-active-blue-10;
+
+    &:disabled {
+      i-feather {
+        fill: $grey;
+      }
+    }
+
+    &:not(:disabled) {
+      i-feather {
+        fill: $primary-active-blue-20;
+      }
+    }
+  }
+}

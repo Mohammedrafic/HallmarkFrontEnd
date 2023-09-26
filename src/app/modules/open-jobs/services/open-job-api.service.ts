@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { FiltersState, LtaEmployeeDto, OpenJobPage, PerDiemEmployeeDto } from '../interfaces';
+import { FiltersState, LtaEmployeeDto, OpenJobPage, PerDiemEmployeeDto, UpdateLtaEmployeeDTO } from '../interfaces';
 
 @Injectable()
 export class OpenJobApiService {
@@ -17,6 +17,10 @@ export class OpenJobApiService {
 
   public applyLtaEmployee(params: LtaEmployeeDto): Observable<void> {
     return this.http.post<void>(`/api/IRPApplicants/create`, params);
+  }
+
+  public updateLtaEmployee(payload: UpdateLtaEmployeeDTO): Observable<void> {
+    return this.http.put<void>('/api/IRPApplicants/update', payload);
   }
 
   public applyPerDiemEmployee(params: PerDiemEmployeeDto): Observable<void> {

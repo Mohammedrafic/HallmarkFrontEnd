@@ -9,11 +9,13 @@ import { ButtonAllModule } from '@syncfusion/ej2-angular-buttons';
 import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
 import { JobGridComponent } from './job-grid.component';
 import { LikeActionComponent } from './like-action/like-action.component';
+import { UnlikeActionComponent } from './unlike-action/unlike-action/unlike-action.component';
 
 @NgModule({
   declarations: [
     JobGridComponent,
     LikeActionComponent,
+    UnlikeActionComponent,
   ],
   exports: [
     JobGridComponent,
