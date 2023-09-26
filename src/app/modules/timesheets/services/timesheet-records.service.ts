@@ -77,10 +77,10 @@ export class TimesheetRecordsService {
           }
 
           // Time out value may be in another format, thus values must be unified.
-          if (timeOutKey && !!dataItem[keyValue]) {
+          if (timeOutKey && !!dataItem[keyValue] && !!values[keyValue]) {
             const dataTime = DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string);
             const formTime = DateTimeHelper.setUtcTimeZone(values[keyValue] as string);
-
+            
             if (dataTime !== formTime) {
               diffValues[keyValue] = values[keyValue] as string;
             }
@@ -88,11 +88,15 @@ export class TimesheetRecordsService {
             diffValues[keyValue] = values[keyValue] as string;
           }
 
+          const timePopulated = timeInKey && initialTimeInNull && values[keyValue] !== null;
+          const timeChanged = timeInKey && !initialTimeInNull && values[keyValue]
+          && DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string)
+          !== DateTimeHelper.setUtcTimeZone(values[keyValue] as string);
+
           // Need to check isTimeInNull
-          if (timeInKey && initialTimeInNull && values[keyValue] !== null) {
+          if (timePopulated) {
             diffValues[keyValue] = values[keyValue] as string | number | boolean;
-          } else if (timeInKey && !initialTimeInNull && DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string)
-          !== DateTimeHelper.setUtcTimeZone(values[keyValue] as string)) {
+          } else if (timeChanged) {
             diffValues[keyValue] = values[keyValue] as string | number | boolean;
           }
         }
