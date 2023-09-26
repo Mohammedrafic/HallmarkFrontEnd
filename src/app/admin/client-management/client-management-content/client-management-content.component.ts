@@ -224,15 +224,14 @@ export class ClientManagementContentComponent
     this.router.navigate(['./add'], { relativeTo: this.route });
   }
 
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+  public changeGridSize(size: number): void {
+    this.pageSize = size;
     this.grid.pageSettings.pageSize = this.pageSize;
+    this.currentPage = 1;
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
+  public changeGridPage(page: number): void {
+    this.pageSubject.next(page);
   }
 
   //TODO: create a pipe

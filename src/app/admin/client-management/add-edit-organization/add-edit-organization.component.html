@@ -1,65 +1,51 @@
 <section class="controls-container">
   <ng-container *ngIf="!profileMode">
-    <div>
-      <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="backButton">Back</button>
-    </div>
+    <ng-container [ngTemplateOutlet]="backButton"></ng-container>
     <div class="form-title">
       <h3>{{ title }} Organization</h3>
     </div>
   </ng-container>
   <ng-container *ngIf="profileMode">
-    <div class="profile"><h3>Edit Organization Profile</h3></div>
+    <div class="profile">
+      <h3>Edit Organization Profile</h3>
+    </div>
   </ng-container>
-  <div class="controls-form stick-right">
-    <button *ngIf="!profileMode" ejs-button cssClass="e-outline" (click)="clearForm()" id="clearButton">Clear</button>
-    <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="cancelButton">Cancel</button>
-    <app-tooltip-container [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
-      <button
-        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
-        ejs-button
-        [isPrimary]="true"
-        (click)="save()"
-        class="save-button"
-        id="saveButton"
-      >
-        Save
-      </button>
-    </app-tooltip-container>
-  </div>
+  <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
 </section>
-<section class="create-under-container bootstrap" *ngIf="!isMspUser && !profileMode">
-  <div class="left-section">
-    <form *ngIf="CreateUnderFormGroup && isAddMode" [formGroup]="CreateUnderFormGroup" id="createUnder">
-      <label>Create Under<span class="required">*</span></label>
-      <div class="input-group dropdown create-under-dropdown">
-        <ejs-dropdownlist
-          appValidateWithMessage
-          [fields]="createUnderFields"
-          formControlName="createUnder"
-          [dataSource]="businessUnits$ | async"
-          [allowFiltering]="true"
-        ></ejs-dropdownlist>
-      </div>
-    </form>
-    <form id="connectiodanString" [formGroup]="dataBaseConnectionsFormGroup" *ngIf="showDataBaseControl">
-      <label>Data Base<span class="required">*</span></label>
-      <div class="input-group dropdown connection-string-dropdown">
-        <ejs-dropdownlist
-          [dataSource]="dataBaseConnections$ | async"
-          [allowFiltering]="true"
-          formControlName="connectionName"
-          appValidateWithMessage
-        ></ejs-dropdownlist>
-      </div>
-    </form>
-  </div>
-  <div class="right-section"></div>
-</section>
-
 <!---General information section--->
 <section class="organization-form">
   <div class="left-section">
     <div tabindex="0" class="e-card">
+      <section class="create-under-container bootstrap" *ngIf="!isMspUser && !profileMode">
+        <form *ngIf="CreateUnderFormGroup && isAddMode" [formGroup]="CreateUnderFormGroup" id="createUnder">
+          <div class="input-container">
+            <label>Create Under<span class="required">*</span></label>
+            <div class="input-group dropdown create-under-dropdown">
+              <ejs-dropdownlist
+                appValidateWithMessage
+                formControlName="createUnder"
+                [fields]="createUnderFields"
+                [dataSource]="businessUnits$ | async"
+                [allowFiltering]="true"
+              ></ejs-dropdownlist>
+            </div>
+          </div>
+        </form>
+        <form id="connectiodanString" [formGroup]="dataBaseConnectionsFormGroup" *ngIf="showDataBaseControl">
+          <div class="input-container">
+            <label>Data Base<span class="required">*</span></label>
+            <div class="input-group dropdown connection-string-dropdown">
+              <ejs-dropdownlist
+                appValidateWithMessage
+                formControlName="connectionName"
+                [dataSource]="dataBaseConnections$ | async"
+                [allowFiltering]="true"
+              ></ejs-dropdownlist>
+            </div>
+          </div>
+        </form>
+      </section>
+
       <div class="e-card-header">
         <div class="e-card-header-caption">
           <div class="e-card-title">General Information</div>
@@ -68,193 +54,206 @@
       <div class="e-card-content">
         <div class="general-information">
           <form *ngIf="GeneralInformationFormGroup" [formGroup]="GeneralInformationFormGroup" id="generalInformation">
-            <div class="org-section">
-              <div class="left-column bootstrap">
-                <div>
-                  <div class="input-container">
-                    <label>Name<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input appValidateWithMessage formControlName="name" class="e-input" type="text" maxlength="50" />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <div class="id-container">
-                    <div class="input-container">
-                      <label>External ID</label>
-                      <input formControlName="externalId" class="e-input" type="text" />
-                    </div>
-                    <div class="input-container">
-                      <label>Tax ID<span class="required">*</span></label>
-                      <div class="input-group">
-                        <input
-                          appValidateWithMessage
-                          formControlName="taxId"
-                          class="e-input"
-                          type="text"
-                          maxlength="12"
-                        />
-                      </div>
-                    </div>
-                    <div class="input-container">
-                      <label>Prefix Order ID<span class="required">*</span></label>
-                      <div class="input-group">
-                        <input
-                          appValidateWithMessage
-                          formControlName="organizationPrefix"
-                          class="e-input prefix-id"
-                          type="text"
-                          maxlength="3"
-                        />
-                      </div>
-                    </div>
-                  </div>
+            <div class="org-section bootstrap">
+              <div class="input-container item-1">
+                <label>Name<span class="required">*</span></label>
+                <div class="input-group">
+                  <input
+                    appValidateWithMessage
+                    formControlName="name"
+                    class="e-input"
+                    type="text"
+                    maxlength="50"
+                  />
                 </div>
               </div>
-              <div class="right-column">
-                <div class="id-container">
-                  <div class="dropdown-container bootstrap">
-                    <label>Organization Type</label>
-                    <ejs-dropdownlist
-                      formControlName="organizationType"
-                      [dataSource]="organizationTypes"
-                      [allowFiltering]="true"
-                    ></ejs-dropdownlist>
-                  </div>
+
+              <div class="dropdown-container item-2">
+                <label>Organization Type</label>
+                <ejs-dropdownlist
+                  formControlName="organizationType"
+                  [dataSource]="organizationTypes"
+                  [allowFiltering]="true"
+                ></ejs-dropdownlist>
+              </div>
+
+              <div class="input-container">
+                <label>External ID</label>
+                <input
+                  formControlName="externalId"
+                  class="e-input"
+                  type="text"
+                />
+              </div>
+
+              <div class="input-container">
+                <label>Tax ID<span class="required">*</span></label>
+                <div class="input-group">
+                  <input
+                    appValidateWithMessage
+                    formControlName="taxId"
+                    class="e-input"
+                    type="text"
+                    maxlength="12"
+                  />
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Prefix Order ID<span class="required">*</span></label>
+                <div class="input-group">
+                  <input
+                    appValidateWithMessage
+                    formControlName="organizationPrefix"
+                    class="e-input prefix-id"
+                    type="text"
+                    maxlength="3"
+                  />
+                </div>
+              </div>
+
+              <div class="dropdown-container">
+                <label>Status<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    appValidateWithMessage
+                    formControlName="status"
+                    [fields]="optionFields"
+                    [dataSource]="organizationStatuses$ | async"
+                    [allowFiltering]="true"
+                  ></ejs-dropdownlist>
                 </div>
               </div>
             </div>
             <div class="address-section bootstrap">
-              <div class="left-column">
-                <div class="input-container">
-                  <label>Address 1<span class="required">*</span></label>
-                  <div class="input-group">
-                    <input
-                      appValidateWithMessage
-                      formControlName="addressLine1"
-                      class="e-input"
-                      type="text"
-                      maxlength="100"
-                    />
-                  </div>
-                </div>
-                <div class="city-section">
-                  <div class="dropdown-container">
-                    <label>Country<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        appValidateWithMessage
-                        [fields]="optionFields"
-                        formControlName="country"
-                        [allowFiltering]="true"
-                        [dataSource]="countries$ | async"
-                        (change)="onGeneralCountryChange($event)"
-                      ></ejs-dropdownlist>
-                    </div>
-                  </div>
-                  <div class="dropdown-container">
-                    <label>State<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        appValidateWithMessage
-                        formControlName="state"
-                        [dataSource]="statesGeneral$ | async"
-                        [allowFiltering]="true"
-                      ></ejs-dropdownlist>
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>City<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input appValidateWithMessage formControlName="city" class="e-input" type="text" maxlength="20" />
-                    </div>
-                  </div>
-                </div>
-                <div class="city-section">
-                  <div class="input-container">
-                    <label>Phone 1</label>
-                    <div class="input-group">
-                      <ejs-maskedtextbox
-                        class="organization-input"
-                        promptChar="_"
-                        mask="000-000-0000"
-                        appValidateWithMessage
-                        formControlName="phone1Ext"
-                        placeholder=" "
-                        maxlength="10"
-                      ></ejs-maskedtextbox>
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>Phone 2</label>
-                    <div class="input-group">
-                      <ejs-maskedtextbox
-                        class="organization-input"
-                        promptChar="_"
-                        mask="000-000-0000"
-                        appValidateWithMessage
-                        formControlName="phone2Ext"
-                        placeholder=" "
-                        maxlength="10"
-                      ></ejs-maskedtextbox>
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>Fax</label>
-                    <div class="input-group">
-                      <ejs-maskedtextbox
-                        class="organization-input"
-                        promptChar="_"
-                        mask="000-000-0000"
-                        appValidateWithMessage
-                        formControlName="fax"
-                        placeholder=" "
-                        maxlength="10"
-                      ></ejs-maskedtextbox>
-                    </div>
-                  </div>
+              <div class="input-container item-1">
+                <label>Address 1<span class="required">*</span></label>
+                <div class="input-group">
+                  <input
+                    appValidateWithMessage
+                    formControlName="addressLine1"
+                    class="e-input"
+                    type="text"
+                    maxlength="100"
+                  />
                 </div>
               </div>
-              <div class="right-column">
-                <div class="input-container">
-                  <label>Address 2</label>
-                  <input formControlName="addressLine2" class="e-input" type="text" maxlength="100" />
+
+              <div class="input-container item-2">
+                <label>Address 2</label>
+                <input
+                  formControlName="addressLine2"
+                  class="e-input"
+                  type="text"
+                  maxlength="100"
+                />
+              </div>
+
+              <div class="dropdown-container">
+                <label>Country<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    appValidateWithMessage
+                    formControlName="country"
+                    [fields]="optionFields"
+                    [allowFiltering]="true" [dataSource]="countries$ | async"
+                    (change)="onGeneralCountryChange($event)"
+                  ></ejs-dropdownlist>
                 </div>
-                <div class="zipcode-section">
-                  <div class="input-container">
-                    <label>Zipcode</label>
-                    <div class="input-group">
-                      <ejs-maskedtextbox
-                        class="organization-input"
-                        promptChar="_"
-                        mask="00000"
-                        appValidateWithMessage
-                        formControlName="zipCode"
-                        placeholder=" "
-                        maxlength="6"
-                      ></ejs-maskedtextbox>
-                    </div>
-                  </div>
-                  <div class="input-container"></div>
+              </div>
+
+              <div class="dropdown-container">
+                <label>State<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    appValidateWithMessage
+                    formControlName="state"
+                    [dataSource]="statesGeneral$ | async"
+                    [allowFiltering]="true"
+                  ></ejs-dropdownlist>
                 </div>
-                <div class="status-section">
-                  <div class="dropdown-container">
-                    <label>Status<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        appValidateWithMessage
-                        formControlName="status"
-                        [fields]="optionFields"
-                        [dataSource]="organizationStatuses$ | async"
-                        [allowFiltering]="true"
-                      ></ejs-dropdownlist>
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>Website</label>
-                    <input formControlName="website" class="e-input" type="text" />
-                  </div>
+              </div>
+
+              <div class="input-container">
+                <label>City<span class="required">*</span></label>
+                <div class="input-group">
+                  <input
+                    appValidateWithMessage
+                    formControlName="city"
+                    class="e-input"
+                    type="text"
+                    maxlength="20"
+                  />
                 </div>
+              </div>
+
+              <div class="input-container">
+                <label>Phone 1</label>
+                <div class="input-group">
+                  <ejs-maskedtextbox
+                    appValidateWithMessage
+                    class="organization-input"
+                    promptChar="_"
+                    mask="000-000-0000"
+                    formControlName="phone1Ext"
+                    placeholder=" "
+                    maxlength="10"
+                  ></ejs-maskedtextbox>
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Phone 2</label>
+                <div class="input-group">
+                  <ejs-maskedtextbox
+                    appValidateWithMessage
+                    class="organization-input"
+                    promptChar="_"
+                    mask="000-000-0000"
+                    formControlName="phone2Ext"
+                    placeholder=" "
+                    maxlength="10"
+                  ></ejs-maskedtextbox>
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Fax</label>
+                <div class="input-group">
+                  <ejs-maskedtextbox
+                    appValidateWithMessage
+                    class="organization-input"
+                    promptChar="_"
+                    mask="000-000-0000"
+                    formControlName="fax"
+                    placeholder=" "
+                    maxlength="10"
+                  ></ejs-maskedtextbox>
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Zipcode</label>
+                <div class="input-group">
+                  <ejs-maskedtextbox
+                    appValidateWithMessage
+                    class="organization-input"
+                    promptChar="_"
+                    mask="00000"
+                    formControlName="zipCode"
+                    placeholder=" "
+                    maxlength="6"
+                  ></ejs-maskedtextbox>
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Website</label>
+                <input
+                  formControlName="website"
+                  class="e-input"
+                  type="text"
+                />
               </div>
             </div>
           </form>
@@ -263,154 +262,179 @@
           <div class="title">Billing Details</div>
           <div class="org-address-checkbox">
             <ejs-checkbox
+              label="Same As Organization"
               [checked]="isSameAsOrg"
               (change)="sameAsOrgChange($event)"
-              label="Same As Organization"
               [disabled]="profileMode"
             ></ejs-checkbox>
           </div>
-          <div class="billing-details-section">
-            <div class="left-column">
-              <form *ngIf="BillingDetailsFormGroup" [formGroup]="BillingDetailsFormGroup" id="billingDetails">
-                <div class="billing-address-section">
-                  <div class="input-container">
-                    <label>Name<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input appValidateWithMessage formControlName="name" class="e-input" type="text" />
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>Address</label>
-                    <input formControlName="address" class="e-input" type="text" />
-                  </div>
+
+          <form
+            *ngIf="BillingDetailsFormGroup"
+            id="billingDetails"
+            [formGroup]="BillingDetailsFormGroup"
+          >
+            <div class="billing-details-form">
+              <div class="input-container item-1">
+                <label>Name<span class="required">*</span></label>
+                <div class="input-group">
+                  <input
+                    appValidateWithMessage
+                    formControlName="name"
+                    class="e-input"
+                    type="text"
+                  />
                 </div>
-                <div class="billing-country-section">
-                  <div class="dropdown-container">
-                    <label>Country<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        appValidateWithMessage
-                        formControlName="country"
-                        [fields]="optionFields"
-                        [dataSource]="countries$ | async"
-                        [allowFiltering]="true"
-                        (change)="onBillingCountryChange($event)"
-                      ></ejs-dropdownlist>
-                    </div>
-                  </div>
-                  <div class="dropdown-container">
-                    <label>State<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        appValidateWithMessage
-                        formControlName="state"
-                        [dataSource]="statesBilling$ | async"
-                        [allowFiltering]="true"
-                      ></ejs-dropdownlist>
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>City<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input appValidateWithMessage formControlName="city" class="e-input" type="text" maxlength="20" />
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>Zipcode</label>
-                    <div class="input-group">
-                      <ejs-maskedtextbox
-                        class="organization-input"
-                        promptChar="_"
-                        mask="00000"
-                        appValidateWithMessage
-                        formControlName="zipCode"
-                        placeholder=" "
-                        maxlength="6"
-                      ></ejs-maskedtextbox>
-                    </div>
-                  </div>
+              </div>
+
+              <div class="input-container item-2">
+                <label>Address</label>
+                <input
+                  formControlName="address"
+                  class="e-input"
+                  type="text"
+                />
+              </div>
+
+              <div class="dropdown-container">
+                <label>Country<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    appValidateWithMessage
+                    formControlName="country"
+                    [fields]="optionFields"
+                    [dataSource]="countries$ | async"
+                    [allowFiltering]="true"
+                    (change)="onBillingCountryChange($event)"
+                  ></ejs-dropdownlist>
                 </div>
-                <div class="billing-phone-section">
-                  <div class="input-container">
-                    <label>Phone 1</label>
-                    <div class="input-group">
-                      <ejs-maskedtextbox
-                        class="organization-input"
-                        promptChar="_"
-                        mask="000-000-0000"
-                        appValidateWithMessage
-                        formControlName="phone1"
-                        placeholder=" "
-                        maxlength="10"
-                      ></ejs-maskedtextbox>
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>Phone 2</label>
-                    <div class="input-group">
-                      <ejs-maskedtextbox
-                        class="organization-input"
-                        promptChar="_"
-                        mask="000-000-0000"
-                        appValidateWithMessage
-                        formControlName="phone2"
-                        placeholder=" "
-                        maxlength="10"
-                      ></ejs-maskedtextbox>
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>Fax</label>
-                    <div class="input-group">
-                      <ejs-maskedtextbox
-                        class="organization-input"
-                        promptChar="_"
-                        mask="000-000-0000"
-                        appValidateWithMessage
-                        formControlName="fax"
-                        placeholder=" "
-                        maxlength="10"
-                      ></ejs-maskedtextbox>
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>Ext</label>
-                    <div class="input-group">
-                      <input
-                        appValidateWithMessage
-                        formControlName="ext"
-                        class="e-input"
-                        mask="00000"
-                        [validation]="false"
-                        type="text"
-                      />
-                    </div>
-                  </div>
+              </div>
+
+              <div class="dropdown-container">
+                <label>State<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    appValidateWithMessage
+                    formControlName="state"
+                    [dataSource]="statesBilling$ | async"
+                    [allowFiltering]="true"
+                  ></ejs-dropdownlist>
                 </div>
-              </form>
+              </div>
+
+              <div class="input-container">
+                <label>City<span class="required">*</span></label>
+                <div class="input-group">
+                  <input
+                    appValidateWithMessage
+                    formControlName="city"
+                    class="e-input"
+                    type="text"
+                    maxlength="20"
+                  />
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Zipcode</label>
+                <div class="input-group">
+                  <ejs-maskedtextbox
+                    appValidateWithMessage
+                    class="organization-input"
+                    promptChar="_"
+                    mask="00000"
+                    formControlName="zipCode"
+                    placeholder=" "
+                    maxlength="6"
+                  ></ejs-maskedtextbox>
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Phone 1</label>
+                <div class="input-group">
+                  <ejs-maskedtextbox
+                    appValidateWithMessage
+                    class="organization-input"
+                    promptChar="_"
+                    mask="000-000-0000"
+                    formControlName="phone1"
+                    placeholder=" "
+                    maxlength="10"
+                  ></ejs-maskedtextbox>
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Phone 2</label>
+                <div class="input-group">
+                  <ejs-maskedtextbox
+                    appValidateWithMessage
+                    class="organization-input"
+                    promptChar="_"
+                    mask="000-000-0000"
+                    formControlName="phone2"
+                    placeholder=" "
+                    maxlength="10"
+                  ></ejs-maskedtextbox>
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Fax</label>
+                <div class="input-group">
+                  <ejs-maskedtextbox
+                    appValidateWithMessage
+                    class="organization-input"
+                    promptChar="_"
+                    mask="000-000-0000"
+                    formControlName="fax"
+                    placeholder=" "
+                    maxlength="10"
+                  ></ejs-maskedtextbox>
+                </div>
+              </div>
+
+              <div class="input-container">
+                <label>Ext</label>
+                <div class="input-group">
+                  <input
+                    appValidateWithMessage
+                    formControlName="ext"
+                    class="e-input"
+                    mask="00000"
+                    type="text"
+                    [validation]="false"
+                  />
+                </div>
+              </div>
             </div>
-            <div class="right-column"></div>
-          </div>
+          </form>
         </div>
         <div class="contact-details">
           <div class="contact-header">
             <div class="title">Contact Details</div>
-            <app-tooltip-container class="stick-right" [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
+            <app-tooltip-container
+              class="stick-right"
+              [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+            >
               <button
-                [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
                 ejs-button
+                [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
                 cssClass="e-outline add-contact-link"
-                (click)="addContact()">
-                <i-feather name="plus" class="icon"></i-feather> Add Contact
+                (click)="addContact()"
+              >
+                <i-feather name="plus" class="icon"></i-feather>
+                Add Contact
               </button>
             </app-tooltip-container>
           </div>
           <form *ngIf="ContactFormGroup" [formGroup]="ContactFormGroup" id="contactDetailsGroup">
             <ng-container formArrayName="contacts">
               <div
-                [formGroupName]="i"
-                class="contact-item"
                 *ngFor="let contact of ContactFormArray.controls; let i = index"
+                class="contact-item"
+                [formGroupName]="i"
               >
                 <div *ngIf="!isEditTitle[i]" class="dropdown-container bootstrap">
                   <label>Contact Type</label>
@@ -423,11 +447,20 @@
                 <div *ngIf="isEditTitle[i]" class="input-container bootstrap">
                   <label>Contact Type</label>
                   <div class="input-group">
-                    <input formControlName="title" class="e-input" type="text" />
+                    <input
+                      formControlName="title"
+                      class="e-input"
+                      type="text"
+                    />
                   </div>
                 </div>
                 <div class="input-container edit-button-container">
-                  <button ejs-button cssClass="e-outline" class="icon-button" (click)="editTitleHandler(i)">
+                  <button
+                    ejs-button
+                    cssClass="e-outline"
+                    class="icon-button"
+                    (click)="editTitleHandler(i)"
+                  >
                     <i-feather name="edit3" class="icon"></i-feather>
                   </button>
                 </div>
@@ -441,38 +474,48 @@
                       type="text"
                       maxlength="100"
                     />
-                    <span class="error" *ngIf="!contact.get('contactPerson')?.untouched">{{
-                      contact.get('contactPerson')?.errors | validationError
-                    }}</span>
+                      <span class="error" *ngIf="!contact.get('contactPerson')?.untouched">
+                        {{contact.get('contactPerson')?.errors | validationError}}
+                      </span>
                   </div>
                 </div>
                 <div class="input-container bootstrap">
                   <label>Phone 1</label>
                   <div class="input-group">
                     <ejs-maskedtextbox
+                      appValidateWithMessage
                       class="organization-input"
                       promptChar="_"
                       mask="000-000-0000"
-                      appValidateWithMessage
                       formControlName="phoneNumberExt"
                       placeholder=" "
                       maxlength="10"
                     ></ejs-maskedtextbox>
                   </div>
                 </div>
-                <div class="input-container bootstrap">
+                <div class="input-container bootstrap email-item">
                   <label>Email</label>
                   <div class="input-group">
-                    <input appValidateWithMessage formControlName="email" class="e-input" type="text" />
+                    <input
+                      appValidateWithMessage
+                      formControlName="email"
+                      class="e-input"
+                      type="text"
+                    />
                   </div>
                 </div>
-                <div class="input-container remove-button-container">
-                  <app-tooltip-container *ngIf="ContactFormArray.controls.length > 1" [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
+                <div
+                  *ngIf="ContactFormArray.controls.length > 1"
+                  class="input-container remove-button-container"
+                >
+                  <app-tooltip-container
+                    [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
                     <button
-                      [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
                       ejs-button
+                      appHideBeforeSyncfusionLoad
                       cssClass="e-outline"
                       class="icon-button"
+                      [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
                       (click)="removeContact(i)"
                     >
                       <i-feather name="trash2" class="icon"></i-feather>
@@ -491,8 +534,8 @@
     <app-image-uploader
       uploaderTitle="Logo"
       [logo]="logo"
-      (selectImage)="onImageSelect($event)"
       [disabled]="profileMode"
+      (selectImage)="onImageSelect($event)"
     ></app-image-uploader>
 
     <!---Preferences section-->
@@ -505,7 +548,8 @@
       <div class="e-card-content">
         <form *ngIf="PreferencesFormGroup" [formGroup]="PreferencesFormGroup" id="preferancesDetails">
           <div *ngIf="isIRPFlagEnabled" class="bootstrap system-wrapper" [class.border-none]="profileMode">
-            <label class="label-gray">System Configuration (at least one system should be selected)<span class="required">*</span></label>
+            <label class="label-gray">System Configuration (at least one system should be selected)<span
+                class="required">*</span></label>
             <div class="checkbox-group">
               <ejs-checkbox
                 formControlName="isIRPEnabled"
@@ -521,7 +565,7 @@
             </div>
           </div>
           <ng-container *ngIf="!profileMode">
-            <div class="dropdown-container bootstrap">
+            <div class="dropdown-container bootstrap week-start-on">
               <label>Week Starts On<span class="required">*</span></label>
               <div class="input-group dropdown">
                 <ejs-dropdownlist
@@ -550,7 +594,11 @@
             <div class="input-container bootstrap">
               <label>Payment Details<span class="required">*</span></label>
               <div class="input-group textbox">
-                <ejs-textbox appValidateWithMessage formControlName="paymentDescription" [multiline]="true"></ejs-textbox>
+                <ejs-textbox
+                  appValidateWithMessage
+                  formControlName="paymentDescription"
+                  [multiline]="true"
+                ></ejs-textbox>
               </div>
             </div>
           </ng-container>
@@ -558,4 +606,53 @@
       </div>
     </div>
   </div>
+  <div class="mobile-button-group">
+    <ng-container [ngTemplateOutlet]="backButton"></ng-container>
+    <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
+  </div>
 </section>
+
+
+<ng-template #backButton>
+  <div class="item">
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      cssClass="e-outline"
+      id="backButton"
+      (click)="navigateBack()"
+    >
+      Back
+    </button>
+  </div>
+</ng-template>
+<ng-template #actionBtn>
+  <div class="controls-form stick-right item">
+    <button
+      *ngIf="!profileMode"
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      id="clearButton"
+      cssClass="e-outline item clear-button"
+      (click)="clearForm()"
+    >
+      Clear
+    </button>
+    <app-tooltip-container
+      class="tooltip"
+      [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+    >
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        class="save-button"
+        id="saveButton"
+        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+        [isPrimary]="true"
+        (click)="save()"
+      >
+        Save
+      </button>
+    </app-tooltip-container>
+  </div>
+</ng-template>
