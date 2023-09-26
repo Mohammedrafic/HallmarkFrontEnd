@@ -89,3 +89,15 @@ export interface AveragedayActivecandidateInfo
   averageDays: any;
 
 }
+
+export interface OrderInitiaExtendeDto {
+  activePositionsInitiaExtendedDetails: ActivePositionsInitiaExtendedDetailsInfo[];
+}
+
+export interface ActivePositionsInitiaExtendedDetailsInfo {
+  orderStatus: number;
+  statusName: string;
+  initialPositions: number;
+  extendedPositions: number;
+  totalCount: number;
+}

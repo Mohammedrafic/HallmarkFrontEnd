@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset, AveragedayActivecandidateInfo } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset, AveragedayActivecandidateInfo, ActivePositionsInitiaExtendedDetailsInfo, OrderInitiaExtendeDto } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -93,6 +93,7 @@ export class DashboardService {
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
+    [WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED]: (filters: DashboartFilterDto) => this.getActivePositionInitialExtendedWidgetData(filters),
     [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
     [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivecandidateStatusWidgetData(filters),
     [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getSkillCategoryByTypes(filters, timeSelection),
@@ -239,7 +240,26 @@ export class DashboardService {
         );
       }
 
-    
+      private getActivePositionInitialExtendedWidgetData(filter: DashboartFilterDto): Observable<any> {
+        return this.httpClient.post<OrderInitiaExtendeDto>(`${this.baseUrl}/ActivePositionsInitiaExtended`, { granulateInProgress: true, ...filter }).pipe(
+          map(({ activePositionsInitiaExtendedDetails }: OrderInitiaExtendeDto) => {
+            return {
+              id: WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED,
+               title: 'Active Positions - Count of Initial & Extended positions',
+               chartData: lodashMapPlain(
+                activePositionsInitiaExtendedDetails,
+                ({ initialPositions, statusName,extendedPositions,totalCount }: ActivePositionsInitiaExtendedDetailsInfo, index: number) => ({
+                  label: statusName,
+                  value: extendedPositions,
+                  average: initialPositions,
+                  totalCount: totalCount,
+                  color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
+                })
+                ),
+              };
+            })
+          );
+        }   
 
   private getApplicantsByRegionWidgetData(
     filters: DashboartFilterDto
