@@ -1139,6 +1139,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       .subscribe((value: boolean) => {
         if (value) {
           this.switchedValueForm.get('value')?.addValidators(Validators.required);
+          this.switchedValueForm.get('value')?.markAsTouched();
         } else {
           this.switchedValueForm.get('value')?.removeValidators(Validators.required);
         }
