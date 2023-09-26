@@ -128,9 +128,11 @@ public readonly legendSettings: Object = { visible: false };
     }
       window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
 
-      if(status === PositionTrendTypeEnum.IN_PROGRESS){
-        candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
-        candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
+      if(status === ActivePositionsChartStatuses.IN_PROGRESS){
+        status = PositionTrendTypeEnum.IN_PROGRESS;
+         candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
+         candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
+         candidatesStatusDataSet.push({"value":30});
       }
       else if(status === ActivePositionsChartStatuses.PENDING){
         status = 'In Progress (Pending)';
