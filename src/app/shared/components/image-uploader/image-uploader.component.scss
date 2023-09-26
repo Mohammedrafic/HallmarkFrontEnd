@@ -28,11 +28,6 @@
   display: none;
 }
 
-.clear-logo-button {
-  width: 100%;
-  margin-top: 20px;
-}
-
 .logo-container {
   display: flex;
 
@@ -61,6 +56,28 @@
   display: none;
 }
 
+.delete-logo {
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+  color: $supportive-red !important;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  
+  &:hover {
+    background-color: $supportive-red-40;
+  }
+}
+
+.e-card-header-caption {
+  flex-direction: row !important;
+  justify-content: space-between;
+  align-items: center;
+}
+
 @media #{$max-desktop-small} {
   .e-card {
     margin-bottom: 0;
@@ -76,9 +93,8 @@
     padding: 0;
   }
 
-  .e-card-header-caption {
-    flex-direction: row !important;
-    justify-content: space-between;
+  .e-card-header {
+    padding: 12px 0 !important;
   }
 
   .upload-btn {

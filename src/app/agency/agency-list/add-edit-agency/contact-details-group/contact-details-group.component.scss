@@ -29,7 +29,7 @@
 
 @media #{$max-mobile} {
   .contact-items {
-    grid-template-columns: 1fr 40px;
+    grid-template-columns: 1fr 40px !important;
     place-items: unset;
 
     .input-container {
