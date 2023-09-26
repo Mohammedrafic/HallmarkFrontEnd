@@ -20,7 +20,7 @@
             <app-tooltip-container [showToolTip]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission">
               <button
                 ejs-button
-                [disabled]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission"
+                [disabled]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission || isAgencyUser"
                 id="addFormButton"
                 type="submit"
                 [isPrimary]="true"
@@ -54,7 +54,7 @@
                 <app-partnership-settings
                   [partnershipForm]="$any(partnershipForm)"
                   [activeTab]="activeTab"
-                  [isAgency]="isAgency"></app-partnership-settings>
+                  [isAgency]="isAgencyUser"></app-partnership-settings>
               </ng-template>
             </e-tabitem>
           </e-tabitems>
