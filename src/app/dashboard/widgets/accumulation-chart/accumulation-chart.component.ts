@@ -146,8 +146,11 @@ export class AccumulationChartComponent
         }
         window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(candidatesOrderDataSet));
 
-        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {         
+        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) { 
+          if(candidatesChartInfo.status!=='Others')
+          {        
             this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
+          }
         }else{
           if(candidatesChartInfo.status!=='Others')
           {

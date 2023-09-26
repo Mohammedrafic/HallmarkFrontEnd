@@ -35,7 +35,7 @@ import { Comment } from '@shared/models/comment.model';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired, ONBOARD_CANDIDATE, onBoardCandidateMessage, SEND_EMAIL, REQUIRED_PERMISSIONS } from '@shared/constants';
+import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired, ONBOARD_CANDIDATE, onBoardCandidateMessage, SEND_EMAIL, REQUIRED_PERMISSIONS, AgencyPartnershipSuspended } from '@shared/constants';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -171,6 +171,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public candidateAddressRequiredValue : string = '';
   public saveStatus:number =0;
   public partnershipStatus = PartnershipStatus;
+  public agencyStatusMessage = AgencyPartnershipSuspended;
+  
   get templateEmailTitle(): string {
     return "Onboarding Email";
   }

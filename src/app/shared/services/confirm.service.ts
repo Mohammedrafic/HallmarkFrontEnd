@@ -84,21 +84,19 @@ export class ConfirmService {
 
         cssClass: 'unsaved-changes-dialog',
         okButton: {
-          text: options?.okButtonLabel ?? '',
+          text: options?.okButtonLabel ?? ' OK',
           cssClass: options?.okButtonClass ?? '',
           click: () => {
             isConfirmed$.next({ action: ConfirmEventType.YES });
-            isConfirmed$.complete();
-            dialog.close();
+            dialog.hide();
           },
         },
         cancelButton: {
-          text: options?.cancelButtonLabel ?? '',
+          text: options?.cancelButtonLabel ?? 'Cancel',
           cssClass: 'e-outline',
           click: () => {
             isConfirmed$.next({ action: ConfirmEventType.NO });
-            isConfirmed$.complete();
-            dialog.close();
+            dialog.hide();
           },
         },
         close: () => {
