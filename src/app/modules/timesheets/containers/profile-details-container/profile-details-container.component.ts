@@ -540,19 +540,23 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.disableAnyAction = allowResult;
 
   }
-  private allowEditButtonEnabled(): void {
+  private allowEditButtonEnabled(jobId: number): void {
     let organizationId = this.orgId;
+    let jobid = this.jobId;
     this.settingsViewService.getViewSettingKey(
       OrganizationSettingKeys.TimesheetSubmissionProcess,
-      OrganizationalHierarchy.Organization,
+      OrganizationalHierarchy.Location,
       organizationId as number,
-      organizationId as number
+      organizationId as number,
+      false,
+      jobId
     ).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(({ TimesheetSubmissionProcess }) => {
       let currentdate = new Date();
       let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));
-
+      console.log(TimesheetSubmissionProcess);
+      console.log(dateDiff);
       if (TimesheetSubmissionProcess == "INT" &&dateDiff <= 30) {
         this.disableEditButton = true;
       }
@@ -625,7 +629,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       }));
       this.setDNWBtnState(details.canEditTimesheet, !!details.allowDNWInTimesheets);
       this.checkForAllowActions(details.agencyStatus);
-      this.allowEditButtonEnabled();
+      this.allowEditButtonEnabled(this.jobId);
       this.cd.markForCheck();
 
       this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
