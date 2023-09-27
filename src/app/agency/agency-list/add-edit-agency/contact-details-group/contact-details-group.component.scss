@@ -27,7 +27,7 @@
   }
 }
 
-@supports (-moz-appearance: none) { //TODO delete this block if Mozilla support :has()
+@supports (-moz-appearance: none) { //TODO delete this block if Mozilla supports :has()
    .contact-items {
     grid-template-columns: repeat(4, 1fr) auto;
   }

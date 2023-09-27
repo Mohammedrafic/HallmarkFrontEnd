@@ -137,7 +137,7 @@
       }
     }
 
-    @supports (-moz-appearance: none) { //TODO delete this block if Mozilla support :has()
+    @supports (-moz-appearance: none) { //TODO delete this block if Mozilla supports :has()
       .contact-item {
         grid-template-columns: 1fr auto 1fr 1fr 1fr auto;
       }
