@@ -1241,7 +1241,6 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         pairwise(),
         takeUntil(this.componentDestroy())
       ).subscribe(([prevJobDistributionId, jobDistributionId]) => {
-        console.log(prevJobDistributionId);
         if (jobDistributionId === OrderJobDistribution.All) {
           this.orderControlsConfig.jobDistributionControl.patchValue(OrderJobDistribution.All, { emitEvent: false });
         }
