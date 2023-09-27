@@ -899,7 +899,7 @@ export class SendGroupEmailComponent
           if(this.allowActiveUsers){
             this.userData = data?.filter(i => i.isDeleted == false);
           }else{
-            this.userData = data?.filter(i => i.isDeleted == true);
+            this.userData = data;
           }
 
       });
