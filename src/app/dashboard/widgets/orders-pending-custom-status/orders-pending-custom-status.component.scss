@@ -141,3 +141,33 @@ header {
   position: sticky;
   top: 0;
 }
+
+
+.table-section .row .col:first-child ,.orderStatus{
+  padding-left: 12px;
+}
+
+.middle-col-header .row.middle-cell:before,.middle-col-header .customStatus:before {
+content: "";
+display: block;
+position: absolute;
+left: -10px;
+height: calc( 100% - 30% );
+width: 1px;
+top: 15%;
+background: #ecf2ff;
+}
+
+.row.middle-cell,.middle-col-header .customStatus {
+  position: relative;
+display:block;
+}
+.orderStatus .customStatus:before {
+  width: 0px;
+}
+.tableHeader .col{
+  background: #fffbfb  !important;
+}
+header.tableHeader .flex-container span {
+  padding: 5px 0!important;
+}
