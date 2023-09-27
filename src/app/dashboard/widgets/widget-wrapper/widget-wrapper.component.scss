@@ -126,7 +126,9 @@ $headerHeight: 19px;
   }
   &__orders_pending_in_custom {
     display: flex;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: calc( 100% - 30px);
   }
 }
 .with-position{
