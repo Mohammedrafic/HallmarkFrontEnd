@@ -9,7 +9,8 @@
 
     &:disabled {
       i-feather {
-        fill: $grey;
+        color: $primary-active-blue-40;
+        fill: $primary-active-blue-60;
       }
     }
 
