@@ -27,6 +27,12 @@
   }
 }
 
+@supports (-moz-appearance: none) { //TODO delete this block if Mozilla support :has()
+   .contact-items {
+    grid-template-columns: repeat(4, 1fr) auto;
+  }
+}
+
 @media #{$max-mobile} {
   .contact-items {
     grid-template-columns: 1fr 40px !important;
