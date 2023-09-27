@@ -35,6 +35,7 @@ export class BillingDetailsGroupComponent implements OnInit, OnDestroy {
       ?.valueChanges.pipe(takeWhile(() => this.isAlive))
       .subscribe((value) => {
         const statesValue = value === Country.USA ? UsaStates : CanadaStates;
+        this.formGroup.get('state')?.reset();
         this.states$.next(statesValue);
       });
   }

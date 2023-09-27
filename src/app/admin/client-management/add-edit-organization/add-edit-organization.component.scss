@@ -101,6 +101,12 @@
     margin-bottom: 10px;
   }
 
+  #contactDetailsGroup {
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
+  }
+
   .contact-details {
     .title {
       margin-bottom: 20px;
@@ -127,6 +133,12 @@
 
 
       &:has(.remove-button-container) {
+        grid-template-columns: 1fr auto 1fr 1fr 1fr auto;
+      }
+    }
+
+    @supports (-moz-appearance: none) { //TODO delete this block if Mozilla supports :has()
+      .contact-item {
         grid-template-columns: 1fr auto 1fr 1fr 1fr auto;
       }
     }

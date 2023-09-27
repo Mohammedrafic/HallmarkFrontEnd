@@ -311,10 +311,12 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
   }
 
   public onGeneralCountryChange(event: ChangeEventArgs): void {
+    this.GeneralInformationFormGroup.get('state')?.reset();
     this.store.dispatch(new SetGeneralStatesByCountry(event.value as Country));
   }
 
   public onBillingCountryChange(event: ChangeEventArgs): void {
+    this.BillingDetailsFormGroup.get('state')?.reset();
     this.store.dispatch(new SetBillingStatesByCountry(event.value as Country));
   }
 
