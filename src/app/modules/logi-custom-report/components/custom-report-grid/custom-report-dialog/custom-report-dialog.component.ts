@@ -85,7 +85,7 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
   public defaultOrganizations: number[] = [];
   public filterColumns: any;
   private agencyOrganizationId: number;
-
+ public  isInitial=true
   constructor(
     protected override store: Store,
     private datePipe: DatePipe,
@@ -129,7 +129,6 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
     this.onOrganizationsChange();
     this.onLocationsChange();
     this.onRegionsChange();
-    this.SearchReport();
 
   }
   ngAfterViewInit(): void {
@@ -188,23 +187,7 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
     this.isAddCustomReportSidebarShown = true;
   }
 
-  public SearchReport(): void {
-    setTimeout(() => {
-      this.paramsData =
-      {
-        OrganizationParam: [this.agencyOrganizationId],
-        RegionsParam: this.regions?.map((list) => Number(list.id)),
-        LocationsParam: this.locations.map((list) => Number(list.id)),
-        DepartmentsParam: this.departments.map((list) => Number(list.id)),
 
-      };
-      this.logiReportComponent.paramsData = this.paramsData;
-      this.logiReportComponent.RenderReport();
-    }, 2500);
-
-
-
-  }
 
   public onAddReportClose(): void {
     this.isAddCustomReportSidebarShown = false;
@@ -251,6 +234,23 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
       .subscribe((data: Department[]) => {
         if (data != undefined) {
           this.departments = data;
+          if(this.departments.length > 0)
+          if(this.isInitial)
+          {
+            this.isInitial=false
+          this.paramsData =
+          {
+            OrganizationParam: [this.agencyOrganizationId],
+            RegionsParam: this.regions?.map((list) => Number(list.id)),
+            LocationsParam: this.locations.map((list) => Number(list.id)),
+            DepartmentsParam: this.departments.map((list) => Number(list.departmentId)),
+    
+          };   
+          setTimeout(() => {
+          this.logiReportComponent.paramsData = this.paramsData;
+          this.logiReportComponent.RenderReport();
+          },1000)
+        }
         }
       });
   }
