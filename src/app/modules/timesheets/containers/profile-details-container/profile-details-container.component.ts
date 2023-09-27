@@ -554,9 +554,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       takeUntil(this.componentDestroy())
     ).subscribe(({ TimesheetSubmissionProcess }) => {
       let currentdate = new Date();
-      let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));
-      console.log(TimesheetSubmissionProcess);
-      console.log(dateDiff);
+      let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));     
       if (TimesheetSubmissionProcess == "INT" &&dateDiff <= 30) {
         this.disableEditButton = true;
       }
