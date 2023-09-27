@@ -22,6 +22,11 @@
         [sizeY]="panel.sizeY"
       >
         <ng-template #content [ngSwitch]="panel.id">
+          <app-stack-column-chart *ngSwitchCase="widgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED" 
+                          [chartData]="widgetsData?.[widgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED]"
+                          [isLoading]="isLoading"
+                          [isDarkTheme]="isDarkTheme" [averageFlag]="true"
+                          [description]="widgetDescriptionEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED"></app-stack-column-chart>
           <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS"
                                     [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]"
                                     [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"

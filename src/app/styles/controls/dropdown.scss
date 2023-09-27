@@ -210,12 +210,6 @@ body.dark {
   }
 }
 
-.e-ddl.e-popup.e-control.e-ddl-device.e-ddl-device-filter.e-popup-full-page.e-popup-open {
-  position: fixed;
-  height: 100dvh;
-  -webkit-overflow-scrolling: touch;
-}
-
 body.dark {
   .bootstrap {
     ejs-dropdownlist.e-control,
@@ -381,6 +375,19 @@ body.dark {
       &::-webkit-scrollbar-track {
         background-color: $sidebar-background;
       }
+    }
+  }
+}
+
+
+@media #{$max-tablet} {
+  body.light,
+  body.dark {
+    .e-ddl.e-popup.e-control.e-ddl-device.e-ddl-device-filter.e-popup-full-page.e-popup-open {
+      position: fixed;
+      height: 100dvh;
+      -webkit-overflow-scrolling: touch;
+      inset: 0 !important;
     }
   }
 }

@@ -13,30 +13,39 @@
         </div>
       </ng-template>
     <ng-template #orders_pending_custom_status>
-        <section>
-          <header>
-            <div class="col center"><span class="customStatus">Order Status</span></div>
+        <section class="m-0">
+          <header class="tableHeader">
             <div class="col w-50">
               <div class="middle-col-header pos-center">
-                <div class="row middle-cell">Initial</div>
+                <div class="row middle-cell"><span class="customStatus"></span></div>
                 <div class="row flex-container">
-                  <div>Count</div>
-                  <div>Avg Days</div>
+                  
+                  <div class="orderStatus"><span class="customStatus ">ORDER STATUS</span></div>
                 </div>
               </div>
             </div>
             <div class="col w-50">
               <div class="middle-col-header pos-center">
-                <div class="row middle-cell">Extension</div>
+                <div class="row middle-cell"><span class="customStatus">INITIAL</span></div>
                 <div class="row flex-container">
-                  <div>Count</div>
-                  <div>Avg Days</div>
+                  <div><span class="customStatus">COUNT</span></div>
+                  <div><span class="customStatus">AVG DAYS</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="col w-50">
+              <div class="middle-col-header pos-center">
+                <div class="row middle-cell"><span class="customStatus">EXTENSION</span></div>
+                <div class="row flex-container">
+                  <div><span class="customStatus">COUNT</span></div>
+                  <div><span class="customStatus">AVG DAYS</span></div>
                 </div>
               </div>
             </div>
           </header>
+          <div class="table-section">
          <div class="row" *ngFor="let data of chartData?.chartData">
-            <div class="col"><span class="customStatus">{{data.customStatus}}</span></div>
+            <div class="col">{{data.customStatus}}</div>
             <div  class="col">
               <div class="middle-col">
                 <div class="row flex-container">
@@ -58,6 +67,7 @@
               </div>
             </div>
           </div>
+        </div>
         </section>
 
     </ng-template>

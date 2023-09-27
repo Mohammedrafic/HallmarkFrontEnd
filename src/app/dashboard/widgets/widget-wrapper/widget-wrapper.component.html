@@ -15,6 +15,9 @@
     <div *ngIf="header" class="app-widget-wrapper__header">
       <ng-container [ngTemplateOutlet]="header"></ng-container>
     </div>
+    <div *ngIf="active_positions_initial_extended" class="app-widget-active__positions_initial_extended">
+      <ng-container [ngTemplateOutlet]="active_positions_initial_extended"></ng-container>
+    </div>
     <div *ngIf="chart" class="app-widget-wrapper__chart">
       <ng-container [ngTemplateOutlet]="chart"></ng-container>
     </div>

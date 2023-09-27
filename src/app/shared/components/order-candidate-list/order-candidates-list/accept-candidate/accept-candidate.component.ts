@@ -33,7 +33,7 @@ import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList, RegularRatesData } from '@shared/models/order-management.model';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetAgencyAvailableSteps,
@@ -57,6 +57,7 @@ import { CommonHelper } from '@shared/helpers/common.helper';
 import { formatNumber } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -197,7 +198,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private changeDetectionRef: ChangeDetectorRef,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private orderManagementService: OrderManagementService,
   ) {
     this.createForm();
   }
@@ -415,7 +417,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           allowDeployWoCredentials: false,
           billRates: this.billRatesData,
           offeredStartDate: this.candidateJob.offeredStartDate,
-          candidatePayRate: value.candidatePayRate
+          candidatePayRate: value.candidatePayRate,
         })
       ).pipe(
         takeUntil(this.unsubscribe$)
@@ -449,7 +451,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       rate: new FormControl(''),
       hours: new FormControl(''),
       dob: new FormControl(''),
-      ssn: new FormControl('')
+      ssn: new FormControl(''),
     });
   }
 
@@ -497,10 +499,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
       this.getComments();
       this.billRatesData = [...value.billRates];
+      const regularRates = this.orderManagementService.setRegularRates(this.billRatesData, jobStartDate);
+      const billRate = regularRates.regular || regularRates.regularLocal || value.order.hourlyRate;
       this.form.patchValue({
         jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
         date: [DateTimeHelper.setCurrentTimeZone(jobStartDate), DateTimeHelper.setCurrentTimeZone(jobEndDate)],
-        billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
+        billRates: billRate && PriceUtils.formatNumbers(billRate),
         availableStartDate: value.availableStartDate ?
           DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
         candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),

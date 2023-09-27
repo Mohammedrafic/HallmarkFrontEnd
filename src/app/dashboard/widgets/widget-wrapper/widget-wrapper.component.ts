@@ -27,6 +27,7 @@ export class WidgetWrapperComponent {
   @ContentChild("upcoming_exp_creds") public readonly upcoming_exp_creds: TemplateRef<HTMLElement>;
   @ContentChild("available_employee") public readonly available_employee: TemplateRef<HTMLElement>;
   @ContentChild("positions_count_day_range") public readonly positions_count_day_range: TemplateRef<HTMLElement>;
+  @ContentChild("active_positions_initial_extended") public readonly active_positions_initial_extended: TemplateRef<HTMLElement>;
   @ContentChild("orders_pending_custom_status") public readonly orders_pending_custom_status: TemplateRef<HTMLElement>;
   @ContentChild("bill_rate_by_skill_category") public readonly bill_rate_by_skill_category: TemplateRef<HTMLElement>;
 }
