@@ -79,6 +79,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'ATPRateCalculation',
   'DisableNumberOfOpenPositions',
   'ShowDeployedEmployees',
+  'LimitNumberOfCandidateanAgencycansubmitToaPosition',
 ];
 
 export const DisabledSettingsByDefault = [
