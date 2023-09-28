@@ -118,6 +118,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   private jobId: number;
 
+  @Select(AppState.isSidebarOpened)
+  isSideBarDocked$: Observable<boolean>;
+
   @Select(AppState.isMobileScreen)
   public readonly isMobileScreen$: Observable<boolean>;
 
@@ -168,6 +171,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private canRecalculate: boolean;
 
   previewAttachemnt:boolean = false;
+  sideBar:boolean = false;
   currentSelectedAttachmentIndex:number = 0;
   navigateTheAttachment$:Subject<number> = new Subject<number>();
   
@@ -210,6 +214,15 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.listenResizeToolbar();
     this.observeRecordsLoad();
     this.observeDetails();
+    this.isSideBarDocked$
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((isOpen) => {
+          this.sideBar =isOpen;
+          if(this.previewAttachemnt){
+            this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);
+          }
+            
+        });
   }
 
   public override ngOnDestroy(): void {
