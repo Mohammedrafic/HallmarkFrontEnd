@@ -3,6 +3,10 @@
 @import 'adaptive-response';
 
 $chip-margin: 8px;
+.main-body{
+  display: flex;
+  clear: both;
+}
 
 .header-container {
   position: sticky;
@@ -341,6 +345,7 @@ app-navigation-panel {
 }
 .w-50{
   width: 50%;
+  // float: left;
 }
 .w-60{
   width: 60%;
