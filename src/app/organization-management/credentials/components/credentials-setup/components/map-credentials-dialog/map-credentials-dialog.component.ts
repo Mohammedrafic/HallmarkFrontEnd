@@ -107,7 +107,6 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   public query: Query = new Query().take(this.maxDepartmentsLength);
   public filterType = 'Contains';
   public credentialTypeSources: CredentialTypeSource[] = [];
-  public targetElement: HTMLElement | null;
   public checkbox = CredentialCheckBox;
   public checkboxState = {} as CredentialCheckboxState;
 
@@ -134,8 +133,6 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     @Inject(DOCUMENT) private document: Document
   ) {
     super();
-
-    this.targetElement = this.document.body;
 
     this.createCredentialMappingForm();
   }
