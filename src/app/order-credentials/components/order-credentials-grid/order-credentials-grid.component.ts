@@ -1,5 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges,
-  ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter, 
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 
 import { GridComponent, GroupSettingsModel, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
 
@@ -10,6 +19,8 @@ import {
   AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { CheckboxState, CredentialCheckboxState } from '@order-credentials/interfaces';
+import { CheckBox } from '@order-credentials/enums';
 
 @Component({
   selector: 'app-order-credentials-grid',
@@ -32,6 +43,8 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
   public pageSizes: any;
   public totalItemCount = 0;
   public totalPageCount = 1;
+  public checkboxState = {} as CredentialCheckboxState;
+  public checkbox = CheckBox;
 
   constructor(private confirmService: ConfirmService) {
     super();
@@ -42,6 +55,8 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
 
     if (!credential.isFirstChange() && credential?.currentValue) {
       this.totalItemCount = credential.currentValue.length;
+    } else {
+      this.setCheckboxState();
     }
   }
 
@@ -61,9 +76,18 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
     this.unsubscribe$.complete();
   }
 
-  public updateCredential(data: IOrderCredentialItem): void {
+  public updateCredential({ checked }: { checked: boolean }, data: IOrderCredentialItem, checkboxName: CheckBox): void {
+    const checkboxState = this.updateCheckboxState(data.credentialId, checked, checkboxName);
+    const { optional, reqForOnboard, reqForSubmission } = checkboxState;
+
     // Do not send column property to the backend, it is a fully qualified object with circular references
-    const setupData = Object.assign({}, { ...data, column: undefined });
+    const setupData = {
+      ...data,
+      optional,
+      reqForOnboard,
+      reqForSubmission,
+      column: undefined,
+    };
     this.update.emit(setupData);
   }
 
@@ -82,23 +106,42 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.grid.pageSettings.currentPage=event.currentPage;
+      this.grid.pageSettings.currentPage = event.currentPage;
       this.currentPage = event.currentPage;
     }
   }
 
   public onRemoveButtonClick(credential: IOrderCredentialItem): void {
     this.confirmService
-    .confirm('Are you sure want to delete?', {
-      title: 'Delete Record',
-      okButtonLabel: 'Delete',
-      okButtonClass: 'delete-button'
-    })
-    .pipe(takeUntil(this.unsubscribe$))
-    .subscribe((confirm) => {
-      if (confirm) {
-        this.delete.emit(credential.credentialId);
-      }
+      .confirm('Are you sure want to delete?', {
+        title: 'Delete Record',
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((confirm) => {
+        if (confirm) {
+          this.delete.emit(credential.credentialId);
+        }
+      });
+  }
+
+  private setCheckboxState(): void {
+    this.credential.forEach((cred) => {
+      this.checkboxState[cred.credentialId] = {
+        optional: cred.optional,
+        reqForOnboard: cred.reqForOnboard,
+        reqForSubmission: cred.reqForSubmission,
+      };
     });
- }
+  }
+
+  private updateCheckboxState(id: number, event: boolean, checkboxName: CheckBox): CheckboxState {
+    this.checkboxState[id] = Object.fromEntries(
+      Object.entries(this.checkboxState[id]).map(([key]) => {
+        return [key, checkboxName === key ? event : false];
+      })) as CheckboxState;
+
+    return this.checkboxState[id];
+  }
 }
