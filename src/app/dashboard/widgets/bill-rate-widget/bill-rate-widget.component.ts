@@ -132,14 +132,16 @@ export class BillRateWidgetComponent extends AbstractSFComponentDirective<ChartC
     this.chartLegend = this.generateLegendData(this.chartData);
     this.handleChartDataChanges(this.chartData);
     const maximumDataValue = this.getMaximumDataValue();
-    const correctorChartHeight = Math.floor(maximumDataValue * 0.10);
+    console.log(maximumDataValue)
+    console.log(maximumDataValue)
+    const correctorChartHeight = Math.floor(maximumDataValue * 0.03);
     this.primaryYAxis = {
       ...this.primaryYAxis,
       maximum: maximumDataValue + correctorChartHeight,
-      interval: maximumDataValue / 2,
+      interval: maximumDataValue / 5,
       labelFormat: '${value}'
     };
-
+console.log(this.primaryXAxis)
     this.primaryYAxisDarkTheme = {
       ...this.primaryYAxisDarkTheme,
       maximum: maximumDataValue + correctorChartHeight,
@@ -153,7 +155,7 @@ export class BillRateWidgetComponent extends AbstractSFComponentDirective<ChartC
       flatten,
       lodashMap((positionByTypeData: PositionByTypeDataModel) => positionByTypeData.value),
       max,
-      thru((value: number) => Math.ceil(value / 10) * 10)
+      thru((value: number) => Math.ceil(value / 50) * 50)
     )(this.chartData);
   }  
 
