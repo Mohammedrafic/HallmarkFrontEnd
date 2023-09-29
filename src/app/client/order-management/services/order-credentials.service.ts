@@ -23,4 +23,13 @@ export class OrderCredentialsService {
     cred: IOrderCredentialItem): IOrderCredentialItem[] {    
     return orderCredentials.filter((credential) => credential.credentialId !== cred.credentialId);
   }
+
+  public checkCredentialFlags(credentials: IOrderCredentialItem[]): boolean {
+    const isSelectedFlag = credentials?.find((credential) => {
+      const { optional, reqForOnboard, reqForSubmission } = credential;
+      return !optional && !reqForOnboard && !reqForSubmission;
+    });
+
+    return !isSelectedFlag;
+  }
 }
