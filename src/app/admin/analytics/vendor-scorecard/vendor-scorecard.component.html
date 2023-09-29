@@ -15,15 +15,33 @@
           </div>
         </section>
         <section class="toolbar-buttons" style="margin-right: -438px;">
-        <div [hidden]="!istypeSetupTabActive">
-            <button ejs-button  (click)="captureScreen()" cssClass="e-outline button-filter">
+          <!-- <div [hidden]="!istypeSetupTabActive">
+            <button ejs-button (click)="captureScreen()" cssClass="e-outline button-filter">
               <div class="filter-button-content">
-                Print 
+                Export
               </div>
             </button>
-        </div>
-      </section>
-        <section class="toolbar-buttons">
+            <button ejs-button  (click)="printPage()" cssClass="e-outline button-filter">
+              <div class="filter-button-content">
+                Print
+              </div>
+            </button>
+          </div> -->
+
+        </section>
+        <section class="toolbar-buttons" style="display: flex;">
+          <div [hidden]="!istypeSetupTabActive">
+            <button ejs-button (click)="captureScreen()" cssClass="e-outline button-filter">
+              <div class="filter-button-content">
+                Export
+              </div>
+            </button>
+            <button ejs-button  (click)="printPage()" cssClass="e-outline button-filter">
+              <div class="filter-button-content">
+                Print
+              </div>
+            </button>
+          </div>
           <button ejs-button id="filterButton" (click)="showFilters()" cssClass="e-outline button-filter">
             <div class="filter-button-content">
               Filters <i-feather name="sliders" class="icon"></i-feather>
@@ -33,65 +51,80 @@
       </section>
     </section>
 
-    <div class="col-lg-12 group" #screen>
+    <div class="col-lg-12 group" #screen id="demo" class="demo">
 
-      <div class="vendor-graph row" id="contentToConvert" style="width:1349.490px ">
+      <div class="vendor-graph row" id="contentToConvert" class="myDivToPrint" style="width:1349.490px ">
 
 
 
         <div class="graphs" [hidden]="!istypeSetupTabActive"
           *ngFor="let agencies of VendorScorecardresponse;let i = index">
-
+          <div class="Toplayers head-line">
+            <h4 class="head">{{agencies.agencyName}}</h4>
+          </div>
           <div class="Toplayer ">
             <div class="col3 graph-heading">
-              <h4>Vendor Details</h4>
-              <div class="vendor_details">
-                <div class="label-sec">
-                  <label for="">Name<span>:</span></label>
-                  <p>{{agencies.agencyName}}</p>
-                </div>
-                <div class="label-sec">
-                  <label for="">Contact<span>:</span></label>
-                  <p>{{agencies.agencyContact}}</p>
-                </div>
-                <div class="label-sec">
-                  <label for="">Phone<span>:</span></label>
-                  <p>{{agencies.phone}}</p>
-                </div>
-                <div class="label-sec">
-                  <label for="">Email<span>:</span></label>
-                  <p>{{agencies.email}}</p>
-                </div>
-              </div>
+              <h4 class="head">{{agencies.agencyContact}}</h4>
+              <p class="head">{{agencies.phone}}|{{agencies.email}}</p>
             </div>
             <div class="col4 graph-heading">
-              <h4>Vendor Overall Score</h4>
-              <div class="">
-                <ejs-progressbar id='mainprogress{{i}}' [startAngle]="startAngle" [endAngle]="endAngle" type='Circular'
+              <h2 class="font-color">Overall Score</h2>
+              <div class="" style=" height: 130px;;width:130px;margin: auto">
+                <div class="col-md-8" style="height: 140px">
+                  <ejs-accumulationchart id="container{{i}}" style="height: inherit !important">
+                    <e-accumulation-series-collection style='display:block;  width: 120px;height:120px '>
+                      <e-accumulation-series name='Browser'
+                        [dataSource]='[{ x: "", y: agencies.vendorOverallScorePercent  },{ x: "", y:  100-agencies.vendorOverallScorePercent }]'
+                        xName='x' yName='y' [startAngle]="startAngle" [endAngle]="endAngle" innerRadius="0%"
+                        radius="70%" [dataLabel]="dataLabel" [explode]='explode' explodeOffset='10%' [explodeIndex]='0'
+                        [palettes]='agencies.vendorOverallScorePercent>=80?["#15ce48","blue"]:agencies.vendorOverallScorePercent>=60?["#0f82bf","blue"]:
+                            agencies.vendorOverallScorePercent>=40?["#36b3ef","blue"]:
+                            agencies.vendorOverallScorePercent>=20?["#f9c679","blue"]:
+                            ["#f5602e","blue"]
+                            '>
+                      </e-accumulation-series>
+                    </e-accumulation-series-collection>
+                  </ejs-accumulationchart>
+                </div>
+                <!-- <div class="col-md-8">
+                    <ejs-accumulationchart id="container" #pie style="display:block;  width: 92%"
+                      [legendSettings]="legendSettings" [tooltip]="tooltip" [title]="titles" (load)="load($event)"
+                      [enableAnimation]="enableAnimation" [center]="center">
+                      <e-accumulation-series-collection>
+                        <e-accumulation-series name="Browser" [dataSource]="data" xName="x" yName="y"
+                          [startAngle]="startAngles" [endAngle]="endAngles" innerRadius="0%" radius="70%"
+                          [dataLabel]="dataLabel" [explode]="explode" explodeOffset="0%" [explodeIndex]="0"
+                          [palettes]="palette">
+                        </e-accumulation-series>
+                      </e-accumulation-series-collection>
+                    </ejs-accumulationchart>
+                  </div> -->
+
+                <!-- <ejs-progressbar id='mainprogress{{i}}' [startAngle]="startAngle" [endAngle]="endAngle" type='Circular'
                   height='150' value={{agencies.vendorOverallScorePercent}} width="150" progressColor="{{agencies.vendorOverallScorePercent>=80 ?'#15ce48':
                 agencies.vendorOverallScorePercent>=60?'#0f82bf':
                 agencies.vendorOverallScorePercent>=40?'#36b3ef':
                 agencies.vendorOverallScorePercent>=20?'#f9c679':
                 '#f5602e'}}" progressThickness="15" trackThickness="15">
-                </ejs-progressbar>
-                <p class="mainscore">{{agencies.vendorOverallScorePercent}}%</p>
+                </ejs-progressbar> -->
+                <p class="font-color-dark">{{agencies.vendorOverallScorePercent}}%</p>
               </div>
             </div>
             <div class="col3 graph-heading">
-              <h4>Vendor Rating</h4>
+              <h2 class="font-color">Overall Rating</h2>
               <div class="Rating" [ngStyle]="{'color':agencies.vendorOverallScorePercent>=80 ?'#15ce48':
               agencies.vendorOverallScorePercent>=60?'#0f82bf':
               agencies.vendorOverallScorePercent>=40?'#36b3ef':
               agencies.vendorOverallScorePercent>=20?'#f9c679':
               '#f5602e'}">
-                <span>{{agencies.vendorOverallScorePercent>=80 ?'A':
+                <span class="font-inc">{{agencies.vendorOverallScorePercent>=80 ?'A':
                   agencies.vendorOverallScorePercent>=60?'B':
                   agencies.vendorOverallScorePercent>=40?'C':
                   agencies.vendorOverallScorePercent>=20?'D':
                   'E'}}</span>
-                <span>{{agencies.vendorOverallScore}}</span>
+                <span class="font-color-dark">{{agencies.vendorOverallScore| uppercase}}</span>
               </div>
-              <div class="vendor_details">
+              <!-- <div class="vendor_details">
                 <div class="label-sec">
                   <div style="background-color:#15ce48" class="widget-legend__point"><span>A</span></div>
                   <p>- Excellent 81-100</p>
@@ -112,14 +145,36 @@
                   <div style="background-color:#f5602e" class="widget-legend__point"><span>E</span></div>
                   <p>- Poor 0-20</p>
                 </div>
+              </div> -->
+            </div>
+          </div>
+          <div class="Toplayers heading">
+            <div class="vendor_details" style="float: right;display: flex;">
+              <div class="label-sec">
+                <div class="widget-legend__point" style="background-color: #15ce48;"><span>A</span></div>
+                <p>- Excellent 81-100</p>
+              </div>
+              <div class="label-sec">
+                <div class="widget-legend__point" style="background-color: #0f82bf;"><span>B</span></div>
+                <p>- Good 61-80</p>
+              </div>
+              <div class="label-sec">
+                <div class="widget-legend__point" style="background-color: #36b3ef;"><span>C</span></div>
+                <p>- Average 41-60</p>
+              </div>
+              <div class="label-sec">
+                <div class="widget-legend__point" style="background-color: #f9c679;"><span>D</span></div>
+                <p>- Fair 21-40</p>
+              </div>
+              <div class="label-sec">
+                <div class="widget-legend__point" style="background-color: #f5602e;"><span>E</span></div>
+                <p>- Poor 0-20</p>
               </div>
             </div>
           </div>
           <div class="Toplayer mb-3">
             <div class="col7 row graphgrid">
-              <div class="graph-heading">
-                <h4>vendor Score</h4>
-              </div>
+
               <div class="graph-cards">
                 <div class="graphalign">
                   <ejs-progressbar id='determinate1{{i}}' progressColor="{{agencies.submissionQualityPercent>80 ?'#15ce48':
@@ -211,13 +266,17 @@
             </div>
             <div class="col4">
               <div class="order-cound">
-                <h4>Order Count {{agencies.totalOrders}}</h4>
-                <p>
-                  ( <span>{{VendorReportForm.controls['startDate'].value| date: 'MM/dd/yyyy'}}</span> -
-                  <span>{{VendorReportForm.controls['endDate'].value| date: 'MM/dd/yyyy'}}</span> )
-                </p>
+                <h2 class="font-color">Stats</h2>
+                <!-- <h4>Order Count {{agencies.totalOrders}}</h4> -->
+                <h4>
+                  ( <span>{{VendorReportForm.controls['startDate'].value| date:'MMM d, y'}}</span> -
+                  <span>{{VendorReportForm.controls['endDate'].value| date:'MMM d, y'}}</span> )
+                </h4>
+                <h4 class="m-">Order Count :{{agencies.totalOrders}}</h4>
+                <h4 class="m-">Time to Submit :{{agencies.timetoSubmit}}</h4>
+                <h4 class="m-">Time to Start :{{agencies.timetoStart}}</h4>
               </div>
-              <div class=" submit-wrapper">
+              <!-- <div class=" submit-wrapper">
                 <div class="col6">
                   <p class="sub-time">Time to Submit</p>
                   <p class="submit-value">{{agencies.timetoSubmit}}</p>
@@ -228,7 +287,7 @@
                   <p class="submit-value">{{agencies.timetoStart}}</p>
                   <p class="sub-time">Days</p>
                 </div>
-              </div>
+              </div> -->
               <div>
 
               </div>
@@ -244,11 +303,11 @@
         <router-outlet></router-outlet>
       </section>
     </div>
-   
+
     <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
       (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
       <form [formGroup]="VendorReportForm" class="filter-form-dialog form-container bootstrap">
-        
+
         <div class="form-elemet">
           <div class="input-container bootstrap">
             <label>Region</label>
