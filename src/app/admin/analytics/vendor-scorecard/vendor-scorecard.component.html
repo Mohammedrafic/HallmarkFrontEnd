@@ -15,6 +15,19 @@
           </div>
         </section>
         <section class="toolbar-buttons" style="margin-right: -438px;">
+          <!-- <div [hidden]="!istypeSetupTabActive">
+            <button ejs-button (click)="captureScreen()" cssClass="e-outline button-filter">
+              <div class="filter-button-content">
+                Export
+              </div>
+            </button>
+            <button ejs-button  (click)="printPage()" cssClass="e-outline button-filter">
+              <div class="filter-button-content">
+                Print
+              </div>
+            </button>
+          </div> -->
+
         </section>
         <section class="toolbar-buttons" style="display: flex;">
           <div [hidden]="!istypeSetupTabActive">
@@ -23,7 +36,7 @@
                 Export
               </div>
             </button>
-            <button ejs-button (click)="printPage()" cssClass="e-outline button-filter">
+            <button ejs-button  (click)="printPage()" cssClass="e-outline button-filter">
               <div class="filter-button-content">
                 Print
               </div>
@@ -45,7 +58,7 @@
 
 
         <div class="graphs" [hidden]="!istypeSetupTabActive"
-             *ngFor="let agencies of VendorScorecardresponse;let i = index">
+          *ngFor="let agencies of VendorScorecardresponse;let i = index">
           <div class="Toplayers head-line">
             <h4 class="head">{{agencies.agencyName}}</h4>
           </div>
@@ -61,43 +74,78 @@
                   <ejs-accumulationchart id="container{{i}}" style="height: inherit !important">
                     <e-accumulation-series-collection style='display:block;  width: 120px;height:120px '>
                       <e-accumulation-series name='Browser'
-                                             [dataSource]='[{ x: "", y: agencies.vendorOverallScorePercent  },{ x: "", y:  100-agencies.vendorOverallScorePercent }]'
-                                             xName='x' yName='y' [startAngle]="startAngle" [endAngle]="endAngle" innerRadius="0%"
-                                             radius="70%" [dataLabel]="dataLabel" [explode]='explode' explodeOffset='10%' [explodeIndex]='0'
-                                             [palettes]='agencies.vendorOverallScorePercent>
-                        =80?["#15ce48","blue"]:agencies.vendorOverallScorePercent>=60?["#0f82bf","blue"]:
-                        agencies.vendorOverallScorePercent>=40?["#36b3ef","blue"]:
-                        agencies.vendorOverallScorePercent>=20?["#f9c679","blue"]:
-                        ["#f5602e","blue"]
-                        '>
+                        [dataSource]='[{ x: "", y: agencies.vendorOverallScorePercent  },{ x: "", y:  100-agencies.vendorOverallScorePercent }]'
+                        xName='x' yName='y' [startAngle]="startAngle" [endAngle]="endAngle" innerRadius="0%"
+                        radius="70%" [dataLabel]="dataLabel" [explode]='explode' explodeOffset='10%' [explodeIndex]='0'
+                        [palettes]='agencies.vendorOverallScorePercent>=80?["#15ce48","blue"]:agencies.vendorOverallScorePercent>=60?["#0f82bf","blue"]:
+                            agencies.vendorOverallScorePercent>=40?["#36b3ef","blue"]:
+                            agencies.vendorOverallScorePercent>=20?["#f9c679","blue"]:
+                            ["#f5602e","blue"]
+                            '>
                       </e-accumulation-series>
                     </e-accumulation-series-collection>
                   </ejs-accumulationchart>
                 </div>
+                <!-- <div class="col-md-8">
+                    <ejs-accumulationchart id="container" #pie style="display:block;  width: 92%"
+                      [legendSettings]="legendSettings" [tooltip]="tooltip" [title]="titles" (load)="load($event)"
+                      [enableAnimation]="enableAnimation" [center]="center">
+                      <e-accumulation-series-collection>
+                        <e-accumulation-series name="Browser" [dataSource]="data" xName="x" yName="y"
+                          [startAngle]="startAngles" [endAngle]="endAngles" innerRadius="0%" radius="70%"
+                          [dataLabel]="dataLabel" [explode]="explode" explodeOffset="0%" [explodeIndex]="0"
+                          [palettes]="palette">
+                        </e-accumulation-series>
+                      </e-accumulation-series-collection>
+                    </ejs-accumulationchart>
+                  </div> -->
 
+                <!-- <ejs-progressbar id='mainprogress{{i}}' [startAngle]="startAngle" [endAngle]="endAngle" type='Circular'
+                  height='150' value={{agencies.vendorOverallScorePercent}} width="150" progressColor="{{agencies.vendorOverallScorePercent>=80 ?'#15ce48':
+                agencies.vendorOverallScorePercent>=60?'#0f82bf':
+                agencies.vendorOverallScorePercent>=40?'#36b3ef':
+                agencies.vendorOverallScorePercent>=20?'#f9c679':
+                '#f5602e'}}" progressThickness="15" trackThickness="15">
+                </ejs-progressbar> -->
                 <p class="font-color-dark">{{agencies.vendorOverallScorePercent}}%</p>
               </div>
             </div>
             <div class="col3 graph-heading">
               <h2 class="font-color">Overall Rating</h2>
-              <div class="Rating" [ngStyle]="{'color':agencies.vendorOverallScorePercent>
-                =80 ?'#15ce48':
-                agencies.vendorOverallScorePercent>=60?'#0f82bf':
-                agencies.vendorOverallScorePercent>=40?'#36b3ef':
-                agencies.vendorOverallScorePercent>=20?'#f9c679':
-                '#f5602e'}">
-                <span class="font-inc">
-                  {{
-agencies.vendorOverallScorePercent>=80 ?'A':
+              <div class="Rating" [ngStyle]="{'color':agencies.vendorOverallScorePercent>=80 ?'#15ce48':
+              agencies.vendorOverallScorePercent>=60?'#0f82bf':
+              agencies.vendorOverallScorePercent>=40?'#36b3ef':
+              agencies.vendorOverallScorePercent>=20?'#f9c679':
+              '#f5602e'}">
+                <span class="font-inc">{{agencies.vendorOverallScorePercent>=80 ?'A':
                   agencies.vendorOverallScorePercent>=60?'B':
                   agencies.vendorOverallScorePercent>=40?'C':
                   agencies.vendorOverallScorePercent>=20?'D':
-                  'E'
-                  }}
-                </span>
+                  'E'}}</span>
                 <span class="font-color-dark">{{agencies.vendorOverallScore| uppercase}}</span>
               </div>
-
+              <!-- <div class="vendor_details">
+                <div class="label-sec">
+                  <div style="background-color:#15ce48" class="widget-legend__point"><span>A</span></div>
+                  <p>- Excellent 81-100</p>
+                </div>
+                <div class="label-sec">
+                  <div style="background-color:#0f82bf" class="widget-legend__point"><span>B</span></div>
+                  <p>- Good 61-80</p>
+                </div>
+                <div class="label-sec">
+                  <div style="background-color:#36b3ef" class="widget-legend__point"><span>C</span></div>
+                  <p>- Average 41-60</p>
+                </div>
+                <div class="label-sec">
+                  <div style="background-color:#f9c679" class="widget-legend__point"><span>D</span></div>
+                  <p>- Fair 21-40</p>
+                </div>
+                <div class="label-sec">
+                  <div style="background-color:#f5602e" class="widget-legend__point"><span>E</span></div>
+                  <p>- Poor 0-20</p>
+                </div>
+              </div> -->
             </div>
           </div>
           <div class="Toplayers heading">
@@ -134,8 +182,8 @@ agencies.vendorOverallScorePercent>=80 ?'A':
                   agencies.submissionQualityPercent>40?'#36b3ef':
                   agencies.submissionQualityPercent>20?'#f9c679':
                   '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                                   value="{{agencies.submissionQualityPercent}}" width="120" progressThickness="15"
-                                   trackThickness="15">
+                    value="{{agencies.submissionQualityPercent}}" width="120" progressThickness="15"
+                    trackThickness="15">
                   </ejs-progressbar>
                   <p class="subscore">{{agencies.submissionQualityPercent}}%</p>
                   <span class="spantag">Submission Quality</span>
@@ -147,7 +195,7 @@ agencies.vendorOverallScorePercent>=80 ?'A':
                   agencies.complianceRatingPercent>40?'#36b3ef':
                   agencies.complianceRatingPercent>20?'#f9c679':
                   '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                                   value={{agencies.complianceRatingPercent}} width="120" progressThickness="15" trackThickness="15">
+                    value={{agencies.complianceRatingPercent}} width="120" progressThickness="15" trackThickness="15">
                   </ejs-progressbar>
                   <p class="subscore">{{agencies.complianceRatingPercent}}%</p>
                   <span class="spantag">Compliance Rating</span>
@@ -159,7 +207,7 @@ agencies.vendorOverallScorePercent>=80 ?'A':
                   agencies.fillRatePercent>40?'#36b3ef':
                   agencies.fillRatePercent>20?'#f9c679':
                   '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                                   value={{agencies.fillRatePercent}} width="120" progressThickness="15" trackThickness="15">
+                    value={{agencies.fillRatePercent}} width="120" progressThickness="15" trackThickness="15">
                   </ejs-progressbar>
                   <p class="subscore">{{agencies.fillRatePercent}}%</p>
                   <span class="spantag">Fill Rate</span>
@@ -171,7 +219,7 @@ agencies.vendorOverallScorePercent>=80 ?'A':
                   agencies.costAdjustmentPercent>40?'#36b3ef':
                   agencies.costAdjustmentPercent>20?'#f9c679':
                   '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                                   value={{agencies.costAdjustmentPercent}} width="120" progressThickness="15" trackThickness="15">
+                    value={{agencies.costAdjustmentPercent}} width="120" progressThickness="15" trackThickness="15">
                   </ejs-progressbar>
                   <p class="subscore">{{agencies.costAdjustmentPercent}}%</p>
                   <span class="spantag">Cost Adjustment</span>
@@ -183,7 +231,7 @@ agencies.vendorOverallScorePercent>=80 ?'A':
                   agencies.onTimeStartPercent>40?'#36b3ef':
                   agencies.onTimeStartPercent>20?'#f9c679':
                   '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                                   value={{agencies.onTimeStartPercent}} width="120" progressThickness="15" trackThickness="15">
+                    value={{agencies.onTimeStartPercent}} width="120" progressThickness="15" trackThickness="15">
                   </ejs-progressbar>
                   <p class="subscore">{{agencies.onTimeStartPercent}}%</p>
                   <span class="spantag">On Time Start</span>
@@ -195,7 +243,7 @@ agencies.vendorOverallScorePercent>=80 ?'A':
                   agencies.candidatesStartPercent>40?'#36b3ef':
                   agencies.candidatesStartPercent>20?'#f9c679':
                   '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                                   value={{agencies.candidatesStartPercent}} width="120" progressThickness="15" trackThickness="15">
+                    value={{agencies.candidatesStartPercent}} width="120" progressThickness="15" trackThickness="15">
                   </ejs-progressbar>
                   <p class="subscore">{{agencies.candidatesStartPercent}}%</p>
                   <span class="spantag">Candidate Starts</span>
@@ -207,8 +255,8 @@ agencies.vendorOverallScorePercent>=80 ?'A':
                   agencies.candidateRemainingonAssignmentPercent>40?'#36b3ef':
                   agencies.candidateRemainingonAssignmentPercent>20?'#f9c679':
                   '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                                   value={{agencies.candidateRemainingonAssignmentPercent}} width="120" progressThickness="15"
-                                   trackThickness="15">
+                    value={{agencies.candidateRemainingonAssignmentPercent}} width="120" progressThickness="15"
+                    trackThickness="15">
                   </ejs-progressbar>
                   <p class="subscore">{{agencies.candidateRemainingonAssignmentPercent}}%</p>
                   <span class="spantag">Cand. Remaining on Assignment.</span>
@@ -228,7 +276,18 @@ agencies.vendorOverallScorePercent>=80 ?'A':
                 <h4 class="m-">Time to Submit :{{agencies.timetoSubmit}}</h4>
                 <h4 class="m-">Time to Start :{{agencies.timetoStart}}</h4>
               </div>
-
+              <!-- <div class=" submit-wrapper">
+                <div class="col6">
+                  <p class="sub-time">Time to Submit</p>
+                  <p class="submit-value">{{agencies.timetoSubmit}}</p>
+                  <p class="sub-time">Days</p>
+                </div>
+                <div class="col6">
+                  <p class="sub-time">Time to Start</p>
+                  <p class="submit-value">{{agencies.timetoStart}}</p>
+                  <p class="sub-time">Days</p>
+                </div>
+              </div> -->
               <div>
 
               </div>
@@ -240,13 +299,13 @@ agencies.vendorOverallScorePercent>=80 ?'A':
     <div [hidden]="istypeSetupTabActive">
       <section class="vendor-report-section">
         <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName"
-                         [reportType]="reportType"></app-logi-report>
+          [reportType]="reportType"></app-logi-report>
         <router-outlet></router-outlet>
       </section>
     </div>
 
     <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
-                       (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+      (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
       <form [formGroup]="VendorReportForm" class="filter-form-dialog form-container bootstrap">
 
         <div class="form-elemet">
@@ -254,8 +313,8 @@ agencies.vendorOverallScorePercent>=80 ?'A':
             <label>Region</label>
             <div class="input-group dropdown">
               <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
-                               [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
-                               [fields]="regionFields">
+                [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
+                [fields]="regionFields">
               </ejs-multiselect>
             </div>
           </div>
@@ -265,8 +324,8 @@ agencies.vendorOverallScorePercent>=80 ?'A':
             <label>Location</label>
             <div class="input-group dropdown">
               <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
-                               [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
-                               [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields">
+                [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
+                [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields">
               </ejs-multiselect>
             </div>
           </div>
@@ -276,8 +335,8 @@ agencies.vendorOverallScorePercent>=80 ?'A':
             <label>Department</label>
             <div class="input-group dropdown">
               <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="All"
-                               [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
-                               [fields]="departmentFields">
+                [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
+                [fields]="departmentFields">
               </ejs-multiselect>
             </div>
           </div>
@@ -290,9 +349,9 @@ agencies.vendorOverallScorePercent>=80 ?'A':
               <label>Agency</label>
               <div class="input-group dropdown">
                 <ejs-multiselect mode="CheckBox" formControlName="agencyIds" placeholder="All" appValidateWithMessage
-                                 [allowFiltering]="true" [showDropDownIcon]="true"
-                                 [dataSource]="this.filterColumns.agencyIds.dataSource" [fields]="agencyFields"
-                                 [selectAllText]='allOption' showSelectAll=true>
+                  [allowFiltering]="true" [showDropDownIcon]="true"
+                  [dataSource]="this.filterColumns.agencyIds.dataSource" [fields]="agencyFields"
+                  [selectAllText]='allOption' showSelectAll=true>
                 </ejs-multiselect>
               </div>
             </div>
@@ -307,7 +366,7 @@ agencies.vendorOverallScorePercent>=80 ?'A':
               <label> Start Date<span class="required">*</span></label>
               <div class="input-group datepicker">
                 <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                                appValidateWithMessage formControlName="startDate">
+                  appValidateWithMessage formControlName="startDate">
                 </ejs-datepicker>
               </div>
             </div>
@@ -315,7 +374,7 @@ agencies.vendorOverallScorePercent>=80 ?'A':
               <label> End Date<span class="required">*</span></label>
               <div class="input-group datepicker">
                 <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                                appValidateWithMessage formControlName="endDate" [min]="VendorReportForm.controls['startDate'].value">
+                  appValidateWithMessage formControlName="endDate" [min]="VendorReportForm.controls['startDate'].value">
                 </ejs-datepicker>
               </div>
             </div>
@@ -327,7 +386,7 @@ agencies.vendorOverallScorePercent>=80 ?'A':
               <label>Order Type</label>
               <div class="input-group datepicker">
                 <ejs-dropdownlist appValidateWithMessage formControlName="orderTypes" [fields]="commonFields"
-                                  [dataSource]="filterColumns.orderTypes.dataSource" [allowFiltering]="true" placeholder="">
+                  [dataSource]="filterColumns.orderTypes.dataSource" [allowFiltering]="true" placeholder="">
                 </ejs-dropdownlist>
 
               </div>
@@ -335,8 +394,8 @@ agencies.vendorOverallScorePercent>=80 ?'A':
             <div class="input-container calendar">
               <label>Skills</label>
               <ejs-multiselect mode="CheckBox" formControlName="skillIds" placeholder="All" [allowFiltering]="true"
-                               [showDropDownIcon]="true" [dataSource]="filterColumns.SkillIds.dataSource" [fields]="commonFields"
-                               [selectAllText]='allOption' showSelectAll=true>
+                [showDropDownIcon]="true" [dataSource]="filterColumns.SkillIds.dataSource" [fields]="commonFields"
+                [selectAllText]='allOption' showSelectAll=true>
               </ejs-multiselect>
             </div>
           </div>
@@ -345,9 +404,9 @@ agencies.vendorOverallScorePercent>=80 ?'A':
           <div class="input-container bootstrap">
             <div class="inline-radio-container">
               <ejs-radiobutton formControlName="invoiceType" label="Vendor Scorecard" name="invoiceType" value="0"
-                               (change)="onTabSelected($event)"></ejs-radiobutton>
+                (change)="onTabSelected($event)"></ejs-radiobutton>
               <ejs-radiobutton formControlName="invoiceType" label="Vendor Scorecard Graph" name="invoiceType" value="1"
-                               (change)="onTabSelected($event)"></ejs-radiobutton>
+                (change)="onTabSelected($event)"></ejs-radiobutton>
             </div>
           </div>
         </div>
