@@ -1268,7 +1268,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           this.orderControlsConfig.agencyControl.removeValidators(Validators.required);
           this.orderControlsConfig.agencyControl.reset();
         }
-        if (jobDistributionId === OrderJobDistribution.TierLogic && !prevJobDistributionId) {
+        if (jobDistributionId === OrderJobDistribution.TierLogic && prevJobDistributionId === null) {
           return;
         }
         const getJobDistId = (id: number) =>
