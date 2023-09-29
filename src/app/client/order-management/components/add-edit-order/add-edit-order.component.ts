@@ -332,10 +332,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
   }
 
-  private showCredentialsValidationMessage(hasSelectedCredentialFlag: boolean): void {
-    const message = hasSelectedCredentialFlag
-      ? ValidationExistenceCredential
-      : ValidationCredentialOption;
+  private showCredentialsValidationMessage(credentialState: boolean): void {
+    const message = credentialState
+      ? ValidationCredentialOption
+      : ValidationExistenceCredential;
 
     ToastUtility.show({
       title: 'Error',
@@ -712,7 +712,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private saveForLater(): void {
     const titleControl = this.orderDetailsFormComponent.orderTypeForm.controls['title'];
     const workLocationForm = this.orderDetailsFormComponent.workLocationForm;
-    const hasSelectedCredentialFlag = this.orderCredentialsService.checkCredentialFlags(this.orderCredentials);
+    const hasSelectedCredentialFlag = this.orderCredentialsService.hasSelectedCredentialFlags(this.orderCredentials);
 
     if (titleControl.invalid) {
       titleControl.markAsTouched();
@@ -721,7 +721,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     if (!this.orderCredentials?.length || !hasSelectedCredentialFlag) {
-      this.showCredentialsValidationMessage(hasSelectedCredentialFlag);
+      this.showCredentialsValidationMessage(!!this.orderCredentials?.length && !hasSelectedCredentialFlag);
       return;
     }
 
@@ -795,18 +795,23 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private saveAsTemplate(): void {
-    const { regionId, locationId, departmentId, skillId } =
+    const { regionId, locationId, departmentId, skillId, credentials } =
       this.orderDetailsFormComponent.generalInformationForm.getRawValue();
-    const requiredFields = [regionId, locationId, departmentId, skillId];
+    const requiredFields = [regionId, locationId, departmentId, skillId, credentials];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
-
-    if (isRequiredFieldsFilled) {
+    const hasSelectedCredentialFlag = this.orderCredentialsService.hasSelectedCredentialFlags(this.orderCredentials);
+    
+    if (isRequiredFieldsFilled && hasSelectedCredentialFlag) {
       this.isSaveForTemplate = true;
     } else {
       this.markControlsAsRequired();
       const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId];
       const invalidFields = fields.filter((field, i) => !requiredFields[i]).join(',\n');
       this.showOrderFormValidationMessage(invalidFields);
+
+      if (!this.orderCredentials?.length || !hasSelectedCredentialFlag) {
+        this.showCredentialsValidationMessage(!!this.orderCredentials?.length && !hasSelectedCredentialFlag);
+      }
     }
   }
 
@@ -834,7 +839,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderBillRates.some((item: BillRate) => item.billRateConfigId === 1);
     const billRatesValid = isRegularBillRate || this.isPerDiem || this.isPermPlacementOrder;
     const credentialsValid = this.orderCredentials?.length;
-    const hasSelectedCredentialFlag = this.orderCredentialsService.checkCredentialFlags(this.orderCredentials);
+    const hasSelectedCredentialFlag = this.orderCredentialsService.hasSelectedCredentialFlags(this.orderCredentials);
     const orderValid =
       (this.orderDetailsFormComponent.orderTypeForm.disabled || this.orderDetailsFormComponent.orderTypeForm.valid) &&
       this.orderDetailsFormComponent.generalInformationForm.valid &&
@@ -849,7 +854,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     if (!credentialsValid || !hasSelectedCredentialFlag) {
-      this.showCredentialsValidationMessage(hasSelectedCredentialFlag);
+      this.showCredentialsValidationMessage(!!credentialsValid && !hasSelectedCredentialFlag);
     }
 
     if (!orderValid) {
