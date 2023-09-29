@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { DOCUMENT, Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime, Subject } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction, FilterPageName } from '@core/enums';
@@ -36,6 +36,8 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
+import { GetOrderComments } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -61,6 +63,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(TimesheetsState.tabCounts)
   readonly tabCounts$: Observable<TabCountConfig>;
 
+  @Select(OrderManagementContentState.orderComments)
+  private orderComments$: Observable<Comment[]>;
+
   @Select(TimesheetsState.timesheetsFilters)
   readonly timesheetsFilters$: Observable<TimesheetsFilterState>;
 
@@ -84,15 +89,17 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<TimesheetsFilterState>>;
-
+  public orderComments: Comment[] = [];
   public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
+  public commentContainerId = 0;
   public orgId: number | null = null;
   public appliedFiltersAmount = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
   public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
   public filters: TimesheetsFilterState | undefined;
   public readonly organizationControl: FormControl = new FormControl(null);
+  private unsubscribe$: Subject<void> = new Subject();
   public readonly currentSelectedTableRowIndex: Observable<number> = this.timesheetsService.getSelectedTimesheetRowStream();
   public isAgency: boolean;
   public businessUnitId?: number;
@@ -200,7 +207,19 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public rowSelected(selectedRow: TimesheetsSelectedRowEvent): void {
     this.timesheetsService.setCurrentSelectedIndexValue(selectedRow.rowIndex);
     this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Open, selectedRow.data));
+    this.commentContainerId = selectedRow.data?.commentContainerId;
     this.cd.markForCheck();
+    this.getOrderComments();
+  }
+
+  private getOrderComments(): void {
+    this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
+    this.orderComments$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((comments: Comment[]) => {
+      this.orderComments = comments;
+      this.cd.markForCheck();
+    });
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
