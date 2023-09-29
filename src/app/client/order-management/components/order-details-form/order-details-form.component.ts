@@ -687,7 +687,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       this.distribution = distributionSource(true);
     }
 
-    this.jobDistributionForm.controls['jobDistribution'].patchValue(this.filteredJobDistributionValue, { emitEvent: false });
+    this.jobDistributionForm.controls['jobDistribution'].patchValue(this.filteredJobDistributionValue);
 
     this.associateAgencies$
       .pipe(
