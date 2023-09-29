@@ -157,7 +157,8 @@
 }
 .graphgrid{
   display : grid !important;
-  overflow-x: auto;
+  border-right: 1px solid black;
+  // overflow-x: auto;
 }
 
 .graph-heading {
@@ -184,9 +185,9 @@
   padding: 10px;
 }
 
-.vendor_details {
-  padding: 0px 10px;
-}
+// .vendor_details {
+//   padding: 0px 10px;
+// }
 
 .label-sec {
   display: flex;
@@ -225,24 +226,21 @@
 .Toplayer{
 width:100% !important;
 display: flex !important;
-border: 1px solid black;
+height: 222px;
 background:white;
 
 }
 .col3{
   width:30%;
   
-  border: 1px solid;
 }
 .col4{
   width: 40%;
-  border: 1px solid;
-    // border-left: none;
     text-align: center;
 }
 .col7{
   width:93%;
-  border: 1px solid;
+  // border: 1px solid;
 }
 .widget-legend__point{
   width:20px !important;
@@ -270,12 +268,12 @@ p.submit-value {
 }
 .submit-wrapper .col6 {
   width: 50%;
-  border-right: 1px solid #000;
+  // border-right: 1px solid #000;
 }
 
 .submit-wrapper {
   display: flex;
-  border-top: 3px solid #000;
+  // border-top: 3px solid #000;
 }
 
 .submit-wrapper .col6:last-child {
@@ -285,11 +283,6 @@ p.submit-value {
   margin-top:-91px !important;
 }
 
-// .subscore{
-//   margin-top: -77px !important;
-//   margin-left: 62px!important;
-//   position: absolute!important;
-// }
 .vendor-score-wrapper{
   height: 100%;
   display: block;
@@ -308,5 +301,85 @@ p.submit-value {
   font-size: 35px !important;
 }
 .graphs{
-  padding-bottom: 2px !important;
+  padding-bottom: 10px !important;
+  margin-bottom: 15px;
+}
+.Toplayers.head-line {
+  background: #5b9bd5;
+  line-height: 0px;
+  display: flex !important;
+}
+h4{
+  padding-left: 10px;
+    color: white;
+}
+.graph-heading {
+  background: #f2f2f2;
+}
+p {
+  color: #595959;
+  font-weight: 600;
+}
+.heading {
+  background: #f2f2f2;
+    height: 52px;
+}
+.font-color{
+  color:#44546a !important;
+  font-weight: 800;
+  margin: 0px;
+  text-align: center !important;
+  font-size: xx-large;
+}
+.font-color-dark{
+  color:black !important;
+  font-weight: 800;
+  margin: 0px;
+  text-align: center !important;
+  font-size: xx-large;
+}
+.font-inc{
+  font-weight: 800;
+  margin: 0px;
+  text-align: center !important;
+  font-size: 92px;
+}
+.order-cound h4 {
+  margin: 10px !important;
+}
+.control-section {
+  min-height: 450px;
+}
+::ng-deep {
+  ejs-accumulationchart>svg>rect {
+    /* background: red !important; */
+     fill: #f2f2f2 !important; 
+  }
+}
+h4.head {
+  font-size: 21px;
+}
+p.head {
+  font-size: 20px;
+  font-weight: bolder;
+}
+
+@media print {
+  .demo {
+    height: 100%;
+    width: 1000%;
+
+  }
+  app-custom-side-dialog{
+display: none !important;
+}
+app-shell
+{
+  display: none !important;
+}
+.header{
+  display: none !important;
+}
+
+ 
 }
