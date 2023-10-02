@@ -33,6 +33,7 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   @Input() areAgencyActionsAllowed: boolean;
   @Input() editAgencyOrg: AssociateOrganizationsAgency;
   @Input() userPermission: Permission;
+  @Input() isAgency: boolean;
 
   public openAddNewFeeDialog = new Subject<number>();
   public readonly userPermissions = UserPermissions;
