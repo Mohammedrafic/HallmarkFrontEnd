@@ -14,6 +14,7 @@ import { downloadBlobFile } from '@shared/utils/file.utils';
 import { ObservableHelper } from '@core/helpers/observable.helper';
 import { FileHelper } from '@core/helpers/file.helper';
 import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
+import { fileViewerEnums } from '../../enums/timesheets.enum';
 
 @Component({
   selector: 'app-timesheet-file-viewer',
@@ -32,15 +33,14 @@ export class TimesheetFileViewerComponent extends Destroyable implements OnInit 
   previewCloseEvent = new EventEmitter<boolean>();
 
   public isFullScreen: boolean;
-  public width = `${window.innerWidth * 0.6}px`;
-  public imageSrs = '';
+  public imageSrs: string = '';
   public isImage: boolean = false;
   public fileName: string;
   public getOriginalFile: (() => Observable<Blob>) | null;
 
   @Input() preViewDoc:boolean = false;
 
-  public readonly service = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
+  public readonly service = fileViewerEnums.serviceUrl;
 
   constructor(
     private store: Store,
@@ -51,9 +51,12 @@ export class TimesheetFileViewerComponent extends Destroyable implements OnInit 
   }
 
   ngOnInit(): void {    
+    this.actionSubscriber(); 
+  }
+
+  public actionSubscriber(){
     this.actions$.pipe(
-      ofActionSuccessful(FileViewer.Open),
-      takeUntil(this.componentDestroy()),
+      ofActionSuccessful(FileViewer.Open),      
       switchMap(({ payload: { fileName, getPDF, getOriginal } }: FileViewer.Open) => {
         this.fileName = fileName;
         this.getOriginalFile = getOriginal;
@@ -71,7 +74,7 @@ export class TimesheetFileViewerComponent extends Destroyable implements OnInit 
         );
 
         return (image ? originalObs : pdfObs) || of(null);
-      })
+      }),takeUntil(this.componentDestroy()),
     ).subscribe(
       () => this.cdr.markForCheck()
     );

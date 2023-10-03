@@ -214,6 +214,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.listenResizeToolbar();
     this.observeRecordsLoad();
     this.observeDetails();
+    this.sideBarObserver();
     this.isSideBarDocked$
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe((isOpen) => {
@@ -602,7 +603,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
   }
 
-  onPreviewAttchementClick($event:number){
+  public onPreviewAttchementClick($event:number){
     this.currentSelectedAttachmentIndex = $event;
     this.previewAttachemnt = true;
   }
@@ -659,5 +660,17 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     ).subscribe(() => {
       this.candidateDialog?.show();
     });
+  }
+  
+  public sideBarObserver(){
+    this.isSideBarDocked$
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((isOpen) => {
+          this.sideBar =isOpen;
+          if(this.previewAttachemnt){
+            this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);
+          }
+            
+        });
   }
 }
