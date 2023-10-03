@@ -23,6 +23,7 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
   @Input() isIRPAndVMSEnabled = false;
   @Input() isCredentialIRP = false;
   @Input() permission = false;
+  @Input() targetElement: HTMLElement;
 
   @Output() closeEditDialog: EventEmitter<void> = new EventEmitter<void>();
 
