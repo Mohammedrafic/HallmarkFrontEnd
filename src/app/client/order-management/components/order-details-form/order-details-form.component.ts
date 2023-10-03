@@ -8,7 +8,9 @@ import {
   debounceTime,
   filter,
   Observable,
+  pairwise,
   skip,
+  startWith,
   switchMap,
   take,
   takeUntil,
@@ -1104,6 +1106,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     };
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private watchForControlsChanges(): void {
     this.contactDetailsFormArray.valueChanges.pipe(
       debounceTime(500),
@@ -1234,8 +1237,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     this.orderControlsConfig.jobDistributionControl.valueChanges
       .pipe(
         debounceTime(600),
+        startWith(null),
+        pairwise(),
         takeUntil(this.componentDestroy())
-      ).subscribe((jobDistributionId: OrderJobDistribution) => {
+      ).subscribe(([prevJobDistributionId, jobDistributionId]) => {
         if (jobDistributionId === OrderJobDistribution.All) {
           this.orderControlsConfig.jobDistributionControl.patchValue(OrderJobDistribution.All, { emitEvent: false });
         }
@@ -1263,12 +1268,14 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           this.orderControlsConfig.agencyControl.removeValidators(Validators.required);
           this.orderControlsConfig.agencyControl.reset();
         }
+        if (jobDistributionId === OrderJobDistribution.TierLogic && prevJobDistributionId === null) {
+          return;
+        }
         const getJobDistId = (id: number) =>
           this.jobDistributionForm.controls['jobDistributions'].value.find(
             (item: JobDistributionModel) => item.jobDistributionOption === id
           )?.id || 0;
         this.orderControlsConfig.agencyControl.updateValueAndValidity();
-
         const jobDistributions = {
           id: getJobDistId(jobDistributionId),
           orderId: this.order?.id || 0,

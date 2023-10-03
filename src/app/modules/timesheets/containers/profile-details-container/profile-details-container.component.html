@@ -11,7 +11,7 @@
 >
   <ng-template #content>
     <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate" #resize>
-      <div style="display: flex;">
+      <div class="main-body">
         <div [ngClass]="previewAttachemnt ? 'w-50' : 'w-100'">        
           <div class="header-container">
             <div class="profile-details">

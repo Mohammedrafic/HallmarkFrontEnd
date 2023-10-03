@@ -20,7 +20,7 @@
             <app-tooltip-container [showToolTip]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission">
               <button
                 ejs-button
-                [disabled]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission"
+                [disabled]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission || isAgencyUser"
                 id="addFormButton"
                 type="submit"
                 [isPrimary]="true"
@@ -37,14 +37,14 @@
             <e-tabitem *ngIf="userPermission[userPermissions.CanViewFeeExceptions]">
               <ng-template #headerText> {{feeSettingsText}} </ng-template>
               <ng-template #content>
-                <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [form]="$any(feeSettingsForm)"></app-fee-settings>
+                <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [isAgency]="isAgencyUser" [form]="$any(feeSettingsForm)"></app-fee-settings>
               </ng-template>
             </e-tabitem>
 
               <e-tabitem *ngIf="canViewTierTab">
                 <ng-template #headerText> {{tierExceptionText}} </ng-template>
                 <ng-template #content>
-                  <app-tier-settings [editAgencyOrg]="editAgencyOrg" (changeTierControl)="handleTierControl($event)"></app-tier-settings>
+                  <app-tier-settings [editAgencyOrg]="editAgencyOrg" [isAgency]="isAgencyUser" (changeTierControl)="handleTierControl($event)"></app-tier-settings>
                 </ng-template>
               </e-tabitem>
 
@@ -54,7 +54,7 @@
                 <app-partnership-settings
                   [partnershipForm]="$any(partnershipForm)"
                   [activeTab]="activeTab"
-                  [isAgency]="isAgency"></app-partnership-settings>
+                  [isAgency]="isAgencyUser"></app-partnership-settings>
               </ng-template>
             </e-tabitem>
           </e-tabitems>
