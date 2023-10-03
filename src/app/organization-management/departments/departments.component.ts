@@ -452,21 +452,9 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     this.store.dispatch(new UpdateDepartment(department, this.filters, ignoreWarning, this.replaceOrder));
   }
 
-  private showDepartmentChangeConfirmation(department: Department, ignoreWarning: boolean): void {
-    this.showSkillConfirmDialog = true;
-    this.departmentChangeConfirm$
-      .pipe(
-        take(1),
-        tap(() => this.showSkillConfirmDialog = false),
-        filter(Boolean),
-    ).subscribe(() => {
-      this.saveDepartment(department, ignoreWarning);
-    });
-  }
-
   private updateDepartment(department: Department, ignoreWarning: boolean): void {
     if (this.isIRPFlagEnabled && this.isSkillChanged() || this.isDateChanged() || this.isExcludedFromIrp()) {
-      this.showDepartmentChangeConfirmation(department, ignoreWarning);
+      this.saveDepartment(department, ignoreWarning);
     } else {
       this.saveDepartment(department, ignoreWarning);
     }
