@@ -95,7 +95,6 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
     this.setPageHeader();
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
     this.activetab =  routerState?.['isIRP'];
-    console.log(this.activetab);
   }
 
   ngOnInit(): void {

@@ -19,6 +19,7 @@ export class CommonReportFilterOptions {
   allCandidateStatusesAndReasons: CandidateStatusAndReasonFilterOptionsDto[];
   allJobStatusesAndReasons: JobStatusAndReasonFilterOptionsDto[];
   invoiceStatuses:FilterOption[];
+  activeAgency: AgencyDto[];
 }
 
 export class CandidateStatusAndReasonFilterOptionsDto {

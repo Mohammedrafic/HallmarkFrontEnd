@@ -10,6 +10,7 @@
         (focus)="priceUtils.setPriceMask(form, 'baseFee', $event)"
         (blur)="priceUtils.setTwoDecimals(form, 'baseFee', $event)"
         maxlength="5"
+        [readonly]="isAgency"
       />
     </div>
   </div>
@@ -19,7 +20,7 @@
       <h3>Fee Exception</h3>
     </div>
     <div class="actions">
-      <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions]" class="action-link" (click)="addNew(form.value.id)"
+      <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions] || isAgency" class="action-link" (click)="addNew(form.value.id)"
       ><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</button
       >
     </div>
@@ -43,10 +44,10 @@
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]=!isLoaded>
-            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" cssClass="e-flat primary-icon-button" (click)="onEdit(data,form.value.id)">
+            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || isAgency" cssClass="e-flat primary-icon-button" (click)="onEdit(data,form.value.id)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions]" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
+            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions] || isAgency" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>

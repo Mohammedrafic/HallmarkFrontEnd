@@ -9,7 +9,7 @@ import { DateWeekService } from '@core/services';
 import { getTime } from '@shared/utils/date-time.utils';
 import { DateTimeHelper } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
-import { ScheduleItemType } from 'src/app/modules/schedule/constants';
+import { ScheduleItemType, ScheduleTypesForCreateBar } from 'src/app/modules/schedule/constants';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
@@ -286,6 +286,7 @@ export class CreateScheduleService {
     scheduleWithAvailability: boolean,
     candidates: ScheduleCandidate[]
   ): CreateScheduleTypesConfig {
+    const isEmployee = this.store.selectSnapshot(UserState.user)?.isEmployee;
     let canSchedule = {
       book: false,
       openPosition: false,
@@ -300,7 +301,16 @@ export class CreateScheduleService {
       };
     }
 
-    let types = scheduleTypes.source.map((item: ScheduleTypeRadioButton) => {
+
+    const types = ScheduleTypesForCreateBar.source
+    .filter((type: ScheduleTypeRadioButton) => {
+      if (isEmployee) {
+        return type.value !== ScheduleItemType.Book && type.value !== ScheduleItemType.OpenPositions;
+      }
+
+      return true;
+    })
+    .map((item: ScheduleTypeRadioButton) => {
       return {
         ...item,
         toolTipMessage: !userPermission[item.permission] ? REQUIRED_PERMISSIONS : addAvailabilityToStart,
@@ -310,11 +320,7 @@ export class CreateScheduleService {
       };
     });
 
-    if (this.store.selectSnapshot(UserState.user)?.isEmployee) {
-      types = types.filter((type: ScheduleTypeRadioButton) => {
-        return type.value !== ScheduleItemType.Book && type.value !== ScheduleItemType.OpenPositions;
-      });
-    }
+
 
     return {
       columnsTemplate: this.getScheduleTypeColumnsTemplate(types),
