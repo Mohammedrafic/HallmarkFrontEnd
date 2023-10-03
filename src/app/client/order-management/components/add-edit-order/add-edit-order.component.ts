@@ -46,11 +46,14 @@ import {
 } from '@shared/constants';
 import { OrderCredentialsService } from "@client/order-management/services";
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage, IsStartEndDateOverlapWithInactivePeriod } from '@core/helpers';
+import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage, IsStartEndDateOverlapWithInactivePeriod }
+  from '@core/helpers';
 import { FieldName } from '@client/order-management/enums';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
-import { ValidationCredentialOption, ValidationExistenceCredential } from '@order-credentials/constants';
+import { ValidationCredentialOption, ValidationExistenceCredential }
+  from '@order-credentials/constants/credential-message.constant';
+
 
 enum SelectedTab {
   OrderDetails,
