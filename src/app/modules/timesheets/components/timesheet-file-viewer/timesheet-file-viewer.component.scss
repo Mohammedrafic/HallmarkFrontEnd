@@ -1,69 +1,73 @@
-@import "src/app/styles/variables/colors";
+@import "colors";
 
-.container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  padding: 24px 0px 0px 0px !important;
-  P{
-    margin: 5px;
-    font-weight: 400;
-    font-size: 12px;
-    color: #9198ac;
-  }
-  .header-container {
-    margin-bottom: 24px;
-    .e-card-title{
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 420px;
+.main-body{
+  max-height: 79vh;
+  overflow: scroll;
+  .container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 24px 0px 0px 0px !important;
+    P{
+      margin: 5px;
+      font-weight: 400;
+      font-size: 12px;
+      color: #9198ac;
     }
+    .header-container {
+      margin-bottom: 24px;
+      .e-card-title{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 420px;
+      }
 
-    .download-button {
-      margin: 0 12px;
+      .download-button {
+        margin: 0 12px;
+
+        i-feather {
+          margin-left: 5px;
+        }
+      }
 
       i-feather {
-        margin-left: 5px;
+        margin: 0;
       }
     }
 
-    i-feather {
-      margin: 0;
-    }
-  }
+    .file-viewer-container {
+      display: flex;
+      height: 100%;
 
-  .file-viewer-container {
-    display: flex;
-    height: 100%;
+      .right {
+        width: 100%;
 
-    .right {
-      width: 100%;
-
-      .file-viewer {
-        height: 100%;
-        border: 1px solid $secondary-dark-blue-45;
-        box-shadow: 0px 3px 28px rgba(0, 0, 0, 0.04);
-        border-radius: 12px;
-
-        .image-container {
-          display: flex;
-          justify-content: center;
+        .file-viewer {
           height: 100%;
+          border: 1px solid $secondary-dark-blue-45;
+          box-shadow: 0px 3px 28px rgba(0, 0, 0, 0.04);
+          border-radius: 12px;
+          .pdfDocSection{
+            display: block; 
+            height: 100%;
+          }
 
-          img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: none;
+          .image-container {
+            display: flex;
+            justify-content: center;
+            height: 100%;
+
+            img {
+              max-width: 100%;
+              max-height: 100%;
+              object-fit: none;
+            }
           }
         }
       }
     }
   }
-}
 
-.main-body{
-    max-height: 79vh;
-    overflow: scroll;
 }
