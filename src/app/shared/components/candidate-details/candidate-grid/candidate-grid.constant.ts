@@ -123,7 +123,13 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
       headerName: 'Leave Request Comments',
       width: 160,
       sortable: true,
-    },          
+    },  
+    {
+      field: 'primaryContactName',
+      headerName: 'Primary Contact',
+      width: 160,
+      sortable: true,
+    },            
   ];
 };
 export const CandidateAgencyExportColumns: CandidateExportColumn[] = [
@@ -143,6 +149,7 @@ export const CandidateAgencyExportColumns: CandidateExportColumn[] = [
   { text: 'Skill', column: 'Skill' },
   { text: 'Guaranteed Work Week', column: 'GuaranteedWorkWeek' },
   { text: 'Leave Request Comments', column: 'RequestComment' },
+  { text: 'Primary Contact', column: 'PrimaryContactName' },
 ];
 
 export const CandidateOrgExportColumns: CandidateExportColumn[] = [
@@ -162,5 +169,6 @@ export const CandidateOrgExportColumns: CandidateExportColumn[] = [
   { text: 'Skill', column: 'Skill' },
   { text: 'Guaranteed Work Week', column: 'GuaranteedWorkWeek' },
   { text: 'Leave Request Comments', column: 'RequestComment' },  
+  { text: 'Primary Contact', column: 'PrimaryContactName' },
 ];
 
