@@ -33,6 +33,7 @@ import { DateTimeHelper } from '@core/helpers';
 export class GeneralInfoComponent extends AbstractContactDetails implements OnInit, OnDestroy {
   public isOnHoldSelected: boolean;
   public isTerminatedSelected: boolean;
+  public minEndDate = new Date();
   fieldsSettingsTeminated: FieldSettingsModel = { text: 'reason', value: 'id' };
   currentPage = 1;
   pageSize = 100;
