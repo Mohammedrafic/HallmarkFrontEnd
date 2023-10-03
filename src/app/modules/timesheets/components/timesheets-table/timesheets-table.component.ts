@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnI
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 
-import { BehaviorSubject, distinctUntilChanged, filter, Observable, takeUntil, throttleTime } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, Observable, takeUntil, throttleTime } from 'rxjs';
 
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
@@ -121,7 +121,6 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
     this.currentPage$
       .pipe(
         distinctUntilChanged(),
-        filter((pageNumber) => this.currentPageSubj.get() !== pageNumber),
         throttleTime(100),
         takeUntil(this.componentDestroy())
       )

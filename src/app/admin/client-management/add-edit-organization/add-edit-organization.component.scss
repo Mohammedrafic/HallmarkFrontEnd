@@ -268,7 +268,7 @@ app-image-uploader {
 
   .week-start-on {
     .input-group {
-      width: 400px;
+      width: min(100%, 400px);
       margin-bottom: 12px;
     }
 
@@ -286,6 +286,10 @@ app-image-uploader {
     .right-section {
       width: 100%;
     }
+  }
+
+  .controls-container {
+    flex-direction: row;
   }
 }
 

@@ -206,7 +206,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   navigateTheAttachment$: Subject<number> = new Subject<number>();
   private eventsHandler: Subject<void> = new Subject();
   private unsubscribe$: Subject<void> = new Subject();
-
+  sideBar:boolean = false;
+  
 
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
@@ -254,6 +255,15 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     if (event.isExpanded) {
       this.eventsHandler.next();
     }
+    this.isSideBarDocked$
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((isOpen) => {
+          this.sideBar =isOpen;
+          if(this.previewAttachemnt){
+            this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);
+          }
+            
+        });
   }
 
   public override ngOnDestroy(): void {

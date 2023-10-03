@@ -37,14 +37,14 @@
             <e-tabitem *ngIf="userPermission[userPermissions.CanViewFeeExceptions]">
               <ng-template #headerText> {{feeSettingsText}} </ng-template>
               <ng-template #content>
-                <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [form]="$any(feeSettingsForm)"></app-fee-settings>
+                <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [isAgency]="isAgencyUser" [form]="$any(feeSettingsForm)"></app-fee-settings>
               </ng-template>
             </e-tabitem>
 
               <e-tabitem *ngIf="canViewTierTab">
                 <ng-template #headerText> {{tierExceptionText}} </ng-template>
                 <ng-template #content>
-                  <app-tier-settings [editAgencyOrg]="editAgencyOrg" (changeTierControl)="handleTierControl($event)"></app-tier-settings>
+                  <app-tier-settings [editAgencyOrg]="editAgencyOrg" [isAgency]="isAgencyUser" (changeTierControl)="handleTierControl($event)"></app-tier-settings>
                 </ng-template>
               </e-tabitem>
 

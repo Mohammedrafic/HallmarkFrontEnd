@@ -687,7 +687,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       this.distribution = distributionSource(true);
     }
 
-    this.jobDistributionForm.controls['jobDistribution'].patchValue(this.filteredJobDistributionValue, { emitEvent: false });
+    this.jobDistributionForm.controls['jobDistribution'].patchValue(this.filteredJobDistributionValue);
 
     this.associateAgencies$
       .pipe(
@@ -1268,7 +1268,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           this.orderControlsConfig.agencyControl.removeValidators(Validators.required);
           this.orderControlsConfig.agencyControl.reset();
         }
-        if (jobDistributionId === OrderJobDistribution.TierLogic && !prevJobDistributionId) {
+        if (jobDistributionId === OrderJobDistribution.TierLogic && prevJobDistributionId === null) {
           return;
         }
         const getJobDistId = (id: number) =>
