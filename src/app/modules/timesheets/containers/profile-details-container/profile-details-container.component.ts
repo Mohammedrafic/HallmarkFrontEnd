@@ -555,18 +555,19 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   }
   private allowEditButtonEnabled(): void {
-    let organizationId = this.orgId;
+    let organizationId = this.orgId; 
     this.settingsViewService.getViewSettingKey(
       OrganizationSettingKeys.TimesheetSubmissionProcess,
-      OrganizationalHierarchy.Organization,
+      OrganizationalHierarchy.Location,
       organizationId as number,
-      organizationId as number
+      organizationId as number,
+      false,
+      this.jobId
     ).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(({ TimesheetSubmissionProcess }) => {
       let currentdate = new Date();
-      let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));
-
+      let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));     
       if (TimesheetSubmissionProcess == "INT" &&dateDiff <= 30) {
         this.disableEditButton = true;
       }
