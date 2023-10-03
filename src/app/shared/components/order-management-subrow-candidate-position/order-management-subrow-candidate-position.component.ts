@@ -41,6 +41,7 @@ export class OrderManagementSubrowCandidatePositionComponent extends AbstractPer
     this.colDefs = OrderManagementSubGridCells(candidate.system as number);
     this.cd.markForCheck();
   }
+  @Input() showDates = false;
 
   @Output() openPosition: EventEmitter<OrderManagementChild> = new EventEmitter();
 

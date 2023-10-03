@@ -634,6 +634,7 @@
             <app-order-management-subrow-candidate-position
               *ngFor="let child of data.children; index as i; trackBy: trackById"
               [candidatePosition]="child"
+              [showDates]="data.orderType === orderTypes.LongTermAssignment || data.orderType === orderTypes.ContractToPerm"
               [isBothSystemsEnabled]="isOrgIRPEnabled && isOrgVMSEnabled"
               [selected]="
                 selectedCandidate?.selected?.order === data.id &&
