@@ -120,7 +120,7 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
     },
     {
       field: 'requestComment',
-      headerName: 'Request Comment',
+      headerName: 'Leave Request Comments',
       width: 160,
       sortable: true,
     },          
@@ -142,7 +142,7 @@ export const CandidateAgencyExportColumns: CandidateExportColumn[] = [
   { text: 'Organization Name', column: 'Organizationname' },
   { text: 'Skill', column: 'Skill' },
   { text: 'Guaranteed Work Week', column: 'GuaranteedWorkWeek' },
-  { text: 'Request Comment', column: 'RequestComment' },
+  { text: 'Leave Request Comments', column: 'RequestComment' },
 ];
 
 export const CandidateOrgExportColumns: CandidateExportColumn[] = [
@@ -161,6 +161,6 @@ export const CandidateOrgExportColumns: CandidateExportColumn[] = [
   { text: 'Agency Name', column: 'Agencyname' },
   { text: 'Skill', column: 'Skill' },
   { text: 'Guaranteed Work Week', column: 'GuaranteedWorkWeek' },
-  { text: 'Request Comment', column: 'RequestComment' },  
+  { text: 'Leave Request Comments', column: 'RequestComment' },  
 ];
 
