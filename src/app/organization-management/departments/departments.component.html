@@ -502,7 +502,6 @@
 
 <app-replacement-order-confirmation
   *ngIf="showSkillConfirmDialog"
-  [text]="irpDepartmentChangeWarning"
   (confirm)="departmentChangeConfirm$.next($event)"
   [(replaceChecked)]="replaceOrder"
 ></app-replacement-order-confirmation>
