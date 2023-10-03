@@ -68,6 +68,8 @@ import { AppState } from 'src/app/store/app.state';
 import { ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { GetOrderComments } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -141,6 +143,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   private jobId: number;
 
+  public commentContainerId = 0;
+
+
+  @Select(OrderManagementContentState.orderComments)
+  private orderComments$: Observable<Comment[]>;
+
   @Select(AppState.isSidebarOpened)
   isSideBarDocked$: Observable<boolean>;
 
@@ -197,6 +205,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   currentSelectedAttachmentIndex: number = 0;
   navigateTheAttachment$: Subject<number> = new Subject<number>();
   private eventsHandler: Subject<void> = new Subject();
+  private unsubscribe$: Subject<void> = new Subject();
+
 
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
@@ -647,6 +657,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
           currentStatus === this.timesheetStatus.PendingApprovalAsterix;
         this.canRecalculateTimesheet = isTimesheetSubmitted && this.canRecalculate;
         this.timesheetId = details.id;
+        this.commentContainerId=details.commentContainerId;
         this.mileageTimesheetId = details.mileageTimesheetId;
         this.isMileageStatusAvailable =
           details.mileageStatusText.toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
@@ -668,6 +679,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         this.setDNWBtnState(details.canEditTimesheet, !!details.allowDNWInTimesheets);
         this.checkForAllowActions(details.agencyStatus);
         this.allowEditButtonEnabled();
+        this.getOrderComments();
         this.cd.markForCheck();
 
         this.store.dispatch(
@@ -690,6 +702,16 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .subscribe(() => {
         this.candidateDialog?.show();
       });
+  }
+
+  private getOrderComments(): void {
+    this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
+    this.orderComments$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+      this.cd.markForCheck();
+    });
   }
 
  
