@@ -47,7 +47,8 @@ export const VendorScorecardReportConstants = {
     StartDate: 'startDate',
     EndDate: 'endDate',
     OrderTypes: 'orderTypes',
-    SkillIds: 'skillIds'
+    SkillIds: 'skillIds',
+    ExcludeInactiveAgency: 'excludeInactiveAgency',
   }
 }
 

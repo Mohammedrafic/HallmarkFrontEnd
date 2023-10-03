@@ -59,7 +59,7 @@
     margin-bottom: 10px;
   }
 
-  > *:not(:first-child) {
+  >*:not(:first-child) {
     box-sizing: border-box;
     padding-left: 10px;
   }
@@ -155,8 +155,9 @@
   border-radius: 4px;
   text-transform: capitalize;
 }
-.graphgrid{
-  display : grid !important;
+
+.graphgrid {
+  display: grid !important;
   border-right: 1px solid black;
   // overflow-x: auto;
 }
@@ -214,43 +215,48 @@
 
 
 
-.spantag{
+.spantag {
   font-size: 10px !important;
-    font-weight: bold !important;
+  font-weight: bold !important;
 }
 
-.graphalign{
+.graphalign {
   width: 14% !important;
-    text-align: center !important;
+  text-align: center !important;
 }
-.Toplayer{
-width:100% !important;
-display: flex !important;
-height: 222px;
-background:white;
+
+.Toplayer {
+  width: 100% !important;
+  display: flex !important;
+  height: 222px;
+  background: white;
 
 }
-.col3{
-  width:30%;
-  
+
+.col3 {
+  width: 30%;
+
 }
-.col4{
+
+.col4 {
   width: 40%;
-    text-align: center;
+  text-align: center;
 }
-.col7{
-  width:93%;
+
+.col7 {
+  width: 93%;
   // border: 1px solid;
 }
-.widget-legend__point{
-  width:20px !important;
-  height: 20px  !important;
+
+.widget-legend__point {
+  width: 20px !important;
+  height: 20px !important;
   border-radius: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.Rating{
+.Rating {
   text-align: center !important;
 }
 
@@ -279,28 +285,28 @@ p.submit-value {
 .submit-wrapper .col6:last-child {
   border-right: 0;
 }
-.mainscore{
-  margin-top:-91px !important;
+.mainscore {
+  margin-top: -91px !important;
 }
 
-.vendor-score-wrapper{
+.vendor-score-wrapper {
   height: 100%;
   display: block;
   overflow-y: auto;
   float: left;
   width: 100%;
 }
-.vendor-graph{
+.vendor-graph {
   width: calc(100% - 4px);
 }
-.mb-3{
+.mb-3 {
   margin-bottom: 30px;
 }
-.Rating{
+.Rating {
   display: grid !important;
   font-size: 35px !important;
 }
-.graphs{
+.graphs {
   padding-bottom: 10px !important;
   margin-bottom: 15px;
 }
@@ -309,9 +315,9 @@ p.submit-value {
   line-height: 0px;
   display: flex !important;
 }
-h4{
+h4 {
   padding-left: 10px;
-    color: white;
+  color: white;
 }
 .graph-heading {
   background: #f2f2f2;
@@ -322,23 +328,23 @@ p {
 }
 .heading {
   background: #f2f2f2;
-    height: 52px;
+  height: 52px;
 }
-.font-color{
-  color:#44546a !important;
+.font-color {
+  color: #44546a !important;
   font-weight: 800;
   margin: 0px;
   text-align: center !important;
   font-size: xx-large;
 }
-.font-color-dark{
-  color:black !important;
+.font-color-dark {
+  color: black !important;
   font-weight: 800;
   margin: 0px;
   text-align: center !important;
   font-size: xx-large;
 }
-.font-inc{
+.font-inc {
   font-weight: 800;
   margin: 0px;
   text-align: center !important;
@@ -353,7 +359,7 @@ p {
 ::ng-deep {
   ejs-accumulationchart>svg>rect {
     /* background: red !important; */
-     fill: #f2f2f2 !important; 
+    fill: #f2f2f2 !important;
   }
 }
 h4.head {
@@ -370,16 +376,16 @@ p.head {
     width: 1000%;
 
   }
-  app-custom-side-dialog{
-display: none !important;
+  app-custom-side-dialog {
+    display: none !important;
+  }
+  app-shell {
+    display: none !important;
+  }
+  .header {
+    display: none !important;
+  }
 }
-app-shell
-{
-  display: none !important;
-}
-.header{
-  display: none !important;
-}
-
- 
+.bootstraps {
+  margin-top: 26px !important;
 }
