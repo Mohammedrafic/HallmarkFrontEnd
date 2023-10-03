@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DOCUMENT } from '@angular/common';
 
 import { Store } from '@ngxs/store';
-import { filter, take, takeUntil } from 'rxjs';
+import { filter, map, merge, take, takeUntil } from 'rxjs';
 
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { AddOrderCredentialFormComponent } from './components/add-order-credential-form/add-order-credential-form.component';
@@ -185,26 +185,27 @@ export class OrderCredentialsComponent extends Destroyable {
   }
 
   private watchForChecboxesState(): void {
+    let selectedCheckbox = '';
     const controlNames = ['optional', 'reqForOnboard', 'reqForSubmission'];
-    const checkboxControls = controlNames.map((name) => this.CredentialForm.get(name) as AbstractControl);
+    const checkboxControls = controlNames.map((name) => {
+      return this.CredentialForm.get(name)?.valueChanges
+        .pipe(map((value) => ({ name, value })));
+    });
 
     /**checbox single selection */
-    checkboxControls.forEach((control, index) => {
-      const controlName = controlNames[index];
-   
-      control.valueChanges
-        .pipe(takeUntil(this.componentDestroy()))
-        .subscribe((value) => {
-          this.checkboxSelected = !value;
+    merge(...checkboxControls)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((data) => {
+        const { name, value } = data as { name: string, value: boolean };
 
-          controlNames.forEach((name) => {
-            if (value && controlName !== name) {
-              this.CredentialForm.get(name)?.setValue(false, { emitEvent: false });
-            }
-          });
+        if (selectedCheckbox) {
+          this.CredentialForm.get(selectedCheckbox)?.setValue(false, { emitEvent: false });
+        }
 
-          this.cdr.markForCheck();
-        });
-    });
+        selectedCheckbox = value ? name : '';
+        this.checkboxSelected = value;
+        this.cdr.markForCheck();
+      });
+
   }
 }
