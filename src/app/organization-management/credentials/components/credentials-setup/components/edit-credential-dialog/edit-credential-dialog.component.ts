@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter
 import { FormGroup } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { filter, takeUntil, take, tap, switchMap, of } from 'rxjs';
+import { filter, takeUntil, take, tap, switchMap, of, merge, map } from 'rxjs';
 
 import { CredentialsSetupService } from '@organization-management/credentials/services';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -12,6 +12,7 @@ import { CredentialSetupDetails, CredentialSetupGet, CredentialSetupPost } from 
 import { OverrideCommentsQuestion, OverrideCommentsTitle } from '../../constants';
 import { UpdateCredentialSetup } from '@organization-management/store/credentials.actions';
 import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
+import { CheckboxNames } from '../../interfaces';
 
 @Component({
   selector: 'app-edit-credential-dialog',
@@ -39,6 +40,7 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
   }
 
   ngOnInit(): void {
+    this.watchForChecboxesState();
     this.watchForSelectedCredential();
   }
 
@@ -136,5 +138,33 @@ export class EditCredentialDialogComponent extends Destroyable implements OnInit
     }
 
     return data;
+  }
+
+  private watchForChecboxesState(): void {
+    let selectedCheckbox: CheckboxNames | null = null;
+    const controlNames = ['isActive', 'reqOnboard', 'reqSubmission'];
+    const checkboxControls = controlNames.map((name) => {
+      return this.editCredentialForm.get(name)?.valueChanges
+        .pipe(map((value) => ({ name, value })));
+    });
+
+    /**checkbox single selection */
+    merge(...checkboxControls)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((data) => {
+        const { name, value } = data as { name: CheckboxNames, value: boolean };
+
+        if (value && selectedCheckbox && selectedCheckbox !== name) {
+          this.editCredentialForm.get(selectedCheckbox)?.setValue(false, { emitEvent: false });
+        }
+
+        if (value) {
+          selectedCheckbox = name;
+        }
+
+        if (!value && selectedCheckbox === name) {
+          selectedCheckbox = null;
+        }
+      });
   }
 }
