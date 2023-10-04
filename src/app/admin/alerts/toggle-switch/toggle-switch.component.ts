@@ -1,5 +1,6 @@
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component} from '@angular/core';
+import { AlertIdEnum } from '../alerts.enum';
 
 @Component({
   selector: 'app-toggle-switch',
@@ -26,9 +27,15 @@ export class ToggleSwitchComponent implements ICellRendererAngularComp {
       this.toggleYesOrNo = this.params.data[this.isEmailEnabled];
     }
     else if (this.params.column.colId == this.isSMSEnabled) {
+      if(this.params.data.alertId === AlertIdEnum['Missing Credentials: Daily Alerts'] || this.params.data.alertId === AlertIdEnum['Missing Credentials: Weekly Alerts'] || this.params.data.alertId === AlertIdEnum['Expiry Credentials: Weekly Alerts']){
+        this.disableFlag = true;
+      }
       this.toggleYesOrNo = this.params.data[this.isSMSEnabled];
     }
     else if (this.params.column.colId == this.isOnScreenEnabled) {
+      if(this.params.data.alertId === AlertIdEnum['Missing Credentials: Daily Alerts'] || this.params.data.alertId === AlertIdEnum['Missing Credentials: Weekly Alerts'] || this.params.data.alertId === AlertIdEnum['Expiry Credentials: Weekly Alerts']){
+        this.disableFlag = true;
+      }
       this.toggleYesOrNo = this.params.data[this.isOnScreenEnabled];
     }else{
       this.disableFlag = true;
