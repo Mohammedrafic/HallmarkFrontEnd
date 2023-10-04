@@ -42,7 +42,9 @@
                                 placeholder="Business"
                                 [showDropDownIcon]="true"
                                 [selectAllText]='allOption'
-                                showSelectAll=true>
+                                showSelectAll=true
+                                maximumSelectionLength="50000"
+                                >
               </ejs-multiselect>
             </div>
           </div>
@@ -245,7 +247,8 @@
                                [fields]="userDataFields"
                                [dataSource]="userData"
                                [selectAllText]='allOption'
-                               showSelectAll=true>
+                               showSelectAll=true
+                               maximumSelectionLength="50000"                               >
               </ejs-multiselect>
             </div>
           </div>
