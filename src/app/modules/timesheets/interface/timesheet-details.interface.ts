@@ -96,7 +96,7 @@ export interface TimesheetDetailsModel {
   agencyStatus: AgencyStatus;
   isEmpty: boolean;
   orderSkillName: string;
-  commentContainerId: number;
+  commentContainerId?: number;
   externalCommentsConfiguration?: boolean | null;
 }
 
