@@ -73,13 +73,8 @@ export class OrderCredentialsComponent extends Destroyable {
   }
 
   public prePopulateData(data: Credential): void {
-    const { comment = '', reqSubmission = false, reqOnboard = false, optional = false } = data;
-    this.CredentialForm.patchValue({
-      comment,
-      reqForSubmission: reqSubmission,
-      reqForOnboard: reqOnboard,
-      optional,
-    });
+    const { comment = '' } = data;
+    this.CredentialForm.patchValue({ comment });
   }
 
   public onEdit(credential: IOrderCredentialItem): void {
@@ -205,13 +200,13 @@ export class OrderCredentialsComponent extends Destroyable {
 
         if (value) {
           selectedCheckbox = name;
+          this.checkboxSelected = true;
         }
 
         if (!value && selectedCheckbox === name) {
           selectedCheckbox = null;
+          this.checkboxSelected = false;
         }
-
-        this.checkboxSelected = value;
         this.cdr.markForCheck();
       });
   }
