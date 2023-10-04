@@ -246,28 +246,14 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.listenResizeToolbar();
     this.observeRecordsLoad();
     this.observeDetails();
-<<<<<<< HEAD
-    this.isSideBarDocked$.pipe(takeUntil(this.componentDestroy())).subscribe((isOpen) => {
-      this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);
-    });
+    this.sideBarObserver();
   }
 
   public onExpanded(event: ExpandedEventArgs): void {
     if (event.isExpanded) {
       this.eventsHandler.next();
     }
-=======
-    this.sideBarObserver();
->>>>>>> origin/main
-    this.isSideBarDocked$
-        .pipe(takeUntil(this.componentDestroy()))
-        .subscribe((isOpen) => {
-          this.sideBar =isOpen;
-          if(this.previewAttachemnt){
-            this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);
-          }
-            
-        });
+   
   }
 
   public override ngOnDestroy(): void {
@@ -607,27 +593,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.disableAnyAction = allowResult;
   }
   private allowEditButtonEnabled(): void {
-<<<<<<< HEAD
-    let organizationId = this.orgId;
-    this.settingsViewService
-      .getViewSettingKey(
-        OrganizationSettingKeys.TimesheetSubmissionProcess,
-        OrganizationalHierarchy.Organization,
-        organizationId as number,
-        organizationId as number
-      )
-      .pipe(takeUntil(this.componentDestroy()))
-      .subscribe(({ TimesheetSubmissionProcess }) => {
-        let currentdate = new Date();
-        let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));
-
-        if (TimesheetSubmissionProcess == 'INT' && dateDiff <= 30) {
-          this.disableEditButton = true;
-        } else {
-          this.disableEditButton = false;
-        }
-      });
-=======
     let organizationId = this.orgId; 
     this.settingsViewService.getViewSettingKey(
       OrganizationSettingKeys.TimesheetSubmissionProcess,
@@ -649,7 +614,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       }
 
     })
->>>>>>> origin/main
   }
 
   private watchForPermissions(): void {
@@ -676,11 +640,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
   }
 
-<<<<<<< HEAD
-  onPreviewAttchementClick($event: number) {
-=======
   public onPreviewAttchementClick($event:number){
->>>>>>> origin/main
     this.currentSelectedAttachmentIndex = $event;
     this.previewAttachemnt = true;
   }
@@ -755,10 +715,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       this.cd.markForCheck();
     });
   }
-<<<<<<< HEAD
-
- 
-=======
   
   public sideBarObserver(){
     this.isSideBarDocked$
@@ -771,5 +727,4 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             
         });
   }
->>>>>>> origin/main
 }
