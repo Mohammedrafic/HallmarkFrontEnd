@@ -656,18 +656,18 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       let pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
       var position = 0;
       let pS = 0;
-      let pE = 270;
+      let pE = 100;
       let graphCount = Number(this.VendorScorecardresponse.length);
       let pageCount = Number(graphCount / 3.5);
-      for (let i = 0; i < pageCount; i++) {
+      for (let i = 0; i < this.VendorScorecardresponse.length; i++) {
         if (i != 0)
           pdf.addPage();
         pdf.addImage(contentDataURL, 'PNG', 5, position + 10, imgWidth, imgHeight);
         pdf.addImage(whiteline, 'PNG', 5, pS, imgWidth, 10);
-        pdf.addImage(whiteline, 'PNG', 5, pE, imgWidth, 30);
+        pdf.addImage(whiteline, 'PNG', 5, pE, imgWidth, 200);
 
         // pdf.setLineWidth(100);
-        position -= 268;
+        position -= 90;
         // p+=10;z
 
       }
