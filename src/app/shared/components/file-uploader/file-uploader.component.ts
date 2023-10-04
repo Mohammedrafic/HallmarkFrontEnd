@@ -44,7 +44,7 @@ export class FileUploaderComponent implements OnChanges {
 
   @Input() allowedFileExtensions: string = AllowedFileExtensions;
 
-  @Input() maxFileSize: FileSize = FileSize.MB_5;
+  @Input() maxFileSize: FileSize = FileSize.MB_15;
 
   @Input() showSelectedFiles = true;
 
@@ -152,9 +152,8 @@ export class FileUploaderComponent implements OnChanges {
       }
     });
   }
-
   private getMaxSizeErrorMessage(): string {
-    return `The file should not exceed ${FileSizeValueMap[this.maxFileSize]}MB.`;
+    return `The file should not exceed 15MB.`;
   }
 
   private getExtensionErrorMessage(): string {

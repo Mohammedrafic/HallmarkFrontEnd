@@ -31,7 +31,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   public width = `${window.innerWidth * 0.6}px`;
   public targetElement: HTMLElement = document.body;
   public dropElement: HTMLElement;
-  public readonly maxFileSize = FileSize.MB_10;
+  public readonly maxFileSize = FileSize.MB_15;
   public selectedFile: FileInfo | null;
   public firstActive = true;
   public uploaderErrorMessageElement: HTMLElement;
@@ -84,7 +84,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
         document.getElementsByClassName('e-file-status e-file-invalid')[0] as HTMLElement;
       if (this.uploaderErrorMessageElement) {
         this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
-          ? 'The file should not exceed 10MB.'
+          ? 'The file should not exceed 15MB.'
           : 'The file should be in .pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png format.';
       }
     });
