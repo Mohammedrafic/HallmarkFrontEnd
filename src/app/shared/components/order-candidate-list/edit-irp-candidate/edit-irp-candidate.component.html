@@ -44,7 +44,7 @@
             <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
              <ng-container *ngIf="field.showField">
                <div
-                 *ngIf="field.field === 'reason' ? candidateForm.get('isClosed')?.value : true"
+                 *ngIf="field.field === 'reason' ? !candidateForm.get('isClosed')?.value : true"
                  class="input-container {{field?.cssClass}}">
                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                  </label>
