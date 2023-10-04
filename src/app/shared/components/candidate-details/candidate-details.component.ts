@@ -198,7 +198,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
 
     this.allAgenciesLoad();
     if (this.isAgency) {
-      this.store.dispatch([new GetCandidateSkills()]);
+      
       const user = this.store.selectSnapshot(UserState.user);
       let lastSelectedAgencyId = window.localStorage.getItem('lastSelectedAgencyId');
       this.lastSelectedAgencyId$.pipe(
@@ -206,26 +206,26 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         takeUntil(this.unsubscribe$),
         distinctUntilChanged(),
       ).subscribe((id) => {
-
         const agencyIdvalue = id.toString(); 
         this.lastAgencyId=Number(agencyIdvalue)||0;
         this.store.dispatch(new GetAssociateOrganizations(Number(agencyIdvalue)));
+        this.store.dispatch([new GetCandidateSkills()]);
         // this.subscribeOnAgencyOrganizationChanges();
         this.updatePage();
       });
        this.store.dispatch(new GetUserAgencies());    
     }
-    else {
-
-      this.store.dispatch([new GetCandidateSkills(),new GetUserOrganizations(),new GetMasterRegions()]);
+    else {     
       this.getRegions();
       this.lastSelectedOrganizationId$.pipe(
         filter(Boolean),
         takeUntil(this.unsubscribe$),
+        distinctUntilChanged(),
       ).subscribe((id) => {
         const orgId = id.toString();
-      this.lastOrgId=Number(orgId)||0;
+        this.lastOrgId=Number(orgId)||0;
         this.store.dispatch([new GetAssociateAgencies(Number(orgId))]);
+        this.store.dispatch([new GetCandidateSkills(),new GetUserOrganizations(),new GetMasterRegions()]);
       });
 
     }
