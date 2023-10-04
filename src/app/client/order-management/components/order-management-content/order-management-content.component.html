@@ -1612,6 +1612,42 @@
 >
 </app-close-order>
 
+
+<ejs-dialog
+  #exportTooLargeWarning
+  cssClass="confirm-dialog"
+  [animationSettings]="{ effect: 'Zoom', duration: 400, delay: 0 }"
+  [isModal]="true"
+  [visible]="false"
+  [showCloseIcon]="false"
+  width="448px"
+  closeOnEscape
+  (close)="exportTooLargeWarning.hide()"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Too Many Records</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    Please reduce number of Orders to less than 8K to export by applying filters.
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <div>
+        <button ejs-button [isPrimary]="true" (click)="exportTooLargeWarning.hide()">Ok</button>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>
+
+
 <mat-menu #menu="matMenu">
   <ng-template matMenuContent let-items="items" let-data="data">
     <button
