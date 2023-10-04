@@ -714,7 +714,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       });
   }
 
-  private getOrderComments(): void {
+  public getOrderComments(): void {
     this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
     this.orderComments$.pipe(
       takeUntil(this.unsubscribe$)

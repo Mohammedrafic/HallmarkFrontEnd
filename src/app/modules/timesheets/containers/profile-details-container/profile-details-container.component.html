@@ -218,6 +218,7 @@
                         [orderId]="timesheetDetails.id"
                         [commentContainerId]="timesheetDetails.commentContainerId || 0"
                         [externalCommentConfiguration]="timesheetDetails.externalCommentsConfiguration"
+                        (commentSaveCheck)="getOrderComments()"
                       ></app-comments>
                     </ng-template>
                   </e-accordionitem>
