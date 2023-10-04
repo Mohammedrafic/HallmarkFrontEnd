@@ -16,6 +16,7 @@ import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { Credential } from "@shared/models/credential.model";
 import { ConfirmService } from '@shared/services/confirm.service';
 import { Destroyable } from '@core/helpers';
+import { CheckboxNames } from './interfaces';
 
 @Component({
   selector: 'app-order-credentials',
@@ -185,27 +186,33 @@ export class OrderCredentialsComponent extends Destroyable {
   }
 
   private watchForChecboxesState(): void {
-    let selectedCheckbox = '';
+    let selectedCheckbox: CheckboxNames | null = null;
     const controlNames = ['optional', 'reqForOnboard', 'reqForSubmission'];
     const checkboxControls = controlNames.map((name) => {
       return this.CredentialForm.get(name)?.valueChanges
         .pipe(map((value) => ({ name, value })));
     });
 
-    /**checbox single selection */
+    /**checkbox single selection */
     merge(...checkboxControls)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((data) => {
-        const { name, value } = data as { name: string, value: boolean };
+        const { name, value } = data as { name: CheckboxNames, value: boolean };
 
-        if (selectedCheckbox) {
+        if (value && selectedCheckbox && selectedCheckbox !== name) {
           this.CredentialForm.get(selectedCheckbox)?.setValue(false, { emitEvent: false });
         }
 
-        selectedCheckbox = value ? name : '';
+        if (value) {
+          selectedCheckbox = name;
+        }
+
+        if (!value && selectedCheckbox === name) {
+          selectedCheckbox = null;
+        }
+
         this.checkboxSelected = value;
         this.cdr.markForCheck();
       });
-
   }
 }
