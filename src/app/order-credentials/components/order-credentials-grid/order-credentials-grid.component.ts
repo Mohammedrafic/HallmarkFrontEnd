@@ -55,7 +55,9 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
 
     if (!credential.isFirstChange() && credential?.currentValue) {
       this.totalItemCount = credential.currentValue.length;
-    } else {
+    }
+
+    if (changes['credential']) {
       this.setCheckboxState();
     }
   }
