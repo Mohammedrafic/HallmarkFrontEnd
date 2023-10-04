@@ -2,7 +2,7 @@ export enum WidgetDescriptionEnum {
   CANDIDATES = 'Count of overall candidates by status',
   AGENCY_CANDIDATES = "Count of overall candidates by status",
   APPLICANTS_BY_REGION = 'Statewise Applicant Density',
-  AGENCY_APPLICANTS_BY_REGION = "State wise count of the applicant's home state",
+  AGENCY_APPLICANTS_BY_REGION = "State wise count of the candidates home state",
   APPLICANTS_BY_POSITIONS = 'Statewise Applicant Density',
   POSITIONS_BY_TYPES = 'Open, In Progress, Filled and Close Positions over a time period',
   AGENCY_POSITIONS_BY_TYPES = 'Count of Open, In Progress, Filled and Close positions over a time period and % difference between previous and current month/week.',
