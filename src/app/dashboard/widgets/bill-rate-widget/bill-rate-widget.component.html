@@ -1,10 +1,10 @@
-<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme" class="averagebillrates">
 
   <ng-template #header>
     <div class="widget-header">
 
       <div class="app-bill-rate-widget__title" [ngClass]="slideBar ? 'slideBarWidth' : ''">
-        <h3 class="widget-header__title">{{ 'Monthly Avg Bill Rate by Skill Category' }}</h3>
+        <h3 class="widget-header__title">{{ 'Average Bill Rate' }}</h3>
       </div>
       <div class="app-bill-rate-widget__tooltip" [ngClass]="slideBar ? 'slideTooltipMar' : ''"
         *ngIf="description.length>0">
@@ -22,7 +22,7 @@
     <ejs-chart #sfComponent [chartArea]="chartArea" [primaryXAxis]="isDarkTheme ? primaryXAxisDarkTheme : primaryXAxis"
       [primaryYAxis]="isDarkTheme ? primaryYAxisDarkTheme : primaryYAxis" [crosshair]="crosshairSettings"
       [legendSettings]="legendSettings" [tooltip]="isDarkTheme ? tooltipDarkSettings : tooltipSettings"
-      class="app-bill-rate-widget__component" [palettes]="palettes"
+      class="app-bill-rate-widget__component avgbill1" [palettes]="palettes"
       [background]="isDarkTheme ? 'var(--chart-dark-bg)' : 'var(--chart-light-bg)'">
 
       <e-series-collection>       
@@ -54,7 +54,7 @@
     </ejs-chart>
   </ng-template>
   <ng-template #legend>
-    <app-widget-legend [slideBar]="slideBar" [isPositionTrend]="true" [legendData]="chartLegend"
+    <app-widget-legend class="avgbill" [slideBar]="slideBar" [isPositionTrend]="true" [legendData]="chartLegend"
       (changeCheckbox)="onClickLegend($event)" [showPercentRatio]="false" [isBillRateTrend]="true"></app-widget-legend>
   </ng-template>
 </app-widget-wrapper>
