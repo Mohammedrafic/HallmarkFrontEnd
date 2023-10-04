@@ -14,7 +14,7 @@ export class MapsChartComponent {
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
-
+  @Input() public userType:number;
   constructor(private readonly dashboardService: DashboardService) {}
 
   public redirectToSourceContent(): void {
