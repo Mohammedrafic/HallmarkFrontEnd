@@ -736,6 +736,8 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
         activeRowsPerPage
       );
     }
+
+    this.setCheckboxState(this.gridDataSource as CredentialSetupGet[]);
   }
 
   private watchForSucceededUpdateCredential(): void {

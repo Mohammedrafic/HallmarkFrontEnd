@@ -70,7 +70,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   public fields = {
     text: 'name',
     value: 'id',
-  };
+};
   public importResult: ImportResult<any> | null;
 
   get activeErrorTab(): boolean {

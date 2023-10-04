@@ -20,5 +20,6 @@ export enum FilterPageName {
   InvoicesVMSAgency = 18,
   InvoicesIRPOrganization = 19,
   SchedullerOrganization = 20,
-  EmployeeOpenJobs = 21
+  EmployeeOpenJobs = 21,
+  EmployeeMyJobs = 22,
 }

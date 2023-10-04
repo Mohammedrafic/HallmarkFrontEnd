@@ -655,10 +655,10 @@ export class OrganizationManagementState {
       catchError((error) => {
         const errorObj = error.error;
         if (errorObj.errors?.IncompleteOpenOrdersExist && errorObj.errors?.InProgressOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Department has Open/ Incomplete Orders please re-assign or close them before inactivating the Department. Department has Orders In Progress past the inactivation date, please review them before inactivating the Department'));
+          return dispatch(new ShowToast(MessageTypes.Error, 'Department has Open/ Incomplete/ InProgress Orders please re-assign or close them before inactivating the Department. Department has Orders In Progress past the inactivation date, please review them before inactivating the Department'));
         }
         if (errorObj.errors?.IncompleteOpenOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Department has Open/Incomplete Orders, please re-assign or close them before inactivating the Department'));
+          return dispatch(new ShowToast(MessageTypes.Error, 'Department has Open/Incomplete/InProgress Orders, please re-assign or close them before inactivating the Department'));
         }
         if (errorObj.errors?.InProgressOrdersExist) {
           return dispatch(new SaveDepartmentConfirm());

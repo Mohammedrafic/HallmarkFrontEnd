@@ -28,5 +28,5 @@ export const widgetTypeToConfigurationMapper: Record<WidgetTypeEnum, PanelModel>
   [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM]: { sizeX: 4, sizeY: 2.5, maxSizeX: 4, maxSizeY: 2.5, minSizeX: 4, minSizeY: 2.5 },
   [WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED]: { sizeX: 5, sizeY: 5, maxSizeX: 5, maxSizeY: 5,  minSizeX: 5, minSizeY: 5},
   [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]: { sizeX: 4, sizeY: 4, maxSizeY: 4, maxSizeX: 4, minSizeX: 4, minSizeY: 4 },
-  [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: { sizeX: 5, sizeY: 5, maxSizeY: 5, maxSizeX: 5, minSizeX: 5, minSizeY: 5},
+  [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: { sizeX: 3, sizeY: 4, maxSizeY: 4, maxSizeX: 3, minSizeX: 3, minSizeY: 4.3},
 };

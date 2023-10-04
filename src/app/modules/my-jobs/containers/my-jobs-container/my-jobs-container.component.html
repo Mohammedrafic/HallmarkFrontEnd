@@ -1,0 +1,30 @@
+<div class="container">
+  <div class="job-header">
+    <div class="title">My Jobs</div>
+    <div class="action-btn">
+      <button
+        ejs-button
+        id="filterButton"
+        cssClass="e-outline button-filter"
+        (click)="showFilters()">
+        <div class="filter-button-content">
+            <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">
+              {{ appliedFiltersAmount }}
+            </span>
+          <span class="filter-button-text">Filters</span>
+          <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
+    </div>
+  </div>
+  <div class="job-grid">
+    <app-my-jobs-grid [jobsPage]="myJobsPage"></app-my-jobs-grid>
+  </div>
+</div>
+
+<app-my-jobs-filter
+  *ngIf="showFilterDialog"
+  [countItems]="myJobsPage?.items?.length"
+  (appliedFiltersAmount)="changeFiltersAmount($event)"
+  (destroyFilterDialog)="closeFilterDialog()"
+></app-my-jobs-filter>
