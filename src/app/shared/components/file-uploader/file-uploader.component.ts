@@ -153,7 +153,7 @@ export class FileUploaderComponent implements OnChanges {
     });
   }
   private getMaxSizeErrorMessage(): string {
-    return `The file should not exceed 15MB.`;
+    return `The file should not exceed ${FileSizeValueMap[this.maxFileSize]}MB.`;
   }
 
   private getExtensionErrorMessage(): string {
