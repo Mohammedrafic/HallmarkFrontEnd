@@ -44,7 +44,7 @@ export class FileUploaderComponent implements OnChanges {
 
   @Input() allowedFileExtensions: string = AllowedFileExtensions;
 
-  @Input() maxFileSize: FileSize = FileSize.MB_15;
+  @Input() maxFileSize: FileSize = FileSize.MB_5;
 
   @Input() showSelectedFiles = true;
 
