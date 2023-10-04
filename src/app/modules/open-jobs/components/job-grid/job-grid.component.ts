@@ -3,9 +3,10 @@ import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import { takeUntil } from 'rxjs';
 import { ColDef, SortChangedEvent } from '@ag-grid-community/core';
 
+import { OpenJob, OpenJobPage } from '@shared/models';
 import { Destroyable } from '@core/helpers';
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
-import { OpenJob, OpenJobPage, PageSettings } from '../../interfaces';
+import { PageSettings } from '../../interfaces';
 import { JobGridConfig } from './contants';
 import { JobPageSettings } from '../../constants';
 import { EmployeeService, JobFilterService } from '../../services';

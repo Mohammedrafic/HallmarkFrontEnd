@@ -52,23 +52,3 @@ export interface PreservedFilters {
   filters: FiltersState;
   appliedFiltersAmount: number;
 }
-
-export interface LtaEmployeeDto {
-  employeeId: number | string;
-  orderId: number;
-  workflowStepType: number;
-}
-
-export interface EmployeeScheduledDays {
-  employeeId: number | string;
-  dates: string[];
-}
-
-export interface PerDiemEmployeeDto {
-  employeeScheduledDays: EmployeeScheduledDays[];
-  userLocalTime: string;
-  scheduleType: number;
-  startTime: string;
-  endTime: string;
-  shiftId: number | null;
-}

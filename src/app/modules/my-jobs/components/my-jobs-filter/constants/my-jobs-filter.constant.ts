@@ -3,6 +3,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { OrderJobType } from '@shared/enums';
 import { FieldType } from '@core/enums';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+
 import { FiltersColumnConfig, OpenJobFilterConfig, OrderTypeSource } from '../../../interfaces';
 import { AllOrderTypeOption } from '../../../constants';
 
@@ -23,7 +24,7 @@ export const OrderTypeSources: OrderTypeSource[] = [
 
 export const OptionFields: FieldSettingsModel = { text: 'text', value: 'value' };
 
-export const OpenJobConfig: OpenJobFilterConfig[] = [
+export const MyJobsConfig: OpenJobFilterConfig[] = [
   {
     field: 'orderType',
     title: 'Order Type',

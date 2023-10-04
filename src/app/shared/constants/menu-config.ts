@@ -1512,7 +1512,7 @@ export const MENU_CONFIG: any = {
       // Useractivity Log report
       icon: '',
       route: '/analytics/user-activity',
-    },  
+    },
   },
 
   [BusinessUnitType.Employee]: {
@@ -1525,6 +1525,11 @@ export const MENU_CONFIG: any = {
       // Open Jobs
       icon: 'briefcase',
       route: 'employee/open-jobs',
+    },
+    118: {
+      // My Jobs
+      icon: 'list',
+      route: 'employee/my-jobs',
     },
   },
 };

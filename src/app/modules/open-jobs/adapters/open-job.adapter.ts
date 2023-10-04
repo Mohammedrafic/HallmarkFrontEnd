@@ -1,5 +1,5 @@
 import { DateTimeHelper } from '@core/helpers';
-import { OpenJob, OpenJobPage } from '../interfaces';
+import { OpenJob, OpenJobPage } from '@shared/models';
 import { OrderJobName } from '../constants';
 
 export class OpenJobsAdapter {
