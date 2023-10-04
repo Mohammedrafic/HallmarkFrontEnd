@@ -4,8 +4,14 @@
       <h3>Associated {{getTitle}}</h3>
     </div>
     <div class="actions">
-      <button ejs-button [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditAssociatedOrganizations]" class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather>
-        Associate New {{getTitle}}</button>
+      <button
+        ejs-button
+        [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditAssociatedOrganizations]"
+        class="action-link" (click)="addNew()"
+      >
+        <i-feather name="plus" class="icon"></i-feather>
+        <span class="text-btn">Associate New {{getTitle}}</span>
+      </button>
     </div>
   </div>
   <app-associate-grid [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [associateEvent$]="associateEvent" [isAgency]="isAgency"></app-associate-grid>
