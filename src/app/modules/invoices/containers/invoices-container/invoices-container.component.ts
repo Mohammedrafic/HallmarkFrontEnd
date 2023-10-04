@@ -839,6 +839,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             delete filterState.state?.locationIds;
             delete filterState.state?.regionIds;
             delete filterState.state?.departmentIds;
+            delete filterState.state?.skillIds;
+            delete filterState.state?.reasonCodeIds;
           }
         }
         this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
