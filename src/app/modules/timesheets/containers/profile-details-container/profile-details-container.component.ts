@@ -341,6 +341,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.tooltip.content = Array.from(parent.children).indexOf(e.target) ? 'Miles Status' : 'Timesheet Status';
   }
 
+  
   public onDWNCheckboxSelectedChange({ checked }: { checked: boolean }, switchComponent: SwitchComponent): void {
     checked
       ? this.timesheetDetails$
