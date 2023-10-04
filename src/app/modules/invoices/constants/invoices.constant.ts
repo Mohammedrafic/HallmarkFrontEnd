@@ -236,6 +236,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean, agencyOrganiz
     type: ControlTypes.Multiselect,
     title: 'Reason Code',
     field: InvoicesTableFiltersColumns.ReasonCodeIds,
+    isDisable: agencyOrganizationIds &&  agencyOrganizationIds > 1 ? true : false
   },
   {
     type: ControlTypes.Text,
