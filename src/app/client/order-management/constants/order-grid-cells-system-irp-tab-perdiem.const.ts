@@ -20,6 +20,7 @@ import{
 }
 from '@client/order-management/components/order-management-content/sub-grid-components/table-system-cell/table-system-cell.component'
 
+// eslint-disable-next-line max-lines-per-function
 export const GridCellsSystemIRPTabPerDiem = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
   canCreateOrder = false,
@@ -143,8 +144,12 @@ export const GridCellsSystemIRPTabPerDiem = (
     width: 135,
     minWidth: 110,
     maxWidth: 180,
-    valueFormatter: (params: ValueFormatterParams) =>
-      `${params.data.numberOfOpenPositions ?? 0}/${params.data.numberOfPositions ?? 0}`,
+    valueFormatter: (params: ValueFormatterParams) => {
+      const openPositions = params.data.numberOfOpenPositions;
+      const calculatedPositions = openPositions && openPositions >= 0 ? params.data.numberOfOpenPositions : 0;
+
+      return `${calculatedPositions}/${params.data.numberOfPositions ?? 0}`;
+    },
   },
   {
     ...DefaultOrderCol,
