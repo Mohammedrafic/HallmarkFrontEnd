@@ -12,7 +12,7 @@ export const BUSINESS_UNITS_VALUES_WITH_IRP = [
   { id: BusinessUnitType.Hallmark, text: 'Hallmark' },
   { id: BusinessUnitType.MSP, text: 'MSP' },
   { id: BusinessUnitType.Organization, text: 'Organization' },
-  { id: BusinessUnitType.Candidates, text: 'Employees' },
+  { id: BusinessUnitType.Employee, text: 'Employee' },
 ];
 
 export const BUSINESS_UNITS_VALUES_USERS_ROLES = [

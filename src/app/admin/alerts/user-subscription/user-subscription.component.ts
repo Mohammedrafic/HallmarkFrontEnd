@@ -414,7 +414,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         });
       }
        
-      if(value == BusinessUnitType.Candidates){
+      if(value == BusinessUnitType.Employee){
         this.usersControl.reset();
         this.businessControl.patchValue(userBusinessId);        
         this.store.dispatch(new GetBusinessForEmployeeType());        
@@ -438,7 +438,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       }
       let userBusinessId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
       let userBusinessType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
-      if(this.businessUnitControl?.value == BusinessUnitType.Candidates){        
+      if(this.businessUnitControl?.value == BusinessUnitType.Employee){        
         if(userBusinessType == BusinessUnitType.Organization){
         if(userBusinessId !=null && userBusinessId !=undefined)
           value = userBusinessId;
@@ -526,7 +526,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           self.userSubscriptionPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
 
             self.itemList = data?.items;
-            if(self.businessUnitControl?.value === BusinessUnitType.Candidates) {
+            if(self.businessUnitControl?.value === BusinessUnitType.Employee) {
             self.itemList = self.itemList?.filter((x=>x.alertId!=AlertIdEnum['Order Comments-IRP']));
             }
             self.totalRecordsCount = data?.totalCount;
@@ -634,7 +634,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     }
 
     if(this.activeSystem == OrderManagementIRPSystemId.VMS){
-      this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.Candidates);
+      this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.Employee);
       this.businessUnitControl.patchValue(user?.businessUnitType);
       this.businessControl.setValue(user?.businessUnitId, {emitEvent:false});
     }
@@ -654,7 +654,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
             }
           });
          } 
-         else if(this.activeSystem == OrderManagementIRPSystemId.IRP && this.businessUnitControl?.value == BusinessUnitType.Candidates){
+         else if(this.activeSystem == OrderManagementIRPSystemId.IRP && this.businessUnitControl?.value == BusinessUnitType.Employee){
           this.employeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
             if (data != undefined) {
               this.userData = data;     
@@ -691,7 +691,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
             }
           });
          } 
-         else if(this.activeSystem == OrderManagementIRPSystemId.IRP && this.businessUnitControl?.value == BusinessUnitType.Candidates){
+         else if(this.activeSystem == OrderManagementIRPSystemId.IRP && this.businessUnitControl?.value == BusinessUnitType.Employee){
           this.employeeUserData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
             if (data != undefined) {
               this.masterUserData = data;
