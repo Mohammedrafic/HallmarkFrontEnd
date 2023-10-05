@@ -32,5 +32,5 @@ export enum WidgetDescriptionEnum {
   ACTIVE_POSITIONS_INITIAL_EXTENDED="Count of Initial Positions and Extended Positions from Active Positions.",
   ORDERS_PENDING_IN_CUSTOM = "Average days positions spending in specific custom status",
   AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS = 'Average Days on Active Candidate Status',
-  BILL_RATE_BY_SKILL_CATEGORY = "Monthly Average Regular Bill Rate by Skill Category"
+  BILL_RATE_BY_SKILL_CATEGORY = "Average Regular Bill Rate per Skill Category per Month"
 }
