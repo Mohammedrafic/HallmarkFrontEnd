@@ -63,7 +63,8 @@ export enum OrganizationSettingKeys {
   DisableNumberOfOpenPositions,
   ATPRateCalculation,
   AutomatedDistributionToVMS,
-  ShowDeployedEmployees
+  ShowDeployedEmployees,
+  OrganizationCanCarryClockIDFromParent
 }
 
 export enum OrganizationalHierarchy {

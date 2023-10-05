@@ -80,6 +80,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'DisableNumberOfOpenPositions',
   'ShowDeployedEmployees',
   'LimitNumberOfCandidateanAgencycansubmitToaPosition',
+  'OrganizationCanCarryClockIDFromParent',
 ];
 
 export const DisabledSettingsByDefault = [
