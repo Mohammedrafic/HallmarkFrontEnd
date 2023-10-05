@@ -1,11 +1,21 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ONLY_LETTERS, ONLY_NUMBER, ONLY_NUMBER_AND_DOT, ALPHANUMERICS_AND_SYMBOLS, ALPHANUMERIC,  MIN_DIGITS_LENGTH_ONLY_NINE, NUMBER_AND_ONE_DECIMAL } from '@shared/constants';
+import { ValidationErrors } from '@angular/forms';
+
+import {
+  ONLY_LETTERS,
+  ONLY_NUMBER,
+  ONLY_NUMBER_AND_DOT,
+  ALPHANUMERICS_AND_SYMBOLS,
+  ALPHANUMERIC,
+  MIN_DIGITS_LENGTH_ONLY_NINE,
+  NUMBER_AND_ONE_DECIMAL,
+} from '@shared/constants';
 
 @Pipe({
   name: 'validationError',
 })
 export class ValidationErrorPipe implements PipeTransform {
-  transform(value: any): string {
+  transform(value: ValidationErrors | null | undefined): string {
     if (!value) {
       return '';
     }
@@ -14,17 +24,17 @@ export class ValidationErrorPipe implements PipeTransform {
       case 'required' in value:
         return 'Required';
       case 'maxlength' in value:
-        return `The max length of ${value.maxlength.requiredLength} characters is reached, you typed in ${value.maxlength.actualLength}`;
+        return `The max length of ${value['maxlength'].requiredLength} characters is reached, you typed in ${value['maxlength'].actualLength}`;
       case 'minlength' in value:
-        return `Min symbols entered should be ${value.minlength.requiredLength}`;
+        return `Min symbols entered should be ${value['minlength'].requiredLength}`;
       case 'email' in value:
         return 'Please enter a valid email address';
       case 'min' in value:
-        return `The minimum value should be ${value.min.min}`;
+        return `The minimum value should be ${value['min'].min}`;
       case 'duplicateDate' in value:
         return 'Payee with such date already exists';
       case 'invalidEmails' in value:
-        return `Please correct e-mail format: ${value.invalidEmails.join()}`;
+        return `Please correct e-mail format: ${value['invalidEmails'].join()}`;
       case 'pattern' in value:
         if (this.isWrongValue(ONLY_LETTERS, value)) {
           return 'Only letters are allowed';
@@ -47,13 +57,18 @@ export class ValidationErrorPipe implements PipeTransform {
         }
         return '';
       case 'max' in value:
-        return `The maximum value should be ${value.max.max}`;
+        return `The maximum value should be ${value['max'].max}`;
+      case 'notMatchPattern' in value:
+        return value['message'];
       default:
         return '';
     }
   }
 
-  private isWrongValue(regex: RegExp, value: any): boolean {
-    return value.pattern.requiredPattern === regex.toString() && !new RegExp(regex).test(value.pattern.actualValue);
+  private isWrongValue(regex: RegExp, value: ValidationErrors): boolean {
+    console.error('value:', value);
+    console.error('regex:', regex);
+    
+    return value['pattern'].requiredPattern === regex.toString() && !new RegExp(regex).test(value['pattern'].actualValue);
   }
 }
