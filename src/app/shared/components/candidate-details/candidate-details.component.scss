@@ -2,6 +2,9 @@
 @import 'adaptive-response';
 
 :host {
+  display: block;
+  height: 100%;
+
   ::ng-deep {
     .controls-container {
       flex-direction: row;
