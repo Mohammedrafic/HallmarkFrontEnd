@@ -689,6 +689,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
     this.jobDistributionForm.controls['jobDistribution'].patchValue(this.filteredJobDistributionValue);
 
+    this.filteredJobDistributionValue = null;
+
     this.associateAgencies$
       .pipe(
         filter((val) => !!val.length),
@@ -948,16 +950,16 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
         this.getComments();
-        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe(() => {
+        this.subscribeForSettings().pipe(take(1)).subscribe(() => {
           this.populateForms(order);
         });
       } else if (order?.isTemplate) {
         this.order = order;
-        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe(() => {
+        this.subscribeForSettings().pipe(take(1)).subscribe(() => {
           this.populateForms(order);
         });
       } else if (!isEditMode) {
-        this.subscribeForSettings().pipe(takeUntil(this.componentDestroy())).subscribe();
+        this.subscribeForSettings().pipe(take(1)).subscribe();
         this.isEditMode = false;
         this.order = null;
         this.populateNewOrderForm();
@@ -1271,6 +1273,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         if (jobDistributionId === OrderJobDistribution.TierLogic && prevJobDistributionId === null) {
           return;
         }
+
         const getJobDistId = (id: number) =>
           this.jobDistributionForm.controls['jobDistributions'].value.find(
             (item: JobDistributionModel) => item.jobDistributionOption === id
