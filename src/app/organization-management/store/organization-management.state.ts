@@ -654,11 +654,16 @@ export class OrganizationManagementState {
       }),
       catchError((error) => {
         const errorObj = error.error;
-        if (errorObj.errors?.IncompleteOpenOrdersExist && errorObj.errors?.InProgressOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Department has Open/ Incomplete/ InProgress Orders please re-assign or close them before inactivating the Department. Department has Orders In Progress past the inactivation date, please review them before inactivating the Department'));
-        }
+        const statues = JSON.parse(errorObj.errors.IncompleteOpenOrdersExist);
         if (errorObj.errors?.IncompleteOpenOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Department has Open/Incomplete/InProgress Orders, please re-assign or close them before inactivating the Department'));
+          return dispatch(
+            new ShowToast(
+              MessageTypes.Error,
+              'Department has ' +
+                statues +
+                ' Orders please re-assign or close them before inactivating the Department. please review them before inactivating the Department'
+            )
+          );
         }
         if (errorObj.errors?.InProgressOrdersExist) {
           return dispatch(new SaveDepartmentConfirm());
@@ -843,12 +848,18 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError((error) => {
+
         const errorObj = error.error;
+        const statues = JSON.parse(errorObj.errors.IncompleteOpenOrdersExist);
         if (errorObj.errors?.IncompleteOpenOrdersExist && errorObj.errors?.InProgressOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Location has Open/ Incomplete Orders please re-assign or close them before inactivating the Location. Location has Orders In Progress past the inactivation date, please review them before inactivating the Location'));
-        }
-        if (errorObj.errors?.IncompleteOpenOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Location has Open/Incomplete Orders, please re-assign or close them before inactivating the Location'));
+          return dispatch(
+            new ShowToast(
+              MessageTypes.Error,
+              'Location has ' +
+                statues +
+                ' Orders please re-assign or close them before inactivating the Location. please review them before inactivating the Location'
+            )
+          );
         }
         if (errorObj.errors?.InProgressOrdersExist) {
           return dispatch(new SaveLocationConfirm());
