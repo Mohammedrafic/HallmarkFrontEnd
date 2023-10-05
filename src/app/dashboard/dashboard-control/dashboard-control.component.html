@@ -18,6 +18,7 @@
     <div class="right-content">
       <button 
         *ngIf="hasWidgetPermission"
+        appHideBeforeSyncfusionLoad
         ejs-button
         cssClass="e-outline icon-btn"
         (click)="showFilterDialog()"
@@ -30,6 +31,7 @@
       </button>
       <button
         ejs-button
+        appHideBeforeSyncfusionLoad
         cssClass="e-outline icon-btn"
         (click)="toggleDialog(true)"
       >
@@ -39,6 +41,7 @@
       <app-tooltip-container [showToolTip]="!hasOrderCreatePermission">
         <button
           *ngIf="(isAgencyUser | async) === false"
+          appHideBeforeSyncfusionLoad
           ejs-button [isPrimary]="true"
           [disabled]="!hasOrderCreatePermission"
           (click)="onCreateOrder()"
