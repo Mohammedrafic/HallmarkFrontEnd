@@ -1,12 +1,21 @@
-@import "colors";
-@import "adaptive-response";
+@import 'colors';
+@import 'adaptive-response';
 
 :host {
-  height: 100%;
+  ::ng-deep {
+    .controls-container {
+      flex-direction: row;
+
+      .right-content {
+        justify-content: flex-end;
+      }
+    }
+  }
 }
 
 .tab-legend {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 17px;
 
   &__item {
@@ -20,6 +29,7 @@
     }
   }
 }
+
 .table-tabs {
   margin-bottom: 0;
   display: inline-block;
@@ -41,15 +51,71 @@
     }
   }
 }
+
 .candidates-grid {
   margin-top: 24px;
   height: calc(100% - 135px);
 
   @media #{$max-desktop-small} {
-    height: calc(100% - 195px);
+    height: calc(100% - 150px);
+  }
+}
+
+@media (max-width: 730px) {
+  .candidates-grid {
+    height: calc(100% - 220px);
   }
 
-  @media #{$max-tablet} {
-    height: calc(100% - 210px);
+  .tab-legend {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  :host {
+    ::ng-deep {
+      .controls-container {
+        flex-direction: column;
+        row-gap: 12px;
+
+        .right-content {
+          justify-content: flex-start;
+        }
+      }
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .candidates-grid {
+    height: auto;
+  }
+
+  .tab-legend {
+    grid-template-columns: 1fr;
+  }
+
+  :host {
+    ::ng-deep {
+      .controls-container {
+        margin-top: 60px;
+      }
+
+      .left-content {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100% !important;
+
+        &:has([style*="box-shadow"]) {
+          box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 4px !important;
+        }
+      }
+
+      .table-tabs {
+        display: block;
+        width: 100%;
+        background-color: var(--background);
+        padding-left: 16px;
+      }
+    }
   }
 }
