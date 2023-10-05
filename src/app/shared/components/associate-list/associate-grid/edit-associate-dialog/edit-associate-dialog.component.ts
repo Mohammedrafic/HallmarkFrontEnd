@@ -29,6 +29,7 @@ import { TierLogic } from '@shared/enums/tier-logic.enum';
 import { GetOrgTierStructure } from '../../../../../store/user.actions';
 import { DateTimeHelper } from '@core/helpers';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-edit-associate-dialog',
@@ -44,10 +45,13 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
 
   @Select(AssociateListState.feeExceptionsPage)
   public feeExceptionsPage$: Observable<FeeExceptionsPage>;
+
   @Select(AssociateListState.baseFee)
   public baseFee$: Observable<number>;
 
-  public targetElement: HTMLElement = document.body;
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
+
   public editAgencyOrg: AssociateOrganizationsAgency;
   public width: string;
   public feeSettingsForm: FormGroup;

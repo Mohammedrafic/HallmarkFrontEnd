@@ -627,7 +627,10 @@
   </div>
 </ng-template>
 <ng-template #actionBtn>
-  <div class="controls-form stick-right item">
+  <div
+    class="controls-form stick-right item"
+    [ngClass]="{'sidebar-open': isSidebarOpened$ | async}"
+  >
     <button
       *ngIf="!profileMode"
       ejs-button
