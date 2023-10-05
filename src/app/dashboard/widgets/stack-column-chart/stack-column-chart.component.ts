@@ -127,31 +127,34 @@ public readonly legendSettings: Object = { visible: false };
       }
     }
       window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
+      if(status ==  OrderStatus[OrderStatus.Open]){
+        this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
+      }else{
 
-      if(status === ActivePositionsChartStatuses.IN_PROGRESS){
-        status = PositionTrendTypeEnum.IN_PROGRESS;
-         candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
-         candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
-         candidatesStatusDataSet.push({"value":30});
-      }
-      else if(status === ActivePositionsChartStatuses.PENDING){
-        status = 'In Progress (Pending)';
-        candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
-      }
-      else if(status === ActivePositionsChartStatuses.ACCEPTED){
-        status = 'In Progress (Accepted)';
-        candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
-      }
-      else if(OrderStatus[OrderStatus.Filled] === status){
-        candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
-        activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
-        window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(activeOrderStatus));
-      }
-      if(status !=  OrderStatus[OrderStatus.Open]){
-        window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+        if(status === ActivePositionsChartStatuses.IN_PROGRESS){
+          status = PositionTrendTypeEnum.IN_PROGRESS;
+          candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
+          candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
+          candidatesStatusDataSet.push({"value":30});
+        }
+        else if(status === ActivePositionsChartStatuses.PENDING){
+          status = 'In Progress (Pending)';
+          candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
+        }
+        else if(status === ActivePositionsChartStatuses.ACCEPTED){
+          status = 'In Progress (Accepted)';
+          candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
+        }
+        else if(OrderStatus[OrderStatus.Filled] === status){
+          candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
+          activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
+          window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(activeOrderStatus));
+        }      
+          window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
       }
       
-      this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
+      
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
