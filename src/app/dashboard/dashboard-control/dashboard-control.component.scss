@@ -1,4 +1,6 @@
 @import 'colors';
+@import 'adaptive-response';
+
 .dashboard-toolbar {
   padding: 20px 16px 20px 0;
   display: flex;
@@ -9,12 +11,26 @@
   }
 
   .right-content {
-    display: initial;
+    display: flex;
     justify-content: flex-end;
     margin-left: 15px;
+    column-gap: 12px;
+  }
+}
 
-    & > *:not(:first-child) {
-      margin-left: 12px;
+@media #{$max-mobile} {
+  .dashboard-toolbar {
+    .left-content {
+      display: none;
+    }
+
+    .icon,
+    .right-content {
+      margin-left: 0;
+    }
+
+    .icon-btn {
+      padding: 8px 11px;
     }
   }
 }
