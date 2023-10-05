@@ -20,6 +20,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { FilteredUser } from '@shared/models/user.model';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { FilterColumns } from 'src/app/modules/timesheets/interface';
+import { FilteredOrderContactPerson } from '../../shared/models/order-contactperson.model';
 
 @Directive()
 export class FiltersDialogHelper<T, F, S> extends Destroyable {
@@ -38,10 +39,12 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public filterOptionFields = filterOptionFields;
   public skillFields: FieldSettingsModel = { text: 'name', value: 'masterSkillsId' };
   public contactPersonFields: FieldSettingsModel = { text: 'fullName', value: 'email' };
+  public orderContactPersonFields: FieldSettingsModel = { text: 'name', value: 'email' };
   public filterColumns: T;
   public formGroup: CustomFormGroup<T>;
   public isAgencyArea: boolean;
   public filteredUsers: FilteredUser[] = [];
+  public filteredOrderContactPerson: FilteredOrderContactPerson[] = [];
   public userSearch$ = new Subject<FilteringEventArgs>();
 
   constructor(
