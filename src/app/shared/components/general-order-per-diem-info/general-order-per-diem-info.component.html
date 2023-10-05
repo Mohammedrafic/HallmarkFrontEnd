@@ -45,8 +45,8 @@
           <i-feather name="briefcase" class="icon"></i-feather>
         </div>
         <div>
-          <div class="title">{{ orderInformation.orderRequisitionReasonName || '-' }}</div>
-          <div class="sup-title">Reason for Requisition</div>
+          <div class="title">{{ orderInformation?.skillName }}</div>
+          <div class="sup-title">Skill</div>
         </div>
       </div>
       <div class="column">
@@ -54,11 +54,10 @@
           <i-feather name="briefcase" class="icon"></i-feather>
         </div>
         <div>
-          <div class="title">{{ orderInformation?.skillName }}</div>
-          <div class="sup-title">Skill</div>
+          <div class="title">{{ orderInformation.orderRequisitionReasonName || '-' }}</div>
+          <div class="sup-title">Reason for Requisition</div>
         </div>
       </div>
-
       <div class="column"></div>
     </div>
   </section>
@@ -90,9 +89,15 @@
         <div class="sup-title">Linked ID</div>
       </div>
     </div>
-    <div class="column" *ngIf="orderInformation.minYrsRequired">
-      <div class="title">{{ orderInformation.minYrsRequired }}</div>
-      <div class="sup-title">Exp. Req.</div>
+    <div class="container-row justify-content-normal">
+      <div class="column" *ngIf="orderInformation.minYrsRequired">
+        <div class="title">{{ orderInformation.minYrsRequired }}</div>
+        <div class="sup-title">Exp. Req.</div>
+      </div>
+      <div class="column">
+        <div class="title">{{ orderInformation.workflowName || '-' }}</div>
+        <div class="sup-title">Workflow</div>
+      </div>
     </div>
   </section>
 </ng-container>
@@ -220,6 +225,10 @@
           <div class="column" *ngIf="orderInformation.minYrsRequired">
             <div class="title">{{ orderInformation.minYrsRequired }}</div>
             <div class="sup-title">Exp. Req.</div>
+          </div>
+          <div class="column">
+            <div class="title">{{ orderInformation.workflowName || '-' }}</div>
+            <div class="sup-title">Workflow</div>
           </div>
         </div>
       </section>

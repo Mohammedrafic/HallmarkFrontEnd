@@ -7,11 +7,11 @@
     >
       <ng-container *ngSwitchCase="orderType.PermPlacement">
         <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="region"></ng-container>
         <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
-        <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
-        <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="orderPlacementFee"></ng-container>
         <ng-container [ngTemplateOutlet]="annualSalaryRange"></ng-container>
@@ -20,21 +20,22 @@
 
       <ng-container *ngSwitchDefault>
         <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
-        <ng-container [ngTemplateOutlet]="region"></ng-container>
-        <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
         <div class="column last-column">
           <ng-container [ngTemplateOutlet]="billRate"></ng-container>
         </div>
+        <ng-container [ngTemplateOutlet]="region"></ng-container>
+        <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
-        <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
-        <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
         <div class="column last-column second-row" *ngIf="regularRates.regularLocal && regularRates.regular">
           <div class="cost">${{ regularRates.regularLocal | number: '1.2-2' }}</div>
           <div class="sup-title">Regular Local Bill Rate</div>
         </div>
         <ng-container [ngTemplateOutlet]="orderInfo" *ngIf="!regularRates.regularLocal || !regularRates.regular"></ng-container>
 
-        <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
+
         <ng-container [ngTemplateOutlet]="orderInfo" *ngIf="regularRates.regularLocal && regularRates.regular"></ng-container>
       </ng-container>
     </div>
@@ -66,6 +67,13 @@
         </div>
         <div class="sup-title">Start / End Bonus</div>
       </div>
+      <div class="column">
+        <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
+        <div class="sup-title">Distributed On</div>
+      </div>
+      <ng-container [ngTemplateOutlet]="workflowName"></ng-container>
+    </div>
+    <div class="container-row">
       <ng-container *ngIf="orderInformation.orderType !== orderType.ReOrder">
         <div class="column">
           <div class="title">{{ activeValue(orderInformation.onCallRequired) }}</div>
@@ -75,23 +83,19 @@
           <div class="title">{{ orderInformation.asapStart ? 'Yes' : 'No' }}</div>
           <div class="sup-title">ASAP Start</div>
         </div>
-        <div class="column">
-          <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No' }}</div>
-          <div class="sup-title">Critical Order</div>
-        </div>
-        <div class="column">
-          <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
-          <div class="sup-title">Distributed On</div>
-        </div>
-        <div class="column" *ngIf="orderInformation.minYrsRequired">
-          <div class="title">{{ orderInformation.minYrsRequired }}</div>
-          <div class="sup-title">Exp. Req.</div>
-        </div>
-        <ng-container
-          [ngTemplateOutlet]="linkedId"
-          [ngTemplateOutletContext]="{ linkedID: orderInformation.linkedId }"
-        ></ng-container>
       </ng-container>
+      <div class="column">
+        <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No' }}</div>
+        <div class="sup-title">Critical Order</div>
+      </div>
+      <div class="column" *ngIf="orderInformation.minYrsRequired">
+        <div class="title">{{ orderInformation.minYrsRequired }}</div>
+        <div class="sup-title">Exp. Req.</div>
+      </div>
+      <ng-container
+        [ngTemplateOutlet]="linkedId"
+        [ngTemplateOutletContext]="{ linkedID: orderInformation.linkedId }"
+      ></ng-container>
     </div>
   </section>
 </ng-container>
@@ -177,6 +181,7 @@
         [ngTemplateOutlet]="linkedId"
         [ngTemplateOutletContext]="{ linkedID: orderInformation.linkedId }"
       ></ng-container>
+      <ng-container [ngTemplateOutlet]="workflowName"></ng-container>
     </div>
   </section>
 </ng-template>
@@ -341,5 +346,12 @@
   <div class="column">
     <div class="title">{{ linkedID || '-' }}</div>
     <div class="sup-title">Linked ID</div>
+  </div>
+</ng-template>
+
+<ng-template #workflowName>
+  <div class="column">
+    <div class="title">{{ orderInformation.workflowName || '-' }}</div>
+    <div class="sup-title">Workflow</div>
   </div>
 </ng-template>
