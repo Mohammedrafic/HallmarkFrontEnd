@@ -243,7 +243,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
 
         intervalMaxControl?.updateValueAndValidity();
         intervalMinControl?.updateValueAndValidity();
-debugger;
+
         this.setOTValue();
 
         this.setFormatdecimalsValues();
