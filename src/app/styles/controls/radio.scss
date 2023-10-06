@@ -1,29 +1,6 @@
 @import 'colors';
 
-.light {
-  ejs-radiobutton {
-    .e-control.e-radio + label {
-      &::before {
-        border: 1px solid;
-        width: 17px;
-        height: 17px;
-      }
-
-      &::after {
-        height: 9px;
-        left: 4px;
-        top: 4px;
-        width: 9px;
-      }
-    }
-
-    .e-label {
-      padding-left: 25px !important;
-      color: $secondary-dark-blue-15 !important;
-    }
-  }
-}
-
+body.light,
 body.dark {
   .bootstrap {
     .e-radio + label {
@@ -47,7 +24,7 @@ body.dark {
     .e-radio {
       &:checked + label {
         &::before {
-          background-color: $sidebar-background;
+          background-color: var(--bg-default);
           box-shadow: none;
         }
 

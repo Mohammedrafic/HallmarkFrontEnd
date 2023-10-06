@@ -151,3 +151,6 @@ export const ERROR_CAN_NOT_ADD_MANAGENOTE_WITHOUT_VIEWNOTE="We can't add the man
 export const AgencyPartnershipSuspended = 'Agency Partnership is suspended';
 export const ViewOrderIRP_PERMISSION = 'Additional permission is required (CanOrganizationViewOrdersIRP)';
 export const ViewOrderVMS_PERMISSION = 'Additional permission is required (CanOrganizationViewOrderVMS)';
+export const TaxIdValidationMessage = '9-digit number';
+export const SwiftCodeValidationMessage = '8-11 alphanumeric code for international payments';
+export const RoutingNumberMessage = '9-digit code to identify financial institution';
