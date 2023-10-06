@@ -16,7 +16,7 @@
             <h3 class="e-card-title">Associate {{title}}</h3>
           </div>
           <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
-          <button tabindex="-1" ejs-button cssClass="e-flat close-button" (click)="onCancel()">
+          <button tabindex="-1" ejs-button cssClass="e-flat mobile-close-button" (click)="onCancel()">
             <i-feather name="x" class="icon"></i-feather>
           </button>
         </div>
@@ -39,6 +39,7 @@
               [allowFiltering]="true"
               [fields]="optionFields"
               [dataSource]="associateAgencyOrg$ | async"
+              [showDropDownIcon]="true"
             ></ejs-multiselect>
           </div>
         </div>
