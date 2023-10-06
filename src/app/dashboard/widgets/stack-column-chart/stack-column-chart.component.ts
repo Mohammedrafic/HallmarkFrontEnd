@@ -132,7 +132,7 @@ public readonly legendSettings: Object = { visible: false };
         status = PositionTrendTypeEnum.IN_PROGRESS;
          candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
          candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
-         candidatesStatusDataSet.push({"value":30});
+         candidatesStatusDataSet.push({"value":CandidatStatus.CustomStatus});
       }
       else if(status === ActivePositionsChartStatuses.PENDING){
         status = 'In Progress (Pending)';

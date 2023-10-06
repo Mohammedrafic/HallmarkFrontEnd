@@ -17,6 +17,7 @@ export enum AlertEnum {
     Skill=7
   }
   export enum AlertIdEnum {
+    "Candidate Credential Reviewed"=52,
     "Candidate Credential Rejected"=1,
     "Candidate Status Update: Accepted"=2,
     "Candidate Status Update: Custom Status"=3,

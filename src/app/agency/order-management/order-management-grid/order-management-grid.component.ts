@@ -96,6 +96,7 @@ import { GetAgencyFilterFormConfig } from './constants';
 import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
   '@shared/components/order-reorders-container/store/re-order.actions';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -265,11 +266,25 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       .subscribe((event: any) => this.exportSelected(event));
   }
   public getAlertOrderId():void{
+    let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
     this.alertOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
     (!this.alertOrderId)?this.alertOrderId=0:""
     window.localStorage.setItem("OrderId", JSON.stringify(""));
-    if(this.alertOrderId>0)
-      this.openDetailsTab = true;
+    if(this.alertOrderId>0){
+      if((AlertIdEnum[AlertIdEnum['Candidate Status Update: Shortlisted']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Onboard']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Accepted']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Offered']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Rejected']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+      )
+      this.previousSelectedOrderId = this.alertOrderId;
+      else{
+        this.openDetailsTab = true;
+      }
+    }
+
+      
+
   }
 
   public override customExport(): void {
