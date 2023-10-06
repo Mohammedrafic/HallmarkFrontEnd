@@ -661,7 +661,7 @@ export class OrganizationManagementState {
               MessageTypes.Error,
               'Department has ' +
                 statues +
-                ' Orders please re-assign or close them before inactivating the Department. please review them before inactivating the Department'
+                ' Orders please re-assign or close them before inactivating the Department.'
             )
           );
         }
@@ -857,7 +857,7 @@ export class OrganizationManagementState {
               MessageTypes.Error,
               'Location has ' +
                 statues +
-                ' Orders please re-assign or close them before inactivating the Location. please review them before inactivating the Location'
+                ' Orders please re-assign or close them before inactivating the Location.'
             )
           );
         }
