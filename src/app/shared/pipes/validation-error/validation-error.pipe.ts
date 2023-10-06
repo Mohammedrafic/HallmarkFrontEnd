@@ -66,9 +66,6 @@ export class ValidationErrorPipe implements PipeTransform {
   }
 
   private isWrongValue(regex: RegExp, value: ValidationErrors): boolean {
-    console.error('value:', value);
-    console.error('regex:', regex);
-    
     return value['pattern'].requiredPattern === regex.toString() && !new RegExp(regex).test(value['pattern'].actualValue);
   }
 }
