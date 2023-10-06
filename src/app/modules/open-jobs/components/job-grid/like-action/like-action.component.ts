@@ -3,7 +3,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 
-import { OpenJob } from '../../../interfaces';
+import { OpenJob } from '@shared/models';
 import { JobGridComponent } from '../job-grid.component';
 
 @Component({

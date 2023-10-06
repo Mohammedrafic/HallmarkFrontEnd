@@ -29,6 +29,7 @@ import { Tiers } from '@shared/enums/tiers.enum';
 import { ActionRendererComponent } from './associate-grid/edit-associate-dialog/tier-settings/tier-settings-grid/action-renderer/action-renderer.component';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { ChipsCssClassPipeModule } from '@shared/pipes/chip-css-class/chip-css-class-pipe.module';
+import { GridPaginationModule } from '../grid/grid-pagination/grid-pagination.module';
 
 @NgModule({
   declarations: [
@@ -63,6 +64,7 @@ import { ChipsCssClassPipeModule } from '@shared/pipes/chip-css-class/chip-css-c
     ChipListModule,
     ChipsCssClassPipeModule,
     NgxsModule.forFeature([AssociateListState]),
+    GridPaginationModule,
   ],
   providers: [
     AssociateService,

@@ -39,6 +39,7 @@ import {
   User,
   UserX,
   Users,
+  List,
 } from 'angular-feather/icons';
 
 import { AdminGuard, AgencyGuard, EmployeeGuard } from '@core/guards';
@@ -85,6 +86,7 @@ const sidebarIcons = {
   Server,
   Twitch,
   TrendingUp,
+  List,
 };
 
 @NgModule({

@@ -1,7 +1,15 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { formatDate } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
-  Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 
 import { FileExtensionsString } from '@core/constants';
@@ -18,17 +26,27 @@ import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { AgencyStatus } from '@shared/enums/status';
-import { AbstractPermission } from "@shared/helpers/permissions";
+import { AbstractPermission } from '@shared/helpers/permissions';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
-import { combineLatest, distinctUntilChanged, filter, map, Observable,
+import {
+  combineLatest,
+  distinctUntilChanged,
+  filter,
+  map,
+  Observable,
   skip,
   Subject,
-  switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+  throttleTime,
+} from 'rxjs';
 import { SettingsViewService } from '../../../../shared/services/settings-view.service';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import {
@@ -47,6 +65,11 @@ import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
 import { AppState } from 'src/app/store/app.state';
+import { ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { Comment } from '@shared/models/comment.model';
+import { CommentsService } from '@shared/services/comments.service';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { GetOrderComments } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -74,6 +97,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public readonly uploadFileArea: UploadFileAreaComponent;
 
   @Input() currentSelectedRowIndex: number | null = null;
+
+  @Input() comments: Comment[] = [];
 
   @Input() maxRowIndex: number = GRID_CONFIG.initialRowsPerPage;
 
@@ -117,6 +142,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public rangeType = DatesRangeType.OneWeek;
 
   private jobId: number;
+
+  public commentContainerId = 0;
+
+
+  @Select(OrderManagementContentState.orderComments)
+  private orderComments$: Observable<Comment[]>;
 
   @Select(AppState.isSidebarOpened)
   isSideBarDocked$: Observable<boolean>;
@@ -170,10 +201,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   private canRecalculate: boolean;
 
-  previewAttachemnt:boolean = false;
+  previewAttachemnt: boolean = false;
+  currentSelectedAttachmentIndex: number = 0;
+  navigateTheAttachment$: Subject<number> = new Subject<number>();
+  private eventsHandler: Subject<void> = new Subject();
+  private unsubscribe$: Subject<void> = new Subject();
   sideBar:boolean = false;
-  currentSelectedAttachmentIndex:number = 0;
-  navigateTheAttachment$:Subject<number> = new Subject<number>();
   
 
   /**
@@ -190,19 +223,18 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     private breakpointObserver: BreakpointObserver,
     private cd: ChangeDetectorRef,
     private actions: Actions,
-    private settingsViewService: SettingsViewService
+    private settingsViewService: SettingsViewService,
   ) {
     super(store);
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
-      map(({id}) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
+      map(({ id }) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
     );
   }
 
   public get isNextDisabled(): boolean {
     return this.maxRowIndex - 1 === this.currentSelectedRowIndex;
   }
-
 
   public override ngOnInit(): void {
     super.ngOnInit();
@@ -214,15 +246,14 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.listenResizeToolbar();
     this.observeRecordsLoad();
     this.observeDetails();
-    this.isSideBarDocked$
-        .pipe(takeUntil(this.componentDestroy()))
-        .subscribe((isOpen) => {
-          this.sideBar =isOpen;
-          if(this.previewAttachemnt){
-            this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);
-          }
-            
-        });
+    this.sideBarObserver();
+  }
+
+  public onExpanded(event: ExpandedEventArgs): void {
+    if (event.isExpanded) {
+      this.eventsHandler.next();
+    }
+   
   }
 
   public override ngOnDestroy(): void {
@@ -235,29 +266,30 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public closeDialogOnNavigationStart(): void {
-    this.router.events.pipe(
-      filter((e) => e instanceof NavigationStart),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(() => this.closeDialog());
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationStart),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => this.closeDialog());
   }
 
-  public isAttachmentNextDisabled(attachments:Attachment[]):boolean{
+  public isAttachmentNextDisabled(attachments: Attachment[]): boolean {
     return attachments.length == this.currentSelectedAttachmentIndex + 1;
   }
 
   public onNextPreviousAttachments(next: boolean): void {
-      if(next){
-        this.currentSelectedAttachmentIndex = this.currentSelectedAttachmentIndex + 1;
-      }else{
-        this.currentSelectedAttachmentIndex = this.currentSelectedAttachmentIndex - 1;
-      }
-      this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);      
+    if (next) {
+      this.currentSelectedAttachmentIndex = this.currentSelectedAttachmentIndex + 1;
+    } else {
+      this.currentSelectedAttachmentIndex = this.currentSelectedAttachmentIndex - 1;
+    }
+    this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);
   }
 
   public onNextPreviousOrder(next: boolean): void {
     if (!this.isChangesSaved) {
-      this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmOrderChange)
-      .subscribe(() => {
+      this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmOrderChange).subscribe(() => {
         this.nextPreviousOrderEvent.emit(next);
       });
     } else {
@@ -271,23 +303,28 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public openAddDialog(meta: TimesheetInt.OpenAddDialogMeta): void {
-    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open,
-      meta.currentTab, meta.startDate, meta.endDate, this.costCenterId));
+    this.store.dispatch(
+      new Timesheets.ToggleTimesheetAddDialog(
+        DialogAction.Open,
+        meta.currentTab,
+        meta.startDate,
+        meta.endDate,
+        this.costCenterId
+      )
+    );
   }
 
   public openUploadSideDialog(timesheetAttachments: TimesheetInt.TimesheetAttachments): void {
-    this.store.dispatch(new Timesheets.ToggleTimesheetUploadAttachmentsDialog(
-      DialogAction.Open,
-      timesheetAttachments,
-    ));
+    this.store.dispatch(new Timesheets.ToggleTimesheetUploadAttachmentsDialog(DialogAction.Open, timesheetAttachments));
   }
 
   public handleProfileClose(): void {
     if (!this.isChangesSaved) {
-      this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmUnsavedChages)
-      .subscribe(() => {
-        this.closeDialog();
-      });
+      this.timesheetDetailsService
+        .confirmTimesheetLeave(TimesheetConfirmMessages.confirmUnsavedChages)
+        .subscribe(() => {
+          this.closeDialog();
+        });
     } else {
       this.closeDialog();
     }
@@ -301,48 +338,52 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public beforeRender(e: { target: HTMLElement }): void {
     const parent = e.target.parentNode as ParentNode;
-    this.tooltip.content = Array.from(parent.children).indexOf(e.target)
-      ? 'Miles Status' : 'Timesheet Status';
+    this.tooltip.content = Array.from(parent.children).indexOf(e.target) ? 'Miles Status' : 'Timesheet Status';
   }
 
-  public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
-    checked ? this.timesheetDetails$
-      .pipe(
-        map(({ status }: TimesheetInt.TimesheetDetailsModel) => status === TimesheetStatus.Approved),
-        switchMap((approved: boolean) => this.confirmService.confirm(
-          approved ? ConfirmApprovedTimesheetDeleteDialogContent : ConfirmDeleteTimesheetDialogContent, {
-            title: 'Delete Timesheet',
-            okButtonLabel: approved ? 'Yes' : 'Proceed',
-            okButtonClass: 'delete-button',
-          })),
-        take(1),
-        tap((submitted: boolean) => !submitted && switchComponent.writeValue(false)),
-        filter(Boolean),
-        switchMap(() => this.store.dispatch(
-          new TimesheetDetails.NoWorkPerformed(true, this.timesheetId, this.organizationId),
-        ))
-      )
-      .subscribe(() => {
-        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
-        this.refreshData();
-        this.closeDialog();
-      }) : this.store.dispatch(
-      new TimesheetDetails.NoWorkPerformed(false, this.timesheetId, this.organizationId)
-    )
-      .pipe(
-        take(1),
-      )
-      .subscribe(() => this.refreshData());
+  
+  public onDWNCheckboxSelectedChange({ checked }: { checked: boolean }, switchComponent: SwitchComponent): void {
+    checked
+      ? this.timesheetDetails$
+          .pipe(
+            map(({ status }: TimesheetInt.TimesheetDetailsModel) => status === TimesheetStatus.Approved),
+            switchMap((approved: boolean) =>
+              this.confirmService.confirm(
+                approved ? ConfirmApprovedTimesheetDeleteDialogContent : ConfirmDeleteTimesheetDialogContent,
+                {
+                  title: 'Delete Timesheet',
+                  okButtonLabel: approved ? 'Yes' : 'Proceed',
+                  okButtonClass: 'delete-button',
+                }
+              )
+            ),
+            take(1),
+            tap((submitted: boolean) => !submitted && switchComponent.writeValue(false)),
+            filter(Boolean),
+            switchMap(() =>
+              this.store.dispatch(new TimesheetDetails.NoWorkPerformed(true, this.timesheetId, this.organizationId))
+            )
+          )
+          .subscribe(() => {
+            this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+            this.refreshData();
+            this.closeDialog();
+          })
+      : this.store
+          .dispatch(new TimesheetDetails.NoWorkPerformed(false, this.timesheetId, this.organizationId))
+          .pipe(take(1))
+          .subscribe(() => this.refreshData());
   }
 
   public handleReject(reason: string): void {
     this.updateTimesheetStatus(TimesheetTargetStatus.Rejected, { reason })
-      .pipe(
-        takeUntil(this.componentDestroy())
-      )
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.store.dispatch([
-          new ShowToast(MessageTypes.Success, rejectTimesheetDialogData(this.isTimesheetOrMileagesUpdate).successMessage),
+          new ShowToast(
+            MessageTypes.Success,
+            rejectTimesheetDialogData(this.isTimesheetOrMileagesUpdate).successMessage
+          ),
           new Timesheets.GetAll(),
           new Timesheets.GetTabsCounts(),
         ]);
@@ -351,8 +392,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       });
   }
 
-  public updateTimesheetStatus(status: TimesheetTargetStatus,
-    data?: Partial<TimesheetInt.ChangeStatusData>): Observable<void> {
+  public updateTimesheetStatus(
+    status: TimesheetTargetStatus,
+    data?: Partial<TimesheetInt.ChangeStatusData>
+  ): Observable<void> {
     return this.store.dispatch(
       new TimesheetDetails.ChangeTimesheetStatus({
         timesheetId: this.isTimesheetOrMileagesUpdate ? this.timesheetId : this.mileageTimesheetId,
@@ -368,13 +411,11 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const { timesheetId, mileageTimesheetId, organizationId } = this;
     const updateId = isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId;
 
-    (organizationId ?
-      this.timesheetDetailsService.submitTimesheet(updateId, organizationId, isTimesheetOrMileagesUpdate)
-        : this.timesheetDetailsService.approveTimesheet(updateId, isTimesheetOrMileagesUpdate)
+    (organizationId
+      ? this.timesheetDetailsService.submitTimesheet(updateId, organizationId, isTimesheetOrMileagesUpdate)
+      : this.timesheetDetailsService.approveTimesheet(updateId, isTimesheetOrMileagesUpdate)
     )
-      .pipe(
-        takeUntil(this.componentDestroy())
-      )
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.handleProfileClose();
         this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
@@ -393,17 +434,11 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public closeExport(): void {
     this.fileName = '';
-    this.store.dispatch(
-      new ShowExportDialog(false)
-    );
+    this.store.dispatch(new ShowExportDialog(false));
   }
 
   public exportProfileDetails(fileType: ExportedFileType): void {
-    this.store.dispatch(
-      new TimesheetDetails.Export(
-        new ExportPayload(fileType),
-      )
-    );
+    this.store.dispatch(new TimesheetDetails.Export(new ExportPayload(fileType)));
   }
 
   public customExport(event: TimesheetInt.CustomExport): void {
@@ -414,20 +449,19 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public showCustomExportDialog(): void {
     this.fileName = `Timesheet ${formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US')}`;
 
-    this.store.dispatch(
-      new ShowExportDialog(true)
-    );
+    this.store.dispatch(new ShowExportDialog(true));
   }
 
   public onFilesSelected(files: FileForUpload[]): void {
-    this.store.dispatch(new TimesheetDetails.UploadFiles({
-      timesheetId: this.timesheetId,
-      organizationId: this.organizationId,
-      files,
-    }))
-      .pipe(
-        takeUntil(this.componentDestroy())
+    this.store
+      .dispatch(
+        new TimesheetDetails.UploadFiles({
+          timesheetId: this.timesheetId,
+          organizationId: this.organizationId,
+          files,
+        })
       )
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.store.dispatch(
           new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
@@ -436,34 +470,41 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public saveFilesOnRecord(uploadData: TimesheetInt.UploadDocumentsModel): void {
-    this.store.dispatch([
-      new Timesheets.UploadMilesAttachments(uploadData.fileForUpload, this.organizationId),
-      ...this.prepareFilesForDelete(uploadData.filesForDelete, this.timesheetId, this.organizationId),
-    ]).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.store.dispatch(
-        new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
-      );
-    });
+    this.store
+      .dispatch([
+        new Timesheets.UploadMilesAttachments(uploadData.fileForUpload, this.organizationId),
+        ...this.prepareFilesForDelete(uploadData.filesForDelete, this.timesheetId, this.organizationId),
+      ])
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.store.dispatch(
+          new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+        );
+      });
   }
 
   public listenResizeToolbar(): void {
     const tabletBreakPoint$: Observable<boolean> = this.breakpointObserver
-    .observe([BreakpointQuery.TABLET_MAX]).pipe(map((data) => data.matches));
-    const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$
-    .pipe(map((data) => data[0].contentRect.width), distinctUntilChanged());
+      .observe([BreakpointQuery.TABLET_MAX])
+      .pipe(map((data) => data.matches));
+    const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$.pipe(
+      map((data) => data[0].contentRect.width),
+      distinctUntilChanged()
+    );
 
     const smallTabletScreenWidth = 760;
-    const mobileScreenWidth = +BreakpointQuery.MOBILE_MAX.replace(/\D/g, "");
+    const mobileScreenWidth = +BreakpointQuery.MOBILE_MAX.replace(/\D/g, '');
 
-      combineLatest([tabletBreakPoint$, resizeToolbarObserver$])
-        .pipe(filter(([isLessMaxTablet, resize]) => Boolean(isLessMaxTablet)), takeUntil(this.componentDestroy()))
-        .subscribe(([isLessMaxTablet, toolbarWidth]) => {
-          this.isMobile = toolbarWidth <= mobileScreenWidth;
-          this.isSmallTabletScreen = toolbarWidth <= smallTabletScreenWidth;
-          this.cd.markForCheck();
-        });
+    combineLatest([tabletBreakPoint$, resizeToolbarObserver$])
+      .pipe(
+        filter(([isLessMaxTablet, resize]) => Boolean(isLessMaxTablet)),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(([isLessMaxTablet, toolbarWidth]) => {
+        this.isMobile = toolbarWidth <= mobileScreenWidth;
+        this.isSmallTabletScreen = toolbarWidth <= smallTabletScreenWidth;
+        this.cd.markForCheck();
+      });
   }
 
   public openFileUploadArea(): void {
@@ -471,49 +512,50 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.previewAttachemnt = false;
   }
 
-  public onMobileMenuSelect({ item: { text }}: MenuEventArgs): void {
-    if(text === MobileMenuItems.Upload) {
+  public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {
+    if (text === MobileMenuItems.Upload) {
       setTimeout(() => this.openFileUploadArea());
     }
     this.previewAttachemnt = false;
   }
 
   public closeDialog(): void {
-    this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
-    .pipe(
-      take(1),
-    ).subscribe(() => {
-      this.candidateDialog.hide();
-    });
+    this.store
+      .dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
+      .pipe(take(1))
+      .subscribe(() => {
+        this.candidateDialog.hide();
+      });
   }
 
   private orgSubmitEmptyTimesheetWarning(): void {
-    this.timesheetDetailsService.orgSubmitEmptyTimesheet().pipe(take(1), takeUntil(this.componentDestroy())).subscribe();
+    this.timesheetDetailsService
+      .orgSubmitEmptyTimesheet()
+      .pipe(take(1), takeUntil(this.componentDestroy()))
+      .subscribe();
   }
 
   private orgSubmitTimesheet(timesheetDetails: TimesheetInt.TimesheetDetailsModel | null): void {
-    this.timesheetDetailsService.submitTimesheet(
-      this.timesheetId,
-      timesheetDetails?.organizationId as number,
-      true
-    ).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.handleProfileClose();
-      this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
-    });
+    this.timesheetDetailsService
+      .submitTimesheet(this.timesheetId, timesheetDetails?.organizationId as number, true)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.handleProfileClose();
+        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+      });
   }
 
   private startSelectedTimesheetWatching(): void {
-    this.selectedTimeSheet$.pipe(
-      throttleTime(100),
-      filter((timesheet) => !!timesheet),
-      takeUntil(this.componentDestroy()),
-    ).subscribe((timesheet) => {
-      this.previewAttachemnt = false;
-      this.store.dispatch(new Timesheets.GetTimesheetDetails(
-        timesheet.id, timesheet.organizationId, this.isAgency));
-    });
+    this.selectedTimeSheet$
+      .pipe(
+        throttleTime(100),
+        filter((timesheet) => !!timesheet),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((timesheet) => {
+        this.previewAttachemnt = false;
+        this.store.dispatch(new Timesheets.GetTimesheetDetails(timesheet.id, timesheet.organizationId, this.isAgency));
+      });
   }
 
   private prepareFilesForDelete(
@@ -521,7 +563,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     timesheetId: number,
     organizationId: number | null = null
   ): DeleteRecordAttachment[] {
-    return arr.map(file => new Timesheets.DeleteRecordAttachment(timesheetId, organizationId, file));
+    return arr.map((file) => new Timesheets.DeleteRecordAttachment(timesheetId, organizationId, file));
   }
 
   private refreshData(): Observable<TimesheetInt.TimesheetDetailsModel> {
@@ -531,16 +573,15 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   private watchForRangeChange(): void {
-    this.timesheetDetailsService.watchRangeStream()
-    .pipe(
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe((range) => {
-      this.previewAttachemnt = false;
-      this.store.dispatch(new TimesheetDetails.GetDetailsByDate(
-        this.organizationId as number, range[0], this.jobId, this.isAgency)
-      );
-    });
+    this.timesheetDetailsService
+      .watchRangeStream()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((range) => {
+        this.previewAttachemnt = false;
+        this.store.dispatch(
+          new TimesheetDetails.GetDetailsByDate(this.organizationId as number, range[0], this.jobId, this.isAgency)
+        );
+      });
   }
 
   private setDNWBtnState(canEditTimesheet: boolean, allowDNWInTimesheets = false): void {
@@ -551,21 +592,21 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const allowResult = agencyStatus === AgencyStatus.Inactive || agencyStatus === AgencyStatus.Terminated;
 
     this.disableAnyAction = allowResult;
-
   }
   private allowEditButtonEnabled(): void {
-    let organizationId = this.orgId;
+    let organizationId = this.orgId; 
     this.settingsViewService.getViewSettingKey(
       OrganizationSettingKeys.TimesheetSubmissionProcess,
-      OrganizationalHierarchy.Organization,
+      OrganizationalHierarchy.Location,
       organizationId as number,
-      organizationId as number
+      organizationId as number,
+      false,
+      this.jobId
     ).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(({ TimesheetSubmissionProcess }) => {
       let currentdate = new Date();
-      let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));
-
+      let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));     
       if (TimesheetSubmissionProcess == "INT" &&dateDiff <= 30) {
         this.disableEditButton = true;
       }
@@ -578,9 +619,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   private watchForPermissions(): void {
     this.getPermissionStream()
-      .pipe(
-        takeUntil(this.componentDestroy())
-      )
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((permissions: Permission) => {
         if (this.isAgency) {
           this.hasEditTimesheetRecordsPermission =
@@ -602,62 +641,91 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
   }
 
-  onPreviewAttchementClick($event:number){
+  public onPreviewAttchementClick($event:number){
     this.currentSelectedAttachmentIndex = $event;
     this.previewAttachemnt = true;
   }
 
   private observeDetails(): void {
     this.timesheetDetails$
-    .pipe(
-      filter((details) => !!details && !details.isNotExist),
-      takeUntil(this.componentDestroy())
-    ).subscribe((details) => {
-      const currentStatus = details.status;
-      const isTimesheetSubmitted = currentStatus === this.timesheetStatus.Approved
-      || currentStatus === this.timesheetStatus.PendingApproval
-      || currentStatus === this.timesheetStatus.PendingApprovalAsterix;
-      this.canRecalculateTimesheet = isTimesheetSubmitted && this.canRecalculate;
-      this.timesheetId = details.id;
-      this.mileageTimesheetId = details.mileageTimesheetId;
-      this.isMileageStatusAvailable = details.mileageStatusText
-      .toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
-      this.costCenterId = details.departmentId;
+      .pipe(
+        filter((details) => !!details && !details.isNotExist),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((details) => {
+        const currentStatus = details.status;
+        const isTimesheetSubmitted =
+          currentStatus === this.timesheetStatus.Approved ||
+          currentStatus === this.timesheetStatus.PendingApproval ||
+          currentStatus === this.timesheetStatus.PendingApprovalAsterix;
+        this.canRecalculateTimesheet = isTimesheetSubmitted && this.canRecalculate;
+        this.timesheetId = details.id;
+        this.commentContainerId=details.commentContainerId;
+        this.mileageTimesheetId = details.mileageTimesheetId;
+        this.isMileageStatusAvailable =
+          details.mileageStatusText.toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
+        this.costCenterId = details.departmentId;
 
-      this.organizationId = this.isAgency ? details.organizationId : null;
-      this.orgId =  details.organizationId;
-      this.jobId = details.jobId;
-      this.weekPeriod = [
-        DateTimeHelper.setCurrentTimeZone(details.weekStartDate),
-        DateTimeHelper.setCurrentTimeZone(details.weekEndDate),
-      ];
-      this.workWeeks = details.candidateWorkPeriods
-      .map((el: TimesheetInt.WorkWeek<string>): TimesheetInt.WorkWeek<Date> => ({
-        weekStartDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekStartDate)),
-        weekEndDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekEndDate)),
-      }));
-      this.setDNWBtnState(details.canEditTimesheet, !!details.allowDNWInTimesheets);
-      this.checkForAllowActions(details.agencyStatus);
-      this.allowEditButtonEnabled();
-      this.cd.markForCheck();
+        this.organizationId = this.isAgency ? details.organizationId : null;
+        this.orgId = details.organizationId;
+        this.jobId = details.jobId;
+        this.weekPeriod = [
+          DateTimeHelper.setCurrentTimeZone(details.weekStartDate),
+          DateTimeHelper.setCurrentTimeZone(details.weekEndDate),
+        ];
+        this.workWeeks = details.candidateWorkPeriods.map(
+          (el: TimesheetInt.WorkWeek<string>): TimesheetInt.WorkWeek<Date> => ({
+            weekStartDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekStartDate)),
+            weekEndDate: new Date(DateTimeHelper.setCurrentTimeZone(el.weekEndDate)),
+          })
+        );
+        this.setDNWBtnState(details.canEditTimesheet, !!details.allowDNWInTimesheets);
+        this.checkForAllowActions(details.agencyStatus);
+        this.allowEditButtonEnabled();
+        this.getOrderComments();
+        this.cd.markForCheck();
 
-      this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
-        details.id, details.organizationId, this.isAgency));
-    });
+        this.store.dispatch(
+          new TimesheetDetails.GetTimesheetRecords(details.id, details.organizationId, this.isAgency)
+        );
+      });
   }
 
   private observeRecordsLoad(): void {
     this.actions
-    .pipe(
-      ofActionCompleted(TimesheetDetails.GetTimesheetRecords),
-      tap(() => {
-        this.chipList?.refresh();
-        this.cd.detectChanges();
-      }),
-      filter(() => this.store.selectSnapshot(TimesheetsState.isTimesheetOpen)),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(() => {
-      this.candidateDialog?.show();
+      .pipe(
+        ofActionCompleted(TimesheetDetails.GetTimesheetRecords),
+        tap(() => {
+          this.chipList?.refresh();
+          this.cd.detectChanges();
+        }),
+        filter(() => this.store.selectSnapshot(TimesheetsState.isTimesheetOpen)),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.candidateDialog?.show();
+      });
+  }
+
+  public getOrderComments(): void {
+    this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
+    this.orderComments$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+      this.cd.markForCheck();
     });
+  }
+  
+  public sideBarObserver(){
+    this.isSideBarDocked$
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((isOpen) => {
+          this.sideBar =isOpen;
+          if(this.previewAttachemnt){
+            this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);
+          }
+            
+        });
   }
 }

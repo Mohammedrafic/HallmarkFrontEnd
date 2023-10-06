@@ -110,6 +110,9 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
   @Select(AdminState.dataBaseConnections)
   dataBaseConnections$: Observable<string[]>;
 
+  @Select(AppState.isSidebarOpened)
+  isSidebarOpened$:Observable<boolean>;
+
   get isAddMode(): boolean {
     return this.title === 'Add';
   }

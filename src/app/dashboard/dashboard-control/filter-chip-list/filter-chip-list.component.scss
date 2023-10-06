@@ -1,4 +1,6 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
+
 .filter-chips {
   display: flex;
   align-items: center;
@@ -89,5 +91,11 @@
         }
       }
     }
+  }
+}
+
+@media #{$max-mobile} {
+  :host {
+    display: none;
   }
 }

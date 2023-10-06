@@ -10,37 +10,6 @@
           <div class="sup-title">Job title</div>
         </div>
       </div>
-      <div class="column">
-        <div class="icon">
-          <i-feather name="map-pin" class="icon"></i-feather>
-        </div>
-        <div>
-          <div class="title">{{ orderInformation.regionName }}</div>
-          <div class="sup-title">Region</div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="icon">
-          <i-feather name="map-pin" class="icon"></i-feather>
-        </div>
-        <div>
-          <div class="title">{{ orderInformation.locationName }}</div>
-          <div class="sup-title">Location</div>
-        </div>
-      </div>
-      <div class="column last-column">
-        <div class="cost">${{ regularRates.regular }}</div>
-        <div class="sup-title">Regular Bill Rate</div>
-      </div>
-      <div class="column">
-        <div class="icon">
-          <i-feather name="folder" class="icon"></i-feather>
-        </div>
-        <div>
-          <div class="title">{{ orderInformation.departmentName }}</div>
-          <div class="sup-title">Department</div>
-        </div>
-      </div>
       <div class="column" *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
         <div class="icon">
           <i-feather name="briefcase" class="icon"></i-feather>
@@ -59,6 +28,38 @@
           <div class="sup-title">Reason for Requisition</div>
         </div>
       </div>
+      <div class="column last-column">
+        <div class="cost">${{ regularRates.regular }}</div>
+        <div class="sup-title">Regular Bill Rate</div>
+      </div>
+      <div class="column">
+        <div class="icon">
+          <i-feather name="map-pin" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.regionName }}</div>
+          <div class="sup-title">Region</div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="icon">
+          <i-feather name="map-pin" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.locationName }}</div>
+          <div class="sup-title">Location</div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="icon">
+          <i-feather name="folder" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.departmentName }}</div>
+          <div class="sup-title">Department</div>
+        </div>
+      </div>
+
 
       <div class="column last-column second-row" *ngIf="regularRates.regularLocal && (isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
         <div class="cost">${{ regularRates.regularLocal }}</div>
@@ -126,6 +127,10 @@
         <div class="sup-title">Exp. Req.</div>
       </div>
       <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
+      <div class="column">
+        <div class="title">{{ orderInformation.workflowName || '-' }}</div>
+        <div class="sup-title">Workflow</div>
+      </div>
     </div>
   </section>
 
@@ -266,6 +271,10 @@
           </div>
 
           <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
+          <div class="column">
+            <div class="title">{{ orderInformation.workflowName || '-' }}</div>
+            <div class="sup-title">Workflow</div>
+          </div>
         </div>
       </section>
     </ng-template>

@@ -777,7 +777,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       });
   }
   private getOrganizationSettings() {
-    const id = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP) {
+      return;
+    }
+    const id = (user?.businessUnitId || this.organizationId) as number;
 
     this.store.dispatch(new GetOrganizationById(id)).pipe(
       takeUntil(this.unsubscribe$)

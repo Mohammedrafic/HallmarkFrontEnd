@@ -109,18 +109,15 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
       });
   }
 
-  public onRowsDropDownChanged(): void {
-    if (this.pageSize !== parseInt(this.activeRowsPerPageDropDown)) {
-      this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-      this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-      this.dispatchNewPage();
-    }
+  public changeGridSize(size: number): void {
+    this.currentPage = 1;
+    this.pageSize = size;
+    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+    this.dispatchNewPage();
   }
 
-  public onGoToClick(event: any): void {
-    if ((event.currentPage && event.currentPage !== this.currentPage) || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
+  public changeGridPage(page: number): void {
+    this.pageSubject.next(page);
   }
 
   private dispatchNewPage(): void {

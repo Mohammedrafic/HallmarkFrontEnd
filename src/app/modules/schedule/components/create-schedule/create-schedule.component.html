@@ -32,6 +32,7 @@
     </div>
   </div>
   <div
+    *ngIf="scheduleTypes.source.length"
     class="input-container schedule-types"
     [ngStyle]="{'grid-template-columns': scheduleTypes.columnsTemplate}"
   >

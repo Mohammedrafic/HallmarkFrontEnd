@@ -156,10 +156,8 @@
   }
 
   .inline-radio-container {
-    margin: 10px 0;
-
     ejs-radiobutton {
-      margin-right: 20px;
+      margin: 10px 20px 10px 0;
     }
 
     label {
@@ -268,7 +266,7 @@ app-image-uploader {
 
   .week-start-on {
     .input-group {
-      width: 400px;
+      width: min(100%, 400px);
       margin-bottom: 12px;
     }
 
@@ -286,6 +284,10 @@ app-image-uploader {
     .right-section {
       width: 100%;
     }
+  }
+
+  .controls-container {
+    flex-direction: row;
   }
 }
 
@@ -343,6 +345,39 @@ app-image-uploader {
       grid-column: 3/4;
       grid-row: 2;
       place-self: end;
+    }
+  }
+}
+
+@media (min-width: $mobile-max) and (max-width: 750px) {
+  .item button {
+    padding: 8px 10px !important;
+  }
+
+  .controls-container .form-title h3 {
+    margin-left: 15px;
+  }
+
+  .controls-form {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 16px;
+    min-width: 125px;
+
+    .save-button {
+      width: 115px !important;
+      transition: .5s;
+    }
+
+    &.sidebar-open {
+      .save-button {
+        width: 55px !important;
+        transition: .5s;
+      }
+
+      button {
+        padding: 8px 10px !important;
+      }
     }
   }
 }

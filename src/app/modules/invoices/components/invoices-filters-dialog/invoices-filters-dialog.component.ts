@@ -251,6 +251,10 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
             this.formGroup.get('locationIds')?.setValue([]);
             this.formGroup.get('departmentIds')?.setValue([]);
             this.formGroup.get('regionIds')?.setValue([]);
+            this.formGroup.get('skillIds')?.setValue([]);
+            this.formGroup.get('reasonCodeIds')?.setValue([]);
+            this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+            this.appliedFiltersAmount.emit(this.filteredItems.length);
           }
           this.initFormConfig();
         }

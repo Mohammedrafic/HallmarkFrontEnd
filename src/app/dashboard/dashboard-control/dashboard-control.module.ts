@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FeatherModule } from 'angular-feather';
-import { Sliders } from 'angular-feather/icons';
+import { Sliders, Tool } from 'angular-feather/icons';
 
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
@@ -20,7 +20,7 @@ import { WidgetListModule } from './widget-list/widget-list.module';
     CommonModule,
     ButtonModule,
     SharedModule,
-    FeatherModule.pick({ Sliders }),
+    FeatherModule.pick({ Sliders, Tool }),
     FilterChipListModule,
     WidgetFilterModule,
     WidgetListModule,

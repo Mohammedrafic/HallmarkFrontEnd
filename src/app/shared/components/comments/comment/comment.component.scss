@@ -23,9 +23,9 @@
       margin-right: 12px;
       border-radius: 4px;
       background-color: $secondary-dark-blue-40;
-      color: $secondary-dark-blue-15; 
+      color: $secondary-dark-blue-15;
     }
-  
+
     .name {
       width: 100%;
       font-size: 12px;
@@ -34,10 +34,10 @@
       display: flex;
       align-items: center;
     }
-  
+
     .controls {
       display: flex;
-  
+
       .date {
         font-size: 12px;
         padding: 0 8px;
@@ -63,5 +63,11 @@
     &.visibility {
       color: $secondary-dark-blue-15;
     }
+  }
+  .d-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
   }
 }

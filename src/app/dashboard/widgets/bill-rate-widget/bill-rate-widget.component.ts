@@ -134,18 +134,17 @@ export class BillRateWidgetComponent extends AbstractSFComponentDirective<ChartC
     const maximumDataValue = this.getMaximumDataValue();
     console.log(maximumDataValue)
     console.log(maximumDataValue)
-    const correctorChartHeight = Math.floor(maximumDataValue * 0.03);
+    const correctorChartHeight = Math.floor(maximumDataValue * 0.10);
     this.primaryYAxis = {
       ...this.primaryYAxis,
       maximum: maximumDataValue + correctorChartHeight,
       interval: maximumDataValue / 5,
       labelFormat: '${value}'
     };
-console.log(this.primaryXAxis)
     this.primaryYAxisDarkTheme = {
       ...this.primaryYAxisDarkTheme,
       maximum: maximumDataValue + correctorChartHeight,
-      interval: maximumDataValue / 2,
+      interval: maximumDataValue / 5,
     }
   }
 

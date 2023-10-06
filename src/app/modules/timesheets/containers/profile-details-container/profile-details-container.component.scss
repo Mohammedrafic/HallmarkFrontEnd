@@ -29,6 +29,7 @@ $chip-margin: 8px;
 }
 
 .profile-table-container {
+  margin-top: 20px;
   padding-bottom: 0;
 
   ::ng-deep {
@@ -368,4 +369,9 @@ app-navigation-panel {
   position: absolute;
   right: 30px;
   top: 35px;
+}
+
+.comments {
+  margin-top: 12px;
+  overflow: auto;
 }
