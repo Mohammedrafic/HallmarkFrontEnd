@@ -23,7 +23,7 @@ import { startDateDuplicationValidator } from '@shared/validators/start-date-dup
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { patternMessageValidator } from '@shared/validators/pattern-message.validator';
-import { RoutingNumberMessage, SwiftCodeValidationMessage } from '@shared/constants';
+import { ALPHANUMERIC_8_11_SYMBOLS, RoutingNumberMessage, SwiftCodeValidationMessage } from '@shared/constants';
 
 @Component({
   selector: 'app-electronic-form',
@@ -97,7 +97,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         accountHolderZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
         fee: [''],
         swiftCode: ['', [
-          patternMessageValidator(/^[a-zA-Z0-9]{8,11}$/, SwiftCodeValidationMessage),
+          patternMessageValidator(ALPHANUMERIC_8_11_SYMBOLS, SwiftCodeValidationMessage),
         ]],
         netSuiteId: [{ value: '', disabled: true }],
       },
