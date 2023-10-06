@@ -1,6 +1,6 @@
 import { PageOfCollections } from "@shared/models/page.model";
 
-export type CandidateWorkCommitment = {
+export interface CandidateWorkCommitment {
   id?: number;
   employeeId?: number;
   workCommitmentIds: number[];
@@ -23,11 +23,12 @@ export type CandidateWorkCommitment = {
   isActive: boolean;
   numberOfOrganizationWorkCommitments: number;
   createReplacement?: boolean;
+  isInUse: boolean;
 }
 
 export type CandidateWorkCommitmentsPage = PageOfCollections<CandidateWorkCommitment>;
 
-export type WorkCommitmentSetup = {
+export interface WorkCommitmentSetup {
   startDate: string;
   endDate: string | null;
   regions: string[];

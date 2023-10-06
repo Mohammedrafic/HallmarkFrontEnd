@@ -1,25 +1,57 @@
-.contact-item {
-  display: flex;
-  align-items: center;
-  padding-top: 12px;
+@import 'adaptive-response';
+
+.contact-items {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  place-items: end;
+
+  &:has(.remove-button-container) {
+    grid-template-columns: repeat(4, 1fr) 40px;
+  }
 
   .remove-button-container {
-    margin-top: 7px;
-
     button {
       width: 40px;
-      height: 35px;
+      height: 40px;
     }
   }
 
   .input-container {
-    margin-bottom: 15px;
-    margin-right: 10px;
-    flex: 1 1 0px;
-  }
+    width: 100%;
 
-  .input-container label {
-    margin-bottom: 5px !important;
-    display: block;
+    label {
+      margin-bottom: 5px !important;
+      display: block;
+    }
+  }
+}
+
+@supports (-moz-appearance: none) { //TODO delete this block if Mozilla supports :has()
+   .contact-items {
+    grid-template-columns: repeat(4, 1fr) auto;
+  }
+}
+
+@media #{$max-mobile} {
+  .contact-items {
+    grid-template-columns: 1fr 40px !important;
+    place-items: unset;
+
+    .input-container {
+      grid-column: 1/3;
+    }
+
+    &:has(.remove-button-container) {
+      .input-container:first-child {
+        grid-column: 1/2;
+      }
+    }
+
+    .remove-button-container {
+      grid-column: 2/3;
+      grid-row: 1;
+      place-self: end;
+    }
   }
 }

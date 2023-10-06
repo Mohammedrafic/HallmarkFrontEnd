@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { distinctUntilChanged, Observable, Subject, takeWhile } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { CandidateListComponent } from '@shared/components/candidate-list/components/candidate-list/candidate-list.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from '../../store/user.state';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-candidates',
@@ -28,6 +29,9 @@ export class CandidatesComponent extends AbstractPermissionGrid implements OnIni
   private isAgency: boolean;
 
   public openImportDialog$: Observable<void> = this.openImportDialog.asObservable();
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   constructor(protected override store: Store, private router: Router, private route: ActivatedRoute) {
     super(store);

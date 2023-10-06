@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { OrderStatusSummaryReportRequest, OrderStatusSummaryCustomReport } from "../store/model/order-status-summary-report.model";
+import { OrderStatusSummaryReportRequest, OrderStatusSummaryCustomReport, OrderStatusSummaryReportFilters } from "../store/model/order-status-summary-report.model";
 import { sortByField } from "../../../shared/helpers/sort-by-field.helper";
 import { CandidatesDetailsRegions } from "../../../shared/components/candidate-details/models/candidate.model";
 
@@ -18,7 +18,7 @@ export class OrderStatusSummaryReportService {
     return this.http.post<OrderStatusSummaryCustomReport[]>(`/api/Reports/orderstatussummary`, payload);
   }
 
-  public getFiltersByOrganizationId(): Observable<{ region: string[], location: string[], department: string[], skills: string[], orderStatus: string[] }> {
-    return this.http.get<{ region: string[], location: string[], department: string[], skills: string[], orderStatus: string[] }>(`/api/AnalyticsFilterOptions/orderstatussummary`);
+  public getFiltersByOrganizationId(): Observable<OrderStatusSummaryReportFilters> {
+    return this.http.get<OrderStatusSummaryReportFilters>(`/api/AnalyticsFilterOptions/orderstatussummary`);
   }
 }

@@ -180,4 +180,8 @@ export class BillRatesService {
 
     return this.http.get<BillRate[]>(endpoint);
   }
+  
+  public getCalculatedRates(jobId: number): Observable<BillRate[]> {
+    return this.http.get<BillRate[]>(`/api/candidatejobs/${jobId}/billrates`);
+  }
 }

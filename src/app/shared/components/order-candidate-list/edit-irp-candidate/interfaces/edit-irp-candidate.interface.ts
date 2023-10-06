@@ -8,6 +8,7 @@ export interface CandidateField {
   required: boolean;
   type: FieldType;
   cssClass: string;
+  showField: boolean;
   dataSource?: DropdownOption[];
   maxDate?: Date | null;
   minDate?: Date | null;

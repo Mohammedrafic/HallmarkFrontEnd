@@ -54,8 +54,31 @@
                   </div>
                 </div>
               </ng-template>
-
             </ng-container>
+          </ng-container>
+
+          <ng-container *ngFor="let group of workflowConfig?.groupFields; trackBy: trackByGroupName">
+            <div class="group-container">
+              <label>{{group.groupName}} <span *ngIf="group.required" class="required">*</span></label>
+              <div class="sources">
+                <ng-container *ngFor="let field of group.fieldSources; trackBy: trackByField">
+                  <ng-container [ngSwitch]="field.type">
+                    <ng-template [ngSwitchCase]="fieldTypes.CheckBox">
+                      <div class="checkbox-container bootstrap">
+                        <ejs-checkbox
+                          [cssClass]="workflowForm.controls[field.field].touched &&
+                          workflowForm.controls[field.field].invalid && 'box-error'"
+                          [disabled]="field.disabled"
+                          [label]="field.title"
+                          appValidateWithMessage
+                          [formControlName]="field.field"
+                        ></ejs-checkbox>
+                      </div>
+                    </ng-template>
+                  </ng-container>
+                </ng-container>
+              </div>
+            </div>
           </ng-container>
         </form>
       </div>

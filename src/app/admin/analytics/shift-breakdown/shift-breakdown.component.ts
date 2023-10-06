@@ -45,6 +45,7 @@ import {
   StaffScheduleReportFilterOptions,
 } from '../models/common-report.model';
 import { YEARANDMONTH_Validation } from '@shared/constants/messages';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-shift-breakdown',
@@ -74,6 +75,7 @@ export class ShiftBreakdownComponent implements OnInit {
   public regionsList: Region[] = [];
   public locationsList: Location[] = [];
   public departmentsList: Department[] = [];
+  selectedLocation: boolean;
   public defaultOrganizations: number;
   public paramsData = {
     OrganizationParam: '',
@@ -347,17 +349,17 @@ export class ShiftBreakdownComponent implements OnInit {
           orgList.forEach((value) => {
             regionsList.push(...value.regions);
             locationsList = regionsList
-              .map((obj) => {
-                return obj.locations.filter(
-                  (location) => location.regionId === obj.id && this.checkInactiveDate(location.inactiveDate));
-              })
-              .reduce((a, b) => a.concat(b), []);
+            .map((obj) => {
+              return obj.locations.filter(
+                (location) => location.regionId === obj.id && this.checkActiveDate(location.inactiveDate, location.reactivateDate));
+            })
+            .reduce((a, b) => a.concat(b), []);
             departmentsList = locationsList
-              .map((obj) => {
-                return obj.departments.filter(
-                  (department) => department.locationId === obj.id && this.checkInactiveDate(department.inactiveDate));
-              })
-              .reduce((a, b) => a.concat(b), []);
+            .map((obj) => {
+              return obj.departments.filter(
+                (department) => department.locationId === obj.id && this.checkActiveDate(department.inactiveDate, department.reactivateDate));
+            })
+            .reduce((a, b) => a.concat(b), []);
           });
 
           this.regionsList = sortByField(regionsList, 'name');
@@ -389,18 +391,15 @@ export class ShiftBreakdownComponent implements OnInit {
     });
   }
 
-  private checkInactiveDate(dateStr?:string) : boolean {
-    if(dateStr == null || dateStr == undefined) {
-      return true;
-    }
-    const date = new Date(dateStr);
-    const today = new Date();
-    if(date < today) {
-      return false;
-    }
-    return true;
-  }
+  checkActiveDate(inactivateDate?:string, reactivateDate?:string){
+    return this.selectedLocation = inactivateDate == null || (new Date != null && inactivateDate && reactivateDate)
+          ? formatDate(inactivateDate!,'yyyy-MM-dd','en_US') > formatDate(new Date,'yyyy-MM-dd','en_US') ||
+          formatDate(reactivateDate!,'yyyy-MM-dd','en_US') <= formatDate(new Date,'yyyy-MM-dd','en_US')
+          : inactivateDate == null || (new Date != null && inactivateDate && !reactivateDate)
+          ? formatDate(inactivateDate!,'yyyy-MM-dd','en_US') > formatDate(new Date,'yyyy-MM-dd','en_US')
+          : inactivateDate == null
 
+  }
 
   private loadShiftData(businessUnitId: number) {
     const businessIdData = [];
@@ -412,6 +411,8 @@ export class ShiftBreakdownComponent implements OnInit {
     this.CommonReportFilterData$.pipe(filter((data) => data !== null), takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions) => {
         this.isAlive = false;
         this.filterOptionData = data;
+        this.filterColumns.skillIds.dataSource = [];
+        this.filterColumns.skillIds.dataSource = data?.masterSkills;
         this.changeDetectorRef.detectChanges();
 
         if (this.isInitialLoad) {

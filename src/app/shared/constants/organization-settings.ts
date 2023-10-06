@@ -55,9 +55,16 @@ export enum OrganizationSettingKeys {
   CreatePartialOrder,
   DepartmentSkillRequired,
   TimesheetSubmissionProcess,
+  AutoRejectOtherCandidatesWhenOfferAccepted,
+  RejectedStatusUpdatedByTheSystem,
   OvertimeCalculation,
+  Sourcing,
+  LimitNumberOfCandidateanAgencycansubmitToaPosition,
+  DisableNumberOfOpenPositions,
+  ATPRateCalculation,
   AutomatedDistributionToVMS,
-  Sourcing
+  ShowDeployedEmployees,
+  OrganizationCanCarryClockIDFromParent
 }
 
 export enum OrganizationalHierarchy {

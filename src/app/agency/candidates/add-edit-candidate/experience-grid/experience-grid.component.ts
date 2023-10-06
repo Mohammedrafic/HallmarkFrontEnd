@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ChangedEventArgs, DatePickerComponent, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { delay, filter, Observable, switchMap, takeUntil } from 'rxjs';
+import { delay, filter, Observable, takeUntil } from 'rxjs';
 
 import {
   GetExperienceByCandidateId,
@@ -27,7 +27,6 @@ import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { DateTimeHelper } from '@core/helpers';
 import { TakeUntilDestroy } from '@core/decorators';
-import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-experience-grid',
@@ -48,9 +47,6 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
 
   @Select(CandidateState.experiences)
   experiences$: Observable<Experience[]>;
-
-  @Select(AppState.isMobileScreen)
-  public readonly isMobile$: Observable<boolean>;
 
   public title = '';
   public experienceForm: FormGroup;
@@ -86,8 +82,6 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     ).subscribe(() => {
       this.store.dispatch(new GetExperienceByCandidateId());
     });
-
-    this.setMobileGridHeight();
   }
 
   ngOnDestroy(): void {
@@ -203,15 +197,5 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
   private setDateRanges(start: Date = this.today, end: Date = this.today): void {
     this.startDate.max = start;
     this.endDate.min = end;
-  }
-
-  private setMobileGridHeight(): void {
-    this.isMobile$.pipe(
-      filter((isMobile) => !!isMobile),
-      switchMap(() => this.experiences$),
-      takeUntil(this.componentDestroy())
-    ).subscribe((data) => {
-      super.setHeightForMobileGrid(data?.length);
-    });
   }
 }

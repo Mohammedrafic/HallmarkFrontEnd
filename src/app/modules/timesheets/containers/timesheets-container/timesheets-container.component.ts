@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { DOCUMENT, Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime, Subject } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction, FilterPageName } from '@core/enums';
@@ -36,6 +36,7 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
+
 
 @Component({
   selector: 'app-timesheets-container',
@@ -84,7 +85,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<TimesheetsFilterState>>;
-
   public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
   public orgId: number | null = null;
@@ -138,7 +138,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public override ngOnDestroy() {
     super.ngOnDestroy();
-    this.store.dispatch(new PreservedFilters.ResetPageFilters());
+    this.store.dispatch([new PreservedFilters.ResetPageFilters(), new Timesheets.ResetTimesheets()]);
   }
 
   public handleChangeTab(tabIndex: number): void {
@@ -202,6 +202,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Open, selectedRow.data));
     this.cd.markForCheck();
   }
+
+
 
   public onNextPreviousOrderEvent(next: boolean): void {
     this.timesheetsService.setNextValue(next);
@@ -289,7 +291,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         filter(Boolean),
         debounceTime(300),
         filter((filters) => (this.isAgency ? !isNaN(filters.organizationId as number) : true)),
-        switchMap(() => this.store.dispatch(new Timesheets.GetAll())),
+        switchMap(() => this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()])),
         takeUntil(this.componentDestroy())
       )
       .subscribe();

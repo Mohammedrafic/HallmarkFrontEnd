@@ -1,4 +1,4 @@
-@import "./colors.scss";
+@import 'colors';
 
 @mixin linkWithIcon {
   cursor: pointer;
@@ -206,9 +206,9 @@
 @mixin stickyTabsPosition($top) {
   position: sticky;
   top: $top;
-  background-color: $white !important;
+  background-color: var(--bg-default) !important;
   z-index: 2;
-  box-shadow: 0px 4px 4px -3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 4px 4px -3px var(--shadow);
   margin-left: -25px;
   width: calc(100% + 50px) !important;
   padding-left: 24px;

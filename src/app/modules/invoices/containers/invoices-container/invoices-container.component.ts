@@ -56,7 +56,6 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
-import { AppState } from 'src/app/store/app.state';
 import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
@@ -173,7 +172,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public organizationId: number;
   public agencyId: number;
-
+  public invoicesOrgIds:number[];
+  public showmsg:boolean = false;
   public populateFilterForm$: BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>
     = new BehaviorSubject<PreservedFiltersByPage<Interfaces.InvoicesFilterState> | null>(null);
 
@@ -187,6 +187,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public userPermission: Permission = {};
   public readonly userPermissions = UserPermissions;
   public allOption: string = "All";
+  public noorgSelection:boolean = false;
+  public addManualInvoiceDisable:boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -214,8 +216,15 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         filter(Boolean),
         tap((id) => {
           if(id.length == 0){
-            this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select atleast one Organization'));
-            return; 
+            this.noorgSelection = true;
+            this.store.dispatch(new Invoices.SelectOrganization(id));
+            this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select at least one Organization'));
+            return;
+          }
+          this.noorgSelection = false;
+          this.addManualInvoiceDisable = false;
+          if(id.length > 1){
+            this.addManualInvoiceDisable = true;
           }
           this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
         }),
@@ -275,11 +284,23 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             this.organizationId = 0;
             this.organizationControl.reset();
             this.organizationsList = [];
+            this.showmsg = true;
             this.store.dispatch(new Invoices.SelectOrganization(0));
           }),
          switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
           switchMap(() => this.organizations$),
-          filter((organizations: DataSourceItem[]) => !!organizations.length),
+          filter((organizations: DataSourceItem[]) =>
+            {
+              if(organizations.length == 0 && this.showmsg){
+                this.store.dispatch(new Invoices.ClearInvoices())
+                this.showmsg = false;
+                this.organizationMultiSelectControl.setValue([]);
+                this.organizationControl.setValue([]);
+                this.agencyOrganizationIds = [];
+              }
+              return !!organizations.length;
+            }
+          ),
           tap((organizations: DataSourceItem[]) => {
             this.organizationsList = organizations;
           }),
@@ -335,8 +356,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       }else{
         this.organizationId = id;
         this.store.dispatch(new Invoices.SelectOrganization(id));
+        this.resetFilters(true);
       }
-      this.resetFilters(true);
       this.navigatedInvoiceId = null;
       this.navigatedOrgId = null;
       this.getGroupingOptions();
@@ -395,7 +416,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public openAddDialog(): void {
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
-    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value 
+    this.store.dispatch(new Invoices.GetInvoicesReasons(this.isAgency ?  this.organizationMultiSelectControl?.value?.[0] : this.organizationControl.value
       || this.store.selectSnapshot(UserState.lastSelectedOrganizationId)));
   }
 
@@ -456,14 +477,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       const invoices = this.store.selectSnapshot(InvoicesState.pendingApprovalInvoicesData);
       const prevId: number | null = invoices?.items[selectedRowData.rowIndex - 1]?.invoiceId || null;
       const nextId: number | null = invoices?.items[selectedRowData.rowIndex + 1]?.invoiceId || null;
-
       this.store.dispatch(
         new Invoices.ToggleInvoiceDialog(
           DialogAction.Open,
           this.isAgency,
           {
             invoiceIds: [selectedRowData.data!.invoiceId],
-            organizationIds: [this.organizationId],
+            organizationIds: [this.isAgency ? selectedRowData.data!.organizationId : this.organizationId],
           },
           prevId,
           nextId
@@ -565,14 +585,23 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   public printInvoices(): void {
+
+    if(this.isAgency){
+      this.invoicesOrgIds = [];
+      this.gridSelections.rowNodes.forEach(element => {
+        if (!this.invoicesOrgIds.includes(element.data.organizationId)) {
+          this.invoicesOrgIds.push(element.data.organizationId);
+        }
+      });
+    }
     const dto: Interfaces.PrintingPostDto = {
       invoiceIds: this.gridSelections.selectedInvoiceIds,
       ...(this.isAgency ? {
-        organizationIds: [this.organizationId] as number[],
+        organizationIds: this.invoicesOrgIds as number[],
       } : {
         organizationId: this.organizationId as number,
       }),
-    };    
+    };
     if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords)
     {
       dto.ids = this.gridSelections.selectedInvoiceIds;
@@ -620,6 +649,14 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public handleBulkAction(event: BulkActionDataModel): void {
     if (event.type === BulkTypeAction.APPROVE) {
       this.bulkApprove(event.items);
+    }
+  }
+
+  public toggleDropdownList(): void {
+    if (this.invoiceContainerConfig.groupInvoicesOverlayVisible) {
+      this.hideGroupingOverlay();
+    } else {
+      this.showGroupingOverlay();
     }
   }
 
@@ -718,6 +755,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled;
     this.colDefs = this.invoicesContainerService.getColDefsByTab(this.selectedTabIdx,
       {
+        agencyOrganizationIds: this.agencyOrganizationIds,
         organizationId: this.organizationId,
         canPay: this.canPay,
         canEdit: this.invoiceContainerConfig.agencyActionsAllowed && this.approveInvoiceEnabled,
@@ -765,29 +803,48 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   private watchForPreservedFilters(): void {
     this.preservedFiltersByPageName$.pipe(
+      distinctUntilChanged(),
       filter((filters) => filters.dispatch),
       takeUntil(this.componentDestroy())
     )
     .subscribe((filterState) => {
-      let filters: Interfaces.InvoicesFilterState = {};
-      if(filterState.isNotPreserved && filterState.state === null){
-            filters.agencyOrganizationIds =  this.organizationMultiSelectControl.value;
-            this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
-      }else if(filterState.state != null){
-        if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){
-          this.agencyOrganizationIds = filterState.state.agencyOrganizationIds;
-          this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);
-        }else if(filterState.state.agencyOrganizationIds != null && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
-          filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
-          this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
+      if(this.isAgency){
+        let filters: Interfaces.InvoicesFilterState = {};
+        if(filterState.state === null){
+              filters.agencyOrganizationIds =  this.organizationMultiSelectControl.value;
+              this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filters),);
+        }else if(filterState.state != null){
+          if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){
+            let agencyOrganizationIds= [];
+            filterState.state.agencyOrganizationIds.forEach(element => {
+              if(this.organizationsList.find((item)=> item.id == element)){
+                agencyOrganizationIds.push(element);
+              }
+            });
+            if(agencyOrganizationIds.length > 0){
+              this.agencyOrganizationIds = filterState.state.agencyOrganizationIds;
+              this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);
+            }else{
+              this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
+              this.resetFilters(true);
+            }
+          }else if(filterState.state.agencyOrganizationIds != null && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
+            filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
+            filterState.state.agencyOrganizationIds = filters.agencyOrganizationIds;
+            this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filterState.state),);
+          }else{
+            this.resetFilters(true);
+          }
+          if(this.organizationMultiSelectControl?.value?.length > 1){
+            delete filterState.state?.locationIds;
+            delete filterState.state?.regionIds;
+            delete filterState.state?.departmentIds;
+            delete filterState.state?.skillIds;
+            delete filterState.state?.reasonCodeIds;
+          }
         }
-        if(this.organizationMultiSelectControl?.value?.length > 1){
-          delete filterState.state?.locationIds;
-          delete filterState.state?.regionIds;
-          delete filterState.state?.departmentIds;
-        }
+        this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
       }
-      this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
       this.store.dispatch(new Invoices.UpdateFiltersState({ ...filterState.state }));
     });
   }

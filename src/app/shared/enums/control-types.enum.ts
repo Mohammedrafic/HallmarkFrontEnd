@@ -7,7 +7,8 @@ export enum ControlTypes {
   Date,
   Autocomplete,
   Toggle,
-  Time
+  Time,
+  TextOrNull,
 }
 
 export enum ValueType {

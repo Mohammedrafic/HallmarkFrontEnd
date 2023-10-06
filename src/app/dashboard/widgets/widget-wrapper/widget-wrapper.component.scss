@@ -54,6 +54,9 @@ $headerHeight: 19px;
   &__line-chart {
     height: 47%;
     margin-top: 5%;
+    &:has(.avgbill1 ){
+      height: fit-content;
+    }
   }
 
   &__map-chart {
@@ -68,7 +71,7 @@ $headerHeight: 19px;
   }
 
   &__legend {
-    height: 45%;
+    height: 41%;
     overflow: auto;
     padding-top: 5px;
     cursor: default;
@@ -78,7 +81,11 @@ $headerHeight: 19px;
   .line-chart-legend {
     height: 40%;
     margin-right: -12px;
+    &:has(.avgbill){
+      height: fit-content;
+    }
   }
+  
 
   .map-chart-legend {
     height: 30%;
@@ -123,6 +130,13 @@ $headerHeight: 19px;
   &__positions_count_day_range {
     display: flex;
     overflow: auto;
+  }
+  &__orders_pending_in_custom {
+    display: flex;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc( 100% - 30px);
+    margin-top: 20px;
   }
 }
 .with-position{
@@ -172,4 +186,7 @@ $headerHeight: 19px;
 .height_update {
   max-height: calc( 100% - 51px);
   overflow: auto;
+}
+.app-widget-wrapper__legend {
+  padding-top: 0 !important;
 }

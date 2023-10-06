@@ -1,8 +1,18 @@
 @import 'colors';
 
-body.light, body.dark {
+body.light,
+body.dark {
   .bootstrap {
     .e-checkbox-wrapper {
+      .e-checkbox:focus + .e-frame {
+        box-shadow: none !important;
+        border-color: $grey;
+
+        &:hover {
+          border-color: $primary-active-blue-10;
+        }
+      }
+
       .e-label {
         color: $secondary-dark-blue-10;
       }
@@ -25,8 +35,42 @@ body.light, body.dark {
 body.dark {
   .bootstrap {
     .e-checkbox-wrapper {
+      .e-checkbox:focus + .e-frame {
+        border-color: $secondary-dark-blue-30;
+      }
+
       .e-label {
-        color: $secondary-dark-blue-40;
+        color: $secondary-dark-blue-40 !important;
+      }
+
+      .e-frame:not(.e-check) {
+        background-color: $secondary-dark-blue-10-2 !important;
+      }
+
+      .e-frame {
+        border-color: $secondary-dark-blue-30;
+        height: 16px;
+        width: 16px;
+
+        &::before {
+          line-height: 14px;
+        }
+
+        &:hover.e-check,
+        &.e-check {
+          border-color: $white !important;
+        }
+      }
+    }
+
+    .e-checkbox-disabled {
+      .e-icons.e-frame {
+        border-color: $white !important;
+        background-color: $secondary-dark-blue-40 !important;
+      }
+
+      .e-frame.e-check {
+        background-color: $primary-active-blue-70 !important;
       }
     }
   }

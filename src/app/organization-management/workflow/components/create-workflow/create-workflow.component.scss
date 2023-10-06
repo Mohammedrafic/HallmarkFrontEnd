@@ -38,6 +38,22 @@
     }
 
     .form {
+      .group-container {
+        margin-top: 12px;
+
+        .sources {
+          display: flex;
+
+          .checkbox-container {
+            padding-top: 5px;
+
+            ejs-checkbox {
+              min-width: 120px;
+            }
+          }
+        }
+      }
+
       .input-container {
         padding-top: 20px;
 
@@ -47,4 +63,10 @@
       }
     }
   }
+}
+
+.box-error {
+    .e-icons {
+      border-color: $supportive-red !important;
+    }
 }

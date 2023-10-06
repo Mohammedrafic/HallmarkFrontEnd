@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule, CheckBoxModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
-import { SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
@@ -32,7 +30,7 @@ import {
   IrpContainerStateService,
 } from '@client/order-management/containers/irp-container/services/irp-container-state.service';
 import { OrderCredentialsService } from "@client/order-management/services";
-import { OrganizationStructureService } from '@shared/services';
+import {OrganizationStructureService, SettingsViewService} from '@shared/services';
 import { PartialSearchService } from '@shared/services/partial-search.service';
 import {
   TableTypeCellComponent,
@@ -40,9 +38,15 @@ import {
 import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
+import{
+  TableSystemCellComponent
+}
+from '@client/order-management/components/order-management-content/sub-grid-components/table-system-cell'
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { IrpContainerApiService } from '@client/order-management/containers/irp-container/services';
 import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
+import { SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -54,6 +58,7 @@ import { DocumentUploaderModule } from '@shared/components/document-uploader/doc
     OrderDetailsFormComponent,
     TableTypeCellComponent,
     CriticalCellComponent,
+    TableSystemCellComponent
   ],
   imports: [
     FeatherModule.pick(GridIcons),
@@ -86,6 +91,7 @@ import { DocumentUploaderModule } from '@shared/components/document-uploader/doc
     OrganizationStructureService,
     PartialSearchService,
     IrpContainerApiService,
+    SettingsViewService,
   ],
 })
 export class CreateEditOrderModule { }

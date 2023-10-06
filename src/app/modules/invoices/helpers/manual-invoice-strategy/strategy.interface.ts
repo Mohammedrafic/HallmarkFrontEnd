@@ -12,7 +12,7 @@ export interface ManualInvoiceStrategy {
     config: AddManInvoiceDialogConfig,
     isPosition: boolean,
     ): void;
-  getMeta(form?: CustomFormGroup<AddManInvoiceForm>): Observable<null>;
+  getMeta(form?: CustomFormGroup<AddManInvoiceForm>,organizationId?:number): Observable<null>;
 
   connectConfigOptions(config: AddManInvoiceDialogConfig, options: ManualInvoiceInputOptions): void;
 

@@ -9,6 +9,8 @@ import {
   OrganizationRegion,
   OrganizationLTALocationInactivate,
   OrganizationLTADepartmentInactivate,
+  templateLocation, 
+  templateDepartment
 } from '@shared/models/organization.model';
 
 @Injectable()
@@ -63,7 +65,23 @@ export class OrganizationStructureService {
     };
     return OrganizationLocationInactivate;
   }
-
+  public getTemplateLocationsById(id: number, locationID?: number): templateLocation {
+    let templateLocation: templateLocation = {
+      locationname: (this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[]).find(
+        (location) => location.id == locationID
+      )?.name,
+    };
+    return templateLocation;
+  }
+  public getTemplateDepartment(id: number, departmentId?: number | undefined): templateDepartment {
+    let templateDepartment: templateDepartment = {
+      departmentname: (this.getSources(this.selectedLocations, id, 'departments') as OrganizationDepartment[]).find(
+        (department) => department.id == departmentId
+      )?.name,
+      
+    };
+    return templateDepartment
+  }
   public getLocationsByIdSet(id: number, jobStartDates: string[]): OrganizationLocation[] {
     let resultSet: OrganizationLocation[] = [];
     this.selectedLocations = this.getSources(this.irpOrgStructure, id, 'locations') as OrganizationLocation[];

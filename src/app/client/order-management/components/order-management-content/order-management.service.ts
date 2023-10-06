@@ -7,7 +7,6 @@ import { BaseObservable } from '@core/helpers';
 import { GlobalWindow } from '@core/tokens';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { RegularRates } from '@shared/enums/order-management';
 import {
   OrderManagementIRPSystemId,
   OrderManagementIRPTabsIndex,
@@ -16,8 +15,10 @@ import {
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models';
 import { RegularRatesData } from '@shared/models/order-management.model';
-import { OrderLinkDetails } from '../../../order-management/interfaces';
+import { OrderLinkDetails } from '@client/order-management/interfaces';
 import { ControlsConfig } from '../order-details-form/interfaces';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
+import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -43,13 +44,17 @@ export class OrderManagementService extends DestroyableDirective {
   private orderManagementSystem: OrderManagementIRPSystemId | null;
   private orderTypeToPrePopulate: OrderType | IrpOrderType | null;
   private previousSelectedOrganizationId: number;
-  private readonly isAvailable: BaseObservable<boolean> = new BaseObservable<boolean>(false);
+  private readonly irpEmployeeToggleState: BaseObservable<IrpEmployeeToggleState> = new BaseObservable<IrpEmployeeToggleState>({
+    isAvailable: false,
+    includeDeployed: true,
+  });
   private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
   private readonly orderFromAnotherSystem: BaseObservable<OrderLinkDetails | null> =
     new BaseObservable<OrderLinkDetails | null>(null);
 
   constructor(
     private fb: FormBuilder,
+    private billRatesSyncService: BillRatesSyncService,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super();
@@ -103,6 +108,7 @@ export class OrderManagementService extends DestroyableDirective {
       shiftIds: new FormControl([]),
       shift: new FormControl([]),
       orderLocked: new FormControl(null),
+      orderDistributionType: new FormControl(['0']),
     });
   }
 
@@ -163,12 +169,18 @@ export class OrderManagementService extends DestroyableDirective {
     this.previousSelectedOrganizationId = id;
   }
 
-  setIsAvailable(state: boolean): void {
-    this.isAvailable.set(state);
+  updateEmployeeToggleState(value: IrpEmployeeToggleState): void {
+    this.irpEmployeeToggleState.set({
+      ...value,
+    })
   }
 
-  getIsAvailable(): boolean {
-    return this.isAvailable.get();
+  getEmployeeToggleState(): IrpEmployeeToggleState {
+    return this.irpEmployeeToggleState.get();
+  }
+
+  getEmployeeToggleStateStream(): Observable<IrpEmployeeToggleState> {
+    return this.irpEmployeeToggleState.getStream();
   }
 
   setCandidate(edit: boolean): void {
@@ -197,10 +209,14 @@ export class OrderManagementService extends DestroyableDirective {
       .some((control) => control.dirty);
   }
 
-  setRegularRates(rates: BillRate[]): RegularRatesData {
+  setRegularRates(rates: BillRate[], startDate: Date | string): RegularRatesData {
+    const jobStartDate = startDate instanceof Date ? startDate : new Date(startDate);
+    const regular = this.billRatesSyncService.getBillRateForSync(rates, jobStartDate, false, true);
+    const regularLocal = this.billRatesSyncService.getBillRateForSync(rates, jobStartDate, true, true);
+
     return ({
-      regular: rates.find((rate) => rate.billRateConfigId === RegularRates.Regular)?.rateHour as number || null,
-      regularLocal: rates.find((rate) => rate.billRateConfigId === RegularRates.RegularLocal)?.rateHour as number || null,
+      regular: regular?.rateHour as number || null,
+      regularLocal: regularLocal?.rateHour as number || null,
     });
   }
 

@@ -398,6 +398,14 @@
     }
   }
 
+  .e-open {
+    .e-node-focus > .e-text-content {
+      .e-text {
+        color: $primary-active-blue-15;
+      }
+    }
+  }
+
   .icon-container {
     height: 3rem;
     display: flex;
@@ -763,7 +771,7 @@
 
         &__title {
           font-weight: bold;
-          height: 28px;
+          height: auto;
           width: 70%;
           left: 36px;
           top: 5px;
@@ -771,7 +779,7 @@
           font-family: Open Sans;
           font-size: 14px;
           font-weight: 700;
-          line-height: 28px;
+          line-height: 20px;
           letter-spacing: 0.015em;
           text-align: left;
         }
@@ -860,3 +868,8 @@
   }
 }
 
+@media #{$max-mobile} {
+  .header-title {
+    font-size: 16px !important;
+  }
+}

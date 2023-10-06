@@ -1,6 +1,5 @@
 import { GridHelper } from '@shared/helpers/grid.helper';
 import { GridStatusRendererComponent } from '@shared/components/candidate-details/candidate-grid/grid-status-renderer/grid-status-renderer.component';
-import { JobClassification } from '@shared/enums/job-classification';
 import { GridNameRendererComponent } from '@shared/components/candidate-details/candidate-grid/grid-name-renderer/grid-name-renderer.component';
 import { GridPositionRendererComponent } from '@shared/components/candidate-details/candidate-grid/grid-position-renderer/grid-position-renderer.component';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
@@ -113,6 +112,24 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
       width: 160,
       sortable: true,
     },
+    {
+      field: 'guaranteedWorkWeek',
+      headerName: 'Guaranteed Work Week',
+      width: 160,
+      sortable: true,
+    },
+    {
+      field: 'requestComment',
+      headerName: 'Leave Request Comments',
+      width: 160,
+      sortable: true,
+    },  
+    {
+      field: 'primaryContactName',
+      headerName: 'Primary Contact',
+      width: 160,
+      sortable: true,
+    },            
   ];
 };
 export const CandidateAgencyExportColumns: CandidateExportColumn[] = [
@@ -130,6 +147,9 @@ export const CandidateAgencyExportColumns: CandidateExportColumn[] = [
   { text: 'Assignment', column: 'Assignment' },
   { text: 'Organization Name', column: 'Organizationname' },
   { text: 'Skill', column: 'Skill' },
+  { text: 'Guaranteed Work Week', column: 'GuaranteedWorkWeek' },
+  { text: 'Leave Request Comments', column: 'RequestComment' },
+  { text: 'Primary Contact', column: 'PrimaryContactName' },
 ];
 
 export const CandidateOrgExportColumns: CandidateExportColumn[] = [
@@ -147,5 +167,8 @@ export const CandidateOrgExportColumns: CandidateExportColumn[] = [
   { text: 'Assignment', column: 'Assignment' },
   { text: 'Agency Name', column: 'Agencyname' },
   { text: 'Skill', column: 'Skill' },
+  { text: 'Guaranteed Work Week', column: 'GuaranteedWorkWeek' },
+  { text: 'Leave Request Comments', column: 'RequestComment' },  
+  { text: 'Primary Contact', column: 'PrimaryContactName' },
 ];
 

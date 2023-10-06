@@ -33,6 +33,7 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { DateTimeHelper } from '@core/helpers';
+import { OrderType } from '@shared/enums/order-type';
 
 import { CandidateCancellationDialogService } from './candidate-cancellation-dialog.service';
 
@@ -52,7 +53,6 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   @ViewChild('candidateCancellationDialog') candidateCancellationDialog: DialogComponent;
 
   @Input() openEvent: Subject<void>;
-  @Input() isReorder = false;
   @Input() candidateJob: OrderCandidateJob | null;
 
   @Output() submitCandidateCancellation = new EventEmitter<JobCancellation>();
@@ -81,6 +81,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
 
   public reasons: CandidateCancellationReason[] | null;
   public readonly penalties: DataSourceObject<PenaltyCriteria>[] = penaltiesDataSource;
+  public isReorder = false;
 
   private predefinedPenalties: Penalty | null;
 
@@ -129,6 +130,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     this.openEvent
       .pipe(
         tap(() => {
+          this.isReorder = this.candidateJob?.order.orderType === OrderType.ReOrder;
           this.adjustEndDateControlSettings();
           this.createForm();
           this.onControlChanges();

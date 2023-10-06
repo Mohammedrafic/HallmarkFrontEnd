@@ -81,6 +81,12 @@ export enum AgencyStatus {
   Terminated,
 }
 
+export enum AgencyPartnershipStatus {
+  Inactive,
+  Active,
+  Suspended,
+}
+
 export const AgencyStatuses = [
   { id: AgencyStatus.Active, text: 'Active' },
   { id: AgencyStatus.Inactive, text: 'Inactive' },
@@ -146,6 +152,7 @@ export enum FilterOrderStatusText {
   Closed = 'Closed',
   NoRecordsFound = "No Pending Orders",
   Incomplete = 'Incomplete',
+  OrdersOpenPositions = 'OrdersOpenPositions',
 }
 
 export enum LocalStorageStatus {

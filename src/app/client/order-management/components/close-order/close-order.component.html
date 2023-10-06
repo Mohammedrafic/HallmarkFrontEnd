@@ -3,7 +3,7 @@
   (isPositionEmitter)="setCloseDateAvailability($event)"
   (formCancelClicked)="onCancel()"
   (formSaveClicked)="onSave()">
-  <form class="close-form" [formGroup]="closeForm">
+  <form class="close-form" [formGroup]="closeForm" *ngIf="isDialogShown">
     <div class="input-container bootstrap">
       <label for="reason">Reason <span class="required">*</span></label>
       <div class="input-group dropdown">

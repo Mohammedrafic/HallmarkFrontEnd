@@ -78,11 +78,19 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
   }
 
   public onRowsDropDownChanged(pageSize: number): void {
+    if (this.pageSize === pageSize) {
+      return;
+    }
+
     this.pageSize = pageSize;
     this.changePerPage.emit(pageSize);
   }
 
   public onGoToClick(pageNumber: number): void {
+    if (this.currentPageSubj.get() === pageNumber) {
+      return;
+    }
+
     this.currentPageSubj.set(pageNumber);
   }
 
@@ -104,11 +112,18 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
     this.gridInstance$
       .getValue()
       ?.columnApi.setColumnVisible(TimesheetsTableColumns.Approve, !this.isAgency && this.activeTabIdx === 1);
+    this.gridInstance$
+      .getValue()
+      ?.columnApi.setColumnVisible(TimesheetsTableColumns.TimesheetApprover, !this.isAgency);
   }
 
   private startCurrentPageWatching(): void {
     this.currentPage$
-      .pipe(distinctUntilChanged(), throttleTime(100), takeUntil(this.componentDestroy()))
+      .pipe(
+        distinctUntilChanged(),
+        throttleTime(100),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe((pageNumber) => {
         this.changePage.emit(pageNumber);
       });

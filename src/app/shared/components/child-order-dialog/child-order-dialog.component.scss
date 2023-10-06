@@ -192,3 +192,13 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   height: 500px;
   display: block;
 }
+
+.candidate-message {
+  @include candidateMessage;
+  background-color: $supportive-red-10;
+  color: $supportive-red-00!important;
+
+  .icon {
+    color: $supportive-red-00;
+  }
+}

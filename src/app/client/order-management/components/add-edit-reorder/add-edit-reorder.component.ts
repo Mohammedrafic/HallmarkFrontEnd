@@ -35,7 +35,7 @@ import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { skip } from 'rxjs/operators';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { ERROR_CAN_NOT_Edit_OpenPositions, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import {
@@ -376,6 +376,11 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private checkPositionsAndSave(payload: ReorderRequestModel): void {
     if (this.isWrongOpenPositionCount(<ReorderRequestModel>payload)) {
       this.showSaveErrorPositionsIssue();
+      return;
+    }
+
+    if(this.order.disableNumberOfOpenPositions && this.order.openPositions != payload.openPositions){
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
       return;
     }
 

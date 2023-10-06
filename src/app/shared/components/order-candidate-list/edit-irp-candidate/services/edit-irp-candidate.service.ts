@@ -6,23 +6,34 @@ import { Observable, map} from 'rxjs';
 
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
-import { atpStipend, atpStipendRate, CandidateForm, ratePerhourConfig } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
-import { CreateCandidateDto, UpdateCandidateDto } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
+import { atpStipendRate, CandidateForm, ratePerhourConfig } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
+import {
+  CreateCandidateDto,
+  CreateOfferedCandidateDto,
+  DisableControls,
+  UpdateCandidateDto,
+  UpdateOfferedCandidateDto,
+  UpdateOnboardCandidateDto,
+} from '@shared/components/order-candidate-list/edit-candidate-list.helper';
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
-import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
+import {
+  CandidateDetails,
+  CreateIrpCandidateDto,
+  CreateOfferedIrpCandidateDto,
+  EditCandidateDialogState,
+} from '@shared/components/order-candidate-list/interfaces';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { ApplicantStatus } from '@shared/models/order-management.model';
 import { RejectReason, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { OrderClosureReasonType } from '@shared/enums/order-closure-reason-type.enum';
 import { DateTimeHelper } from '@core/helpers';
-import { OrderType } from '@shared/enums/order-type';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Location } from "@shared/models/location.model"
 
 @Injectable()
 export class EditIrpCandidateService {
 
-constructor(
+  constructor(
     private formBuilder: FormBuilder,
     private orderCandidateApiService: OrderCandidateApiService,
     private store: Store,
@@ -35,22 +46,41 @@ constructor(
       actualStartDate: [null],
       actualEndDate: [null],
       availableStartDate: [null],
+      offeredStartDate: [null],
+      offeredEndDate: [null],
       isClosed: [false],
       reason: [null],
       closeDate: [null]
     }) as CustomFormGroup<CandidateForm>;
   }
 
+  disableOfferedDateForOnboardedCandidate(
+    status: CandidatStatus,
+    details: CandidateDetails,
+    form: FormGroup
+  ): void {
+    if (status === CandidatStatus.OnBoard &&
+      details?.offeredStartDate &&
+      details?.offeredEndDate) {
+      DisableControls(['offeredStartDate', 'offeredEndDate'], form);
+    }
+  }
+
   getCandidateAction(
     candidateForm: FormGroup,
     state: EditCandidateDialogState,
     createReplacement: boolean,
-    isIRPLTAOrder:boolean
+    isIRPLTAOrder: boolean
   ): Observable<void> {
-    const { status, actualStartDate, actualEndDate,availableStartDate } = candidateForm.getRawValue();
+    const { status, actualStartDate, actualEndDate } = candidateForm.getRawValue();
 
     if (status) {
-      return this.getActionForStatus(status, state, actualStartDate, actualEndDate, availableStartDate,createReplacement,isIRPLTAOrder);
+      return this.getActionForStatus(
+        candidateForm,
+        state,
+        createReplacement,
+        isIRPLTAOrder
+      );
     } else {
       return this.orderCandidateApiService.updateIrpCandidate(
         UpdateCandidateDto(
@@ -104,99 +134,152 @@ constructor(
   }
 
   private getActionForStatus(
-    status: CandidatStatus,
+    candidateForm: FormGroup,
     state: EditCandidateDialogState,
-    actualStartDate: string,
-    actualEndDate: string,
-    availableStartDate:string,
     createReplacement: boolean,
-    isIRPLTAOrder:boolean
+    isIRPLTAOrder: boolean
   ): Observable<void> {
+    const { status, actualStartDate, actualEndDate } = candidateForm.getRawValue();
 
-    if(isIRPLTAOrder) {
-      if(state.candidate.status === CandidatStatus['Not Applied']) {
+    if (isIRPLTAOrder) {
+      return this.createActionsForLtaOrder(candidateForm, state, createReplacement);
+    } else {
+      if (status === CandidatStatus.OnBoard && state.candidate.status !== status) {
         return this.orderCandidateApiService.createIrpCandidate(
           CreateCandidateDto(
             state.candidate,
             state.order.id,
             actualStartDate,
             actualEndDate,
-            availableStartDate,
-            status
           ));
-      }
-      else if(status === CandidatStatus.Cancelled) {
-        return this.orderCandidateApiService.cancelIrpCandidate( {
-          organizationId: state.order.organizationId as number,
-          jobId: state.candidate.candidateJobId,
-          createReplacement,
-          actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
-        });
-      }
-      else{
-
+      } else if (status === CandidatStatus.OnBoard && state.candidate.status === status) {
         return this.orderCandidateApiService.updateIrpCandidate(
           UpdateCandidateDto(
             state.order.organizationId as number,
             state.candidate.candidateJobId,
             actualStartDate,
+            actualEndDate
+          ));
+      } else if (status === CandidatStatus.Cancelled) {
+        return this.orderCandidateApiService.cancelIrpCandidate({
+          organizationId: state.order.organizationId as number,
+          jobId: state.candidate.candidateJobId,
+          createReplacement,
+          actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
+        });
+      } else {
+        return this.orderCandidateApiService.createIrpCandidate(
+          CreateCandidateDto(
+            state.candidate,
+            state.order.id,
+            actualStartDate,
             actualEndDate,
-            availableStartDate!,
-            status,
-            state.order.id
           ));
       }
-    } else {
-    if(status === CandidatStatus.OnBoard && state.candidate.status !== status) {
-      return this.orderCandidateApiService.createIrpCandidate(
-        CreateCandidateDto(
-          state.candidate,
-          state.order.id,
-          actualStartDate,
-          actualEndDate,
-        ));
-    } else if(status === CandidatStatus.OnBoard && state.candidate.status === status) {
-      return this.orderCandidateApiService.updateIrpCandidate(
-        UpdateCandidateDto(
-          state.order.organizationId as number,
-          state.candidate.candidateJobId,
-          actualStartDate,
-          actualEndDate
-        ));
-    } else if(status === CandidatStatus.Cancelled) {
-      return this.orderCandidateApiService.cancelIrpCandidate( {
+    }
+  }
+
+  private createLtaCandidateBaseStatus(
+    candidateForm: FormGroup,
+    state: EditCandidateDialogState,
+  ): CreateIrpCandidateDto | CreateOfferedIrpCandidateDto {
+    const { status, actualStartDate, actualEndDate, availableStartDate, offeredStartDate, offeredEndDate } =
+      candidateForm.getRawValue();
+
+    if (status === CandidatStatus.Offered) {
+      return CreateOfferedCandidateDto(
+        state.candidate,
+        state.order.id,
+        offeredStartDate,
+        offeredEndDate,
+        status,
+        availableStartDate,
+      );
+    }
+
+    return CreateCandidateDto(
+      state.candidate,
+      state.order.id,
+      actualStartDate,
+      actualEndDate,
+      availableStartDate,
+      status
+    );
+  }
+
+  private createActionsForLtaOrder(
+    candidateForm: FormGroup,
+    state: EditCandidateDialogState,
+    createReplacement: boolean,
+  ): Observable<void> {
+    const { status, actualStartDate, actualEndDate, availableStartDate, offeredStartDate, offeredEndDate } =
+      candidateForm.getRawValue();
+
+    if (state.candidate.status === CandidatStatus['Not Applied']) {
+      const candidateDto = this.createLtaCandidateBaseStatus(candidateForm, state);
+      return this.orderCandidateApiService.createIrpCandidate(candidateDto);
+    } else if (status === CandidatStatus.Cancelled) {
+      return this.orderCandidateApiService.cancelIrpCandidate({
         organizationId: state.order.organizationId as number,
         jobId: state.candidate.candidateJobId,
         createReplacement,
         actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
       });
-    } else {
-      return this.orderCandidateApiService.createIrpCandidate(
-        CreateCandidateDto(
-          state.candidate,
-          state.order.id,
+    } else if (status === CandidatStatus.Offered) {
+      return this.orderCandidateApiService.updateIrpCandidate(
+        UpdateOfferedCandidateDto(
+          state.order.organizationId as number,
+          state.candidate.candidateJobId,
+          offeredStartDate,
+          offeredEndDate,
+          status,
+          availableStartDate,
+          state.order.id
+        )
+      );
+    } else if (status === CandidatStatus.OnBoard) {
+      return this.orderCandidateApiService.updateIrpCandidate(
+        UpdateOnboardCandidateDto(
+          state.order.organizationId as number,
+          state.candidate.candidateJobId,
           actualStartDate,
           actualEndDate,
+          status,
+          offeredStartDate,
+          offeredEndDate,
+          availableStartDate,
+          state.order.id,
+        )
+      );
+    } else {
+      return this.orderCandidateApiService.updateIrpCandidate(
+        UpdateCandidateDto(
+          state.order.organizationId as number,
+          state.candidate.candidateJobId,
+          actualStartDate,
+          actualEndDate,
+          availableStartDate!,
+          status,
+          state.order.id
         ));
     }
   }
-}
 
 
-public getPredefinedBillRatesforRatePerHour(orderType: number, departmentId: number, skillId: number): Observable<ratePerhourConfig> {
-  let params = new HttpParams()
-    .append('orderType', orderType)
-    .append('departmentId', departmentId)
-    .append('skillId', skillId);
+    public getPredefinedBillRatesforRatePerHour(orderType: number, departmentId: number, skillId: number): Observable<ratePerhourConfig> {
+      let params = new HttpParams()
+        .append('orderType', orderType)
+        .append('departmentId', departmentId)
+        .append('skillId', skillId);
 
-  return this.http.get<ratePerhourConfig>('/api/PayRates/predefinedpayrate/forOrder', { params })
-}
+      return this.http.get<ratePerhourConfig>('/api/PayRates/predefinedpayrate/forOrder', { params })
+    }
 
-public getATPstipendRate(zip: string, Actualstartdate: string) : Observable<atpStipendRate>{
-  return this.http.get<atpStipendRate>('/api/IRPApplicants/atpstipendrate?zip='+ zip + '&ActualStartdate=' + Actualstartdate)
-}
+    public getATPstipendRate(zip: string, Actualstartdate: string) : Observable<atpStipendRate>{
+      return this.http.get<atpStipendRate>('/api/IRPApplicants/atpstipendrate?zip='+ zip + '&ActualStartdate=' + Actualstartdate)
+    }
 
-public getLocationsByRegionId(regionId: number): Observable<Location[]> {
-  return this.http.get<Location[]>(`/api/Locations/region/${regionId}`);
-}
+    public getLocationsByRegionId(regionId: number): Observable<Location[]> {
+      return this.http.get<Location[]>(`/api/Locations/region/${regionId}`);
+    }
 }

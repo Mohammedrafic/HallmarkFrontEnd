@@ -1,3 +1,10 @@
+@import 'colors';
+@import 'adaptive-response';
+
+:host {
+  display: none;
+}
+
 .scroll-to-top {
   position: fixed;
   bottom: 16vh;
@@ -6,15 +13,34 @@
   transition: all 0.2s ease-in-out;
   z-index: 20;
 
-  ::ng-deep.e-control.e-btn {
-    padding: 8px 12px !important;
-  }
 
-  ::ng-deep.icon {
-    margin-left: 0 !important;
+  ::ng-deep {
+    .e-control.e-btn.e-outline {
+      &:hover {
+        background-color: $white !important;
+      }
+
+      &:focus {
+        background-color: $primary-active-blue-60 !important;
+      }
+    }
+
+    .icon {
+      margin-left: 0;
+    }
+
+    .e-control.e-btn {
+      padding: 8px 12px;
+    }
   }
 }
 
 .show-scrollTop {
   display: block;
+}
+
+@media #{$max-mobile} {
+  :host {
+    display: block;
+  }
 }

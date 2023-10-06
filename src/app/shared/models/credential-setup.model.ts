@@ -25,6 +25,7 @@ export class CredentialSetupPost {
   reqOnboard: boolean;
   inactiveDate: string;
   comments: string;
+  updateOrderCredentials: boolean;
 }
 
 export class CredentialSetupMappingPost {
@@ -46,7 +47,7 @@ export class CredentialSetupDetails {
   reqOnboard?: boolean;
   inactiveDate?: string;
   comments?: string;
-  irpComment?: string;
+  irpComments?: string;
 }
 
 export interface CredentialsSelectedItem {

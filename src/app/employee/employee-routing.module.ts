@@ -29,6 +29,13 @@ const routes: Routes = [
         },
       },
       {
+        path: 'my-jobs',
+        loadChildren: () => import('../modules/my-jobs/my-jobs.module').then((m) => m.MyJobsModule),
+        data: {
+          isOrganizationArea: true,
+        },
+      },
+      {
         path: 'profile',
         loadChildren: () => import('../modules/employee-profile/employee-profile.module')
           .then((m) => m.EmployeeProfileModule),

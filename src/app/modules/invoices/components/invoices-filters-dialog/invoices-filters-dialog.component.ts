@@ -177,6 +177,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       takeUntil(this.componentDestroy()),
     )
     .subscribe((id) => {
+      if(typeof id =='number'){
       const orgId = this.isAgency ? null : id;
 
       if (this.selectedTabId === InvoicesOrgTabId.PendingInvoiceRecords) {
@@ -196,6 +197,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
           this.clearAllFilters(true)
         }
       }
+    }
     });
   }
 
@@ -249,6 +251,10 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
             this.formGroup.get('locationIds')?.setValue([]);
             this.formGroup.get('departmentIds')?.setValue([]);
             this.formGroup.get('regionIds')?.setValue([]);
+            this.formGroup.get('skillIds')?.setValue([]);
+            this.formGroup.get('reasonCodeIds')?.setValue([]);
+            this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+            this.appliedFiltersAmount.emit(this.filteredItems.length);
           }
           this.initFormConfig();
         }
@@ -369,7 +375,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.invoicesFiltersService.setCurrentTimezone(filterState);
 
     this.formGroup.patchValue({
-      ...JSON.parse(JSON.stringify(filterState)),
+      ...filterState
     });
 
     if (filterState.formattedInvoiceIds && Array.isArray(filterState.formattedInvoiceIds)) {

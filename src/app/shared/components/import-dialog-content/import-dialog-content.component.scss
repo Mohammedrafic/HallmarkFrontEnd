@@ -1,4 +1,4 @@
-@import "colors.scss";
+@import 'colors.scss';
 @import 'adaptive-response';
 
 .e-dlg-content {
@@ -211,8 +211,26 @@
   }
 }
 
+.dialog {
+  min-width: 460px !important;
+
+ .e-footer-content {
+   display: none;
+ }
+}
+
+
+
 @media #{$max-mobile} {
-  .import-dialog {
+  .dialog {
     width: 100% !important;
+
+    .header-container .e-card-content {
+      display: none;
+    }
+
+    .e-footer-content {
+      display: block;
+    }
   }
 }

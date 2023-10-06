@@ -43,6 +43,8 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   @Input() disabled = false;
 
+  @Input() emitOnSetInit = true;
+
   @Output() rangeChanged: EventEmitter<Date[]> = new EventEmitter<Date[]>();
 
   public maxDate: Date | null = new Date(new Date().setHours(23, 59, 59));
@@ -191,10 +193,12 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
       const utcStartDate = DateTimeHelper.setUtcTimeZone(new Date(firstDay));
       const utcLastDate = DateTimeHelper.setUtcTimeZone(new Date(lastDay));
 
-      this.weekService.setRange([
-        utcStartDate,
-        utcLastDate,
-      ]);
+      if (this.emitOnSetInit) {
+        this.weekService.setRange([
+          utcStartDate,
+          utcLastDate,
+        ]);
+      }
     }
 
 

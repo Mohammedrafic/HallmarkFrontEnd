@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { OrderType } from '@shared/enums/order-type';
 import { OrderStatusText } from '@shared/enums/status';
 
 import { AgencyOrderManagement, OrderManagementChild, OrderManagement } from '@shared/models/order-management.model';
@@ -12,6 +13,8 @@ type MergedOrder = AgencyOrderManagement & OrderManagement;
   styleUrls: ['./grid-subrow-candidate.component.scss'],
 })
 export class GridSubrowCandidateComponent {
+  public CPorderType: number = OrderType.ContractToPerm
+  public LTAorderType: number = OrderType.LongTermAssignment
   @Input() selected: boolean;
   @Input() order: MergedOrder;
   @Input() candidat: OrderManagementChild;

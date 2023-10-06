@@ -18,7 +18,8 @@ ejs-datetimepicker.e-datetimepicker {
   }
 }
 
-body.light, body.dark {
+body.light,
+body.dark {
   .bootstrap {
     ejs-datetimepicker.e-datetimepicker,
     ejs-daterangepicker.e-daterangepicker {
@@ -45,7 +46,10 @@ body.light, body.dark {
   }
 }
 
-ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-datetimepicker {
+ejs-datepicker.datepicker,
+ejs-daterangepicker.e-daterangepicker,
+ejs-timepicker.e-timepicker,
+ejs-datetimepicker.e-datetimepicker {
   .e-input-group.e-control-wrapper.e-date-wrapper,
   .e-input-group.e-control-wrapper.e-time-wrapper,
   .e-input-group.e-control-wrapper.e-datetime-wrapper,
@@ -85,7 +89,7 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
       .e-input-group-icon.e-range-icon.e-icons::before,
       .e-input-group-icon.e-range-icon.e-icons::after,
       .e-input-group-icon.e-date-icon.e-icons::before,
-      .e-input-group-icon.e-date-icon.e-icons::after{
+      .e-input-group-icon.e-date-icon.e-icons::after {
         background-color: transparent;
         color: $primary-active-blue-10;
       }
@@ -98,10 +102,19 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
       .e-input-group-icon.e-range-icon.e-icons::before,
       .e-input-group-icon.e-range-icon.e-icons::after,
       .e-input-group-icon.e-date-icon.e-icons::before,
-      .e-input-group-icon.e-date-icon.e-icons::after{
+      .e-input-group-icon.e-date-icon.e-icons::after {
         background-color: transparent;
         color: $primary-active-blue-10;
       }
+    }
+  }
+
+  &.ng-touched.ng-invalid {
+    .e-input-group.e-control-wrapper.e-date-wrapper,
+    .e-input-group.e-control-wrapper.e-time-wrapper,
+    .e-input-group.e-control-wrapper.e-datetime-wrapper,
+    .e-input-group.e-control-wrapper.e-date-range-wrapper {
+      border-color: $supportive-red !important;
     }
   }
 
@@ -117,17 +130,16 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
     background: transparent !important;
   }
 
-  .e-input-group.e-control-wrapper.e-float-input .e-float-text::after{
+  .e-input-group.e-control-wrapper.e-float-input .e-float-text::after {
     content: "*";
     color: $supportive-red;
   }
 
   &.ng-touched.ng-invalid {
-    span.e-input-group  {
-      border-color: $supportive-red  !important;
+    span.e-input-group {
+      border-color: $supportive-red !important;
     }
   }
-
 
   &.ng-touched.ng-invalid.e-control.e-textbox {
     span.e-input-group {
@@ -152,27 +164,103 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
 }
 
 body.dark {
-  ejs-datepicker.datepicker, ejs-daterangepicker.e-daterangepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-datetimepicker {
-    .e-input-group.e-control-wrapper.e-date-wrapper, .e-input-group.e-control-wrapper.e-time-wrapper, .e-input-group.e-control-wrapper.e-datetime-wrapper, .e-input-group.e-control-wrapper.e-date-range-wrapper {
+  ejs-datepicker.datepicker,
+  ejs-daterangepicker.e-daterangepicker,
+  ejs-timepicker.e-timepicker,
+  ejs-datetimepicker.e-datetimepicker {
+
+    .e-input-group.e-control-wrapper.e-date-wrapper,
+    .e-input-group.e-control-wrapper.e-time-wrapper,
+    .e-input-group.e-control-wrapper.e-datetime-wrapper,
+    .e-input-group.e-control-wrapper.e-date-range-wrapper {
+
       .e-input[readonly],
       .e-input[readonly] ~ span.e-input-group-icon {
         background-color: transparent !important;
       }
+
+      &.e-disabled {
+        background-color: $bg-gray-200 !important;
+      }
     }
 
-    .e-input-group.e-control-wrapper {
-      &.e-disabled {
-        background-color: $secondary-dark-blue-20 !important;
+    &.ng-dirty {
+      .e-input-group.e-control-wrapper.e-date-wrapper,
+      .e-input-group.e-control-wrapper.e-time-wrapper,
+      .e-input-group.e-control-wrapper.e-datetime-wrapper,
+      .e-input-group.e-control-wrapper.e-date-range-wrapper {
+        .e-input {
+          color: $white !important;
+
+          &.e-disabled {
+            -webkit-text-fill-color: $white !important
+          }
+        }
       }
     }
   }
-}
 
-body.dark .e-datepicker.e-popup-wrapper.e-lib.e-popup.e-control.e-popup-open {
-  .e-day {
-    &:hover {
-      background-color: $primary-active-blue-80 !important;
-      color: $black;
+  .e-datepicker.e-popup-wrapper.e-lib.e-popup.e-control.e-popup-open,
+  .e-daterangepicker.e-popup.e-control.e-lib.e-popup-open.e-keyboard {
+    .e-cell:hover {
+      .e-day {
+        background-color: $primary-active-blue-80 !important;
+        color: $black;
+      }
+    }
+  }
+
+  .e-timepicker.e-popup.e-lib.e-control.e-popup-open {
+    .e-list-parent {
+      background-color: $sidebar-background;
+
+      .e-list-item {
+        &.e-active:hover,
+        &:hover {
+          background-color: $primary-active-blue-80;
+          color: $bg-grey-100;
+        }
+
+        &.e-active {
+          background-color: $primary-active-blue;
+          color: $white;
+        }
+      }
+    }
+  }
+
+  .e-datepicker.e-popup-wrapper.e-lib.e-popup.e-control.e-popup-open {
+    .e-calendar {
+      .e-content {
+        .e-cell {
+          &.e-focused-date.e-today {
+            &:hover .e-day {
+              color: $bg-grey-100 !important;
+            }
+
+            .e-day {
+              border-color: $primary-active-blue-80;
+              color: $white !important;
+              background-color: $secondary-dark-blue-10-2;
+
+              &:hover {
+                background-color: $primary-active-blue-80;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .e-calendar .e-content td.e-focused-date {
+    &:hover span.e-day {
+      color: $bg-grey-100 !important;
+    }
+
+    span.e-day {
+      background: unset;
+      color: $white !important;
     }
   }
 }

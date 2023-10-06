@@ -1,10 +1,25 @@
 <app-page-toolbar></app-page-toolbar>
-<section class="app-grid table-wrapper controls-container" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
+<section class="document">
+  <div class="e-gridcustomheader" *ngIf="isHalmarkSelected && isInitial">
+    <div class="title">
+    </div>
+    <div class="row-tool-buttons">
+      <button ejs-button cssClass="e-flat seconadry-dark-icon-button" (click)="shareSelectedDocuments($event)">
+        <span><i-feather name="share-2" class="icon"></i-feather></span>
+      </button>
+
+    
+    </div>
+  </div>
+</section>
+<section class="app-grid table-wrapper controls-container" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'"> 
   <div class="custom-grid" *ngIf="!isCRPopup">
     <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                      [gridOptions]="gridOptions"
                      (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                     [headerHeight]="52"></ag-grid-angular>
+                     [headerHeight]="52" [rowSelection]="rowSelection"       (selectionChanged)="onSelectionChanged($event)"
+
+                     ></ag-grid-angular>
 
     <div class="grid-pagination">
       <ejs-dropdownlist id="rowsPerPage"
@@ -24,3 +39,49 @@
   >
   </app-custom-report-dialog>
 </section>
+
+
+
+<app-side-dialog header="{{formDailogTitle}}" (formCancelClicked)="closeDialog()"  (formSaveClicked)="handleOnSave()" [width]="dialogWidth">
+  <form [formGroup]="shareForm" class="documentlibrary-addnewfolder-form-dialog form-container bootstrap" id="dclForm">
+
+    <section>
+
+       <div class="form-elemet" >
+        <div class="group">
+          <div class="input-container agency-switcher-container">
+            <div class="input-group datepicker">
+          
+              <label for="org-switcher" class="switch-text">Organization</label>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <div class="input-group multiselect">
+              <ejs-multiselect mode="CheckBox"
+                               placeholder="All"
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               [fields]="organizationFields"
+                               [dataSource]="organizations"
+                               [enabled]="organizationSwitch"
+                               formControlName="organizationid"
+                              >
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container allSwitch">
+            <div class="switch">
+              <ejs-switch
+                name="allOrgnizations"
+                label="All"
+                (change)="allOrgnizationsChange($event)"
+              ></ejs-switch> 
+              <label for="allOrgnizations" class="switch-text">All</label>
+            </div>
+          </div>
+        </div>
+      </div> 
+    
+    </section>
+  </form>
+</app-side-dialog>

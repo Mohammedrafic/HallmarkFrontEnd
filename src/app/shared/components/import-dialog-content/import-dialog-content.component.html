@@ -1,6 +1,6 @@
 <ejs-dialog
   #sideDialog
-  cssClass="dialog import-dialog"
+  cssClass="dialog import-dialog responsive"
   [width]="width"
   [target]="targetElement"
   [visible]="false"
@@ -14,13 +14,7 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title">{{title}}</h3>
           </div>
-          <div class="e-card-content">
-            <button ejs-button cssClass="e-outline" (click)="onCancel()">Cancel</button>
-            <ng-container *ngIf="!activeErrorTab"><ng-container *ngTemplateOutlet="importBtn"></ng-container></ng-container>
-            <ejs-tooltip *ngIf="activeErrorTab" id="tooltip" content="Invalid data cannot be imported" [showTipPointer]="false" position="BottomCenter">
-              <div><ng-container *ngTemplateOutlet="importBtn"></ng-container></div>
-            </ejs-tooltip>
-          </div>
+          <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
         </div>
       </section>
       <section class="import-items-container">
@@ -78,10 +72,13 @@
       </section>
     </section>
   </ng-template>
+  <ng-template #footerTemplate>
+    <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
+  </ng-template>
 </ejs-dialog>
 
 <ng-template #importBtn>
-  <button ejs-button cssClass="e-primary" [disabled]="!enabledImportButton" (click)="onImport()">Import</button>
+  <button ejs-button cssClass="e-primary action-btn" [disabled]="!enabledImportButton" (click)="onImport()">Import</button>
 </ng-template>
 
 <ejs-dialog
@@ -118,3 +115,27 @@
     <h1 class="modal-dialog__header">Import</h1>
   </ng-template>
 </ejs-dialog>
+
+<ng-template #actionBtn>
+  <div class="e-card-content mobile-button-group">
+    <button
+      ejs-button
+      cssClass="e-outline action-btn"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+
+    <ng-container *ngIf="!activeErrorTab" [ngTemplateOutlet]="importBtn"></ng-container>
+    <ejs-tooltip
+      *ngIf="activeErrorTab"
+      id="tooltip"
+      content="Invalid data cannot be imported"
+      position="BottomCenter"
+      class="action-btn"
+      [showTipPointer]="false"
+    >
+      <div><ng-container *ngTemplateOutlet="importBtn"></ng-container></div>
+    </ejs-tooltip>
+  </div>
+</ng-template>

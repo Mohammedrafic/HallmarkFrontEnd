@@ -9,7 +9,9 @@ export enum OrganizationSettingControlType {
   EmailAria = 8,
   SwitchedValue = 9,
   CheckboxValue = 10,
-  PayPeriod =11
+  PayPeriod =11,
+  ATPRateCalculation=12
+
 }
 
 export enum TextFieldTypeControl {

@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { CommentsFilter } from '@core/enums/common.enum';
 import { Comment } from '@shared/models/comment.model';
 import { Subject, Subscription, takeUntil } from 'rxjs';
@@ -8,7 +18,7 @@ import { Destroyable } from '@core/helpers';
   selector: 'app-comment',
   templateUrl: './comment.component.html',
   styleUrls: ['./comment.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentComponent extends Destroyable {
   @Input() comment: Comment;
@@ -16,8 +26,8 @@ export class CommentComponent extends Destroyable {
   @Input() commentType: string | undefined;
   @Output() onCommentAdded = new EventEmitter<Comment>();
   @Output() onRead = new EventEmitter<Comment>();
-  public ExternalIcon:boolean = false;
-  public InternalIcon:boolean = false;
+  public ExternalIcon: boolean = false;
+  public InternalIcon: boolean = false;
 
   @ViewChild('message')
   public messageRef: ElementRef;
@@ -30,11 +40,11 @@ export class CommentComponent extends Destroyable {
 
   ngOnInit(): void {
     if (!this.comment.isRead) {
-      this.unreadObserverSubscription = this.scrolledToMessage$.pipe(
-        takeUntil(this.componentDestroy())
-      ).subscribe(() => {
-        this.isScrolledIntoView();
-      });
+      this.unreadObserverSubscription = this.scrolledToMessage$
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe(() => {
+          this.isScrolledIntoView();
+        });
     }
     if (this.comment.new) {
       setTimeout(() => {
@@ -45,15 +55,21 @@ export class CommentComponent extends Destroyable {
     }
   }
 
-  ngOnChanges():void {
+  ngOnChanges(): void {
     this.watchForCommentTypes();
   }
 
-  private watchForCommentTypes() : void{
-    if(this.comment.isExternal === true){
-      this.commentType === CommentsFilter.All ? (this.comment.isPrivate === false ? this.ExternalIcon = true : this.ExternalIcon = false) : this.commentType === CommentsFilter.External ? this.ExternalIcon = true : this.ExternalIcon = false;
-    } else if(this.comment.isExternal === false) {
-      this.InternalIcon = true
+  private watchForCommentTypes(): void {
+    if (this.comment.isExternal === true) {
+      this.commentType === CommentsFilter.All
+        ? this.comment.isPrivate === false
+          ? (this.ExternalIcon = true)
+          : (this.ExternalIcon = false)
+        : this.commentType === CommentsFilter.External
+        ? (this.ExternalIcon = true)
+        : (this.ExternalIcon = false);
+    } else if (this.comment.isExternal === false) {
+      this.InternalIcon = true;
     }
     this.cd.markForCheck();
   }
@@ -72,7 +88,7 @@ export class CommentComponent extends Destroyable {
       }
       const rect = this.messageRef.nativeElement.getBoundingClientRect();
       const containerRect = container.getBoundingClientRect();
-      const isVisible = (rect.top >= containerRect.top) && (rect.bottom <= containerRect.bottom);
+      const isVisible = rect.top >= containerRect.top && rect.bottom <= containerRect.bottom;
 
       if (isVisible) {
         this.comment.isRead = true;

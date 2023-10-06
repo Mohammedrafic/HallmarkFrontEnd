@@ -74,9 +74,13 @@ export const SettingsAppliedToPermissions: string[] = [
   'CreatePartialOrder',
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
-  'OvertimeCalculation',
   'AutomatedDistributionToVMS',
-  'Sourcing'
+  'Sourcing',
+  'ATPRateCalculation',
+  'DisableNumberOfOpenPositions',
+  'ShowDeployedEmployees',
+  'LimitNumberOfCandidateanAgencycansubmitToaPosition',
+  'OrganizationCanCarryClockIDFromParent',
 ];
 
 export const DisabledSettingsByDefault = [
@@ -97,8 +101,9 @@ export const DisabledSettingsByDefault = [
   'SetDefaultCommentsScopeToExternal',
   'CreateUserWhenEmployeeCreated',
   'CreateEmployeeWhenUserCreated',
-  'OvertimeCalculation',
-  'Sourcing'
+  'Sourcing',
+  'ATPRateCalculation',
+  'ShowDeployedEmployees',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

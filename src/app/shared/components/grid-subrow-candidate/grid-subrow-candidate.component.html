@@ -1,4 +1,4 @@
-<div class="candidate-row"  [ngClass]="{'selected': selected}" (click)="clickEvent.emit(candidat)">
+<div class="candidate-row" [ngClass]="{'selected': selected}" (click)="clickEvent.emit(candidat)">
   <div class="info">
     <div class="data">{{ order.organizationPrefix }}-{{ order.publicId }}-{{ candidat.positionId }}</div>
     <div class="title">Position ID</div>
@@ -51,6 +51,16 @@
       <app-custom-progress-bar [value]="candidat.onboardedPercentage"></app-custom-progress-bar>
     </div>
     <div class="title">Onboard %</div>
+  </div>
+  <div class="info" *ngIf="order.orderType == CPorderType ||order.orderType == LTAorderType">
+    <span class="data" *ngIf="candidat.actualStartDate === null">{{ order.startDate | date: 'MM/dd/yyyy':'UTC'}}</span>
+    <span class="data" *ngIf="candidat.actualStartDate !== null">{{candidat.actualStartDate  | date: 'MM/dd/yyyy':'UTC'}}</span>
+    <div class="title">Actual Start Date </div>
+  </div>
+  <div class="info" *ngIf="order.orderType == CPorderType ||order.orderType == LTAorderType">
+    <span class="data" *ngIf="candidat.actualEndDate === null">{{ order.endDate | date: 'MM/dd/yyyy':'UTC'}}</span>
+    <span class="data" *ngIf="candidat.actualEndDate !== null">{{candidat.actualEndDate  | date: 'MM/dd/yyyy':'UTC'}}</span>
+    <div class="title">Actual End Date </div>
   </div>
 </div>
 

@@ -5,7 +5,7 @@ import { AssociateGridComponent } from './associate-grid/associate-grid.componen
 import { FeatherModule } from 'angular-feather';
 import { GridModule } from '@shared/components/grid/grid.module';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { NgxsModule } from '@ngxs/store';
@@ -27,6 +27,9 @@ import { TIER_DIALOG_TYPE } from '@shared/components/tiers-dialog/constants';
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { Tiers } from '@shared/enums/tiers.enum';
 import { ActionRendererComponent } from './associate-grid/edit-associate-dialog/tier-settings/tier-settings-grid/action-renderer/action-renderer.component';
+import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { ChipsCssClassPipeModule } from '@shared/pipes/chip-css-class/chip-css-class-pipe.module';
+import { GridPaginationModule } from '../grid/grid-pagination/grid-pagination.module';
 
 @NgModule({
   declarations: [
@@ -46,6 +49,7 @@ import { ActionRendererComponent } from './associate-grid/edit-associate-dialog/
     FeatherModule,
     GridModule,
     GridAllModule,
+    DatePickerModule,
     ButtonModule,
     DropDownListModule,
     NumericTextBoxModule,
@@ -57,7 +61,10 @@ import { ActionRendererComponent } from './associate-grid/edit-associate-dialog/
     ReactiveFormsModule,
     TiersDialogModule,
     TooltipContainerModule,
+    ChipListModule,
+    ChipsCssClassPipeModule,
     NgxsModule.forFeature([AssociateListState]),
+    GridPaginationModule,
   ],
   providers: [
     AssociateService,

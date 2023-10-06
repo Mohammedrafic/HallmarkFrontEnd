@@ -2,19 +2,24 @@ import { FormGroup, Validators, FormBuilder, AbstractControlOptions } from '@ang
 import { Injectable } from '@angular/core';
 
 import { ColDef } from '@ag-grid-community/core';
+import { Store } from '@ngxs/store';
 import { merge, Observable } from 'rxjs';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { DropdownOption } from '@core/interface';
 import { AllTimesheetTimeSet, DateTimeHelper } from '@core/helpers';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { UserState } from 'src/app/store/user.state';
 import { TimesheetRecordsDto, RecordValue } from '../interface';
 import { RecordFields, RecordsMode, RecordStatus, TableTabIndex } from '../enums';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor';
+import { TimesheetsState } from '../store/state/timesheets.state';
 
 @Injectable()
 export class TimesheetRecordsService {
   constructor(
     private fb: FormBuilder,
+    private store: Store,
   ) {}
 
   createEditForm(
@@ -72,10 +77,10 @@ export class TimesheetRecordsService {
           }
 
           // Time out value may be in another format, thus values must be unified.
-          if (timeOutKey && !!dataItem[keyValue]) {
+          if (timeOutKey && !!dataItem[keyValue] && !!values[keyValue]) {
             const dataTime = DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string);
             const formTime = DateTimeHelper.setUtcTimeZone(values[keyValue] as string);
-
+            
             if (dataTime !== formTime) {
               diffValues[keyValue] = values[keyValue] as string;
             }
@@ -83,11 +88,15 @@ export class TimesheetRecordsService {
             diffValues[keyValue] = values[keyValue] as string;
           }
 
+          const timePopulated = timeInKey && initialTimeInNull && values[keyValue] !== null;
+          const timeChanged = timeInKey && !initialTimeInNull && values[keyValue]
+          && DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string)
+          !== DateTimeHelper.setUtcTimeZone(values[keyValue] as string);
+
           // Need to check isTimeInNull
-          if (timeInKey && initialTimeInNull && values[keyValue] !== null) {
+          if (timePopulated) {
             diffValues[keyValue] = values[keyValue] as string | number | boolean;
-          } else if (timeInKey && !initialTimeInNull && DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string)
-          !== DateTimeHelper.setUtcTimeZone(values[keyValue] as string)) {
+          } else if (timeChanged) {
             diffValues[keyValue] = values[keyValue] as string | number | boolean;
           }
         }
@@ -133,6 +142,7 @@ export class TimesheetRecordsService {
 
     tabs.hideTab(TableTabIndex.Miles, !isMileageAvailable);
     tabs.hideTab(TableTabIndex.Expenses, !isExpensesAvailable);
+    tabs.hideTab(TableTabIndex.HistoricalData, !this.getDisplayTimesheetHistoricalData());
   }
 
   checkForStatus(data: RecordValue[]): boolean {
@@ -195,5 +205,13 @@ export class TimesheetRecordsService {
     return Object.keys(forms).every((key) => {
       return forms[key].valid;
     });
+  }
+
+
+  private getDisplayTimesheetHistoricalData(): boolean {
+    const user = this.store.selectSnapshot(UserState.user);
+    const displayTimesheetHistoricalData = this.store.selectSnapshot(TimesheetsState.displayTimesheetHistoricalData);
+
+    return displayTimesheetHistoricalData || user?.businessUnitType === BusinessUnitType.Hallmark;
   }
 }

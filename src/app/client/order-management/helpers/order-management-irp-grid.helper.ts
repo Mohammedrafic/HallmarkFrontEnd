@@ -11,6 +11,7 @@ import {
   GridCellsSystemIRPTabLta,
   GridCellsSystemIRPTabPerDiem,
 } from '@client/order-management/constants';
+import { GridCellsSystemIRPTabOrderTemplate } from '../constants/order-grid-cells-system-irp-tab-ordertemplate.const';
 
 export class OrderManagementIrpGridHelper {
   static prepareColDefs(
@@ -41,6 +42,14 @@ export class OrderManagementIrpGridHelper {
 
     if (isSystemIRP && activeTab === OrderManagementIRPTabsIndex.Lta) {
       return GridCellsSystemIRPTabLta(threeDotsMenuOptions, ...restArguments);
+    }
+    if (isSystemIRP && (activeTab === OrderManagementIRPTabsIndex.OrderTemplates)
+    ) {
+      return GridCellsSystemIRPTabOrderTemplate(
+        threeDotsMenuOptions,
+        activeTab === OrderManagementIRPTabsIndex.OrderTemplates,
+        ...restArguments
+      );
     }
 
     return [];

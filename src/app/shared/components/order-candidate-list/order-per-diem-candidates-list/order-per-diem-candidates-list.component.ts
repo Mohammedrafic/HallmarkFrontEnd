@@ -1,8 +1,8 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, distinctUntilChanged, filter, merge, takeUntil } from 'rxjs';
+import { Observable, distinctUntilChanged, filter, merge, takeUntil } from 'rxjs';
 
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import {
@@ -22,6 +22,10 @@ import { SettingsViewService } from '@shared/services';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation.helper';
+import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
@@ -33,13 +37,14 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
 
   @Input() system: OrderManagementIRPSystemId;
 
-  public templateState: Subject<any> = new Subject();
   public candidate: OrderCandidatesList;
   public candidateJob: OrderCandidateJob | null;
   public agencyActionsAllowed: boolean;
   public isFeatureIrpEnabled = false;
   public isCandidatePayRateVisible: boolean;
   public readonly systemType = OrderManagementIRPSystemId;
+  public selectedIndex: number;
+  public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -50,12 +55,14 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   private isOrgVMSEnabled = false;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public activeSystem: OrderManagementIRPSystemId;
+  public readonly partnershipStatus = PartnershipStatus;
 
   constructor(
     protected override store: Store,
     protected override router: Router,
     private settingService: SettingsViewService,
     private orderManagementService: OrderManagementService,
+    private cd: ChangeDetectorRef,
     @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
     ) {
     super(store, router, globalWindow);
@@ -77,9 +84,30 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     });
   }
 
-  public onEdit(data: OrderCandidatesList): void {
+  public emitChangeCandidate(isNext: boolean): void {
+    const nextIndex = isNext ? this.selectedIndex + 1 : this.selectedIndex - 1;
+    const nextCandidate = (this.grid.dataSource as OrderCandidatesList[])[nextIndex];
+    this.candidate = nextCandidate;
+    this.selectedIndex = nextIndex;
+    this.getCandidateJob(this.candidate);
+    this.dialogNextPreviousOption =
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
+  }
+
+  public getPartnershipMessage(data: OrderCandidatesList): string {
+    return `Partnership was suspended on ${DateTimeHelper.formatDateUTC(data.suspentionDate, 'MM/dd/yyyy')}`;
+  }
+
+  public onEdit(data: OrderCandidatesList & { index: string }): void {
     this.candidate = { ...data };
     this.getCandidatePayRateSetting();
+    this.selectedIndex = Number(data.index);
+    this.dialogNextPreviousOption =
+      getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
+    this.getCandidateJob(this.candidate);
+  }
+
+  private getCandidateJob(data: OrderCandidatesList): void {
     if (this.order && this.candidate) {
       if (this.isAgency) {
         if ([ApplicantStatus.NotApplied, ApplicantStatus.Withdraw].includes(this.candidate.status)) {
@@ -106,7 +134,10 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
         filter((candidateJob) => !!candidateJob),
         takeUntil(this.unsubscribe$)
       )
-      .subscribe((candidateJob: OrderCandidateJob) => (this.candidateJob = candidateJob));
+      .subscribe((candidateJob: OrderCandidateJob) => {
+        this.candidateJob = candidateJob;
+        this.cd.markForCheck();
+      });
   }
 
   private isOnboardOrRejectStatus(): boolean {

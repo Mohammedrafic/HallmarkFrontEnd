@@ -80,12 +80,13 @@
     [isAgency]="true"
     [isIRP]="false"
     [agencyActionsAllowed]="agencyActionsAllowed"
+    [isMobileScreen]="(isMobile$ | async) ?? false"
   ></app-candidate-list>
 </section>
 
 <app-import-candidates [openEvent]="openImportDialog$" (reloadCandidateList)="reloadCandidatesList()"></app-import-candidates>
 
-
+<app-scroll-to-top></app-scroll-to-top>
 <ng-template #switcher>
   <ejs-switch
     id="switcher" 

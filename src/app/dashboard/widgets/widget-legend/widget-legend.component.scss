@@ -23,6 +23,10 @@
     width: 100%;
     text-align: right
   }
+  &__averageFlagHead {
+    font-weight: 700;
+    width: 35%;
+  }
 
   &__row {
     display: flex;
@@ -59,7 +63,8 @@
 
   &__point {
     //width: 32px;
-    width: 24px;
+    width: 16px;
+    min-width: 16px;
     height: 16px;
     border-radius: 50%;
     margin-right: 12px;
@@ -131,3 +136,15 @@
   align-items: right;
   display: flex;
  }
+.w-11{
+  width: 11% !important;
+}
+.w-25{
+  width: 28% !important;
+}
+.widget-legend__item-content.legent-sticky-header {
+  position: sticky !important;
+  background: #fff !important;
+  z-index: 99 !important;
+  top: 0 !important;
+}

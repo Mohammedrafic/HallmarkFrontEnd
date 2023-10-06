@@ -1,8 +1,37 @@
+@import 'colors';
+@import 'adaptive-response';
+
 .associated-grid {
   height: 100%;
 
   .e-headercell,
   .e-detailheadercell {
     height: auto !important;
+  }
+}
+
+.warning-icon-container {
+  color: $supportive-red;
+  width: 16px;
+  height: 16px;
+}
+
+.status-cell {
+  display: flex;
+  align-items: center;
+}
+
+.tooltip {
+  height: 16px;
+  width: 16px;
+}
+
+@media #{$max-mobile} {
+  .associated-grid {
+    height: auto;
+  }
+
+  .associated-grid.empty-grid {
+    height: 220px;
   }
 }

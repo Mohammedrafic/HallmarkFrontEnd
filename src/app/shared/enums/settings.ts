@@ -4,5 +4,6 @@ export enum SettingsKeys {
   IsReOrder = 'IsReOrder', // TODO: rename, pending BE
   HideContactDetailsOfOrderInAgencyLogin ='HideContactDetailsOfOrderInAgencyLogin',
   DisableAddEditTimesheetsInAgencyLogin = 'DisableAddEditTimesheetsInAgencyLogin',
-  ATPRateCalculation = 'ATPRateCalculation'
+  ATPRateCalculation = 'ATPRateCalculation',
+  DisableNumberOfOpenPositions='DisableNumberOfOpenPositions'
 }

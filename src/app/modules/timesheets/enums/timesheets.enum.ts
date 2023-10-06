@@ -15,6 +15,7 @@ export enum TIMESHEETS_ACTIONS {
   GET_FILTERS_DATA_SOURCE = '[timesheets] GET FILTERS DATA SOURCE',
   UPDATE_FILTERS_STATE = '[timesheets] UPDATE FILTERS STATE',
   RESET_FILTERS_STATE = '[timesheets] RESET FILTERS STATE',
+  RESET_TIMESHEETS = '[timesheets] RESET TIMESHEETS STATE',
   AGENCY_SUBMIT_TIMESHEET = '[timesheets] AGENCY SUBMIT TIMESHEET',
   ORGANIZATION_APPROVE_TIMESHEET = '[timesheets] ORGANIZATION APPROVE TIMESHEET',
   SUBMIT_TIMESHEET = '[timesheets] SUBMIT TIMESHEET',
@@ -92,7 +93,9 @@ export enum TimesheetsTableColumns {
   StartDate = 'startDate',
   Department = 'department',
   BillRate = 'billRate',
-  AgencyName = 'agencyName',
+  AgencyName = 'agencyName',  
+  TimesheetApprover = 'approverName',
+  TimesheetApproverList = 'approverNameList',
   TotalDays = 'totalDays',
   Controls = 'controls',
 }
@@ -123,4 +126,8 @@ export enum FilteringOptionsFields {
   Regions = 'regions',
   Skills = 'skills',
   Statuses = 'statuses'
+}
+
+export enum fileViewerEnums {
+  serviceUrl = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer'
 }

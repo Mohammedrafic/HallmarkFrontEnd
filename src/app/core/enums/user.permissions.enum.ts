@@ -211,6 +211,8 @@ export enum UserPermissions {
   AgencyReports=7000,
   CanViewAgencyFinancialTimesheet = 7001,
   CanViewAgencyInvoiceSummary = 7002,
+  CanViewAgencymissingcredentials=7003,
+  CanViewAgencyCredentialExpire=7004,
   //View Order Journey
   ViewOrderJourney = 8001,
 
@@ -233,4 +235,8 @@ export enum UserPermissions {
   //Candidate Assignment
   CandidateAssigment=850,
   CanViewCandidateAssigment=851,
+
+  //General Note
+  ViewNotes=8121,
+  ManageNotes=8122
 }

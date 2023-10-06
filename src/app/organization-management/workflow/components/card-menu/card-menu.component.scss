@@ -27,10 +27,21 @@
       text-overflow: ellipsis;
     }
 
+    .card-info {
+      margin: 0;
+      padding-left: 4px;
+      color: $secondary-dark-blue-30;
+      min-height: 16px;
+      line-height: 16px;
+      font-weight: 400;
+      font-size: 12px;
+    }
+
     &.active-card {
       background-color:$primary-active-blue;
 
-      h4 {
+      h4,
+      .card-info {
         color: $white;
       }
     }

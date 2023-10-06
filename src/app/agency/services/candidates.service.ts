@@ -145,13 +145,20 @@ export class CandidateService {
       }); 
     }
 
-  public saveCredential(credential: CandidateCredential): Observable<CandidateCredential> {
+  public saveCredential(credential: CandidateCredential, file: Blob | null): Observable<CandidateCredential> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const endpoint = new Map<boolean, string>([
-      [true, '/api/CandidateCredentials'],
-      [false, '/api/EmployeeCredentials'],
+      [true, '/api/CandidateCredentials/new'],
+      [false, '/api/EmployeeCredentials/new'],
     ]);
-    return this.http[credential.id ? 'put' : 'post']<CandidateCredential>(endpoint.get(isAgencyArea) as string, credential);
+    const formData = new FormData();
+    if (file) {
+      formData.append('documents', file);
+    }
+    for (const key in credential) {
+      formData.append(key, credential[key as keyof CandidateCredential]?.toString() || '');
+    }
+    return this.http[credential.id ? 'put' : 'post']<CandidateCredential>(endpoint.get(isAgencyArea) as string, formData);
   }
 
   public verifyCandidatesCredentials(credentials: BulkVerifyCandidateCredential): Observable<CandidateCredential[]> {
@@ -203,14 +210,19 @@ export class CandidateService {
     return this.http.get(endpoint.get(isAgencyArea) as string, { responseType: 'blob' });
   }
 
-  public getCredentialGroupedFiles(candidateId: number): Observable<CredentialGroupedFiles[]> {
+  public getCredentialGroupedFiles(
+    candidateId: number, orderId?: number | null, organizationId?: number | null
+  ): Observable<CredentialGroupedFiles[]> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const orgIdParam = organizationId ? { organizationId: organizationId } : {};
+
     const endpoint = new Map<boolean, string>([
       [true, `/api/CandidateCredentials/groupedCandidateCredentialsFiles/${candidateId}`],
       [false, `/api/EmployeeCredentials/groupedCandidateCredentialsFiles/${candidateId}`],
     ]);
+    const params = isAgencyArea && orderId ? GetQueryParams({ orderId, ...orgIdParam }) : {};
 
-    return this.http.get<CredentialGroupedFiles[]>(endpoint.get(isAgencyArea) as string);
+    return this.http.get<CredentialGroupedFiles[]>(endpoint.get(isAgencyArea) as string, { params: params });
   }
 
   public getCredentialStatuses(

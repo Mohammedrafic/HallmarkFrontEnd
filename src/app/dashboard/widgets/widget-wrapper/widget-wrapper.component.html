@@ -15,6 +15,9 @@
     <div *ngIf="header" class="app-widget-wrapper__header">
       <ng-container [ngTemplateOutlet]="header"></ng-container>
     </div>
+    <div *ngIf="active_positions_initial_extended" class="app-widget-active__positions_initial_extended">
+      <ng-container [ngTemplateOutlet]="active_positions_initial_extended"></ng-container>
+    </div>
     <div *ngIf="chart" class="app-widget-wrapper__chart">
       <ng-container [ngTemplateOutlet]="chart"></ng-container>
     </div>
@@ -54,6 +57,12 @@
     </div>
     <div *ngIf="positions_count_day_range" class="app-widget-wrapper__positions_count_day_range">
       <ng-container [ngTemplateOutlet]="positions_count_day_range"></ng-container>
+    </div>
+    <div *ngIf="orders_pending_custom_status" class="app-widget-wrapper__orders_pending_in_custom">
+      <ng-container [ngTemplateOutlet]="orders_pending_custom_status"></ng-container>
+    </div>
+    <div *ngIf="bill_rate_by_skill_category" class="app-widget-wrapper__line-chart">
+      <ng-container [ngTemplateOutlet]="bill_rate_by_skill_category"></ng-container>
     </div>
   </div> 
 </ng-template>

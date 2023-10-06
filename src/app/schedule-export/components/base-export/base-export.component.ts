@@ -36,6 +36,7 @@ export class BaseExportComponent implements OnInit {
   departments: string[] = [];
   public orgName:string = 'Hallmark Healthcare';
   startDate: Date;
+  endDate: Date;
 
   constructor(
               private store: Store,
@@ -50,11 +51,12 @@ export class BaseExportComponent implements OnInit {
               }
   }
 
-  public getExportDetails(data: { data: ScheduleInt.ScheduleExport[]; dateRange: ScheduleInt.DateRangeOption[]; activePeriod: DatesRangeType; startDate: Date; }){
+  public getExportDetails(data: { data: ScheduleInt.ScheduleExport[]; dateRange: ScheduleInt.DateRangeOption[]; activePeriod: DatesRangeType; startDate: Date; endDate : Date}){
     this.setScheduleTable(data.data);
     this.setDateSchedule(data.dateRange);
     this.activePeriod = data.activePeriod;
     this.startDate = data.startDate;
+    this.endDate = data.endDate;
   }
 
   trackByDatesRange: TrackByFunction<ScheduleInt.DateRangeOption> =
@@ -71,28 +73,13 @@ export class BaseExportComponent implements OnInit {
     if(this.scheduleFilters){
       for(let i=0; i<this.scheduleFilters.length; i++){
         if(this.scheduleFilters[i].groupTitle === 'Region'){
-          this.regions = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: string }) => {
-            if (combinedObj !== '') {
-              combinedObj += ',';
-            }
-            return combinedObj + obj;
-          }, '');
+          this.regions = this.scheduleFilters[i].data;
         }
         if(this.scheduleFilters[i].groupTitle === 'Location'){
-          this.locations = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: { value: string; }) => {
-            if (combinedObj !== '') {
-              combinedObj += ',';
-            }
-            return combinedObj + obj;
-          }, '');
+          this.locations = this.scheduleFilters[i].data;
         }
         if(this.scheduleFilters[i].groupTitle === 'Department'){
-          this.departments = this.scheduleFilters[i].data.reduce((combinedObj: string, obj: {value : string}) => {
-            if (combinedObj !== '') {
-              combinedObj += ',';
-            }
-            return combinedObj + obj;
-          }, '');
+          this.departments = this.scheduleFilters[i].data;
         }
       }
     }

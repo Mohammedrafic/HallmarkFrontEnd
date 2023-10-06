@@ -15,7 +15,12 @@ import { GridValuesHelper } from '@core/helpers';
 import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
+import{
+  TableSystemCellComponent
+}
+from '@client/order-management/components/order-management-content/sub-grid-components/table-system-cell/table-system-cell.component'
 
+// eslint-disable-next-line max-lines-per-function
 export const GridCellsSystemIRPTabPerDiem = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
   canCreateOrder = false,
@@ -60,7 +65,7 @@ export const GridCellsSystemIRPTabPerDiem = (
               params.context.componentParent.menuOptionSelected(itemId, params.data);
             },
             iconName: 'more-vertical',
-            buttonClass: 'e-primary',
+            buttonClass: 'e-flat primary-icon-button',
             disabled: false,
             menuItems: PrepareMenuItems(params.data, threeDotsMenuOptions),
           },
@@ -102,6 +107,14 @@ export const GridCellsSystemIRPTabPerDiem = (
     cellRenderer: TableStatusCellComponent,
     cellClass: 'status-cell',
   },
+  ...(isIRPEnabled && isVMSEnabled? [{
+    ...DefaultOrderCol,
+    field: 'system',
+    headerName: 'System',
+    cellClass: 'name',
+    cellRenderer: TableSystemCellComponent,
+    width: 125,
+  }] : []),
   {
     ...DefaultOrderCol,
     field: 'criticalOrder',
@@ -131,8 +144,12 @@ export const GridCellsSystemIRPTabPerDiem = (
     width: 135,
     minWidth: 110,
     maxWidth: 180,
-    valueFormatter: (params: ValueFormatterParams) =>
-      `${params.data.numberOfOpenPositions ?? 0}/${params.data.numberOfPositions ?? 0}`,
+    valueFormatter: (params: ValueFormatterParams) => {
+      const openPositions = params.data.numberOfOpenPositions;
+      const calculatedPositions = openPositions && openPositions >= 0 ? params.data.numberOfOpenPositions : 0;
+
+      return `${calculatedPositions}/${params.data.numberOfPositions ?? 0}`;
+    },
   },
   {
     ...DefaultOrderCol,
@@ -206,6 +223,6 @@ export const GridCellsSystemIRPTabPerDiem = (
     minWidth: 135,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) =>
-      formatDate(params.value, 'MM/dd/YYYY HH:mm', 'en-US', 'UTC'),
+      formatDate(params.value, 'MM/dd/YYYY', 'en-US'),
   },
 ];

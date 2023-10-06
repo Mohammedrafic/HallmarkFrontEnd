@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef,
-  EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
+  EventEmitter, Input, NgZone, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, of, Subject, takeUntil } from 'rxjs';
@@ -40,6 +40,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { UserState } from 'src/app/store/user.state';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { SettingsViewService } from '@shared/services';
+import { OutsideZone } from '@core/decorators';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -87,6 +88,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Output() readonly orgSubmitting: EventEmitter<void> = new EventEmitter<void>();
 
+  @Output() readonly closeDetails: EventEmitter<void> = new EventEmitter();
+
   @Select(TimesheetsState.tmesheetRecords)
   public readonly timesheetRecords$: Observable<TimesheetRecordsDto>;
 
@@ -112,8 +115,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   public currentTab: RecordFields = RecordFields.Time;
 
   public readonly tableTypes = RecordFields;
-
-  public isFirstSelected = true;
 
   public readonly modeValues = RecordsMode;
 
@@ -217,6 +218,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     private breakpointObserver: BreakpointObserver,
     private settingsViewService: SettingsViewService,
     private actions$: Actions,
+    private ngZone: NgZone,
   ) {
     super();
     this.context = {
@@ -247,6 +249,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.adjustColumnWidth();
     this.initResizeObserver();
     this.listenResizeContent();
+    this.asyncRefresh();
   }
 
   public override ngOnDestroy(): void {
@@ -255,8 +258,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public onTabSelect(selectEvent: SelectingEventArgs): void {
-    this.isFirstSelected = false;
-    
     if (!this.isChangesSaved && (this.slectingindex !== selectEvent.selectedIndex)) {
       this.confirmService.confirm(TimesheetConfirmMessages.confirmTabChange, {
         title: 'Unsaved Progress',
@@ -340,7 +341,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         filter(Boolean),
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
-        this.saveRecords();
+        this.saveRecords(false);
+        this.closeDetails.emit();
       });
     } else {
       this.saveRecords();
@@ -432,6 +434,14 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.store.dispatch(new TimesheetDetails.RecalculateTimesheets(this.timesheetDetails.jobId));
     });
   }
+
+  @OutsideZone
+  private asyncRefresh(): void {
+    setTimeout(() => {
+      this.tabs.refreshActiveTabBorder();
+    });
+  }
+
 
   private selectTab(index: number): void {
     this.changeColDefs(index);
@@ -616,7 +626,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     );
   }
 
-  private saveRecords(): void {
+  private saveRecords(updateDetailsAfter = true): void {
     const diffs = this.timesheetRecordsService.findDiffs(
       this.records[this.currentTab][this.currentMode], this.formControls, this.timesheetColDef);
 
@@ -641,7 +651,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         this.idsToDelete,
       );
 
-      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency));
+      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency, updateDetailsAfter));
 
       this.actions$
       .pipe(
@@ -666,7 +676,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
               switchMap(() => {
                 dto.forceUpdate = true;
 
-                return this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency));
+                return this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency, updateDetailsAfter));
               }),
             );
           }

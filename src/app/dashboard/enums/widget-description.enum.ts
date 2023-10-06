@@ -2,7 +2,7 @@ export enum WidgetDescriptionEnum {
   CANDIDATES = 'Count of overall candidates by status',
   AGENCY_CANDIDATES = "Count of overall candidates by status",
   APPLICANTS_BY_REGION = 'Statewise Applicant Density',
-  AGENCY_APPLICANTS_BY_REGION = "State wise count of the applicant's home state",
+  AGENCY_APPLICANTS_BY_REGION = "State wise count of the candidates home state",
   APPLICANTS_BY_POSITIONS = 'Statewise Applicant Density',
   POSITIONS_BY_TYPES = 'Open, In Progress, Filled and Close Positions over a time period',
   AGENCY_POSITIONS_BY_TYPES = 'Count of Open, In Progress, Filled and Close positions over a time period and % difference between previous and current month/week.',
@@ -18,7 +18,7 @@ export enum WidgetDescriptionEnum {
   INVOICES = 'Invoces_widget',
   OPEN_POSITIONS_TREND = 'Open_Positions_Trend',
   IN_PROGRESS_POSITIONS_TREND = 'In_Progress_Positions_Trend',
-  LTA_ORDER_ENDING = 'LTA order ending in 45 days',
+  LTA_ORDER_ENDING = 'Positions ending in next 45 days',
   Candidate_Applied_In_Last_N_Days ='The number of candidates who are in Applied status for configured or more days',
   ORG = 'Organization Widget Description',
   AGENCY_POSITION_COUNT = 'Count of Open and In Progress positions by Organizations.',
@@ -29,4 +29,8 @@ export enum WidgetDescriptionEnum {
   AVAILABLE_EMPLOYEE='Available Employees in next 24 hrs.',
   CANDIDATES_ACTIVE_POSITIONS="Count of Candidate statuses in Active Orders/Positions.",
   POSITIONS_COUNT_DAY_RANGE="Active Positions by Open Day Range",
+  ACTIVE_POSITIONS_INITIAL_EXTENDED="Count of Initial Positions and Extended Positions from Active Positions.",
+  ORDERS_PENDING_IN_CUSTOM = "Average days positions spending in specific custom status",
+  AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS = 'Average Days on Active Candidate Status',
+  BILL_RATE_BY_SKILL_CATEGORY = "Average Regular Bill Rate per Skill Category per Month"
 }

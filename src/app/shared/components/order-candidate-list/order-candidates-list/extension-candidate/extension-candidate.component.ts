@@ -68,6 +68,7 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { Comment } from '@shared/models/comment.model';
 import {
+  AcceptJobDTO,
   ApplicantStatus,
   Order,
   OrderCandidateJob,
@@ -295,7 +296,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         jobId: this.candidateJob.jobId,
         skillName: value.skillName,
         offeredBillRate: this.candidateJob?.offeredBillRate,
-        offeredStartDate: this.candidateJob ? DateTimeHelper.setUtcTimeZone(this.candidateJob.offeredStartDate) : undefined,
+        offeredStartDate: this.candidateJob?.offeredStartDate ? 
+          DateTimeHelper.setUtcTimeZone(this.candidateJob.offeredStartDate) : undefined,
         candidateBillRate: this.candidateJob.candidateBillRate,
         nextApplicantStatus: {
           applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
@@ -410,7 +412,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       }
     }
 
-    this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
+    this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' }, true);
   }
 
   public onSave(): void {
@@ -610,7 +612,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const actualEndDate = new Date(startDate); actualEndDate.setDate(startDate.getDate() + daysToAdd);
     return actualEndDate;
   }
-  private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
+
+  private rewriteActualDatesWithOrder(value: AcceptJobDTO): void {
+    value.actualStartDate = new Date(this.candidateJob.order.jobStartDate).toISOString();
+    value.actualEndDate = new Date(this.candidateJob.order.jobEndDate).toISOString();
+  }
+  
+  // eslint-disable-next-line max-lines-per-function
+  private updateAgencyCandidateJob(applicantStatus: ApplicantStatus, acceptAction = false): void {
     const value = this.form.getRawValue();
     const jobStartDate = new Date(this.candidateJob.order.jobStartDate);
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
@@ -629,6 +638,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         value.actualEndDate = new Date(value.actualEndDate);
       }
      }
+    
+    if (acceptAction) {
+      this.rewriteActualDatesWithOrder(value);
+    }
+
     if (this.form.valid) {
       const updatedValue = {
         organizationId: this.candidateJob.organizationId,
@@ -656,21 +670,21 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       const statusChanged = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
 
       this.store
-        .dispatch(
-          this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
-        ).pipe(
-          takeUntil(this.destroy$)
-        ).subscribe(() => {
-          this.store.dispatch(
-            this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
-          );
-          if (statusChanged) {
-            this.updateDetails.emit();
-          } else {
-            this.resetStatusesFormControl();
-            this.adjustCandidatePayRateField();
-          }
-        });
+      .dispatch(
+        this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
+      ).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(() => {
+        this.store.dispatch(
+          this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
+        );
+        if (statusChanged) {
+          this.updateDetails.emit();
+        } else {
+          this.resetStatusesFormControl();
+          this.adjustCandidatePayRateField();
+        }
+      });
       this.action$.pipe(takeUntil(this.destroy$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
         if (applicantStatus.applicantStatus === ApplicantStatusEnum.OnBoarded) {
           const options = {

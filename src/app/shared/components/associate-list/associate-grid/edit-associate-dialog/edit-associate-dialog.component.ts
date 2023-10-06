@@ -27,6 +27,9 @@ import { createDepartmentsTier } from '@shared/helpers';
 import { SettingsViewService } from '@shared/services';
 import { TierLogic } from '@shared/enums/tier-logic.enum';
 import { GetOrgTierStructure } from '../../../../../store/user.actions';
+import { DateTimeHelper } from '@core/helpers';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-edit-associate-dialog',
@@ -42,10 +45,13 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
 
   @Select(AssociateListState.feeExceptionsPage)
   public feeExceptionsPage$: Observable<FeeExceptionsPage>;
+
   @Select(AssociateListState.baseFee)
   public baseFee$: Observable<number>;
 
-  public targetElement: HTMLElement = document.body;
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
+
   public editAgencyOrg: AssociateOrganizationsAgency;
   public width: string;
   public feeSettingsForm: FormGroup;
@@ -63,6 +69,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   public partnershipText: string = TabsText[TabsText["Partnership Settings"]];
   private isAlive = true;
   public isAgency: boolean;
+  public isAgencyUser: boolean = false;
 
   constructor(
     protected override store: Store,
@@ -72,11 +79,11 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     private settingsViewService: SettingsViewService,
   ) {
     super(store);
+    this.isAgency = this.router.url.includes('agency');
   }
 
   override ngOnInit(): void {
-    super.ngOnInit()
-    this.isAgency = this.router.url.includes('agency');
+    super.ngOnInit();
     this.onOpenEvent();
     this.width = this.getDialogWidth();
     this.feeSettingsForm = FeeSettingsComponent.createFormGroup();
@@ -84,7 +91,10 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     this.onFeeExceptionsPageChanged();
 
     this.partnershipForm = PartnershipSettingsComponent.createForm();
-
+    const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    if (businessUnitType == BusinessUnitType.Agency) {
+      this.isAgencyUser = true;
+    }
     if (this.isAgency) {
       this.checkForAgencyStatus();
     }
@@ -119,15 +129,30 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   }
 
   public onSave(): void {
+    if (this.partnershipForm.invalid) {
+      this.partnershipForm.markAllAsTouched();
+      return;
+    }
+      
     let switchTabVal=this.activeTab;
+
     switch (switchTabVal) {
       case Tabs.JobDistribution:
         this.partnershipForm.markAllAsTouched();
         if (this.partnershipForm.valid) {
           const jobDistributionFormValue = this.partnershipForm.getRawValue();
+
+          if (jobDistributionFormValue.suspentionDate) {
+            jobDistributionFormValue.suspentionDate = DateTimeHelper.setUtcTimeZone(
+              DateTimeHelper.setInitDateHours(jobDistributionFormValue.suspentionDate)
+            );
+          }
+
           this.store.dispatch(
-            new TiersException.SavePartnershipSettings({ ...jobDistributionFormValue, associateOrganizationId: this.editAgencyOrg.id })
+            new TiersException.SavePartnershipSettings({
+              ...jobDistributionFormValue, associateOrganizationId: this.editAgencyOrg.id })
           );
+
         }
         break;
       case Tabs.TierException:

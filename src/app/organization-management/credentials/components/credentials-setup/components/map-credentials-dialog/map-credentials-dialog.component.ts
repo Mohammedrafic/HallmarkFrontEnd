@@ -1,5 +1,6 @@
-import { Component, Input, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import {FormGroup } from '@angular/forms';
+import { DOCUMENT } from '@angular/common';
 
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { combineLatestWith, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
@@ -17,7 +18,6 @@ import {
   AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
-  Organization,
   OrganizationDepartment,
   OrganizationLocation,
   OrganizationRegion,
@@ -60,6 +60,8 @@ import { UserPermissions } from '@core/enums';
 import { CredentialTypeSource } from '@organization-management/credentials/interfaces';
 import { CredentialsState } from '@organization-management/store/credentials.state';
 import { SaveEditCredentialMessage } from '@organization-management/credentials/components/credentials-setup/constants';
+import { CheckboxState, CredentialCheckboxState } from '../../interfaces';
+import { CredentialCheckBox } from '../../enums';
 
 @TakeUntilDestroy
 @Component({
@@ -78,8 +80,6 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   @ViewChild('departmentsDropdown') departmentsDropdown: MultiSelectComponent;
   @ViewChild('groupsDropdown') groupsDropdown: MultiSelectComponent;
 
-  @Select(OrganizationManagementState.organization)
-  private organization$: Observable<Organization>;
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   @Select(OrganizationManagementState.credentials)
@@ -107,6 +107,8 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   public query: Query = new Query().take(this.maxDepartmentsLength);
   public filterType = 'Contains';
   public credentialTypeSources: CredentialTypeSource[] = [];
+  public checkbox = CredentialCheckBox;
+  public checkboxState = {} as CredentialCheckboxState;
 
   public readonly userPermissions = UserPermissions;
   public readonly editCredentialMessage: string = SaveEditCredentialMessage;
@@ -128,6 +130,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     private mapCredentialsService: MapCredentialsService,
     private readonly ngZone: NgZone,
     private credentialsSetupService: CredentialsSetupService,
+    @Inject(DOCUMENT) private document: Document
   ) {
     super();
 
@@ -447,14 +450,18 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     }
 
    credentialSetupMapping.credentials.forEach(savedMapping => {
-      (this.gridDataSource as CredentialSetupGet[]).map((credential) => {
+      (this.gridDataSource as CredentialSetupGet[]).forEach((credential) => {
         if (credential.masterCredentialId === savedMapping.masterCredentialId) {
           credential.inactiveDate = savedMapping.inactiveDate;
           credential.isActive = savedMapping.isActive;
           credential.reqSubmission = savedMapping.reqSubmission;
           credential.reqOnboard = savedMapping.reqOnboard;
+          credential.comments = this.isEdit ? savedMapping.comments : credential.comments;
+          credential.irpComments = this.isEdit ? savedMapping.irpComments: credential.irpComments;
         }
       });
+
+      this.setCheckboxState(this.gridDataSource as CredentialSetupGet[]);
       this.grid.refresh();
     });
   }
@@ -474,14 +481,18 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   }
 
   public checkboxStateChanged(
-    event: { checked: boolean },
+    { checked }: { checked: boolean },
     credential: CredentialSetupGet,
-    checkboxName: 'isActive' | 'reqSubmission' | 'reqOnboard'
+    checkboxName: CredentialCheckBox,
   ): void {
-    (this.grid.dataSource as []).map((item: CredentialSetupGet) => {
+    const checkboxState = this.updateCheckboxState(credential.masterCredentialId, checked, checkboxName);
+    const { isActive, reqOnboard, reqSubmission } = checkboxState;
+
+    (this.grid.dataSource as CredentialSetupGet[]).forEach((item: CredentialSetupGet) => {
       if (item.masterCredentialId === credential.masterCredentialId) {
-        // update checkbox state value
-        item[checkboxName] = event.checked;
+        item.isActive = isActive;
+        item.reqOnboard = reqOnboard;
+        item.reqSubmission = reqSubmission;
       }
     });
   }
@@ -725,6 +736,8 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
         activeRowsPerPage
       );
     }
+
+    this.setCheckboxState(this.gridDataSource as CredentialSetupGet[]);
   }
 
   private watchForSucceededUpdateCredential(): void {
@@ -742,5 +755,25 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     setTimeout(() => {
       this.store.dispatch(new ShowSideDialog(true));
     }, 100);
+  }
+
+  private setCheckboxState(dataSource: CredentialSetupGet[]): void {
+    dataSource.forEach((credential) => {
+      const {reqSubmission, reqOnboard, isActive} = credential;
+      this.checkboxState[credential.masterCredentialId] = {
+        reqSubmission: !!reqSubmission,
+        reqOnboard: !!reqOnboard,
+        isActive: !!isActive,
+      };
+    });
+  }
+
+  private updateCheckboxState(id: number, event: boolean, checkboxName: CredentialCheckBox): CheckboxState {
+    this.checkboxState[id] = Object.fromEntries(
+      Object.entries(this.checkboxState[id]).map(([key]) => {
+        return [key, checkboxName === key ? event : false];
+      })) as CheckboxState;
+    
+    return this.checkboxState[id];
   }
 }

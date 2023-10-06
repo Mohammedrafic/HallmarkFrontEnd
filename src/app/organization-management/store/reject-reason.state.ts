@@ -16,7 +16,7 @@ import {
   UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess,
   GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty,
   SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog, GetUnavailabilityReasons,
-  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess, SaveTerminatedReasonError, UpdateInternalTransferReasonsError, UpdateCategoryNoteReasonsError, GetSourcingReasons, GetRecuriterReasonsByPage, SaveRecuriterReasons, SaveRecuriterReasonsSuccess, SaveRecuriterReasonsError, RemoveRecuriterReasons, UpdateRecuriterReasonsSuccess, SaveSourcingReasonsError, SaveSourcingReasonsSuccess, UpdateSourcingReasonsSuccess, GetSourcingReasonsByPage, SaveSourcingReasons, RemoveSourcingReasons, UpdateSourcingReasons, UpdateRecuriterReasons,
+  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess, SaveTerminatedReasonError, UpdateInternalTransferReasonsError, UpdateCategoryNoteReasonsError, GetSourcingReasons, GetRecuriterReasonsByPage, SaveRecuriterReasons, SaveRecuriterReasonsSuccess, SaveRecuriterReasonsError, RemoveRecuriterReasons, UpdateRecuriterReasonsSuccess, SaveSourcingReasonsError, SaveSourcingReasonsSuccess, UpdateSourcingReasonsSuccess, GetSourcingReasonsByPage, SaveSourcingReasons, RemoveSourcingReasons, UpdateSourcingReasons, UpdateRecuriterReasons, GetSourcingConfig,
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
 import { RecuriterReasonPage, RejectReason, RejectReasonPage, RejectReasonwithSystem, SourcingReasonPage, UnavailabilityReasons } from "@shared/models/reject-reason.model";
@@ -28,6 +28,7 @@ import { RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from "@shared/constants"
 import { Penalty, PenaltyPage } from "@shared/models/penalty.model";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
 import { PageOfCollections } from '@shared/models/page.model';
+import { GetSourcingConfigModel } from "@shared/models/organization.model";
 
 export interface RejectReasonStateModel {
   rejectReasonsPage: RejectReasonPage | null;
@@ -43,6 +44,7 @@ export interface RejectReasonStateModel {
   categoryNote: RejectReasonPage | null;
   recuriterReasonsPage: RecuriterReasonPage | null;
   sourcingReasonsPage: SourcingReasonPage | null;
+  souringConfig: GetSourcingConfigModel | null;
 }
 
 @State<RejectReasonStateModel>({
@@ -60,7 +62,8 @@ export interface RejectReasonStateModel {
     categoryNote: null,
     souringReason:  null,
     recuriterReasonsPage:null,
-    sourcingReasonsPage:null
+    sourcingReasonsPage:null,
+    souringConfig:null
   },
 })
 @Injectable()
@@ -131,6 +134,10 @@ export class RejectReasonState {
   @Selector()
   static sourcingReasonspage(state: RejectReasonStateModel) : SourcingReasonPage | null {
     return state.sourcingReasonsPage;
+  }
+  @Selector()
+  static sourcingConfigs(state: RejectReasonStateModel) : GetSourcingConfigModel | null {
+    return state.souringConfig;
   }
 
   constructor(private rejectReasonService:RejectReasonService) {}
@@ -766,6 +773,9 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new UpdateRecuriterReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
@@ -841,6 +851,8 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new UpdateSourcingReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      }),catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
@@ -858,6 +870,20 @@ export class RejectReasonState {
       catchError((error: HttpErrorResponse) => {
         dispatch(new SaveSourcingReasonsError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+  @Action(GetSourcingConfig)
+  GetSourcingConfig(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    {}: GetSourcingConfig
+  ): Observable<GetSourcingConfigModel> {
+    patchState({ isReasonLoading: true });
+
+    return this.rejectReasonService.GetSourcingConfig({}).pipe(
+      tap((payload) => {
+        patchState({souringConfig: payload});
+        return payload;
       })
     );
   }

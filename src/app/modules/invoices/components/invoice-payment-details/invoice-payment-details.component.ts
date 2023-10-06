@@ -107,7 +107,7 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
       switchMap((details) => {
         this.invoiceData.invoiceId = details.meta.invoiceId;
         this.invoiceData.agencySuffix = details.meta.agencySuffix as number;
-        this.actionsAllowed = details.meta.invoiceState === InvoiceState.PendingPayment;
+        this.actionsAllowed = details.meta.invoiceState === InvoiceState.PendingPayment || details.meta.invoiceState === InvoiceState.ShortPaid || details.meta.invoiceState === InvoiceState.OverPaid;
 
         const dto: InvoicePaymentGetParams =  {
           InvoiceId: details.meta.invoiceId,

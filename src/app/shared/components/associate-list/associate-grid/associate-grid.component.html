@@ -1,12 +1,14 @@
-<div class="associated-grid">
+<div
+  class="associated-grid"
+  [ngClass]="{'empty-grid': agencyData.items.length < 1}"
+>
   <ejs-grid
     #grid
-    [dataSource]="(associateListPage$ | async)?.items"
+    [dataSource]="agencyData.items"
     [allowSorting]="true"
     [allowResizing]="true"
     [allowSelection]="false"
     [resizeSettings]="resizeSettings"
-    [allowPaging]="allowPaging"
     [enableVirtualization]="false"
     [pageSettings]="pageSettings"
     [height]="fullScreenGridHeight"
@@ -42,55 +44,40 @@
       <e-column field="tierName" headerText="Tier" width="150" textAlign="left"></e-column>
       <e-column field="exeptionFee" headerText="Exception Fee" width="150" textAlign="left"></e-column>
       <e-column headerText="Job Distribution" [columns]="jobDistributionColumns" textAlign="left"></e-column>
-      <e-column field="partnershipStatus" headerText="Partnership Status" textAlign="left" [valueAccessor]="partnershipStatusValueAccess"></e-column>
-    </e-columns>
-
-    <ng-template #pagerTemplate let-data>
-      <div class="e-pagertemplate">
-        <div class="control-section">
-          <div class="content-wrapper">
-            <section class="left-side-pager-controls">
-              <ejs-dropdownlist
-                id="rowsPerPage"
-                class="dropdown-no-border"
-                [allowFiltering]="true"
-                [dataSource]="rowsPerPageDropDown"
-                [(value)]="activeRowsPerPageDropDown"
-                (change)="onRowsDropDownChanged()"
-              >
-              </ejs-dropdownlist>
-              <ejs-numerictextbox
-                id="goToPage"
-                class="numeric-input-no-border"
-                format="#"
-                placeholder="Go to:"
-                min="1"
-                [max]="(associateListPage$ | async)?.totalPages"
-                [showSpinButton]="false"
-                (change)="onGoToClick($event)"
-              >
-              </ejs-numerictextbox>
-              <div class="total-rows">
-                Total Rows: {{(associateListPage$ | async)?.totalCount}}
+      <e-column field="partnershipStatus" headerText="Partnership Status" textAlign="left">
+        <ng-template #template let-data>
+          <div class="status-cell">
+            <app-tooltip-container
+            [message]="data.suspensionMessage"
+            [showToolTip]="!!data.suspensionMessage && data.partnershipStatus === partnershipStatuses.Suspended"
+            >
+              <ejs-chiplist>
+                <e-chips>
+                  <e-chip [text]="partnershipStatuses[data.partnershipStatus]" [cssClass]="partnershipStatuses[data.partnershipStatus] | chipsCssClass"></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+            </app-tooltip-container>
+            <app-tooltip-container
+              class="tooltip"
+              *ngIf="data.partnershipStatus === partnershipStatuses.Active && data.suspensionMessage"
+              [message]="data.suspensionMessage"
+              [showToolTip]="true">
+              <div class="warning-icon-container">
+                <i-feather class="icon" name="alert-circle"></i-feather>
               </div>
-            </section>
-            <section class="right-side-pager-controls">
-              <ejs-pager
-                id="gridPager"
-                #gridPager
-                [pageSize]="pageSize"
-                [totalRecordsCount]="(associateListPage$ | async)?.totalCount"
-                [enablePagerMessage]="false"
-                [currentPage]="currentPage"
-                (click)="onGoToClick($event)"
-              >
-              </ejs-pager>
-            </section>
+            </app-tooltip-container>
           </div>
-        </div>
-      </div>
-    </ng-template>
+        </ng-template>
+      </e-column>
+    </e-columns>
   </ejs-grid>
+  <app-grid-pagination
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    [totalRecordsCount]="(associateListPage$ | async)?.totalCount ?? 0"
+    (navigateToPageEmitter)="changeGridPage($event)"
+    (pageSizeChangeEmitter)="changeGridSize($event)"
+  ></app-grid-pagination>
 </div>
 
 <app-invite-dialog [openEvent]="openAssociateOrgAgencyDialog"></app-invite-dialog>

@@ -1,21 +1,29 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { DOCUMENT } from '@angular/common';
+
 import { Store } from '@ngxs/store';
+import { filter, map, merge, take, takeUntil } from 'rxjs';
+
+import { ShowSideDialog } from 'src/app/store/app.actions';
+import { AddOrderCredentialFormComponent } from './components/add-order-credential-form/add-order-credential-form.component';
+import {
+  EditOrderCredentialFormComponent,
+} from './components/edit-order-credential-form/edit-order-credential-form.component';
+import { CredentialOptionMessage } from './constants/credential-message.constant';
+import { IOrderCredential, IOrderCredentialItem } from './types';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { Credential } from "@shared/models/credential.model";
 import { ConfirmService } from '@shared/services/confirm.service';
-import { filter, take } from 'rxjs';
-import { ShowSideDialog } from 'src/app/store/app.actions';
-import { AddOrderCredentialFormComponent } from './components/add-order-credential-form/add-order-credential-form.component';
-import { EditOrderCredentialFormComponent } from './components/edit-order-credential-form/edit-order-credential-form.component';
-import { IOrderCredential, IOrderCredentialItem } from './types';
+import { Destroyable } from '@core/helpers';
+import { CheckboxNames } from './interfaces';
 
 @Component({
   selector: 'app-order-credentials',
   templateUrl: './order-credentials.component.html',
   styleUrls: ['./order-credentials.component.scss'],
 })
-export class OrderCredentialsComponent {
+export class OrderCredentialsComponent extends Destroyable {
   @ViewChild('addCred') addCred: AddOrderCredentialFormComponent;
   @ViewChild('editCred') editCred: EditOrderCredentialFormComponent;
   @Input() credentials: IOrderCredentialItem[];
@@ -30,8 +38,20 @@ export class OrderCredentialsComponent {
   public CredentialForm: FormGroup;
   public formSubmitted = false;
   public showForm = false;
+  public targetElement: HTMLElement | null;
+  public checkboxSelected = false;
+  public tooltipMessage = CredentialOptionMessage;
 
-  constructor(private store: Store, private fb: FormBuilder, private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private fb: FormBuilder,
+    private confirmService: ConfirmService,
+    private cdr: ChangeDetectorRef,
+    @Inject(DOCUMENT) private document: Document
+  ) {
+    super();
+    this.targetElement = this.document.body;
+
     this.CredentialForm = this.fb.group({
       credentialId: new FormControl(0),
       credentialType: new FormControl('', [Validators.required]),
@@ -41,6 +61,8 @@ export class OrderCredentialsComponent {
       reqForOnboard: new FormControl(false),
       optional: new FormControl(false),
     });
+
+    this.watchForChecboxesState();
   }
 
   public addNew(): void {
@@ -51,13 +73,8 @@ export class OrderCredentialsComponent {
   }
 
   public prePopulateData(data: Credential): void {
-    const { comment = '', reqSubmission = false, reqOnboard = false, optional = false } = data;
-    this.CredentialForm.patchValue({
-      comment,
-      reqForSubmission: reqSubmission,
-      reqForOnboard: reqOnboard,
-      optional,
-    });
+    const { comment = '' } = data;
+    this.CredentialForm.patchValue({ comment });
   }
 
   public onEdit(credential: IOrderCredentialItem): void {
@@ -111,7 +128,7 @@ export class OrderCredentialsComponent {
     } else {
       this.addNewCred();
     }
-    
+
     this.resetToDefault();
     this.formSubmitted = false;
     this.showForm = false;
@@ -133,7 +150,7 @@ export class OrderCredentialsComponent {
 
   private editExistedCred(data?: IOrderCredentialItem): void {
     const cred = data || (this.CredentialForm.getRawValue() as IOrderCredentialItem);
-    
+
     this.credentialChanged.emit(Object.assign({}, { ...cred }));
     this.isEditMode = false;
   }
@@ -161,5 +178,36 @@ export class OrderCredentialsComponent {
     this.showForm = false;
     this.store.dispatch(new ShowSideDialog(false));
     this.formSubmitted = false;
+  }
+
+  private watchForChecboxesState(): void {
+    let selectedCheckbox: CheckboxNames | null = null;
+    const controlNames = ['optional', 'reqForOnboard', 'reqForSubmission'];
+    const checkboxControls = controlNames.map((name) => {
+      return this.CredentialForm.get(name)?.valueChanges
+        .pipe(map((value) => ({ name, value })));
+    });
+
+    /**checkbox single selection */
+    merge(...checkboxControls)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((data) => {
+        const { name, value } = data as { name: CheckboxNames, value: boolean };
+
+        if (value && selectedCheckbox && selectedCheckbox !== name) {
+          this.CredentialForm.get(selectedCheckbox)?.setValue(false, { emitEvent: false });
+        }
+
+        if (value) {
+          selectedCheckbox = name;
+          this.checkboxSelected = true;
+        }
+
+        if (!value && selectedCheckbox === name) {
+          selectedCheckbox = null;
+          this.checkboxSelected = false;
+        }
+        this.cdr.markForCheck();
+      });
   }
 }

@@ -38,6 +38,7 @@ import { CandidateWorkCommitmentService } from '../../services/candidate-work-co
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { commonRangesValidator } from '@shared/validators/date.validator';
 import { AppState } from 'src/app/store/app.state';
+import { checkCommitmentNotOverride } from '@shared/helpers';
 
 @Component({
   selector: 'app-candidate-work-commitment-dialog',
@@ -84,10 +85,8 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     text: 'name',
     value: 'id',
   };
-
   public readonly numericInputAttributes = { maxLength: '10' };
   public format = '#.#';
-
   public todayDate = new Date();
   public lastActiveDate: Date | null;
   public selectWorkCommitmentStartDate: Date;
@@ -100,7 +99,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   public overrideCommitmentConfirm$ = new Subject<boolean>();
   public replacementConfirmationMessage = EMPLOYEE_SKILL_CHANGE_WARNING;
   public isEdit = false;
-
+  private commitment: CandidateWorkCommitment;
 
   constructor(
     private cd: ChangeDetectorRef,
@@ -271,6 +270,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
       departmentName: '',
       allRegionsSelected: false,
       allLocationsSelected: false,
+      isInUse: false,
     };
     return commitment;
   }
@@ -459,15 +459,19 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private getCandidateWorkCommitmentById(commitment: CandidateWorkCommitment): void {
-    this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number).pipe(
+    this.candidateWorkCommitmentService.getCandidateWorkCommitmentById(commitment.id as number)
+    .pipe(
+      filter((commitment: CandidateWorkCommitment) => !!commitment.workCommitmentIds),
       takeUntil(this.destroy$),
     ).subscribe((commitment: CandidateWorkCommitment) => {
-        if (commitment.workCommitmentIds) {
-          commitment.startDate = commitment.startDate && DateTimeHelper.setCurrentTimeZone(commitment.startDate as string);
-          const masterId = this.allWorkCommitments.find(item => item.workCommitmentId === commitment.workCommitmentIds[0]);
-          masterId && this.getWorkCommitmentById(masterId.masterWorkCommitmentId, commitment, false);
-        }
-      });
+      this.commitment = commitment;
+      commitment.startDate = commitment.startDate && DateTimeHelper.setCurrentTimeZone(commitment.startDate as string);
+      const masterId = this.allWorkCommitments.find(item => item.workCommitmentId === commitment.workCommitmentIds[0]);
+
+      if (masterId) {
+        this.getWorkCommitmentById(masterId.masterWorkCommitmentId, commitment, false);
+      }
+    });
   }
 
   private subscribeOnDialog(): void {
@@ -584,9 +588,14 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
   }
 
   private isLocationChanged(): boolean {
-    const regionControl = this.candidateWorkCommitmentForm.get('regionIds');
-    const locationControl = this.candidateWorkCommitmentForm.get('locationIds');
-    return !!(regionControl?.dirty || locationControl?.dirty) && this.title === DialogMode.Edit;
+    if (this.isEdit) {
+      const selectedRegions = this.candidateWorkCommitmentForm?.get('regionIds')?.value;
+      const selectedLocations = this.candidateWorkCommitmentForm?.get('locationIds')?.value;
+
+      return !checkCommitmentNotOverride(this.commitment, selectedRegions, selectedLocations);
+    }
+
+    return false;
   }
 
   private saveCommitment(): void {

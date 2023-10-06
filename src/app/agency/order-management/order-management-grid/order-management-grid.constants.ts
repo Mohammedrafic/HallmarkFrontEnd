@@ -30,6 +30,8 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Actual Start Date', column: 'ActualStartDate' },
+  { text: 'Actual End Date', column: 'ActualEndDate' },
   { text: 'Linked ID', column: 'LinkedId' },
   { text: 'Order Locked?', column: 'OrderLocked' },
 

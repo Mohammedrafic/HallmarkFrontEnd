@@ -6,7 +6,7 @@ body.light, body.dark {
   .e-dialog {
     .e-icon-dlg-close::before {
       content: "\e7e7" !important;
-      color: $secondary-dark-blue-30 !important;
+      color: $primary-active-blue-10 !important;
     }
 
     & + .e-dlg-overlay {
@@ -30,10 +30,12 @@ body.light, body.dark {
       .e-card-content {
         display: flex;
         justify-content: space-evenly;
-        padding: 10px 5px;
+        padding: 10px 12px;
+        column-gap: 12px;
 
         .action-btn {
-          width: 45%;
+          width: 100%;
+          margin-left: 0 !important;
         }
       }
     }

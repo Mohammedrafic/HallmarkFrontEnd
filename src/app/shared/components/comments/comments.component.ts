@@ -1,16 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { GetOrderComments } from '@client/store/order-managment-content.actions';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { Comment } from '@shared/models/comment.model';
+
+import { Store } from '@ngxs/store';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
+
+import { Comment } from '@shared/models/comment.model';
 import { UserState } from 'src/app/store/user.state';
 import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments.actions';
-import { CommentsState } from './store/comments.state';
 
 enum CommentsFilter {
   All = 'All',
@@ -30,6 +28,7 @@ export class CommentsComponent {
   @Input() orderId: number;
   public commentData: Comment[] = [];
   @Input() canVmsCreateOrders: boolean;
+  @Output() commentSaveCheck = new EventEmitter<boolean>();
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
     if (value.length) {
@@ -180,6 +179,7 @@ export class CommentsComponent {
     this.scroll$.next(null);
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment));
+      this.commentSaveCheck.emit(true);
     }
   }
 

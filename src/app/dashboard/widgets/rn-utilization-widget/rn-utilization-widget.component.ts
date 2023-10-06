@@ -35,6 +35,7 @@ import { RnUtilizationForm } from './rn-utilization.interface';
 import {
   GetNursingUtilizationbyByFilters,
   GetNursingWidgetData,
+  GetSkillsbyByFilters,
   GetWorkCommitment,
 } from '../../models/rn-utilization.model';
 import { ProgressBar } from '@syncfusion/ej2-angular-progressbar';
@@ -56,7 +57,7 @@ export class RnUtilizationWidgetComponent implements OnInit {
 
   @ViewChildren("progressBar")
   public pb: ProgressBar[];
-
+  public skills : DashboartFilterDto;
   @Select(DashboardState.commitmentsPage)
   commitmentsPage$: Observable<GetWorkCommitment[]>;
   @Select(DashboardState.nursingSkill)
@@ -98,6 +99,9 @@ export class RnUtilizationWidgetComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.filterData$.pipe().subscribe((data)=>{
+      this.skills = data;
+     })
     this.getLookups().subscribe(() => {
       this.setupChangeListeners();
       this.cdr.detectChanges();
@@ -106,7 +110,13 @@ export class RnUtilizationWidgetComponent implements OnInit {
   }
 
   getLookups(): Observable<any> {
-    const commitmentsLookup = this.store.dispatch(new GetAllCommitmentByPage()).pipe(
+    this.filterData$.pipe().subscribe((data)=>{
+      this.skills = data;
+     })
+    const data: GetSkillsbyByFilters = {
+      organizationFilter: this.skills.organizationFilter,
+    };
+    const commitmentsLookup = this.store.dispatch(new GetAllCommitmentByPage(data)).pipe(
       take(1),
       tap((result) => {
         const ids = (result.dashboard.commitmentsPage || []).map((m: { id: number }) => m.id);
@@ -114,8 +124,8 @@ export class RnUtilizationWidgetComponent implements OnInit {
       }),
       takeUntil(this.unsubscribe$)
     );
-
-    const skillsLookup = this.store.dispatch(new GetSkillData()).pipe(
+   
+    const skillsLookup = this.store.dispatch(new GetSkillData(data)).pipe(
       take(1),
       tap((result) => {
         const ids = (result.dashboard.nursingSkill || []).map((m: { id: number }) => m.id);
@@ -135,8 +145,25 @@ export class RnUtilizationWidgetComponent implements OnInit {
         debounceTime(500),
         filter(() => true),
         switchMap(([value, filters]) => {
-          const skillsList = this.nursingSkill$.pipe(take(1), takeUntil(this.unsubscribe$));
-          const workCommitmentList = this.commitmentsPage$.pipe(take(1), takeUntil(this.unsubscribe$));
+          const data: GetSkillsbyByFilters = {
+            organizationFilter: filters.organizationFilter,
+          };
+          const skillsList = this.store.dispatch(new GetSkillData(data)).pipe(
+            take(1),
+            tap((result) => {
+              const ids = (result.dashboard.nursingSkill || []).map((m: { id: number }) => m.id);
+              this.rnUtilizationForm.controls['skills'].setValue(ids, { emitEvent: false });
+            }),
+            takeUntil(this.unsubscribe$)
+          );
+          const workCommitmentList = this.store.dispatch(new GetAllCommitmentByPage(data)).pipe(
+            take(1),
+            tap((result) => {
+              const ids = (result.dashboard.commitmentsPage || []).map((m: { id: number }) => m.id);
+              this.rnUtilizationForm.controls['workCommitment'].setValue(ids, { emitEvent: false });
+            }),
+            takeUntil(this.unsubscribe$)
+          );
           return forkJoin([of(value), of(filters), skillsList, workCommitmentList]);
         }),
         tap(([value,, skillsList, workCommitmentList]) => {

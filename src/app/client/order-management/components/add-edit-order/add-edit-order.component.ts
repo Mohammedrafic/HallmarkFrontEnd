@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   ClearPredefinedBillRates,
   EditOrder,
+  GetParentOrderById,
   GetPredefinedBillRates,
   SaveOrder,
   SaveOrderSucceeded,
@@ -36,6 +37,8 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { OrderJobDistribution } from '@shared/enums/job-distibution';
 import {
+  ERROR_CAN_NOT_Edit_OpenPositions,
+  ExtensionStartDateValidation,
   JOB_DISTRIBUTION_TITLE,
   ORDER_DISTRIBUTED_TO_ALL,
   PROCEED_FOR_ALL_AGENCY,
@@ -43,8 +46,14 @@ import {
 } from '@shared/constants';
 import { OrderCredentialsService } from "@client/order-management/services";
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage, IsStartEndDateOverlapWithInactivePeriod } from '@core/helpers';
+import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage, IsStartEndDateOverlapWithInactivePeriod }
+  from '@core/helpers';
 import { FieldName } from '@client/order-management/enums';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ShowToast } from 'src/app/store/app.actions';
+import { ValidationCredentialOption, ValidationExistenceCredential }
+  from '@order-credentials/constants/credential-message.constant';
+
 
 enum SelectedTab {
   OrderDetails,
@@ -74,6 +83,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
 
+  @Select(OrderManagementContentState.selectedParentOrder)
+  selectedParentOrder$: Observable<Order>;
+
   @Select(OrderManagementContentState.getPredefinedBillRatesData)
   getPredefinedBillRatesData$: Observable<GetPredefinedBillRatesData | null>;
 
@@ -98,6 +110,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private manuallyAddedBillRates: BillRate[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private order: Order;
+  public parentOrder: Order;
+  public startDate: Date;
 
   public isPerDiem = false;
   public isPermPlacementOrder = false;
@@ -156,6 +170,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
           this.removeMenuItem(SubmitButtonItem.SaveForLater);
         }
+        if(order?.extensionFromId != null){
+          this.store.dispatch(new GetParentOrderById(order?.extensionFromId))
+        }
+      });
+
+      this.selectedParentOrder$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((parentOrder: Order) => {
+        this.parentOrder = parentOrder;
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
@@ -314,10 +335,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
   }
 
-  private showCredentialsValidationMessage(): void {
+  private showCredentialsValidationMessage(credentialState: boolean): void {
+    const message = credentialState
+      ? ValidationCredentialOption
+      : ValidationExistenceCredential;
+
     ToastUtility.show({
       title: 'Error',
-      content: 'Please add Credentials in Credentials tab',
+      content: message,
       position: { X: 'Center', Y: 'Top' },
       cssClass: 'error-toast',
     });
@@ -690,10 +715,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private saveForLater(): void {
     const titleControl = this.orderDetailsFormComponent.orderTypeForm.controls['title'];
     const workLocationForm = this.orderDetailsFormComponent.workLocationForm;
+    const hasSelectedCredentialFlag = this.orderCredentialsService.hasSelectedCredentialFlags(this.orderCredentials);
 
     if (titleControl.invalid) {
       titleControl.markAsTouched();
       this.showOrderFormValidationMessage(FieldName.title);
+      return;
+    }
+
+    if (!this.orderCredentials?.length || !hasSelectedCredentialFlag) {
+      this.showCredentialsValidationMessage(!!this.orderCredentials?.length && !hasSelectedCredentialFlag);
       return;
     }
 
@@ -727,13 +758,20 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         takeUntil(this.unsubscribe$)
       )
       .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
-        if (this.orderDetailsFormComponent.isEditMode) {
+        if (!this.orderDetailsFormComponent.isEditMode) {
+          this.orderCredentials = predefinedCredentials;
+          this.cd.detectChanges();
+          return;
+        }
+
+        const departmentChanged = this.orderDetailsFormComponent?.generalInformationForm.get('departmentId')?.touched;
+        const skillChanged = this.orderDetailsFormComponent?.generalInformationForm.get('skillId')?.touched;
+
+        if (this.orderDetailsFormComponent.isEditMode && (departmentChanged || skillChanged)) {
           const credentials = this.orderCredentials.filter(cred => !cred.isPredefined);
           this.orderCredentials = unionBy('credentialId', credentials, predefinedCredentials);
-        } else {
-          this.orderCredentials = predefinedCredentials;
+          this.cd.detectChanges();
         }
-        this.cd.detectChanges();
       });
   }
 
@@ -749,7 +787,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
             .getRawValue()
             .filter((billrate) => !billrate.isPredefined);
         }
-        
+
         this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
         this.cd.detectChanges();
       });
@@ -760,18 +798,23 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private saveAsTemplate(): void {
-    const { regionId, locationId, departmentId, skillId } =
+    const { regionId, locationId, departmentId, skillId, credentials } =
       this.orderDetailsFormComponent.generalInformationForm.getRawValue();
-    const requiredFields = [regionId, locationId, departmentId, skillId];
+    const requiredFields = [regionId, locationId, departmentId, skillId, credentials];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
-
-    if (isRequiredFieldsFilled) {
+    const hasSelectedCredentialFlag = this.orderCredentialsService.hasSelectedCredentialFlags(this.orderCredentials);
+    
+    if (isRequiredFieldsFilled && hasSelectedCredentialFlag) {
       this.isSaveForTemplate = true;
     } else {
       this.markControlsAsRequired();
       const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId];
       const invalidFields = fields.filter((field, i) => !requiredFields[i]).join(',\n');
       this.showOrderFormValidationMessage(invalidFields);
+
+      if (!this.orderCredentials?.length || !hasSelectedCredentialFlag) {
+        this.showCredentialsValidationMessage(!!this.orderCredentials?.length && !hasSelectedCredentialFlag);
+      }
     }
   }
 
@@ -799,6 +842,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderBillRates.some((item: BillRate) => item.billRateConfigId === 1);
     const billRatesValid = isRegularBillRate || this.isPerDiem || this.isPermPlacementOrder;
     const credentialsValid = this.orderCredentials?.length;
+    const hasSelectedCredentialFlag = this.orderCredentialsService.hasSelectedCredentialFlags(this.orderCredentials);
     const orderValid =
       (this.orderDetailsFormComponent.orderTypeForm.disabled || this.orderDetailsFormComponent.orderTypeForm.valid) &&
       this.orderDetailsFormComponent.generalInformationForm.valid &&
@@ -811,19 +855,39 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!billRatesValid) {
       this.showBillRatesValidationMessage();
     }
-    if (!credentialsValid) {
-      this.showCredentialsValidationMessage();
+
+    if (!credentialsValid || !hasSelectedCredentialFlag) {
+      this.showCredentialsValidationMessage(!!credentialsValid && !hasSelectedCredentialFlag);
     }
+
     if (!orderValid) {
       this.showOrderFormValidationMessage();
       this.showInvalidValueMessage();
     }
 
-    if (orderValid && billRatesValid && credentialsValid) {
+    if(this.orderDetailsFormComponent.isEditMode && this.order.disableNumberOfOpenPositions && this.order.openPositions != this.orderDetailsFormComponent.generalInformationForm.getRawValue().openPositions){
+      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
+      return;
+    }
+
+    if (orderValid && billRatesValid && credentialsValid && hasSelectedCredentialFlag) {
 
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
-
+      
+      if(this.orderDetailsFormComponent.isEditMode && this.order?.extensionFromId != null){
+        let positionOrder = this.parentOrder?.candidates?.find((current) => current.id == this.order?.candidates?.[0].id);
+        if(positionOrder && positionOrder?.actualEndDate){
+          this.startDate = order.jobStartDate;
+          let parentOrderEndDate = new Date(positionOrder?.actualEndDate);
+          let twoWeekDate = new Date(parentOrderEndDate.setDate(parentOrderEndDate.getDate() + 14));
+          if(this.startDate && this.startDate > twoWeekDate ){
+              this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
+              return;
+           }
+        }
+      }
+      
       const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
       if (this.needToShowConfirmPopup(order, hourlyRate)) {
         this.showConfirmPopupForZeroRate(order, documents);

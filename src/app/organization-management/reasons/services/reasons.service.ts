@@ -181,7 +181,7 @@ export class ReasonsService {
         const payload = params.editMode ? this.createUpdateReasonPayload(params) : this.createNewReasonPayload(params);
         this.store.dispatch(new Action(payload));
       }
-    } else if (params.selectedTab === ReasonsNavigationTabs.RecuriterReason) {
+    } else if (params.selectedTab === ReasonsNavigationTabs.RecruiterReason) {
       const value = params.formValue as CategoryNoteValue;
       if (value.id != undefined || null) {
         this.store.dispatch(new UpdateRecuriterReasons({

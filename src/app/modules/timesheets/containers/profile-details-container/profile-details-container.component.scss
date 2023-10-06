@@ -1,17 +1,21 @@
-@import "colors";
-@import "mixins";
-@import "adaptive-response";
+@import 'colors';
+@import 'mixins';
+@import 'adaptive-response';
 
 $chip-margin: 8px;
+.main-body{
+  display: flex;
+  clear: both;
+}
 
 .header-container {
   position: sticky;
   top: 0;
   z-index: 3;
   padding:24px 24px 20px 24px;
-  background-color: $white;
-  box-shadow: 0px 4px 4px -3px $secondary-black-25;
-  border-bottom: 1px solid $secondary-dark-blue-45;
+  background-color: var(--bg-default);
+  box-shadow: 0px 4px 4px -3px var(--shadow);
+  border-bottom: 1px solid var(--header-border);
 }
 
 .content-container {
@@ -25,6 +29,7 @@ $chip-margin: 8px;
 }
 
 .profile-table-container {
+  margin-top: 20px;
   padding-bottom: 0;
 
   ::ng-deep {
@@ -52,11 +57,13 @@ $chip-margin: 8px;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   &__info {
     display: flex;
     align-items: center;
+    margin-right: 20px;
 
     .e-avatar {
       margin-right: 16px;
@@ -333,4 +340,38 @@ app-navigation-panel {
       padding-top: 6px;
     }
   }
+}
+
+.w-100{
+  width: 100%;
+}
+.w-50{
+  width: 50%;
+  // float: left;
+}
+.w-60{
+  width: 60%;
+}
+.w-40{
+  width: 40%;
+}
+.job-general-scroll{
+  width: auto;
+  overflow: scroll;
+}
+.preview-content-container{
+  max-height: 51.5vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.closeButton{
+  position: absolute;
+  right: 30px;
+  top: 35px;
+}
+
+.comments {
+  margin-top: 12px;
+  overflow: auto;
 }

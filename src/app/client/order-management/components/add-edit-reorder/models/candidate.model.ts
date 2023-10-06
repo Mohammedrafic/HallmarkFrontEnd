@@ -7,6 +7,8 @@ export interface CandidateModel {
   id: number;
   name: string;
   hasActiveCandidate?: boolean;
+  actualEndDate?: string | null;
+  actualStartDate?: string | null;
 }
 
 export interface AgencyModel {

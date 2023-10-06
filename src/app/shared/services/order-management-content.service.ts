@@ -96,8 +96,12 @@ export class OrderManagementContentService {
    * Get the orders
    @param payload filter with details we need to get
    */
-  public getOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
-    return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
+   public getOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
+      return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
+  }
+
+  public getIRPTemplates(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
+      return this.http.post<OrderManagementPage>(`/api/IRPOrders/filtered`, payload);
   }
 
     /**
@@ -380,8 +384,8 @@ export class OrderManagementContentService {
     return this.http.post<Blob[]>(`/api/IRPOrders/documents`, formData) as Observable<Blob[]>;
   }
 
-  public editIrpOrder(order: EditOrderDto): Observable<Order[]> {
-    return this.http.put<Order[]>('/api/IRPOrders', this.changeDateToUtc(order));
+  public editIrpOrder(order: EditOrderDto): Observable<Order> {
+    return this.http.put<Order>('/api/IRPOrders', this.changeDateToUtc(order));
   }
 
   /**

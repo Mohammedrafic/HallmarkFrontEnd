@@ -11,6 +11,7 @@ import {
   RecuriterReasonPage,
   RejectReason, RejectReasonPage, RejectReasonwithSystem, SourcingReasonPage, UnavailabilityPaging, UnavailabilityReasons,
 } from '@shared/models/reject-reason.model';
+import { GetSourcingConfigModel } from '@shared/models/organization.model';
 
 /**
  * TODO: provide service in modules instead of root.
@@ -367,5 +368,9 @@ export class RejectReasonService {
    */
   public getSourcingReasonsByPage(pageNumber: number, pageSize: number): Observable<SourcingReasonPage> {
     return this.http.get<SourcingReasonPage>(`/api/Sourcing?PageNumber=${pageNumber}&PageSize=${pageSize}`);
+  }
+
+  public GetSourcingConfig(payload?:any): Observable<GetSourcingConfigModel> {
+    return this.http.post<any>(`/api/Employee/getSourcingConfig`,payload);
   }
 }

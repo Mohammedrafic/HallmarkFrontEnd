@@ -12,13 +12,15 @@ export enum OrderManagementIRPTabs {
   PerDiem = 'Per Diem',
   LTA = 'LTA',
   Incomplete = 'Incomplete',
+  OrderTemplates = 'Order Templates',
 }
 
 export enum OrderManagementIRPTabsIndex {
   AllOrders,
   PerDiem,
   Lta,
-  Incomplete
+  Incomplete,
+  OrderTemplates
 }
 
 export enum OrderManagementIRPSystemId {
@@ -41,4 +43,9 @@ export const orderLockList: { name: string; id: any }[] = [
   { name: 'All', id: 'all' },
   { name: 'Locked', id: 'true' },
   { name: 'Unlocked', id: 'false' }
+];
+export const orderDistributionList: { name: string; id: any }[] = [
+  { name: 'All', id: 0 },
+  { name: 'VMS and IRP', id: 1 },
+  { name: 'VMS only', id: 2 }
 ];

@@ -10,9 +10,10 @@ import { AgencyStatus } from 'src/app/shared/enums/status';
 import { agencyStatusCreationOptions, agencyStatusOptions } from '../../agency-list.constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { AgencyConfig, AgencyStatusesModel } from "@shared/models/agency.model";
-import { ALPHANUMERIC } from '@shared/constants';
+import { ONLY_NUMBER, TaxIdValidationMessage } from '@shared/constants';
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
+import { patternMessageValidator } from '@shared/validators/pattern-message.validator';
 
 @Component({
   selector: 'app-general-info-group',
@@ -21,7 +22,7 @@ import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
 })
 export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
-  @Input() public agencyConfig: AgencyConfig
+  @Input() public agencyConfig: AgencyConfig;
 
   @Output() private mspCheckboxEmitter: EventEmitter<boolean> = new EventEmitter();
 
@@ -55,6 +56,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       ?.valueChanges.pipe(takeWhile(() => this.isAlive))
       .subscribe((value) => {
         const statesValue = value === Country.USA ? UsaStates : CanadaStates;
+        this.formGroup.get('state')?.reset();
         this.states$.next(statesValue);
       });
   }
@@ -73,7 +75,11 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
     return new FormGroup({
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       externalId: new FormControl('', [Validators.maxLength(10)]),
-      taxId: new FormControl('', [Validators.required, Validators.minLength(9), Validators.pattern(ALPHANUMERIC)]),
+      taxId: new FormControl('', [
+        Validators.required,
+        Validators.minLength(9),
+        patternMessageValidator(ONLY_NUMBER, TaxIdValidationMessage),
+      ]),
       baseFee: new FormControl(''),
       addressLine1: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       addressLine2: new FormControl('', [Validators.maxLength(100)]),
@@ -86,7 +92,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       fax: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       status: new FormControl(AgencyStatus.InProgress, [Validators.required]),
       website: new FormControl(''),
-      netSuiteId: new FormControl(''),
+      netSuiteId: new FormControl({value: '', disabled: true}),
     });
   }
 

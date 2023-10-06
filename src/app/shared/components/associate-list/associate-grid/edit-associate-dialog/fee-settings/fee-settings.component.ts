@@ -33,6 +33,7 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   @Input() areAgencyActionsAllowed: boolean;
   @Input() editAgencyOrg: AssociateOrganizationsAgency;
   @Input() userPermission: Permission;
+  @Input() isAgency: boolean;
 
   public openAddNewFeeDialog = new Subject<number>();
   public readonly userPermissions = UserPermissions;
@@ -130,6 +131,7 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
 
   private subscribeOnIdChanges(): void {
     this.form.get('id')?.valueChanges.pipe(
+      filter((id) => id !== null),
       takeUntil(this.componentDestroy())
     ).subscribe((organizationAgencyId) => {
       this.organizationAgencyId = organizationAgencyId;

@@ -1,24 +1,22 @@
 <h2 class="title">General Info</h2>
 <form class="general-info__form">
-  <div class="two-controls">
     <app-input
-      [formGroupInstance]="candidateForm"
-      [required]="employeeIdRequired"
-      maxlength="25"
-      controlName="employeeId"
-      id="employeeId"
-      label="Employee ID"
-    ></app-input>
+    [formGroupInstance]="candidateForm"
+    [required]="employeeIdRequired"
+    maxlength="25"
+    controlName="employeeId"
+    id="employeeId"
+    label="Employee ID"
+  ></app-input>
 
-    <app-input
-      [formGroupInstance]="candidateForm"
-      [required]="true"
-      maxlength="50"
-      controlName="firstName"
-      id="first-name"
-      label="First Name"
-    ></app-input>
-  </div>
+  <app-input
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    maxlength="50"
+    controlName="firstName"
+    id="first-name"
+    label="First Name"
+  ></app-input>
 
   <app-input
     [formGroupInstance]="candidateForm"
@@ -116,6 +114,7 @@
   <app-datepicker
     *ngIf="isOnHoldSelected"
     [formGroupInstance]="candidateForm"
+    [min]="minEndDate"
     id="hold-end-date"
     controlName="holdEndDate"
     label="On Hold End Date"

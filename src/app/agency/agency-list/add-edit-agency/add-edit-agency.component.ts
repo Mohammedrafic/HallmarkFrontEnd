@@ -46,6 +46,7 @@ import {
 import { JobDistributionComponent } from '@agency/agency-list/add-edit-agency/job-distribution/job-distribution.component';
 import { AgencyStatus } from '@shared/enums/status';
 import { AbstractPermission } from '@shared/helpers/permissions';
+import { AppState } from 'src/app/store/app.state';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -120,6 +121,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   private agencyId: number | null = null;
   private isRemoveLogo: boolean = false;
   private fetchedAgency: Agency;
+  private isEdit = false;
 
   constructor(
     protected override store: Store,
@@ -130,7 +132,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     private confirmService: ConfirmService 
   ) {
     super(store);
-    this.store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'briefcase' }));
+    this.isEdit = !!this.route.snapshot.paramMap.get('id');
     this.store.dispatch(new GetBusinessUnitList());
   }
 
@@ -142,6 +144,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     this.enableCreateUnderControl();
     this.getAgencyRegionsSkills();
     this.getActiveUser();
+    this.setHeaderTitle();
 
     this.actions$
       .pipe(
@@ -181,7 +184,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
         this.logo = logo.payload;
       });
 
-    if (this.route.snapshot.paramMap.get('id')) {
+    if (this.isEdit) {
       this.agencyConfig.isEditMode = true;
       this.title = 'Edit';
       this.store.dispatch(new GetAgencyById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
@@ -412,5 +415,18 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       parentBusinessUnitControl?.reset();
       parentBusinessUnitControl?.enable();
     }
+  }
+
+  private setHeaderTitle(): void {
+    const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
+    let title = 'Agency Profile';
+
+    if (this.isEdit && isMobile) {
+      title = 'Edit Agency' + this.activeUser.businessUnitName;
+    } else if (!this.isEdit && isMobile) {
+      title = 'Add Agency';
+    }
+
+    this.store.dispatch(new SetHeaderState({ title, iconName: 'briefcase' }));
   }
 }

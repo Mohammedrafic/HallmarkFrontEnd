@@ -75,6 +75,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { OnboardCandidateMessageDialogComponent } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -140,6 +141,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
+  public canEditStartEndDate = false;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public payRateSetting = CandidatePayRateSettings;
   public readonly reorderType: OrderType = OrderType.ReOrder;
@@ -208,7 +210,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     private commentsService: CommentsService,
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private orderManagementService: OrderManagementService,
   ) {
     super();
     this.createForm();
@@ -412,6 +415,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         takeUntil(this.unsubscribe$),
       )
       .subscribe((isConfirm) => {
+        // Mark form to prevent showing leave confirm message after saving changes
+        this.form.markAsPristine();
+
         if (isConfirm) {
           this.onboardEmailTemplateForm.rteCreated();
           this.onboardEmailTemplateForm.disableControls(true);
@@ -493,7 +499,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           if (!this.isAgency) {
             this.getOrderPermissions(value.orderId);
           }
-          this.billRatesData = [...value?.billRates];
+          this.billRatesData = [...value.billRates];
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
@@ -504,11 +510,14 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             jobEndDate: value.order.jobEndDate,
           }).toString();
 
+          const regularRates = this.orderManagementService.setRegularRates(this.billRatesData, value.order.jobStartDate);
+          const billRate = regularRates.regular || regularRates.regularLocal || value.order.hourlyRate;
+
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
             date: [DateTimeHelper.setCurrentTimeZone(actualStart),
               DateTimeHelper.setCurrentTimeZone(actualEnd)],
-            billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
+            billRates: billRate && PriceUtils.formatNumbers(billRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
             locationName: value.order.locationName,
@@ -615,6 +624,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.canOffer = false;
     this.canOnboard = false;
     this.canClose = false;
+    this.canEditStartEndDate = false;
     this.orderPermissions.forEach((permission) => {
       this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
       this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
@@ -622,6 +632,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
       this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
       this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
+      this.canEditStartEndDate = permission.permissionId === PermissionTypes.EditClosedPositionActualDates;
     });
     this.disableControlsBasedOnPermissions();
     this.changeDetectorRef.detectChanges();
@@ -658,7 +669,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.form.controls['allow'].enable();
     }
 
-    this.disableDatesForClosedPostition();
+    this.disableDatesForClosedPosition();
   }
 
   onGroupEmailAddCancel(){
@@ -786,10 +797,24 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     );
   }
 
-  private disableDatesForClosedPostition(): void {
-    if (this.candidateJob?.closeDate) {
-      this.form.get('startDate')?.disable();
-      this.form.get('endDate')?.disable();
+  private disableDatesForClosedPosition(): void {
+    if (!this.candidateJob?.closeDate) {
+      return;
+    }
+
+    const startDateControl = this.form.get('startDate');
+    const endDateControl = this.form.get('endDate');
+
+    if (
+      this.canEditStartEndDate
+      && this.candidateJob.applicantStatus?.applicantStatus === CandidatStatus.Offboard
+      && this.order?.orderType === OrderType.LongTermAssignment
+    ) {
+      startDateControl?.enable();
+      endDateControl?.enable();
+    } else {
+      startDateControl?.disable();
+      endDateControl?.disable();
     }
   }
 

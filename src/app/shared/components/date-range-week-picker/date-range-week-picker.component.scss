@@ -8,7 +8,7 @@
 
     .e-day {
       background-color: $primary-active-blue !important;
-      color: $white !important;
+      color: var(--selected-date-range-color) !important;
       font-weight: 700 !important;
     }
   }
@@ -35,6 +35,27 @@
       &.e-icons {
         background-color: $white !important;
       }
+    }
+  }
+
+  button.e-apply.e-flat.e-primary.e-css.e-lib.e-btn.e-control.e-keyboard {
+    color: $white !important;
+    background-color: $primary-active-blue-10;
+
+    &:disabled {
+      background-color: $primary-active-blue-70;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: $primary-active-blue-20;
+    }
+
+    &:active {
+      background-color: $primary-active-blue;
+    }
+
+    &:focus {
+      border: 1px solid $primary-active-blue;
     }
   }
 }

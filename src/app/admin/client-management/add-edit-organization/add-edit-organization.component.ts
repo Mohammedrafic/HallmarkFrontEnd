@@ -110,6 +110,9 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
   @Select(AdminState.dataBaseConnections)
   dataBaseConnections$: Observable<string[]>;
 
+  @Select(AppState.isSidebarOpened)
+  isSidebarOpened$:Observable<boolean>;
+
   get isAddMode(): boolean {
     return this.title === 'Add';
   }
@@ -311,10 +314,12 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
   }
 
   public onGeneralCountryChange(event: ChangeEventArgs): void {
+    this.GeneralInformationFormGroup.get('state')?.reset();
     this.store.dispatch(new SetGeneralStatesByCountry(event.value as Country));
   }
 
   public onBillingCountryChange(event: ChangeEventArgs): void {
+    this.BillingDetailsFormGroup.get('state')?.reset();
     this.store.dispatch(new SetBillingStatesByCountry(event.value as Country));
   }
 

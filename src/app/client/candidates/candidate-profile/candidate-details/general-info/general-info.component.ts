@@ -33,6 +33,7 @@ import { DateTimeHelper } from '@core/helpers';
 export class GeneralInfoComponent extends AbstractContactDetails implements OnInit, OnDestroy {
   public isOnHoldSelected: boolean;
   public isTerminatedSelected: boolean;
+  public minEndDate = new Date(new Date().setHours(0, 0, 0, 0));
   fieldsSettingsTeminated: FieldSettingsModel = { text: 'reason', value: 'id' };
   currentPage = 1;
   pageSize = 100;
@@ -73,6 +74,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   public override ngOnInit(): void {
     let Status =[ProfileStatusesEnum.Sourcing,ProfileStatusesEnum.Prospect,ProfileStatusesEnum.Onboarding,ProfileStatusesEnum.ClearedForOrientation,ProfileStatusesEnum.OrientationScheduled,ProfileStatusesEnum.DoNotHire,ProfileStatusesEnum.FallOffOnboarding,ProfileStatusesEnum.VerbalOfferMade]
     this.profileStatuses = this.profileStatuses.filter(f => !Status.includes(f.id));
+    this.profileStatuses =this.profileStatuses.sort((a, b) => a.name.localeCompare(b.name))
     super.ngOnInit();
     this.listenProfileStatusChanges();
     this.listenSkillsChanges();
@@ -106,6 +108,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
 
       if (this.isSourceValidated) {
         this.profileStatuses = ProfileStatuses
+        this.profileStatuses =this.profileStatuses.sort((a, b) => a.name.localeCompare(b.name))
       }
 
       this.cdr.markForCheck();
@@ -245,6 +248,8 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.candidateForm.get('employeeId')?.addValidators(Validators.required);
     this.candidateForm.get('hireDate')?.addValidators(Validators.required);
     this.candidateForm.get('employeeSourceId')?.removeValidators(Validators.required);
+    this.candidateForm.get('employeeId')?.updateValueAndValidity();
+    this.candidateForm.get('employeeSourceId')?.updateValueAndValidity();
     this.employeeIdRequired = true;
     this.sourceIdUpdateListener$?.unsubscribe();
     this.isTerminatedSelected = false;

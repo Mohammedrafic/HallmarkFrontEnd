@@ -1,6 +1,6 @@
-@import '../variables/mixins';
-@import '../../styles/variables/colors';
-@import "adaptive-response";
+@import 'mixins';
+@import 'colors';
+@import 'adaptive-response';
 
 $grid-border-radius: 10px;
 $grid-box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
@@ -115,8 +115,8 @@ body.dark {
 
           .e-emptyrow {
             height: 100%;
-            position: absolute;
             width: 100%;
+            position: absolute;
             display: flex;
             justify-content: center;
 
@@ -125,11 +125,9 @@ body.dark {
               color: $secondary-dark-blue-30;
               font-size: 14px;
               padding-top: 25px;
-
-              @media #{$max-mobile} {
-                position: absolute;
-                left: 40px;
-              }
+              position: fixed;
+              display: flex;
+              justify-content: center;
             }
 
             .e-lastrowcell, td {
@@ -626,6 +624,31 @@ body.dark {
       .e-table {
         .e-emptyrow {
           background-color: $sidebar-background !important;
+        }
+      }
+    }
+
+    .e-gridchkbox,
+    .e-headercell {
+      .e-checkbox-wrapper {
+        vertical-align: middle;
+
+        &:hover .e-frame {
+          border-color: $primary-active-blue-10;
+        }
+
+        .e-frame {
+          border-color: $secondary-dark-blue-40;
+
+          &.e-check {
+            background-color: $primary-active-blue-10 !important;
+            color: $white !important;
+            border-color: $white;
+          }
+
+          &.e-check::before {
+            line-height: 13px;
+          }
         }
       }
     }

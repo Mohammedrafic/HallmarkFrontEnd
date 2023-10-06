@@ -230,11 +230,11 @@ export class DashboardState {
   @Action(GetAllCommitmentByPage)
   GetAllCommitmentByPage(
     { patchState }: StateContext<DashboardStateModel>,
-    {  }: GetAllCommitmentByPage
+    { payload }: GetAllCommitmentByPage
   ): Observable<GetWorkCommitment[]> {
     //patchState({ isCommitmentLoading: true });
 
-    return this.dashboardService.getAllMasterCommitments().pipe(
+    return this.dashboardService.getAllMasterCommitments(payload).pipe(
       tap((payload:GetWorkCommitment[]) => {
         patchState({commitmentsPage: payload});
       })
@@ -244,9 +244,9 @@ export class DashboardState {
   @Action(GetSkilldata)
   GetSkilldata(
     { patchState }: StateContext<DashboardStateModel>,
-    {  }: GetSkilldata
+    { payload }: GetSkilldata
   ): Observable<GetWorkCommitment[]> {
-    return this.dashboardService.getSkills().pipe(
+    return this.dashboardService.getSkills(payload).pipe(
       tap((payload:GetWorkCommitment[]) => {
         patchState({nursingSkill: payload});
       })

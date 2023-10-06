@@ -556,20 +556,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       }
     });
     this.action$.pipe(ofActionDispatched(SaveLocationConfirm), takeUntil(this.componentDestroy())).subscribe(() => {
-      this.confirmService
-      .confirm('Location has active orders past the inactivation date. Do you want to proceed?', {
-        title: 'Confirmation',
-        okButtonLabel: 'Yes',
-        cancelButtonLabel: 'No',
-        okButtonClass: 'delete-button',
-      })
-      .pipe(
-        filter(Boolean),
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe(() => {
         this.saveLocation(true);
-      });
     });
   }
 
@@ -581,7 +568,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     )
     .subscribe((options) => {
       this.filterColumns.externalIds.dataSource = options.externalIds;
-      this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds;
+      this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds.filter((id) => !!id);
       this.filterColumns.names.dataSource = options.locationNames;
       this.filterColumns.addresses1.dataSource = options.addresses1;
       this.filterColumns.cities.dataSource = options.cities;

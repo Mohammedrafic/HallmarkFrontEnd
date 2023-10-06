@@ -3,12 +3,12 @@
 
 .job-info-container {
   display: flex;
-  justify-content: space-between;
   width: 100%;
-
+  flex-wrap: wrap;
+  
   .job-info-section {
     display: flex;
-    margin-right: 25px;
+    margin: 0px 0px 24px 24px;
   }
 
   i-feather {

@@ -618,12 +618,12 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   }
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      if(value == BusinessUnitType.Candidates){
+      if(value == BusinessUnitType.Employee){
         this.store.dispatch(new GetBusinessForEmployeeType());
       } else {
         this.store.dispatch(new GetBusinessByUnitType(value));
       }
-      if (value == 1) {
+      if (value == 1 || (this.userBusinessType == BusinessUnitType.Organization)) {
         this.dispatchNewPage();
       }
     });
@@ -688,7 +688,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     }
 
     if(this.activeSystem == OrderManagementIRPSystemId.VMS){
-      this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.Candidates);
+      this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.Employee);
       this.businessUnitControl.patchValue(user?.businessUnitType);
     }
   }

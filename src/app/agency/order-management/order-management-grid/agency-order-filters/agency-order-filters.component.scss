@@ -1,5 +1,5 @@
-@import "colors";
-@import "adaptive-response";
+@import 'colors';
+@import 'adaptive-response';
 
 .input-group {
   margin-top: 5px;
@@ -43,10 +43,14 @@
   text-indent: 0;
 
   &_parent {
- font-size: 12px;
-    color: $secondary-dark-blue-20;
+    font-size: 12px;
+    color: var(--sub-title-4);
     position: absolute;
     left: 0;
     top: 20px;
+
+    &:hover {
+      color: $bg-gray-200;
+    }
   }
 }

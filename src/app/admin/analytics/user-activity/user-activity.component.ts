@@ -126,7 +126,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       filter: true,
       sortable: true,
       resizable: true,
-      valueFormatter: params => (params.value ? 'Active' : 'Inactive'),
+      valueFormatter: params => (params.value ? 'Inactive' : 'Active'),
     },
     {
       headerName: 'User IP',
@@ -231,6 +231,14 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
+    {
+      headerName: 'Message',
+      field: 'message',
+      minWidth: 250,
+      filter: true,
+      sortable: true,
+      resizable: true
+    },
  
 
 
@@ -280,6 +288,9 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
     startDate.setDate(startDate.getDate() - 7);
     this.userActivityForm.controls['startDate'].setValue(startDate);
     this.userActivityForm.controls['endDate'].setValue(new Date(Date.now()));
+    this.userActivityForm.controls['userName'].setValue(this.userData[0]?.id);
+
+
   }
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));

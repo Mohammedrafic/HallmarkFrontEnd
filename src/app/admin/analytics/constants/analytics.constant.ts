@@ -47,7 +47,8 @@ export const VendorScorecardReportConstants = {
     StartDate: 'startDate',
     EndDate: 'endDate',
     OrderTypes: 'orderTypes',
-    SkillIds: 'skillIds'
+    SkillIds: 'skillIds',
+    ExcludeInactiveAgency: 'excludeInactiveAgency',
   }
 }
 
@@ -79,6 +80,21 @@ export const ytdSummaryConstants = {
     Month: 'month',
   }
 }
+
+export const ytdReportConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    //DepartmentIds: 'departmentIds',
+    //SkillCategoryIds: 'skillCategoryIds',
+    //SkillIds: 'skillIds',
+    Year: 'year',
+    Month: 'month'
+    //SearchBy:'searchby'
+  }
+}
+
 
 export const vmsInvoiceConstants = {
   formControlNames: {
@@ -295,6 +311,13 @@ export const ageGroups: { name: string; id: number }[] = [
   {name:"Above 90",id:5}
 
 ];
+
+//export const YTDReportSearchBy: { name: string; id: number }[] = [
+//  { name: 'By Month', id: 1 },
+//  { name: 'By Location', id: 2 }
+  
+//];
+
 
 export type Year = {
   id: number;

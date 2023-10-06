@@ -1,6 +1,11 @@
 @import 'colors';
 @import 'adaptive-response';
 
+:host {
+  height: 100%;
+  display: block;
+}
+
 .right-container {
   justify-content: flex-end;
 

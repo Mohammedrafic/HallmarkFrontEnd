@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, takeUntil, take } from 'rxjs';
 
 import {
   ExportAgencyList,
@@ -24,6 +24,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { agencyListFilterColumns, agencyStatusMapper } from '@agency/agency-list/agency-list.constants';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
 
 @Component({
   selector: 'app-agency-list',
@@ -119,15 +120,14 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.grid.hideScroll();
   }
 
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+  public changeGridSize(page: number): void {
+    this.pageSize = page;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+    this.currentPage = 1;
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
+  public changeGridPage(page: number): void {
+    this.pageSubject.next(page);
   }
 
   public getChipCssClass(status: string): string {
@@ -135,20 +135,20 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     return found ? found[0] : 'e-default';
   }
 
-  public onEdit(data: any) {
+  public onEdit(data: Agency) {
     this.router.navigate(['/agency/agency-list/edit', data.agencyDetails.id]);
   }
 
-  public onRemove(data: any) {
+  public onRemove(data: Agency) {
     this.confirmService
-      .confirm('Are you sure you want to inactivate the Agency?', {
+      .confirmActions('Are you sure you want to inactivate the Agency?', {
         okButtonLabel: 'Inactivate',
         okButtonClass: 'delete-button',
         title: 'Inactivate the Agency',
       })
       .pipe(
-        filter((confirm) => !!confirm),
-        takeUntil(this.unsubscribe$),
+        take(1),
+        filter(({action}) => action === ConfirmEventType.YES),
       ).subscribe(() => {
         this.inactivateAgency(data);
       });

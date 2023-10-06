@@ -36,7 +36,7 @@ import type {
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails } from '../models/active-positions-dto.model';
+import { ActivePositionsDto, ActivePositionTypeInfo, OrderStatusesActivePositionsDto, OrderStatusesAvgDetailsInfo, PositionsCountByDayRange, PositionsCountByDayRangeDataset, StatusesAvgDetails,OrdersPendingInCustom,CustomStatusesAvgDetails,OrdersPendingInCustomDataset, AveragedayActivecandidateInfo, ActivePositionsInitiaExtendedDetailsInfo, OrderInitiaExtendeDto } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
@@ -58,8 +58,10 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { OrgDetailsInfoModel } from '../models/org-details-info.model';
 import { AgencyPositionModel } from '../models/agency-position.model';
 import { ExpiryDetailsModel } from '../models/expiry.model';
-import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetWorkCommitment } from '../models/rn-utilization.model';
+import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetSkillsbyByFilters, GetWorkCommitment } from '../models/rn-utilization.model';
 import { AvailableEmployeeModel } from '../models/available-employee.model';
+import { BillRateResponse, SkillCategoryName } from '../models/bill-rate-by-skill-category-response.model';
+import { BillRateBySkillCategoryTypeAggregatedModel } from '../models/bill-rate-by-skill-category-type-aggregated.model';
 
 @Injectable()
 export class DashboardService {
@@ -85,18 +87,23 @@ export class DashboardService {
     [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
     [WidgetTypeEnum.ORG]: (filters: DashboartFilterDto) => this.getOrganizationWidgetdata(filters),
     [WidgetTypeEnum.AGENCY_POSITION_COUNT]: (filters: DashboartFilterDto) => this.getAgencyPositionCount(filters),
-      [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
+    [WidgetTypeEnum.RN_UTILIZATION]: (filters: DashboartFilterDto) => of(null), //Empty loader. Data is loaded in the component due to load order for lookups
     [WidgetTypeEnum.ALREADY_EXPIRED_CREDS]: (filters: DashboartFilterDto) => this.getalreadyExpiredCredentials(filters),
     [WidgetTypeEnum.UPCOMING_EXP_CREDS]: (filters: DashboartFilterDto) => this.getupcomingExpiredCredentials(filters),
     [WidgetTypeEnum.AVAILABLE_EMPLOYEE]: () => this.getAvailableEmployee(),
     [WidgetTypeEnum.CANDIDATES_ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getCandidatesActivePositionsWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE]: (filters: DashboartFilterDto) => this.getPositionsCountByDayRange(filters),
+    [WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED]: (filters: DashboartFilterDto) => this.getActivePositionInitialExtendedWidgetData(filters),
+    [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
+    [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivecandidateStatusWidgetData(filters),
+    [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getSkillCategoryByTypes(filters, timeSelection),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
 
   candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
+  candidatesavgForActivePositions$:BehaviorSubject<AveragedayActivecandidateInfo[]> = new BehaviorSubject<AveragedayActivecandidateInfo[]>([]);
 
   constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
 
@@ -197,7 +204,7 @@ export class DashboardService {
       map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
         return {
           id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS,
-           title: 'Average Days of Active Positions ',
+           title: 'Average Days of Active Positions without Custom Workflow',
            chartData: lodashMapPlain(
             orderStatusesAvgDetails,
             ({ count, statusName,average }: OrderStatusesAvgDetailsInfo, index: number) => ({
@@ -233,7 +240,26 @@ export class DashboardService {
         );
       }
 
-    
+      private getActivePositionInitialExtendedWidgetData(filter: DashboartFilterDto): Observable<any> {
+        return this.httpClient.post<OrderInitiaExtendeDto>(`${this.baseUrl}/ActivePositionsInitiaExtended`, { granulateInProgress: true, ...filter }).pipe(
+          map(({ activePositionsInitiaExtendedDetails }: OrderInitiaExtendeDto) => {
+            return {
+              id: WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED,
+               title: 'Active Positions - Count of Initial & Extended positions',
+               chartData: lodashMapPlain(
+                activePositionsInitiaExtendedDetails,
+                ({ initialPositions, statusName,extendedPositions,totalCount }: ActivePositionsInitiaExtendedDetailsInfo, index: number) => ({
+                  label: statusName,
+                  value: extendedPositions,
+                  average: initialPositions,
+                  totalCount: totalCount,
+                  color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
+                })
+                ),
+              };
+            })
+          );
+        }   
 
   private getApplicantsByRegionWidgetData(
     filters: DashboartFilterDto
@@ -389,7 +415,7 @@ export class DashboardService {
     } else {
       return this.getMonthTimeRanges(5);
     }
-  }
+  }  
 
   private getOrderPositionWidgetData(filter: DashboartFilterDto, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
     return this.httpClient
@@ -461,6 +487,10 @@ export class DashboardService {
   public redirect_to_expiring_credentials(url : string,startDate? : Date,  endDate? : Date, type? : number) : void {
     this.router.navigate([url], { state: { redirectedFromDashboard: true ,startDate: startDate, endDate: endDate, type : type} });
   }
+  public redirectToUrlWithActivePositions(url: string,orderStatus? :number,orderstatustext? : string,candidateStatusId? :string,candidateStatus?:string,xtraCandidateStatus? :string,xtraCandidateStatustext? : string,): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus,status: orderstatustext,candidateStatusId:candidateStatusId,candidateStatus:candidateStatus, xtraCandidateStatus: xtraCandidateStatus,xtraCandidateStatustext: xtraCandidateStatustext} });
+  }
+
   public redirect_to_schedule(url : string, EmpId : Object) : void{
     this.router.navigate([url], { state: { redirectedFromDashboard: true , EmpId : EmpId} });
   }
@@ -542,11 +572,11 @@ export class DashboardService {
       );
   }
 
-  public getAllMasterCommitments(): Observable<GetWorkCommitment[]> {
-    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, { });
+  public getAllMasterCommitments(data : GetSkillsbyByFilters): Observable<GetWorkCommitment[]> {
+    return this.httpClient.post<GetWorkCommitment[]>(`${this.baseUrl}/GetAllWorkcommitment`, data);
   }
-  public getSkills(): Observable<GetWorkCommitment[]> {
-    return this.httpClient.get<GetWorkCommitment[]>(`${this.baseUrl}/GetAllNursingSkills`);
+  public getSkills(data : GetSkillsbyByFilters): Observable<GetWorkCommitment[]> {
+    return this.httpClient.post<GetWorkCommitment[]>(`${this.baseUrl}/GetAllNursingSkills`,data);
   }
 
   public filterNursingWidget(data : GetNursingUtilizationbyByFilters): Observable<GetNursingWidgetData> {
@@ -562,22 +592,41 @@ export class DashboardService {
       map(({ orderStatusesAvgDetails }: PositionsCountByDayRange) => {
         return {
           id: WidgetTypeEnum.POSITIONS_COUNT_DAY_RANGE,
-          title: 'Count Of Positions By Day Range',
+          title: 'Active Positions by Open Day Range',
           chartData: lodashMapPlain(
             orderStatusesAvgDetails,
             ({ count3Positions,count7Positions,count15Positions,count30PlusPositions,count30Positions,totalCount, statusName }: StatusesAvgDetails, index: number) => ({
-              label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
+              label: statusName,
               value: totalCount,
               count30: count30Positions,
               count30Plus: count30PlusPositions,
               count15: count15Positions,
               count7: count7Positions,
               count3: count3Positions,
+              color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
             })
           ),
         };
       }))
   }
+
+  public getOrdersPendingInCustomStatus(filter: DashboartFilterDto): Observable<OrdersPendingInCustomDataset>{
+    return this.httpClient.post<any>(`${this.baseUrl}/GetOrderPendingForApproval`, { ...filter }).pipe(
+      map(({ orderPendingApprovalCustom }: OrdersPendingInCustom) => {
+        return {
+          id: WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM,
+          title: 'Orders Pending for Approval',
+          chartData: lodashMapPlain(
+            orderPendingApprovalCustom,
+            ({ customStatus,initialOrderDtos,extensionOrderDtos }: CustomStatusesAvgDetails, index: number) => ({
+              customStatus: customStatus,
+              initialOrderDtos: initialOrderDtos,
+              extensionOrderDtos: extensionOrderDtos,
+            })
+          )
+        };
+      }))
+    }
 
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
     return this.candidatesForActivePositions$.asObservable();
@@ -587,5 +636,61 @@ export class DashboardService {
     return  this.candidatesOverallStatus$.asObservable();
   }
 
+  
+  private getAvergaeDayActivecandidateStatusWidgetData(filter: DashboartFilterDto): Observable<any> {
+    return this.httpClient.post<AveragedayActivecandidateInfo[]>(`${this.baseUrl}/GetAverageDaysforActiveCandidatesInStatus`, { ...filter }).pipe(
+      map((candidatesInfo: AveragedayActivecandidateInfo[]) => {
+         this.candidatesavgForActivePositions$.next(candidatesInfo);
+        return {
+          id: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS,
+           title: 'Average Days for Active Candidates in a Status',
+          chartData: lodashMapPlain(candidatesInfo, ({ count, status,averageDays }: AveragedayActivecandidateInfo, index: number) => ({
+            label: status,
+            value: Number(averageDays.toFixed(1)),
+            average: count,
+            color: candidateLegendPalette[status as CandidateChartStatuses] ||
+            candidateLegendPalette[CandidateChartStatuses.CUSTOM],
+          })),
+        };
+      })
+    );
+    } 
+
+    private getSkillCategoryByTypes(filter: DashboartFilterDto, timeSelection: TimeSelectionEnum): Observable<BillRateBySkillCategoryTypeAggregatedModel> {
+      const timeRanges = this.getLastSixMonthTimeRanges();    
+      var data = this.httpClient      
+        .post<BillRateResponse>(`${this.baseUrl}/GetAverageBillRateBySkillCategory`, { ...timeRanges, ...filter, rangeType: timeSelection})     
+        .pipe(
+          map((positions: BillRateResponse) => {             
+            let obj: any = {}           
+            var keysOfData = Object.keys(positions.data[0]);            
+            keysOfData.forEach((eachVAlue, index) => {              
+              if (eachVAlue) {                
+                var objValues: any[] = Object.values(positions.data[0])[index];
+                var formattedValue = objValues.map(a => ({
+                  month: MONTHS[a.dateIndex],
+                  value: a.value
+                }));
+                var objKey = eachVAlue.charAt(0).toUpperCase() + eachVAlue.slice(1);
+                obj[SkillCategoryName(objKey)] = formattedValue;
+              }
+            });       
+            return obj;            
+          }));          
+      return data;
+    } 
+
+    private getLastSixMonthTimeRanges(): ITimeSlice {
+      const date = new Date();
+      const  timeRanges  = this.getLastSixMonthFirstLastMonthDay(new Date(date.setMonth(date.getMonth() - 5)));
+      return { ...timeRanges };
+    }
+
+    private getLastSixMonthFirstLastMonthDay(startDate: Date): ITimeSlice {
+      const today = new Date();
+      const dateFrom = DateTimeHelper.setUtcTimeZone(new Date(new Date(startDate.getFullYear(), startDate.getMonth()-1, 1)));
+      const dateTo =  DateTimeHelper.setUtcTimeZone(new Date(new Date(today.getFullYear(), today.getMonth(), 0)));
+      return { dateFrom, dateTo };
+    }
  
 }

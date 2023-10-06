@@ -26,3 +26,10 @@
     </e-tabitem>
   </e-tabitems>
 </ejs-tab>
+<app-save-template-dialog
+  *ngIf="isSaveForTemplate"
+  [isIRPtab] = "true"
+  [order]="generalInformationForm"
+  (closeEmitter)="closeSaveTemplateDialog()"
+  (createEmitter)="createTemplate($event)"
+></app-save-template-dialog>

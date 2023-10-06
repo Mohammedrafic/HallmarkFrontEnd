@@ -1,0 +1,11 @@
+
+<ng-container *ngIf="cellValue!= 'IRP, VMS'; else bothSystem">
+    <div (click)="onClickSystem(cellValue)">
+        <b>{{cellValue}}</b>
+        </div>
+  </ng-container>
+  <ng-template #bothSystem >
+    <div>
+      <b (click)="onClickSystem('IRP')">IRP,</b>&nbsp;<b (click)="onClickSystem('VMS')">VMS</b>
+    </div>
+  </ng-template>

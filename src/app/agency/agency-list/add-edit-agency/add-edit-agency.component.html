@@ -1,33 +1,21 @@
 <app-page-toolbar>
   <ng-container left>
-    <button *ngIf="!agencyConfig.isAgencyUser" ejs-button cssClass="e-outline" (click)="onBack()">Back</button>
-    <h3>{{ title }} Agency</h3>
+    <section class="button-group">
+      <ng-container [ngTemplateOutlet]="backButton"></ng-container>
+      <h3>{{ title }} Agency {{activeUser.businessUnitName}}</h3>
+    </section>
   </ng-container>
   <ng-container right>
-    <ng-container *ngIf="!isSeccondStepActive">
-      <button [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
-      <app-tooltip-container
-        [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanEditAgencyProfile]">
-        <button
-          ejs-button
-          [disabled]="(activeUser.businessUnitType === businessUnitType.Agency && (activeUser.agencyStatus === agencyStatus.Inactive || activeUser.agencyStatus === agencyStatus.Terminated))|| !userPermission[userPermissions.CanEditAgencyProfile]"
-          [isPrimary]="true"
-          (click)="onSave()">Save</button>
-      </app-tooltip-container>
-    </ng-container>
+    <section class="button-group">
+      <ng-container [ngTemplateOutlet]="buttonSection"></ng-container>
+    </section>
   </ng-container>
 </app-page-toolbar>
 
-<ejs-tab class="stepper" #stepper (created)="onStepperCreated()">
+<ejs-tab class="stepper" #stepper (created)="onStepperCreated()" width="99%">
   <e-tabitems>
     <e-tabitem>
-      <ng-template #headerText>
-        <div class="stepper-header required">
-          <div class="stepper-title">General Info</div>
-          <div class="stepper-sub-title">Overall Agency Info</div>
-        </div>
-      </ng-template>
+      <ng-template #headerText></ng-template>
       <ng-template #content>
         <!-- General info step -->
         <form [formGroup]="agencyForm" id="agencyFormFirstStep">
@@ -119,3 +107,41 @@
     </e-tabitem>
   </e-tabitems>
 </ejs-tab>
+
+<section
+  class="mobile-button-group"
+  [ngClass]="{'agency-user': agencyConfig.isAgencyUser}"
+>
+  <ng-container [ngTemplateOutlet]="backButton"></ng-container>
+  <ng-container [ngTemplateOutlet]="buttonSection"></ng-container>
+</section>
+
+<ng-template #backButton>
+  <button *ngIf="!agencyConfig.isAgencyUser" ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline item"
+    (click)="onBack()">
+    Back
+  </button>
+</ng-template>
+
+<ng-template #buttonSection>
+  <ng-container *ngIf="!isSeccondStepActive">
+    <button appHideBeforeSyncfusionLoad [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline item"
+      (click)="onClear()">
+      Clear
+    </button>
+    <app-tooltip-container
+      class="item"
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanEditAgencyProfile]"
+    >
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        class="save-btn"
+        [disabled]="(activeUser.businessUnitType === businessUnitType.Agency && (activeUser.agencyStatus === agencyStatus.Inactive || activeUser.agencyStatus === agencyStatus.Terminated))|| !userPermission[userPermissions.CanEditAgencyProfile]"
+        [isPrimary]="true" (click)="onSave()">
+        Save
+      </button>
+    </app-tooltip-container>
+  </ng-container>
+</ng-template>

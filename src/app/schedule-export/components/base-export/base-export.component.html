@@ -5,7 +5,7 @@
         <h2>Schedule Management</h2>
       </div>
       <div class="col text-end">
-        <img class="" src="/assets/logo-login.svg" alt="Hallmark HCS E2" />
+        <img class="" src="assets/logo-login.svg" alt="Hallmark HCS E2" />
       </div>
     </div>
     <div class="row pt-3 pb-2 border-top border-bottom border-secondary-subtle border-3">
@@ -15,35 +15,86 @@
           <p class="text-muted">Organization Name</p>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-auto">
         <div class="pe-4">
           <p class="mb-1 text-bold">
-            <span class="headerdata">{{regions}}</span>
+            <span class="headerdata" *ngIf="regions.length == 0">All</span>
+            <span class="headerdata" *ngIf="regions.length == 1">{{regions}}</span>
+            <span class="headerdata" *ngIf="regions.length >= 2">Multiple</span>
           </p>
           <p class="text-muted">Region</p>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-auto">
         <div class="pe-4">
           <p class="mb-1 text-bold">
-            <span class="headerdata">{{locations}}</span>
+            <span class="headerdata" *ngIf="locations.length == 0">All</span>
+            <span class="headerdata" *ngIf="locations.length == 1">{{locations}}</span>
+            <span class="headerdata" *ngIf="locations.length >= 2">Multiple</span>
           </p>
           <p class="text-muted">Location</p>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-auto">
         <div class="pe-4">
           <p class="mb-1 text-bold">
-            <span class="headerdata">{{departments}}</span>
+            <span class="headerdata" *ngIf="departments.length == 0">All</span>
+            <span class="headerdata" *ngIf="departments.length == 1">{{departments}}</span>
+            <span class="headerdata" *ngIf="departments.length >= 2">Multiple</span>
           </p>
           <p class="text-muted">Department</p>
         </div>
       </div>
-  
-      <div class="col-2">
+
+      <div class="col-auto" *ngIf="activePeriod === monthPeriod">
         <div class="pe-4">
-          <p class="mb-1 text-bold">{{startDate | date: 'MM/dd/yyy':'UTC'}}</p>
-          <p class="text-muted">Start Date</p>
+          <p class="mb-1 text-bold">
+            <span class="headerdata">{{scheduleData[0].skill}}</span>
+          </p>
+          <p class="text-muted">Skill</p>
+        </div>
+      </div>
+
+      <div class="col-auto" *ngIf="activePeriod === monthPeriod">
+        <div class="pe-4">
+          <p class="mb-1 text-bold">
+            <span class="headerdata">{{scheduleData[0].firstName}} {{scheduleData[0].lastName}}</span>
+          </p>
+          <p class="text-muted">Employee</p>
+        </div>
+      </div>
+
+      <div class="col-auto" *ngIf="activePeriod === monthPeriod">
+        <div class="pe-4">
+          <p class="mb-1 text-bold">
+            <span class="headerdata">{{scheduleData[0].displayId}}</span>
+          </p>
+          <p class="text-muted">ID</p>
+        </div>
+      </div>
+
+      <div class="col-auto" *ngIf="activePeriod === monthPeriod">
+        <div class="pe-4">
+          <p class="mb-1 text-bold">
+            <span class="headerdata">{{scheduleData[0].employeeSchedules?.workHours}}</span>
+          </p>
+          <p class="text-muted">Hours</p>
+        </div>
+      </div>
+
+      <div class="col-auto" *ngIf="activePeriod === monthPeriod">
+        <div class="pe-4">
+          <p class="mb-1 text-bold">
+            <span class="headerdata">{{scheduleData[0].workCommitments[0]}}</span>
+          </p>
+          <p class="text-muted">WorkCommitment</p>
+        </div>
+      </div>
+  
+      <div class="col-auto">
+        <div class="pe-4">
+          <p class="mb-1 text-bold">{{startDate | date: 'MM/dd/yyy':'UTC'}} - {{endDate | date: 'MM/dd/yyy':'UTC'}}</p>
+          <p class="text-muted">Start Date - End Date</p>
         </div>
       </div>
     </div>
@@ -126,7 +177,7 @@
         <tr *ngFor="let scheduleItem of scheduleData" class="table-row">
           <td>
             <span>{{scheduleItem.lastName}} {{scheduleItem.firstName}}</span>
-            <span>ID : {{scheduleItem.employeeId}}</span>
+            <span>ID : {{scheduleItem.displayId}}</span>
           </td>
           <td>{{scheduleItem.skill}}</td>
           <td>{{scheduleItem.employeeSchedules?.workHours}}</td>

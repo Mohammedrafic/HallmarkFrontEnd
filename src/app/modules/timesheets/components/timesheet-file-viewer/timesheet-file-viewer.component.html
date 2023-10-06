@@ -1,0 +1,36 @@
+<section [style.display]="preViewDoc ? 'block' : 'none'" class="main-body">
+    <section class="container">
+        <section class="header-container">
+            <div class="e-card-header">
+                <div class="e-card-header-caption">
+                    <h3 class="e-card-title" *ngIf="fileName" title="{{fileName}}">{{fileName}}</h3>
+                    <p>Document Preview</p>
+                </div>
+                <div class="e-card-content">
+                    <button ejs-button cssClass="e-outline" class="download-button" (click)="downloadFile()">
+                        Download <span><i-feather name="download" class="icon"></i-feather></span>
+                    </button>
+                    <button ejs-button cssClass="e-flat" (click)="onCancel()">
+                        <i-feather name="x" class="icon"></i-feather>
+                    </button>
+                </div>
+            </div>
+        </section>
+        <section class="file-viewer-container">
+            <div class="right">
+                <div class="file-viewer">
+                    <ejs-pdfviewer id="PdfViewer"
+                                class="pdfDocSection"
+                                *ngIf="!isImage"
+                                #PdfViewer
+                                [serviceUrl]="service"
+                                [enableTextSelection]="false"
+                    ></ejs-pdfviewer>
+                    <div *ngIf="isImage" class="image-container">
+                        <img class="image" [src]="imageSrs"/>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>

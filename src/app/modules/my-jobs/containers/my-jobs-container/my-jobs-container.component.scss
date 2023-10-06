@@ -1,0 +1,13 @@
+@import 'colors';
+
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0;
+
+  .title {
+    color: $secondary-dark-blue-10;
+    font-size: 24px;
+    line-height: 32px;
+  }
+}

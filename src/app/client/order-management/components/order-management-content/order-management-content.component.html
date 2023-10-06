@@ -54,8 +54,7 @@
         <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
         <button
           *ngIf="
-            activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
-            activeTab !== OrganizationOrderManagementTabs.Incomplete &&
+            activeTab !== OrganizationOrderManagementTabs.OrderTemplates && OrganizationOrderManagementTabs.Incomplete &&
             !isActiveSystemIRP &&
             !(isContentSmallDesktop || isMiddleTabletWidth)
           "
@@ -70,7 +69,7 @@
           <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
 
-        <button *ngIf="isActiveSystemIRP" ejs-dropdownbutton appHideBeforeSyncfusionLoad [items]="exportOptions" (select)="exportSelected($event)"
+        <button *ngIf="isActiveSystemIRP && activeIRPtabs != OrganizationIRPTabs.OrderTemplates" ejs-dropdownbutton appHideBeforeSyncfusionLoad [items]="exportOptions" (select)="exportSelected($event)"
           id="importButton" cssClass="e-outline button-export" [disabled]="!canCreateOrderIRP || !userPermission[userPermissions.CanCreateOrdersIRP]">
           <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
         </button>
@@ -228,7 +227,7 @@
       (rowDataBound)="setRowHighlight($event)"
       [dataSource]="(ordersPage$ | async)?.items"
       [pageSettings]="pageSettings"
-      [height]="isMobile ? mobileGridHeight : fullScreenGridHeight"
+      [height]="fullScreenGridHeight"
       [rowHeight]="rowHeight"
       [resizeSettings]="resizeSettings"
       [allowSorting]="allowSorting"
@@ -417,6 +416,29 @@
             </div>
           </ng-template>
         </e-column>
+        <e-column
+        field="system"
+        headerText="System"
+        width="125"
+        minWidth="140"
+        maxWidth="200"
+        textAlign="Left"
+        [visible]="isOrgIRPEnabled && isOrgVMSEnabled"
+      >
+      <ng-template #template let-data>
+        <ng-container *ngIf="data.system != 'IRP, VMS'; else IRPVMS">
+          <div class="subrow-toggle" (click)="RedirecttoVMSorder(data)">
+            <b>{{data.system}}</b>
+            </div>
+        </ng-container>
+        <ng-template #IRPVMS >
+          <div class="subrow-toggle">
+            <b (click)="RedirecttoIRPOrder(data)">IRP,</b>&nbsp;<b (click)="RedirecttoVMSorder(data)">VMS</b>
+          </div>
+        </ng-template>
+
+      </ng-template>
+    </e-column>
         <e-column field="orderType" headerText="TYPE" textAlign="Center" width="85" minWidth="70" maxWidth="110">
           <ng-template #template let-data>
             <div class="order-type-column" *ngIf="orderTypeTooltipMessage[data.orderType] as orderType">
@@ -612,6 +634,7 @@
             <app-order-management-subrow-candidate-position
               *ngFor="let child of data.children; index as i; trackBy: trackById"
               [candidatePosition]="child"
+              [showDates]="data.orderType === orderTypes.LongTermAssignment || data.orderType === orderTypes.ContractToPerm"
               [isBothSystemsEnabled]="isOrgIRPEnabled && isOrgVMSEnabled"
               [selected]="
                 selectedCandidate?.selected?.order === data.id &&
@@ -725,7 +748,7 @@
 ></app-export-dialog>
 
 <app-filter-dialog
-  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates && activeSystem != OrderManagementIRPSystemId.OrderJourney"
+  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates && activeSystem != OrderManagementIRPSystemId.OrderJourney && activeIRPtabs != OrganizationIRPTabs.OrderTemplates"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   [targetElement]="targetElement"
@@ -876,6 +899,9 @@
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.orderStatuses.dataSource"
             [changeOnBlur]="!(isMobile || isTablet)"
+            (select)="onSelect($event)"
+            cssClass="custom"
+            (click)="orderStatusSelect()"
           >
           </ejs-multiselect>
         </div>
@@ -941,8 +967,24 @@
       </div>
       <div class="input-container">
         <label>Contact Person</label>
-        <div class="input-group">
-          <input class="e-input" type="text" maxlength="50" formControlName="contactEmails" />
+        <div class="input-group multiselect">
+          <ejs-autocomplete
+            mode="CheckBox"
+            formControlName="contactEmails"
+            [dataSource]="filteredUsers"
+            [autofill]="true"
+            [minLength]="3"
+            [allowCustom]="false"
+            (filtering)="contactPersonFiltering($event)"
+            [fields]="contactPersonFields"
+          >
+            <ng-template #itemTemplate="" let-data="">
+              <div class="contact-option-container">
+                <span class="contact-name">{{ data.fullName }}</span>
+                <span class="contact-email">{{ data.email }}</span>
+              </div>
+            </ng-template>
+          </ejs-autocomplete>
         </div>
       </div>
     </div>
@@ -1195,12 +1237,15 @@
         </div>
       </div>
     </div>
-    <div *ngIf="!isActiveSystemIRP">
-      <div class="radio-container">
-        <label class="radio-label">Internal Agency</label>
-        <ejs-radiobutton formControlName="agencyType" label="Yes" name="agencyType" value="1"></ejs-radiobutton>
-        <ejs-radiobutton formControlName="agencyType" label="No" name="agencyType" value="2"></ejs-radiobutton>
-        <ejs-radiobutton formControlName="agencyType" label="Both" name="agencyType" value="0"></ejs-radiobutton>
+    <div class="filter-row bootstrap">
+      <div class="input-container" *ngIf="(activeSystem === OrderManagementIRPSystemId.VMS && isOrgIRPEnabled && isOrgVMSEnabled) 
+        && (activeTab === OrganizationOrderManagementTabs.ReOrders|| activeTab === OrganizationOrderManagementTabs.AllOrders)">
+        <label>Order Distribution</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist  formControlName="orderDistributionType" [fields]="optionFields"
+              placeholder="All" [allowFiltering]="true" [dataSource]="orderDistributionList">
+          </ejs-dropdownlist>
+        </div>
       </div>
     </div>
     <div *ngIf="isActiveSystemIRP">
@@ -1401,7 +1446,7 @@
   </form>
 </app-filter-dialog>
 <app-filter-dialog
-  *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates"
+  *ngIf="activeSystem != OrderManagementIRPSystemId.OrderJourney && (activeTab == OrganizationOrderManagementTabs.OrderTemplates) || (activeIRPtabs == OrganizationIRPTabs.OrderTemplates)"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   (deleteFilter)="onFilterDelete($event)"
@@ -1519,6 +1564,7 @@
   [settings]="settings"
   [openEvent]="openDetails"
   [isCondidateTab]="isCondidateTab"
+  [isOrderDetailsTab]="isOrderDetailsTab"
   [activeSystem]="activeSystem"
   [orderPositionSelected$]="orderPositionSelected$"
   [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
@@ -1581,6 +1627,6 @@
 
 <app-order-import [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-order-import>
 
-<app-scroll-to-top *ngIf="isMobile"></app-scroll-to-top>
+<app-scroll-to-top></app-scroll-to-top>
 
 <app-order-history-details #historyDetailsDialog [order]="orderDetail"></app-order-history-details>

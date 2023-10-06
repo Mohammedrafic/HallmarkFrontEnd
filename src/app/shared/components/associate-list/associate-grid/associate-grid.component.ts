@@ -3,7 +3,7 @@ import {
   AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import PriceUtils from '@shared/utils/price.utils';
-import { JOB_DISTRIBUTION_COLUMNS } from '@shared/components/associate-list/associate-grid/associated-org-grid.constant';
+import { AgencyStatusText, JOB_DISTRIBUTION_COLUMNS } from '@shared/components/associate-list/associate-grid/associated-org-grid.constant';
 import {
   AssociateOrganizationsAgency,
   AssociateOrganizationsAgencyPage,
@@ -11,7 +11,7 @@ import {
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
-import { combineLatest, debounceTime, filter, Observable, Subject, take, takeWhile } from 'rxjs';
+import { combineLatest, debounceTime, filter, map, Observable, Subject, take, takeWhile } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { TiersException } from '@shared/components/associate-list/store/associate.actions';
@@ -20,6 +20,7 @@ import { UserState } from '../../../../store/user.state';
 import { AgencyStatus } from '@shared/enums/status';
 import { UserPermissions } from "@core/enums";
 import { Permission } from "@core/interface";
+import { CreateSuspensionTooltip } from '../helpers';
 
 @Component({
   selector: 'app-associate-grid',
@@ -36,8 +37,10 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
 
   @Select(AssociateListState.associateListPage)
   public associateListPage$: Observable<AssociateOrganizationsAgencyPage>;
+
   @Select(UserState.lastSelectedAgencyId)
   private lastSelectedAgencyId$: Observable<number>;
+
   @Select(UserState.lastSelectedOrganizationId)
   private lastSelectedOrganizationId$: Observable<number>;
 
@@ -45,9 +48,11 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
     return this.isAgency ? 'Organization' : 'Agency';
   }
 
+  public agencyData: AssociateOrganizationsAgencyPage;
   public readonly userPermissions = UserPermissions;
   public priceUtils = PriceUtils;
   public readonly agencyStatus = AgencyStatus;
+  public readonly partnershipStatuses = PartnershipStatus;
   public jobDistributionColumns = JOB_DISTRIBUTION_COLUMNS;
   public openAssociateOrgAgencyDialog = new EventEmitter<boolean>();
   public partnershipStatusValueAccess = (_: string, { partnershipStatus }: AssociateOrganizationsAgency) => {
@@ -63,6 +68,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   }
 
   ngOnInit(): void {
+    this.getAgencies();
     this.subscribeOnAssociateOrgAgencyDialogEvent();
     this.subscribeOnUpdatePage();
     this.subscribeOnBusinessUnitChange();
@@ -103,18 +109,15 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
       });
   }
 
-  public onRowsDropDownChanged(): void {
-    if (this.pageSize !== parseInt(this.activeRowsPerPageDropDown)) {
-      this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-      this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-      this.dispatchNewPage();
-    }
+  public changeGridSize(size: number): void {
+    this.currentPage = 1;
+    this.pageSize = size;
+    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+    this.dispatchNewPage();
   }
 
-  public onGoToClick(event: any): void {
-    if ((event.currentPage && event.currentPage !== this.currentPage) || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
+  public changeGridPage(page: number): void {
+    this.pageSubject.next(page);
   }
 
   private dispatchNewPage(): void {
@@ -154,6 +157,23 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
     ).subscribe((page: number) => {
       this.currentPage = page;
       this.dispatchNewPage();
+    });
+  }
+
+  private getAgencies(): void {
+    this.associateListPage$
+    .pipe(
+      map((data) => {
+        data.items.forEach((agency) => {
+          CreateSuspensionTooltip(agency);
+        });
+
+        return data;
+      }),
+      takeWhile(() => this.isAlive),
+    )
+    .subscribe((data) => {
+      this.agencyData = data;
     });
   }
 }
