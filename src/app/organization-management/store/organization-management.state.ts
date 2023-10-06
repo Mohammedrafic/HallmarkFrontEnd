@@ -851,7 +851,7 @@ export class OrganizationManagementState {
 
         const errorObj = error.error;
         const statues = JSON.parse(errorObj.errors.IncompleteOpenOrdersExist);
-        if (errorObj.errors?.IncompleteOpenOrdersExist && errorObj.errors?.InProgressOrdersExist) {
+        if (errorObj.errors?.IncompleteOpenOrdersExist) {
           return dispatch(
             new ShowToast(
               MessageTypes.Error,
