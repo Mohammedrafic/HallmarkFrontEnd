@@ -7,7 +7,6 @@ export const ALPHANUMERIC = /^[a-zA-Z0-9]+$/;
 export const MIN_DIGITS_LENGTH_ONLY_NINE =/^[0-9]{9}$/;
 export const DOCUMENT_NAME_PATTERN =/^[a-zA-Z0-9+-_. ]+$/;
 export const EMPTY_SPACE_PATTERN=/^(\s+\S+\s*)*(?!\s).*$/;
-export const START_FROM_9_ONLY_DIGITS = /^9\d*$/;
 
 /**
  * TODO: test and think if it is needed.

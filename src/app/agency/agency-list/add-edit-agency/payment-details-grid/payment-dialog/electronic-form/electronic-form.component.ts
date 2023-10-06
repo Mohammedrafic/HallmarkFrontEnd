@@ -22,6 +22,8 @@ import PriceUtils from '@shared/utils/price.utils';
 import { startDateDuplicationValidator } from '@shared/validators/start-date-duplication.validator';
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { patternMessageValidator } from '@shared/validators/pattern-message.validator';
+import { RoutingNumberMessage, SwiftCodeValidationMessage } from '@shared/constants';
 
 @Component({
   selector: 'app-electronic-form',
@@ -74,7 +76,10 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         endDate: [null],
         nsPaymentId: [''],
         bankName: ['', [Validators.required]],
-        routingNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+        routingNumber: ['', [
+          Validators.required,
+          patternMessageValidator(/^[0-9]+$/, RoutingNumberMessage),
+        ]],
         bankAddress1: ['', [Validators.required]],
         bankAddress2: [''],
         bankCountry: ['', [Validators.required]],
@@ -91,8 +96,10 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         accountHolderCity: [''],
         accountHolderZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
         fee: [''],
-        swiftCode: ['', [Validators.pattern(/^[0-9]+$/)]],
-        netSuiteId: ['']
+        swiftCode: ['', [
+          patternMessageValidator(/^[a-zA-Z0-9]{8,11}$/, SwiftCodeValidationMessage),
+        ]],
+        netSuiteId: [{ value: '', disabled: true }],
       },
       {
         validators: startDateDuplicationValidator('startDate', this.paymentsList, this.formValue?.startDate, this.mode),
