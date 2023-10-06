@@ -223,6 +223,7 @@
 
 @media #{$max-mobile} {
   .dialog {
+    min-width: unset !important;
     width: 100% !important;
 
     .header-container .e-card-content {
