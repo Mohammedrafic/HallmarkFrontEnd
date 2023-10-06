@@ -3,7 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import {
+  ButtonModule,
+  CheckBoxModule,
+  ChipListModule,
+  RadioButtonModule,
+  SwitchModule,
+} from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import {
   AlertCircle,
@@ -98,6 +104,7 @@ import { AgencyReportsModule } from '@agency/agency-reports/agency-reports.modul
 import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-container/order-reorders-container.module';
 import { AgencySettingsModule } from './settings/agency-settings.module';
 import { EmployeeImportService } from '@client/candidates/services/employee-import.service';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
 
 
@@ -209,6 +216,7 @@ const sidebarIcons = {
     CandidatesModule,
     AgencyReportsModule,
     OrderReOrdersContainerModule,
+    ValidateDirectiveModule,
   ],
   providers: [
     OrderCandidateApiService,
