@@ -3,5 +3,6 @@ export enum SettingsKeys {
   MandatorySpecialProjectDetails = 'MandatorySpecialProjectDetails',
   IsReOrder = 'IsReOrder', // TODO: rename, pending BE
   HideContactDetailsOfOrderInAgencyLogin ='HideContactDetailsOfOrderInAgencyLogin',
-  DisableAddEditTimesheetsInAgencyLogin = 'DisableAddEditTimesheetsInAgencyLogin'
+  DisableAddEditTimesheetsInAgencyLogin = 'DisableAddEditTimesheetsInAgencyLogin',
+  ATPRateCalculation = 'ATPRateCalculation'
 }

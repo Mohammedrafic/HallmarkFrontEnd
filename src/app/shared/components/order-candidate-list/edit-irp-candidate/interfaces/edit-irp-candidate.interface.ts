@@ -22,3 +22,18 @@ export interface CandidateForm {
   reason: number;
   closeDate: Date;
 }
+
+export interface atpStipendRate {
+  mealrate : number;
+  lodgingrate : number;
+}
+
+export interface ratePerhourConfig {
+  payRateSettingId : number;
+  amountMultiplier : number;
+}
+
+export interface atpStipend {
+  zip : number;
+  Actualstartdate : string;
+}

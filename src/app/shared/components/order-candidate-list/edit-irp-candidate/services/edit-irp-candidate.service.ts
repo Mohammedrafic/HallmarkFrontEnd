@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, map} from 'rxjs';
 
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { CustomFormGroup, DropdownOption } from '@core/interface';
-import { CandidateForm } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
+import { atpStipend, atpStipendRate, CandidateForm, ratePerhourConfig } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
 import { CreateCandidateDto, UpdateCandidateDto } from '@shared/components/order-candidate-list/edit-candidate-list.helper';
 import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 import { EditCandidateDialogState } from '@shared/components/order-candidate-list/interfaces';
@@ -15,6 +15,9 @@ import { ApplicantStatus } from '@shared/models/order-management.model';
 import { RejectReason, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { OrderClosureReasonType } from '@shared/enums/order-closure-reason-type.enum';
 import { DateTimeHelper } from '@core/helpers';
+import { OrderType } from '@shared/enums/order-type';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Location } from "@shared/models/location.model"
 
 @Injectable()
 export class EditIrpCandidateService {
@@ -23,6 +26,7 @@ constructor(
     private formBuilder: FormBuilder,
     private orderCandidateApiService: OrderCandidateApiService,
     private store: Store,
+    private http: HttpClient
   ) {}
 
   createCandidateForm(): CustomFormGroup<CandidateForm> {
@@ -33,7 +37,7 @@ constructor(
       availableStartDate: [null],
       isClosed: [false],
       reason: [null],
-      closeDate: [null],
+      closeDate: [null]
     }) as CustomFormGroup<CandidateForm>;
   }
 
@@ -176,5 +180,23 @@ constructor(
         ));
     }
   }
+}
+
+
+public getPredefinedBillRatesforRatePerHour(orderType: number, departmentId: number, skillId: number): Observable<ratePerhourConfig> {
+  let params = new HttpParams()
+    .append('orderType', orderType)
+    .append('departmentId', departmentId)
+    .append('skillId', skillId);
+
+  return this.http.get<ratePerhourConfig>('/api/PayRates/predefinedpayrate/forOrder', { params })
+}
+
+public getATPstipendRate(zip: string, Actualstartdate: string) : Observable<atpStipendRate>{
+  return this.http.get<atpStipendRate>('/api/IRPApplicants/atpstipendrate?zip='+ zip + '&ActualStartdate=' + Actualstartdate)
+}
+
+public getLocationsByRegionId(regionId: number): Observable<Location[]> {
+  return this.http.get<Location[]>(`/api/Locations/region/${regionId}`);
 }
 }

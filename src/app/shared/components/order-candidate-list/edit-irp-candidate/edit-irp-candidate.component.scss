@@ -57,3 +57,34 @@
 .switch {
   @include toggle;
 }
+
+.class_table{
+  table {
+    border: 1px solid gainsboro;
+    margin: 20px 0px 0px 0px;
+  }
+  table thead{
+    background: #8bb2ff;
+    color: white;
+  }
+  table th {
+    padding: 10px;
+    vertical-align: top;
+    text-align: left;
+  }
+  tr td {
+    border: 1px solid gainsboro;
+    padding: 5px;
+  }
+}
+.atpformfield {
+  width: 100%;
+  padding: 10px 10px 0px 0px;
+}
+.w_100{
+  width: 100%;
+  display: flex;
+}
+.class_table{
+  overflow: auto;
+}
