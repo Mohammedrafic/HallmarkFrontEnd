@@ -11,6 +11,7 @@ import { CommonFormConfig } from '@shared/models/common-form-config.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilteredUser } from '@shared/models/user.model';
 import { DropdownOption } from '@core/interface';
+import { FilteredOrderContactPerson } from '../models/order-contactperson.model';
 
 @Injectable({ providedIn: 'root' })
 export class FilterService {
@@ -143,6 +144,10 @@ export class FilterService {
 
   public getUsersListBySearchTerm(searchTerm: string): Observable<FilteredUser[]> {
     return this.http.get<FilteredUser[]>('/api/UserSearch', { params: { searchTerm } });
+  }
+
+  public getOrderContactPersonListBySearchTerm(searchTerm: string, title: string): Observable<FilteredOrderContactPerson[]> {
+    return this.http.get<FilteredOrderContactPerson[]>('/api/OrderContactPersonSearch', { params: { searchTerm, title } });
   }
 
   public syncFilterTagsWithControls<T>(formGroup: FormGroup, filterColumns: T): Observable<FilteredItem[]> {
