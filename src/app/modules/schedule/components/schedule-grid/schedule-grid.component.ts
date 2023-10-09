@@ -49,7 +49,7 @@ import {
   ScheduleModel,
   SelectedCells,
 } from '../../interface';
-import { GetMonthRange, GetScheduledShift } from '../../helpers';
+import { GetMonthRange, GetScheduledShift, GetStructureValue } from '../../helpers';
 import { ScheduleGridService } from './schedule-grid.service';
 import { ShowToast } from '../../../../store/app.actions';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
@@ -477,8 +477,10 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: filteringEventArgs.text,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
-        departmentsIds : this.selectedFilters.departmentsIds,
-        isExcludeNotOrganized : this.selectedFilters.isExcludeNotOrganized
+        departmentsIds : GetStructureValue(this.selectedFilters.departmentsIds),
+        locationIds : GetStructureValue(this.selectedFilters.locationIds),
+        regionIds : GetStructureValue(this.selectedFilters.regionIds),
+        isExcludeNotOrganized : this.selectedFilters.isExcludeNotOrganized,
       }).pipe(
         tap((employeeDto) => {
           this.candidatesSuggestions = ScheduleGridAdapter.prepareCandidateFullName(employeeDto.items);

@@ -29,7 +29,7 @@ import {
   ScheduleFilterFormSourceKeys,
   ScheduleFiltersColumns,
 } from '../../constants';
-import { ScheduleFilterHelper } from '../../helpers';
+import { GetStructureValue, ScheduleFilterHelper } from '../../helpers';
 import {
   ChipSettings,
   ChipsFilterStructure,
@@ -599,18 +599,10 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup?.get('departmentsIds')?.patchValue([departmentId]);
   }
 
-  private getStructureValue(value?: number[] | null): number[] | null {
-    if (value === null) {
-      return null;
-    } else {
-      return value ? [...value] : [];
-    }
-  }
-
   private setTooglesState(preservFilters: ScheduleFilters): void {
-    this.allRecords.regionIds = !preservFilters.regionIds;
-    this.allRecords.locationIds = !preservFilters.locationIds;
-    this.allRecords.departmentIds = !preservFilters.departmentsIds;
+    this.allRecords.regionIds = preservFilters.regionIds === null;
+    this.allRecords.locationIds = preservFilters.locationIds === null;
+    this.allRecords.departmentIds = preservFilters.departmentsIds === null;
     this.allRegionsChange({ checked: this.allRecords.regionIds });
     this.allLocationsChange({ checked: this.allRecords.locationIds });
     this.allDepartmentsChange({ checked: this.allRecords.departmentIds });
@@ -632,16 +624,16 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         this.isPreservedFilters = !!preservFilters;
         if(preservFilters != null){
           this.scheduleFilterFormGroup.patchValue({
-            regionIds: this.getStructureValue(this.filters.regionIds),
-            locationIds: this.getStructureValue(this.filters.locationIds),
-            departmentsIds: this.getStructureValue(this.filters.departmentsIds),
+            regionIds: GetStructureValue(this.filters.regionIds),
+            locationIds: GetStructureValue(this.filters.locationIds),
+            departmentsIds: GetStructureValue(this.filters.departmentsIds),
             skillIds : this.filters.skillIds ? [...this.filters.skillIds] : [],
             isAvailablity : !!this.filters.isAvailablity,
             isUnavailablity : !!this.filters.isUnavailablity,
             isExcludeNotOrganized : !!this.filters.isExcludeNotOrganized,
             isOnlySchedulatedCandidate : !!this.filters.isOnlySchedulatedCandidate,
             startTime : getPreservedTime(this.filters.startTime),
-            endTime : getPreservedTime(this.filters.endTime)
+            endTime : getPreservedTime(this.filters.endTime),
           });
         }
          //Get only valid numeric values
