@@ -62,7 +62,7 @@ export class FilterService {
                 isDate(value) || 
                 isBoolean(value) || 
                 isNumber(value) || 
-                filterColumns[key].allowNull;
+                filterColumns[key]?.allowNull;
       })
       .forEach((key) => {
         if (!filterColumns[key]) {
