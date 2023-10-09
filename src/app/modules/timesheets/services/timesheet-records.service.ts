@@ -157,6 +157,7 @@ export class TimesheetRecordsService {
     formControls: Record<string, FormGroup>,
     colDefs: ColDef[]): ColDef[] {
     return colDefs.map((def) => {
+      debugger;
       let definition: ColDef = def;
 
       if (editOn && def.field === 'hadLunchBreak') {
@@ -185,6 +186,12 @@ export class TimesheetRecordsService {
         definition.field = 'billRateConfigName';
         delete definition.cellRenderer;
         delete definition.cellRendererParams;
+      }
+
+      if (editOn && (def.field === 'billRate' || def.field === 'total') && currentTab === RecordFields.Time) {
+        definition.hide = true;
+      } else if (!editOn && (def.field === 'billRate' || def.field === 'total') && currentTab === RecordFields.Time) {
+        definition.hide = false;
       }
 
       if (definition.cellRendererParams && definition.cellRendererParams.editMode) {
