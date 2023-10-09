@@ -47,6 +47,7 @@ describe('TimesheetsService', () => {
       regionsIds: [[]],
       locationIds: [[]],
       contactEmails: '',
+      title: '',
     }) as CustomFormGroup<TimesheetForm>;
 
     const resultFormGroup = service.createForm();

@@ -22,7 +22,7 @@
         [commentType]="commentType"
         (onRead)="onRead(comment)"></app-comment>
     </ng-container>
-    <div class="no-comments" *ngIf="!comments.length">
+    <div class="no-comments" *ngIf="!comments?.length">
       There are no comments to display yet!
     </div>
   </div>
