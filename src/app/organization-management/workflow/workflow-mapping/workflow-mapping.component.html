@@ -525,7 +525,7 @@
                     class="e-input"
                     type="text"
                     readonly
-                    [value]="applicationWorkflowSteps[i]?.status + ' > ' + applicationWorkflowSteps[i]?.nextStepStatus"
+                    [value]="(applicationWorkflowSteps[i]?.multiple ?? applicationWorkflowSteps[i]?.status) + ' > ' + applicationWorkflowSteps[i]?.nextStepStatus"
                   />
                 </div>
               </div>
