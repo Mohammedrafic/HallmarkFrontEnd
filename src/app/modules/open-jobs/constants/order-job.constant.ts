@@ -1,6 +1,7 @@
-import { OrderJobType } from '../enums';
+import { OrderJobType } from '@shared/enums';
+import { GetLocalDate } from '@shared/helpers';
+
 import { FiltersState, PageSettings } from '../interfaces';
-import { GetLocalDate } from '../helpers';
 
 export const JobPageSettings: PageSettings = {
   pageNumber: 1,
@@ -16,7 +17,7 @@ export const WithdrawnMessage = 'You have been withdrawn';
 
 export const OrderJobName: Record<number, string> = {
   [OrderJobType.LTA]: 'L',
-  [OrderJobType.PerDiem]: 'P',
+  [OrderJobType.PerDiem]: 'D',
 };
 
 export const DefaultFilterState: FiltersState = {

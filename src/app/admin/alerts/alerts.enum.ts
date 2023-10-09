@@ -47,6 +47,10 @@ export enum AlertEnum {
     "Invoice: Generated & Pending Approval"=28,
     "Invoice: Approved"=29,
     "Invoice: Organization Paid"=30,
-   "Order Comments-IRP"=59
+   "Order Comments-IRP"=59,
+   "Missing Credentials: Daily Alerts" = 64,
+   "Missing Credentials: Weekly Alerts" = 65,
+   "Expiry Credentials: Weekly Alerts" = 66
+
   }
   

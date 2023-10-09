@@ -2613,7 +2613,8 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   updateOrderDetails(order: Order | OrderManagement): void {
-    this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
+    this.store.dispatch(new GetOrderById(order.id, order.organizationId as number, undefined,
+      this.activeSystem === OrderManagementIRPSystemId.IRP ));
     this.dispatchAgencyOrderCandidatesList(order.id, order.organizationId as number, !!order.irpOrderMetadata);
     this.getOrders(true);
   }
@@ -2755,12 +2756,14 @@ public RedirecttoIRPOrder(order:Order)
       }
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       if(!this.canViewOrderIRP){
+        this.isOrgIRPEnabled = false;
         let irpIndex = this.systemGroupConfig.findIndex(ordertab => ordertab.title === "IRP");
         if(irpIndex){
           this.systemGroupConfig.splice(irpIndex, 1);
         }
       }
       if(!this.canViewOrderVMS){
+        this.isOrgVMSEnabled = false;
         let vmsIndex = this.systemGroupConfig.findIndex(ordertab => ordertab.title === "VMS");
         if(vmsIndex){
           this.systemGroupConfig.splice(vmsIndex,1);
@@ -2769,7 +2772,7 @@ public RedirecttoIRPOrder(order:Order)
       if(this.canViewOrderIRP && !this.canViewOrderVMS){
         this.activeSystem = OrderManagementIRPSystemId.IRP;
       } 
-      this.systemGroupConfig = SystemGroupConfig(this.canViewOrderIRP, this.canViewOrderVMS, this.activeSystem,this.canOrderJourney);
+      this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       this.cd.detectChanges();
       this.setOrderTypesFilterDataSource();
       this.initMenuItems();

@@ -1,359 +1,365 @@
 <div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="group-email-template-form">
-    
-    <!-- validation errors-->  
-    <div class="section-container">
 
-      <div class="left-section">
-        <div class="business-dropdowns">
-          <div class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>Business Unit Type<span class="required">*</span></label>
-              <ejs-dropdownlist appValidateWithMessage
-                                formControlName="businessUnit"
-                                [fields]="optionFields"
-                                [dataSource]="businessUnits"
-                                [allowFiltering]="true"
-                                [(ngModel)]="businessUnitType"
-                                placeholder="Business Unit">
-              </ejs-dropdownlist>
-            </div>
+  <!-- validation errors-->
+  <div class="section-container">
+
+    <div class="left-section">
+      <div class="business-dropdowns">
+        <div class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Business Unit Type<span class="required">*</span></label>
+            <ejs-dropdownlist appValidateWithMessage
+                              formControlName="businessUnit"
+                              [fields]="optionFields"
+                              [dataSource]="businessUnits"
+                              [allowFiltering]="true"
+                              [(ngModel)]="businessUnitType"
+                              placeholder="Business Unit">
+            </ejs-dropdownlist>
           </div>
-          <div class="bootstrap dropdown-container" *ngIf="!isBusinessUnitTypeAgency">
-            <div class="input-group dropdown">
-              <label>Business Unit<span class="required">*</span></label>
-              <ejs-dropdownlist appValidateWithMessage
-                                formControlName="business"
-                                [fields]="businessDataFields"
-                                [dataSource]="businessData$ | async"
-                                [value]="defaultBusinessValue"
-                                [allowFiltering]="true"                                
-                                placeholder="Business">
-              </ejs-dropdownlist>
-            </div>
+        </div>
+        <div class="bootstrap dropdown-container" *ngIf="!isBusinessUnitTypeAgency">
+          <div class="input-group dropdown">
+            <label>Business Unit<span class="required">*</span></label>
+            <ejs-dropdownlist appValidateWithMessage
+                              formControlName="business"
+                              [fields]="businessDataFields"
+                              [dataSource]="businessData$ | async"
+                              [value]="defaultBusinessValue"
+                              [allowFiltering]="true"
+                              placeholder="Business">
+            </ejs-dropdownlist>
           </div>
-          <div class="bootstrap dropdown-container" *ngIf="isBusinessUnitTypeAgency">
-            <div class="input-group dropdown">
-              <label>Business Unit<span class="required">*</span></label>
-              <ejs-multiselect mode="CheckBox" appValidateWithMessage
-                                formControlName="businesses"
-                                [fields]="businessDataFields"
-                                [dataSource]="businessData"                                
-                                [allowFiltering]="true"
-                                placeholder="Business"
-                                [showDropDownIcon]="true"
-                                [selectAllText]='allOption'
-                                showSelectAll=true>
-              </ejs-multiselect>
-            </div>
+        </div>
+        <div class="bootstrap dropdown-container" *ngIf="isBusinessUnitTypeAgency">
+          <div class="input-group dropdown">
+            <label>Business Unit<span class="required">*</span></label>
+            <ejs-multiselect mode="CheckBox" appValidateWithMessage
+                             formControlName="businesses"
+                             [fields]="businessDataFields"
+                             [dataSource]="businessData"
+                             [allowFiltering]="true"
+                             placeholder="Business"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true
+                             maximumSelectionLength="50000">
+            </ejs-multiselect>
           </div>
-          <div class="bootstrap dropdown-container" *ngIf="!hideUserTypeControl">
-            <div class="input-group dropdown">
-              <label>User Type<span class="required">*</span></label>
-              <ejs-dropdownlist appValidateWithMessage
-                                formControlName="userType"
-                                [fields]="commonFields"
-                                [dataSource]="filteredUserType"
-                                [value]="defaultUserType"
-                                [allowFiltering]="true"
-                                [(ngModel)]="userTypeInput"
-                                placeholder="User Type">
-              </ejs-dropdownlist>
-            </div>
+        </div>
+        <div class="bootstrap dropdown-container" *ngIf="!hideUserTypeControl">
+          <div class="input-group dropdown">
+            <label>User Type<span class="required">*</span></label>
+            <ejs-dropdownlist appValidateWithMessage
+                              formControlName="userType"
+                              [fields]="commonFields"
+                              [dataSource]="filteredUserType"
+                              [value]="defaultUserType"
+                              [allowFiltering]="true"
+                              [(ngModel)]="userTypeInput"
+                              placeholder="User Type">
+            </ejs-dropdownlist>
           </div>
-          <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
+        </div>
+        <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Agencies<span class="required">*</span></label>
+            <ejs-multiselect mode="CheckBox" appValidateWithMessage
+                             formControlName="agencies"
+                             [fields]="agencyFields"
+                             [dataSource]="agencyData"
+                             [allowFiltering]="true"
+                             placeholder="Agencies"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Skills<span class="required">*</span></label>
+            <ejs-multiselect mode="CheckBox" appValidateWithMessage
+                             formControlName="skills"
+                             [fields]="regionFields"
+                             [dataSource]="skillData"
+                             [allowFiltering]="true"
+                             placeholder="Skills"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Region<span *ngIf="!isEmployeeType" class="required">*</span></label>
+            <ejs-multiselect mode="CheckBox" formControlName="region"
+                             [allowFiltering]="true"
+                             appValidateWithMessage
+                             [fields]="regionFields"
+                             [dataSource]="regionsList"
+                             placeholder="Region"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true
+                             maximumSelectionLength="50000">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Location<span *ngIf="!isEmployeeType" class="required">*</span></label>
+            <ejs-multiselect mode="CheckBox" formControlName="location"
+                             [allowFiltering]="true"
+                             appValidateWithMessage
+                             [fields]="regionFields"
+                             [dataSource]="locationsList"
+                             placeholder="Location"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true
+                             maximumSelectionLength="50000">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
+          <div class="input-container bootstrap">
+            <label>Department<span *ngIf="!isEmployeeType" class="required">*</span></label>
             <div class="input-group dropdown">
-              <label>Agencies<span class="required">*</span></label>
-              <ejs-multiselect mode="CheckBox" appValidateWithMessage
-                                formControlName="agencies"
-                                [fields]="agencyFields"
-                                [dataSource]="agencyData"                                
-                                [allowFiltering]="true"
-                                placeholder="Agencies"
-                                [showDropDownIcon]="true"
-                                [selectAllText]='allOption'
-                                showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>               
-          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>Skills<span class="required">*</span></label>
-              <ejs-multiselect  mode="CheckBox" appValidateWithMessage
-                                formControlName="skills"
-                                [fields]="regionFields"
-                                [dataSource]="skillData"                                
-                                [allowFiltering]="true"
-                                placeholder="Skills"
-                                [showDropDownIcon]="true"
-                                [selectAllText]='allOption'
-                                showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>          
-          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>Region<span *ngIf="!isEmployeeType" class="required">*</span></label>
-              <ejs-multiselect mode="CheckBox" formControlName="region"
-                               [allowFiltering]="true"
+              <ejs-multiselect mode="CheckBox" formControlName="departmentIds"
                                appValidateWithMessage
+                               [placeholder]="allOption"
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               [dataSource]="departmentsList"
                                [fields]="regionFields"
-                               [dataSource]="regionsList"
-                               placeholder="Region"
-                               [showDropDownIcon]="true"
                                [selectAllText]='allOption'
-                               showSelectAll=true>
+                               showSelectAll=true
+                               maximumSelectionLength="50000" >
               </ejs-multiselect>
             </div>
           </div>
-          <div *ngIf="isOrgInternalUserType || isOrgCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>Location<span *ngIf="!isEmployeeType" class="required">*</span></label>
-              <ejs-multiselect mode="CheckBox" formControlName="location"
-                               [allowFiltering]="true"
-                               appValidateWithMessage
-                               [fields]="regionFields"
-                               [dataSource]="locationsList"
-                               placeholder="Location"
-                               [showDropDownIcon]="true"
-                               [selectAllText]='allOption'
-                               showSelectAll=true>
-              </ejs-multiselect>
-            </div>
+        </div>
+        <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Order Type</label>
+            <ejs-multiselect mode="CheckBox" formControlName="orderTypes"
+                             [allowFiltering]="true"
+                             appValidateWithMessage
+                             [fields]="regionFields"
+                             [dataSource]="orderTypes"
+                             placeholder="Order Type"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true>
+            </ejs-multiselect>
           </div>
-          <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
-            <div class="input-container bootstrap">
-              <label>Department<span *ngIf="!isEmployeeType" class="required">*</span></label>
-              <div class="input-group dropdown">
-                <ejs-multiselect mode="CheckBox" formControlName="departmentIds"
-                                appValidateWithMessage
-                                [placeholder]="allOption"
-                                [allowFiltering]="true"
-                                [showDropDownIcon]="true"
-                                [dataSource]="departmentsList"
-                                [fields]="regionFields"
-                                [selectAllText]='allOption'
-                                showSelectAll=true>
-                </ejs-multiselect>
-              </div>
-            </div>
+        </div>
+        <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Candidate Status</label>
+            <ejs-multiselect mode="CheckBox" formControlName="candidateStatus"
+                             [allowFiltering]="true"
+                             appValidateWithMessage
+                             [fields]="candidateStatusFields"
+                             [dataSource]="candidateStatusData"
+                             placeholder="Candiate Status"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true>
+            </ejs-multiselect>
           </div>
-          <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>Order Type</label>
-              <ejs-multiselect mode="CheckBox" formControlName="orderTypes"
-                               [allowFiltering]="true"
-                               appValidateWithMessage
-                               [fields]="regionFields"
-                               [dataSource]="orderTypes"
-                               placeholder="Order Type"
-                               [showDropDownIcon]="true"
-                               [selectAllText]='allOption'
-                               showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>
-          <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>Candidate Status</label>
-              <ejs-multiselect mode="CheckBox" formControlName="candidateStatus"
-                               [allowFiltering]="true"
-                               appValidateWithMessage
-                               [fields]="candidateStatusFields"
-                               [dataSource]="candidateStatusData"
-                               placeholder="Candiate Status"
-                               [showDropDownIcon]="true"
-                               [selectAllText]='allOption'
-                               showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>
-          <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
-            <div class="input-container bootstrap">
-              <label>Job ID</label>
-              <input class="e-input"
+        </div>
+        <div *ngIf="isOrgCandidatesType" class="bootstrap dropdown-container">
+          <div class="input-container bootstrap">
+            <label>Job ID</label>
+            <input class="e-input"
                    type="text"
                    appValidateWithMessage
                    maxlength="50"
-                   formControlName="jobID" 
-                   (keyup.enter)="onJobIdStatusValueChanged()"/>
-            </div>
-          </div>
-          <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>Role<span class="required">*</span></label>
-              <ejs-multiselect mode="CheckBox"
-                               formControlName="roles"
-                               [placeholder]='placeholderValue'
-                               [allowFiltering]="true"
-                               [showDropDownIcon]="true"
-                               appValidateWithMessage
-                               [fields]="businessDataFields"
-                               [dataSource]="roleData$ | async"
-                               [selectAllText]='allOption'
-                               showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>    
-          <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>Skills</label>
-              <ejs-multiselect  mode="CheckBox" appValidateWithMessage
-                                formControlName="skills"
-                                [fields]="regionFields"
-                                [dataSource]="skillData"                                
-                                [allowFiltering]="true"
-                                placeholder="Skills"
-                                [showDropDownIcon]="true"
-                                [selectAllText]='allOption'
-                                showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>
-          <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>Work Commitment</label>
-              <ejs-multiselect  mode="CheckBox" appValidateWithMessage
-                                formControlName="workCommitments"
-                                [fields]="regionFields"
-                                [dataSource]="workCommitmentData"                                
-                                [allowFiltering]="true"
-                                placeholder="Work Commitments"
-                                [showDropDownIcon]="true"
-                                [selectAllText]='allOption'
-                                showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>
-          <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">    
-              <div style="height: 25px;"></div>
-              <label for="chkOrientationComplete">
-                <input type="checkbox" formControlName="orientationComplete" id="chkOrientationComplete" /> 
-                Orientation Complete
-              </label>
-            </div>
-          </div>
-          <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label>User<span class="required">*</span></label>
-              <ejs-multiselect mode="CheckBox"
-                               formControlName="user"
-                               [placeholder]='placeholderValue'
-                               [allowFiltering]="true"
-                               [showDropDownIcon]="true"
-                               appValidateWithMessage
-                               [fields]="userDataFields"
-                               [dataSource]="userData"
-                               [selectAllText]='allOption'
-                               showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>
-          <div class="button-group"  *ngIf="isOrgInternalUserType || isAgencyUserType">
-              <ejs-switch id="switcher" [checked]="allowActiveUsers" (change)="onSwitcher($event);"></ejs-switch>
-              <label for="switcher" class="switch-text">Show Only Active Users</label>  
-          </div>
-          <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
-            <div class="input-group dropdown">
-              <label *ngIf="!isEmployeeType">Candidate<span class="required">*</span></label>
-              <label *ngIf="isEmployeeType">Employee<span class="required">*</span></label>
-              <ejs-multiselect mode="CheckBox"
-                               formControlName="candidate"
-                               [placeholder]='placeholderValue'
-                               [allowFiltering]="true"
-                               [showDropDownIcon]="true"
-                               appValidateWithMessage
-                               [fields]="userDataFields"
-                               [dataSource]="userData"
-                               [selectAllText]='allOption'
-                               showSelectAll=true>
-              </ejs-multiselect>
-            </div>
-          </div>     
-        </div>
-
-        <div class="input-container bootstrap top-container">
-          <label>To<span class="required">*</span></label>
-          <div class="input-group">
-            <input appValidateWithMessage formControlName="emailTo" class="e-input" type="text"
-                   [(ngModel)]="emailTo" />
+                   formControlName="jobID"
+                   (keyup.enter)="onJobIdStatusValueChanged()" />
           </div>
         </div>
-        <div class="input-container bootstrap top-container">
-          <label>CC</label>
-          <div class="input-group">
-            <input formControlName="emailCc" class="e-input" type="text"
-                   [(ngModel)]="emailCc" (keyup)="onCCFieldKeyup()" />
+        <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Role<span class="required">*</span></label>
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="roles"
+                             [placeholder]='placeholderValue'
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             appValidateWithMessage
+                             [fields]="businessDataFields"
+                             [dataSource]="roleData$ | async"
+                             [selectAllText]='allOption'
+                             showSelectAll=true>
+            </ejs-multiselect>
           </div>
         </div>
-        <div class="input-container bootstrap top-container">
-          <label>Subject<span class="required">*</span></label>
-          <div class="input-group">
-            <input appValidateWithMessage formControlName="emailSubject" class="e-input" type="text"
-                   [(ngModel)]="emailSubject" />
+        <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Skills</label>
+            <ejs-multiselect mode="CheckBox" appValidateWithMessage
+                             formControlName="skills"
+                             [fields]="regionFields"
+                             [dataSource]="skillData"
+                             [allowFiltering]="true"
+                             placeholder="Skills"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true>
+            </ejs-multiselect>
           </div>
         </div>
-        <div class="input-container bootstrap top-container attachmentdiv" *ngIf="!isSend && (fileName != null) && (fileName != '')">
-          <h5 (click)="openpdf(id)">{{fileName}}</h5>&nbsp;
-          <button
-            style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
-            (click)="downloadfile(id)">
-            <fa-icon [icon]='faDownload' class="pr-3">
-              faDownload
-            </fa-icon>
-          </button>
-        </div>
-
-        <app-document-preview-side-dialog [header]="previewTitle"
-                                  (previewCloseClick)="onClosePreview()"
-                                  [width]="dialogWidth">
-
-
-            <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='pdfDocumentPath' style="height:1080px;"
-                          [style.display]="isPdf && !isWordDoc && !isImage ? 'block' : 'none'">
-            </ejs-pdfviewer>
-
-            <div *ngIf="isWordDoc">
-              <iframe [src]="previewUrl" style="width:100%;height:1080px;" [style.display]="isWordDoc && !isImage && !isPdf ? 'block' : 'none'"></iframe>
-            </div>
-
-            <div *ngIf="isImage">
-              <img [src]="previewUrl" height="400px" width="100%" [style.display]="isImage && !isWordDoc && !isPdf ? 'block' : 'none'">
-            </div>
-          </app-document-preview-side-dialog>
-        <div>
-          <div class="id-container">
-            <div class="input-container bootstrap">
-              <label>Attachment</label>
-              <input *ngIf="!isSend" class="e-input" type="text" disabled [(ngModel)]="fileNameInput" 
-                     [ngModelOptions]="{standalone: true}" />
-              <div id="group-attachment-files" *ngIf="isSend" [ngClass]="uploaderstatus ? 'enabled' : 'disabled'">
-                <div id="droparea" class="droparea" (click)="browseGroupEmail()">
-                  <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
-                </div>
-                <ejs-uploader #filesUploaderGroupEmail formControlName="fileUpload"
-                              [dropArea]="dropElement"
-                              [allowedExtensions]="allowedExtensions"
-                              [multiple]="false"
-                              [maxFileSize]="maxFileSize"
-                              [autoUpload]="false"
-                              (selected)="onFileSelectedGroup($event)"
-                              (removing)="onFileRemoving()">
-                </ejs-uploader>
-              </div>
-              <label *ngIf="isSend">Attached file size should not exceed 2MB<span class="e-input"></span></label>
-            </div>
+        <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>Work Commitment</label>
+            <ejs-multiselect mode="CheckBox" appValidateWithMessage
+                             formControlName="workCommitments"
+                             [fields]="regionFields"
+                             [dataSource]="workCommitmentData"
+                             [allowFiltering]="true"
+                             placeholder="Work Commitments"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true>
+            </ejs-multiselect>
           </div>
         </div>
-        <div class="rich-text-container">
-          <label>Mail Body<span class="required">*</span></label>
-          <div class="input-group" id="richTextEditorDiv" [ngClass]="emailBodyRequired ? 'invalidRichTextEditorDiv' : ''">
-            <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
-                                formControlName="emailBody" [toolbarSettings]='tools' [(ngModel)]='emailBody'
-                                [(value)]='emailBody' required>
-            </ejs-richtexteditor>
+        <div *ngIf="isEmployeeType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <div style="height: 25px;"></div>
+            <label for="chkOrientationComplete">
+              <input type="checkbox" formControlName="orientationComplete" id="chkOrientationComplete" />
+              Orientation Complete
+            </label>
           </div>
         </div>
-
+        <div *ngIf="isOrgInternalUserType || isAgencyUserType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label>User<span class="required">*</span></label>
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="user"
+                             [placeholder]='placeholderValue'
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             appValidateWithMessage
+                             [fields]="userDataFields"
+                             [dataSource]="userData"
+                             [selectAllText]='allOption'
+                             showSelectAll=true
+                             maximumSelectionLength="50000">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="button-group" *ngIf="isOrgInternalUserType || isAgencyUserType">
+          <ejs-switch id="switcher" [checked]="allowActiveUsers" (change)="onSwitcher($event);"></ejs-switch>
+          <label for="switcher" class="switch-text">Show Only Active Users</label>
+        </div>
+        <div *ngIf="isOrgCandidatesType || isAgencyCandidatesType || isEmployeeType" class="bootstrap dropdown-container">
+          <div class="input-group dropdown">
+            <label *ngIf="!isEmployeeType">Candidate<span class="required">*</span></label>
+            <label *ngIf="isEmployeeType">Employee<span class="required">*</span></label>
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="candidate"
+                             [placeholder]='placeholderValue'
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             appValidateWithMessage
+                             [fields]="userDataFields"
+                             [dataSource]="userData"
+                             [selectAllText]='allOption'
+                             showSelectAll=true
+                             maximumSelectionLength="50000" >
+            </ejs-multiselect>
+          </div>
+        </div>
       </div>
+
+      <div class="input-container bootstrap top-container">
+        <label>To<span class="required">*</span></label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="emailTo" class="e-input" type="text"
+                 [(ngModel)]="emailTo" />
+        </div>
+      </div>
+      <div class="input-container bootstrap top-container">
+        <label>CC</label>
+        <div class="input-group">
+          <input formControlName="emailCc" class="e-input" type="text"
+                 [(ngModel)]="emailCc" (keyup)="onCCFieldKeyup()" />
+        </div>
+      </div>
+      <div class="input-container bootstrap top-container">
+        <label>Subject<span class="required">*</span></label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="emailSubject" class="e-input" type="text"
+                 [(ngModel)]="emailSubject" />
+        </div>
+      </div>
+      <div class="input-container bootstrap top-container attachmentdiv" *ngIf="!isSend && (fileName != null) && (fileName != '')">
+        <h5 (click)="openpdf(id)">{{fileName}}</h5>&nbsp;
+        <button style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
+                (click)="downloadfile(id)">
+          <fa-icon [icon]='faDownload' class="pr-3">
+            faDownload
+          </fa-icon>
+        </button>
+      </div>
+
+      <app-document-preview-side-dialog [header]="previewTitle"
+                                        (previewCloseClick)="onClosePreview()"
+                                        [width]="dialogWidth">
+
+
+        <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='pdfDocumentPath' style="height:1080px;"
+                       [style.display]="isPdf && !isWordDoc && !isImage ? 'block' : 'none'">
+        </ejs-pdfviewer>
+
+        <div *ngIf="isWordDoc">
+          <iframe [src]="previewUrl" style="width:100%;height:1080px;" [style.display]="isWordDoc && !isImage && !isPdf ? 'block' : 'none'"></iframe>
+        </div>
+
+        <div *ngIf="isImage">
+          <img [src]="previewUrl" height="400px" width="100%" [style.display]="isImage && !isWordDoc && !isPdf ? 'block' : 'none'">
+        </div>
+      </app-document-preview-side-dialog>
+<div>
+  <div class="id-container">
+    <div class="input-container bootstrap">
+      <label>Attachment</label>
+      <input *ngIf="!isSend" class="e-input" type="text" disabled [(ngModel)]="fileNameInput"
+             [ngModelOptions]="{standalone: true}" />
+      <div id="group-attachment-files" *ngIf="isSend" [ngClass]="uploaderstatus ? 'enabled' : 'disabled'">
+        <div id="droparea" class="droparea" (click)="browseGroupEmail()">
+          <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+        </div>
+        <ejs-uploader #filesUploaderGroupEmail formControlName="fileUpload"
+                      [dropArea]="dropElement"
+                      [allowedExtensions]="allowedExtensions"
+                      [multiple]="false"
+                      [maxFileSize]="maxFileSize"
+                      [autoUpload]="false"
+                      (selected)="onFileSelectedGroup($event)"
+                      (removing)="onFileRemoving()">
+        </ejs-uploader>
+      </div>
+      <label *ngIf="isSend">Attached file size should not exceed 2MB<span class="e-input"></span></label>
     </div>
+  </div>
+</div>
+<div class="rich-text-container">
+  <label>Mail Body<span class="required">*</span></label>
+  <div class="input-group" id="richTextEditorDiv" [ngClass]="emailBodyRequired ? 'invalidRichTextEditorDiv' : ''">
+    <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
+                        formControlName="emailBody" [toolbarSettings]='tools' [(ngModel)]='emailBody'
+                        [(value)]='emailBody' required>
+    </ejs-richtexteditor>
+  </div>
+</div>
+
+</div>
+</div>
+</div>

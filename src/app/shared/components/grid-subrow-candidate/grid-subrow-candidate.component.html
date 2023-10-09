@@ -53,13 +53,13 @@
     <div class="title">Onboard %</div>
   </div>
   <div class="info" *ngIf="order.orderType == CPorderType ||order.orderType == LTAorderType">
-    <span class="data" *ngIf="candidat.actualStartDate === null">{{ order.startDate | date: 'MM/dd/yyyy'}}</span>
-    <span class="data" *ngIf="candidat.actualStartDate !== null">{{candidat.actualStartDate  | date: 'MM/dd/yyyy'}}</span>
+    <span class="data" *ngIf="candidat.actualStartDate === null">{{ order.startDate | date: 'MM/dd/yyyy':'UTC'}}</span>
+    <span class="data" *ngIf="candidat.actualStartDate !== null">{{candidat.actualStartDate  | date: 'MM/dd/yyyy':'UTC'}}</span>
     <div class="title">Actual Start Date </div>
   </div>
   <div class="info" *ngIf="order.orderType == CPorderType ||order.orderType == LTAorderType">
-    <span class="data" *ngIf="candidat.actualEndDate === null">{{ order.endDate | date: 'MM/dd/yyyy'}}</span>
-    <span class="data" *ngIf="candidat.actualEndDate !== null">{{candidat.actualEndDate  | date: 'MM/dd/yyyy'}}</span>
+    <span class="data" *ngIf="candidat.actualEndDate === null">{{ order.endDate | date: 'MM/dd/yyyy':'UTC'}}</span>
+    <span class="data" *ngIf="candidat.actualEndDate !== null">{{candidat.actualEndDate  | date: 'MM/dd/yyyy':'UTC'}}</span>
     <div class="title">Actual End Date </div>
   </div>
 </div>

@@ -3,6 +3,10 @@
 @import 'adaptive-response';
 
 $chip-margin: 8px;
+.main-body{
+  display: flex;
+  clear: both;
+}
 
 .header-container {
   position: sticky;
@@ -25,6 +29,7 @@ $chip-margin: 8px;
 }
 
 .profile-table-container {
+  margin-top: 20px;
   padding-bottom: 0;
 
   ::ng-deep {
@@ -58,6 +63,7 @@ $chip-margin: 8px;
   &__info {
     display: flex;
     align-items: center;
+    margin-right: 20px;
 
     .e-avatar {
       margin-right: 16px;
@@ -341,6 +347,7 @@ app-navigation-panel {
 }
 .w-50{
   width: 50%;
+  // float: left;
 }
 .w-60{
   width: 60%;
@@ -362,4 +369,9 @@ app-navigation-panel {
   position: absolute;
   right: 30px;
   top: 35px;
+}
+
+.comments {
+  margin-top: 12px;
+  overflow: auto;
 }

@@ -16,7 +16,7 @@ import {
   DatePickerModule,
   MaskedDateTimeService,
 } from '@syncfusion/ej2-angular-calendars';
-import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
+import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import {
   FileText,
   ChevronRight,
@@ -203,6 +203,7 @@ const gridIcons = {
     TooltipContainerModule,
     UploadFileAreaModule,
     SwitchEditorModule,
+    AccordionModule
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

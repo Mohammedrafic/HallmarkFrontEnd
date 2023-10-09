@@ -21,6 +21,7 @@ import {
   CriticalCellComponent,
 } from '@client/order-management/components/order-management-content/sub-grid-components/critical-cell';
 
+// eslint-disable-next-line max-lines-per-function
 export const GridCellsSystemAll = (
   canCreateOrder = false,
   settingsIsReordered = false,
@@ -172,9 +173,12 @@ export const GridCellsSystemAll = (
     width: 135,
     minWidth: 110,
     maxWidth: 180,
-    valueFormatter: (params: ValueFormatterParams) =>
-      params.data.orderType !== OrderType.OpenPerDiem
-        ? `${params.data.numberOfOpenPositions || ''}/${params.data.numberOfPositions || ''}` : '',
+    valueFormatter: (params: ValueFormatterParams) => {
+      const openPositions = params.data.numberOfOpenPositions;
+      const calculatedPositions = openPositions && openPositions >= 0 ? params.data.numberOfOpenPositions : 0;
+      return params.data.orderType !== OrderType.OpenPerDiem
+        ? `${calculatedPositions}/${params.data.numberOfPositions || ''}` : '';
+    },
   },
   {
     ...DefaultOrderCol,

@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { FiltersState, LtaEmployeeDto, OpenJobPage, PerDiemEmployeeDto, UpdateLtaEmployeeDTO } from '../interfaces';
+import { OpenJobPage } from '@shared/models';
+import { FiltersState, LtaEmployeeDto, PerDiemEmployeeDto, UpdateLtaEmployeeDTO } from '../interfaces';
 
 @Injectable()
 export class OpenJobApiService {

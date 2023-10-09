@@ -1,3 +1,4 @@
+@import 'colors';
 @import 'adaptive-response';
 
 @media #{$min-mobile} {
@@ -7,6 +8,12 @@
 
   .mobile-action-btn {
     display: none;
+  }
+
+  .dialog {
+    .mobile-close-button {
+      display: none !important;
+    }
   }
 }
 
@@ -31,6 +38,30 @@
 
     .e-btn {
       margin-left: 0;
+    }
+  }
+
+  .mobile-button-group {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 24px;
+    background-color: var(--bg-default);
+    box-shadow: 0px 4px 4px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .dialog {
+    .mobile-close-button {
+      display: block !important;
+      border-radius: 50% !important;
+      height: auto !important;
+      padding: 5px !important;
+      color: $primary-active-blue-10 !important;
+
+      .icon {
+        margin: 0;
+      }
     }
   }
 }

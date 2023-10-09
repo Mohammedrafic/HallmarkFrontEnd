@@ -2,7 +2,7 @@
   <ng-container left>
     <section class="button-group">
       <ng-container [ngTemplateOutlet]="backButton"></ng-container>
-      <h3>{{ title }} Agency</h3>
+      <h3>{{ title }} Agency {{activeUser.businessUnitName}}</h3>
     </section>
   </ng-container>
   <ng-container right>
@@ -108,7 +108,10 @@
   </e-tabitems>
 </ejs-tab>
 
-<section class="mobile-button-group">
+<section
+  class="mobile-button-group"
+  [ngClass]="{'agency-user': agencyConfig.isAgencyUser}"
+>
   <ng-container [ngTemplateOutlet]="backButton"></ng-container>
   <ng-container [ngTemplateOutlet]="buttonSection"></ng-container>
 </section>

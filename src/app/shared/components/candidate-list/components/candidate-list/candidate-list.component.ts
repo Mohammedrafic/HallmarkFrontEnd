@@ -351,6 +351,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public changePageSize(event: number): void {
+    this.currentPage = 1;
     this.pageSize = event;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }

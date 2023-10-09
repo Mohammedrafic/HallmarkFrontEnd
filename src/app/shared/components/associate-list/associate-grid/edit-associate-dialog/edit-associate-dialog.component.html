@@ -1,9 +1,9 @@
 <ejs-dialog
   id="edit-dialog"
   #sideDialog
-  cssClass="dialog"
+  cssClass="dialog responsive"
   [width]="width"
-  [target]="targetElement"
+  [target]="targetElement$ | async"
   [visible]="false"
   [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -15,36 +15,27 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title">{{ editAgencyOrg?.businessUnitName}}</h3>
           </div>
-          <div class="e-card-content">
-            <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">Cancel</button>
-            <app-tooltip-container [showToolTip]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission">
-              <button
-                ejs-button
-                [disabled]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission"
-                id="addFormButton"
-                type="submit"
-                [isPrimary]="true"
-                (click)="onSave()">Save
-              </button>
-            </app-tooltip-container>
-          </div>
+          <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
         </div>
       </section>
 
       <section class="edit-org" [ngClass]="{ 'first-active': firstActive }">
-        <ejs-tab #editOrgTab (selecting)="onTabSelecting($event)">
+        <ejs-tab
+          #editOrgTab (selecting)="onTabSelecting($event)"
+          [heightAdjustMode]="'Fill'"
+        >
           <e-tabitems>
             <e-tabitem *ngIf="userPermission[userPermissions.CanViewFeeExceptions]">
               <ng-template #headerText> {{feeSettingsText}} </ng-template>
               <ng-template #content>
-                <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [form]="$any(feeSettingsForm)"></app-fee-settings>
+                <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [isAgency]="isAgencyUser" [form]="$any(feeSettingsForm)"></app-fee-settings>
               </ng-template>
             </e-tabitem>
 
               <e-tabitem *ngIf="canViewTierTab">
                 <ng-template #headerText> {{tierExceptionText}} </ng-template>
                 <ng-template #content>
-                  <app-tier-settings [editAgencyOrg]="editAgencyOrg" (changeTierControl)="handleTierControl($event)"></app-tier-settings>
+                  <app-tier-settings [editAgencyOrg]="editAgencyOrg" [isAgency]="isAgencyUser" (changeTierControl)="handleTierControl($event)"></app-tier-settings>
                 </ng-template>
               </e-tabitem>
 
@@ -54,7 +45,7 @@
                 <app-partnership-settings
                   [partnershipForm]="$any(partnershipForm)"
                   [activeTab]="activeTab"
-                  [isAgency]="isAgency"></app-partnership-settings>
+                  [isAgency]="isAgencyUser"></app-partnership-settings>
               </ng-template>
             </e-tabitem>
           </e-tabitems>
@@ -62,4 +53,37 @@
       </section>
     </section>
   </ng-template>
+  <ng-template #footerTemplate>
+    <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
+  </ng-template>
 </ejs-dialog>
+
+<ng-template #actionBtn>
+  <div class="e-card-content mobile-button-group">
+    <button
+      ejs-button
+      cssClass="e-outline button-cancel action-btn"
+      id="cancelFormButton"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+
+    <app-tooltip-container
+      [showToolTip]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission"
+      class="action-btn"
+    >
+      <button
+        ejs-button
+        id="addFormButton"
+        type="submit"
+        class="save-btn"
+        [isPrimary]="true"
+        [disabled]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission || isAgencyUser"
+        (click)="onSave()"
+      >
+        Save
+      </button>
+    </app-tooltip-container>
+  </div>
+</ng-template>

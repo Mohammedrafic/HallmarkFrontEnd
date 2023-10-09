@@ -164,8 +164,12 @@ export const GridCellsSystemIRPTabAll = (
     width: 135,
     minWidth: 110,
     maxWidth: 180,
-    valueFormatter: (params: ValueFormatterParams) =>
-      `${params.data.numberOfOpenPositions ?? 0}/${params.data.numberOfPositions ?? 0}`,
+    valueFormatter: (params: ValueFormatterParams) => {
+      const openPositions = params.data.numberOfOpenPositions;
+      const calculatedPositions = openPositions && openPositions >= 0 ? params.data.numberOfOpenPositions : 0;
+
+      return `${calculatedPositions}/${params.data.numberOfPositions ?? 0}`;
+    },
   },
   {
     ...DefaultOrderCol,

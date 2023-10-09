@@ -14,13 +14,15 @@ export class SettingsViewService {
     id: number,
     organizationId?: number,
     includeInIrp = false,
+    jobId?: number
   ): Observable<Record<string, string>> {
     const params = {
       SettingKeys: settingKeys,
       HierarchyId: id,
       HierarchyLevel: hierarchyLevel,
       ...organizationId ? { OrganizationId: organizationId } : {},
-      ...includeInIrp ? { IsIRPConfiguration: includeInIrp }: {},
+      ...includeInIrp ? { IsIRPConfiguration: includeInIrp } : {},
+      ...jobId ? { JobId: jobId } : {}
     };
     const url = includeInIrp ? '/api/OrganizationSettings/hierarchy/byKeys' : '/api/OrganizationSettings/byKeys';
 

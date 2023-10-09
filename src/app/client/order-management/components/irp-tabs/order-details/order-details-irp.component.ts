@@ -130,6 +130,7 @@ import {
 } from '@organization-management/store/organization-management.actions';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { Router } from '@angular/router';
+import { OrderStatus } from '@shared/enums/order-management';
 enum SubmitButtonItem {
   SaveForLater = '0',
   Save = '1',
@@ -931,6 +932,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       if (isPerDiemOrderEditable) {
         this.generalInformationForm.controls['jobDates'].disable();
       }
+    }
+
+    if (selectedOrder.status === OrderStatus.Filled || selectedOrder.status === OrderStatus.Closed) {
+      this.generalInformationForm.get('openPositions')?.disable();
     }
   }
 

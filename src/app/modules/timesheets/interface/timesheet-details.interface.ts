@@ -29,7 +29,7 @@ export interface DetailsTableConfig {
 
 export interface DialogActionPayload {
   dialogState: boolean;
-  id:  number;
+  id: number;
 }
 
 export interface CandidateInfo {
@@ -96,6 +96,8 @@ export interface TimesheetDetailsModel {
   agencyStatus: AgencyStatus;
   isEmpty: boolean;
   orderSkillName: string;
+  commentContainerId: number;
+  externalCommentsConfiguration?: boolean | null;
 }
 
 export interface WorkWeek<T> {
@@ -139,7 +141,7 @@ export interface AddRecordDto {
   timeOut?: string;
   billRateConfigId: number;
   departmentId: number;
-  description?: string,
+  description?: string;
   value?: number;
   hadLunchBreak?: boolean;
   isTimeInNull?: boolean;

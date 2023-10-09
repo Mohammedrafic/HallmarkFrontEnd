@@ -135,8 +135,24 @@ export class SkillsService {
   }
 
   public getAssignedSkillsByOrganization(params: SkillParams): Observable<AssignedSkillsByOrganization[]> {
+    const departmentsLimitReached = params.params.DepartmentIds !== undefined && params.params.DepartmentIds?.length > 50;
+    const categoryLimitReached = params.params.SkillCategoryIds !== undefined && params.params.SkillCategoryIds?.length > 50;
+    if (departmentsLimitReached || categoryLimitReached) {
+      return this.getAssignedSkillsByOrganizationWithBody(params);
+     } else {
+      return this.getAssignedSkillsByOrganizationWithoutBody(params);
+     }
+  }
+
+  private getAssignedSkillsByOrganizationWithoutBody(params: SkillParams): Observable<AssignedSkillsByOrganization[]> {
     return this.http.get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit', params);
   }
+
+  private getAssignedSkillsByOrganizationWithBody(params: SkillParams): Observable<AssignedSkillsByOrganization[]> {
+    return this.http.post<AssignedSkillsByOrganization[]>(
+      '/api/AssignedSkills/assignedSkillsForCurrentBusinessUnitFromBody', params.params);
+  }
+
 
   public getAllMasterSkillList(): Observable<MasterSkill[]> {
     return this.http.get<MasterSkill[]>('/api/MasterSkills/getAll');

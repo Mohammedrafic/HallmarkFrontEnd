@@ -22,6 +22,7 @@ export class SideDialogComponent extends DestroyableDirective implements OnInit 
   @Input() width = '434px';
   @Input() disableSaveButton = false;
   @Input() saveButtonLabel = 'Save';
+  @Input() tooltipMessage = '';
 
   @Output() formCancelClicked = new EventEmitter();
   @Output() formSaveClicked = new EventEmitter();

@@ -11,5 +11,6 @@ export class Comment {
   isPrivate? : boolean;
   isIRP?:boolean;
   candidateJobId?:number;
+  organizationName?:string;
 }
   

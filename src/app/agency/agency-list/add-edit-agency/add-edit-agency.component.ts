@@ -133,7 +133,6 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   ) {
     super(store);
     this.isEdit = !!this.route.snapshot.paramMap.get('id');
-    this.setHeaderTitle();
     this.store.dispatch(new GetBusinessUnitList());
   }
 
@@ -145,6 +144,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     this.enableCreateUnderControl();
     this.getAgencyRegionsSkills();
     this.getActiveUser();
+    this.setHeaderTitle();
 
     this.actions$
       .pipe(
@@ -419,10 +419,10 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
 
   private setHeaderTitle(): void {
     const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
-    let title = 'Agency';
+    let title = 'Agency Profile';
 
     if (this.isEdit && isMobile) {
-      title = 'Edit Agency';
+      title = 'Edit Agency' + this.activeUser.businessUnitName;
     } else if (!this.isEdit && isMobile) {
       title = 'Add Agency';
     }

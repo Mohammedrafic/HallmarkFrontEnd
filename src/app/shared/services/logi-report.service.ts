@@ -27,62 +27,63 @@ export class LogiReportService {
    * Get the list of available Regions by organizations
    * @return Array of Regions
    */
-   public getRegionsByOrganizationId(filter:any): Observable<regionsPage> {
-      return this.http.post<regionsPage>(`/api/LogiReport/region/filter`, filter);
+  public getRegionsByOrganizationId(filter: any): Observable<regionsPage> {
+    return this.http.post<regionsPage>(`/api/LogiReport/region/filter`, filter);
   }
 
   /**
    * Get the list of available Locations by Regions
    * @return Array of Locations
    */
-   public getLocationsByOrganizationId(filter:any): Observable<LocationsPage> {
+  public getLocationsByOrganizationId(filter: any): Observable<LocationsPage> {
     return this.http.post<LocationsPage>(`/api/LogiReport/location/filter`, filter);
-}
+  }
 
-/**
-   * Get the list of available Departments by Locations
-   * @return Array of Departments
-   */
- public getDepartmentsByOrganizationId(filter:any): Observable<DepartmentsPage> {
-  return this.http.post<DepartmentsPage>(`/api/LogiReport/department/filter`, filter);
-}
-/**
-   * Get the list of Configurations
-   * @return ConfigurationDto
-   */
-public getLogiReportData(): Observable<ConfigurationDto[]> {
-  return this.http.get<ConfigurationDto[]>(`/config/ReportServer`);
-}
-/**
-   * Get the Common Report  Filter Options
-   * @return CommonReportFilterOptions
-   */
-public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOptions> {
-  return this.http.post<CommonReportFilterOptions>(`/api/LogiReport/financialtimesheet/filter`,filter).pipe(map((data) => {
-    const sortedFields: Record<keyof CommonReportFilterOptions, string> = { 
-      candidateStatuses: 'statusText',
-      orderStatuses: 'statusText',
-      jobStatuses:'statusText',
-      masterSkills: 'name',
-      skillCategories: 'name',
-      agencies: 'agencyName',
-      timesheetStatuses: 'name',
-      candidateStatusesAndReasons :'statusText',
-      jobStatusesAndReasons :'statusText',
-      allCandidateStatusesAndReasons :'statusText',
-      allJobStatusesAndReasons :'statusText',
-      invoiceStatuses:'name'
-    }
-    
-    return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof CommonReportFilterOptions])]))
-  }));
-}
-/**
-   * Get the Common Candidate Search
-   * @return SearchCandidate
-   */
- public getCommonCandidateSearch(filter:any): Observable<SearchCandidate[]> {
-   return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`,filter);
+  /**
+     * Get the list of available Departments by Locations
+     * @return Array of Departments
+     */
+  public getDepartmentsByOrganizationId(filter: any): Observable<DepartmentsPage> {
+    return this.http.post<DepartmentsPage>(`/api/LogiReport/department/filter`, filter);
+  }
+  /**
+     * Get the list of Configurations
+     * @return ConfigurationDto
+     */
+  public getLogiReportData(): Observable<ConfigurationDto[]> {
+    return this.http.get<ConfigurationDto[]>(`/config/ReportServer`);
+  }
+  /**
+     * Get the Common Report  Filter Options
+     * @return CommonReportFilterOptions
+     */
+  public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOptions> {
+    return this.http.post<CommonReportFilterOptions>(`/api/LogiReport/financialtimesheet/filter`, filter).pipe(map((data) => {
+      const sortedFields: Record<keyof CommonReportFilterOptions, string> = {
+        candidateStatuses: 'statusText',
+        orderStatuses: 'statusText',
+        jobStatuses:'statusText',
+        masterSkills: 'name',
+        skillCategories: 'name',
+        agencies: 'agencyName',
+        activeAgency: 'agencyName',
+        timesheetStatuses: 'name',
+        candidateStatusesAndReasons :'statusText',
+        jobStatusesAndReasons :'statusText',
+        allCandidateStatusesAndReasons :'statusText',
+        allJobStatusesAndReasons :'statusText',
+        invoiceStatuses:'name'
+      }
+
+      return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof CommonReportFilterOptions])]))
+    }));
+  }
+  /**
+     * Get the Common Candidate Search
+     * @return SearchCandidate
+     */
+  public getCommonCandidateSearch(filter:any): Observable<SearchCandidate[]> {
+    return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`, filter);
   }
   /**
    * Get the Common Candidate Search For Agency
@@ -91,12 +92,12 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
   public getCommonAgencyCandidateSearch(filter: any): Observable<SearchCandidate[]> {
     return this.http.post<SearchCandidate[]>(`/api/LogiReport/common/candidatesearch`, filter);
   }
-/**
-   * Get the Common Credential Search
-   * @return SearchCredential
-   */
- public getCommonCredentialSearch(filter:any): Observable<SearchCredential[]> {
-  return this.http.post<SearchCredential[]>(`/api/LogiReport/common/credentialsearch`,filter);
+  /**
+     * Get the Common Credential Search
+     * @return SearchCredential
+     */
+  public getCommonCredentialSearch(filter: any): Observable<SearchCredential[]> {
+    return this.http.post<SearchCredential[]>(`/api/LogiReport/common/credentialsearch`, filter);
   }
 
 
@@ -115,8 +116,8 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
    * Get the Staff list Candidate Search
    * @return SearchCandidate
    */
- public getStaffListCandidateSearch(filter:any): Observable<SearchCandidate[]> {
-  return this.http.post<SearchCandidate[]>(`/api/LogiReport/stafflist/candidatesearch`,filter);
+  public getStaffListCandidateSearch(filter:any): Observable<SearchCandidate[]> {
+    return this.http.post<SearchCandidate[]>(`/api/LogiReport/stafflist/candidatesearch`, filter);
   }
   /**
   * TODO: remove this with shared service

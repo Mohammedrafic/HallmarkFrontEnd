@@ -7,11 +7,11 @@
     </ng-container>
     <ng-container right>
       <section class="org-controls-container">
-        <div>
+        <div class="button-group">
           <app-tooltip-container
             [message]="toolTipMessage"
             [showToolTip]="!userPermission[userPermissions.CanCreateDeleteOrganization]">
-           <button class="noResponsive"
+           <button
               ejs-button
               appHideBeforeSyncfusionLoad
               [isPrimary]="true"
@@ -30,7 +30,8 @@
             cssClass="e-outline button-export"
           >
             <div class="button-export-container">
-              Export <i-feather name="upload" class="icon"></i-feather>
+              <span class="text-btn">Export</span>
+              <i-feather name="upload" class="icon"></i-feather>
             </div>
           </button>
           <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
@@ -53,7 +54,6 @@
       [allowSorting]="true"
       [allowResizing]="true"
       [resizeSettings]="resizeSettings"
-      [allowPaging]="allowPaging"
       [pageSettings]="pageSettings"
       [enableVirtualization]="false"
       [height]="fullScreenGridHeight"
@@ -71,7 +71,7 @@
           </ng-template>
           <ng-template #template let-data>
             <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-              <button ejs-button cssClass="e-flat primary-icon-button noResponsive" (click)="editOrganization(data)">
+              <button ejs-button cssClass="e-flat primary-icon-button" (click)="editOrganization(data)">
                 <span><i-feather name="edit" class="icon"></i-feather></span>
               </button>
             </div>
@@ -103,54 +103,18 @@
           </ng-template>
         </e-column>
       </e-columns>
-      <ng-template #pagerTemplate let-data>
-        <!--TODO: move to shared component-->
-        <div class="e-pagertemplate">
-          <div class="control-section">
-            <div class="content-wrapper">
-              <section class="left-side-pager-controls">
-                <ejs-dropdownlist
-                  id="rowsPerPage"
-                  class="dropdown-no-border"
-                  [dataSource]="rowsPerPageDropDown"
-                  [allowFiltering]="true"
-                  [(value)]="activeRowsPerPageDropDown"
-                  (change)="onRowsDropDownChanged()"
-                >
-                </ejs-dropdownlist>
-                <ejs-numerictextbox
-                  id="goToPage"
-                  class="numeric-input-no-border"
-                  format="#"
-                  placeholder="Go to:"
-                  min="1"
-                  [max]="(organizations$ | async)?.totalPages"
-                  [showSpinButton]="false"
-                  (change)="onGoToClick($event)"
-                >
-                </ejs-numerictextbox>
-                <div class="total-rows">
-                  Total Rows: {{(organizations$ | async)?.totalCount}}
-                </div>
-              </section>
-              <section class="right-side-pager-controls">
-                <ejs-pager
-                  id="gridPager"
-                  #gridPager
-                  [pageSize]="pageSize"
-                  [totalRecordsCount]="(organizations$ | async)?.totalCount"
-                  [enablePagerMessage]="false"
-                  [currentPage]="currentPage"
-                  (click)="onGoToClick($event)"
-                >
-                </ejs-pager>
-              </section>
-            </div>
-          </div>
-        </div>
-      </ng-template>
     </ejs-grid>
+
+    <app-grid-pagination
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalRecordsCount]="(organizations$ | async)?.totalCount ?? 0"
+      (navigateToPageEmitter)="changeGridPage($event)"
+      (pageSizeChangeEmitter)="changeGridSize($event)"
+    ></app-grid-pagination>
   </section>
+
+  <app-scroll-to-top></app-scroll-to-top>
 </section>
 
 <app-filter-dialog

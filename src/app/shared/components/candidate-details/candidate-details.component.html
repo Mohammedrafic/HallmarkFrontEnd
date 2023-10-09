@@ -1,8 +1,11 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tab-navigation 
-    #tabNavigation 
-    class="table-tabs" (selectedTab)="tabSelected($event)"></app-tab-navigation>
+    <app-tab-navigation
+      #tabNavigation 
+      appTabsMobileShadow
+      class="table-tabs responsive"
+      (selectedTab)="tabSelected($event)"
+    ></app-tab-navigation>
   </ng-container>
   <ng-container right>
     <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="showFilters()">

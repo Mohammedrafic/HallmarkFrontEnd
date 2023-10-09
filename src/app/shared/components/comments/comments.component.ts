@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
@@ -28,6 +28,7 @@ export class CommentsComponent {
   @Input() orderId: number;
   public commentData: Comment[] = [];
   @Input() canVmsCreateOrders: boolean;
+  @Output() commentSaveCheck = new EventEmitter<boolean>();
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
     if (value.length) {
@@ -178,6 +179,7 @@ export class CommentsComponent {
     this.scroll$.next(null);
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment));
+      this.commentSaveCheck.emit(true);
     }
   }
 

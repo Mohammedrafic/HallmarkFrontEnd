@@ -147,7 +147,7 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
   private subscribeOnOpenEvent(): void {
     this.dialogEvent
       .pipe(
-        filter((event: boolean) => event!!),
+        filter((event: boolean) => event),
         takeUntil(this.destroy$)
       ).subscribe(() => {
         this.dialogTitle = ADD_PAYMENT;

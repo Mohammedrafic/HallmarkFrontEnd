@@ -29,6 +29,8 @@ export class TierSettingsComponent extends DestroyableDirective implements OnIni
     }
   }
 
+  @Input() isAgency: boolean;
+
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
   public tierControl: FormControl = new FormControl();
   public tiersList: TierList[];

@@ -28,6 +28,8 @@ import { SettingsViewService } from '@shared/services';
 import { TierLogic } from '@shared/enums/tier-logic.enum';
 import { GetOrgTierStructure } from '../../../../../store/user.actions';
 import { DateTimeHelper } from '@core/helpers';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-edit-associate-dialog',
@@ -43,10 +45,13 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
 
   @Select(AssociateListState.feeExceptionsPage)
   public feeExceptionsPage$: Observable<FeeExceptionsPage>;
+
   @Select(AssociateListState.baseFee)
   public baseFee$: Observable<number>;
 
-  public targetElement: HTMLElement = document.body;
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
+
   public editAgencyOrg: AssociateOrganizationsAgency;
   public width: string;
   public feeSettingsForm: FormGroup;
@@ -64,6 +69,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   public partnershipText: string = TabsText[TabsText["Partnership Settings"]];
   private isAlive = true;
   public isAgency: boolean;
+  public isAgencyUser: boolean = false;
 
   constructor(
     protected override store: Store,
@@ -85,7 +91,10 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     this.onFeeExceptionsPageChanged();
 
     this.partnershipForm = PartnershipSettingsComponent.createForm();
-
+    const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    if (businessUnitType == BusinessUnitType.Agency) {
+      this.isAgencyUser = true;
+    }
     if (this.isAgency) {
       this.checkForAgencyStatus();
     }

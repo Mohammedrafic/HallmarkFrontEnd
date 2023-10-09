@@ -634,6 +634,7 @@
             <app-order-management-subrow-candidate-position
               *ngFor="let child of data.children; index as i; trackBy: trackById"
               [candidatePosition]="child"
+              [showDates]="data.orderType === orderTypes.LongTermAssignment || data.orderType === orderTypes.ContractToPerm"
               [isBothSystemsEnabled]="isOrgIRPEnabled && isOrgVMSEnabled"
               [selected]="
                 selectedCandidate?.selected?.order === data.id &&
@@ -936,8 +937,7 @@
           <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
         </div>
       </div>
-      <div class="input-container"
-           *ngIf="!isActiveSystemIRP">
+      <div class="input-container">
           <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Status</label>
           <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Status</label>
         <div class="input-group multiselect">

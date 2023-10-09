@@ -1,12 +1,9 @@
 import { ValueType } from '@syncfusion/ej2-angular-grids';
 
-import { PageOfCollections } from '@shared/models/page.model';
+import { OrderJobType } from '@shared/enums';
 import { FieldType } from '@core/enums';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { DropdownOption } from '@core/interface';
-import { OrderJobType } from '../enums';
-
-export type OpenJobPage = PageOfCollections<OpenJob>;
 
 export interface PageSettings {
   pageNumber: number;

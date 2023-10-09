@@ -769,7 +769,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       }
       else {
         this.gridApi?.hideOverlay();
-        const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))];
+        let documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))];
         if(this.filterSelecetdBusinesType == BusinessUnitType.Agency){
           this.agencyColumnDefinitions.forEach(element => {
             if(element.field == "businessUnitName"){
@@ -782,6 +782,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
               element.headerName = 'Agency Name';
             }
           });
+        }
+        if(documentData.filter(ele=>ele.isSharedWithMe).length == documentData.length){
+          documentData = documentData.filter(data=>data.status === 'Active');
         }
         this.gridApi.setColumnDefs(this.agencyColumnDefinitions);
         this.rowData = documentData;

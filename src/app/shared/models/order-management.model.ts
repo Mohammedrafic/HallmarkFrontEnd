@@ -525,6 +525,7 @@ export class Order {
   documentsCount: number;
   fromTemplateId?: number;
   disableNumberOfOpenPositions?: boolean | null;
+  workflowName?: string;
 }
 
 export class ReOrder {
