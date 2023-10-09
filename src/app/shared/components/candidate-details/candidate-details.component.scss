@@ -90,6 +90,7 @@
 @media #{$max-mobile} {
   .candidates-grid {
     height: auto;
+    padding-bottom: 24px;
   }
 
   .tab-legend {
@@ -107,6 +108,7 @@
         top: 80px;
         left: 0;
         width: 100% !important;
+        z-index: 2;
 
         &:has([style*="box-shadow"]) {
           box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 4px !important;
