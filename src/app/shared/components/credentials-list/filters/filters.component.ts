@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, skip, takeUntil } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
 
 import { OptionFields } from '@shared/components/credentials-list/constants';
 import { CredentialFiltersService, CredentialListService } from '@shared/components/credentials-list/services';
@@ -114,7 +114,6 @@ export class FiltersComponent extends Destroyable implements OnInit {
 
   private watchForOrganizationId(): void {
     this.organizationId$.pipe(
-      skip(1),
       takeUntil(this.componentDestroy())
     ).subscribe((id: number) => {
       this.clearAllFilters(id);
