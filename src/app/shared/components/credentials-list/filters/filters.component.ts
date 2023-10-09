@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, takeUntil } from 'rxjs';
+import { Observable, skip, takeUntil } from 'rxjs';
 
 import { OptionFields } from '@shared/components/credentials-list/constants';
 import { CredentialFiltersService, CredentialListService } from '@shared/components/credentials-list/services';
@@ -57,7 +56,6 @@ export class FiltersComponent extends Destroyable implements OnInit {
     private filterService: FilterService,
     private credentialFiltersService: CredentialFiltersService,
     private store: Store,
-    private datePipe: DatePipe,
     private changeDetection: ChangeDetectorRef
   ) {
     super();
@@ -107,7 +105,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
       });
     }
 
-    this.filteredItems = this.filterService.generateChips(this.credentialsFilters, this.filterColumns, this.datePipe);
+    this.filteredItems = this.filterService.generateChips(this.credentialsFilters, this.filterColumns);
   }
 
   private initFilterForm(): void {
@@ -116,6 +114,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
 
   private watchForOrganizationId(): void {
     this.organizationId$.pipe(
+      skip(1),
       takeUntil(this.componentDestroy())
     ).subscribe((id: number) => {
       this.clearAllFilters(id);
