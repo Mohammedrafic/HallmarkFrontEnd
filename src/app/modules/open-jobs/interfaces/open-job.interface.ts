@@ -10,31 +10,6 @@ export interface PageSettings {
   pageSize: number;
 }
 
-export interface OpenJob {
-  employeeId: string;
-  id: number;
-  skillId: number;
-  skillName: string;
-  startDate: string;
-  endDate: string;
-  jobDate: string;
-  shiftStartDateTime: string;
-  shiftEndDateTime: string;
-  shiftId: number;
-  regionId: number;
-  regionName: string;
-  locationId: number;
-  locationName: string;
-  departmentId: number;
-  departmentName: string;
-  orderType: number;
-  isApplySelected: boolean;
-  isApplyEnabled: boolean;
-  isDeprtmentVisible: boolean;
-  orderTypeName: string;
-  jobId?: number | null;
-}
-
 export interface OpenJobFilter {
   orderType: number | null | OrderJobType;
 }
