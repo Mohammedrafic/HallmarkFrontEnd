@@ -17,12 +17,9 @@ import { OpenJobsAdapter } from '../adapters';
 import { 
   FiltersState, 
   LtaEmployeeDto, 
-  OpenJob, 
-  OpenJobPage, 
   PerDiemEmployeeDto, 
   UpdateLtaEmployeeDTO, 
 } from '../interfaces';
-import { OrderJobType } from '../enums';
 import { 
   AppliedMessage, 
   AppliedWorkflowStep, 
@@ -30,7 +27,6 @@ import {
   WithdrawnMessage, 
   WithdrawnWorkflowStep, 
 } from '../constants';
-import { GetLocalDate } from '../helpers';
 import { ShowToast } from '../../../store/app.actions';
 import { JobFilterService } from './job-filter.service';
 import { UserState } from 'src/app/store/user.state';
