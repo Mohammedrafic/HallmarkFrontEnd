@@ -38,6 +38,7 @@ enum CommentsFilter {
 })
 export class CommentsComponent {
   @Input() useBackground = true;
+  @Input() useStyle = false;
   @Input() disabled = false;
   @Input() orderId: number;
   public commentData: Comment[] = [];
