@@ -597,7 +597,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   private manageNotifications(): void {
     const menu=this.store.selectSnapshot(UserState.menu)
-    console.log(menu)
       if (menu.menuItems.length) {
         const menuItems = menu.menuItems
           .find((element) => element.id == 96)
