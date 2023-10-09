@@ -16,7 +16,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { FieldType } from '@core/enums';
-import { OPTION_FIELDS, TIER_DIALOG_TYPE, TiersDialogConfig, FiledNamesSettings, FieldNames, OPTION_FIELDS_IRP } from '@shared/components/tiers-dialog/constants';
+import { OPTION_FIELDS, TIER_DIALOG_TYPE, TiersDialogConfig, OPTION_FIELDS_IRP } from '@shared/components/tiers-dialog/constants';
 import { TierDataSource, TierDetails, TierDialogConfig, TiersInputConfig } from '@shared/components/tiers-dialog/interfaces';
 import { Tiers } from '@shared/enums/tiers.enum';
 import { CustomFormGroup } from '@core/interface';
@@ -38,6 +38,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Query } from "@syncfusion/ej2-data";
 import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
 import { SystemType } from '@shared/enums/system-type.enum';
+import { FieldNames, FiledNamesSettings } from '@shared/constants/base-dropdown-fields-settings';
 
 @Component({
   selector: 'app-tiers-dialog',
@@ -97,7 +98,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   public allRecords: FiledNamesSettings = {
     'regionIds': false,
     'locationIds': false,
-    'departmentIds': false
+    'departmentIds': false,
   };
   public maxDepartmentsLength = 1000;
   public query: Query = new Query().take(this.maxDepartmentsLength);

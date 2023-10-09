@@ -164,6 +164,7 @@ export interface ScheduleFilterItem {
   valueId: string;
   valueType: ValueType;
   filterTitle: string;
+  allowNull?: boolean;
 }
 
 export interface ScheduleFilters {
@@ -203,6 +204,8 @@ export interface ScheduleFilterFormFieldConfig {
   type: FieldType;
   required: boolean;
   sourceKey: ScheduleFilterFormSourceKeys;
+  showAllToggle?: boolean;
+  customFiltering?: boolean;
 }
 
 export interface ScheduleFilterFormConfig {

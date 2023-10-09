@@ -167,12 +167,14 @@ export const CardTitleforExport = (scheduleItem: DaySchedules): string => {
 };
 
 export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilters): ScheduleInt.EmployeesFilters => {
-  const { startDate, endDate, departmentsIds, isAvailablity, isUnavailablity, isOnlySchedulatedCandidate, startTime, endTime } = filters;
+  const { 
+    startDate, endDate, departmentsIds, isAvailablity, isUnavailablity, isOnlySchedulatedCandidate, startTime, endTime 
+  } = filters;
 
   return {
     startDate: startDate || '',
     endDate: endDate || '',
-    departmentsIds: departmentsIds ?? [],
+    departmentsIds: departmentsIds === undefined ? [] : departmentsIds,
     userLocalTime: DateTimeHelper.setUtcTimeZone(new Date()),
     isAvailablity : isAvailablity || false,
     isUnavailablity : isUnavailablity || false,

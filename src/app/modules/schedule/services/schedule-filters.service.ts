@@ -36,6 +36,7 @@ export class ScheduleFiltersService {
   allDepartments: DropdownOption[];
   firstDepartment: OrganizationDepartment;
   getallDepartments: any;
+  public fieldsWithAllToggle = ['regionIds', 'locationIds', 'departmentsIds'];
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -105,7 +106,7 @@ export class ScheduleFiltersService {
         return !!(formValue[key] as number[]).length;
       }
 
-      return !!formValue[key];
+      return this.fieldsWithAllToggle.indexOf(key) > -1 && formValue[key] === null || !!formValue[key];
     })
     .map((key) => {
       const configItem = filterConfig[key as keyof ScheduleFiltersConfig];
@@ -165,7 +166,7 @@ export class ScheduleFiltersService {
     };
 
     structureState.regionIds = filterStructure.regions?.filter((region: OrganizationRegion) => {
-      return regionIds.includes(region.id as number) && region.name !== name;
+      return regionIds?.includes(region.id as number) && region.name !== name;
     }).map((region: OrganizationRegion) => {
       structureState.regions = [...state.regions,...structureState.regions,...region.locations as OrganizationLocation[]];
       return Number(region.id);
@@ -192,7 +193,7 @@ export class ScheduleFiltersService {
     };
 
     structureState.locationIds = state.regions?.filter((location: OrganizationLocation) => {
-      return locationIds.includes(location.id) && location.name !== name;
+      return locationIds?.includes(location.id) && location.name !== name;
     }).map((location: OrganizationLocation) => {
       structureState.locations = [...state.locations,...structureState.locations,...location.departments];
       return Number(location.id);
@@ -217,7 +218,7 @@ export class ScheduleFiltersService {
     };
 
     structureState.departmentIds = state.locations?.filter((departments: OrganizationDepartment) => {
-      return departmentsIds.includes(departments.id) && departments.name !== name;
+      return departmentsIds?.includes(departments.id) && departments.name !== name;
     }).map((departments: OrganizationDepartment) => {
       structureState.departments.push(departments);
       return Number(departments.id);
@@ -242,7 +243,7 @@ export class ScheduleFiltersService {
 
   getFilteredDepartmentsIds(departments: OrganizationDepartment[], departmentsIds: number[]): number[] {
     const depIds = departments.map((department: OrganizationDepartment) => department.id);
-    return  departmentsIds.filter((id: number) => depIds.includes(id));
+    return  departmentsIds?.filter((id: number) => depIds.includes(id));
   }
 
   private createChipValue(formValue: number[] | number | string | boolean, configIem: ScheduleFilterItem): string[] {
@@ -256,6 +257,10 @@ export class ScheduleFiltersService {
 
     if (typeof formValue === 'number') {
       return [formValue.toString()];
+    }
+
+    if (formValue === null) {
+      return ['All'];
     }
 
     return [formValue];

@@ -37,6 +37,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueField: 'text',
     valueId: 'value',
     filterTitle: 'Region',
+    allowNull: true,
   },
   [ScheduleFilterFormSourceKeys.Locations]: {
     type: ControlTypes.Multiselect,
@@ -45,6 +46,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueField: 'text',
     valueId: 'value',
     filterTitle: 'Location',
+    allowNull: true,
   },
   [ScheduleFilterFormSourceKeys.Departments]: {
     type: ControlTypes.Multiselect,
@@ -53,6 +55,7 @@ export const ScheduleFiltersColumns: ScheduleFiltersConfig = {
     valueField: 'text',
     valueId: 'value',
     filterTitle: 'Department',
+    allowNull: true,
   },
   [ScheduleFilterFormSourceKeys.Skills]: {
     type: ControlTypes.Multiselect,
@@ -131,6 +134,8 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     type: FieldType.MultiSelectDropdown,
     required: true,
     sourceKey: ScheduleFilterFormSourceKeys.Regions,
+    showAllToggle: true,
+    customFiltering: true,
   },
   {
     field: 'locationIds',
@@ -138,6 +143,8 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     type: FieldType.MultiSelectDropdown,
     required: true,
     sourceKey: ScheduleFilterFormSourceKeys.Locations,
+    showAllToggle: true,
+    customFiltering: true,
   },
   {
     field: 'departmentsIds',
@@ -145,6 +152,8 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     type: FieldType.MultiSelectDropdown,
     required: false,
     sourceKey: ScheduleFilterFormSourceKeys.Departments,
+    showAllToggle: true,
+    customFiltering: true,
   },
   {
     field: 'skillIds',
