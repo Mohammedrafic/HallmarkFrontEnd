@@ -739,9 +739,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       startDateFormControl?.disable();
       endDateConfigField.required = true;
       endDateConfigField.minDate = this.candidateDetails?.actualStartDate
-        ? new Date(this.candidateDetails.actualStartDate) : null;
+        ? DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualStartDate as string) : null;
       endDateConfigField.maxDate = this.candidateDetails?.actualEndDate
-        ? new Date(this.candidateDetails.actualEndDate) : null;
+        ? DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualEndDate as string) : null;
       this.endDateFormControlValue = endDateFormControl?.value;
       endDateFormControl?.reset();
       endDateFormControl?.setValidators([Validators.required]);
