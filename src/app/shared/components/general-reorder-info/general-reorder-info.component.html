@@ -28,11 +28,20 @@
           <div class="sup-title">Reason for Requisition</div>
         </div>
       </div>
+      <div class="column" *ngIf="(isOrganizationOrAgencyArea$ | async)?.isAgencyArea">
+        <div class="icon">
+          <i-feather name="map-pin" class="icon"></i-feather>
+        </div>
+        <div>
+          <div class="title">{{ orderInformation.regionName }}</div>
+          <div class="sup-title">Region</div>
+        </div>
+      </div>
       <div class="column last-column">
         <div class="cost">${{ regularRates.regular }}</div>
         <div class="sup-title">Regular Bill Rate</div>
       </div>
-      <div class="column">
+      <div class="column" *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
         <div class="icon">
           <i-feather name="map-pin" class="icon"></i-feather>
         </div>

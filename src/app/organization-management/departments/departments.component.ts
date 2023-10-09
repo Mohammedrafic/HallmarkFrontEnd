@@ -147,7 +147,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     private filterService: FilterService,
     private departmentService: DepartmentService,
     private action$: Actions,
-    private settingsViewService: SettingsViewService,
+    private settingsViewService: SettingsViewService
   ) {
     super(store);
 
@@ -185,7 +185,11 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   public onFilterClose() {
     this.departmentService.populateFilterForm(this.DepartmentFilterFormGroup, this.filters, this.isIRPFlagEnabled);
 
-    this.filteredItems = this.filterService.generateChips(this.DepartmentFilterFormGroup, this.filterColumns, this.datePipe);
+    this.filteredItems = this.filterService.generateChips(
+      this.DepartmentFilterFormGroup,
+      this.filterColumns,
+      this.datePipe
+    );
   }
 
   public showFilters(): void {
@@ -206,7 +210,11 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
 
     this.filters = formValue;
     this.filters.inactiveDate = inactiveDate ? DateTimeHelper.setUtcTimeZone(inactiveDate) : '';
-    this.filteredItems = this.filterService.generateChips(this.DepartmentFilterFormGroup, this.filterColumns, this.datePipe);
+    this.filteredItems = this.filterService.generateChips(
+      this.DepartmentFilterFormGroup,
+      this.filterColumns,
+      this.datePipe
+    );
 
     this.getDepartments();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -230,14 +238,18 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = 'Organization Departments ' + this.generateDateTime(this.datePipe);
-    this.store.dispatch(new ExportDepartments(new ExportPayload(
-      fileType,
-      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
-      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
-      options?.fileName || this.defaultFileName,
-      this.selectedItems.length ? 180 : null
-    )));
+    this.store.dispatch(
+      new ExportDepartments(
+        new ExportPayload(
+          fileType,
+          { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
+          options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
+          this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
+          options?.fileName || this.defaultFileName,
+          this.selectedItems.length ? 180 : null
+        )
+      )
+    );
     this.clearSelection(this.grid);
   }
 
@@ -256,26 +268,25 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     });
     this.action$.pipe(ofActionDispatched(SaveDepartmentConfirm), takeUntil(this.componentDestroy())).subscribe(() => {
       this.confirmService
-      .confirm('Department has active orders past the inactivation date. Do you want to proceed?', {
-        title: 'Confirmation',
-        okButtonLabel: 'Yes',
-        cancelButtonLabel: 'No',
-        okButtonClass: 'delete-button',
-      })
-      .pipe(
-        filter(Boolean),
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe(() => {
-        this.onDepartmentFormSaveClick(true);
-      });
+        .confirm('Department has active orders past the inactivation date. Do you want to proceed?', {
+          title: 'Confirmation',
+          okButtonLabel: 'Yes',
+          cancelButtonLabel: 'No',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+        .subscribe(() => {
+          this.onDepartmentFormSaveClick(true);
+        });
     });
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion?.id) {
-      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id)).pipe(takeUntil(this.componentDestroy()))
+      this.store
+        .dispatch(new GetLocationsByRegionId(this.selectedRegion.id))
+        .pipe(takeUntil(this.componentDestroy()))
         .subscribe((data) => {
           if (data.organizationManagement.locations.length > 0) {
             this.defaultLocationValue = data.organizationManagement.locations[0].id;
@@ -312,7 +323,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     this.grid.pageSettings.pageSize = this.pageSize;
   }
 
-  changeTablePagination(event: { currentPage?: number; value: number; }): void {
+  changeTablePagination(event: { currentPage?: number; value: number }): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
     }
@@ -333,20 +344,24 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     this.store.dispatch(new ShowSideDialog(true));
     this.inactivateDateHandler(
       this.departmentsDetailsFormGroup.controls['inactiveDate'],
-      department.inactiveDate, department.reactivateDate
+      department.inactiveDate,
+      department.reactivateDate
     );
   }
 
   private inactivateDateHandler(field: AbstractControl, value: string | null, reactivateValue: string | null): void {
     if (value) {
       const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
-      const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
+      const reactivateDate = reactivateValue
+        ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy'))
+        : null;
       inactiveDate.setHours(0, 0, 0, 0);
       const now = new Date();
       now.setHours(0, 0, 0, 0);
+      const inactiveInPast = DateTimeHelper.hasDateBefore(inactiveDate, now);
       const areDatesInThePast = (reactivateDate && DateTimeHelper.hasDateBefore(reactivateDate, now)) &&
-        DateTimeHelper.hasDateBefore(inactiveDate, now);
-      if (!areDatesInThePast) {
+      inactiveInPast;
+      if (areDatesInThePast || inactiveInPast) {
         field.disable();
       } else {
         field.enable();
@@ -363,25 +378,29 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-      }).pipe(
-        takeUntil(this.componentDestroy()),
-    ).subscribe((confirm) => {
-      if (confirm && department.departmentId) {
-        this.store.dispatch(new DeleteDepartmentById(department, this.filters));
-      }
-      this.removeActiveCssClass();
-    });
+      })
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((confirm) => {
+        if (confirm && department.departmentId) {
+          this.store.dispatch(new DeleteDepartmentById(department, this.filters));
+        }
+        this.removeActiveCssClass();
+      });
   }
 
   private reactivationDateHandler(): void {
     if (this.selectedLocation) {
       const reactivationDateField = this.departmentsDetailsFormGroup.controls['reactivateDate'];
-      const reactivateDate = this.selectedLocation.reactivateDate ? new Date(this.selectedLocation.reactivateDate) : null;
+      const reactivateDate = this.selectedLocation.reactivateDate
+        ? new Date(this.selectedLocation.reactivateDate)
+        : null;
       const inactiveDate = this.selectedLocation.inactiveDate ? new Date(this.selectedLocation.inactiveDate) : null;
-      this.minReactivateDate = reactivateDate ?
-        DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') :
-        null;
-      this.maxInactivateDate = inactiveDate ? DateTimeHelper.formatDateUTC(inactiveDate.toISOString(), 'MM/dd/yyyy') : null;
+      this.minReactivateDate = reactivateDate
+        ? DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy')
+        : null;
+      this.maxInactivateDate = inactiveDate
+        ? DateTimeHelper.formatDateUTC(inactiveDate.toISOString(), 'MM/dd/yyyy')
+        : null;
       if (!this.selectedLocation.reactivateDate && this.selectedLocation.isDeactivated) {
         reactivationDateField.disable();
       } else {
@@ -395,7 +414,9 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   onAddDepartmentClick(): void {
     if (this.selectedLocation && this.selectedRegion) {
       this.departmentsDetailsFormGroup.controls['inactiveDate'].enable();
-      this.departmentsDetailsFormGroup.controls['includeInIRP']?.setValue(this.isIRPFlagEnabled && !this.isOrgUseIRPAndVMS);
+      this.departmentsDetailsFormGroup.controls['includeInIRP']?.setValue(
+        this.isIRPFlagEnabled && !this.isOrgUseIRPAndVMS
+      );
       this.isLocationIRPEnabled = this.selectedLocation.includeInIRP;
       this.reactivationDateHandler();
       this.store.dispatch(new ShowSideDialog(true));
@@ -411,12 +432,11 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
-        }).pipe(
-          filter(Boolean),
-          takeUntil(this.componentDestroy()),
-      ).subscribe(() => {
-        this.closeDepartmentWindow();
-      });
+        })
+        .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+        .subscribe(() => {
+          this.closeDepartmentWindow();
+        });
     } else {
       this.closeDepartmentWindow();
     }
@@ -452,9 +472,22 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     this.store.dispatch(new UpdateDepartment(department, this.filters, ignoreWarning, this.replaceOrder));
   }
 
+  private showDepartmentChangeConfirmation(department: Department, ignoreWarning: boolean): void {
+    this.showSkillConfirmDialog = true;
+    this.departmentChangeConfirm$
+      .pipe(
+        take(1),
+        tap(() => (this.showSkillConfirmDialog = false)),
+        filter(Boolean)
+      )
+      .subscribe(() => {
+        this.saveDepartment(department, ignoreWarning);
+      });
+  }
+
   private updateDepartment(department: Department, ignoreWarning: boolean): void {
-    if (this.isIRPFlagEnabled && this.isSkillChanged() || this.isDateChanged() || this.isExcludedFromIrp()) {
-      this.saveDepartment(department, ignoreWarning);
+    if ((this.isIRPFlagEnabled && this.isSkillChanged()) || this.isExcludedFromIrp()) {
+      this.showDepartmentChangeConfirmation(department, ignoreWarning);
     } else {
       this.saveDepartment(department, ignoreWarning);
     }
@@ -474,12 +507,10 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
 
   private checkOrgPreferences(): void {
     const { isIRPEnabled, isVMCEnabled } =
-    this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+      this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
 
     this.isOrgUseIRPAndVMS = !!(isVMCEnabled && isIRPEnabled);
-    this.isInvoiceDepartmentIdFieldShow = !this.isIRPFlagEnabled
-      || !!isVMCEnabled
-      || !(!isVMCEnabled && isIRPEnabled);
+    this.isInvoiceDepartmentIdFieldShow = !this.isIRPFlagEnabled || !!isVMCEnabled || !(!isVMCEnabled && isIRPEnabled);
 
     if (!this.isInvoiceDepartmentIdFieldShow) {
       this.departmentsDetailsFormGroup.removeControl('invoiceDepartmentId');
@@ -498,8 +529,10 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   }
 
   private createDepartmentsForm(): void {
-    this.departmentsDetailsFormGroup =
-      this.departmentService.createDepartmentDetailForm(this.isIRPFlagEnabled, this.isOrgUseIRPAndVMS);
+    this.departmentsDetailsFormGroup = this.departmentService.createDepartmentDetailForm(
+      this.isIRPFlagEnabled,
+      this.isOrgUseIRPAndVMS
+    );
     this.DepartmentFilterFormGroup = this.departmentService.createDepartmentFilterForm(this.isIRPFlagEnabled);
     this.addDatesValidation();
   }
@@ -509,56 +542,50 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     const reactivateDate = this.departmentsDetailsFormGroup.controls['reactivateDate'];
     inactiveDate.addValidators(startDateValidator(this.departmentsDetailsFormGroup, 'reactivateDate'));
     reactivateDate.addValidators(endDateValidator(this.departmentsDetailsFormGroup, 'inactiveDate'));
-    inactiveDate.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
-      reactivateDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
-    );
-    reactivateDate.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
-      inactiveDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
-    );
+    inactiveDate.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => reactivateDate.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+    reactivateDate.valueChanges
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => inactiveDate.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
   }
 
   private startDepartmentOptionsWatching(): void {
-    this.departmentFilterOptions$.pipe(
-      filter(Boolean),
-      takeUntil(this.componentDestroy())
-    ).subscribe(options => {
+    this.departmentFilterOptions$.pipe(filter(Boolean), takeUntil(this.componentDestroy())).subscribe((options) => {
       this.departmentService.populateDataSources(this.filterColumns, options as any, this.isIRPFlagEnabled);
     });
   }
 
   private startPageNumberWatching(): void {
-    this.pageSubject.pipe(
-      throttleTime(1),
-      takeUntil(this.componentDestroy())
-    ).subscribe((page) => {
+    this.pageSubject.pipe(throttleTime(1), takeUntil(this.componentDestroy())).subscribe((page) => {
       this.currentPage = page;
       this.getDepartments();
     });
   }
 
   private startOrgIdWatching(): void {
-    this.organizationId$.pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(id => {
+    this.organizationId$.pipe(takeUntil(this.componentDestroy())).subscribe((id) => {
       this.clearFilters();
       this.getOrganization(id);
-      this.store.dispatch(new GetRegions()).pipe(
-        takeUntil(this.componentDestroy())
-      ).subscribe(() => {
-        const regions = this.store.selectSnapshot(OrganizationManagementState.regions);
-        this.defaultValue = regions[0]?.id;
-      });
+      this.store
+        .dispatch(new GetRegions())
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe(() => {
+          const regions = this.store.selectSnapshot(OrganizationManagementState.regions);
+          this.defaultValue = regions[0]?.id;
+        });
     });
   }
 
   private getOrganization(businessUnitId: number) {
-    const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+    const id = businessUnitId || (this.store.selectSnapshot(UserState.user)?.businessUnitId as number);
 
-    this.store.dispatch(new GetOrganizationById(id)).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.checkOrgPreferences();
-    });
+    this.store
+      .dispatch(new GetOrganizationById(id))
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.checkOrgPreferences();
+      });
   }
 
   private getDepartments(): void {
@@ -588,11 +615,17 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   }
 
   private listenPrimarySkill(): void {
-    this.departmentsDetailsFormGroup.get('primarySkills')?.valueChanges
-      .pipe(takeUntil(this.componentDestroy()))
+    this.departmentsDetailsFormGroup
+      .get('primarySkills')
+      ?.valueChanges.pipe(takeUntil(this.componentDestroy()))
       .subscribe((formValue) => {
-        const diff = difference(this.primarySkills.map(({ masterSkillId }: ListOfSkills) => masterSkillId), formValue);
-        this.secondarySkills = this.primarySkills.filter(({ masterSkillId }: ListOfSkills) => diff.includes(masterSkillId));
+        const diff = difference(
+          this.primarySkills.map(({ masterSkillId }: ListOfSkills) => masterSkillId),
+          formValue
+        );
+        this.secondarySkills = this.primarySkills.filter(({ masterSkillId }: ListOfSkills) =>
+          diff.includes(masterSkillId)
+        );
         this.departmentsDetailsFormGroup.get('secondarySkills')?.reset();
       });
   }
@@ -608,8 +641,10 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   }
 
   private isSkillChanged(): boolean {
-    return !!(this.departmentsDetailsFormGroup.get('primarySkills')?.dirty ||
-      this.departmentsDetailsFormGroup.get('secondarySkills')?.dirty);
+    return !!(
+      this.departmentsDetailsFormGroup.get('primarySkills')?.dirty ||
+      this.departmentsDetailsFormGroup.get('secondarySkills')?.dirty
+    );
   }
 
   /**
@@ -617,15 +652,20 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
    * @returns boolean
    */
   private isDateChanged(): boolean {
-    return !!(this.departmentsDetailsFormGroup.get('inactiveDate')?.dirty ||
+    return !!(
+      this.departmentsDetailsFormGroup.get('inactiveDate')?.dirty ||
       (this.departmentsDetailsFormGroup.get('reactivateDate')?.dirty &&
-      !this.departmentsDetailsFormGroup.get('reactivateDate')?.value));
+        !this.departmentsDetailsFormGroup.get('reactivateDate')?.value)
+    );
   }
 
   private isExcludedFromIrp(): boolean {
     const wasIncludedInIrp = this.initialIrpValue === true;
-    return !!(wasIncludedInIrp && this.departmentsDetailsFormGroup.get('includeInIRP')?.dirty &&
-      !this.departmentsDetailsFormGroup.get('includeInIRP')?.value);
+    return !!(
+      wasIncludedInIrp &&
+      this.departmentsDetailsFormGroup.get('includeInIRP')?.dirty &&
+      !this.departmentsDetailsFormGroup.get('includeInIRP')?.value
+    );
   }
 
   private configureSkillDropdowns(isIRP: boolean): void {

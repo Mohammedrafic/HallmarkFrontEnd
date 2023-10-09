@@ -12,8 +12,10 @@ import { FilterColumns, TimesheetsFilterState } from '../../interface';
 import { UserState } from 'src/app/store/user.state';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { FilteredUser } from '@shared/models/user.model';
+//import { FilteredUser } from '@shared/models/user.model';
 import { AppState } from 'src/app/store/app.state';
+import { FilteredOrderContactPerson } from '../../../../shared/models/order-contactperson.model';
+import { ORDER_CONTACT_DETAIL_TITLES } from '../../../../shared/constants';
 
 @Component({
   selector: 'app-timesheets-filter-dialog',
@@ -43,6 +45,8 @@ export class TimesheetsFilterDialogComponent
 
   public showStatuses = true;
   public filterType: string = 'Contains';
+  public contactDetailTitles = ORDER_CONTACT_DETAIL_TITLES;
+  public title: string = '';
 
   private activeTab$: Subject<void> = new Subject();
 
@@ -80,7 +84,7 @@ export class TimesheetsFilterDialogComponent
           args.updateData([]);
         }),
         debounceTime(300),
-        switchMap((args) => this.getUsersListBySearchTerm(args)),
+        switchMap((args) => this.getOrderContactPersonListBySearchTerm(args, this.title)),
         takeUntil(this.componentDestroy())
       )
       .subscribe();
@@ -107,8 +111,9 @@ export class TimesheetsFilterDialogComponent
       });
   }
 
-  private getUsersListBySearchTerm(args: FilteringEventArgs): Observable<FilteredUser[]> {
-    return this.filterService.getUsersListBySearchTerm(args.text).pipe(
+  private getOrderContactPersonListBySearchTerm(args: FilteringEventArgs, title: string): Observable<FilteredOrderContactPerson[]> {
+    this.title = this.formGroup.get('title')?.value ?? '';
+    return this.filterService.getOrderContactPersonListBySearchTerm(args.text, this.title).pipe(
       tap((data) => {
         this.filterColumns.contactEmails.dataSource = data;
         args.updateData(data);

@@ -4,7 +4,7 @@
   cssClass="dialog"
   [zIndex]="1007"
   [isModal]="true"
-  [width]="400"
+  [width]="700"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <div class="header-candidate">
@@ -28,7 +28,7 @@
     </div>
   </div>
   <div class="form-wrapper irp-candidate" *ngIf="candidateForm">
-    <div class="info-content">
+    <div class="info-content w_100">
       <div class="message" *ngIf="candidateModelState?.candidate?.deployedUntil">
         Employee is already working on an assignment till {{candidateModelState?.candidate?.deployedUntil}}.
       </div>
@@ -44,7 +44,8 @@
             <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
              <ng-container *ngIf="field.showField">
                <div
-                 *ngIf="field.field === 'reason' ? !candidateForm.get('isClosed')?.value : true"
+                 *ngIf="field.field === 'reason' ?
+                  candidateForm.get('isClosed')?.value && candidateModelState?.candidate?.status !== statuses.Cancelled : true"
                  class="input-container {{field?.cssClass}}">
                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                  </label>
@@ -75,6 +76,7 @@
                       [min]="field.minDate"
                       format="MM/dd/yyyy"
                       placeholder="MM/DD/YYYY"
+                      [serverTimezoneOffset]="0"
                       [formControlName]="field.field"
                     ></ejs-datepicker>
                   </div>
@@ -102,6 +104,147 @@
     </div>
     <app-comments-irp *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId" [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP" [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP" [comments]="comments" [commentContainerId]="candidateCommentContainerId" [candidateJobId]="candidateJobId" [useBackground]="false"
       [externalCommentConfiguration]="externalCommentConfiguration"></app-comments-irp>
+
+    <div *ngIf="showATPform">
+      <form [formGroup]="AtpCalcForm" class="atpcalc-form">
+        <div class="w_100"> 
+          <div class="input-container bootstrap left atpformfield">
+            <label for="billRatesCategory">Hours Worked<span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                maxlength="10"
+                format="###.00"
+                formControlName="hoursWorked"
+                [showSpinButton]="false"
+                [validateDecimalOnType]="true"
+                [decimals]="2"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+          <div class="input-container bootstrap right atpformfield">
+            <label for="billRatesCategory">Cost Saving<span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                maxlength="10"
+                format="###.00"
+                formControlName="costSaving"
+                [showSpinButton]="false"
+                [validateDecimalOnType]="true"
+                [decimals]="2"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="class_table">
+        <table>
+          <thead>
+            <th>Rate Per Hour</th>
+            <th>Benefit Percent of SW</th>
+            <th>Wage Percent(Non-Benefit Only)</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ratePerHour}}</td>
+              <td>{{benefitpercentofsw}}</td>
+              <td>{{wagePercent}}</td> 
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <th>COSTS</th>
+            <th>SALARY WAGES AND BEBEFITS</th>
+            <th>BENEFITS</th>
+            <th>COST SAVING</th>
+            <th>MEAL</th>
+            <th>LODGING</th>
+            <th>STIPENDS</th>
+            <th>ADJUSTED TOTAL</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>BENEFITS</td>
+              <td>{{salaryWagesandBenefits | number:'1.2-2'}}</td>
+              <td>{{benefitsBenefits | number:'1.2-2'}}</td>
+              <td>{{costSavingBenefits | number:'1.2-2'}}</td>
+              <td>{{meal | number:'1.2-2'}}</td>
+              <td>{{lodging | number:'1.2-2'}}</td>
+              <td>{{stipendBenefits | number:'1.2-2'}}</td>
+              <td>{{adjustedTotalBenefits | number:'1.2-2'}}</td>
+            </tr>
+            <tr>
+              <td>NON-BENEFITS</td>
+              <td>{{salaryWagesandBenefits | number:'1.2-2'}}</td>
+              <td>{{benefitsNonBenefits | number:'1.2-2'}}</td>
+              <td>{{costSavingBenefits | number:'1.2-2'}}</td>
+              <td>{{meal | number:'1.2-2'}}</td>
+              <td>{{lodging | number:'1.2-2'}}</td>
+              <td>{{stipendNonBenefits | number:'1.2-2'}}</td>
+              <td>{{adjustedTotalNonBenefits | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <th>
+              STIPEND HOURLY RATE
+            </th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{stipendHourlyRate | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <th colspan="2">
+              CONTRACT LABOUR RATE COMPARISION GROSS
+            </th>
+          </thead>
+          <thead>
+            <th>BENEFIT RATE</th>
+            <th>NON-BENEFIT RATE</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{contractLabourBenefit  | number:'1.2-2'}}</td>
+              <td>{{contractLabourNonBenefit  | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <th colspan="2">
+              FULLY LOADED BLENDED RATE GROSS
+            </th>
+          </thead>
+          <thead>
+            <th>BENEFIT RATE</th>
+            <th>NON-BENEFIT RATE</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{fullyLoadedBenefit  | number:'1.2-2'}}</td>
+              <td>{{fullyLoadedNonBenefit  | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>    
   </div>
 </ejs-dialog>
 
