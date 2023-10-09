@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { formatDate } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { catchError, EMPTY, filter, map, Observable, tap } from 'rxjs';
@@ -9,7 +8,6 @@ import { SortChangedEvent } from '@ag-grid-community/core';
 import { OpenJob, OpenJobPage } from '@shared/models';
 import { OrderJobType } from '@shared/enums';
 import { GetLocalDate } from '@shared/helpers';
-import { formatTimeWithSecond } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { OpenJobApiService } from './open-job-api.service';
@@ -18,12 +16,12 @@ import {
   FiltersState, 
   LtaEmployeeDto, 
   PerDiemEmployeeDto, 
-  UpdateLtaEmployeeDTO, 
+  UpdateLtaEmployeeDTO,
+  WithdrawPerDiemEmployeeDto, 
 } from '../interfaces';
 import { 
   AppliedMessage, 
   AppliedWorkflowStep, 
-  AvailabilityScheduleType, 
   WithdrawnMessage, 
   WithdrawnWorkflowStep, 
 } from '../constants';
@@ -87,9 +85,9 @@ export class EmployeeService {
 
     if (job.orderType === OrderJobType.LTA) {
       return this.openJobApiService.updateLtaEmployee(employeeWithdrawDto as UpdateLtaEmployeeDTO);
+    } else if (job.orderType === OrderJobType.PerDiem) {
+      return this.openJobApiService.withdrawPerDiemEmployee(employeeWithdrawDto as WithdrawPerDiemEmployeeDto);
     }
-
-    //TODO: handle withdraw for PD orders
 
     return EMPTY;
   }
@@ -131,19 +129,12 @@ export class EmployeeService {
     }
 
     return {
-      employeeScheduledDays: [{
-          employeeId: job.employeeId,
-          dates: [ job.startDate ],
-      }],
-      userLocalTime: GetLocalDate(),
-      scheduleType: AvailabilityScheduleType,
-      startTime: formatDate(job.shiftStartDateTime, formatTimeWithSecond, 'en-US', 'UTC'),
-      endTime: formatDate(job.shiftEndDateTime, formatTimeWithSecond, 'en-US', 'UTC'),
-      shiftId: null,
+      orderId: job.id,
+      employeeTime: GetLocalDate(),
     };
   }
 
-  private createEmployeeWithdrawDto(job: OpenJob): UpdateLtaEmployeeDTO | undefined {
+  private createEmployeeWithdrawDto(job: OpenJob): UpdateLtaEmployeeDTO | WithdrawPerDiemEmployeeDto {
 
     if (job.orderType === OrderJobType.LTA) {
       return {
@@ -155,9 +146,10 @@ export class EmployeeService {
       };
     }
 
-    //TODO: handle withdraw for PD orders
-
-    return undefined;
+    return {
+      orderId: job.id,
+      employeeTime: GetLocalDate(),
+    };
   }
 
   private handleError(error: HttpErrorResponse): Observable<never | Error> {

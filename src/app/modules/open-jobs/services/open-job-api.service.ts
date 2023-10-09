@@ -4,7 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { OpenJobPage } from '@shared/models';
-import { FiltersState, LtaEmployeeDto, PerDiemEmployeeDto, UpdateLtaEmployeeDTO } from '../interfaces';
+import { 
+  FiltersState, 
+  LtaEmployeeDto, 
+  PerDiemEmployeeDto, 
+  UpdateLtaEmployeeDTO, 
+  WithdrawPerDiemEmployeeDto} from '../interfaces';
 
 @Injectable()
 export class OpenJobApiService {
@@ -25,6 +30,10 @@ export class OpenJobApiService {
   }
 
   public applyPerDiemEmployee(params: PerDiemEmployeeDto): Observable<void> {
-    return this.http.post<void>(`/api/Schedules/create`, params);
+    return this.http.post<void>(`/api/IRPApplicants/applyPerDiem`, params);
+  }
+
+  public withdrawPerDiemEmployee(params: WithdrawPerDiemEmployeeDto): Observable<void> {
+    return this.http.post<void>(`/api/IRPApplicants/setWithdrawPerDiem`, params);
   }
 }

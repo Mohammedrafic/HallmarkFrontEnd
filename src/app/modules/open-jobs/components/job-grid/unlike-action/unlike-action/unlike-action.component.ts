@@ -2,7 +2,7 @@ import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { JobGridComponent } from '../../job-grid.component';
 import { ICellRendererParams } from '@ag-grid-community/core';
-import { OpenJob } from 'src/app/modules/open-jobs/interfaces';
+import { OpenJob } from '@shared/models';
 
 @Component({
   selector: 'app-unlike-action',
