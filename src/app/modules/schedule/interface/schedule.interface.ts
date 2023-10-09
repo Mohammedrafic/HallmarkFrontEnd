@@ -230,6 +230,8 @@ export interface EmployeesFilters {
   startDate: string | Date;
   endDate: string | Date;
   departmentsIds: number[];
+  locationIds: number[];
+  regionIds: number[];
   userLocalTime: string;
   isOnlySchedulatedCandidate: boolean;
   isAvailablity: boolean;
