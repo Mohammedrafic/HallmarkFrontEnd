@@ -12,7 +12,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of, Subscription, Observable, Subject, takeWhile, combineLatest } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of, Subscription } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
@@ -28,6 +28,7 @@ import {
   OfferedStatusFlow,
   OnboardConfigFieldsToShow,
   OptionField,
+  RejectedReasonField,
   StatusField,
 } from '@shared/components/order-candidate-list/edit-irp-candidate/constants/edit-irp-candidate.constant';
 import { FieldType } from '@core/enums';
@@ -69,6 +70,7 @@ import { SettingsKeys } from '@shared/enums/settings';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
 import { Configuration } from '@shared/models/organization-settings.model';
 import { Location } from "@shared/models/location.model"
+import { GetRejectReasonsForOrganisation } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -183,6 +185,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getRejectedReasons();
     this.observeCloseControl();
     this.observeStatusControl();
     this.createATPform();
@@ -197,11 +200,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           this.performCalculations();
         }
       })
-  
+
       this.AtpCalcForm.get("costSaving")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
           this.costSaving = data;
-          this.performCalculations();  
+          this.performCalculations();
         }
       })
     }
@@ -268,7 +271,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       if(this.configdata){
         this.benefitpercentofsw = this.configdata.benefitPercent;
         this.costSaving = this.configdata.costSavings;
-        this.wagePercent = this.configdata.wagePercent;  
+        this.wagePercent = this.configdata.wagePercent;
       }
       this.createATPform();
     });
@@ -328,7 +331,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       }
     });
   }
-  
+
   private performCalculations(): void {
     this.salaryWagesandBenefits = (!Number.isNaN(this.ratePerHour * this.hoursWorked != null)) ? this.ratePerHour * this.hoursWorked : 0;
     this.costSavingBenefits = (!Number.isNaN((this.salaryWagesandBenefits * this.costSaving) / 100)) ? ((this.salaryWagesandBenefits * this.costSaving) / 100) : 0; 
@@ -450,6 +453,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
           statusConfigField.dataSource = this.editIrpCandidateService
           .createStatusOptions([...candidateDetails.availableStatuses ?? []]);
+
           if(!this.canOnboardCandidateIRP){
             const objWithIdIndex = statusConfigField.dataSource.findIndex((obj:any) => obj.text === "Onboard");
             if (objWithIdIndex > -1) {
@@ -470,6 +474,10 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         }),
         switchMap(() => {
           const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
+          const rejectionReasonField = GetConfigField(this.dialogConfig, RejectedReasonField);
+
+          rejectionReasonField.dataSource = this.editIrpCandidateService
+            .createReasonsOptions(this.editIrpCandidateService.getRejectedReasons());
 
           if (this.candidateModelState.candidate.status === CandidatStatus.Cancelled
             || this.candidateModelState.candidate.status === CandidatStatus.Offboard) {
@@ -492,6 +500,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           }
 
           this.candidateForm.enable();
+          this.populateFormForRejectedEmployee();
+
           this.editIrpCandidateService.disableOfferedDateForOnboardedCandidate(
             this.candidateModelState.candidate.status,
             this.candidateDetails,
@@ -529,6 +539,26 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
   }
 
+  private populateFormForRejectedEmployee(): void {
+    if(this.candidateModelState.candidate.status === CandidatStatus.Rejected) {
+      const fieldsToShow = this.editIrpCandidateService.getFieldsForRejectedEmployee(this.candidateDetails);
+      this.isAppliedorShortlisted = fieldsToShow.includes('availableStartDate');
+      this.showactualStartEndDate = fieldsToShow.includes('actualStartDate') && fieldsToShow.includes('actualEndDate');
+
+      UpdateVisibilityConfigFields(this.dialogConfig, fieldsToShow);
+
+      this.candidateForm.patchValue({
+        ...this.candidateDetails,
+        status: CandidatStatus.Rejected,
+        rejectedReason: this.candidateDetails.rejectionReasonId
+      }, { emitEvent: false, onlySelf: true });
+
+
+      this.disableSaveButton = true;
+      DisableControls(fieldsToShow, this.candidateForm);
+    }
+  }
+
   private watchForActualDateValues(): void {
     this.actualStartDateSubscription = this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
       filter((value: string) => {
@@ -543,7 +573,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
       this.candidateForm.get('actualEndDate')?.patchValue(actualEndDate, { emitEvent: false, onlySelf: true });
     }) || null;
-    
+
 
     this.candidateForm.get("status")?.valueChanges.pipe(
       distinctUntilChanged(),
@@ -617,6 +647,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.candidateForm.get('availableStartDate')?.patchValue(
         DateTimeHelper.setCurrentTimeZone(this.availableStartDate as string), { emitEvent: false, onlySelf: true }
       );
+      this.handleRejectStatus(value);
       this.handleCancelledStatus(value);
       this.handleOfferedStatus(
        value,
@@ -724,6 +755,15 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.candidateForm.disable();
   }
 
+  private handleRejectStatus(status: CandidatStatus): void {
+    if (!status) {
+      return;
+    }
+
+    const rejectedReasonField = this.getConfigField(RejectedReasonField);
+    this.editIrpCandidateService.setValidatorsForRejectedStatus(status, rejectedReasonField, this.candidateForm);
+  }
+
   private handleCancelledStatus(status: CandidatStatus): void {
     if (!status || this.candidateModelState.candidate.status === CandidatStatus.Cancelled) {
       return;
@@ -739,9 +779,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       startDateFormControl?.disable();
       endDateConfigField.required = true;
       endDateConfigField.minDate = this.candidateDetails?.actualStartDate
-        ? new Date(this.candidateDetails.actualStartDate) : null;
+        ? DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualStartDate as string) : null;
       endDateConfigField.maxDate = this.candidateDetails?.actualEndDate
-        ? new Date(this.candidateDetails.actualEndDate) : null;
+        ? DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualEndDate as string) : null;
       this.endDateFormControlValue = endDateFormControl?.value;
       endDateFormControl?.reset();
       endDateFormControl?.setValidators([Validators.required]);
@@ -783,5 +823,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     ) {
       this.candidateForm.get('actualEndDate')?.patchValue(this.candidateDetails.actualStartDate);
     }
+  }
+
+  private getRejectedReasons(): void {
+    this.store.dispatch(new GetRejectReasonsForOrganisation());
   }
 }

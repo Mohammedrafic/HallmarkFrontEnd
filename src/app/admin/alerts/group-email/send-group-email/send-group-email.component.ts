@@ -1392,6 +1392,12 @@ export class SendGroupEmailComponent
           `data:image/jpg;base64,${file.fileAsBase64}`
         );
         break;
+        case '.PNG':
+          this.isImage = true;
+          this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+            `data:image/png;base64,${file.fileAsBase64}`
+          );
+          break;
       case '.png':
         this.isImage = true;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(

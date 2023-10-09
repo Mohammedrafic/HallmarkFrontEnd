@@ -1,78 +1,70 @@
-<app-filter-dialog
-  [items]="filteredItems"
-  [count]="(timesheets$ | async)?.totalCount"
-  [targetElement]="targetElement$ | async"
-  (deleteFilter)="deleteFilter($event)"
-  (clearAllFiltersClicked)="clearAllFilters()"
-  (applyFilterClicked)="applyFilters()">
+<app-filter-dialog [items]="filteredItems"
+                   [count]="(timesheets$ | async)?.totalCount"
+                   [targetElement]="targetElement$ | async"
+                   (deleteFilter)="deleteFilter($event)"
+                   (clearAllFiltersClicked)="clearAllFilters()"
+                   (applyFilterClicked)="applyFilters()">
   <form class="bootstrap" [formGroup]="formGroup">
     <div class="input-container">
       <label for="searchTerm">Candidate name</label>
       <div class="input-group">
-        <input
-          id="searchTerm"
-          class="e-input"
-          type="text"
-          maxlength="50"
-          formControlName="searchTerm"
-        />
+        <input id="searchTerm"
+               class="e-input"
+               type="text"
+               maxlength="50"
+               formControlName="searchTerm" />
       </div>
     </div>
     <div class="input-container">
       <label for="orderId">Order ID</label>
       <div class="input-group dropdown">
-        <input
-          class="e-input"
-          type="text"
-          id="orderId"
-          formControlName="orderIds"
-        />
+        <input class="e-input"
+               type="text"
+               id="orderId"
+               formControlName="orderIds" />
       </div>
     </div>
     <div *ngIf="showStatuses" class="input-container">
       <label for="status">Status</label>
       <div class="input-group dropdown">
-        <ejs-multiselect
-          id="status"
-          mode="CheckBox"
-          [allowFiltering]="true"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.statusIds?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="statusIds"
-          placeholder=""></ejs-multiselect>
+        <ejs-multiselect id="status"
+                         mode="CheckBox"
+                         [allowFiltering]="true"
+                         [fields]="filterOptionFields"
+                         [dataSource]="filterColumns.statusIds?.dataSource"
+                         [showDropDownIcon]="true"
+                         formControlName="statusIds"
+                         placeholder=""></ejs-multiselect>
       </div>
     </div>
     <div class="row">
       <div class="input-container">
         <label for="region">Region</label>
         <div class="input-group dropdown">
-          <ejs-multiselect
-            #regionMultiselect
-            id="region"
-            mode="CheckBox"
-            [allowFiltering]="true"
-            [fields]="filterOptionFields"
-            [dataSource]="filterColumns.regionsIds?.dataSource"
-            [showDropDownIcon]="true"
-            formControlName="regionsIds"
-            placeholder=""></ejs-multiselect>
+          <ejs-multiselect #regionMultiselect
+                           id="region"
+                           mode="CheckBox"
+                           [allowFiltering]="true"
+                           [fields]="filterOptionFields"
+                           [dataSource]="filterColumns.regionsIds?.dataSource"
+                           [showDropDownIcon]="true"
+                           formControlName="regionsIds"
+                           placeholder=""></ejs-multiselect>
         </div>
       </div>
       <div class="input-container">
         <label for="location">Location</label>
         <div class="input-group dropdown">
-          <ejs-multiselect
-            id="location"
-            mode="CheckBox"
-            [allowFiltering]="true"
-            [fields]="filterOptionFields"
-            [dataSource]="filterColumns.locationIds?.dataSource"
-            [showDropDownIcon]="true"
-            [filterType]="filterType"
-            [noRecordsTemplate]="'Please select the Region'"
-            formControlName="locationIds"
-            placeholder=""></ejs-multiselect>
+          <ejs-multiselect id="location"
+                           mode="CheckBox"
+                           [allowFiltering]="true"
+                           [fields]="filterOptionFields"
+                           [dataSource]="filterColumns.locationIds?.dataSource"
+                           [showDropDownIcon]="true"
+                           [filterType]="filterType"
+                           [noRecordsTemplate]="'Please select the Region'"
+                           formControlName="locationIds"
+                           placeholder=""></ejs-multiselect>
         </div>
       </div>
     </div>
@@ -80,31 +72,29 @@
       <div [class.full-width]="isAgency" class="input-container">
         <label for="department">Department</label>
         <div class="input-group dropdown">
-          <ejs-multiselect
-            id="department"
-            mode="CheckBox"
-            [allowFiltering]="true"
-            [fields]="filterOptionFields"
-            [dataSource]="filterColumns.departmentIds?.dataSource"
-            [showDropDownIcon]="true"
-            [filterType]="filterType"
-            formControlName="departmentIds"
-            [noRecordsTemplate]="'Please select the Region and Location'"
-            placeholder=""></ejs-multiselect>
+          <ejs-multiselect id="department"
+                           mode="CheckBox"
+                           [allowFiltering]="true"
+                           [fields]="filterOptionFields"
+                           [dataSource]="filterColumns.departmentIds?.dataSource"
+                           [showDropDownIcon]="true"
+                           [filterType]="filterType"
+                           formControlName="departmentIds"
+                           [noRecordsTemplate]="'Please select the Region and Location'"
+                           placeholder=""></ejs-multiselect>
         </div>
       </div>
       <div class="input-container">
         <label for="skill">Skill</label>
         <div class="input-group dropdown">
-          <ejs-multiselect
-            id="skill"
-            mode="CheckBox"
-            [allowFiltering]="true"
-            [fields]="skillFields"
-            [dataSource]="filterColumns.skillIds?.dataSource"
-            [showDropDownIcon]="true"
-            formControlName="skillIds"
-            placeholder=""></ejs-multiselect>
+          <ejs-multiselect id="skill"
+                           mode="CheckBox"
+                           [allowFiltering]="true"
+                           [fields]="skillFields"
+                           [dataSource]="filterColumns.skillIds?.dataSource"
+                           [showDropDownIcon]="true"
+                           formControlName="skillIds"
+                           placeholder=""></ejs-multiselect>
         </div>
       </div>
     </div>
@@ -112,31 +102,40 @@
       <div class="input-container">
         <label for="agencyName">Select Agency</label>
         <div class="input-group dropdown">
-          <ejs-multiselect
-            id="agencyName"
-            mode="CheckBox"
-            [allowFiltering]="true"
-            [fields]="filterOptionFields"
-            [dataSource]="filterColumns.agencyIds?.dataSource"
-            [showDropDownIcon]="true"
-            formControlName="agencyIds"
-            placeholder=""></ejs-multiselect>
+          <ejs-multiselect id="agencyName"
+                           mode="CheckBox"
+                           [allowFiltering]="true"
+                           [fields]="filterOptionFields"
+                           [dataSource]="filterColumns.agencyIds?.dataSource"
+                           [showDropDownIcon]="true"
+                           formControlName="agencyIds"
+                           placeholder=""></ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container">
+        <label>Title</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist formControlName="title"
+                            [allowFiltering]="true"
+                            [dataSource]="contactDetailTitles">
+          </ejs-dropdownlist>
         </div>
       </div>
       <div class="input-container">
         <label>Contact Person</label>
         <div class="input-group multiselect">
-          <ejs-autocomplete
-            formControlName="contactEmails"
-            [dataSource]="filteredUsers"
-            [autofill]="true"
-            [minLength]="3"
-            [allowCustom]="false" 
-            (filtering)="contactPersonFiltering($event)"
-            [fields]="contactPersonFields">
+          <ejs-autocomplete formControlName="contactEmails"
+                            [dataSource]="filteredOrderContactPerson"
+                            [autofill]="true"
+                            [minLength]="3"
+                            [allowCustom]="false"
+                            (filtering)="contactPersonFiltering($event)"
+                            [fields]="orderContactPersonFields">
             <ng-template #itemTemplate="" let-data="">
               <div class="contact-option-container">
-                <span class="contact-name">{{data.fullName}}</span>
+                <span class="contact-name">{{data.name}}</span>
                 <span class="contact-email">{{data.email}}</span>
               </div>
             </ng-template>

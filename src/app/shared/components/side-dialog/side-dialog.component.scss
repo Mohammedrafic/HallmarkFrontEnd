@@ -55,22 +55,11 @@
       }
     }
   }
-
-  .close-button {
-    display: none;
-  }
 }
 
 @media #{$max-mobile} {
   .dialog {
     width: 100% !important;
-
-    .close-button {
-      display: block;
-      border-radius: 50%;
-      height: auto !important;
-      padding: 5px !important;
-    }
 
     .stick-right,
     ::ng-deep .tooltip-container {

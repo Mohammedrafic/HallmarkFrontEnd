@@ -32,6 +32,9 @@
 
 @media #{$max-mobile} {
   :host {
+    display: block;
+    padding-bottom: 24px;
+
     ::ng-deep {
       app-grid .app-grid {
         height: auto;
