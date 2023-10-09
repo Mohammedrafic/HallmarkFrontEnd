@@ -157,7 +157,6 @@ export class TimesheetRecordsService {
     formControls: Record<string, FormGroup>,
     colDefs: ColDef[]): ColDef[] {
     return colDefs.map((def) => {
-      debugger;
       let definition: ColDef = def;
 
       if (editOn && def.field === 'hadLunchBreak') {
