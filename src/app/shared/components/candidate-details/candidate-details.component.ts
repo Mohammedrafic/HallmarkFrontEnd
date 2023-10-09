@@ -650,20 +650,23 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   }
 
   private subscribeOnAgencyOrganizationChanges(): void {
+    const businessUnitId$ = this.isAgency ? this.lastSelectedAgencyId$ : this.lastSelectedOrganizationId$;
     combineLatest([
-   //   this.lastSelectedOrganizationId$,
-    //  this.lastSelectedAgencyId$,
+      businessUnitId$,
       this.candidateRegions$, 
     //  this.candidateLocations$,
      // this.candidateDepartments$,
     ])
       .pipe(   
-        distinctUntilChanged(),
+        filter((data) => !!data[1]),
+        distinctUntilChanged((prev, curr) => prev[0] === curr[0]),
         debounceTime(600),
-        tap(() => {     
+        tap(() => {
+          this.store.dispatch(new PreservedFilters.ResetPageFilters());
           this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
         }),
         switchMap(() => this.preservedFiltersByPageName$),
+        filter(({dispatch}) => dispatch),
         debounceTime(100),
         tap((filters) => {
           this.handleFilterState(filters);
@@ -745,7 +748,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           locationIds: (state?.locationIds && [...state.locationIds]) || [],
           departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
           candidateNames: state?.candidateNames,
-          orderId:state?.orderId
+          orderId: state?.orderId,
         };
 
         dispatchPatch = true;
