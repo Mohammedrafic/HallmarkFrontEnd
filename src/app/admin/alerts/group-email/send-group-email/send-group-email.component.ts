@@ -1109,10 +1109,10 @@ export class SendGroupEmailComponent
       this.agenciesControl.value != null && this.agenciesControl.value != undefined
         ? this.agenciesControl.value.join()
         : 'null';
-    var skills =
-      this.skillsControl.value != null && this.skillsControl.value != undefined
-        ? this.skillsControl.value.join()
-        : 'null';
+        var skills =
+        this.skillsControl.value != null && this.skillsControl.value != undefined
+          ? (this.skillsControl.value.length!=this.skillData.length? this.skillsControl.value.join():'all')
+          : 'null';
     var regions =
       this.regionControl.value != null && this.regionControl.value != undefined
         ? this.regionControl.value.join()
