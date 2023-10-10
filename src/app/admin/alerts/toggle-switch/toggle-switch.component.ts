@@ -20,7 +20,8 @@ export class ToggleSwitchComponent implements ICellRendererAngularComp {
   public permissionsCheck:boolean = false;
   agInit(params: any): void {
     this.params = params;
-    if(this.permissionsCheck){
+    this.permissionsCheck =  this.params?.permissionsCheck;
+    if(this.permissionsCheck === true){
       this.disableFlag = this.params?.canEditUserSubscription ? false : true;
     }
     this.SetData();

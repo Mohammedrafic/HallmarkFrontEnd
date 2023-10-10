@@ -475,6 +475,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           self.userSubscriptionPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
 
             self.itemList = data?.items;
+            self.gridColumns();
             if(self.businessUnitControl?.value === BusinessUnitType.Employee) {
             self.itemList = self.itemList?.filter((x=>x.alertId!=AlertIdEnum['Order Comments-IRP']));
             }
@@ -542,7 +543,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         if (updated != undefined && updated == true) {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
           if(this.userPermission[this.userPermissions.CanDeleteUserSubscription]){
-            this.dispatchUserPage([this.businessControl.value]);
+            this.dispatchNewPage(this.usersControl.value);
           }
         }
       });
