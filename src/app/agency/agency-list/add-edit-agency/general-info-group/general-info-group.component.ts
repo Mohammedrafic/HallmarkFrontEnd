@@ -10,7 +10,7 @@ import { AgencyStatus } from 'src/app/shared/enums/status';
 import { agencyStatusCreationOptions, agencyStatusOptions } from '../../agency-list.constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { AgencyConfig, AgencyStatusesModel } from "@shared/models/agency.model";
-import { ONLY_NUMBER, TaxIdValidationMessage } from '@shared/constants';
+import { MIN_DIGITS_LENGTH_ONLY_NINE, TaxIdValidationMessage } from '@shared/constants';
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
 import { patternMessageValidator } from '@shared/validators/pattern-message.validator';
@@ -77,8 +77,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       externalId: new FormControl('', [Validators.maxLength(10)]),
       taxId: new FormControl('', [
         Validators.required,
-        Validators.minLength(9),
-        patternMessageValidator(ONLY_NUMBER, TaxIdValidationMessage),
+        patternMessageValidator(MIN_DIGITS_LENGTH_ONLY_NINE, TaxIdValidationMessage),
       ]),
       baseFee: new FormControl(''),
       addressLine1: new FormControl('', [Validators.required, Validators.maxLength(100)]),
