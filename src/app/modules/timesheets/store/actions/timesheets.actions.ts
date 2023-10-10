@@ -37,7 +37,7 @@ export namespace Timesheets {
   }
 
   export class GetOrderComments {
-    static readonly type = '[agency order management] Get Order Comments';
+    static readonly type = '[Timesheet Comments] Get Timesheet Comments';
     constructor(public commentContainerId: number) {}
   }
 
