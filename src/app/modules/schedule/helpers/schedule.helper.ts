@@ -175,7 +175,7 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
   return {
     startDate: startDate || '',
     endDate: endDate || '',
-    departmentsIds: departmentsIds === undefined ? [] : departmentsIds,
+    departmentIds: departmentsIds === undefined ? [] : departmentsIds,
     locationIds: locationIds === undefined ? [] : locationIds,
     regionIds: regionIds === undefined ? [] : regionIds,
     userLocalTime: DateTimeHelper.setUtcTimeZone(new Date()),
