@@ -51,6 +51,10 @@ import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { filter } from 'rxjs/operators';
 import { CreateOverlapErrorData } from '../../helpers';
+import { CommentsService } from '@shared/services/comments.service';
+import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
+import { Comment } from '@shared/models/comment.model';
+
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -62,7 +66,8 @@ export class TimesheetsState {
     private timesheetsApiService: TimesheetsApiService,
     private timesheetDetailsApiService: TimesheetDetailsApiService,
     private store: Store,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private commentService: CommentsService
   ) {}
 
   @Selector([TimesheetsState])
@@ -191,6 +196,21 @@ export class TimesheetsState {
   @Selector()
   static displayTimesheetHistoricalData(state: TimesheetsModel): boolean {
     return state.displayTimesheetHistoricalData;
+  }
+
+  @Selector()
+  static orderComments(state: OrderManagementContentStateModel): Comment[] {
+    return state.orderComments;
+  }
+
+  @Action(Timesheets.GetOrderComments)
+  GetOrderComments(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { commentContainerId }: Timesheets.GetOrderComments
+  ): Observable<Comment[]> {
+    return this.commentService
+      .getComments(commentContainerId, null)
+      .pipe(tap((payload) => patchState({ orderComments: payload })));
   }
 
   @Action(Timesheets.GetAll)

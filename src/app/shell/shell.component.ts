@@ -596,9 +596,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   private manageNotifications(): void {
-    this.menu$
-    .pipe(takeUntil(this.componentDestroy()))
-    .subscribe((menu: Menu) => {
+    const menu=this.store.selectSnapshot(UserState.menu)
       if (menu.menuItems.length) {
         const menuItems = menu.menuItems
           .find((element) => element.id == 96)
@@ -607,7 +605,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
           this.router.navigate([menuItems.route]);
         }
       }
-    });
   }
 
   private toggleTheme(): void {
