@@ -261,6 +261,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForSavePaymentAction();
     this.watchForPreservedFilters();
     this.getuserPermission();
+    this.subscriptionOfPendingInvoices();
   }
 
   ngAfterViewInit(): void {
@@ -862,5 +863,23 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     ).subscribe((permissions: Permission) => {
       this.userPermission = permissions;
     });
+  }
+
+  public subscriptionOfPendingInvoices(){    
+    this.pendingApprovalInvoicesData$.pipe(
+          takeUntil(this.componentDestroy()),
+        ).subscribe(pendingInvoicesData=>{
+        let invoiceId = JSON.parse(localStorage.getItem('InvoiceId') || '""') as string;
+        if(invoiceId != '' && pendingInvoicesData?.items.length >0){
+          let notificationInvoice:Interfaces.SelectedInvoiceRow = {rowIndex:0};
+          let ind  = pendingInvoicesData.items?.findIndex(ele=> ele.invoiceId === parseInt(invoiceId));          
+          if(ind > -1){
+            notificationInvoice.rowIndex = ind;
+            notificationInvoice.data = pendingInvoicesData?.items[ind];
+            this.selectRow(notificationInvoice)
+          }
+        }
+        
+    })
   }
 }
