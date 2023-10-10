@@ -146,7 +146,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public commentContainerId = 0;
 
 
-  @Select(OrderManagementContentState.orderComments)
+  @Select(TimesheetsState.orderComments)
   private orderComments$: Observable<Comment[]>;
 
   @Select(AppState.isSidebarOpened)
