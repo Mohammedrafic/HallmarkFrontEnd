@@ -211,12 +211,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   createATPform(): void {
-    this.performCalculations();
     this.AtpCalcForm = this.formBuilder.group({
       hoursWorked: [this.hoursWorked, [Validators.required]],
       costSaving: [this.costSaving, [Validators.required]]
     });
-
+    this.performCalculations();
   }
 
   ngOnChanges(changes : SimpleChanges): void {
@@ -304,6 +303,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         }
         this.stipendBenefits = (!Number.isNaN(this.meal + this.lodging)) ? this.meal + this.lodging : 0;
         this.stipendNonBenefits = (!Number.isNaN(this.meal + this.lodging)) ? this.meal + this.lodging : 0;
+        this.adjustedTotalBenefits = (!Number.isNaN(this.salaryWagesandBenefits - (this.benefitsBenefits + this.costSavingBenefits + this.stipendBenefits))) ? 
+        (this.salaryWagesandBenefits - (this.benefitsBenefits + this.costSavingBenefits + this.stipendBenefits)) : 0;
+        this.adjustedTotalNonBenefits = (!Number.isNaN(this.salaryWagesandBenefits - (this.benefitsNonBenefits + this.costSavingBenefits + this.stipendNonBenefits))) ? 
+                (this.salaryWagesandBenefits - (this.benefitsNonBenefits + this.costSavingBenefits + this.stipendNonBenefits)) : 0;
+        this.stipendHourlyRate = (!Number.isNaN(this.stipendBenefits / this.hoursWorked)) ? (this.stipendBenefits / this.hoursWorked) : 0;
+        this.contractLabourBenefit = (!Number.isNaN(this.adjustedTotalBenefits / this.hoursWorked)) ? (this.adjustedTotalBenefits / this.hoursWorked) : 0;
+        this.contractLabourNonBenefit = (!Number.isNaN(this.adjustedTotalNonBenefits / this.hoursWorked)) ? (this.adjustedTotalNonBenefits / this.hoursWorked) : 0;
+        this.fullyLoadedBenefit = (!Number.isNaN(this.contractLabourBenefit + this.stipendHourlyRate)) ? this.contractLabourBenefit + this.stipendHourlyRate : 0;
+        this.fullyLoadedNonBenefit = (!Number.isNaN(this.contractLabourNonBenefit + this.stipendHourlyRate)) ? this.contractLabourNonBenefit + this.stipendHourlyRate : 0;
+
       }
     })
     this.performCalculations();
@@ -325,18 +334,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private performCalculations(): void {
     this.salaryWagesandBenefits = (!Number.isNaN(this.ratePerHour * this.hoursWorked != null)) ? this.ratePerHour * this.hoursWorked : 0;
-    this.costSavingBenefits = (!Number.isNaN(this.salaryWagesandBenefits / this.costSaving)) ? (this.salaryWagesandBenefits / this.costSaving) : 0;
+    this.costSavingBenefits = (!Number.isNaN((this.salaryWagesandBenefits * this.costSaving) / 100)) ? ((this.salaryWagesandBenefits * this.costSaving) / 100) : 0; 
     this.benefitsBenefits = (!Number.isNaN(this.salaryWagesandBenefits * (this.benefitpercentofsw / 100))) ? (this.salaryWagesandBenefits * (this.benefitpercentofsw / 100)) : 0;
     this.benefitsNonBenefits = (!Number.isNaN(this.salaryWagesandBenefits * (this.wagePercent / 100))) ? (this.salaryWagesandBenefits * (this.wagePercent / 100)) : 0;
-    this.adjustedTotalBenefits = (!Number.isNaN(this.salaryWagesandBenefits - (this.benefitsBenefits + this.costSavingBenefits + this.stipendBenefits))) ?
-                                  (this.salaryWagesandBenefits - (this.benefitsBenefits + this.costSavingBenefits + this.stipendBenefits)) : 0;
-    this.adjustedTotalNonBenefits = (!Number.isNaN(this.salaryWagesandBenefits - (this.benefitsNonBenefits + this.costSavingBenefits + this.stipendNonBenefits))) ?
-                                  (this.salaryWagesandBenefits - (this.benefitsNonBenefits + this.costSavingBenefits + this.stipendNonBenefits)) : 0;
-    this.stipendHourlyRate = (!Number.isNaN(this.stipendBenefits / this.hoursWorked)) ? (this.stipendBenefits / this.hoursWorked) : 0;
-    this.contractLabourBenefit = (!Number.isNaN(this.adjustedTotalBenefits / this.hoursWorked)) ? (this.adjustedTotalBenefits / this.hoursWorked) : 0;
-    this.contractLabourNonBenefit = (!Number.isNaN(this.adjustedTotalNonBenefits / this.hoursWorked)) ? (this.adjustedTotalNonBenefits / this.hoursWorked) : 0;
-    this.fullyLoadedBenefit = (!Number.isNaN(this.contractLabourBenefit + this.stipendHourlyRate)) ? this.contractLabourBenefit + this.stipendHourlyRate : 0;
-    this.fullyLoadedNonBenefit = (!Number.isNaN(this.contractLabourNonBenefit + this.stipendHourlyRate)) ? this.contractLabourNonBenefit + this.stipendHourlyRate : 0;
     this.cdr.markForCheck();
   }
 

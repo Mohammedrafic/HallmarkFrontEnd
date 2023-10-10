@@ -60,6 +60,7 @@ import {
 } from '@organization-management/workflow/workflow-mapping/constants';
 import { WorkflowMappingService } from '@organization-management/workflow/workflow-mapping/services';
 import { SystemFlags } from '@organization-management/workflow/interfaces';
+import { CreateNextStepStatusForWorkflows } from '@organization-management/workflow/helpers';
 
 @Component({
   selector: 'app-workflow-mapping',
@@ -278,14 +279,14 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       foundWorkflow?.workflows?.forEach((workflow: Workflow) => {
         workflow.steps.sort((first: Step, second: Step) => (first.order as number) - (second.order as number));
       });
+
       // add nextStepStatus field
       foundWorkflow?.workflows?.forEach((workflow: Workflow) => {
-        workflow.steps = workflow.steps.map((item: Step, index: number, array: Step[]) => {
-          return {
-            ...item,
-            nextStepStatus: array[index + 1]?.status,
-          };
-        });
+       workflow.steps = CreateNextStepStatusForWorkflows(
+         workflow.steps,
+         foundWorkflow?.includeInIRP,
+         foundWorkflow?.type
+        );
       });
 
       if (foundWorkflow && foundWorkflow.workflows) {

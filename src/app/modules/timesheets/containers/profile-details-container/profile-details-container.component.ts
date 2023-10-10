@@ -67,9 +67,6 @@ import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
 import { AppState } from 'src/app/store/app.state';
 import { ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { Comment } from '@shared/models/comment.model';
-import { CommentsService } from '@shared/services/comments.service';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { GetOrderComments } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -146,7 +143,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public commentContainerId = 0;
 
 
-  @Select(OrderManagementContentState.orderComments)
+  @Select(TimesheetsState.orderComments)
   private orderComments$: Observable<Comment[]>;
 
   @Select(AppState.isSidebarOpened)
@@ -708,7 +705,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public getOrderComments(): void {
-    this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
+    this.store.dispatch(new Timesheets.GetOrderComments(this.commentContainerId as number));
     this.orderComments$.pipe(
       takeUntil(this.unsubscribe$)
     ).subscribe((comments: Comment[]) => {

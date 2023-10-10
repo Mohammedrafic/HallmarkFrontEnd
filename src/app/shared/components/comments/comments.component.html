@@ -1,8 +1,6 @@
 <section class="comments-container" [class.background]="useBackground">
   <div class="comments-header">
-    <div class="title">
-      Comments
-    </div>
+    <div class="title">Comments</div>
     <div class="dropdown-container bootstrap">
       <ejs-dropdownlist
         *ngIf="!isAgencyUser"
@@ -14,17 +12,16 @@
       ></ejs-dropdownlist>
     </div>
   </div>
-  <div #body class="comments-body" (scroll)="onScroll()">
+  <div #body class="comments-body" (scroll)="onScroll()" [class.useStyle]="useStyle">
     <ng-container *ngFor="let comment of commentData">
-      <app-comment 
+      <app-comment
         [scrolledToMessage$]="scrolledToMessage$"
         [comment]="comment"
         [commentType]="commentType"
-        (onRead)="onRead(comment)"></app-comment>
+        (onRead)="onRead(comment)"
+      ></app-comment>
     </ng-container>
-    <div class="no-comments" *ngIf="!comments?.length">
-      There are no comments to display yet!
-    </div>
+    <div class="no-comments" *ngIf="!comments?.length">There are no comments to display yet!</div>
   </div>
   <div class="comments-controls">
     <div class="input-group bootstrap">
@@ -37,27 +34,25 @@
         maxlength="500"
         [(value)]="message"
         [readonly]="disabled"
-        placeholder="Enter your comment here..."></ejs-textbox>
+        placeholder="Enter your comment here..."
+      ></ejs-textbox>
     </div>
     <div class="actions" [class.readonly]="disabled">
-      <ejs-tooltip
-        [content]="isExternal ? 'External' : 'Internal'">
+      <ejs-tooltip [content]="isExternal ? 'External' : 'Internal'">
         <span class="control-wrapper visibility" (click)="visibilityHandler()">
           <i-feather *ngIf="!isExternal" name="eye-off" class="icon"></i-feather>
           <i-feather *ngIf="isExternal" name="eye" class="icon"></i-feather>
         </span>
       </ejs-tooltip>
       <div *ngIf="!isAgencyUser">
-        <ejs-tooltip
-        [content]="'Send'">
-        <span class="control-wrapper send" (click)="send()">
-          <i-feather name="send" class="icon"></i-feather>
-        </span>
-      </ejs-tooltip>
+        <ejs-tooltip [content]="'Send'">
+          <span class="control-wrapper send" (click)="send()">
+            <i-feather name="send" class="icon"></i-feather>
+          </span>
+        </ejs-tooltip>
       </div>
-      
-      <ejs-tooltip
-        [content]="'Send'" *ngIf="isAgencyUser">
+
+      <ejs-tooltip [content]="'Send'" *ngIf="isAgencyUser">
         <span class="control-wrapper send" (click)="send()">
           <i-feather name="send" class="icon"></i-feather>
         </span>

@@ -38,6 +38,7 @@ enum CommentsFilter {
 })
 export class CommentsComponent {
   @Input() useBackground = true;
+  @Input() useStyle = false;
   @Input() disabled = false;
   @Input() orderId: number;
   public commentData: Comment[] = [];
@@ -190,7 +191,11 @@ export class CommentsComponent {
       isRead: true,
     };
     this.comments.push(comment);
-    this.commentData.push(comment);
+    if(this.useStyle === true){
+      this.commentData.unshift(comment);
+    }else{
+      this.commentData.push(comment);
+    }
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
