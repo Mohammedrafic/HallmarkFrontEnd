@@ -191,7 +191,7 @@ export class CommentsComponent {
       isRead: true,
     };
     this.comments.push(comment);
-    if(this.useStyle == true){
+    if(this.useStyle === true){
       this.commentData.unshift(comment);
     }else{
       this.commentData.push(comment);
