@@ -3,7 +3,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
 
 import { Comment } from '@shared/models/comment.model';
-import { MarkCommentAsRead, SaveComment } from './comments.actions';
+import { MarkCommentAsRead, SaveComment, SaveCommentSuccess } from './comments.actions';
 import { CommentsService } from '@shared/services/comments.service';
 
 export interface CommentsStateModel {
@@ -26,9 +26,10 @@ export class CommentsState {
   constructor(private commentsService: CommentsService) {}
 
   @Action(SaveComment)
-  SaveComment({ }: StateContext<CommentsStateModel>, { comment }: SaveComment): Observable<Comment> {
+  SaveComment({dispatch}: StateContext<CommentsStateModel>, { comment }: SaveComment): Observable<Comment> {
     return this.commentsService.saveComment(comment).pipe(
       tap((payload) => {
+        dispatch(new SaveCommentSuccess());
         return payload;
       })
     );

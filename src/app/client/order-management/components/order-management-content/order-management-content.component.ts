@@ -2616,7 +2616,8 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   updateOrderDetails(order: Order | OrderManagement): void {
-    this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
+    this.store.dispatch(new GetOrderById(order.id, order.organizationId as number, undefined,
+      this.activeSystem === OrderManagementIRPSystemId.IRP ));
     this.dispatchAgencyOrderCandidatesList(order.id, order.organizationId as number, !!order.irpOrderMetadata);
     this.getOrders(true);
   }

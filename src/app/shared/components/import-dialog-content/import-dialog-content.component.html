@@ -2,7 +2,7 @@
   #sideDialog
   cssClass="dialog import-dialog responsive"
   [width]="width"
-  [target]="targetElement"
+  [target]="targetElement$ | async"
   [visible]="false"
   [isModal]="true"
   [zIndex]="zIndex"
@@ -15,6 +15,14 @@
             <h3 class="e-card-title">{{title}}</h3>
           </div>
           <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
+          <button
+            tabindex="-1"
+            ejs-button
+            cssClass="e-flat mobile-close-button"
+            (click)="onCancel()"
+          >
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
         </div>
       </section>
       <section class="import-items-container">
@@ -88,8 +96,8 @@
   [isModal]="true"
   [visible]="false"
   height="262"
-  [target]="targetElement"
-  width='435px'
+  [target]="targetElement$ | async"
+  width="435px"
   class="modal-dialog"
 >
   <ng-template #footerTemplate>

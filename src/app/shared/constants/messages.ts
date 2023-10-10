@@ -67,7 +67,7 @@ export const updateCandidateJobMessage = (dates: string[]) =>
 export const usedByOrderErrorMessage = (val: string, entities: string) =>
   `${val} cannot be deleted. This ${val} was used in ${entities}.`;
 export const usedInMappingMessage = (mappingName: string) =>
-  `This change has been affected ${mappingName} Mapping, please update it on the ${mappingName} Mapping tab`;
+  `This change has affected ${mappingName} Mapping. Please update it on the ${mappingName} Mapping tab.`;
 export const DEPLOYED_CANDIDATE = 'Deployed Candidate';
 export const deployedCandidateMessage = (orderIds: string[]) =>
   `<span class="deployed-candidate__message">Candidate is already working on order <span class="deployed-candidate__order-id"> ${orderIds.join(
@@ -146,8 +146,13 @@ export const RECORD_MODIFIED_SUCCESS_WITH_ORDERID=(organizationPrefix: string,pu
 `Order ${organizationPrefix}-${publicId} has been modified`
 export const ManageOrderIRP_PERMISSION = 'User missing required permissions (CanOrganizationEditOrdersIRP)';
 export const CloseOrderIRP_PERMISSION = 'User missing required permissions (CanCloseOrdersIRP)';
+export const INVALID_ZIP = 'Invalid location Zip-code';
 export const ERROR_CAN_NOT_Edit_OpenPositions = '# Open Positions field is not editable.';
 export const ERROR_CAN_NOT_ADD_MANAGENOTE_WITHOUT_VIEWNOTE="We can't add the manage note without view note.";
 export const AgencyPartnershipSuspended = 'Agency Partnership is suspended';
 export const ViewOrderIRP_PERMISSION = 'Additional permission is required (CanOrganizationViewOrdersIRP)';
 export const ViewOrderVMS_PERMISSION = 'Additional permission is required (CanOrganizationViewOrderVMS)';
+export const TaxIdValidationMessage = '9-digit number';
+export const NumberValidationMessage = '10-12 digit number';
+export const SwiftCodeValidationMessage = '8-11 alphanumeric code for international payments';
+export const RoutingNumberMessage = '9-digit code to identify financial institution';

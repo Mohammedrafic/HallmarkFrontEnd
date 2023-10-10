@@ -5,7 +5,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { NgxsModule, Store } from '@ngxs/store';
-import { AutoCompleteAllModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
+import { AutoCompleteAllModule, DropDownListModule, FilteringEventArgs, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { Observable, of } from 'rxjs';
 
 import { FilteredItem } from '@shared/models/filter.model';
@@ -21,6 +21,7 @@ import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimesheetDetailsApiService, TimesheetsApiService, TimesheetsService } from '../../services';
 import { FilterColumns } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
+import { FilteredOrderContactPerson } from '@shared/models/order-contactperson.model';
 
 
 @Component({
@@ -46,6 +47,7 @@ const emptyForm = new FormGroup({
   regionsIds: new FormControl([]),
   locationIds: new FormControl([]),
   contactEmails: new FormControl(''),
+  title: new FormControl(''),
 }) as CustomFormGroup<FilterColumns>;
 
 const filteredColumns = {
@@ -74,6 +76,12 @@ class FilterStubService {
       userId: '1'
     }]);
   }
+  getOrderContactPersonListBySearchTerm(args: FilteringEventArgs, title: string): Observable<FilteredOrderContactPerson[]> {
+    return of([{
+      name: 'Test',
+      email: 'test@mail.com'
+    }]);
+  }
 }
 
 describe('TimesheetsFilterDialogComponent', () => {
@@ -85,6 +93,7 @@ describe('TimesheetsFilterDialogComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
+        DropDownListModule,
         HttpClientTestingModule,
         MultiSelectModule,
         AutoCompleteAllModule,
@@ -190,7 +199,7 @@ describe('TimesheetsFilterDialogComponent', () => {
 
     tick(500);
 
-    expect(component.filterColumns.contactEmails.dataSource).toEqual([{ fullName: 'Test', email: 'test@mail.com', userId: '1' }]);
+    expect(component.filterColumns.contactEmails.dataSource).toEqual([{ name: 'Test', email: 'test@mail.com' }]);
 
     flush();
   }));

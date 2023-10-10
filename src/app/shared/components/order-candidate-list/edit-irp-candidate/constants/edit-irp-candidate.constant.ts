@@ -13,6 +13,7 @@ export const OptionField: FieldSettingsModel = { text: 'text', value: 'value' };
 export const CandidateTitle = 'Edit Employee';
 export const StatusField = 'status';
 export const CloseReasonField = 'reason';
+export const RejectedReasonField = 'rejectedReason';
 export const DefaultConfigFieldsToShow: string[] = [
   'status',
   'actualStartDate',
@@ -34,6 +35,7 @@ export const OnboardConfigFieldsToShow: string[] = [
   'reason',
   'closeDate',
 ];
+export const RejectedConfigFieldsToShow: string[] = ['availableStartDate','actualEndDate','actualStartDate','offeredStartDate', 'offeredEndDate'];
 
 export const OfferedStatusFlow = [
   CandidatStatus.Offered,
@@ -87,6 +89,15 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     type: FieldType.Date,
     showField: true,
     cssClass: 'date-field',
+  },
+  {
+    field: 'rejectedReason',
+    title: 'Rejection Reason',
+    disabled: false,
+    required: true,
+    type: FieldType.Dropdown,
+    showField: false,
+    cssClass: 'reject-reason',
   },
   {
     field: 'isClosed',

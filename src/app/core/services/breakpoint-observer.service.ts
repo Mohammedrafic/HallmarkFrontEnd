@@ -19,10 +19,10 @@ export class BreakpointObserverService {
     return this.breakpointObserver.observe(MediaQueryBreakpoints).pipe(
       map(({ breakpoints }) => {
         return {
-          isDesktopLarge: breakpoints[BreakpointQuery.DESKTOP_LG_MAX] && breakpoints[BreakpointQuery.DESKTOP_LG_MIN],
+          isDesktopLarge: breakpoints[BreakpointQuery.DESKTOP_LG_MIN],
           isDesktopSmall: breakpoints[BreakpointQuery.DESKTOP_SM_MAX] && breakpoints[BreakpointQuery.DESKTOP_SM_MIN],
           isTablet: breakpoints[BreakpointQuery.TABLET_MAX] && breakpoints[BreakpointQuery.TABLET_MIN],
-          isMobile: breakpoints[BreakpointQuery.MOBILE_MAX] && breakpoints[BreakpointQuery.MOBILE_MIN],
+          isMobile: breakpoints[BreakpointQuery.MOBILE_MAX],
         };
       })
     );

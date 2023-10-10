@@ -1,6 +1,13 @@
 <app-page-toolbar>
   <ng-container left>
-    <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      cssClass="e-outline"
+      (click)="navigateBack()"
+    >
+      Back
+    </button>
     <h3 class="employee-title"><span>{{titlevalue}}</span>  <span class="candidate-name-title">{{candidateName$ | async}}</span></h3>
   </ng-container>
   <ng-container right

@@ -62,6 +62,9 @@ import { GetNursingUtilizationbyByFilters, GetNursingWidgetData, GetSkillsbyByFi
 import { AvailableEmployeeModel } from '../models/available-employee.model';
 import { BillRateResponse, SkillCategoryName } from '../models/bill-rate-by-skill-category-response.model';
 import { BillRateBySkillCategoryTypeAggregatedModel } from '../models/bill-rate-by-skill-category-type-aggregated.model';
+import { Store } from '@ngxs/store';
+import { UserState } from 'src/app/store/user.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Injectable()
 export class DashboardService {
@@ -105,7 +108,7 @@ export class DashboardService {
   candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesavgForActivePositions$:BehaviorSubject<AveragedayActivecandidateInfo[]> = new BehaviorSubject<AveragedayActivecandidateInfo[]>([]);
 
-  constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
+  constructor(private readonly httpClient: HttpClient, private readonly router: Router, private readonly store: Store) {}
 
   public getDashboardsData(): Observable<DashboardDataModel> {
     return forkJoin({ panels: this.getDashboardState(), widgets: this.getWidgetList() }).pipe(
@@ -316,7 +319,8 @@ export class DashboardService {
       ...combinedData.shapeSettings,
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
-    const title = "Applicant’s Home State";
+    const user = this.store.selectSnapshot(UserState.user);
+    const title =user?.businessUnitType==BusinessUnitType.Agency? "Candidate Home State": "Applicant’s Home State";
     const description = "";
     return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description };
   }

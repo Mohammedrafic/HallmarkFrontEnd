@@ -17,8 +17,13 @@ export class ToggleSwitchComponent implements ICellRendererAngularComp {
   private isSMSEnabled:string='isSMSEnabled';
   private isOnScreenEnabled:string='isOnScreenEnabled';
   public disableFlag:boolean =false;
+  public permissionsCheck:boolean = false;
   agInit(params: any): void {
     this.params = params;
+    this.permissionsCheck =  this.params?.permissionsCheck;
+    if(this.permissionsCheck === true){
+      this.disableFlag = this.params?.canEditUserSubscription ? false : true;
+    }
     this.SetData();
   }
 
@@ -40,6 +45,9 @@ export class ToggleSwitchComponent implements ICellRendererAngularComp {
     }else{
       this.disableFlag = true;
       this.toggleYesOrNo = this.params.value;
+    }
+    if(this.permissionsCheck && this.params.canDeleteUserSubscription && this.toggleYesOrNo){
+      this.disableFlag = false;
     }
   }
   refresh(): boolean {

@@ -53,6 +53,23 @@
     "itm4 itm4 itm5 itm5"
     "itm6 itm7 itm8 itm9";
 
+  @media #{$max-tablet} {
+    grid-template-areas:
+    "itm1 itm1 . ."
+    "itm2 itm2 itm3 itm3"
+    "itm4 itm4 itm5 itm5"
+    "itm6 itm7 itm8 itm9";
+  }
+
+  @media (max-width: 825px) {
+    grid-template-areas:
+    "itm1 itm1 . ."
+    "itm2 itm2 itm3 itm3"
+    "itm4 itm4 itm5 itm5"
+    "itm6 itm6 itm7 itm7"
+    "itm8 itm8 itm9 itm9";
+  }
+
   .item-1 {
     grid-area: itm1;
   }
@@ -143,5 +160,9 @@
       "itm7 itm7"
       "itm8 itm8"
       "itm9 itm9";
+  }
+
+  .bank-details-title {
+    margin-top: 30px;
   }
 }

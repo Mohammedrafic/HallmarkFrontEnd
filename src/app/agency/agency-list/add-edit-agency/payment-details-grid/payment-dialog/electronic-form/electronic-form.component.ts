@@ -22,6 +22,15 @@ import PriceUtils from '@shared/utils/price.utils';
 import { startDateDuplicationValidator } from '@shared/validators/start-date-duplication.validator';
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { patternMessageValidator } from '@shared/validators/pattern-message.validator';
+import {
+  ALPHANUMERIC_8_11_SYMBOLS,
+  MIN_DIGITS_LENGTH_ONLY_NINE,
+  NUMERIC_10_12_DIGITS,
+  NumberValidationMessage,
+  RoutingNumberMessage,
+  SwiftCodeValidationMessage,
+} from '@shared/constants';
 
 @Component({
   selector: 'app-electronic-form',
@@ -74,7 +83,10 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         endDate: [null],
         nsPaymentId: [''],
         bankName: ['', [Validators.required]],
-        routingNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+        routingNumber: ['', [
+          Validators.required,
+          patternMessageValidator(MIN_DIGITS_LENGTH_ONLY_NINE, RoutingNumberMessage),
+        ]],
         bankAddress1: ['', [Validators.required]],
         bankAddress2: [''],
         bankCountry: ['', [Validators.required]],
@@ -82,7 +94,10 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         bankCity: [''],
         bankZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
         accountHolderName: ['', [Validators.required]],
-        accountHolderNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+        accountHolderNumber: ['', [
+          Validators.required,
+          patternMessageValidator(NUMERIC_10_12_DIGITS, NumberValidationMessage),
+        ]],
         accountHolderPhone: ['', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]],
         accountHolderAddress1: [''],
         accountHolderAddress2: [''],
@@ -91,8 +106,10 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         accountHolderCity: [''],
         accountHolderZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
         fee: [''],
-        swiftCode: ['', [Validators.pattern(/^[0-9]+$/)]],
-        netSuiteId: ['']
+        swiftCode: ['', [
+          patternMessageValidator(ALPHANUMERIC_8_11_SYMBOLS, SwiftCodeValidationMessage),
+        ]],
+        netSuiteId: [{ value: '', disabled: true }],
       },
       {
         validators: startDateDuplicationValidator('startDate', this.paymentsList, this.formValue?.startDate, this.mode),

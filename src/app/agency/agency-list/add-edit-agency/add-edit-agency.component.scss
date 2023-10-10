@@ -130,7 +130,6 @@
 
 @media #{$max-mobile} {
   :host {
-
     ::ng-deep .controls-container {
       padding-bottom: 0;
     }
@@ -145,6 +144,10 @@
       place-items: center;
       grid-template-columns: auto 30% 40%;
       gap: 12px;
+
+      &.agency-user {
+        grid-template-columns: 50% 50%;
+      }
 
       .item {
         justify-self: stretch;

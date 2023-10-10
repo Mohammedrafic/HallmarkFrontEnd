@@ -937,8 +937,7 @@
           <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
         </div>
       </div>
-      <div class="input-container"
-           *ngIf="!isActiveSystemIRP">
+      <div class="input-container">
           <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Status</label>
           <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Status</label>
         <div class="input-group multiselect">
