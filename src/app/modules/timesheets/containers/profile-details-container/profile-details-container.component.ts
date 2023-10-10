@@ -708,7 +708,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public getOrderComments(): void {
-    console.log(this.commentContainerId)
     this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
     this.orderComments$.pipe(
       takeUntil(this.unsubscribe$)
