@@ -142,6 +142,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public handleChangeTab(tabIndex: number): void {
+    debugger;
     this.activeTabIdx = tabIndex;
 
     const preservedFilters = this.store.selectSnapshot(

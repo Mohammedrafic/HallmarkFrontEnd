@@ -54,6 +54,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
   public orgwidgetpendingtimesheet: string;
   public missingtimesheet: string;
   public tabsWidth$: Observable<string>;
+  public selectedTab = 0;
 
   @Select(TimesheetsState.tabCounts) private tabsConfig$: Observable<TabCountConfig>;
 
@@ -96,6 +97,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
   }
 
   public onSelect(selectEvent: SelectingEventArgs): void {
+    this.selectedTab = selectEvent.selectingIndex;
     this.changeTab.emit(selectEvent.selectingIndex);
   }
 
