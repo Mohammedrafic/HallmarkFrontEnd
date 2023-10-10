@@ -36,6 +36,11 @@ export namespace Timesheets {
     ) {}
   }
 
+  export class GetOrderComments {
+    static readonly type = '[agency order management] Get Order Comments';
+    constructor(public commentContainerId: number) {}
+  }
+
   export class ToggleTimesheetUploadAttachmentsDialog {
     static readonly type = TIMESHEETS_ACTIONS.TOGGLE_TIMESHEET_UPLOAD_ATTACHMENTS_DIALOG;
 
