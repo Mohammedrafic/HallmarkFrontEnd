@@ -1,4 +1,9 @@
-<section class="fee-settings" [formGroup]="form">
+<section
+  #container
+  class="fee-settings"
+  [ngClass]="{'empty-grid': feeExceptions.length < 1}"
+  [formGroup]="form"
+>
   <div class="input-container bootstrap base-fee">
     <label>Base Fee %</label>
     <div class="input-group">
@@ -20,11 +25,18 @@
       <h3>Fee Exception</h3>
     </div>
     <div class="actions">
-      <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions] || isAgency" class="action-link" (click)="addNew(form.value.id)"
-      ><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</button
+      <button
+        ejs-button
+        class="action-link"
+        [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions] || isAgency"
+        (click)="addNew(form.value.id)"
       >
+        <i-feather name="plus" class="icon"></i-feather>
+        <span class="text-btn">Add Fee Exception</span>
+      </button>
     </div>
   </div>
+  <div class="grid-container">
   <ejs-grid
     #grid
     [dataSource]="feeExceptions"
@@ -33,9 +45,8 @@
     [allowSelection]="true"
     [enableVirtualization]="false"
     [resizeSettings]="resizeSettings"
-    [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
-    [height]="gridHeight"
+    [height]="fullScreenGridHeight"
     (dataBound)="gridDataBound($event)"
     (actionBegin)="actionBegin($event)"
     class="e-gridwithheader"
@@ -67,54 +78,21 @@
         </ng-template>
       </e-column>
     </e-columns>
-
-    <ng-template #pagerTemplate let-data>
-      <div class="e-pagertemplate">
-        <div class="control-section">
-          <div class="content-wrapper">
-            <section class="left-side-pager-controls">
-              <ejs-dropdownlist
-                id="rowsPerPage"
-                class="dropdown-no-border"
-                [allowFiltering]="true"
-                [dataSource]="rowsPerPageDropDown"
-                [(value)]="activeRowsPerPageDropDown"
-                (change)="onRowsDropDownChanged()"
-              >
-              </ejs-dropdownlist>
-              <ejs-numerictextbox
-                id="goToPage"
-                class="numeric-input-no-border"
-                format="#"
-                placeholder="Go to:"
-                min="1"
-                [max]="(feeExceptionsPage$ | async)?.totalPages"
-                [showSpinButton]="false"
-                (change)="onGoToClick($event)"
-              >
-              </ejs-numerictextbox>
-              <div class="total-rows">
-                Total Rows: {{(feeExceptionsPage$ | async)?.totalCount}}
-              </div>
-            </section>
-            <section class="right-side-pager-controls">
-              <ejs-pager
-                id="gridPager"
-                #gridPager
-                [pageSize]="pageSize"
-                [totalRecordsCount]="(feeExceptionsPage$ | async)?.totalCount"
-                [enablePagerMessage]="false"
-                [currentPage]="currentPage"
-                (click)="onGoToClick($event)"
-              >
-              </ejs-pager>
-            </section>
-          </div>
-        </div>
-      </div>
-    </ng-template>
   </ejs-grid>
+  <app-grid-pagination
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    [totalRecordsCount]="(feeExceptionsPage$ | async)?.totalPages ?? 0"
+    (navigateToPageEmitter)="changeGridPage($event)"
+    (pageSizeChangeEmitter)="changeGridSize($event)"
+  ></app-grid-pagination>
+</div>
 </section>
 
-<app-add-new-fee-dialog [openEvent]="openAddNewFeeDialog" [openEditEvent]="editFeeData" [disableSaveButton]="!userPermission[userPermissions.CanEditFeeExceptions]"></app-add-new-fee-dialog>
+<app-add-new-fee-dialog
+  [openEvent]="openAddNewFeeDialog"
+  [openEditEvent]="editFeeData"
+  [disableSaveButton]="!userPermission[userPermissions.CanEditFeeExceptions]"
+  [targetElement]="container"
+></app-add-new-fee-dialog>
 
