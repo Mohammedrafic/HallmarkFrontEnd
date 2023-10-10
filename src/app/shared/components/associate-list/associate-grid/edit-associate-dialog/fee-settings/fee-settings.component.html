@@ -1,5 +1,4 @@
 <section
-  #container
   class="fee-settings"
   [ngClass]="{'empty-grid': feeExceptions.length < 1}"
   [formGroup]="form"
@@ -93,6 +92,5 @@
   [openEvent]="openAddNewFeeDialog"
   [openEditEvent]="editFeeData"
   [disableSaveButton]="!userPermission[userPermissions.CanEditFeeExceptions]"
-  [targetElement]="container"
+  [targetElement]="grid.element"
 ></app-add-new-fee-dialog>
-
