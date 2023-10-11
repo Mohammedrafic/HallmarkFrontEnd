@@ -197,6 +197,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private resizeObserver: ResizeObserverModel;
 
   private canRecalculate: boolean;
+  private isTimeSheetChanged: boolean;
 
   previewAttachemnt: boolean = false;
   currentSelectedAttachmentIndex: number = 0;
@@ -259,6 +260,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public onOpen(args: { preventFocus: boolean }): void {
+    this.isTimeSheetChanged = false;
     args.preventFocus = true;
   }
 
@@ -337,7 +339,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const parent = e.target.parentNode as ParentNode;
     this.tooltip.content = Array.from(parent.children).indexOf(e.target) ? 'Miles Status' : 'Timesheet Status';
   }
-
   
   public onDWNCheckboxSelectedChange({ checked }: { checked: boolean }, switchComponent: SwitchComponent): void {
     checked
@@ -362,7 +363,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             )
           )
           .subscribe(() => {
-            this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+            this.refreshGrid();
             this.refreshData();
             this.closeDialog();
           })
@@ -415,7 +416,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.handleProfileClose();
-        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+        this.refreshGrid();
       });
   }
 
@@ -522,7 +523,18 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(take(1))
       .subscribe(() => {
         this.candidateDialog.hide();
+        if (this.isTimeSheetChanged) {
+          this.refreshGrid();
+        }
       });
+  }
+
+  public handleTimeSheetChange(): void {
+    this.isTimeSheetChanged = true;
+  }
+
+  private refreshGrid(): void {
+    this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
   }
 
   private orgSubmitEmptyTimesheetWarning(): void {
@@ -538,7 +550,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.handleProfileClose();
-        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+        this.refreshGrid();
       });
   }
 
