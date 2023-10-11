@@ -1,7 +1,7 @@
 <ejs-dialog
   id="add-new-fee-dialog"
   #addFeeSideDialog
-  cssClass="dialog"
+  cssClass="dialog responsive"
   [width]="'538px'"
   [target]="targetElement"
   [visible]="false"
@@ -15,12 +15,10 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title">{{ title }}</h3>
           </div>
-          <div class="e-card-content">
-            <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">
-              Cancel
-            </button>
-            <button ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onAdd()" [disabled]="disableSaveButton">Add</button>
-          </div>
+          <ng-container [ngTemplateOutlet]="actionButtons"></ng-container>
+          <button tabindex="-1" ejs-button cssClass="e-flat mobile-close-button" (click)="onCancel()">
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
         </div>
       </section>
 
@@ -85,5 +83,32 @@
       </section>
     </section>
   </ng-template>
+
+  <ng-template #footerTemplate>
+    <ng-container [ngTemplateOutlet]="actionButtons"></ng-container>
+  </ng-template>
 </ejs-dialog>
 
+<ng-template #actionButtons>
+  <div class="e-card-content mobile-button-group">
+    <button
+      ejs-button
+      id="cancelFormButton"
+      cssClass="e-outline button-cancel action-btn"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+    <button
+      ejs-button
+      id="addFormButton"
+      class="action-btn"
+      type="submit"
+      (click)="onAdd()"
+      [isPrimary]="true"
+      [disabled]="disableSaveButton"
+    >
+      Add
+    </button>
+  </div>
+</ng-template>

@@ -43,7 +43,7 @@ import { SystemType } from '@shared/enums/system-type.enum';
   selector: 'app-tiers-dialog',
   templateUrl: './tiers-dialog.component.html',
   styleUrls: ['./tiers-dialog.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TiersDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
