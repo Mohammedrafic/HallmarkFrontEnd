@@ -531,7 +531,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
     if(offeredStartDate && offeredEndDate) {
       this.offeredDateSubscription = offeredStartDate.valueChanges.pipe(
-        filter((value: string) => !!value ),
         skip(1),
         distinctUntilChanged(),
         takeUntil(this.componentDestroy()),
@@ -674,7 +673,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
 
     const actualStartDate = isStatusEqualCandidateStatus && !startDate ? startDate : this.candidateDetails.actualStartDate;
-    const actualEndDate = isStatusEqualCandidateStatus && !endDate ? endDate : this.candidateDetails.actualStartDate;
+    const actualEndDate = isStatusEqualCandidateStatus && !endDate ? endDate : this.candidateDetails.actualEndDate;
     const offeredStartDate = startDate || actualStartDate ? DateTimeHelper.setCurrentTimeZone(startDate ?? actualStartDate as string) : null;
     const offeredEndDate = endDate || actualEndDate ? DateTimeHelper.setCurrentTimeZone(endDate ?? actualEndDate as string) : null;
 
