@@ -4,11 +4,11 @@ import { GetEmployeeUsers, GetNonEmployeeUsers, GetRolePerUser } from './../../.
 import { ButtonModel } from './../../../shared/models/buttons-group.model';
 import { Component, Input, NgZone, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { Actions, Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { distinctUntilChanged, filter, Observable, Subject, take, takeUntil, takeWhile } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
 import {
   alertsFilterColumns,
@@ -50,8 +50,6 @@ import { isNumber } from 'lodash';
 import { GroupEmailRole } from '@shared/models/group-email.model';
 import { RolesPerUser } from '@shared/models/user-managment-page.model';
 import { Role } from '@shared/models/roles.model';
-import { Permission } from '@core/interface';
-import { UserPermissions } from '@core/enums/user.permissions.enum';
 
 @Component({
   selector: 'app-user-subscription',
@@ -88,9 +86,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   @Select(SecurityState.rolesPerUsers)
   rolesPerUsers$: Observable<RolesPerUser[]>;
-
-  @Select(UserState.userPermission)
-  currentUserPermissions$: Observable<Permission>;
 
   @Input() filterForm: FormGroup;
   public businessForm: FormGroup;
@@ -135,9 +130,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public showtoast:boolean = true;
   public getdata: any;
-  public userPermission: Permission = {};
-  public readonly userPermissions = UserPermissions;
-  
+  apiSaveReq:boolean = false;
+
   public isIRPFlagEnabled = false;
   public isOrgVMSEnabled = false;
   public isOrgIRPEnabled = false;
@@ -185,7 +179,66 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       this.cacheBlockSize = this.pageSize;
     this.serverSideStoreType = 'partial';
     this.maxBlocksInCache = 2;
-    this.columnDefs = [];
+    this.columnDefs = [
+      {
+        field: 'id',
+        hide: true
+      },
+      {
+        headerName: 'Notification Description',
+        field: 'alert.alertTitle',
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
+      },
+      {
+        headerName: 'Email',
+        field: 'isEmailEnabled',
+        cellRenderer: ToggleSwitchComponent,
+        cellRendererParams: {
+          onChange: this.onEmailChanged.bind(this),
+          label: 'email'
+        },
+        valueGetter: (params: { data: { isEmailEnabled: boolean } }) => { return AlertEnum[Number(params.data.isEmailEnabled)] },
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
+      {
+        headerName: 'SMS',
+        field: 'isSMSEnabled',
+        cellRenderer: ToggleSwitchComponent,
+        cellRendererParams: {
+          onChange: this.onSmsChanged.bind(this),
+          label: 'sms'
+        },
+        valueGetter: (params: { data: { isSMSEnabled: boolean } }) => { return AlertEnum[Number(params.data.isSMSEnabled)] },
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
+      {
+        headerName: 'OnScreen',
+        field: 'isOnScreenEnabled',
+        cellRenderer: ToggleSwitchComponent,
+        cellRendererParams: {
+          onChange: this.onScreenChanged.bind(this),
+          label: 'onScreen'
+        },
+        valueGetter: (params: { data: { isOnScreenEnabled: boolean } }) => { return AlertEnum[Number(params.data.isOnScreenEnabled)] },
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
+
+
+    ];
 
     this.defaultColDef = {
       flex: 1,
@@ -263,7 +316,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.onUserValueChanged();
     this.onOrganizationChangedHandler();
     this.onRolesValueChanged();
-    this.getPermission();
 
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
@@ -323,6 +375,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       }
     });
     this.allowActiveUsers = true;
+
   }
 
   public onGridReady(params: GridReadyEvent): void {
@@ -475,7 +528,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           self.userSubscriptionPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
 
             self.itemList = data?.items;
-            self.gridColumns();
             if(self.businessUnitControl?.value === BusinessUnitType.Employee) {
             self.itemList = self.itemList?.filter((x=>x.alertId!=AlertIdEnum['Order Comments-IRP']));
             }
@@ -527,6 +579,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   }
   private SaveData(data: any, alertChannel: AlertChannel) {
     if (data != undefined) {
+      this.apiSaveReq = true;
       let updateUserSubscription: UserSubscriptionRequest = {
         alertId: data.rowData?.alertId,
         userId: this.userGuid,
@@ -539,14 +592,16 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         updateUserSubscription.isIRP = true;
       }
       this.store.dispatch(new UpdateUserSubscription(updateUserSubscription));
-      this.updateUserSubscription$.pipe(takeUntil(this.unsubscribe$)).subscribe((updated: boolean) => {
-        if (updated != undefined && updated == true) {
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-          if(this.userPermission[this.userPermissions.CanDeleteUserSubscription]){
-            this.dispatchNewPage(this.usersControl.value);
-          }
-        }
-      });
+      this.actions$.pipe(
+            ofActionDispatched(ShowToast),
+            distinctUntilChanged(),
+            takeUntil(this.unsubscribe$)
+          ).subscribe((val) => {
+            if(val.type === 1 && this.apiSaveReq){
+              this.apiSaveReq = false;
+              this.dispatchNewPage(this.usersControl.value);
+            }
+          });
     }
   }
 
@@ -670,87 +725,4 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       }
       }
   }
-
-  private getPermission(): void {
-    this.currentUserPermissions$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-      if (data != undefined) {
-        this.userPermission = data;
-        this.gridColumns();        
-      }
-    });
-
-  }
-
-  private gridColumns(){
-    this.columnDefs = [
-      {
-        field: 'id',
-        hide: true
-      },
-      {
-        headerName: 'Notification Description',
-        field: 'alert.alertTitle',
-        filter: 'agTextColumnFilter',
-        filterParams: {
-          buttons: ['reset'],
-          debounceMs: 1000,
-          suppressAndOrCondition: true,
-        }
-      },
-      {
-        headerName: 'Email',
-        field: 'isEmailEnabled',
-        cellRenderer: ToggleSwitchComponent,
-        cellRendererParams: {
-          onChange: this.onEmailChanged.bind(this),
-          label: 'email',
-          canEditUserSubscription: this.userPermission[this.userPermissions.CanEditUserSubscription],
-          canDeleteUserSubscription: this.userPermission[this.userPermissions.CanDeleteUserSubscription],
-          permissionsCheck : true,
-        },
-        valueGetter: (params: { data: { isEmailEnabled: boolean } }) => { return AlertEnum[Number(params.data.isEmailEnabled)] },
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
-      },
-      {
-        headerName: 'SMS',
-        field: 'isSMSEnabled',
-        cellRenderer: ToggleSwitchComponent,
-        cellRendererParams: {
-          onChange: this.onSmsChanged.bind(this),
-          label: 'sms',
-          canEditUserSubscription: this.userPermission[this.userPermissions.CanEditUserSubscription],
-          canDeleteUserSubscription: this.userPermission[this.userPermissions.CanDeleteUserSubscription],
-          permissionsCheck : true,
-        },
-        valueGetter: (params: { data: { isSMSEnabled: boolean } }) => { return AlertEnum[Number(params.data.isSMSEnabled)] },
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
-      },
-      {
-        headerName: 'OnScreen',
-        field: 'isOnScreenEnabled',
-        cellRenderer: ToggleSwitchComponent,
-        cellRendererParams: {
-          onChange: this.onScreenChanged.bind(this),
-          label: 'onScreen',
-          canEditUserSubscription: this.userPermission[this.userPermissions.CanEditUserSubscription],
-          canDeleteUserSubscription: this.userPermission[this.userPermissions.CanDeleteUserSubscription],
-          permissionsCheck : true,
-        },
-        valueGetter: (params: { data: { isOnScreenEnabled: boolean } }) => { return AlertEnum[Number(params.data.isOnScreenEnabled)] },
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
-      },
-
-
-    ];
-  }
-  
 }
