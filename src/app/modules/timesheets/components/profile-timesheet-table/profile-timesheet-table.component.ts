@@ -448,8 +448,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private subscribeOnAddRecordSucceed(): void {
     this.actions$
       .pipe(
-        takeUntil(this.componentDestroy()),
         ofActionDispatched(TimesheetDetails.AddTimesheetRecordSucceed),
+        takeUntil(this.componentDestroy()),
       )
       .subscribe(() => this.timeSheetChanged.emit(true));
   }
