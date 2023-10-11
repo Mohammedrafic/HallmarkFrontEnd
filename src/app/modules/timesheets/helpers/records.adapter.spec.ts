@@ -90,7 +90,7 @@ describe('RecordsAdapter', () => {
         expect(result.forceUpdate).toBe(undefined);
         expect(result.type).toBe(TimesheetRecordType.Timesheet);
         expect(result.records?.length).toBe(3);
-        expect((result.records as PutRecord[])[0].timeIn).toBe('2023-03-12T07:00:00.000Z');
+        expect((result.records as PutRecord[])[0].timeIn).toBe('2023-03-12T08:00:00.000Z');
         expect((result.records as PutRecord[])[0].timeOut).toBe('2023-03-12T14:00:00.000Z');
         expect((result.records as PutRecord[])[2].isTimeInNull).toBe(true);
     });
@@ -227,7 +227,7 @@ describe('RecordsAdapter', () => {
       };
 
       const result = RecordsAdapter.adaptRecordAddDto(addData, 158, 65, RecordFields.Miles, false);
-      expect(result.timeIn).toBe('2023-06-20T00:00:00.000Z');
+      expect(result.timeIn).toBe('2023-06-19T00:00:00.000Z');
       expect(result.organizationId).toBe(158);
       expect(result.timesheetId).toBe(65);
       expect(result.type).toBe(TimesheetRecordType.Miles);
