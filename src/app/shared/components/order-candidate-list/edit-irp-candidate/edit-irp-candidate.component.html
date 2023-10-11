@@ -76,7 +76,6 @@
                       [min]="field.minDate"
                       format="MM/dd/yyyy"
                       placeholder="MM/DD/YYYY"
-                      [serverTimezoneOffset]="0"
                       [formControlName]="field.field"
                     ></ejs-datepicker>
                   </div>
@@ -107,7 +106,7 @@
 
     <div *ngIf="showATPform">
       <form [formGroup]="AtpCalcForm" class="atpcalc-form">
-        <div class="w_100"> 
+        <div class="w_100">
           <div class="input-container bootstrap left atpformfield">
             <label for="billRatesCategory">Hours Worked<span class="required">*</span></label>
             <div class="input-group">
@@ -155,7 +154,7 @@
             <tr>
               <td>{{ratePerHour}}</td>
               <td>{{benefitpercentofsw}}</td>
-              <td>{{wagePercent}}</td> 
+              <td>{{wagePercent}}</td>
             </tr>
           </tbody>
         </table>
@@ -244,7 +243,7 @@
           </tbody>
         </table>
       </div>
-    </div>    
+    </div>
   </div>
 </ejs-dialog>
 
