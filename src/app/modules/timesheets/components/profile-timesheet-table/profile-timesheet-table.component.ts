@@ -82,6 +82,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  @Output() readonly timeSheetChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   @Output() readonly rejectEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Output() readonly approveEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -250,6 +252,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.initResizeObserver();
     this.listenResizeContent();
     this.asyncRefresh();
+    this.subscribeOnAddRecordSucceed();
   }
 
   public override ngOnDestroy(): void {
@@ -442,6 +445,14 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     });
   }
 
+  private subscribeOnAddRecordSucceed(): void {
+    this.actions$
+      .pipe(
+        takeUntil(this.componentDestroy()),
+        ofActionDispatched(TimesheetDetails.AddTimesheetRecordSucceed),
+      )
+      .subscribe(() => this.timeSheetChanged.emit(true));
+  }
 
   private selectTab(index: number): void {
     this.changeColDefs(index);
