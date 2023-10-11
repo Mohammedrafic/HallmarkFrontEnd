@@ -695,14 +695,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
   }
 
-  onGroupEmailAddCancel() {
-    // console.log('this.candidateJob at cancel',this.candidateJob);
-    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
-    this.isSend = false;
-    this.store.dispatch(new ShowGroupEmailSideDialog(false));
-    this.updateDetails.emit();
-  }
-
+  
   private displayMessageConfirmation(): Observable<boolean> {
     const options = {
       title: ONBOARD_CANDIDATE,
@@ -730,6 +723,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
               }            
         }
       );
+  }
+
+  onGroupEmailAddCancel() {
+    this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
+    this.isSend = false;
+    this.store.dispatch(new ShowGroupEmailSideDialog(false));
   }
 
   onGroupEmailSend() {
