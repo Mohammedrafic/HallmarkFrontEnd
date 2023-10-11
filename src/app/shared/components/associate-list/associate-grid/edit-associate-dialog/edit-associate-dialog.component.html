@@ -16,6 +16,9 @@
             <h3 class="e-card-title">{{ editAgencyOrg?.businessUnitName}}</h3>
           </div>
           <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
+          <button tabindex="-1" ejs-button cssClass="e-flat mobile-close-button" (click)="onCancel()">
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
         </div>
       </section>
 
@@ -62,6 +65,7 @@
   <div class="e-card-content mobile-button-group">
     <button
       ejs-button
+      appHideBeforeSyncfusionLoad
       cssClass="e-outline button-cancel action-btn"
       id="cancelFormButton"
       (click)="onCancel()"
@@ -75,6 +79,7 @@
     >
       <button
         ejs-button
+        appHideBeforeSyncfusionLoad
         id="addFormButton"
         type="submit"
         class="save-btn"

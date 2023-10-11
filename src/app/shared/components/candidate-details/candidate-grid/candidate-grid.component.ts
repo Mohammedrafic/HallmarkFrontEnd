@@ -59,6 +59,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
   }
 
   public onRowsDropDownChanged(pageSize: number): void {
+    this.store.dispatch(new SetPageNumber(1));
     this.store.dispatch(new SetPageSize(pageSize));
   }
 
