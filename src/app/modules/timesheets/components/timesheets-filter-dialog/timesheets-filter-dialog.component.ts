@@ -58,6 +58,7 @@ export class TimesheetsFilterDialogComponent
     this.subscribeOnUserSearch();
     this.watchForPreservedFilters();
     this.watchForSwitchTabs();
+    this.watchForTitleChange();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -111,6 +112,13 @@ export class TimesheetsFilterDialogComponent
       });
   }
 
+  private watchForTitleChange() {
+    this.formGroup?.controls['title'].valueChanges
+      .subscribe(() => {
+        this.formGroup.controls['contactEmails'].patchValue('')
+      });
+  }
+
   private getOrderContactPersonListBySearchTerm(args: FilteringEventArgs, title: string): Observable<FilteredOrderContactPerson[]> {
     this.title = this.formGroup.get('title')?.value ?? '';
     return this.filterService.getOrderContactPersonListBySearchTerm(args.text, this.title).pipe(
@@ -138,7 +146,7 @@ export class TimesheetsFilterDialogComponent
     }
     this.patchFilterForm({ ...filters });
     const contactEmails = Array.isArray(filters?.contactEmails) ? filters.contactEmails[0] : null;
-    this.getPreservedContactPerson(contactEmails);
+    this.getPreservedOrderContactPerson(this.title, contactEmails);
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
   }
