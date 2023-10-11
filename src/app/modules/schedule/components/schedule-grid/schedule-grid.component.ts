@@ -463,6 +463,9 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   }
    public clearCandidateSuggesstion():void{
     this.autoCompleteSearch?.clear();
+     this.store.dispatch([
+       new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
+     ]);
    }
   private watchForCandidateSearch(): void {
     this.searchControl.valueChanges.pipe(

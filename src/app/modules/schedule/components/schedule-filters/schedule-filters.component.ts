@@ -451,6 +451,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
   private setFilterStructure(structure: ScheduleFilterStructure): void {
     if (this.filteredItems.length) {
       this.clearAllFilters(false);
+      this.applyPreservedFilters(); 
     }
 
     this.filterStructure = structure;
