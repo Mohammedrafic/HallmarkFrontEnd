@@ -59,7 +59,8 @@ const filteredColumns = {
   agencyIds: { type: 2, valueType: 0, valueField: 'name', valueId: 'id' },
   regionsIds: { type: 2, valueType: 0, valueField: 'name', valueId: 'id' },
   locationIds: { type: 2, valueType: 0, valueField: 'name', valueId: 'id' },
-  contactEmails: { type: 6, valueType: 0, valueField: 'fullName', valueId: 'email' }
+  contactEmails: { type: 6, valueType: 0, valueField: 'name', valueId: 'email' },
+  title: { type: 0, valueType: 1 }
 };
 
 class FiltersDialogHelperStubService {
