@@ -143,6 +143,20 @@
             </div>
           </div>
         </div>
+        <div class="input-container bootstrap left atpformfield">
+          <label for="billRatesCategory">Select Switcher <span class="required">*</span></label>
+          <div class="input-group">
+            <div class="input-group">
+              <ejs-dropdownlist
+                formControlName="calculations"
+                placeholder="All"
+                [allowFiltering]="true"
+                [dataSource]="SwitcherCalcvariables"
+              >
+              </ejs-dropdownlist>
+              </div>
+          </div>
+        </div>
       </form>
       <div class="class_table">
         <table>
@@ -172,7 +186,7 @@
             <th>Adjusted Total</th>
           </thead>
           <tbody>
-            <tr>
+            <tr *ngIf="showbenefits">
               <td>Benefits</td>
               <td>{{salaryWagesandBenefits | number:'1.2-2'}}</td>
               <td>{{benefitsBenefits | number:'1.2-2'}}</td>
@@ -182,7 +196,7 @@
               <td>{{stipendBenefits | number:'1.2-2'}}</td>
               <td>{{adjustedTotalBenefits | number:'1.2-2'}}</td>
             </tr>
-            <tr>
+            <tr *ngIf="shownonbenefits">
               <td>Non-Benefits</td>
               <td>{{salaryWagesandBenefits | number:'1.2-2'}}</td>
               <td>{{benefitsNonBenefits | number:'1.2-2'}}</td>
@@ -215,13 +229,13 @@
             </th>
           </thead>
           <thead>
-            <th>Benefit Rate</th>
-            <th>Non-Benefit Rate</th>
+            <th *ngIf="showbenefits">Benefit Rate</th>
+            <th *ngIf="shownonbenefits">Non-Benefit Rate</th>
           </thead>
           <tbody>
             <tr>
-              <td>{{contractLabourBenefit  | number:'1.2-2'}}</td>
-              <td>{{contractLabourNonBenefit  | number:'1.2-2'}}</td>
+              <td *ngIf="showbenefits">{{contractLabourBenefit  | number:'1.2-2'}}</td>
+              <td *ngIf="shownonbenefits">{{contractLabourNonBenefit  | number:'1.2-2'}}</td>
             </tr>
           </tbody>
         </table>
@@ -233,13 +247,13 @@
             </th>
           </thead>
           <thead>
-            <th>Benefit Rate</th>
-            <th>Non-Benefit Rate/th>
+            <th  *ngIf="showbenefits">Benefit Rate</th>
+            <th *ngIf="shownonbenefits">Non-Benefit Rate/th>
           </thead>
           <tbody>
             <tr>
-              <td>{{fullyLoadedBenefit  | number:'1.2-2'}}</td>
-              <td>{{fullyLoadedNonBenefit  | number:'1.2-2'}}</td>
+              <td *ngIf="showbenefits">{{fullyLoadedBenefit  | number:'1.2-2'}}</td>
+              <td *ngIf="shownonbenefits">{{fullyLoadedNonBenefit  | number:'1.2-2'}}</td>
             </tr>
           </tbody>
         </table>

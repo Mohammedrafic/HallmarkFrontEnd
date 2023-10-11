@@ -30,6 +30,8 @@ import {
   OptionField,
   RejectedReasonField,
   StatusField,
+  SwitcherValue,
+  SwitcherValueEnum,
 } from '@shared/components/order-candidate-list/edit-irp-candidate/constants/edit-irp-candidate.constant';
 import { FieldType } from '@core/enums';
 import { EditIrpCandidateService } from '@shared/components/order-candidate-list/edit-irp-candidate/services';
@@ -152,7 +154,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   meal : number;
   lodging : number;
   public showATPform: boolean = false;
-
+  public showbenefits: boolean = true;
+  public SwitcherCalcvariables = SwitcherValue;
+  public shownonbenefits: boolean = true;
   public candidateModelState: EditCandidateDialogState;
   public readonly statuses = CandidatStatus;
   public comments: Comment[] = [];
@@ -206,6 +210,20 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           this.costSaving = data;
           this.performCalculations();
         }
+      });
+
+      this.AtpCalcForm.get("calculations")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
+        if(data == SwitcherValueEnum.Benefits){
+          this.showbenefits = true;
+          this.shownonbenefits = false;
+        } else if (data == SwitcherValueEnum.NonBenefits){
+          this.shownonbenefits = true;
+          this.showbenefits = false;
+        } else {
+          this.showbenefits = true;
+          this.shownonbenefits = true;
+        }
+        this.performCalculations();
       })
     }
   }
@@ -213,7 +231,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   createATPform(): void {
     this.AtpCalcForm = this.formBuilder.group({
       hoursWorked: [this.hoursWorked, [Validators.required]],
-      costSaving: [this.costSaving, [Validators.required]]
+      costSaving: [this.costSaving, [Validators.required]],
+      calculations : [SwitcherValueEnum.All]
     });
     this.performCalculations();
   }
@@ -580,7 +599,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy()),
     ).subscribe((status : string) => {
       if(JSON.parse(status) == ApplicantStatus.OnBoarded){
-        this.showATPform = true;
+        this.showATPform = this.meal !== 0 ? true : false;
       } else {
         this.showATPform = false;
       }
