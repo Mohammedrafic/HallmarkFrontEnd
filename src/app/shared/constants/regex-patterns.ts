@@ -8,6 +8,7 @@ export const MIN_DIGITS_LENGTH_ONLY_NINE =/^[0-9]{9}$/;
 export const DOCUMENT_NAME_PATTERN =/^[a-zA-Z0-9+-_. ]+$/;
 export const EMPTY_SPACE_PATTERN=/^(\s+\S+\s*)*(?!\s).*$/;
 export const ALPHANUMERIC_8_11_SYMBOLS = /^[a-zA-Z0-9]{8,11}$/;
+export const NUMERIC_10_12_DIGITS = /^\d{10,12}$/;
 
 /**
  * TODO: test and think if it is needed.

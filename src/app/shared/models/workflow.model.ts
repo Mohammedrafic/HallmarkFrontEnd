@@ -50,6 +50,7 @@ export interface Step {
   order?: number;
   nextStepStatus?: string;
   parentId?: number | null;
+  multiple?: string | null;
 }
 
 export class WorkflowFilters {

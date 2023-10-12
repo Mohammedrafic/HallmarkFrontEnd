@@ -8,6 +8,7 @@
     overflowMode="Scrollable"
     [width]="tabsWidth$ | async"
     (selecting)="onSelect($event)"
+    [selectedItem]="selectedTab"
     >
       <div class="e-tab-header">
         <div *ngFor="let tab of tabConfig; trackBy: trackBy">

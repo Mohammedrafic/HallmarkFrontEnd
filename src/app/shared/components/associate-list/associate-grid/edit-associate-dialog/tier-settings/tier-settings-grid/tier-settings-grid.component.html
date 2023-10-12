@@ -10,7 +10,7 @@
       [disabled]="isAgency"
     >
       <i-feather name="plus" class="icon"></i-feather>
-      Add Tier Exception
+      <span class="text-btn">Add Tier Exception</span>
     </button>
   </div>
 </div>
@@ -25,6 +25,7 @@
   [currentPage]="filters.pageNumber"
   [totalRecordsCount]="(tiersExceptionPage$ | async)?.totalCount || 0"
   class="app-grid-header"
+  [ngClass]="{'empty-grid': (tiersExceptionPage$ | async)?.totalCount || 0 < 1}"
 ></app-grid>
 
 <app-tiers-dialog

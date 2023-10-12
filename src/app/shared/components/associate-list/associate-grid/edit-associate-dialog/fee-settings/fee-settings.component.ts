@@ -96,16 +96,17 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
       });
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.store.dispatch(
-        new TiersException.GetFeeSettingByOrganizationId(this.organizationAgencyId, this.currentPage, this.pageSize)
-      );
-    }
+  public changeGridPage(page: number): void {
+    this.currentPage = page;
+
+    this.store.dispatch(
+      new TiersException.GetFeeSettingByOrganizationId(this.organizationAgencyId, this.currentPage, this.pageSize)
+    );
   }
 
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+  public changeGridSize(pageSize: number): void {
+    this.currentPage = 1;
+    this.pageSize = pageSize;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 

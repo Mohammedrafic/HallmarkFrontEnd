@@ -187,6 +187,12 @@ export class TimesheetRecordsService {
         delete definition.cellRendererParams;
       }
 
+      if (editOn && (def.field === 'billRate' || def.field === 'total') && currentTab === RecordFields.Time) {
+        definition.hide = true;
+      } else if (!editOn && (def.field === 'billRate' || def.field === 'total') && currentTab === RecordFields.Time) {
+        definition.hide = false;
+      }
+
       if (definition.cellRendererParams && definition.cellRendererParams.editMode) {
         definition.cellRendererParams.isEditable = editOn;
         definition.cellRendererParams.formGroup = formControls;

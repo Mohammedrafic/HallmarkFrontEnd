@@ -219,6 +219,7 @@
                         [commentContainerId]="timesheetDetails.commentContainerId || 0"
                         [externalCommentConfiguration]="timesheetDetails.externalCommentsConfiguration"
                         (commentSaveCheck)="getOrderComments()"
+                        [useStyle]="true"
                       ></app-comments>
                     </ng-template>
                   </e-accordionitem>
@@ -241,6 +242,7 @@
                 (openAddSideDialog)="openAddDialog($event)"
                 (uploadSideDialog)="openUploadSideDialog($event)"
                 (changesSaved)="handleEditChanges($event)"
+                (timeSheetChanged)="handleTimeSheetChange()"
                 (rejectEvent)="onRejectButtonClick($event)"
                 (approveEvent)="handleApprove($event)"
                 (closeDetails)="closeDialog()"

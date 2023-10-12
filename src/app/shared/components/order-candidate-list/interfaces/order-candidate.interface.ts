@@ -50,6 +50,12 @@ export interface CancelIrpCandidateDto {
   actualEndDate: string | null
 }
 
+export interface RejectedIrpCandidateDto {
+  organizationId: number;
+  employeeId: number;
+  rejectReasonId: number;
+}
+
 export interface CandidateDetails {
   actualStartDate: string | Date;
   actualEndDate: string | Date;
@@ -57,6 +63,8 @@ export interface CandidateDetails {
   commentContainerId : number;
   offeredStartDate: string | Date | null;
   offeredEndDate: string | Date | null;
+  rejectedReason: string;
+  rejectionReasonId: number;
 }
 
 export interface EditCandidateDialogState {

@@ -18,7 +18,7 @@ import {
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 
-import { AfterViewInit, ChangeDetectorRef, Component,EventEmitter, Input, NgZone, OnChanges, OnDestroy, OnInit, Output,
+import { AfterViewInit, ChangeDetectorRef, Component,EventEmitter, Input, NgZone, OnDestroy, OnInit, Output,
   ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -77,6 +77,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public reorderForm: FormGroup;
   public dialogTitle = 'Add Re-Order';
   public candidates: CandidateModel[];
+  public candidatesByAgency: CandidateModel[];
   public agencies: AgencyModel[];
   public billRate$: Observable<number>;
   public commentContainerId = 0;
@@ -215,7 +216,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     )
     .subscribe(([agencies, candidates]) => {
       this.agencies = agencies;
-      this.candidates = candidates;
+      this.candidates = this.candidatesByAgency = candidates;
 
       this.setFormData(this.order);
       this.disablePositionsField(this.order);
@@ -242,6 +243,10 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       billRate: reorder.hourlyRate ?? '',
       openPosition: reorder.openPositions ?? '',
     }, { emitEvent: false });
+
+    if (this.isEditMode) {
+      this.reorderForm.get('agencies')?.updateValueAndValidity({ onlySelf: true });
+    }
   }
 
   private createForm(): void {
@@ -265,6 +270,12 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
         if (!agenciesIds.length && candidates.length) {
           this.reorderForm.patchValue({ candidates: [] });
           this.reorderForm.updateValueAndValidity();
+        }
+
+        if (agenciesIds.length) {
+          this.candidatesByAgency = this.candidates.filter((candidate) => agenciesIds.includes(candidate.agencyId));
+        } else {
+          this.candidatesByAgency = [];
         }
 
         return [agenciesIds, candidates];

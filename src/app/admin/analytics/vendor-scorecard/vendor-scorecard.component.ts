@@ -271,7 +271,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
-        agencyIds: new FormControl([], [Validators.required]),
+        agencyIds: new FormControl([]),
         startDate: new FormControl(startDate, [Validators.required]),
         endDate: new FormControl(new Date(Date.now()), [Validators.required]),
         skillIds: new FormControl([]),

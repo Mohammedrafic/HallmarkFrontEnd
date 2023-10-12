@@ -1,7 +1,7 @@
 @import 'colors';
 @import 'adaptive-response';
 
-@media #{$min-mobile} {
+@media #{$min-tablet} {
   .desktop-action-btn {
     display: block;
   }
@@ -10,10 +10,18 @@
     display: none;
   }
 
-  .dialog {
+  .dialog.responsive {
     .mobile-close-button {
       display: none !important;
     }
+  }
+
+  .dialog.responsive .header-container .mobile-button-group {
+    display: block;
+  }
+
+  .dialog.responsive .e-footer-content .mobile-button-group {
+    display: none !important;
   }
 }
 
@@ -51,7 +59,7 @@
     box-shadow: 0px 4px 4px 4px rgba(0, 0, 0, 0.25);
   }
 
-  .dialog {
+  .dialog.responsive {
     .mobile-close-button {
       display: block !important;
       border-radius: 50% !important;
@@ -63,5 +71,13 @@
         margin: 0;
       }
     }
+  }
+
+  .dialog.responsive .header-container .mobile-button-group {
+    display: none;
+  }
+
+  .dialog.responsive .e-footer-content .mobile-button-group {
+    display: block;
   }
 }

@@ -199,7 +199,7 @@ const skillsColumnMapping = {
 const contactEmailsColumnMapping = {
   type: ControlTypes.Autocomplete,
   valueType: ValueType.Id,
-  valueField: 'fullName',
+  valueField: 'name',
   valueId: 'email',
 };
 
@@ -213,6 +213,7 @@ export const DefaultFilterColumns: FilterColumns = {
   regionsIds: defaultColumnMapping,
   locationIds: defaultColumnMapping,
   contactEmails: contactEmailsColumnMapping,
+  title: defaultInputMapping,
 } as FilterColumns;
 
 export const SavedFiltersParams: TimesheetsTableFiltersColumns[] = [
