@@ -8,6 +8,7 @@ import {
   CredentialSetupDetails,
   CredentialSetupGet,
   CredentialSetupMappingPost,
+  CredentialsSelectedItem,
 } from '@shared/models/credential-setup.model';
 import { CredentialTypeSource } from '@organization-management/credentials/interfaces';
 
@@ -122,6 +123,12 @@ export class MapCredentialsService {
       }
 
       return credentialSetup;
+    });
+  }
+
+  checkReqParamSelected(creds: CredentialsSelectedItem[]): boolean {
+    return creds.every((cred) => {
+      return cred.isActive || cred.reqOnboard || cred.reqSubmission;
     });
   }
 
