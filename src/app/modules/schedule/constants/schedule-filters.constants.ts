@@ -19,7 +19,7 @@ export const SkillsFieldsOptions = {
 export enum ScheduleFilterFormSourceKeys {
   Regions = 'regionIds',
   Locations = 'locationIds',
-  Departments = 'departmentsIds',
+  Departments = 'departmentIds',
   Skills = 'skillIds',
   isAvailablity = 'isAvailablity',
   isUnavailablity = 'isUnavailablity',
@@ -147,7 +147,7 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     customFiltering: true,
   },
   {
-    field: 'departmentsIds',
+    field: 'departmentIds',
     title: 'Department',
     type: FieldType.MultiSelectDropdown,
     required: false,
@@ -220,6 +220,6 @@ export const ChipsStructureState: ChipsInitialState = {
 export const FilterChipsStructure: ChipsFilterStructure = {
   regionIds: [],
   locationIds: [],
-  departmentsIds: [],
+  departmentIds: [],
   skillIds: [],
 };

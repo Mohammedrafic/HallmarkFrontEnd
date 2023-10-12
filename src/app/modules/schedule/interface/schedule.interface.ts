@@ -173,7 +173,7 @@ export interface ScheduleFilters {
   endDate?: string | Date;
   regionIds?: number[] | null;
   locationIds?: number[] | null;
-  departmentsIds?: number[] | null;
+  departmentIds?: number[] | null;
   skillIds?: number[];
   isAvailablity?: boolean;
   isUnavailablity?: boolean;
@@ -296,7 +296,7 @@ export interface DateRangeOption {
 export interface ChipsFilterStructure {
   regionIds: number[];
   locationIds: number[];
-  departmentsIds: number[];
+  departmentIds: number[];
   skillIds: number[];
 }
 

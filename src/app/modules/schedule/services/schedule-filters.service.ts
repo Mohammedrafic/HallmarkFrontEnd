@@ -36,7 +36,7 @@ export class ScheduleFiltersService {
   allDepartments: DropdownOption[];
   firstDepartment: OrganizationDepartment;
   getallDepartments: any;
-  public fieldsWithAllToggle = ['regionIds', 'locationIds', 'departmentsIds'];
+  public fieldsWithAllToggle = ['regionIds', 'locationIds', 'departmentIds'];
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -44,14 +44,14 @@ export class ScheduleFiltersService {
     return this.fb.group({
       regionIds: [[], Validators.required],
       locationIds: [[], Validators.required],
-      departmentsIds: [[], Validators.required],
+      departmentIds: [[], Validators.required],
       skillIds: [],
       isAvailablity : [true],
       isUnavailablity : [true],
       isOnlySchedulatedCandidate : [false],
       isExcludeNotOrganized : [true],
       startTime: [null],
-      endTime : [null]
+      endTime : [null],
     });
   }
 
@@ -66,6 +66,22 @@ export class ScheduleFiltersService {
     structure.departments = structure.locations.flatMap((location) => location.departments as OrganizationDepartment[]);
 
     return structure;
+  }
+
+  filterDepartments(
+    filterStructure: ScheduleFilterStructure, locationIds: number[] | null, regionIds: number[] | null
+  ): number[] {
+    if (locationIds?.length) {
+      return filterStructure.departments
+        .filter(department => locationIds.includes(department.locationId as number))
+        .map(department => department.id);
+    }
+    if (regionIds?.length) {
+      return filterStructure.departments
+        .filter(department => regionIds.includes(department.regionId as number))
+        .map(department => department.id);
+    }
+    return filterStructure.departments.map(department => department.id);
   }
 
   getSelectedLocatinOptions(structure: ScheduleFilterStructure, selectedIds: number[]): DropdownOption[] {

@@ -480,7 +480,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: filteringEventArgs.text,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
-        departmentsIds : GetStructureValue(this.selectedFilters.departmentsIds),
+        departmentIds : GetStructureValue(this.selectedFilters.departmentIds),
         locationIds : GetStructureValue(this.selectedFilters.locationIds),
         regionIds : GetStructureValue(this.selectedFilters.regionIds),
         isExcludeNotOrganized : this.selectedFilters.isExcludeNotOrganized,
@@ -507,8 +507,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: user.fullName,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
-        departmentsIds : this.selectedFilters.departmentsIds,
-        isExcludeNotOrganized : this.selectedFilters.isExcludeNotOrganized
+        departmentIds : this.selectedFilters.departmentIds,
+        isExcludeNotOrganized : this.selectedFilters.isExcludeNotOrganized,
       })
         .pipe(take(1))
         .subscribe((page: ScheduleCandidatesPage) => {

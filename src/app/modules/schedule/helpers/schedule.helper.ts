@@ -168,14 +168,14 @@ export const CardTitleforExport = (scheduleItem: DaySchedules): string => {
 
 export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilters): ScheduleInt.EmployeesFilters => {
   const { 
-    startDate, endDate, departmentsIds, locationIds, regionIds, isAvailablity,
+    startDate, endDate, departmentIds, locationIds, regionIds, isAvailablity,
     isUnavailablity, isOnlySchedulatedCandidate, startTime, endTime,
   } = filters;
 
   return {
     startDate: startDate || '',
     endDate: endDate || '',
-    departmentIds: departmentsIds === undefined ? [] : departmentsIds,
+    departmentIds: departmentIds === undefined ? [] : departmentIds,
     locationIds: locationIds === undefined ? [] : locationIds,
     regionIds: regionIds === undefined ? [] : regionIds,
     userLocalTime: DateTimeHelper.setUtcTimeZone(new Date()),
@@ -188,14 +188,14 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
 };
 
 export const HasNotMandatoryFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
-  return (!filters.departmentsIds || !filters.departmentsIds.length)
+  return (!filters.departmentIds || !filters.departmentIds.length)
     || (!filters.skillIds || !filters.skillIds.length);
 };
 
 export const HasMultipleFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
   return filters.regionIds && filters.regionIds.length > 1 ||
     filters.locationIds && filters.locationIds.length > 1 ||
-    filters.departmentsIds && filters.departmentsIds.length > 1 ||
+    filters.departmentIds && filters.departmentIds.length > 1 ||
     filters.skillIds && filters.skillIds.length > 1;
 };
 
