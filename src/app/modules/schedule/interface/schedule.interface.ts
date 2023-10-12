@@ -229,7 +229,7 @@ export interface ScheduleFilterStructure {
 export interface EmployeesFilters {
   startDate: string | Date;
   endDate: string | Date;
-  departmentsIds: number[] | null;
+  departmentIds: number[] | null;
   locationIds: number[] | null;
   regionIds: number[] | null;
   userLocalTime: string;
