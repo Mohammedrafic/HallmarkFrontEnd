@@ -39,7 +39,6 @@ import {
   filter,
   map,
   Observable,
-  skip,
   Subject,
   switchMap,
   take,
@@ -382,8 +381,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             MessageTypes.Success,
             rejectTimesheetDialogData(this.isTimesheetOrMileagesUpdate).successMessage
           ),
-          new Timesheets.GetAll(),
-          new Timesheets.GetTabsCounts(),
         ]);
 
         this.handleProfileClose();
@@ -416,7 +413,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.handleProfileClose();
-        this.refreshGrid();
       });
   }
 
@@ -550,7 +546,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.handleProfileClose();
-        this.refreshGrid();
       });
   }
 
