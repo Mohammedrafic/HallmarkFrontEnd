@@ -106,7 +106,7 @@
     <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isRejectBtnEnabled && !actionsDisabled">
       <button
         ejs-button
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions"
+        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions || (currentTab === tableTypes.Miles && !timesheetDetails.mileageTimesheetId)"
         cssClass="e-outline privilege"
         (click)="reject()"
       >
@@ -117,7 +117,7 @@
       <button
         ejs-button
         [isPrimary]="true"
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions"
+        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions || (currentTab === tableTypes.Miles && !timesheetDetails.mileageTimesheetId)"
         cssClass="spinner-btn privilege"
         (click)="approve()"
       >

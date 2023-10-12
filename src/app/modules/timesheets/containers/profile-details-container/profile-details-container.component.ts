@@ -39,7 +39,6 @@ import {
   filter,
   map,
   Observable,
-  skip,
   Subject,
   switchMap,
   take,
@@ -67,6 +66,8 @@ import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
 import { AppState } from 'src/app/store/app.state';
 import { ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { Comment } from '@shared/models/comment.model';
+import { HttpErrorResponse } from '@angular/common/http';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -376,18 +377,24 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public handleReject(reason: string): void {
     this.updateTimesheetStatus(TimesheetTargetStatus.Rejected, { reason })
       .pipe(takeUntil(this.componentDestroy()))
-      .subscribe(() => {
-        this.store.dispatch([
-          new ShowToast(
-            MessageTypes.Success,
-            rejectTimesheetDialogData(this.isTimesheetOrMileagesUpdate).successMessage
-          ),
-          new Timesheets.GetAll(),
-          new Timesheets.GetTabsCounts(),
-        ]);
-
-        this.handleProfileClose();
-      });
+      .subscribe(
+        {
+          next: () => {
+            this.store.dispatch([
+              new ShowToast(
+                MessageTypes.Success,
+                rejectTimesheetDialogData(this.isTimesheetOrMileagesUpdate).successMessage
+              ),
+              new Timesheets.GetAll(),
+              new Timesheets.GetTabsCounts(),
+            ]);
+            this.handleProfileClose();
+          },
+          error: (err: HttpErrorResponse) => {
+            return this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+          },
+        }
+      );
   }
 
   public updateTimesheetStatus(
@@ -414,9 +421,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       : this.timesheetDetailsService.approveTimesheet(updateId, isTimesheetOrMileagesUpdate)
     )
       .pipe(takeUntil(this.componentDestroy()))
-      .subscribe(() => {
-        this.handleProfileClose();
-        this.refreshGrid();
+      .subscribe({
+        next: () => { this.handleProfileClose(); },
       });
   }
 
@@ -550,7 +556,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.handleProfileClose();
-        this.refreshGrid();
       });
   }
 

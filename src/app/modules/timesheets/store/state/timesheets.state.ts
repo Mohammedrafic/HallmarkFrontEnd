@@ -475,7 +475,7 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.OrganizationApproveTimesheet)
   ApproveTimesheet(
-    { dispatch }: StateContext<TimesheetsModel>,
+    _: StateContext<TimesheetsModel>,
     { id, orgId }: TimesheetDetails.OrganizationApproveTimesheet
   ): Observable<void> {
     return this.timesheetDetailsApiService.changeTimesheetStatus({
@@ -483,28 +483,15 @@ export class TimesheetsState {
       organizationId: orgId,
       targetStatus: TimesheetTargetStatus.Approved,
       reason: null,
-    })
-    .pipe(
-      catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-      }),
-    );
+    });
   }
 
   @Action(TimesheetDetails.ChangeTimesheetStatus)
   ChangeTimesheetStatus(
-    { dispatch }: StateContext<TimesheetsModel>,
+    _: StateContext<TimesheetsModel>,
     { payload }: TimesheetDetails.ChangeTimesheetStatus
   ): Observable<void> {
-    return this.timesheetDetailsApiService.changeTimesheetStatus(payload)
-    .pipe(
-      tap(() => {
-        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
-      }),
-      catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-      }),
-    );
+    return this.timesheetDetailsApiService.changeTimesheetStatus(payload);
   }
 
   @Action(TimesheetDetails.Export)

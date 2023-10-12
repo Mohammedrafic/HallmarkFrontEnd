@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { catchError, distinctUntilChanged, filter, Observable, skip, switchMap, take, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, Observable, skip, switchMap, take, tap, throwError } from 'rxjs';
 
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -54,7 +54,11 @@ export class TimesheetDetailsService {
             new Timesheets.GetAll(),
             new Timesheets.GetTabsCounts(),
           ]);
-        })
+        }),
+        catchError((err: HttpErrorResponse) => {
+           this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+           return throwError(() => err);
+        }),
       );
   }
 
@@ -79,9 +83,10 @@ export class TimesheetDetailsService {
             new Timesheets.GetTabsCounts(),
           ]);
         }),
-        catchError((err: HttpErrorResponse) =>
-          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
-        ),
+        catchError((err: HttpErrorResponse) => {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+          return throwError(() => err);
+       }),
       );
   }
 
