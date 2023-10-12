@@ -356,7 +356,8 @@ export const HasTimeControlValues = (form: FormGroup): boolean => {
 export const GetStructureValue = (value?: number[] | null): number[] | null => {
   if (value === null) {
     return null;
-  } else {
-    return value ? [...value] : [];
+  } else if (value) {
+    return [...value];
   }
+  return [];
 };
