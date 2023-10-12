@@ -164,22 +164,23 @@ export interface ScheduleFilterItem {
   valueId: string;
   valueType: ValueType;
   filterTitle: string;
+  allowNull?: boolean;
 }
 
 export interface ScheduleFilters {
   firstLastNameOrId?: string;
   startDate?: string | Date;
   endDate?: string | Date;
-  regionIds?: number[];
-  locationIds?: number[];
-  departmentsIds?: number[];
+  regionIds?: number[] | null;
+  locationIds?: number[] | null;
+  departmentIds?: number[] | null;
   skillIds?: number[];
   isAvailablity?: boolean;
   isUnavailablity?: boolean;
   isOnlySchedulatedCandidate?: boolean;
   isExcludeNotOrganized?: boolean;
-  startTime? : Time | String | null;
-  endTime? : Time | String | null;
+  startTime? : Time | string | null;
+  endTime? : Time | string | null;
   pageNumber?: number;
   pageSize?: number;
 }
@@ -203,6 +204,8 @@ export interface ScheduleFilterFormFieldConfig {
   type: FieldType;
   required: boolean;
   sourceKey: ScheduleFilterFormSourceKeys;
+  showAllToggle?: boolean;
+  customFiltering?: boolean;
 }
 
 export interface ScheduleFilterFormConfig {
@@ -226,13 +229,15 @@ export interface ScheduleFilterStructure {
 export interface EmployeesFilters {
   startDate: string | Date;
   endDate: string | Date;
-  departmentsIds: number[];
+  departmentIds: number[] | null;
+  locationIds: number[] | null;
+  regionIds: number[] | null;
   userLocalTime: string;
   isOnlySchedulatedCandidate: boolean;
   isAvailablity: boolean;
   isUnavailablity: boolean;
-  startTime: Time | String | null;
-  endTime: Time | String | null;
+  startTime: Time | string | null;
+  endTime: Time | string | null;
 }
 
 export interface DatesByWeekday {
@@ -291,7 +296,7 @@ export interface DateRangeOption {
 export interface ChipsFilterStructure {
   regionIds: number[];
   locationIds: number[];
-  departmentsIds: number[];
+  departmentIds: number[];
   skillIds: number[];
 }
 

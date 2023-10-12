@@ -580,7 +580,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.scheduleItemsComponent.scheduleItems,
       this.customShiftId,
       scheduleFiltersData?.filters?.skillIds || [],
-      scheduleFiltersData?.filters?.departmentsIds || [],
+      scheduleFiltersData?.filters?.departmentIds || [],
     );
     const request: BookingsOverlapsRequest = {
       employeeScheduledDays: this.scheduleToBook.employeeBookedDays,

@@ -29,7 +29,7 @@ import {
   ScheduleFilterFormSourceKeys,
   ScheduleFiltersColumns,
 } from '../../constants';
-import { ScheduleFilterHelper } from '../../helpers';
+import { GetStructureValue, ScheduleFilterHelper } from '../../helpers';
 import {
   ChipSettings,
   ChipsFilterStructure,
@@ -43,7 +43,9 @@ import { ClearPageFilters, SaveFiltersByPageName } from 'src/app/store/preserved
 import { TimeMask } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { getPreservedfilterTime, getPreservedTime, getTime } from '@shared/utils/date-time.utils';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { Query } from "@syncfusion/ej2-data";
+import { FieldNames, FiledNamesSettings } from '@shared/constants/base-dropdown-fields-settings';
+import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-schedule-filters',
@@ -77,10 +79,19 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   public readonly fieldTypes = FieldType;
 
+  public readonly timeMask = TimeMask;
+  public filterType = 'Contains';
+  public maxDepartmentsLength = 1000;
+  public query: Query = new Query().take(this.maxDepartmentsLength);
+  public noValue = undefined;
+  public allRecords: FiledNamesSettings = {
+    'regionIds': false,
+    'locationIds': false,
+    'departmentIds': false,
+  };
+
   private filters: ScheduleFilters = {};
   private isPreservedFilters = false;
-  public readonly timeMask = TimeMask;
-  public filterType: string = 'Contains';
 
   private filterStructure: ScheduleFilterStructure = {
     regions: [],
@@ -116,6 +127,67 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.applyPreservedFilters();
   }
 
+  public getToggleValue(field: string): boolean {
+    return this.allRecords[field as FieldNames];
+  }
+
+  public allRecordsChange(event: { checked: boolean }, field: string): void {
+    field === 'regionIds' && this.allRegionsChange(event);
+    field === 'locationIds' && this.allLocationsChange(event);
+    field === 'departmentIds' && this.allDepartmentsChange(event);
+  }
+
+  public allRegionsChange(event: { checked: boolean }): void {
+    this.allRecords[FieldNames.regionIds] = event.checked;
+    const regionsControl = this.scheduleFilterFormGroup?.controls['regionIds'];
+    if (this.allRecords[FieldNames.regionIds]) {
+      regionsControl?.setValue(null, { emitEvent: false });
+      regionsControl?.disable();
+      const selectedRegionIds = this.filterStructure.regions.map(region => region.id) as number[];
+      this.filterColumns.locationIds.dataSource = selectedRegionIds?.length
+        ? this.scheduleFiltersService.getSelectedLocatinOptions(this.filterStructure, selectedRegionIds)
+        : [];
+    } else {
+      regionsControl?.enable();
+    }
+  }
+
+  public allLocationsChange(event: { checked: boolean }): void {
+    this.allRecords[FieldNames.locationIds] = event.checked;
+    const locationsControl = this.scheduleFilterFormGroup?.controls['locationIds'];
+    if (this.allRecords[FieldNames.locationIds]) {
+      locationsControl?.setValue(null, { emitEvent: false });
+      locationsControl?.disable();
+      const selectedLocationIds = this.filterStructure.locations.map(location => location.id) as number[];
+      this.filterColumns.departmentIds.dataSource = selectedLocationIds?.length
+        ? this.scheduleFiltersService.getSelectedDepartmentOptions(this.filterStructure, selectedLocationIds)
+        : [];
+    } else {
+      locationsControl?.enable();
+    }
+  }
+
+  public allDepartmentsChange(event: { checked: boolean }, emitEvent = true): void {
+    this.allRecords[FieldNames.departmentIds] = event.checked;
+    const departmentsControl = this.scheduleFilterFormGroup?.controls['departmentIds'];
+    if (this.allRecords[FieldNames.departmentIds]) {
+      departmentsControl?.setValue(null, {emitEvent: emitEvent});
+      departmentsControl?.disable({emitEvent: false});
+    } else {
+      departmentsControl?.enable({emitEvent: false});
+    }
+  }
+
+  public onDepartmentsFiltering(e: FilteringEventArgs): void {
+    const char = e.text.length + 1;
+    let query: Query = new Query();
+    query =
+      e.text !== ''
+        ? query.where('text', 'contains', e.text, true).take(char * 15)
+        : query;
+    e.updateData(this.filterColumns.departmentIds.dataSource as [], query);
+  }
+
   public deleteFilter(event: FilteredItem): void {
     this.filterService.removeValue(event, this.scheduleFilterFormGroup, this.filterColumns);
     this.cdr.markForCheck();
@@ -125,14 +197,14 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.scheduleFilterFormGroup.patchValue({
       regionIds: [],
       locationIds: [],
-      departmentsIds: [],
+      departmentIds: [],
       skillIds: [],
       isAvailablity : true,
       isUnavailablity : true,
       isOnlySchedulatedCandidate : false,
       isExcludeNotOrganized : true,
       startTime: null,
-      endTime : null
+      endTime : null,
     });
     this.filters = this.scheduleFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
@@ -142,6 +214,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     if (clearPreservedFilters) {
       this.store.dispatch(new ClearPageFilters(FilterPageName.SchedullerOrganization));
     }
+    this.resetFilterToggles();
   }
 
   public applyFilter(): void {
@@ -158,6 +231,15 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   public closeFilterDialog(): void {
     this.scheduleFilterFormGroup.markAsUntouched();
+  }
+
+  private resetFilterToggles(): void {
+    this.allRecords.regionIds = false;
+    this.allRecords.locationIds = false;
+    this.allRecords.departmentIds = false;
+    this.allRegionsChange({ checked: false });
+    this.allLocationsChange({ checked: false });
+    this.allDepartmentsChange({ checked: false });
   }
 
   private watchForOrganizationStructure(): void {
@@ -192,9 +274,13 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       });
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private watchForControls(): void {
     this.scheduleFilterFormGroup.get('regionIds')?.valueChanges
-      .pipe(takeUntil(this.componentDestroy()))
+      .pipe(
+        filter((value: number[]) => !!value),
+        takeUntil(this.componentDestroy(),
+      ))
       .subscribe((selectedRegionIds: number[]) => {
         if(selectedRegionIds.length === 0) {
           this.scheduleFilterFormGroup.get('locationIds')?.patchValue([]);
@@ -206,31 +292,42 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       });
 
     this.scheduleFilterFormGroup.get('locationIds')?.valueChanges
-      .pipe(takeUntil(this.componentDestroy()))
+      .pipe(
+        filter((value: number[]) => !!value),
+        takeUntil(this.componentDestroy()),
+      )
       .subscribe((selectedLocationIds: number[]) => {
         if(selectedLocationIds.length === 0){
-          this.scheduleFilterFormGroup.get('departmentsIds')?.patchValue([]);
+          this.scheduleFilterFormGroup.get('departmentIds')?.patchValue([]);
         }
-        this.filterColumns.departmentsIds.dataSource = selectedLocationIds?.length
+        this.filterColumns.departmentIds.dataSource = selectedLocationIds?.length
           ? this.scheduleFiltersService.getSelectedDepartmentOptions(this.filterStructure, selectedLocationIds)
           : [];
         this.setFilteredItems();
       });
 
-    this.scheduleFilterFormGroup.get('departmentsIds')?.valueChanges
+    this.scheduleFilterFormGroup.get('departmentIds')?.valueChanges
       .pipe(
-        tap((departmentsIds: number[]) => {
-          if (!departmentsIds?.length) {
+        tap((departmentIds: number[] | null) => {
+          if (!departmentIds?.length && departmentIds !== null) {
             this.resetSkillFilters();
             this.setFilteredItems();
           }
         }),
-        filter((departmentsIds: number[]) => !!departmentsIds?.length),
-        switchMap((departmentsIds: number[]) => {
-          const params = { SystemType: SystemType.IRP, DepartmentIds: departmentsIds, IsSchedulingContext: true };
+        filter((departmentIds: number[] | null) => departmentIds === null || !!departmentIds.length),
+        switchMap((value: number[] | null) => {
+          let departmentIds: number[];
+          const locationIds = this.scheduleFilterFormGroup.get('locationIds')?.value;
+          const regionIds = this.scheduleFilterFormGroup.get('regionIds')?.value;
+          if (value === null) {
+            departmentIds = this.scheduleFiltersService.filterDepartments(this.filterStructure, locationIds, regionIds);
+          } else {
+            departmentIds = value;
+          }
+          const params = { SystemType: SystemType.IRP, DepartmentIds: departmentIds, IsSchedulingContext: true };
 
           if (this.isHomeCostCenterFilters) {
-            return this.scheduleApiService.getSkillsByEmployees(departmentsIds, this.selectedCandidateId);
+            return this.scheduleApiService.getSkillsByEmployees(departmentIds, this.selectedCandidateId);
           }
 
           return this.skillsService.getAssignedSkillsByOrganization({ params });
@@ -269,7 +366,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
         this.scheduleFilterFormGroup.controls['endTime'].valueChanges
       )
       .pipe(takeUntil(this.componentDestroy()))
-      .subscribe(() => {this.setFilteredItems()});
+      .subscribe(() => {this.setFilteredItems();});
   }
 
   private observeInlineChipDeleteEvent(): void {
@@ -286,21 +383,25 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       const itemToDelete = this.filteredItems.find((item) => item.column === event.field && item.text === event.value);
       const itemToggleDelete = this.filteredItems.find((item) => item.column === event.field);
       const controlValue = this.scheduleFilterFormGroup.get(event.field)?.value;
-      if (controlValue && (itemToDelete || itemToggleDelete)) {
+
+      if (
+        (controlValue || this.scheduleFilterService.fieldsWithAllToggle.indexOf(event.field) > -1) &&
+        (itemToDelete || itemToggleDelete)
+      ) {
         const updatedStructure = this.updateFiltersStructure(event);
-        const hasEmptyState = !updatedStructure.regionIds.length ||
-          !updatedStructure.locationIds.length ||
-          !updatedStructure.departmentsIds.length ||
-          !updatedStructure.skillIds.length;
+        const hasEmptyState = !updatedStructure.regionIds?.length ||
+          !updatedStructure.locationIds?.length ||
+          !updatedStructure.departmentIds?.length ||
+          !updatedStructure.skillIds?.length;
 
         this.scheduleFilterFormGroup?.patchValue(updatedStructure);
         this.chipsSettings.editedChips = true;
 
-       if(hasEmptyState) {
+        if (hasEmptyState) {
           this.setFilters();
         }
 
-      this.cdr.markForCheck();
+        this.cdr.markForCheck();
       }
     });
   }
@@ -326,7 +427,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       } else {
         this.filters.endTime = getPreservedfilterTime(this.filters.endTime);
       }
-      if(this.filters.departmentsIds?.length){
+      if(this.filters.departmentIds?.length){
         skipDataUpdate = false;
       }
 
@@ -342,8 +443,9 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     });
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private updateFiltersStructure(event: ChipDeleteEvent): ChipsFilterStructure {
-    const { regionIds, locationIds, departmentsIds, skillIds } = this.scheduleFilterFormGroup.getRawValue();
+    const { regionIds, locationIds, departmentIds, skillIds } = this.scheduleFilterFormGroup.getRawValue();
     const initialState: ChipsInitialState = {...ChipsStructureState};
     const filterStructure: ChipsFilterStructure = {...FilterChipsStructure};
 
@@ -374,28 +476,35 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       filterStructure.locationIds = locationStructureState.locationIds;
     } else {
       initialState.locations = this.scheduleFiltersService.getLocationInitialChipsStructure(initialState.regions);
-      filterStructure.locationIds = filterStructure.regionIds.length ? locationIds : [];
+      filterStructure.locationIds = filterStructure.regionIds?.length ? locationIds : [];
     }
 
     if(event.field === ScheduleFilterFormSourceKeys.Departments) {
       const departmentStructureState = this.scheduleFiltersService.getDepartmentChipsStructureState(
         this.filterStructure,
         initialState,
-        departmentsIds,
+        departmentIds,
         event.value
       );
 
       initialState.departments = departmentStructureState.departments;
-      filterStructure.departmentsIds = departmentStructureState.departmentIds;
+      filterStructure.departmentIds = departmentStructureState.departmentIds;
     } else {
       initialState.departments = this.scheduleFiltersService.getDepartmentInitialChipsStructure(initialState.locations);
-      const hasPreviousState = filterStructure.regionIds.length && filterStructure.locationIds.length;
+      const hasPreviousState = filterStructure.regionIds?.length && filterStructure.locationIds?.length;
       const filteredDepartment = this.scheduleFiltersService.getFilteredDepartmentsIds(
         initialState.departments,
-        departmentsIds
-      );
+        departmentIds
+      ) || null;
 
-      filterStructure.departmentsIds = hasPreviousState ? filteredDepartment : [];
+      filterStructure.departmentIds = hasPreviousState ? filteredDepartment : [];
+    }
+
+    if (this.scheduleFilterService.fieldsWithAllToggle.indexOf(event.field) > -1 && event.value === 'All') {
+      filterStructure.departmentIds = 
+      filterStructure.locationIds =
+      filterStructure.regionIds = [];
+      this.resetFilterToggles();
     }
 
     if(event.field === ScheduleFilterFormSourceKeys.Skills) {
@@ -406,9 +515,9 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       );
 
     } else {
-      const hasPreviousState = filterStructure.regionIds.length &&
-        filterStructure.locationIds.length &&
-        filterStructure.departmentsIds.length;
+      const hasPreviousState = filterStructure.regionIds?.length &&
+        filterStructure.locationIds?.length &&
+        filterStructure.departmentIds?.length;
       filterStructure.skillIds =  hasPreviousState ? skillIds : [];
     }
 
@@ -473,7 +582,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
       this.filterColumns.locationIds.dataSource = this.scheduleFiltersService
         .getSelectedLocatinOptions(this.filterStructure, [regionId]);
-      this.filterColumns.departmentsIds.dataSource = this.scheduleFiltersService
+      this.filterColumns.departmentIds.dataSource = this.scheduleFiltersService
         .getSelectedDepartmentOptions(this.filterStructure, [locationId]);
 
     } else {
@@ -482,14 +591,23 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
       this.filterColumns.locationIds.dataSource = this.scheduleFiltersService
         .getSelectedLocatinOptions(this.filterStructure, [regionId]);
 
-      this.filterColumns.departmentsIds.dataSource = this.scheduleFiltersService
+      this.filterColumns.departmentIds.dataSource = this.scheduleFiltersService
         .getSelectedDepartmentOptions(this.filterStructure, [locationId]);
-      departmentId = this.filterColumns.departmentsIds.dataSource[0]?.value as number;
+      departmentId = this.filterColumns.departmentIds.dataSource[0]?.value as number;
     }
 
     this.scheduleFilterFormGroup?.get('regionIds')?.patchValue([regionId], { emitEvent: false, onlySelf: true });
     this.scheduleFilterFormGroup?.get('locationIds')?.patchValue([locationId], { emitEvent: false, onlySelf: true });
-    this.scheduleFilterFormGroup?.get('departmentsIds')?.patchValue([departmentId]);
+    this.scheduleFilterFormGroup?.get('departmentIds')?.patchValue([departmentId]);
+  }
+
+  private setTooglesState(preservFilters: ScheduleFilters): void {
+    this.allRecords.regionIds = preservFilters.regionIds === null;
+    this.allRecords.locationIds = preservFilters.locationIds === null;
+    this.allRecords.departmentIds = preservFilters.departmentIds === null;
+    this.allRegionsChange({ checked: this.allRecords.regionIds });
+    this.allLocationsChange({ checked: this.allRecords.locationIds });
+    this.allDepartmentsChange({ checked: this.allRecords.departmentIds });
   }
 
   private applyPreservedFilters(): void {
@@ -504,19 +622,20 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     )
       .subscribe((preservFilters) => {
         this.filters = preservFilters || {};
+        this.setTooglesState(this.filters);
         this.isPreservedFilters = !!preservFilters;
         if(preservFilters != null){
           this.scheduleFilterFormGroup.patchValue({
-            regionIds: this.filters.regionIds ? [...this.filters.regionIds] : [],
-            locationIds: this.filters.locationIds ? [...this.filters.locationIds] : [],
-            departmentsIds: this.filters.departmentsIds ? [...this.filters.departmentsIds] : [],
+            regionIds: GetStructureValue(this.filters.regionIds),
+            locationIds: GetStructureValue(this.filters.locationIds),
+            departmentIds: GetStructureValue(this.filters.departmentIds),
             skillIds : this.filters.skillIds ? [...this.filters.skillIds] : [],
             isAvailablity : !!this.filters.isAvailablity,
             isUnavailablity : !!this.filters.isUnavailablity,
             isExcludeNotOrganized : !!this.filters.isExcludeNotOrganized,
             isOnlySchedulatedCandidate : !!this.filters.isOnlySchedulatedCandidate,
             startTime : getPreservedTime(this.filters.startTime),
-            endTime : getPreservedTime(this.filters.endTime)
+            endTime : getPreservedTime(this.filters.endTime),
           });
         }
          //Get only valid numeric values

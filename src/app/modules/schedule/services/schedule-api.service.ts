@@ -39,7 +39,7 @@ export class ScheduleApiService {
     employeeIds: number[],
     filters: EmployeesFilters,
   ): Observable<CandidateSchedules[]> {
-    return this.http.post<CandidateSchedules[]>('/api/Schedules/byEmployeesIds', { employeeIds, ...filters });
+    return this.http.post<CandidateSchedules[]>('/api/Schedules/byEmployeesIds?api-version=2', { employeeIds, ...filters });
   }
 
   getUnavailabilityReasons(visibleForIRPCandidates: boolean | null = null): Observable<UnavailabilityReason[]> {
