@@ -6,15 +6,12 @@ import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermission } from "@shared/helpers/permissions";
+import { takeUntil } from 'rxjs/operators';
 
 import { TimesheetDetails } from '../../../store/actions/timesheet-details.actions';
-import { Timesheets } from '../../../store/actions/timesheets.actions';
 import { ShowToast } from '../../../../../store/app.actions';
 import { approveTimesheetDialogData } from '../../../constants';
 import { AgencyStatus } from '@shared/enums/status';
-import { takeUntil } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
-import { getAllErrors } from '@shared/utils/error.utils';
 
 @Component({
   selector: 'app-timesheet-table-status-cell',
@@ -55,20 +52,8 @@ export class TimesheetTableApproveCellComponent extends AbstractPermission imple
 
     this.store.dispatch(
       new TimesheetDetails.OrganizationApproveTimesheet(timesheetId, null)
-    ).pipe(takeUntil(this.componentDestroy()))
-      .subscribe(
-        {
-          next: () => {
-            this.store.dispatch([
-              new ShowToast(MessageTypes.Success, successMessage),
-              new Timesheets.GetAll(),
-              new Timesheets.GetTabsCounts(),
-            ]);
-          },
-          error: (err: HttpErrorResponse) => {
-            return this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-          },
-        }
-      );
+    ).subscribe(() => {
+      this.store.dispatch(new ShowToast(MessageTypes.Success, successMessage));
+    });
   }
 }

@@ -211,6 +211,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     return actionItems;
   }
 
+  public get noMilesReported(): boolean {
+    return this.currentTab === this.tableTypes.Miles && !this.timesheetDetails.mileageTimesheetId;
+  }
+
   constructor(
     private store: Store,
     private confirmService: ConfirmService,
