@@ -81,6 +81,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'ShowDeployedEmployees',
   'LimitNumberOfCandidateanAgencycansubmitToaPosition',
   'OrganizationCanCarryClockIDFromParent',
+  'AllowDuplicateClockIdforOrganization'
 ];
 
 export const DisabledSettingsByDefault = [
@@ -105,6 +106,7 @@ export const DisabledSettingsByDefault = [
   'ATPRateCalculation',
   'ShowDeployedEmployees',
   'OrganizationCanCarryClockIDFromParent',
+  'AllowDuplicateClockIdforOrganization'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {
