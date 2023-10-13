@@ -7,6 +7,7 @@ import { DoNotReturn} from '@admin/store/donotreturn.actions';
 import { AbstractImport } from '@shared/classes/abstract-import';
 import { ColDef } from '@ag-grid-community/core';
 import { GridErroredCellComponent } from '@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
+import { GridErroredCellListComponent } from '@shared/components/import-dialog-content/grid-errored-cell-list/grid-errored-cell-list.component';
 
 const importConfig = {
   importTemplate: DoNotReturn.GetDoNotReturnImportTemplate,
@@ -84,7 +85,14 @@ export class ImportDnrComponent  extends AbstractImport implements OnChanges {
       headerName: 'Blocked Location Name',
       cellRenderer: GridErroredCellComponent,
     },
-
+    {
+      field: 'errorDescriptions',
+      resizable: true,
+      autoHeight:true,
+      suppressSizeToFit:true,
+      headerName: 'Error Description',
+      cellRenderer: GridErroredCellListComponent,
+    },
   ]
 
 
