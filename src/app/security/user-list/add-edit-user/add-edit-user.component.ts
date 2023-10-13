@@ -22,7 +22,6 @@ export class AddEditUserComponent implements OnDestroy {
 
   @Input() set user (user: User | null) {
     // this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
-    // && !this.isAgencyUser
     this.createdUser = user;
     this.switchVisibilityTab(!!this.createdUser);
   }
