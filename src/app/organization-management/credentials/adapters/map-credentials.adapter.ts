@@ -10,7 +10,7 @@ export class MapCredentialsAdapter {
       optional: item.isActive,
       reqSubmission: item.reqSubmission,
       reqOnboard: item.reqOnboard,
-      inactiveDate: item.inactiveDate
+      inactiveDate: item.inactiveDate,
     }));
   }
 

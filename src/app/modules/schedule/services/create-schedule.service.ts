@@ -416,7 +416,7 @@ export class CreateScheduleService {
 
   createOpenPositionsParams(dates: string[], eventDepartmentId?: number, eventSkillId?: number): OpenPositionParams {
     const scheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
-    const departmentId = eventDepartmentId ?? (scheduleFiltersData.filters.departmentsIds as number[])[0];
+    const departmentId = eventDepartmentId ?? (scheduleFiltersData.filters.departmentIds as number[])[0];
     const skillId = eventSkillId ?? (scheduleFiltersData.filters.skillIds as number[])[0];
 
     if (dates.length) {

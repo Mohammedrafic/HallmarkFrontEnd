@@ -104,6 +104,7 @@ export const DisabledSettingsByDefault = [
   'Sourcing',
   'ATPRateCalculation',
   'ShowDeployedEmployees',
+  'OrganizationCanCarryClockIDFromParent',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

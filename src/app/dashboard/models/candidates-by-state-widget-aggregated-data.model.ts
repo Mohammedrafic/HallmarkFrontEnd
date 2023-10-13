@@ -5,4 +5,5 @@ export interface CandidatesByStateWidgetAggregatedDataModel {
   unknownStateCandidates: number;
   title: string;
   description: string;
+  totalCandidates:number;
 }

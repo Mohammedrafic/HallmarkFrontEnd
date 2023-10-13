@@ -63,7 +63,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '../../shared/enums/message-types';
 import { User } from '@shared/models/user.model';
-import { DOCUMENT_DOWNLOAD_SUCCESS } from '@shared/constants/messages';
+import { DOCUMENT_DOWNLOAD_SUCCESS, RECORD_MODIFIED } from '@shared/constants/messages';
 import { Organization } from '@shared/models/organization.model';
 
 interface AlertsStateModel {
@@ -218,6 +218,7 @@ export class AlertsState {
     return this.alertsService.updateUserSubscription(userSubscriptionRequest).pipe(
       tap((payload) => {
         patchState({ userSubscriptionSaved: true });
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {

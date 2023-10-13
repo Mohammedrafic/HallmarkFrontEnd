@@ -508,7 +508,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed))
       .subscribe(() => 
       {
-        if(this.saveStatus === ApplicantStatusEnum.OnBoarded){
+        if(this.saveStatus === ApplicantStatusEnum.OnBoarded 
+          && (this.orderCandidate.candidateStatus ? this.saveStatus != this.orderCandidate.candidateStatus : this.saveStatus != this.orderCandidate.status)){
           const options = {
               title: ONBOARD_CANDIDATE,
               okButtonLabel: 'Yes',

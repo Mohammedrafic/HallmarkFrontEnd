@@ -58,7 +58,11 @@ export class FilterService {
     Object.keys(form.controls)
       .filter((key) => {
         const value = form.controls[key].value;
-        return !isEmpty(value) || isDate(value) || isBoolean(value) || isNumber(value);
+        return !isEmpty(value) || 
+                isDate(value) || 
+                isBoolean(value) || 
+                isNumber(value) || 
+                filterColumns[key]?.allowNull;
       })
       .forEach((key) => {
         if (!filterColumns[key]) {
@@ -70,6 +74,14 @@ export class FilterService {
 
         switch (filterColumns[key].type) {
           case ControlTypes.Multiselect:
+            if (val === null) {
+              chips.push({
+                text: 'All',
+                column: key,
+                value: true,
+              });
+              break;
+            }
             val.forEach((item: any) => {
               const filteredItem = filterColumns[key].dataSource?.find(
                 (data: any) => data[filterColumns[key].valueId] === item

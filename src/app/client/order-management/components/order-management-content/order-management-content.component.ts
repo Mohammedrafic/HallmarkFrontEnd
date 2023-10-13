@@ -242,6 +242,7 @@ import { ReOrderState } from '@shared/components/order-reorders-container/store/
 import { ButtonGroupComponent } from '@shared/components/button-group/button-group.component';
 import { OrderLinkDetails } from '@client/order-management/interfaces';
 import { CurrentUserPermission } from '@shared/models/permission.model';
+import { DialogComponent, DialogUtility } from '@syncfusion/ej2-angular-popups';
 import { CandidatesStatusText } from '@shared/enums/status';
 import {
   ViewOrderIRP_PERMISSION,
@@ -264,6 +265,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
   @ViewChild('updaterateRow') updaterateRow: UpdateRegRateComponent;
   @ViewChild('systemGroup') systemGroup: ButtonGroupComponent;
+
+  @ViewChild('exportTooLargeWarning') exportWarning: DialogComponent;
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
 
@@ -801,6 +804,10 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   public override customExport(): void {
+    if (!this.validateExport()) {
+      return;
+    }
+
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
       // TODO new export for IRP system
       this.defaultFileName = `Organization Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
@@ -828,6 +835,11 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+
+    if (!this.validateExport()) {
+      return;
+    }
+
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
       this.defaultFileName = `Order Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
       this.store.dispatch(
@@ -896,6 +908,14 @@ public RedirecttoIRPOrder(order:Order)
         )
       );
     }
+  }
+
+  validateExport():boolean {
+    if (this.ordersPage.totalCount > 8000) {
+      this.exportWarning.show();
+      return false;
+    }
+    return true;
   }
 
   public override updatePage(clearedFilters?: boolean): void {
