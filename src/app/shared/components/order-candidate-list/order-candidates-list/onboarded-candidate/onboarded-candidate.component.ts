@@ -400,7 +400,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       okButtonClass: 'ok-button',
       cancelButtonLabel: 'No',
     };
-    if (this.saveStatus === ApplicantStatusEnum.OnBoarded) {
+    if (this.saveStatus === ApplicantStatusEnum.OnBoarded 
+        && (this.candidate.status ? this.saveStatus != this.candidate.status : this.saveStatus != this.candidate.candidateStatus)) {
       return this.confirmService.confirm(onBoardCandidateMessage, options)
         .pipe(take(1));
     }

@@ -933,8 +933,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private getFilterDepartmentSkillIds(): { departmentId: number | null, skillId: number | null } {
     const scheduleFiltersData = this.scheduleFiltersService.getScheduleFiltersData();
-    const departmentId = scheduleFiltersData.filters.departmentsIds?.length
-      ? scheduleFiltersData.filters.departmentsIds[0]
+    const departmentId = scheduleFiltersData.filters.departmentIds?.length
+      ? scheduleFiltersData.filters.departmentIds[0]
       : null;
     const skillId = scheduleFiltersData.filters.skillIds?.length
       ? scheduleFiltersData.filters.skillIds[0]
@@ -991,7 +991,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     const filters = this.scheduleFiltersService.getScheduleFiltersData().filters;
     const regionId = (filters.regionIds as number[])[0];
     const locationId = (filters.locationIds as number[])[0];
-    const departmentId = (filters.departmentsIds as number[])[0];
+    const departmentId = (filters.departmentIds as number[])[0];
 
     this.availabilityOpenPositionSkillId = filters.skillIds ? (filters.skillIds as number[])[0] : null;
     this.scheduleFormSourcesMap[ScheduleFormSourceKeys.Locations] = this.scheduleFiltersService

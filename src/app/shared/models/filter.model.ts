@@ -16,6 +16,7 @@ export interface FilterColumn {
   valueField?: string;
   valueId?: string;
   checkBoxTitle?: string;
+  allowNull?: boolean;
 }
 
 export type FilterColumnsModel = Record<string, FilterColumn>;

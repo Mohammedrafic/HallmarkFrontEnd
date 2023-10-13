@@ -36,6 +36,7 @@ export class ScheduleFiltersService {
   allDepartments: DropdownOption[];
   firstDepartment: OrganizationDepartment;
   getallDepartments: any;
+  public fieldsWithAllToggle = ['regionIds', 'locationIds', 'departmentIds'];
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -43,14 +44,14 @@ export class ScheduleFiltersService {
     return this.fb.group({
       regionIds: [[], Validators.required],
       locationIds: [[], Validators.required],
-      departmentsIds: [[], Validators.required],
+      departmentIds: [[], Validators.required],
       skillIds: [],
       isAvailablity : [true],
       isUnavailablity : [true],
       isOnlySchedulatedCandidate : [false],
       isExcludeNotOrganized : [true],
       startTime: [null],
-      endTime : [null]
+      endTime : [null],
     });
   }
 
@@ -65,6 +66,22 @@ export class ScheduleFiltersService {
     structure.departments = structure.locations.flatMap((location) => location.departments as OrganizationDepartment[]);
 
     return structure;
+  }
+
+  filterDepartments(
+    filterStructure: ScheduleFilterStructure, locationIds: number[] | null, regionIds: number[] | null
+  ): number[] {
+    if (locationIds?.length) {
+      return filterStructure.departments
+        .filter(department => locationIds.includes(department.locationId as number))
+        .map(department => department.id);
+    }
+    if (regionIds?.length) {
+      return filterStructure.departments
+        .filter(department => regionIds.includes(department.regionId as number))
+        .map(department => department.id);
+    }
+    return filterStructure.departments.map(department => department.id);
   }
 
   getSelectedLocatinOptions(structure: ScheduleFilterStructure, selectedIds: number[]): DropdownOption[] {
@@ -105,7 +122,7 @@ export class ScheduleFiltersService {
         return !!(formValue[key] as number[]).length;
       }
 
-      return !!formValue[key];
+      return this.fieldsWithAllToggle.indexOf(key) > -1 && formValue[key] === null || !!formValue[key];
     })
     .map((key) => {
       const configItem = filterConfig[key as keyof ScheduleFiltersConfig];
@@ -165,7 +182,7 @@ export class ScheduleFiltersService {
     };
 
     structureState.regionIds = filterStructure.regions?.filter((region: OrganizationRegion) => {
-      return regionIds.includes(region.id as number) && region.name !== name;
+      return regionIds?.includes(region.id as number) && region.name !== name;
     }).map((region: OrganizationRegion) => {
       structureState.regions = [...state.regions,...structureState.regions,...region.locations as OrganizationLocation[]];
       return Number(region.id);
@@ -192,7 +209,7 @@ export class ScheduleFiltersService {
     };
 
     structureState.locationIds = state.regions?.filter((location: OrganizationLocation) => {
-      return locationIds.includes(location.id) && location.name !== name;
+      return locationIds?.includes(location.id) && location.name !== name;
     }).map((location: OrganizationLocation) => {
       structureState.locations = [...state.locations,...structureState.locations,...location.departments];
       return Number(location.id);
@@ -217,7 +234,7 @@ export class ScheduleFiltersService {
     };
 
     structureState.departmentIds = state.locations?.filter((departments: OrganizationDepartment) => {
-      return departmentsIds.includes(departments.id) && departments.name !== name;
+      return departmentsIds?.includes(departments.id) && departments.name !== name;
     }).map((departments: OrganizationDepartment) => {
       structureState.departments.push(departments);
       return Number(departments.id);
@@ -242,7 +259,7 @@ export class ScheduleFiltersService {
 
   getFilteredDepartmentsIds(departments: OrganizationDepartment[], departmentsIds: number[]): number[] {
     const depIds = departments.map((department: OrganizationDepartment) => department.id);
-    return  departmentsIds.filter((id: number) => depIds.includes(id));
+    return  departmentsIds?.filter((id: number) => depIds.includes(id));
   }
 
   private createChipValue(formValue: number[] | number | string | boolean, configIem: ScheduleFilterItem): string[] {
@@ -256,6 +273,10 @@ export class ScheduleFiltersService {
 
     if (typeof formValue === 'number') {
       return [formValue.toString()];
+    }
+
+    if (formValue === null) {
+      return ['All'];
     }
 
     return [formValue];

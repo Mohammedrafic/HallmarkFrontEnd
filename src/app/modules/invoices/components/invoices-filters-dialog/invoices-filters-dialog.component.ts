@@ -135,13 +135,28 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   clearAllFilters(eventEmmit = true): void {
-    this.store.dispatch(new ClearPageFilters(this.getPageName()));
-    this.formGroup.reset();
-    this.filteredItems = [];
-    this.appliedFiltersAmount.emit(this.filteredItems.length);
+    if (this.formGroup.controls['issueDateFrom'] && this.formGroup.controls['issueDateTo']) {
+      this.formGroup.reset();
+      const today = new Date(new Date().toDateString());
+      const priorDate = new Date(new Date().setDate(today.getDate() - 30));
 
-    if (eventEmmit) {
-      this.resetFilters.emit();
+      this.formGroup.controls['issueDateFrom'].setValue(priorDate, { emitEvent: eventEmmit });
+      this.formGroup.controls['issueDateTo'].setValue(today, { emitEvent: eventEmmit });
+
+      this.updateTableByFilters.emit(InvoiceFiltersAdapter.prepareFilters(this.formGroup));
+      this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
+      this.appliedFiltersAmount.emit(this.filteredItems.length);
+      this.formGroup.markAsPristine();
+      this.cdr.markForCheck();
+    } else {
+      this.store.dispatch(new ClearPageFilters(this.getPageName()));
+      this.formGroup.reset();
+      this.filteredItems = [];
+      this.appliedFiltersAmount.emit(this.filteredItems.length);
+
+      if (eventEmmit) {
+        this.resetFilters.emit();
+      }
     }
   }
 
@@ -365,7 +380,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       this.regions,
       this.isAgency
     );
-    
+
     const filterState: Partial<InvoicesFilterState> = this.filterService.composeFilterState(
       this.filtersFormConfig,
       filteredStructure as Record<string, unknown>

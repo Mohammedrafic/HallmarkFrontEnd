@@ -105,13 +105,15 @@ export const hasDuplicateSteps = (steps: Step[]): boolean => {
 
 export const CreateNextStepStatusField = (
   steps: Step[],
-  hasDuplicateStep: boolean
+  hasDuplicateStep: boolean,
+  isApplicantIrpWorkflow: boolean
 ): Step[] => {
   return steps.map((item: Step, index: number, array: Step[]) => {
     return {
       ...item,
       multiple: hasDuplicateStep && (item.name === 'Shortlisted' || item.name === 'Offered') ? 'Multiple' : null,
       nextStepStatus: array[index + 1]?.status,
+      nextStepId: isApplicantIrpWorkflow ? array[index + 1]?.id : null,
     };
   });
 }
@@ -124,5 +126,5 @@ export const CreateNextStepStatusForWorkflows = (
   const isIrpWorkflow = includeInIrp && type === TypeFlow.applicationWorkflow;
   const hasDuplicate = isIrpWorkflow ? hasDuplicateSteps(steps) : false;
 
-  return CreateNextStepStatusField(steps, hasDuplicate);
+  return CreateNextStepStatusField(steps, hasDuplicate, isIrpWorkflow);
 }

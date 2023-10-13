@@ -28,14 +28,14 @@ import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
 export class AddNewFeeDialogComponent extends DestroyableDirective implements OnInit {
   @Input() openEvent: Subject<number>;
   @Input() openEditEvent: Subject<FeeExceptions>;
-  @Input() disableSaveButton: boolean = false;
+  @Input() targetElement: HTMLElement;
+  @Input() disableSaveButton = false;
 
   @ViewChild('addFeeSideDialog') sideDialog: DialogComponent;
 
   @Select(AssociateListState.feeExceptionsInitialData)
   public feeExceptionsInitialData$: Observable<FeeExceptionsInitialData>;
 
-  public targetElement: HTMLElement = document.body;
   public editMode = false;
   public feeFormGroup: FormGroup = this.generateNewForm();
   public optionFields = OPTION_FIELDS;

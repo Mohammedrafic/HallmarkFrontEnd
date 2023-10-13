@@ -4,7 +4,7 @@ import { GetEmployeeUsers, GetNonEmployeeUsers, GetRolePerUser } from './../../.
 import { ButtonModel } from './../../../shared/models/buttons-group.model';
 import { Component, Input, NgZone, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { Actions, Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
@@ -130,6 +130,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public showtoast:boolean = true;
   public getdata: any;
+  apiSaveReq:boolean = false;
 
   public isIRPFlagEnabled = false;
   public isOrgVMSEnabled = false;
@@ -374,6 +375,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       }
     });
     this.allowActiveUsers = true;
+
   }
 
   public onGridReady(params: GridReadyEvent): void {
@@ -577,6 +579,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   }
   private SaveData(data: any, alertChannel: AlertChannel) {
     if (data != undefined) {
+      this.apiSaveReq = true;
       let updateUserSubscription: UserSubscriptionRequest = {
         alertId: data.rowData?.alertId,
         userId: this.userGuid,
@@ -589,11 +592,16 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         updateUserSubscription.isIRP = true;
       }
       this.store.dispatch(new UpdateUserSubscription(updateUserSubscription));
-      this.updateUserSubscription$.pipe(takeUntil(this.unsubscribe$)).subscribe((updated: boolean) => {
-        if (updated != undefined && updated == true) {
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-        }
-      });
+      this.actions$.pipe(
+            ofActionDispatched(ShowToast),
+            distinctUntilChanged(),
+            takeUntil(this.unsubscribe$)
+          ).subscribe((val) => {
+            if(val.type === 1 && this.apiSaveReq){
+              this.apiSaveReq = false;
+              this.dispatchNewPage(this.usersControl.value);
+            }
+          });
     }
   }
 

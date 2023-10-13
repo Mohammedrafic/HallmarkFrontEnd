@@ -35,6 +35,19 @@ export const OnboardConfigFieldsToShow: string[] = [
   'reason',
   'closeDate',
 ];
+
+export const SwitcherValue : string[] = [
+  'All',
+  'Benefits',
+  'Non-Benefits'
+]
+
+export enum SwitcherValueEnum {
+  All = 'All',
+  Benefits = 'Benefits',
+  NonBenefits = 'Non-Benefits'
+}
+
 export const RejectedConfigFieldsToShow: string[] = ['availableStartDate','actualEndDate','actualStartDate','offeredStartDate', 'offeredEndDate'];
 
 export const OfferedStatusFlow = [

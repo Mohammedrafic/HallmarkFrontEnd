@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -51,6 +51,10 @@ import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { filter } from 'rxjs/operators';
 import { CreateOverlapErrorData } from '../../helpers';
+import { CommentsService } from '@shared/services/comments.service';
+import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
+import { Comment } from '@shared/models/comment.model';
+
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -62,7 +66,8 @@ export class TimesheetsState {
     private timesheetsApiService: TimesheetsApiService,
     private timesheetDetailsApiService: TimesheetDetailsApiService,
     private store: Store,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private commentService: CommentsService
   ) {}
 
   @Selector([TimesheetsState])
@@ -191,6 +196,21 @@ export class TimesheetsState {
   @Selector()
   static displayTimesheetHistoricalData(state: TimesheetsModel): boolean {
     return state.displayTimesheetHistoricalData;
+  }
+
+  @Selector()
+  static orderComments(state: OrderManagementContentStateModel): Comment[] {
+    return state.orderComments;
+  }
+
+  @Action(Timesheets.GetOrderComments)
+  GetOrderComments(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { commentContainerId }: Timesheets.GetOrderComments
+  ): Observable<Comment[]> {
+    return this.commentService
+      .getComments(commentContainerId, null)
+      .pipe(tap((payload) => patchState({ orderComments: payload })));
   }
 
   @Action(Timesheets.GetAll)
@@ -442,7 +462,7 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.AgencySubmitTimesheet)
   SubmitTimesheet(
-    ctx: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { id, orgId }: TimesheetDetails.AgencySubmitTimesheet
   ): Observable<void> {
     return this.timesheetDetailsApiService.changeTimesheetStatus({
@@ -450,7 +470,16 @@ export class TimesheetsState {
       organizationId: orgId,
       targetStatus: TimesheetTargetStatus.Submitted,
       reason: null,
-    });
+    })
+      .pipe(
+        tap(() => {
+          this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+          return throwError(() => err);
+        }),
+      );
   }
 
   @Action(TimesheetDetails.OrganizationApproveTimesheet)
@@ -464,11 +493,15 @@ export class TimesheetsState {
       targetStatus: TimesheetTargetStatus.Approved,
       reason: null,
     })
-    .pipe(
-      catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-      }),
-    );
+      .pipe(
+        tap(() => {
+          this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+          return throwError(() => err);
+        }),
+      );
   }
 
   @Action(TimesheetDetails.ChangeTimesheetStatus)
@@ -477,14 +510,15 @@ export class TimesheetsState {
     { payload }: TimesheetDetails.ChangeTimesheetStatus
   ): Observable<void> {
     return this.timesheetDetailsApiService.changeTimesheetStatus(payload)
-    .pipe(
-      tap(() => {
-        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
-      }),
-      catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-      }),
-    );
+      .pipe(
+        tap(() => {
+          this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+          return throwError(() => err);
+        }),
+      );
   }
 
   @Action(TimesheetDetails.Export)
