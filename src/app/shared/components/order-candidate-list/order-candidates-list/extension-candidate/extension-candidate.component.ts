@@ -703,7 +703,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       okButtonClass: 'ok-button',
       cancelButtonLabel: 'No',
     };
-    if (this.selectedApplicantStatus?.applicantStatus === ApplicantStatusEnum.OnBoarded) {
+    if (this.selectedApplicantStatus?.applicantStatus === ApplicantStatusEnum.OnBoarded && this.selectedApplicantStatus.applicantStatus != this.candidate?.status) {
       return this.confirmService.confirm(onBoardCandidateMessage, options)
         .pipe(take(1));
     }
