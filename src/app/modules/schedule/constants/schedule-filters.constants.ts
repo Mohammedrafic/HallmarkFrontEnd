@@ -150,7 +150,7 @@ const scheduleFilterFormFields: ScheduleFilterFormFieldConfig[] = [
     field: 'departmentIds',
     title: 'Department',
     type: FieldType.MultiSelectDropdown,
-    required: false,
+    required: true,
     sourceKey: ScheduleFilterFormSourceKeys.Departments,
     showAllToggle: true,
     customFiltering: true,
