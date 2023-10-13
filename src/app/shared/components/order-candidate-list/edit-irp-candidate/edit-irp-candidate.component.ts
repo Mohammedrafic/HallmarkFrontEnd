@@ -129,6 +129,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public ratePerHour : number = 96;
   public benefitpercentofsw : number;
   public wagePercent : number;
+  public isTurnedOn : boolean;
   public payrateData: Configuration[];
   public RegionDetails: Location[];
 
@@ -273,6 +274,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.benefitpercentofsw = this.configdata.benefitPercent;
         this.costSaving = this.configdata.costSavings;
         this.wagePercent = this.configdata.wagePercent;
+        this.isTurnedOn = this.configdata.isEnabled;
       }
       this.createATPform();
     });
