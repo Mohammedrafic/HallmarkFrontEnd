@@ -222,11 +222,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             return;
           }
           this.noorgSelection = false;
-          this.addManualInvoiceDisable = false;
-          if(id.length > 1){
-            this.addManualInvoiceDisable = true;
+          this.addManualInvoiceDisable = true;
+          if(id.length == 1){ 
+            this.addManualInvoiceDisable = false;
           }
-          this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
+          if(id.length > 1){            
+            this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
+          }
         }),
       );
       this.recordsPerPageOptions = InvoiceDefaulPerPageOptions;
@@ -289,22 +291,17 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           }),
          switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
           switchMap(() => this.organizations$),
-          filter((organizations: DataSourceItem[]) =>
-            {
-              if(organizations.length == 0 && this.showmsg){
-                this.store.dispatch(new Invoices.ClearInvoices())
-                this.showmsg = false;
-                this.organizationMultiSelectControl.setValue([]);
-                this.organizationControl.setValue([]);
-                this.agencyOrganizationIds = [];
-              }
-              return !!organizations.length;
-            }
-          ),
           tap((organizations: DataSourceItem[]) => {
             this.organizationsList = organizations;
+            if(organizations.length == 0 && this.showmsg){
+              this.store.dispatch(new Invoices.ClearInvoices())
+              this.showmsg = false;
+              this.organizationMultiSelectControl.setValue([]);
+              this.organizationControl.setValue([]);
+              this.agencyOrganizationIds = [];
+            }
           }),
-          map(([firstOrganization]: DataSourceItem[]) => firstOrganization.id),
+          map(([firstOrganization]: DataSourceItem[]) => firstOrganization ? firstOrganization.id : 0),
           takeUntil(this.componentDestroy()),
         )
         .subscribe((orgId: number) => {
@@ -342,7 +339,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           return id === this.navigatedOrgId;
         }
 
-        return this.isAgency ? id.length > 0 ? true : false : !!id;
+        return this.isAgency ? id.length > 0 : !!id;
       }),
       takeUntil(this.componentDestroy()),
     )
@@ -365,7 +362,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.invoicesFilters$
       .pipe(
         distinctUntilChanged(),
-        filter(() => !!this.organizationId),
         skip(1),
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {

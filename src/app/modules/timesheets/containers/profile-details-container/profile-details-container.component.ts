@@ -39,7 +39,6 @@ import {
   filter,
   map,
   Observable,
-  skip,
   Subject,
   switchMap,
   take,
@@ -67,9 +66,6 @@ import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
 import { AppState } from 'src/app/store/app.state';
 import { ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { Comment } from '@shared/models/comment.model';
-import { CommentsService } from '@shared/services/comments.service';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { GetOrderComments } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -146,7 +142,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public commentContainerId = 0;
 
 
-  @Select(OrderManagementContentState.orderComments)
+  @Select(TimesheetsState.orderComments)
   private orderComments$: Observable<Comment[]>;
 
   @Select(AppState.isSidebarOpened)
@@ -200,6 +196,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private resizeObserver: ResizeObserverModel;
 
   private canRecalculate: boolean;
+  private isTimeSheetChanged: boolean;
 
   previewAttachemnt: boolean = false;
   currentSelectedAttachmentIndex: number = 0;
@@ -262,6 +259,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public onOpen(args: { preventFocus: boolean }): void {
+    this.isTimeSheetChanged = false;
     args.preventFocus = true;
   }
 
@@ -340,7 +338,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const parent = e.target.parentNode as ParentNode;
     this.tooltip.content = Array.from(parent.children).indexOf(e.target) ? 'Miles Status' : 'Timesheet Status';
   }
-
   
   public onDWNCheckboxSelectedChange({ checked }: { checked: boolean }, switchComponent: SwitchComponent): void {
     checked
@@ -365,7 +362,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             )
           )
           .subscribe(() => {
-            this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+            this.refreshGrid();
             this.refreshData();
             this.closeDialog();
           })
@@ -384,8 +381,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             MessageTypes.Success,
             rejectTimesheetDialogData(this.isTimesheetOrMileagesUpdate).successMessage
           ),
-          new Timesheets.GetAll(),
-          new Timesheets.GetTabsCounts(),
         ]);
 
         this.handleProfileClose();
@@ -418,7 +413,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.handleProfileClose();
-        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
       });
   }
 
@@ -525,7 +519,18 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(take(1))
       .subscribe(() => {
         this.candidateDialog.hide();
+        if (this.isTimeSheetChanged) {
+          this.refreshGrid();
+        }
       });
+  }
+
+  public handleTimeSheetChange(): void {
+    this.isTimeSheetChanged = true;
+  }
+
+  private refreshGrid(): void {
+    this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
   }
 
   private orgSubmitEmptyTimesheetWarning(): void {
@@ -541,7 +546,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.handleProfileClose();
-        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
       });
   }
 
@@ -708,7 +712,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public getOrderComments(): void {
-    this.store.dispatch(new GetOrderComments(this.commentContainerId as number));
+    this.store.dispatch(new Timesheets.GetOrderComments(this.commentContainerId as number));
     this.orderComments$.pipe(
       takeUntil(this.unsubscribe$)
     ).subscribe((comments: Comment[]) => {

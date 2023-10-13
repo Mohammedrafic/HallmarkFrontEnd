@@ -49,7 +49,9 @@ export interface Step {
   formStepName?: string;
   order?: number;
   nextStepStatus?: string;
+  nextStepId?: number | null;
   parentId?: number | null;
+  multiple?: string | null;
 }
 
 export class WorkflowFilters {

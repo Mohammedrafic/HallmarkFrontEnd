@@ -6,9 +6,9 @@ import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AbstractPermission } from "@shared/helpers/permissions";
+import { takeUntil } from 'rxjs/operators';
 
 import { TimesheetDetails } from '../../../store/actions/timesheet-details.actions';
-import { Timesheets } from '../../../store/actions/timesheets.actions';
 import { ShowToast } from '../../../../../store/app.actions';
 import { approveTimesheetDialogData } from '../../../constants';
 import { AgencyStatus } from '@shared/enums/status';
@@ -52,12 +52,8 @@ export class TimesheetTableApproveCellComponent extends AbstractPermission imple
 
     this.store.dispatch(
       new TimesheetDetails.OrganizationApproveTimesheet(timesheetId, null)
-   ).subscribe(() => {
-      this.store.dispatch([
-        new ShowToast(MessageTypes.Success, successMessage),
-        new Timesheets.GetAll(),
-        new Timesheets.GetTabsCounts(),
-      ]);
+    ).subscribe(() => {
+      this.store.dispatch(new ShowToast(MessageTypes.Success, successMessage));
     });
   }
 }

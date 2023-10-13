@@ -11,9 +11,12 @@ import {
   CancelIrpCandidateDto,
   CandidateDetails,
   ClosePositionDto,
-  CreateIrpCandidateDto, CreateOfferedIrpCandidateDto,
+  CreateIrpCandidateDto,
+  CreateOfferedIrpCandidateDto,
   JobDetailsDto,
-  UpdateIrpCandidateDto, UpdateOfferedIrpCandidateDto,
+  RejectedIrpCandidateDto,
+  UpdateIrpCandidateDto,
+  UpdateOfferedIrpCandidateDto,
 } from '@shared/components/order-candidate-list/interfaces';
 import { ShowToast } from '../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -42,6 +45,10 @@ export class OrderCandidateApiService {
         isirpLTA:isirpLTA
       },
     });
+  }
+
+  rejectIrpCandidate(payload: RejectedIrpCandidateDto): Observable<void> {
+    return this.http.post<void>('/api/IRPApplicants/reject', payload);
   }
 
   cancelIrpCandidate(payload: CancelIrpCandidateDto): Observable<void> {

@@ -59,7 +59,10 @@ export class CandidateStatusComponent implements OnInit {
     "candidateStatusesParamCS": "",
     "skillCS": "",
     "OrderIdParam": "",
-    "OrderStatusParam": ""
+    "OrderStatusParam": "",
+    "organizationNameCS": "",
+    "reportPulledMessageCS": "",
+    "DateRangeCS": ""
   };
 
 
@@ -157,6 +160,7 @@ export class CandidateStatusComponent implements OnInit {
 
   public candidateStatuses: CandidateStatusAndReasonFilterOptionsDto[] = [];
   public defaultjobStatuses: (string | undefined)[] = ['Open', 'In progress', 'Filled'];
+  private culture = 'en-US';
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -433,6 +437,7 @@ export class CandidateStatusComponent implements OnInit {
     skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
     skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
 
+    let currentDate = new Date(Date.now());
 
     this.paramsData =
     {
@@ -454,6 +459,9 @@ export class CandidateStatusComponent implements OnInit {
       "skillCS": skillIds.length == 0 ? "null" : skillIds,
       "OrderIdParam": jobId == null || jobId == "" ? '' : jobId,
       "OrderStatusParam": jobStatuses.length == 0 ? '' : jobStatuses.join(this.joinString),
+      "organizationNameCS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageCS": ("Report Print date: " + formatDate(beginStartDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeCS": (formatDate(beginStartDate, "MMM", this.culture) + " " + beginStartDate.getDate() + ", " + beginStartDate.getFullYear().toString()).trim() + " - " + (formatDate(endStartDate, "MMM", this.culture) + " " + endStartDate.getDate() + ", " + endStartDate.getFullYear().toString()).trim()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

@@ -4,7 +4,30 @@
 .stepper {
   padding-bottom: 40px;
 
+  .e-tab-header {
+    .e-items {
+      .e-item {
+        background-color: var(--bg-steper);
+        border: 1px solid var(--header-border);
+      }
+
+      .e-disable {
+        opacity: 0.5;
+      }
+
+      .e-active {
+        background-color: $primary-active-blue-10;
+
+        .stepper-title {
+          color: $white !important;
+        }
+      }
+    }
+  }
+
   .stepper-title {
+    color: var(--title) !important;
+
     .required {
       color: $supportive-red;
     }
@@ -28,13 +51,14 @@
     .tabs {
       .e-tab-header {
         overflow: hidden;
-  
+
         .e-item {
           max-width: 135px;
+          background-color: blue;
         }
       }
     }
-  
+
     .stepper {
       .stepper-title {
         .text {

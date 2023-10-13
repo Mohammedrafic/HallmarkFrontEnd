@@ -10,7 +10,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { COMPONENT_PERMISSIONS } from '@organization-management/credentials/constants';
 import { CredentialPermissions } from '@organization-management/credentials/interfaces';
-import { ShowExportDialog, ShowSideDialog } from '../../store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import {
@@ -92,6 +92,10 @@ export class CredentialsComponent extends AbstractPermissionGrid implements OnIn
 
   public showCredentialDialogs(): void {
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public showFilterDialog(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
   }
 
   public selectTab(selectedTab: SelectEventArgs): void {

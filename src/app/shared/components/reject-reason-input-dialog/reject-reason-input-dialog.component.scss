@@ -3,6 +3,7 @@
 ::ng-deep {
   .profile-details-reject-reason-dialog {
     font-family: 'Open Sans', sans-serif;
+    max-height: 100vh !important;
 
     h2 {
       margin: 0;

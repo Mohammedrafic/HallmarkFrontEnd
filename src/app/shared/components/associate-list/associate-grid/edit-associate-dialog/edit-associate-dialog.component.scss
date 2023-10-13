@@ -23,7 +23,24 @@
   display: none;
 }
 
+@media #{$min-tablet} {
+  .container {
+    height: calc(100% - 50px) !important;
+  }
+}
+
+@media #{$max-tablet} {
+  .dialog.responsive {
+    width: 100% !important;
+  }
+}
+
 @media #{$max-mobile} {
+  .fee-settings {
+    height: auto;
+    padding-bottom: 70px;
+  }
+
   .header-container .e-card-content {
     display: none;
   }

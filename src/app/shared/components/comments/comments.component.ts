@@ -1,14 +1,28 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Store } from '@ngxs/store';
+import { Actions, Store, ofActionSuccessful } from '@ngxs/store';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 
 import { Comment } from '@shared/models/comment.model';
 import { UserState } from 'src/app/store/user.state';
-import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments.actions';
+import {
+  MarkCommentAsRead,
+  SaveComment,
+  SaveCommentSuccess,
+  UpdateGridCommentsCounter,
+} from './store/comments.actions';
 
 enum CommentsFilter {
   All = 'All',
@@ -24,20 +38,20 @@ enum CommentsFilter {
 })
 export class CommentsComponent {
   @Input() useBackground = true;
+  @Input() useStyle = false;
   @Input() disabled = false;
   @Input() orderId: number;
   public commentData: Comment[] = [];
   @Input() canVmsCreateOrders: boolean;
   @Output() commentSaveCheck = new EventEmitter<boolean>();
   @Input() set comments(value: Comment[]) {
-    this.commentsList = value;
-    if (value.length) {
-      this.commentData = value.filter(comments => !comments.isPrivate);
+    if (value?.length) {
+      this.commentsList = value;
+      this.commentData = value.filter((comments) => !comments.isPrivate);
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
-    }
-    else
-    {
+    } else {
+      this.commentsList = [];
       this.commentData = [];
     }
   }
@@ -84,7 +98,7 @@ export class CommentsComponent {
 
   private hasUnreadMessages = false;
 
-  constructor(private store: Store, private router : Router, private cd : ChangeDetectorRef) {
+  constructor(private store: Store, private router: Router, private cd: ChangeDetectorRef, private actions$: Actions) {
     this.commentType = CommentsFilter.All;
     this.scroll$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((messageEl: HTMLElement | null) => {
       if (messageEl) {
@@ -114,6 +128,9 @@ export class CommentsComponent {
     if (this.isAgencyUser || this.CommentConfiguration === true) {
       this.isExternal = true;
     }
+    this.actions$
+      .pipe(ofActionSuccessful(SaveCommentSuccess), takeUntil(this.unsubscribe$))
+      .subscribe(() => this.commentSaveCheck.emit(true));
   }
 
   ngOnDestroy(): void {
@@ -174,21 +191,33 @@ export class CommentsComponent {
       isRead: true,
     };
     this.comments.push(comment);
-    this.commentData.push(comment);
+    if(this.useStyle === true){
+      this.commentData.unshift(comment);
+    }else{
+      this.commentData.push(comment);
+    }
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment));
-      this.commentSaveCheck.emit(true);
     }
   }
 
-
   public onFilterChange(event: SelectEventArgs): void {
     this.commentData = this.commentsList;
-    event.itemData.value === CommentsFilter.External ? this.commentData = this.commentData.filter((comments) => comments.isExternal === true && comments.isPrivate === false) : this.commentData;
-    event.itemData.value === CommentsFilter.Internal ? this.commentData = this.commentData.filter((comments) => comments.isExternal === false && comments.isPrivate === false) : this.commentData;
-    event.itemData.value === CommentsFilter.All ?  this.commentData = this.commentData.filter((comments) => comments.isPrivate === false) : this.commentData;
+    event.itemData.value === CommentsFilter.External
+      ? (this.commentData = this.commentData.filter(
+          (comments) => comments.isExternal === true && comments.isPrivate === false
+        ))
+      : this.commentData;
+    event.itemData.value === CommentsFilter.Internal
+      ? (this.commentData = this.commentData.filter(
+          (comments) => comments.isExternal === false && comments.isPrivate === false
+        ))
+      : this.commentData;
+    event.itemData.value === CommentsFilter.All
+      ? (this.commentData = this.commentData.filter((comments) => comments.isPrivate === false))
+      : this.commentData;
     this.commentType = event.itemData.value;
     this.scroll$.next(null);
   }

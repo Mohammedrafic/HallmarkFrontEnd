@@ -5,6 +5,10 @@ export class SaveComment {
   constructor(public comment: Comment) {}
 }
 
+export class SaveCommentSuccess {
+  static readonly type = '[Comments] Save Comment Success';
+}
+
 export class MarkCommentAsRead {
   static readonly type = '[Comments] Mark Comment As Read';
   constructor(public ids: number[]) {}

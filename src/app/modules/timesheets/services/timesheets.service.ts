@@ -36,7 +36,7 @@ export class TimesheetsService {
       regionsIds: [[]],
       locationIds: [[]],
       contactEmails: '',
-      title: ''
+      title: '',
     }) as CustomFormGroup<TimesheetForm>;
   }
 

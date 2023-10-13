@@ -23,7 +23,14 @@ import { startDateDuplicationValidator } from '@shared/validators/start-date-dup
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { patternMessageValidator } from '@shared/validators/pattern-message.validator';
-import { ALPHANUMERIC_8_11_SYMBOLS, RoutingNumberMessage, SwiftCodeValidationMessage } from '@shared/constants';
+import {
+  ALPHANUMERIC_8_11_SYMBOLS,
+  MIN_DIGITS_LENGTH_ONLY_NINE,
+  NUMERIC_10_12_DIGITS,
+  NumberValidationMessage,
+  RoutingNumberMessage,
+  SwiftCodeValidationMessage,
+} from '@shared/constants';
 
 @Component({
   selector: 'app-electronic-form',
@@ -78,7 +85,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         bankName: ['', [Validators.required]],
         routingNumber: ['', [
           Validators.required,
-          patternMessageValidator(/^[0-9]+$/, RoutingNumberMessage),
+          patternMessageValidator(MIN_DIGITS_LENGTH_ONLY_NINE, RoutingNumberMessage),
         ]],
         bankAddress1: ['', [Validators.required]],
         bankAddress2: [''],
@@ -87,7 +94,10 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         bankCity: [''],
         bankZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
         accountHolderName: ['', [Validators.required]],
-        accountHolderNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+        accountHolderNumber: ['', [
+          Validators.required,
+          patternMessageValidator(NUMERIC_10_12_DIGITS, NumberValidationMessage),
+        ]],
         accountHolderPhone: ['', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]],
         accountHolderAddress1: [''],
         accountHolderAddress2: [''],

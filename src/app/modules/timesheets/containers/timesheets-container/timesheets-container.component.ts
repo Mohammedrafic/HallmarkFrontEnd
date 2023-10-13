@@ -264,7 +264,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private onOrganizationChangedHandler(): void {
    this.organizationId$.pipe( takeUntil(this.componentDestroy())).subscribe((value)=>{
-    this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
     if(value!=null&&value!=undefined){this.OrganizationId=value}
     });
     const idStream = this.isAgency ? this.agencyId$ : this.organizationId$;
@@ -273,6 +272,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       .pipe(
         debounceTime(600),
         filter((id) => !!id),
+        switchMap(() => {
+          return this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
+        }),
         switchMap(() => this.preservedFiltersByPageName$),
         filter(({ dispatch }) => dispatch),
         tap((filters) => {
