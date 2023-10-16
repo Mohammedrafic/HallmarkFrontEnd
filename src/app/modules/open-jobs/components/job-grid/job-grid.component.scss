@@ -8,5 +8,16 @@
     .ag-header-cell {
       color: $secondary-dark-blue-15;
     }
+
+    .ag-cell {
+      &.status-cell {
+        padding-left: 0;
+        padding-right: 0;
+
+        .e-chip-list {
+          justify-content: center;
+        }
+      }
+    }
   }
 }

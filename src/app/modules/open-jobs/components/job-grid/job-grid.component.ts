@@ -45,7 +45,7 @@ export class JobGridComponent extends Destroyable {
   }
 
   public withdrawEmployeeJob(job: OpenJob): void {
-    //this method call from UnlikeActionComponent, to withdraw Employee job
+    //this method call from LikeActionComponent, to withdraw Employee job
     this.employeeService.withdrawEmployee(job).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe();

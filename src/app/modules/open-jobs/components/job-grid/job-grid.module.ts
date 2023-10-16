@@ -4,28 +4,31 @@ import { CommonModule } from '@angular/common';
 import { FeatherModule } from 'angular-feather';
 import { ThumbsUp } from 'angular-feather/icons';
 import { AgGridModule } from '@ag-grid-community/angular';
-import { ButtonAllModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonAllModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 
 import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
 import { JobGridComponent } from './job-grid.component';
 import { LikeActionComponent } from './like-action/like-action.component';
-import { UnlikeActionComponent } from './unlike-action/unlike-action/unlike-action.component';
+import { ChipsCssClassPipeModule } from "../../../../shared/pipes/chip-css-class/chip-css-class-pipe.module";
+import { OpenJobStatusComponent } from './open-job-status/open-job-status/open-job-status.component';
 
 @NgModule({
-  declarations: [
-    JobGridComponent,
-    LikeActionComponent,
-    UnlikeActionComponent,
-  ],
-  exports: [
-    JobGridComponent,
-  ],
-  imports: [
-    CommonModule,
-    AgGridModule,
-    GridPaginationModule,
-    ButtonAllModule,
-    FeatherModule.pick({ ThumbsUp }),
-  ],
+    declarations: [
+        JobGridComponent,
+        LikeActionComponent,
+        OpenJobStatusComponent,
+    ],
+    exports: [
+        JobGridComponent,
+    ],
+    imports: [
+        CommonModule,
+        AgGridModule,
+        GridPaginationModule,
+        ButtonAllModule,
+        FeatherModule.pick({ ThumbsUp }),
+        ChipListModule,
+        ChipsCssClassPipeModule,
+    ],
 })
 export class JobGridModule {}
