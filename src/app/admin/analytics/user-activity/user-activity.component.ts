@@ -5,7 +5,7 @@ import { ColDef, ExcelStyle, FilterChangedEvent, GridOptions, ICellRendererParam
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, Inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import {  Select, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
@@ -15,10 +15,10 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { User, UsersPage } from '@shared/models/user.model';
 import { userActivity, useractivitlogreportPage } from '@shared/models/userlog-activity.model';
-import { BehaviorSubject, Observable, Subject, map, takeUntil, takeWhile } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, distinctUntilChanged, map, takeUntil, takeWhile } from 'rxjs';
 import { APP_SETTINGS, AppSettings } from 'src/app.settings';
 import { BUSSINES_DATA_FIELDS } from 'src/app/security/roles-and-permissions/roles-and-permissions.constants';
-import { GetAllUsersPage, GetBusinessByUnitType, GetUsersPage } from 'src/app/security/store/security.actions';
+import { GetAllUsersPage, GetBusinessByUnitType, GetEmployeeUsers, GetNonEmployeeUsers, GetRolePerUser, GetUsersPage } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { UNIT_FIELDS } from 'src/app/security/user-list/user-list.constants';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
@@ -26,6 +26,11 @@ import { UserState } from 'src/app/store/user.state';
 import { DefaultUseractivityGridColDef, SideBarConfig } from './user-activity.constant';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { RolesPerUser } from '@shared/models/user-managment-page.model';
+import { GroupEmailRole } from '@shared/models/group-email.model';
+import { AlertsState } from '@admin/store/alerts.state';
+import { GetGroupEmailRoles } from '@admin/store/alerts.actions';
+import { isNumber } from 'lodash';
 
 @Component({
   selector: 'app-user-activity',
@@ -51,6 +56,8 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   paginationPageSize: number;
   defaultColDef: ColDef = DefaultUseractivityGridColDef;
   cacheBlockSize: any;
+  public roleData: GroupEmailRole[];
+
   itemList: Array<userActivity> = [];
   @Select(SecurityState.allUsersPage)
   public userData$: Observable<UsersPage>;
@@ -58,11 +65,20 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   @Select(useractivityReportState.CustomReportPage)
   public logInterfacePage$: Observable<useractivitlogreportPage>;
 
-  @Select(SecurityState.businessUserData)
-  public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
+  // @Select(SecurityState.businessUserData)
+  // public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
+  @Select(AlertsState.GetGroupRolesByOrgId)
+  public roleData$: Observable<GroupEmailRole[]>;
+  @Select(SecurityState.newBusinessDataPerUser)
+  public newBusinessDataPerUser$: Observable<(type: number) => BusinessUnit[]>;
   isBusinessFormDisabled = false;
-
+  @Select(SecurityState.rolesPerUsers)
+  rolesPerUsers$: Observable<RolesPerUser[]>;
+  @Select(SecurityState.nonEmployeeUserData)
+  public nonEmployeeUserData$: Observable<User[]>;
   private unsubscribe$: Subject<void> = new Subject();
+  public businessValue: BusinessUnit[];
+  public allOption: string = 'All';
 
   public paramsData: any = {
     "businessUnitType": '',
@@ -72,6 +88,9 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
     "periodTo": '',
   };
   public totalRecordsCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  defaultBusinessValue: any;
+  public masterUserData: User[];
+  isOrgage: boolean;
 
   constructor(private store: Store, private formBuilder: FormBuilder, private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef,
@@ -91,6 +110,9 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
 
   get userControl(): AbstractControl {
     return this.userActivityForm.get('userName') as AbstractControl;
+  }
+  get rolesControl(): AbstractControl {
+    return this.userActivityForm.get('roles') as AbstractControl;
   }
   isInitialloadCalled = false;
   public readonly columnDefs: ColumnDefinitionModel[] = [
@@ -136,7 +158,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
-  
+
     {
       headerName: 'UTC Date & Time',
       field: 'utcDate',
@@ -190,7 +212,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
-  
+
     {
       headerName: 'Browser',
       field: 'client',
@@ -239,7 +261,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       sortable: true,
       resizable: true
     },
- 
+
 
 
   ];
@@ -248,23 +270,36 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
     this.initForm();
     this.onBusinesstypeValueChanged();
     this.onBusinesunitValueChanged();
+    this.onRolesValueChanged()
+    this.newBusinessDataPerUser$
+      .pipe(
+        map((fn) => fn(this.businessUnitControl?.value)),
+        takeWhile(() => this.isAlive)
+      )
+      .subscribe((value) => {
+        this.businessValue = value;
+        this.defaultBusinessValue = this.businessValue[0]?.id
+      });
     const user = this.store.selectSnapshot(UserState.user) as User;
+    console.log(user)
     this.businessUnitControl.patchValue(user?.businessUnitType);
     this.businessControl.patchValue(user?.businessUnitId || 0);
     const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
-    if(businessUnitType == BusinessUnitType.Agency || businessUnitType == BusinessUnitType.Organization) {
+    if (businessUnitType == BusinessUnitType.Agency || businessUnitType == BusinessUnitType.Organization) {
       this.businessUnitControl.disable();
+      this.businessControl.disable();
+      this.isOrgage = true;
     }
 
 
-  }
-  get bussinesUserData$(): Observable<BusinessUnit[]> {
-    return this.businessUserData$.pipe(map((fn) => fn(this.businessUnitControl?.value)));
+
   }
 
   private initForm(): void {
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 7);
+    let endate= new Date(Date.now())
+    endate.setDate(endate.getDate()+7);
     this.userActivityForm = this.formBuilder.group(
       {
         businessunitType: new FormControl([], [Validators.required]),
@@ -272,6 +307,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         userName: new FormControl([], [Validators.required]),
         startDate: new FormControl(startDate),
         endDate: new FormControl(new Date(Date.now())),
+        roles: new FormControl(),
       }
     );
   }
@@ -297,36 +333,42 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   }
 
   private onBusinesstypeValueChanged(): void {
+    this.businessValue = []
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       value && this.store.dispatch(new GetBusinessByUnitType(value));
       if (!this.isBusinessFormDisabled) {
-        this.businessControl.patchValue(0);
+        const user = this.store.selectSnapshot(UserState.user) as User;
+        this.businessControl.patchValue(user?.businessUnitId || 0);
       }
     });
 
   }
 
   private onBusinesunitValueChanged(): void {
-
     this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (value == 0) {
-
         this.dispatchUserPage([]);
       }
       else {
         this.dispatchUserPage([value]);
         this.userData = [];
-
       }
+
       if (!this.isInitialloadCalled) {
         this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           if (data != undefined && data != null) {
-            this.userData = sortByField(data.items,'name');
+            this.userData = sortByField(data.items, 'name');
             this.userControl.patchValue(this.userData[0]?.id)
-            if (!this.isInitialloadCalled) {
-              setTimeout(()=>{
-                const user = this.store.selectSnapshot(UserState.user) as User;
+            this.changeDetectorRef.detectChanges()
+            const user = this.store.selectSnapshot(UserState.user) as User;
+            if (this.businessUnitControl.value == user.businessUnitType) {
               this.userControl.patchValue(user.id)
+            } else {
+              this.userControl.patchValue(this.userData[0].id)
+            }
+            if (!this.isInitialloadCalled) {
+              setTimeout(() => {
+                this.userControl.patchValue(user.id)
                 this.isInitialload();
               }, 0);
               this.isInitialloadCalled = true;
@@ -337,6 +379,30 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         })
       }
 
+      this.userData = [];
+      let businessUnitIds = [];
+      if (value != 0 && value != null) {
+        businessUnitIds.push(this.businessControl.value);
+      }
+
+      this.roleData = [];
+      this.changeDetectorRef.detectChanges()
+
+      var businessId = this.businessControl.value;
+      if (businessId != undefined) {
+        this.store.dispatch(new GetGroupEmailRoles([businessId]));
+        const user = this.store.selectSnapshot(UserState.user) as User;
+
+        this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+          this.roleData = data;
+          if (this.isOrgage) {
+            const roleIds = user?.roles.map((role: { id: any; }) => role.id) || [];
+            this.rolesControl.patchValue(roleIds);
+          }
+          this.changeDetectorRef.detectChanges()
+
+        });
+      }
     })
 
   }
@@ -432,7 +498,7 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   onBtExport() {
     const params = {
       fileName: 'User Audit Log Report',
-      sheetName:'User Audit Log Report'
+      sheetName: 'User Audit Log Report'
     };
     this.gridApi.exportDataAsExcel(params);
   }
@@ -446,10 +512,62 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         format: 'mm-dd-yyyy hh:mm:ss',
       },
     },
-   
+
   ];
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private onRolesValueChanged(): void {
+    this.rolesControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.userControl.reset();
+      this.userData = [];
+      if (value && value.length > 0) {
+        this.getUsersByRole();
+      }
+      else {
+        // if (this.businessUnitControl?.value == BusinessUnitType.Organization) {
+        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+          if (data != undefined && data != null) {
+            this.userData = sortByField(data.items, 'name');
+            this.userControl.patchValue(this.userData[0]?.id)
+            this.changeDetectorRef.detectChanges()
+            const user = this.store.selectSnapshot(UserState.user) as User;
+            if (this.businessUnitControl.value == user.businessUnitType) {
+              this.userControl.patchValue(user.id)
+            } else {
+              this.userControl.patchValue(this.userData[0].id)
+            }
+            if (!this.isInitialloadCalled) {
+              setTimeout(() => {
+                this.userControl.patchValue(user.id)
+                this.isInitialload();
+              }, 0);
+              this.isInitialloadCalled = true;
+              this.changeDetectorRef.detectChanges();
+
+            }
+          }
+        })
+
+      }
+
+
+    });
+  }
+  private getUsersByRole(): void {
+    this.userData = [];
+    if (this.rolesControl.value.length > 0) {
+      this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+        if (data != undefined) {
+          this.masterUserData = data.items;
+          this.userData = data.items.filter(i => i.isDeleted == false);
+          this.userData = this.userData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
+          this.changeDetectorRef.detectChanges();
+        }
+      });
+
+    }
   }
 }
