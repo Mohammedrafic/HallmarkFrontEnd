@@ -4,11 +4,12 @@ import { ActivatedRoute, Data } from '@angular/router';
 import { filter, map, switchMap, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
 
+import { OpenJobPage } from '@shared/models';
 import { OutsideZone } from '@core/decorators';
 import { Destroyable } from '@core/helpers';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { EmployeeService, JobFilterService } from '../../services';
-import { FiltersState, OpenJobPage, PreservedFilters } from '../../interfaces';
+import { FiltersState, PreservedFilters } from '../../interfaces';
 
 @Component({
   selector: 'app-open-job-container',

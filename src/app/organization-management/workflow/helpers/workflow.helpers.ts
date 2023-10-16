@@ -1,5 +1,6 @@
 import {
   FiltersApplicability,
+  Step,
   WorkflowFilters,
   WorkflowFlags,
   WorkflowWithDetails,
@@ -7,7 +8,7 @@ import {
 import { WorkflowMappingGet, WorkflowMappingPage } from '@shared/models/workflow-mapping.model';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowTabNames } from '@organization-management/workflow/workflow-mapping/constants';
-import { Applicability } from '@organization-management/workflow/enumns';
+import { Applicability, TypeFlow } from '@organization-management/workflow/enumns';
 
 export const GetSelectedCardIndex = (workflowDetails: WorkflowWithDetails[], cardId: number): number => {
   return workflowDetails.findIndex((workflows: WorkflowWithDetails) => {
@@ -88,3 +89,42 @@ export const UpdateFiltersApplicability = (filters: WorkflowFilters): WorkflowFi
   return filters;
 };
 
+export const hasDuplicateSteps = (steps: Step[]): boolean => {
+  const stepList = new Set();
+
+  for (const item of steps) {
+    if (item.hasOwnProperty('order') && stepList.has(item.order)) {
+      return true;
+    }
+
+    stepList.add(item.order);
+  }
+
+  return false;
+}
+
+export const CreateNextStepStatusField = (
+  steps: Step[],
+  hasDuplicateStep: boolean,
+  isApplicantIrpWorkflow: boolean
+): Step[] => {
+  return steps.map((item: Step, index: number, array: Step[]) => {
+    return {
+      ...item,
+      multiple: hasDuplicateStep && (item.name === 'Shortlisted' || item.name === 'Offered') ? 'Multiple' : null,
+      nextStepStatus: array[index + 1]?.status,
+      nextStepId: isApplicantIrpWorkflow ? array[index + 1]?.id : null,
+    };
+  });
+}
+
+export const CreateNextStepStatusForWorkflows = (
+  steps: Step[],
+  includeInIrp = false,
+  type: TypeFlow
+): Step[] => {
+  const isIrpWorkflow = includeInIrp && type === TypeFlow.applicationWorkflow;
+  const hasDuplicate = isIrpWorkflow ? hasDuplicateSteps(steps) : false;
+
+  return CreateNextStepStatusField(steps, hasDuplicate, isIrpWorkflow);
+}

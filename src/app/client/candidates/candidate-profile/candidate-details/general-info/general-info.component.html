@@ -114,6 +114,7 @@
   <app-datepicker
     *ngIf="isOnHoldSelected"
     [formGroupInstance]="candidateForm"
+    [min]="minEndDate"
     id="hold-end-date"
     controlName="holdEndDate"
     label="On Hold End Date"

@@ -42,10 +42,12 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
 
   @Input() set user(user: User | null) {
     this.isOrganisationUser = user?.businessUnitType === BusinessUnitType.Organization;
+    this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
     this.createdUser = user;
   }
 
   public isOrganisationUser = false;
+  public isAgencyUser = false;
   public createdUser: User | null;
   public width = '434px';
   public title = '';

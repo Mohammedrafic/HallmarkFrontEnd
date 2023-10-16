@@ -75,6 +75,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { OnboardCandidateMessageDialogComponent } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -209,7 +210,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     private commentsService: CommentsService,
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private orderManagementService: OrderManagementService,
   ) {
     super();
     this.createForm();
@@ -398,7 +400,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       okButtonClass: 'ok-button',
       cancelButtonLabel: 'No',
     };
-    if (this.saveStatus === ApplicantStatusEnum.OnBoarded) {
+    if (this.saveStatus === ApplicantStatusEnum.OnBoarded 
+        && (this.candidate.status ? this.saveStatus != this.candidate.status : this.saveStatus != this.candidate.candidateStatus)) {
       return this.confirmService.confirm(onBoardCandidateMessage, options)
         .pipe(take(1));
     }
@@ -497,7 +500,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           if (!this.isAgency) {
             this.getOrderPermissions(value.orderId);
           }
-          this.billRatesData = [...value?.billRates];
+          this.billRatesData = [...value.billRates];
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
@@ -508,11 +511,14 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             jobEndDate: value.order.jobEndDate,
           }).toString();
 
+          const regularRates = this.orderManagementService.setRegularRates(this.billRatesData, value.order.jobStartDate);
+          const billRate = regularRates.regular || regularRates.regularLocal || value.order.hourlyRate;
+
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
             date: [DateTimeHelper.setCurrentTimeZone(actualStart),
               DateTimeHelper.setCurrentTimeZone(actualEnd)],
-            billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
+            billRates: billRate && PriceUtils.formatNumbers(billRate),
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
             locationName: value.order.locationName,

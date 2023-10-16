@@ -132,8 +132,8 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   @Select(CandidateDetailsState.associateOrganizations)
   public associateOrg$: Observable<AgencyOrderFilteringOptions>;
 
-  @Select(CandidateDetailsState.candidateRegions)
-  public regions$: Observable<string[]>;
+  /* @Select(CandidateDetailsState.candidateRegions)
+  public regions$: Observable<string[]>;*/
   @ViewChild(FiltersComponent, { static: false }) filterco: FiltersComponent;
   public selectedRowDatas: any[] = [];
   @Input() export$: Subject<ExportedFileType>;
@@ -198,33 +198,34 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
 
     this.allAgenciesLoad();
     if (this.isAgency) {
-      this.store.dispatch([new GetCandidateSkills()]);
+      
       const user = this.store.selectSnapshot(UserState.user);
       let lastSelectedAgencyId = window.localStorage.getItem('lastSelectedAgencyId');
       this.lastSelectedAgencyId$.pipe(
         filter(Boolean),
         takeUntil(this.unsubscribe$),
+        distinctUntilChanged(),
       ).subscribe((id) => {
-
         const agencyIdvalue = id.toString(); 
         this.lastAgencyId=Number(agencyIdvalue)||0;
         this.store.dispatch(new GetAssociateOrganizations(Number(agencyIdvalue)));
-        this.subscribeOnAgencyOrganizationChanges();
+        this.store.dispatch([new GetCandidateSkills()]);
+        // this.subscribeOnAgencyOrganizationChanges();
         this.updatePage();
       });
        this.store.dispatch(new GetUserAgencies());    
     }
-    else {
-
-      this.store.dispatch([new GetCandidateRegions(), new GetCandidateSkills(),new GetUserOrganizations(),new GetMasterRegions()]);
+    else {     
       this.getRegions();
       this.lastSelectedOrganizationId$.pipe(
         filter(Boolean),
         takeUntil(this.unsubscribe$),
+        distinctUntilChanged(),
       ).subscribe((id) => {
         const orgId = id.toString();
-      this.lastOrgId=Number(orgId)||0;
+        this.lastOrgId=Number(orgId)||0;
         this.store.dispatch([new GetAssociateAgencies(Number(orgId))]);
+        this.store.dispatch([new GetCandidateSkills(),new GetUserOrganizations(),new GetMasterRegions()]);
       });
 
     }
@@ -258,7 +259,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       .pipe(takeUntil(this.destroy$))
       .subscribe();
       this.subscribeOnAgencyOrganizationChanges();
-      this.updatePage()
+      // this.updatePage()
   }
 
   public ngOnDestroy(): void {
@@ -279,7 +280,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   }
   public allAgenciesLoad() {
     this.agencies$
-      .pipe(filter(() => this.isAgency), takeUntil(this.unsubscribe$)).subscribe((data: UserAgencyOrganization) => {   
+      .pipe(filter(() => this.isAgency), takeUntil(this.unsubscribe$),distinctUntilChanged()).subscribe((data: UserAgencyOrganization) => {   
         if(data!=null)
         { 
         const agencyData: AssociateAgency[] = data?.businessUnits.map((business) => ({
@@ -294,28 +295,31 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           const filteredArray = agencyData.filter((item:AssociateAgency) => item?.agencyId === Number(agencyIdvalue));
           this.orgAgencyName = filteredArray[0]?.agencyName;
         });
-        this.subscribeOnAgencyOrganizationChanges();
+        // this.subscribeOnAgencyOrganizationChanges();
       }
       });       
     this.organizations$
       .pipe(filter(() => !this.isAgency), takeUntil(this.unsubscribe$)).subscribe((data: UserAgencyOrganization) => {
-        const orgData: Organisation[] = data.businessUnits.map((business) => ({
-          name: business.name,
-          id: business.id,
-          organizationId:business.id,
-          regions:[]
-        }));
-      
-
-        this.lastSelectedOrganizationId$.pipe(
-          filter(Boolean),
-          takeUntil(this.unsubscribe$),
-        ).subscribe((id) => {
-          const orgId = id.toString();
-          const filtereorgdArray = orgData.filter((item) => item?.id === Number(orgId));
-          this.orgAgencyName = filtereorgdArray[0]?.name;
-        });
-
+        if(data){
+          const orgData: Organisation[] = data.businessUnits.map((business) => ({
+            name: business.name,
+            id: business.id,
+            organizationId:business.id,
+            regions:[]
+          }));
+        
+  
+          this.lastSelectedOrganizationId$.pipe(
+            filter(Boolean),
+            takeUntil(this.unsubscribe$),
+          ).subscribe((id) => {
+            const orgId = id.toString();
+            const filtereorgdArray = orgData.filter((item) => item?.id === Number(orgId));
+            this.orgAgencyName = filtereorgdArray[0]?.name;
+          });
+  
+        }
+        
       });
 
     this.organizationStructure$
@@ -646,19 +650,23 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   }
 
   private subscribeOnAgencyOrganizationChanges(): void {
+    const businessUnitId$ = this.isAgency ? this.lastSelectedAgencyId$ : this.lastSelectedOrganizationId$;
     combineLatest([
-      this.lastSelectedOrganizationId$,
-      this.lastSelectedAgencyId$,
+      businessUnitId$,
       this.candidateRegions$, 
-      this.candidateLocations$,
-      this.candidateDepartments$,
+    //  this.candidateLocations$,
+     // this.candidateDepartments$,
     ])
-      .pipe(        
+      .pipe(   
+        filter((data) => !!data[1]),
+        distinctUntilChanged((prev, curr) => prev[0] === curr[0]),
         debounceTime(600),
-        tap(() => {     
+        tap(() => {
+          this.store.dispatch(new PreservedFilters.ResetPageFilters());
           this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
         }),
         switchMap(() => this.preservedFiltersByPageName$),
+        filter(({dispatch}) => dispatch),
         debounceTime(100),
         tap((filters) => {
           this.handleFilterState(filters);
@@ -740,7 +748,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           locationIds: (state?.locationIds && [...state.locationIds]) || [],
           departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
           candidateNames: state?.candidateNames,
-          orderId:state?.orderId
+          orderId: state?.orderId,
         };
 
         dispatchPatch = true;
@@ -754,9 +762,9 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         dispatchPatch = true;
       }
 
-      if (dispatchPatch) {
+      /*if (dispatchPatch) {
         this.patchFormValue();
-      }
+      }*/
      
       setTimeout(() => {
         this.filters = {
@@ -764,18 +772,18 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           regionsIds: filterValues?.regionsIds,
         };
 
-        dispatchPatch = true;
+       /* dispatchPatch = true;
         if (dispatchPatch) {
           this.patchFormValue();
-        }
+        }*/
         this.filters = {
           ...this.filters,
           locationIds: filterValues?.locationIds,
         };
-        dispatchPatch = true;
+        /*dispatchPatch = true;
         if (dispatchPatch) {
           this.patchFormValue();
-        }
+        }*/
         this.filters = {
           ...this.filters,
           departmentIds: filterValues?.departmentIds,
@@ -873,6 +881,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   private getRegions(): void {
     this.getLastSelectedBusinessUnitId()
       .pipe(
+        distinctUntilChanged(),
         filter(Boolean),
         switchMap(() => this.store.dispatch(new GetCandidateRegions())),
         takeUntil(this.unsubscribe$)
@@ -924,7 +933,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   
   private onOrganizationIdsControlChange(): Observable<number[]> {
     const organizationIdsControl = this.filtersForm.get('organizationIds') as AbstractControl;  
-    return organizationIdsControl.valueChanges.pipe(filter(() => this.isAgency),
+    return organizationIdsControl.valueChanges.pipe(filter(() => this.isAgency),distinctUntilChanged(),
       tap((value: number[]) => {    
         if (!(value || []).length) {
           this.filterColumns.departmentIds.dataSource = [];
@@ -974,7 +983,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   }
 
   private onGridFilterRegions(): Observable<unknown> {
-    return this.actions$.pipe(
+    return this.actions$.pipe(distinctUntilChanged(),
       ofActionSuccessful(GetOrganizationStructure),
       tap(() => {
         const regions = this.store.selectSnapshot(OrderManagementState.gridFilterRegions);

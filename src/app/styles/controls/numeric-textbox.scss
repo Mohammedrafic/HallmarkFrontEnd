@@ -46,3 +46,21 @@ body.light, body.dark {
     }
   }
 }
+
+body.dark {
+  .app-numeric-textbox {
+    ejs-numerictextbox {
+
+      span.e-input-group {
+        border-bottom-color: $input-border-color !important;
+      }
+
+      span.e-input-group.e-disabled {
+        input {
+          padding: 0 !important;
+          height: 38px !important;
+        }
+      }
+    }
+  }
+}

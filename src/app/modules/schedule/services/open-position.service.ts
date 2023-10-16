@@ -127,7 +127,7 @@ export class OpenPositionService {
         bookedDays: [event.container.data.dateItem],
       }],
       perDiemOrderId: event.item.data.orderId ?? null,
-      departmentId: scheduleFiltersData?.filters?.departmentsIds ? scheduleFiltersData?.filters?.departmentsIds[0] : '',
+      departmentId: scheduleFiltersData?.filters?.departmentIds ? scheduleFiltersData?.filters?.departmentIds[0] : '',
       skillId: scheduleFiltersData?.filters?.skillIds ? scheduleFiltersData?.filters?.skillIds[0] : null,
       shiftId: event.item.data.shiftId,
       startTime: getTime(DateTimeHelper.setCurrentTimeZone(event.item.data.shiftStartTime)),

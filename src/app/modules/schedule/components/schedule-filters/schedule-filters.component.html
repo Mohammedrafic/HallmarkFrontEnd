@@ -14,28 +14,45 @@
       <ng-container *ngFor="let item of formConfig.formFields">
         <ng-container [ngSwitch]="item.type">
           <ng-template [ngSwitchCase]="fieldTypes.MultiSelectDropdown">
-            <div class="input-container bootstrap">
+            <div class="input-container">
               <label [for]="item.field">{{ item.title }} <span *ngIf="item.required" class="required">*</span></label>
-              <div class="input-group multiselect">
-                <ejs-multiselect
-                  appValidateWithMessage
-                  selectAllText="Select All"
-                  mode="CheckBox"
-                  [dataSource]="filterColumns[item.sourceKey].dataSource"
-                  [fields]="optionFields"
-                  [showSelectAll]="true"
-                  [allowFiltering]="true"
-                  [showDropDownIcon]="true"
-                  [filterType]="filterType"
-                  [formControlName]="item.field"
-                >
-                </ejs-multiselect>
-                <span
-                  *ngIf="scheduleFilterFormGroup.get(item.field)?.value?.length as counter"
-                  class="e-badge e-badge-success e-badge-pill"
-                >
-                  {{ counter }}
-                </span>
+              <div class="dropdown-wrapper">
+                <div class="input-group multiselect bootstrap">
+                  <ejs-multiselect
+                    appValidateWithMessage
+                    selectAllText="Select All"
+                    mode="CheckBox"
+                    [dataSource]="filterColumns[item.sourceKey].dataSource"
+                    [fields]="optionFields"
+                    [showSelectAll]="!item.showAllToggle"
+                    [allowFiltering]="true"
+                    [showDropDownIcon]="true"
+                    [filterType]="filterType"
+                    [formControlName]="item.field"
+                    [query]="item.customFiltering ? query : noValue"
+                    (filtering)="item.customFiltering ? onDepartmentsFiltering($event) : noValue"
+                  >
+                  </ejs-multiselect>
+                  <span
+                    *ngIf="scheduleFilterFormGroup.get(item.field)?.value?.length as counter"
+                    class="e-badge e-badge-success e-badge-pill"
+                  >
+                    {{ counter }}
+                  </span>
+                  <span
+                    *ngIf="item.showAllToggle && getToggleValue(item.field)"
+                    class="e-badge e-badge-success e-badge-pill"
+                  >All</span>
+                </div>
+                <div class="switch" *ngIf="item.showAllToggle">
+                  <ejs-switch
+                    [name]="'all' + item.field"
+                    [checked]="getToggleValue(item.field)"
+                    (change)="allRecordsChange($event, item.field)"
+                    label="All"
+                  ></ejs-switch>
+                  <label [for]="'all' + item.field" class="switch-text">All</label>
+                </div>
               </div>
             </div>
           </ng-template>

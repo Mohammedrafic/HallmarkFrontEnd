@@ -1,3 +1,5 @@
+@import 'adaptive-response';
+
 .invite {
   padding-top: 24px;
 
@@ -8,5 +10,33 @@
 
   .input-container {
     margin-bottom: 12px;
+  }
+}
+
+.e-dialog .e-footer-content {
+  display: none;
+}
+
+@media #{$min-mobile} {
+  .header-container .close-button {
+    display: none;
+  }
+}
+
+@media #{$max-mobile} {
+  .header-container .e-card-content {
+    display: none;
+  }
+
+  .e-dialog .e-footer-content {
+    display: block;
+  }
+
+  .e-dialog.responsive {
+    width: 100% !important;
+
+    .e-card-title {
+      font-size: 22px !important;
+    }
   }
 }

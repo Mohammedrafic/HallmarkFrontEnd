@@ -64,10 +64,15 @@ export const ScheduleTypesForEditBar: CreateScheduleTypesConfig = {
   ],
 };
 
+export const DefaultScheduleTypes: CreateScheduleTypesConfig = {
+  columnsTemplate: 'auto auto auto auto',
+  source: [],
+};
+
 export const ScheduleTypesForCreateBar: CreateScheduleTypesConfig = {
   columnsTemplate: 'auto auto auto auto',
   source: [
-    BookTypes,OpenPositionTypes, AvailabilityTypes, UnavailabilityTypes,
+    BookTypes, OpenPositionTypes, AvailabilityTypes, UnavailabilityTypes,
   ],
 };
 

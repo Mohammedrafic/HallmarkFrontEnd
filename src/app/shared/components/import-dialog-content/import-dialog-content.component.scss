@@ -1,4 +1,4 @@
-@import "colors.scss";
+@import 'colors.scss';
 @import 'adaptive-response';
 
 .e-dlg-content {
@@ -26,7 +26,7 @@
       width: 100%;
       margin: 0 -24px;
       padding: 24px;
-      background-color: $secondary-dark-blue-50;
+      background-color: var(--bg-file-uploader);
 
       .section-header {
         margin-bottom: 16px;
@@ -211,8 +211,27 @@
   }
 }
 
+.dialog {
+  min-width: 460px !important;
+
+ .e-footer-content {
+   display: none;
+ }
+}
+
+
+
 @media #{$max-mobile} {
-  .import-dialog {
+  .dialog {
+    min-width: unset !important;
     width: 100% !important;
+
+    .header-container .e-card-content {
+      display: none;
+    }
+
+    .e-footer-content {
+      display: block;
+    }
   }
 }

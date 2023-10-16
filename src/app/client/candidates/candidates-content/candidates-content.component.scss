@@ -58,8 +58,22 @@
   }
 }
 
+@media #{$max-tablet} {
+  .button-export {
+    padding: 8px 11px !important;
+
+    .text-btn {
+      display: none;
+    }
+
+    .icon {
+      margin: 0;
+    }
+  }
+}
+
 @media #{$max-mobile} {
-  .button-export-container {
+  .action-btn {
     .icon {
       margin: 0;
     }

@@ -19,7 +19,7 @@ import { TimePickerAllModule } from '@syncfusion/ej2-angular-calendars';
     FilterDialogModule,
     ReactiveFormsModule,
     TimePickerAllModule,
-    SwitchModule
+    SwitchModule,
   ],
   exports: [ScheduleFiltersComponent],
 })

@@ -47,6 +47,7 @@ import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacemen
 import {
   AvailabilityFormConfig,
   BookFormConfig,
+  DefaultScheduleTypes,
   OpenPositionsConfig,
   PastTimeErrorMessage,
   ScheduleItemType,
@@ -120,7 +121,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   readonly scheduleFormSourcesMap: ScheduleInt.ScheduleFormSource = ScheduleSourcesMap;
   readonly removeBtnTooltip: string = RemoveButtonToolTip;
 
-  scheduleTypes: CreateScheduleTypesConfig = ScheduleTypesForCreateBar;
+  scheduleTypes: CreateScheduleTypesConfig = DefaultScheduleTypes;
   scheduleForm: CustomFormGroup<ScheduleInt.ScheduleForm>;
   scheduleFormConfig: ScheduleInt.ScheduleFormConfig;
   scheduleType: ScheduleItemType;
@@ -159,11 +160,11 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   ngOnChanges(changes: SimpleChanges) {
     const candidates: ScheduleCandidate[] = changes['scheduleSelectedSlots']?.currentValue.candidates;
 
-    if(candidates?.length && !this.sideBarSettings.showScheduleForm){
+    if (candidates?.length && !this.sideBarSettings.showScheduleForm){
       this.sideBarSettings.showScheduleForm = true;
     }
 
-    if(candidates && candidates?.length >= 1) {
+    if (candidates && candidates?.length >= 1) {
       this.getOpenPositions();
       this.createScheduleService.setOrientationControlValue(this.scheduleSelectedSlots, this.scheduleForm);
       this.sideBarSettings.showRemoveButton = this.createScheduleService.hasSelectedSlotsWithDate(candidates);
@@ -174,7 +175,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.disableRemoveButton = candidates[0].days?.some((day: ScheduleDay) => !day.employeeCanEdit);
     }
 
-    if(this.scheduleOnlyWithAvailability) {
+    if (this.scheduleOnlyWithAvailability) {
       this.updateScheduleTypesWithPermissionAvailability();
     }
   }
@@ -579,7 +580,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.scheduleItemsComponent.scheduleItems,
       this.customShiftId,
       scheduleFiltersData?.filters?.skillIds || [],
-      scheduleFiltersData?.filters?.departmentsIds || [],
+      scheduleFiltersData?.filters?.departmentIds || [],
     );
     const request: BookingsOverlapsRequest = {
       employeeScheduledDays: this.scheduleToBook.employeeBookedDays,

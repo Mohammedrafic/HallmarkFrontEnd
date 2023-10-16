@@ -167,12 +167,17 @@ export const CardTitleforExport = (scheduleItem: DaySchedules): string => {
 };
 
 export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilters): ScheduleInt.EmployeesFilters => {
-  const { startDate, endDate, departmentsIds, isAvailablity, isUnavailablity, isOnlySchedulatedCandidate, startTime, endTime } = filters;
+  const { 
+    startDate, endDate, departmentIds, locationIds, regionIds, isAvailablity,
+    isUnavailablity, isOnlySchedulatedCandidate, startTime, endTime,
+  } = filters;
 
   return {
     startDate: startDate || '',
     endDate: endDate || '',
-    departmentsIds: departmentsIds ?? [],
+    departmentIds: departmentIds === undefined ? [] : departmentIds,
+    locationIds: locationIds === undefined ? [] : locationIds,
+    regionIds: regionIds === undefined ? [] : regionIds,
     userLocalTime: DateTimeHelper.setUtcTimeZone(new Date()),
     isAvailablity : isAvailablity || false,
     isUnavailablity : isUnavailablity || false,
@@ -183,14 +188,14 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
 };
 
 export const HasNotMandatoryFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
-  return (!filters.departmentsIds || !filters.departmentsIds.length)
+  return (!filters.departmentIds || !filters.departmentIds.length)
     || (!filters.skillIds || !filters.skillIds.length);
 };
 
 export const HasMultipleFilters = (filters: ScheduleInt.ScheduleFilters): boolean | undefined => {
   return filters.regionIds && filters.regionIds.length > 1 ||
     filters.locationIds && filters.locationIds.length > 1 ||
-    filters.departmentsIds && filters.departmentsIds.length > 1 ||
+    filters.departmentIds && filters.departmentIds.length > 1 ||
     filters.skillIds && filters.skillIds.length > 1;
 };
 
@@ -346,4 +351,13 @@ export const HasTimeControlValues = (form: FormGroup): boolean => {
   const endTime = form.get('endTime')?.value;
 
   return startTime && endTime;
+};
+
+export const GetStructureValue = (value?: number[] | null): number[] | null => {
+  if (value === null) {
+    return null;
+  } else if (value) {
+    return [...value];
+  }
+  return [];
 };

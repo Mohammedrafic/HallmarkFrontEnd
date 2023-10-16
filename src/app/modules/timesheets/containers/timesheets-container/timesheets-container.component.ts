@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { DOCUMENT, Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime, Subject } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction, FilterPageName } from '@core/enums';
@@ -36,6 +36,7 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
+
 
 @Component({
   selector: 'app-timesheets-container',
@@ -84,7 +85,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<TimesheetsFilterState>>;
-
   public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
   public orgId: number | null = null;
@@ -203,6 +203,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.cd.markForCheck();
   }
 
+
+
   public onNextPreviousOrderEvent(next: boolean): void {
     this.timesheetsService.setNextValue(next);
     this.cd.markForCheck();
@@ -262,7 +264,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private onOrganizationChangedHandler(): void {
    this.organizationId$.pipe( takeUntil(this.componentDestroy())).subscribe((value)=>{
-    this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
     if(value!=null&&value!=undefined){this.OrganizationId=value}
     });
     const idStream = this.isAgency ? this.agencyId$ : this.organizationId$;
@@ -271,6 +272,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       .pipe(
         debounceTime(600),
         filter((id) => !!id),
+        switchMap(() => {
+          return this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
+        }),
         switchMap(() => this.preservedFiltersByPageName$),
         filter(({ dispatch }) => dispatch),
         tap((filters) => {

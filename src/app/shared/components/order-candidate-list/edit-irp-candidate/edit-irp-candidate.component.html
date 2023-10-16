@@ -4,7 +4,7 @@
   cssClass="dialog"
   [zIndex]="1007"
   [isModal]="true"
-  [width]="400"
+  [width]="700"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <div class="header-candidate">
@@ -28,7 +28,7 @@
     </div>
   </div>
   <div class="form-wrapper irp-candidate" *ngIf="candidateForm">
-    <div class="info-content">
+    <div class="info-content w_100">
       <div class="message" *ngIf="candidateModelState?.candidate?.deployedUntil">
         Employee is already working on an assignment till {{candidateModelState?.candidate?.deployedUntil}}.
       </div>
@@ -44,7 +44,8 @@
             <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
              <ng-container *ngIf="field.showField">
                <div
-                 *ngIf="field.field === 'reason' ? candidateForm.get('isClosed')?.value : true"
+                 *ngIf="field.field === 'reason' ?
+                  candidateForm.get('isClosed')?.value && candidateModelState?.candidate?.status !== statuses.Cancelled : true"
                  class="input-container {{field?.cssClass}}">
                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                  </label>
@@ -102,6 +103,161 @@
     </div>
     <app-comments-irp *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId" [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP" [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP" [comments]="comments" [commentContainerId]="candidateCommentContainerId" [candidateJobId]="candidateJobId" [useBackground]="false"
       [externalCommentConfiguration]="externalCommentConfiguration"></app-comments-irp>
+
+    <div *ngIf="showATPform">
+      <form [formGroup]="AtpCalcForm" class="atpcalc-form">
+        <div class="w_100">
+          <div class="input-container bootstrap left atpformfield">
+            <label for="billRatesCategory">Hours Worked<span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                maxlength="10"
+                format="###.00"
+                formControlName="hoursWorked"
+                [showSpinButton]="false"
+                [validateDecimalOnType]="true"
+                [decimals]="2"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+          <div class="input-container bootstrap right atpformfield">
+            <label for="billRatesCategory">Cost Saving<span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                maxlength="10"
+                format="###.00"
+                formControlName="costSaving"
+                [showSpinButton]="false"
+                [validateDecimalOnType]="true"
+                [decimals]="2"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+        </div>
+        <div class="input-container bootstrap left atpformfield">
+          <label for="billRatesCategory">Select Switcher <span class="required">*</span></label>
+          <div class="input-group">
+            <div class="input-group">
+              <ejs-dropdownlist
+                formControlName="calculations"
+                placeholder="All"
+                [allowFiltering]="true"
+                [dataSource]="SwitcherCalcvariables"
+              >
+              </ejs-dropdownlist>
+              </div>
+          </div>
+        </div>
+      </form>
+      <div class="class_table">
+        <table>
+          <thead>
+            <th>Rate Per Hour</th>
+            <th>Benefit Percent of SW</th>
+            <th>Wage Percent(Non-Benefit Only)</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ratePerHour}}</td>
+              <td>{{benefitpercentofsw}}</td>
+              <td>{{wagePercent}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <th>Costs</th>
+            <th>Salary Wages and Benefits</th>
+            <th>Benefits</th>
+            <th>Cost Saving</th>
+            <th>Meal</th>
+            <th>Lodging</th>
+            <th>Stipends</th>
+            <th>Adjusted Total</th>
+          </thead>
+          <tbody>
+            <tr *ngIf="showbenefits">
+              <td>Benefits</td>
+              <td>{{salaryWagesandBenefits | number:'1.2-2'}}</td>
+              <td>{{benefitsBenefits | number:'1.2-2'}}</td>
+              <td>{{costSavingBenefits | number:'1.2-2'}}</td>
+              <td>{{meal | number:'1.2-2'}}</td>
+              <td>{{lodging | number:'1.2-2'}}</td>
+              <td>{{stipendBenefits | number:'1.2-2'}}</td>
+              <td>{{adjustedTotalBenefits | number:'1.2-2'}}</td>
+            </tr>
+            <tr *ngIf="shownonbenefits">
+              <td>Non-Benefits</td>
+              <td>{{salaryWagesandBenefits | number:'1.2-2'}}</td>
+              <td>{{benefitsNonBenefits | number:'1.2-2'}}</td>
+              <td>{{costSavingBenefits | number:'1.2-2'}}</td>
+              <td>{{meal | number:'1.2-2'}}</td>
+              <td>{{lodging | number:'1.2-2'}}</td>
+              <td>{{stipendNonBenefits | number:'1.2-2'}}</td>
+              <td>{{adjustedTotalNonBenefits | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <th>
+              Stipend Hourly Rate
+            </th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{stipendHourlyRate | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <th colspan="2">
+              Contract Labor Rate Comparision Gross
+            </th>
+          </thead>
+          <thead>
+            <th *ngIf="showbenefits">Benefit Rate</th>
+            <th *ngIf="shownonbenefits">Non-Benefit Rate</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td *ngIf="showbenefits">{{contractLabourBenefit  | number:'1.2-2'}}</td>
+              <td *ngIf="shownonbenefits">{{contractLabourNonBenefit  | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <th colspan="2">
+              Fully Loaded Blended Rate Gross
+            </th>
+          </thead>
+          <thead>
+            <th  *ngIf="showbenefits">Benefit Rate</th>
+            <th *ngIf="shownonbenefits">Non-Benefit Rate/th>
+          </thead>
+          <tbody>
+            <tr>
+              <td *ngIf="showbenefits">{{fullyLoadedBenefit  | number:'1.2-2'}}</td>
+              <td *ngIf="shownonbenefits">{{fullyLoadedNonBenefit  | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </ejs-dialog>
 

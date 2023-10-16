@@ -1,9 +1,11 @@
+@import 'adaptive-response';
+
 :host {
   height: 100%;
 
   .associate {
     margin-top: 24px;
-    height: calc(100% - 115px);
+    height: calc(100% - 165px);
 
     .actions {
       button {
@@ -13,6 +15,17 @@
 
     .e-gridcustomheader {
       width: unset;
+    }
+  }
+
+  @media #{$max-mobile} {
+    .e-gridcustomheader {
+      width: 90%;
+      justify-content: flex-end;
+    }
+
+    .title {
+      display: none;
     }
   }
 }

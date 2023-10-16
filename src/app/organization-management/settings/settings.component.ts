@@ -81,7 +81,7 @@ import {
 } from './settings.constant';
 import { ATPRateCalculationPayload, AutoGenerationPayload, PayPeriodPayload, SwitchValuePayload } from '../../shared/models/settings.interface';
 import { MessageTypes } from '@shared/enums/message-types';
-
+import { mapKeys, camelCase } from 'lodash';
 /**
  * TODO: component needs to be rework with configurable dialog and form.
  * Component can be slightly simplified. A lot of code smells.
@@ -989,7 +989,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.organizationId$.pipe(
       distinctUntilChanged(),
       tap((id: number) => {
-        console.log('id', id)
         this.organizationId = id || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
         this.clearFilters();
         this.store.dispatch(new GetOrganizationSettingsFilterOptions());
@@ -1085,7 +1084,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       || this.organizationSettingKey === OrganizationSettingKeys.PayHigherBillRates
       || this.organizationSettingKey === OrganizationSettingKeys.OvertimeCalculation
       || this.organizationSettingKey === OrganizationSettingKeys.OTHours
-      || this.organizationSettingKey === OrganizationSettingKeys.AutomatedDistributionToVMS) {
+      || this.organizationSettingKey === OrganizationSettingKeys.AutomatedDistributionToVMS
+      || this.organizationSettingKey === OrganizationSettingKeys.TimesheetSubmissionProcess) {
       this.departmentFormGroup.get('departmentId')?.disable();
     } else {
       this.departmentFormGroup.get('departmentId')?.enable();
@@ -1139,6 +1139,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       .subscribe((value: boolean) => {
         if (value) {
           this.switchedValueForm.get('value')?.addValidators(Validators.required);
+          this.switchedValueForm.get('value')?.markAsTouched();
         } else {
           this.switchedValueForm.get('value')?.removeValidators(Validators.required);
         }
@@ -1549,6 +1550,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           groupingBy: dynamicValue.groupingBy,
         });
       }
+      
+      if(dynamicValue && dynamicValue.IsEnabled){
+        dynamicValue = mapKeys(dynamicValue, (val, key) =>camelCase(key));
+      }
 
       if (dynamicValue?.isSwitchedValue) {
         this.switchedValueForm.setValue({
@@ -1561,7 +1566,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   disableSettingsValue(event?: any, obj?: any) {
-    if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingKeyAutomatedDistributedToVMS ) {
+    if (this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingKeyAutomatedDistributedToVMS ) {
       if (event?.checked || obj) {
         this.switchedValueForm.get("value")?.enable();
       } else {

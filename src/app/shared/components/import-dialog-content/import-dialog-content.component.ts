@@ -6,27 +6,29 @@ import {
   Input,
   OnInit,
   Output,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FileInfo } from '@syncfusion/ej2-inputs/src/uploader/uploader';
-import { filter, Subject, take, takeUntil } from 'rxjs';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
+import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
+import { Select } from '@ngxs/store';
 
 import {
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   IMPORT_CONFIRM_TEXT,
-  IMPORT_CONFIRM_TITLE
+  IMPORT_CONFIRM_TITLE,
 } from '@shared/constants';
 import { FileStatusCode } from '@shared/enums/file.enum';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ImportResult } from '@shared/models/import.model';
 import { FileSize, UploaderFileStatus } from '@core/enums';
-import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-import-dialog-content',
@@ -56,8 +58,10 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     this.firstActive = !!this.importResult?.succesfullRecords.length;
   }
 
+  @Select(AppState.getMainContentElement)
+  public readonly targetElement$: Observable<HTMLElement | null>;
+
   public width = `${window.innerWidth * 0.6}px`;
-  public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dropElement: HTMLElement;
   public readonly allowedExtensions: string = '.xlsx';
   public readonly maxFileSize = FileSize.MB_10;
@@ -70,7 +74,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   public fields = {
     text: 'name',
     value: 'id',
-  };
+};
   public importResult: ImportResult<any> | null;
 
   get activeErrorTab(): boolean {

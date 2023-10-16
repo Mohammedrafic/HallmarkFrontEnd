@@ -81,7 +81,9 @@ import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/d
 import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { OrderStatusSummaryComponent } from './order-status-summary/order-status-summary.component';
 import { OrderStatusSummaryCustomReportState } from '../../modules/custom-reports/store/state/order-status-summary-report.state';
-
+import { AccumulationChartModule } from '@syncfusion/ej2-angular-charts';
+import {  PieSeriesService, AccumulationLegendService, AccumulationTooltipService, AccumulationAnnotationService,
+  AccumulationDataLabelService} from '@syncfusion/ej2-angular-charts';
 
 @NgModule({
   declarations: [
@@ -165,11 +167,17 @@ import { OrderStatusSummaryCustomReportState } from '../../modules/custom-report
     TextBoxModule,
     SwitchModule,
     AgGridModule,
+    AccumulationChartModule,
     NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState, VendorSCorecardState, useractivityReportState, OrderStatusSummaryCustomReportState]),
   ],
-  providers:[
+  providers: [
     ScheduleApiService,
-    VendorscorecardService
+    VendorscorecardService,
+    PieSeriesService,
+    AccumulationLegendService,
+    AccumulationTooltipService,
+    AccumulationDataLabelService,
+    AccumulationAnnotationService
   ]
 })
 export class AnalyticsModule { }

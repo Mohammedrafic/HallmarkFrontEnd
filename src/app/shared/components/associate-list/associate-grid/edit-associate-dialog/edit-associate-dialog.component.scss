@@ -1,3 +1,5 @@
+@import 'adaptive-response';
+
 .edit-org {
   padding-top: 24px;
 
@@ -9,6 +11,55 @@
     .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
       left: 0px !important;
       right: 280px !important;
+    }
+  }
+}
+
+.save-btn {
+  width: 100%;
+}
+
+.e-dialog .e-footer-content {
+  display: none;
+}
+
+@media #{$min-tablet} {
+  .container {
+    height: calc(100% - 50px) !important;
+  }
+}
+
+@media #{$max-tablet} {
+  .dialog.responsive {
+    width: 100% !important;
+  }
+}
+
+@media #{$max-mobile} {
+  .fee-settings {
+    height: auto;
+    padding-bottom: 70px;
+  }
+
+  .header-container .e-card-content {
+    display: none;
+  }
+
+  .e-dialog .e-footer-content {
+    display: block;
+  }
+
+  .e-dialog .e-footer-content .e-btn {
+    margin-left: 0;
+  }
+
+  .dialog.responsive {
+    width: 100% !important;
+
+    ::ng-deep {
+      .tooltip-container {
+        display: block;
+      }
     }
   }
 }

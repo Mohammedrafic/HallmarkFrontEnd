@@ -31,8 +31,14 @@
         <span class="app-maps-chart__text">{{ chartData?.description ?? '' }}</span>
       </div>
 
+      <div  class="app-maps-chart__unknown-candidates" *ngIf="userType===businessUnitType.Agency && chartData?.title==='Candidate Home State'">
+        <span class="app-maps-chart__text" >Total Candidate</span>
+        <span class="app-maps-chart__number" [ngClass]="isDarkTheme?' app-maps-chart__dark-number':''">{{chartData?.totalCandidates}}</span>
+      </div>
+
       <div *ngIf="chartData?.unknownStateCandidates" class="app-maps-chart__unknown-candidates">
-        <span class="app-maps-chart__text">Applicants with no state indicated</span>
+        <span class="app-maps-chart__text" *ngIf="userType!=4">Applicants with no state indicated</span>
+        <span class="app-maps-chart__text" *ngIf="userType==4">Candidate with no state indicated</span>
         <span class="app-maps-chart__number" [ngClass]="isDarkTheme?' app-maps-chart__dark-number':''">{{ chartData?.unknownStateCandidates }}</span>
       </div>
     </div>

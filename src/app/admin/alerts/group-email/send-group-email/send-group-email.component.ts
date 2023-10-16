@@ -894,7 +894,14 @@ export class SendGroupEmailComponent
     if(regionId !='' && locationId !='' && roles !=''){
       this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles, businessUnitId, false));
       this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-        this.userData = data;
+          // this.userData = data;
+          this.masterUserData = data;
+          if(this.allowActiveUsers){
+            this.userData = data?.filter(i => i.isDeleted == false);
+          }else{
+            this.userData = data;
+          }
+
       });
     }else if (this.rolesControl.value.length > 0) {
         const user = this.store.selectSnapshot(UserState.user);
@@ -921,9 +928,9 @@ export class SendGroupEmailComponent
     this.usersControl.reset();
     this.allowActiveUsers = event.checked;
     if(event.checked){
-      this.userData = this.masterUserData.filter(i => i.isDeleted == false && (i.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)));
+      this.userData = this.masterUserData?.filter(i => i.isDeleted == false && (i.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)));
     }else{
-      this.userData = this.masterUserData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
+      this.userData = this.masterUserData?.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
     }
   }
 
@@ -1102,10 +1109,10 @@ export class SendGroupEmailComponent
       this.agenciesControl.value != null && this.agenciesControl.value != undefined
         ? this.agenciesControl.value.join()
         : 'null';
-    var skills =
-      this.skillsControl.value != null && this.skillsControl.value != undefined
-        ? this.skillsControl.value.join()
-        : 'null';
+        var skills =
+        this.skillsControl.value != null && this.skillsControl.value != undefined
+          ? (this.skillsControl.value.length!=this.skillData.length? this.skillsControl.value.join():'all')
+          : 'null';
     var regions =
       this.regionControl.value != null && this.regionControl.value != undefined
         ? this.regionControl.value.join()
@@ -1385,6 +1392,12 @@ export class SendGroupEmailComponent
           `data:image/jpg;base64,${file.fileAsBase64}`
         );
         break;
+        case '.PNG':
+          this.isImage = true;
+          this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+            `data:image/png;base64,${file.fileAsBase64}`
+          );
+          break;
       case '.png':
         this.isImage = true;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(

@@ -11,6 +11,7 @@ import { CommonFormConfig } from '@shared/models/common-form-config.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilteredUser } from '@shared/models/user.model';
 import { DropdownOption } from '@core/interface';
+import { FilteredOrderContactPerson } from '../models/order-contactperson.model';
 
 @Injectable({ providedIn: 'root' })
 export class FilterService {
@@ -57,7 +58,11 @@ export class FilterService {
     Object.keys(form.controls)
       .filter((key) => {
         const value = form.controls[key].value;
-        return !isEmpty(value) || isDate(value) || isBoolean(value) || isNumber(value);
+        return !isEmpty(value) || 
+                isDate(value) || 
+                isBoolean(value) || 
+                isNumber(value) || 
+                filterColumns[key]?.allowNull;
       })
       .forEach((key) => {
         if (!filterColumns[key]) {
@@ -69,6 +74,14 @@ export class FilterService {
 
         switch (filterColumns[key].type) {
           case ControlTypes.Multiselect:
+            if (val === null) {
+              chips.push({
+                text: 'All',
+                column: key,
+                value: true,
+              });
+              break;
+            }
             val.forEach((item: any) => {
               const filteredItem = filterColumns[key].dataSource?.find(
                 (data: any) => data[filterColumns[key].valueId] === item
@@ -143,6 +156,10 @@ export class FilterService {
 
   public getUsersListBySearchTerm(searchTerm: string): Observable<FilteredUser[]> {
     return this.http.get<FilteredUser[]>('/api/UserSearch', { params: { searchTerm } });
+  }
+
+  public getOrderContactPersonListBySearchTerm(searchTerm: string, title: string): Observable<FilteredOrderContactPerson[]> {
+    return this.http.get<FilteredOrderContactPerson[]>('/api/OrderContactPersonSearch', { params: { searchTerm, title } });
   }
 
   public syncFilterTagsWithControls<T>(formGroup: FormGroup, filterColumns: T): Observable<FilteredItem[]> {

@@ -8,6 +8,7 @@ import { GridReadyEvent, RowNode } from '@ag-grid-community/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface Timesheet {
+  commentContainerId: any;
   id: number;
   name: string;
   candidateFirstName: string;

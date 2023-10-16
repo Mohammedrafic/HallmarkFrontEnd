@@ -93,6 +93,7 @@ export interface InvoicesFilterState {
   weekPeriodTo?: string;
   serviceDateFrom?: string;
   serviceDateTo?: string;
+  reasonCodeIds?: number[];
 }
 
 export type InvoiceFilterColumns = {

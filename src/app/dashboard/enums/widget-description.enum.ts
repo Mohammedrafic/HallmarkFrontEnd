@@ -2,7 +2,7 @@ export enum WidgetDescriptionEnum {
   CANDIDATES = 'Count of overall candidates by status',
   AGENCY_CANDIDATES = "Count of overall candidates by status",
   APPLICANTS_BY_REGION = 'Statewise Applicant Density',
-  AGENCY_APPLICANTS_BY_REGION = "State wise count of the applicant's home state",
+  AGENCY_APPLICANTS_BY_REGION = "State wise count of the candidates home state",
   APPLICANTS_BY_POSITIONS = 'Statewise Applicant Density',
   POSITIONS_BY_TYPES = 'Open, In Progress, Filled and Close Positions over a time period',
   AGENCY_POSITIONS_BY_TYPES = 'Count of Open, In Progress, Filled and Close positions over a time period and % difference between previous and current month/week.',
@@ -32,5 +32,5 @@ export enum WidgetDescriptionEnum {
   ACTIVE_POSITIONS_INITIAL_EXTENDED="Count of Initial Positions and Extended Positions from Active Positions.",
   ORDERS_PENDING_IN_CUSTOM = "Average days positions spending in specific custom status",
   AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS = 'Average Days on Active Candidate Status',
-  BILL_RATE_BY_SKILL_CATEGORY = "Monthly Average Regular Bill Rate by Skill Category"
+  BILL_RATE_BY_SKILL_CATEGORY = "Average Regular Bill Rate per Skill Category per Month"
 }

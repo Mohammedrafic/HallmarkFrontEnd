@@ -2,7 +2,7 @@
 @import 'adaptive-response';
 
 .app-grid-pagination {
-  background-color: #fff;
+  background-color: var(--pagination-background);
   border: 1px solid var(--grid-row-border);
   padding: 5px 0 5px 16px;
   border-bottom-left-radius: var(--grid-border-radius);

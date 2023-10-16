@@ -1,4 +1,4 @@
-import { FiledNamesSettings } from "@shared/components/tiers-dialog/constants"
+import { FiledNamesSettings } from '@shared/constants/base-dropdown-fields-settings';
 
 export const createDepartmentsTier = (
   organizationId: number,
@@ -11,5 +11,5 @@ export const createDepartmentsTier = (
     regionIds: allRecords?.regionIds ? null : regionIds ?? [],
     locationIds: allRecords?.locationIds ? null : locationIds ?? [],
     departmentIds: allRecords?.departmentIds ? null : departmentIds ?? [],
-  }
-}
+  };
+};

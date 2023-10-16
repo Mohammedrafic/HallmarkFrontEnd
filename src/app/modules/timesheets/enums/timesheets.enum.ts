@@ -118,6 +118,7 @@ export enum TimesheetsTableFiltersColumns {
   BillRate = 'billRate',
   SkillIds = 'skillIds',
   ContactEmails = 'contactEmails',
+  Title = 'title',
 }
 
 export enum FilteringOptionsFields {
@@ -126,4 +127,8 @@ export enum FilteringOptionsFields {
   Regions = 'regions',
   Skills = 'skills',
   Statuses = 'statuses'
+}
+
+export enum fileViewerEnums {
+  serviceUrl = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer'
 }

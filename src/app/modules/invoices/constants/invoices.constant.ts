@@ -214,6 +214,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean, agencyOrganiz
     field: InvoicesTableFiltersColumns.SkillIds,
     isShort: true,
     showSelectAll: true,
+    isDisable: agencyOrganizationIds &&  agencyOrganizationIds > 1 ? true : false
   },
   {
     type: ControlTypes.Date,
@@ -236,6 +237,7 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean, agencyOrganiz
     type: ControlTypes.Multiselect,
     title: 'Reason Code',
     field: InvoicesTableFiltersColumns.ReasonCodeIds,
+    isDisable: agencyOrganizationIds &&  agencyOrganizationIds > 1 ? true : false
   },
   {
     type: ControlTypes.Text,

@@ -6,15 +6,16 @@ import { catchError, EMPTY, filter, map, Observable, tap } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { SortChangedEvent } from '@ag-grid-community/core';
 
+import { OpenJob, OpenJobPage } from '@shared/models';
+import { OrderJobType } from '@shared/enums';
+import { GetLocalDate } from '@shared/helpers';
 import { formatTimeWithSecond } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { OpenJobApiService } from './open-job-api.service';
 import { OpenJobsAdapter } from '../adapters';
-import { FiltersState, LtaEmployeeDto, OpenJob, OpenJobPage, PerDiemEmployeeDto } from '../interfaces';
-import { OrderJobType } from '../enums';
+import { FiltersState, LtaEmployeeDto, PerDiemEmployeeDto } from '../interfaces';
 import { AppliedMessage, AppliedWorkflowStep, AvailabilityScheduleType } from '../constants';
-import { GetLocalDate } from '../helpers';
 import { ShowToast } from '../../../store/app.actions';
 import { JobFilterService } from './job-filter.service';
 

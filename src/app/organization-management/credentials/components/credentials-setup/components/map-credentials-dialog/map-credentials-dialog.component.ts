@@ -24,7 +24,7 @@ import {
 } from '@shared/models/organization.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { CANCEL_CONFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { ShowSideDialog } from '../../../../../../store/app.actions';
+import { ShowSideDialog, ShowToast } from '../../../../../../store/app.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CredentialSetupDetails,
@@ -59,7 +59,10 @@ import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { CredentialTypeSource } from '@organization-management/credentials/interfaces';
 import { CredentialsState } from '@organization-management/store/credentials.state';
-import { SaveEditCredentialMessage } from '@organization-management/credentials/components/credentials-setup/constants';
+import { InvalidReqParams, SaveEditCredentialMessage } from '@organization-management/credentials/components/credentials-setup/constants';
+import { CheckboxState, CredentialCheckboxState } from '../../interfaces';
+import { CredentialCheckBox } from '../../enums';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @TakeUntilDestroy
 @Component({
@@ -105,7 +108,8 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   public query: Query = new Query().take(this.maxDepartmentsLength);
   public filterType = 'Contains';
   public credentialTypeSources: CredentialTypeSource[] = [];
-  public targetElement: HTMLElement | null;
+  public checkbox = CredentialCheckBox;
+  public checkboxState = {} as CredentialCheckboxState;
 
   public readonly userPermissions = UserPermissions;
   public readonly editCredentialMessage: string = SaveEditCredentialMessage;
@@ -130,8 +134,6 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     @Inject(DOCUMENT) private document: Document
   ) {
     super();
-
-    this.targetElement = this.document.body;
 
     this.createCredentialMappingForm();
   }
@@ -317,6 +319,12 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   public saveCredentialMapping(): void {
     if (this.mapCredentialsFormGroup.valid && this.gridDataSource.length) {
       const { regionIds, locationIds, departmentIds, groupIds, mappingId } = this.mapCredentialsFormGroup.getRawValue();
+
+      if (!this.mapCredentialsService.checkReqParamSelected(this.gridDataSource as CredentialsSelectedItem[])) {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, InvalidReqParams));
+        return;
+      }
+
       const credentialSetupMapping: CredentialSetupMappingPost = {
         regionIds: this.allRegions ? null : regionIds,
         locationIds: this.allLocations ? null : locationIds,
@@ -449,7 +457,7 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     }
 
    credentialSetupMapping.credentials.forEach(savedMapping => {
-      (this.gridDataSource as CredentialSetupGet[]).map((credential) => {
+      (this.gridDataSource as CredentialSetupGet[]).forEach((credential) => {
         if (credential.masterCredentialId === savedMapping.masterCredentialId) {
           credential.inactiveDate = savedMapping.inactiveDate;
           credential.isActive = savedMapping.isActive;
@@ -459,6 +467,8 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
           credential.irpComments = this.isEdit ? savedMapping.irpComments: credential.irpComments;
         }
       });
+
+      this.setCheckboxState(this.gridDataSource as CredentialSetupGet[]);
       this.grid.refresh();
     });
   }
@@ -478,14 +488,18 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   }
 
   public checkboxStateChanged(
-    event: { checked: boolean },
+    { checked }: { checked: boolean },
     credential: CredentialSetupGet,
-    checkboxName: 'isActive' | 'reqSubmission' | 'reqOnboard'
+    checkboxName: CredentialCheckBox,
   ): void {
-    (this.grid.dataSource as []).map((item: CredentialSetupGet) => {
+    const checkboxState = this.updateCheckboxState(credential.masterCredentialId, checked, checkboxName);
+    const { isActive, reqOnboard, reqSubmission } = checkboxState;
+
+    (this.grid.dataSource as CredentialSetupGet[]).forEach((item: CredentialSetupGet) => {
       if (item.masterCredentialId === credential.masterCredentialId) {
-        // update checkbox state value
-        item[checkboxName] = event.checked;
+        item.isActive = isActive;
+        item.reqOnboard = reqOnboard;
+        item.reqSubmission = reqSubmission;
       }
     });
   }
@@ -729,6 +743,8 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
         activeRowsPerPage
       );
     }
+
+    this.setCheckboxState(this.gridDataSource as CredentialSetupGet[]);
   }
 
   private watchForSucceededUpdateCredential(): void {
@@ -746,5 +762,25 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
     setTimeout(() => {
       this.store.dispatch(new ShowSideDialog(true));
     }, 100);
+  }
+
+  private setCheckboxState(dataSource: CredentialSetupGet[]): void {
+    dataSource.forEach((credential) => {
+      const {reqSubmission, reqOnboard, isActive} = credential;
+      this.checkboxState[credential.masterCredentialId] = {
+        reqSubmission: !!reqSubmission,
+        reqOnboard: !!reqOnboard,
+        isActive: !!isActive,
+      };
+    });
+  }
+
+  private updateCheckboxState(id: number, event: boolean, checkboxName: CredentialCheckBox): CheckboxState {
+    this.checkboxState[id] = Object.fromEntries(
+      Object.entries(this.checkboxState[id]).map(([key]) => {
+        return [key, checkboxName === key ? event : false];
+      })) as CheckboxState;
+    
+    return this.checkboxState[id];
   }
 }

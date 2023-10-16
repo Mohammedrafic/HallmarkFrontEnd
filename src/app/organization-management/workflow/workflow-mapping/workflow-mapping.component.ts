@@ -60,6 +60,7 @@ import {
 } from '@organization-management/workflow/workflow-mapping/constants';
 import { WorkflowMappingService } from '@organization-management/workflow/workflow-mapping/services';
 import { SystemFlags } from '@organization-management/workflow/interfaces';
+import { CreateNextStepStatusForWorkflows } from '@organization-management/workflow/helpers';
 
 @Component({
   selector: 'app-workflow-mapping',
@@ -278,14 +279,14 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       foundWorkflow?.workflows?.forEach((workflow: Workflow) => {
         workflow.steps.sort((first: Step, second: Step) => (first.order as number) - (second.order as number));
       });
+
       // add nextStepStatus field
       foundWorkflow?.workflows?.forEach((workflow: Workflow) => {
-        workflow.steps = workflow.steps.map((item: Step, index: number, array: Step[]) => {
-          return {
-            ...item,
-            nextStepStatus: array[index + 1]?.status,
-          };
-        });
+       workflow.steps = CreateNextStepStatusForWorkflows(
+         workflow.steps,
+         foundWorkflow?.includeInIRP,
+         foundWorkflow?.type
+        );
       });
 
       if (foundWorkflow && foundWorkflow.workflows) {
@@ -548,7 +549,6 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
         workflowGroupId: this.workflowMappingFormGroup.controls['workflowName'].value, // workflowName contains selected workflow id, on the BE workflowGroupId is just workflowId
         stepMappings: this.getStepMappings(),
       };
-
       this.store.dispatch(new SaveWorkflowMapping(workflowMapping, this.filters));
     } else {
       this.workflowMappingFormGroup.markAllAsTouched();
@@ -681,7 +681,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       const { roleUserList } = (this.applicationRoleUserFormArray.controls[i] as FormGroup).getRawValue();
       if (!roleUserList) {
         const stepMapping: StepMapping = {
-          workflowStepId: step.id as number,
+          workflowStepId: step.nextStepId ?? step.id as number,
           isPermissionBased: this.applicationRoleUserFormArray.controls[i].value.isPermissionBased,
         };
         mappings.push(stepMapping);
@@ -690,14 +690,14 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
           if (roleUserId.includes('-')) {
             // define if roleUserId is GUID and then assign it to userId instead of roleId
             const stepMapping: StepMapping = {
-              workflowStepId: step.id as number,
+              workflowStepId: step.nextStepId ?? step.id as number,
               userId: roleUserId,
               isPermissionBased: this.applicationRoleUserFormArray.controls[i].value.isPermissionBased,
             };
             mappings.push(stepMapping);
           } else {
             const stepMapping: StepMapping = {
-              workflowStepId: step.id as number,
+              workflowStepId: step.nextStepId ?? step.id as number,
               roleId: parseInt(roleUserId),
               isPermissionBased: this.applicationRoleUserFormArray.controls[i].value.isPermissionBased,
             };

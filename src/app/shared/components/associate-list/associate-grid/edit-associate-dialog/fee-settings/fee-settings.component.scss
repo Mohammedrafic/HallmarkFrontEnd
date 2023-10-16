@@ -1,4 +1,8 @@
+@import 'adaptive-response';
+
 .fee-settings {
+  height: 100%;
+
   .actions {
     button {
       background-color: transparent;
@@ -25,5 +29,45 @@
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
     -webkit-appearance: none;
+  }
+
+  .grid-container {
+    height: 100%;
+    min-height: calc(100vh - 425px);
+
+    .e-gridwithheader {
+      height: calc(100% - 50px) !important;
+    }
+
+    .e-gridcontent {
+      height: calc(100% - 50px) !important;
+    }
+  }
+}
+
+@media #{$min-tablet} {
+  .dialog .header-container .close-button {
+    display: none !important;
+  }
+}
+
+@media #{$max-mobile} {
+  .fee-settings {
+    height: auto;
+    padding-bottom: 70px;
+
+    &.empty-grid .grid-container {
+      height: 200px;
+      min-height: unset;
+    }
+
+    .dialog .header-container .close-button {
+      display: block;
+    }
+
+    .base-fee {
+      max-width: unset !important;
+      width: 100%;
+    }
   }
 }

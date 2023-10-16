@@ -47,7 +47,9 @@ export class HeadCountComponent implements OnInit {
     "LocationParamHCR": "",
     "BearerParamHCR": "",
     "BusinessUnitIdParamHCR": "",
-    "HostName": ""
+    "HostName": "",
+    "organizationNameHCR": "",
+    "reportPulledMessageHCR": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/HeadCount/HeadCount.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/HeadCount/HeadCount.cat" };
@@ -286,7 +288,8 @@ export class HeadCountComponent implements OnInit {
       this.isResetFilter = false;
       this.message = ""
     }
-    
+    let currentDate = new Date(Date.now());
+
     this.paramsData =
     {
       "OrganizationParamHCR": this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
@@ -298,7 +301,9 @@ export class HeadCountComponent implements OnInit {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "HostName": this.baseUrl
+      "HostName": this.baseUrl,
+      "organizationNameHCR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageHCR": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim()
     };
 
     this.logiReportComponent.paramsData = this.paramsData;

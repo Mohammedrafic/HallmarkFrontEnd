@@ -325,6 +325,8 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
             this.userControl.patchValue(this.userData[0]?.id)
             if (!this.isInitialloadCalled) {
               setTimeout(()=>{
+                const user = this.store.selectSnapshot(UserState.user) as User;
+              this.userControl.patchValue(user.id)
                 this.isInitialload();
               }, 0);
               this.isInitialloadCalled = true;

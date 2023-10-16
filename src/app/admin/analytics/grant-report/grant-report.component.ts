@@ -52,7 +52,10 @@ export class GrantReportComponent implements OnInit {
     "StartDateGR": "",
     "EndDateGR": "",
     "InvoiceIdGR":"",
-    "InvoiceStatusGR":""
+    "InvoiceStatusGR": "",
+    "organizationNameGR": "",
+    "reportPulledMessageGR": "",
+    "DateRangeGR": ""
   };
 
 
@@ -144,7 +147,8 @@ export class GrantReportComponent implements OnInit {
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
-  
+  private culture = 'en-US';
+
   constructor(private store: Store,
     private formBuilder: FormBuilder,
     private filterService: FilterService,
@@ -358,6 +362,9 @@ export class GrantReportComponent implements OnInit {
     locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     this.isResetFilter = false;
+
+    let currentDate = new Date(Date.now());
+
     this.paramsData =
     {
 
@@ -377,8 +384,10 @@ export class GrantReportComponent implements OnInit {
       "StartDateGR":  formatDate(startDate, 'MM/dd/yyyy', 'en-US') ,
       "EndDateGR":formatDate(endDate, 'MM/dd/yyyy', 'en-US') ,
       "InvoiceIdGR": invoiceId == null || invoiceId == "" ? "null" : invoiceId,
-      "InvoiceStatusGR": invoiceStatusIds.length == 0 ? "null" : invoiceStatusIds.join(",")
-      
+      "InvoiceStatusGR": invoiceStatusIds.length == 0 ? "null" : invoiceStatusIds.join(","),
+       "organizationNameGR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageGR": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+       "DateRangeGR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
 
     };
     this.logiReportComponent.paramsData = this.paramsData;

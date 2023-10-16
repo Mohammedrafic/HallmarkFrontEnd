@@ -16,7 +16,12 @@
             <h3 class="e-card-title">{{header}}</h3>
           </div>
           <ng-container *ngIf="!(isMobile$ | async)" [ngTemplateOutlet]="actionButtons"></ng-container>
-          <button tabindex="-1" ejs-button cssClass="e-flat close-button" (click)="onFormCancelClick()">
+          <button
+            tabindex="-1"
+            ejs-button
+            cssClass="e-flat mobile-close-button"
+            (click)="onFormCancelClick()"
+          >
             <i-feather name="x" class="icon"></i-feather>
           </button>
         </div>
@@ -38,14 +43,22 @@
       id="cancelFormButton"
       (click)="onFormCancelClick()"
     >Cancel</button>
-    <button
-      ejs-button
-      id="addFormButton"
-      type="submit"
-      cssClass="action-btn"
-      [isPrimary]="true"
-      [disabled]="disableSaveButton"
-      (click)="onFormSaveClick()"
-    >{{ saveButtonLabel }}</button>
+    <app-tooltip-container
+      class="stick-right"
+      [message]="tooltipMessage"
+      [showToolTip]="!!tooltipMessage && disableSaveButton"
+    >
+      <button
+        ejs-button
+        id="addFormButton"
+        type="submit"
+        cssClass="action-btn"
+        [isPrimary]="true"
+        [disabled]="disableSaveButton"
+        (click)="onFormSaveClick()"
+      >
+        {{ saveButtonLabel }}
+      </button>
+    </app-tooltip-container>
   </div>
 </ng-template>
