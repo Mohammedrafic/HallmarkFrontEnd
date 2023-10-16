@@ -178,7 +178,7 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
     if ((AlertIdEnum[AlertIdEnum['Invoice: Generated & Pending Approval']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
-      if (user?.businessUnitType === BusinessUnitType.Organization) {
+      if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
         this.changeTab.emit(InvoicesOrgTabId.PendingApproval);
         this.tabComponent.selectedItem = InvoicesOrgTabId.PendingApproval;
       }
