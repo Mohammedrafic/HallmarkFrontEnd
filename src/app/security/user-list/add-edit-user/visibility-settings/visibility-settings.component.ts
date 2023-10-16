@@ -66,7 +66,7 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
     this.filters.userId = this.userId;
     this.filters.pageNumber = this.currentPage;
     this.filters.pageSize = this.pageSize;
-
+    
     this.store.dispatch(new GetUserVisibilitySettingsPage(this.filters));
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
