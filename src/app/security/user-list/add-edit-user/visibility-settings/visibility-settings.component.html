@@ -43,7 +43,7 @@
           <span>{{data.locationId === null ? 'All' : data.locationName}}</span>
         </ng-template>
       </e-column>
-      <e-column headerText="Department" width=190>
+      <e-column headerText="Department" width=190 *ngIf="!isAgencyUser">
         <ng-template #template let-data>
           <span>{{data.departmentId === null ? 'All' : data.departmentName}}</span>
         </ng-template>
