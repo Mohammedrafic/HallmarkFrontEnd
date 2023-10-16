@@ -87,10 +87,10 @@ export class SkillsService {
     return this.http.delete<Skill>(`/api/AssignedSkills/${skill.id}`);
   }
   public bulkupdateAssignedSkills(selectedskillItems: Skill[]): Observable<BulkSkillsAction> {
-    return  this.http.put<BulkSkillsAction>(`/api/AssignedSkills/bulkupdateskills`, selectedskillItems)
+    return  this.http.put<BulkSkillsAction>(`/api/AssignedSkills/bulk-update-skills`, selectedskillItems)
   }
   public bulkdeleteAssignedSkills(selectedskillItems: Number[]): Observable<BulkSkillsAction> {
-    return  this.http.delete<BulkSkillsAction>(`/api/AssignedSkills/bulkdeleteskills`, { body: selectedskillItems })
+    return  this.http.delete<BulkSkillsAction>(`/api/AssignedSkills/bulk-delete-skills`, { body: selectedskillItems })
   }
   public export(payload: ExportPayload): Observable<Blob> {
     if (payload.ids) {
