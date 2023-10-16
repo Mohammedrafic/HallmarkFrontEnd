@@ -276,6 +276,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
        || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Accepted']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
        || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Offered']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
        || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Rejected']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Cancelled']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Offboard']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Applied']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Custom Status']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (AlertIdEnum[AlertIdEnum['Candidate Status Update: End']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
       )
       this.previousSelectedOrderId = this.alertOrderId;
       else{

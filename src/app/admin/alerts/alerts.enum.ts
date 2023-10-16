@@ -51,7 +51,7 @@ export enum AlertEnum {
    "Order Comments-IRP"=59,
    "Missing Credentials: Daily Alerts" = 64,
    "Missing Credentials: Weekly Alerts" = 65,
-   "Expiry Credentials: Weekly Alerts" = 66
-
+   "Expiry Credentials: Weekly Alerts" = 66,
+   "Candidate Status Update: Cancelled" = 31
   }
   
