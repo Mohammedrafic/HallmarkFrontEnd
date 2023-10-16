@@ -21,9 +21,9 @@ export class AddEditUserComponent implements OnDestroy {
   @Output() changeBusinessUnitId =new EventEmitter<boolean>();
 
   @Input() set user (user: User | null) {
-    this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
+    // this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
     this.createdUser = user;
-    this.switchVisibilityTab(!!this.createdUser && !this.isAgencyUser);
+    this.switchVisibilityTab(!!this.createdUser);
   }
 
   public firstActive = true;

@@ -798,9 +798,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private saveAsTemplate(): void {
-    const { regionId, locationId, departmentId, skillId, credentials } =
+    const { regionId, locationId, departmentId, skillId } =
       this.orderDetailsFormComponent.generalInformationForm.getRawValue();
-    const requiredFields = [regionId, locationId, departmentId, skillId, credentials];
+    const requiredFields = [regionId, locationId, departmentId, skillId];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
     const hasSelectedCredentialFlag = this.orderCredentialsService.hasSelectedCredentialFlags(this.orderCredentials);
     
@@ -811,7 +811,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId];
       const invalidFields = fields.filter((field, i) => !requiredFields[i]).join(',\n');
       this.showOrderFormValidationMessage(invalidFields);
-
+      
       if (!this.orderCredentials?.length || !hasSelectedCredentialFlag) {
         this.showCredentialsValidationMessage(!!this.orderCredentials?.length && !hasSelectedCredentialFlag);
       }
