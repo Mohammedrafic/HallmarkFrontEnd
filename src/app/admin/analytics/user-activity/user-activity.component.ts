@@ -39,7 +39,7 @@ import { isNumber } from 'lodash';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserActivityComponent extends AbstractGridConfigurationComponent implements OnInit {
-  public title: string = "User Audit Log Report";
+  public title: string = "User Activity Log Report";
   public message: string = ''
   userActivityForm: FormGroup;
   public businessUnits = BUSINESS_UNITS_VALUES;
@@ -497,8 +497,8 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   }
   onBtExport() {
     const params = {
-      fileName: 'User Audit Log Report',
-      sheetName: 'User Audit Log Report'
+      fileName: 'User Activity Log Report',
+      sheetName: 'User Activity Log Report'
     };
     this.gridApi.exportDataAsExcel(params);
   }
