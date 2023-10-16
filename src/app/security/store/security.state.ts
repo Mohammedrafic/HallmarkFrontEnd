@@ -90,7 +90,7 @@ interface SecurityStateModel {
   nonEmployeeUserData: User[];
   logFileDownloadDetail:any;
   businessIdDetails:GetBusinessUnitIdDetails|null;
-  isagencyVisibilityEnabled:boolean;
+  isAgencyVisibilityEnabled:boolean;
 }
 
 @State<SecurityStateModel>({
@@ -120,7 +120,7 @@ interface SecurityStateModel {
     nonEmployeeUserData: [],
     logFileDownloadDetail:null,
     businessIdDetails:null,
-    isagencyVisibilityEnabled:false
+    isAgencyVisibilityEnabled:false
   },
 })
 @Injectable()
@@ -290,6 +290,11 @@ export class SecurityState {
     return state.businessIdDetails;
   }
 
+  @Selector()
+  static isAgencyVisibilityFlagEnabled(state: SecurityStateModel): boolean {
+    return state.isAgencyVisibilityEnabled;
+  }
+
 
   constructor(
     private businessUnitService: BusinessUnitService,
@@ -302,7 +307,7 @@ export class SecurityState {
   @Action(SetAgencyVisibilityFlag)
   SetIrpFlag({ patchState }: StateContext<SecurityStateModel>, { agencyVisibilityEnabled }: SetAgencyVisibilityFlag): void {
     patchState({
-      isagencyVisibilityEnabled: agencyVisibilityEnabled,
+      isAgencyVisibilityEnabled: agencyVisibilityEnabled,
     });
   }
 
