@@ -18,7 +18,7 @@ export class AgencyVisibilityFlagResolverService implements Resolve<boolean> {
    * can be easly modified to use multiple flags.
    */
   resolve(): Observable<boolean> {
-    return this.http.get<boolean>(`/api/FeaturesConfiguration/IsEnabled/AgencyVisibility`)
+    return this.http.get<boolean>(`/api/FeaturesConfiguration/IsEnabled/AgencyUserVisibility`)
     .pipe(
       tap((value) => {
         this.store.dispatch(new SetAgencyVisibilityFlag(value));
