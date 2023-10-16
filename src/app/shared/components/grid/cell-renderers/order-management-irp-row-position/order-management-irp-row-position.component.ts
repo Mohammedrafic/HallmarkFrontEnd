@@ -33,6 +33,9 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 
 import { OrderManagementIrpCandidateSystem } from './order-management-irp-row-position.enum';
 import { OrderManagementIrpRowCandidatesAdapter } from './order-management-irp-row-position.adapter';
+import { OrderManagementIRPRowPositionService } from './order-management-irp-row-position.service';
+import { CandidatesStatusText } from '@shared/enums/status';
+import { ApplicantStatusIRP } from '@shared/enums/applicant-status.enum';
 
 @TakeUntilDestroy
 @Component({
@@ -57,6 +60,7 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
     protected override store: Store,
     private orderManagementService: OrderManagementService,
     private orderManagementIrpApiService: OrderManagementIrpApiService,
+    private service : OrderManagementIRPRowPositionService
   ) {
     super(store);
   }
@@ -95,6 +99,12 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
 
   public trackByField(index: number, config: ColDef): string {
     return config.field as string;
+  }
+
+  public onClickChip(cellData: IRPOrderPosition, string: string | number, system : string){
+    if(string === ApplicantStatusIRP.OnBoard || string === CandidatesStatusText.Onboard){
+      this.service.HandleStatusChangeClick(this.params.data,cellData, system)
+    }
   }
 
   navigateToPositionDetails(data: OrderInfo): void {
