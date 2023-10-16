@@ -30,6 +30,8 @@ import {
   OptionField,
   RejectedReasonField,
   StatusField,
+  SwitcherValue,
+  SwitcherValueEnum,
 } from '@shared/components/order-candidate-list/edit-irp-candidate/constants/edit-irp-candidate.constant';
 import { FieldType } from '@core/enums';
 import { EditIrpCandidateService } from '@shared/components/order-candidate-list/edit-irp-candidate/services';
@@ -129,6 +131,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public ratePerHour : number = 96;
   public benefitpercentofsw : number;
   public wagePercent : number;
+  public isTurnedOn : boolean;
   public payrateData: Configuration[];
   public RegionDetails: Location[];
 
@@ -152,7 +155,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   meal : number;
   lodging : number;
   public showATPform: boolean = false;
-
+  public showbenefits: boolean = true;
+  public SwitcherCalcvariables = SwitcherValue;
+  public shownonbenefits: boolean = true;
   public candidateModelState: EditCandidateDialogState;
   public readonly statuses = CandidatStatus;
   public comments: Comment[] = [];
@@ -206,6 +211,20 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           this.costSaving = data;
           this.performCalculations();
         }
+      });
+
+      this.AtpCalcForm.get("calculations")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
+        if(data == SwitcherValueEnum.Benefits){
+          this.showbenefits = true;
+          this.shownonbenefits = false;
+        } else if (data == SwitcherValueEnum.NonBenefits){
+          this.shownonbenefits = true;
+          this.showbenefits = false;
+        } else {
+          this.showbenefits = true;
+          this.shownonbenefits = true;
+        }
+        this.performCalculations();
       })
     }
   }
@@ -213,7 +232,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   createATPform(): void {
     this.AtpCalcForm = this.formBuilder.group({
       hoursWorked: [this.hoursWorked, [Validators.required]],
-      costSaving: [this.costSaving, [Validators.required]]
+      costSaving: [this.costSaving, [Validators.required]],
+      calculations : [SwitcherValueEnum.All]
     });
     this.performCalculations();
   }
@@ -272,6 +292,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.benefitpercentofsw = this.configdata.benefitPercent;
         this.costSaving = this.configdata.costSavings;
         this.wagePercent = this.configdata.wagePercent;
+        this.isTurnedOn = this.configdata.isEnabled;
       }
       this.createATPform();
     });
@@ -289,6 +310,10 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
 
   private getATPstipendRate() {
+    if (!this.candidateDetails.actualStartDate) {
+      return;
+    }
+
     this.editIrpCandidateService.getATPstipendRate(this.zipcode, DateTimeHelper.setUtcTimeZone(this.candidateDetails.actualStartDate as Date)).pipe(
       takeUntil(this.componentDestroy()),
       take(1)
@@ -303,9 +328,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         }
         this.stipendBenefits = (!Number.isNaN(this.meal + this.lodging)) ? this.meal + this.lodging : 0;
         this.stipendNonBenefits = (!Number.isNaN(this.meal + this.lodging)) ? this.meal + this.lodging : 0;
-        this.adjustedTotalBenefits = (!Number.isNaN(this.salaryWagesandBenefits - (this.benefitsBenefits + this.costSavingBenefits + this.stipendBenefits))) ? 
+        this.adjustedTotalBenefits = (!Number.isNaN(this.salaryWagesandBenefits - (this.benefitsBenefits + this.costSavingBenefits + this.stipendBenefits))) ?
         (this.salaryWagesandBenefits - (this.benefitsBenefits + this.costSavingBenefits + this.stipendBenefits)) : 0;
-        this.adjustedTotalNonBenefits = (!Number.isNaN(this.salaryWagesandBenefits - (this.benefitsNonBenefits + this.costSavingBenefits + this.stipendNonBenefits))) ? 
+        this.adjustedTotalNonBenefits = (!Number.isNaN(this.salaryWagesandBenefits - (this.benefitsNonBenefits + this.costSavingBenefits + this.stipendNonBenefits))) ?
                 (this.salaryWagesandBenefits - (this.benefitsNonBenefits + this.costSavingBenefits + this.stipendNonBenefits)) : 0;
         this.stipendHourlyRate = (!Number.isNaN(this.stipendBenefits / this.hoursWorked)) ? (this.stipendBenefits / this.hoursWorked) : 0;
         this.contractLabourBenefit = (!Number.isNaN(this.adjustedTotalBenefits / this.hoursWorked)) ? (this.adjustedTotalBenefits / this.hoursWorked) : 0;
@@ -334,7 +359,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private performCalculations(): void {
     this.salaryWagesandBenefits = (!Number.isNaN(this.ratePerHour * this.hoursWorked != null)) ? this.ratePerHour * this.hoursWorked : 0;
-    this.costSavingBenefits = (!Number.isNaN((this.salaryWagesandBenefits * this.costSaving) / 100)) ? ((this.salaryWagesandBenefits * this.costSaving) / 100) : 0; 
+    this.costSavingBenefits = (!Number.isNaN((this.salaryWagesandBenefits * this.costSaving) / 100)) ? ((this.salaryWagesandBenefits * this.costSaving) / 100) : 0;
     this.benefitsBenefits = (!Number.isNaN(this.salaryWagesandBenefits * (this.benefitpercentofsw / 100))) ? (this.salaryWagesandBenefits * (this.benefitpercentofsw / 100)) : 0;
     this.benefitsNonBenefits = (!Number.isNaN(this.salaryWagesandBenefits * (this.wagePercent / 100))) ? (this.salaryWagesandBenefits * (this.wagePercent / 100)) : 0;
     this.cdr.markForCheck();
@@ -527,7 +552,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
     if(offeredStartDate && offeredEndDate) {
       this.offeredDateSubscription = offeredStartDate.valueChanges.pipe(
-        filter((value: string) => !!value ),
         skip(1),
         distinctUntilChanged(),
         takeUntil(this.componentDestroy()),
@@ -580,7 +604,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy()),
     ).subscribe((status : string) => {
       if(JSON.parse(status) == ApplicantStatus.OnBoarded){
-        this.showATPform = true;
+        this.showATPform = this.meal !== 0 ? true : false;
       } else {
         this.showATPform = false;
       }
@@ -670,7 +694,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
 
     const actualStartDate = isStatusEqualCandidateStatus && !startDate ? startDate : this.candidateDetails.actualStartDate;
-    const actualEndDate = isStatusEqualCandidateStatus && !endDate ? endDate : this.candidateDetails.actualStartDate;
+    const actualEndDate = isStatusEqualCandidateStatus && !endDate ? endDate : this.candidateDetails.actualEndDate;
     const offeredStartDate = startDate || actualStartDate ? DateTimeHelper.setCurrentTimeZone(startDate ?? actualStartDate as string) : null;
     const offeredEndDate = endDate || actualEndDate ? DateTimeHelper.setCurrentTimeZone(endDate ?? actualEndDate as string) : null;
 

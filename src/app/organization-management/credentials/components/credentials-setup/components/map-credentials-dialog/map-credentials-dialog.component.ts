@@ -24,7 +24,7 @@ import {
 } from '@shared/models/organization.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { CANCEL_CONFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { ShowSideDialog } from '../../../../../../store/app.actions';
+import { ShowSideDialog, ShowToast } from '../../../../../../store/app.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CredentialSetupDetails,
@@ -59,9 +59,10 @@ import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { CredentialTypeSource } from '@organization-management/credentials/interfaces';
 import { CredentialsState } from '@organization-management/store/credentials.state';
-import { SaveEditCredentialMessage } from '@organization-management/credentials/components/credentials-setup/constants';
+import { InvalidReqParams, SaveEditCredentialMessage } from '@organization-management/credentials/components/credentials-setup/constants';
 import { CheckboxState, CredentialCheckboxState } from '../../interfaces';
 import { CredentialCheckBox } from '../../enums';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @TakeUntilDestroy
 @Component({
@@ -318,6 +319,12 @@ export class MapCredentialsDialogComponent extends AbstractGridConfigurationComp
   public saveCredentialMapping(): void {
     if (this.mapCredentialsFormGroup.valid && this.gridDataSource.length) {
       const { regionIds, locationIds, departmentIds, groupIds, mappingId } = this.mapCredentialsFormGroup.getRawValue();
+
+      if (!this.mapCredentialsService.checkReqParamSelected(this.gridDataSource as CredentialsSelectedItem[])) {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, InvalidReqParams));
+        return;
+      }
+
       const credentialSetupMapping: CredentialSetupMappingPost = {
         regionIds: this.allRegions ? null : regionIds,
         locationIds: this.allLocations ? null : locationIds,

@@ -15,6 +15,8 @@ import {
   map,
   merge,
   mergeMap,
+  of,
+  switchMap,
   take,
   takeUntil,
 } from 'rxjs';
@@ -264,6 +266,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeToCandidateJob();
     this.observeOrderManagementPagerState();
+    this.subscribeOnJobUpdate();
   }
 
   observeOrderManagementPagerState() {
@@ -416,7 +419,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   public onSave(): void {
-    this.saveHandler({ itemData: this.selectedApplicantStatus });
+    if(this.selectedApplicantStatus){
+      this.saveHandler({ itemData: this.selectedApplicantStatus });
+    }    
   }
 
   public onStatusChange(event: { itemData: ApplicantStatus }): void {
@@ -685,31 +690,42 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           this.adjustCandidatePayRateField();
         }
       });
-      this.action$.pipe(takeUntil(this.destroy$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
-        if (applicantStatus.applicantStatus === ApplicantStatusEnum.OnBoarded) {
-          const options = {
-            title: ONBOARD_CANDIDATE,
-            okButtonLabel: 'Yes',
-            okButtonClass: 'ok-button',
-            cancelButtonLabel: 'No'
-          };
-          this.confirmService.confirm(onBoardCandidateMessage, options).pipe(take(1))
-            .subscribe((isConfirm) => {
-              if (isConfirm) {
-                this.onboardEmailTemplateForm.rteCreated();
-                this.onboardEmailTemplateForm.disableControls(true);
-                this.store.dispatch(new ShowGroupEmailSideDialog(true));
-              }
-            });
-        }
-      });
     } else {
       this.resetStatusesFormControl();
     }
   }
 
+  
+  private displayMessageConfirmation(): Observable<boolean> {
+    const options = {
+      title: ONBOARD_CANDIDATE,
+      okButtonLabel: 'Yes',
+      okButtonClass: 'ok-button',
+      cancelButtonLabel: 'No',
+    };
+    if (this.selectedApplicantStatus?.applicantStatus === ApplicantStatusEnum.OnBoarded && this.selectedApplicantStatus.applicantStatus != this.candidate?.status) {
+      return this.confirmService.confirm(onBoardCandidateMessage, options)
+        .pipe(take(1));
+    }
+    return of(false);
+  }
+
+  private subscribeOnJobUpdate(): void {
+    this.action$.pipe(
+        takeUntil(this.destroy$)
+      , ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)
+      , switchMap(() => this.displayMessageConfirmation())
+      ).subscribe((isConfirm) => {
+              if (isConfirm) {
+                this.onboardEmailTemplateForm.rteCreated();
+                this.onboardEmailTemplateForm.disableControls(true);
+                this.store.dispatch(new ShowGroupEmailSideDialog(true));
+              }            
+        }
+      );
+  }
+
   onGroupEmailAddCancel() {
-    // console.log('this.candidateJob at cancel',this.candidateJob);
     this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
     this.isSend = false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));

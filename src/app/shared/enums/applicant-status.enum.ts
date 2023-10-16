@@ -30,6 +30,7 @@ export enum CandidatStatus {
   Offboard = 90,
   Rejected = 100,
   Cancelled = 110,
+  CustomStatus = 30,
 }
 
 export enum ConfigurationValues {

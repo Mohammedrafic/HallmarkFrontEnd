@@ -1084,7 +1084,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       || this.organizationSettingKey === OrganizationSettingKeys.PayHigherBillRates
       || this.organizationSettingKey === OrganizationSettingKeys.OvertimeCalculation
       || this.organizationSettingKey === OrganizationSettingKeys.OTHours
-      || this.organizationSettingKey === OrganizationSettingKeys.AutomatedDistributionToVMS) {
+      || this.organizationSettingKey === OrganizationSettingKeys.AutomatedDistributionToVMS
+      || this.organizationSettingKey === OrganizationSettingKeys.TimesheetSubmissionProcess) {
       this.departmentFormGroup.get('departmentId')?.disable();
     } else {
       this.departmentFormGroup.get('departmentId')?.enable();

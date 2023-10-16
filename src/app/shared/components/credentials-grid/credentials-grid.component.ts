@@ -73,6 +73,7 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
 import { CandidateService } from '@agency/services/candidates.service';
 import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-credentials-grid',
@@ -91,6 +92,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() isIRP = false;
   @Input() isActive = true;
   @Input() isMobileLoginOn = false;
+  @Input() reloadCredentials:Subject<boolean> = new Subject<boolean>();
   @Input() set employeeId(value: number | null | undefined) {
     if (value) {
       this.candidateProfileId = value;
@@ -212,13 +214,27 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   private get credentialRequestParams(): CredentialRequestParams {
-    return this.credentialGridService.getCredentialRequestParams(
-      this.currentPage,
-      this.pageSize,
-      this.orderId,
-      this.organizationId,
-      this.candidateProfileId
-    );
+    let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+    if(JSON.parse((localStorage.getItem('OrderId') || '0')) as number && 
+      ((AlertIdEnum[AlertIdEnum['Candidate Credential Rejected']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase() 
+        || (AlertIdEnum[AlertIdEnum['Candidate Credential Reviewed']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase())
+      ){
+        return this.credentialGridService.getCredentialRequestParams(
+            this.currentPage,
+            this.pageSize,
+            JSON.parse((localStorage.getItem('OrderId') || '0')) as number,
+            this.organizationId,
+            this.candidateProfileId
+        );
+     }else{
+        return this.credentialGridService.getCredentialRequestParams(
+            this.currentPage,
+            this.pageSize,
+            this.orderId,
+            this.organizationId,
+            this.candidateProfileId
+        );
+     }
   }
 
   constructor(
@@ -235,7 +251,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.candidateProfileId = Number(this.route.snapshot.paramMap.get('id'));
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void { 
+    this.reloadCredentials?.pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
+      if(val){
+        this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
+      }
+    });
     this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
     this.store.dispatch(new GetCredentialTypes());
     this.addCredentialForm = this.credentialGridService.createAddCredentialForm();
@@ -255,6 +276,15 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new ClearCandidatesCredentials());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+    if(JSON.parse((localStorage.getItem('OrderId') || '0')) as number && 
+      ((AlertIdEnum[AlertIdEnum['Candidate Credential Rejected']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+        || (AlertIdEnum[AlertIdEnum['Candidate Credential Reviewed']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase())
+      ){
+      this.orderId = null;
+      window.localStorage.setItem("OrderId", JSON.stringify(""));
+      window.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
   }
 
   public browse(): void {

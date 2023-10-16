@@ -100,6 +100,18 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
     }
   }
 
+  public getPreservedOrderContactPerson(title: string, contactEmails?: string | null): void {
+    if (contactEmails) {
+      this.filterService.getOrderContactPersonListBySearchTerm(contactEmails, title).pipe(take(1)).subscribe((data) => {
+        this.filteredOrderContactPerson = data;
+        this.filtersHelperService.setDataSourceByFormKey(this.filtersConfig['ContactEmails'], data);
+        this.formGroup.controls['contactEmails'].setValue(contactEmails || '', { emitEvent: false });
+        this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+        this.appliedFiltersAmount.emit(this.filteredItems.length);
+      });
+    }
+  }
+
   public filterPreservedFilters(state: F): F {
     const filterState = this.activeTabIdx !== 0
       ? { ...state, statusIds: [] }

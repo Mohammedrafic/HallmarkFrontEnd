@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -462,7 +462,7 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.AgencySubmitTimesheet)
   SubmitTimesheet(
-    ctx: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { id, orgId }: TimesheetDetails.AgencySubmitTimesheet
   ): Observable<void> {
     return this.timesheetDetailsApiService.changeTimesheetStatus({
@@ -470,7 +470,16 @@ export class TimesheetsState {
       organizationId: orgId,
       targetStatus: TimesheetTargetStatus.Submitted,
       reason: null,
-    });
+    })
+      .pipe(
+        tap(() => {
+          this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+          return throwError(() => err);
+        }),
+      );
   }
 
   @Action(TimesheetDetails.OrganizationApproveTimesheet)
@@ -484,11 +493,15 @@ export class TimesheetsState {
       targetStatus: TimesheetTargetStatus.Approved,
       reason: null,
     })
-    .pipe(
-      catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-      }),
-    );
+      .pipe(
+        tap(() => {
+          this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+          return throwError(() => err);
+        }),
+      );
   }
 
   @Action(TimesheetDetails.ChangeTimesheetStatus)
@@ -497,14 +510,15 @@ export class TimesheetsState {
     { payload }: TimesheetDetails.ChangeTimesheetStatus
   ): Observable<void> {
     return this.timesheetDetailsApiService.changeTimesheetStatus(payload)
-    .pipe(
-      tap(() => {
-        this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
-      }),
-      catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-      }),
-    );
+      .pipe(
+        tap(() => {
+          this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+          return throwError(() => err);
+        }),
+      );
   }
 
   @Action(TimesheetDetails.Export)

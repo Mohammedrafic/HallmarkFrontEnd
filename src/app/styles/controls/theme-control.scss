@@ -6,10 +6,13 @@ body.light {
   --bg-default: #{$white};
   --bg-upload-area: #{$primary-active-blue-90};
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
+  --bg-file-uploader: #{$secondary-dark-blue-50};
   --bg-empty-grid: #{$secondary-dark-blue-45};
   --bg-grid: #{$white};
   --bg-button: #{$white};
   --bg-filter-chips: #{$secondary-dark-blue-50};
+  --pagination-background: #{$white};
+  --bg-steper: #{$white};
 
   --bg-primary-btn-disabled: #{$primary-active-blue-70};
   --color-primary-btn-disabled: #{$white};
@@ -24,7 +27,7 @@ body.light {
   --icon-color: #{$secondary-dark-blue-10};
 
   --text: #{$black};
-  --secondary-text: {$black};
+  --secondary-text: #{$black};
   --description: #{$pure-black};
   --title: #{$secondary-dark-blue-10};
   --sub-title: #{$secondary-dark-blue-15};
@@ -37,6 +40,7 @@ body.light {
   --selected-date-range-color: #{$white};
 
   --shadow: #{$secondary-black-25};
+  --redonly-text: #{$secondary-dark-blue-30};
 }
 
 body.dark {
@@ -45,10 +49,13 @@ body.dark {
   --bg-default: #{$sidebar-background};
   --bg-upload-area: #{$widget-dark-tooltip};
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
+  --bg-file-uploader: #{$widget-dark-tooltip};
   --bg-empty-grid: #{$sidebar-background};
   --bg-grid: #{$sidebar-background};
   --bg-button: #{$sidebar-background};
   --bg-filter-chips: #{$widget-dark-tooltip};
+  --pagination-background: #{$sidebar-background};
+  --bg-steper: #{$alert-side-bar-bgcolor};
 
   --bg-primary-btn-disabled: #{$secondary-dark-blue-10-2};
   --color-primary-btn-disabled: #{$secondary-dark-blue-30};
@@ -76,4 +83,5 @@ body.dark {
   --selected-date-range-color: #{$black};
 
   --shadow: #{$secondary-dark-blue-10-2};
+  --redonly-text: #{$icewind-dale};
 }

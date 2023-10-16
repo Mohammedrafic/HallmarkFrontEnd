@@ -65,6 +65,7 @@ import { BillRateBySkillCategoryTypeAggregatedModel } from '../models/bill-rate-
 import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { sum } from 'lodash';
 
 @Injectable()
 export class DashboardService {
@@ -222,7 +223,7 @@ export class DashboardService {
       );
     }
 
-    private getAvergaeDayCUSTOMActivePositionsWidgetData(filter: DashboartFilterDto): Observable<any> {
+    private getAvergaeDayCUSTOMActivePositionsWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
       return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter, type : 'Custom' }).pipe(
         map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
           return {
@@ -306,6 +307,7 @@ export class DashboardService {
       Object.fromEntries,
     ])(applicantsByRegion);
     const maxCandidatesValue = flow(values, max)(candidatesWithState);
+    const totalcandidatesWithState=flow(values, sum)(candidatesWithState);
     const unknownStateCandidates = applicantsByRegion['Unknown'];
     const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
     const dataSource = lodashMap(
@@ -322,7 +324,7 @@ export class DashboardService {
     const user = this.store.selectSnapshot(UserState.user);
     const title =user?.businessUnitType==BusinessUnitType.Agency? "Candidate Home State": "Applicant’s Home State";
     const description = "";
-    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description };
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description,totalCandidates:totalcandidatesWithState+unknownStateCandidates };
   }
 
   private getFormattedPostionsByStatesWidgetAggregatedData({
@@ -352,7 +354,7 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
-    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates, title, description };
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates, title, description, totalCandidates:0 };
   }
 
   private getDashboardState(): Observable<PanelModel[]> {

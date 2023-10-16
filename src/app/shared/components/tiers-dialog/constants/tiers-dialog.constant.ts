@@ -2,7 +2,7 @@ import { Tiers } from '@shared/enums/tiers.enum';
 import { FieldType } from '@core/enums';
 import { Skillvalue, TierDialogConfig } from '@shared/components/tiers-dialog/interfaces';
 import { OrganizationRegion } from '@shared/models/organization.model';
-import { FieldNames } from './tiers.constant';
+import { FieldNames } from '@shared/constants/base-dropdown-fields-settings';
 
 export const TiersDialogConfig = (regions?: OrganizationRegion[], workcommitmentIds? : any): Record<Tiers, TierDialogConfig> => ({
   [Tiers.tierSettingsIRP]: {
