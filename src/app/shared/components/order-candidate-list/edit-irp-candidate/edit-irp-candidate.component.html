@@ -104,7 +104,7 @@
     <app-comments-irp *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId" [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP" [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP" [comments]="comments" [commentContainerId]="candidateCommentContainerId" [candidateJobId]="candidateJobId" [useBackground]="false"
       [externalCommentConfiguration]="externalCommentConfiguration"></app-comments-irp>
 
-    <div *ngIf="showATPform">
+    <div *ngIf="showATPform && isTurnedOn">
       <form [formGroup]="AtpCalcForm" class="atpcalc-form">
         <div class="w_100">
           <div class="input-container bootstrap left atpformfield">
