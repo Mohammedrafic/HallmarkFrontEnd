@@ -20,6 +20,7 @@ import { AssignSkillComponent } from './assign-skill/assign-skill.component';
 import { SkillsComponent } from './skills.component';
 import { SkillsService } from './skills.service';
 import { SkillsRoutingModule } from './skills-routing.module';
+import{ BulkSkillActionDialogComponent } from'./assign-skill/bulk-skill-action-dialog.component'
 
 const icons = {
   Sliders,
@@ -32,6 +33,7 @@ const icons = {
   declarations: [
     SkillsComponent,
     AssignSkillComponent,
+    BulkSkillActionDialogComponent
   ],
   imports: [
     CommonModule,

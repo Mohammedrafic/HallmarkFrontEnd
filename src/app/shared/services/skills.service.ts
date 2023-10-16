@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { map, Observable } from 'rxjs';
 
 import {
   AssignedSkillsByOrganization,
   AssignedSkillTree,
+  BulkSkillsAction,
   ListOfSkills,
   MasterSkill,
   MasterSkillByOrganization,
@@ -85,7 +86,12 @@ export class SkillsService {
   public removeAssignedSkill(skill: Skill): Observable<Skill> {
     return this.http.delete<Skill>(`/api/AssignedSkills/${skill.id}`);
   }
-
+  public bulkupdateAssignedSkills(selectedskillItems: Skill[]): Observable<BulkSkillsAction> {
+    return  this.http.put<BulkSkillsAction>(`/api/AssignedSkills/bulkupdateskills`, selectedskillItems)
+  }
+  public bulkdeleteAssignedSkills(selectedskillItems: Number[]): Observable<BulkSkillsAction> {
+    return  this.http.delete<BulkSkillsAction>(`/api/AssignedSkills/bulkdeleteskills`, { body: selectedskillItems })
+  }
   public export(payload: ExportPayload): Observable<Blob> {
     if (payload.ids) {
       return this.http.post(`/api/masterSkills/export/byIds`, payload, { responseType: 'blob' });
