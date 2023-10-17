@@ -69,6 +69,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
 
   public userPermission: Permission = {};
   public readonly userPermissions = UserPermissions;
+  totalAmount: number;
 
   constructor(
     private paymentService: InvoiceAddPaymentService,
@@ -92,7 +93,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
     this.watchForCheckControl();
     this.watchForCheckAmountControl();
     this.setTableData();
-
+    
     if (this.checkNumber) {
       this.checkForm.patchValue({ checkNumber: this.checkNumber });
     }
@@ -192,6 +193,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
 
     this.gridApi.setRowData(this.tableData);
     this.cd.detectChanges();
+    this.totalAmount = this.tableData.reduce((acc, item) => acc + item.amount, 0);
   }
 
   calcCheckAmount(): void {
