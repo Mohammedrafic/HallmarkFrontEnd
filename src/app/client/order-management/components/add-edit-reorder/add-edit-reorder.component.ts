@@ -238,7 +238,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       takeUntil(this.destroy$),
     )
     .subscribe(([agencies, candidates]) => {
-      debugger;
       this.agencies = agencies;
       this.candidates = this.candidatesByAgency = candidates;
 
