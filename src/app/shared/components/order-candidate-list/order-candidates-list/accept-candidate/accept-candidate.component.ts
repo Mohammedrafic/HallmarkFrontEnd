@@ -383,6 +383,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public revertStatus(): void {
+    console.log("Acdepterd candidate")
     this.updateAgencyCandidateJob( this.revertedStatus);
   }
 
@@ -423,7 +424,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         takeUntil(this.unsubscribe$)
       ).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
-        this.closeDialog();
       });
       this.updateDetails.emit();
   }
