@@ -158,6 +158,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   lodging : number;
   public showATPform: boolean = false;
   public showbenefits: boolean = true;
+  public showError: boolean = false;
   public SwitcherCalcvariables = SwitcherValue;
   public shownonbenefits: boolean = true;
   public candidateModelState: EditCandidateDialogState;
@@ -227,7 +228,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           this.shownonbenefits = true;
         }
         this.performCalculations();
-      })
+      });
+
+      this.candidateForm.get("actualStartDate")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
+        if(data){
+          this.candidateDetails.actualStartDate = data;
+          this.getATPstipendRate();
+        }
+      });
     }
   }
 
@@ -339,10 +347,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.contractLabourNonBenefit = (!Number.isNaN(this.adjustedTotalNonBenefits / this.hoursWorked)) ? (this.adjustedTotalNonBenefits / this.hoursWorked) : 0;
         this.fullyLoadedBenefit = (!Number.isNaN(this.contractLabourBenefit + this.stipendHourlyRate)) ? this.contractLabourBenefit + this.stipendHourlyRate : 0;
         this.fullyLoadedNonBenefit = (!Number.isNaN(this.contractLabourNonBenefit + this.stipendHourlyRate)) ? this.contractLabourNonBenefit + this.stipendHourlyRate : 0;
-
+        this.performCalculations();
+      }
+    },(error) => {
+      if(error){
+        this.meal = this.lodging = 0;
       }
     })
-    this.performCalculations();
+    this.cdr.detectChanges();
   }
 
   private getLocationDetails(orderDetails : Order) {
@@ -606,9 +618,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy()),
     ).subscribe((status : string) => {
       if(JSON.parse(status) == ApplicantStatus.OnBoarded){
-        this.showATPform = this.meal !== 0 ? true : false;
+        if(this.meal !== 0){
+          this.showATPform = true;
+          this.showError = false;
+        } else {
+          this.showATPform = false;
+          this.showError = true;
+        }
       } else {
         this.showATPform = false;
+        this.showError = false;
       }
     });
 

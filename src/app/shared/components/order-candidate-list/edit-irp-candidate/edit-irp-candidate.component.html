@@ -141,19 +141,19 @@
               </ejs-numerictextbox>
             </div>
           </div>
-        </div>
-        <div class="input-container bootstrap left atpformfield">
-          <label for="billRatesCategory">Select Switcher <span class="required">*</span></label>
-          <div class="input-group">
+          <div class="input-container bootstrap left atpformfield">
+            <label for="billRatesCategory">Switcher <span class="required">*</span></label>
             <div class="input-group">
-              <ejs-dropdownlist
-                formControlName="calculations"
-                placeholder="All"
-                [allowFiltering]="true"
-                [dataSource]="SwitcherCalcvariables"
-              >
-              </ejs-dropdownlist>
-              </div>
+              <div class="input-group">
+                <ejs-dropdownlist
+                  formControlName="calculations"
+                  placeholder="All"
+                  [allowFiltering]="true"
+                  [dataSource]="SwitcherCalcvariables"
+                >
+                </ejs-dropdownlist>
+                </div>
+            </div>
           </div>
         </div>
       </form>
@@ -257,6 +257,9 @@
           </tbody>
         </table>
       </div>
+    </div>
+    <div class="invaliderror" *ngIf="showError">
+      <p> ATP Calculation cannot be displayed as there is invalid Zip-code for the location </p>
     </div>
   </div>
 </ejs-dialog>
