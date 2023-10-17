@@ -20,7 +20,7 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import {
   ApplyOrderApplicants,
   GetRejectReasonsForAgency,
@@ -75,6 +75,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   @Input() actionsAllowed: boolean;
   @Input() isCandidatePayRateVisible: boolean;
   @Input() dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
+  @Input() selectedOrder: Order;
 
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob | null) {
     this.orderCandidateJob = orderCandidateJob;
@@ -605,8 +606,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
             this.candidateSSNRequired = data.candidateSSNRequired;
           }
           this.orderApplicantsInitialData = data;
-          this.form?.patchValue({
-            jobId: data.orderId,
+          this.form?.patchValue({            
+            jobId: `${this.selectedOrder.organizationPrefix}-${this.selectedOrder.publicId}`,
             locationName: data.locationName,
             department: data.departmentName,
             skill: data.skill,
