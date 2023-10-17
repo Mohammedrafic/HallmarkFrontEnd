@@ -30,6 +30,8 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
 
   @Input() activeTabIdx: number;
 
+  @Input() allowSelecton: boolean = true;
+
   @Output() readonly changePage: EventEmitter<number> = new EventEmitter<number>();
 
   @Output() readonly changePerPage: EventEmitter<number> = new EventEmitter<number>();
