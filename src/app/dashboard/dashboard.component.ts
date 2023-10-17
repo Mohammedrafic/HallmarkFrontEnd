@@ -100,6 +100,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   public hasWidgetPermission: boolean = true;
   public hasOrderManagePermission: boolean = true;
   public hasOrderCreatePermission: boolean = true;
+  public userIsAgency: boolean = false;
 
   public widgetsData$: Observable<WidgetsDataModel>;
   public UserType:number;
@@ -140,9 +141,10 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   private getAdminOrganizationsStructureAll(): void {
     this.user$.pipe(takeUntil(this.destroy$), filter(Boolean)).subscribe((user: User) => {
       const userIsAdmin = user.businessUnitType === BusinessUnitType.MSP || user.businessUnitType === BusinessUnitType.Hallmark;
+      this.userIsAgency = user.businessUnitType === BusinessUnitType.Agency;
       this.userIsAdmin$.next(userIsAdmin);
 
-      if (user && userIsAdmin) {
+      if (user && userIsAdmin || this.userIsAgency) {
         this.store.dispatch(new GetOrganizationsStructureAll(user.id));
       }
     });
@@ -295,7 +297,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         takeUntil(this.destroy$)
       )
       .subscribe(([filteredItems, userIsAdmin, orgStructure]) => {
-        if (userIsAdmin) {
+        if (userIsAdmin || this.userIsAgency) {
           const organizationFilter: FilteredDataByOrganizationId[] = filteredItems
             .filter((item) => item.column === FilterColumnTypeEnum.ORGANIZATION)
             .map((item) => new FilteredDataByOrganizationId(item.value));
