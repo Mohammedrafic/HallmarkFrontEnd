@@ -1128,11 +1128,9 @@ export class OrganizationManagementState {
       }),
       catchError((error) => {
         const errorObj = error.error;
-        if (errorObj.errors?.IncompleteOpenOrdersExist && errorObj.errors?.InProgressOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has Open/ Incomplete Orders please re-assign or close them before inactivating the Skill. Skill has Orders In Progress past the inactivation date, please review them before inactivating the Skill'));
-        }
+        const statues = JSON.parse(errorObj.errors.IncompleteOpenOrdersExist);
         if (errorObj.errors?.IncompleteOpenOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has Open/Incomplete Orders, please re-assign or close them before inactivating the Skill'));
+          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has '+ statues +' Orders please re-assign or close them before inactivating the Skill.'));
         }
         if (errorObj.errors?.InProgressOrdersExist) {
           return dispatch(new SaveLocationConfirm());
