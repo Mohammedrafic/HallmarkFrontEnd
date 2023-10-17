@@ -22,6 +22,7 @@ export class SmsSideDialogComponent extends DestroyableDirective implements OnIn
 
   @Output() smsFormCancelClicked = new EventEmitter();
   @Output() smsFormSaveClicked = new EventEmitter();
+  public isDisabled=false;
 
   constructor(private action$: Actions) {
     super();
@@ -31,6 +32,7 @@ export class SmsSideDialogComponent extends DestroyableDirective implements OnIn
     this.action$.pipe(ofActionDispatched(ShowSmsSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
         this.smsSideDialog.show();
+        this.isDisabled=false
       } else {
         this.smsSideDialog.hide();
       }
@@ -43,6 +45,7 @@ export class SmsSideDialogComponent extends DestroyableDirective implements OnIn
 
   onSmsFormSaveClick(): void {
     this.smsFormSaveClicked.emit();
+    this.isDisabled=true
   }
 }
 
