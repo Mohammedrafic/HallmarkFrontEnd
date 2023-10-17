@@ -135,3 +135,7 @@ export class SetHelpSystem {
   static readonly type = '[app] Set help system';
   constructor(public readonly isIrpSystem: boolean) {}
 }
+export class ShowBulkSkillActionDialog {
+  static readonly type = '[app] Set BulkSkill Action Dialog Showing state';
+  constructor(public isDialogShown: boolean,public message:string) { }
+}

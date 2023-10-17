@@ -25,6 +25,7 @@ import {
   CandidateDetails,
   CreateIrpCandidateDto,
   CreateOfferedIrpCandidateDto,
+  DatesWithCurrentTime,
   EditCandidateDialogState,
 } from '@shared/components/order-candidate-list/interfaces';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -35,7 +36,11 @@ import { DateTimeHelper } from '@core/helpers';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Location } from "@shared/models/location.model"
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { RejectedConfigFieldsToShow, RejectedReasonField } from '@shared/components/order-candidate-list/edit-irp-candidate/constants';
+import {
+  OfferedDates,
+  RejectedConfigFieldsToShow,
+  RejectedReasonField
+} from '@shared/components/order-candidate-list/edit-irp-candidate/constants';
 
 @Injectable()
 export class EditIrpCandidateService {
@@ -62,15 +67,15 @@ export class EditIrpCandidateService {
     }) as CustomFormGroup<CandidateForm>;
   }
 
-  disableOfferedDateForOnboardedCandidate(
+  disableOfferedDateControls(
     status: CandidatStatus,
     details: CandidateDetails,
     form: FormGroup
   ): void {
-    if (status === CandidatStatus.OnBoard &&
+    if ((status === CandidatStatus.OnBoard || status === CandidatStatus.Accepted)&&
       details?.offeredStartDate &&
       details?.offeredEndDate) {
-      DisableControls(['offeredStartDate', 'offeredEndDate'], form);
+      DisableControls(OfferedDates, form);
     }
   }
 
@@ -278,6 +283,18 @@ export class EditIrpCandidateService {
           state.order.id,
         )
       );
+    } else if (status === CandidatStatus.Accepted) {
+      return this.orderCandidateApiService.updateIrpCandidate(
+        UpdateCandidateDto(
+          state.order.organizationId as number,
+          state.candidate.candidateJobId,
+          actualStartDate,
+          actualEndDate,
+          undefined,
+          status,
+          state.order.id,
+        )
+      );
     } else {
       return this.orderCandidateApiService.updateIrpCandidate(
         UpdateCandidateDto(
@@ -304,6 +321,24 @@ export class EditIrpCandidateService {
       rejectedReasonField.showField = false;
       form.get(RejectedReasonField)?.removeValidators(Validators.required);
     }
+  }
+
+  public setCurrentTimeToDates(details: CandidateDetails): DatesWithCurrentTime {
+    const actualStartDate = details.actualStartDate ?
+      DateTimeHelper.setCurrentTimeZone(details.actualStartDate as string) : null;
+    const actualEndDate = details.actualEndDate ?
+      DateTimeHelper.setCurrentTimeZone(details.actualEndDate as string) : null;
+    const offeredStartDate = details.offeredStartDate ?
+      DateTimeHelper.setCurrentTimeZone(details.offeredStartDate as string) : null;
+    const offeredEndDate = details.offeredEndDate ?
+      DateTimeHelper.setCurrentTimeZone(details.offeredEndDate as string) : null;
+
+    return {
+      actualStartDate,
+      actualEndDate,
+      offeredStartDate,
+      offeredEndDate
+    };
   }
 
     public getPredefinedBillRatesforRatePerHour(orderType: number, departmentId: number, skillId: number): Observable<ratePerhourConfig> {

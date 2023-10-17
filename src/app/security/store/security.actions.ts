@@ -52,6 +52,11 @@ export class GetAllUsersPage {
   ) {}
 }
 
+export class SetAgencyVisibilityFlag {
+  static readonly type = '[security] Set Agency Visibility flag';
+  constructor(public readonly agencyVisibilityEnabled: boolean) { }
+}
+
 export class GetPermissionsTree {
   static readonly type = '[security] Get Permissions Tree';
   constructor(public type: BusinessUnitType,public businessUnitId:number) {}

@@ -413,6 +413,7 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     ).subscribe((res) => {
       if (selectedIndex == (selectedRegionsLength - 1)) {
         this.store.dispatch(new GetRegionsPage(this.filters));
+        this.getMasterRegionData();
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
       }
     });
