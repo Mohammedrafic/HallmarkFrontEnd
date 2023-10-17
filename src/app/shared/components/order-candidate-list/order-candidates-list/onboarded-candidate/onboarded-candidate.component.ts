@@ -500,7 +500,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           if (!this.isAgency) {
             this.getOrderPermissions(value.orderId);
           }
-          this.billRatesData = [...value.billRates];
+          if(value?.billRates){
+            this.billRatesData = [...value?.billRates];
+          }
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
