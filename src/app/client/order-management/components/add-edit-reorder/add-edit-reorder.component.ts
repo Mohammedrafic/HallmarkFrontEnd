@@ -53,6 +53,8 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { MultiselectDropdownComponent,
 } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.component';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { BillRate } from '@shared/models';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -79,7 +81,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public candidates: CandidateModel[];
   public candidatesByAgency: CandidateModel[];
   public agencies: AgencyModel[];
-  public billRate$: Observable<number>;
   public commentContainerId = 0;
   public comments: Comment[] = [];
   public initialDates: {
@@ -90,6 +91,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public canCreateOrder: boolean;
   private unsubscribe$: Subject<void> = new Subject();
   private multipleReorderDates: Date[] = [];
+  private predefinedBillrates: BillRate[];
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -99,7 +101,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     private actions$: Actions,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private billRatesSyncService: BillRatesSyncService,
   ) {
     super();
     this.createForm();
@@ -149,6 +152,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   ngAfterViewInit(): void {
     this.initAgenciesAndCandidates();
+    this.getPredefinedBillRates();
   }
 
   public override ngOnDestroy(): void {
@@ -173,6 +177,16 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public setMultipleDates(dates: Date[]): void {
     this.reorderForm.get('reorderDate')?.setValue(dates.length ? dates[0] : null);
     this.multipleReorderDates = dates;
+    this.setDefaultBillRate(dates);
+  }
+
+  private setDefaultBillRate(dates: Date[]): void {
+    if (dates.length) {
+      const regularBillRate = this.billRatesSyncService.getBillRateForSync(
+        this.predefinedBillrates, dates[0],
+      );
+      regularBillRate && this.reorderForm.get('billRate')?.setValue(regularBillRate.rateHour);
+    }
   }
 
   private setInitialDatesValue(): void {
@@ -199,13 +213,22 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     );
   }
 
+  private getPredefinedBillRates(): void {
+    if (!this.isEditMode) {
+      const { organizationId, skillId } = this.order;
+      this.reorderService.getBillRate(organizationId!, skillId)
+        .pipe(takeUntil(this.destroy$),)
+        .subscribe((billRates: BillRate[]) => {
+          this.predefinedBillrates = billRates;
+        });
+    }
+  }
+
   private initAgenciesAndCandidates(): void {
-    const { id, organizationId, reOrderFromId, skillId } = this.order;
+    const { id, reOrderFromId } = this.order;
     const isReOrder = !isNil(reOrderFromId) && reOrderFromId !== 0;
     const reorderId = id;
     const perDiemId = isReOrder ? reOrderFromId : id;
-
-    this.billRate$ = this.reorderService.getBillRate(organizationId!, skillId).pipe(filter(() => !this.isEditMode));
 
     forkJoin([
       this.reorderService.getAgencies(reorderId, perDiemId, isReOrder),
@@ -215,6 +238,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       takeUntil(this.destroy$),
     )
     .subscribe(([agencies, candidates]) => {
+      debugger;
       this.agencies = agencies;
       this.candidates = this.candidatesByAgency = candidates;
 
