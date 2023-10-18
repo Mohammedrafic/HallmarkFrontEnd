@@ -16,28 +16,23 @@ export class BillRatesSyncService {
   ): BillRate | null {
     const jobStartDateTimeStamp = jobStartDate ? jobStartDate.getTime() : new Date().getTime();
     let billRateForSync: BillRate | null = null;
-    if(billRates != null){
-      const billRateType = isLocal ? BillRateCalculationType.RegularLocal : BillRateCalculationType.Regular;
-      const sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
-        (billRate) => billRate.billRateConfig.id === billRateType
-      );
-      for (const billRate of sortedBillRates) {
-        const timeStamp =  DateTimeHelper.setInitDateHours(billRate.effectiveDate).getTime();
-        if (timeStamp < jobStartDateTimeStamp) {
-          billRateForSync = billRate;
-          break;
-        }
+    const billRateType = isLocal ? BillRateCalculationType.RegularLocal : BillRateCalculationType.Regular;
+    const sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
+      (billRate) => billRate.billRateConfig.id === billRateType
+    );
+    for (const billRate of sortedBillRates) {
+      const timeStamp = new Date(billRate.effectiveDate).getTime();
+      if (timeStamp < jobStartDateTimeStamp) {
+        billRateForSync = billRate;
+        break;
       }
-  
-      if (!billRateForSync && showWithLongerDate) {
-        billRateForSync = sortedBillRates[sortedBillRates.length - 1] || null;
-      }
-  
-      return billRateForSync;
-  
-    } else {
-      return billRateForSync
     }
+
+    if (!billRateForSync && showWithLongerDate) {
+      billRateForSync = sortedBillRates[sortedBillRates.length - 1] || null;
+    }
+
+    return billRateForSync;
   }
 
   public setFormChangedState(value: boolean): void {

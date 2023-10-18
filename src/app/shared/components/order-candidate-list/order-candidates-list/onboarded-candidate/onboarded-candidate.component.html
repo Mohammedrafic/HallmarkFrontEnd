@@ -73,12 +73,13 @@
                       </div>
                     </div>
                     <div class="input-container bootstrap">
-                      <label class="input-group">Candidate</label>
+                      <label class="input-group" *ngIf="activeSystems !== ordersystemId.IRP">Candidate</label>
+                      <label class="input-group" *ngIf="activeSystems === ordersystemId.IRP">Employee</label>
                       <div class="input-group input-readonly">
                         <input appValidateWithMessage formControlName="candidates" class="e-input" type="text" readonly/>
                       </div>
                     </div>
-                    <div class="input-container bootstrap">
+                    <div class="input-container bootstrap" *ngIf="activeSystems !== ordersystemId.IRP">
                       <label class="input-group">Guaranteed Work Week</label>
                       <div class="input-group" [ngClass]="{'input-readonly': isOnBoarded}">
                         <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" maxlength="50" [readOnly]="isOnBoarded"/>
@@ -91,7 +92,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="right-column">
+                  <div class="right-column" *ngIf="activeSystems !== ordersystemId.IRP">
                     <div class="input-container bootstrap">
                       <label class="input-group">Bill Rate ($)</label>
                       <div class="input-group input-readonly">
@@ -151,7 +152,7 @@
                     <input appValidateWithMessage formControlName="offeredStartDate" class="e-input" type="text" readonly/>
                   </div>
                 </div>
-                <div class="form-container row">
+                <div class="form-container row" *ngIf="activeSystems !== ordersystemId.IRP">
                   <div class="input-container bootstrap">
                     <label class="input-group">Yrs. of Exp.</label>
                     <div class="input-group input-readonly">
@@ -180,7 +181,7 @@
                   </div>
                 </div>
                 <div class="input-container bootstrap" *ngIf="candidateJobState$ | async as candidateJobState">
-                  <div *ngIf="isAccepted || isOnBoarded">
+                  <div *ngIf="isAccepted || isOnBoarded && activeSystems !== ordersystemId.IRP">
                     <ejs-checkbox formControlName="allow" label="Allow deploy w/o credentials"></ejs-checkbox>
                   </div>
                 </div>
@@ -220,7 +221,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="input-container bootstrap">
+                <div class="input-container bootstrap" *ngIf="activeSystems !== ordersystemId.IRP">
                   <label class="input-group">Leave request comments</label>
                   <div class="input-group input-readonly">
                     <input appValidateWithMessage formControlName="comments" class="e-input" type="text" readonly/>
@@ -274,11 +275,28 @@
         </e-accordionitems>
       </ejs-accordion>
     </div>
-    <div class="comments" *ngIf="candidateJob?.commentContainerId !== null">
-      <app-comments *ngIf="candidateJob" [canVmsCreateOrders]="canCreateOrder" [comments]="candidateComments" [externalCommentConfiguration]="order.externalCommentsConfiguration" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
+    <div class="comments" *ngIf="candidateJob?.commentContainerId !== null && activeSystems !== OrderManagementIRPSystemId.IRP">
+      <app-comments 
+        *ngIf="candidateJob" 
+        [canVmsCreateOrders]="canCreateOrder" 
+        [comments]="candidateComments" 
+        [externalCommentConfiguration]="order.externalCommentsConfiguration" 
+        [commentContainerId]="candidateJob.commentContainerId || 0">
+      </app-comments>
     </div>
+    <div class="comments" *ngIf="candidateJob?.commentContainerId !== null && activeSystems === OrderManagementIRPSystemId.IRP">
+      <app-comments-irp
+        [comments]="candidateComments"
+        [commentContainerId]="commentContainerId"
+        [useBackground]="false"
+        [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
+        [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
+        [externalCommentConfiguration]="order.externalCommentsConfiguration" 
+      ></app-comments-irp>
+    </div>
+
   </section>
-  <section>
+  <section *ngIf="activeSystems !== ordersystemId.IRP">
     <ng-container [ngTemplateOutlet]="(isCancelled && !canEditClosedBillRate) ? billRates : editBillRates"></ng-container>
     <ng-template #billRates>
       <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>

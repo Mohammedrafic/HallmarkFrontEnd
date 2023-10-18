@@ -139,7 +139,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() order: MergedOrder;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
-  @Input() activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
+  @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() orderComments: Comment[] = [];
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild, string] | null>;
   @Output() saveEmitter = new EventEmitter<void>();
@@ -176,7 +176,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   @Select(OrderManagementState.deployedCandidateOrderInfo)
   public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
-
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public irpOrderType = IrpOrderType;
   public system: string;
   public firstActive = true;
