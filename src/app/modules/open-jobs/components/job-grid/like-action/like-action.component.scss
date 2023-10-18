@@ -4,16 +4,20 @@
   button {
     color: $primary-active-blue-10;
 
-    &:disabled.btn-unlike {
-      i-feather {
-        color: $primary-active-blue-40;
-        fill: $primary-active-blue-60;
+    &:disabled {
+      &.btn-unlike {
+        i-feather {
+          color: $primary-active-blue-40;
+          fill: $primary-active-blue-60;
+        }
       }
     }
 
-    &:not(:disabled).btn-unlike {
-      i-feather {
-        fill: $primary-active-blue-20;
+    &:not(:disabled) {
+      &.btn-unlike {
+        i-feather {
+          fill: $primary-active-blue-20;
+        }
       }
     }
   }
