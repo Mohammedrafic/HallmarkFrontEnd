@@ -67,7 +67,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CustomFormGroup } from '@core/interface';
 import { OrderManagementService, } from '@client/order-management/components/order-management-content/order-management.service';
 import { DurationService } from '@shared/services/duration.service';
-import { OrderType } from '@shared/enums/order-type';
+import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { Order, OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
@@ -206,14 +206,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.AtpCalcForm.get("hoursWorked")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
           this.hoursWorked = data;
-          this.performCalculations();
+          this.getATPstipendRate();
         }
       })
 
       this.AtpCalcForm.get("costSaving")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
           this.costSaving = data;
-          this.performCalculations();
+          this.getATPstipendRate();
         }
       });
 
@@ -228,7 +228,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           this.showbenefits = true;
           this.shownonbenefits = true;
         }
-        this.performCalculations();
+        this.getATPstipendRate();
       });
 
       this.candidateForm.get("actualStartDate")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
@@ -310,7 +310,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   public getOrderDetails(orderDetails : Order){
-      this.editIrpCandidateService.getPredefinedBillRatesforRatePerHour(1, orderDetails.departmentId, orderDetails.skillId).pipe(
+      this.editIrpCandidateService.getPredefinedBillRatesforRatePerHour(IrpOrderType.LongTermAssignment, orderDetails.departmentId, orderDetails.skillId).pipe(
         takeUntil(this.componentDestroy()),
         take(1)
       ).subscribe(data => {
@@ -335,7 +335,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.lodging = this.stipendData.lodgingrate;
         if(this.meal == 0 || this.lodging == 0){
           this.showATPform = false;
-          this.store.dispatch(new ShowToast(MessageTypes.Error, INVALID_ZIP))
         }
         this.stipendBenefits = (!Number.isNaN(this.meal + this.lodging)) ? this.meal + this.lodging : 0;
         this.stipendNonBenefits = (!Number.isNaN(this.meal + this.lodging)) ? this.meal + this.lodging : 0;
@@ -349,13 +348,13 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.fullyLoadedBenefit = (!Number.isNaN(this.contractLabourBenefit + this.stipendHourlyRate)) ? this.contractLabourBenefit + this.stipendHourlyRate : 0;
         this.fullyLoadedNonBenefit = (!Number.isNaN(this.contractLabourNonBenefit + this.stipendHourlyRate)) ? this.contractLabourNonBenefit + this.stipendHourlyRate : 0;
         this.performCalculations();
+        this.cdr.detectChanges();
       }
     },(error) => {
       if(error){
         this.meal = this.lodging = 0;
       }
     })
-    this.cdr.detectChanges();
   }
 
   private getLocationDetails(orderDetails : Order) {
@@ -377,7 +376,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.costSavingBenefits = (!Number.isNaN((this.salaryWagesandBenefits * this.costSaving) / 100)) ? ((this.salaryWagesandBenefits * this.costSaving) / 100) : 0;
     this.benefitsBenefits = (!Number.isNaN(this.salaryWagesandBenefits * (this.benefitpercentofsw / 100))) ? (this.salaryWagesandBenefits * (this.benefitpercentofsw / 100)) : 0;
     this.benefitsNonBenefits = (!Number.isNaN(this.salaryWagesandBenefits * (this.wagePercent / 100))) ? (this.salaryWagesandBenefits * (this.wagePercent / 100)) : 0;
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
   showReplacementPdOrdersDialog(show = true): void {
