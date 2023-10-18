@@ -42,6 +42,7 @@ import {
   GetLogFileDownload,
   GetNonEmployeeUsers,
   GetBusinessIdDetails,
+  SetAgencyVisibilityFlag,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -89,6 +90,7 @@ interface SecurityStateModel {
   nonEmployeeUserData: User[];
   logFileDownloadDetail:any;
   businessIdDetails:GetBusinessUnitIdDetails|null;
+  isAgencyVisibilityEnabled:boolean;
 }
 
 @State<SecurityStateModel>({
@@ -117,7 +119,8 @@ interface SecurityStateModel {
     userData: [],
     nonEmployeeUserData: [],
     logFileDownloadDetail:null,
-    businessIdDetails:null
+    businessIdDetails:null,
+    isAgencyVisibilityEnabled:false
   },
 })
 @Injectable()
@@ -287,6 +290,11 @@ export class SecurityState {
     return state.businessIdDetails;
   }
 
+  @Selector()
+  static isAgencyVisibilityFlagEnabled(state: SecurityStateModel): boolean {
+    return state.isAgencyVisibilityEnabled;
+  }
+
 
   constructor(
     private businessUnitService: BusinessUnitService,
@@ -295,6 +303,13 @@ export class SecurityState {
     private nodatimeService: NodatimeService,  
     private orgInterfaceService: OrgInterfaceService
   ) {}
+
+  @Action(SetAgencyVisibilityFlag)
+  SetIrpFlag({ patchState }: StateContext<SecurityStateModel>, { agencyVisibilityEnabled }: SetAgencyVisibilityFlag): void {
+    patchState({
+      isAgencyVisibilityEnabled: agencyVisibilityEnabled,
+    });
+  }
 
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType(

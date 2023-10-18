@@ -1,36 +1,43 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder } from "@angular/forms";
+import { FormBuilder } from '@angular/forms';
 
-import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { GridComponent } from "@syncfusion/ej2-angular-grids";
-import { debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from "rxjs";
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 
-import { User } from "@shared/models/user-managment-page.model";
-import { UserVisibilitySetting, UserVisibilitySettingsPage, UserVisibilityFilter } from "@shared/models/visibility-settings.model";
-import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from "@shared/constants";
-import { ConfirmService } from "@shared/services/confirm.service";
+import { User } from '@shared/models/user-managment-page.model';
+import {
+  UserVisibilitySetting,
+  UserVisibilitySettingsPage,
+  UserVisibilityFilter,
+} from '@shared/models/visibility-settings.model';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
 import {
   GetUserVisibilitySettingsPage,
   RemoveUserVisibilitySetting,
   RemoveUserVisibilitySettingSucceeded,
-  SaveUserVisibilitySettingsSucceeded
-} from "src/app/security/store/security.actions";
-import { SecurityState } from "src/app/security/store/security.state";
+  SaveUserVisibilitySettingsSucceeded,
+} from 'src/app/security/store/security.actions';
+import { SecurityState } from 'src/app/security/store/security.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-visibility-settings',
   templateUrl: './visibility-settings.component.html',
-  styleUrls: ['./visibility-settings.component.scss']
+  styleUrls: ['./visibility-settings.component.scss'],
 })
 export class VisibilitySettingsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
-  @Input() set user (user: User | null) {
+  @Input() set user(user: User | null) {
+    this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
     this.createdUser = user;
     this.userId = this.createdUser?.id as string;
   }
 
+  public isAgencyUser = false;
   @Select(SecurityState.userVisibilitySettingsPage)
   public userVisibilitySettingsPage$: Observable<UserVisibilitySettingsPage>;
 
@@ -42,30 +49,34 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
   private userId: string;
 
   public filters: UserVisibilityFilter = {
-    userId: ''
+    userId: '',
   };
 
-  constructor(private store: Store,
-              private fb: FormBuilder,
-              private actions$: Actions,
-              private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private fb: FormBuilder,
+    private actions$: Actions,
+    private confirmService: ConfirmService
+  ) {
     super();
   }
 
   ngOnInit(): void {
-    this.currentPage= 1;
+    this.currentPage = 1;
     this.filters.userId = this.userId;
     this.filters.pageNumber = this.currentPage;
     this.filters.pageSize = this.pageSize;
-
+    
     this.store.dispatch(new GetUserVisibilitySettingsPage(this.filters));
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetUserVisibilitySettingsPage(this.filters));
     });
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUserVisibilitySettingsSucceeded))
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUserVisibilitySettingsSucceeded))
       .subscribe(() => this.store.dispatch(new GetUserVisibilitySettingsPage(this.filters)));
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveUserVisibilitySettingSucceeded))
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveUserVisibilitySettingSucceeded))
       .subscribe(() => this.store.dispatch(new GetUserVisibilitySettingsPage(this.filters)));
   }
 
@@ -91,18 +102,19 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .pipe(
         filter((confirm) => !!confirm),
         take(1)
-        ).subscribe(() => {
+      )
+      .subscribe(() => {
         this.store.dispatch(new RemoveUserVisibilitySetting(data.id, this.userId));
       });
   }
 
   public onRowsDropDownChanged(): void {
-    this.pageSize  = parseInt(this.activeRowsPerPageDropDown);
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 
@@ -110,7 +122,7 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
       this.filters.pageNumber = this.currentPage;
-      this.currentPage=event.currentPage;
+      this.currentPage = event.currentPage;
     }
   }
 }

@@ -14,6 +14,7 @@ export const CandidateTitle = 'Edit Employee';
 export const StatusField = 'status';
 export const CloseReasonField = 'reason';
 export const RejectedReasonField = 'rejectedReason';
+export const OfferedDates = ['offeredStartDate', 'offeredEndDate'];
 export const DefaultConfigFieldsToShow: string[] = [
   'status',
   'actualStartDate',
@@ -35,6 +36,7 @@ export const OnboardConfigFieldsToShow: string[] = [
   'reason',
   'closeDate',
 ];
+export const AcceptConfigFieldsToShow = ['status', 'actualStartDate', 'actualEndDate', 'offeredStartDate', 'offeredEndDate'];
 
 export const SwitcherValue : string[] = [
   'All',

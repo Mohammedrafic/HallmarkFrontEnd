@@ -1,18 +1,18 @@
 import {
-  Component,
-  OnInit,
   ChangeDetectionStrategy,
-  ViewChild,
-  Input,
-  Output,
-  EventEmitter,
   ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { catchError, distinctUntilChanged, filter, switchMap, take, takeUntil, skip, tap, of, Subscription } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, of, skip, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
@@ -20,11 +20,13 @@ import { Store } from '@ngxs/store';
 import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import {
+  AcceptConfigFieldsToShow,
   CandidateDialogConfig,
   CandidateTitle,
   CloseReasonField,
   DefaultConfigFieldsToShow,
   OfferedConfigFieldsToShow,
+  OfferedDates,
   OfferedStatusFlow,
   OnboardConfigFieldsToShow,
   OptionField,
@@ -131,6 +133,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public ratePerHour : number = 96;
   public benefitpercentofsw : number;
   public wagePercent : number;
+  public isTurnedOn : boolean;
   public payrateData: Configuration[];
   public RegionDetails: Location[];
 
@@ -155,6 +158,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   lodging : number;
   public showATPform: boolean = false;
   public showbenefits: boolean = true;
+  public showError: boolean = false;
   public SwitcherCalcvariables = SwitcherValue;
   public shownonbenefits: boolean = true;
   public candidateModelState: EditCandidateDialogState;
@@ -224,7 +228,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           this.shownonbenefits = true;
         }
         this.performCalculations();
-      })
+      });
+
+      this.candidateForm.get("actualStartDate")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
+        if(data){
+          this.candidateDetails.actualStartDate = data;
+          this.getATPstipendRate();
+        }
+      });
     }
   }
 
@@ -291,6 +302,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.benefitpercentofsw = this.configdata.benefitPercent;
         this.costSaving = this.configdata.costSavings;
         this.wagePercent = this.configdata.wagePercent;
+        this.isTurnedOn = this.configdata.isEnabled;
       }
       this.createATPform();
     });
@@ -335,10 +347,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.contractLabourNonBenefit = (!Number.isNaN(this.adjustedTotalNonBenefits / this.hoursWorked)) ? (this.adjustedTotalNonBenefits / this.hoursWorked) : 0;
         this.fullyLoadedBenefit = (!Number.isNaN(this.contractLabourBenefit + this.stipendHourlyRate)) ? this.contractLabourBenefit + this.stipendHourlyRate : 0;
         this.fullyLoadedNonBenefit = (!Number.isNaN(this.contractLabourNonBenefit + this.stipendHourlyRate)) ? this.contractLabourNonBenefit + this.stipendHourlyRate : 0;
-
+        this.performCalculations();
+      }
+    },(error) => {
+      if(error){
+        this.meal = this.lodging = 0;
       }
     })
-    this.performCalculations();
+    this.cdr.detectChanges();
   }
 
   private getLocationDetails(orderDetails : Order) {
@@ -469,6 +485,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
             candidateDetails.offeredStartDate as string,
             candidateDetails.offeredEndDate as string
           );
+          this.handleAcceptedStatus(this.candidateModelState.candidate.status, candidateDetails);
 
           this.candidateCommentContainerId = candidateDetails.commentContainerId;
           this.getComments();
@@ -522,15 +539,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
             );
           }
 
-          this.candidateForm.enable();
+          this.candidateForm.enable({ emitEvent: false, onlySelf: true });
           this.populateFormForRejectedEmployee();
 
-          this.editIrpCandidateService.disableOfferedDateForOnboardedCandidate(
+          this.editIrpCandidateService.disableOfferedDateControls(
             this.candidateModelState.candidate.status,
             this.candidateDetails,
             this.candidateForm
           );
-
           reasonConfigField.dataSource = this.editIrpCandidateService
             .createReasonsOptions(this.editIrpCandidateService.getClosureReasons(true));
 
@@ -602,9 +618,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy()),
     ).subscribe((status : string) => {
       if(JSON.parse(status) == ApplicantStatus.OnBoarded){
-        this.showATPform = this.meal !== 0 ? true : false;
+        if(this.meal !== 0){
+          this.showATPform = true;
+          this.showError = false;
+        } else {
+          this.showATPform = false;
+          this.showError = true;
+        }
       } else {
         this.showATPform = false;
+        this.showError = false;
       }
     });
 
@@ -665,7 +688,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.updateVisibilityConfig(value, this.candidateDetails);
       this.isAppliedorShortlisted = value === CandidatStatus.Applied || value === CandidatStatus.Shortlisted;
       this.showactualStartEndDate = value === CandidatStatus.OnBoard
-       || value === CandidatStatus.Cancelled ||value === CandidatStatus.Offboard;
+       || value === CandidatStatus.Cancelled || value === CandidatStatus.Offboard || value === CandidatStatus.Accepted;
       this.candidateForm.get('availableStartDate')?.patchValue(
         DateTimeHelper.setCurrentTimeZone(this.availableStartDate as string), { emitEvent: false, onlySelf: true }
       );
@@ -678,6 +701,17 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       );
       this.cdr.markForCheck();
   });
+  }
+
+  private handleAcceptedStatus(status: CandidatStatus, details: CandidateDetails): void {
+    if(!status || status !== CandidatStatus.Accepted) {
+      return;
+    }
+
+    this.showactualStartEndDate = status === CandidatStatus.Accepted;
+    const formValues = this.editIrpCandidateService.setCurrentTimeToDates(details);
+
+    this.candidateForm.patchValue(formValues, { emitEvent: false, onlySelf: true });
   }
 
   private handleOfferedStatus(
@@ -722,7 +756,13 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
     if (hasOnboardedCandidateOfferedDate || hasCancelledOffboardCandidate) {
       UpdateVisibilityConfigFields(this.dialogConfig, OnboardConfigFieldsToShow);
-      DisableControls(['offeredStartDate', 'offeredEndDate'], this.candidateForm);
+      DisableControls(OfferedDates, this.candidateForm);
+      return;
+    }
+
+    if (status === CandidatStatus.Accepted) {
+      UpdateVisibilityConfigFields(this.dialogConfig, AcceptConfigFieldsToShow);
+      DisableControls(OfferedDates, this.candidateForm);
       return;
     }
 

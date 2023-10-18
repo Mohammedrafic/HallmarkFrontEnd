@@ -39,6 +39,7 @@ import {
   filter,
   map,
   Observable,
+  of,
   Subject,
   switchMap,
   take,
@@ -52,6 +53,7 @@ import {
   ConfirmApprovedTimesheetDeleteDialogContent,
   ConfirmDeleteTimesheetDialogContent,
   rejectTimesheetDialogData,
+  SwitchingDnwOffForApprovedTimesheetDialogContent,
   TimesheetConfirmMessages,
   TimesheetDetailsExportOptions,
 } from '../../constants';
@@ -204,7 +206,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private eventsHandler: Subject<void> = new Subject();
   private unsubscribe$: Subject<void> = new Subject();
   sideBar:boolean = false;
-  
+
 
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
@@ -250,7 +252,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     if (event.isExpanded) {
       this.eventsHandler.next();
     }
-   
+
   }
 
   public override ngOnDestroy(): void {
@@ -338,7 +340,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const parent = e.target.parentNode as ParentNode;
     this.tooltip.content = Array.from(parent.children).indexOf(e.target) ? 'Miles Status' : 'Timesheet Status';
   }
-  
+
   public onDWNCheckboxSelectedChange({ checked }: { checked: boolean }, switchComponent: SwitchComponent): void {
     checked
       ? this.timesheetDetails$
@@ -366,10 +368,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             this.refreshData();
             this.closeDialog();
           })
-      : this.store
-          .dispatch(new TimesheetDetails.NoWorkPerformed(false, this.timesheetId, this.organizationId))
-          .pipe(take(1))
-          .subscribe(() => this.refreshData());
+      : this.switchDnwOff(switchComponent);
   }
 
   public handleReject(reason: string): void {
@@ -405,6 +404,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public handleApprove(isTimesheetOrMileagesUpdate: boolean): void {
     const { timesheetId, mileageTimesheetId, organizationId } = this;
     const updateId = isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId;
+    const timesheetDetails = this.store.selectSnapshot(TimesheetsState.timesheetDetails);
+
+    if (organizationId && timesheetDetails?.isEmpty && !timesheetDetails?.noWorkPerformed) {
+      this.submitEmptyTimesheetWarning();
+      return;
+    }
 
     (organizationId
       ? this.timesheetDetailsService.submitTimesheet(updateId, organizationId, isTimesheetOrMileagesUpdate)
@@ -420,7 +425,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const timesheetDetails = this.store.selectSnapshot(TimesheetsState.timesheetDetails);
 
     if (timesheetDetails?.isEmpty && !timesheetDetails?.noWorkPerformed) {
-      this.orgSubmitEmptyTimesheetWarning();
+      this.submitEmptyTimesheetWarning();
     } else {
       this.orgSubmitTimesheet(timesheetDetails);
     }
@@ -533,10 +538,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
   }
 
-  private orgSubmitEmptyTimesheetWarning(): void {
+  private submitEmptyTimesheetWarning(): void {
     this.timesheetDetailsService
-      .orgSubmitEmptyTimesheet()
-      .pipe(take(1), takeUntil(this.componentDestroy()))
+      .submitEmptyTimesheet()
+      .pipe(take(1))
       .subscribe();
   }
 
@@ -598,7 +603,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.disableAnyAction = allowResult;
   }
   private allowEditButtonEnabled(): void {
-    let organizationId = this.orgId; 
+    let organizationId = this.orgId;
     this.settingsViewService.getViewSettingKey(
       OrganizationSettingKeys.TimesheetSubmissionProcess,
       OrganizationalHierarchy.Location,
@@ -610,7 +615,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       takeUntil(this.componentDestroy())
     ).subscribe(({ TimesheetSubmissionProcess }) => {
       let currentdate = new Date();
-      let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));     
+      let dateDiff = Math.floor((currentdate.valueOf() - this.weekPeriod[0].valueOf()) / (1000 * 3600 * 24));
       if (TimesheetSubmissionProcess == "INT" &&dateDiff <= 30) {
         this.disableEditButton = true;
       }
@@ -720,7 +725,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       this.cd.markForCheck();
     });
   }
-  
+
   public sideBarObserver(){
     this.isSideBarDocked$
         .pipe(takeUntil(this.componentDestroy()))
@@ -729,7 +734,51 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
           if(this.previewAttachemnt){
             this.navigateTheAttachment$.next(this.currentSelectedAttachmentIndex);
           }
-            
+
         });
+  }
+
+  private switchDnwOff(switchComponent: SwitchComponent): void {
+    let isApproved: boolean;
+
+    this.timesheetDetails$
+      .pipe(
+        map(({ status }: TimesheetInt.TimesheetDetailsModel) => status === TimesheetStatus.Approved),
+        switchMap((approved: boolean) => {
+          isApproved = approved;
+
+          if (!approved) {
+            return of(true);
+          }
+
+          return this.confirmService.confirm(
+            SwitchingDnwOffForApprovedTimesheetDialogContent,
+            {
+              title: 'DNW Timesheet',
+              okButtonLabel: 'Yes',
+              okButtonClass: 'delete-button',
+            }
+          );
+        }),
+        take(1),
+        tap((submitted: boolean) => {
+          if (!submitted) {
+            switchComponent.writeValue(true);
+          }
+        }),
+        filter(Boolean),
+        switchMap(() =>
+          this.store.dispatch(new TimesheetDetails.NoWorkPerformed(false, this.timesheetId, this.organizationId))
+        ),
+        take(1),
+      )
+      .subscribe(() => {
+        if (isApproved) {
+          this.refreshGrid();
+          this.closeDialog();
+        } else {
+          this.refreshData();
+        }
+      });
   }
 }

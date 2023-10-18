@@ -65,13 +65,19 @@
       }
 
       .ag-root-wrapper-body {
-        height: auto !important;
+        height: 100% !important;
       }
 
       .ag-header-cell-text {
         text-overflow: initial !important;
         white-space: normal !important;
       }
+      .ag-layout-auto-height
+        {
+          height: calc(100vh - 270px) !important;
+          overflow: auto;
+        }
+     
     }
   }
 
@@ -112,4 +118,12 @@
       }
     }
   }
+}
+button.e-control.e-btn.e-flat.close-button:focus{
+  background: none !important;
+  color:  #3e7fff !important;
+}
+button.e-control.e-btn.e-flat.close-button:hover{
+  background-color: #d8e5ff !important;
+    color:  #3e7fff !important;
 }

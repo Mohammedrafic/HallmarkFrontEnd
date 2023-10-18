@@ -399,11 +399,11 @@ export const submitTimesheetDialogData = (timesheetOrMiles = true) => ({
   successMessage: `Success. ${timesheetOrMiles ? 'Timesheet' : 'Mileages'} Submitted`,
 });
 
-export const orgSubmitEmptyTimesheetDialogData = () => ({
+export const SubmitEmptyTimesheetDialogData = {
   title: 'Submit Timesheet',
   submitButtonText: 'Ok',
   confirmMessage: 'If the candidate did not work this week, check the DNW switch.',
-});
+};
 
 const billRateCalculationTypeMapper = {
   [BillRateCalculationType.Regular]: 'Regular',

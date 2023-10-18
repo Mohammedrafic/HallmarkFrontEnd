@@ -6,10 +6,12 @@ import {
   OrderManagementIrpRowPositionComponent,
 } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.component';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { OrderManagementIRPRowPositionService } from './order-management-irp-row-position.service';
 
 @NgModule({
   declarations: [OrderManagementIrpRowPositionComponent],
   imports: [CommonModule, ChipListModule, SharedModule, TooltipContainerModule],
   exports: [OrderManagementIrpRowPositionComponent],
+  providers : [OrderManagementIRPRowPositionService]
 })
 export class OrderManagementIrpRowPositionModule {}
