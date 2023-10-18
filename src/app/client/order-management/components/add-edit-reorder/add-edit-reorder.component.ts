@@ -183,7 +183,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private setDefaultBillRate(dates: Date[]): void {
     if (dates.length) {
       const regularBillRate = this.billRatesSyncService.getBillRateForSync(
-        this.predefinedBillrates, dates[0],
+        this.predefinedBillrates, new Date(DateTimeHelper.setUtcTimeZone(dates[0])),
       );
       regularBillRate && this.reorderForm.get('billRate')?.setValue(regularBillRate.rateHour);
     }

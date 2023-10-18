@@ -11,6 +11,7 @@ export const SkillFields: FieldSettingsModel = { text: 'name', value: 'masterSki
 export const ListOfPermPlacementControls = ['orderPlacementFee', 'annualSalaryRangeFrom', 'annualSalaryRangeTo'];
 export const ListOfGeneralOrderControls = ['hourlyRate', 'jobEndDate', 'duration', 'joiningBonus', 'compBonus'];
 export const ControlsForDisable = ['regionId', 'locationId', 'departmentId', 'skillId'];
+export const ControlsForDisablelocation = [ 'skillId'];
 export const OrderTypeControls = ['orderType'];
 export const JobDistributionControls = ['jobDistribution', 'agency', 'jobDistributions'];
 export const ExtensionControls = ['jobDistribution', 'agency', 'classifications'];

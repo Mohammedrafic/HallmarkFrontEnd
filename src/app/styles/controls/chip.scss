@@ -110,6 +110,17 @@ ejs-chiplist.e-control.e-chip-list {
     }
   }
 
+  &.open-jobs-status {
+    .e-chip {
+      width: 111px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      line-height: 13px;
+    }
+  }
+
   &.events-off {
     pointer-events: none;
   }

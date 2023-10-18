@@ -59,16 +59,30 @@ export interface LtaEmployeeDto {
   workflowStepType: number;
 }
 
+export interface UpdateLtaEmployeeDTO {
+  jobId: number;
+  orderId: number | null;
+  organizationId: number;
+  workflowStepType: number;
+  actualStartDate?: string | null;
+  actualEndDate?: string | null;
+  availableStartDate?: string | null;
+  offeredStartDate?: string | null;
+  offeredEndDate?: string | null;
+  employeeTime?: string | null;
+}
+
 export interface EmployeeScheduledDays {
   employeeId: number | string;
   dates: string[];
 }
 
 export interface PerDiemEmployeeDto {
-  employeeScheduledDays: EmployeeScheduledDays[];
-  userLocalTime: string;
-  scheduleType: number;
-  startTime: string;
-  endTime: string;
-  shiftId: number | null;
+  orderId: number;
+  employeeTime?: string | null;
+}
+
+export interface WithdrawPerDiemEmployeeDto {
+  orderId: number;
+  employeeTime?: string | null;
 }

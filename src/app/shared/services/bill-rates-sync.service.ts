@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BaseObservable } from '@core/helpers';
+import { BaseObservable, DateTimeHelper } from '@core/helpers';
 import { BillRate, BillRateCalculationType } from '@shared/models';
 
 @Injectable({
@@ -22,7 +22,7 @@ export class BillRatesSyncService {
         (billRate) => billRate.billRateConfig.id === billRateType
       );
       for (const billRate of sortedBillRates) {
-        const timeStamp = new Date(billRate.effectiveDate).getTime();
+        const timeStamp =  DateTimeHelper.setInitDateHours(billRate.effectiveDate).getTime();
         if (timeStamp < jobStartDateTimeStamp) {
           billRateForSync = billRate;
           break;
