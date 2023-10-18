@@ -1,9 +1,9 @@
 <div class="action">
   <button
     ejs-button
-    cssClass="e-flat"
+    [ngClass]="{'e-flat': true, 'btn-unlike': isApplySelected}"
     [disabled]="isApplyEnabled"
-    (click)="applyJob()"
+    (click)="callJobAction()"
   >
     <i-feather name="thumbs-up" class="icon"></i-feather>
   </button>
