@@ -4,16 +4,16 @@
   display: flex;
   align-items: center;
 
-  & ejs-chiplist {
+  ejs-chiplist {
     flex-wrap: initial !important;
     gap: 15px;
   }
 }
-  
+
 .status-cell {
   width: 100%;
 
-  & .e-chip {
+  .e-chip {
     width: 100%;
   }
 }
