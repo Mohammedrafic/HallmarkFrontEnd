@@ -67,6 +67,13 @@ export interface CandidateDetails {
   rejectionReasonId: number;
 }
 
+export interface DatesWithCurrentTime {
+  actualStartDate: Date | null;
+  actualEndDate: Date | null;
+  offeredStartDate: Date | null;
+  offeredEndDate: Date | null;
+}
+
 export interface EditCandidateDialogState {
   isOpen: boolean;
   candidate: IrpOrderCandidate;

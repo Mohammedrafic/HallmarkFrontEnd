@@ -19,7 +19,7 @@ import { CreatedCandidateStatus } from '@shared/enums/status';
 import { CredentialStorageFacadeService } from "@agency/services/credential-storage-facade.service";
 import { CandidateCredentialResponse } from "@shared/models/candidate-credential.model";
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { distinctUntilChanged, filter, Observable, takeUntil, switchMap, take, map } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, takeUntil, switchMap, take, map, Subject } from 'rxjs';
 import { CandidateGeneralInfoComponent } from
   'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from
@@ -50,6 +50,7 @@ import { Country } from "@shared/enums/states";
 import { GetRegionList } from "@shared/components/candidate-list/store/candidate-list.actions";
 import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
 import { AppState } from 'src/app/store/app.state';
+import { AlertIdEnum } from "@admin/alerts/alerts.enum";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -85,7 +86,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   private filesDetails: Blob[] = [];
   private isInitialUpload = false;
-
+  reloadCredentials$:Subject<boolean> = new Subject<boolean>();
   public get isCandidateAssigned(): boolean {
     return !!this.orderId && !!this.candidateStatus;
   }
@@ -278,8 +279,18 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       )
     .subscribe((res) => {
       this.tab.enableTab(experienceTabIndex, !!res);
-      this.tab.enableTab(educationTabIndex, !!res);
-      this.tab.enableTab(credentialTabIndex, !!res);
+      this.tab.enableTab(educationTabIndex, !!res);      
+      let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+      if(((AlertIdEnum[AlertIdEnum['Candidate Credential Rejected']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+          || (AlertIdEnum[AlertIdEnum['Candidate Credential Reviewed']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase())
+          && JSON.parse((localStorage.getItem('OrderId') || '0')) as number){
+            setTimeout(() => {
+              this.tab.enableTab(profileTabIndex, !!res);
+              this.tab.select(credentialTabIndex);
+            });
+          }else{
+            this.tab.enableTab(credentialTabIndex, !!res);
+          }
     });
 
     this.tab.selected
@@ -294,6 +305,16 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         event.previousIndex !== profileTabIndex
       ) {
         this.tab.refresh();
+      }
+      let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+      if(event.previousIndex === credentialTabIndex
+          && ((AlertIdEnum[AlertIdEnum['Candidate Credential Rejected']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+            || (AlertIdEnum[AlertIdEnum['Candidate Credential Reviewed']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+            )
+          && JSON.parse((localStorage.getItem('OrderId') || '0')) as number){
+            window.localStorage.setItem("OrderId", JSON.stringify(""));
+            window.localStorage.setItem("alertTitle", JSON.stringify(""));
+            this.reloadCredentials$.next(true);
       }
     });
   }

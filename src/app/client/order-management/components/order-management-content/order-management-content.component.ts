@@ -143,6 +143,7 @@ import {
   FilterOrderStatus,
   FilterStatus,
   IRPOrderManagement,
+  IRPOrderPosition,
   Order,
   OrderCandidateJob,
   OrderFilter,
@@ -249,6 +250,7 @@ import {
   ViewOrderVMS_PERMISSION
 } from '@shared/constants';
 import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/interfaces';
+import { OrderManagementIRPRowPositionService } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -525,6 +527,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private readonly ngZone: NgZone,
     private preservedOrderService: PreservedOrderService,
     private ordergridsystemstateservice:OrderGridSystemStateService,
+    public orderManagementIRPRowPositionService: OrderManagementIRPRowPositionService,
     @Inject(DOCUMENT) private documentEle: Document,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
@@ -646,6 +649,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.watchForOrderFromAnotherSystem();
     this.watchForOrderGridSystemClickEvent();
     this.watchForOrderFromNotification();
+    this.watchForOrderIRPSubRowClickEvent();
   }
 
   ngOnDestroy(): void {
@@ -665,7 +669,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
     this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     if (Object.values(AlertIdEnum).includes(this.alertTitle)) {
-      if((this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim().toLowerCase()){
+      if((this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim().toLowerCase()
+       ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Open']].trim().toLowerCase()
+       ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Closed']].trim().toLowerCase()
+      ){
         this.isOrderDetailsTab=true;
       }
       else
@@ -686,6 +693,27 @@ private watchForOrderGridSystemClickEvent()
   }
 })
 }
+
+public watchForOrderIRPSubRowClickEvent(){
+  this.orderManagementIRPRowPositionService.handleStatusClickEvent.pipe(
+    takeUntil(this.unsubscribe$)).subscribe(({Order, orderData, system}) => {
+      console.log(Order, orderData);
+    if(orderData.system === 'IRP' && Order.orderType === OrderType.LongTermAssignment){
+      this.openIrpSubrowDetails(Order, orderData, system)
+    }
+})
+}
+public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : string) {
+  const orderData = Data as IRPOrderPosition;
+
+  this.store.dispatch(new GetOrderById(orderData.orderId, orderData.organizationId));
+  this.dispatchAgencyOrderCandidatesList(orderData.orderId, orderData.organizationId, true);
+  this.openChildDialog.next([Order, Data, system]);
+  this.orderPositionSelected$.next({ state: false });
+  this.openDetails.next(false);
+  this.selectedRowRef = Data;
+}
+
 public watchForOrderFromNotification(){
 	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
     this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
@@ -967,7 +995,6 @@ public RedirecttoIRPOrder(order:Order)
     this.filters.pageSize = this.pageSize;
     this.isIncomplete = false;
     this.filters.orderDistributionType?this.filters.orderDistributionType:null;
-
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
       let IsLTAOrders=  JSON.parse(localStorage.getItem('IsLTAOrders') || '"false"') as boolean;
       if(IsLTAOrders==true){
@@ -1775,7 +1802,7 @@ public RedirecttoIRPOrder(order:Order)
     const columnWithSort = sortEvent.columnApi.getColumnState().find((col) => col.sort !== null);
     this.orderBy = columnWithSort ? `${columnWithSort.colId} ${columnWithSort.sort}` : '';
 
-    this.getOrders();
+    this.getOrders(true);
   }
 
   gridPageChanged(page: number) {
@@ -2720,6 +2747,14 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number, isIrp = false): void {
+    this.store.dispatch(new GetAgencyOrderCandidatesList(
+      orderId,
+      organizationId,
+      GRID_CONFIG.initialPage,
+      GRID_CONFIG.initialRowsPerPage,
+      this.orderManagementService.excludeDeployed,
+      ""
+    ));
     if (isIrp) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
@@ -2730,18 +2765,7 @@ public RedirecttoIRPOrder(order:Order)
         this.employeeToggleState?.includeDeployed,
         ""
       ));
-
-      return;
     }
-
-    this.store.dispatch(new GetAgencyOrderCandidatesList(
-        orderId,
-        organizationId,
-        GRID_CONFIG.initialPage,
-        GRID_CONFIG.initialRowsPerPage,
-        this.orderManagementService.excludeDeployed,
-        ""
-      ));
   }
 
   private getOrganization(businessUnitId: number) {

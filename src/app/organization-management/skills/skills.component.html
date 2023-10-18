@@ -94,6 +94,31 @@
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
+        <div   *ngIf="selectedItems.length > 0 else pagingtemplate">
+          <section class="bulk-section">
+            <h3 class="bulk-section__rowscount">{{ selectedItems.length }} Rows Selected</h3>
+            <button ejs-button class="edit-button" cssClass="e-flat primary-icon-button" (click)="OnBulkEdit()">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather>Edit</span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" 
+              [disabled]="!userPermission[userPermissions.CanEditAssignedSkills]" (click)="OnBulkDelete()">
+              <span class="delete-button"><i-feather name="trash-2" class="icon"></i-feather>Delete</span>
+            </button>
+            <section class="gridrightpager">
+              <ejs-pager
+                id="gridPager"
+                #gridPager
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(skills$ | async)?.totalCount"
+                [enablePagerMessage]="false"
+                [currentPage]="currentPage"
+                (click)="changePage($event)"
+              >
+              </ejs-pager>
+            </section>
+          </section>
+        </div>
+        <ng-template #pagingtemplate>
         <div class="control-section">
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
@@ -136,6 +161,7 @@
             </section>
           </div>
         </div>
+      </ng-template>
       </div>
     </ng-template>
   </ejs-grid>
@@ -145,7 +171,7 @@
   [disableSaveButton]="!userPermission[userPermissions.CanEditAssignedSkills]"
   (formCancelClicked)="closeAsignDialog()"
   (formSaveClicked)="saveSkill()"
-  header="Edit Skill"
+  header={{sidedialogheader}}
   >
   <form
     class="skills-form-dialog form-container bootstrap"
@@ -153,8 +179,7 @@
     [formGroup]="skillForm">
     <ng-container *ngFor="let control of skillDialogConfig; trackBy: trackByField">
       <ng-container [ngSwitch]="control.fieldType">
-
-        <ng-template [ngSwitchCase]="fieldTypes.Dropdown">
+        <ng-template *ngIf="!isbulkedit" [ngSwitchCase]="fieldTypes.Dropdown">
           <div class="input-container form-dropdown">
             <label [for]="control.field">
               {{control.title}}
@@ -173,7 +198,7 @@
         </ng-template>
 
         <ng-template [ngSwitchCase]="fieldTypes.Input">
-          <div class="input-container">
+          <div *ngIf="control.field === 'skillDescription' ? !isbulkedit : true" class="input-container">
             <label [for]="control.field">{{control.title}}
               <span class="required" *ngIf="control.required">*</span>
             </label>
@@ -320,3 +345,10 @@
 <app-assign-skill [openSidebar]="openAssignSidebarSubject"></app-assign-skill>
 
 <app-file-upload-dialog></app-file-upload-dialog>
+<app-bulkskill-action-side-dialog
+[message]="bulkactionmessage"
+[skillNames]="bulkactionnotvalidskillnmaes"
+[bulkAction]="bulkaction"
+>
+ 
+</app-bulkskill-action-side-dialog>

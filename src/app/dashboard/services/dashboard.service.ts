@@ -223,7 +223,7 @@ export class DashboardService {
       );
     }
 
-    private getAvergaeDayCUSTOMActivePositionsWidgetData(filter: DashboartFilterDto): Observable<any> {
+    private getAvergaeDayCUSTOMActivePositionsWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
       return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter, type : 'Custom' }).pipe(
         map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
           return {

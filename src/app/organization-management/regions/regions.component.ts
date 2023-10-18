@@ -147,6 +147,7 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
       this.businessUnitId = id;
       this.getOrganization();
       this.clearFilters();
+      this.getMasterRegionData();
     });
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization?.generalInformation?.country));
@@ -412,6 +413,7 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     ).subscribe((res) => {
       if (selectedIndex == (selectedRegionsLength - 1)) {
         this.store.dispatch(new GetRegionsPage(this.filters));
+        this.getMasterRegionData();
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
       }
     });

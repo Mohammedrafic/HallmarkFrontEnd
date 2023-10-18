@@ -8,7 +8,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { DateWeekService } from '@core/services';
 import {
   approveTimesheetDialogData,
-  orgSubmitEmptyTimesheetDialogData,
+  SubmitEmptyTimesheetDialogData,
   submitTimesheetDialogData,
 } from '../constants';
 import { TimesheetDetails } from '../store/actions/timesheet-details.actions';
@@ -54,7 +54,7 @@ export class TimesheetDetailsService {
 
   public submitTimesheet(timesheetId: number, orgId: number, isTimesheetOrMileagesUpdate: boolean): Observable<void> {
     const { title, submitButtonText, confirmMessage,
-      successMessage } = submitTimesheetDialogData(isTimesheetOrMileagesUpdate);
+      successMessage } = submitTimesheetDialogData(isTimesheetOrMileagesUpdate);//
 
     return this.confirmService.confirm(confirmMessage, {
       title,
@@ -72,8 +72,8 @@ export class TimesheetDetailsService {
       );
   }
 
-  public orgSubmitEmptyTimesheet(): Observable<boolean> {
-    const { title, submitButtonText, confirmMessage } = orgSubmitEmptyTimesheetDialogData();
+  public submitEmptyTimesheet(): Observable<boolean> {
+    const { title, submitButtonText, confirmMessage } = SubmitEmptyTimesheetDialogData;
 
     return this.confirmService.confirm(confirmMessage, {
       title,

@@ -63,6 +63,8 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public extensionStartDateValidation = false;
   public candidateJob: OrderCandidateJob;
   public candidateRates: BillRate[];
+  @Input() public system: string;
+  public extensionFormIRP: FormGroup;
 
   private get billRateControl(): FormControl {
     return this.extensionForm?.get('billRate') as FormControl;
@@ -87,8 +89,11 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     this.minDate = DateTimeHelper.setCurrentTimeZone(minDate.toString());
     this.initExtensionForm();
     this.listenPrimaryDuration();
+    this.listenPrimaryDurationIRP();
     this.listenDurationChanges();
+    this.listenDurationChangesIRP();
     this.listenStartEndDatesChanges();
+    this.listenStartEndDatesChangesIRP();
     this.subsToBillRateControlChange();
   }
 
@@ -108,6 +113,42 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   }
 
   public saveExtension(positionDialog: DialogComponent, ignoreMissingCredentials: boolean): void  {
+    if(this.system === "IRP"){
+      if (this.extensionFormIRP.invalid) {
+        this.extensionFormIRP.markAllAsTouched();
+        return;
+      }
+      if (this.extensionStartDateValidation) {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
+        return;
+      }
+      const extension = this.extensionFormIRP.getRawValue();
+      this.extensionSidebarService
+        .saveExtension({
+          ...extension,
+          jobId: this.orderPosition.jobId,
+          orderId: this.candidateJob.orderId,
+          comments: this.comments,
+          ignoreMissingCredentials,
+        })
+        .pipe(
+          tap((data : ExtenstionResponseModel) => {
+            this.store.dispatch(
+              new ShowToast(
+                MessageTypes.Success,
+                'Extension Order ' + data.organizationPrefix + '-' + data.publicId + ' has been added'
+              )
+            );
+            positionDialog.hide();
+            this.saveEmitter.emit();
+          }),
+          catchError((error) =>
+            this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)))
+          ),
+          takeUntil(this.componentDestroy())
+        ).subscribe();
+    } else {
+
     if (this.extensionForm.invalid) {
       this.extensionForm.markAllAsTouched();
       return;
@@ -143,6 +184,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         ),
         takeUntil(this.componentDestroy())
       ).subscribe();
+    }
   }
 
   private getBillRate(billRates: BillRate[], startDate?: Date): BillRate | null {
@@ -185,6 +227,18 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     const { actualEndDate } = this.candidateJob || {};
     const startDate = addDays(actualEndDate, 1);
     const startDateValue = startDate ? DateTimeHelper.setCurrentTimeZone(startDate.toString()) : undefined;
+
+    this.extensionFormIRP = this.formBuilder.group({
+      durationPrimary: [Duration.Other],
+      durationSecondary: [],
+      durationTertiary: [],
+      startDate: [startDateValue, [Validators.required]],
+      endDate: ['', [Validators.required]],
+      comments: [null],
+      linkedId: [this.order.linkedId, Validators.maxLength(20)],
+
+    })
+
     const candidateBillRate = this.getBillRate(this.candidateJob.billRates, startDateValue)?.rateHour;
     this.maxEndDate = addDays(startDate as Date, 14) as Date;
 
@@ -237,6 +291,75 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         const { value: startDate } = this.extensionForm.get('startDate')!;
         const endDate = this.extensionSidebarService.getEndDate(startDate, durationSecondary, durationTertiary);
         this.extensionForm.patchValue({ endDate });
+        this.cd.markForCheck();
+      });
+  }
+
+  private listenPrimaryDurationIRP(): void {
+    this.extensionFormIRP.get('durationPrimary')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((duration: Duration) => {
+      const durationSecondary = this.extensionFormIRP.get('durationSecondary');
+      const durationTertiary = this.extensionFormIRP.get('durationTertiary');
+
+      if (duration === Duration.Other) {
+        durationSecondary?.enable({emitEvent: false});
+        durationTertiary?.enable({emitEvent: false});
+        durationSecondary?.reset();
+        durationTertiary?.reset();
+        this.extensionFormIRP.get('startDate')?.markAsPristine();
+        this.extensionFormIRP.get('endDate')?.markAsPristine();
+      } else {
+        durationSecondary?.disable();
+        durationTertiary?.disable();
+        durationSecondary?.setValue(this.extensionSidebarService.getSecondaryDuration(duration));
+        durationTertiary?.setValue(this.extensionSidebarService.getTertiaryDuration(duration));
+      }
+      this.cd.markForCheck();
+    });
+  }
+
+  private listenDurationChangesIRP(): void {
+    const durationSecondary$ = this.extensionFormIRP.get('durationSecondary')?.valueChanges!;
+    const durationTertiary$ = this.extensionFormIRP.get('durationTertiary')?.valueChanges!;
+
+    combineLatest([durationSecondary$, durationTertiary$])
+      .pipe(
+        filter(([durationSecondary$, durationTertiary$]) => !isNil(durationSecondary$) && !isNil(durationTertiary$)),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(([durationSecondary, durationTertiary]: number[]) => {
+        const { value: startDate } = this.extensionFormIRP.get('startDate')!;
+        const endDate = this.extensionSidebarService.getEndDate(startDate, durationSecondary, durationTertiary);
+        this.extensionFormIRP.patchValue({ endDate });
+        this.cd.markForCheck();
+      });
+  }
+
+  private listenStartEndDatesChangesIRP(): void {
+    const startDateControl = this.extensionFormIRP.get('startDate') as AbstractControl;
+    const endDateControl = this.extensionFormIRP.get('endDate') as AbstractControl;
+
+    combineLatest([
+      startDateControl.valueChanges.pipe(startWith(null)),
+      endDateControl.valueChanges.pipe(startWith(null)),
+    ])
+      .pipe(
+        filter(() => startDateControl.dirty || endDateControl.dirty),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(([startDate, endDate]) => {
+        this.startDate = startDate;
+        this.extensionStartDateValidation = false;
+        let actualEndDate = new Date(this.candidateJob?.actualEndDate); 
+        let twoWeekDate = new Date(actualEndDate.setDate(actualEndDate.getDate() + 14));
+        if(startDate && startDate > twoWeekDate){
+           this.extensionStartDateValidation = true;
+        }
+        if (startDate > endDate) {
+          this.extensionFormIRP.get('endDate')?.setErrors({incorrect: true});
+        }
+        this.extensionFormIRP.get('durationPrimary')?.setValue(Duration.Other);
         this.cd.markForCheck();
       });
   }

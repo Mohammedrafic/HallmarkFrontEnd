@@ -232,7 +232,7 @@
                       <input formControlName="rejectReason" class="e-input" type="text" readonly/>
                     </div>
                 </div>
-                <div *ngIf="candidate.candidateStatus === applicantStatus.Cancelled">
+                <div *ngIf="candidate?.candidateStatus === applicantStatus.Cancelled">
                   <div class="input-container bootstrap">
                     <label class="input-group">Reason</label>
                     <div class="input-group input-readonly">

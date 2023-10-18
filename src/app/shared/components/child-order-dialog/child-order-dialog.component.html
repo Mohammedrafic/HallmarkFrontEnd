@@ -27,7 +27,6 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="showAddExtension"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
               [disabled]="disableAddExtension || isAgencySuspended"
@@ -188,7 +187,7 @@
               </ng-template>
             </e-tabitem>
 
-            <e-tabitem *ngIf="order?.orderType === orderType.ContractToPerm || order?.orderType === orderType.LongTermAssignment">
+            <e-tabitem *ngIf="(system !== 'IRP' && (order?.orderType === orderType.ContractToPerm || order?.orderType === orderType.LongTermAssignment)) || (system === 'IRP' && order?.orderType === orderType.LongTermAssignment)">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
                 <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
@@ -233,6 +232,7 @@
       <app-extension-sidebar
         *ngIf="isExtensionSidebarShown"
         [order]="order"
+        [system]="system"
         [orderPosition]="candidate"
         (saveEmitter)="updateGrid()"
       ></app-extension-sidebar>

@@ -73,6 +73,7 @@
     [tableData]="timesheets"
     [newSelectedIndex]="currentSelectedTableRowIndex | async"
     [activeTabIdx]="activeTabIdx"
+    [allowSelecton]="allowSelecton"
     (changePage)="handleChangePage($event)"
     (changePerPage)="handleChangePerPage($event)"
     (timesheetRowSelected)="rowSelected($event)"

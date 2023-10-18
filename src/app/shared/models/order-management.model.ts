@@ -138,6 +138,7 @@ export interface IRPOrderPosition {
   orderId: number;
   organizationId: number;
   candidateStatus: number | string;
+  candidateStatusValue : number | string;
   orderPublicId: number | string;
   orderStatus: number | string;
   employeeId: number;

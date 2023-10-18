@@ -41,6 +41,7 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   sendOnboardCandidateEmailMessage,
+  GetAgencyOrderCandidatesList,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
@@ -72,6 +73,7 @@ import { Comment } from '@shared/models/comment.model';
 import {
   AcceptJobDTO,
   ApplicantStatus,
+  IrpOrderCandidate,
   Order,
   OrderCandidateJob,
   OrderCandidatesList,
@@ -95,6 +97,7 @@ import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { AppState } from 'src/app/store/app.state';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
 import { CandidateState } from '@agency/store/candidate.state';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -113,14 +116,18 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Input() actionsAllowed = true;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Output() updateDetails = new EventEmitter<void>();
+  @Input() public activeSystem : {};
 
-  candidate$: Observable<OrderCandidatesList>;
+  candidate$: Observable<OrderCandidatesList | null>;
 
   @Select(OrderManagementState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
   @Select(OrderManagementContentState.orderCandidatePage)
   public clientOrderCandidatePage$: Observable<OrderCandidatesListPage>;
+
+  @Select(OrderManagementContentState.getIrpCandidates)
+  public getIrpCandidates$ : Observable<OrderCandidatesListPage>
 
   @Select(UserState.currentUserPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
@@ -133,7 +140,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   @Select(CandidateState.orderManagementPagerState)
   public orderManagementPagerState$: Observable<OrderManagementPagerState | null>;
-
+  public systemTypes = OrderManagementIRPSystemId;
   public rejectReasons$: Observable<RejectReason[]>;
   public form: FormGroup;
   public statusesFormControl = new FormControl();
@@ -181,6 +188,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     Canceled: { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' },
     Offered: { applicantStatus: ApplicantStatusEnum.Offered, statusText: 'Offered' },
   };
+  orgId: number | undefined;
 
   get isAccepted(): boolean {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Accepted;
@@ -479,42 +487,56 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
 
     this.applicantStatuses = statuses;
-    this.changeDetectorRef.markForCheck();
 
+    if(this.activeSystem == OrderManagementIRPSystemId.IRP){
+      this.applicantStatuses = [
+        { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'OnBoard' },
+        { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancel' },
+      ]
+    }
+    this.changeDetectorRef.markForCheck();
     if (!this.applicantStatuses.length) {
       this.statusesFormControl.disable();
     }
   }
 
   private subsToCandidate(): void {
-    const state$ = this.isAgency ? this.orderCandidatePage$ : this.clientOrderCandidatePage$;
-    this.candidate$ = state$.pipe(
-      filter(Boolean),
-      map((res) => {
-        const items = res?.items || this.candidateOrder?.items;
-        const candidate = items?.find((candidate) => candidate.candidateJobId);
-        this.candidate = candidate;
-        if (candidate) {
-          return candidate;
-        } else {
-          return EMPTY;
-        }
-      })
-    ) as Observable<OrderCandidatesList>;
+    const state$ = this.isAgency ? this.orderCandidatePage$ : (this.activeSystem == OrderManagementIRPSystemId.IRP ? this.getIrpCandidates$ : this.clientOrderCandidatePage$);
+      this.candidate$ = state$.pipe(
+        filter(Boolean),
+        map((res) => {
+          const items = res?.items || this.candidateOrder?.items;
+          const candidate = items?.find((candidate) => candidate.candidateJobId);
+          this.candidate = candidate;
+          if (candidate) {
+            return candidate;
+          } else {
+            return null;
+          }
+        })
+      );
 
     combineLatest([this.orderPermissions$, this.candidate$])
       .pipe(
         filter(([permission, candidate]) => !!permission && !!candidate),
         takeUntil(this.destroy$)
       )
-      .subscribe(([permissions, candidate]: [CurrentUserPermission[], OrderCandidatesList]) => {
+      .subscribe(([permissions, candidate]: [CurrentUserPermission[], OrderCandidatesList | null]) => {
         this.orderPermissions = permissions;
         this.mapPermissions();
         this.getCandidatePayRateSetting();
-        const { organizationId, candidateJobId } = candidate;
+        if(candidate?.organizationId){
+          this.orgId = candidate.organizationId
+        } else {
+          this.orgId = this.currentOrder.organizationId
+        }
+        const candidateJobId = candidate?.candidateJobId;
         const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;
-        this.store.dispatch(new GetCandidateJobAction(organizationId as number, candidateJobId));
+        if (this.orgId && candidateJobId) {
+          this.store.dispatch(new GetCandidateJobAction(this.orgId, candidateJobId));
+        }
       });
+      this.changeDetectorRef.detectChanges();
   }
 
   private getOrderPermissions(orderId: number): void {
