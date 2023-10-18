@@ -45,6 +45,7 @@ import {
   GetInterfaceLogSummaryPage,
   GetInterfaceLogDetails,
   ExportEmployeeImportDetails,
+  SetAgencyVisibilityFlag,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -94,6 +95,7 @@ interface SecurityStateModel {
   logFileDownloadDetail:any;
   businessIdDetails:GetBusinessUnitIdDetails|null;
   interfaceLogSummaryIRP:InterfaceLogSummaryIRPPage |null;
+  isAgencyVisibilityEnabled:boolean;
 }
 
 @State<SecurityStateModel>({
@@ -124,7 +126,8 @@ interface SecurityStateModel {
     logFileDownloadDetail:null,
     businessIdDetails:null,
     interfaceLogSummaryIRP:null,
-    logSummaryDetailsPage:null
+    logSummaryDetailsPage:null,
+    isAgencyVisibilityEnabled:false
   },
 })
 @Injectable()
@@ -303,6 +306,11 @@ export class SecurityState {
   static logSummaryDetails(state: SecurityStateModel): InterfaceLogSummaryDetails[] | null {
     return state.logSummaryDetailsPage;
   }
+  @Selector()
+  static isAgencyVisibilityFlagEnabled(state: SecurityStateModel): boolean {
+    return state.isAgencyVisibilityEnabled;
+  }
+
 
 
   constructor(
@@ -313,6 +321,13 @@ export class SecurityState {
     private orgInterfaceService: OrgInterfaceService
   ) {}
 
+  @Action(SetAgencyVisibilityFlag)
+  SetIrpFlag({ patchState }: StateContext<SecurityStateModel>, { agencyVisibilityEnabled }: SetAgencyVisibilityFlag): void {
+    patchState({
+      isAgencyVisibilityEnabled: agencyVisibilityEnabled,
+    });
+  }
+  
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType(
     { dispatch, patchState }: StateContext<SecurityStateModel>,
