@@ -142,7 +142,11 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.user$.pipe(takeUntil(this.destroy$), filter(Boolean)).subscribe((user: User) => {
       const userIsAdmin = user.businessUnitType === BusinessUnitType.MSP || user.businessUnitType === BusinessUnitType.Hallmark;
       this.userIsAgency = user.businessUnitType === BusinessUnitType.Agency;
-      this.userIsAdmin$.next(userIsAdmin);
+      if(this.userIsAgency){
+        this.userIsAdmin$.next(this.userIsAgency);
+      }else{
+        this.userIsAdmin$.next(userIsAdmin);
+      }
 
       if (user && userIsAdmin || this.userIsAgency) {
         this.store.dispatch(new GetOrganizationsStructureAll(user.id));
@@ -297,7 +301,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         takeUntil(this.destroy$)
       )
       .subscribe(([filteredItems, userIsAdmin, orgStructure]) => {
-        if (userIsAdmin || this.userIsAgency) {
+        if (userIsAdmin) {
           const organizationFilter: FilteredDataByOrganizationId[] = filteredItems
             .filter((item) => item.column === FilterColumnTypeEnum.ORGANIZATION)
             .map((item) => new FilteredDataByOrganizationId(item.value));
