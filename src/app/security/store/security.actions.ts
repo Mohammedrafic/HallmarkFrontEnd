@@ -52,11 +52,6 @@ export class GetAllUsersPage {
   ) {}
 }
 
-export class SetAgencyVisibilityFlag {
-  static readonly type = '[security] Set Agency Visibility flag';
-  constructor(public readonly agencyVisibilityEnabled: boolean) { }
-}
-
 export class GetPermissionsTree {
   static readonly type = '[security] Get Permissions Tree';
   constructor(public type: BusinessUnitType,public businessUnitId:number) {}
@@ -184,9 +179,23 @@ export class GetLogInterfacePage {
   ) {}
 }
 
+export class GetInterfaceLogSummaryPage {
+  static readonly type = '[security] Get InterfaceLogSummary Page';
+  constructor(
+    public organizationId: number | null,
+    public pageNumber: number,
+    public pageSize: number,
+  ) {}
+}
+
+
 export class GetLogHistoryById {
   static readonly type = '[security log interface] Get History By Id';
   constructor(public runId: string, public organizationId: number, public pageNumber: number,public pageSize: number,public options?: DialogNextPreviousOption) {}
+}
+export class GetInterfaceLogDetails {
+  static readonly type = '[security log interface] Get Interface Details';
+  constructor(public interfaceLogSummaryID: number, public statusType: number, public pageNumber: number,public pageSize: number,public options?: DialogNextPreviousOption) {}
 }
 
 export class GetLogFileDownload {
@@ -226,4 +235,12 @@ export class GetNonEmployeeUsers {
 export class GetBusinessIdDetails {
   static readonly type = '[security] Get Business Id Details';
   constructor(public id: number) {}
+}
+export class ExportEmployeeImportDetails {
+  static readonly type = '[security] Export EmployeeImport List';
+  constructor(public payload: ExportPayload) {}
+}
+export class SetAgencyVisibilityFlag {
+  static readonly type = '[security] Set Agency Visibility flag';
+  constructor(public readonly agencyVisibilityEnabled: boolean) { }
 }

@@ -21,6 +21,7 @@ import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import {
   AcceptConfigFieldsToShow,
+  CancelReasonField,
   CandidateDialogConfig,
   CandidateTitle,
   CloseReasonField,
@@ -515,9 +516,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         switchMap(() => {
           const reasonConfigField = GetConfigField(this.dialogConfig, CloseReasonField);
           const rejectionReasonField = GetConfigField(this.dialogConfig, RejectedReasonField);
+          const cancelReasonField = GetConfigField(this.dialogConfig, CancelReasonField);
 
-          rejectionReasonField.dataSource = this.editIrpCandidateService
-            .createReasonsOptions(this.editIrpCandidateService.getRejectedReasons());
+          rejectionReasonField.dataSource = this.editIrpCandidateService.createReasonsOptions(this.editIrpCandidateService.getRejectedReasons());
+          cancelReasonField.dataSource = this.editIrpCandidateService.createReasonsOptions(this.editIrpCandidateService.getCancelEmployeeReasons());
+
+          this.populateCancellationReasonIdField();
 
           if (this.candidateModelState.candidate.status === CandidatStatus.Cancelled
             || this.candidateModelState.candidate.status === CandidatStatus.Offboard) {
@@ -526,8 +530,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
               JobId: this.candidateModelState.candidate.candidateJobId,
             };
 
-            reasonConfigField.dataSource = this.editIrpCandidateService
-              .createReasonsOptions(this.editIrpCandidateService.getClosureReasons());
+            reasonConfigField.dataSource = this.editIrpCandidateService.createReasonsOptions(this.editIrpCandidateService.getClosureReasons());
 
             return this.orderCandidateApiService.getPositionDetails(jobDto)
             .pipe(
@@ -558,6 +561,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.candidateDialog.show();
       this.cdr.markForCheck();
     });
+  }
+
+  private populateCancellationReasonIdField(): void {
+    if (this.candidateModelState.candidate.status === CandidatStatus.Cancelled) {
+      this.candidateForm.get(CancelReasonField)?.patchValue(this.candidateDetails.cancellationReasonId, { emitEvent: false, onlySelf: true })
+    }
   }
 
   private watchForOfferedDateValue(): void {
@@ -766,6 +775,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       return;
     }
 
+    if (status === CandidatStatus.Cancelled) {
+      const cancelReasonConfigField = this.getConfigField(CancelReasonField);
+      cancelReasonConfigField.showField = true;
+      return;
+    }
+
     UpdateVisibilityConfigFields(this.dialogConfig,  DefaultConfigFieldsToShow);
   }
 
@@ -833,13 +848,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
     const endDateFormControl = this.candidateForm.get('actualEndDate');
     const startDateFormControl = this.candidateForm.get('actualStartDate');
+    const cancelReasonFormControl = this.candidateForm.get(CancelReasonField);
     const isClosedFormControl = this.candidateForm.get('isClosed');
     const endDateConfigField = this.getConfigField('actualEndDate');
+    const cancelReasonConfigField = this.getConfigField(CancelReasonField);
 
     if (status === CandidatStatus.Cancelled) {
       startDateFormControl?.patchValue(this.candidateDetails?.actualStartDate);
       startDateFormControl?.disable();
       endDateConfigField.required = true;
+      cancelReasonConfigField.showField = true;
       endDateConfigField.minDate = this.candidateDetails?.actualStartDate
         ? DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualStartDate as string) : null;
       endDateConfigField.maxDate = this.candidateDetails?.actualEndDate
@@ -847,11 +865,13 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.endDateFormControlValue = endDateFormControl?.value;
       endDateFormControl?.reset();
       endDateFormControl?.setValidators([Validators.required]);
+      cancelReasonFormControl?.setValidators([Validators.required]);
       isClosedFormControl?.setValue(false);
       isClosedFormControl?.disable();
       this.checkActualStartDate();
     } else {
       this.removeEndDateControlLimitations(endDateFormControl as FormControl, endDateConfigField);
+      cancelReasonFormControl?.setValidators([]);
       endDateFormControl?.setValue(endDateFormControl?.value);
       startDateFormControl?.enable({ emitEvent: false, onlySelf: true });
       isClosedFormControl?.enable();

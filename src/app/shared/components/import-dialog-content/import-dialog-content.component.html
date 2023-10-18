@@ -86,7 +86,7 @@
 </ejs-dialog>
 
 <ng-template #importBtn>
-  <button ejs-button cssClass="e-primary action-btn" [disabled]="!enabledImportButton" (click)="onImport()">Import</button>
+  <button ejs-button cssClass="e-primary action-btn" [disabled]="!enabledImportButton" (click)="onImport()">{{hideImportButton ? 'Validate' :'Import'}}</button>
 </ng-template>
 
 <ejs-dialog
