@@ -23,10 +23,13 @@ export class ButtonRendererComponent extends AbstractPermission implements ICell
   faView = faEye as IconProp;
   params: any;
   label: string;
+  selectedType:number=0;
 
   agInit(params: any): void {
     this.params = params;
     this.label = this.params.label || null;
+    this.selectedType = this.params.selectedType
+
   }
 
   refresh(params?: any): boolean {

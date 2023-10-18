@@ -515,6 +515,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/order-status-summary-report',
     },
+    119:{
+      // Interface log summary for IRP
+      icon: '',
+      route: '/admin/interfacelogirp', 
+   }
   },
 
   [BusinessUnitType.MSP]: {
@@ -786,7 +791,13 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/user-activity',
     },
+    119:{
+      // Interface log summary for IRP
+      icon: '',
+      route: '/admin/interfacelogirp', 
+   }
   },
+  
 
   [BusinessUnitType.Organization]: {
     1: {
@@ -1259,6 +1270,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/user-activity',
     },
+    119:{
+      // Interface log summary for IRP
+      icon: '',
+      route: '/admin/interfacelogirp', 
+   }
   },
 
   [BusinessUnitType.Agency]: {
