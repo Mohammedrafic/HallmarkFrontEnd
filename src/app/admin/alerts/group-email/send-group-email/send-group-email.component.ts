@@ -414,6 +414,7 @@ export class SendGroupEmailComponent
       this.isOrgUser = true;
       this.businessUnits = [
         { id: BusinessUnitType.Organization, text: 'Organization' },
+        { id: BusinessUnitType.Agency, text: 'Agency' },
       ];
     } else if (user?.businessUnitType === BusinessUnitType.Agency) {
       this.businessUnits = [
@@ -598,7 +599,7 @@ export class SendGroupEmailComponent
           this.isBusinessUnitTypeAgency = true;
           this.validationCheckForBusiness();
           if (this.isOrgUser) {
-             this.filteredUserType.splice(1, 1);
+             this.filteredUserType.splice(0, 0);
           }
         }
         if (value == 1) {
@@ -889,8 +890,7 @@ export class SendGroupEmailComponent
     var regionId = this.regionControl.value ? this.regionControl.value.join() : '';
     var locationId = this.locationControl.value ? this.locationControl.value.join() : '';
     var roles = this.rolesControl.value ? this.rolesControl.value.join() : '';
-    var businessUnitId = this.businessControl.value;
-
+    var businessUnitId = this.isBusinessUnitTypeAgency == true ? this.businessesControl.value : this.businessControl.value;
     if(regionId !='' && locationId !='' && roles !=''){
       this.store.dispatch(new GetGroupEmailInternalUsers(regionId, locationId, roles, businessUnitId, false));
       this.groupEmailUserData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -905,7 +905,7 @@ export class SendGroupEmailComponent
       });
     }else if (this.rolesControl.value.length > 0) {
         const user = this.store.selectSnapshot(UserState.user);
-        if (user?.businessUnitType != BusinessUnitType.MSP &&   user?.businessUnitType != BusinessUnitType.Hallmark) {
+        if (user?.businessUnitType != BusinessUnitType.MSP &&  user?.businessUnitType != BusinessUnitType.Hallmark && user?.businessUnitType != BusinessUnitType.Organization) {
           this.dispatchUserPage(this.businessesControl.value);
         }
         this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
