@@ -324,7 +324,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.lodging = this.stipendData.lodgingrate;
         if(this.meal == 0 || this.lodging == 0){
           this.showATPform = false;
-          this.store.dispatch(new ShowToast(MessageTypes.Error, INVALID_ZIP))
         }
         this.stipendBenefits = (!Number.isNaN(this.meal + this.lodging)) ? this.meal + this.lodging : 0;
         this.stipendNonBenefits = (!Number.isNaN(this.meal + this.lodging)) ? this.meal + this.lodging : 0;

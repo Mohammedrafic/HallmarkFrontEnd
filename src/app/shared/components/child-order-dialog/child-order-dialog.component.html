@@ -11,8 +11,11 @@
       <section class="header-container dialog-header">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title preview-title">
+            <h3 class="e-card-title preview-title" *ngIf="activeSystem !== OrderManagementIRPSystemId.IRP">
               Position ID {{ order?.organizationPrefix }}-{{ order?.publicId }}-{{ candidate?.positionId }}
+            </h3>
+            <h3 class="e-card-title preview-title" *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">
+              Position ID {{ candidate?.positionId }}
             </h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList class="events-off" *ngIf="candidate?.orderStatus">
@@ -99,7 +102,10 @@
             </e-tabitem>
 
             <e-tabitem>
-              <ng-template #headerText>Candidate</ng-template>
+              <ng-template #headerText>
+                <span *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">{{ order?.extensionFromId ? 'Employee' : 'Employees' }}</span>
+                <span *ngIf="activeSystem !== OrderManagementIRPSystemId.IRP">{{ order?.extensionFromId ? 'Candidate' : 'Candidates' }}</span>
+              </ng-template>
               <ng-template #content>
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate" *ngIf="!order?.extensionFromId; else extensionCandidate">
