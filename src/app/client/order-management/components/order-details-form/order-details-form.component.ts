@@ -953,14 +953,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   private watchForSelectOrder(): void {
     this.selectedOrder$.pipe(takeUntil(this.componentDestroy())).subscribe((order) => {
-      this.orderData=order;
+      this.orderData = order;
       const isEditMode = this.route.snapshot.data['isEditing'];
       this.isEditoption=isEditMode;
-      if (isEditMode) {
-        this.isEditoption = true;
-      } else {
-        this.isEditoption = false;
-      }
       if (order && isEditMode) {
         this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
         this.isEditMode = true;
