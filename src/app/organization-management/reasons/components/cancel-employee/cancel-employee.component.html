@@ -1,0 +1,23 @@
+<div class="cancel-employee-container">
+  <div class="grid-container">
+    <section class="grid-table-container">
+      <ag-grid-angular
+        [columnDefs]="gridDefs"
+        [rowData]="(reasons$ | async)?.items || []"
+        [rowHeight]="64"
+        [context]="context"
+        [overlayNoRowsTemplate]="gridEmptyMessage"
+        [class.empty-table]="!(reasons$ | async)?.items?.length"
+        class="ag-theme-alpine app-grid__component"
+      >
+      </ag-grid-angular>
+      <app-grid-pagination
+        [currentPage]="pagingData.currentPage"
+        [pageSize]="pagingData.pageSize"
+        [totalRecordsCount]="(reasons$ | async)?.items?.length || 0"
+        (navigateToPageEmitter)="changePage($event)"
+        (pageSizeChangeEmitter)="changePageSize($event)"
+      ></app-grid-pagination>
+    </section>
+  </div>
+</div>

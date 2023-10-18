@@ -1,4 +1,4 @@
-import { UnavailabilityValue } from '@organization-management/reasons/interfaces';
+import { CancelEmployeeReasonValue, UnavailabilityValue } from '@organization-management/reasons/interfaces';
 import { PenaltyPayload } from "@shared/models/penalty.model";
 import { RejectReason, RejectReasonWithRedflag, RejectReasonwithSystem } from "@shared/models/reject-reason.model";
 
@@ -167,6 +167,22 @@ export class GetUnavailabilityReasons {
   constructor(public readonly page: number, public pageSize: number) {}
 }
 
+export class GetCancelEmployeeReason {
+  static readonly type = '[reject reason] Get Cancel employee reasons';
+
+  constructor(
+    public readonly page: number,
+    public readonly pageSize: number,
+    public readonly getAll?: boolean,
+  ) {}
+}
+
+export class SaveCancelEmployeeReason {
+  static readonly type = '[reject reason] Save Cancel employee reason';
+
+  constructor(public payload: CancelEmployeeReasonValue) {}
+}
+
 export class SaveUnavailabilityReason {
   static readonly type = '[reject reason] Save Unavailability reason';
 
@@ -178,6 +194,13 @@ export class RemoveUnavailabilityReason {
 
   constructor(public readonly id: number) {}
 }
+
+export class RemoveCancelEmployeeReason {
+  static readonly type = '[reject reason] Remove Cancel employee reason';
+
+  constructor(public readonly id: number) {}
+}
+
 
 export class GetInternalTransferReasons {
   static readonly type = '[reject reason] Get Internal Transfer reason by Page';

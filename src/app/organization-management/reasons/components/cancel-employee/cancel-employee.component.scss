@@ -1,0 +1,29 @@
+@import 'colors';
+
+.cancel-employee-container {
+  height: calc(100% - 80px);
+
+  .grid-container {
+    margin-top: 24px;
+    height: 100%;
+  }
+}
+
+.grid-table-container {
+  height: 100%;
+  min-height: 700px;
+  width: 100%;
+
+  ::ng-deep {
+    .ag-root-wrapper {
+      border: 1px solid var(--grid-border-color) !important;
+      border-top-left-radius: 14px !important;
+      border-top-right-radius: 14px !important;
+    }
+
+    .ag-header-cell {
+      color: $secondary-dark-blue-15;
+      font-weight: 600;
+    }
+  }
+}

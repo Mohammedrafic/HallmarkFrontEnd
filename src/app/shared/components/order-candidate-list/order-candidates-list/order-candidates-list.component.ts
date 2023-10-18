@@ -38,6 +38,7 @@ import { UserPermissions } from '@core/enums';
 import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation.helper';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { DateTimeHelper } from '@core/helpers';
+import { GetCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -142,6 +143,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.subscribeToDeployedCandidateOrdersInfo();
     }
 
+    this.getAllEmployeeCancelReasons();
     this.setOrganizationId();
     this.watchForEmployeeToggleState();
 
@@ -236,6 +238,12 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.includeDeployed = state.includeDeployed;
       this.cdr.markForCheck();
     })
+  }
+
+  private getAllEmployeeCancelReasons(): void {
+    if(this.isIRPLTAorder) {
+      this.store.dispatch(new GetCancelEmployeeReason(1, 100, true));
+    }
   }
 
   private getCandidateJob(data: OrderCandidatesList): void {
