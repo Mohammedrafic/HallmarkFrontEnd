@@ -88,6 +88,7 @@ import {
   AssociateAgencyFields,
   BillRateDependencyControlNames,
   ControlsForDisable,
+  ControlsForDisablelocation,
   DepartmentField,
   DepartmentFields,
   ExtensionControls,
@@ -130,6 +131,8 @@ import { PartialSearchDataType } from '@shared/models/partial-search-data-source
 import { PermissionService } from '../../../../security/services/permission.service';
 import { OrderManagementService } from '../order-management-content/order-management.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
+import { UserPermissions } from '@core/enums';
+import { Permission } from '@core/interface';
 
 @Component({
   selector: 'app-order-details-form',
@@ -139,7 +142,10 @@ import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 })
 export class OrderDetailsFormComponent extends AbstractPermission implements OnInit {
   @Input() isActive = false;
-
+  public orderData: Order | null;
+  selectedOrderId: string | null;
+  isEditoption: boolean;
+  AllowToUpdateDept: boolean | undefined;
   @Input() set disableOrderType(value: boolean) {
     if (value) {
       this.orderTypeForm.controls['orderType'].disable();
@@ -809,7 +815,11 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
     }
 
     if (order.status === OrderStatus.InProgress || order.status === OrderStatus.Filled) {
+      if ((order.status === OrderStatus.InProgress && this.AllowToUpdateDept) || (order.status === OrderStatus.Filled && this.AllowToUpdateDept)) {
+        this.generalInformationForm = disableControls(this.generalInformationForm, ControlsForDisablelocation, false);
+      } else {
       this.generalInformationForm = disableControls(this.generalInformationForm, ControlsForDisable, false);
+      }
     }
 
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
@@ -943,7 +953,14 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   private watchForSelectOrder(): void {
     this.selectedOrder$.pipe(takeUntil(this.componentDestroy())).subscribe((order) => {
+      this.orderData=order;
       const isEditMode = this.route.snapshot.data['isEditing'];
+      this.isEditoption=isEditMode;
+      if (isEditMode) {
+        this.isEditoption = true
+      } else {
+        this.isEditoption = false
+      }
       if (order && isEditMode) {
         this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
         this.isEditMode = true;
@@ -1163,7 +1180,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       );
 
       this.billRatesSyncService.setFormChangedState(formChangedState);
-
+      if(!this.isEditMode ||  this.orderData?.status != OrderStatus.InProgress && this.orderData?.status != OrderStatus.Filled || this.orderStatus=='Incomplete')
+      {
       this.store.dispatch(
         new SetPredefinedBillRatesData(
           orderType,
@@ -1173,6 +1191,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value)
         )
       );
+        }
     });
 
     combineLatest([
@@ -1336,7 +1355,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       }),
       takeUntil(this.componentDestroy())
     ).subscribe(([departmentId, skillId]) => {
+      if(!this.isEditMode ||  this.orderData?.status != OrderStatus.InProgress && this.orderData?.status != OrderStatus.Filled)
+      {
       this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId, SystemType.VMS));
+      }
     });
   }
 
@@ -1358,8 +1380,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions().pipe(
       takeUntil(this.componentDestroy())
-    ).subscribe(({ canCreateOrder}) => {
+    ).subscribe(({ canCreateOrder,AllowToUpdateDept}) => {
       this.canCreateOrder = canCreateOrder;
+      this.AllowToUpdateDept=AllowToUpdateDept;
     });
   }
 

@@ -571,6 +571,7 @@ export interface CreateOrderDto extends Omit
   billRates: OrderBillRateDto[];
   jobDistribution?: number[];
   removeLinkedSchedulesFromLta?: boolean;
+  AllowToUpdateDept?:boolean;
 }
 
 export interface EditOrderDto extends Omit
@@ -580,6 +581,7 @@ export interface EditOrderDto extends Omit
 > {
   billRates: OrderBillRateDto[];
   deleteDocumentsGuids: string[];
+  AllowToUpdateDept?:boolean;
 }
 
 export type AcceptJobDTO = {

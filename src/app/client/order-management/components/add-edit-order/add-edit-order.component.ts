@@ -556,6 +556,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.specialProject.getRawValue(),
       ...{ credentials: this.orderCredentials },
       ...{ billRates: orderBillRates },
+       AllowToUpdateDept:this.orderDetailsFormComponent.AllowToUpdateDept
     };
 
     const {
@@ -596,6 +597,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       annualSalaryRangeTo,
       orderPlacementFee,
       linkedId,
+      AllowToUpdateDept
     } = allValues;
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
       const {
@@ -627,6 +629,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         weeklyOtEnabled,
         dailyOtEnabled,
         holidayCalculationEnabled,
+        AllowToUpdateDept
       };
     });
 
@@ -671,6 +674,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderPlacementFee,
       isTemplate: false,
       linkedId,
+      AllowToUpdateDept
     };
 
     if (this.orderDetailsFormComponent.order?.isTemplate) {
