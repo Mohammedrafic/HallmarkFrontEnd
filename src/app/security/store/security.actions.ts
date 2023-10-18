@@ -240,3 +240,7 @@ export class ExportEmployeeImportDetails {
   static readonly type = '[security] Export EmployeeImport List';
   constructor(public payload: ExportPayload) {}
 }
+export class SetAgencyVisibilityFlag {
+  static readonly type = '[security] Set Agency Visibility flag';
+  constructor(public readonly agencyVisibilityEnabled: boolean) { }
+}
