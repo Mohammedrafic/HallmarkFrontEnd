@@ -30,7 +30,64 @@ const importConfig = {
 export class ImportDnrComponent  extends AbstractImport implements OnChanges {
 
   public titleImport: string = 'Import DNR';
-  public columnDefs: ColDef[] = [
+  public successColumnDefs: ColDef[] = [
+    {
+      field: 'orgName',
+      width: 150,
+      headerName: 'Organization Name',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'firstName',
+      width: 150,
+      headerName: 'First Name',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'middleName',
+      width: 150,
+      headerName: 'Middle Name',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'lastName',
+      width: 200,
+      headerName: 'Last Name',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'dateOfBirth',
+      width: 150,
+      headerName: 'Date Of Birth',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'maskedssn',
+      width: 200,
+      headerName: 'SSN',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'email',
+      width: 150,
+      headerName: 'Email',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'region',
+      width: 200,
+      headerName: 'Blocked Region Name',
+      cellRenderer: GridErroredCellComponent,
+    },
+    {
+      field: 'location',
+      width: 200,
+      headerName: 'Blocked Location Name',
+      cellRenderer: GridErroredCellComponent,
+    },
+  ]
+
+  public errorColumnDefs: ColDef[] = [
     {
       field: 'orgName',
       width: 150,
