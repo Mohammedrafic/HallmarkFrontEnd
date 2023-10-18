@@ -20,7 +20,7 @@ import {
   UploadOrderImportFile
 } from '@client/store/order-managment-content.actions';
 import { DoNotReturn } from '@admin/store/donotreturn.actions';
-import { GetEmployeeImportErrors, GetEmployeeImportTemplate, SaveEmployeeImportResult, SaveEmployeeImportResultSucceeded, UploadEmployeeFile } from '@shared/components/candidate-list/store/candidate-list.actions';
+import { GetEmployeeImportErrors, GetEmployeeImportTemplate, SaveEmployeeImportLogResult, SaveEmployeeImportResult, SaveEmployeeImportResultSucceeded, UploadEmployeeFile } from '@shared/components/candidate-list/store/candidate-list.actions';
 
 type ImportTemplates =
   | typeof GetLocationsImportTemplate
@@ -42,7 +42,7 @@ type SaveImportResult =
   | typeof SaveBillRatesImportResult
   | typeof SaveOrderImportResult
   | typeof DoNotReturn.SaveDoNotReturnImportResult
-  | typeof SaveEmployeeImportResult;
+  | typeof SaveEmployeeImportLogResult;
 type UploadFile =
   | typeof UploadLocationsFile
   | typeof UploadDepartmentsFile

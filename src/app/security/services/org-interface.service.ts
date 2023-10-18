@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ExportPayload } from '@shared/models/export.model';
-import { LogInterfacePage, LogTimeSheetHistoryPage, OrgInterfacePage } from '@shared/models/org-interface.model';
+import { InterfaceLogSummaryDetails, InterfaceLogSummaryIRPPage, LogInterfacePage, LogTimeSheetHistoryPage, OrgInterfacePage } from '@shared/models/org-interface.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -64,6 +64,7 @@ export class OrgInterfaceService {
         return this.http.post<LogTimeSheetHistoryPage>(`/api/Integration/getTimesheetStagingHistory`, { RunId, OrganizationId, PageNumber, PageSize });
       }
 
+
     /**
      * Export the list of Timesheet Data by ExportPayload
      * @param ExportPayload
@@ -85,4 +86,58 @@ export class OrgInterfaceService {
         params = params.append("OrganizationId", OrganizationId);   
         return this.http.get<any>(`/api/Integration/Download`, { params: params });
       }
+
+
+       /**
+   * Get the list of Log Summary for IRP Interface by  BusinessUnitId
+   * @param BusinessUnitId
+   * @param PageNumber
+   * @param PageSize
+   *
+   * @return OrgInterfacePage
+   */
+    public getInterfaceLogSummaryIRP(
+      OrganizationId: number | null,
+      PageNumber: number,
+      PageSize: number,
+    ): Observable<InterfaceLogSummaryIRPPage> {
+      return this.http.post<InterfaceLogSummaryIRPPage>(`/api/InterfaceLogSummaryIRP/getInterfaceLogSummaryForIRPDetails`, { OrganizationId, PageNumber, PageSize });
+    }
+
+    public downloadFile(documentId: string): Observable<Blob> {
+      return this.http.get(`/api/InterfaceLogSummaryIRP/document/interfaceLog/${documentId}`, {
+        responseType: 'blob',
+      });
+    }
+
+    
+        /**
+   * Get the list of Log Employee import  by InterfaceId
+   * @param InterfaceId
+   * @param PageNumber
+   * @param PageSize
+   *
+   * @return OrgInterfacePage
+   */
+        public getInterfaceSummaryDetails(
+          interfaceLogSummaryID: number ,
+          statusType:number,
+          PageNumber: number,
+          PageSize: number,
+        ): Observable<InterfaceLogSummaryDetails[]> {
+          return this.http.post<InterfaceLogSummaryDetails[]>(`/api/InterfaceLogSummaryIRP/getInterfaceLogSummaryDetails`, { interfaceLogSummaryID, statusType,PageNumber, PageSize });
+        }
+
+        /**
+     * Export the list of Employee Import Data by ExportPayload
+     * @param ExportPayload
+     *
+     * @return Blob
+     */
+      public exportEmployeeImport(payload: ExportPayload): Observable<Blob> {
+        return this.http.post(`/api/InterfaceLogSummaryIRP/export`, payload, { responseType: 'blob' });
+      }
+  
 }
+
+

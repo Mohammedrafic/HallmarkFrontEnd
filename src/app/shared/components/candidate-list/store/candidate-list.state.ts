@@ -232,16 +232,16 @@ export class CandidateListState {
     );
   }
 
-  @Action(CandidateListActions.SaveEmployeeImportResult)
+  @Action(CandidateListActions.SaveEmployeeImportLogResult)
   SaveEmployeesImportResult(
     { dispatch }: StateContext<CandidateListStateModel>,
-    { payload }: CandidateListActions.SaveEmployeeImportResult
+    { payload}: CandidateListActions.SaveEmployeeImportLogResult
   ): Observable<ImportResult<any> | Observable<void>> {
     return this.employeeService.saveImportEmployeeResult(payload).pipe(
       tap((payload) => {
-        if(payload.errorRecords.length > 0){          
-          dispatch(new CandidateListActions.UploadEmployeeFileSucceeded(payload));          
-        }
+        // if(payload.errorRecords.length > 0){          
+        //   dispatch(new CandidateListActions.UploadEmployeeFileSucceeded(payload));          
+        // }
         dispatch(new CandidateListActions.SaveEmployeeImportResultFailAndSucceeded(payload));  
         return payload;
       }),

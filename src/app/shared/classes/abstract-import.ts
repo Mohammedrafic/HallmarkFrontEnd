@@ -13,6 +13,7 @@ import { ImportedBillRate } from '@shared/models';
 import { CandidateImportRecord } from '@shared/models/candidate-profile-import.model';
 import { ImportedOrder } from '@shared/models/imported-order.model';
 import { N_SUCCESS_RECORDS, N_FAILED_RECORDS } from '@shared/constants';
+import { EmployeeImportSaveResult } from '@shared/models/imported-employee';
 
 type ImportModel = ImportedLocation[]
   & ImportedDepartment[]
@@ -51,6 +52,10 @@ export abstract class AbstractImport extends DestroyableDirective implements OnI
   }
 
   public saveImportResult(value: ImportModel): void {
+    this.store.dispatch(new this.action.saveImportResult(value));
+  }
+
+  public saveEmployeeImportResult(value: EmployeeImportSaveResult): void {
     this.store.dispatch(new this.action.saveImportResult(value));
   }
 
@@ -94,28 +99,28 @@ export abstract class AbstractImport extends DestroyableDirective implements OnI
         }
       });
 
-      this.actions$
+    this.actions$
       .pipe(takeUntil(this.destroy$), ofActionSuccessful(this.action?.saveImportResultFailAndSucess ? this.action?.saveImportResultFailAndSucess?.instance : this.action.saveImportResultSucceeded.instance))
       .subscribe((result: { payload: ImportResult<any> }) => {
-          if ((result.payload.succesfullRecords.length || result.payload.errorRecords.length) && this.action?.saveImportResultFailAndSucess?.instance) {
-              if(result.payload?.succesfullRecords.length > 0 && result.payload?.errorRecords.length > 0){
-                let message = this.action?.saveImportResultFailAndSucess ?  this.action?.saveImportResultFailAndSucess?.message : '';
-                message = message.replace('<sn>',result.payload?.succesfullRecords.length.toString());
-                message = message.replace('<fn>',result.payload?.errorRecords.length.toString())
-                this.store.dispatch(new ShowToast(MessageTypes.Error, message));
-                this.reloadItemsList.next();
-              }else if (result.payload?.succesfullRecords.length) {
-                this.store.dispatch(new ShowToast(MessageTypes.Success, N_SUCCESS_RECORDS(result.payload?.succesfullRecords.length)));
-                this.reloadItemsList.next();
-              }else{
-                this.store.dispatch(new ShowToast(MessageTypes.Error, N_FAILED_RECORDS(result.payload?.errorRecords.length)));
-              }
-              if (result.payload?.errorRecords.length) {
-                this.selectErrorsTab.next();
-              } else {
-                this.dialogEvent.next(false);
-              }
-          }         
+        if ((result.payload.succesfullRecords.length || result.payload.errorRecords.length) && this.action?.saveImportResultFailAndSucess?.instance) {
+          if (result.payload?.succesfullRecords.length > 0 && result.payload?.errorRecords.length > 0) {
+            let message = this.action?.saveImportResultFailAndSucess ? this.action?.saveImportResultFailAndSucess?.message : '';
+            message = message.replace('<sn>', result.payload?.succesfullRecords.length.toString());
+            message = message.replace('<fn>', result.payload?.errorRecords.length.toString())
+            this.store.dispatch(new ShowToast(MessageTypes.Error, message));
+            this.reloadItemsList.next();
+          } else if (result.payload?.succesfullRecords.length) {
+            this.store.dispatch(new ShowToast(MessageTypes.Success, N_SUCCESS_RECORDS(result.payload?.succesfullRecords.length)));
+            this.reloadItemsList.next();
+          } else {
+            this.store.dispatch(new ShowToast(MessageTypes.Error, N_FAILED_RECORDS(result.payload?.errorRecords.length)));
+          }
+          if (result.payload?.errorRecords.length) {
+            this.selectErrorsTab.next();
+          } else {
+            this.dialogEvent.next(false);
+          }
+        }
       });
   }
 }

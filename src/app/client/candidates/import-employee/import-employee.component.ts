@@ -5,7 +5,7 @@ import { AbstractImport } from '@shared/classes/abstract-import';
 import { ImportedEmployeeGrid } from '@shared/models/imported-employee';
 import {  ListBoxItem, OrderGrid } from '@shared/models/imported-order.model';
 import { FieldSettingsModel,  SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { GetEmployeeImportErrors, GetEmployeeImportErrorsSucceeded, GetEmployeeImportTemplate, GetEmployeeImportTemplateSucceeded, SaveEmployeeImportResult, SaveEmployeeImportResultFailAndSucceeded, SaveEmployeeImportResultSucceeded, UploadEmployeeFile, UploadEmployeeFileSucceeded } from '@shared/components/candidate-list/store/candidate-list.actions';
+import { GetEmployeeImportErrors, GetEmployeeImportErrorsSucceeded, GetEmployeeImportTemplate, GetEmployeeImportTemplateSucceeded, SaveEmployeeImportLogResult, SaveEmployeeImportResult, SaveEmployeeImportResultFailAndSucceeded, SaveEmployeeImportResultSucceeded, UploadEmployeeFile, UploadEmployeeFileSucceeded } from '@shared/components/candidate-list/store/candidate-list.actions';
 import { ColDef } from '@ag-grid-community/core';
 import { EmployeesColumnsConfig, EmployeesErrorColumnsConfig } from './employee-grid.constants';
 
@@ -13,7 +13,7 @@ const employeeImportConfig = {
   importTemplate: GetEmployeeImportTemplate,
   importError: GetEmployeeImportErrors,
   uploadFile: UploadEmployeeFile,
-  saveImportResult:SaveEmployeeImportResult,
+  saveImportResult:SaveEmployeeImportLogResult,
   uploadFileSucceeded: { instance: UploadEmployeeFileSucceeded, message: 'There are no records in the file' },
   importTemplateSucceeded: { instance:GetEmployeeImportTemplateSucceeded, fileName: 'Employee.xlsx' },
   importErrorsSucceeded: { instance: GetEmployeeImportErrorsSucceeded, fileName: 'Employee_errors.xlsx' },

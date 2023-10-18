@@ -126,6 +126,76 @@ export class LogInterface {
     skippedRecord:    number;
 }
 
+export class InterfaceLogSummaryIRPPage {
+  items:           InterfaceLogSummary[];
+  pageNumber:      number;
+  totalPages:      number;
+  totalCount:      number;
+  hasPreviousPage: boolean;
+  hasNextPage:     boolean;
+}
+
+export class InterfaceLogSummary {
+  id:               number;
+  organizationId:   number;
+  importType:       string;
+  originalFileName:     string;
+  createdAt:      DateTime;
+  status:           string;
+  totalRows:        number;
+  insertedRecord:   number;
+  updatedRecord:    number;
+  failedRecord:     number;
+  infaceLogSummaryId:string;
+}
+
+export class InterfaceLogSummaryIRPDetailsPage {
+  items:           InterfaceLogSummaryDetails[];
+  pageNumber:      number;
+  totalPages:      number;
+  totalCount:      number;
+  hasPreviousPage: boolean;
+  hasNextPage:     boolean;
+}
+export class InterfaceLogSummaryDetails{
+  id: number;
+  interfaceLogId: number;
+  employeeID: string | null;
+  firstName: string | null;
+  middleName: string | null;
+  lastName: string | null;
+  dOB: string | null;
+  primarySkill: string | null;
+  secondarySkill: string | null;
+  classification: string | null;
+  hireDate: string | null;
+  fTE: string | null;
+  hRCompanyCode: string | null;
+  internalTransferRecruitment: string | null;
+  contract: string | null;
+  contractStartDate: string | null;
+  contractEndDate: string | null;
+  address: string | null;
+  country: string | null;
+  state: string | null;
+  city: string | null;
+  zipCode: string | null;
+  email: string | null;
+  workEmail: string | null;
+  cellphone: string | null;
+  alternativePhone: string | null;
+  professionalSummary: string | null;
+  profileStatus: string | null;
+  holdStartDate: string | null;
+  holdEndDate: string | null;
+  terminationDate: string | null;
+  terminationReason: string | null;
+  homeLocation: string | null;
+  homeDepartment: string | null;
+  errorDescriptions: string[];
+  status: string | null;
+}
+
 export enum LogInterfaceStatus {
     CopyDataActivityFailed = "Copy Data Activity Failed",
     ImportedSuccessfully = "Imported Successfully",
