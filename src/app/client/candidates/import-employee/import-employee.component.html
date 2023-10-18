@@ -1,10 +1,11 @@
 <app-import-dialog-content
   [importResponse]="importResponse"
+  [isEmployeeIRPImport]="true"
   [dialogEvent]="dialogEvent"
   [selectErrorsTab]="selectErrorsTab"
   (downloadErrorsEvent)="downloadErrors($event)"
   (downloadTemplateEvent)="downloadTemplate()"
-  (saveImportResult)="saveImportResult($event)"
+  (employeeSaveImportResult)="saveEmployeeImportResult($event)"
   (uploadImportFile)="uploadImportFile($event)"
   [title]="titleImport"
 >

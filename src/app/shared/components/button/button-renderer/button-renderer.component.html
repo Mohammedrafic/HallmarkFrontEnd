@@ -55,3 +55,25 @@
     {{this.params.node.data?.originalFileName}}
   </span>
 </ng-container>
+<ng-container *ngIf="label === 'Count'">
+  <span *ngIf="this.selectedType == 0" style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
+  [attr.title]="'Download'"
+  (click)="onClick($event)">
+ {{this.params.node.data?.totalRows }}
+  </span>
+  <span *ngIf="this.selectedType == 1" style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
+  [attr.title]="'Download'"
+  (click)="onClick($event)">
+ {{ this.params.node.data?.insertedRecord }}
+  </span>
+  <span *ngIf="this.selectedType == 3" style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
+  [attr.title]="'Download'"
+  (click)="onClick($event)">
+ {{ this.params.node.data?.updatedRecord }}
+  </span>
+  <span *ngIf="this.selectedType == 2" style='color:rgb(255,0,0); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
+  [attr.title]="'Download'"
+  (click)="onClick($event)">
+ {{this.params.node.data?.failedRecord }}
+  </span>
+</ng-container>

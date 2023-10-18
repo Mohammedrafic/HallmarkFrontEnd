@@ -91,9 +91,15 @@
 
 @media #{$max-mobile} {
   .horizontal-flex {
+    flex-direction: column;
+
     .input-group {
       width: 100%;
       margin-right: 0;
+    }
+
+    .status-selector-container {
+      margin-bottom: 16px;
     }
   }
 

@@ -20,6 +20,7 @@ export interface PermissionsModel {
   canManageOrderIRP:boolean;
   CanOrganizationViewOrdersIRP: boolean;
   CanOrganizationEditOrdersIRP: boolean;
+  AllowToUpdateDept?:boolean;
 }
 
 export type CustomPermissionModel = { [key: string]: PermissionTypes  };
@@ -53,8 +54,9 @@ export class PermissionService extends DestroyableDirective {
           canCandidateAssignment:permissionIds.includes(PermissionTypes.CanViewCandidateAssigment),
           canManageOrderIRP:permissionIds.includes(PermissionTypes.CanCreateOrdersIRP) || permissionIds.includes(PermissionTypes.CanOrganizationEditOrdersIRP),
           CanOrganizationEditOrdersIRP: permissionIds.includes(PermissionTypes.CanOrganizationEditOrdersIRP),
-          CanOrganizationViewOrdersIRP: permissionIds.includes(PermissionTypes.CanOrganizationViewOrdersIRP)
-          };  
+          CanOrganizationViewOrdersIRP: permissionIds.includes(PermissionTypes.CanOrganizationViewOrdersIRP),
+          AllowToUpdateDept:permissionIds.includes(PermissionTypes.AllowToUpdateDept),
+          };
       })
     );
   }

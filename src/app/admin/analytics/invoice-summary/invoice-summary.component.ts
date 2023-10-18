@@ -55,7 +55,10 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
     "candidateISD": "",
     "invoiceNumberISD": "",
     "InvoiceStartDateISD": "",
-    "invoiceEndDateISD": ""
+    "invoiceEndDateISD": "",
+    "organizationNameISD": "",
+    "reportPulledMessageISD": "",
+    "DateRangeISD": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/InvoiceSummaryReport/InvoiceSummaryReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/InvoiceSummaryReport/InvoiceSummaryReport.cat" };
@@ -151,6 +154,7 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
   private isAlive = true;
   private previousOrgId: number = 0;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
+  private culture = 'en-US';
 
   constructor(private store: Store,
     private formBuilder: FormBuilder,
@@ -364,7 +368,7 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
     departmentIds = departmentIds.length > 0 ? departmentIds : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
 
 
-
+    let currentDate = new Date(Date.now());
     this.paramsData =
     {
 
@@ -384,7 +388,11 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
 //        candidateName == null || candidateName == "" ? "null" : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
       "invoiceNumberISD": invoiceNumber == null ? "null" : invoiceNumber,
       "InvoiceStartDateISD": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "invoiceEndDateISD": formatDate(endDate, 'MM/dd/yyyy', 'en-US')
+      "invoiceEndDateISD": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "organizationNameISD": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageISD": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeISD": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

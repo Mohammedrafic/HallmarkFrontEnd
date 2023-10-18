@@ -995,7 +995,6 @@ public RedirecttoIRPOrder(order:Order)
     this.filters.pageSize = this.pageSize;
     this.isIncomplete = false;
     this.filters.orderDistributionType?this.filters.orderDistributionType:null;
-
     if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
       let IsLTAOrders=  JSON.parse(localStorage.getItem('IsLTAOrders') || '"false"') as boolean;
       if(IsLTAOrders==true){
@@ -1803,7 +1802,7 @@ public RedirecttoIRPOrder(order:Order)
     const columnWithSort = sortEvent.columnApi.getColumnState().find((col) => col.sort !== null);
     this.orderBy = columnWithSort ? `${columnWithSort.colId} ${columnWithSort.sort}` : '';
 
-    this.getOrders();
+    this.getOrders(true);
   }
 
   gridPageChanged(page: number) {

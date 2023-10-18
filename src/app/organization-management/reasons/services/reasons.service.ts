@@ -3,7 +3,19 @@ import { Injectable } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 
-import { SaveCategoryNoteReasons, SaveClosureReasons, SaveOrderRequisition, SavePenalty, SaveUnavailabilityReason, UpdateCategoryNoteReasons, UpdateRecuriterReasons, UpdateSourcingReasons, CreateManualInvoiceRejectReason, UpdateManualInvoiceRejectReason } from '@organization-management/store/reject-reason.actions';
+import {
+  CreateManualInvoiceRejectReason,
+  SaveCancelEmployeeReason,
+  SaveCategoryNoteReasons,
+  SaveClosureReasons,
+  SaveOrderRequisition,
+  SavePenalty,
+  SaveUnavailabilityReason,
+  UpdateCategoryNoteReasons,
+  UpdateManualInvoiceRejectReason,
+  UpdateRecuriterReasons,
+  UpdateSourcingReasons
+} from '@organization-management/store/reject-reason.actions';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { REASON_WARNING } from '@shared/constants';
@@ -12,19 +24,19 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { Organization, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { Penalty, PenaltyPayload } from '@shared/models/penalty.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { filter, Observable, takeUntil } from 'rxjs';
+import { filter, Observable } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { NewReasonsActionsMap, UpdateReasonsActionsMap } from '../constants';
 import { ReasonsNavigationTabs } from '../enums';
-import { CategoryNoteValue, Closurevalue, SaveReasonParams, UnavailabilityValue } from '../interfaces';
+import { CancelEmployeeReasonValue, CategoryNoteValue, Closurevalue, SaveReasonParams, UnavailabilityValue } from '../interfaces';
 
 @Injectable()
 export class ReasonsService {
   constructor(
     private store: Store,
   ) { }
-  
+
   @Select(OrganizationManagementState.organization)
   public readonly organization$: Observable<Organization>;
   protected componentDestroy: () => Observable<unknown>;
@@ -87,6 +99,13 @@ export class ReasonsService {
         calculateTowardsWeeklyHours: !!value.calculateTowardsWeeklyHours,
         eligibleToBeScheduled: !!value.eligibleToBeScheduled,
         visibleForIRPCandidates: !!value.visibleForIRPCandidates,
+      }));
+    } else if (params.selectedTab === ReasonsNavigationTabs.CancelEmployeeReasons) {
+      const value = params.formValue as CancelEmployeeReasonValue;
+
+      this.store.dispatch(new SaveCancelEmployeeReason({
+        id: value.id || null,
+        reason: value.reason,
       }));
     } else if (params.selectedTab === ReasonsNavigationTabs.Closure) {
       var value = params.formValue as Closurevalue;
@@ -208,7 +227,7 @@ export class ReasonsService {
           reason: valueRR.reason,
           agencyFeeApplicable: !!valueRR.agencyFeeApplicable,
         }));
-      } 
+      }
     } else {
       const Action = params.editMode ? UpdateReasonsActionsMap[params.selectedTab]
         : NewReasonsActionsMap[params.selectedTab];

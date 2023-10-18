@@ -16,6 +16,7 @@ export class LikeActionComponent implements ICellRendererAngularComp {
   public componentParent: JobGridComponent;
 
   public isApplyEnabled = false;
+  public isApplySelected = false;
 
   private currentEmployeeJob: OpenJob;
 
@@ -28,13 +29,22 @@ export class LikeActionComponent implements ICellRendererAngularComp {
     return false;
   }
 
+  public callJobAction(): void {
+    this.isApplySelected ? this.withdrawJob() : this.applyJob();
+  }
+
   public applyJob(): void {
     this.componentParent.applyEmployeeJob(this.currentEmployeeJob);
+  }
+
+  public withdrawJob(): void {
+    this.componentParent.withdrawEmployeeJob(this.currentEmployeeJob);
   }
 
   private setData(params: ICellRendererParams): void {
     this.componentParent = params.context.componentParent;
     this.currentEmployeeJob= params.data;
     this.isApplyEnabled = !params.data.isApplyEnabled;
+    this.isApplySelected = params.data.isApplySelected;
   }
 }

@@ -404,6 +404,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public handleApprove(isTimesheetOrMileagesUpdate: boolean): void {
     const { timesheetId, mileageTimesheetId, organizationId } = this;
     const updateId = isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId;
+    const timesheetDetails = this.store.selectSnapshot(TimesheetsState.timesheetDetails);
+
+    if (organizationId && timesheetDetails?.isEmpty && !timesheetDetails?.noWorkPerformed) {
+      this.submitEmptyTimesheetWarning();
+      return;
+    }
 
     (organizationId
       ? this.timesheetDetailsService.submitTimesheet(updateId, organizationId, isTimesheetOrMileagesUpdate)
@@ -419,7 +425,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const timesheetDetails = this.store.selectSnapshot(TimesheetsState.timesheetDetails);
 
     if (timesheetDetails?.isEmpty && !timesheetDetails?.noWorkPerformed) {
-      this.orgSubmitEmptyTimesheetWarning();
+      this.submitEmptyTimesheetWarning();
     } else {
       this.orgSubmitTimesheet(timesheetDetails);
     }
@@ -532,10 +538,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
   }
 
-  private orgSubmitEmptyTimesheetWarning(): void {
+  private submitEmptyTimesheetWarning(): void {
     this.timesheetDetailsService
-      .orgSubmitEmptyTimesheet()
-      .pipe(take(1), takeUntil(this.componentDestroy()))
+      .submitEmptyTimesheet()
+      .pipe(take(1))
       .subscribe();
   }
 

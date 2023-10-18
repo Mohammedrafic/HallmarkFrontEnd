@@ -8,5 +8,13 @@
     .ag-header-cell {
       color: $secondary-dark-blue-15;
     }
+
+    .ag-cell {
+      &.status-cell {
+        .e-chip-list {
+          padding-left: 0;
+        }
+      }
+    }
   }
 }

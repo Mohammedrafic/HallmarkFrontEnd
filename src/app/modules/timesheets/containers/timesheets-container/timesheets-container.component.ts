@@ -102,6 +102,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     rowNodes: [],
   };
   public OrganizationId:number;
+  public allowSelecton:boolean = true;
   constructor(
     private store: Store,
     private timesheetsService: TimesheetsService,
@@ -143,7 +144,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public handleChangeTab(tabIndex: number): void {
     this.activeTabIdx = tabIndex;
-
+    this.allowSelecton = this.activeTabIdx == 2 ? false : true
     const preservedFilters = this.store.selectSnapshot(
       PreservedFiltersState.preservedFiltersByPageName
     ) as PreservedFiltersByPage<TimesheetsFilterState>;

@@ -227,7 +227,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           if(id.length == 1){ 
             this.addManualInvoiceDisable = false;
           }
-          if(id.length > 1){            
+          if(id.length > 0){            
             this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
           }
         }),

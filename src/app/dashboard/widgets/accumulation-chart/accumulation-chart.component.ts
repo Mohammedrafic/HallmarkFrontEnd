@@ -101,6 +101,7 @@ export class AccumulationChartComponent
         else if(status === PositionTrendTypeEnum.IN_PROGRESS){
           candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
           candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
+          candidatesStatusDataSet.push({"value":CandidatStatus.CustomStatus});
         }
         else if(status === 'In Progress (Pending)'){
           candidatesStatusDataSet.push({"value":CandidatStatus.Offered});

@@ -34,6 +34,9 @@ import { EmpTerminationComponent } from './components/emp-termination/emp-termin
 import { CategoryNoteComponent } from './components/category-note/category-note.component';
 import { SourcingReasonComponent } from './components/sourcing-reason/sourcing-reason.component';
 import { RecuriterReasonComponent } from './components/recuriter-reason/recuriter-reason.component';
+import {
+    CancelEmployeeModule
+} from '@organization-management/reasons/components/cancel-employee/cancel-employee.module';
 
 const icons = {
     Edit,
@@ -63,6 +66,7 @@ const icons = {
         TextBoxAllModule,
         ValidateDirectiveModule,
         CheckBoxModule,
+        CancelEmployeeModule,
     ],
     declarations: [
         ReasonsComponent,

@@ -29,6 +29,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { ImportResult } from '@shared/models/import.model';
 import { FileSize, UploaderFileStatus } from '@core/enums';
 import { AppState } from 'src/app/store/app.state';
+import { EmployeeImportSaveResult } from '@shared/models/imported-employee';
 
 @Component({
   selector: 'app-import-dialog-content',
@@ -46,11 +47,14 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   @Output() public downloadErrorsEvent: EventEmitter<any[]> = new EventEmitter<any[]>();
   @Output() public saveImportResult: EventEmitter<any[]> = new EventEmitter<any[]>();
   @Output() public uploadImportFile: EventEmitter<Blob> = new EventEmitter<Blob>();
-  @Output() public tabChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() public tabChange: EventEmitter<boolean> = new EventEmitter<boolean>();  
+  @Output() public employeeSaveImportResult: EventEmitter<EmployeeImportSaveResult> = new EventEmitter<EmployeeImportSaveResult>();
+
 
   @Input() public dialogEvent: Subject<boolean>;
   @Input() public isOrderImport: boolean;
-  @Input() public title = 'Import';
+  @Input() public title = 'Import';  
+  @Input() public isEmployeeIRPImport: boolean;
   @Input() public zIndex: number;
   @Input() public selectErrorsTab: Subject<void>;
   @Input() public set importResponse(response: any) {
@@ -83,6 +87,10 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
 
   get enabledImportButton(): boolean {
     return this.selectedFile?.statusCode === UploaderFileStatus.ReadyForUpload && !this.activeErrorTab;
+  } 
+   get hideImportButton(): boolean {
+    return  this.importResult == null && this.isEmployeeIRPImport
+
   }
 
   constructor(private confirmService: ConfirmService, private cdr: ChangeDetectorRef) {
@@ -227,14 +235,33 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
             filter((confirm) => confirm),
             take(1)
           ).subscribe(() => {
-            this.saveImportResult.next(this.importResult?.succesfullRecords || []);
+            if(this.isEmployeeIRPImport){
+              let employeeData :EmployeeImportSaveResult={
+                employeeImportData :this.importResult?.succesfullRecords.concat(this.importResult?.errorRecords)||[],
+                selectedFile :this.selectedFile?.rawFile as Blob
+              };             
+              this.employeeSaveImportResult.next(employeeData)
+            }
+            else{
+              this.saveImportResult.next(this.importResult?.succesfullRecords || []);
+            }
           });
       } else {
+        if(this.isEmployeeIRPImport){
+          let employeeData :EmployeeImportSaveResult={
+            employeeImportData :this.importResult?.succesfullRecords.concat(this.importResult?.errorRecords)||[],
+            selectedFile :this.selectedFile?.rawFile as Blob
+          };
+          this.employeeSaveImportResult.next(employeeData)
+        }
+        else{
         this.saveImportResult.next(this.importResult?.succesfullRecords || []);
+        }
       }
     }
 
   }
+
 
   private saveImportedOrder(): void {
     this.confirmOrderImport.show();

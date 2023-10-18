@@ -4,6 +4,7 @@ import { ColDef, ValueFormatterParams } from '@ag-grid-community/core';
 
 import { formatTime } from '@shared/constants';
 import { LikeActionComponent } from '../like-action/like-action.component';
+import { OpenJobStatusComponent } from '../open-job-status/open-job-status/open-job-status.component';
 
 const commonCell: ColDef = {
   resizable: true,
@@ -14,11 +15,20 @@ export const JobGridConfig: ColDef[] = [
   {
     field: 'id',
     headerName: '',
-    type: 'leftAligned',
+    type: 'rightAligned',
     resizable: false,
     sortable: false,
     maxWidth: 140,
     cellRenderer: LikeActionComponent,
+  },
+  {
+    field: 'statusName',
+    headerName: 'STATUS',
+    maxWidth: 160,
+    type: 'leftAligned',
+    cellClass: 'status-cell',
+    cellRenderer: OpenJobStatusComponent,
+    ...commonCell,
   },
   {
     field: 'skillName',

@@ -14,6 +14,8 @@ export const CandidateTitle = 'Edit Employee';
 export const StatusField = 'status';
 export const CloseReasonField = 'reason';
 export const RejectedReasonField = 'rejectedReason';
+export const CancelReasonField = 'cancellationReasonId';
+export const OfferedDates = ['offeredStartDate', 'offeredEndDate'];
 export const DefaultConfigFieldsToShow: string[] = [
   'status',
   'actualStartDate',
@@ -35,6 +37,7 @@ export const OnboardConfigFieldsToShow: string[] = [
   'reason',
   'closeDate',
 ];
+export const AcceptConfigFieldsToShow = ['status', 'actualStartDate', 'actualEndDate', 'offeredStartDate', 'offeredEndDate'];
 
 export const SwitcherValue : string[] = [
   'All',
@@ -102,6 +105,15 @@ export const CandidateDialogConfig = (): ReadonlyArray<CandidateField> => [
     type: FieldType.Date,
     showField: true,
     cssClass: 'date-field',
+  },
+  {
+    field: 'cancellationReasonId',
+    title: 'Reason',
+    disabled: false,
+    required: true,
+    type: FieldType.Dropdown,
+    showField: false,
+    cssClass: 'reason',
   },
   {
     field: 'rejectedReason',
