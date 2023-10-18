@@ -50,5 +50,5 @@ export enum PermissionTypes {
   //Candidate Assignment
   CandidateAssigment=850,
   CanViewCandidateAssigment=851,
-  AllowToUpdateDept=8137
+  AllowToUpdateDept=8137,
 }

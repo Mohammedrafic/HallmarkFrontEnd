@@ -51,7 +51,7 @@ export class PermissionService extends DestroyableDirective {
           canRejectCandidateIRP:permissionIds.includes(PermissionTypes.CanRejectCandidateIRP),
           canCandidateAssignment:permissionIds.includes(PermissionTypes.CanViewCandidateAssigment),
           canManageOrderIRP:permissionIds.includes(PermissionTypes.CanCreateOrdersIRP) || permissionIds.includes(PermissionTypes.CanOrganizationEditOrdersIRP),
-          AllowToUpdateDept:permissionIds.includes(PermissionTypes.AllowToUpdateDept)
+          AllowToUpdateDept:permissionIds.includes(PermissionTypes.AllowToUpdateDept),
 
           };
       })

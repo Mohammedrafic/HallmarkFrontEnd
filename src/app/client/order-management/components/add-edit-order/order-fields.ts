@@ -20,7 +20,7 @@ enum CommonInfo {
   linkedId,
   deleteDocumentsGuids,
   fromTemplateId,
-  AllowToUpdateDept
+  AllowToUpdateDept,
 }
 
 enum ContactToPermTravelerGeneralInfo {

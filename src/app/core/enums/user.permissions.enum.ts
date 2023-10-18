@@ -240,5 +240,5 @@ export enum UserPermissions {
   ViewNotes=8121,
   ManageNotes=8122,
   //Allow update to order form
-   AllowToUpdateDept=8137
+  AllowToUpdateDept=8137,
 }

@@ -142,10 +142,7 @@ import { Permission } from '@core/interface';
 })
 export class OrderDetailsFormComponent extends AbstractPermission implements OnInit {
   @Input() isActive = false;
-  public orderData: Order | null;
-  selectedOrderId: string | null;
-  isEditoption: boolean;
-  AllowToUpdateDept: boolean | undefined;
+
   @Input() set disableOrderType(value: boolean) {
     if (value) {
       this.orderTypeForm.controls['orderType'].disable();
@@ -155,7 +152,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
   @Output() hourlyRateSync = new EventEmitter<string>();
   @Input() public externalCommentConfiguration?: boolean | null;
-
+  public orderData: Order | null;
+  public selectedOrderId: string | null;
+  public isEditoption: boolean;
+  public AllowToUpdateDept: boolean | undefined;
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
@@ -818,7 +818,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       if ((order.status === OrderStatus.InProgress && this.AllowToUpdateDept) || (order.status === OrderStatus.Filled && this.AllowToUpdateDept)) {
         this.generalInformationForm = disableControls(this.generalInformationForm, ControlsForDisablelocation, false);
       } else {
-      this.generalInformationForm = disableControls(this.generalInformationForm, ControlsForDisable, false);
+         this.generalInformationForm = disableControls(this.generalInformationForm, ControlsForDisable, false);
       }
     }
 
@@ -957,9 +957,9 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       const isEditMode = this.route.snapshot.data['isEditing'];
       this.isEditoption=isEditMode;
       if (isEditMode) {
-        this.isEditoption = true
+        this.isEditoption = true;
       } else {
-        this.isEditoption = false
+        this.isEditoption = false;
       }
       if (order && isEditMode) {
         this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
@@ -1191,7 +1191,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           DateTimeHelper.setUtcTimeZone(this.orderControlsConfig.jobEndDateControl.value)
         )
       );
-        }
+      }
     });
 
     combineLatest([
