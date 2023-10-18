@@ -23,6 +23,6 @@ export class OpenJobStatusComponent implements ICellRendererAngularComp {
   }
 
   private setData(params: ICellRendererParams): void {
-    this.applicantStatus = params.data.applicantStatusName;
+    this.applicantStatus = params.data.statusName;
   }
 }

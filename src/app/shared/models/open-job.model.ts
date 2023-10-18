@@ -23,7 +23,7 @@ export interface OpenJob {
   isDeprtmentVisible: boolean;
   orderTypeName: string;
   jobId?: number | null;
-  applicantStatusName?: string | null;
+  statusName?: string | null;
 }
 
 export type OpenJobPage = PageOfCollections<OpenJob>;
