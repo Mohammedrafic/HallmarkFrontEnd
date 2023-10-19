@@ -24,7 +24,6 @@ import {
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
 import { CandidateDetailsApiService } from '../services/candidate-details-api.service';
-import { DoNotReturnStateModel } from '@client/do-not-return/do-not-return.interface';
 import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
