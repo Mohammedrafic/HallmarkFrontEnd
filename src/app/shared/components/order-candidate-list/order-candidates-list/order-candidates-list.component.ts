@@ -4,9 +4,10 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import {ChangeDetectorRef, Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob,
-  GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
+  GetPredefinedBillRates, 
+  UpdateOrganisationCandidateJob} from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -123,7 +124,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
     private orderManagementService: OrderManagementService,
     private settingsViewService: SettingsViewService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private actions: Actions,
   ) {
     super(store, router, globalWindow);
     this.setIrpFeatureFlag();
@@ -150,6 +152,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     if(this.orderDetails?.commentContainerId != undefined){
     this.commentContainerId = this.orderDetails.commentContainerId;
     }
+
+    this.updateOnJobChange();
   }
 
   public changeCandidate(isNext: boolean): void {
@@ -440,6 +444,16 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       }
 
       this.previousSelectedSystemId = null;
+    });
+  }
+
+  private updateOnJobChange(): void {
+    this.actions.pipe(
+      ofActionSuccessful(UpdateOrganisationCandidateJob),
+      takeUntil(this.unsubscribe$)
+    )
+    .subscribe(() => {
+      this.getCandidateJob(this.candidate);
     });
   }
 }
