@@ -204,7 +204,12 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
 
   private searchCandidatesByName(): void {
     this.searchByCandidateName$
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.unsubscribe$))
+      .pipe(
+        filter((queryString) => queryString.length > 2), 
+        debounceTime(1000), 
+        distinctUntilChanged(), 
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe((queryString) => {
         this.searchTermByCandidateName = queryString;
         this.searchCandidateByName(queryString);

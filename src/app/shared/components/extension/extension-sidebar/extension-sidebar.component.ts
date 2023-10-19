@@ -31,6 +31,8 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { ExtenstionResponseModel } from './models/extension.model';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -65,6 +67,11 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public candidateRates: BillRate[];
   @Input() public system: string;
   public extensionFormIRP: FormGroup;
+  public CanOrganizationEditOrdersIRP: boolean;
+  public CanOrganizationViewOrdersIRP: boolean;
+  public commentContainerId: number;
+  public activeSystems: OrderManagementIRPSystemId | null;
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
 
   private get billRateControl(): FormControl {
     return this.extensionForm?.get('billRate') as FormControl;
@@ -78,12 +85,14 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     private permissionService: PermissionService,
     private billRatesApiService: BillRatesService,
     private cd: ChangeDetectorRef,
+    private orderManagementService : OrderManagementService
   ) {
     super();
   }
 
   public ngOnInit(): void {
     this.getJobData();
+    this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.subscribeOnPermissions();
     const minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
     this.minDate = DateTimeHelper.setCurrentTimeZone(minDate.toString());
@@ -397,8 +406,10 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     .pipe(
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(({ canCreateOrder}) => {
+    .subscribe(({ canCreateOrder, CanOrganizationEditOrdersIRP, CanOrganizationViewOrdersIRP}) => {
       this.canCreateOrder = canCreateOrder;
+      this.CanOrganizationEditOrdersIRP = CanOrganizationEditOrdersIRP;
+      this.CanOrganizationViewOrdersIRP = CanOrganizationViewOrdersIRP;
       this.cd.markForCheck();
     });
   }
@@ -408,6 +419,9 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     .pipe(
       tap((job) => {
         this.candidateJob = job;
+        if(this.candidateJob?.commentContainerId && this.candidateJob.commentContainerId != null){
+          this.commentContainerId = this.candidateJob.commentContainerId;
+        }
       }),
       switchMap((job) => this.billRatesApiService.getCalculatedRates(job.jobId)),
       takeUntil(this.componentDestroy()),
