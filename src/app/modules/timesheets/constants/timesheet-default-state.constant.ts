@@ -35,6 +35,7 @@ export const DefaultTimesheetState: TimesheetsModel = {
   selectedTimeSheet: null,
   billRateTypes: [],
   costCenterOptions: [],
+  organizationStructure: null,
   isAddDialogOpen: {
     action: false,
     dialogType: RecordFields.Time,

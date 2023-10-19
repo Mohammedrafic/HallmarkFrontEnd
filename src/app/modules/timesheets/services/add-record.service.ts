@@ -17,6 +17,7 @@ export class AddRecordService {
           day: [null, [Validators.required]],
           timeIn: [null, [Validators.required]],
           timeOut: [null, [Validators.required]],
+          locationId: [null, Validators.required],
           departmentId: [null, Validators.required],
           billRateConfigId: [null, Validators.required],
           hadLunchBreak: [false],
