@@ -9,4 +9,5 @@ import { OrderCandidateJob, OrderManagementChild } from '@shared/models/order-ma
 export class ExtensionCandidateInfoComponent {
   @Input() public candidateJob: OrderCandidateJob;
   @Input() public orderPosition: OrderManagementChild;
+  @Input() public system: string;
 }

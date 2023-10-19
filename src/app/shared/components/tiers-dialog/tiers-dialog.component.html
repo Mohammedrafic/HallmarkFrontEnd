@@ -1,6 +1,6 @@
 <ejs-dialog
   #sideDialog
-  cssClass="dialog"
+  cssClass="dialog responsive"
   [width]="'434px'"
   [visible]="false"
   [isModal]="true"
@@ -13,20 +13,7 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title">{{ title }}</h3>
           </div>
-          <div  class="e-card-content">
-            <button
-              ejs-button
-              cssClass="e-outline button-cancel"
-              (click)="closeDialog()"
-              >Cancel</button>
-            <button
-              ejs-button
-              type="submit"
-              [isPrimary]="true"
-              [disabled]="permission"
-              (click)="saveTiers()"
-              >Save</button>
-          </div>
+          <ng-container [ngTemplateOutlet]="actionButtons"></ng-container>
         </div>
       </section>
       <div class="form" *ngIf="tierForm">
@@ -141,4 +128,25 @@
       </ng-container>
     </section>
   </ng-template>
+  <ng-template #footerTemplate>
+    <ng-container [ngTemplateOutlet]="actionButtons"></ng-container>
+  </ng-template>
 </ejs-dialog>
+
+<ng-template #actionButtons>
+  <div class="e-card-content mobile-button-group">
+    <button
+    ejs-button
+    cssClass="e-outline button-cancel action-btn"
+    (click)="closeDialog()"
+    >Cancel</button>
+  <button
+    ejs-button
+    type="submit"
+    [isPrimary]="true"
+    class="action-btn"
+    [disabled]="permission"
+    (click)="saveTiers()"
+    >Save</button>
+  </div>
+</ng-template>

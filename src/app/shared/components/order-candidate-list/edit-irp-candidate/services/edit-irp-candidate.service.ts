@@ -30,7 +30,7 @@ import {
 } from '@shared/components/order-candidate-list/interfaces';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { ApplicantStatus } from '@shared/models/order-management.model';
-import { RejectReason, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
+import { CancelEmployeeReasons, RejectReason, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { OrderClosureReasonType } from '@shared/enums/order-closure-reason-type.enum';
 import { DateTimeHelper } from '@core/helpers';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -63,6 +63,7 @@ export class EditIrpCandidateService {
       rejectedReason: [null],
       isClosed: [false],
       reason: [null],
+      cancellationReasonId: [null],
       closeDate: [null],
     }) as CustomFormGroup<CandidateForm>;
   }
@@ -136,6 +137,10 @@ export class EditIrpCandidateService {
 
   getRejectedReasons(): RejectReason[] {
     return this.store.selectSnapshot(OrderManagementContentState.rejectionReasonsList) || [];
+  }
+
+  getCancelEmployeeReasons(): CancelEmployeeReasons[] {
+    return this.store.selectSnapshot(RejectReasonState.getCancelEmployeeReasons)?.items || [];
   }
 
   getClosureReasons(onlyCustom = false): RejectReasonwithSystem[] {
@@ -238,7 +243,7 @@ export class EditIrpCandidateService {
     state: EditCandidateDialogState,
     createReplacement: boolean,
   ): Observable<void> {
-    const { status, actualStartDate, actualEndDate, availableStartDate, offeredStartDate, offeredEndDate, rejectedReason } =
+    const { status, actualStartDate, actualEndDate, availableStartDate, offeredStartDate, offeredEndDate, rejectedReason, cancellationReasonId } =
       candidateForm.getRawValue();
 
     if (state.candidate.status === CandidatStatus['Not Applied']) {
@@ -250,6 +255,7 @@ export class EditIrpCandidateService {
         jobId: state.candidate.candidateJobId,
         createReplacement,
         actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
+        cancellationReasonId,
       });
     } else if (status === CandidatStatus.Offered) {
       return this.orderCandidateApiService.updateIrpCandidate(

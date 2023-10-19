@@ -183,6 +183,10 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   public onTabSelecting(tab: SelectingEventArgs): void {
     this.firstActive = false;
 
+    if (tab.isSwiped) {
+      tab.cancel = true;
+    }
+
     let switchTabVal=this.switchTab(tab?.selectingItem?.innerText);
     this.activeTab = switchTabVal;
     switch (switchTabVal) {

@@ -61,10 +61,9 @@ export class AddEditReorderService {
     return this.http.put<ReorderResponse[]>('/api/reorders', this.adaptToReorderRequest(reorder, multipleReorderDates));
   }
 
-  public getBillRate(departmentId: number, skillId: number): Observable<number> {
+  public getBillRate(departmentId: number, skillId: number): Observable<BillRate[]> {
     return this.orderManagementContentService
-      .getPredefinedBillRates(OrderType.OpenPerDiem, departmentId, skillId)
-      .pipe(map((billRates: BillRate[]) => billRates[0].rateHour));
+      .getPredefinedBillRates(OrderType.OpenPerDiem, departmentId, skillId);
   }
 
   /**

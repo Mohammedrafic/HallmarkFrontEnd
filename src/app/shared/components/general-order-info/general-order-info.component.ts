@@ -28,7 +28,7 @@ export class GeneralOrderInfoComponent {
     }
   }
 
-  @Input() system: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
+  @Input() system: {};
 
   public orderType: typeof OrderType = OrderType;
   public readonly systemType = OrderManagementIRPSystemId;

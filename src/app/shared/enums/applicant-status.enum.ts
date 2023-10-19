@@ -33,6 +33,11 @@ export enum CandidatStatus {
   CustomStatus = 30,
 }
 
+export enum ApplicantStatusIRP{
+  OnBoard = "Onboard",
+  Accepted = "Accepted"
+}
+
 export enum ConfigurationValues {
   Accept = "Accept",
   Apply = "Apply"

@@ -18,6 +18,7 @@ import { OrganizationalHierarchy, OrganizationSettingKeys } from '../../constant
 import { BusinessUnitType } from '../../enums/business-unit-type';
 import { SettingsViewService } from '../../services/settings-view.service';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 @Component({
@@ -49,6 +50,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   public canCreateOrder: boolean;
   private unsubscribe$: Subject<void> = new Subject();
   private eventsHandler: Subject<void> = new Subject();
+  public activeSystems: OrderManagementIRPSystemId | null;
 
     constructor(
     private store: Store,
@@ -56,13 +58,15 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
     private cdr: ChangeDetectorRef,
     private historicalEventsService: HistoricalEventsService,
     private settingsViewService: SettingsViewService,
-    private permissionService : PermissionService
+    private permissionService : PermissionService,
+    private orderManagementService : OrderManagementService
   ) {
     this.eventsHandler.pipe(takeUntil(this.unsubscribe$), throttleTime(500))
       .subscribe(() => {
         this.getHistoricalEvents();
       });
     this.subscribeOnPermissions();
+    this.activeSystems = this.orderManagementService.getOrderManagementSystem();
   }
 
   private subscribeForSettings(): void {
