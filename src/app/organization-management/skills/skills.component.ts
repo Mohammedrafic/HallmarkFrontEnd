@@ -339,6 +339,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
         this.skillForm.reset();
         this.removeActiveCssClass();
         this.isbulkedit=false;
+        this.clearSelection(this.grid);
       });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
@@ -353,11 +354,16 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     const atLeastOneSystemSelected = this.skillForm.get('includeInIRP')?.value
     || this.skillForm.get('includeInVMS')?.value;
 
-    if (this.orgModuleSettings.isFeatureIrpEnabled && !atLeastOneSystemSelected) {
+    if (this.orgModuleSettings.isFeatureIrpEnabled && !atLeastOneSystemSelected && !this.isbulkedit) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select system for Skill'));
       return;
     }
       if(this.isbulkedit){
+       if(this.orgModuleSettings.isFeatureIrpEnabled
+        && this.orgModuleSettings.isIrpDisplayed && !atLeastOneSystemSelected) {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select system for Skill'));
+          return;
+        }
         let selectedassignedskills:Skill[]=this.selectedItems.map(val => ({id: val.id,MasterSkillId: val.masterSkill?.id,
           skillCategoryId:val.masterSkill?.skillCategoryId,
           skillAbbr:val.masterSkill?.skillAbbr,
@@ -537,9 +543,9 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     ).subscribe((payload) => {
       this.clearSelection(this.grid);
       this.isbulkdelete=false;
-      
       this.getSkills();
       this.bulkactionmessage = payload.payload.message;
+      this.bulkactionnotvalidskillnmaes=[];
       this.store.dispatch(new ShowBulkSkillActionDialog(true,this.bulkactionmessage));
         
     });  
