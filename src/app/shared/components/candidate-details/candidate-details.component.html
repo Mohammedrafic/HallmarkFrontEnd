@@ -8,6 +8,11 @@
     ></app-tab-navigation>
   </ng-container>
   <ng-container right>
+    <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="showInfoAlert()" *ngIf="isMobile">
+      <div>
+        <i-feather name="info" class="icon no-margin"></i-feather>
+      </div>
+    </button>
     <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="showFilters()">
       <div class="filter-button-content">
         <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
@@ -29,7 +34,7 @@
    </button>
   </ng-container>
 </app-page-toolbar>
-<section class="tab-legend">
+<section class="tab-legend" *ngIf="!isMobile">
   <div class="tab-legend__item">
     <span>All:</span> Confirmed, Active, Past job Candidates.
   </div>
