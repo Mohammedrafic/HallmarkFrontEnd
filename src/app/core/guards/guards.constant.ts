@@ -2,6 +2,7 @@ export const AllowedAdminUrlForOrgUser: string[] = [
   '/admin/profile',
   '/admin/loginterfaces',
   '/admin/orginterfaces',
+  '/admin/interfacelogirp',
 ];
 
 export const AllowedAdminUrlForAgencyUser: string[] = [
