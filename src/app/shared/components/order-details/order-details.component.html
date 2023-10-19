@@ -123,7 +123,7 @@
 <section
   class="bill-rates"
   *ngIf="order && order?.orderType !== orderType.OpenPerDiem && order?.orderType !== orderType.PermPlacement
-  && activeSystem !== systemTypes.IRP"
+  && activeSystems !== systemTypes.IRP"
 >
   <app-bill-rates-view-grid [billRatesData]="order.billRates"></app-bill-rates-view-grid>
 </section>

@@ -116,7 +116,16 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Input() actionsAllowed = true;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Output() updateDetails = new EventEmitter<void>();
-  @Input() public activeSystem : {};
+
+  private _activeSystem: any;
+  public get activeSystem() {
+    return this._activeSystem;
+  }
+ 
+  @Input() public set activeSystem(val: any) {
+    this._activeSystem = val;
+    this.subsToCandidate();
+  }
 
   candidate$: Observable<OrderCandidatesList | null>;
 

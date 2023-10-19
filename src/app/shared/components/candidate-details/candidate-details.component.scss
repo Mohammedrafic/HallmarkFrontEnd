@@ -33,6 +33,14 @@
   }
 }
 
+@media #{$max-tablet} {
+  .tab-legend {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+
 .table-tabs {
   margin-bottom: 0;
   display: inline-block;
@@ -123,4 +131,8 @@
       }
     }
   }
+}
+
+.icon.no-margin {
+  margin-left: 0;
 }

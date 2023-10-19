@@ -9,7 +9,8 @@ export enum ReasonsNavigationTabs {
   InternalTransfer,
   CategoryNote,
   SourcingReason,
-  RecruiterReason
+  RecruiterReason,
+  CancelEmployeeReasons
 }
 
 export enum ReasonFormType {
@@ -23,5 +24,6 @@ export enum ReasonFormType {
   TerminatedReason = "TerminatedReason",
   InternalTransferReason = "InternalTransferReason",
   RecruiterReason = "RecuriterReason",
-  SourcingReason = "SourcingReason"
+  SourcingReason = "SourcingReason",
+  CancelEmployeeReasons = "CancelEmployeeReasons"
 }

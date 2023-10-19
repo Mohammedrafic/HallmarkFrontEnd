@@ -1,0 +1,23 @@
+@import 'colors';
+
+.grid-table-container {
+  height: calc(100% - 30px);
+  padding-top: 24px;
+
+  ::ng-deep {
+    .ag-root-wrapper {
+      border: 1px solid var(--grid-border-color) !important;
+      border-top-left-radius: 14px !important;
+      border-top-right-radius: 14px !important;
+    }
+
+    .ag-header-cell {
+      color: $secondary-dark-blue-15;
+      font-weight: 600;
+    }
+
+    .ag-center-cols-viewport {
+      overflow-x: hidden;
+    }
+  }
+}

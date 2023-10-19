@@ -160,12 +160,22 @@
       </form>
 
     </div>
-    <div class="extension__comments">
+    <div class="extension__comments" *ngIf="activeSystems !== OrderManagementIRPSystemId.IRP">
       <app-comments
         [canVmsCreateOrders]="canCreateOrder"
         [comments]="comments"
         [isCreating]="true"></app-comments>
     </div>
+    <div class="extension__comments" *ngIf="activeSystems === OrderManagementIRPSystemId.IRP">
+      <app-comments-irp
+        [comments]="comments"
+        [commentContainerId]="commentContainerId"
+        [useBackground]="false"
+        [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
+        [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
+      ></app-comments-irp>
+    </div>
+
   </div>
   <div class="extension__bill-rates">
     <app-bill-rates

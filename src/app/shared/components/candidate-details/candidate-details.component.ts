@@ -80,6 +80,9 @@ import { UserAgencyOrganization } from '@shared/models/user-agency-organization.
 import { GetUserAgencies, GetUserOrganizations } from 'src/app/store/user.actions';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { DoNotReturnCandidateSearchFilter } from '@shared/models/donotreturn.model';
+import { AlertService } from '@shared/services/alert.service';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 @Component({
   selector: 'app-candidate-details',
   templateUrl: './candidate-details.component.html',
@@ -174,6 +177,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   public lastAgencyId: number;
   public CandidateNames:any;
   public orgAgencyId:number|null|undefined;
+  public isMobile = false;
 
   constructor(
     store: Store,
@@ -183,12 +187,15 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     private datePipe: DatePipe,
     private candidateService: CandidateDetailsService,
     private actions$: Actions,
+    private alertService: AlertService,
+    private breakpointObserver: BreakpointObserver,
   ) {
     super(store);
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
     this.CandidateStatus = routerState?.['orderStatus'];
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
+    this.listenMediaQueryBreakpoints();
   }
 
   override ngOnInit(): void {
@@ -411,6 +418,34 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
 
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
+  }
+
+  public showInfoAlert(): void {
+    this.alertService.alert(
+      `
+      <div>
+        <div style="display: flex; flex-direction: column; margin-bottom: 24px">
+          <span style="font-weight: bold; color: #4C5673">All</span>
+          <span>Confirmed, Active, Past job Candidates.</span>
+        </div>
+        <div style="display: flex; flex-direction: column; margin-bottom: 24px">
+          <span style="font-weight: bold; color: #4C5673">Confirmed</span>
+          <span>Offer accepted and ready to Onboard.</span>
+        </div>
+        <div style="display: flex; flex-direction: column; margin-bottom: 24px">
+          <span style="font-weight: bold; color: #4C5673">Active</span>
+          <span>On assignment candidates.</span>
+        </div>
+        <div style="display: flex; flex-direction: column; margin-bottom: 24px">
+          <span style="font-weight: bold; color: #4C5673">Past</span>
+          <span>Jobs completed Candidates.</span>
+        </div>
+      </div>`,
+      {
+        title: 'Candidate Statuses',
+        okButtonLabel: 'Close',
+      }
+    );
   }
 
   private setHeaderName(): void {
@@ -1009,4 +1044,10 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     }
   }
 
+  private listenMediaQueryBreakpoints(): void {
+    this.breakpointObserver.observe([BreakpointQuery.MOBILE_MAX])
+    .pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.isMobile = data.breakpoints[BreakpointQuery.MOBILE_MAX];
+    });
+  }
 }
