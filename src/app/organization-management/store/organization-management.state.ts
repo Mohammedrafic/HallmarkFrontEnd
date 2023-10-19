@@ -1090,7 +1090,6 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Skills));
               dispatch(new BulkDleteAssignedSkillSucceeded(payload));
             }
             else{
