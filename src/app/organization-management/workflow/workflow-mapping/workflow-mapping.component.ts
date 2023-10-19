@@ -285,7 +285,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
        workflow.steps = CreateNextStepStatusForWorkflows(
          workflow.steps,
          foundWorkflow?.includeInIRP,
-         foundWorkflow?.type
+         workflow?.type
         );
       });
 
@@ -293,7 +293,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
         this.orderWorkflowSteps = foundWorkflow.workflows[0].steps.filter(
           (step) => step.type === WorkflowStepType.Incomplete || step.type === WorkflowStepType.Custom
         ); // includes required Order step
-        this.applicationWorkflowSteps = foundWorkflow.workflows[1].steps.filter((step) => step.requirePermission); // excludes not required App step
+        this.applicationWorkflowSteps = foundWorkflow.workflows[1].steps.filter((step) => {
+          return (step.requirePermission && !step.includeInIrp) || (step.requirePermission && step.includeInIrp && step.nextStepId);
+        }); // excludes not required App step
       }
 
       if (this.orderWorkflowSteps.length > 0) {
@@ -623,7 +625,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
 
   private setUsersAndRolesForEdit(stepMappings: StepMapping[], workflowSteps: Step[], formArray: FormArray): void {
     workflowSteps.forEach((step, i) => {
-      let foundMatchedSteps = stepMappings.filter((s) => s.workflowStepId === step.id);
+      let foundMatchedSteps = stepMappings.filter((s) => {
+        return s.workflowStepId === (step.nextStepId ?? step.id);
+      });
 
       if (foundMatchedSteps.length) {
         foundMatchedSteps.forEach((foundMatchedStep: StepMapping) => {
@@ -808,6 +812,12 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     if (value === WorkflowGroupType.IRPOrderWorkflow) {
       this.skills = this.workflowMappingService.getIncludeIrpSources(this.allSkills);
       this.workflowSources = this.workflowMappingService.getIncludeIrpSources(this.allWorkflows);
+      return;
+    }
+
+    if (value === WorkflowGroupType.VMSOrderWorkflow) {
+      this.skills = this.workflowMappingService.getIncludeVmsSources(this.allSkills);
+      this.workflowSources = this.workflowMappingService.getIncludeVmsSources(this.allWorkflows);
       return;
     }
 
