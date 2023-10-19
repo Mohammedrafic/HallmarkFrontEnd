@@ -631,6 +631,7 @@ body.dark .title, body.dark .contact-name {
 }
 .reason-form .input-group span.error{
   position: relative;
+  top: 0;
   bottom: 0px;
 }
 .exp_creds .app-widget-wrapper__projection-wrapper {
@@ -664,12 +665,12 @@ svg.svg-inline--fa.fa-lock,  svg.svg-inline--fa.fa-unlock{
     width: 20px;
     height: 20px;
   }
-  
+
 }
 .app-grid__component .ag-root-wrapper {
   border: none !important;
   }
- 
+
 
   .app-grid__component span.ag-icon.ag-icon-menu {
     display: none;

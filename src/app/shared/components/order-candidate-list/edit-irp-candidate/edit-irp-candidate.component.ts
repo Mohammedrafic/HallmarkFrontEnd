@@ -763,8 +763,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
 
     if (hasOnboardedCandidateOfferedDate || hasCancelledOffboardCandidate) {
-      UpdateVisibilityConfigFields(this.dialogConfig, OnboardConfigFieldsToShow);
+      const isCandidateCancelled = status === CandidatStatus.Cancelled;
+      const fieldsToShow = isCandidateCancelled ? [...OnboardConfigFieldsToShow, CancelReasonField] : OnboardConfigFieldsToShow;
+
+      UpdateVisibilityConfigFields(this.dialogConfig, fieldsToShow);
       DisableControls(OfferedDates, this.candidateForm);
+
       return;
     }
 
@@ -777,6 +781,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     if (status === CandidatStatus.Cancelled) {
       const cancelReasonConfigField = this.getConfigField(CancelReasonField);
       cancelReasonConfigField.showField = true;
+
       return;
     }
 
