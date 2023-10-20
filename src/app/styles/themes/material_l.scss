@@ -62561,7 +62561,7 @@ $grid-bigger-icon-font-size: $grid-icon-font-size !default;
       overflow-wrap: break-word;
       text-overflow: clip;
       white-space: normal;
-      word-wrap: break-word;
+      word-break: break-word;
     }
 
     & .e-stackedheadercelldiv {
