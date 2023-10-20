@@ -152,8 +152,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     if(this.orderDetails?.commentContainerId != undefined){
     this.commentContainerId = this.orderDetails.commentContainerId;
     }
-
-    this.updateOnJobChange();
   }
 
   public changeCandidate(isNext: boolean): void {
@@ -444,16 +442,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       }
 
       this.previousSelectedSystemId = null;
-    });
-  }
-
-  private updateOnJobChange(): void {
-    this.actions.pipe(
-      ofActionSuccessful(UpdateOrganisationCandidateJob),
-      takeUntil(this.unsubscribe$)
-    )
-    .subscribe(() => {
-      this.getCandidateJob(this.candidate);
     });
   }
 }
