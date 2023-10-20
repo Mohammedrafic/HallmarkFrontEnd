@@ -5,6 +5,7 @@ import {
   AuditLogPayload,
   CreateOrderDto,
   EditOrderDto,
+  JobDistributionfilters,
   OnboardCandidateEmail,
   Order,
   OrderFilter,
@@ -529,4 +530,8 @@ export class GetOrderJobDistributionDetailSucceeded {
 export class GetOrderWorkLocationDetailSucceeded {
   static readonly type = '[order management] Get Order WorkLocation Detail Succeeded';
   constructor() {}
+}
+export class GetJobDistributionValues {
+  static readonly type = '[order management] Get Order Job Distribution values';
+  constructor(public payload: JobDistributionfilters) {}
 }

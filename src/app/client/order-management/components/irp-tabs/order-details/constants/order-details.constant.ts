@@ -22,6 +22,7 @@ export const ExternalDistributionError = 'Please select only one external job di
 export const InternalTieringError = 'Change cannot be saved. Order was distributed to all eligible employees';
 export const ChangeInternalDistributionSuccess = 'Record has been modified. Order was distributed to all eligible employees';
 export const InternalNotSelectedError = 'Please select at least one internal job distribution option';
+export const DistributionvalueError = 'Please Enter Distribution delay value';
 export const AllInternalJob = { id: IrpOrderJobDistribution.AllInternal, name: 'All Internal' };
 export const TierInternal = { id: IrpOrderJobDistribution.TieringLogicInternal, name: 'Tiering logic Internal' };
 

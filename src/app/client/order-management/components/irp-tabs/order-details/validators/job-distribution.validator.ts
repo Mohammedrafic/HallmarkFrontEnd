@@ -2,13 +2,14 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import {
+  DistributionvalueError,
   ExternalDistributionError,
   InternalDistributionError,
   InternalNotSelectedError,
 } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { isDistributionIncludeExternalOptions } from '@client/order-management/components/irp-tabs/order-details/helpers';
 
-export function jobDistributionValidator(controlName: string,isTemplate? : boolean): ValidatorFn {
+export function jobDistributionValidator(controlName: string,distributeToVMS:string,distributionDelay: string,isTemplate? : boolean): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
     const control = formGroup.get(controlName);
     const value = control?.value;
@@ -27,6 +28,14 @@ export function jobDistributionValidator(controlName: string,isTemplate? : boole
 
     if(value && isDistributionIncludeExternalOptions(value).length > 1 && !isTemplate) {
       control?.setErrors({ errorMessage: ExternalDistributionError });
+    }
+    const distributiondelaycontrol = formGroup.get(distributionDelay);
+    const distributiondelayvalue = distributiondelaycontrol?.value;
+    const distributionvaluecontrol = formGroup.get(distributeToVMS);
+    const distributionvalue = distributionvaluecontrol?.value;
+
+    if (distributiondelayvalue && distributionvalue == null && !isTemplate) {
+      distributionvaluecontrol?.setErrors({ errorMessage: DistributionvalueError });
     }
 
     return  null;

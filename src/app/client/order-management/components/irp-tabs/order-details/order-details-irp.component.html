@@ -189,6 +189,18 @@
                   </div>
                 </ng-template >
 
+                <ng-template #switcher [ngSwitchCase]="FieldTypes.Toggle">
+                  <div class="input-container toggle_field" *ngIf="item.show">
+                  <div class="input-group wide" >
+                  <ejs-switch
+                   class="switch"
+                   [formControlName]="item.field"
+                  ></ejs-switch>
+                  <label [for]="item.field" class="switch-text">{{ item.title }}</label>
+                </div>
+                  </div>
+                  </ng-template>
+                  
                 <ng-template [ngSwitchCase]="FieldTypes.CheckBox">
                   <div class="{{item.cssClass}} checkbox-container">
                     <ejs-checkbox

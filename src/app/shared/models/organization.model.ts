@@ -18,7 +18,7 @@ export class Organization {
   isOrganizationUsed?: boolean;
   organizationPrefix: string;
   externalCommentsConfiguration?:boolean | null;
-
+  isDistributionActivate?:boolean|null;
   constructor(
     organizationId: number,
     businessUnitId: number,

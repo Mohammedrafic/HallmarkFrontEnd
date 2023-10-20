@@ -88,6 +88,8 @@ export const mapSpecialProjectStructure = (data: ProjectSpecialData): SpecialPro
   };
 };
 
+
+
 const mapSpecialProjectDataToCorrectFormat =
   <T extends {
     includeInIRP: boolean; id: number;includeInVMS: boolean 
@@ -138,6 +140,18 @@ export const modifyJobDistribution = (selectedOrder: Order) => {
       index === selectedDistribution.jobDistributionValue?.indexOf(distribution)),
   };
 };
+export const getDistibutionDelayFiled = (config: OrderFormsConfig): OrderFormInput => {
+  return config?.fields.find((control: OrderFormInput) => {
+    return control.field === 'distributionDelay';
+  }) as OrderFormInput;
+};
+
+export const getDistibutionDelayValueFiled = (config: OrderFormsConfig): OrderFormInput => {
+  return config?.fields.find((control: OrderFormInput) => {
+    return control.field === 'distributeToVMS';
+  }) as OrderFormInput;
+};
+
 
 export const setDefaultPrimaryContact = (forms: FormGroup[]): void => {
   const isPrimarySelected = forms.map((currentForm: FormGroup) => {
@@ -155,12 +169,28 @@ export const mapperForContactDetail = (contactDetails: Department): ContactDetai
   mobilePhone: contactDetails.facilityPhoneNo,
 });
 
-export const getDataSourceForJobDistribution = (selectedSystem: SelectSystem, tieringLogicEnabled: boolean) => {
+export const getDataSourceForJobDistribution = (selectedSystem: SelectSystem, tieringLogicEnabled: boolean,isDistributionActivate?:boolean) => {
   if (selectedSystem.isIRP && selectedSystem.isVMS) {
     return JobDistributionIrpVms(tieringLogicEnabled);
   }
 
   return JobDistributionIrpOnly(tieringLogicEnabled);
+};
+
+export const viewDistributiondelay =
+  (value: boolean, selectedConfig: OrderFormsConfig): void => {
+  const distributionDelayConfigControl = getDistibutionDelayFiled(selectedConfig);
+  const distributionDelayValueControl = getDistibutionDelayValueFiled(selectedConfig);
+    distributionDelayConfigControl.show = value;
+    distributionDelayValueControl.show = value;
+};
+
+
+export const viewDistributiontoVMS =
+  (value: boolean, selectedConfig: OrderFormsConfig): void => {
+    const distributionDelayConfigControl = getDistibutionDelayFiled(selectedConfig);
+  const distributionDelayValueControl = getDistibutionDelayValueFiled(selectedConfig);
+  distributionDelayValueControl.show = value;
 };
 
 export const showHideFormAction = (config: OrderFormsArrayConfig, list: FormGroup[]): void => {
