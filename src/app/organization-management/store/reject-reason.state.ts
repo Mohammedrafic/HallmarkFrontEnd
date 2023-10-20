@@ -74,7 +74,7 @@ import {
   GetCancelEmployeeReason,
   RemoveCancelEmployeeReason,
 } from "@organization-management/store/reject-reason.actions";
-import { catchError, Observable, tap } from "rxjs";
+import { catchError, map, Observable, tap } from "rxjs";
 import {
   CancelEmployeeReasons,
   RecuriterReasonPage,
@@ -93,6 +93,7 @@ import { Penalty, PenaltyPage } from "@shared/models/penalty.model";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
 import { PageOfCollections } from '@shared/models/page.model';
 import { GetSourcingConfigModel } from "@shared/models/organization.model";
+import { CreateSystemString, prepareCancelReasonsPage } from '@organization-management/helpers';
 
 export interface RejectReasonStateModel {
   rejectReasonsPage: RejectReasonPage | null;
@@ -221,6 +222,9 @@ export class RejectReasonState {
     patchState({ isReasonLoading: true });
 
     return this.rejectReasonService.getRejectReasonsByPage(pageNumber, pageSize).pipe(
+      map((payload) => {
+        return prepareCancelReasonsPage(payload);
+      }),
       tap((payload) => {
         patchState({rejectReasonsPage: payload});
         return payload;
@@ -238,7 +242,12 @@ export class RejectReasonState {
     return this.rejectReasonService.saveRejectReasons(payload).pipe(
       tap(payload => {
         if(state.rejectReasonsPage){
-          const items = [payload, ...state.rejectReasonsPage?.items];
+          const reasonWithSystem = {
+            ...payload,
+            system: CreateSystemString(payload.includeInIRP as boolean, payload.includeInVMS as boolean)
+          };
+
+          const items = [reasonWithSystem, ...state.rejectReasonsPage?.items];
           const rejectReasonsPage = { ...state.rejectReasonsPage, items };
           patchState({rejectReasonsPage});
         }

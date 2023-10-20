@@ -18,6 +18,7 @@ import {
   UnavailabilityReasons,
 } from '@shared/models/reject-reason.model';
 import { GetSourcingConfigModel } from '@shared/models/organization.model';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 /**
  * TODO: provide service in modules instead of root.
@@ -59,10 +60,13 @@ export class RejectReasonService {
     return this.http.put<void>('/api/RejectReasons', payload);
   }
 
-  /**
-   * Get all reject reasons
-   */
-  public getAllRejectReasons(): Observable<RejectReasonPage> {
+  public getAllRejectReasons(systemType?: SystemType): Observable<RejectReasonPage> {
+    if (systemType !== null && systemType !== undefined) {
+      return this.http.get<RejectReasonPage>(`/api/RejectReasons`, {
+        params: GetQueryParams({systemType}),
+      });
+    }
+
     return this.http.get<RejectReasonPage>(`/api/RejectReasons`);
   }
 

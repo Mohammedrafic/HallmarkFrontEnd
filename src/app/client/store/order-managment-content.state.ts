@@ -1065,10 +1065,11 @@ export class OrderManagementContentState {
   }
 
   @Action(GetRejectReasonsForOrganisation)
-  GetRejectReasonsForOrganisation({
-    patchState,
-  }: StateContext<OrderManagementContentStateModel>): Observable<RejectReasonPage> {
-    return this.rejectReasonService.getAllRejectReasons().pipe(
+  GetRejectReasonsForOrganisation(
+    { patchState}: StateContext<OrderManagementContentStateModel>,
+    { systemType }: GetRejectReasonsForOrganisation
+    ): Observable<RejectReasonPage> {
+    return this.rejectReasonService.getAllRejectReasons(systemType).pipe(
       tap((reasons) => {
         patchState({ rejectionReasonsList: reasons.items });
         return reasons;

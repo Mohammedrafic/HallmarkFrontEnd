@@ -1,4 +1,15 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { merge, Observable, Subject, take, takeUntil } from 'rxjs';
@@ -35,13 +46,26 @@ import { Comment } from '@shared/models/comment.model';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { CandidateDOBRequired, CandidateSSNRequired, CandidatePHONE1Required, CandidateADDRESSRequired, ONBOARD_CANDIDATE, onBoardCandidateMessage, SEND_EMAIL, REQUIRED_PERMISSIONS, AgencyPartnershipSuspended } from '@shared/constants';
+import {
+  AgencyPartnershipSuspended,
+  CandidateADDRESSRequired,
+  CandidateDOBRequired,
+  CandidatePHONE1Required,
+  CandidateSSNRequired,
+  ONBOARD_CANDIDATE,
+  onBoardCandidateMessage,
+  REQUIRED_PERMISSIONS,
+  SEND_EMAIL
+} from '@shared/constants';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
-import { OnboardCandidateMessageDialogComponent } from '../../order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import {
+  OnboardCandidateMessageDialogComponent
+} from '../../order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -143,7 +167,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
 
   get applyBtnTooltipText(): string {
     if (this.candidate) {
-      return this.candidate.partnershipStatus === PartnershipStatus.Suspended ? 
+      return this.candidate.partnershipStatus === PartnershipStatus.Suspended ?
       'Agency Partnership is suspended' : REQUIRED_PERMISSIONS;
     }
 
@@ -173,7 +197,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public saveStatus:number =0;
   public partnershipStatus = PartnershipStatus;
   public agencyStatusMessage = AgencyPartnershipSuspended;
-  
+
   get templateEmailTitle(): string {
     return "Onboarding Email";
   }
@@ -184,7 +208,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   @ViewChild('RTE')
   public rteEle: RichTextEditorComponent;
   @ViewChild(OnboardCandidateMessageDialogComponent, { static: true }) onboardEmailTemplateForm: OnboardCandidateMessageDialogComponent;
-  
+
 
   constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef, private permissionService : PermissionService,private confirmService: ConfirmService,) {
     this.sendOnboardMessageEmailFormGroup = new FormGroup({
@@ -241,7 +265,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   }
 
   public onReject(): void {
-    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
+    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation(SystemType.VMS));
     this.openRejectDialog.next(true);
   }
 
@@ -379,12 +403,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
     if (this.form.valid && this.orderCandidateJob) {
       const value = this.form.getRawValue();
       this.isSend =  true;
-      this.emailTo = this.orderCandidateJob?.candidateProfile.email; 
+      this.emailTo = this.orderCandidateJob?.candidateProfile.email;
       this.sendOnboardMessageEmailFormGroup.get('emailTo')?.setValue(this.orderCandidateJob?.candidateProfile.email);
       this.sendOnboardMessageEmailFormGroup.get('orderId')?.setValue(this.orderCandidateJob?.orderId);
       this.sendOnboardMessageEmailFormGroup.get('candidateId')?.setValue(this.orderCandidateJob?.candidateProfileId);
       this.sendOnboardMessageEmailFormGroup.get('businessUnitId')?.setValue(this.orderCandidateJob?.organizationId);
-            
+
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
@@ -507,9 +531,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   private subscribeOnUpdateCandidateJobSucceed(): void {
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed))
-      .subscribe(() => 
+      .subscribe(() =>
       {
-        if(this.saveStatus === ApplicantStatusEnum.OnBoarded 
+        if(this.saveStatus === ApplicantStatusEnum.OnBoarded
           && (this.orderCandidate.candidateStatus ? this.saveStatus != this.orderCandidate.candidateStatus : this.saveStatus != this.orderCandidate.status)){
           const options = {
               title: ONBOARD_CANDIDATE,
@@ -547,7 +571,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   onGroupEmailSend(){
     this.isSendOnboardFormInvalid = !this.sendOnboardMessageEmailFormGroup.valid;
     if(this.sendOnboardMessageEmailFormGroup.valid){
-      const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();  
+      const emailvalue = this.sendOnboardMessageEmailFormGroup.getRawValue();
       this.store.dispatch(new sendOnboardCandidateEmailMessage({
             subjectMail : emailvalue.emailSubject,
             bodyMail : emailvalue.emailBody,
@@ -564,7 +588,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
         .subscribe(() => {
           this.isSend =  false;
           this.closeDialog();
-          this.store.dispatch(new ShowGroupEmailSideDialog(false));  
+          this.store.dispatch(new ShowGroupEmailSideDialog(false));
           this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
         });

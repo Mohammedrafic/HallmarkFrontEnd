@@ -16,14 +16,14 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
-  deployedCandidateMessage,
   DEPLOYED_CANDIDATE,
+  deployedCandidateMessage,
   SET_READONLY_STATUS,
 } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
+import { filter, Observable, of, Subject, take, takeUntil } from 'rxjs';
 
 import { BillRate } from '@shared/models/bill-rate.model';
 import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
@@ -55,6 +55,7 @@ import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-s
 import { formatNumber } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -147,7 +148,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
-  
+
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
@@ -398,7 +399,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       )
     .subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
-      
+
       this.getComments();
       this.currentApplicantStatus = data.applicantStatus;
       this.billRatesData = [...data.billRates];
@@ -498,7 +499,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private onReject(): void {
-    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.store.dispatch(new GetRejectReasonsForOrganisation(SystemType.VMS));
     this.openRejectDialog.next(true);
   }
 
