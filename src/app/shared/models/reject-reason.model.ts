@@ -7,11 +7,18 @@ export type OrderRequisitionReason = {
   businessUnitId?: number;
 }
 
+export interface SelectRejectedSystem {
+  isIRP: boolean;
+  isVMS: boolean;
+}
+
 export type RejectReason = {
   id?: number;
   reason: string;
   agencyFeeApplicable?: boolean;
   businessUnitId?: number;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
 }
 
 export type RejectReasonwithSystem = {

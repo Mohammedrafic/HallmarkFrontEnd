@@ -146,6 +146,22 @@ export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
 
 export const defaultDialogConfig: ReasonFormConfig[]  = [
   {
+    field: '',
+    title: 'System Configuration',
+    fieldType: FieldType.CheckBoxGroup,
+    required: true,
+    checkBoxes: [
+      {
+        field: 'includeInIRP',
+        title: 'IRP',
+      },
+      {
+        field: 'includeInVMS',
+        title: 'VMS',
+      },
+    ],
+  },
+  {
     field: 'reason',
     title: 'Reason',
     required: true,

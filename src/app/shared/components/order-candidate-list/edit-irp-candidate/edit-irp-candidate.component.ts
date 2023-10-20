@@ -76,6 +76,7 @@ import { OrganizationSettingsService } from '@shared/services/organization-setti
 import { Configuration } from '@shared/models/organization-settings.model';
 import { Location } from "@shared/models/location.model"
 import { GetRejectReasonsForOrganisation } from '@client/store/order-managment-content.actions';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -912,6 +913,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   private getRejectedReasons(): void {
-    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.store.dispatch(new GetRejectReasonsForOrganisation(SystemType.IRP));
   }
 }

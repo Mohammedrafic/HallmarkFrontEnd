@@ -214,6 +214,15 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         penaltyCriteria: (data as Penalty).penaltyCriteria,
       });
 
+    } else if (this.selectedTab === ReasonsNavigationTabs.Rejection) {
+      const reason = data as RejectReason;
+
+      this.reasonForm.patchValue({
+        id: reason.id,
+        reason: reason.reason,
+        includeInIRP: reason.includeInIRP,
+        includeInVMS: reason.includeInVMS,
+      });
     } else if (this.selectedTab === ReasonsNavigationTabs.Unavailability) {
       const reason  = data as UnavailabilityValue;
 

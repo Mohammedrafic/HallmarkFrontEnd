@@ -23,6 +23,7 @@ import {
 import { Comment } from '@shared/models/comment.model';
 import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.model';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 export class GetOrders {
   static readonly type = '[order management] Get Orders';
@@ -274,7 +275,7 @@ export class ClearSelectedOrder {
 
 export class GetRejectReasonsForOrganisation {
   static readonly type = '[organizationManagement] Get All Reject Reasons';
-  constructor() {}
+  constructor(public readonly systemType?: SystemType) {}
 }
 
 export class RejectCandidateForOrganisationSuccess {
