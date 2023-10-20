@@ -5,8 +5,9 @@
         *ngIf="candidateJob"
         [candidateJob]="candidateJob"
         [orderPosition]="orderPosition"
+        [system]="system"
       ></app-extension-candidate-info>
-      <form class="config">
+      <form class="config" *ngIf="system !== 'IRP'">
         <div class="durations">
           <app-dropdown
             [dataSource]="extensionDurationPrimary"
@@ -66,6 +67,7 @@
         </div>
         <div class="row">
           <app-numeric-textbox
+            *ngIf="system !== 'IRP'"
             [formGroupInstance]="extensionForm"
             [required]="true"
             [htmlAttributes]="billRateAttributes"
@@ -86,17 +88,99 @@
           ></app-input>
         </div>
       </form>
+
+      <form class="config" *ngIf="system === 'IRP'">
+        <div class="durations">
+          <app-dropdown
+            [dataSource]="extensionDurationPrimary"
+            [fields]="durationFieldsSettings"
+            [formGroupInstance]="extensionFormIRP"
+            [hideBorder]="false"
+            label="Extension Duration"
+            class="durations-control itm1"
+            controlName="durationPrimary"
+          ></app-dropdown>
+          <app-dropdown
+            [dataSource]="extensionDurationSecondary"
+            [fields]="durationFieldsSettings"
+            [formGroupInstance]="extensionFormIRP"
+            [hideBorder]="false"
+            class="durations-control"
+            controlName="durationSecondary"
+          ></app-dropdown>
+          <app-numeric-textbox
+            [formGroupInstance]="extensionFormIRP"
+            [htmlAttributes]="numericInputAttributes"
+            [min]="1"
+            [max]="99"
+            [strictMode]="false"
+            format="#"
+            controlName="durationTertiary"
+            class="durations-control"
+          ></app-numeric-textbox>
+        </div>
+        <div class="row">
+          <app-datepicker
+            [formGroupInstance]="extensionFormIRP"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            [required]="true"
+            [min]="minDate"
+            id="extension-start-date"
+            controlName="startDate"
+            label="Extension Start Date"
+            format="MM/dd/yyyy"
+            placeholder="MM/DD/YYYY"
+            class="form-line-item-50"
+          ></app-datepicker>
+          <app-datepicker
+            [formGroupInstance]="extensionFormIRP"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            [required]="true"
+            [min]="startDate || minDate"
+            id="extension-end-date"
+            controlName="endDate"
+            label="Extension End Date"
+            format="MM/dd/yyyy"
+            placeholder="MM/DD/YYYY"
+            class="form-line-item-50"
+          ></app-datepicker>
+        </div>
+        <div class="row">
+          <app-input
+            [formGroupInstance]="extensionFormIRP"
+            controlName="linkedId"
+            id="linkedId"
+            maxlength="20"
+            label="Linked ID"
+            class="form-line-item-50"
+          ></app-input>
+        </div>
+      </form>
+
     </div>
-    <div class="extension__comments">
+    <div class="extension__comments" *ngIf="activeSystems !== OrderManagementIRPSystemId.IRP">
       <app-comments
         [canVmsCreateOrders]="canCreateOrder"
         [comments]="comments"
         [isCreating]="true"></app-comments>
     </div>
+    <div class="extension__comments" *ngIf="activeSystems === OrderManagementIRPSystemId.IRP">
+      <app-comments-irp
+        [comments]="comments"
+        [commentContainerId]="commentContainerId"
+        [useBackground]="false"
+        [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
+        [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
+      ></app-comments-irp>
+    </div>
+
   </div>
   <div class="extension__bill-rates">
     <app-bill-rates
       #billRates
+      *ngIf="system !== 'IRP'"
       [billRates]="candidateRates"
       [isActive]="true"
       [isLocal]="candidateJob?.isLocal!"

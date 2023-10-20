@@ -99,6 +99,15 @@ export namespace TimesheetDetails {
     ) {}
   }
 
+  export class GetOrganizationsStructure {
+    static readonly type = TimesheetDetailsActions.GetOrganizationsStructure;
+
+    constructor(
+      public readonly orgId: number,
+      public readonly isAgency: boolean,
+    ) {}
+  }
+
   export class DownloadAttachment {
     static readonly type = TimesheetDetailsActions.DownloadAttachment;
 
@@ -115,7 +124,7 @@ export namespace TimesheetDetails {
       public readonly isAgency: boolean,
     ) {}
   }
-  
+
   export class AddTimesheetRecordSucceed {
     static readonly type = TimesheetDetailsActions.AddTimesheetRecordSucceed;
 

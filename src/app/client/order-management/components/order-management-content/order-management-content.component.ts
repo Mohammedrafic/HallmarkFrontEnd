@@ -143,6 +143,7 @@ import {
   FilterOrderStatus,
   FilterStatus,
   IRPOrderManagement,
+  IRPOrderPosition,
   Order,
   OrderCandidateJob,
   OrderFilter,
@@ -249,6 +250,7 @@ import {
   ViewOrderVMS_PERMISSION
 } from '@shared/constants';
 import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/interfaces';
+import { OrderManagementIRPRowPositionService } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -525,6 +527,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private readonly ngZone: NgZone,
     private preservedOrderService: PreservedOrderService,
     private ordergridsystemstateservice:OrderGridSystemStateService,
+    public orderManagementIRPRowPositionService: OrderManagementIRPRowPositionService,
     @Inject(DOCUMENT) private documentEle: Document,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
@@ -646,6 +649,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.watchForOrderFromAnotherSystem();
     this.watchForOrderGridSystemClickEvent();
     this.watchForOrderFromNotification();
+    this.watchForOrderIRPSubRowClickEvent();
   }
 
   ngOnDestroy(): void {
@@ -689,6 +693,27 @@ private watchForOrderGridSystemClickEvent()
   }
 })
 }
+
+public watchForOrderIRPSubRowClickEvent(){
+  this.orderManagementIRPRowPositionService.handleStatusClickEvent.pipe(
+    takeUntil(this.unsubscribe$)).subscribe(({Order, orderData, system}) => {
+      console.log(Order, orderData);
+    if(orderData.system === 'IRP' && Order.orderType === OrderType.LongTermAssignment){
+      this.openIrpSubrowDetails(Order, orderData, system)
+    }
+})
+}
+public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : string) {
+  const orderData = Data as IRPOrderPosition;
+
+  this.store.dispatch(new GetOrderById(orderData.orderId, orderData.organizationId));
+  this.dispatchAgencyOrderCandidatesList(orderData.orderId, orderData.organizationId, true);
+  this.openChildDialog.next([Order, Data, system]);
+  this.orderPositionSelected$.next({ state: false });
+  this.openDetails.next(false);
+  this.selectedRowRef = Data;
+}
+
 public watchForOrderFromNotification(){
 	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
     this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
@@ -1104,8 +1129,9 @@ public RedirecttoIRPOrder(order:Order)
         cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
     }
-
-    this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.VMS);
+    if(this.orderManagementService.getOrderManagementSystem() != OrderManagementIRPSystemId.IRP){
+      this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.VMS);
+    }
     this.checkSelectedChildrenItem();
   }
 
@@ -2722,6 +2748,14 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number, isIrp = false): void {
+    this.store.dispatch(new GetAgencyOrderCandidatesList(
+      orderId,
+      organizationId,
+      GRID_CONFIG.initialPage,
+      GRID_CONFIG.initialRowsPerPage,
+      this.orderManagementService.excludeDeployed,
+      ""
+    ));
     if (isIrp) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
@@ -2732,18 +2766,7 @@ public RedirecttoIRPOrder(order:Order)
         this.employeeToggleState?.includeDeployed,
         ""
       ));
-
-      return;
     }
-
-    this.store.dispatch(new GetAgencyOrderCandidatesList(
-        orderId,
-        organizationId,
-        GRID_CONFIG.initialPage,
-        GRID_CONFIG.initialRowsPerPage,
-        this.orderManagementService.excludeDeployed,
-        ""
-      ));
   }
 
   private getOrganization(businessUnitId: number) {
@@ -2757,9 +2780,9 @@ public RedirecttoIRPOrder(order:Order)
 
       this.isOrgIRPEnabled = !!isIRPEnabled;
       this.isOrgVMSEnabled = !!isVMCEnabled;
-
-      this.setPreviousSelectedSystem();
-
+      if(!this.isRedirectedFromDashboard){
+        this.setPreviousSelectedSystem();
+      }    
       if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
         this.activeSystem = OrderManagementIRPSystemId.VMS;
       } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {

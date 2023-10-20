@@ -11,6 +11,7 @@ import { ComponentStateChangedEvent, GridApi, GridReadyEvent, IClientSideRowMode
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
+import { OrganizationStructure } from '@shared/models/organization.model';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
@@ -101,8 +102,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   @Select(TimesheetsState.billRateTypes)
   private readonly billRates$: Observable<DropdownOption[]>;
 
-  @Select(TimesheetsState.costCenters)
-  private readonly costCenters$: Observable<DropdownOption[]>;
+  @Select(TimesheetsState.organizationStructure)
+  private readonly organizationStructure$: Observable<OrganizationStructure>;
 
   public isEditOn = false;
 
@@ -483,7 +484,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       switchMap(() => {
         return combineLatest([
           this.billRates$,
-          this.costCenters$,
+          this.organizationStructure$,
         ]);
       }),
       filter(() => !!this.gridApi),

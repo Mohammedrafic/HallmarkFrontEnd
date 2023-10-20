@@ -21,6 +21,7 @@ import { CredentialsListComponent } from '@shared/components/credentials-list/cr
 import { CommitmentComponent } from './master-data/commitment/commitment.component';
 import { OrgInterfaceComponent } from './org-interface/org-interface.component';
 import { LogInterfaceComponent } from './log-interface/log-interface.component';
+import { InterfaceLogSummaryIrpComponent } from './interface-log-summary-irp/interface-log-summary-irp.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -65,6 +66,13 @@ const routes: Routes = [
       {
         path: 'loginterfaces',
         component : LogInterfaceComponent,
+        data: {
+          isOrganizationArea: true,
+        },
+      },
+      {
+        path: 'interfacelogirp',
+        component : InterfaceLogSummaryIrpComponent,
         data: {
           isOrganizationArea: true,
         },

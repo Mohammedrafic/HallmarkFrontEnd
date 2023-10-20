@@ -47,7 +47,8 @@ export interface CancelIrpCandidateDto {
   organizationId: number;
   jobId: number;
   createReplacement: boolean;
-  actualEndDate: string | null
+  actualEndDate: string | null;
+  cancellationReasonId?: number;
 }
 
 export interface RejectedIrpCandidateDto {
@@ -65,6 +66,7 @@ export interface CandidateDetails {
   offeredEndDate: string | Date | null;
   rejectedReason: string;
   rejectionReasonId: number;
+  cancellationReasonId: number;
 }
 
 export interface DatesWithCurrentTime {

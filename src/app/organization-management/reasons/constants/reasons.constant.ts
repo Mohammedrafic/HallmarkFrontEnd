@@ -73,7 +73,8 @@ export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
   7: ReasonFormType.InternalTransferReason,
   8: ReasonFormType.CategoryNoteReason,
   9: ReasonFormType.SourcingReason,
-  10: ReasonFormType.RecruiterReason
+  10: ReasonFormType.RecruiterReason,
+  11: ReasonFormType.CancelEmployeeReasons,
 };
 
 export const NewReasonsActionsMap = {
@@ -86,7 +87,7 @@ export const NewReasonsActionsMap = {
   [ReasonsNavigationTabs.CategoryNote]: ReasonActions.SaveCategoryNoteReasons,
   [ReasonsNavigationTabs.SourcingReason]: ReasonActions.SaveSourcingReasons,
   [ReasonsNavigationTabs.RecruiterReason]: ReasonActions.SaveRecuriterReasons,
- 
+
 };
 
 export const UpdateReasonsActionsMap = {
@@ -100,6 +101,15 @@ export const UpdateReasonsActionsMap = {
   [ReasonsNavigationTabs.SourcingReason]: ReasonActions.UpdateSourcingReasons,
   [ReasonsNavigationTabs.RecruiterReason]: ReasonActions.UpdateRecuriterReasons,
 };
+
+export const CancelEmployeeReasonDialogConfig: ReasonFormConfig[] = [
+  {
+    field: 'reason',
+    title: 'Reason',
+    required: true,
+    fieldType: FieldType.Input,
+  },
+];
 
 export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
   {
@@ -135,6 +145,22 @@ export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
 ];
 
 export const defaultDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: '',
+    title: 'System Configuration',
+    fieldType: FieldType.CheckBoxGroup,
+    required: true,
+    checkBoxes: [
+      {
+        field: 'includeInIRP',
+        title: 'IRP',
+      },
+      {
+        field: 'includeInVMS',
+        title: 'VMS',
+      },
+    ],
+  },
   {
     field: 'reason',
     title: 'Reason',
@@ -259,5 +285,5 @@ export const ReasonDialogConfig: ReasonFormConfigMap = {
   [ReasonFormType.InternalTransferReason] : InternalDialogConfig,
   [ReasonFormType.SourcingReason] : TerminatedDialogConfig,
   [ReasonFormType.RecruiterReason] : TerminatedDialogConfig,
-
+  [ReasonFormType.CancelEmployeeReasons]: CancelEmployeeReasonDialogConfig
 };

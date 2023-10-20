@@ -8,7 +8,7 @@
     </div>
     <div class="sub-title">Candidate Name</div>
   </div>
-  <div class="section">
+  <div class="section" *ngIf="system !== 'IRP'">
     <div class="title">
       <i-feather name="briefcase" class="icon"></i-feather>
       <span class="title-text">{{ orderPosition?.agencyName }}</span>

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -19,15 +19,22 @@ import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import {  GetSourcingConfigModel, Organization, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Penalty } from '@shared/models/penalty.model';
-import { Recuriter, RecuriterReasonPage, RejectReason, Sourcing, SourcingReasonPage } from '@shared/models/reject-reason.model';
+import { Recuriter,  RejectReason, Sourcing } from '@shared/models/reject-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { concatMap, delay, filter, Observable, takeUntil } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
-import { ReasonDialogConfig, ReasonFormsTypeMap } from './constants';
+import {  ReasonDialogConfig, ReasonFormsTypeMap } from './constants';
 import { ReasonFormType, ReasonsNavigationTabs } from './enums';
-import { CategoryNoteValue, Closurevalue, ReasonCheckBoxGroup, ReasonFormConfig, UnavailabilityValue } from './interfaces';
+import {
+  CancelEmployeeReasonValue,
+  CategoryNoteValue,
+  Closurevalue,
+  ReasonCheckBoxGroup,
+  ReasonFormConfig,
+  UnavailabilityValue
+} from './interfaces';
 import { ReasonsFormsService } from './services/reasons-form.service';
 import { ReasonsService } from './services/reasons.service';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -43,7 +50,6 @@ import { RejectReasonState } from '@organization-management/store/reject-reason.
 })
 @TakeUntilDestroy
 export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
-  // public selectedTab = ReasonsNavigationTabs.Rejection;
   public selectedTab : any;
   public reasonsNavigationTabs = ReasonsNavigationTabs;
   public canRejectOrClosure = true;
@@ -101,7 +107,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     } else {
       this.selectedTab = ReasonsNavigationTabs.Rejection;
       this.formType = ReasonFormType.DefaultReason;
-    } 
+    }
     this.dialogConfig = ReasonDialogConfig[this.formType];
     this.createForm();
     this.setIRPFlag();
@@ -139,8 +145,10 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.SourcingReason;
     } else if (selectedTab.selectedItem.innerText === "Recruiter Reason") {
       this.selectedTab = ReasonsNavigationTabs.RecruiterReason;
-    } 
-    
+    } else if (selectedTab.selectedItem.innerText === "Employee Cancellation") {
+      this.selectedTab = ReasonsNavigationTabs.CancelEmployeeReasons;
+    }
+
     this.formType = ReasonFormsTypeMap[this.selectedTab];
     this.createForm();
     this.dialogConfig = ReasonDialogConfig[this.formType];
@@ -184,7 +192,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  editReason(data: RejectReason | Penalty | UnavailabilityValue | Closurevalue | CategoryNoteValue | Sourcing | Recuriter): void {
+  editReason(data: RejectReason | Penalty | UnavailabilityValue | Closurevalue | CategoryNoteValue | Sourcing | Recuriter | CancelEmployeeReasonValue): void {
     this.isEdit = true;
     this.title = DialogMode.Edit;
 
@@ -206,6 +214,15 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         penaltyCriteria: (data as Penalty).penaltyCriteria,
       });
 
+    } else if (this.selectedTab === ReasonsNavigationTabs.Rejection) {
+      const reason = data as RejectReason;
+
+      this.reasonForm.patchValue({
+        id: reason.id,
+        reason: reason.reason,
+        includeInIRP: reason.includeInIRP,
+        includeInVMS: reason.includeInVMS,
+      });
     } else if (this.selectedTab === ReasonsNavigationTabs.Unavailability) {
       const reason  = data as UnavailabilityValue;
 
@@ -216,6 +233,13 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         calculateTowardsWeeklyHours: !!reason.calculateTowardsWeeklyHours,
         eligibleToBeScheduled: !!reason.eligibleToBeScheduled,
         visibleForIRPCandidates: !!reason.visibleForIRPCandidates,
+      });
+    } else if (this.selectedTab === ReasonsNavigationTabs.CancelEmployeeReasons) {
+      const reason  = data as CancelEmployeeReasonValue;
+
+      this.reasonForm.patchValue({
+        id: reason.id,
+        reason: reason.reason,
       });
     } else if((this.selectedTab === ReasonsNavigationTabs.Requisition )) {
       const reason  = data as Closurevalue;
@@ -339,11 +363,21 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
 
   private subscribeOnSaveReasonSuccess(): void {
     this.actions$.pipe(
-      ofActionSuccessful(ReasonActions.SaveRejectReasonsSuccess, ReasonActions.UpdateClosureReasonsSuccess,
-        ReasonActions.UpdateManualInvoiceRejectReasonSuccess, ReasonActions.UpdateOrderRequisitionSuccess,
-        ReasonActions.UpdateInternalTransferReasonsSuccess, ReasonActions.UpdateTerminationReasonsSuccess,
+      ofActionSuccessful(
+        ReasonActions.SaveRejectReasonsSuccess,
+        ReasonActions.UpdateClosureReasonsSuccess,
+        ReasonActions.UpdateManualInvoiceRejectReasonSuccess,
+        ReasonActions.UpdateOrderRequisitionSuccess,
+        ReasonActions.UpdateInternalTransferReasonsSuccess,
+        ReasonActions.UpdateTerminationReasonsSuccess,
         ReasonActions.UpdateCategoryNoteReasonsSuccess,
-        ReasonActions.SavePenaltySuccess, ReasonActions.SaveUnavailabilityReason, ReasonActions.RemoveUnavailabilityReason, ReasonActions.UpdateSourcingReasonsSuccess, ReasonActions.UpdateRecuriterReasonsSuccess),
+        ReasonActions.SavePenaltySuccess,
+        ReasonActions.SaveCancelEmployeeReason,
+        ReasonActions.SaveUnavailabilityReason,
+        ReasonActions.RemoveUnavailabilityReason,
+        ReasonActions.UpdateSourcingReasonsSuccess,
+        ReasonActions.UpdateRecuriterReasonsSuccess
+      ),
       takeUntil(this.componentDestroy()),
     ).subscribe(() =>this.closeSideDialog());
   }
@@ -409,7 +443,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.saveReason(true);
     });
   }
-  
+
   trackByField(index: number, item: ReasonFormConfig | ReasonCheckBoxGroup): string {
     return item.field;
   }
@@ -440,7 +474,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
     } else if(this.selectedSystem.isVMS && !this.selectedSystem.isIRP) {
       this.showSystem = false;
       this.system = "VMS"
-    } 
+    }
   }
 
   private setIRPFlag(): void {
@@ -455,7 +489,6 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
   .subscribe((data:GetSourcingConfigModel ) => {
     if(data !=null){
       this.isSourcingConfig=data.issourcing;
-      console.log(data)
     }
   })
   }

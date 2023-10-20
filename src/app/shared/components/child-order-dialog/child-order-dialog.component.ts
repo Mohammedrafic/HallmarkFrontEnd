@@ -81,7 +81,7 @@ import {
 } from '@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderStatus } from '@shared/enums/order-management';
-import { OrderType } from '@shared/enums/order-type';
+import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { OrderStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { Comment } from '@shared/models/comment.model';
@@ -137,11 +137,11 @@ enum MobileMenuItems {
 })
 export class ChildOrderDialogComponent extends AbstractPermission implements OnInit, OnChanges, OnDestroy {
   @Input() order: MergedOrder;
-  @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
-  @Input() activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
+  @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() orderComments: Comment[] = [];
+  @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild, string] | null>;
   @Output() saveEmitter = new EventEmitter<void>();
   @Output() updateOrderData = new EventEmitter<{ order: OrderManagement, candidate: OrderManagementChild }>();
 
@@ -176,8 +176,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   @Select(OrderManagementState.deployedCandidateOrderInfo)
   public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
-
-
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
+  public irpOrderType = IrpOrderType;
+  public system: string;
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
@@ -711,7 +712,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (data) {
         this.tab.select(1);
-        const [order, candidate] = data;
+        const [order, candidate, system] = data;
+        this.system = system as string
         this.order = order as MergedOrder;
         this.candidate = candidate;
         this.isClosedOrder = this.isClosedOrderPosition;

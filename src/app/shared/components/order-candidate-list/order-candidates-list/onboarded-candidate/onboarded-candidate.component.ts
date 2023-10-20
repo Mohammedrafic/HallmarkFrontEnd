@@ -4,11 +4,9 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import {
@@ -19,14 +17,13 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, of, take, distinctUntilChanged, switchMap } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import {
   OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, Order,
-  OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { formatDate, formatNumber } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -37,10 +34,10 @@ import {
   GetRejectReasonsForOrganisation,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
+  sendOnboardCandidateEmailMessage,
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
-  UpdateOrganisationCandidateJobSucceed,
-  sendOnboardCandidateEmailMessage
+  UpdateOrganisationCandidateJobSucceed
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
@@ -50,12 +47,12 @@ import PriceUtils from '@shared/utils/price.utils';
 import {
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
-  deployedCandidateMessage,
   DEPLOYED_CANDIDATE,
-  SET_READONLY_STATUS,
-  onBoardCandidateMessage,
+  deployedCandidateMessage,
   ONBOARD_CANDIDATE,
+  onBoardCandidateMessage,
   SEND_EMAIL,
+  SET_READONLY_STATUS,
 } from '@shared/constants';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
@@ -63,7 +60,7 @@ import { Comment } from '@shared/models/comment.model';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { Duration } from '@shared/enums/durations';
 import { DurationService } from '@shared/services/duration.service';
-import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directives/unsaved-form.directive';
+import { UNSAVED_FORM_PROVIDERS, UnsavedFormComponentRef } from '@shared/directives/unsaved-form.directive';
 import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
@@ -72,10 +69,15 @@ import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-or
 import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { OrderType } from '@shared/enums/order-type';
-import { OnboardCandidateMessageDialogComponent } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import {
+  OnboardCandidateMessageDialogComponent
+} from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { UserPermissions } from '@core/enums/user.permissions.enum';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -116,6 +118,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() canEditClosedBillRate = false;
   @Input() order: Order;
 
+  private readonly permissions = UserPermissions;
+  public ordersystemId = OrderManagementIRPSystemId;
   public override form: FormGroup;
   public jobStatusControl: FormControl;
   public optionFields = OPTION_FIELDS;
@@ -147,6 +151,11 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public readonly reorderType: OrderType = OrderType.ReOrder;
   public canCreateOrder:boolean;
   public saveStatus: number = 0;
+  public activeSystems: OrderManagementIRPSystemId | null;
+  public CanOrganizationViewOrdersIRP: boolean;
+  public CanOrganizationEditOrdersIRP: boolean;
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
+  public commentContainerId: number;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -228,6 +237,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   ngOnInit(): void {
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
+    this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.subscribeOnPermissions();
     this.subscribeOnReasonsList();
     this.checkRejectReason();
@@ -400,7 +410,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       okButtonClass: 'ok-button',
       cancelButtonLabel: 'No',
     };
-    if (this.saveStatus === ApplicantStatusEnum.OnBoarded 
+    if (this.saveStatus === ApplicantStatusEnum.OnBoarded
         && (this.candidate.status ? this.saveStatus != this.candidate.status : this.saveStatus != this.candidate.candidateStatus)) {
       return this.confirmService.confirm(onBoardCandidateMessage, options)
         .pipe(take(1));
@@ -493,14 +503,18 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         takeUntil(this.unsubscribe$),
       ).subscribe((value) => {
         this.candidateJob = value;
-
+        if(this.candidateJob?.commentContainerId && this.candidateJob?.commentContainerId !== null){
+          this.commentContainerId = this.candidateJob.commentContainerId as number;
+        }
         if (value) {
           this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
           this.getComments();
           if (!this.isAgency) {
             this.getOrderPermissions(value.orderId);
           }
-          this.billRatesData = [...value.billRates];
+          if(value?.billRates){
+            this.billRatesData = [...value?.billRates];
+          }
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
@@ -777,7 +791,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private onReject(): void {
-    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.store.dispatch(new GetRejectReasonsForOrganisation(SystemType.VMS));
     this.openRejectDialog.next(true);
   }
 
@@ -843,8 +857,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, CanOrganizationEditOrdersIRP, CanOrganizationViewOrdersIRP}) => {
       this.canCreateOrder = canCreateOrder;
+      this.CanOrganizationViewOrdersIRP = CanOrganizationViewOrdersIRP;
+      this.CanOrganizationEditOrdersIRP = CanOrganizationEditOrdersIRP;
     });
   }
 }

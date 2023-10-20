@@ -78,6 +78,8 @@ import { DonotReturnState } from './store/donotreturn.state';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
 import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
+import { InterfaceLogSummaryIrpComponent } from './interface-log-summary-irp/interface-log-summary-irp.component';
+import { InterfaceLogSummaryIrpDialogComponent } from './interface-log-summary-irp/interface-log-summary-irp-dialog/interface-log-summary-irp-dialog.component';
 
 const sidebarIcons = {
   Download,
@@ -117,7 +119,9 @@ const sidebarIcons = {
     LogInterfaceComponent,
     LogInterfaceDialogComponent,
     OrgInterfaceDialogComponent,
-    OrgInterfaceConfigurationComponent
+    OrgInterfaceConfigurationComponent,
+    InterfaceLogSummaryIrpComponent,
+    InterfaceLogSummaryIrpDialogComponent
   ],
     imports: [
         CommonModule,

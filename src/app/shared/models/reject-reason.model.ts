@@ -7,11 +7,18 @@ export type OrderRequisitionReason = {
   businessUnitId?: number;
 }
 
+export interface SelectRejectedSystem {
+  isIRP: boolean;
+  isVMS: boolean;
+}
+
 export type RejectReason = {
   id?: number;
   reason: string;
   agencyFeeApplicable?: boolean;
   businessUnitId?: number;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
 }
 
 export type RejectReasonwithSystem = {
@@ -42,6 +49,12 @@ export type RejectReasonPayload = {
 
 export type RejectReasonPage = PageOfCollections<RejectReasonwithSystem>;
 
+export interface CancelEmployeeReasons {
+  id: number;
+  organizationId: number;
+  reason: string;
+}
+
 export interface UnavailabilityReasons {
   id: string;
   reason: string;
@@ -55,6 +68,7 @@ export interface UnavailabilityReasons {
 export interface UnavailabilityPaging {
   PageNumber: number;
   PageSize: number;
+  GetAll?: boolean;
 }
 
 export type SourcingReasonPage = PageOfCollections<Sourcing>;
@@ -62,7 +76,7 @@ export type Sourcing = {
   id: number;
   organizationId: number;
   reason: string;
- 
+
 }
 
 
@@ -71,6 +85,6 @@ export type Recuriter = {
   id: number;
   organizationId: number;
   reason: string;
- 
+
 }
 

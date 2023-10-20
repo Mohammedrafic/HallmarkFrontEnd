@@ -26,6 +26,7 @@
         <ejs-tab
           #editOrgTab (selecting)="onTabSelecting($event)"
           [heightAdjustMode]="'Fill'"
+          overflowMode='Scrollable'
         >
           <e-tabitems>
             <e-tabitem *ngIf="userPermission[userPermissions.CanViewFeeExceptions]">

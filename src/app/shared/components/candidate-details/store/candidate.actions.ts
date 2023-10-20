@@ -1,5 +1,4 @@
-import { FiltersModal, FiltersPageModal } from '@shared/components/candidate-details/models/candidate.model';
-import { DoNotReturnActionsTypesEnum } from '@shared/enums/DoNotReturnActionsTypesEnum';
+import { FiltersPageModal } from '@shared/components/candidate-details/models/candidate.model';
 import { DoNotReturnCandidateSearchFilter } from '@shared/models/donotreturn.model';
 import { ExportPayload } from '@shared/models/export.model';
 

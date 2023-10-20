@@ -30,37 +30,20 @@ import { OrderCandidateListViewService } from '@shared/components/order-candidat
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
 import { CandidateADDRESSRequired, CandidatePHONE1Required, SET_READONLY_STATUS } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from
-'@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues } from '@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderType } from '@shared/enums/order-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { CandidatesStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
-import {
-  ApplicantStatus,
-  Order,
-  OrderCandidateJob,
-  OrderCandidatesList,
-} from'@shared/models/order-management.model';
+import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList, } from '@shared/models/order-management.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import {
-  BehaviorSubject,
-  combineLatest,
-  filter,
-  merge,
-  mergeMap,
-  Observable,
-  of,
-  Subject,
-  takeUntil,
-  tap,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, merge, mergeMap, Observable, of, Subject, takeUntil, tap, } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -70,6 +53,7 @@ import { DateTimeHelper } from '@core/helpers';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -372,7 +356,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   public onReject(): void {
-    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
+    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation(SystemType.VMS));
     this.openRejectDialog.next(true);
   }
 

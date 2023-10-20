@@ -35,6 +35,12 @@ export class ReasonsFormsService {
         eligibleToBeScheduled: [false],
         visibleForIRPCandidates: [false],
       });
+    } else if (formType === ReasonFormType.CancelEmployeeReasons) {
+      this.form = this.fb.group({
+        id: [],
+        reason: [null, [Validators.required, Validators.maxLength(100),
+          Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]]
+      });
     } else if (formType === ReasonFormType.ClosureReason) {
       this.form = this.fb.group({
         id: [],
@@ -64,6 +70,8 @@ export class ReasonsFormsService {
         id: [],
         reason: ['', [Validators.required, Validators.maxLength(100),
           Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+        includeInIRP: [false],
+        includeInVMS: [false],
       });
     } else if(formType === ReasonFormType.TerminatedReason){
       this.form = this.fb.group({
@@ -90,14 +98,14 @@ export class ReasonsFormsService {
         reason: ['', [Validators.required, Validators.maxLength(100),
           Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
       });
-    } 
+    }
     else if(formType === ReasonFormType.SourcingReason){
       this.form = this.fb.group({
         id: [],
         reason: ['', [Validators.required, Validators.maxLength(100),
           Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
       });
-    } 
+    }
     return this.form;
   }
 }

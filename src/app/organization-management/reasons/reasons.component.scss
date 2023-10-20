@@ -1,5 +1,6 @@
 @import 'colors.scss';
 @import "colors";
+
 .container {
   padding-top: 24px;
   height: calc(100% - 50px);
@@ -140,6 +141,10 @@
       border: 0px !important;
     }
   }
+}
+
+.required {
+  color: $supportive-red;
 }
 
 .switch-label {

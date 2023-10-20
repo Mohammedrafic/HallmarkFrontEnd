@@ -30,7 +30,7 @@
 
             <ng-container *ngSwitchCase="'candidateStatus' || 'orderStatus'">
               <ng-container *ngIf="data[cell?.field || ''] as cellValue">
-                <div [class]="cell?.cellClass">
+                <div [class]="cell?.cellClass" (click)="onClickChip(data, cellValue, row.system)">
                   <ejs-chiplist>
                     <e-chips>
                       <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>

@@ -5,21 +5,85 @@ import { RejectReasonService } from "@shared/services/reject-reason.service";
  * TODO: use es6 modules.
  */
 import {
-  GetClosureReasonsByPage, GetManualInvoiceRejectReasonsByPage,
+  GetClosureReasonsByPage,
+  GetManualInvoiceRejectReasonsByPage,
   GetRejectReasonsByPage,
-  RemoveClosureReasons, RemoveManualInvoiceRejectReason,
+  RemoveClosureReasons,
+  RemoveManualInvoiceRejectReason,
   RemoveRejectReasons,
   SaveClosureReasons,
-  SaveClosureReasonsError, CreateManualInvoiceRejectReason, SaveManualInvoiceRejectReasonError,
-  SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess,
-  UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReason, UpdateManualInvoiceRejectReasonSuccess,
-  UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess,
-  GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty,
-  SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog, GetUnavailabilityReasons,
-  SaveUnavailabilityReason, RemoveUnavailabilityReason,GetInternalTransferReasons, SaveInternalTransferReasons, RemoveInternalTransferReasons, UpdateInternalTransferReasons, UpdateInternalTransferReasonsSuccess, GetTerminationReasons, SaveTerminationReasons, RemoveTerminationReasons, UpdateTerminationReasons, UpdateTerminationReasonsSuccess, GetCategoryNoteReasons, SaveCategoryNoteReasons, RemoveCategoryNoteReasons, UpdateCategoryNoteReasons, UpdateCategoryNoteReasonsSuccess, SaveTerminatedReasonError, UpdateInternalTransferReasonsError, UpdateCategoryNoteReasonsError, GetSourcingReasons, GetRecuriterReasonsByPage, SaveRecuriterReasons, SaveRecuriterReasonsSuccess, SaveRecuriterReasonsError, RemoveRecuriterReasons, UpdateRecuriterReasonsSuccess, SaveSourcingReasonsError, SaveSourcingReasonsSuccess, UpdateSourcingReasonsSuccess, GetSourcingReasonsByPage, SaveSourcingReasons, RemoveSourcingReasons, UpdateSourcingReasons, UpdateRecuriterReasons, GetSourcingConfig,
+  SaveClosureReasonsError,
+  CreateManualInvoiceRejectReason,
+  SaveManualInvoiceRejectReasonError,
+  SaveRejectReasons,
+  SaveRejectReasonsError,
+  SaveRejectReasonsSuccess,
+  UpdateClosureReasonsSuccess,
+  UpdateManualInvoiceRejectReason,
+  UpdateManualInvoiceRejectReasonSuccess,
+  UpdateRejectReasons,
+  UpdateRejectReasonsSuccess,
+  RemoveOrderRequisition,
+  UpdateOrderRequisitionSuccess,
+  GetOrderRequisitionByPage,
+  SaveOrderRequisition,
+  SaveOrderRequisitionError,
+  GetPenaltiesByPage,
+  SavePenalty,
+  SavePenaltySuccess,
+  SavePenaltyError,
+  RemovePenalty,
+  ShowOverridePenaltyDialog,
+  GetUnavailabilityReasons,
+  SaveUnavailabilityReason,
+  RemoveUnavailabilityReason,
+  GetInternalTransferReasons,
+  SaveInternalTransferReasons,
+  RemoveInternalTransferReasons,
+  UpdateInternalTransferReasons,
+  UpdateInternalTransferReasonsSuccess,
+  GetTerminationReasons,
+  SaveTerminationReasons,
+  RemoveTerminationReasons,
+  UpdateTerminationReasons,
+  UpdateTerminationReasonsSuccess,
+  GetCategoryNoteReasons,
+  SaveCategoryNoteReasons,
+  RemoveCategoryNoteReasons,
+  UpdateCategoryNoteReasons,
+  UpdateCategoryNoteReasonsSuccess,
+  SaveTerminatedReasonError,
+  UpdateInternalTransferReasonsError,
+  UpdateCategoryNoteReasonsError,
+  GetSourcingReasons,
+  GetRecuriterReasonsByPage,
+  SaveRecuriterReasons,
+  SaveRecuriterReasonsSuccess,
+  SaveRecuriterReasonsError,
+  RemoveRecuriterReasons,
+  UpdateRecuriterReasonsSuccess,
+  SaveSourcingReasonsError,
+  UpdateSourcingReasonsSuccess,
+  GetSourcingReasonsByPage,
+  SaveSourcingReasons,
+  RemoveSourcingReasons,
+  UpdateSourcingReasons,
+  UpdateRecuriterReasons,
+  GetSourcingConfig,
+  SaveCancelEmployeeReason,
+  GetCancelEmployeeReason,
+  RemoveCancelEmployeeReason,
 } from "@organization-management/store/reject-reason.actions";
-import { catchError, Observable, tap } from "rxjs";
-import { RecuriterReasonPage, RejectReason, RejectReasonPage, RejectReasonwithSystem, SourcingReasonPage, UnavailabilityReasons } from "@shared/models/reject-reason.model";
+import { catchError, map, Observable, tap } from "rxjs";
+import {
+  CancelEmployeeReasons,
+  RecuriterReasonPage,
+  RejectReason,
+  RejectReasonPage,
+  RejectReasonwithSystem,
+  SourcingReasonPage,
+  UnavailabilityReasons
+} from "@shared/models/reject-reason.model";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ShowToast } from "../../store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
@@ -29,6 +93,7 @@ import { Penalty, PenaltyPage } from "@shared/models/penalty.model";
 import { sortByField } from "@shared/helpers/sort-by-field.helper";
 import { PageOfCollections } from '@shared/models/page.model';
 import { GetSourcingConfigModel } from "@shared/models/organization.model";
+import { CreateSystemString, prepareCancelReasonsPage } from '@organization-management/helpers';
 
 export interface RejectReasonStateModel {
   rejectReasonsPage: RejectReasonPage | null;
@@ -38,6 +103,7 @@ export interface RejectReasonStateModel {
   penalties: PenaltyPage | null;
   isReasonLoading: boolean;
   unavailabilityReasons: PageOfCollections<UnavailabilityReasons> | null;
+  cancelEmployeeReasons: PageOfCollections<CancelEmployeeReasons> | null;
   internalTransfer: RejectReasonPage | null;
   terminationReasons: RejectReasonPage | null;
   souringReason: any | null;
@@ -57,6 +123,7 @@ export interface RejectReasonStateModel {
     penalties: null,
     isReasonLoading: false,
     unavailabilityReasons: null,
+    cancelEmployeeReasons: null,
     internalTransfer: null,
     terminationReasons: null,
     categoryNote: null,
@@ -106,6 +173,11 @@ export class RejectReasonState {
   }
 
   @Selector()
+  static getCancelEmployeeReasons(state: RejectReasonStateModel): PageOfCollections<CancelEmployeeReasons> | null {
+    return state.cancelEmployeeReasons;
+  }
+
+  @Selector()
   static internalTransfer(state: RejectReasonStateModel) : RejectReasonPage | null {
     return state.internalTransfer;
   }
@@ -150,6 +222,9 @@ export class RejectReasonState {
     patchState({ isReasonLoading: true });
 
     return this.rejectReasonService.getRejectReasonsByPage(pageNumber, pageSize).pipe(
+      map((payload) => {
+        return prepareCancelReasonsPage(payload);
+      }),
       tap((payload) => {
         patchState({rejectReasonsPage: payload});
         return payload;
@@ -167,7 +242,12 @@ export class RejectReasonState {
     return this.rejectReasonService.saveRejectReasons(payload).pipe(
       tap(payload => {
         if(state.rejectReasonsPage){
-          const items = [payload, ...state.rejectReasonsPage?.items];
+          const reasonWithSystem = {
+            ...payload,
+            system: CreateSystemString(payload.includeInIRP as boolean, payload.includeInVMS as boolean)
+          };
+
+          const items = [reasonWithSystem, ...state.rejectReasonsPage?.items];
           const rejectReasonsPage = { ...state.rejectReasonsPage, items };
           patchState({rejectReasonsPage});
         }
@@ -237,7 +317,6 @@ export class RejectReasonState {
     { pageNumber, pageSize, orderBy, getAll, excludeDefaultReasons }: GetClosureReasonsByPage
   ): Observable<RejectReasonPage> {
     patchState({ isReasonLoading: true });
-
     return this.rejectReasonService.getClosureReasonsByPage(
       pageNumber,
       pageSize,
@@ -457,6 +536,24 @@ export class RejectReasonState {
     );
   }
 
+  @Action(GetCancelEmployeeReason)
+  GetCancelEmployeeReason(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { page, pageSize, getAll}: GetCancelEmployeeReason
+  ): Observable<PageOfCollections<CancelEmployeeReasons>> {
+    return this.rejectReasonService.getCancelEmployeeReasons({
+      PageNumber: page as number,
+      PageSize: pageSize as number,
+      GetAll: getAll ?? false,
+    }).pipe(
+      tap((response) => {
+        patchState({
+          cancelEmployeeReasons: response,
+        });
+      }),
+    );
+  }
+
   @Action(GetUnavailabilityReasons)
   GetUnavailabilityReasons(
     { patchState }: StateContext<RejectReasonStateModel>,
@@ -475,6 +572,23 @@ export class RejectReasonState {
     );
   }
 
+  @Action(SaveCancelEmployeeReason)
+  SaveCancelEmployeeReason(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: SaveCancelEmployeeReason
+  ): Observable<void> {
+    return this.rejectReasonService.saveCancelEmployeeReason(payload)
+      .pipe(
+        tap(() => {
+          const message = payload?.id ? RECORD_MODIFIED : RECORD_ADDED;
+          dispatch(new ShowToast(MessageTypes.Success, message));
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+        }),
+      );
+  }
+
   @Action(SaveUnavailabilityReason)
   SaveUnavailabilityReson(
     { dispatch }: StateContext<RejectReasonStateModel>,
@@ -489,6 +603,22 @@ export class RejectReasonState {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }),
     );
+  }
+
+  @Action(RemoveCancelEmployeeReason)
+  RemoveCancelEmployeeReason(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveCancelEmployeeReason
+  ): Observable<void> {
+    return this.rejectReasonService.removeCancelEmployeeReason(id)
+      .pipe(
+        tap(() => {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+        }),
+      );
   }
 
   @Action(RemoveUnavailabilityReason)

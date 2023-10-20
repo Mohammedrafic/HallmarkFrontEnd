@@ -3,23 +3,10 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { capitalize } from 'lodash';
-import {
-  EMPTY,
-  Observable,
-  Subject,
-  combineLatest,
-  filter,
-  map,
-  merge,
-  mergeMap,
-  of,
-  switchMap,
-  take,
-  takeUntil,
-} from 'rxjs';
+import { combineLatest, filter, map, merge, mergeMap, Observable, of, Subject, switchMap, take, takeUntil, } from 'rxjs';
 
 import {
   GetCandidateJob,
@@ -38,9 +25,9 @@ import {
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
+  sendOnboardCandidateEmailMessage,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
-  sendOnboardCandidateEmailMessage,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
@@ -49,18 +36,19 @@ import {
   PenaltiesMap,
 } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import {
-  CandidateADDRESSRequired, CandidateDOBRequired, CandidatePHONE1Required,
+  CandidateADDRESSRequired,
+  CandidateDOBRequired,
+  CandidatePHONE1Required,
   ONBOARD_CANDIDATE,
-  OrganizationSettingKeys, OrganizationalHierarchy, SEND_EMAIL, onBoardCandidateMessage,
+  onBoardCandidateMessage,
+  OrganizationalHierarchy,
+  OrganizationSettingKeys,
+  SEND_EMAIL,
 } from '@shared/constants';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { UNSAVED_FORM_PROVIDERS, UnsavedFormComponentRef } from '@shared/directives/unsaved-form.directive';
-import {
-  ApplicantStatus as ApplicantStatusEnum,
-  CandidatStatus,
-  ConfigurationValues,
-} from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues, } from '@shared/enums/applicant-status.enum';
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { MessageTypes } from '@shared/enums/message-types';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
@@ -88,13 +76,17 @@ import { GetOrderPermissions, SetLastSelectedOrganizationAgencyId } from 'src/ap
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
-import { OnboardCandidateMessageDialogComponent } from '../onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import {
+  OnboardCandidateMessageDialogComponent
+} from '../onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { AppState } from 'src/app/store/app.state';
 import { OrderManagementPagerState } from '@shared/models/candidate.model';
 import { CandidateState } from '@agency/store/candidate.state';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -114,13 +106,26 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Output() updateDetails = new EventEmitter<void>();
 
-  candidate$: Observable<OrderCandidatesList>;
+  private _activeSystem: any;
+  public get activeSystem() {
+    return this._activeSystem;
+  }
+ 
+  @Input() public set activeSystem(val: any) {
+    this._activeSystem = val;
+    this.subsToCandidate();
+  }
+
+  candidate$: Observable<OrderCandidatesList | null>;
 
   @Select(OrderManagementState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
   @Select(OrderManagementContentState.orderCandidatePage)
   public clientOrderCandidatePage$: Observable<OrderCandidatesListPage>;
+
+  @Select(OrderManagementContentState.getIrpCandidates)
+  public getIrpCandidates$ : Observable<OrderCandidatesListPage>
 
   @Select(UserState.currentUserPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
@@ -133,7 +138,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   @Select(CandidateState.orderManagementPagerState)
   public orderManagementPagerState$: Observable<OrderManagementPagerState | null>;
-
+  public systemTypes = OrderManagementIRPSystemId;
   public rejectReasons$: Observable<RejectReason[]>;
   public form: FormGroup;
   public statusesFormControl = new FormControl();
@@ -181,6 +186,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     Canceled: { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' },
     Offered: { applicantStatus: ApplicantStatusEnum.Offered, statusText: 'Offered' },
   };
+  orgId: number | undefined;
 
   get isAccepted(): boolean {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Accepted;
@@ -299,7 +305,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         jobId: this.candidateJob.jobId,
         skillName: value.skillName,
         offeredBillRate: this.candidateJob?.offeredBillRate,
-        offeredStartDate: this.candidateJob?.offeredStartDate ? 
+        offeredStartDate: this.candidateJob?.offeredStartDate ?
           DateTimeHelper.setUtcTimeZone(this.candidateJob.offeredStartDate) : undefined,
         candidateBillRate: this.candidateJob.candidateBillRate,
         nextApplicantStatus: {
@@ -341,7 +347,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   public onReject(): void {
-    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
+    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation(SystemType.VMS));
     this.openRejectDialog.next(true);
   }
 
@@ -421,7 +427,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public onSave(): void {
     if(this.selectedApplicantStatus){
       this.saveHandler({ itemData: this.selectedApplicantStatus });
-    }    
+    }
   }
 
   public onStatusChange(event: { itemData: ApplicantStatus }): void {
@@ -479,42 +485,56 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
 
     this.applicantStatuses = statuses;
-    this.changeDetectorRef.markForCheck();
 
+    if(this.activeSystem == OrderManagementIRPSystemId.IRP){
+      this.applicantStatuses = [
+        { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'OnBoard' },
+        { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancel' },
+      ]
+    }
+    this.changeDetectorRef.markForCheck();
     if (!this.applicantStatuses.length) {
       this.statusesFormControl.disable();
     }
   }
 
   private subsToCandidate(): void {
-    const state$ = this.isAgency ? this.orderCandidatePage$ : this.clientOrderCandidatePage$;
-    this.candidate$ = state$.pipe(
-      filter(Boolean),
-      map((res) => {
-        const items = res?.items || this.candidateOrder?.items;
-        const candidate = items?.find((candidate) => candidate.candidateJobId);
-        this.candidate = candidate;
-        if (candidate) {
-          return candidate;
-        } else {
-          return EMPTY;
-        }
-      })
-    ) as Observable<OrderCandidatesList>;
+    const state$ = this.isAgency ? this.orderCandidatePage$ : (this.activeSystem == OrderManagementIRPSystemId.IRP ? this.getIrpCandidates$ : this.clientOrderCandidatePage$);
+      this.candidate$ = state$.pipe(
+        filter(Boolean),
+        map((res) => {
+          const items = res?.items || this.candidateOrder?.items;
+          const candidate = items?.find((candidate) => candidate.candidateJobId);
+          this.candidate = candidate;
+          if (candidate) {
+            return candidate;
+          } else {
+            return null;
+          }
+        })
+      );
 
     combineLatest([this.orderPermissions$, this.candidate$])
       .pipe(
         filter(([permission, candidate]) => !!permission && !!candidate),
         takeUntil(this.destroy$)
       )
-      .subscribe(([permissions, candidate]: [CurrentUserPermission[], OrderCandidatesList]) => {
+      .subscribe(([permissions, candidate]: [CurrentUserPermission[], OrderCandidatesList | null]) => {
         this.orderPermissions = permissions;
         this.mapPermissions();
         this.getCandidatePayRateSetting();
-        const { organizationId, candidateJobId } = candidate;
+        if(candidate?.organizationId){
+          this.orgId = candidate.organizationId
+        } else {
+          this.orgId = this.currentOrder.organizationId
+        }
+        const candidateJobId = candidate?.candidateJobId;
         const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;
-        this.store.dispatch(new GetCandidateJobAction(organizationId as number, candidateJobId));
+        if (this.orgId && candidateJobId) {
+          this.store.dispatch(new GetCandidateJobAction(this.orgId, candidateJobId));
+        }
       });
+      this.changeDetectorRef.detectChanges();
   }
 
   private getOrderPermissions(orderId: number): void {
@@ -622,7 +642,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     value.actualStartDate = new Date(this.candidateJob.order.jobStartDate).toISOString();
     value.actualEndDate = new Date(this.candidateJob.order.jobEndDate).toISOString();
   }
-  
+
   // eslint-disable-next-line max-lines-per-function
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus, acceptAction = false): void {
     const value = this.form.getRawValue();
@@ -643,7 +663,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         value.actualEndDate = new Date(value.actualEndDate);
       }
      }
-    
+
     if (acceptAction) {
       this.rewriteActualDatesWithOrder(value);
     }
@@ -695,7 +715,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
   }
 
-  
+
   private displayMessageConfirmation(): Observable<boolean> {
     const options = {
       title: ONBOARD_CANDIDATE,
@@ -720,7 +740,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
                 this.onboardEmailTemplateForm.rteCreated();
                 this.onboardEmailTemplateForm.disableControls(true);
                 this.store.dispatch(new ShowGroupEmailSideDialog(true));
-              }            
+              }
         }
       );
   }

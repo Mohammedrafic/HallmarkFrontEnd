@@ -4,14 +4,21 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { GetQueryParams } from '@core/helpers/functions.helper';
-import { UnavailabilityValue } from '@organization-management/reasons/interfaces';
+import { CancelEmployeeReasonValue, UnavailabilityValue } from '@organization-management/reasons/interfaces';
 import { PageOfCollections } from '@shared/models/page.model';
 import { Penalty, PenaltyPage, PenaltyPayload } from '@shared/models/penalty.model';
 import {
+  CancelEmployeeReasons,
   RecuriterReasonPage,
-  RejectReason, RejectReasonPage, RejectReasonwithSystem, SourcingReasonPage, UnavailabilityPaging, UnavailabilityReasons,
+  RejectReason,
+  RejectReasonPage,
+  RejectReasonwithSystem,
+  SourcingReasonPage,
+  UnavailabilityPaging,
+  UnavailabilityReasons,
 } from '@shared/models/reject-reason.model';
 import { GetSourcingConfigModel } from '@shared/models/organization.model';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 /**
  * TODO: provide service in modules instead of root.
@@ -53,10 +60,13 @@ export class RejectReasonService {
     return this.http.put<void>('/api/RejectReasons', payload);
   }
 
-  /**
-   * Get all reject reasons
-   */
-  public getAllRejectReasons(): Observable<RejectReasonPage> {
+  public getAllRejectReasons(systemType?: SystemType): Observable<RejectReasonPage> {
+    if (systemType !== null && systemType !== undefined) {
+      return this.http.get<RejectReasonPage>(`/api/RejectReasons`, {
+        params: GetQueryParams({systemType}),
+      });
+    }
+
     return this.http.get<RejectReasonPage>(`/api/RejectReasons`);
   }
 
@@ -140,7 +150,7 @@ export class RejectReasonService {
     excludeDefaultReasons?: boolean,
   ): HttpParams {
     let params = {};
-    
+
     if (pageNumber) {
       params = {...params, pageNumber};
     }
@@ -235,12 +245,30 @@ export class RejectReasonService {
     });
   }
 
+  public getCancelEmployeeReasons(params: UnavailabilityPaging): Observable<PageOfCollections<CancelEmployeeReasons>> {
+    return this.http.get<PageOfCollections<CancelEmployeeReasons>>('/api/CancellationReason', {
+      params: GetQueryParams(params),
+    });
+  }
+
+  public saveCancelEmployeeReason(data: CancelEmployeeReasonValue): Observable<void> {
+    if(data.id) {
+      return this.http.put<void>('/api/CancellationReason', data);
+    }
+
+    return this.http.post<void>('/api/CancellationReason', data);
+  }
+
   public saveUnavailabilityReason(data: UnavailabilityValue): Observable<void> {
     return this.http.post<void>('/api/UnavailabilityReasons', data);
   }
 
   public removeUnavailabilityReason(id: number): Observable<void> {
     return this.http.delete<void>(`/api/UnavailabilityReasons/${id}`);
+  }
+
+  public removeCancelEmployeeReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/CancellationReason/${id}`);
   }
 
   public getInternalTransferReason(pageNumber: number, pageSize: number): Observable<RejectReasonPage> {
@@ -334,7 +362,7 @@ export class RejectReasonService {
 
 
   //Sourcing
-  
+
   //Sourcing-Reasons
    /**
    * Save Sourcing

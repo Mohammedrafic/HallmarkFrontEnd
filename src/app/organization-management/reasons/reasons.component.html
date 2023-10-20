@@ -21,8 +21,12 @@
       <e-tabitem *ngIf="selectedSystem.isVMS">
         <ng-template #headerText><div>Candidate Rejection</div></ng-template>
         <ng-template #content>
-          <app-candidate-reject-reason [userPermission]="userPermission"
-            (editReason)="editReason($event)" [form]="reasonForm"></app-candidate-reject-reason>
+          <app-candidate-reject-reason
+            [userPermission]="userPermission"
+            (editReason)="editReason($event)"
+            [form]="reasonForm"
+            [showSystem]="showSystem"
+          ></app-candidate-reject-reason>
         </ng-template>
       </e-tabitem>
 
@@ -101,7 +105,12 @@
             [form]="reasonForm"></app-recuriter-reason>
         </ng-template>
       </e-tabitem>
-
+      <e-tabitem *ngIf="selectedSystem.isIRP">
+        <ng-template #headerText><div>Employee Cancellation</div></ng-template>
+        <ng-template #content>
+          <app-cancel-employee (editReason)="editReason($event)"></app-cancel-employee>
+        </ng-template>
+      </e-tabitem>
     </e-tabitems>
   </ejs-tab>
 </section>
@@ -304,7 +313,7 @@
       <div class="input-container bootstrap">
         <label for="agencyFeeApplicable">Vendor Fee Applicable<span class="required">*</span></label>
         <div class="input-container long flexed">
-          <ejs-switch [checked]="agencyFeeApplicableSwitch"                      
+          <ejs-switch [checked]="agencyFeeApplicableSwitch"
                       [disabled]="canUpdateAgencyFeeApplicable"
                       class="toggle"
                       onLabel="Yes"
@@ -327,7 +336,7 @@
             <div class="input-container">
               <span class="controls-group-title">{{control.title}}</span>
               <span class="required" *ngIf="control.required"> *</span>
-              
+
                 <div class="input-group checkboxes">
                   <div class="control-block" *ngFor="let checkbox of control.checkBoxes; trackBy: trackByField">
                     <ejs-tooltip content="At least one system should be selected">
@@ -337,7 +346,7 @@
                 </div>
             </div>
           </ng-template>
-  
+
           <ng-template [ngSwitchCase]="inputType.Input">
             <div class="input-container bootstrap">
               <label [for]="control.field">{{control.title}}<span class="required" *ngIf="control.required">*</span></label>
@@ -350,7 +359,7 @@
               </div>
             </div>
           </ng-template>
-  
+
           <ng-template [ngSwitchCase]="inputType.Toggle">
             <div class="input-container row-flexed">
               <div class="input-group wide">
@@ -378,7 +387,7 @@
               </div>
             </div>
           </ng-template>
-  
+
         </ng-container>
       </ng-container>
 

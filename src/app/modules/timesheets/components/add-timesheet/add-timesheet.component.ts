@@ -4,6 +4,7 @@ import { Select, ofActionDispatched } from '@ngxs/store';
 import { Observable, filter, merge, of, takeUntil } from 'rxjs';
 import { switchMap, take, tap } from 'rxjs/operators';
 
+import { OrganizationStructure } from '@shared/models/organization.model';
 import { DialogAction } from '@core/enums';
 import { AddDialogHelper, DateTimeHelper } from '@core/helpers';
 import { createUniqHashObj } from '@core/helpers/functions.helper';
@@ -15,10 +16,14 @@ import {
   MealBreakeName, GetRecordAddDialogConfig, TimeInName, TimeOutName, TimesheetConfirmMessages,
 } from '../../constants';
 import { RecordFields } from '../../enums';
-import { RecordsAdapter } from '../../helpers';
+import { GetCostCenterOptions, GetDropdownOptions, RecordsAdapter } from '../../helpers';
 import {
-  AddRecordBillRate, AddTimesheetForm, DialogConfig, DialogConfigField,
+  AddRecordBillRate,
+  AddTimesheetForm,
+  DialogConfig,
+  DialogConfigField,
   TimesheetDetailsAddDialogState,
+  TimesheetDetailsModel,
 } from '../../interface';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { Timesheets } from '../../store/actions/timesheets.actions';
@@ -31,7 +36,7 @@ import { TimesheetsState } from '../../store/state/timesheets.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> implements OnInit {
-  @Input() profileId: number;
+  @Input() timesheetDetails: TimesheetDetailsModel;
 
   @Input() public container: HTMLElement | null = null;
 
@@ -49,6 +54,8 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
 
   @Select(AppState.isMobileScreen)
   public readonly isMobile$: Observable<boolean>;
+
+  private organizationStructure: OrganizationStructure;
 
   ngOnInit(): void {
     this.getDialogState();
@@ -136,6 +143,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
       }),
       filter((value) => value.type === RecordFields.Time),
       switchMap(() => merge(
+        this.watchForLocations(),
         this.watchForBillRate(),
         this.watchForDayChange(),
         this.observeStartDate(),
@@ -151,9 +159,24 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
   }
 
   private populateOptions(): void {
+    this.organizationStructure = this.store.selectSnapshot(TimesheetsState.organizationStructure) as OrganizationStructure;
     this.dialogConfig[this.formType].fields.forEach((item) => {
       if (item.optionsStateKey) {
         item.options = this.store.snapshot().timesheets[item.optionsStateKey];
+      }
+
+      if (this.formType === RecordFields.Time && item.optionsStateKey === 'organizationStructure') {
+        const locations = this.organizationStructure?.regions
+          .find((region) => region.id === this.timesheetDetails.orderRegionId)?.locations || [];
+        item.options = GetDropdownOptions(locations);
+      }
+
+      if (this.formType === RecordFields.Time && item.optionsStateKey === 'costCenterOptions') {
+        item.options = GetCostCenterOptions(
+          this.organizationStructure,
+          this.timesheetDetails.orderRegionId,
+          this.timesheetDetails.orderLocationId
+        );
       }
 
       if (item.optionsStateKey === 'billRateTypes') {
@@ -172,9 +195,29 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
         item.options = Object.values(uniqBillRatesHashObj);
 
         this.onCallId = item.options?.find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
-        this.form?.get('departmentId')?.patchValue(this.initialCostCenterId, { emitEvent: false, onlySelf: true });
       }
+
+      this.form?.get('locationId')?.patchValue(this.timesheetDetails.orderLocationId, { emitEvent: false, onlySelf: true });
+      this.form?.get('departmentId')?.patchValue(this.timesheetDetails.departmentId, { emitEvent: false, onlySelf: true });
     });
+  }
+
+  private watchForLocations(): Observable<number> {
+    return this.form?.get('locationId')?.valueChanges
+      .pipe(
+        tap((locationId) => {
+          const departmentIdField = this.dialogConfig[RecordFields.Time].fields
+            .find((field) => field.field === 'departmentId') as DialogConfigField;
+
+          departmentIdField.options = GetCostCenterOptions(
+            this.organizationStructure,
+            this.timesheetDetails.orderRegionId,
+            locationId
+          );
+          this.form?.get('departmentId')?.reset();
+          this.cd.markForCheck();
+        })
+      ) as Observable<number>;
   }
 
   private watchForDayChange(): Observable<Date> {

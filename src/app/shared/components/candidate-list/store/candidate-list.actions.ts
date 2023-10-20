@@ -1,7 +1,7 @@
 import { ImportResult } from '@shared/models/import.model';
 import { CandidateListExport, CandidateListRequest, CandidateListTableState } from '../types/candidate-list.model';
 import { CandidateStatus } from '@shared/enums/status';
-import { EmployeeImportDto, ImportedEmployee } from '@shared/models/imported-employee';
+import { EmployeeImportDto, EmployeeImportSaveResult, ImportedEmployee } from '@shared/models/imported-employee';
 
 export class GetCandidatesByPage {
   static readonly type = '[candidate-list] Get Candidates List';
@@ -103,4 +103,8 @@ export class GetCredentialsTypeList {
 
 export class SourceConfig{
   static readonly type ='[candidate list] Get Sourcing Config';
+}
+export class SaveEmployeeImportLogResult {
+  static readonly type = '[candidate list] Save Employee Import Result';
+  constructor(public payload:EmployeeImportSaveResult) {}
 }
