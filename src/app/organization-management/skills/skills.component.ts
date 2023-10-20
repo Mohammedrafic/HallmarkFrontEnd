@@ -510,6 +510,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       takeUntil(this.componentDestroy())
     ).subscribe((payload) => {
         this.bulkactionmessage = payload.payload.message;
+        this.bulkactionnotvalidskillnmaes=[];
         this.bulkaction=0;
         this.skillForm.reset();
         this.closeAsignDialog();
@@ -527,7 +528,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       this.bulkaction=1;
       this.getSkills();
       let skillnames=payload.payload.skillNames;
-      if(skillnames){
+      if(skillnames.length > 0){
         this.bulkactionnotvalidskillnmaes=skillnames;
         this.bulkactionmessage = payload.payload.message;
         this.store.dispatch(new ShowBulkSkillActionDialog(true,this.bulkactionmessage));
