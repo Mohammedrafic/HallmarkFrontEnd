@@ -35,62 +35,62 @@
       </button>
     </div>
   </div>
-  <div class="grid-container">
-  <ejs-grid
-    #grid
-    [dataSource]="feeExceptions"
-    [allowSorting]="true"
-    [allowResizing]="true"
-    [allowSelection]="true"
-    [enableVirtualization]="false"
-    [resizeSettings]="resizeSettings"
-    [pageSettings]="pageSettings"
-    [height]="fullScreenGridHeight"
-    (dataBound)="gridDataBound($event)"
-    (actionBegin)="actionBegin($event)"
-    class="e-gridwithheader"
-  >
-    <e-columns>
-      <e-column textAlign="Right" width="120">
-        <ng-template #template let-data>
-          <div class="row-tool-buttons" [class.hidden]=!isLoaded>
-            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || isAgency" cssClass="e-flat primary-icon-button" (click)="onEdit(data,form.value.id)">
-              <span><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions] || isAgency" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
-              <span><i-feather name="trash-2" class="icon"></i-feather></span>
-            </button>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column field="regionName" headerText="Region" textAlign="Left"></e-column>
-      <e-column
-        field="classification"
-        headerText="Classification"
-        textAlign="left"
-        [valueAccessor]="classificationValueAccess"
-      ></e-column>
-      <e-column field="skillName" headerText="Skill" textAlign="left"></e-column>
-      <e-column field="fee" headerText="Fee %" textAlign="left">
-        <ng-template #template let-data>
-          {{ priceUtils.formatNumbers(data.fee) }}
-        </ng-template>
-      </e-column>
-    </e-columns>
-  </ejs-grid>
-  <app-grid-pagination
-    [currentPage]="currentPage"
-    [pageSize]="pageSize"
-    [totalRecordsCount]="(feeExceptionsPage$ | async)?.totalPages ?? 0"
-    (navigateToPageEmitter)="changeGridPage($event)"
-    (pageSizeChangeEmitter)="changeGridSize($event)"
-  ></app-grid-pagination>
-</div>
+  <div class="grid-container" #container>
+    <ejs-grid
+      #grid
+      [dataSource]="feeExceptions"
+      [allowSorting]="true"
+      [allowResizing]="true"
+      [allowSelection]="true"
+      [enableVirtualization]="false"
+      [resizeSettings]="resizeSettings"
+      [pageSettings]="pageSettings"
+      [height]="fullScreenGridHeight"
+      (dataBound)="gridDataBound($event)"
+      (actionBegin)="actionBegin($event)"
+      class="e-gridwithheader"
+    >
+      <e-columns>
+        <e-column textAlign="Right" width="120">
+          <ng-template #template let-data>
+            <div class="row-tool-buttons" [class.hidden]=!isLoaded>
+              <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || isAgency" cssClass="e-flat primary-icon-button" (click)="onEdit(data,form.value.id)">
+                <span><i-feather name="edit" class="icon"></i-feather></span>
+              </button>
+              <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditFeeExceptions] || isAgency" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
+                <span><i-feather name="trash-2" class="icon"></i-feather></span>
+              </button>
+            </div>
+          </ng-template>
+        </e-column>
+        <e-column field="regionName" headerText="Region" textAlign="Left"></e-column>
+        <e-column
+          field="classification"
+          headerText="Classification"
+          textAlign="left"
+          [valueAccessor]="classificationValueAccess"
+        ></e-column>
+        <e-column field="skillName" headerText="Skill" textAlign="left"></e-column>
+        <e-column field="fee" headerText="Fee %" textAlign="left">
+          <ng-template #template let-data>
+            {{ priceUtils.formatNumbers(data.fee) }}
+          </ng-template>
+        </e-column>
+      </e-columns>
+    </ejs-grid>
+    <app-grid-pagination
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalRecordsCount]="(feeExceptionsPage$ | async)?.totalPages ?? 0"
+      (navigateToPageEmitter)="changeGridPage($event)"
+      (pageSizeChangeEmitter)="changeGridSize($event)"
+    ></app-grid-pagination>
+  </div>
 </section>
 
 <app-add-new-fee-dialog
   [openEvent]="openAddNewFeeDialog"
   [openEditEvent]="editFeeData"
   [disableSaveButton]="!userPermission[userPermissions.CanEditFeeExceptions]"
-  [targetElement]="grid.element"
+  [targetElement]="container"
 ></app-add-new-fee-dialog>
