@@ -23,6 +23,7 @@ body.light {
   --border-upload-file: #{$white};
   --input-border: #{$primary-active-blue-40};
   --header-border: #{$secondary-dark-blue-45};
+  --grid-header-border: #{$grid-row-border};
 
   --icon-color: #{$secondary-dark-blue-10};
 
@@ -66,6 +67,7 @@ body.dark {
   --border-upload-file: #{$secondary-dark-blue-30};
   --input-border: #{$primary-active-blue-40};
   --header-border: #{$secondary-dark-blue-15};
+  --grid-header-border: #{$grid-border-color};
 
   --icon-color: #{$secondary-dark-blue-30};
 

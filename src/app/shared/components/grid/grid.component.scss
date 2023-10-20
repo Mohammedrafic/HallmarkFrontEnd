@@ -39,7 +39,7 @@ app-grid {
       width: 100%;
       box-sizing: border-box;
       padding: 17px;
-      border: 1px solid var(--grid-border-color);
+      border: 1px solid var(--grid-header-border);
       border-top-left-radius: var(--grid-border-radius);
       border-top-right-radius: var(--grid-border-radius);
 
@@ -59,15 +59,16 @@ app-grid {
     }
 
     .ag-root-wrapper {
-      border-top: 1px solid var(--grid-border-color) !important;
+      border-top: 1px solid var(--grid-header-border) !important;
       border-top-left-radius: 0;
       border-top-right-radius: 0;
     }
   }
 
   &__component {
-    width: 100%;
+    width: calc(100% - 2px) !important;
     flex: 1;
+    border: 1px solid var(--grid-header-border);
   }
 
   .ag-header {
@@ -142,6 +143,16 @@ app-grid {
   .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
     &:hover {
       background: transparent !important;
+    }
+  }
+
+  .app-grid-pagination {
+    border: 1px solid var(--grid-header-border) !important;
+  }
+
+  .app-grid-dark-pagination {
+    .app-numeric-textbox ejs-numerictextbox span.e-input-group {
+      border-bottom-color:  $alert-side-bar-bgcolor !important;
     }
   }
 

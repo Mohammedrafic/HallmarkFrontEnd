@@ -625,6 +625,12 @@ body.dark {
     }
 
     .e-gridcontent {
+      .e-content {
+          &:has(.e-table>tbody>.e-emptyrow) {
+            background-color: $alert-side-bar-bgcolor;
+          }
+      }
+
       .e-table {
         .e-emptyrow {
           background-color: $sidebar-background !important;
