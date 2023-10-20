@@ -77,6 +77,12 @@ export class WorkflowMappingService {
     });
   }
 
+  public getIncludeVmsSources<T extends Partial<{includeInVMS: boolean}>>(sources: T[]): T[] {
+    return sources.filter((source: T) => {
+      return source?.includeInVMS;
+    });
+  }
+
   public getDepartmentsBaseOnType(
     form: FormGroup,
     locations: OrganizationLocation[],

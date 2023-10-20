@@ -73,7 +73,7 @@
     margin: 20px 0px 0px 0px;
   }
   table thead{
-    background: #8bb2ff;
+    background: #3E7FFF;
     color: white;
   }
   table th {
@@ -100,4 +100,14 @@
 app-comments-irp {
   display: block;
   margin-top: 16px;
+}
+.invaliderror{
+  border: 1px solid #fa9191;
+  margin-top: 30px;
+  justify-content: center;
+  display: flex;
+  background: #fa7d7d;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
 }

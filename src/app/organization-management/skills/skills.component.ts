@@ -20,17 +20,23 @@ import { Organization } from '@shared/models/organization.model';
 import { SkillCategoriesPage } from '@shared/models/skill-category.model';
 import { FilterService } from '@shared/services/filter.service';
 import {
-  CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE,
+  CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE,Bulk_Update_Skills,Bulk_Delete_Skills
 } from 'src/app/shared/constants/messages';
-import { Skill, SkillDataSource, SkillFilters, SkillsPage } from 'src/app/shared/models/skill.model';
+import { Skill, SkillDataSource, SkillFilters, SkillsPage,BulkSkillsAction } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast,ShowBulkSkillActionDialog } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import {
   ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, GetSkillDataSources,
-  RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded,
+  RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, BulkUpdateAssignedSkill,
+  SaveAssignedSkillSucceeded,
+  BulkUpdateAssignedSkillSucceeded,
+  BulkUpdateAssignedSkillFailed,
+  BulkDleteAssignedSkillSucceeded,
+  BulkUDeleteassignedSkillFailed,
   SetDirtyState,
+  BulkDeleteAssignedSkill,
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { InactivateColFormat, IrpSkillsColsExport, IrpSkillsDialogConfig,
@@ -39,7 +45,12 @@ import { SkillCheckBoxGroup, SkillGridEventData, SkillsForm, SkillsFormConfig, S
 import { SkillsService } from './skills.service';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { MessageTypes } from '@shared/enums/message-types';
+import { BulkActionConfig } from '@shared/models/bulk-action-data.model';
 
+enum BulkSkillsActionConfig {
+  'Ediit',
+  'Delete'
+}
 @Component({
   selector: 'app-skills',
   templateUrl: './skills.component.html',
@@ -105,10 +116,17 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   readonly dropDownfields = {
     text: 'text', value: 'value',
   };
-
+  public bulkaction: BulkSkillsActionConfig = 0;
+  
   private pageSubject = new Subject<number>();
 
   private componentDestroy: () => Observable<unknown>;
+  public isbulkedit=false;
+  public isbulkdelete=false;
+  public bulkactionmessage:string;
+  public bulkactionnotvalidskillnmaes:string[];
+  public sidedialogheader='Edit Skill'
+  
 
   constructor(
     protected override store: Store,
@@ -246,6 +264,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   editSkill(data: SkillGridEventData, event: MouseEvent): void {
     this.addActiveCssClass(event);
     this.title = 'Edit';
+    this.sidedialogheader='Edit Skill';
 
     this.skillForm.patchValue({
       id: data.id,
@@ -281,7 +300,30 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
         this.removeActiveCssClass();
       });
   }
-
+  OnBulkEdit(){
+    this.isbulkedit=true;
+    this.bulkaction=0;
+    this.sidedialogheader='Edit Skills'
+    this.store.dispatch(new ShowSideDialog(true));
+  }
+  OnBulkDelete(){
+    this.isbulkdelete=true;
+    this.bulkaction=1;
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button',
+      }).pipe(
+        take(1)
+      ).subscribe((confirm) => {
+        if (confirm) {
+          let selectedskillstodelete = this.selectedItems.map((val) => (val.masterSkill?.id ?? 0));
+          this.store.dispatch(new BulkDeleteAssignedSkill(selectedskillstodelete));
+        }
+        this.removeActiveCssClass();
+      });
+  }
   closeAsignDialog(): void {
     if (this.skillForm.dirty) {
       this.confirmService
@@ -296,9 +338,13 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
         this.store.dispatch(new ShowSideDialog(false));
         this.skillForm.reset();
         this.removeActiveCssClass();
+        this.isbulkedit=false;
+        this.clearSelection(this.grid);
       });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
+      this.isbulkedit=false;
+      this.clearSelection(this.grid);
       this.skillForm.reset();
       this.removeActiveCssClass();
     }
@@ -308,21 +354,43 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     const atLeastOneSystemSelected = this.skillForm.get('includeInIRP')?.value
     || this.skillForm.get('includeInVMS')?.value;
 
-    if (this.orgModuleSettings.isFeatureIrpEnabled && !atLeastOneSystemSelected) {
+    if (this.orgModuleSettings.isFeatureIrpEnabled && !atLeastOneSystemSelected && !this.isbulkedit) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select system for Skill'));
       return;
     }
+      if(this.isbulkedit){
+       if(this.orgModuleSettings.isFeatureIrpEnabled
+        && this.orgModuleSettings.isIrpDisplayed && !atLeastOneSystemSelected) {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select system for Skill'));
+          return;
+        }
+        let selectedassignedskills:Skill[]=this.selectedItems.map(val => ({id: val.id,MasterSkillId: val.masterSkill?.id,
+          skillCategoryId:val.masterSkill?.skillCategoryId,
+          skillAbbr:val.masterSkill?.skillAbbr,
+          SkillCode:this.skillForm.get('skillCode')?.value,
+          skillDescription:val.masterSkill?.skillDescription ?? '',
+          IsDefault:val.masterSkill?.isDefault,
+          GLNumber:this.skillForm.get('glNumber')?.value,
+          InactiveDate:this.skillForm.get('inactiveDate')?.value == '' ?  null :this.skillForm.get('inactiveDate')?.value,
+          AllowOnboard:this.skillForm.get('allowOnboard')?.value ?? false,
+          IncludeInIRP:this.skillForm.get('includeInIRP')?.value ?? false,
+          IncludeInVMS:this.skillForm.get('includeInVMS')?.value ?? false}));
 
-    if (this.skillForm.valid) {
+         this.store.dispatch(new BulkUpdateAssignedSkill(selectedassignedskills));
+      }
+      else
+      {
+      if (this.skillForm.valid) {
       this.store.dispatch(new SaveAssignedSkill(new Skill(
         this.skillForm.getRawValue(), true
       )));
       this.store.dispatch(new SetDirtyState(false));
-    } else {
+      } else {
       this.skillForm.markAllAsTouched();
-    }
-    this.removeActiveCssClass();
+     }
+     this.removeActiveCssClass();
   }
+}
 
   changeRowsPerPage(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
@@ -393,7 +461,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     .pipe(
       takeUntil(this.componentDestroy()),
       ofActionSuccessful(SaveAssignedSkillSucceeded)
-    ).subscribe(() => {
+    ).subscribe((payload) => {
       this.skillForm.reset();
       this.closeAsignDialog();
       this.getSkills();
@@ -414,6 +482,74 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     ).subscribe(() => {
       this.getSkills();
     });
+
+    this.actions$
+    .pipe(
+      ofActionSuccessful(BulkUpdateAssignedSkillSucceeded),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+      this.skillForm.reset();
+      this.closeAsignDialog();
+      this.clearSelection(this.grid);
+      this.getSkills();
+      let skillnames=payload.payload.skillNames;
+      if(skillnames.length > 0){
+        this.bulkaction=0;
+        this.bulkactionnotvalidskillnmaes=skillnames;
+        this.bulkactionmessage = payload.payload.message;
+        this.store.dispatch(new ShowBulkSkillActionDialog(true,this.bulkactionmessage));
+      }
+      else{
+        this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Skills));
+      }
+      
+    });
+    this.actions$
+    .pipe(
+      ofActionSuccessful(BulkUpdateAssignedSkillFailed),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+        this.bulkactionmessage = payload.payload.message;
+        this.bulkaction=0;
+        this.skillForm.reset();
+        this.closeAsignDialog();
+        this.clearSelection(this.grid);
+        this.store.dispatch(new ShowBulkSkillActionDialog(true,this.bulkactionmessage));
+        
+    });
+    this.actions$
+    .pipe(
+      takeUntil(this.componentDestroy()),
+      ofActionSuccessful(BulkDleteAssignedSkillSucceeded)
+    ).subscribe((payload) => {
+      this.clearSelection(this.grid);
+      this.isbulkdelete=false;
+      this.bulkaction=1;
+      this.getSkills();
+      let skillnames=payload.payload.skillNames;
+      if(skillnames){
+        this.bulkactionnotvalidskillnmaes=skillnames;
+        this.bulkactionmessage = payload.payload.message;
+        this.store.dispatch(new ShowBulkSkillActionDialog(true,this.bulkactionmessage));
+      }
+      else{
+        this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Skills));
+      }
+    });
+    this.actions$
+    .pipe(
+      ofActionSuccessful(BulkUDeleteassignedSkillFailed),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+      this.clearSelection(this.grid);
+      this.isbulkdelete=false;
+      this.getSkills();
+      this.bulkactionmessage = payload.payload.message;
+      this.bulkactionnotvalidskillnmaes=[];
+      this.store.dispatch(new ShowBulkSkillActionDialog(true,this.bulkactionmessage));
+        
+    });  
+
   }
 
   private getSkillsCategories(): void {
@@ -481,4 +617,5 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       this.formSourcesMap.skillCategory = categories;
     });
   }
+
 }

@@ -104,7 +104,7 @@
     <app-comments-irp *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId" [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP" [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP" [comments]="comments" [commentContainerId]="candidateCommentContainerId" [candidateJobId]="candidateJobId" [useBackground]="false"
       [externalCommentConfiguration]="externalCommentConfiguration"></app-comments-irp>
 
-    <div *ngIf="showATPform">
+    <div *ngIf="showATPform && isTurnedOn">
       <form [formGroup]="AtpCalcForm" class="atpcalc-form">
         <div class="w_100">
           <div class="input-container bootstrap left atpformfield">
@@ -141,19 +141,19 @@
               </ejs-numerictextbox>
             </div>
           </div>
-        </div>
-        <div class="input-container bootstrap left atpformfield">
-          <label for="billRatesCategory">Select Switcher <span class="required">*</span></label>
-          <div class="input-group">
+          <div class="input-container bootstrap left atpformfield">
+            <label for="billRatesCategory">Switcher <span class="required">*</span></label>
             <div class="input-group">
-              <ejs-dropdownlist
-                formControlName="calculations"
-                placeholder="All"
-                [allowFiltering]="true"
-                [dataSource]="SwitcherCalcvariables"
-              >
-              </ejs-dropdownlist>
-              </div>
+              <div class="input-group">
+                <ejs-dropdownlist
+                  formControlName="calculations"
+                  placeholder="All"
+                  [allowFiltering]="true"
+                  [dataSource]="SwitcherCalcvariables"
+                >
+                </ejs-dropdownlist>
+                </div>
+            </div>
           </div>
         </div>
       </form>
@@ -247,7 +247,7 @@
           </thead>
           <thead>
             <th  *ngIf="showbenefits">Benefit Rate</th>
-            <th *ngIf="shownonbenefits">Non-Benefit Rate/th>
+            <th *ngIf="shownonbenefits">Non-Benefit Rate</th>
           </thead>
           <tbody>
             <tr>
@@ -257,6 +257,9 @@
           </tbody>
         </table>
       </div>
+    </div>
+    <div class="invaliderror" *ngIf="showError && isTurnedOn">
+      <p> ATP Calculation cannot be displayed as there is invalid Zip-code for the location </p>
     </div>
   </div>
 </ejs-dialog>

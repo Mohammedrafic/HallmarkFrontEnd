@@ -60,7 +60,11 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     "HostName": "",
     "AccrualReportFilterTypeFTS": "",
     "InvoiceIdParamFTS": "",
-    "TimesheetStatusesFTS":""
+    "TimesheetStatusesFTS": "",
+    "organizationNameFTS":"",
+    "reportPulledMessageFTS":"",
+    "DateRangeFTS": ""
+
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
@@ -157,6 +161,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public masterDepartmentsList: Department[] = [];
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
+  private culture = 'en-US';
 
   constructor(private store: Store,
     private formBuilder: FormBuilder,
@@ -414,6 +419,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
     skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
+    let currentDate = new Date(Date.now());
 
     this.paramsData =
     {
@@ -438,7 +444,11 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       "HostName": this.baseUrl,
       "AccrualReportFilterTypeFTS": accrualReportTypes.toString(),
       "InvoiceIdParamFTS": invoiceID == null || invoiceID == "" ? "null" : invoiceID,
-      "TimesheetStatusesFTS": accrualReportTypes==1?(timesheetStatuses.length == 0 ? "null" : timesheetStatuses.join(",")):"null"
+      "TimesheetStatusesFTS": accrualReportTypes == 1 ? (timesheetStatuses.length == 0 ? "null" : timesheetStatuses.join(",")) : "null",
+      "organizationNameFTS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageFTS": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeFTS": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

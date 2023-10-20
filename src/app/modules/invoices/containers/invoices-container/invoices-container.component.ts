@@ -57,6 +57,7 @@ import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-invoices-container',
@@ -226,7 +227,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           if(id.length == 1){ 
             this.addManualInvoiceDisable = false;
           }
-          if(id.length > 1){            
+          if(id.length > 0){            
             this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
           }
         }),
@@ -263,6 +264,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForSavePaymentAction();
     this.watchForPreservedFilters();
     this.getuserPermission();
+    this.subscriptionOfPendingInvoices();
   }
 
   ngAfterViewInit(): void {
@@ -859,4 +861,24 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.userPermission = permissions;
     });
   }
+
+  public subscriptionOfPendingInvoices(){  
+    let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""');
+    this.pendingApprovalInvoicesData$.pipe(
+          takeUntil(this.componentDestroy()),
+        ).subscribe(pendingInvoicesData=>{
+        let invoiceId = this.route.snapshot.queryParams['InvoiceId'];
+        if(invoiceId != '' && pendingInvoicesData?.items.length >0 && (AlertIdEnum[AlertIdEnum['Invoice: Generated & Pending Approval']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()){
+          let notificationInvoice:Interfaces.SelectedInvoiceRow = {rowIndex:0};
+          let ind  = pendingInvoicesData.items?.findIndex(ele=> ele.invoiceId === parseInt(invoiceId));          
+          if(ind > -1){
+            notificationInvoice.rowIndex = ind;
+            notificationInvoice.data = pendingInvoicesData?.items[ind];
+            this.selectRow(notificationInvoice);
+            alertTitle = '';
+          }
+        }        
+    })
+  }
+
 }

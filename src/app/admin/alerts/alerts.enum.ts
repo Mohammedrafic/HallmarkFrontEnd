@@ -17,6 +17,7 @@ export enum AlertEnum {
     Skill=7
   }
   export enum AlertIdEnum {
+    "Candidate Credential Reviewed"=52,
     "Candidate Credential Rejected"=1,
     "Candidate Status Update: Accepted"=2,
     "Candidate Status Update: Custom Status"=3,
@@ -50,7 +51,7 @@ export enum AlertEnum {
    "Order Comments-IRP"=59,
    "Missing Credentials: Daily Alerts" = 64,
    "Missing Credentials: Weekly Alerts" = 65,
-   "Expiry Credentials: Weekly Alerts" = 66
-
+   "Expiry Credentials: Weekly Alerts" = 66,
+   "Candidate Status Update: Cancelled" = 31
   }
   

@@ -42,6 +42,10 @@ import {
   GetLogFileDownload,
   GetNonEmployeeUsers,
   GetBusinessIdDetails,
+  GetInterfaceLogSummaryPage,
+  GetInterfaceLogDetails,
+  ExportEmployeeImportDetails,
+  SetAgencyVisibilityFlag,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -60,7 +64,7 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from
 import { TimeZoneModel } from '@shared/models/location.model';
 import { GetUSCanadaTimeZoneIds } from './security.actions';
 import { NodatimeService } from '@shared/services/nodatime.service';
-import { LogInterface, LogInterfacePage, LogTimeSheetHistory, LogTimeSheetHistoryPage, OrgInterface, OrgInterfacePage } from '@shared/models/org-interface.model';
+import { InterfaceLogSummaryDetails, InterfaceLogSummaryIRPPage, LogInterface, LogInterfacePage, LogTimeSheetHistory, LogTimeSheetHistoryPage, OrgInterface, OrgInterfacePage } from '@shared/models/org-interface.model';
 import { OrgInterfaceService } from '../services/org-interface.service';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
@@ -85,10 +89,13 @@ interface SecurityStateModel {
   logInterfacePage: LogInterfacePage | null;
   logDialogOptions: DialogNextPreviousOption;
   logTimeSheetHistoryPage: LogTimeSheetHistoryPage | null;
+  logSummaryDetailsPage: InterfaceLogSummaryDetails[] | null;
   userData: User[];
   nonEmployeeUserData: User[];
   logFileDownloadDetail:any;
   businessIdDetails:GetBusinessUnitIdDetails|null;
+  interfaceLogSummaryIRP:InterfaceLogSummaryIRPPage |null;
+  isAgencyVisibilityEnabled:boolean;
 }
 
 @State<SecurityStateModel>({
@@ -117,7 +124,10 @@ interface SecurityStateModel {
     userData: [],
     nonEmployeeUserData: [],
     logFileDownloadDetail:null,
-    businessIdDetails:null
+    businessIdDetails:null,
+    interfaceLogSummaryIRP:null,
+    logSummaryDetailsPage:null,
+    isAgencyVisibilityEnabled:false
   },
 })
 @Injectable()
@@ -189,6 +199,11 @@ export class SecurityState {
   @Selector()
   static logInterfacePage(state: SecurityStateModel): LogInterfacePage | null {
     return state.logInterfacePage;
+  }
+
+  @Selector()
+  static interfaceLogSummaryIRPPage(state: SecurityStateModel): InterfaceLogSummaryIRPPage | null {
+    return state.interfaceLogSummaryIRP;
   }
 
   @Selector()
@@ -287,6 +302,16 @@ export class SecurityState {
     return state.businessIdDetails;
   }
 
+  @Selector()
+  static logSummaryDetails(state: SecurityStateModel): InterfaceLogSummaryDetails[] | null {
+    return state.logSummaryDetailsPage;
+  }
+  @Selector()
+  static isAgencyVisibilityFlagEnabled(state: SecurityStateModel): boolean {
+    return state.isAgencyVisibilityEnabled;
+  }
+
+
 
   constructor(
     private businessUnitService: BusinessUnitService,
@@ -296,6 +321,13 @@ export class SecurityState {
     private orgInterfaceService: OrgInterfaceService
   ) {}
 
+  @Action(SetAgencyVisibilityFlag)
+  SetIrpFlag({ patchState }: StateContext<SecurityStateModel>, { agencyVisibilityEnabled }: SetAgencyVisibilityFlag): void {
+    patchState({
+      isAgencyVisibilityEnabled: agencyVisibilityEnabled,
+    });
+  }
+  
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType(
     { dispatch, patchState }: StateContext<SecurityStateModel>,
@@ -691,6 +723,24 @@ export class SecurityState {
       );
   }
 
+  @Action(GetInterfaceLogSummaryPage)
+  GetInterfaceLogSummaryIRP(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { organizationId,  pageNumber, pageSize }: GetInterfaceLogSummaryPage
+  ): Observable<InterfaceLogSummaryIRPPage | void> {
+    return this.orgInterfaceService
+      .getInterfaceLogSummaryIRP(organizationId, pageNumber, pageSize)
+      .pipe(
+        tap((payload) => {
+          patchState({ interfaceLogSummaryIRP: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
+
   @Action(GetLogHistoryById)
   GetLogHistoryById(
     { dispatch, patchState }: StateContext<SecurityStateModel>,
@@ -702,6 +752,25 @@ export class SecurityState {
       .pipe(
         tap((payload) => {
           patchState({ logTimeSheetHistoryPage: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
+
+  @Action(GetInterfaceLogDetails)
+  GetInterfaceLogDetails(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { interfaceLogSummaryID,statusType,  pageNumber, pageSize,options }: GetInterfaceLogDetails
+  ): Observable<InterfaceLogSummaryDetails[] | void> {
+    patchState({ logDialogOptions: options });
+    return this.orgInterfaceService
+      .getInterfaceSummaryDetails(interfaceLogSummaryID,statusType, pageNumber, pageSize)
+      .pipe(
+        tap((payload) => {
+          patchState({ logSummaryDetailsPage: payload });
           return payload;
         }),
         catchError((error: HttpErrorResponse) => {
@@ -797,4 +866,14 @@ export class SecurityState {
       })
     );
   }
+
+  @Action(ExportEmployeeImportDetails)
+  ExportEmployeeImportDetails({}: StateContext<SecurityStateModel>, { payload }: ExportTimeSheetList): Observable<Blob> {
+  return this.orgInterfaceService.exportEmployeeImport(payload).pipe(
+    tap((file: Blob) => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    })
+  );
+}
 }

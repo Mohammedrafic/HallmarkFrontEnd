@@ -83,6 +83,11 @@ import {
   RemoveSkillsCategorySucceeded,
   SaveAssignedSkill,
   SaveAssignedSkillSucceeded,
+  BulkUpdateAssignedSkill,
+  BulkUpdateAssignedSkillSucceeded,
+  BulkUpdateAssignedSkillFailed,
+  BulkDleteAssignedSkillSucceeded,
+  BulkUDeleteassignedSkillFailed,
   SaveBillRatesImportResult,
   SaveBillRatesImportResultSucceeded,
   SaveCredential,
@@ -125,6 +130,7 @@ import {
   UploadOrganizationLogo,
   UploadRegionsFile,
   UploadRegionsFileSucceeded,
+  BulkDeleteAssignedSkill,
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter, regionsPage } from '@shared/models/region.model';
@@ -146,9 +152,10 @@ import {
   Skill,
   SkillDataSource,
   SkillsPage,
+  BulkSkillsAction
 } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
-import { ShowToast } from 'src/app/store/app.actions';
+import { ShowToast,ShowBulkSkillActionDialog } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialPage } from '@shared/models/credential.model';
@@ -158,6 +165,8 @@ import {
   RECORD_CANNOT_BE_DELETED,
   RECORD_DELETE,
   RECORD_MODIFIED,
+  Bulk_Update_Skills,
+  Bulk_Delete_Skills,
   usedByOrderErrorMessage,
 } from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
@@ -231,6 +240,7 @@ export interface OrganizationManagementStateModel {
   assignedSkillsByOrganization: ListOfSkills[];
   filteringAssignedSkillsByOrganization: ListOfSkills[];
   credentialSettingPage: CredentialPage | null;
+  bulkupdateskills:BulkUpdateAssignedSkill[] | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -290,6 +300,7 @@ export interface OrganizationManagementStateModel {
     assignedSkillsByOrganization: [],
     filteringAssignedSkillsByOrganization: [],
     credentialSettingPage: null,
+    bulkupdateskills:null
   },
 })
 @Injectable()
@@ -1039,6 +1050,67 @@ export class OrganizationManagementState {
     );
   }
 
+  @Action(BulkUpdateAssignedSkill)
+  BulkUpdateAssignedSkill(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { selectedskillItems }: BulkUpdateAssignedSkill
+  ): Observable<BulkSkillsAction | void> {
+    patchState({ isOrganizationLoading: true });
+    return this.skillsService.bulkupdateAssignedSkills(selectedskillItems).pipe(
+      tap((payload) => {
+        if(payload){
+            if(payload.bulkactionresult){
+              dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Skills));
+              dispatch(new BulkUpdateAssignedSkillSucceeded(payload));
+            }
+            else{
+              if(payload.hasValidRecords){
+                dispatch(new BulkUpdateAssignedSkillSucceeded(payload));
+              }
+              else{
+                dispatch(new BulkUpdateAssignedSkillFailed(payload));
+              }
+            }
+        }
+        return payload;
+      }),
+      catchError((error) => {
+        const errorObj = error.error;
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
+      })
+    );
+  }
+  @Action(BulkDeleteAssignedSkill)
+  BulkDeleteAssignedSkill(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { selectedskillItems }: BulkDeleteAssignedSkill
+  ): Observable<BulkSkillsAction | void> {
+    patchState({ isOrganizationLoading: true });
+    return this.skillsService.bulkdeleteAssignedSkills(selectedskillItems).pipe(
+      tap((payload) => {
+        if(payload){
+            if(payload.bulkactionresult){
+              dispatch(new BulkDleteAssignedSkillSucceeded(payload));
+            }
+            else{
+              if(payload.hasValidRecords){
+                dispatch(new BulkDleteAssignedSkillSucceeded(payload));
+              }
+              else{
+                dispatch(new BulkUDeleteassignedSkillFailed(payload));
+              }
+            }
+        }
+        return payload;
+      }),
+      catchError((error) => {
+        const errorObj = error.error;
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
+      })
+    );
+  }
+
+
   @Action(SaveAssignedSkill)
   SaveAssignedSkill(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
@@ -1055,11 +1127,9 @@ export class OrganizationManagementState {
       }),
       catchError((error) => {
         const errorObj = error.error;
-        if (errorObj.errors?.IncompleteOpenOrdersExist && errorObj.errors?.InProgressOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has Open/ Incomplete Orders please re-assign or close them before inactivating the Skill. Skill has Orders In Progress past the inactivation date, please review them before inactivating the Skill'));
-        }
+        const statues = JSON.parse(errorObj.errors.IncompleteOpenOrdersExist);
         if (errorObj.errors?.IncompleteOpenOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has Open/Incomplete Orders, please re-assign or close them before inactivating the Skill'));
+          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has '+ statues +' Orders please re-assign or close them before inactivating the Skill.'));
         }
         if (errorObj.errors?.InProgressOrdersExist) {
           return dispatch(new SaveLocationConfirm());
@@ -1068,6 +1138,7 @@ export class OrganizationManagementState {
       })
     );
   }
+
 
   @Action(GetAssignedSkillsByPage)
   GetAssignedSkillsByPage(

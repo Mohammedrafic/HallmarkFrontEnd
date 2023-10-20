@@ -12,7 +12,7 @@ import { Recuriter, RecuriterReasonPage, RejectReason, RejectReasonPage, Sourcin
 import { ConfirmService } from '@shared/services/confirm.service';
 import { UserState } from '../../../store/user.state';
 import { PageOfCollections } from '@shared/models/page.model';
-import { CategoryNoteValue, Closurevalue, UnavailabilityValue } from '../interfaces';
+import { CancelEmployeeReasonValue, CategoryNoteValue, Closurevalue, UnavailabilityValue } from '../interfaces';
 
 @Directive()
 export abstract class ReasonsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
@@ -21,7 +21,8 @@ export abstract class ReasonsComponent extends AbstractGridConfigurationComponen
 
   @Output()
   public readonly editReason: EventEmitter<RejectReason
-  | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue> = new EventEmitter<RejectReason | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue|Sourcing|Recuriter>();
+  | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue | CancelEmployeeReasonValue> =
+    new EventEmitter<RejectReason | Penalty | UnavailabilityValue | CategoryNoteValue | Closurevalue | Sourcing | Recuriter | CancelEmployeeReasonValue>();
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
@@ -51,7 +52,9 @@ export abstract class ReasonsComponent extends AbstractGridConfigurationComponen
     this.isAlive = false;
   }
 
-  public onEdit(data: RejectReason | UnavailabilityValue|Sourcing|Recuriter) {
+  public onEdit(
+    data: RejectReason | UnavailabilityValue |Sourcing | Recuriter | CancelEmployeeReasonValue
+  ) {
     this.editReason.emit(data);
   }
 

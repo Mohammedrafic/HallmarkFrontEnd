@@ -196,13 +196,19 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     },
   },
   {
-    field: 'location',
+    field: 'locationId',
     headerName: 'Location',
     ...commonColumn,
-    width: 125,
-    minWidth: 105,
-    headerClass: 'custom-wrap',
+    width: 180,
+    minWidth: 100,
+    cellRenderer: DropdownEditorComponent,
     type: 'rightAligned',
+    headerClass: 'custom-wrap',
+    cellRendererParams: {
+      editMode: true,
+      isEditable: false,
+      storeField: 'locations',
+    },
   },
   editableCostCenterDef,
   {
@@ -399,11 +405,11 @@ export const submitTimesheetDialogData = (timesheetOrMiles = true) => ({
   successMessage: `Success. ${timesheetOrMiles ? 'Timesheet' : 'Mileages'} Submitted`,
 });
 
-export const orgSubmitEmptyTimesheetDialogData = () => ({
+export const SubmitEmptyTimesheetDialogData = {
   title: 'Submit Timesheet',
   submitButtonText: 'Ok',
   confirmMessage: 'If the candidate did not work this week, check the DNW switch.',
-});
+};
 
 const billRateCalculationTypeMapper = {
   [BillRateCalculationType.Regular]: 'Regular',

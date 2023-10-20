@@ -2,7 +2,7 @@ import { ImportResult } from '@shared/models/import.model';
 import { Country } from 'src/app/shared/enums/states';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { SkillCategory } from 'src/app/shared/models/skill-category.model';
-import { Skill, SkillFilters } from 'src/app/shared/models/skill.model';
+import { BulkSkillsAction, Skill, SkillFilters } from 'src/app/shared/models/skill.model';
 import { Department, DepartmentFilter, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter } from '@shared/models/region.model';
 import { ImportedLocation, Location, LocationFilter } from '@shared/models/location.model';
@@ -277,7 +277,22 @@ export class RemoveAssignedSkillSucceeded {
   static readonly type = '[organizationManagement] Remove Assigned Skill by ID Succeeded';
   constructor() {}
 }
-
+export class BulkUpdateAssignedSkillSucceeded {
+  static readonly type = '[organizationManagement] Bulk Update Assigned Skill Succeeded';
+  constructor(public payload:BulkSkillsAction) {}
+}
+export class BulkUpdateAssignedSkillFailed {
+  static readonly type = '[organizationManagement] Bulk Update Assigned Skill Failed';
+  constructor(public payload:BulkSkillsAction) {}
+}
+export class BulkDleteAssignedSkillSucceeded {
+  static readonly type = '[organizationManagement] Bulk Delete Assigned Skill Succeeded';
+  constructor(public payload:BulkSkillsAction) {}
+}
+export class BulkUDeleteassignedSkillFailed {
+  static readonly type = '[organizationManagement] Bulk Delete Assigned Skill Failed';
+  constructor(public payload:BulkSkillsAction) {}
+}
 export class GetCredentialTypes {
   static readonly type = '[organizationManagement] Get Credential Types';
   constructor() {}
@@ -602,3 +617,12 @@ export class SaveRegionsImportResultSucceeded {
   static readonly type = '[candidate] Save Regions Import Result Succeeded';
   constructor(public payload: ImportResult<ImportedRegion>) { }
 }
+export class BulkUpdateAssignedSkill {
+  static readonly type = '[organizationManagement] Bulk Update Assigned Skill';
+  constructor(public selectedskillItems: Skill[]) {}
+}
+export class BulkDeleteAssignedSkill {
+  static readonly type = '[organizationManagement] Bulk Delete Assigned Skill';
+  constructor(public selectedskillItems: Number[]) {}
+}
+

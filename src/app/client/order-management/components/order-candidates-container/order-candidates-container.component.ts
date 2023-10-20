@@ -71,19 +71,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
     this.orderManagementService.updateEmployeeToggleState({
       isAvailable: event.isAvailable,
       includeDeployed: event.includeDeployed ?? false
-    })
-
-    if (this.order.irpOrderMetadata) {
-      this.store.dispatch(new GetIrpOrderCandidates(
-        event.orderId,
-        event.organizationId,
-        event.currentPage,
-        event.pageSize,
-        event.isAvailable,
-        event.includeDeployed,
-        event.searchTerm||""
-      ));
-    } else {
+    })    
       this.store.dispatch(new GetAgencyOrderCandidatesList(
         event.orderId,
         event.organizationId,
@@ -92,6 +80,18 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
         event.excludeDeployed,
         event.searchTerm,
       ));
-    }
+
+      if (this.order.irpOrderMetadata) {
+        this.store.dispatch(new GetIrpOrderCandidates(
+          event.orderId,
+          event.organizationId,
+          event.currentPage,
+          event.pageSize,
+          event.isAvailable,
+          event.includeDeployed,
+          event.searchTerm||""
+        ));
+      } 
+    
   }
 }

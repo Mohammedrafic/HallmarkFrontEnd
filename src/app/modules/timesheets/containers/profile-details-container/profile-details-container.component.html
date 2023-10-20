@@ -294,7 +294,10 @@
   (rejectReasonChange)="handleReject($event)"
 ></app-reject-reason-input-dialog>
 
-<app-add-timesheet [container]="candidateDialog.element"></app-add-timesheet>
+<app-add-timesheet
+  [timesheetDetails]="timesheetDetails"
+  [container]="candidateDialog.element"
+></app-add-timesheet>
 
 <app-upload-documents (fileChange)="saveFilesOnRecord($event)"></app-upload-documents>
 

@@ -1,0 +1,38 @@
+<ejs-dialog id="bulkskillactiondialog" #bulkskillactiondialog cssClass="confirm-dialog" [width]="width" [target]="targetElement"
+  [visible]="false" [isModal]="true" [showCloseIcon]="true"
+  closeOnEscape
+  (close)="bulkskillactiondialog.hide()">
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <i-feather name="alert-circle" class="icon validation-icon"></i-feather>&nbsp;
+            <span>Error</span>
+          </div>
+          <div class="e-card-content">
+            <div *ngIf="skillNames else AllNotValid">
+              <span>{{bulkactionmessage1}}</span>
+              <ul>
+                <section *ngFor="let item of skillNames">
+                  <li>{{item}}</li>
+                </section>
+              </ul>
+              {{bulkactionmessage2}}
+            </div>
+            <ng-template #AllNotValid>
+              <div *ngIf="message">
+                <span> {{bulkactionmessage3}}</span>
+              </div>
+            </ng-template>
+            
+            <!-- <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton"
+              (click)="onOkClick()">Ok</button> -->
+          </div>
+        </div>
+      </section>
+
+      <ng-content></ng-content>
+    </section>
+  </ng-template>
+</ejs-dialog>

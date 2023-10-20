@@ -28,7 +28,7 @@
         <ng-container [ngTemplateOutlet]="region"></ng-container>
         <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
-        <div class="column last-column second-row" *ngIf="regularRates.regularLocal && regularRates.regular">
+        <div class="column last-column second-row" *ngIf="regularRates.regularLocal && regularRates.regular && system !== systemType.IRP">
           <div class="cost">${{ regularRates.regularLocal | number: '1.2-2' }}</div>
           <div class="sup-title">Regular Local Bill Rate</div>
         </div>

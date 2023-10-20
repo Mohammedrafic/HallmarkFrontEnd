@@ -39,7 +39,8 @@ export class OrderManagementIrpRowCandidatesAdapter {
       return {
         ...candidate,
         positionId: `${candidate.organizationPrefix}-${candidate.orderPublicId}-${candidate.positionId}`,
-        candidateStatus: CandidatesStatusText[candidate.candidateStatus as number],
+        candidateStatus : CandidatesStatusText[candidate.candidateStatus as number],
+        candidateStatusValue: candidate.candidateStatus as number,
         orderStatus: OrderStatusText[candidate.orderStatus as number],
         system: OrderManagementIrpCandidateSystem[candidate.system as number],
         agency: candidate.businessUnitName,

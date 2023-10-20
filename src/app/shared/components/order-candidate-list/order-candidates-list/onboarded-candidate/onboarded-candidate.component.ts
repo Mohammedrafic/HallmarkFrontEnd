@@ -76,6 +76,8 @@ import { OnboardCandidateMessageDialogComponent } from '@shared/components/order
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { UserPermissions } from '@core/enums/user.permissions.enum';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -116,6 +118,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() canEditClosedBillRate = false;
   @Input() order: Order;
 
+  private readonly permissions = UserPermissions;
+  public ordersystemId = OrderManagementIRPSystemId;
   public override form: FormGroup;
   public jobStatusControl: FormControl;
   public optionFields = OPTION_FIELDS;
@@ -147,6 +151,11 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public readonly reorderType: OrderType = OrderType.ReOrder;
   public canCreateOrder:boolean;
   public saveStatus: number = 0;
+  public activeSystems: OrderManagementIRPSystemId | null;
+  public CanOrganizationViewOrdersIRP: boolean;
+  public CanOrganizationEditOrdersIRP: boolean;
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
+  public commentContainerId: number;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -228,6 +237,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   ngOnInit(): void {
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
+    this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.subscribeOnPermissions();
     this.subscribeOnReasonsList();
     this.checkRejectReason();
@@ -493,14 +503,18 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         takeUntil(this.unsubscribe$),
       ).subscribe((value) => {
         this.candidateJob = value;
-
+        if(this.candidateJob?.commentContainerId && this.candidateJob?.commentContainerId !== null){
+          this.commentContainerId = this.candidateJob.commentContainerId as number;
+        }
         if (value) {
           this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
           this.getComments();
           if (!this.isAgency) {
             this.getOrderPermissions(value.orderId);
           }
-          this.billRatesData = [...value.billRates];
+          if(value?.billRates){
+            this.billRatesData = [...value?.billRates];
+          }
 
           const actualStart = !value.wasActualStartDateChanged && value.offeredStartDate
           ? value.offeredStartDate : value.actualStartDate;
@@ -843,8 +857,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, CanOrganizationEditOrdersIRP, CanOrganizationViewOrdersIRP}) => {
       this.canCreateOrder = canCreateOrder;
+      this.CanOrganizationViewOrdersIRP = CanOrganizationViewOrdersIRP;
+      this.CanOrganizationEditOrdersIRP = CanOrganizationEditOrdersIRP;
     });
   }
 }

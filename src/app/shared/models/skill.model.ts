@@ -153,3 +153,10 @@ export class SkillsByDepartments {
   id : number;
   name : string;
 }
+export class BulkSkillsAction{
+  bulkactionresult:boolean;
+  hasValidRecords:boolean;
+  isInProgressRecordsExists:boolean;
+  message:string;
+  skillNames:string[];
+}

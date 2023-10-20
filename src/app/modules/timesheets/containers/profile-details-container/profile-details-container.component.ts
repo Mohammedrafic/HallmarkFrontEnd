@@ -118,6 +118,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public timesheetId: number;
 
+  public timesheetDetails: TimesheetInt.TimesheetDetailsModel;
+
   public mileageTimesheetId: number;
 
   public organizationId: number | null = null;
@@ -404,6 +406,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public handleApprove(isTimesheetOrMileagesUpdate: boolean): void {
     const { timesheetId, mileageTimesheetId, organizationId } = this;
     const updateId = isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId;
+    const timesheetDetails = this.store.selectSnapshot(TimesheetsState.timesheetDetails);
+
+    if (organizationId && timesheetDetails?.isEmpty && !timesheetDetails?.noWorkPerformed) {
+      this.submitEmptyTimesheetWarning();
+      return;
+    }
 
     (organizationId
       ? this.timesheetDetailsService.submitTimesheet(updateId, organizationId, isTimesheetOrMileagesUpdate)
@@ -419,7 +427,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const timesheetDetails = this.store.selectSnapshot(TimesheetsState.timesheetDetails);
 
     if (timesheetDetails?.isEmpty && !timesheetDetails?.noWorkPerformed) {
-      this.orgSubmitEmptyTimesheetWarning();
+      this.submitEmptyTimesheetWarning();
     } else {
       this.orgSubmitTimesheet(timesheetDetails);
     }
@@ -532,10 +540,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
   }
 
-  private orgSubmitEmptyTimesheetWarning(): void {
+  private submitEmptyTimesheetWarning(): void {
     this.timesheetDetailsService
-      .orgSubmitEmptyTimesheet()
-      .pipe(take(1), takeUntil(this.componentDestroy()))
+      .submitEmptyTimesheet()
+      .pipe(take(1))
       .subscribe();
   }
 
@@ -662,6 +670,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
           currentStatus === this.timesheetStatus.PendingApproval ||
           currentStatus === this.timesheetStatus.PendingApprovalAsterix;
         this.canRecalculateTimesheet = isTimesheetSubmitted && this.canRecalculate;
+        this.timesheetDetails = details;
         this.timesheetId = details.id;
         this.commentContainerId=details.commentContainerId;
         this.mileageTimesheetId = details.mileageTimesheetId;
@@ -688,9 +697,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         this.getOrderComments();
         this.cd.markForCheck();
 
-        this.store.dispatch(
-          new TimesheetDetails.GetTimesheetRecords(details.id, details.organizationId, this.isAgency)
-        );
+        this.store.dispatch([
+          new TimesheetDetails.GetTimesheetRecords(details.id, details.organizationId, this.isAgency),
+          new TimesheetDetails.GetOrganizationsStructure(details.organizationId, this.isAgency),
+        ]);
       });
   }
 

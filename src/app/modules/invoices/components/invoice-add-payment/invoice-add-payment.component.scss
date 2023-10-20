@@ -171,3 +171,33 @@
     margin-top: 12px;
   }
 }
+.total {
+  margin-left: 30px;
+  display: flex;
+  align-items: center;
+  margin-block: 10px;
+
+  &__value {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    color: var(--text);
+    margin-left: 30px;
+
+  }
+
+  &__text {
+    margin-top: 1px;
+    margin-bottom: 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 16px;
+    text-align: start;
+    color: $secondary-dark-blue-30;
+    margin-left: 100px;
+
+  }
+}
+
