@@ -67,7 +67,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CustomFormGroup } from '@core/interface';
 import { OrderManagementService, } from '@client/order-management/components/order-management-content/order-management.service';
 import { DurationService } from '@shared/services/duration.service';
-import { IrpOrderType, OrderType } from '@shared/enums/order-type';
+import { IrpOrderTypeforPayRate, OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { Order, OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
@@ -310,7 +310,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   public getOrderDetails(orderDetails : Order){
-      this.editIrpCandidateService.getPredefinedBillRatesforRatePerHour(IrpOrderType.LongTermAssignment, orderDetails.departmentId, orderDetails.skillId).pipe(
+      this.editIrpCandidateService.getPredefinedBillRatesforRatePerHour(IrpOrderTypeforPayRate.LongTermAssignment, orderDetails.departmentId, orderDetails.skillId).pipe(
         takeUntil(this.componentDestroy()),
         take(1)
       ).subscribe(data => {
@@ -763,8 +763,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
 
     if (hasOnboardedCandidateOfferedDate || hasCancelledOffboardCandidate) {
-      UpdateVisibilityConfigFields(this.dialogConfig, OnboardConfigFieldsToShow);
+      const isCandidateCancelled = status === CandidatStatus.Cancelled;
+      const fieldsToShow = isCandidateCancelled ? [...OnboardConfigFieldsToShow, CancelReasonField] : OnboardConfigFieldsToShow;
+
+      UpdateVisibilityConfigFields(this.dialogConfig, fieldsToShow);
       DisableControls(OfferedDates, this.candidateForm);
+
       return;
     }
 
@@ -777,6 +781,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     if (status === CandidatStatus.Cancelled) {
       const cancelReasonConfigField = this.getConfigField(CancelReasonField);
       cancelReasonConfigField.showField = true;
+
       return;
     }
 

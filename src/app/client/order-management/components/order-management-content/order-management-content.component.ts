@@ -1129,8 +1129,9 @@ public RedirecttoIRPOrder(order:Order)
         cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
     }
-
-    this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.VMS);
+    if(this.orderManagementService.getOrderManagementSystem() != OrderManagementIRPSystemId.IRP){
+      this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.VMS);
+    }
     this.checkSelectedChildrenItem();
   }
 
@@ -2779,9 +2780,9 @@ public RedirecttoIRPOrder(order:Order)
 
       this.isOrgIRPEnabled = !!isIRPEnabled;
       this.isOrgVMSEnabled = !!isVMCEnabled;
-
-      this.setPreviousSelectedSystem();
-
+      if(!this.isRedirectedFromDashboard){
+        this.setPreviousSelectedSystem();
+      }    
       if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
         this.activeSystem = OrderManagementIRPSystemId.VMS;
       } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {

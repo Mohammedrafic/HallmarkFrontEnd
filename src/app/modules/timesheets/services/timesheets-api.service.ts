@@ -15,6 +15,7 @@ import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { ExportPayload } from '@shared/models/export.model';
 import { BillRatesService } from '@shared/services/bill-rates.service';
+import { OrganizationStructure } from '@shared/models/organization.model';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -103,6 +104,11 @@ export class TimesheetsApiService {
     );
   }
 
+  public getOrganizationsStructure(orgId: number, isAgency: boolean): Observable<OrganizationStructure>{
+    const endpoint = isAgency ? `/api/Organizations/structure/partnered/${orgId}` : '/api/Organizations/structure';
+    return this.http.get<OrganizationStructure>(endpoint);
+  }
+
   public getOrganizations(): Observable<DataSourceItem[]> {
     return this.http.get<DataSourceItem[]>(`/api/Agency/partneredorganizations`);
   }
@@ -157,7 +163,7 @@ export class TimesheetsApiService {
 
   private mapTimeSheetsFilters(filters: TimesheetsFilterState): TimesheetsFilterState {
     return {
-      ...filters, 
+      ...filters,
       orderIds: filters.orderIds && !Array.isArray(filters.orderIds) ? [filters.orderIds as string] : filters.orderIds,
     };
   }

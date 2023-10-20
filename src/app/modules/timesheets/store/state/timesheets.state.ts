@@ -54,7 +54,7 @@ import { CreateOverlapErrorData } from '../../helpers';
 import { CommentsService } from '@shared/services/comments.service';
 import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
 import { Comment } from '@shared/models/comment.model';
-
+import { OrganizationStructure } from '@shared/models/organization.model';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -181,6 +181,11 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static costCenters(state: TimesheetsModel): unknown {
     return state.costCenterOptions;
+  }
+
+  @Selector([TimesheetsState])
+  static organizationStructure(state: TimesheetsModel): OrganizationStructure | null {
+    return state.organizationStructure;
   }
 
   @Selector([TimesheetsState])
@@ -691,6 +696,22 @@ export class TimesheetsState {
         new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
       )),
     );
+  }
+
+  @Action(TimesheetDetails.GetOrganizationsStructure)
+  GetOrganizationsStructure(
+    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { orgId, isAgency }: TimesheetDetails.GetOrganizationsStructure,
+  ): Observable<OrganizationStructure | void> {
+    return this.timesheetsApiService.getOrganizationsStructure(orgId, isAgency)
+      .pipe(
+        tap((res) => patchState({
+          organizationStructure: res,
+        })),
+        catchError((err: HttpErrorResponse) => dispatch(
+          new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
+        )),
+      );
   }
 
   @Action(TimesheetDetails.DownloadAttachment)

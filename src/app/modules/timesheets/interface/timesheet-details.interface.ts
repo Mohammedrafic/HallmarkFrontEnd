@@ -77,7 +77,9 @@ export interface TimesheetDetailsModel {
   orderId: number;
   orderTitle: string;
   orderRegionName: string | null;
+  orderRegionId: number;
   orderLocationName: string | null;
+  orderLocationId: number;
   orderDepartmentName: string | null;
   orderSkillAbbreviation: string | null;
   orderCostCenterId: number;

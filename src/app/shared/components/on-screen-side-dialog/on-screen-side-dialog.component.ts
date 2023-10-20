@@ -19,6 +19,7 @@ export class OnScreenSideDialogComponent extends DestroyableDirective implements
 
   @Input() header: string | null;
   @Input() width: string = '434px';
+  public isDisabled=false;
 
   @Output() onScreenFormCancelClicked = new EventEmitter();
   @Output() onScreenFormSaveClicked = new EventEmitter();
@@ -31,6 +32,7 @@ export class OnScreenSideDialogComponent extends DestroyableDirective implements
     this.action$.pipe(ofActionDispatched(ShowOnScreenSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
         this.onScreenSideDialog.show();
+        this.isDisabled=false
       } else {
         this.onScreenSideDialog.hide();
       }
@@ -43,6 +45,7 @@ export class OnScreenSideDialogComponent extends DestroyableDirective implements
 
   onScreenFormSaveClick(): void {
     this.onScreenFormSaveClicked.emit();
+    this.isDisabled=true
   }
 }
 

@@ -571,7 +571,8 @@ export class RejectReasonState {
     return this.rejectReasonService.saveCancelEmployeeReason(payload)
       .pipe(
         tap(() => {
-          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+          const message = payload?.id ? RECORD_MODIFIED : RECORD_ADDED;
+          dispatch(new ShowToast(MessageTypes.Success, message));
         }),
         catchError((error: HttpErrorResponse) => {
           return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));

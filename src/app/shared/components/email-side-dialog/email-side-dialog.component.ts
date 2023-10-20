@@ -22,6 +22,7 @@ export class EmailSideDialogComponent extends DestroyableDirective implements On
 
   @Output() emailFormCancelClicked = new EventEmitter();
   @Output() emailFormSaveClicked = new EventEmitter();
+  public isDisabled=false;
 
   constructor(private action$: Actions) {
     super();
@@ -30,6 +31,7 @@ export class EmailSideDialogComponent extends DestroyableDirective implements On
   ngOnInit(): void {
     this.action$.pipe(ofActionDispatched(ShowEmailSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
+        this.isDisabled=false
         this.emailSideDialog.show();
       } else {
         this.emailSideDialog.hide();
@@ -43,6 +45,7 @@ export class EmailSideDialogComponent extends DestroyableDirective implements On
 
   onemailFormSaveClick(): void {
     this.emailFormSaveClicked.emit();
+    this.isDisabled=true
   }
 }
 

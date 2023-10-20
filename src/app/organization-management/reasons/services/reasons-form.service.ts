@@ -38,7 +38,8 @@ export class ReasonsFormsService {
     } else if (formType === ReasonFormType.CancelEmployeeReasons) {
       this.form = this.fb.group({
         id: [],
-        reason: [null, [Validators.required]]
+        reason: [null, [Validators.required, Validators.maxLength(100),
+          Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]]
       });
     } else if (formType === ReasonFormType.ClosureReason) {
       this.form = this.fb.group({

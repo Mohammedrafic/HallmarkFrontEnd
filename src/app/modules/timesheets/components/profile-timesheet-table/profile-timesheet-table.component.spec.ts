@@ -33,6 +33,8 @@ const gridIcons = {
 
 const timesheetDetailsMock: TimesheetDetailsModel = {
   id: 70180,
+  orderRegionId: 1,
+  orderLocationId: 2,
   mileageTimesheetId: 0,
   statusText: "Approved",
   mileageStatusText: "No mileages exist",
