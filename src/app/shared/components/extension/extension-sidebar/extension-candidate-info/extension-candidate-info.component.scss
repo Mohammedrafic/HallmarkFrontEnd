@@ -2,7 +2,7 @@
 @import 'adaptive-response';
 
 .common-info {
-  background-color: $secondary-dark-blue-50;
+  background-color: var(--info-background);
   border-radius: 8px;
   display: grid;
   grid-template-rows: 1fr 1fr;
@@ -23,7 +23,7 @@
       &-text {
         font-weight: 700;
         font-size: 14px;
-        color: $black;
+        color: var(--text);
       }
 
       .icon {

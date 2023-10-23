@@ -52,7 +52,7 @@ button.e-control.e-btn {
         transform: none;
       }
 
-      color: $primary-active-blue-10;
+      color: var(--close-button);
 
       &.e-active,
       &:focus {

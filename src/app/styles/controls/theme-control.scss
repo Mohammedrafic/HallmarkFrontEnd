@@ -3,6 +3,7 @@
 body.light {
   --background: #{$background};
   --secondary-background: #{$secondary-dark-blue-50};
+  --info-background: #{$secondary-dark-blue-50};
   --bg-default: #{$white};
   --bg-upload-area: #{$primary-active-blue-90};
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
@@ -13,6 +14,7 @@ body.light {
   --bg-filter-chips: #{$secondary-dark-blue-50};
   --pagination-background: #{$white};
   --bg-steper: #{$white};
+  --close-button: #{$primary-active-blue-10};
 
   --bg-primary-btn-disabled: #{$primary-active-blue-70};
   --color-primary-btn-disabled: #{$white};
@@ -25,6 +27,8 @@ body.light {
   --input-border: #{$primary-active-blue-40};
   --header-border: #{$secondary-dark-blue-45};
   --grid-header-border: #{$grid-row-border};
+  --dialog-border: #{$secondary-dark-blue-45};
+  --separator: #{$secondary-dark-blue-45};
 
   --icon-color: #{$secondary-dark-blue-10};
 
@@ -43,11 +47,15 @@ body.light {
 
   --shadow: #{$secondary-black-25};
   --redonly-text: #{$secondary-dark-blue-30};
+
+  --acrdn-hover-border: #{$secondary-dark-blue-45};
+  --bg-acrdn-selected-header: #{$primary-active-blue-90};
 }
 
 body.dark {
   --background: #{$sidebar-background};
   --secondary-background: #{$secondary-dark-blue-10-2};
+  --info-background: #{$widget-dark-tooltip};
   --bg-default: #{$sidebar-background};
   --bg-upload-area: #{$widget-dark-tooltip};
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
@@ -58,6 +66,7 @@ body.dark {
   --bg-filter-chips: #{$widget-dark-tooltip};
   --pagination-background: #{$sidebar-background};
   --bg-steper: #{$alert-side-bar-bgcolor};
+  --close-button: #{$supportive-red};
 
   --bg-primary-btn-disabled: #{$secondary-dark-blue-10-2};
   --color-primary-btn-disabled: #{$secondary-dark-blue-30};
@@ -70,6 +79,8 @@ body.dark {
   --input-border: #{$primary-active-blue-40};
   --header-border: #{$secondary-dark-blue-15};
   --grid-header-border: #{$grid-border-color};
+  --dialog-border: #{$secondary-dark-blue-10-2};
+  --separator: #{$secondary-dark-blue-10-2};
 
   --icon-color: #{$secondary-dark-blue-30};
 
@@ -88,4 +99,7 @@ body.dark {
 
   --shadow: #{$secondary-dark-blue-10-2};
   --redonly-text: #{$icewind-dale};
+
+  --acrdn-hover-border: #{$primary-active-blue-10};
+  --bg-acrdn-selected-header: #{$widget-dark-tooltip};
 }

@@ -12,6 +12,10 @@ body.light, body.dark {
     & + .e-dlg-overlay {
       background-color: unset;
     }
+
+    .e-footer-content {
+      border-top: 1px solid var(--dialog-border);
+    }
   }
 
   .e-dialog.filter {
@@ -78,6 +82,7 @@ body.light, body.dark {
       padding: 24px;
 
       .header-container {
+        background-color: var(--bg-default);
 
         .e-card-header {
           display: flex;
@@ -159,7 +164,7 @@ body.light, body.dark {
     &.extension-dialog,
     &.candidate-dialog {
       width: 59%;
-  
+
       @media #{$max-desktop-small} {
         width: 72%;
       }

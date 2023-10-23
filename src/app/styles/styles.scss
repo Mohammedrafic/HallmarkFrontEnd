@@ -434,7 +434,7 @@ body.light .header-item .e-menu-item.e-selected {
 }
 
 hr {
-  background-color: $secondary-dark-blue-45;
+  background-color: var(--separator);
   height: 1px;
   border: 0;
   margin: 12px 0;
@@ -721,4 +721,8 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 .orderStatusSummaryReport .ag-body-viewport {
   max-height: calc( 60vh ) !important;
   overflow: auto;
+}
+
+.separator {
+  background-color: var(--separator) !important;
 }

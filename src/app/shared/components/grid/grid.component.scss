@@ -150,12 +150,6 @@ app-grid {
     border: 1px solid var(--grid-header-border) !important;
   }
 
-  .app-grid-dark-pagination {
-    .app-numeric-textbox ejs-numerictextbox span.e-input-group {
-      border-bottom-color:  $alert-side-bar-bgcolor !important;
-    }
-  }
-
   .ag-header-cell-text {
     font-weight: 700 !important;
     color: $secondary-dark-blue-30 !important;
