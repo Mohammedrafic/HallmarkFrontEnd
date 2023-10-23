@@ -43,22 +43,75 @@
 
             <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
              <ng-container *ngIf="field.showField">
-               <div
-                 *ngIf="field.field === 'reason' ?
-                  candidateForm.get('isClosed')?.value && candidateModelState?.candidate?.status !== statuses.Cancelled : true"
-                 class="input-container {{field?.cssClass}}">
-                 <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
-                 </label>
-                 <div class="input-group dropdown">
-                   <ejs-dropdownlist
-                     appValidateWithMessage
-                     [formControlName]="field.field"
-                     [allowFiltering]="true"
-                     [fields]="optionFields"
-                     [dataSource]="field.dataSource"
-                   ></ejs-dropdownlist>
-                 </div>
-               </div>
+              
+              <ng-container [ngSwitch]="field.field">
+                <ng-template [ngSwitchCase]="'reason'">
+                  <div
+                    *ngIf="candidateForm.get('isClosed')?.value && candidateModelState?.candidate?.status !== statuses.Cancelled"
+                    class="input-container {{field?.cssClass}}">
+                    <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                    </label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        appValidateWithMessage
+                        [formControlName]="field.field"
+                        [allowFiltering]="true"
+                        [fields]="optionFields"
+                        [dataSource]="field.dataSource"
+                      ></ejs-dropdownlist>
+                    </div>
+                  </div>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'status'">
+                  <div
+                    class="input-container {{field?.cssClass}}">
+                    <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                    </label>
+                    <div class="input-group dropdown">
+                      <ejs-tooltip
+                        [showTipPointer]="false"
+                        [position]="'BottomCenter'"
+                        [content]="'Employee is ON HOLD'"
+                        *ngIf="candidateModelState?.candidate?.status === statuses.Rejected
+                        && candidateModelState?.candidate?.profileStatus === profileStatus.OnHold; else defaultSelect"
+                      >
+                      <ejs-dropdownlist
+                        appValidateWithMessage
+                        [formControlName]="field.field"
+                        [allowFiltering]="true"
+                        [fields]="optionFields"
+                        [dataSource]="field.dataSource"
+                      ></ejs-dropdownlist> 
+                    </ejs-tooltip>
+                    <ng-template #defaultSelect>
+                      <ejs-dropdownlist
+                        appValidateWithMessage
+                        [formControlName]="field.field"
+                        [allowFiltering]="true"
+                        [fields]="optionFields"
+                        [dataSource]="field.dataSource"
+                      ></ejs-dropdownlist>
+                    </ng-template>
+                    </div>
+                  </div>
+                </ng-template>
+                <ng-template ngSwitchDefault>
+                  <div
+                    class="input-container {{field?.cssClass}}">
+                    <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                    </label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        appValidateWithMessage
+                        [formControlName]="field.field"
+                        [allowFiltering]="true"
+                        [fields]="optionFields"
+                        [dataSource]="field.dataSource"
+                      ></ejs-dropdownlist>
+                    </div>
+                  </div>
+                </ng-template>
+              </ng-container>
              </ng-container>
             </ng-template>
 
