@@ -5,6 +5,7 @@ body.light {
   --secondary-background: #{$secondary-dark-blue-50};
   --info-background: #{$secondary-dark-blue-50};
   --bg-default: #{$white};
+  --bg-sub-row: #{$white};
   --bg-upload-area: #{$primary-active-blue-90};
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
   --bg-file-uploader: #{$secondary-dark-blue-50};
@@ -29,6 +30,7 @@ body.light {
   --grid-header-border: #{$grid-row-border};
   --dialog-border: #{$secondary-dark-blue-45};
   --separator: #{$secondary-dark-blue-45};
+  --devider: #{$secondary-dark-blue-40};
 
   --icon-color: #{$secondary-dark-blue-10};
 
@@ -44,6 +46,8 @@ body.light {
   --selector-title: #{$secondary-dark-blue-15};
   --disabled-drop-area-text: #{$secondary-dark-blue-30};
   --selected-date-range-color: #{$white};
+  --checkbox-background: #{$white};
+  --chechbox-corder-color: #{$secondary-dark-blue-30};
 
   --shadow: #{$secondary-black-25};
   --redonly-text: #{$secondary-dark-blue-30};
@@ -57,6 +61,7 @@ body.dark {
   --secondary-background: #{$secondary-dark-blue-10-2};
   --info-background: #{$widget-dark-tooltip};
   --bg-default: #{$sidebar-background};
+  --bg-sub-row: #{$grid-detail-row-bgcolor};
   --bg-upload-area: #{$widget-dark-tooltip};
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
   --bg-file-uploader: #{$widget-dark-tooltip};
@@ -81,6 +86,9 @@ body.dark {
   --grid-header-border: #{$grid-border-color};
   --dialog-border: #{$secondary-dark-blue-10-2};
   --separator: #{$secondary-dark-blue-10-2};
+  --devider: #{$secondary-dark-blue-15};
+  --checkbox-background: #{$secondary-dark-blue-10-2};
+  --chechbox-corder-color: #{$secondary-dark-blue-40};
 
   --icon-color: #{$secondary-dark-blue-30};
 

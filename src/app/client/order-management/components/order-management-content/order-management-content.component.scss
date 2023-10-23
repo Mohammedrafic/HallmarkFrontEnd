@@ -199,7 +199,7 @@
   .button-group {
     margin-top: 24px;
     padding-bottom: 24px;
-    border-bottom: 1px solid $secondary-dark-blue-40;
+    border-bottom: 1px solid var(--devider);
     display: block;
   }
 
@@ -281,8 +281,82 @@
   color: $secondary-dark-blue-20;
 }
 
+.IRPgrid {
+  ::ng-deep {
+    .ag-root-wrapper {
+      background-color: var(--bg-default) !important;
+      border-bottom: 1px solid var(--grid-header-border) !important;
+
+      .ag-menu, .ag-tabs-header {
+        background-color: var(--bg-default) !important;
+        color: var(--text) !important;
+        box-shadow: none !important;
+      }
+
+      .ag-header {
+        border-bottom: 1px solid var(--grid-header-border) !important;
+
+        .ag-header-cell-text {
+          font-weight: 700 !important;
+          color: var(--sub-title-2) !important;
+        }
+      }
+
+      .ag-checkbox-input-wrapper {
+        background-color: var(--checkbox-background) !important;
+
+        &::after {
+          color: var(--chechbox-corder-color) !important;
+        }
+
+        &:hover::after {
+          color: $primary-active-blue-10 !important;
+        }
+
+        &.ag-checked::after {
+          background-color: $white !important;
+          color: $primary-active-blue-10 !important;
+        }
+      }
+
+      .ag-checkbox-input-wrapper:active {
+        box-shadow: none !important;
+      }
+
+      .ag-row {
+        border-color: var(--grid-header-border) !important;
+
+        .ag-cell-value {
+          color: var(--text) !important;
+        }
+
+        .color-primary-active-blue-10 {
+          color: $primary-active-blue-10 !important;
+        }
+      }
+
+      .ag-row-hover {
+        .ag-cell-value {
+          color: $black !important;
+        }
+
+        .color-primary-active-blue-10 {
+          color: $primary-active-blue-10 !important;
+        }
+      }
+    }
+  }
+}
+
 .grid-table-container {
   height: calc(98vh - 320px);
+
+  .app-grid__component {
+    border-top-left-radius: var(--grid-border-radius) !important;
+    border-top-right-radius: var(--grid-border-radius) !important;
+    border: 1px solid var(--grid-header-border);
+    width: calc(100% - 2px) !important;
+  }
 
   @media #{$max-tablet} {
     height: calc(98vh - 350px);
@@ -300,7 +374,12 @@
 
     & ag-grid-angular {
       & .ag-row-selected {
-        background: $primary-active-blue-70 !important;
+        background: $grid-active-row-bgcolor !important;
+
+        .ag-cell-value,
+        .ag-cell.name {
+          color: $white !important;
+        }
       }
 
       .ag-cell {

@@ -1,11 +1,13 @@
 .mat-menu-panel.mat-menu-after {
   border-radius: 0;
   min-height: 54px;
+  background-color: var(--bg-default);
 
   .mat-menu-content {
     .mat-menu-item {
       line-height: 40px;
       height: 40px;
+      color: var(--text);
     }
   }
 }
