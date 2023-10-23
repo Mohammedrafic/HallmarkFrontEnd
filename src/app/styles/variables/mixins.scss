@@ -230,3 +230,9 @@
     margin-right: 12px;
   }
 }
+
+@mixin readonlyInput {
+  background-color: var(--bg-input-field-disabled);
+  color: $secondary-dark-blue-30 !important;
+  border: 1px solid var(--input-border-color) !important;
+}

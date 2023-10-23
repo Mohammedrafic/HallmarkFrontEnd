@@ -124,7 +124,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
   @media (max-width: $tablet-min) {
     display: flex;
-    
+
     button:not(.close-button, .menu-mobile), app-button {
       display: none;
     }
@@ -151,9 +151,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
       .input-group.input-readonly {
         .e-input[readonly], ejs-daterangepicker .e-input-group, ejs-datepicker .e-input-group {
-          background-color: $secondary-dark-blue-50;
-          color: $secondary-dark-blue-30;
-          border: 1px solid $secondary-dark-blue-40 !important;
+          @include readonlyInput;
         }
       }
 

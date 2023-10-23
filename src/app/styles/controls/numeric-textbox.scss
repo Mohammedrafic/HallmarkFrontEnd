@@ -50,11 +50,12 @@ body.light, body.dark {
 body.dark {
   .app-numeric-textbox {
     ejs-numerictextbox {
-
       span.e-input-group.e-disabled {
+        background-color: $bg-gray-200 !important;
+        border-bottom-color: $input-border-color !important;
+
         input {
-          padding: 0 !important;
-          height: 38px !important;
+          background-color: transparent !important;
         }
       }
     }

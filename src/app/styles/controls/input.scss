@@ -26,7 +26,7 @@ body.light, body.dark {
         background-color: $secondary-dark-blue-50;
 
         &:hover {
-          border-color: $secondary-dark-blue-40 !important;
+          border-color: var(--input-border-color) !important;
         }
       }
 
@@ -153,10 +153,10 @@ body.light, body.dark {
 
         &.e-disabled {
           background: $secondary-dark-blue-50 !important;
-          border-color: $secondary-dark-blue-40 !important;
+          border-color: var(--input-border-color) !important;
 
           &:hover {
-            border-color: $secondary-dark-blue-40 !important;
+            border-color: var(--input-border-color) !important;
           }
         }
 
@@ -184,7 +184,7 @@ body.light, body.dark {
         border-bottom-color: $grey;
 
         &:hover {
-          border-color: $secondary-dark-blue-40 !important;
+          border-color: var(--input-border-color) !important;
         }
       }
     }
