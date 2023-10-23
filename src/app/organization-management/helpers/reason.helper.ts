@@ -3,15 +3,15 @@ import { RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-
 export const CreateSystemString = (includeInIrp: boolean, includeInVms: boolean): string => {
   const systemString = [];
 
-  if (includeInVms) {
-    systemString.push('VMS');
-  }
-
   if (includeInIrp) {
     systemString.push('IRP');
   }
 
-  return systemString.join();
+  if (includeInVms) {
+    systemString.push('VMS');
+  }
+
+  return systemString.join(', ');
 }
 
 export const prepareCancelReasonsPage = (reasonsPage: RejectReasonPage): RejectReasonPage => {
