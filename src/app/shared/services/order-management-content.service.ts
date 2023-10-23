@@ -16,6 +16,7 @@ import {
   IrpCandidatesParams,
   IrpOrderCandidate,
   IrpOrderCandidateDto,
+  JobDistributionfilters,
   OnboardCandidateEmail,
   Order,
   OrderAuditHistory,
@@ -32,6 +33,7 @@ import {
   OrderManagementPage,
   OrdersJourneyPage,
   OrderWorkLocationAuditHistory,
+  OrgStructureDto,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
@@ -611,4 +613,8 @@ export class OrderManagementContentService {
     public getOrderClassificationAuditHistory(payload: AuditLogPayload): Observable<OrderClassificationAuditHistory[]> {
      return this.http.post<OrderClassificationAuditHistory[]>('/api/Audit/OrderClassificationAuditHistory', payload);
     }
+
+    public getJobDistributionValues(payload: JobDistributionfilters): Observable<OrgStructureDto> {
+      return this.http.post<OrgStructureDto>('/api/OrganizationSettings/GetOrganizationDistributionvalue', payload);
+     }
 }

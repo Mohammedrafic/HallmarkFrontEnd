@@ -206,7 +206,7 @@ export const GeneralInformationConfigPO = (): OrderFormsConfig => ({
   ],
 });
 
-export const JobDistributionConfigLTA = (selectedSystem: SelectSystem): OrderFormsConfig => ({
+export const JobDistributionConfigLTA = (selectedSystem: SelectSystem,isDistributionActivate?:boolean): OrderFormsConfig => ({
   title: 'Job Distribution',
   formName: 'jobDistributionForm',
   cssClass: 'job-distribution-wrapper',
@@ -234,10 +234,26 @@ export const JobDistributionConfigLTA = (selectedSystem: SelectSystem): OrderFor
       show: false,
       type: FieldType.Number,
     },
+    {
+      field: 'distributionDelay',
+      title: 'Distribution With Delay',
+      required: false,
+      show: false,
+      type: FieldType.Toggle,
+    },
+    {
+      field: 'distributeToVMS',
+      title: 'Value',
+      cssClass: 'item10',
+      required: true,
+      show: false,
+      type: FieldType.Input,
+      maxLength: 6,
+    },
   ],
 });
 
-export const JobDistributionConfigPO = (selectedSystem: SelectSystem): OrderFormsConfig => ({
+export const JobDistributionConfigPO = (selectedSystem: SelectSystem,isDistributionActivate?:boolean): OrderFormsConfig => ({
   title: 'Job Distribution',
   formName: 'jobDistributionForm',
   cssClass: 'job-distribution-wrapper',
@@ -264,6 +280,22 @@ export const JobDistributionConfigPO = (selectedSystem: SelectSystem): OrderForm
       show: false,
       required: false,
       type: FieldType.Input,
+    },
+    {
+      field: 'distributionDelay',
+      title: 'Distribution With Delay',
+      required: false,
+      show: false,
+      type: FieldType.Toggle,
+    },
+    {
+      field: 'distributeToVMS',
+      title: 'Value',
+      cssClass: 'item10',
+      required: true,
+      show: false,
+      type: FieldType.Input,
+      maxLength: 6,
     },
   ],
 });
@@ -590,16 +622,16 @@ export const WorkLocationConfig = (form: OrderFormInput[]): OrderFormsArrayConfi
   },
 ];
 
-export const LongTermAssignmentConfig = (selectedSystem: SelectSystem): OrderFormsConfig[] => ([
+export const LongTermAssignmentConfig = (selectedSystem: SelectSystem,isDistributionActivate?:boolean): OrderFormsConfig[] => ([
   GeneralInformationConfigLTA(),
-  JobDistributionConfigLTA(selectedSystem),
+  JobDistributionConfigLTA(selectedSystem,isDistributionActivate),
   JobDescriptionConfig(),
   SpecialConfigProject(),
 ]);
 
-export const perDiemConfig = (selectedSystem: SelectSystem): OrderFormsConfig[] => ([
+export const perDiemConfig = (selectedSystem: SelectSystem,isDistributionActivate?:boolean): OrderFormsConfig[] => ([
   GeneralInformationConfigPO(),
-  JobDistributionConfigPO(selectedSystem),
+  JobDistributionConfigPO(selectedSystem,isDistributionActivate),
   JobDescriptionConfigPO(),
   SpecialConfigProject(),
 ]);
