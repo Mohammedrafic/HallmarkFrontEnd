@@ -1502,7 +1502,7 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed = false;
     }
 
-    if (this.creatingReorder) {
+    if (this.creatingReorder || event.rowIndex === event.previousRowIndex) {
       this.creatingReorder = false;
       return;
     }

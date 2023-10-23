@@ -278,7 +278,6 @@
     <div class="comments" *ngIf="candidateJob?.commentContainerId !== null && activeSystems !== OrderManagementIRPSystemId.IRP">
       <app-comments 
         *ngIf="candidateJob" 
-        [canVmsCreateOrders]="canCreateOrder" 
         [comments]="candidateComments" 
         [externalCommentConfiguration]="order.externalCommentsConfiguration" 
         [commentContainerId]="candidateJob.commentContainerId || 0">
