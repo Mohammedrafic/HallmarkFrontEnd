@@ -339,6 +339,10 @@ body {
       background: $sidebar-background !important;
     }
 
+    .comments-header .bootstrap .e-input-group.e-control-wrapper {
+      background: unset !important;
+    }
+
     .custom-chip,
     .candidates-additional-info .container-row,
     .search, .credentials-container,

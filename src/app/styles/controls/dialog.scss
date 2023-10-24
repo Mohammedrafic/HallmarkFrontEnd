@@ -4,6 +4,12 @@
 
 body.light, body.dark {
   .e-dialog {
+    .e-dlg-header-content,
+    .e-dlg-content,
+    .e-footer-content {
+      color: var(--text);
+    }
+
     .e-dlg-content {
       background-color: var(--bg-default);
     }
@@ -94,7 +100,7 @@ body.light, body.dark {
           align-items: center;
 
           .e-card-title {
-            color: $black;
+            color: var(--text);
             font-size: 24px;
             font-weight: 700;
           }

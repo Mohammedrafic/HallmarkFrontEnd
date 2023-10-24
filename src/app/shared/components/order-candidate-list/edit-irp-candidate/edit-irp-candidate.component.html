@@ -43,7 +43,7 @@
 
             <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
              <ng-container *ngIf="field.showField">
-              
+
               <ng-container [ngSwitch]="field.field">
                 <ng-template [ngSwitchCase]="'reason'">
                   <div
@@ -81,7 +81,7 @@
                         [allowFiltering]="true"
                         [fields]="optionFields"
                         [dataSource]="field.dataSource"
-                      ></ejs-dropdownlist> 
+                      ></ejs-dropdownlist>
                     </ejs-tooltip>
                     <ng-template #defaultSelect>
                       <ejs-dropdownlist
@@ -154,8 +154,16 @@
         </ng-container>
       </form>
     </div>
-    <app-comments-irp *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId" [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP" [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP" [comments]="comments" [commentContainerId]="candidateCommentContainerId" [candidateJobId]="candidateJobId" [useBackground]="false"
-      [externalCommentConfiguration]="externalCommentConfiguration"></app-comments-irp>
+    <app-comments-irp
+      *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId"
+      [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
+      [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
+      [comments]="comments"
+      [commentContainerId]="candidateCommentContainerId"
+      [candidateJobId]="candidateJobId"
+      [useBackground]="true"
+      [externalCommentConfiguration]="externalCommentConfiguration"
+    ></app-comments-irp>
 
     <div *ngIf="showATPform && isTurnedOn">
       <form [formGroup]="AtpCalcForm" class="atpcalc-form">

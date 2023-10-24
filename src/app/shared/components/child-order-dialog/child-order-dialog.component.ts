@@ -642,6 +642,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private setAddExtensionBtnState(candidate: OrderManagementChild): void {
+    if (!this.order) {
+      return;
+    }
+
     const isOrderTravelerOrContractToPerm =
       this.order.orderType === OrderType.LongTermAssignment || this.order.orderType === OrderType.ContractToPerm;
     const isOrderFilledOrProgressOrClosed =
