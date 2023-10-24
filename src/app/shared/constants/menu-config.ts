@@ -140,7 +140,7 @@ export const MENU_CONFIG: any = {
     29: {
       // MSP List
       icon: '',
-      route: '',
+      route: 'msp/msp-list',
     },
     30: {
       // Roles & Permissions
@@ -633,7 +633,7 @@ export const MENU_CONFIG: any = {
     29: {
       // MSP List
       icon: '',
-      route: '',
+      route: 'msp/msp-list',
     },
     30: {
       // Roles & Permissions
