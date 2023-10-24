@@ -16,6 +16,9 @@ body.light {
   --pagination-background: #{$white};
   --bg-steper: #{$white};
   --close-button: #{$primary-active-blue-10};
+  --button-group-border: #{$secondary-dark-blue-45};
+  --button-group-background: #{$white};
+  --button-group-color: #{$secondary-dark-blue-10};
 
   --bg-primary-btn-disabled: #{$primary-active-blue-70};
   --color-primary-btn-disabled: #{$white};
@@ -72,6 +75,9 @@ body.dark {
   --pagination-background: #{$sidebar-background};
   --bg-steper: #{$alert-side-bar-bgcolor};
   --close-button: #{$supportive-red};
+  --button-group-border: #{$primary-active-blue-40};
+  --button-group-background: #{$sidebar-background};
+  --button-group-color: #{$primary-active-blue-10};
 
   --bg-primary-btn-disabled: #{$secondary-dark-blue-10-2};
   --color-primary-btn-disabled: #{$secondary-dark-blue-30};
