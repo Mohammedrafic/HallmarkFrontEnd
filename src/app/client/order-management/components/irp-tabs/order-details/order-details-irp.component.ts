@@ -779,8 +779,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           this.distributionIds?.includes(IrpOrderJobDistribution.AllExternal) ||
           this.distributionIds?.includes(IrpOrderJobDistribution.SelectedExternal)
         ) {
-          viewDistributiondelay(true, selecteddistributiondelay);
           if (this.isDistributionActivate) {
+            viewDistributiondelay(true, selecteddistributiondelay);
             this.distributionFilter = {
               regionId: this.generalInformationForm.get('departmentId')?.value
                 ? this.generalInformationForm.get('regionId')?.value
