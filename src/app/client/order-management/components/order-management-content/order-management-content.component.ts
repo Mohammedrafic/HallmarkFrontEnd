@@ -2706,7 +2706,7 @@ public RedirecttoIRPOrder(order:Order)
       }),
       switchMap(() => this.projectSpecialData$),
       filter((project) => !!project),
-      takeUntil(this.unsubscribe$),
+      take(1),
     ).subscribe((data) => {
       const { poNumbers, projectNames, specialProjectCategories } = data;
       this.filterColumns.projectTypeIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP? specialProjectCategories.filter(f=>f.includeInIRP == true) :  specialProjectCategories.filter(f=>f.includeInVMS == true);
