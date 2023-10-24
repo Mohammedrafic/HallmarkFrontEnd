@@ -891,7 +891,6 @@ export class SendGroupEmailComponent
   }
 
   private getUsersByRole(): void{
-
     this.userData = [];
     var regionId = this.regionControl.value ? this.regionControl.value.join() : '';
     var locationId = this.locationControl.value ? this.locationControl.value.join() : '';
@@ -910,7 +909,6 @@ export class SendGroupEmailComponent
 
       });
     }else if (this.rolesControl.value.length > 0) {
-  
         const user = this.store.selectSnapshot(UserState.user);
         if (user?.businessUnitType != BusinessUnitType.MSP &&  user?.businessUnitType != BusinessUnitType.Hallmark && user?.businessUnitType != BusinessUnitType.Organization) {
           this.dispatchUserPage(this.businessesControl.value);
@@ -922,14 +920,6 @@ export class SendGroupEmailComponent
             this.masterUserData = data.items;
             if(this.allowActiveUsers){
               this.userData = data.items.filter(i => i.isDeleted == false);
-              // let filterData=this.userData.map(obj => {
-              //   let rolesOBj=obj.roles.filter((role: { id: number,name:string}) => this.rolesControl.value.includes(role.id ));
-              //   if(rolesOBj.length>0)
-              //   {
-              //     return obj;
-              //   };
-              //   return null;
-              // });
               this.userData = this.userData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
             }else{
               this.userData = this.masterUserData.filter(f => (f.roles || []).find((f: { id: number; }) => this.rolesControl.value.includes(f.id)))
