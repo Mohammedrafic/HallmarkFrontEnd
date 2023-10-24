@@ -16,6 +16,7 @@ export class Credential {
   reqSubmission?: boolean;
   reqOnboard?: boolean;
   optional?: boolean;
+  isPublic?: boolean | null;
 
   constructor(credential: Credential) {
     if (credential.id) {
@@ -32,6 +33,7 @@ export class Credential {
     this.reqOnboard = credential.reqOnboard;
     this.reqSubmission = credential.reqSubmission;
     this.optional = credential.optional;
+    this.isPublic = credential.isPublic;
   }
 }
 
@@ -47,6 +49,7 @@ export interface CredentialFilter {
   pageNumber?: number;
   includeInIRP?: boolean;
   includeInVMS?: boolean;
+  isPublic?: boolean | null;
 }
 
 export class CredentialDataSource {

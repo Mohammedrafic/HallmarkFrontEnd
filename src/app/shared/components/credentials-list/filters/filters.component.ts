@@ -92,11 +92,13 @@ export class FiltersComponent extends Destroyable implements OnInit {
       expireDateApplicable,
       includeInIRP,
       includeInVMS,
+      isPublic,
     } = this.credentialFiltersService.filtersState;
     this.credentialsFilters.patchValue({
       credentialIds: credentialIds ?? null,
       credentialTypeIds: credentialTypeIds ?? [],
       expireDateApplicable: expireDateApplicable ?? null,
+      isPublic: isPublic ?? null,
     });
     if(this.isCredentialWithIrp()) {
       this.credentialsFilters.patchValue({

@@ -54,6 +54,13 @@ export const CredentialConfig: CredentialListConfig[] = [
         type: FieldType.CheckBox
       },
       {
+        field: 'isPublic',
+        title: 'Is Public',
+        disabled: false,
+        required: false,
+        type: FieldType.CheckBox,
+      },
+      {
         field: 'comment',
         title: 'Comment',
         disabled: false,
