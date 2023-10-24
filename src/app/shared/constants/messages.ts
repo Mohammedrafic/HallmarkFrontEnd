@@ -127,6 +127,9 @@ export const EMPLOYEE_TERMINATED_WARNING = 'Do you want to terminate the employe
 export const addAvailabilityToStart = 'Add Availability to start Scheduling';
 export const CommitmentOverlapMessage = 'Are you sure you want assign new Work Commitment? It may have impact on existing schedules and orders';
 
+export const AGENCY_CONVERTED_TO_MSP = 'Agency converted to MSP successfully.'
+export const AGENCY_CONVERTED_TO_MSP_FAIL = 'Failed to convert Agency to MSP.'
+
 export const RECORD_SAVED_SUCCESS = 'Record saved successfully';
 export const INACTIVEDATE = 'Location will be inactivated at '
 export const INACTIVEDATE_DEPARTMENT = 'Department will be inactivated at '

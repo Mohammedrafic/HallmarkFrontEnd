@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { catchError, Observable, of, tap } from 'rxjs';
-import { AGENCY_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
+import { AGENCY_ADDED, AGENCY_CONVERTED_TO_MSP, AGENCY_CONVERTED_TO_MSP_FAIL, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 
 import { Agency, AgencyFilteringOptions, AgencyPage, AgencyRegionSkills } from 'src/app/shared/models/agency.model';
@@ -25,6 +25,7 @@ import {
   ExportAgencyList,
   GetAgencyFilteringOptions,
   GetAgencyRegionsSkills,
+  ConvertAgencyToMSP,
 } from './agency.actions';
 import { AdminStateModel } from '@admin/store/admin.state';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -41,6 +42,9 @@ export interface AgencyStateModel {
   businessUnits: BusinessUnit[];
   agencyFilteringOptions: AgencyFilteringOptions | null;
   regionsSkills: AgencyRegionSkills | null;
+  agencyId: number | null;
+  netSuiteId: number | null;
+  name: string;
 }
 
 @State<AgencyStateModel>({
@@ -54,6 +58,9 @@ export interface AgencyStateModel {
     businessUnits: [],
     agencyFilteringOptions: null,
     regionsSkills: null,
+    agencyId: null,
+    netSuiteId: null,
+    name: "",
   },
 })
 @Injectable()
@@ -116,6 +123,26 @@ export class AgencyState {
         return of(dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))));
       })
     );
+  }
+
+  @Action(ConvertAgencyToMSP)
+  ConvertAgencyToMSP(
+    { dispatch }: StateContext<AgencyStateModel>,
+    { agencyId, netSuiteId, name }: ConvertAgencyToMSP
+  ): Observable<boolean | void> {
+    return this.agencyService.convertAgencyToMSP(agencyId, netSuiteId, name)
+      .pipe(
+        tap((res) => {
+          if (res) {
+            dispatch(new ShowToast(MessageTypes.Success, AGENCY_CONVERTED_TO_MSP));
+          } else {
+            dispatch(new ShowToast(MessageTypes.Warning, AGENCY_CONVERTED_TO_MSP_FAIL));
+          }
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+        }),
+      );
   }
 
   @Action(GetAgencyByPage)
