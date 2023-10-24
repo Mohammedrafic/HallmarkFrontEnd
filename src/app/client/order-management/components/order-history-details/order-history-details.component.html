@@ -1,10 +1,10 @@
 <ejs-dialog
   id="dialog"
   #sideDialog
-  cssClass="dialog order-details-dialog"
+  cssClass="dialog order-details-dialog history-dialog"
   [target]="targetElement$ | async"
-  [visible]="false"  
-  [animationSettings]="{ effect: 'SlideRight' }"  
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
   [isModal]="true"
   >
   <ng-template #content>
@@ -14,30 +14,30 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title">
               Order ID {{ orderDetail?.organizationPrefix }}-{{ orderDetail?.publicId }}
-            </h3>  
+            </h3>
           </div>
-          <div class="e-card-content dialog-controls contact-to-perm">  
+          <div class="e-card-content dialog-controls contact-to-perm">
             <button ejs-button type="submit" style="margin-left: 20px;" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="ml-2 icon"></i-feather>
             </button>
           </div>
         </div>
-      </section>      
+      </section>
       <div class="order-tabs">
         <ng-container>
           <ejs-accordion expandMode='Single' (expanding)="expanding($event)">
-            <e-accordionitems>              
+            <e-accordionitems>
               <e-accordionitem expanded='true'>
                 <ng-template #header>
                   <div>Order Audit History</div>
                 </ng-template>
-                <ng-template #content>   
-                  <section class="app-grid">                               
+                <ng-template #content>
+                  <section class="app-grid">
                   <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                   [gridOptions]="gridOptions"
                   (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                  ></ag-grid-angular>   
-                </section>      
+                  ></ag-grid-angular>
+                </section>
                 </ng-template>
               </e-accordionitem >
               <e-accordionitem>
@@ -45,12 +45,12 @@
                   <div>Order Credential Audit History</div>
                 </ng-template>
                 <ng-template #content>
-                  <section class="app-grid"> 
+                  <section class="app-grid">
                   <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                   [gridOptions]="OrderCredentialAuditHistoryGridOptions"
                   (gridReady)="onCredentialAuditGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                  ></ag-grid-angular>  
-                </section>   
+                  ></ag-grid-angular>
+                </section>
                 </ng-template>
               </e-accordionitem>
 
@@ -59,12 +59,12 @@
                   <div>Order Bill Rates Audit History</div>
                 </ng-template>
                 <ng-template #content>
-                  <section class="app-grid"> 
+                  <section class="app-grid">
                   <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                   [gridOptions]="OrderBillRatesAuditHistoryGridOptions"
                   (gridReady)="onBillRatesAuditGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                  ></ag-grid-angular>  
-                </section>   
+                  ></ag-grid-angular>
+                </section>
                 </ng-template>
               </e-accordionitem>
 
@@ -74,12 +74,12 @@
                   <div>Order Contacts Audit History</div>
                 </ng-template>
                 <ng-template #content>
-                  <section class="app-grid"> 
+                  <section class="app-grid">
                   <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                   [gridOptions]="OrderContactAuditHistoryDetailsGridOptions"
                   (gridReady)="onOrderContactAuditGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                  ></ag-grid-angular>  
-                </section>   
+                  ></ag-grid-angular>
+                </section>
                 </ng-template>
               </e-accordionitem>
 
@@ -88,44 +88,44 @@
                   <div>Order Work Location Audit History</div>
                 </ng-template>
                 <ng-template #content>
-                  <section class="app-grid"> 
+                  <section class="app-grid">
                   <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                   [gridOptions]="OrderWorkLocationDetailsGridOptions"
                   (gridReady)="onOrderWorkLocationAuditGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                  ></ag-grid-angular>  
-                </section>   
+                  ></ag-grid-angular>
+                </section>
                 </ng-template>
-              </e-accordionitem>               
+              </e-accordionitem>
               <e-accordionitem>
                 <ng-template #header>
                   <div>Order JobDistribution Audit History</div>
                 </ng-template>
                 <ng-template #content>
-                  <section class="app-grid"> 
+                  <section class="app-grid">
                   <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                   [gridOptions]="OrderJobDistributionDetailsGridOptions"
                   (gridReady)="onOrderJobDistributionAuditGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                  ></ag-grid-angular>  
-                </section>   
-                </ng-template>              
-              </e-accordionitem>  
+                  ></ag-grid-angular>
+                </section>
+                </ng-template>
+              </e-accordionitem>
               <e-accordionitem>
                 <ng-template #header>
                   <div>Order Classification Audit History</div>
                 </ng-template>
                 <ng-template #content>
-                  <section class="app-grid"> 
+                  <section class="app-grid">
                   <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                   [gridOptions]="OrderClassificationDetailsGridOptions"
                   (gridReady)="onOrderClassificationAuditGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                  ></ag-grid-angular>  
-                </section>   
+                  ></ag-grid-angular>
+                </section>
                 </ng-template>
-              </e-accordionitem>  
+              </e-accordionitem>
             </e-accordionitems>
           </ejs-accordion>
         </ng-container>
       </div>
     </section>
-  </ng-template> 
+  </ng-template>
 </ejs-dialog>
