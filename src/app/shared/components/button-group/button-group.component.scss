@@ -11,14 +11,18 @@
 .e-btn {
   min-width: 80px;
   padding: 11px 15px !important;
-  border: 1px solid $secondary-dark-blue-45 !important;
+  border: 1px solid var(--button-group-border) !important;
   font-size: 14px !important;
   font-weight: 700 !important;
   line-height: 16px !important;
   text-transform: initial !important;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05) !important;
-  background: $white !important;
-  color: $secondary-dark-blue-10 !important;
+  background: var(--button-group-background) !important;
+  color: var(--button-group-color) !important;
+
+  &:not(:last-child) {
+    border-right: none !important;
+  }
 
   &:hover,
   &:focus {
@@ -35,8 +39,6 @@
   }
 
   &.active {
-    border-right: none !important;
-    border-left: none !important;
     background: $primary-active-blue-10 !important;
     color: $white !important;
   }

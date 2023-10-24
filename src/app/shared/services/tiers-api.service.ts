@@ -34,6 +34,6 @@ export class TiersApiService {
   }
 
   public getMasterWorkCommitments(): Observable<MasterCommitmentsPage> {
-    return this.http.post<MasterCommitmentsPage>(`/api/WorkCommitment/GetAll`, { pageNumber: 1, pageSize: 30,tierPage:true });
+    return this.http.post<MasterCommitmentsPage>(`/api/WorkCommitment/GetAll`, { pageNumber: 1, pageSize: 1000,tierPage:true });
   }
 }
