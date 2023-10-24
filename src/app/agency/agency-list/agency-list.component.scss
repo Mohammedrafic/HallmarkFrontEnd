@@ -94,3 +94,23 @@
     }
   }
 }
+.msp-text-box {
+  border: 5px;
+  border-color: #ffffff;
+  border-style: groove;
+  padding: 14px;
+  border-radius: 5px;
+  font-size: 12px;
+  margin-top: 80px;
+  margin-bottom: 80px;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+.msp-note-text {
+  color: #c8180b !important;
+}
+.msp-button-container{
+    display: flex;
+    align-content:center;
+    justify-content: center;
+}

@@ -7,6 +7,11 @@ export class SaveAgency {
   constructor(public payload: Agency) {}
 }
 
+export class ConvertAgencyToMSP {
+  static readonly type = '[agency] Successfully converted Agency To MSP';
+  constructor(public agencyId: number | null, public netSuiteId: number | null, public name: string) { }
+}
+
 export class SaveAgencySucceeded {
   static readonly type = '[agency] Save Agency Succeeded';
   constructor(public payload: Agency) {}
