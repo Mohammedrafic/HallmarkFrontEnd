@@ -35,6 +35,7 @@ import { GroupEmailColumnsDefinition } from './group-email.constant';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 @Component({
   selector: 'app-group-email',
   templateUrl: './group-email.component.html',
@@ -45,6 +46,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   public tools = toolsRichTextEditor;
   targetElement: HTMLElement = document.body;
   public userObj: User | null;
+  public isOrgUser: boolean = false;
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
   @Select()
@@ -253,11 +255,16 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       }
       return;
     }
+    this.isOrgUser = false;
     if (this.groupEmailTemplateForm.emailBody!=''&&this.groupEmailTemplateForm.emailTo!=''&&this.groupEmailTemplateForm.emailSubject!='') {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
       let businessUnitId: number | null = null;
+      const user = this.store.selectSnapshot(UserState.user);
+      if (user?.businessUnitType === BusinessUnitType.Organization) {
+        this.isOrgUser = true;
+      }
       if(formValues.businessUnit == 4)
-        businessUnitId = formValues.businesses[0]
+        businessUnitId =  this.isOrgUser == true ? user?.businessUnitId : formValues.businesses[0]
       if(formValues.businessUnit == 3)
         businessUnitId = formValues.business == 0 ? null : formValues.business
       const sendGroupEmailDto: SendGroupEmailRequest = {

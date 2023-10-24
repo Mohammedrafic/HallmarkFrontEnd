@@ -886,7 +886,6 @@ export class SendGroupEmailComponent
       if(value && value.length >0){
         this.getUsersByRole();
       }
-
     });
   }
 
@@ -906,7 +905,6 @@ export class SendGroupEmailComponent
           }else{
             this.userData = data;
           }
-
       });
     }else if (this.rolesControl.value.length > 0) {
         const user = this.store.selectSnapshot(UserState.user);
@@ -915,7 +913,6 @@ export class SendGroupEmailComponent
         }
         this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           if (data != undefined) {
-          
             let rolesdata=[]
             this.masterUserData = data.items;
             if(this.allowActiveUsers){
@@ -1114,7 +1111,6 @@ export class SendGroupEmailComponent
   }
 
   private getCandidates(): void {
-   
     this.candidateControl.patchValue([]);
     this.userData = [];
     var agencies =
