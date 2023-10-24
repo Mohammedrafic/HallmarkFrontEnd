@@ -1,0 +1,14 @@
+@import "colors";
+.action-cell {
+  .download-icon {
+    color: $secondary-dark-blue-20 !important;
+  }
+
+  .ellipsis-icon {
+    color: $primary-active-blue-10 !important;
+  }
+
+  .e-btn-icon.e-icons.e-icon-right.e-caret {
+    display: none;
+  }
+}

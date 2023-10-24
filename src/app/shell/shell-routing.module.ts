@@ -84,6 +84,10 @@ const shellRoutes: Routes = [
         canActivate: [EmployeeGuard],
         canLoad: [EmployeeGuard],
       },
+      {
+        path: 'msp',
+        loadChildren: () => import('../msp/msp.module').then((m) => m.MspModule),        
+      },
     ],
   },
 ];
