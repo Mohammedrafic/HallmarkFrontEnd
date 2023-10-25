@@ -15,7 +15,6 @@ body.light {
   --bg-filter-chips: #{$secondary-dark-blue-50};
   --pagination-background: #{$white};
   --bg-steper: #{$white};
-  --close-button: #{$primary-active-blue-10};
   --button-group-border: #{$secondary-dark-blue-45};
   --button-group-background: #{$white};
   --button-group-color: #{$secondary-dark-blue-10};
@@ -24,6 +23,7 @@ body.light {
   --color-primary-btn-disabled: #{$white};
   --input-border-color: #{$secondary-dark-blue-40};
   --bg-input-field-disabled: #{$secondary-dark-blue-50};
+  --menu-item-hover: #{$secondary-dark-blue-50};
 
   --border-drop-area: #{$secondary-dark-blue-40};
   --grid-row-border: #{$grid-row-border};
@@ -74,15 +74,15 @@ body.dark {
   --bg-filter-chips: #{$widget-dark-tooltip};
   --pagination-background: #{$sidebar-background};
   --bg-steper: #{$alert-side-bar-bgcolor};
-  --close-button: #{$supportive-red};
   --button-group-border: #{$primary-active-blue-40};
   --button-group-background: #{$sidebar-background};
   --button-group-color: #{$primary-active-blue-10};
 
   --bg-primary-btn-disabled: #{$secondary-dark-blue-10-2};
   --color-primary-btn-disabled: #{$secondary-dark-blue-30};
-  --input-border-color: #{$input-border-color};
+  --input-border-color: #{$secondary-dark-blue-15};
   --bg-input-field-disabled: #{$bg-gray-200};
+  --menu-item-hover: #{$primary-active-blue-70};
 
   --border-drop-area: #{$secondary-dark-blue-50};
   --grid-row-border: #{$sidebar-background};

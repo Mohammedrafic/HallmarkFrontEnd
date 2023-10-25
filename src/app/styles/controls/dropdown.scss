@@ -224,7 +224,8 @@ body.dark {
         }
 
         &.e-disabled {
-          background-color: $secondary-dark-blue-10-2 !important;
+          background-color: $bg-gray-200 !important;
+          color: $secondary-dark-blue-30 !important;
           border-color: $secondary-dark-blue-15 !important;
         }
       }
@@ -262,7 +263,7 @@ body.dark {
     .e-dropdownlist {
       .e-disabled {
         .e-disabled {
-          background-color: $secondary-dark-blue-10-2 !important;
+          background-color: $bg-gray-200 !important;
         }
       }
     }

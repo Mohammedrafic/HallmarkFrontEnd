@@ -199,7 +199,8 @@ body.dark {
 
       &:disabled {
         background: $bg-gray-200 !important;
-        color: $secondary-dark-blue-30;
+        color: $secondary-dark-blue-30 !important;
+        border-color: $secondary-dark-blue-15 !important;
       }
 
       &.ng-touched.ng-invalid:focus {

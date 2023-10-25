@@ -8,6 +8,11 @@
       line-height: 40px;
       height: 40px;
       color: var(--text);
+
+      &:hover:not([disabled]) {
+        background-color: var(--menu-item-hover);
+        color: $black;
+      }
     }
   }
 }
