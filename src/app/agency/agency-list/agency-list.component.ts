@@ -277,7 +277,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     var netSuiteId = this.currentAgency.netSuiteId ?? null;
     var name = this.currentAgency.agencyDetails.name;
     this.store.dispatch(new ConvertAgencyToMSP(agencyId, netSuiteId, name));
-    this.ngOnInit();
+    this.updatePage();
     this.store.dispatch(new ShowSideDialog(false));
   }
 
