@@ -233,6 +233,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         calculateTowardsWeeklyHours: !!reason.calculateTowardsWeeklyHours,
         eligibleToBeScheduled: !!reason.eligibleToBeScheduled,
         visibleForIRPCandidates: !!reason.visibleForIRPCandidates,
+        sendThroughIntegration : !!reason.sendThroughIntegration
       });
     } else if (this.selectedTab === ReasonsNavigationTabs.CancelEmployeeReasons) {
       const reason  = data as CancelEmployeeReasonValue;
