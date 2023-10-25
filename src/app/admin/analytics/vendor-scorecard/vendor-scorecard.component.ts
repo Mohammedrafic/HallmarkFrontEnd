@@ -70,6 +70,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     "OrderTypeVSR": "",
     "SkillVSR": "",
     "ExcludeInActiveAgency":"",
+    "ActiveAgencyVSR":0,
   };
 
 
@@ -446,7 +447,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       }
     }
     let { departmentIds, locationIds,
-      regionIds, startDate, endDate, agencyIds, orderTypes, skillIds ,activeAgency} = this.VendorReportForm.getRawValue();
+      regionIds, startDate, endDate, agencyIds, orderTypes, skillIds ,excludeInactiveAgency} = this.VendorReportForm.getRawValue();
 
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
@@ -473,7 +474,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       "EndDateVSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "OrderTypeVSR": orderTypes == null || orderTypes == "" ? "null" : orderTypes,
       "SkillVSR": skillIds.length == 0 ? "null" : skillIds.join(","),
-      "ExcludeInActiveAgencyVSR":activeAgency==true?true:false
+      "ActiveAgencyVSR":excludeInactiveAgency==true?1:0
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -615,8 +616,9 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
   public filtergraphdata(): void {
     let StartDate = (this.VendorReportForm.controls['startDate'].value) != null ? this.datepipe.transform(this.VendorReportForm.controls['startDate'].value, 'MM/dd/yyyy') : "";
     let EndDate = this.datepipe.transform(this.VendorReportForm.controls['endDate'].value, 'MM/dd/yyyy');
-    let { departmentIds, locationIds,
-      regionIds, startDate, endDate, agencyIds, orderTypes, skillIds } = this.VendorReportForm.getRawValue();
+    let { departmentIds, locationIds,regionIds, startDate, endDate, agencyIds, orderTypes, skillIds 
+      ,excludeInactiveAgency
+    } = this.VendorReportForm.getRawValue();
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
@@ -633,6 +635,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       Agencies: agencyIds.length == 0 ? "null" : agencyIds.join(","),
       StartDate: StartDate != null ? StartDate : "",
       EndDate: EndDate != null ? EndDate : "",
+      ActiveAgency:excludeInactiveAgency==1?1:0,
     }
     this.store.dispatch(new Filtervendorscorecard(vendorscorecard)).pipe(delay(500)).subscribe((data) => {
       if (!data) {
