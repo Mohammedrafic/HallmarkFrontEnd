@@ -335,6 +335,16 @@
         }
       }
 
+      .ag-row-selected {
+        .color-primary-active-blue-10 {
+          color: $white !important;
+
+          .ag-icon {
+            color: $white !important;
+          }
+        }
+      }
+
       .ag-row-hover {
         .ag-cell-value {
           color: $black !important;
