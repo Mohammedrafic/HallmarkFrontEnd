@@ -99,6 +99,7 @@ export class ReasonsService {
         calculateTowardsWeeklyHours: !!value.calculateTowardsWeeklyHours,
         eligibleToBeScheduled: !!value.eligibleToBeScheduled,
         visibleForIRPCandidates: !!value.visibleForIRPCandidates,
+        sendThroughIntegration : !!value.sendThroughIntegration
       }));
     } else if (params.selectedTab === ReasonsNavigationTabs.CancelEmployeeReasons) {
       const value = params.formValue as CancelEmployeeReasonValue;

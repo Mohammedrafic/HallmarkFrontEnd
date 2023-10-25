@@ -16,6 +16,7 @@ export interface UnavailabilityValue {
   calculateTowardsWeeklyHours: boolean;
   eligibleToBeScheduled: boolean;
   visibleForIRPCandidates: boolean;
+  sendThroughIntegration:boolean;
 }
 
 export interface CancelEmployeeReasonValue {

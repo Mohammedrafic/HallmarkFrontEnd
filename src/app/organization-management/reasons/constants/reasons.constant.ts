@@ -60,6 +60,14 @@ export const UnavaliabilityGridConfig: ColDef[] = [
     cellRenderer: ToggleIconRendererComponent,
     ...commonCell,
   },
+  {
+    field: 'sendThroughIntegration',
+    headerName: 'Send Through Integration',
+    width: 280,
+    type: 'leftAligned',
+    cellRenderer: ToggleIconRendererComponent,
+    ...commonCell,
+  },
 ];
 
 export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
@@ -139,6 +147,12 @@ export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
   {
     field: 'visibleForIRPCandidates',
     title: 'Visible For IRP Employee',
+    required: false,
+    fieldType: FieldType.Toggle,
+  },
+  {
+    field: 'sendThroughIntegration',
+    title: 'Send Through Integration',
     required: false,
     fieldType: FieldType.Toggle,
   },
