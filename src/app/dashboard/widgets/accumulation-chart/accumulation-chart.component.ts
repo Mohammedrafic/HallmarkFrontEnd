@@ -160,6 +160,36 @@ export class AccumulationChartComponent
         }
         
     }
+    if (this.chartData?.title == " Average Days of Active Positions with Custom Workflow") {
+      if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+        this.dashboardService.redirectToUrl('agency/candidate-details');
+      } else {
+        window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
+        if(OrderStatus[OrderStatus.Open] ===  status){
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
+        }
+        else if(status === PositionTrendTypeEnum.IN_PROGRESS){
+          candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
+          candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
+          candidatesStatusDataSet.push({"value":CandidatStatus.CustomStatus});
+        }
+        else if(status === 'In Progress (Pending)'){
+          candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
+        }
+        else if(status === 'In Progress (Accepted)'){
+          candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
+        }
+        else if(OrderStatus[OrderStatus.Filled] === status){
+          candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
+          activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
+          window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(activeOrderStatus));
+        }
+      }
+      if(status !=  OrderStatus[OrderStatus.Open]){
+        window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+        this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
+      }
+    }
 
   }
 
