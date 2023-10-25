@@ -66,6 +66,7 @@ import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { sum } from 'lodash';
+import { WidgetLegengDataModel } from '../models/widget-legend-data.model';
 
 @Injectable()
 export class DashboardService {
@@ -104,7 +105,7 @@ export class DashboardService {
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
-
+  avgForActivePositionsCustom$:BehaviorSubject<OrderStatusesAvgDetailsInfo[]> = new BehaviorSubject<OrderStatusesAvgDetailsInfo[]>([]);
   candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesavgForActivePositions$:BehaviorSubject<AveragedayActivecandidateInfo[]> = new BehaviorSubject<AveragedayActivecandidateInfo[]>([]);
@@ -226,6 +227,7 @@ export class DashboardService {
     private getAvergaeDayCUSTOMActivePositionsWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
       return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter, type : 'Custom' }).pipe(
         map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
+        this.avgForActivePositionsCustom$.next(orderStatusesAvgDetails)
           return {
             id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM,
              title: ' Average Days of Active Positions with Custom Workflow',
@@ -235,6 +237,7 @@ export class DashboardService {
                 label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +customStatusName +')',
                 value: average,
                 average: count,
+                customStatus: customStatusName,
                 color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses] ||
                         activePositionsLegendPalette[ActivePositionsChartStatuses.CUSTOM]
               })
@@ -633,6 +636,10 @@ export class DashboardService {
         };
       }))
     }
+
+  public getavgForActivePositionsCustom(): Observable<OrderStatusesAvgDetailsInfo[]>{
+    return this.avgForActivePositionsCustom$.asObservable();
+  }
 
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
     return this.candidatesForActivePositions$.asObservable();

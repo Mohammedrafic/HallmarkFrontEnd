@@ -12,7 +12,7 @@
   <div *ngFor="let legend of legendData; trackBy: trackByHandler">
     <div class="widget-legend__item-content">
       <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
-      <div class="widget-legend__row-container"  [ngClass]="slideBar ? 'container-mar' : ''" (click)="onClickLegendRow($event,legend.label)" (mousedown)="defineMousePosition($event)">
+      <div class="widget-legend__row-container"  [ngClass]="slideBar ? 'container-mar' : ''" (click)="onClickLegendRow($event,legend)" (mousedown)="defineMousePosition($event)">
         <div class="widget-legend__row">
           <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"  [ngClass]="slideBar ? 'trend-marright' : averageFlag ? 'pointSize' : ''"></div>
           <div [ngClass]="['widget-legend__legend-text', legendPosition]" title="{{legend.label}}">{{ legend.label }}</div>
@@ -33,7 +33,7 @@
     <div class="widget-legend__item-content" *ngIf="isPositionTrend && !isBillRateTrend">
       <div id="widget_left" class="widget_left">
         <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
-        <div class="widget-legend__row-container" [ngClass]="slideBar ? 'container-mar' : ''"  (click)="onClickLegendRow($event,legend.label)" (mousedown)="defineMousePosition($event)">
+        <div class="widget-legend__row-container" [ngClass]="slideBar ? 'container-mar' : ''"  (click)="onClickLegendRow($event,legend)" (mousedown)="defineMousePosition($event)">
           <div class="widget-legend__row">
             <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__pointPositionTrend" [ngClass]="slideBar ? 'trend-marright' : ''"></div>
             <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
@@ -52,7 +52,7 @@
     <div class="widget-legend__item-content" *ngIf="isBillRateTrend">
       <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
       <div class="widget-legend__row-container" [ngClass]="slideBar ? 'container-mar' : ''"
-        (click)="onClickLegendRow($event,legend.label)" (mousedown)="defineMousePosition($event)">
+        (click)="onClickLegendRow($event,legend)" (mousedown)="defineMousePosition($event)">
         <div class="widget-legend__row">
           <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"
             [ngClass]="slideBar ? 'trend-marright' : averageFlag ? 'pointSize' : ''"></div>
