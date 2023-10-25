@@ -27,6 +27,7 @@ export class CredentialListService {
       credentialIds: [[]],
       credentialTypeIds: [[]],
       expireDateApplicable: [false],
+      isPublic: [false],
     });
 
     if(isIncludeIrp) {
@@ -52,6 +53,7 @@ export class CredentialListService {
       comment: ['', Validators.maxLength(4000)],
       updateMappingCredentials: [false],
       updateOrderCredentials: [false],
+      isPublic: this.formBuilder.control(!isCredentialSettings, {initialValueIsDefault: !isCredentialSettings}),
     });
 
     if(isIncludeIrp && isCredentialSettings) {
