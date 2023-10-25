@@ -253,6 +253,7 @@ export class SendGroupEmailComponent
   faDownload = faDownload as IconProp;
   public isCurrentBusinessHasIRPEnabled: boolean | undefined = false;
   public isCurrentBusinessHasVMSEnabled: boolean | undefined = false;
+  public allCandidate: boolean = false;
 
   constructor(private actions$: Actions,
               private store: Store,
@@ -1064,6 +1065,8 @@ export class SendGroupEmailComponent
     this.skillsControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       this.userData = [];
       this.candidateControl.patchValue([]);
+      this.allCandidate = false;
+      this.candidateControl.enable();
       if (value != undefined && value.length > 0)
         this.isEmployeeType ? (this.getEmployees(), this.getWorkCommitments()) : this.getCandidates();
     });
@@ -1081,6 +1084,20 @@ export class SendGroupEmailComponent
       if (value != undefined && value.length > 0)
         this.getCandidates();
     });
+  }
+
+  public allCandidateChange(event: { checked: boolean }): void {
+    this.allCandidate = event.checked;
+    if (this.allCandidate) {
+      this.candidateControl.setValue(null);
+      this.candidateControl.disable();
+      this.emailTo = this.userData
+      ?.map((item) => item.email)
+      ?.join(', ');
+    } else {
+      this.candidateControl.enable();
+      this.groupEmailTemplateForm.controls['emailTo'].setValue('');
+    }
   }
 
   private clearFields(): void {
@@ -1105,6 +1122,8 @@ export class SendGroupEmailComponent
 
   private onAgenciesValueChanged(): void {
     this.agenciesControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.allCandidate = false;
+      this.candidateControl.enable();
       if (value != undefined && value.length > 0)
         this.getCandidates();
     });
