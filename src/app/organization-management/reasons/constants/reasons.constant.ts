@@ -199,6 +199,21 @@ export const TerminatedDialogConfig: ReasonFormConfig[]  = [
     required: true,
     fieldType: FieldType.Input,
   },
+  {
+    field: 'defaultValue',
+    title: 'Default',
+    required: false,
+    fieldType: FieldType.Toggle,
+  },
+];
+
+export const SourcingDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: 'reason',
+    title: 'Reason',
+    required: true,
+    fieldType: FieldType.Input,
+  }
 ];
 
 export const ManualInvoiceDialogConfig: ReasonFormConfig[]  = [
@@ -297,7 +312,7 @@ export const ReasonDialogConfig: ReasonFormConfigMap = {
   [ReasonFormType.ManualInvoiceReason] : ManualInvoiceDialogConfig,
   [ReasonFormType.TerminatedReason] : TerminatedDialogConfig,
   [ReasonFormType.InternalTransferReason] : InternalDialogConfig,
-  [ReasonFormType.SourcingReason] : TerminatedDialogConfig,
-  [ReasonFormType.RecruiterReason] : TerminatedDialogConfig,
+  [ReasonFormType.SourcingReason] : SourcingDialogConfig,
+  [ReasonFormType.RecruiterReason] : SourcingDialogConfig,
   [ReasonFormType.CancelEmployeeReasons]: CancelEmployeeReasonDialogConfig
 };

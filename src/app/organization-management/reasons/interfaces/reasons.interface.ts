@@ -32,6 +32,12 @@ export interface CategoryNoteValue {
   isRedFlag?: boolean;
 }
 
+export interface TerminatedValue {
+  id?: number | null;
+  reason: string;
+  defaultValue?: boolean;
+}
+
 
 export interface Closurevalue {
   id?: number | null;
