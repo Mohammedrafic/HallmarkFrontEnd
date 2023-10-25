@@ -348,7 +348,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       );
       if (data && !isUndefined(index)) {
         this.gridWithChildRow.selectRow(index);
-        //this.onRowClick({ data });
       }
     }
     this.contentLoadedHandler();
