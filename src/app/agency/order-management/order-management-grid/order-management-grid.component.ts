@@ -47,6 +47,7 @@ import {
 } from './order-management-grid.constants';
 import {
   ClearOrders,
+  ClearSelectedOrder,
   ExportAgencyOrders,
   GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
@@ -242,7 +243,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnDestroy(): void {
-    this.store.dispatch(new ResetPageFilters());
+    this.store.dispatch([
+      new ResetPageFilters(),
+      new ClearSelectedOrder(),
+      new ClearOrders(),
+    ]);
     this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
     this.isAlive = false;
     this.unsubscribe$.next();
@@ -343,11 +348,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       );
       if (data && !isUndefined(index)) {
         this.gridWithChildRow.selectRow(index);
-        this.onRowClick({ data });
+        //this.onRowClick({ data });
       }
-    }
-    if (this.selectedIndex) {
-      this.gridWithChildRow.selectRow(this.selectedIndex);
     }
     this.contentLoadedHandler();
 
@@ -645,6 +647,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onRowClick(event: RowSelectEventArgs): void {
+    if ((event.rowIndex !== undefined) && event.rowIndex === event.previousRowIndex) {
+      return;
+    }
+
     if (event.target) {
       this.orderManagementAgencyService.excludeDeployed = false;
       this.orderManagementAgencyService.setIsAvailable(false);
@@ -1035,17 +1041,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         takeWhile(() => this.isAlive)
       )
       .subscribe(() => {
-        this.store
-          .dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters)).pipe(
-          takeWhile(() => this.isAlive)
-        ).subscribe((data) => {
-            const order = data.agencyOrders.ordersPage.items.find(
-              (item: AgencyOrderManagement) => item.orderId === this.selectedOrder.orderId
-            );
-            if (order) {
-              this.onRowClick({ data: order, rowIndex: this.selectedIndex ?? undefined });
-            }
-          });
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        this.getCandidatesList(this.selectedOrder);
       });
   }
 

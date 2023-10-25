@@ -149,12 +149,12 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   private subsToSelectedOrder(): void {
     this.selectedOrder$
-    .pipe(takeUntil(this.unsubscribe$))
-    .subscribe((order) => {
-      this.currentOrder = order;
-      this.currentOrder && this.getOrderComments();
-      this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;
-    });
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((order) => {
+        this.currentOrder = order;
+        this.currentOrder && this.getOrderComments();
+        this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;
+      });
   }
 
   private subscribeOnOrderCandidatePage(): void {
