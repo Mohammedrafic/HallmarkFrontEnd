@@ -526,7 +526,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         if(candidate?.organizationId){
           this.orgId = candidate.organizationId
         } else {
-          this.orgId = this.currentOrder.organizationId
+          this.orgId = this.currentOrder?.organizationId
         }
         const candidateJobId = candidate?.candidateJobId;
         const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;

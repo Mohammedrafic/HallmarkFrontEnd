@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import {
@@ -19,7 +19,8 @@ enum Active {
   templateUrl: './general-order-info.component.html',
   styleUrls: ['./general-order-info.component.scss'],
 })
-export class GeneralOrderInfoComponent {
+export class GeneralOrderInfoComponent implements OnInit {
+  activeSystems: OrderManagementIRPSystemId | null;
   @Input() set order(order: Order) {
     this.orderInformation = order;
 
@@ -28,7 +29,7 @@ export class GeneralOrderInfoComponent {
     }
   }
 
-  @Input() system: {};
+  @Input() system: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
 
   public orderType: typeof OrderType = OrderType;
   public readonly systemType = OrderManagementIRPSystemId;
@@ -47,6 +48,10 @@ export class GeneralOrderInfoComponent {
     private orderManagementService: OrderManagementService,
     private orderManagementAgencyService: OrderManagementAgencyService
   ) {}
+
+  ngOnInit(){
+    this.activeSystems = this.orderManagementService.getOrderManagementSystem();
+  }
 
   public activeValue(value: boolean): string {
     return Active[Number(value)];

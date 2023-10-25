@@ -710,7 +710,7 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   this.dispatchAgencyOrderCandidatesList(orderData.orderId, orderData.organizationId, true);
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
-  this.openDetails.next(false);
+  this.openDetails.next(true);
   this.selectedRowRef = Data;
 }
 
