@@ -56,9 +56,9 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   public ngOnInit(): void {
     this.filteredItems$.pipe(takeUntil(this.destroy$)).subscribe((filters) => this.toPutInOrderFilters(filters));
     const user = this.store.selectSnapshot(UserState.user);
-    if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-      this.hasWidgetPermission = false;
-    }
+    // if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+    //   this.hasWidgetPermission = false;
+    // }
   }
 
 

@@ -34,6 +34,7 @@ export class ReasonsFormsService {
         calculateTowardsWeeklyHours: [false],
         eligibleToBeScheduled: [false],
         visibleForIRPCandidates: [false],
+        sendThroughIntegration:[false]
       });
     } else if (formType === ReasonFormType.CancelEmployeeReasons) {
       this.form = this.fb.group({

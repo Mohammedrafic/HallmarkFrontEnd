@@ -181,7 +181,16 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
 
   public expireDateApplicableChange(data: Credential, event: any): void {
     data.expireDateApplicable = event.checked;
-    this.store.dispatch(new SaveCredential({
+    this.store.dispatch(this.createSaveCredentialModel(data));
+  }
+
+  public isPublicChange(data: Credential, event: any): void {
+    data.isPublic = event.checked;
+    this.store.dispatch(this.createSaveCredentialModel(data));
+  }
+
+  private createSaveCredentialModel(data: Credential): SaveCredential {
+    return new SaveCredential({
       id: data.id,
       name: data.name,
       credentialTypeId: data.credentialTypeId,
@@ -189,7 +198,8 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
       comment: data.comment,
       includeInVMS: data.includeInVMS,
       includeInIRP: data.includeInIRP,
-    }));
+      isPublic: data.isPublic,
+    });
   }
 
   public editCredential(credential: Credential, event: MouseEvent): void {
