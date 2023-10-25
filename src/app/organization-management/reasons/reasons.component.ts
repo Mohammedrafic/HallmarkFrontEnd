@@ -287,6 +287,13 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         agencyFeeApplicable: !!reason.agencyFeeApplicable,
         agencyFeeApplicableSwitch: reason.agencyFeeApplicable === false ? false : true,
       });
+    } else if((this.selectedTab === ReasonsNavigationTabs.Termination)) {
+      const reason  = data as RejectReason;
+      this.reasonForm.patchValue({
+        id: (data as RejectReason).id,
+        reason: reason.reason,
+        defaultValue : reason.defaultValue
+        });
     } else {
       this.reasonForm.patchValue({
         id: (data as RejectReason).id,

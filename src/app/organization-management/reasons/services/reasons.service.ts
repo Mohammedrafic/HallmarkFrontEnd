@@ -11,11 +11,13 @@ import {
   SaveClosureReasons,
   SaveOrderRequisition,
   SavePenalty,
+  SaveTerminationReasons,
   SaveUnavailabilityReason,
   UpdateCategoryNoteReasons,
   UpdateManualInvoiceRejectReason,
   UpdateRecuriterReasons,
-  UpdateSourcingReasons
+  UpdateSourcingReasons,
+  UpdateTerminationReasons
 } from '@organization-management/store/reject-reason.actions';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
@@ -29,7 +31,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { NewReasonsActionsMap, UpdateReasonsActionsMap } from '../constants';
 import { ReasonsNavigationTabs } from '../enums';
-import { CancelEmployeeReasonValue, CategoryNoteValue, Closurevalue, SaveReasonParams, UnavailabilityValue } from '../interfaces';
+import { CancelEmployeeReasonValue, CategoryNoteValue, Closurevalue, SaveReasonParams, TerminatedValue, UnavailabilityValue } from '../interfaces';
 
 @Injectable()
 export class ReasonsService {
@@ -239,7 +241,21 @@ export class ReasonsService {
           agencyFeeApplicable: !!valueRR.agencyFeeApplicable,
         }));
       }
-    } else {
+    } else if (params.selectedTab === ReasonsNavigationTabs.Termination) {
+      const value = params.formValue as TerminatedValue;
+      if (value.id != undefined || null) {
+        this.store.dispatch(new UpdateTerminationReasons({
+          id: value.id || undefined,
+          reason: value.reason,
+          defaultValue : !!value.defaultValue
+        }));
+      } else {
+        this.store.dispatch(new SaveTerminationReasons({
+          reason: value.reason,
+          defaultValue : !!value.defaultValue
+        }));
+      }
+     } else {
       const Action = params.editMode ? UpdateReasonsActionsMap[params.selectedTab]
         : NewReasonsActionsMap[params.selectedTab];
       const payload = params.editMode ? this.createUpdateReasonPayload(params) : this.createNewReasonPayload(params);

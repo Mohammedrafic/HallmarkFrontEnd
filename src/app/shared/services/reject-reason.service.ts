@@ -294,7 +294,7 @@ export class RejectReasonService {
     return this.http.post<any>(`/api/Employee/getSourcing`,payload);
   }
 
-  public saveTerminationReason(payload: {reason: string}): Observable<RejectReason> {
+  public saveTerminationReason(payload : RejectReason): Observable<RejectReason> {
     return this.http.post<RejectReason>('/api/TerminatedReason', payload);
   }
 
