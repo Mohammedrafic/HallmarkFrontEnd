@@ -346,7 +346,7 @@ export class TimesheetsState {
     .pipe(
       switchMap(() => {
         const state = ctx.getState();
-        const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
+        const { id } = state.timesheetDetails as TimesheetDetailsModel;
 
         if (updateAfterLoad) {
           ctx.dispatch(new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency));
@@ -354,15 +354,12 @@ export class TimesheetsState {
         /**
          * TODO: make all messages for toast in one constant.
          */
-        ctx.dispatch([
+        return ctx.dispatch([
           new ShowToast(MessageTypes.Success, PutSuccess.successMessage),
           new TimesheetDetails.ForceUpdateRecord(false),
           new Timesheets.GetAll(),
           new Timesheets.GetTabsCounts(),
         ]);
-
-
-        return ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
       catchError((err: HttpErrorResponse) => {
         if (err.error.status === 403 && err.error && err.error['detail']) {
@@ -841,7 +838,7 @@ export class TimesheetsState {
       .pipe(
         tap(() => {
           const state = ctx.getState();
-          const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
+          const { id } = state.timesheetDetails as TimesheetDetailsModel;
 
           if (body.type === 2 && !timesheetDetails.mileageTimesheetId) {
             ctx.dispatch(new Timesheets.GetAll());
@@ -851,7 +848,6 @@ export class TimesheetsState {
             new TimesheetDetails.AddTimesheetRecordSucceed(),
             new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
             new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency),
-            new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency),
             new TimesheetDetails.ForceAddRecord(false),
           ]);
         }),

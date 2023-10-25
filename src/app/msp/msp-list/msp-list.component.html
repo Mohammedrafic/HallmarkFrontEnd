@@ -1,0 +1,39 @@
+
+<app-page-toolbar>
+    <ng-container left>
+      <h3 class="page-title">MSP List</h3>
+    </ng-container>
+    <ng-container right>    
+     
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanCreateDeleteAgency]">
+        <button ejs-button appHideBeforeSyncfusionLoad [disabled]="!userPermission[userPermissions.CanCreateDeleteAgency]" [isPrimary]="true">Add MSP</button>
+      </app-tooltip-container>
+    </ng-container>
+  </app-page-toolbar>
+  
+  <section class="document-grid msp-list table-wrapper" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'" style=" height:100%;">    
+    <div class="custom-grid">
+      <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
+                       [gridOptions]="gridOptions"
+                       (gridReady)="onGridReady($event)"  [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
+                       [headerHeight]="52"></ag-grid-angular>
+      <div class="grid-pagination">
+        <ejs-dropdownlist id="rowsPerPage"
+                          class="dropdown-no-border"
+                          [allowFiltering]="true"
+                          [dataSource]="rowsPerPageDropDown"
+                          [(value)]="activeRowsPerPageDropDown"
+                          (change)="onPageSizeChanged($event)">
+        </ejs-dropdownlist>
+        <div class="total-rows">
+          Total Rows: {{totalRecordsCount}}
+        </div>
+      </div>
+    </div>  
+  </section>  
+
+ 
+ 
+  

@@ -48,6 +48,15 @@ export class AgencyService {
   }
 
   /**
+   * Convert agency to msp
+   * @param agency object to save
+   * @return Created/Updated agency
+   */
+  public convertAgencyToMSP(agencyId: number | null, netSuiteId: number | null, name: string): Observable<boolean> {
+    return this.http.post<boolean>(`/api/MSP/convertagencytomsp`, { agencyId, netSuiteId, name });
+  }
+
+  /**
    * Get the list of available business units
    * @return Array of units
    */

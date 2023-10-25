@@ -76,7 +76,7 @@ export class EditIrpCandidateService {
     if ((status === CandidatStatus.OnBoard || status === CandidatStatus.Accepted)&&
       details?.offeredStartDate &&
       details?.offeredEndDate) {
-      DisableControls(OfferedDates, form);
+      DisableControls(OfferedDates, form, false);
     }
   }
 

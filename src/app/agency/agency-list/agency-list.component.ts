@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil, take } from 'rxjs';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import {
   ExportAgencyList,
@@ -11,18 +13,19 @@ import {
   GetAgencyFilteringOptions,
   SaveAgency,
   SaveAgencySucceeded,
+  ConvertAgencyToMSP
 } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AgencyStatus, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { Agency, AgencyFilteringOptions, AgencyListFilters, AgencyPage } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { agencyListFilterColumns, agencyStatusMapper } from '@agency/agency-list/agency-list.constants';
+import { agencyListFilterColumns, agencyStatusMapper, MSPMenuOptions, MSPMenuType } from '@agency/agency-list/agency-list.constants';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
 
@@ -33,6 +36,14 @@ import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
 })
 export class AgencyListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
+  @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
+    convertAgencyToMSPFormGroup: FormGroup;
+
+  onScroll() {
+    if (this.trigger) {
+      this.trigger.closeMenu();
+    }
+  }
 
   public readonly statusEnum = AgencyStatus;
   public readonly statusMapper = agencyStatusMapper;
@@ -72,6 +83,8 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public filterColumns = agencyListFilterColumns;
   public agencyListFilterFormGroup: FormGroup;
   public filteredItems$ = new Subject<number>();
+  public menuOption: Record<string, ItemModel[]>;
+  public currentAgency: Agency;
 
   private filters: AgencyListFilters = {};
   private pageSubject = new Subject<number>();
@@ -99,6 +112,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   override ngOnInit(): void {
     super.ngOnInit();
     this.initAgencyListFilterFormGroup();
+    this.initMenuItems();
     this.updatePage();
     this.subscribeOnPageChanges();
     this.subscribeOnAgencyFilteringOptions();
@@ -233,6 +247,48 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
 
   public override updatePage(): void {
     this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+  }
+
+  public menuOptionSelected(id: MSPMenuType, data: Agency): void {
+    switch (Number(id)) {
+      case MSPMenuType['Edit']:
+        this.onEdit(data);
+        break;
+      case MSPMenuType['Convert to MSP']:
+        this.store.dispatch(new ShowSideDialog(true));
+        this.currentAgency = data;
+        break;
+      case MSPMenuType['Unlink from MSP']:
+        /**/
+        break;
+      case MSPMenuType['History']:
+        /**/
+        break;
+    }
+  }
+
+  public onConvertAgencyToMSPFormCancelClick(): void {
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  public onConvertAgencyToMSPFormSaveClick(): void {
+    var agencyId = this.currentAgency.agencyDetails.id ?? null;
+    var netSuiteId = this.currentAgency.netSuiteId ?? null;
+    var name = this.currentAgency.agencyDetails.name;
+    this.store.dispatch(new ConvertAgencyToMSP(agencyId, netSuiteId, name));
+    this.updatePage();
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  private initMenuItems(): void {
+    this.agencies$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (data?.items) {
+        data.items.forEach((item) => {
+          this.menuOption = MSPMenuOptions(item.isMsp ? item.isMsp : false);
+          item.menuItems = this.menuOption['mSPMenuOption'];
+        });
+      }
+    });
   }
 
   private getDefaultFileName(): string {

@@ -124,8 +124,12 @@ export const GetConfigField = (config: ReadonlyArray<CandidateField>, field: str
   return config.find((item: CandidateField) => item.field === field) as CandidateField;
 };
 
-export const DisableControls = (controlList: string[], form: FormGroup): void => {
+export const DisableControls = (controlList: string[], form: FormGroup, enableStatusControl: boolean): void => {
   controlList.forEach((control: string) => {
+    if (enableStatusControl && control === 'status') {
+      return;
+    }
+
     form.get(control)?.disable({ emitEvent: false, onlySelf: true });
   });
 };

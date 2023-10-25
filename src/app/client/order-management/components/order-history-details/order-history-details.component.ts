@@ -312,7 +312,7 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
       case 0:
         if (e.isExpanded && this.orderDetail?.id > 0) {
           if (!this.viewedTab.some(a => a == e.index)) {
-            this.store.dispatch(new GetOrderAuditHistory({ entityType: "order", searchValue: this.orderDetail.id.toString() }));
+            this.store.dispatch(new GetOrderAuditHistory({ entityType: "Einstein.CoreApplication.Domain.Entities.Order.Order", searchValue: this.orderDetail.id.toString() }));
             this.actions$.pipe(ofActionDispatched(GetOrderHistoryDetailSucceeded), take(1))
               .subscribe(() => {
                 this.viewedTab.push(expandData?.index!);
@@ -332,7 +332,7 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
       case 1:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
-            this.store.dispatch(new GetOrderCredentialAuditHistory({ entityType: "OrderCredential", searchValue: this.orderDetail.id.toString() }));
+            this.store.dispatch(new GetOrderCredentialAuditHistory({ entityType: "Einstein.CoreApplication.Domain.Entities.Order.OrderCredential", searchValue: this.orderDetail.id.toString() }));
             this.actions$.pipe(ofActionDispatched(GetOrderCredentialDetailSucceeded), take(1))
               .subscribe(() => {
                 this.viewedTab.push(expandData?.index!);
@@ -355,7 +355,7 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
       case 2:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
-            this.store.dispatch(new GetOrderBillRatesAuditHistory({ entityType: "BillRate", searchValue: this.orderDetail.id.toString() }));
+            this.store.dispatch(new GetOrderBillRatesAuditHistory({ entityType: "Einstein.CoreApplication.Domain.Entities.BillRates.BillRate", searchValue: this.orderDetail.id.toString() }));
             this.actions$.pipe(ofActionDispatched(GetOrderBillRateDetailSucceeded), take(1))
               .subscribe(() => {
                 this.viewedTab.push(expandData?.index!);
@@ -378,7 +378,7 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
       case 3:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
-            this.store.dispatch(new GetOrderContactAuditHistory({ entityType: "OrderContactDetails", searchValue: this.orderDetail.id.toString() }));
+            this.store.dispatch(new GetOrderContactAuditHistory({ entityType: "Einstein.CoreApplication.Domain.Entities.Order.OrderContactDetails", searchValue: this.orderDetail.id.toString() }));
             this.actions$.pipe(ofActionDispatched(GetOrderContactDetailSucceeded), take(1))
               .subscribe(() => {
                 this.viewedTab.push(expandData?.index!);
@@ -401,7 +401,7 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
       case 4:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
-            this.store.dispatch(new GetOrderWorkLocationAuditHistory({ entityType: "OrderWorkLocation", searchValue: this.orderDetail.id.toString() }));
+            this.store.dispatch(new GetOrderWorkLocationAuditHistory({ entityType: "Einstein.CoreApplication.Domain.Entities.Order.OrderWorkLocation", searchValue: this.orderDetail.id.toString() }));
             this.actions$.pipe(ofActionDispatched(GetOrderWorkLocationDetailSucceeded), take(1))
               .subscribe(() => {
                 this.viewedTab.push(expandData?.index!);
@@ -424,7 +424,7 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
       case 5:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
-            this.store.dispatch(new GetOrderJobDistributionAuditHistory({ entityType: "OrderJobDistribution", searchValue: this.orderDetail.id.toString() }));
+            this.store.dispatch(new GetOrderJobDistributionAuditHistory({ entityType: "Einstein.CoreApplication.Domain.Entities.Order.OrderJobDistribution", searchValue: this.orderDetail.id.toString() }));
             this.actions$.pipe(ofActionDispatched(GetOrderJobDistributionDetailSucceeded), take(1))
               .subscribe(() => {
                 this.viewedTab.push(expandData?.index!);
@@ -446,7 +446,7 @@ export class OrderHistoryDetailsComponent extends AbstractPermissionGrid impleme
       case 6:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
-            this.store.dispatch(new GetOrderClassificationAuditHistory({ entityType: "OrderClassification", searchValue: this.orderDetail.id.toString() }));
+            this.store.dispatch(new GetOrderClassificationAuditHistory({ entityType: "Einstein.CoreApplication.Domain.Entities.Order.OrderClassification", searchValue: this.orderDetail.id.toString() }));
             this.actions$.pipe(ofActionDispatched(GetOrderClassificationDetailSucceeded), take(1))
               .subscribe(() => {
                 this.viewedTab.push(expandData?.index!);

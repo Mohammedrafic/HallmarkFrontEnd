@@ -423,6 +423,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         takeUntil(this.unsubscribe$)
       ).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
+        this.closeDialog();
       });
       this.updateDetails.emit();
   }

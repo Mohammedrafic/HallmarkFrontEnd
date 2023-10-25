@@ -3,6 +3,21 @@
 
 form {
   margin-top: 20px;
+
+  .input-group {
+    .e-disabled {
+      background-color: var(--bg-input-field-disabled) !important;
+    }
+
+    span.e-disabled {
+      border: 1px solid var(--input-border-color) !important;
+    }
+
+    input.e-disabled {
+      background-color: var(--bg-input-field-disabled) !important;
+      height: 38px !important;
+    }
+  }
 }
 
 .ot-label {

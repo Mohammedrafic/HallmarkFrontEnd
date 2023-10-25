@@ -194,6 +194,7 @@ export const irpAllOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
   { text: 'System', column: 'System' },
+  {text:'Position Status',column:'PositionStatus'} 
 ];
 
 export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
@@ -217,6 +218,7 @@ export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
   { text: 'System', column: 'System' },
+  {text:'Position Status',column:'PositionStatus'} 
 ];
 
 export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
@@ -241,6 +243,7 @@ export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
   { text: 'System', column: 'System' },
+  {text:'Position Status',column:'PositionStatus'} 
 ];
 
 export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
@@ -265,6 +268,7 @@ export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Creation date', column: 'CreationDate' },
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
+  {text:'Position Status',column:'PositionStatus'} 
 ];
 
 export const orderJourneyColumnsToExport: ExportColumn[] = [

@@ -3,6 +3,7 @@ import { AgencyStatus, AgencyStatuses } from "@shared/enums/status";
 import { FilterColumnsModel } from "@shared/models/filter.model";
 import { valuesOnly } from "@shared/utils/enum.utils";
 import { AgencyStatusesModel } from "@shared/models/agency.model";
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 const addAgencyStatuses = ['InProgress', 'Active'];
 const agencyStatusList = [
@@ -53,4 +54,22 @@ export const agencyListFilterColumns: FilterColumnsModel = {
   cities: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
   contacts: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
 };
+
+export const MSPMenuOptions = (
+  isMSP: boolean
+): Record<string, ItemModel[]> => ({
+  mSPMenuOption: [
+    { text: MSPMenuType[0], id: '0' },
+    { text: MSPMenuType[1], id: '1', disabled: isMSP },
+    { text: MSPMenuType[2], id: '2', disabled: true },//re add after implementation - disabled: !isMSP
+    { text: MSPMenuType[3], id: '3', disabled: true },// remove - disabled: true  after implementations.
+  ]
+});
+
+export enum MSPMenuType {
+  'Edit',
+  'Convert to MSP',
+  'Unlink from MSP',
+  'History'
+}
 

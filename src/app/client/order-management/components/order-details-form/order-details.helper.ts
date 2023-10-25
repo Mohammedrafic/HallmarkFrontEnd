@@ -39,6 +39,7 @@ export const valueMapperForGeneralInformation = (order: Order) => ({
     ? parseFloat(order.annualSalaryRangeTo.toString()).toFixed(2) : '',
 });
 
+
 export const getFilteredJobDistribution = (jobDistributionValues: number[]): number[] => {
   return distributionSource(true)
     .map((distribution: {id: number}) => distribution.id)

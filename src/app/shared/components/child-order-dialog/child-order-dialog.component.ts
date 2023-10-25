@@ -301,7 +301,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     private changeDetectorRef: ChangeDetectorRef,
     private childOrderDialogService: ChildOrderDialogService,
     private settingService: SettingsViewService,
-    private cd: ChangeDetectorRef,
   ) {
     super(store);
   }
@@ -643,6 +642,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private setAddExtensionBtnState(candidate: OrderManagementChild): void {
+    if (!this.order) {
+      return;
+    }
+
     const isOrderTravelerOrContractToPerm =
       this.order.orderType === OrderType.LongTermAssignment || this.order.orderType === OrderType.ContractToPerm;
     const isOrderFilledOrProgressOrClosed =
@@ -728,6 +731,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.clearOrderCandidateList();
         this.clearCandidateJobState();
       }
+      this.isAlive = !!data;
     });
     this.jobStatusControl = new FormControl('');
   }
@@ -753,7 +757,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
         }
-        this.cd.detectChanges();
+        this.changeDetectorRef.detectChanges();
       });
     }
     if (this.isAgency) {

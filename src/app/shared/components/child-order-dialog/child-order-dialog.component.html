@@ -124,6 +124,7 @@
                         [hasCanEditOrderBillRatePermission]="userPermission[userPermissions.CanEditOrderBillRate]"
                         [order]="order"
                         [isCandidatePayRateVisible]="isCandidatePayRateVisible"
+                        [reloadOnUpdate]="true"
                       ></app-onboarded-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
@@ -322,7 +323,6 @@
       <div class="comments">
         <app-comments
           *ngIf="candidateJob"
-          [canVmsCreateOrders]="canCreateOrder"
           [comments]="comments"
           [commentContainerId]="candidateJob.commentContainerId || 0"
         ></app-comments>

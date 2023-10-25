@@ -53,4 +53,5 @@ export enum FieldName {
   'zipCode' = 'Zip Code',
   'joiningBonus' = 'Joining Bonus',
   'compBonus' = 'Comp. Bonus',
+  'distributeToVMS' = 'Distribution Delay value.'
 }

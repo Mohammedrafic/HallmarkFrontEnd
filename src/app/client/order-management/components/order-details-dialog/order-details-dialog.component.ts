@@ -282,7 +282,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.showCloseButton = hasStatus || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate));
 
       if (this.chipList) {
-        const status = this.order.irpOrderMetadata?.statusText
+        const status = this.order.irpOrderMetadata?.statusText && this.activeSystem === OrderManagementIRPSystemId.IRP
           ? this.order.irpOrderMetadata.statusText
           : this.order.statusText;
 

@@ -64,7 +64,7 @@ ejs-datetimepicker.e-datetimepicker {
     }
 
     .e-input {
-      color: var(--secondary-text) !important;
+      color: var(--text) !important;
       padding-left: 16px !important;
     }
 
@@ -157,7 +157,7 @@ ejs-datetimepicker.e-datetimepicker {
       color: $secondary-dark-blue-30 !important;
 
       &:hover {
-        border-color: $secondary-dark-blue-40 !important;
+        border-color: var(--input-border-color) !important;
       }
     }
   }

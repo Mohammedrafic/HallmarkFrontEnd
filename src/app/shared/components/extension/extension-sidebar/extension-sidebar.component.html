@@ -162,7 +162,6 @@
     </div>
     <div class="extension__comments" *ngIf="activeSystems !== OrderManagementIRPSystemId.IRP">
       <app-comments
-        [canVmsCreateOrders]="canCreateOrder"
         [comments]="comments"
         [isCreating]="true"></app-comments>
     </div>

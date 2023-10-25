@@ -9,6 +9,7 @@ import {
   ALPHANUMERIC,
   MIN_DIGITS_LENGTH_ONLY_NINE,
   NUMBER_AND_ONE_DECIMAL,
+  NUMBER_AND_TWO_DECIMAL,
 } from '@shared/constants';
 
 @Pipe({
@@ -39,7 +40,7 @@ export class ValidationErrorPipe implements PipeTransform {
         if (this.isWrongValue(ONLY_LETTERS, value)) {
           return 'Only letters are allowed';
         }
-        if (this.isWrongValue(ONLY_NUMBER, value) || this.isWrongValue(ONLY_NUMBER_AND_DOT, value)) {
+        if (this.isWrongValue(ONLY_NUMBER, value) || this.isWrongValue(ONLY_NUMBER_AND_DOT, value)|| this.isWrongValue(NUMBER_AND_TWO_DECIMAL , value)) {
           return 'Only numbers are allowed';
         }
         if (this.isWrongValue(ALPHANUMERICS_AND_SYMBOLS, value)) {
