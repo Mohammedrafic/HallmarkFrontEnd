@@ -66,7 +66,6 @@ import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { sum } from 'lodash';
-import { WidgetLegengDataModel } from '../models/widget-legend-data.model';
 
 @Injectable()
 export class DashboardService {
