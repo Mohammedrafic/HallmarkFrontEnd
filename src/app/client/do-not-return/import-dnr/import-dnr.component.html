@@ -14,7 +14,7 @@
     gridName="Do Not Return"
     *ngIf="importResponse?.succesfullRecords?.length"
     [importedItems]="importResponse?.succesfullRecords || []"
-    [columnDefs]="columnDefs"
+    [columnDefs]="successColumnDefs"
   ></app-import-grid>
 </div>
 <div errors class="grid-wrapper">
@@ -23,7 +23,7 @@
     gridName="Do Not Return"
     *ngIf="importResponse?.errorRecords?.length"
     [importedItems]="importResponse?.errorRecords || []"
-    [columnDefs]="columnDefs"
+    [columnDefs]="errorColumnDefs"
   ></app-import-grid>
 </div>
 </app-import-dialog-content>
