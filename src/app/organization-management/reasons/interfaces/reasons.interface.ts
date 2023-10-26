@@ -16,6 +16,7 @@ export interface UnavailabilityValue {
   calculateTowardsWeeklyHours: boolean;
   eligibleToBeScheduled: boolean;
   visibleForIRPCandidates: boolean;
+  sendThroughIntegration:boolean;
 }
 
 export interface CancelEmployeeReasonValue {
@@ -29,6 +30,12 @@ export interface CategoryNoteValue {
   isRedFlagCategory: boolean;
   categoryName : string;
   isRedFlag?: boolean;
+}
+
+export interface TerminatedValue {
+  id?: number | null;
+  reason: string;
+  defaultValue?: boolean;
 }
 
 

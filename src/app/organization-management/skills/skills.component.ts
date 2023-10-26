@@ -265,7 +265,6 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     this.addActiveCssClass(event);
     this.title = 'Edit';
     this.sidedialogheader='Edit Skill';
-
     this.skillForm.patchValue({
       id: data.id,
       isDefault: data.masterSkill?.isDefault || false,
@@ -278,6 +277,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       includeInIRP: data.includeInIRP,
       includeInVMS: data.includeInVMS,
       skillAbbr: data.masterSkill?.skillAbbr,
+      skillCode:data.skillCode
     });
     this.store.dispatch(new ShowSideDialog(true));
     this.changeControlsAvaliability(data.masterSkill?.isDefault as boolean);

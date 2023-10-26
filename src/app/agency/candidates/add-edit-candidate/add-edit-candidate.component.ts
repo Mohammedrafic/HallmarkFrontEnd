@@ -51,6 +51,7 @@ import { GetRegionList } from "@shared/components/candidate-list/store/candidate
 import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
 import { AppState } from 'src/app/store/app.state';
 import { AlertIdEnum } from "@admin/alerts/alerts.enum";
+import { SetLastSelectedOrganizationAgencyId } from "src/app/store/user.actions";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -119,6 +120,17 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   ) {
     super(store);
     store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
+    this.route.queryParams.subscribe( paramMap => {
+      if (paramMap['agId']) {
+        this.store.dispatch(
+          new SetLastSelectedOrganizationAgencyId({
+            lastSelectedAgencyId: Number(paramMap['agId']),
+            lastSelectedOrganizationId: null
+          })
+        );
+      };
+
+  })
   }
 
   override ngOnInit(): void {
@@ -314,6 +326,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           && JSON.parse((localStorage.getItem('OrderId') || '0')) as number){
             window.localStorage.setItem("OrderId", JSON.stringify(""));
             window.localStorage.setItem("alertTitle", JSON.stringify(""));
+            window.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
             this.reloadCredentials$.next(true);
       }
     });

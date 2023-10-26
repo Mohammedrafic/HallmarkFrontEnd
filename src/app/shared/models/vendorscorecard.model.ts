@@ -10,7 +10,8 @@ export class VendorScorePayload {
     OrderType: string;
     Agencies: string;
     StartDate: string;
-    EndDate: string;    
+    EndDate: string; 
+    ActiveAgency:number;   
 }
 
 

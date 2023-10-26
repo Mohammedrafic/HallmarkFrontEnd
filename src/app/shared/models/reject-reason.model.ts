@@ -19,6 +19,7 @@ export type RejectReason = {
   businessUnitId?: number;
   includeInIRP?: boolean;
   includeInVMS?: boolean;
+  defaultValue?: boolean;
 }
 
 export type RejectReasonwithSystem = {
