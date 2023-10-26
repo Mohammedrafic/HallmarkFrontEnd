@@ -104,7 +104,6 @@ export class DashboardService {
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
-  avgForActivePositionsCustom$:BehaviorSubject<OrderStatusesAvgDetailsInfo[]> = new BehaviorSubject<OrderStatusesAvgDetailsInfo[]>([]);
   candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesavgForActivePositions$:BehaviorSubject<AveragedayActivecandidateInfo[]> = new BehaviorSubject<AveragedayActivecandidateInfo[]>([]);
@@ -226,7 +225,6 @@ export class DashboardService {
     private getAvergaeDayCUSTOMActivePositionsWidgetData(filter: DashboartFilterDto): Observable<ChartAccumulation> {
       return this.httpClient.post<OrderStatusesActivePositionsDto>(`${this.baseUrl}/AvgActivePositionsDays`, { granulateInProgress: true, ...filter, type : 'Custom' }).pipe(
         map(({ orderStatusesAvgDetails }: OrderStatusesActivePositionsDto) => {
-        this.avgForActivePositionsCustom$.next(orderStatusesAvgDetails)
           return {
             id: WidgetTypeEnum.AVERAGE_DAY_ACTIVE_POSITIONS_CUSTOM,
              title: ' Average Days of Active Positions with Custom Workflow',
@@ -636,9 +634,6 @@ export class DashboardService {
       }))
     }
 
-  public getavgForActivePositionsCustom(): Observable<OrderStatusesAvgDetailsInfo[]>{
-    return this.avgForActivePositionsCustom$.asObservable();
-  }
 
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
     return this.candidatesForActivePositions$.asObservable();

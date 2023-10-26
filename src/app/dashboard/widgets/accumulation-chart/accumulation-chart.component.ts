@@ -75,7 +75,7 @@ export class AccumulationChartComponent
     super();
   }
 
-  public redirectToSourceContent(status: any): void {
+  public redirectToSourceContent(status: any = []): void {
     let candidatesStatusDataSet: any = [];
     let activeOrderStatus: any = [];
     let lastSelectedOrganizationId = window.localStorage.getItem('lastSelectedOrganizationId');
@@ -167,13 +167,7 @@ export class AccumulationChartComponent
           this.dashboardService.redirectToUrlWithStatus('client/order-management/', candidatesChartInfo.status);
         }
       }
-    }
-    if (this.chartData?.title == ' Average Days of Active Positions with Custom Workflow') {
-      let AvgCustomDaysSet: any = [];
-      this.dashboardService.avgForActivePositionsCustom$.subscribe((data) => {
-        AvgCustomDaysSet = data;
-      });
-      let avgCustomDataInfo = AvgCustomDaysSet.find((ele: any) => ele.customStatusName == status.customStatus);
+    } else if (this.chartData?.title == ' Average Days of Active Positions with Custom Workflow') {
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
@@ -201,11 +195,21 @@ export class AccumulationChartComponent
         }
       }
       if (status.label != OrderStatus[OrderStatus.Open]) {
-        if(candidatesStatusDataSet.length>0){
+        if (candidatesStatusDataSet.length > 0) {
           window.localStorage.setItem('candidateStatusListFromDashboard', JSON.stringify(candidatesStatusDataSet));
-          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined,status.label,status.customStatus);
-        }else{
-          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, undefined,status.customStatus);
+          this.dashboardService.redirectToUrlWithActivePositions(
+            'client/order-management',
+            undefined,
+            status.label,
+            status.customStatus
+          );
+        } else {
+          this.dashboardService.redirectToUrlWithActivePositions(
+            'client/order-management',
+            undefined,
+            undefined,
+            status.customStatus
+          );
         }
       }
     }
