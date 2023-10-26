@@ -258,6 +258,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
 
   private setDefaultFilter(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+    if (!this.activeTab) {
+      return;
+    }
     if (!selectedOrderAfterRedirect) {
       const statuses = this.filterColumns.orderStatuses.dataSource.filter((data:any) => data !== FilterOrderStatusText["Closed"]);
       this.form.get('orderStatuses')?.setValue(statuses);

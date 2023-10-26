@@ -85,7 +85,6 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     protected override store: Store,
     protected override router: Router,
     private orderCandidateListViewService: OrderCandidateListViewService,
-    private candidateApiService: OrderCandidateApiService,
     private actions$: Actions,
     private settingService: SettingsViewService,
     private cdr: ChangeDetectorRef,
@@ -105,13 +104,14 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
 
     if (this.isAgency) {
       this.checkForAgencyStatus();
+    } else {
+      this.organizationId$.pipe(
+        filter(Boolean),
+        takeUntil(this.unsubscribe$),
+      ).subscribe((id) => {
+        this.getOrganization(id);
+      });
     }
-    this.organizationId$.pipe(
-      filter(Boolean),
-      takeUntil(this.unsubscribe$),
-    ).subscribe((id) => {
-      this.getOrganization(id);
-    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -120,7 +120,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     }
   }
 
-  public onEdit(data: OrderCandidatesList & { index: string }, event: MouseEvent): void {
+  public onEdit(data: OrderCandidatesList & { index: string }): void {
     if (this.order?.isClosed && data.statusName !== this.cancelledStatusName) {
       return;
     }
