@@ -419,7 +419,7 @@ import { GridErroredCellListComponent } from "@shared/components/import-dialog-c
 
   export enum LogStatusEnum {
     OverAll = 0,
-    Created = 1,
+    Inserted = 1,
     Errored = 2,
     Updated = 3,
   }
