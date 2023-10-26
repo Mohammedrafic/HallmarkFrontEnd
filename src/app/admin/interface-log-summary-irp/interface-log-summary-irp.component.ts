@@ -106,7 +106,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
       filter: false,
     },
     {
-      headerName: 'Document Name',
+      headerName: 'File Name',
       field: 'documentName',
       minWidth: 250,
       filter: 'agTextColumnFilter',
@@ -217,7 +217,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
       cellRendererParams: {
         onClick: this.onInsertedLogData.bind(this),
         label: 'Count',
-        selectedType: LogStatusEnum.Created,
+        selectedType: LogStatusEnum.Inserted,
         suppressMovable: true,
         filter: false,
         sortable: false,
@@ -330,7 +330,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
   }
   public onInsertedLogData(data: any) {
     if (data.rowData.insertedRecord > 0) {
-      this.selectedType =  LogStatusEnum.Created;
+      this.selectedType =  LogStatusEnum.Inserted;
       this.openLogData(data);
     }
   }
