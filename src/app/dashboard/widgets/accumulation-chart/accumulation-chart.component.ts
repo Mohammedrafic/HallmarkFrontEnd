@@ -12,7 +12,6 @@ import type {
   LegendSettingsModel,
 } from '@syncfusion/ej2-angular-charts';
 
-
 import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { DashboardService } from '../../services/dashboard.service';
@@ -38,13 +37,14 @@ import { PositionTrendTypeEnum } from '../../enums/position-trend-type.enum';
 })
 export class AccumulationChartComponent
   extends AbstractSFComponentDirective<SFAccumulationChartComponent>
-  implements OnChanges, OnInit {
+  implements OnChanges, OnInit
+{
   @Input() public chartData: ChartAccumulation | undefined;
   @Input() public chartDatachanges: ChartAccumulation | undefined;
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean;
   @Input() public description: string;
-  @Input() public averageFlag: boolean =false;
+  @Input() public averageFlag: boolean = false;
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
@@ -56,158 +56,168 @@ export class AccumulationChartComponent
   public ontooltipRender: Function;
 
   public readonly tooltipSettings: TooltipSettingsModel = {
-    enable: true,  
-    template: '<div class="widget-tooltip"><div>${x}</div><b>${tooltip}%</b></div>',       
-}
+    enable: true,
+    template: '<div class="widget-tooltip"><div>${x}</div><b>${tooltip}%</b></div>',
+  };
 
   public readonly legendSettings: LegendSettingsModel = { visible: false };
 
-  private readonly chartData$: BehaviorSubject<ChartAccumulation | null> = new BehaviorSubject<ChartAccumulation | null>(null);
+  private readonly chartData$: BehaviorSubject<ChartAccumulation | null> =
+    new BehaviorSubject<ChartAccumulation | null>(null);
 
   private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
 
-  constructor(private readonly dashboardService: DashboardService, private store: Store, private alertService: AlertService
+  constructor(
+    private readonly dashboardService: DashboardService,
+    private store: Store,
+    private alertService: AlertService
   ) {
-
     super();
-
   }
 
   public redirectToSourceContent(status: any): void {
-    let candidatesStatusDataSet:any = []
-    let activeOrderStatus:any = []
-    let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
+    let candidatesStatusDataSet: any = [];
+    let activeOrderStatus: any = [];
+    let lastSelectedOrganizationId = window.localStorage.getItem('lastSelectedOrganizationId');
     let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
     if (filteredList.length > 0) {
-      let organizations = filteredList.filter((ele: any) => ele.column == "organizationIds").sort((a: any, b: any) => a.value - b.value);
+      let organizations = filteredList
+        .filter((ele: any) => ele.column == 'organizationIds')
+        .sort((a: any, b: any) => a.value - b.value);
       if (organizations.length > 0 && organizations[0].value != lastSelectedOrganizationId) {
         this.store.dispatch(
           new SetLastSelectedOrganizationAgencyId({
             lastSelectedAgencyId: null,
-            lastSelectedOrganizationId: organizations[0].value
+            lastSelectedOrganizationId: organizations[0].value,
           })
         );
       }
     }
     const user = this.store.selectSnapshot(UserState.user);
-    if (this.chartData?.title == "Active Positions") {
+    if (this.chartData?.title == 'Active Positions') {
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
-        window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
-        if(OrderStatus[OrderStatus.Open] ===  status){
-          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
-        }
-        else if(status === PositionTrendTypeEnum.IN_PROGRESS){
-          candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
-          candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
-          candidatesStatusDataSet.push({"value":CandidatStatus.CustomStatus});
-        }
-        else if(status === 'In Progress (Pending)'){
-          candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
-        }
-        else if(status === 'In Progress (Accepted)'){
-          candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
-        }
-        else if(OrderStatus[OrderStatus.Filled] === status){
-          candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
-          activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
-          window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(activeOrderStatus));
+        window.localStorage.setItem('orderTypeFromDashboard', JSON.stringify(true));
+        if (OrderStatus[OrderStatus.Open] === status.label) {
+          this.dashboardService.redirectToUrlWithActivePositions(
+            'client/order-management',
+            undefined,
+            OrderStatus[OrderStatus.OrdersOpenPositions]
+          );
+        } else if (status.label === PositionTrendTypeEnum.IN_PROGRESS) {
+          candidatesStatusDataSet.push({ value: CandidatStatus.Applied });
+          candidatesStatusDataSet.push({ value: CandidatStatus.Shortlisted });
+          candidatesStatusDataSet.push({ value: CandidatStatus.CustomStatus });
+        } else if (status.label === 'In Progress (Pending)') {
+          candidatesStatusDataSet.push({ value: CandidatStatus.Offered });
+        } else if (status.label === 'In Progress (Accepted)') {
+          candidatesStatusDataSet.push({ value: CandidatStatus.Accepted });
+        } else if (OrderStatus[OrderStatus.Filled] === status.label) {
+          candidatesStatusDataSet.push({ value: CandidatStatus.OnBoard });
+          activeOrderStatus.push({ value: OrderStatus.InProgress, name: PositionTrendTypeEnum.IN_PROGRESS });
+          window.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(activeOrderStatus));
         }
       }
-      if(status !=  OrderStatus[OrderStatus.Open]){
-        window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
-        this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
+      if (status.label != OrderStatus[OrderStatus.Open]) {
+        window.localStorage.setItem('candidateStatusListFromDashboard', JSON.stringify(candidatesStatusDataSet));
+        this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status.label);
       }
-    }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status" ||  this.chartData?.title==="Average Days for Active Candidates in a Status"){
-        let candidatesDataset:any = [];
-        let candidatesOrderDataSet = [];
-        if(this.chartData?.title == "Candidates for Active Positions"){
-          this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
-            candidatesDataset = data;
-          }); 
-        }else if(this.chartData?.title==="Average Days for Active Candidates in a Status"){
-          this.dashboardService.candidatesavgForActivePositions$.subscribe(data=>{
-            candidatesDataset = data;
-          });
-        }
-        else{
-          this.dashboardService.candidatesOverallStatus$.subscribe(data=>{
-            candidatesDataset = data;
-          }); 
-        }        
+    } else if (
+      this.chartData?.title == 'Candidates for Active Positions' ||
+      this.chartData?.title == 'Candidate Overall Status' ||
+      this.chartData?.title === 'Average Days for Active Candidates in a Status'
+    ) {
+      let candidatesDataset: any = [];
+      let candidatesOrderDataSet = [];
+      if (this.chartData?.title == 'Candidates for Active Positions') {
+        this.dashboardService.candidatesForActivePositions$.subscribe((data) => {
+          candidatesDataset = data;
+        });
+      } else if (this.chartData?.title === 'Average Days for Active Candidates in a Status') {
+        this.dashboardService.candidatesavgForActivePositions$.subscribe((data) => {
+          candidatesDataset = data;
+        });
+      } else {
+        this.dashboardService.candidatesOverallStatus$.subscribe((data) => {
+          candidatesDataset = data;
+        });
+      }
 
-        let candidatesChartInfo = candidatesDataset.find((ele:any)=>ele.status == status);
-        candidatesOrderDataSet.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
-        if(candidatesChartInfo?.applicantStatus === OrderStatus.Onboard){
-          candidatesOrderDataSet.push({"value":OrderStatus.Filled, "name": PositionTrendTypeEnum.FILLED});
-        }else if(candidatesChartInfo?.applicantStatus === OrderStatus.Cancelled || candidatesChartInfo?.applicantStatus === OrderStatus.Offboard){ // "Cancelled" "Offboard"
-          candidatesOrderDataSet.push({"value":OrderStatus.Filled, "name": PositionTrendTypeEnum.FILLED});
-          candidatesOrderDataSet.push({"value":OrderStatus.Closed, "name": PositionTrendTypeEnum.CLOSED});
-        }
-        window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(candidatesOrderDataSet));
+      let candidatesChartInfo = candidatesDataset.find((ele: any) => ele.status == status);
+      candidatesOrderDataSet.push({ value: OrderStatus.InProgress, name: PositionTrendTypeEnum.IN_PROGRESS });
+      if (candidatesChartInfo?.applicantStatus === OrderStatus.Onboard) {
+        candidatesOrderDataSet.push({ value: OrderStatus.Filled, name: PositionTrendTypeEnum.FILLED });
+      } else if (
+        candidatesChartInfo?.applicantStatus === OrderStatus.Cancelled ||
+        candidatesChartInfo?.applicantStatus === OrderStatus.Offboard
+      ) {
+        // "Cancelled" "Offboard"
+        candidatesOrderDataSet.push({ value: OrderStatus.Filled, name: PositionTrendTypeEnum.FILLED });
+        candidatesOrderDataSet.push({ value: OrderStatus.Closed, name: PositionTrendTypeEnum.CLOSED });
+      }
+      window.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(candidatesOrderDataSet));
 
-        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) { 
-          if(candidatesChartInfo.status!=='Others')
-          {        
-            this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
-          }
-        }else{
-          if(candidatesChartInfo.status!=='Others')
-          {
-            this.dashboardService.redirectToUrlWithStatus('client/order-management/',candidatesChartInfo.status);
-          }
+      if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+        if (candidatesChartInfo.status !== 'Others') {
+          this.dashboardService.redirectToUrlWithStatus('agency/order-management/', candidatesChartInfo.status);
         }
-        
+      } else {
+        if (candidatesChartInfo.status !== 'Others') {
+          this.dashboardService.redirectToUrlWithStatus('client/order-management/', candidatesChartInfo.status);
+        }
+      }
     }
-    if (this.chartData?.title == " Average Days of Active Positions with Custom Workflow") {
-      let AvgCustomDaysSet:any = [];
-      this.dashboardService.avgForActivePositionsCustom$.subscribe(data=>{
+    if (this.chartData?.title == ' Average Days of Active Positions with Custom Workflow') {
+      let AvgCustomDaysSet: any = [];
+      this.dashboardService.avgForActivePositionsCustom$.subscribe((data) => {
         AvgCustomDaysSet = data;
-      }); 
-      let avgCustomDataInfo = AvgCustomDaysSet.find((ele:any)=>ele.customStatusName == status.customStatus);
+      });
+      let avgCustomDataInfo = AvgCustomDaysSet.find((ele: any) => ele.customStatusName == status.customStatus);
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
-        window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
-        if(OrderStatus[OrderStatus.Open] ===  status.label){
-          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
-        }
-        else if(status.label === PositionTrendTypeEnum.IN_PROGRESS){
-          candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
-          candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
-        }
-        else if(status.label === 'In Progress (Pending)'){
-          candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
-        }
-        else if(status.label === 'In Progress (Accepted)'){
-          candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
-        }
-        else if(status.customStatus === avgCustomDataInfo.customStatusName){
-          activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
-          window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(activeOrderStatus));
-        }
-        else if(OrderStatus[OrderStatus.Filled] === status.label){
-          candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
-          activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
-          window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(activeOrderStatus));
+        window.localStorage.setItem('orderTypeFromDashboard', JSON.stringify(true));
+        if (OrderStatus[OrderStatus.Open] === status.label) {
+          this.dashboardService.redirectToUrlWithActivePositions(
+            'client/order-management',
+            undefined,
+            OrderStatus[OrderStatus.OrdersOpenPositions]
+          );
+        } else if (status.label === PositionTrendTypeEnum.IN_PROGRESS) {
+          candidatesStatusDataSet.push({ value: CandidatStatus.Applied });
+          candidatesStatusDataSet.push({ value: CandidatStatus.Shortlisted });
+        } else if (status.label === 'In Progress (Pending)') {
+          candidatesStatusDataSet.push({ value: CandidatStatus.Offered });
+        } else if (status.label === 'In Progress (Accepted)') {
+          candidatesStatusDataSet.push({ value: CandidatStatus.Accepted });
+        } else if (OrderStatus[OrderStatus.Filled] === status.label) {
+          candidatesStatusDataSet.push({ value: CandidatStatus.OnBoard });
+          activeOrderStatus.push({ value: OrderStatus.InProgress, name: PositionTrendTypeEnum.IN_PROGRESS });
+          window.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(activeOrderStatus));
+        } else {
+          activeOrderStatus.push({ value: OrderStatus.InProgress, name: PositionTrendTypeEnum.IN_PROGRESS });
+          window.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(activeOrderStatus));
         }
       }
-      if(status.label !=  OrderStatus[OrderStatus.Open]){
-        window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
-        this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status.label,status.customStatus);
+      if (status.label != OrderStatus[OrderStatus.Open]) {
+        if(candidatesStatusDataSet.length>0){
+          window.localStorage.setItem('candidateStatusListFromDashboard', JSON.stringify(candidatesStatusDataSet));
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined,status.label,status.customStatus);
+        }else{
+          this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, undefined,status.customStatus);
+        }
       }
     }
-
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
     changes['chartData'] && this.handleChartDataChanges();
     this.totalScore = 0;
-    this.chartData?.chartData.forEach(obj => {
-      if(this.averageFlag){
+    this.chartData?.chartData.forEach((obj) => {
+      if (this.averageFlag) {
         this.totalScore += obj.average ? obj.average : 0;
-      }else{
+      } else {
         this.totalScore += obj.value;
       }
     });
@@ -216,13 +226,12 @@ export class AccumulationChartComponent
   public ngOnInit(): void {
     this.datalabel = { visible: true, position: 'Outside' };
     this.filteredChartData$ = this.getFilteredChartData();
-    if(this.averageFlag){
+    if (this.averageFlag) {
       this.tooltipSettings.template = '<div class="widget-tooltip"><div>${x} - <b>${tooltip}</b></div></div>';
-    }    
+    }
   }
 
   public onClickLegend(label: string): void {
-
     const currentValue = this.selectedEntries$.value;
     const nextValue = includes(label, currentValue)
       ? lodashFilter((currentValueLabel: string) => currentValueLabel !== label, currentValue)
@@ -230,11 +239,11 @@ export class AccumulationChartComponent
 
     this.selectedEntries$.next(nextValue);
     this.totalScore = 0;
-    this.chartData?.chartData.forEach(obj => {
+    this.chartData?.chartData.forEach((obj) => {
       if (includes(obj.label, this.selectedEntries$.value)) {
-        if(this.averageFlag){
+        if (this.averageFlag) {
           this.totalScore += obj.average ? obj.average : 0;
-        }else{
+        } else {
           this.totalScore += obj.value;
         }
       }
@@ -247,18 +256,20 @@ export class AccumulationChartComponent
 
   private handleChartDataChanges(): void {
     this.chartDatachanges = this.chartData;
-    this.totalval=0;
-    this.chartDatachanges?.chartData.forEach(obj => {
-      this.totalval += obj.value;      
+    this.totalval = 0;
+    this.chartDatachanges?.chartData.forEach((obj) => {
+      this.totalval += obj.value;
     });
-    this.chartDatachanges?.chartData.forEach(obj => {
-      if(this.averageFlag){
-        obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString()+'% <br>'+obj.average+' Positions':"0";
-      }else{
-        obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString():"0";
-      }      
-    });  
-
+    this.chartDatachanges?.chartData.forEach((obj) => {
+      if (this.averageFlag) {
+        obj.text =
+          obj.value && this.totalval
+            ? Math.round((obj.value / this.totalval) * 100).toString() + '% <br>' + obj.average + ' Positions'
+            : '0';
+      } else {
+        obj.text = obj.value && this.totalval ? Math.round((obj.value / this.totalval) * 100).toString() : '0';
+      }
+    });
 
     this.legendData = this.chartData?.chartData as WidgetLegengDataModel[];
     this.chartData$.next(this.chartData ?? null);
