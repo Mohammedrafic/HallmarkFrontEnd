@@ -43,7 +43,7 @@ export class BulkSkillActionDialogComponent extends DestroyableDirective impleme
       ).subscribe(payload => {
         if (payload.isDialogShown) {
           this.sideDialog.show();
-          this.bulkactionmessage1=this.bulkAction===0?'Following Skills Cannot be Updated': this.message;
+          this.bulkactionmessage1=this.bulkAction===0?'Following Skills Cannot be Updated': 'Following Skills Cannot be Deleted';
           this.bulkactionmessage2=this.bulkAction===0? `They have ${this.message}` : 'They Are Currently Used In Orders';
           this.bulkactionmessage3=this.bulkAction === 0 ? `Selected Records are not updated. They have ${this.message}` 
           : `${this.message} They Are Currently Used In Orders`;
