@@ -294,6 +294,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.form.disable();
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
+      if (!this.reloadOnUpdate) {
+        this.closeDialog();
+      }
       this.updateDetails.emit();
     }
   }
