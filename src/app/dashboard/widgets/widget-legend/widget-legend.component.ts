@@ -20,7 +20,7 @@ export class WidgetLegendComponent {
   @Input() public initialExtended: boolean =false;
 
   @Input() public isBillRateTrend: boolean =false;
-  @Output() onClickLegend: EventEmitter<string> = new EventEmitter();
+  @Output() onClickLegend: EventEmitter<WidgetLegengDataModel> = new EventEmitter();
   @Output() changeCheckbox: EventEmitter<string> = new EventEmitter();
 
   private mousePosition = {
