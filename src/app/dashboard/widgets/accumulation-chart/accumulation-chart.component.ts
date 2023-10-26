@@ -94,7 +94,8 @@ export class AccumulationChartComponent
       }
     }
     const user = this.store.selectSnapshot(UserState.user);
-    if (this.chartData?.title == 'Active Positions') {
+    if (this.chartData?.title == 'Active Positions' || this.chartData?.title == ' Average Days of Active Positions with Custom Workflow') {
+     if(this.chartData?.title == 'Active Positions'){
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
@@ -123,51 +124,8 @@ export class AccumulationChartComponent
         window.localStorage.setItem('candidateStatusListFromDashboard', JSON.stringify(candidatesStatusDataSet));
         this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status.label);
       }
-    } else if (
-      this.chartData?.title == 'Candidates for Active Positions' ||
-      this.chartData?.title == 'Candidate Overall Status' ||
-      this.chartData?.title === 'Average Days for Active Candidates in a Status'
-    ) {
-      let candidatesDataset: any = [];
-      let candidatesOrderDataSet = [];
-      if (this.chartData?.title == 'Candidates for Active Positions') {
-        this.dashboardService.candidatesForActivePositions$.subscribe((data) => {
-          candidatesDataset = data;
-        });
-      } else if (this.chartData?.title === 'Average Days for Active Candidates in a Status') {
-        this.dashboardService.candidatesavgForActivePositions$.subscribe((data) => {
-          candidatesDataset = data;
-        });
-      } else {
-        this.dashboardService.candidatesOverallStatus$.subscribe((data) => {
-          candidatesDataset = data;
-        });
-      }
-
-      let candidatesChartInfo = candidatesDataset.find((ele: any) => ele.status == status);
-      candidatesOrderDataSet.push({ value: OrderStatus.InProgress, name: PositionTrendTypeEnum.IN_PROGRESS });
-      if (candidatesChartInfo?.applicantStatus === OrderStatus.Onboard) {
-        candidatesOrderDataSet.push({ value: OrderStatus.Filled, name: PositionTrendTypeEnum.FILLED });
-      } else if (
-        candidatesChartInfo?.applicantStatus === OrderStatus.Cancelled ||
-        candidatesChartInfo?.applicantStatus === OrderStatus.Offboard
-      ) {
-        // "Cancelled" "Offboard"
-        candidatesOrderDataSet.push({ value: OrderStatus.Filled, name: PositionTrendTypeEnum.FILLED });
-        candidatesOrderDataSet.push({ value: OrderStatus.Closed, name: PositionTrendTypeEnum.CLOSED });
-      }
-      window.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(candidatesOrderDataSet));
-
-      if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-        if (candidatesChartInfo.status !== 'Others') {
-          this.dashboardService.redirectToUrlWithStatus('agency/order-management/', candidatesChartInfo.status);
-        }
-      } else {
-        if (candidatesChartInfo.status !== 'Others') {
-          this.dashboardService.redirectToUrlWithStatus('client/order-management/', candidatesChartInfo.status);
-        }
-      }
-    } else if (this.chartData?.title == ' Average Days of Active Positions with Custom Workflow') {
+     }
+     if(this.chartData?.title == ' Average Days of Active Positions with Custom Workflow'){
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
@@ -212,7 +170,52 @@ export class AccumulationChartComponent
           );
         }
       }
-    }
+     }
+    } else if (
+      this.chartData?.title == 'Candidates for Active Positions' ||
+      this.chartData?.title == 'Candidate Overall Status' ||
+      this.chartData?.title === 'Average Days for Active Candidates in a Status'
+    ) {
+      let candidatesDataset: any = [];
+      let candidatesOrderDataSet = [];
+      if (this.chartData?.title == 'Candidates for Active Positions') {
+        this.dashboardService.candidatesForActivePositions$.subscribe((data) => {
+          candidatesDataset = data;
+        });
+      } else if (this.chartData?.title === 'Average Days for Active Candidates in a Status') {
+        this.dashboardService.candidatesavgForActivePositions$.subscribe((data) => {
+          candidatesDataset = data;
+        });
+      } else {
+        this.dashboardService.candidatesOverallStatus$.subscribe((data) => {
+          candidatesDataset = data;
+        });
+      }
+
+      let candidatesChartInfo = candidatesDataset.find((ele: any) => ele.status == status.label);
+      candidatesOrderDataSet.push({ value: OrderStatus.InProgress, name: PositionTrendTypeEnum.IN_PROGRESS });
+      if (candidatesChartInfo?.applicantStatus === OrderStatus.Onboard) {
+        candidatesOrderDataSet.push({ value: OrderStatus.Filled, name: PositionTrendTypeEnum.FILLED });
+      } else if (
+        candidatesChartInfo?.applicantStatus === OrderStatus.Cancelled ||
+        candidatesChartInfo?.applicantStatus === OrderStatus.Offboard
+      ) {
+        // "Cancelled" "Offboard"
+        candidatesOrderDataSet.push({ value: OrderStatus.Filled, name: PositionTrendTypeEnum.FILLED });
+        candidatesOrderDataSet.push({ value: OrderStatus.Closed, name: PositionTrendTypeEnum.CLOSED });
+      }
+      window.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(candidatesOrderDataSet));
+
+      if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+        if (candidatesChartInfo.status !== 'Others') {
+          this.dashboardService.redirectToUrlWithStatus('agency/order-management/', candidatesChartInfo.status);
+        }
+      } else {
+        if (candidatesChartInfo.status !== 'Others') {
+          this.dashboardService.redirectToUrlWithStatus('client/order-management/', candidatesChartInfo.status);
+        }
+      }
+    } 
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
