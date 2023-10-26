@@ -64,7 +64,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
     private orderManagementService: OrderManagementService,
     private cd: ChangeDetectorRef,
     @Inject(GlobalWindow) protected override readonly globalWindow : WindowProxy & typeof globalThis,
-    ) {
+  ) {
     super(store, router, globalWindow);
     this.setIrpFeatureFlag();
   }
@@ -75,13 +75,14 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
 
     if (this.isAgency) {
       this.checkForAgencyStatus();
+    } else {
+      this.organizationId$.pipe(
+        filter(Boolean),
+        takeUntil(this.unsubscribe$),
+      ).subscribe((id) => {
+        this.getOrganization(id);
+      });
     }
-    this.organizationId$.pipe(
-      filter(Boolean),
-      takeUntil(this.unsubscribe$),
-    ).subscribe((id) => {
-      this.getOrganization(id);
-    });
   }
 
   public emitChangeCandidate(isNext: boolean): void {
