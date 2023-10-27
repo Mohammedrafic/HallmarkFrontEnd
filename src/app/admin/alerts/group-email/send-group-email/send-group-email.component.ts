@@ -409,11 +409,13 @@ export class SendGroupEmailComponent
     }
     this.isOrgUser = false;
     if (user?.businessUnitType === BusinessUnitType.MSP) {
-      const [Hallmark, ...rest] = this.businessUnits;
-      this.businessUnits = rest;
+      this.businessUnits = [
+        { id: BusinessUnitType.MSP, text: 'MSP' },
+        { id: BusinessUnitType.Organization, text: 'Organization' },
+        { id: BusinessUnitType.Agency, text: 'Agency' },
+      ];
     } else if (user?.businessUnitType === BusinessUnitType.Organization) {
       this.isOrgUser = true;
-     
       this.businessUnits = [
         { id: BusinessUnitType.Agency, text: 'Agency' },
         { id: BusinessUnitType.Organization, text: 'Organization' },
