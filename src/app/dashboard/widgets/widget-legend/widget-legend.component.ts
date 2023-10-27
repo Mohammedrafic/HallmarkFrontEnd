@@ -37,7 +37,7 @@ export class WidgetLegendComponent {
     this.mousePosition.y = $event.screenY;
   }
 
-  public onClickLegendRow(event: MouseEvent,legend:any): void {
+  public onClickLegendRow(event: MouseEvent,legend:WidgetLegengDataModel): void {
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
       this.onClickLegend.emit(legend);
     }
