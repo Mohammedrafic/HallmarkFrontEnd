@@ -714,8 +714,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private onOpenEvent(): void {
     this.openEvent.pipe(
-      tap(data => this.isActive = !!data),
-      filter(() => this.isActive),
+      filter((data) => {
+        this.isActive = !!data;
+        return this.isActive;
+      }),
       takeWhile(() => this.isAlive),
     ).subscribe((data) => {
       if (data) {
