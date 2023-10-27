@@ -29,6 +29,7 @@ import { agencyListFilterColumns, agencyStatusMapper, MSPMenuOptions, MSPMenuTyp
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
 
+
 @Component({
   selector: 'app-agency-list',
   templateUrl: './agency-list.component.html',
