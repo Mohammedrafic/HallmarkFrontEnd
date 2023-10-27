@@ -7,6 +7,7 @@ import {
   ViewChild,
   Inject,
   ChangeDetectionStrategy,
+  NgZone,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DOCUMENT, DatePipe, Location } from '@angular/common';
@@ -516,6 +517,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
     private cd: ChangeDetectorRef,
+    private ngZone: NgZone,
     private breakpointService: BreakpointObserverService,
     private preservedOrderService: PreservedOrderService,
     private ordergridsystemstateservice:OrderGridSystemStateService,

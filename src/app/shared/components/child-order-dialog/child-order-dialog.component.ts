@@ -106,7 +106,7 @@ import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.util
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { catchError, distinctUntilChanged, EMPTY, Observable, Subject, take, takeWhile, takeUntil } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
@@ -220,6 +220,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public readonly orderStatus = OrderStatus;
 
   private isAlive = true;
+  private isActive = false;
   private isLastExtension = false;
   private ignoreMissingCredentials = false;
   private readonly permissions = UserPermissions;
@@ -712,7 +713,13 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private onOpenEvent(): void {
-    this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+    this.openEvent.pipe(
+      filter((data) => {
+        this.isActive = !!data;
+        return this.isActive;
+      }),
+      takeWhile(() => this.isAlive),
+    ).subscribe((data) => {
       if (data) {
         this.tab.select(1);
         const [order, candidate, system] = data;
@@ -731,13 +738,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.clearOrderCandidateList();
         this.clearCandidateJobState();
       }
-      this.isAlive = !!data;
     });
     this.jobStatusControl = new FormControl('');
   }
 
   private getComments(): void {
-    if (this.isReorderType && this.candidateJob?.commentContainerId) {
+    if (this.isReorderType && this.candidateJob?.commentContainerId && this.isActive) {
       this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .pipe(takeUntil(this.componentDestroy()))
