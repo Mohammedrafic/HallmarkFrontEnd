@@ -5,4 +5,5 @@ export interface WidgetLegengDataModel {
   text: string;
   totalCount:number;
   average?:number;
+  customStatus?:string;
 }

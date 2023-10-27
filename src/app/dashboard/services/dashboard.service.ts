@@ -104,7 +104,6 @@ export class DashboardService {
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
-
   candidatesForActivePositions$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesOverallStatus$:BehaviorSubject<CandidateTypeInfoModel[]> = new BehaviorSubject<CandidateTypeInfoModel[]>([]);
   candidatesavgForActivePositions$:BehaviorSubject<AveragedayActivecandidateInfo[]> = new BehaviorSubject<AveragedayActivecandidateInfo[]>([]);
@@ -235,6 +234,7 @@ export class DashboardService {
                 label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses] || 'In Progress (' +customStatusName +')',
                 value: average,
                 average: count,
+                customStatus: customStatusName,
                 color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses] ||
                         activePositionsLegendPalette[ActivePositionsChartStatuses.CUSTOM]
               })
@@ -633,6 +633,7 @@ export class DashboardService {
         };
       }))
     }
+
 
   public getcandidatesForActivePositions(): Observable<CandidateTypeInfoModel[]>{
     return this.candidatesForActivePositions$.asObservable();
