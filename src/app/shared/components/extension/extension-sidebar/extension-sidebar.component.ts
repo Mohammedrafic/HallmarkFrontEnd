@@ -95,7 +95,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.subscribeOnPermissions();
     const minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
-    this.minDate = DateTimeHelper.setCurrentTimeZone(minDate.toString());
+    this.minDate = DateTimeHelper.setCurrentTimeZone(minDate?.toString());
     this.initExtensionForm();
     this.listenPrimaryDuration();
     this.listenPrimaryDurationIRP();

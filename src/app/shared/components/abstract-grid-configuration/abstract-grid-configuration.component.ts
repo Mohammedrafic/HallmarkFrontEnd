@@ -13,7 +13,6 @@ import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { formatDate } from '@shared/constants/format-date';
 import { placeholderDate } from '@shared/constants/placeholder-date';
 import { ChangeDetectorRef } from '@angular/core';
-import { OrderManagement } from '@shared/models/order-management.model';
 
 enum ExportType {
   'Excel File',
@@ -52,7 +51,7 @@ export abstract class AbstractGridConfigurationComponent {
   // pager
   totalDataRecords: number;
   pageSizePager = GRID_CONFIG.initialRowsPerPage;
-  currentPagerPage: number = 1;
+  currentPagerPage = 1;
 
   pageSize = 100;
   currentPage = 1;
@@ -84,7 +83,6 @@ export abstract class AbstractGridConfigurationComponent {
   datepickerMask = datepickerMask;
 
   public readonly onlyLetters: RegExp = ONLY_LETTERS;
-  private openedChildRows = 0;
   public mobileGridHeight = this.gridHeight;
 
   protected constructor() {}
@@ -138,12 +136,12 @@ export abstract class AbstractGridConfigurationComponent {
     }
   }
 
-  clearSelection(grid: any): void {
+  clearSelection(grid: GridComponent): void {
     this.selectedItems = [];
     grid?.clearSelection();
   }
 
-  addActiveCssClass(event: any): void {
+  addActiveCssClass(event?: Event): void {
     if (event) {
       event.stopPropagation();
       this.clickedElement = event.currentTarget;
@@ -221,7 +219,7 @@ export abstract class AbstractGridConfigurationComponent {
     this.contentLoadedHandler(cd);
   }
 
-  actionBegin(args: PageEventArgs, grid?: any): void {
+  actionBegin(args: PageEventArgs, grid?: GridComponent): void {
     if (args.requestType === 'sorting') {
       this.sortingHandler(args);
       grid && this.clearSelection(grid);
