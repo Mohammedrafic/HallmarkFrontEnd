@@ -94,7 +94,7 @@
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
-        <div   *ngIf="selectedItems.length > 0 else pagingtemplate">
+        <div   *ngIf="selectedItems.length > 1 else pagingtemplate">
           <section class="bulk-section">
             <h3 class="bulk-section__rowscount">{{ selectedItems.length }} Rows Selected</h3>
             <button ejs-button class="edit-button" cssClass="e-flat primary-icon-button" (click)="OnBulkEdit()">
