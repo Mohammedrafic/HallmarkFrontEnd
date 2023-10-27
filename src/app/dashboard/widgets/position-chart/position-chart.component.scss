@@ -6,7 +6,7 @@
   padding-top: 10%;
 }
 .padt-5{
-  padding-top: 3%;
+  padding-top: 4%;
 }
 .app-accumulation-chart__title{
   text-align: center;   
@@ -15,10 +15,8 @@
 .widget {
   display: flex;
   flex-direction: column;
- // padding-left: 10px;
   height: 100%;
   text-align: center;
-  // justify-content: center;
 
   &__title {
     padding-bottom: 4%;
@@ -35,8 +33,6 @@
   &__type {
     font-size: 14px;
     color: $secondary-dark-blue-20;
-  //  margin-right: -12px;
-  // margin-right: 4px;
     cursor: default;
 
     @media screen and (max-width: 1550px) {
