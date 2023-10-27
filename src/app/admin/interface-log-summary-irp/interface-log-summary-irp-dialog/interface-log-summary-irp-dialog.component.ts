@@ -119,6 +119,10 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
     return  this.selectedType == LogStatusEnum.OverAll
 
   }
+  get getSelectedTypeName(): string {
+    return this.selectedType==LogStatusEnum.Errored ? "Error" : LogStatusEnum[this.selectedType]
+
+  }
   constructor(
     private store: Store,private datePipe: DatePipe,
   ) {
@@ -184,7 +188,7 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
 
   public override customExport(): void {
     const currentDateTime = this.generateDateTime(this.datePipe);
-    this.fileName = `EmployeeImportDetails_${currentDateTime}`;
+    this.fileName = this.hidePreviousDialog ?`InterfaceLogSummaryIRPDetails_${currentDateTime}`: this.getSelectedTypeName+`RecordDetails_${currentDateTime}`;
     this.store.dispatch(new ShowExportDialog(true));
   }
 
@@ -199,7 +203,7 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = `EmployeeImportDetails_${this.generateDateTime(this.datePipe)}`;
+    this.defaultFileName = this.hidePreviousDialog ?`InterfaceLogSummaryIRPDetails_${this.generateDateTime(this.datePipe)}`: this.getSelectedTypeName+`RecordDetails_${this.generateDateTime(this.datePipe)}`;
     this.store.dispatch(
       new ExportEmployeeImportDetails(
         new ExportPayload(
