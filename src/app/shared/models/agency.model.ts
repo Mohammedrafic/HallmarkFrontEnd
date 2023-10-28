@@ -153,3 +153,30 @@ export interface AgencyConfig {
   agencyIsMsp: boolean;
   isEditMode: boolean;
 }
+
+export interface AgencyAuditHistory {
+  changeType: string;
+  modifiedOn: string;
+  modifiedBy: string;
+  businessUnitId: number;
+  businessUnitType: number;
+  businessUnitName: string;
+  parentUnitId: number;
+  logoId: string;
+  businessUnitCreatedAt: string;
+  businessUnitCreatedBy: string;
+  businessUnitLastModifiedAt: string;
+  businessUnitLastModifiedBy: string;
+  dbConnectionName: string;
+  organizationPrefix: string;
+  netSuiteId: string;
+  isIRPEnabled: boolean;
+  isVMSEnabled: boolean;
+  netSuiteEnabled: boolean;
+  isMspSource: boolean;
+}
+
+export interface AgencyAuditPayload {
+  entityTypeName: string;
+  searchValue: string;
+}

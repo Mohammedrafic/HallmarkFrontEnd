@@ -4,6 +4,8 @@ import { map, Observable } from 'rxjs';
 
 import {
   Agency,
+  AgencyAuditHistory,
+  AgencyAuditPayload,
   AgencyFilteringOptions,
   AgencyListFilters,
   AgencyPage,
@@ -55,6 +57,10 @@ export class AgencyService {
   public convertAgencyToMSP(agencyId: number | null, netSuiteId: number | null, name: string): Observable<boolean> {
     return this.http.post<boolean>(`/api/MSP/convertagencytomsp`, { agencyId, netSuiteId, name });
   }
+
+  public getAgencyAuditHistory(payload: AgencyAuditPayload): Observable<AgencyAuditHistory[]> {
+    return this.http.post<AgencyAuditHistory[]>(`/api/Audit/businessunitaudithistory`, payload);
+  }  
 
   /**
    * Get the list of available business units

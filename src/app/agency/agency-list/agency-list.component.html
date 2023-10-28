@@ -152,7 +152,7 @@
       <br />
     </div>
     <div class="msp-button-container">
-      <button ejs-button [isPrimary]="true" [disabled]="!userPermission[userPermissions.CanCreateMSP]" (click)="onConvertAgencyToMSPFormSaveClick()">Convert To MSP</button>
+      <button ejs-button [isPrimary]="true" [disabled]="!userPermission[userPermissions.CanCreateMSP]" (click)="onConvertAgencyToMSPFormSaveClick()" [formGroup]="convertAgencyToMSPFormGroup">Convert To MSP</button>
     </div>
   </form>
 </app-side-dialog>
@@ -169,3 +169,5 @@
 </app-filter-dialog>
 
 <app-scroll-to-top></app-scroll-to-top>
+
+<app-agency-history-details [agencyHD]="agencyData"></app-agency-history-details>
