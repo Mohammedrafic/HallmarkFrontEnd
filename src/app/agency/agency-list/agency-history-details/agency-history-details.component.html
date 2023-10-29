@@ -1,0 +1,46 @@
+<ejs-dialog id="dialog"
+            #sideDialog
+            cssClass="dialog order-details-dialog history-dialog"
+            [target]="targetElement$ | async"
+            [visible]="false"
+            [animationSettings]="{ effect: 'SlideRight' }"
+            [isModal]="true">
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">
+              Agency Name: {{ agencyDetail?.agencyDetails.name }}
+            </h3>
+          </div>
+          <div class="e-card-content dialog-controls contact-to-perm">
+            <button ejs-button type="submit" style="margin-left: 20px;" cssClass="e-flat close-button" (click)="onClose()">
+              <i-feather name="x" class="ml-2 icon"></i-feather>
+            </button>
+          </div>
+        </div>
+      </section>
+      <div>
+        <ng-container>
+          <ejs-accordion expandMode='Single' (expanding)="expanding($event)">
+            <e-accordionitems>
+              <e-accordionitem expanded='true'>
+                <ng-template #header>
+                  <div>Agency Audit History</div>
+                </ng-template>
+                <ng-template #content>
+                  <section class="app-grid">
+                    <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
+                                     [gridOptions]="gridOptions"
+                                     (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"></ag-grid-angular>
+                  </section>
+                </ng-template>
+              </e-accordionitem>
+            </e-accordionitems>
+          </ejs-accordion>
+        </ng-container>
+      </div>
+    </section>
+  </ng-template>
+</ejs-dialog>
