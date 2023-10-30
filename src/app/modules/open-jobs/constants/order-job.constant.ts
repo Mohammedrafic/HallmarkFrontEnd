@@ -2,6 +2,7 @@ import { OrderJobType } from '@shared/enums';
 import { GetLocalDate } from '@shared/helpers';
 
 import { FiltersState, PageSettings } from '../interfaces';
+import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
 
 export const JobPageSettings: PageSettings = {
   pageNumber: 1,
@@ -27,4 +28,12 @@ export const DefaultFilterState: FiltersState = {
   orderType: null,
   orderBy: null,
   ...JobPageSettings,
+};
+
+export const GetDurationText = (durationValue: number): string => {
+  const selectedDuration = ORDER_DURATION_LIST.find((duration) => {
+    return duration.id === durationValue;
+  });
+
+  return selectedDuration?.name ?? '';
 };

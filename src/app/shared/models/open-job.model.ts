@@ -29,6 +29,7 @@ export interface OpenJob {
   status: CandidatStatus;
   jobId?: number | null;
   statusName?: string | null;
+  durationText?: string;
 }
 
 export type OpenJobPage = PageOfCollections<OpenJob>;
