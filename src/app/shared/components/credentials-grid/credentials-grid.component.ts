@@ -41,7 +41,7 @@ import { CredentialGridService } from '@agency/services/credential-grid.service'
 import { AbstractGridConfigurationComponent } from
   '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { 
-  DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED, RECORD_MODIFIED
+  DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED, RECORD_MODIFIED, RECORD_UNSAVED
 } from '@shared/constants/messages';
 import { optionFields } from '@shared/constants';
 import { FileStatusCode } from '@shared/enums/file.enum';
@@ -121,6 +121,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public disableAddCredentialButton: boolean;
   public requiredCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
+  public isPublic: boolean;
   public existingFiles: CredentialFiles[] = [];
   public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
 
@@ -716,6 +717,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       .subscribe((credential: { payload: CandidateCredential }) => {
         const isEdit = this.isEdit;
         this.credentialId = credential.payload.id as number;
+        this.isPublic = credential.payload.isPublic as boolean;
         this.disabledCopy = false;
         this.selectedItems = [];
 
@@ -724,7 +726,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           return;
         }
 
-        this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADDED : RECORD_MODIFIED));
+        if(this.isPublic) {
+          this.store.dispatch(new ShowToast(MessageTypes.Warning, RECORD_UNSAVED ));
+        }else{
+          this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADDED : RECORD_MODIFIED));
+        }
+
         this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
         this.addCredentialForm.markAsPristine();
         this.closeDialog();
