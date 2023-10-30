@@ -72,7 +72,7 @@ export class OrderDetailsIrpService {
       jobDistribution: [null, Validators.required ],
       agencyId: [null],
       billRate: [null],
-      distributeToVMS: [null],
+      distributeToVMS: [null,[Validators.pattern(NUMBER_AND_TWO_DECIMAL)]],
       distributionDelay: [null],
     }, {
         validators: jobDistributionValidator('jobDistribution','distributeToVMS','distributionDelay',this.isTemplate),
