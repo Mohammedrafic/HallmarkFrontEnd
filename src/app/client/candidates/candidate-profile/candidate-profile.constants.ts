@@ -2,8 +2,7 @@ export enum ProfileStatusesEnum {
   Inactive,
   Active,
   OnHold,
-  Terminated,
-  Sourcing,
+  Sourcing = 4,
   Prospect,
   VerbalOfferMade,
   Onboarding,
@@ -29,7 +28,6 @@ export const ProfileStatuses = [
   { id: ProfileStatusesEnum.Active, name: 'Active' },
   { id: ProfileStatusesEnum.Inactive, name: 'Inactive' },
   { id: ProfileStatusesEnum.OnHold, name: 'On Hold' },
-  { id: ProfileStatusesEnum.Terminated, name: 'Terminated' },
   { id: ProfileStatusesEnum.Sourcing, name: 'Sourcing' },
   { id: ProfileStatusesEnum.Prospect, name: 'Prospect' },
   { id: ProfileStatusesEnum.VerbalOfferMade, name: 'Verbal Offer Made' },
@@ -37,7 +35,7 @@ export const ProfileStatuses = [
   { id: ProfileStatusesEnum.ClearedForOrientation, name: 'Cleared For Orientation' },
   { id: ProfileStatusesEnum.OrientationScheduled, name: 'Orientation Scheduled' },
   { id: ProfileStatusesEnum.DoNotHire, name: 'Do Not Hire' },
-  { id: ProfileStatusesEnum.FallOffOnboarding, name: 'Fall Off Onboarding' }
+  { id: ProfileStatusesEnum.FallOffOnboarding, name: 'Fall Off Onboarding' },
 ];
 
 export const recruitContent = [
@@ -75,7 +73,7 @@ export const HrCompanyCodes = [
 ];
 
 
-export const TerminationReasons = [
+export const InactivationReasons = [
   { id: 0, name: 'Termination reason 1' },
   { id: 1, name: 'Termination reason 2' },
   { id: 2, name: 'Termination reason 3' },

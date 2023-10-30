@@ -12,7 +12,7 @@ import { CandidateTabsEnum } from '@client/candidates/enums';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { Store } from '@ngxs/store';
 import { SystemType } from '@shared/enums/system-type.enum';
-import { EMPLOYEE_SKILL_CHANGE_WARNING, EMPLOYEE_TERMINATED_WARNING } from '@shared/constants/messages';
+import { EMPLOYEE_SKILL_CHANGE_WARNING, EMPLOYEE_INACTIVATED_WARNING } from '@shared/constants/messages';
 import { ProfileStatusesEnum } from './candidate-profile.constants';
 import { UserState } from 'src/app/store/user.state';
 import { Permission } from '@core/interface';
@@ -26,13 +26,13 @@ import { UserPermissions } from '@core/enums';
 })
 export class CandidateProfileComponent extends DestroyableDirective implements OnInit, OnDestroy {
   public photo$: Observable<Blob>;
-  public readonlyMode = false;
+  public readonlyMode = false; 
   public $skillsConfirmDialog = new Subject<boolean>();
   public $statusConfirmDialog = new Subject<boolean>();
   public showSkillConfirmDialog = false;
   public showStatusConfirmDialog = false;
   public replaceOrder = false;
-  public employeeTerminatedWaring = EMPLOYEE_TERMINATED_WARNING;
+  public employeeTerminatedWaring = EMPLOYEE_INACTIVATED_WARNING;
   public employeeSkillChangeWarning = EMPLOYEE_SKILL_CHANGE_WARNING;
 
   private filesDetails: Blob | null;
@@ -99,7 +99,8 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   private isEmployeeTerminated(): boolean {
     const profileStatusControl = this.candidateProfileFormService.candidateForm.get('profileStatus');
     return !!(this.candidateService.employeeId &&
-      (profileStatusControl?.dirty && profileStatusControl?.value === ProfileStatusesEnum.Terminated ||profileStatusControl?.value === ProfileStatusesEnum.FallOffOnboarding));
+      (profileStatusControl?.dirty && profileStatusControl?.value === ProfileStatusesEnum.Inactive
+        || profileStatusControl?.value === ProfileStatusesEnum.FallOffOnboarding));
   }
 
   private profileStatusTerminatedConfirmation(): Observable<void | CandidateModel> {
@@ -177,7 +178,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
         this.candidateProfileFormService.populateCandidateForm(candidate);
         this.candidateService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
         this.candidateService.setProfileData(candidate);
-        this.generalNotesService.notes$.next(candidate.generalNotes);
+        this.generalNotesService.notes$.next(candidate.generalNotes); 
       });
   }
 
