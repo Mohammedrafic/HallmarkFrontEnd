@@ -279,7 +279,6 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
             });
           this.agencyControl?.updateValueAndValidity();
           this.billingControl?.disable();
-          debugger
           this.populateBillingFromGeneral();
         } else {
           this.populatedSubscription?.unsubscribe();
