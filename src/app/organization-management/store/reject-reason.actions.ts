@@ -232,8 +232,8 @@ export class UpdateInternalTransferReasonsError {
 }
 
 
-export class GetTerminationReasons {
-  static readonly type = '[reject reason] Get Termination reason by Page';
+export class GetInactivationReasons {
+  static readonly type = '[reject reason] Get Inactivation reason by Page';
   constructor(public pageNumber: number, public pageSize: number) { }
 }
 export class GetSourcingReasons {
@@ -241,27 +241,27 @@ export class GetSourcingReasons {
   constructor() { }
 }
 
-export class SaveTerminationReasons {
+export class SaveInactivationReasons {
   static readonly type = '[reject reason] Save Termination Reason';
   constructor(public payload: RejectReason){}
 }
 
-export class RemoveTerminationReasons {
+export class RemoveInactivationReasons {
   static readonly type = '[reject reason] Remove Termination Reason';
   constructor(public id: number){}
 }
 
-export class UpdateTerminationReasons {
+export class UpdateInactivationReasons {
   static readonly type = '[reject reason] Update Termination Reason';
   constructor(public payload: RejectReason) {
   }
 }
 
-export class UpdateTerminationReasonsSuccess {
+export class UpdateInactivationReasonsSuccess {
   static readonly type = '[reject reason] Update Termination Reason Success';
 }
 
-export class SaveTerminatedReasonError {
+export class SaveInactivatedReasonError {
   static readonly type = '[reject reason] Save Manual Invoice Reason Error';
 }
 

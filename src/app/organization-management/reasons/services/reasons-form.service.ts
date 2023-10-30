@@ -74,7 +74,7 @@ export class ReasonsFormsService {
         includeInIRP: [false],
         includeInVMS: [false],
       });
-    } else if(formType === ReasonFormType.TerminatedReason){
+    } else if(formType === ReasonFormType.InactivatedReason){
       this.form = this.fb.group({
         id: [],
         reason: ['', [Validators.required, Validators.maxLength(100),

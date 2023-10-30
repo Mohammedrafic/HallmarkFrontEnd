@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { Select, ofActionSuccessful } from '@ngxs/store';
 import { ReasonsComponent } from '@organization-management/reasons/models';
-import { GetSourcingReasonsByPage, GetTerminationReasons, RemoveSourcingReasons, RemoveTerminationReasons, SaveSourcingReasonsError, SaveTerminatedReasonError, UpdateSourcingReasonsSuccess, UpdateTerminationReasonsSuccess } from '@organization-management/store/reject-reason.actions';
+import { GetSourcingReasonsByPage, GetInactivationReasons, RemoveSourcingReasons, RemoveInactivationReasons, SaveSourcingReasonsError, SaveInactivatedReasonError, UpdateSourcingReasonsSuccess, UpdateInactivationReasonsSuccess } from '@organization-management/store/reject-reason.actions';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { RejectReasonPage, SourcingReasonPage } from '@shared/models/reject-reason.model';
 import { Observable, takeWhile } from 'rxjs';
