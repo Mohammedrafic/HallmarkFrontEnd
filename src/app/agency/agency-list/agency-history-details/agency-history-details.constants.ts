@@ -161,50 +161,6 @@ export const AgencyAuditHistoryTableColumnsDefinition = (): ColumnDefinitionMode
       sortable: true,
       resizable: true
     },
-    //{
-    //  headerName: BusinessUnitAuditHistoryTableColumns.businessUnitLastModifiedAt,
-    //  field: 'businessUnitLastModifiedAt',
-    //  minWidth: 100,
-    //  filter: 'agDateColumnFilter',
-    //  filterParams: {
-    //    buttons: ['reset'],
-    //    debounceMs: 1000,
-    //    suppressAndOrCondition: true,
-    //    comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
-    //      if (cellValue == null) {
-    //        return 0;
-    //      }
-    //      const dateAsString = GridValuesHelper.formatDate(cellValue, 'MM/dd/yyyy') as string
-    //      const dateParts = dateAsString.split('/');
-    //      const year = Number(dateParts[2]);
-    //      const month = Number(dateParts[0]) - 1;
-    //      const day = Number(dateParts[1]);
-
-    //      const cellDate = new Date(year, month, day);
-    //      if (cellDate < filterLocalDateAtMidnight) {
-    //        return -1;
-    //      } else if (cellDate > filterLocalDateAtMidnight) {
-    //        return 1;
-    //      }
-    //      return 0;
-    //    },
-    //    inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
-    //  },
-    //  cellRenderer: (params: ICellRendererParams) => {
-    //    const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy') as string
-    //    return str?.length > 0 ? str : "";
-    //  },
-    //  sortable: true,
-    //  resizable: true
-    //},
-    //{
-    //  headerName: BusinessUnitAuditHistoryTableColumns.businessUnitLastModifiedBy,
-    //  field: 'businessUnitLastModifiedBy',
-    //  minWidth: 100,
-    //  filter: true,
-    //  sortable: true,
-    //  resizable: true
-    //},
     {
       headerName: BusinessUnitAuditHistoryTableColumns.dbConnectionName,
       field: 'dbConnectionName',
@@ -260,7 +216,7 @@ export const EmptyAgency: Agency = {
     state: '',
     country: 0,
     city: '',
-    zipCode: '',
+    zipcode: '',
     phone1Ext: '',
     phone2Ext: '',
     fax: '',
@@ -276,7 +232,7 @@ export const EmptyAgency: Agency = {
     country: 0,
     state: '',
     city: '',
-    zipCode: '',
+    zipcode: '',
     phone1: '',
     phone2: '',
     ext: '',
