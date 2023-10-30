@@ -10,6 +10,11 @@
     display: flex;
     column-gap: 20px;
 
+    .extension__comments {
+      background: #f7f8fc;
+      border-radius: 10px;
+    }
+    
     .extension__details {
       display: flex;
       flex-direction: column;

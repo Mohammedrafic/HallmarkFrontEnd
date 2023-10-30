@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 
 import { DateTimeHelper } from "@core/helpers";
 import { OrganizationManagementState } from "@organization-management/store/organization-management.state";
-import { ExpiredCredentialsMessage } from "@shared/components/child-order-dialog/child-order-dialog.constants";
+import { ExpiredCredentialsEmpMessage, ExpiredCredentialsMessage } from "@shared/components/child-order-dialog/child-order-dialog.constants";
 import { ChildOrderDialogService } from "@shared/components/child-order-dialog/child-order-dialog.service";
 import { MissingCredentialsRequestBody, MissingCredentialsResponse } from "@shared/models/credential.model";
 import {
@@ -116,6 +116,7 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 import { SettingsViewService } from '@shared/services';
 import { UserPermissions } from '@core/enums';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 enum Template {
   accept,
@@ -224,6 +225,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private isLastExtension = false;
   private ignoreMissingCredentials = false;
   private readonly permissions = UserPermissions;
+  confirmationMessage: string;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -804,7 +806,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
         ? candidateBillRate
         : offeredBillRate;
-    const orderDate = this.order.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate;
+    const orderDate = this.order?.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate;
 
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
@@ -910,8 +912,13 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private showMissingCredentialsWarningMessage(): void {
+    if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+      this.confirmationMessage = ExpiredCredentialsEmpMessage;
+    } else {
+      this.confirmationMessage = ExpiredCredentialsMessage;
+    }
     this.confirmService
-      .confirm(ExpiredCredentialsMessage, {
+      .confirm(this.confirmationMessage, {
         title: 'Add Extension',
         okButtonLabel: 'Yes',
         okButtonClass: 'delete-button',

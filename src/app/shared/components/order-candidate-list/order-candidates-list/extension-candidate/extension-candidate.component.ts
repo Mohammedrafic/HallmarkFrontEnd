@@ -60,6 +60,7 @@ import { Comment } from '@shared/models/comment.model';
 import {
   AcceptJobDTO,
   ApplicantStatus,
+  IrpOrderCandidate,
   Order,
   OrderCandidateJob,
   OrderCandidatesList,
@@ -87,6 +88,7 @@ import { OrderManagementPagerState } from '@shared/models/candidate.model';
 import { CandidateState } from '@agency/store/candidate.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -107,6 +109,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Output() updateDetails = new EventEmitter<void>();
 
   private _activeSystem: any;
+  activeSystems: OrderManagementIRPSystemId | null;
+  CanOrganizationEditOrdersIRP: boolean;
+  CanOrganizationViewOrdersIRP: boolean;
   public get activeSystem() {
     return this._activeSystem;
   }
@@ -115,8 +120,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this._activeSystem = val;
     this.subsToCandidate();
   }
-
-  candidate$: Observable<OrderCandidatesList | null>;
+  
+  public candidate$: Observable<OrderCandidatesList | null>;
 
   @Select(OrderManagementState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
@@ -125,7 +130,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public clientOrderCandidatePage$: Observable<OrderCandidatesListPage>;
 
   @Select(OrderManagementContentState.getIrpCandidates)
-  public getIrpCandidates$ : Observable<OrderCandidatesListPage>
+  public getIrpCandidates$ : Observable<IrpOrderCandidate>
+
+
+  @Select(OrderManagementContentState.irpCandidatesforExtension)
+  public getIrpCandidatesforExtension$ : Observable<OrderCandidatesListPage>
 
   @Select(UserState.currentUserPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
@@ -249,6 +258,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private settingService: SettingsViewService,
     private permissionService: PermissionService,
     private confirmService: ConfirmService,
+    private orderManagementService: OrderManagementService
   ) {
     super();
     this.isAgency = this.router.url.includes('agency');
@@ -264,6 +274,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   ngOnInit(): void {
+    this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.subscribeOnPermissions();
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
@@ -499,42 +510,44 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private subsToCandidate(): void {
-    const state$ = this.isAgency ? this.orderCandidatePage$ : (this.activeSystem == OrderManagementIRPSystemId.IRP ? this.getIrpCandidates$ : this.clientOrderCandidatePage$);
-      this.candidate$ = state$.pipe(
-        filter(Boolean),
-        map((res) => {
-          const items = res?.items || this.candidateOrder?.items;
-          const candidate = items?.find((candidate) => candidate.candidateJobId);
-          this.candidate = candidate;
-          if (candidate) {
-            return candidate;
-          } else {
-            return null;
-          }
-        })
-      );
-
-    combineLatest([this.orderPermissions$, this.candidate$])
-      .pipe(
-        filter(([permission, candidate]) => !!permission && !!candidate),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(([permissions, candidate]: [CurrentUserPermission[], OrderCandidatesList | null]) => {
-        this.orderPermissions = permissions;
-        this.mapPermissions();
-        this.getCandidatePayRateSetting();
-        if(candidate?.organizationId){
-          this.orgId = candidate.organizationId
-        } else {
-          this.orgId = this.currentOrder?.organizationId
-        }
-        const candidateJobId = candidate?.candidateJobId;
-        const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;
-        if (this.orgId && candidateJobId) {
-          this.store.dispatch(new GetCandidateJobAction(this.orgId, candidateJobId));
-        }
-      });
-      this.changeDetectorRef.detectChanges();
+    if(this.activeSystem == undefined){
+      this.activeSystem = this.activeSystems;
+    }
+        const state$ = this.isAgency ? this.orderCandidatePage$ : (this.activeSystem === OrderManagementIRPSystemId.IRP ? this.getIrpCandidatesforExtension$ : this.clientOrderCandidatePage$);
+          this.candidate$ = state$.pipe(
+            filter(Boolean),
+            map((res) => {
+              const items = res?.items || this.candidateOrder?.items;
+              const candidate = items?.find((candidate) => candidate.candidateJobId);
+              this.candidate = candidate;
+              if (candidate) {
+                return candidate;
+              } else {
+                return null;
+              }
+            })
+          )
+        combineLatest([this.orderPermissions$, this.candidate$])
+          .pipe(
+            filter(([permission, candidate]) => !!permission && !!candidate),
+            takeUntil(this.destroy$)
+          )
+          .subscribe(([permissions, candidate]: [CurrentUserPermission[], OrderCandidatesList | null]) => {
+            this.orderPermissions = permissions;
+            this.mapPermissions();
+            this.getCandidatePayRateSetting();
+            if(candidate?.organizationId){
+              this.orgId = candidate.organizationId
+            } else {
+              this.orgId = this.currentOrder?.organizationId
+            }
+            const candidateJobId = candidate?.candidateJobId;
+            const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;
+            if (this.orgId && candidateJobId) {
+              this.store.dispatch(new GetCandidateJobAction(this.orgId, candidateJobId));
+            }
+            this.changeDetectorRef.detectChanges();
+          });
   }
 
   private getOrderPermissions(orderId: number): void {
@@ -983,8 +996,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder }) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, CanOrganizationEditOrdersIRP, CanOrganizationViewOrdersIRP }) => {
       this.canCreateOrder = canCreateOrder;
+      this.CanOrganizationEditOrdersIRP = CanOrganizationEditOrdersIRP;
+      this.CanOrganizationViewOrdersIRP = CanOrganizationViewOrdersIRP;
     });
   }
 }
