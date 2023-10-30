@@ -12,6 +12,7 @@ export class OpenJobsAdapter {
           startDate: DateTimeHelper.setUtcTimeZone(item.startDate),
           endDate: DateTimeHelper.setUtcTimeZone(item.endDate),
           orderTypeName: OrderJobName[item.orderType],
+          title: item.skillName,
         };
       }),
     };

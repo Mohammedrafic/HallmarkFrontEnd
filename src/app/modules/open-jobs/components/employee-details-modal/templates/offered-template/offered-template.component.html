@@ -1,0 +1,85 @@
+<div class="wrapper">
+  <div class="header-modal">
+    <div class="sub-title">
+      <div>Long Term Assignment</div>
+      <div class="type">{{selectedEmployeeDetails?.orderTypeName}}</div>
+    </div>
+    <div class="status">
+      <ejs-chiplist ngClass="open-jobs-status">
+        <e-chips>
+          <e-chip [text]="selectedEmployeeDetails?.statusName" [cssClass]="(selectedEmployeeDetails?.statusName ?? '' | chipsCssClass)"></e-chip>
+        </e-chips>
+      </ejs-chiplist>
+    </div>
+  </div>
+  <div class="content-modal">
+    <div class="times">
+      <div class="time-item">
+        <div class="icon">
+          <i-feather name="clock" class="icon"></i-feather>
+        </div>
+        <div class="text">
+            <div class="text-value">
+              {{selectedEmployeeDetails?.shiftStartDateTime | date: "HH:mm":"utc": "en-US"}}
+              -
+              {{selectedEmployeeDetails?.shiftEndDateTime | date: "HH:mm":"utc": "en-US"}}
+            </div>
+            <div class="text-title">
+              Shift Time
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="times jobs">
+      <div class="time-item">
+        <div class="icon">
+          <i-feather name="calendar" class="icon"></i-feather>
+        </div>
+        <div class="text">
+          <div class="text-value">
+            {{selectedEmployeeDetails?.startDate | date: "MM/dd/yyy":"utc": "en-US"}}
+            -
+            {{selectedEmployeeDetails?.endDate | date: "MM/dd/yyy":"utc": "en-US"}}
+          </div>
+          <div class="text-title">
+            Job Date
+          </div>
+        </div>
+      </div>
+      <div class="time-item duration">
+        <div class="text">
+          <div class="text-value">
+            {{selectedEmployeeDetails?.duration}} weeks
+          </div>
+          <div class="text-title">
+            Duration
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text text-wrapper">
+      <div class="text-value">
+        {{selectedEmployeeDetails?.positionId}}
+      </div>
+      <div class="text-title">
+        Position ID
+      </div>
+    </div>
+    <div class="text text-wrapper">
+      <div class="text-value">
+        {{selectedEmployeeDetails?.locationName}}
+      </div>
+      <div class="text-title">
+        Location
+      </div>
+    </div>
+    <div class="text text-wrapper">
+      <div class="text-value">
+        {{selectedEmployeeDetails?.departmentName}}
+      </div>
+      <div class="text-title">
+        Department
+      </div>
+    </div>
+  </div>
+</div>

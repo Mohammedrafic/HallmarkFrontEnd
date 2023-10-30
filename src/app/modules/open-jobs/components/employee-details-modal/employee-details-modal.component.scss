@@ -1,0 +1,26 @@
+@import "colors";
+
+.employee-details-dialog {
+  border-radius: 10px !important;
+
+  & + .e-dlg-overlay {
+    background-color: $black;
+  }
+
+  .e-dlg-header-content {
+    border-bottom: 1px solid var(--dialog-border);
+    border-radius: 10px 10px 0 0;
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 32px;
+  }
+
+  .e-footer-content {
+    border-top: 1px solid $secondary-dark-blue-45;
+    padding: 16px 24px;
+    border-radius: 0 0 10px 10px;
+  }
+}

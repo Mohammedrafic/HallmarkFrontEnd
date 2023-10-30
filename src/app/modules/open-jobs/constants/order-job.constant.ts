@@ -9,11 +9,13 @@ export const JobPageSettings: PageSettings = {
 };
 
 export const AllOrderTypeOption = 0;
-export const AppliedWorkflowStep = 10;
-export const WithdrawnWorkflowStep = 35;
-export const AvailabilityScheduleType = 1;
-export const AppliedMessage = 'You have been applied';
-export const WithdrawnMessage = 'You have been withdrawn';
+
+export const JobMessages = {
+  appliedMessage: 'You have been applied',
+  withdrawnMessage: 'You have been withdrawn',
+  acceptMessage: 'You have been accepted',
+  rejectMessage: 'You have been rejected',
+};
 
 export const OrderJobName: Record<number, string> = {
   [OrderJobType.LTA]: 'L',

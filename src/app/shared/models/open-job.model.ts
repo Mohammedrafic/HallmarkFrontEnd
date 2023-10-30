@@ -1,4 +1,5 @@
 import { PageOfCollections } from '@shared/models/page.model';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 export interface OpenJob {
   employeeId: string;
@@ -21,7 +22,11 @@ export interface OpenJob {
   isApplySelected: boolean;
   isApplyEnabled: boolean;
   isDeprtmentVisible: boolean;
+  title: string;
+  positionId: string;
+  duration: number;
   orderTypeName: string;
+  status: CandidatStatus;
   jobId?: number | null;
   statusName?: string | null;
 }
