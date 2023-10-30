@@ -24,7 +24,7 @@
     <app-tooltip-container
       [message]="toolTipMessage"
       [showToolTip]="!userPermission[userPermissions.CanCreateDeleteAgency]">
-      <button ejs-button appHideBeforeSyncfusionLoad [disabled]="!userPermission[userPermissions.CanCreateDeleteAgency]" [isPrimary]="true" (click)="navigateToAgencyForm()">Add Agency</button>
+      <button ejs-button appHideBeforeSyncfusionLoad *ngIf="!isBusinessUnitTypeMSP" [disabled]="!userPermission[userPermissions.CanCreateDeleteAgency]" [isPrimary]="true" (click)="navigateToAgencyForm()">Add Agency</button>
     </app-tooltip-container>
   </ng-container>
 </app-page-toolbar>
@@ -60,6 +60,7 @@
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
             <button ejs-button
+                    *ngIf="!isBusinessUnitTypeMSP"
                     [matMenuTriggerFor]="menu"
                     (click)="$event.stopPropagation()"
                     [disabled]="false"

@@ -28,6 +28,8 @@ import { FilterService } from '@shared/services/filter.service';
 import { agencyListFilterColumns, agencyStatusMapper, MSPMenuOptions, MSPMenuType } from '@agency/agency-list/agency-list.constants';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
+import { UserState } from '../../store/user.state';
+import { BusinessUnitType } from '../../shared/enums/business-unit-type';
 
 
 @Component({
@@ -91,6 +93,8 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   public agencyData = new Subject<Agency>();
+  public businessUnitType: BusinessUnitType;
+  public isBusinessUnitTypeMSP: boolean = false;
 
   @Select(AgencyState.agencies)
   agencies$: Observable<AgencyPage>;
@@ -120,6 +124,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.subscribeOnAgencyFilteringOptions();
     this.subscribeOnSuccessAgencyByPage();
     this.setFileName();
+    this.isBusinessUnitMSP();
   }
 
   ngOnDestroy(): void {
@@ -134,6 +139,13 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public dataBound(): void {
     this.contentLoadedHandler();
     this.grid.hideScroll();
+  }
+
+  public isBusinessUnitMSP(): void {
+    this.businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    if (this.businessUnitType == BusinessUnitType.MSP) {
+      this.isBusinessUnitTypeMSP = true;
+    }
   }
 
   public changeGridSize(page: number): void {
@@ -257,13 +269,13 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
         this.onEdit(data);
         break;
       case MSPMenuType['Convert to MSP']:
-        this.store.dispatch(new ShowSideDialog(true));
         this.currentAgency = data;
+        this.store.dispatch(new ShowSideDialog(true));
         break;
       case MSPMenuType['Unlink from MSP']:
-        /**/
+        /*to be implemented*/
         break;
-      case MSPMenuType['History']:
+      case MSPMenuType['View History']:
         this.agencyData.next(data);
         break;
     }
