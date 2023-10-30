@@ -30,3 +30,8 @@
   (appliedFiltersAmount)="changeFiltersAmount($event)"
   (destroyFilterDialog)="closeFilterDialog()"
 ></app-job-filters>
+
+<app-employee-details-modal
+  *ngIf="showEmployeeDetailsDialog"
+  [selectedEmployeeDetails]="selectedEmployeeDetails"
+></app-employee-details-modal>

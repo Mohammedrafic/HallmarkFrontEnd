@@ -1,47 +1,48 @@
-<div class="general-info" *ngIf="orderCandidateInformation" [ngSwitch]="orderCandidateInformation?.orderType">
-  <app-general-order-per-diem-info
-    *ngSwitchCase="orderType.OpenPerDiem"
-    [orderInformation]="orderCandidateInformation"
-  ></app-general-order-per-diem-info>
-  <app-general-reorder-info
-    *ngSwitchCase="orderType.ReOrder"
-    [order]="orderCandidateInformation"
-  ></app-general-reorder-info>
-  <app-general-order-info *ngSwitchDefault [order]="orderCandidateInformation"></app-general-order-info>
-</div>
-<div class="line"></div>
-<ng-container *ngIf="orderCandidateInformation?.orderClosureReason">
-  <app-order-close-reason-info [orderInformation]="orderCandidateInformation"></app-order-close-reason-info>
+<ng-container *ngIf="(orderCandidatesInformation$ | async) as orderCandidateInformation">
+  <div class="general-info" [ngSwitch]="orderCandidateInformation.orderType">
+    <app-general-order-per-diem-info
+      *ngSwitchCase="orderType.OpenPerDiem"
+      [orderInformation]="orderCandidateInformation"
+    ></app-general-order-per-diem-info>
+    <app-general-reorder-info
+      *ngSwitchCase="orderType.ReOrder"
+      [order]="orderCandidateInformation"
+    ></app-general-reorder-info>
+    <app-general-order-info *ngSwitchDefault [order]="orderCandidateInformation"></app-general-order-info>
+  </div>
   <div class="line"></div>
+  <ng-container *ngIf="orderCandidateInformation?.orderClosureReason">
+    <app-order-close-reason-info [orderInformation]="orderCandidateInformation"></app-order-close-reason-info>
+    <div class="line"></div>
+  </ng-container>
+  <div class="candidates-list" [ngSwitch]="orderCandidateInformation.orderType">
+    <app-order-per-diem-candidates-list
+      *ngSwitchCase="orderType.OpenPerDiem"
+      [includeDeployedCandidates]="!excludeDeployed"
+      [candidatesList]="orderCandidatePage$ | async"
+      (getCandidatesList)="onGetCandidatesList($event)"
+      [order]="orderCandidates"
+      [selectedOrder]="currentOrder"
+      [orderManagementPagerState]="orderManagementPagerState$ | async"
+    >
+    </app-order-per-diem-candidates-list>
+    <app-reorder-candidates-list
+      *ngSwitchCase="orderType.ReOrder"
+      [includeDeployedCandidates]="!excludeDeployed"
+      [candidatesList]="orderCandidatePage$ | async"
+      (getCandidatesList)="onGetCandidatesList($event)"
+      [order]="orderCandidates"
+      [selectedOrder]="currentOrder"
+      [orderManagementPagerState]="orderManagementPagerState$ | async"
+    ></app-reorder-candidates-list>
+    <app-order-candidates-list
+      *ngSwitchDefault
+      [candidatesList]="orderCandidatePage$ | async"
+      [includeDeployedCandidates]="!excludeDeployed"
+      (getCandidatesList)="onGetCandidatesList($event)"
+      [order]="orderCandidates"
+      [orderManagementPagerState]="orderManagementPagerState$ | async"
+    >
+    </app-order-candidates-list>
+  </div>
 </ng-container>
-<div class="candidates-list" [ngSwitch]="orderCandidateInformation?.orderType">
-  <app-order-per-diem-candidates-list
-    *ngSwitchCase="orderType.OpenPerDiem"
-    [includeDeployedCandidates]="!excludeDeployed"
-    [candidatesList]="orderCandidatePage$ | async"
-    (getCandidatesList)="onGetCandidatesList($event)"
-    [order]="orderCandidates"
-    [selectedOrder]="currentOrder"
-    [orderManagementPagerState]="orderManagementPagerState$ | async"
-  >
-  </app-order-per-diem-candidates-list>
-  <app-reorder-candidates-list
-    *ngSwitchCase="orderType.ReOrder"
-    [includeDeployedCandidates]="!excludeDeployed"
-    [candidatesList]="orderCandidatePage$ | async"
-    (getCandidatesList)="onGetCandidatesList($event)"
-    [order]="orderCandidates"
-    [selectedOrder]="currentOrder"
-    [orderManagementPagerState]="orderManagementPagerState$ | async"
-  ></app-reorder-candidates-list>
-  <app-order-candidates-list
-    *ngSwitchDefault
-    [candidatesList]="orderCandidatePage$ | async"
-    [includeDeployedCandidates]="!excludeDeployed"
-    (getCandidatesList)="onGetCandidatesList($event)"
-    [order]="orderCandidates"
-    [orderManagementPagerState]="orderManagementPagerState$ | async"
-  >
-  </app-order-candidates-list>
-</div>
-

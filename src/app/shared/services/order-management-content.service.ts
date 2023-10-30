@@ -160,7 +160,7 @@ export class OrderManagementContentService {
     }
 
     if(searchTerm) {
-      params = { ...params, searchTerm }
+      params = { ...params, searchTerm };
     }
     return this.http.get<OrderCandidatesListPage>(
       `/api/CandidateProfile/order/${orderId}/organization/${organizationId}`,

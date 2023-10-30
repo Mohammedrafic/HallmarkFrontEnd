@@ -34,7 +34,7 @@ export function jobDistributionValidator(controlName: string,distributeToVMS:str
     const distributionvaluecontrol = formGroup.get(distributeToVMS);
     const distributionvalue = distributionvaluecontrol?.value;
 
-    if (distributiondelayvalue && distributionvalue == null && !isTemplate) {
+    if (distributiondelayvalue && distributionvalue.length === 0 && !isTemplate) {
       distributionvaluecontrol?.setErrors({ errorMessage: DistributionvalueError });
     }
 

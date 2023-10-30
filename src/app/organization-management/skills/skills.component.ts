@@ -321,6 +321,9 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
           let selectedskillstodelete = this.selectedItems.map((val) => (val.masterSkill?.id ?? 0));
           this.store.dispatch(new BulkDeleteAssignedSkill(selectedskillstodelete));
         }
+        else{
+          this.clearSelection(this.grid);
+        }
         this.removeActiveCssClass();
       });
   }
@@ -493,7 +496,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       this.clearSelection(this.grid);
       this.getSkills();
       let skillnames=payload.payload.skillNames;
-      if(skillnames.length > 0){
+      if(skillnames && skillnames.length > 0){
         this.bulkaction=0;
         this.bulkactionnotvalidskillnmaes=skillnames;
         this.bulkactionmessage = payload.payload.message;
@@ -528,7 +531,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       this.bulkaction=1;
       this.getSkills();
       let skillnames=payload.payload.skillNames;
-      if(skillnames.length > 0){
+      if(skillnames && skillnames.length > 0){
         this.bulkactionnotvalidskillnmaes=skillnames;
         this.bulkactionmessage = payload.payload.message;
         this.store.dispatch(new ShowBulkSkillActionDialog(true,this.bulkactionmessage));

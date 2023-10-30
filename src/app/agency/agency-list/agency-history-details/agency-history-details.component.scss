@@ -1,0 +1,79 @@
+@import "colors";
+
+.e-card-header {
+  padding-bottom: 20px;
+  background-color: var(--bg-default);
+}
+
+.e-dlg-header-content {
+  display: none;
+}
+
+.dialog {
+  .header-container {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: $white;
+  }
+
+  .e-gridwithheader {
+    border-top: 1px solid #ccc;
+    border-radius: 10px;
+  }
+}
+
+.history-dialog {
+  ::ng-deep {
+    .app-grid {
+      .ag-header {
+        background-color: var(--bg-default) !important;
+
+        .ag-header-cell-text {
+          font-weight: 700 !important;
+          color: var(--sub-title-2) !important;
+        }
+      }
+
+      .ag-menu, .ag-tabs-header {
+        background-color: var(--bg-default) !important;
+        color: var(--text) !important;
+        box-shadow: none !important;
+      }
+
+      .ag-row-odd,
+      .ag-row,
+      .ag-header {
+        border-bottom: 1px solid var(--grid-header-border) !important;
+        color: var(--text);
+      }
+
+      .ag-paging-panel,
+      .ag-root {
+        border: 1px solid var(--grid-header-border) !important;
+        color: var(--text);
+
+        .ag-paging-button {
+          color: var(--text);
+        }
+      }
+
+      .ag-root {
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+      }
+
+      .ag-paging-panel {
+        border-bottom-left-radius: 14px !important;
+        border-bottom-right-radius: 14px !important;
+      }
+
+      .ag-root,
+      .ag-paging-panel,
+      .ag-row-odd,
+      .ag-row {
+        background-color: var(--bg-default) !important;
+      }
+    }
+  }
+}

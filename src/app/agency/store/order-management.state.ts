@@ -52,6 +52,7 @@ import {
   ClearOrganizationStructure,
   ReloadOrderCandidatesLists,
   GetAgencyAvailableSteps,
+  ClearSelectedOrder,
 } from './order-management.actions';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { OrderFilteringOptionsService } from '@shared/services/order-filtering-options.service';
@@ -263,6 +264,11 @@ export class OrderManagementState {
         return payload;
       })
     );
+  }
+
+  @Action(ClearSelectedOrder)
+  ClearSelectedOrder({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({ selectedOrder: null, contactDetails: null });
   }
 
   @Action(GetOrderApplicantsData)

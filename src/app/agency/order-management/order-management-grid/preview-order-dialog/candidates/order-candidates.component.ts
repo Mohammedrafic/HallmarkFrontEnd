@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { Observable, takeUntil } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { AgencyOrder, CandidateListEvent, OrderCandidatesListPage } from '@shared/models/order-management.model';
@@ -20,7 +20,6 @@ import { OrderManagementPagerState } from '@shared/models/candidate.model';
 })
 export class OrderCandidatesComponent extends DestroyableDirective implements OnInit, OnChanges {
   @Input() currentOrder: Order;
-  public orderCandidateInformation: Order;
   public orderCandidates: AgencyOrder;
   public orderType = OrderType;
   public excludeDeployed = false;
@@ -52,7 +51,6 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
   }
 
   ngOnInit(): void {
-    this.subscribeOnOrderCandidates();
     this.excludeDeployed = this.orderManagementAgencyService.excludeDeployed;
   }
 
@@ -68,11 +66,5 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
         event.searchTerm,
       )
     );
-  }
-
-  private subscribeOnOrderCandidates(): void {
-    this.orderCandidatesInformation$.pipe(takeUntil(this.destroy$)).subscribe((order) => {
-      this.orderCandidateInformation = order;
-    });
   }
 }

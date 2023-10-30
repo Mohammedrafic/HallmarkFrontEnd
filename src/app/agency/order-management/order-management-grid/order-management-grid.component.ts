@@ -1,4 +1,6 @@
 import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Inject,
@@ -12,7 +14,6 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
-import { Router } from '@angular/router';
 
 import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -47,6 +48,7 @@ import {
 } from './order-management-grid.constants';
 import {
   ClearOrders,
+  ClearSelectedOrder,
   ExportAgencyOrders,
   GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
@@ -102,6 +104,7 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
   selector: 'app-order-management-grid',
   templateUrl: './order-management-grid.component.html',
   styleUrls: ['./order-management-grid.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ChipsCssClass, DetailRowService],
 })
 export class OrderManagementGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
@@ -178,7 +181,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderManagementPagerState: OrderManagementPagerState | null;
 
   private isAlive = true;
-  private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private alertOrderId:number;
@@ -191,8 +193,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
-    private router: Router,
     private orderManagementService: OrderManagementService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
     this.listenRedirectFromExtension();
@@ -231,6 +233,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           this.onRowClick({data:this.ordersPage.items[0],isInteracted:false})
         }
       }
+      this.cd.detectChanges();
     });
 
     this.subscribeOnPageChanges();
@@ -242,7 +245,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnDestroy(): void {
-    this.store.dispatch(new ResetPageFilters());
+    this.store.dispatch([
+      new ResetPageFilters(),
+      new ClearSelectedOrder(),
+      new ClearOrders(),
+    ]);
     this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
     this.isAlive = false;
     this.unsubscribe$.next();
@@ -257,6 +264,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           this.selectedRowRef.data.unreadComments -= data.readComments;
           this.gridWithChildRow.setRowData(data.orderId, this.selectedRowRef.data);
         }
+        this.cd.detectChanges();
       });
   }
 
@@ -343,16 +351,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       );
       if (data && !isUndefined(index)) {
         this.gridWithChildRow.selectRow(index);
-        this.onRowClick({ data });
       }
     }
-    if (this.selectedIndex) {
-      this.gridWithChildRow.selectRow(this.selectedIndex);
-    }
-    this.contentLoadedHandler();
-
+    
     this.openPerDiemDetails();
     this.openMyAgencyTabWithCandidate();
+    this.contentLoadedHandler(this.cd);
   }
 
   private openMyAgencyTabWithCandidate(): void {
@@ -371,6 +375,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.gridWithChildRow.detailRowModule.expand(0);
       }
     }
+    this.cd.detectChanges();
   }
 
   /* Trigger when user redirect to per diem order from re-order */
@@ -464,7 +469,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     } else {
       this.setDefaultStatuses(statuses, preservedFiltes.dispatch);
     }
-
+    this.cd.detectChanges();
   }
 
   private prepopulateFilterFormStructure(): void {
@@ -545,7 +550,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           }
           this.clearFilters();
           this.store.dispatch(new ClearOrders());
-          this.selectedIndex = null;
           if (this.orderPerDiemId || this.orderId) {
             this.filters.orderPublicId = this.prefix + '-' + this.orderPerDiemId;
             this.OrderFilterFormGroup.controls['orderPublicId'].setValue(
@@ -617,6 +621,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
 
     this.checkSelectedChildrenItem();
+    this.cd.detectChanges();
   }
 
   public onGridCreated(): void {
@@ -642,9 +647,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;
     }
+    this.cd.detectChanges();
   }
 
   public onRowClick(event: RowSelectEventArgs): void {
+    if ((event.rowIndex !== undefined) && event.rowIndex === event.previousRowIndex) {
+      return;
+    }
+
     if (event.target) {
       this.orderManagementAgencyService.excludeDeployed = false;
       this.orderManagementAgencyService.setIsAvailable(false);
@@ -669,7 +679,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.getCandidatesList(rowData);
 
       this.orderPositionSelected$.next(false);
-      this.selectedIndex = Number(event.rowIndex);
     }
 
     this.checkSelectedChildrenItem();
@@ -678,7 +687,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public onRowDeselect(event: any, grid: any) {
+  public onRowDeselect(event: RowSelectEventArgs, grid: GridComponent) {
     this.rowDeselected(event, grid);
     this.checkSelectedChildrenItem();
   }
@@ -727,11 +736,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     );
 
     this.selectedOrder = reOrder;
-    this.selectedIndex = null;
     this.openPreview.next(true);
   }
 
-  public selectReOrder(event: { reOrder: AgencyOrderManagement; order: Order | AgencyOrderManagement }): void {
+  public selectReOrder(): void {
     const tabSwitchAnimation = 400;
     const tabId = Object.values(AgencyOrderManagementTabs).indexOf(AgencyOrderManagementTabs.ReOrders);
     this.selectTab.emit(tabId);
@@ -760,7 +768,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
     this.openChildDialog.next([order, candidate]);
-    this.selectedIndex = null;
   }
 
   public expandAll(): void {
@@ -942,9 +949,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
         this.filteredItems$.next(this.filteredItems.length);
-        // if(this.Organizations != null){
-        //   this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
-        // }
         this.dispatchNewPage();
       });
   }
@@ -974,7 +978,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.clearSelection(this.gridWithChildRow);
         this.previousSelectedOrderId = null;
         this.orderManagementPagerState = null;
-        this.selectedIndex = null;
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
@@ -1035,17 +1038,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         takeWhile(() => this.isAlive)
       )
       .subscribe(() => {
-        this.store
-          .dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters)).pipe(
-          takeWhile(() => this.isAlive)
-        ).subscribe((data) => {
-            const order = data.agencyOrders.ordersPage.items.find(
-              (item: AgencyOrderManagement) => item.orderId === this.selectedOrder.orderId
-            );
-            if (order) {
-              this.onRowClick({ data: order, rowIndex: this.selectedIndex ?? undefined });
-            }
-          });
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        this.getCandidatesList(this.selectedOrder);
       });
   }
 

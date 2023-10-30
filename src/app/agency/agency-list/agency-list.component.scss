@@ -114,3 +114,6 @@
     align-content:center;
     justify-content: center;
 }
+.mat-menu-item[disabled] {
+  color: rgba(0,0,0,.38) !important;
+}

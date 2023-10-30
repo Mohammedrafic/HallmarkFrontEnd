@@ -29,6 +29,7 @@ import { agencyListFilterColumns, agencyStatusMapper, MSPMenuOptions, MSPMenuTyp
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
 
+
 @Component({
   selector: 'app-agency-list',
   templateUrl: './agency-list.component.html',
@@ -89,6 +90,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   private filters: AgencyListFilters = {};
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
+  public agencyData = new Subject<Agency>();
 
   @Select(AgencyState.agencies)
   agencies$: Observable<AgencyPage>;
@@ -262,7 +264,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
         /**/
         break;
       case MSPMenuType['History']:
-        /**/
+        this.agencyData.next(data);
         break;
     }
   }

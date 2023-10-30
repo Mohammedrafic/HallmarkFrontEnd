@@ -15,6 +15,11 @@ export class GetOrderById {
   constructor(public id: number, public organizationId: number, public options?: DialogNextPreviousOption) {}
 }
 
+export class ClearSelectedOrder {
+  static readonly type = '[agency order management] Clear selected order';
+  constructor() {}
+}
+
 export class GetAgencyOrderCandidatesList {
   static readonly type = '[agency order management] Get Agency Order Candidates Page';
   constructor(

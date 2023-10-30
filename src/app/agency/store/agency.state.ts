@@ -5,7 +5,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { AGENCY_ADDED, AGENCY_CONVERTED_TO_MSP, AGENCY_CONVERTED_TO_MSP_FAIL, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 
-import { Agency, AgencyFilteringOptions, AgencyPage, AgencyRegionSkills } from 'src/app/shared/models/agency.model';
+import { Agency, AgencyAuditHistory, AgencyFilteringOptions, AgencyPage, AgencyRegionSkills } from 'src/app/shared/models/agency.model';
 import { OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { ShowToast } from 'src/app/store/app.actions';
@@ -26,6 +26,8 @@ import {
   GetAgencyFilteringOptions,
   GetAgencyRegionsSkills,
   ConvertAgencyToMSP,
+  GetAgencyAuditHistory,
+  GetAgencyAuditHistoryDetailSucceeded,
 } from './agency.actions';
 import { AdminStateModel } from '@admin/store/admin.state';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -45,6 +47,7 @@ export interface AgencyStateModel {
   agencyId: number | null;
   netSuiteId: number | null;
   name: string;
+  AgencyAuditHistory: AgencyAuditHistory[];
 }
 
 @State<AgencyStateModel>({
@@ -61,6 +64,7 @@ export interface AgencyStateModel {
     agencyId: null,
     netSuiteId: null,
     name: "",
+    AgencyAuditHistory: []
   },
 })
 @Injectable()
@@ -100,6 +104,11 @@ export class AgencyState {
     return state.regionsSkills;
   }
 
+  @Selector()
+  static getAgencyAuditHistoryDetails(state: AgencyStateModel): AgencyAuditHistory[] {
+    return state.AgencyAuditHistory;
+  }
+
   constructor(private agencyService: AgencyService, private organizationService: OrganizationService) {}
 
   @Action(SaveAgency)
@@ -123,26 +132,6 @@ export class AgencyState {
         return of(dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))));
       })
     );
-  }
-
-  @Action(ConvertAgencyToMSP)
-  ConvertAgencyToMSP(
-    { dispatch }: StateContext<AgencyStateModel>,
-    { agencyId, netSuiteId, name }: ConvertAgencyToMSP
-  ): Observable<boolean | void> {
-    return this.agencyService.convertAgencyToMSP(agencyId, netSuiteId, name)
-      .pipe(
-        tap((res) => {
-          if (res) {
-            dispatch(new ShowToast(MessageTypes.Success, AGENCY_CONVERTED_TO_MSP));
-          } else {
-            dispatch(new ShowToast(MessageTypes.Warning, AGENCY_CONVERTED_TO_MSP_FAIL));
-          }
-        }),
-        catchError((err: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
-        }),
-      );
   }
 
   @Action(GetAgencyByPage)
@@ -251,6 +240,43 @@ export class AgencyState {
     return this.agencyService.getAgencyRegionSkills().pipe(
       tap((regionsSkills: AgencyRegionSkills) => {
         patchState({ regionsSkills });
+      })
+    );
+  }
+
+  @Action(ConvertAgencyToMSP)
+  ConvertAgencyToMSP(
+    { dispatch }: StateContext<AgencyStateModel>,
+    { agencyId, netSuiteId, name }: ConvertAgencyToMSP
+  ): Observable<boolean | void> {
+    return this.agencyService.convertAgencyToMSP(agencyId, netSuiteId, name)
+      .pipe(
+        tap((res) => {
+          if (res) {
+            dispatch(new ShowToast(MessageTypes.Success, AGENCY_CONVERTED_TO_MSP));
+          } else {
+            dispatch(new ShowToast(MessageTypes.Warning, AGENCY_CONVERTED_TO_MSP_FAIL));
+          }
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+        }),
+      );
+  }
+
+  @Action(GetAgencyAuditHistory)
+  GetAgencyAuditHistory({ patchState, dispatch }
+    : StateContext<AgencyStateModel>,
+    { payload }: GetAgencyAuditHistory)
+    : Observable<AgencyAuditHistory[] | void> {
+    return this.agencyService.getAgencyAuditHistory(payload).pipe(
+      tap((payloads) => {
+        patchState({ AgencyAuditHistory: payloads });
+        dispatch(new GetAgencyAuditHistoryDetailSucceeded());
+        return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }

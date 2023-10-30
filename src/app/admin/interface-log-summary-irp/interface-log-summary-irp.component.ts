@@ -72,11 +72,6 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
   // public rowData: LogInterfacePage[]=[];
   public readonly columnDefs: ColumnDefinitionModel[] = [
     {
-      field: 'id',
-      hide: true,
-      filter: false,
-    },
-    {
       headerName: 'View',
       cellRenderer: ButtonRendererComponent,
       width: 100,
@@ -99,15 +94,15 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
       filter: false,
     },
     {
-      headerName: 'organizationId',
+      headerName: 'Organization ID',
       field: 'organizationId',
       minWidth: 100,
       hide: true,
       filter: false,
     },
     {
-      headerName: 'Document Name',
-      field: 'documentName',
+      headerName: 'File Name',
+      field: 'originalFileName',
       minWidth: 250,
       filter: 'agTextColumnFilter',
       cellRenderer: ButtonRendererComponent,
@@ -217,7 +212,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
       cellRendererParams: {
         onClick: this.onInsertedLogData.bind(this),
         label: 'Count',
-        selectedType: LogStatusEnum.Created,
+        selectedType: LogStatusEnum.Inserted,
         suppressMovable: true,
         filter: false,
         sortable: false,
@@ -330,7 +325,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
   }
   public onInsertedLogData(data: any) {
     if (data.rowData.insertedRecord > 0) {
-      this.selectedType =  LogStatusEnum.Created;
+      this.selectedType =  LogStatusEnum.Inserted;
       this.openLogData(data);
     }
   }
