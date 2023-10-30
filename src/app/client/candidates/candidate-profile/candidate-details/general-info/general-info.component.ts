@@ -9,8 +9,6 @@ import { AbstractContactDetails } from '@client/candidates/candidate-profile/can
 import {
   ProfileStatuses,
   ProfileStatusesEnum,
-  recruitContent,
-  sourceContent,
   TerminationReasons,
 } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { JobClassifications } from '@client/order-management/constants';
