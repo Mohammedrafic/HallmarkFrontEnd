@@ -120,7 +120,7 @@
             [gridTitle]="'Invoices'"
             (gridReadyEmitter)="setGridApi($event)"
           ></app-grid>
-          <div class="total" *ngIf="dialogTitle=='Add'">
+          <div class="total">
             <p class="total__text">Invoice total amount:</p>
             <h5 class="total__value">$ {{ totalAmount }}</h5>
           </div>

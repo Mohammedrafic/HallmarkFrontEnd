@@ -97,6 +97,7 @@ export interface RecordValue {
   isGenerated?: boolean;
   isTimeInNull?: boolean;
   location: string;
+  locationId: number;
   state: number;
   stateText: RecordStatus;
   timeIn: string;

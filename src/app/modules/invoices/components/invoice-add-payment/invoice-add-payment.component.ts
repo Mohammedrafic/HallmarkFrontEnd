@@ -174,6 +174,8 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
         delete this.paymentsForm[invoiceId];
 
         this.tableData = this.tableData.filter((payment) => payment.invoiceNumber !== invoiceId);
+        this.totalAmount = this.tableData.reduce((acc, item) => acc + item.amount, 0);
+
         this.cd.markForCheck();
 
         if (invoiceDbid) {

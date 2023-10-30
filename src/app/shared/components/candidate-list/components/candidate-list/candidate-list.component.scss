@@ -83,3 +83,18 @@ ejs-checkbox.e-checkbox-wrapper.e-wrapper {
     height: 140px;
   }
 }
+
+::ng-deep {
+  body.dark .candidate-list-table .app-grid-pagination .app-grid-pagination__controls .app-grid-pagination__navigate-to-control {
+    .input-group {
+      ejs-numerictextbox {
+        .e-control-wrapper {
+          border-bottom-color: $alert-side-bar-bgcolor !important;
+        }
+        .e-control-wrapper:hover {
+          border-bottom-color: $primary-active-blue-10 !important;
+        }
+      }
+    }
+  }
+}

@@ -17,6 +17,7 @@ export interface CredentialDTO {
   includeInVMS?: boolean;
   system?: string;
   id?: number;
+  isPublic: boolean;
 }
 
 export interface CredentialInputConfig {

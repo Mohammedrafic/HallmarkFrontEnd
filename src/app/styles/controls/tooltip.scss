@@ -3,6 +3,7 @@
 .e-tooltip-wrap.e-popup.e-lib.e-control.e-popup-open {
   background-color: $secondary-dark-blue-15;
   border-radius: 4px;
+  border-color: $secondary-dark-blue-15;
 
   .e-arrow-tip {
     .e-arrow-tip-outer {
@@ -21,4 +22,8 @@
       max-width: 180px;
     }
   }
+}
+
+body.dark .e-tooltip-wrap.e-popup.e-lib.e-control.e-popup-open {
+  border-radius: 4px !important;
 }

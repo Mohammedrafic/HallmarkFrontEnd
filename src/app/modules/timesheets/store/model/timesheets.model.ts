@@ -1,4 +1,5 @@
 import { DataSourceItem, DropdownOption } from '@core/interface';
+import { OrganizationStructure } from '@shared/models/organization.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { RecordFields } from '../../enums';
 import {
@@ -22,6 +23,7 @@ export interface TimesheetsModel {
   candidateInvoices: TimesheetInvoice[];
   timeSheetRecords: TimesheetRecordsDto;
   costCenterOptions: DropdownOption[];
+  organizationStructure: OrganizationStructure | null;
   billRateTypes: AddRecordBillRate[];
   isTimeSheetOpen: boolean;
   selectedTimeSheet: Timesheet | null;

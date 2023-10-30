@@ -3,23 +3,10 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { capitalize } from 'lodash';
-import {
-  EMPTY,
-  Observable,
-  Subject,
-  combineLatest,
-  filter,
-  map,
-  merge,
-  mergeMap,
-  of,
-  switchMap,
-  take,
-  takeUntil,
-} from 'rxjs';
+import { combineLatest, filter, map, merge, mergeMap, Observable, of, Subject, switchMap, take, takeUntil, } from 'rxjs';
 
 import {
   GetCandidateJob,
@@ -38,10 +25,9 @@ import {
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
+  sendOnboardCandidateEmailMessage,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
-  sendOnboardCandidateEmailMessage,
-  GetAgencyOrderCandidatesList,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { CheckNumberValue, DateTimeHelper } from '@core/helpers';
@@ -50,18 +36,19 @@ import {
   PenaltiesMap,
 } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import {
-  CandidateADDRESSRequired, CandidateDOBRequired, CandidatePHONE1Required,
+  CandidateADDRESSRequired,
+  CandidateDOBRequired,
+  CandidatePHONE1Required,
   ONBOARD_CANDIDATE,
-  OrganizationSettingKeys, OrganizationalHierarchy, SEND_EMAIL, onBoardCandidateMessage,
+  onBoardCandidateMessage,
+  OrganizationalHierarchy,
+  OrganizationSettingKeys,
+  SEND_EMAIL,
 } from '@shared/constants';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { UNSAVED_FORM_PROVIDERS, UnsavedFormComponentRef } from '@shared/directives/unsaved-form.directive';
-import {
-  ApplicantStatus as ApplicantStatusEnum,
-  CandidatStatus,
-  ConfigurationValues,
-} from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationValues, } from '@shared/enums/applicant-status.enum';
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { MessageTypes } from '@shared/enums/message-types';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
@@ -90,7 +77,9 @@ import { GetOrderPermissions, SetLastSelectedOrganizationAgencyId } from 'src/ap
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
-import { OnboardCandidateMessageDialogComponent } from '../onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
+import {
+  OnboardCandidateMessageDialogComponent
+} from '../onboarded-candidate/onboard-candidate-message-dialog/onboard-candidate-message-dialog.component';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
@@ -327,7 +316,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         jobId: this.candidateJob.jobId,
         skillName: value.skillName,
         offeredBillRate: this.candidateJob?.offeredBillRate,
-        offeredStartDate: this.candidateJob?.offeredStartDate ? 
+        offeredStartDate: this.candidateJob?.offeredStartDate ?
           DateTimeHelper.setUtcTimeZone(this.candidateJob.offeredStartDate) : undefined,
         candidateBillRate: this.candidateJob.candidateBillRate,
         nextApplicantStatus: {
@@ -369,7 +358,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   public onReject(): void {
-    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
+    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation(SystemType.VMS));
     this.openRejectDialog.next(true);
   }
 
@@ -449,7 +438,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public onSave(): void {
     if(this.selectedApplicantStatus){
       this.saveHandler({ itemData: this.selectedApplicantStatus });
-    }    
+    }
   }
 
   public onStatusChange(event: { itemData: ApplicantStatus }): void {
@@ -666,7 +655,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     value.actualStartDate = new Date(this.candidateJob.order.jobStartDate).toISOString();
     value.actualEndDate = new Date(this.candidateJob.order.jobEndDate).toISOString();
   }
-  
+
   // eslint-disable-next-line max-lines-per-function
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus, acceptAction = false): void {
     const value = this.form.getRawValue();
@@ -687,7 +676,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         value.actualEndDate = new Date(value.actualEndDate);
       }
      }
-    
+
     if (acceptAction) {
       this.rewriteActualDatesWithOrder(value);
     }
@@ -739,7 +728,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
   }
 
-  
+
   private displayMessageConfirmation(): Observable<boolean> {
     const options = {
       title: ONBOARD_CANDIDATE,
@@ -764,7 +753,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
                 this.onboardEmailTemplateForm.rteCreated();
                 this.onboardEmailTemplateForm.disableControls(true);
                 this.store.dispatch(new ShowGroupEmailSideDialog(true));
-              }            
+              }
         }
       );
   }

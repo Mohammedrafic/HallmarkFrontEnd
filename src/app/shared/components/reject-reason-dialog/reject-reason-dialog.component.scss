@@ -6,12 +6,12 @@
   & + .e-dlg-overlay {
     background-color: $black;
   }
+
   .e-dlg-header-content {
-    border-bottom: 1px solid $secondary-dark-blue-45;
+    border-bottom: 1px solid var(--dialog-border);
   }
 
   .e-footer-content {
-    border-top: 1px solid $secondary-dark-blue-45;
     padding: 20px 10px;
   }
 
@@ -19,14 +19,12 @@
     h3 {
       font-size: 24px;
       font-weight: 700;
-      color: $black;
     }
   }
 
   .sup-title {
     font-size: 16px;
     font-weight: 400;
-    color: $pure-black;
     margin: 18px 0;
   }
 

@@ -54,7 +54,7 @@ import { CreateOverlapErrorData } from '../../helpers';
 import { CommentsService } from '@shared/services/comments.service';
 import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
 import { Comment } from '@shared/models/comment.model';
-
+import { OrganizationStructure } from '@shared/models/organization.model';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -181,6 +181,11 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static costCenters(state: TimesheetsModel): unknown {
     return state.costCenterOptions;
+  }
+
+  @Selector([TimesheetsState])
+  static organizationStructure(state: TimesheetsModel): OrganizationStructure | null {
+    return state.organizationStructure;
   }
 
   @Selector([TimesheetsState])
@@ -341,7 +346,7 @@ export class TimesheetsState {
     .pipe(
       switchMap(() => {
         const state = ctx.getState();
-        const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
+        const { id } = state.timesheetDetails as TimesheetDetailsModel;
 
         if (updateAfterLoad) {
           ctx.dispatch(new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency));
@@ -349,15 +354,12 @@ export class TimesheetsState {
         /**
          * TODO: make all messages for toast in one constant.
          */
-        ctx.dispatch([
+        return ctx.dispatch([
           new ShowToast(MessageTypes.Success, PutSuccess.successMessage),
           new TimesheetDetails.ForceUpdateRecord(false),
           new Timesheets.GetAll(),
           new Timesheets.GetTabsCounts(),
         ]);
-
-
-        return ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
       catchError((err: HttpErrorResponse) => {
         if (err.error.status === 403 && err.error && err.error['detail']) {
@@ -693,6 +695,22 @@ export class TimesheetsState {
     );
   }
 
+  @Action(TimesheetDetails.GetOrganizationsStructure)
+  GetOrganizationsStructure(
+    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { orgId, isAgency }: TimesheetDetails.GetOrganizationsStructure,
+  ): Observable<OrganizationStructure | void> {
+    return this.timesheetsApiService.getOrganizationsStructure(orgId, isAgency)
+      .pipe(
+        tap((res) => patchState({
+          organizationStructure: res,
+        })),
+        catchError((err: HttpErrorResponse) => dispatch(
+          new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
+        )),
+      );
+  }
+
   @Action(TimesheetDetails.DownloadAttachment)
   DownloadAttachment(
     { dispatch }: StateContext<TimesheetsModel>,
@@ -820,7 +838,7 @@ export class TimesheetsState {
       .pipe(
         tap(() => {
           const state = ctx.getState();
-          const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
+          const { id } = state.timesheetDetails as TimesheetDetailsModel;
 
           if (body.type === 2 && !timesheetDetails.mileageTimesheetId) {
             ctx.dispatch(new Timesheets.GetAll());
@@ -830,7 +848,6 @@ export class TimesheetsState {
             new TimesheetDetails.AddTimesheetRecordSucceed(),
             new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
             new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency),
-            new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency),
             new TimesheetDetails.ForceAddRecord(false),
           ]);
         }),

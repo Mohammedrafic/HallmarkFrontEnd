@@ -118,6 +118,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public timesheetId: number;
 
+  public timesheetDetails: TimesheetInt.TimesheetDetailsModel;
+
   public mileageTimesheetId: number;
 
   public organizationId: number | null = null;
@@ -668,6 +670,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
           currentStatus === this.timesheetStatus.PendingApproval ||
           currentStatus === this.timesheetStatus.PendingApprovalAsterix;
         this.canRecalculateTimesheet = isTimesheetSubmitted && this.canRecalculate;
+        this.timesheetDetails = details;
         this.timesheetId = details.id;
         this.commentContainerId=details.commentContainerId;
         this.mileageTimesheetId = details.mileageTimesheetId;
@@ -694,9 +697,10 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         this.getOrderComments();
         this.cd.markForCheck();
 
-        this.store.dispatch(
-          new TimesheetDetails.GetTimesheetRecords(details.id, details.organizationId, this.isAgency)
-        );
+        this.store.dispatch([
+          new TimesheetDetails.GetTimesheetRecords(details.id, details.organizationId, this.isAgency),
+          new TimesheetDetails.GetOrganizationsStructure(details.organizationId, this.isAgency),
+        ]);
       });
   }
 

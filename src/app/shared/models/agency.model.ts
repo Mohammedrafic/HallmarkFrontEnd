@@ -4,6 +4,7 @@ import {
   PaymentDetails,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
 import { AgencyStatus, FilterOrderStatusText } from "@shared/enums/status";
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 export type Agency = {
   isMsp?: boolean,
@@ -17,6 +18,7 @@ export type Agency = {
   agencyJobDistribution: AgencyRegionSkills;
   contactPerson?: string;
   netSuiteId?: number;
+  menuItems?: ItemModel[]; // use only in UI for context menu datasource
 };
 
 export type AgencyCreateUnder = {

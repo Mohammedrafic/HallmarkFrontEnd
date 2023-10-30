@@ -67,7 +67,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CustomFormGroup } from '@core/interface';
 import { OrderManagementService, } from '@client/order-management/components/order-management-content/order-management.service';
 import { DurationService } from '@shared/services/duration.service';
-import { OrderType } from '@shared/enums/order-type';
+import { IrpOrderTypeforPayRate, OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { Order, OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
@@ -76,6 +76,9 @@ import { OrganizationSettingsService } from '@shared/services/organization-setti
 import { Configuration } from '@shared/models/organization-settings.model';
 import { Location } from "@shared/models/location.model"
 import { GetRejectReasonsForOrganisation } from '@client/store/order-managment-content.actions';
+import { SystemType } from '@shared/enums/system-type.enum';
+import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
+import { OrderStatus } from '@shared/enums/order-management';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -91,6 +94,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   @Input() set orderDetails(orderDetails : Order) {
     if(orderDetails){
+      this.orderDetailsData = orderDetails;
       this.getOrderDetails(orderDetails);
       this.getLocationDetails(orderDetails);
     }
@@ -137,6 +141,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public isTurnedOn : boolean;
   public payrateData: Configuration[];
   public RegionDetails: Location[];
+  public readonly profileStatus = ProfileStatusesEnum;
 
   //Calculation Variables
   public AtpCalcForm: FormGroup;
@@ -173,6 +178,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private candidateDetails: CandidateDetails;
   private actualStartDateSubscription: Subscription | null;
   private offeredDateSubscription: Subscription | null;
+  private orderDetailsData: Order;
 
   constructor(
     private editIrpCandidateService: EditIrpCandidateService,
@@ -206,14 +212,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.AtpCalcForm.get("hoursWorked")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
           this.hoursWorked = data;
-          this.performCalculations();
+          this.getATPstipendRate();
         }
       })
 
       this.AtpCalcForm.get("costSaving")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
           this.costSaving = data;
-          this.performCalculations();
+          this.getATPstipendRate();
         }
       });
 
@@ -228,7 +234,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           this.showbenefits = true;
           this.shownonbenefits = true;
         }
-        this.performCalculations();
+        this.getATPstipendRate();
       });
 
       this.candidateForm.get("actualStartDate")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
@@ -310,7 +316,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   public getOrderDetails(orderDetails : Order){
-      this.editIrpCandidateService.getPredefinedBillRatesforRatePerHour(1, orderDetails.departmentId, orderDetails.skillId).pipe(
+      this.editIrpCandidateService.getPredefinedBillRatesforRatePerHour(IrpOrderTypeforPayRate.LongTermAssignment, orderDetails.departmentId, orderDetails.skillId).pipe(
         takeUntil(this.componentDestroy()),
         take(1)
       ).subscribe(data => {
@@ -348,13 +354,13 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         this.fullyLoadedBenefit = (!Number.isNaN(this.contractLabourBenefit + this.stipendHourlyRate)) ? this.contractLabourBenefit + this.stipendHourlyRate : 0;
         this.fullyLoadedNonBenefit = (!Number.isNaN(this.contractLabourNonBenefit + this.stipendHourlyRate)) ? this.contractLabourNonBenefit + this.stipendHourlyRate : 0;
         this.performCalculations();
+        this.cdr.detectChanges();
       }
     },(error) => {
       if(error){
         this.meal = this.lodging = 0;
       }
     })
-    this.cdr.detectChanges();
   }
 
   private getLocationDetails(orderDetails : Order) {
@@ -376,7 +382,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.costSavingBenefits = (!Number.isNaN((this.salaryWagesandBenefits * this.costSaving) / 100)) ? ((this.salaryWagesandBenefits * this.costSaving) / 100) : 0;
     this.benefitsBenefits = (!Number.isNaN(this.salaryWagesandBenefits * (this.benefitpercentofsw / 100))) ? (this.salaryWagesandBenefits * (this.benefitpercentofsw / 100)) : 0;
     this.benefitsNonBenefits = (!Number.isNaN(this.salaryWagesandBenefits * (this.wagePercent / 100))) ? (this.salaryWagesandBenefits * (this.wagePercent / 100)) : 0;
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
   showReplacementPdOrdersDialog(show = true): void {
@@ -471,6 +477,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     });
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private getCandidateDetails(): void {
     this.orderCandidateApiService.getIrpCandidateDetails(
       this.candidateModelState.order.id, this.candidateModelState.candidate.candidateProfileId,this.isIRPLTAOrder)
@@ -594,14 +601,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       UpdateVisibilityConfigFields(this.dialogConfig, fieldsToShow);
 
       this.candidateForm.patchValue({
-        ...this.candidateDetails,
+        ...this.candidateDetails, 
         status: CandidatStatus.Rejected,
-        rejectedReason: this.candidateDetails.rejectionReasonId
+        rejectedReason: this.candidateDetails.rejectionReasonId,
       }, { emitEvent: false, onlySelf: true });
 
-
-      this.disableSaveButton = true;
-      DisableControls(fieldsToShow, this.candidateForm);
+      const enableStatusControl = this.orderDetailsData.orderType === OrderType.LongTermAssignment
+      && this.candidateModelState.candidate.profileStatus !== this.profileStatus.OnHold
+      && this.orderDetailsData.status !== OrderStatus.Filled && this.orderDetailsData.status !== OrderStatus.Cancelled;
+      this.disableSaveButton = !enableStatusControl;
+      DisableControls(fieldsToShow, this.candidateForm, enableStatusControl);
     }
   }
 
@@ -763,20 +772,25 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     }
 
     if (hasOnboardedCandidateOfferedDate || hasCancelledOffboardCandidate) {
-      UpdateVisibilityConfigFields(this.dialogConfig, OnboardConfigFieldsToShow);
-      DisableControls(OfferedDates, this.candidateForm);
+      const isCandidateCancelled = status === CandidatStatus.Cancelled;
+      const fieldsToShow = isCandidateCancelled ? [...OnboardConfigFieldsToShow, CancelReasonField] : OnboardConfigFieldsToShow;
+
+      UpdateVisibilityConfigFields(this.dialogConfig, fieldsToShow);
+      DisableControls(OfferedDates, this.candidateForm, false);
+
       return;
     }
 
     if (status === CandidatStatus.Accepted) {
       UpdateVisibilityConfigFields(this.dialogConfig, AcceptConfigFieldsToShow);
-      DisableControls(OfferedDates, this.candidateForm);
+      DisableControls(OfferedDates, this.candidateForm, false);
       return;
     }
 
     if (status === CandidatStatus.Cancelled) {
       const cancelReasonConfigField = this.getConfigField(CancelReasonField);
       cancelReasonConfigField.showField = true;
+
       return;
     }
 
@@ -907,6 +921,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   private getRejectedReasons(): void {
-    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.store.dispatch(new GetRejectReasonsForOrganisation(SystemType.IRP));
   }
 }

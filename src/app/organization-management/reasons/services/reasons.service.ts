@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { filter, Observable } from 'rxjs';
 
 import {
   CreateManualInvoiceRejectReason,
@@ -23,8 +24,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { Organization, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { Penalty, PenaltyPayload } from '@shared/models/penalty.model';
-import { RejectReason } from '@shared/models/reject-reason.model';
-import { filter, Observable } from 'rxjs';
+import { RejectReason, SelectRejectedSystem } from '@shared/models/reject-reason.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { NewReasonsActionsMap, UpdateReasonsActionsMap } from '../constants';
@@ -99,6 +99,7 @@ export class ReasonsService {
         calculateTowardsWeeklyHours: !!value.calculateTowardsWeeklyHours,
         eligibleToBeScheduled: !!value.eligibleToBeScheduled,
         visibleForIRPCandidates: !!value.visibleForIRPCandidates,
+        sendThroughIntegration : !!value.sendThroughIntegration
       }));
     } else if (params.selectedTab === ReasonsNavigationTabs.CancelEmployeeReasons) {
       const value = params.formValue as CancelEmployeeReasonValue;
@@ -107,6 +108,17 @@ export class ReasonsService {
         id: value.id || null,
         reason: value.reason,
       }));
+    } else if(params.selectedTab === ReasonsNavigationTabs.Rejection) {
+      const {formValue, selectedSystem, editMode , isVMSIRP} = params;
+      const hasSelectedSystem = isVMSIRP ? !(formValue as RejectReason).includeInIRP && !(formValue as RejectReason).includeInVMS :
+        !selectedSystem.isIRP && !selectedSystem.isVMS;
+
+      if (hasSelectedSystem) {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, REASON_WARNING));
+        return;
+      }
+
+      this.saveUpdateRejectReason(formValue as RejectReason,selectedSystem,editMode);
     } else if (params.selectedTab === ReasonsNavigationTabs.Closure) {
       var value = params.formValue as Closurevalue;
       (value.includeInIRP == null) ? (value.includeInIRP = false) : "";
@@ -234,6 +246,30 @@ export class ReasonsService {
       const payload = params.editMode ? this.createUpdateReasonPayload(params) : this.createNewReasonPayload(params);
       this.store.dispatch(new Action(payload));
     }
+  }
+
+  private saveUpdateRejectReason(formValue: RejectReason, selectedSystem: SelectRejectedSystem, editMode: boolean): void {
+    const action = editMode ? UpdateReasonsActionsMap[ReasonsNavigationTabs.Rejection] : NewReasonsActionsMap[ReasonsNavigationTabs.Rejection];
+
+    if (formValue.includeInIRP || formValue.includeInVMS) {
+      const rejectedDto = {
+        id: formValue.id || undefined,
+        reason: formValue.reason,
+        includeInVMS: !!formValue.includeInVMS,
+        includeInIRP: !!formValue.includeInIRP,
+      };
+
+      this.store.dispatch(new action(rejectedDto));
+      return;
+    }
+
+    const rejectedDto = {
+      id: formValue.id || undefined,
+      reason: formValue.reason,
+      includeInVMS: !!selectedSystem.isVMS,
+      includeInIRP: !!selectedSystem.isIRP,
+    };
+    this.store.dispatch(new action(rejectedDto));
   }
 
   private createNewReasonPayload(params: SaveReasonParams): RejectReason {

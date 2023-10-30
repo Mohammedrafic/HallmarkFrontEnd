@@ -105,7 +105,8 @@ import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-
 import { AgencySettingsModule } from './settings/agency-settings.module';
 import { EmployeeImportService } from '@client/candidates/services/employee-import.service';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
-
+import { MatMenuModule } from '@angular/material/menu';
+import { TextareaModule } from '../shared/components/form-controls/textarea/textarea.module';
 
 
 const sidebarIcons = {
@@ -205,6 +206,8 @@ const sidebarIcons = {
     TooltipContainerModule,
     ScrollToTopModule,
     AgencySettingsModule,
+    MatMenuModule,
+    TextareaModule,
 
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),

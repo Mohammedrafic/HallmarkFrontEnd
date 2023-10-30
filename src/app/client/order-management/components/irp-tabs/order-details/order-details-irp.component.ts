@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { combineLatest, filter, map, Observable, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Observable, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -23,6 +23,7 @@ import {
   OrderTypes,
   PoNumbers,
   ProjectNames,
+  SelectedDistributionState,
   SelectedStructureState,
   SelectSystem,
   SpecialProjectCategories,
@@ -76,6 +77,8 @@ import {
   setDefaultPrimaryContact,
   showHideFormAction,
   updateJobDistributionForm,
+  viewDistributiondelay,
+  viewDistributiontoVMS,
 } from '@client/order-management/components/irp-tabs/order-details/helpers';
 import { Department } from '@shared/models/department.model';
 import { AssignedSkillsByOrganization, ListOfSkills } from '@shared/models/skill.model';
@@ -100,12 +103,13 @@ import { Document } from '@shared/models/document.model';
 import {
   IrpContainerStateService,
 } from '@client/order-management/containers/irp-container/services/irp-container-state.service';
-import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
+import { JobDistributionfilters, Order, OrderContactDetails, OrderWorkLocation, OrgStructureDto, SuggestedDetails } from '@shared/models/order-management.model';
 import { UserState } from '../../../../../store/user.state';
 import { Organization, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import {
   GetAllShifts,
   GetContactDetails,
+  GetJobDistributionValues,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
   GetSuggestedDetails,
@@ -131,6 +135,7 @@ import {
 import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
+import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 enum SubmitButtonItem {
   SaveForLater = '0',
   Save = '1',
@@ -147,6 +152,15 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.selectedSystem = value;
 
     if (!this.selectedOrder) {
+      let isDistribution: any;
+      this.organization$
+        .pipe(
+          filter((organisation: Organization) => !!organisation && !this.selectedOrder),
+          takeUntil(this.componentDestroy())
+        )
+        .subscribe((organisation: Organization) => {
+          isDistribution = organisation.isDistributionActivate ? true : false;
+        });
       this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
       this.setConfigDataSources();
     }
@@ -163,6 +177,16 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public specialProjectForm: FormGroup;
   public isShow: boolean | undefined;
   public isDeptShow: boolean | undefined;
+  public distributionFilter: JobDistributionfilters;
+  public isDistributionActivate: boolean = false;
+  public distributionIds: number[] | null;
+  public isDistributionInternal: boolean;
+  public isDistributionExternal: boolean;
+  public distributionInternalIds: number[];
+  public distributionExternalIds: number[];
+  public isEdit: boolean = false;
+  public OrgStructure: OrgStructureDto;
+  private selectedDistributionState: SelectedDistributionState;
   public readonly optionFields: FieldSettingsModel = OptionFields;
   public readonly orderTypesDataSource: OrderTypes[] = OrderTypeList;
   public readonly FieldTypes = FieldType;
@@ -193,6 +217,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private isTieringLogicLoad = true;
   public AutopopulateId: number | undefined;
   private reason: OrderRequisitionReason[] = [];
+  private unsubscribe$: Subject<void> = new Subject();
   public allShifts: any[];
   private selectedStructureState: SelectedStructureState;
   public filterType = 'Contains';
@@ -221,6 +246,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private getAllShifts$: Observable<ScheduleShift[]>;
   @Select(OrganizationManagementState.organizationSettings)
   private organizationSettings$: Observable<Configuration[]>;
+  @Select(OrderManagementContentState.selectedDistribution)
+  private selectedDistribution$: Observable<OrgStructureDto>;
 
   constructor(
     private router: Router,
@@ -277,7 +304,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
   public changeOrderType(): void {
     const { regionId, locationId, departmentId, skillId } = this.generalInformationForm.getRawValue();
+    const { distributionDelay, distributeToVMS } = this.jobDescriptionForm.getRawValue();
     this.selectedStructureState = { regionId, locationId, departmentId, skillId };
+    this.selectedDistributionState = { distributionDelay, distributeToVMS };
   }
 
   public addFields(config: OrderFormsArrayConfig): void {
@@ -431,6 +460,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       if (value) {
         this.generalInformationForm.controls[key].patchValue(value);
+      }
+    });
+    Object.keys(this.selectedDistributionState).forEach((key: string) => {
+      const value = this.selectedDistributionState[key as keyof SelectedDistributionState];
+
+      if (value) {
+        this.jobDistributionForm.controls[key].patchValue(value);
       }
     });
   }
@@ -604,6 +640,26 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('departmentId')?.valueChanges
       .pipe(
         tap((departmentsId: number) => {
+          if (this.isDistributionActivate && departmentsId && this.jobDistributionForm.get('jobDistribution')?.value) {
+            this.distributionFilter = {
+              regionId: departmentsId ? this.generalInformationForm.get('regionId')?.value : null,
+              locationId: departmentsId ? this.generalInformationForm.get('locationId')?.value : null,
+              departmentId: departmentsId ? this.generalInformationForm.get('departmentId')?.value : null,
+            };
+
+            this.store.dispatch(new GetJobDistributionValues(this.distributionFilter));
+
+            this.selectedDistribution$.pipe(takeUntil(this.unsubscribe$)).subscribe((orgStructure: OrgStructureDto) => {
+              if (orgStructure != null) {
+                this.jobDistributionForm.get('distributeToVMS')?.setValue(orgStructure.distributionConfigs.value);
+                this.jobDistributionForm.get('distributionDelay')?.setValue(orgStructure.distributionConfigs.isEnabled);
+              }
+              this.changeDetection.markForCheck();
+            });
+          } else {
+            this.jobDistributionForm.get('distributeToVMS')?.setValue('');
+            this.jobDistributionForm.get('distributionDelay')?.setValue(false);
+          }
           if (!departmentsId && this.generalInformationForm.get('skillId')?.value) {
             this.setSkillFilters([]);
           }
@@ -652,6 +708,46 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.autoSetupJobEndDateControl(duration, value);
       this.changeDetection.markForCheck();
     });
+    this.jobDistributionForm
+    .get('distributionDelay')
+    ?.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.componentDestroy()))
+    .subscribe((value: boolean) => {
+      const Distributiondelay = this.getSelectedFormConfig(JobDistributionForm);
+      if (value) {
+        viewDistributiontoVMS(true, Distributiondelay);
+        if (this.isDistributionActivate) {
+          this.distributionFilter = {
+            regionId: this.generalInformationForm.get('departmentId')?.value
+              ? this.generalInformationForm.get('regionId')?.value
+              : null,
+            locationId: this.generalInformationForm.get('departmentId')?.value
+              ? this.generalInformationForm.get('locationId')?.value
+              : null,
+            departmentId: this.generalInformationForm.get('departmentId')?.value
+              ? this.generalInformationForm.get('departmentId')?.value
+              : null,
+          };
+
+          this.store.dispatch(new GetJobDistributionValues(this.distributionFilter));
+          this.selectedDistribution$.pipe(takeUntil(this.unsubscribe$)).subscribe((orgStructure: OrgStructureDto) => {
+            if (orgStructure != null) {
+              this.jobDistributionForm.get('distributeToVMS')?.setValue(orgStructure.distributionConfigs.value);
+              this.jobDistributionForm.get('distributeToVMS')?.enable();
+              this.jobDistributionForm.get('distributionDelay')?.setValue(true);
+            }
+            this.changeDetection.markForCheck();
+          });
+        } else {
+          this.jobDistributionForm.get('distributeToVMS')?.setValue('');
+          this.jobDistributionForm.get('distributeToVMS')?.disable();
+          this.jobDistributionForm.get('distributionDelay')?.setValue(false);
+        }
+      } else if (!value) {
+        this.jobDistributionForm.get('distributeToVMS')?.setValue('');
+        this.jobDistributionForm.get('distributeToVMS')?.disable();
+      }
+      this.changeDetection.markForCheck();
+    });
 
     this.generalInformationForm.get('departmentId')?.valueChanges.pipe(
       filter((id) => !!id),
@@ -677,6 +773,38 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter((id) => !!id),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number[]) => {
+      this.distributionIds = this.jobDistributionForm.get('jobDistribution')?.value;
+        const selecteddistributiondelay = this.getSelectedFormConfig(JobDistributionForm);
+        if (
+          this.distributionIds?.includes(IrpOrderJobDistribution.AllExternal) ||
+          this.distributionIds?.includes(IrpOrderJobDistribution.SelectedExternal)
+        ) {
+          if (this.isDistributionActivate) {
+            viewDistributiondelay(true, selecteddistributiondelay);
+            this.distributionFilter = {
+              regionId: this.generalInformationForm.get('departmentId')?.value
+                ? this.generalInformationForm.get('regionId')?.value
+                : null,
+              locationId: this.generalInformationForm.get('departmentId')?.value
+                ? this.generalInformationForm.get('locationId')?.value
+                : null,
+              departmentId: this.generalInformationForm.get('departmentId')?.value
+                ? this.generalInformationForm.get('departmentId')?.value
+                : null,
+            };
+
+            this.store.dispatch(new GetJobDistributionValues(this.distributionFilter));
+            this.selectedDistribution$.pipe(takeUntil(this.unsubscribe$)).subscribe((orgStructure: OrgStructureDto) => {
+              if (orgStructure != null) {
+                this.jobDistributionForm.get('distributeToVMS')?.setValue(orgStructure.distributionConfigs.value);
+                this.jobDistributionForm.get('distributionDelay')?.setValue(true);
+              }
+              this.changeDetection.markForCheck();
+            });
+          }
+        } else {
+          viewDistributiondelay(false, selecteddistributiondelay);
+        }
       const internalLogicIncompatible = value.includes(TierInternal.id)
       && this.selectedOrder?.jobDistributionValue?.includes(AllInternalJob.id);
 
@@ -904,6 +1032,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
       linkedId: selectedOrder.linkedId,
+      distributionDelay: selectedOrder.distributionDelay,
+      distributeToVMS: selectedOrder.distributeToVMS,
     });
     setTimeout(() => {
       this.generalInformationForm.patchValue({
@@ -943,7 +1073,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     if (selectedOrder.orderType === IrpOrderType.PerDiem as unknown as OrderType) {
       this.orderFormsConfig = perDiemConfig(this.selectedSystem);
     } else {
-      this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
+      this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem, this.isDistributionActivate);
     }
   }
 
@@ -1024,7 +1154,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.organization$.pipe(
       filter((organisation: Organization) => !!organisation && !this.selectedOrder),
       takeUntil(this.componentDestroy())
-    ).subscribe(() => {
+    ).subscribe((organisation: Organization) => {
+      this.isDistributionActivate = organisation.isDistributionActivate ? true : false;
       const orderTypeToPrePopulate =
         this.orderManagementService.getOrderTypeToPrePopulate() || IrpOrderType.LongTermAssignment;
       this.orderManagementService.clearOrderTypeToPrePopulate();

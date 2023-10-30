@@ -34,11 +34,13 @@ export class ReasonsFormsService {
         calculateTowardsWeeklyHours: [false],
         eligibleToBeScheduled: [false],
         visibleForIRPCandidates: [false],
+        sendThroughIntegration:[false]
       });
     } else if (formType === ReasonFormType.CancelEmployeeReasons) {
       this.form = this.fb.group({
         id: [],
-        reason: [null, [Validators.required]]
+        reason: [null, [Validators.required, Validators.maxLength(100),
+          Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]]
       });
     } else if (formType === ReasonFormType.ClosureReason) {
       this.form = this.fb.group({
@@ -69,6 +71,8 @@ export class ReasonsFormsService {
         id: [],
         reason: ['', [Validators.required, Validators.maxLength(100),
           Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)]],
+        includeInIRP: [false],
+        includeInVMS: [false],
       });
     } else if(formType === ReasonFormType.TerminatedReason){
       this.form = this.fb.group({

@@ -60,6 +60,14 @@ export const UnavaliabilityGridConfig: ColDef[] = [
     cellRenderer: ToggleIconRendererComponent,
     ...commonCell,
   },
+  {
+    field: 'sendThroughIntegration',
+    headerName: 'Send Through Integration',
+    width: 280,
+    type: 'leftAligned',
+    cellRenderer: ToggleIconRendererComponent,
+    ...commonCell,
+  },
 ];
 
 export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
@@ -142,9 +150,31 @@ export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
     required: false,
     fieldType: FieldType.Toggle,
   },
+  {
+    field: 'sendThroughIntegration',
+    title: 'Send Through Integration',
+    required: false,
+    fieldType: FieldType.Toggle,
+  },
 ];
 
 export const defaultDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: '',
+    title: 'System Configuration',
+    fieldType: FieldType.CheckBoxGroup,
+    required: true,
+    checkBoxes: [
+      {
+        field: 'includeInIRP',
+        title: 'IRP',
+      },
+      {
+        field: 'includeInVMS',
+        title: 'VMS',
+      },
+    ],
+  },
   {
     field: 'reason',
     title: 'Reason',

@@ -132,7 +132,6 @@ $headerHeight: 19px;
     overflow: auto;
   }
   &__orders_pending_in_custom {
-    display: flex;
     overflow-x: hidden;
     overflow-y: auto;
     max-height: calc( 100% - 30px);

@@ -5,10 +5,8 @@
   display: flex;
   align-items: center;
   padding-left: 103px;
-
-  &:hover {
-    background-color: $primary-active-blue-90;
-  }
+  background-color: var(--bg-sub-row) !important;
+  border-bottom: 1px solid var(--grid-header-border) !important;
 
   .info {
     font-size: 12px;
@@ -19,13 +17,13 @@
 
     .data {
       font-weight: 700;
-      color: $black;
+      color: var(--text) !important;
     }
 
     .title {
       margin-top: 2px;
       font-weight: 400;
-      color: $secondary-dark-blue-30;
+      color: $secondary-dark-blue-30 !important;
     }
   }
 

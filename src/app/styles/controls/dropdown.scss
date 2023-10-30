@@ -32,8 +32,8 @@ body.dark {
         }
 
         &.e-disabled {
-          background-color: $secondary-dark-blue-50 !important;
-          border: 1px solid $secondary-dark-blue-40 !important;
+          background-color: var(--bg-input-field-disabled) !important;
+          border: 1px solid var(--input-border-color) !important;
 
           .e-delim-values {
             color: $secondary-dark-blue-30 !important;
@@ -224,7 +224,8 @@ body.dark {
         }
 
         &.e-disabled {
-          background-color: $secondary-dark-blue-10-2 !important;
+          background-color: $bg-gray-200 !important;
+          color: $secondary-dark-blue-30 !important;
           border-color: $secondary-dark-blue-15 !important;
         }
       }
@@ -262,7 +263,7 @@ body.dark {
     .e-dropdownlist {
       .e-disabled {
         .e-disabled {
-          background-color: $secondary-dark-blue-10-2 !important;
+          background-color: $bg-gray-200 !important;
         }
       }
     }
@@ -318,7 +319,7 @@ body.dark {
         color: $white;
       }
     }
-    
+
     .e-list-item {
       &.e-item-focus {
         background-color: $sidebar-background !important;

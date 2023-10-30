@@ -3,7 +3,9 @@
 body.light {
   --background: #{$background};
   --secondary-background: #{$secondary-dark-blue-50};
+  --info-background: #{$secondary-dark-blue-50};
   --bg-default: #{$white};
+  --bg-sub-row: #{$white};
   --bg-upload-area: #{$primary-active-blue-90};
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
   --bg-file-uploader: #{$secondary-dark-blue-50};
@@ -13,16 +15,25 @@ body.light {
   --bg-filter-chips: #{$secondary-dark-blue-50};
   --pagination-background: #{$white};
   --bg-steper: #{$white};
+  --button-group-border: #{$secondary-dark-blue-45};
+  --button-group-background: #{$white};
+  --button-group-color: #{$secondary-dark-blue-10};
 
   --bg-primary-btn-disabled: #{$primary-active-blue-70};
   --color-primary-btn-disabled: #{$white};
   --input-border-color: #{$secondary-dark-blue-40};
+  --bg-input-field-disabled: #{$secondary-dark-blue-50};
+  --menu-item-hover: #{$secondary-dark-blue-50};
 
   --border-drop-area: #{$secondary-dark-blue-40};
   --grid-row-border: #{$grid-row-border};
   --border-upload-file: #{$white};
   --input-border: #{$primary-active-blue-40};
   --header-border: #{$secondary-dark-blue-45};
+  --grid-header-border: #{$grid-row-border};
+  --dialog-border: #{$secondary-dark-blue-45};
+  --separator: #{$secondary-dark-blue-45};
+  --devider: #{$secondary-dark-blue-40};
 
   --icon-color: #{$secondary-dark-blue-10};
 
@@ -38,15 +49,22 @@ body.light {
   --selector-title: #{$secondary-dark-blue-15};
   --disabled-drop-area-text: #{$secondary-dark-blue-30};
   --selected-date-range-color: #{$white};
+  --checkbox-background: #{$white};
+  --chechbox-corder-color: #{$secondary-dark-blue-30};
 
   --shadow: #{$secondary-black-25};
   --redonly-text: #{$secondary-dark-blue-30};
+
+  --acrdn-hover-border: #{$secondary-dark-blue-45};
+  --bg-acrdn-selected-header: #{$primary-active-blue-90};
 }
 
 body.dark {
   --background: #{$sidebar-background};
   --secondary-background: #{$secondary-dark-blue-10-2};
+  --info-background: #{$widget-dark-tooltip};
   --bg-default: #{$sidebar-background};
+  --bg-sub-row: #{$grid-detail-row-bgcolor};
   --bg-upload-area: #{$widget-dark-tooltip};
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
   --bg-file-uploader: #{$widget-dark-tooltip};
@@ -56,16 +74,27 @@ body.dark {
   --bg-filter-chips: #{$widget-dark-tooltip};
   --pagination-background: #{$sidebar-background};
   --bg-steper: #{$alert-side-bar-bgcolor};
+  --button-group-border: #{$primary-active-blue-40};
+  --button-group-background: #{$sidebar-background};
+  --button-group-color: #{$primary-active-blue-10};
 
   --bg-primary-btn-disabled: #{$secondary-dark-blue-10-2};
   --color-primary-btn-disabled: #{$secondary-dark-blue-30};
-  --input-border-color: #{$input-border-color};
+  --input-border-color: #{$secondary-dark-blue-15};
+  --bg-input-field-disabled: #{$bg-gray-200};
+  --menu-item-hover: #{$primary-active-blue-70};
 
   --border-drop-area: #{$secondary-dark-blue-50};
   --grid-row-border: #{$sidebar-background};
   --border-upload-file: #{$secondary-dark-blue-30};
   --input-border: #{$primary-active-blue-40};
   --header-border: #{$secondary-dark-blue-15};
+  --grid-header-border: #{$grid-border-color};
+  --dialog-border: #{$secondary-dark-blue-10-2};
+  --separator: #{$secondary-dark-blue-10-2};
+  --devider: #{$secondary-dark-blue-15};
+  --checkbox-background: #{$secondary-dark-blue-10-2};
+  --chechbox-corder-color: #{$secondary-dark-blue-40};
 
   --icon-color: #{$secondary-dark-blue-30};
 
@@ -84,4 +113,7 @@ body.dark {
 
   --shadow: #{$secondary-dark-blue-10-2};
   --redonly-text: #{$icewind-dale};
+
+  --acrdn-hover-border: #{$primary-active-blue-10};
+  --bg-acrdn-selected-header: #{$widget-dark-tooltip};
 }

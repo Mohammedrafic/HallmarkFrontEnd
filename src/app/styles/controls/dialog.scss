@@ -4,6 +4,16 @@
 
 body.light, body.dark {
   .e-dialog {
+    .e-dlg-header-content,
+    .e-dlg-content,
+    .e-footer-content {
+      color: var(--text);
+    }
+
+    .e-dlg-content {
+      background-color: var(--bg-default);
+    }
+
     .e-icon-dlg-close::before {
       content: "\e7e7" !important;
       color: $primary-active-blue-10 !important;
@@ -11,6 +21,10 @@ body.light, body.dark {
 
     & + .e-dlg-overlay {
       background-color: unset;
+    }
+
+    .e-footer-content {
+      border-top: 1px solid var(--dialog-border);
     }
   }
 
@@ -78,6 +92,7 @@ body.light, body.dark {
       padding: 24px;
 
       .header-container {
+        background-color: var(--bg-default);
 
         .e-card-header {
           display: flex;
@@ -85,7 +100,7 @@ body.light, body.dark {
           align-items: center;
 
           .e-card-title {
-            color: $black;
+            color: var(--text);
             font-size: 24px;
             font-weight: 700;
           }
@@ -159,7 +174,7 @@ body.light, body.dark {
     &.extension-dialog,
     &.candidate-dialog {
       width: 59%;
-  
+
       @media #{$max-desktop-small} {
         width: 72%;
       }

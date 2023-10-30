@@ -527,6 +527,8 @@ export class Order {
   fromTemplateId?: number;
   disableNumberOfOpenPositions?: boolean | null;
   workflowName?: string;
+  distributeToVMS?:number | null;
+  distributionDelay?:boolean
 }
 
 export class ReOrder {
@@ -1008,4 +1010,17 @@ export interface OrderAuditHistory{
     changeType: string
     modifiedOn: string
     modifiedBy: string
+  }
+
+  export interface OrgStructureDto {
+    distributionConfigs : DistributionConfig
+  }
+  export interface DistributionConfig {
+    value?: number;
+    isEnabled?: boolean;
+  }
+  export interface JobDistributionfilters {
+    regionId?: number;
+    locationId?: number;
+    departmentId?: number;
   }

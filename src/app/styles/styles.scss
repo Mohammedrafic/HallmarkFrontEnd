@@ -40,6 +40,10 @@ html {
   height: 6px;
 }
 
+*::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
 *::-webkit-scrollbar-track {
   background-color: transparent;
 }
@@ -339,6 +343,10 @@ body {
       background: $sidebar-background !important;
     }
 
+    .comments-header .bootstrap .e-input-group.e-control-wrapper {
+      background: unset !important;
+    }
+
     .custom-chip,
     .candidates-additional-info .container-row,
     .search, .credentials-container,
@@ -434,7 +442,7 @@ body.light .header-item .e-menu-item.e-selected {
 }
 
 hr {
-  background-color: $secondary-dark-blue-45;
+  background-color: var(--separator);
   height: 1px;
   border: 0;
   margin: 12px 0;
@@ -631,6 +639,7 @@ body.dark .title, body.dark .contact-name {
 }
 .reason-form .input-group span.error{
   position: relative;
+  top: 0;
   bottom: 0px;
 }
 .exp_creds .app-widget-wrapper__projection-wrapper {
@@ -664,12 +673,12 @@ svg.svg-inline--fa.fa-lock,  svg.svg-inline--fa.fa-unlock{
     width: 20px;
     height: 20px;
   }
-  
+
 }
 .app-grid__component .ag-root-wrapper {
   border: none !important;
   }
- 
+
 
   .app-grid__component span.ag-icon.ag-icon-menu {
     display: none;
@@ -720,4 +729,8 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 .orderStatusSummaryReport .ag-body-viewport {
   max-height: calc( 60vh ) !important;
   overflow: auto;
+}
+
+.separator {
+  background-color: var(--separator) !important;
 }

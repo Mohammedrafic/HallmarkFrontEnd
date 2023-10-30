@@ -52,6 +52,7 @@ export interface Step {
   nextStepId?: number | null;
   parentId?: number | null;
   multiple?: string | null;
+  includeInIrp?: boolean;
 }
 
 export class WorkflowFilters {

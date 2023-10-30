@@ -2,7 +2,7 @@
 
 @mixin textPrimary {
   .e-acrdn-header-content {
-    color: $primary-active-blue-10;
+    color: $primary-active-blue-10 !important;
   }
 
   .e-toggle-icon {
@@ -31,7 +31,7 @@ body.dark {
       .e-acrdn-header {
         min-height: 40px;
         line-height: 39px;
-        border: 1px solid $secondary-dark-blue-45 !important;
+        border: 1px solid var(--header-border) !important;
         border-radius: 8px;
 
         &:focus {
@@ -40,6 +40,7 @@ body.dark {
 
         &:hover {
           background: $primary-active-blue-90 !important;
+          border: 1px solid var(--acrdn-hover-border) !important;
           @include textPrimary;
         }
 
@@ -51,7 +52,7 @@ body.dark {
         .e-acrdn-header-content {
           font-size: 14px;
           font-weight: 700;
-          color: $secondary-dark-blue-15;
+          color: var(--selector-title);
         }
       }
 
@@ -67,7 +68,7 @@ body.dark {
       &.e-select.e-expand-state {
         & > .e-acrdn-header {
           border-color: $primary-active-blue-10 !important;
-          background: $primary-active-blue-90;
+          background: var(--bg-acrdn-selected-header) !important;
 
           &:hover {
             background: $primary-active-blue-80 !important;

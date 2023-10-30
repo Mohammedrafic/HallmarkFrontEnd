@@ -87,6 +87,7 @@ import {
   GetOrderBillRateDetailSucceeded,
   GetParentOrderById,
   GetIrpOrderExtensionCandidates
+  GetJobDistributionValues
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -110,6 +111,7 @@ import {
   OrderManagementPage,
   OrderWorkLocationAuditHistory,
   OrdersJourneyPage,
+  OrgStructureDto,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -173,6 +175,7 @@ export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
   ordersJourneyPage: OrdersJourneyPage | null;
   selectedOrder: Order | null;
+  OrgStructure: OrgStructureDto |null;
   selectedParentOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
   applicantStatuses: ApplicantStatus[];
@@ -219,6 +222,7 @@ export interface OrderManagementContentStateModel {
     ordersPage: null,
     ordersJourneyPage: null,
     selectedOrder: null,
+    OrgStructure:null,
     selectedParentOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
@@ -464,6 +468,10 @@ export class OrderManagementContentState {
   static getOrderAuditHistoryDetails(state: OrderManagementContentStateModel): OrderAuditHistory[] {
     return state.OrderAuditHistory;
   }
+  @Selector()
+  static selectedDistribution(state: OrderManagementContentStateModel): OrgStructureDto | null {
+    return state.OrgStructure;
+  }
 
   @Selector()
   static getOrderCredentialAuditHistory(state: OrderManagementContentStateModel): OrderCredentialAuditHistory[] {
@@ -590,6 +598,20 @@ export class OrderManagementContentState {
         return payload;
       })
     );
+  }
+
+  @Action(GetJobDistributionValues)
+  GetJobDistributionValue({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetJobDistributionValues): Observable<OrgStructureDto | void> {
+    return this.orderManagementService.getJobDistributionValues(payload).pipe(
+      tap((payloads) => {
+        patchState({ OrgStructure: payloads });
+        dispatch(new GetOrderJobDistributionDetailSucceeded());
+        return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      }));
   }
 
   @Action(SetLock)
@@ -1097,10 +1119,11 @@ export class OrderManagementContentState {
   }
 
   @Action(GetRejectReasonsForOrganisation)
-  GetRejectReasonsForOrganisation({
-    patchState,
-  }: StateContext<OrderManagementContentStateModel>): Observable<RejectReasonPage> {
-    return this.rejectReasonService.getAllRejectReasons().pipe(
+  GetRejectReasonsForOrganisation(
+    { patchState}: StateContext<OrderManagementContentStateModel>,
+    { systemType }: GetRejectReasonsForOrganisation
+    ): Observable<RejectReasonPage> {
+    return this.rejectReasonService.getAllRejectReasons(systemType).pipe(
       tap((reasons) => {
         patchState({ rejectionReasonsList: reasons.items });
         return reasons;

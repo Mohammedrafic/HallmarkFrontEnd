@@ -711,7 +711,7 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   this.dispatchAgencyOrderCandidatesList(orderData.orderId, orderData.organizationId, true);
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
-  this.openDetails.next(false);
+  this.openDetails.next(true);
   this.selectedRowRef = Data;
 }
 
@@ -1130,8 +1130,9 @@ public RedirecttoIRPOrder(order:Order)
         cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
     }
-
-    this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.VMS);
+    if(this.orderManagementService.getOrderManagementSystem() != OrderManagementIRPSystemId.IRP){
+      this.orderManagementService.setOrderManagementSystem(this.activeSystem ?? OrderManagementIRPSystemId.VMS);
+    }
     this.checkSelectedChildrenItem();
   }
 
@@ -1502,7 +1503,7 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed = false;
     }
 
-    if (this.creatingReorder) {
+    if (this.creatingReorder || event.rowIndex === event.previousRowIndex) {
       this.creatingReorder = false;
       return;
     }
@@ -2706,7 +2707,7 @@ public RedirecttoIRPOrder(order:Order)
       }),
       switchMap(() => this.projectSpecialData$),
       filter((project) => !!project),
-      takeUntil(this.unsubscribe$),
+      take(1),
     ).subscribe((data) => {
       const { poNumbers, projectNames, specialProjectCategories } = data;
       this.filterColumns.projectTypeIds.dataSource =this.activeSystem === OrderManagementIRPSystemId.IRP? specialProjectCategories.filter(f=>f.includeInIRP == true) :  specialProjectCategories.filter(f=>f.includeInVMS == true);
@@ -2790,9 +2791,9 @@ public RedirecttoIRPOrder(order:Order)
 
       this.isOrgIRPEnabled = !!isIRPEnabled;
       this.isOrgVMSEnabled = !!isVMCEnabled;
-
-      this.setPreviousSelectedSystem();
-
+      if(!this.isRedirectedFromDashboard){
+        this.setPreviousSelectedSystem();
+      }    
       if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
         this.activeSystem = OrderManagementIRPSystemId.VMS;
       } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {

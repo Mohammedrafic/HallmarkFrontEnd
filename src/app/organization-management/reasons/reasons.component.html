@@ -21,8 +21,12 @@
       <e-tabitem *ngIf="selectedSystem.isVMS">
         <ng-template #headerText><div>Candidate Rejection</div></ng-template>
         <ng-template #content>
-          <app-candidate-reject-reason [userPermission]="userPermission"
-            (editReason)="editReason($event)" [form]="reasonForm"></app-candidate-reject-reason>
+          <app-candidate-reject-reason
+            [userPermission]="userPermission"
+            (editReason)="editReason($event)"
+            [form]="reasonForm"
+            [showSystem]="showSystem"
+          ></app-candidate-reject-reason>
         </ng-template>
       </e-tabitem>
 

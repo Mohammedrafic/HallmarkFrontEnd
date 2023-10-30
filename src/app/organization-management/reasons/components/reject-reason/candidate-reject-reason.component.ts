@@ -20,6 +20,7 @@ import { Permission } from "@core/interface";
 })
 export class CandidateRejectReasonComponent extends ReasonsComponent implements OnInit,OnDestroy {
   @Input() userPermission: Permission;
+  @Input() showSystem = false;
 
   @Select(RejectReasonState.rejectReasonsPage)
   public reasons$: Observable<RejectReasonPage>;

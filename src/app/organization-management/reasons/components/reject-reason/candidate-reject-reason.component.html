@@ -28,7 +28,8 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="reason" headerText="Reason" textAlign="Left" width="100%"></e-column>
+      <e-column field="reason" headerText="Reason" textAlign="Left" width="{{showSystem ? '440' : '100%'}}"></e-column>
+      <e-column field="system" headerText="System" textAlign="Left" width="100%" *ngIf="showSystem"></e-column>
     </e-columns>
 
     <ng-template #pagerTemplate let-data>
