@@ -257,6 +257,14 @@ export class OrderManagementContentService {
     });
   }
 
+  public getIrpExtensionCandidates(orderId: number,
+    paramsData: IrpCandidatesParams): Observable<OrderCandidatesListPage> {
+    return this.http.get<OrderCandidatesListPage>(`/api/IRPOrders/${orderId}/candidates`, {
+      params: GetQueryParams(paramsData),
+    })
+  }
+
+
   public getIrpCandidates(orderId: number,
     paramsData: IrpCandidatesParams): Observable<PageOfCollections<IrpOrderCandidate>> {
     return this.http.get<PageOfCollections<IrpOrderCandidateDto>>(`/api/IRPOrders/${orderId}/candidates`, {

@@ -161,6 +161,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public showEmployeeTab = true;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   private secondHasOpenedOnes = false;
+  activeSystems: OrderManagementIRPSystemId | null;
 
   public get isReOrder(): boolean {
     return !isNil(this.order?.reOrderFromId) && this.order?.reOrderFromId !== 0;
