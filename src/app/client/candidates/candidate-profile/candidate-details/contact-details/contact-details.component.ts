@@ -8,24 +8,12 @@ import { CandidateProfileFormService } from '@client/candidates/candidate-profil
 import { TakeUntilDestroy } from '@core/decorators';
 import { Select, Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
-import { ActivatedRoute, Router } from '@angular/router';
-import {  FormGroup } from '@angular/forms';
-import { DomSanitizer } from '@angular/platform-browser';
-import {  ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
-import {
-  PdfViewerComponent,
-  MagnificationService,
-  NavigationService,
-  TextSelectionService,
-  AnnotationService,
-  ToolbarService,
-} from '@syncfusion/ej2-angular-pdfviewer';
+import { FormGroup } from '@angular/forms';
+import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { User } from '@shared/models/user-managment-page.model';
 import { SendGroupEmailRequest } from '@shared/models/group-email.model';
 import { EmployeeGroupMailComponent } from '../../employee-group-mail/employee-group-mail.component';
-import { CandidateListState } from '@shared/components/candidate-list/store/candidate-list.state';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { GroupMailStatus, OrganizationUserType } from '@admin/alerts/group-email.enum';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -68,14 +56,13 @@ public id:any;
   protected componentDestroy: () => Observable<unknown>;
 
   constructor(
-    protected override cdr: ChangeDetectorRef,private router: Router,   private store: Store,
-    protected override candidateProfileFormService: CandidateProfileFormService,    private route: ActivatedRoute, private sanitizer: DomSanitizer,
+    protected override cdr: ChangeDetectorRef, private store: Store,
+    protected override candidateProfileFormService: CandidateProfileFormService,
   ) {
     super(cdr, candidateProfileFormService);
   }
 
   public override ngOnInit(): void {
-    this.store.dispatch(new GetSourcingReasons());
     this.sourcing$.pipe(takeUntil(this.destroy$)).subscribe((data:any) => {
       if (data != null) {
         this.isSourceValidated = data.issourcing

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GeneralNotesService } from '@client/candidates/candidate-profile/general-notes/general-notes.service';
-import { Observable, takeUntil } from 'rxjs';
+import { Observable, skip, takeUntil } from 'rxjs';
 import { CategoryModel } from '@client/candidates/candidate-profile/general-notes/models/category.model';
 import { Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../../../store/app.actions';
@@ -36,16 +36,12 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
 
   public ngOnInit(): void {
     this.listenEditMode();
+    this.createForm();
   }
 
-  public initNoteForm(note: GeneralNotesModel | undefined): void {
+  public initNoteForm(note?: GeneralNotesModel): void {
     this.categories$ = this.generalNotesService.getCategories();
-    this.noteForm = this.formBuilder.group({
-      date: [note?.date ?? null, [Validators.required]],
-      categoryId: [note?.categoryId ?? null, [Validators.required]],
-      note: [note?.note ?? null, [Validators.maxLength(250)]],
-      createdByName:[],
-    });
+    this.createForm(note);
   }
 
   public saveNote(): void {
@@ -63,8 +59,20 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
     }
   }
 
+  private createForm(note?: GeneralNotesModel): void {
+    this.noteForm = this.formBuilder.group({
+      date: [note?.date ?? null, [Validators.required]],
+      categoryId: [note?.categoryId ?? null, [Validators.required]],
+      note: [note?.note ?? null, [Validators.maxLength(250)]],
+      createdByName:[],
+    });
+  }
+
   private listenEditMode(): void {
-    this.generalNotesService.editMode$.pipe(takeUntil(this.destroy$)).subscribe((note: EditGeneralNoteModel | null) => {
+    this.generalNotesService.editMode$.pipe(
+      skip(1),
+      takeUntil(this.destroy$),
+    ).subscribe((note: EditGeneralNoteModel | null) => {
       this.initNoteForm(note?.data);
     });
   }
