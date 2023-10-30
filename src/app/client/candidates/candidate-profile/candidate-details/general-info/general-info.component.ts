@@ -206,7 +206,6 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.removeValidatorsAndReset(['inactivation', 'inactivationReasonId']);
   }
 
-  // TODO: inactivation
   private handleInactivationProfileStatus(): void {
     this.candidateForm.get('employeeId')?.enable();
     this.candidateForm.get('employeeId')?.addValidators(Validators.required);
