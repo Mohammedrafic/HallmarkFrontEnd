@@ -279,9 +279,12 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
             });
           this.agencyControl?.updateValueAndValidity();
           this.billingControl?.disable();
+          debugger
+          this.populateBillingFromGeneral();
         } else {
           this.populatedSubscription?.unsubscribe();
           this.billingControl?.enable();
+          this.populateBillingFromGeneral();
         }
       });
   }
@@ -295,7 +298,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       country: agency.country,
       state: agency.state,
       city: agency.city,
-      zipCode: agency.zipCode,
+      zipcode: agency.zipcode,
       phone1: agency.phone1Ext,
       phone2: agency.phone2Ext,
       fax: agency.fax,
