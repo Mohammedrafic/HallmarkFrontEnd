@@ -7,8 +7,13 @@
      
       <app-tooltip-container
         [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanCreateDeleteAgency]">
-        <button ejs-button appHideBeforeSyncfusionLoad [disabled]="!userPermission[userPermissions.CanCreateDeleteAgency]" [isPrimary]="true">Add MSP</button>
+       >
+       <button ejs-button id="filterButton" (click)="onBtExport()" cssClass="e-outline button-filter">
+        <div class="filter-button-content">
+          Export <i-feather name="upload" class="icon"></i-feather>
+        </div>
+      </button>
+        <button ejs-button appHideBeforeSyncfusionLoad  [isPrimary]="true" (click)="addMsp()">Add MSP</button>
       </app-tooltip-container>
     </ng-container>
   </app-page-toolbar>

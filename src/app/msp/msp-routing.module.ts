@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MspComponent } from './msp.component';
 import { MspListComponent } from './msp-list/msp-list.component';
+import { AddEditMspComponent } from './add-edit-msp/add-edit-msp.component';
 
  const routes: Routes = [  
   {
@@ -11,7 +12,15 @@ import { MspListComponent } from './msp-list/msp-list.component';
       {
         path: 'msp-list',
         component: MspListComponent,
-      }    
+      },
+      {
+        path: 'msp-add',
+        component: AddEditMspComponent,
+      },
+      {
+        path: 'msp-edit/edit/:id',
+        component: AddEditMspComponent,
+      },
     ],
   },
 ];
