@@ -151,6 +151,12 @@ export class CandidateListState {
     {dispatch}: StateContext<CandidateListStateModel>,
     { dto }: CandidateListActions.DeleteIRPCandidate): Observable<void> {
     return this.candidateListService.deleteIRPCandidate(dto).pipe(
+      tap(() => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, 'Employee inactivation successful'),
+          new CandidateListActions.EmployeeInactivationSuccessful(),
+        ]);
+      }),
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }

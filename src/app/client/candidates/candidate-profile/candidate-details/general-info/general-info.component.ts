@@ -30,7 +30,7 @@ import { DateTimeHelper } from '@core/helpers';
 })
 export class GeneralInfoComponent extends AbstractContactDetails implements OnInit, OnDestroy {
   public isOnHoldSelected: boolean;
-  public isTerminatedSelected: boolean;
+  public isInactivatedSelected: boolean;
   public minEndDate = new Date(new Date().setHours(0, 0, 0, 0));
   fieldsSettingsTeminated: FieldSettingsModel = { text: 'reason', value: 'id' };
   currentPage = 1;
@@ -134,7 +134,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       ?.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((profileStatus: ProfileStatusesEnum) => {
         this.isSourceConfig = false;
-        this.isTerminatedSelected = false;
+        this.isInactivatedSelected = false;
         this.isOnHoldSelected = false;
         const handlers = {
           [ProfileStatusesEnum.OnHold]: () => this.handleOnHoldProfileStatus(),
@@ -194,7 +194,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       : null;
 
     this.isOnHoldSelected = true;
-    this.isTerminatedSelected = false;
+    this.isInactivatedSelected = false;
     this.candidateForm.get('holdStartDate')?.setValue(startDate);
     this.candidateForm.get('holdStartDate')?.setValidators([
       Validators.required,
@@ -203,7 +203,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     ]);
     this.candidateForm.get('holdEndDate')?.setValue(endDate);
     this.candidateForm.get('holdEndDate')?.setValidators(endDateValidator(this.candidateForm, 'holdStartDate'));
-    this.removeValidatorsAndReset(['inactivation', 'inactivationReasonId']);
+    this.removeValidatorsAndReset(['inactivationDate', 'inactivationReasonId']);
   }
 
   private handleInactivationProfileStatus(): void {
@@ -219,10 +219,10 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       ? DateTimeHelper.setCurrentTimeZone(profileData.inactivationDate)
       : this.today;
 
-    this.isTerminatedSelected = true;
+    this.isInactivatedSelected = true;
     this.isOnHoldSelected = false;
-    this.candidateForm.get('inactivation')?.setValue(startDate);
-    this.candidateForm.get('inactivation')?.setValidators([
+    this.candidateForm.get('inactivationDate')?.setValue(startDate);
+    this.candidateForm.get('inactivationDate')?.setValidators([
       Validators.required,
       endTimeValidator(this.candidateForm, 'hireDate'),
     ]);
@@ -249,7 +249,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.candidateForm.get('employeeSourceId')?.updateValueAndValidity();
     this.employeeIdRequired = true;
     this.sourceIdUpdateListener$?.unsubscribe();
-    this.isTerminatedSelected = false;
+    this.isInactivatedSelected = false;
     this.isOnHoldSelected = false;
 
     this.removeValidatorsAndReset(['holdStartDate', 'inactivationDate', 'inactivationReasonId', 'holdEndDate']);

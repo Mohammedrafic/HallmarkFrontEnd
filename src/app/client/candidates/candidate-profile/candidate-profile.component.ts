@@ -96,14 +96,14 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     ));
   }
 
-  private isEmployeeTerminated(): boolean {
+  private isEmployeeInactivated(): boolean {
     const profileStatusControl = this.candidateProfileFormService.candidateForm.get('profileStatus');
     return !!(this.candidateService.employeeId &&
       (profileStatusControl?.dirty && profileStatusControl?.value === ProfileStatusesEnum.Inactive
         || profileStatusControl?.value === ProfileStatusesEnum.FallOffOnboarding));
   }
 
-  private profileStatusTerminatedConfirmation(): Observable<void | CandidateModel> {
+  private profileStatusInactivatedConfirmation(): Observable<void | CandidateModel> {
     this.showStatusConfirmDialog = true;
     this.cd.markForCheck();
     return this.$statusConfirmDialog.pipe(
@@ -120,14 +120,14 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     return this.$skillsConfirmDialog.pipe(
       tap(() => this.showSkillConfirmDialog = false),
       filter(Boolean),
-      switchMap(() => this.employeeTerminationHandler()),
+      switchMap(() => this.employeeInactivationHandler()),
       take(1)
     );
   }
 
-  private employeeTerminationHandler(): Observable<void | CandidateModel> {
-    if (this.isEmployeeTerminated()) {
-      return this.profileStatusTerminatedConfirmation();
+  private employeeInactivationHandler(): Observable<void | CandidateModel> {
+    if (this.isEmployeeInactivated()) {
+      return this.profileStatusInactivatedConfirmation();
     }
     return this.saveCandidate();
   }
@@ -136,7 +136,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     if (this.isSkillChanged()) {
       return this.skillChangeConfirmation();
     }
-    return this.employeeTerminationHandler();
+    return this.employeeInactivationHandler();
   }
 
   private saveCandidate(): Observable<void | CandidateModel> {

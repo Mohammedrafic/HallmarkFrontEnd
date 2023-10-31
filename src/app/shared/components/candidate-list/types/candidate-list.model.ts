@@ -164,3 +164,8 @@ export interface InactivateEmployeeDto {
   inactivationReasonId: number;
   createReplacement: boolean;
 }
+
+export interface InactivationEvent {
+  id: number | null;
+  hireDate: string | null;
+}

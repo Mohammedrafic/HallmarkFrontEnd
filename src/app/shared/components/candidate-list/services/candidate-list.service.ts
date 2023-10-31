@@ -134,8 +134,9 @@ export class CandidateListService {
   public createInactivateForm(): CustomFormGroup<EmployeeInactivateData> {
     return this.fb.group({
       inactivationDate: [null, Validators.required],
-      inactivationReason: [null, Validators.required],
+      inactivationReasonId: [null, Validators.required],
       createReplacement: [false],
+      hireDate: [null],
     }) as CustomFormGroup<EmployeeInactivateData>;
   }
 }

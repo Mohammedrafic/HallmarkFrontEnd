@@ -108,3 +108,7 @@ export class SaveEmployeeImportLogResult {
   static readonly type = '[candidate list] Save Employee Import Result';
   constructor(public payload:EmployeeImportSaveResult) {}
 }
+
+export class EmployeeInactivationSuccessful {
+  static readonly type = '[candidate list] Employee inactivation successful';
+}
