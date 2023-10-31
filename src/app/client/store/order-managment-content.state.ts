@@ -86,7 +86,7 @@ import {
   GetOrderContactDetailSucceeded,
   GetOrderBillRateDetailSucceeded,
   GetParentOrderById,
-  GetIrpOrderExtensionCandidates
+  GetIrpOrderExtensionCandidates,
   GetJobDistributionValues
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
