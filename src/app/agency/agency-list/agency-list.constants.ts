@@ -53,6 +53,7 @@ export const agencyListFilterColumns: FilterColumnsModel = {
   statuses: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
   cities: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
   contacts: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+  isMSPAgencies: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'MSP Agencies'},
 };
 
 export const MSPMenuOptions = (
