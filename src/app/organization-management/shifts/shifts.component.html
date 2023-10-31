@@ -60,6 +60,7 @@
       <e-column headerText="on call shift" width=100>
         <ng-template #template let-data>{{data.onCall ? 'Yes' : 'No'}}</ng-template>
       </e-column>
+      <e-column  field="inactiveDate" headerText="InactiveDate" width=100  type="date"  [format]="inactivateColformat"></e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -175,6 +176,14 @@
     <div class="input-container toggle-wrapper">
       <ejs-switch class="toggle" formControlName="onCall"></ejs-switch>
       <span>On Call</span>
+    </div>
+    <div class="input-container calendar">
+      <label>Inactive Date</label>
+      <div class="input-group datepicker" style="width:55%">
+        <ejs-datepicker id="inactiveDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                        appValidateWithMessage formControlName="inactiveDate">
+        </ejs-datepicker>
+      </div>
     </div>
   </form>
 </app-side-dialog>
