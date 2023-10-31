@@ -95,6 +95,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public agencyData = new Subject<Agency>();
   public businessUnitType: BusinessUnitType;
   public isBusinessUnitTypeMSP: boolean = false;
+  public isBusinessUnitTypeHallmark: boolean = false;
 
   @Select(AgencyState.agencies)
   agencies$: Observable<AgencyPage>;
@@ -124,7 +125,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.subscribeOnAgencyFilteringOptions();
     this.subscribeOnSuccessAgencyByPage();
     this.setFileName();
-    this.isBusinessUnitMSP();
+    this.setBusinessUnitType();
   }
 
   ngOnDestroy(): void {
@@ -141,9 +142,12 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.grid.hideScroll();
   }
 
-  public isBusinessUnitMSP(): void {
+  public setBusinessUnitType(): void {
     this.businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
-    if (this.businessUnitType == BusinessUnitType.MSP) {
+    if (this.businessUnitType == BusinessUnitType.Hallmark) {
+      this.isBusinessUnitTypeHallmark = true;
+    }
+    else if (this.businessUnitType == BusinessUnitType.MSP) {
       this.isBusinessUnitTypeMSP = true;
     }
   }

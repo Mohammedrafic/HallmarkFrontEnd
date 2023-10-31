@@ -60,7 +60,7 @@
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
             <button ejs-button
-                    *ngIf="!isBusinessUnitTypeMSP"
+                    *ngIf="isBusinessUnitTypeHallmark"
                     [matMenuTriggerFor]="menu"
                     (click)="$event.stopPropagation()"
                     [disabled]="false"
