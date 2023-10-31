@@ -45,3 +45,12 @@
     }
   }
 }
+
+.child-grid{
+  .e-columnheader{
+    display: none;
+  }
+  .e-content{
+    overflow-x: hidden;
+  }
+}

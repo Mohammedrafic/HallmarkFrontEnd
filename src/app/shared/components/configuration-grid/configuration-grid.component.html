@@ -12,7 +12,34 @@
     (actionBegin)="actionBegin($event, grid)"
     class="grid-component">
     <ng-template #detailTemplate let-data>
-      <table class="detailtable" width="100%">
+      <div class="child-grid"> 
+       <ejs-grid #grid [dataSource]='data.children'>
+          <e-columns>
+            <e-column textAlign="right" width="100">
+              <ng-template #template ngFor let-childData let-i="index" [ngForOf]="data.children">
+                <div class="row-tool-buttons" [class.hidden]="childData.hidden">
+                  <button ejs-button cssClass="e-flat primary-icon-button"
+                      (click)="emitOpenEditSettingDialog(data, childData, $event)"
+                      [disabled]="hasPermissions | hasAccess : data : false">
+                      <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+                  </button>
+                </div>
+              </ng-template>
+            </e-column>
+            <e-column field="name" headerText="ATTRIBUTE" minWidth="420" width="100%"></e-column>
+            <e-column field="systemType" headerText="SYSTEM CONFIGURATION" width=150></e-column>
+            <e-column field="regionName" headerText="REGION" width=150></e-column>
+            <e-column field="locationName" headerText="LOCATION" width=150></e-column>
+            <e-column field="departmentName" headerText="DEPARTMENT" width=150></e-column>
+            <e-column field="displayValue" headerText="VALUE" width="380" textAlign="left">
+              <ng-template #template let-data>
+                {{ data.displayValue || data.value }}
+              </ng-template>
+            </e-column>
+          </e-columns>
+        </ejs-grid>
+      </div>
+      <!-- <table class="detailtable" width="100%">
         <tbody>
           <tr *ngFor="let child of data.children" [hidden]="child.hidden">
             <td class="e-rowcell e-templatecell" [style.width.px]="100">
@@ -32,7 +59,7 @@
             <td class="e-rowcell e-templatecell" [style.width.px]="400" style="text-align: left">{{child.displayValue}}</td>
           </tr>
         </tbody>
-      </table>
+      </table> -->
     </ng-template>
     <e-columns>
       <e-column textAlign="Right" width="100">
