@@ -149,5 +149,15 @@ export class MspListComponent extends AbstractPermissionGrid implements OnInit, 
       this.gridApi.setRowData(this.rowData);
     }
   }
- 
+  addMsp()
+  {
+    this.router.navigateByUrl('/msp/msp-add')
+  }
+  onBtExport() {
+    const params = {
+      fileName: 'Msp List',
+      sheetName: 'Msp List'
+    };
+    this.gridApi.exportDataAsExcel(params);
+  }
 }
