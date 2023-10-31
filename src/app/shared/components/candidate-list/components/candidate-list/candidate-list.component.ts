@@ -20,6 +20,7 @@ import {
   Subject,
   Subscription,
   switchMap,
+  take,
   takeUntil,
   takeWhile,
   tap,
@@ -82,6 +83,7 @@ import {
   CandidateListStateModel,
   EmployeeInactivateData,
   InactivateEmployeeDto,
+  InactivationEvent,
 } from '../../types/candidate-list.model';
 import {
   CandidatesExportCols, CandidatesTableFilters, filterColumns,
@@ -96,6 +98,7 @@ import { Credential } from '@shared/models/credential.model';
 import { CredentialTypeFilter } from '@shared/models/credential.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { endTimeValidator } from '@shared/validators/date.validator';
 @Component({
   selector: 'app-candidate-list',
   templateUrl: './candidate-list.component.html',
@@ -210,7 +213,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private activeTab: number;
   private scrollSubscription: Subscription;
   private redirectfromDashboard: boolean;
-  private inactivationId: number | null;
+  private inactivationData: InactivationEvent = {
+    id: null,
+    hireDate: null,
+  };
   public isSourcingEnabled = false;
   constructor(
     private store: Store,
@@ -392,7 +398,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     );
   }
 
-  public onRemove(id: number): void {
+  public onRemove(id: number, employeeHireData: string | null = null): void {
     if (!this.isIRP) {
       this.confirmService
         .confirm('Are you sure you want to inactivate the Candidate?', {
@@ -409,7 +415,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         });
     } else {
       this.store.dispatch(new GetInactivationReasons(1, 1000));
-      this.inactivationId = id;
+      this.inactivationData = { id: id, hireDate: employeeHireData};
+      this.inactivationForm.get('hireDate')?.patchValue(employeeHireData);
+      this.inactivationForm.get('inactivationDate')?.patchValue(new Date(new Date().setHours(0, 0, 0)));
+      this.inactivationForm.get('inactivationDate')?.setValidators(endTimeValidator(this.inactivationForm, 'hireDate'));
       this.inactivationDialog.show();
     }
   }
@@ -470,25 +479,35 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public cancelInactivation(): void {
-    this.inactivationId = null;
+    this.inactivationData = { id: null, hireDate: null};
     this.inactivationForm.reset();
     this.inactivationDialog.hide();
   }
 
   public inactivateIrpEmployee(): void {
-    if (!this.inactivationForm.valid || this.inactivationId === null) {
+    if (!this.inactivationForm.valid || this.inactivationData.id === null) {
+      this.inactivationForm.markAllAsTouched();
       return;
     }
-
     const data = this.inactivationForm.value;
     const dto: InactivateEmployeeDto = {
-      ...data,
-      id: this.inactivationId,
+      id: this.inactivationData.id,
       inactivationDate: DateTimeHelper.setUtcTimeZone(data.inactivationDate),
+      inactivationReasonId: data.inactivationReasonId,
+      createReplacement: data.createReplacement,
     };
-
+    
     this.store.dispatch(new CandidateListActions.DeleteIRPCandidate(dto));
-    this.inactivationId = null;
+    this.inactivationData = { id: null, hireDate: null};
+    this.cancelInactivation();
+
+    this.actions$.pipe(
+      ofActionDispatched(CandidateListActions.EmployeeInactivationSuccessful),
+      take(1),
+    )
+    .subscribe(() => {
+      this.dispatchNewPage();
+    });
   }
 
   private initCandidateFilterForm(): void {

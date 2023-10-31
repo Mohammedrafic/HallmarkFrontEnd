@@ -66,6 +66,7 @@ export enum OrganizationSettingKeys {
   ShowDeployedEmployees,
   OrganizationCanCarryClockIDFromParent,
   AllowDuplicateClockIdforOrganization,
+  MandatorySpecialProjectDetails,
   MarkZeroDollarInvoicetoPaidOnApproval
 }
 

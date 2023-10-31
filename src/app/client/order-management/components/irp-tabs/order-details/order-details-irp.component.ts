@@ -6,7 +6,7 @@ import {
   OnInit,
   TrackByFunction,
 } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { AbstractControl,FormGroup } from '@angular/forms';
 
 import { combineLatest, distinctUntilChanged, filter, map, Observable, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
@@ -129,18 +129,14 @@ import { Configuration } from '@shared/models/organization-settings.model';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { SettingsKeys } from '@shared/enums/settings';
 import {
-
   GetOrganizationSettings,
 } from '@organization-management/store/organization-management.actions';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
-enum SubmitButtonItem {
-  SaveForLater = '0',
-  Save = '1',
-  SaveAsTemplate = '2',
-}
+import { SubmitButtonItem } from '@client/order-management/components/irp-tabs/order-details/enums';
+
 @Component({
   selector: 'app-order-details-irp',
   templateUrl: './order-details-irp.component.html',
@@ -180,12 +176,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public distributionFilter: JobDistributionfilters;
   public isDistributionActivate: boolean = false;
   public distributionIds: number[] | null;
-  public isDistributionInternal: boolean;
-  public isDistributionExternal: boolean;
-  public distributionInternalIds: number[];
-  public distributionExternalIds: number[];
   public isEdit: boolean = false;
-  public OrgStructure: OrgStructureDto;
   private selectedDistributionState: SelectedDistributionState;
   public readonly optionFields: FieldSettingsModel = OptionFields;
   public readonly orderTypesDataSource: OrderTypes[] = OrderTypeList;
@@ -206,10 +197,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public deleteDocumentsGuids: string[] = [];
   public orderStatus = Incomplete;
   public selectedOrder: Order;
-  public regionsStructure: OrganizationRegion[] = [];
   public comments: Comment[] = [];
   public commentContainerId = 0;
-  public isTemplate : boolean=false;  
+  public isTemplate : boolean=false;
   @Input() public externalCommentConfiguration?: boolean | null;
 
   private dataSourceContainer: OrderDataSourceContainer = {};
@@ -279,7 +269,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSpecialProjectCategory();
     this.setReasonAutopopulate();
     this.subscribeForSettings();
-
   }
 
   private subscribeForSettings() {
@@ -566,7 +555,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((data: SpecialProjectStructure) => {
       this.updateDataSourceFormList('specialProjectCategories', data.specialProjectCategories.filter(f => f.includeInIRP == true));
-      //this.updateDataSourceFormList('projectNames', data.projectNames.filter(f=>f.includeInIRP==true));
       this.updateDataSourceFormList('poNumbers', data.poNumbers);
       this.setDataSourceForSpecialProject(data);
       this.changeDetection.markForCheck();
@@ -682,7 +670,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           this.generalInformationForm.controls['skillId'].patchValue(this.selectedStructureState.skillId);
         }
       });
-      
+
 
     this.generalInformationForm.get('duration')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
@@ -811,7 +799,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       if (internalLogicIncompatible) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, InternalTieringError));
         const filteredValues = this.setCorrectDistributions(value);
-        
+
         this.jobDistributionForm.get('jobDistribution')?.patchValue(filteredValues,
         { emitEvent: false });
       } else {
@@ -849,9 +837,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           this.generalInformationForm.get('shiftEndTime')?.reset();
           this.changeDetection.markForCheck();
         }
-
       }
-
     });
 
     this.generalInformationForm.get('shiftStartTime')?.valueChanges.pipe(
@@ -1005,19 +991,31 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private watchForSelectOrder(): void {
     this.selectedOrder$.pipe(
       filter(Boolean),
-      map((selectedOrder: Order) => adaptOrder(selectedOrder)),
+      map((selectedOrder: Order) => {
+        this.selectedOrder = adaptOrder(selectedOrder);
+        return selectedOrder.organizationId as number;
+      }),
+      switchMap((id: number) => {
+        return this.settingsViewService.getViewSettingKey(
+          OrganizationSettingKeys.MandatorySpecialProjectDetails,
+          OrganizationalHierarchy.Organization,
+          id,
+          id,
+          true
+        );
+      }),
       takeUntil(this.componentDestroy())
-    ).subscribe((selectedOrder: Order) => {
-      this.selectedOrder = selectedOrder;
+    ).subscribe(({MandatorySpecialProjectDetails}) => {
       this.orderTypeForm.disable();
-      this.commentContainerId = selectedOrder.commentContainerId as number;
+      this.commentContainerId = this.selectedOrder.commentContainerId as number;
       this.getComments();
-      this.orderStatus = selectedOrder.statusText;
+      this.orderStatus = this.selectedOrder.statusText;
       this.getAllShifts();
-      this.setConfigType(selectedOrder);
-      this.patchFormValues(selectedOrder);
-      this.createPatchContactDetails(selectedOrder);
-      this.createPatchWorkLocation(selectedOrder);
+      this.setConfigType(this.selectedOrder);
+      this.patchFormValues(this.selectedOrder);
+      this.createPatchContactDetails(this.selectedOrder);
+      this.createPatchWorkLocation(this.selectedOrder);
+      this.updateSpecialProjectValidation(JSON.parse(MandatorySpecialProjectDetails));
     });
   }
 
@@ -1044,8 +1042,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       }, { emitEvent: false });
     }, 1000);
 
-
-    // this.generalInformationForm.patchValue(selectedOrder);
     this.jobDistributionForm.patchValue(selectedOrder);
     this.jobDescriptionForm.patchValue(selectedOrder);
     this.specialProjectForm.patchValue(selectedOrder);
@@ -1114,11 +1110,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       'projectTypeId',
       data?.specialProjectCategories.filter(f => f.includeInIRP == true) ?? this.dataSourceContainer.specialProjectCategories as SpecialProjectCategories[]
     );
-    // setDataSource(
-    //   specialProjectForm.fields,
-    //   'projectNameId',
-    //   data?.projectNames.filter(f=>f.includeInIRP==true) ?? this.dataSourceContainer.projectNames as ProjectNames[]
-    // );
     setDataSource(
       specialProjectForm.fields,
       'poNumberId',
@@ -1153,9 +1144,21 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
     this.organization$.pipe(
       filter((organisation: Organization) => !!organisation && !this.selectedOrder),
+      map((organisation: Organization) => {
+        this.isDistributionActivate = !!organisation.isDistributionActivate;
+        return organisation.organizationId as number;
+      }),
+      switchMap((id: number) => {
+        return this.settingsViewService.getViewSettingKey(
+          OrganizationSettingKeys.MandatorySpecialProjectDetails,
+          OrganizationalHierarchy.Organization,
+          id,
+          id,
+          true
+        );
+      }),
       takeUntil(this.componentDestroy())
-    ).subscribe((organisation: Organization) => {
-      this.isDistributionActivate = organisation.isDistributionActivate ? true : false;
+    ).subscribe(({MandatorySpecialProjectDetails}) => {
       const orderTypeToPrePopulate =
         this.orderManagementService.getOrderTypeToPrePopulate() || IrpOrderType.LongTermAssignment;
       this.orderManagementService.clearOrderTypeToPrePopulate();
@@ -1170,8 +1173,20 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.jobDescriptionForm.reset();
       this.specialProjectForm.reset();
 
+      this.updateSpecialProjectValidation(JSON.parse(MandatorySpecialProjectDetails));
       this.changeDetection.markForCheck();
     });
+  }
+
+  private updateSpecialProjectValidation(projectSetting = false): void {
+    const specialProjectConfig = this.getSelectedFormConfig(SpecialProjectForm);
+    const specialProjectControls = this.listOfKeyForms.specialProjectForm.controls;
+
+    this.orderDetailsService.updateSpecialProjectValidation(
+      specialProjectConfig,
+      specialProjectControls,
+      projectSetting
+    );
   }
 
   private getContactDetailsById(id: number): number {

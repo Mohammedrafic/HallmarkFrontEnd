@@ -38,7 +38,7 @@
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat secondary-icon-button enabled-button"
-              [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id)">
+              [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id, data.hireDate)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
             <ng-container *ngIf="data.hasRedFlag">
@@ -438,7 +438,7 @@
       <div class="input-group dropdown">
         <ejs-dropdownlist
           appValidateWithMessage
-          formControlName="inactivationReason"
+          formControlName="inactivationReasonId"
           [allowFiltering]="true"
           [fields]="reasonFields"
           [dataSource]="(inactivationReasons$ | async)?.items"

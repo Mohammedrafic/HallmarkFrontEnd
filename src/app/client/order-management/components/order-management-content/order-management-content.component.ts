@@ -703,7 +703,7 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   this.dispatchAgencyOrderCandidatesList(orderData.orderId, orderData.organizationId, true);
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
-  this.openDetails.next(true);
+  this.openDetails.next(false);
   this.selectedRowRef = Data;
 }
 
@@ -2747,7 +2747,7 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed,
       ""
     ));
-    if (isIrp && (this.selectedOrder.extensionFromId === null)) {
+    if (isIrp && (this.selectedOrder?.extensionFromId === null)) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
         organizationId,
@@ -2757,7 +2757,7 @@ public RedirecttoIRPOrder(order:Order)
         this.employeeToggleState?.includeDeployed,
         ""
       )); 
-    } else if(isIrp && (this.selectedOrder.extensionFromId !== null)){
+    } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)){
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
         orderId,
         organizationId,

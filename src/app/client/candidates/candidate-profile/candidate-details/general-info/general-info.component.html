@@ -121,7 +121,7 @@
   ></app-datepicker>
 
   <app-datepicker
-    *ngIf="isTerminatedSelected"
+    *ngIf="isInactivatedSelected"
     [formGroupInstance]="candidateForm"
     [required]="true"
     id="termination-date"
@@ -130,7 +130,7 @@
   ></app-datepicker>
 
   <app-dropdown
-    *ngIf="isTerminatedSelected"
+    *ngIf="isInactivatedSelected"
     [dataSource]="(reasons$ | async)?.items"
     [fields]="fieldsSettingsTeminated"
     [formGroupInstance]="candidateForm"
