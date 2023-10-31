@@ -57,6 +57,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';
 import { InputModule } from '@shared/components/form-controls/input/input.module';
 import { TimesheetsModule } from '../modules/timesheets/timesheets.module';
+import { MspTableStatusCellComponent } from './msp-table-status-cell/msp-table-status-cell.component';
 const sidebarIcons = {    
   Edit ,
   Download,
@@ -79,7 +80,8 @@ const sidebarIcons = {
     MspComponent,
     MspListComponent,
     MspactionCellrenderComponent,
-    AddEditMspComponent
+    AddEditMspComponent,
+    MspTableStatusCellComponent
   ],  
   imports: [
     CommonModule,
