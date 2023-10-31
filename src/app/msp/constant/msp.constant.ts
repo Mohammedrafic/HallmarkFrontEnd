@@ -1,10 +1,10 @@
 import { ColDef, ICellRendererParams } from "@ag-grid-community/core";
 import { ColumnDefinitionModel } from "@shared/components/grid/models";
-import { TableStatusCellComponent } from "@shared/components/table-status-cell/table-status-cell.component";
 import { AgencyStatus } from "@shared/enums/status";
 import { ActionCellrenderComponent } from "src/app/modules/document-library/components/cell-render/action-cellrender/action-cellrender.component";
 import { StatusTextCellrenderComponent } from "src/app/modules/document-library/components/cell-render/status-text-cellrender/status-text-cellrender.component";
 import { MspactionCellrenderComponent } from "../cell-render/mspaction-cellrender/mspaction-cellrender.component";
+import { MspTableStatusCellComponent } from "../msp-table-status-cell/msp-table-status-cell.component";
 
 const commonColumn: ColDef = {
     sortable: true,
@@ -81,7 +81,7 @@ const commonColumn: ColDef = {
       field: MspListColumnField.Status,
       headerName:MspListColumnHeaderText.Status,
       minWidth: 170,
-      cellRenderer: TableStatusCellComponent,
+      cellRenderer: MspTableStatusCellComponent,
       cellClass: 'status-cell',
       ...commonColumn,
     },  
