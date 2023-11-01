@@ -26,7 +26,7 @@ constructor(    private router: Router,
   editMsp(value:any)
   {
     // console.log(this.params.data)
-    // this.router.navigate(['/msp/msp-edit/edit', this.params.data.id]);
+   this.router.navigate(['/msp/msp-edit/edit', this.params.data.id]);
 
   }
 }

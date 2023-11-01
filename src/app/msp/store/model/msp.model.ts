@@ -8,17 +8,25 @@ export class MSP {
     mspDetails: GeneralInformation;
     mspBillingDetails: BillingDetails;
     mspContactDetails: ContactDetails[];
-  
+    organizationId?: number | null;
+    isOrganizationUsed?: boolean;
     constructor(
       mspDetails: GeneralInformation,
       mspBillingDetails: BillingDetails,
       mspContactDetails: ContactDetails[],
+      organizationId: number,
+      isSameAsOrg: boolean,
     ) {
+      if (organizationId) {
+        this.organizationId = organizationId;
+      }
       this.mspDetails = mspDetails;
       if (this.mspDetails.externalId === '') {
         this.mspDetails.externalId = null;
       }
       this.mspBillingDetails = mspBillingDetails;
+      this.mspBillingDetails.organizationId = organizationId || 0;
+      this.mspBillingDetails.SameAsMsp= isSameAsOrg;
       this.mspContactDetails = mspContactDetails;
     }
   }
@@ -49,7 +57,7 @@ export class GeneralInformation {
     id?: number;
     organizationId: number;
     adminUserId: number;
-    sameAsOrganization: boolean;
+    SameAsMsp: boolean;
     name: string;
     address: string;
     country: number;
