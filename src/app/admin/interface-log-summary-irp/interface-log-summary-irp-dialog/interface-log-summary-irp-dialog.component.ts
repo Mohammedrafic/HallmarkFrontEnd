@@ -110,8 +110,8 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
   { text: 'Profile Status', column: 'ProfileStatus' },
   { text: 'Hold Start Date', column: 'HoldStartDate' },
   { text: 'Hold End Date', column: 'HoldEndDate' },
-  { text: 'Termination Date', column: 'TerminationDate' },
-  { text: 'Termination Reason', column: 'TerminationReason' },
+  { text: 'Inactivation Date', column: 'InactivationDate' },
+  { text: 'Inactivation Reason', column: 'InactivationReason' },
   { text: 'Status', column: 'Status' },
   { text: 'Error Descriptions', column: 'ErrorDescriptions' }
    ];

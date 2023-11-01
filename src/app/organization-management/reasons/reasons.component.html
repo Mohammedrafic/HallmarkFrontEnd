@@ -66,7 +66,7 @@
         </ng-template>
       </e-tabitem>
       <e-tabitem *ngIf="selectedSystem.isIRP">
-        <ng-template #headerText><div>Inactivated Reason</div></ng-template>
+        <ng-template #headerText><div>Inactivation Reason</div></ng-template>
         <ng-template #content>
           <app-emp-termination
             (editReason)="editReason($event)"

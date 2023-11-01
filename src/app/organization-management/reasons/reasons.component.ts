@@ -135,7 +135,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.ManualInvoice;
     } else if(selectedTab.selectedItem.innerText === "Unavailability"){
       this.selectedTab = ReasonsNavigationTabs.Unavailability;
-    } else if(selectedTab.selectedItem.innerText === "Inactivated Reason"){
+    } else if(selectedTab.selectedItem.innerText === "Inactivation Reason"){
       this.selectedTab = ReasonsNavigationTabs.Inactivation;
     } else if(selectedTab.selectedItem.innerText === "Internal Transfer/Recruitment"){
       this.selectedTab = ReasonsNavigationTabs.InternalTransfer;
