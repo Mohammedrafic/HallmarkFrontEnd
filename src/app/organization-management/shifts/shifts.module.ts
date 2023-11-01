@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { TimePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { GridModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
@@ -40,6 +40,7 @@ const icons = {
     NumericTextBoxModule,
     DialogModule,
     TimePickerModule,
+    DatePickerModule,
     DropDownButtonModule,
     TooltipContainerModule,
     SwitchModule,

@@ -81,7 +81,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'ShowDeployedEmployees',
   'LimitNumberOfCandidateanAgencycansubmitToaPosition',
   'OrganizationCanCarryClockIDFromParent',
-  'AllowDuplicateClockIdforOrganization'
+  'AllowDuplicateClockIdforOrganization',
+  'MarkZeroDollarInvoicetoPaidOnApproval'
 ];
 
 export const DisabledSettingsByDefault = [
