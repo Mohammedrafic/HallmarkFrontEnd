@@ -148,14 +148,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.selectedSystem = value;
 
     if (!this.selectedOrder) {
-      let isDistribution: any;
       this.organization$
         .pipe(
           filter((organisation: Organization) => !!organisation && !this.selectedOrder),
           takeUntil(this.componentDestroy())
         )
         .subscribe((organisation: Organization) => {
-          isDistribution = organisation.isDistributionActivate ? true : false;
+          this.isDistributionActivate = organisation.isDistributionActivate ? true : false;
         });
       this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
       this.setConfigDataSources();
@@ -645,7 +644,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
               this.changeDetection.markForCheck();
             });
           } else {
-            this.jobDistributionForm.get('distributeToVMS')?.setValue('');
+            this.jobDistributionForm.get('distributeToVMS')?.setValue(null);
             this.jobDistributionForm.get('distributionDelay')?.setValue(false);
           }
           if (!departmentsId && this.generalInformationForm.get('skillId')?.value) {
@@ -702,6 +701,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     .subscribe((value: boolean) => {
       const Distributiondelay = this.getSelectedFormConfig(JobDistributionForm);
       if (value) {
+if(!this.isEdit){
         viewDistributiontoVMS(true, Distributiondelay);
         if (this.isDistributionActivate) {
           this.distributionFilter = {
@@ -726,12 +726,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
             this.changeDetection.markForCheck();
           });
         } else {
-          this.jobDistributionForm.get('distributeToVMS')?.setValue('');
+          this.jobDistributionForm.get('distributeToVMS')?.setValue(null);
           this.jobDistributionForm.get('distributeToVMS')?.disable();
           this.jobDistributionForm.get('distributionDelay')?.setValue(false);
         }
+      }
       } else if (!value) {
-        this.jobDistributionForm.get('distributeToVMS')?.setValue('');
+        this.jobDistributionForm.get('distributeToVMS')?.setValue(null);
         this.jobDistributionForm.get('distributeToVMS')?.disable();
       }
       this.changeDetection.markForCheck();
@@ -768,6 +769,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           this.distributionIds?.includes(IrpOrderJobDistribution.SelectedExternal)
         ) {
           if (this.isDistributionActivate) {
+            if(!this.isEdit)
+            {
             viewDistributiondelay(true, selecteddistributiondelay);
             this.distributionFilter = {
               regionId: this.generalInformationForm.get('departmentId')?.value
@@ -789,6 +792,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
               }
               this.changeDetection.markForCheck();
             });
+          }
           }
         } else {
           viewDistributiondelay(false, selecteddistributiondelay);
@@ -1020,6 +1024,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private patchFormValues(selectedOrder: Order): void {
+    this.isEdit=true;
     this.orderTypeForm.patchValue(selectedOrder);
     this.generalInformationForm.patchValue({
       jobStartDate: selectedOrder.jobStartDate,
@@ -1029,9 +1034,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       departmentId: selectedOrder.departmentId,
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
-      linkedId: selectedOrder.linkedId,
-      distributionDelay: selectedOrder.distributionDelay,
-      distributeToVMS: selectedOrder.distributeToVMS,
+      linkedId: selectedOrder.linkedId
     });
     setTimeout(() => {
       this.generalInformationForm.patchValue({
@@ -1062,6 +1065,17 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
     if (selectedOrder.status === OrderStatus.Filled || selectedOrder.status === OrderStatus.Closed) {
       this.generalInformationForm.get('openPositions')?.disable();
+    }
+    this.generalInformationForm.patchValue({
+      distributionDelay: selectedOrder.distributionDelay,
+      distributeToVMS: selectedOrder.distributeToVMS,
+    });
+    
+    if (selectedOrder.distributeToVMS !=null) {
+      const Distributiondelay = this.getSelectedFormConfig(JobDistributionForm);
+      viewDistributiontoVMS(true, Distributiondelay);
+      this.jobDistributionForm.get('distributionDelay')?.disable();
+      this.jobDistributionForm.get('distributeToVMS')?.disable();
     }
   }
 

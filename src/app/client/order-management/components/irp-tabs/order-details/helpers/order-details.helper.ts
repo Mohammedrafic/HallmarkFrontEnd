@@ -174,10 +174,11 @@ export const viewDistributiondelay =
 };
 
 
-export const viewDistributiontoVMS =
-  (value: boolean, selectedConfig: OrderFormsConfig): void => {
+export const viewDistributiontoVMS = (value: boolean, selectedConfig: OrderFormsConfig): void => {
+  const distributionDelayConfigControl = getDistibutionDelayFiled(selectedConfig);
   const distributionDelayValueControl = getDistibutionDelayValueFiled(selectedConfig);
   distributionDelayValueControl.show = value;
+  distributionDelayConfigControl.show = value;
 };
 
 export const showHideFormAction = (config: OrderFormsArrayConfig, list: FormGroup[]): void => {
