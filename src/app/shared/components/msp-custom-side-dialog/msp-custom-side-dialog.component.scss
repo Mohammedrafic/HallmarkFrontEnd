@@ -1,0 +1,83 @@
+@import 'colors';
+@import 'adaptive-response';
+
+.dialog {
+  right: 0;
+  top: 60px !important;
+  left: auto !important;
+  height: calc(100% - 60px) !important;
+
+  .e-dlg-content {
+    padding: 0;
+  }
+
+  .container {
+    padding: 24px;
+
+    .form-container {
+      .input-container {
+        padding-top: 20px;
+
+        label {
+          margin-bottom: 12px;
+        }
+
+        &.facility-phone {
+          width: 207px;
+        }
+
+        &.calendar {
+          width: 198px;
+        }
+      }
+    }
+  }
+
+  .e-dlg-header-content {
+    padding: 24px;
+
+    .e-dlg-closeicon-btn {
+      margin-top: 5px;
+    }
+
+    .container {
+      padding: 0;
+
+      .header-container {
+        .e-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .e-card-title {
+            color: $black;
+            font-size: 24px;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .dialog {
+    width: 100% !important;
+
+    .stick-right,
+    ::ng-deep .tooltip-container {
+      width: 100%;
+    }
+
+    .e-footer-content {
+      padding: 0 !important;
+    }
+
+    .e-card-content {
+      position: relative;
+      z-index: 1;
+      box-shadow: 0px 4px 4px 4px rgba(0, 0, 0, 0.25);
+      padding: 15px 20px !important;
+    }
+  }
+}

@@ -58,6 +58,11 @@ export class ShowCloseOrderDialog {
   constructor(public isDialogShown: boolean, public isPosition: boolean = false) { }
 }
 
+export class ShowMSPCustomSideDialog {
+  static readonly type = '[app] Set MSP Custom Side Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
+}
+
 
 export class SetIsOrganizationAgencyArea {
   static readonly type = '[app] Set Is Organization/Agency Area';

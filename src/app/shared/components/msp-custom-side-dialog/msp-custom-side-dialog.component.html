@@ -1,0 +1,27 @@
+<ejs-dialog id="dialog"
+            #mspCustomSideDialog
+            cssClass="dialog responsive"
+            [width]="width"
+            [target]="targetElement"
+            [visible]="false"
+            [isModal]="true"
+            [animationSettings]="{ effect: 'SlideRight' }"
+            [showCloseIcon]="true"
+            (close)="onClose()">
+  <ng-template #header>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">{{headerText}}</h3>
+          </div>
+        </div>
+      </section>
+    </section>
+  </ng-template>
+  <ng-template #content>
+    <section class="container">
+      <ng-content></ng-content>
+    </section>
+  </ng-template>
+</ejs-dialog>
