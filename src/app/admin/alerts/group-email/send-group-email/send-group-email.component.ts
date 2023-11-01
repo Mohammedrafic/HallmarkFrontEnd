@@ -229,6 +229,7 @@ export class SendGroupEmailComponent
   public filteredUserType: any = [];
   @ViewChild('filesUploaderGroupEmail') uploadObj: UploaderComponent;
   public formFields: any[] = ["agencies", "skills", "candidate", "region", "location", "roles", "user"];
+  public isMspUsertype: boolean = false;
   public isOrgInternalUserType: boolean = false;
   public isOrgCandidatesType: boolean = false;
   public isAgencyUserType: boolean = false;
@@ -595,17 +596,22 @@ export class SendGroupEmailComponent
         this.isAgencyUserType = false;
         this.isOrgCandidatesType = false;
         this.isOrgInternalUserType = false;
+        this.isMspUsertype = false;
         this.filteredUserType = [];
         if (value == 3) {
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == false);
         }
-        if (value == 4) {
+        else if (value == 4) {
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == true);
           this.isBusinessUnitTypeAgency = true;
           this.validationCheckForBusiness();
           if (this.isOrgUser) {
              this.filteredUserType.splice(0, 0);
           }
+        }
+        else if(value == 2){
+          this.isMspUsertype = true;
+          this.filteredUserType = [{ name: 'MSPUsers', value: 1}];          
         }
         if (value == 1) {
           this.dispatchUserPage([]);
@@ -711,7 +717,7 @@ export class SendGroupEmailComponent
            this.dispatchUserPage(businessUnitIds);    
             if (businessUnitIds != undefined && businessUnitIds.length > 0) {
               this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
-              this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+              this.roleData$.pipe(distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((data) => {
                 this.roleData = data;
               });
             }
@@ -720,7 +726,7 @@ export class SendGroupEmailComponent
             this.dispatchUserPage(businessUnitIds);
             if (businessUnitIds != undefined && businessUnitIds.length > 0) {
               this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
-              this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+              this.roleData$.pipe(distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((data) => {
                 this.roleData = data;
               });
             }
@@ -739,7 +745,7 @@ export class SendGroupEmailComponent
         this.userData = [];
         this.ResetForm();
         let businessUnitIds = [];
-        if (value != 0 && value != null) {
+        if (value != 0 && value != null && this.businessUnitControl.value != 2) {
           businessUnitIds.push(this.businessControl.value);
           this.regionAndLocationDataset(value);
         }    
@@ -752,6 +758,9 @@ export class SendGroupEmailComponent
           if(this.isCurrentBusinessHasIRPEnabled && !this.isCurrentBusinessHasVMSEnabled){
             this.filteredUserType = this.filteredUserType.filter((x:any) => x.value != OrganizationUserType.Candidates);
           }
+        }
+        if(this.businessUnitControl.value == 2 && value){
+          this.dispatchUserPage([value]);
         }
         this.changeDetectorRef.detectChanges();
       }
@@ -951,15 +960,20 @@ export class SendGroupEmailComponent
         this.clearFields();
         var businessUnit = this.businessUnitControl.value;
         var businessId = this.businessControl.value;
-        if (businessUnit == 3) {
-          if (value == 1) {
-            this.onFormvalidation(['region', 'location', 'roles', 'user']);   
-            this.isOrgInternalUserType = true;
+        if (businessUnit == 3 || businessUnit == 2) {
+          if (value == 1) {           
+            if(businessUnit == 2){
+              this.onFormvalidation(['roles', 'user']);
+              this.isAgencyUserType = true;
+            }else{
+              this.onFormvalidation(['region', 'location', 'roles', 'user']);   
+              this.isOrgInternalUserType = true;
+            }
             this.userData = [];
             this.dispatchNewPage(null);
             if (businessId != undefined && businessId > 0) {                     
               this.store.dispatch(new GetGroupEmailRoles([businessId]));
-              this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+              this.roleData$.pipe(distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((data) => {
                 this.roleData = data;
               });
             }
@@ -1015,7 +1029,7 @@ export class SendGroupEmailComponent
               let businessUnitIds = this.businessesControl.value;
               if (businessUnitIds != undefined && businessUnitIds.length > 0) {
                 this.store.dispatch(new GetGroupEmailRoles(businessUnitIds));
-                this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+                this.roleData$.pipe(distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((data) => {
                   this.roleData = data;
                 });
               }
