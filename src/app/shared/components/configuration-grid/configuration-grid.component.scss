@@ -47,6 +47,16 @@
 }
 
 .child-grid{
+  .e-grid{
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .e-gridheader{
+    border: none !important;
+  }
+  .e-table tbody{
+    background-color: #f6f7fb !important;
+  }
   .e-columnheader{
     display: none;
   }
