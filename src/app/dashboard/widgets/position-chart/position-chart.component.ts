@@ -9,6 +9,7 @@ import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions'
 import { DASHBOARD_FILTER_STATE } from '@shared/constants';
 import { PositionTrendTypeEnum } from '../../enums/position-trend-type.enum';
 import { OrderStatus } from '@shared/enums/order-management';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-position-chart',
@@ -67,6 +68,7 @@ export class PositionChartComponent {
   }
 
   public navigateToUrl(event: MouseEvent,status:string){
+    let candidatesStatusDataSet:any = []
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
     let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
     if (filteredList.length > 0) {
@@ -83,6 +85,12 @@ export class PositionChartComponent {
     if(status == PositionTrendTypeEnum.OPEN){
       window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true))
       this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
+    }else {
+      candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
+      candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
+      candidatesStatusDataSet.push({"value":CandidatStatus.CustomStatus});
+      window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+      this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.InProgress]);
     }
   }
 }
