@@ -31,4 +31,3 @@ export enum RegularRates {
   Regular = 1,
   RegularLocal = 2,
 }
-
