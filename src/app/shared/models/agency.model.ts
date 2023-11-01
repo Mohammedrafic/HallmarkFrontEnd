@@ -124,6 +124,7 @@ export type AgencyListFilters = {
   statuses?: string[];
   cities?: string[];
   contacts?: string[];
+  isMSPAgencies?: boolean;
 };
 
 export class AgencyFilteringOptions {
