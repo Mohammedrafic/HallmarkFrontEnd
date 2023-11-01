@@ -39,27 +39,6 @@
           </e-columns>
         </ejs-grid>
       </div>
-      <!-- <table class="detailtable" width="100%">
-        <tbody>
-          <tr *ngFor="let child of data.children" [hidden]="child.hidden">
-            <td class="e-rowcell e-templatecell" [style.width.px]="100">
-              <div class="row-tool-buttons">
-                <button ejs-button cssClass="e-flat primary-icon-button"
-                  (click)="emitOpenEditSettingDialog(data, child, $event)"
-                  [disabled]="hasPermissions | hasAccess : data : false">
-                  <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-                </button>
-              </div>
-            </td>
-            <td class="e-rowcell e-templatecell attr-td" [style.width.px]="450"> </td>
-            <td class="e-rowcell e-templatecell" [style.width.px]="150">{{child.systemType}}</td>
-            <td class="e-rowcell e-templatecell" [style.max-width.px]="150">{{child.regionName}}</td>
-            <td class="e-rowcell e-templatecell" [style.max-width.px]="150">{{child.locationName}}</td>
-            <td class="e-rowcell e-templatecell" [style.max-width.px]="150">{{child.departmentName}}</td>
-            <td class="e-rowcell e-templatecell" [style.width.px]="400" style="text-align: left">{{child.displayValue}}</td>
-          </tr>
-        </tbody>
-      </table> -->
     </ng-template>
     <e-columns>
       <e-column textAlign="Right" width="100">
