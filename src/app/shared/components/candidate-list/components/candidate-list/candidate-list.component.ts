@@ -494,7 +494,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       id: this.inactivationData.id,
       inactivationDate: DateTimeHelper.setUtcTimeZone(data.inactivationDate),
       inactivationReasonId: data.inactivationReasonId,
-      createReplacement: data.createReplacement,
+      createReplacement: !!data.createReplacement,
     };
     
     this.store.dispatch(new CandidateListActions.DeleteIRPCandidate(dto));
