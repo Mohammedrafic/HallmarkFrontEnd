@@ -50,6 +50,7 @@
               <div class="input-container">
                 <label>External ID</label>
                 <input
+                appValidateWithMessage
                   formControlName="externalId"
                   class="e-input"
                   type="text"
@@ -156,6 +157,20 @@
                   />
                 </div>
               </div>
+              <div class="input-container">
+                <label>Zipcode</label>
+                <div class="input-group">
+                  <ejs-maskedtextbox
+                    appValidateWithMessage
+                    class="organization-input"
+                    promptChar="_"
+                    mask="00000"
+                    formControlName="zipCode"
+                    placeholder=" "
+                    maxlength="6"
+                  ></ejs-maskedtextbox>
+                </div>
+              </div>
 
               <div class="input-container">
                 <label>Phone 1</label>
@@ -202,20 +217,7 @@
                 </div>
               </div>
 
-              <div class="input-container">
-                <label>Zipcode</label>
-                <div class="input-group">
-                  <ejs-maskedtextbox
-                    appValidateWithMessage
-                    class="organization-input"
-                    promptChar="_"
-                    mask="00000"
-                    formControlName="zipCode"
-                    placeholder=" "
-                    maxlength="6"
-                  ></ejs-maskedtextbox>
-                </div>
-              </div>
+          
 
               <div class="input-container">
                 <label>Website</label>

@@ -13,7 +13,6 @@ export class AddEditMSPService {
 
 
   createBillingDetailForm(organization?: MSP): FormGroup {
-    console.log("Billing",organization)
     return this.fb.group({
       id: new FormControl(organization ? organization.mspBillingDetails.id : 0),
       name: new FormControl(organization ? organization.mspBillingDetails.name : '', [Validators.required]),
@@ -81,7 +80,6 @@ export class AddEditMSPService {
   }
 
   createContactForm(contact?: ContactDetails): FormGroup {
-    console.log("Contace",contact)
     return this.fb.group({
       id: new FormControl(contact ? contact.id : 0),
       title: new FormControl(contact ? contact.title : ''),
