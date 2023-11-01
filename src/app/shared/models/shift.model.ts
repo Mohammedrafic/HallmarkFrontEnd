@@ -1,5 +1,6 @@
 import { getTime } from "@shared/utils/date-time.utils";
 import { PageOfCollections } from "./page.model";
+import { DateTime } from "@syncfusion/ej2-angular-charts";
 
 export class Shift {
   id: number;
@@ -12,6 +13,7 @@ export class Shift {
   standardStartTime?: string;
   standardEndTime?: string;
   onCall: boolean;
+  inactiveDate?:string | null;
 
   constructor(shift: Shift) {
     this.id = shift.id;
@@ -25,6 +27,7 @@ export class Shift {
 
     this.startTime = getTime(startTime);
     this.endTime = getTime(endTime);
+    this.inactiveDate=shift.inactiveDate ===''?null:shift.inactiveDate;
   }
 }
 
