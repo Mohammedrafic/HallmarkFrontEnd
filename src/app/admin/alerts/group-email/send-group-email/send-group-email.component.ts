@@ -501,7 +501,7 @@ export class SendGroupEmailComponent
     agencyUserTypes.forEach((v, i) => {
       if (i > agencyUserTypes.length / 2 - 1) {
         var val = parseInt(agencyUserTypes[i - agencyUserTypes.length / 2]);
-        this.userType.push({ name: v, value: val, isAgency: true });
+        this.userType.push({ name: v.replace("AgencyUsers", "Agency Users"), value: val, isAgency: true });
       }
     });
 
