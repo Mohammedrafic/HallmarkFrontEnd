@@ -369,7 +369,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
       statuses: new FormControl([]),
       cities: new FormControl([]),
       contacts: new FormControl([]),
-      isMSPAgencies: new FormControl()
+      isMSPAgencies: new FormControl(false)
     });
   }
 }
