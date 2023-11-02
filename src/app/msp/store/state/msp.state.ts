@@ -46,7 +46,7 @@ export class MspState {
     return this.mspService.saveOrganization(payload).pipe(tap((payloadResponse) => {
       patchState({ isOrganizationLoading: false });
       dispatch([new SaveMSPSucceeded(payloadResponse)]);
-        if (payload.organizationId) {
+        if (payload.businessUnit?.id) {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         } else {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
