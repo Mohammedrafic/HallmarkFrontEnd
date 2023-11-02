@@ -18,7 +18,7 @@ const employeeImportConfig = {
   importTemplateSucceeded: { instance:GetEmployeeImportTemplateSucceeded, fileName: 'Employee.xlsx' },
   importErrorsSucceeded: { instance: GetEmployeeImportErrorsSucceeded, fileName: 'Employee_errors.xlsx' },
   saveImportResultSucceeded: { instance: SaveEmployeeImportResultSucceeded, message: '<n> records successfully processed.' },
-  saveImportResultFailAndSucess : { instance: SaveEmployeeImportResultFailAndSucceeded, message: '<sn> records successfully processed. <fn> failed to process.' }
+  saveImportResultFailAndSucess : { instance: SaveEmployeeImportResultFailAndSucceeded, message: '<sn> records successfully processed. <fn> failed records to process.' }
 };
 
 @Component({
