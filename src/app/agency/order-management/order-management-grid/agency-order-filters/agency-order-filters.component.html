@@ -18,7 +18,7 @@
           [showSelectAll]="true"
           formControlName="organizationIds"
           placeholder="All"
-          [fields]="optionFields"
+          [fields]="isAgency ? organizationFields : optionFields"
           [allowFiltering]="true"
           [showDropDownIcon]="true"
           [changeOnBlur]="false"

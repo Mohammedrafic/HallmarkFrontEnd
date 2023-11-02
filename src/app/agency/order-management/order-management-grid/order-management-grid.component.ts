@@ -15,7 +15,7 @@ import {
 import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 
-import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
+import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take, distinctUntilChanged } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -99,6 +99,7 @@ import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
   '@shared/components/order-reorders-container/store/re-order.actions';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -148,7 +149,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
-
+  public isAgency:boolean = false;
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<boolean>();
@@ -159,7 +160,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public filters: AgencyOrderFilters = {
     includeReOrders: true,
   };
-  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
+  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns(this.isAgency);
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
   public columnsToExport: ExportColumn[];
   public fileName: string;
@@ -201,6 +202,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnInit(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    if(user?.businessUnitType === BusinessUnitType.Agency){
+      this.isAgency= true;
+      this.filterColumns = AgencyOrderFiltersComponent.generateFilterColumns(this.isAgency);
+    }
     this.getAlertOrderId();
     this.onOrderPreviewChange();
     this.onAgencyChange();
@@ -442,7 +448,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const filterState = { ...state, orderStatuses };
       const filterFormConfig = GetAgencyFilterFormConfig(this.selectedTab);
       this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
-      if(this.Organizations != null){
+      if(this.Organizations != null && this.Organizations.length > 0){
         this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
         this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
       }
@@ -457,8 +463,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       if(this.ltaOrder){
         this.clearFilters();
       }
-      this.patchFilterForm(!!this.filters?.regionIds?.length);
-      this.prepopulateFilterFormStructure();
+      if(this.isAgency){
+        this.patchFilterForm();
+        this.prepopulateAgencyFilterFormStructure();
+      }else{
+        this.patchFilterForm(!!this.filters?.regionIds?.length);
+        this.prepopulateFilterFormStructure();
+      }
       this.dispatchNewPage();
       return;
     }
@@ -470,6 +481,26 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.setDefaultStatuses(statuses, preservedFiltes.dispatch);
     }
     this.cd.detectChanges();
+  }
+  
+  private prepopulateAgencyFilterFormStructure(): void {
+    if (this.filters.regionIds) {
+      this.OrderFilterFormGroup.get('regionIds')?.setValue([...this.filters.regionIds]);
+    }
+    if (this.filters.locationIds) {
+      this.OrderFilterFormGroup.get('locationIds')?.setValue([...this.filters.locationIds]);
+    }
+    if (this.filters.departmentsIds) {
+      this.OrderFilterFormGroup.get('departmentsIds')?.setValue([...this.filters.departmentsIds]);
+    }
+    if(this.Organizations.length > 0){
+      this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
+      this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+    }else if(this.filters.organizationIds){
+      this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.filters.organizationIds]);
+    }        
+    this.generateFilterChips();
+    // this.dispatchNewPage();
   }
 
   private prepopulateFilterFormStructure(): void {

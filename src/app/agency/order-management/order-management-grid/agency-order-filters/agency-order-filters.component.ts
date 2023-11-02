@@ -5,15 +5,15 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
 
-import { isEmpty } from 'lodash';
+import { isEmpty, uniqBy } from 'lodash';
 
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrderTypeOptions } from '@shared/enums/order-type';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { GetOrganizationStructure } from '@agency/store/order-management.actions';
-import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
-import { getDepartmentFromLocations, getLocationsFromRegions } from './agency-order-filters.utils';
+import { getDepartmentFromLocations, getLocationsFromRegions, getRegionsFromOrganizationStructure } from './agency-order-filters.utils';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AgencyOrderManagementTabs, orderLockList } from '@shared/enums/order-management-tabs.enum';
 import { CandidatesStatusText, FilterOrderStatusText } from '@shared/enums/status';
@@ -26,6 +26,11 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { AllCandidateStatuses, filterOrderLockList } from '@client/order-management/constants';
+import { SecurityState } from 'src/app/security/store/security.state';
+import { Organisation } from '@shared/models/visibility-settings.model';
+import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
+import { UserState } from 'src/app/store/user.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 enum RLDLevel {
   Orginization,
@@ -59,6 +64,12 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   @Select(OrderManagementState.gridFilterRegions)
   gridFilterRegions$: Observable<OrganizationRegion[]>;
 
+  @Select(SecurityState.organisations)
+  organizations$: Observable<Organisation[]>;
+
+  @Select(SecurityState.isOrganizaionsLoaded)
+  isOrganizaionsLoaded$: Observable<boolean>;
+
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
@@ -68,10 +79,16 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   public readonly placeholderDate = placeholderDate;
   public readonly datepickerMask = datepickerMask;
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
+  partneredOrganizations:OrganizationStructure[] = [];
+  public isAgency:boolean = false;
 
   public optionFields = {
     text: 'name',
     value: 'id',
+  };
+  public organizationFields = {
+    text: 'organizationName',
+    value: 'organizationId',
   };
   public statusFields = {
     text: 'statusText',
@@ -104,6 +121,18 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
 
   ngOnInit(): void {
     this.onOrderFilteringOptionsChange();
+    const user = this.store.selectSnapshot(UserState.user);
+    if(user?.businessUnitType === BusinessUnitType.Agency){
+      this.isAgency= true;
+      this.agencyOrganizations();
+      this.isOrganizaionsLoaded$.pipe(takeUntil(this.destroy$)).subscribe((flag) => {
+        if(!flag){               
+          if(this.isAgency){
+            this.store.dispatch(new GetOrganizationsStructureAll(user?.id));  
+          }       
+        }
+      });
+    }
   }
 
   ngAfterViewInit(): void {
@@ -126,7 +155,17 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         if (isEmpty(value)) {
           this.clearRLDByLevel(RLDLevel.Orginization);
         } else {
+          if(this.isAgency){
+            let filteredOrg = this.partneredOrganizations.filter(el => {
+              return value.find(element => {
+                return element == el.organizationId;
+              });
+            });
+            const regions =  getRegionsFromOrganizationStructure(filteredOrg);
+            this.filterColumns.regionIds.dataSource = sortByField(regions, 'name');
+         }else{
           this.store.dispatch(new GetOrganizationStructure(value));
+         }
         }
         this.cd.detectChanges();
       })
@@ -254,7 +293,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           candidateStatusesData = candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
         }
 
-        this.filterColumns.organizationIds.dataSource = partneredOrganizations;
+        if(!this.isAgency){
+          this.filterColumns.organizationIds.dataSource = partneredOrganizations;
+        }
         this.filterColumns.skillIds.dataSource = masterSkills;
         this.filterColumns.candidateStatuses.dataSource = candidateStatusesData;
         this.filterColumns.orderStatuses.dataSource = statuses;
@@ -265,6 +306,17 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         this.setDefaultFilter();
         this.cd.detectChanges();
       });
+  }
+
+  private agencyOrganizations(): void{
+    this.organizations$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      this.filterColumns.organizationIds.dataSource = [];
+      if (data != null && data.length > 0) {
+        let modifedOrgStructure =data.map(({ organizationId, name, regions }) => ({ organizationId: organizationId, organizationName: name, regions:regions }));
+        this.filterColumns.organizationIds.dataSource = uniqBy(modifedOrgStructure, 'organizationId');
+        this.partneredOrganizations = uniqBy(modifedOrgStructure, 'organizationId');
+      }
+    });
   }
 
   private setDefaultFilter(): void {
@@ -315,15 +367,15 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     });
   }
 
-  static generateFilterColumns(): any {
+  static generateFilterColumns(isAgency:boolean = false): any {
     return {
       orderPublicId: { type: ControlTypes.Text, valueType: ValueType.Text },
       organizationIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
+        valueField: isAgency ? 'organizationName' : 'name',
+        valueId: isAgency ? 'organizationId' : 'id',
       },
       regionIds: {
         type: ControlTypes.Multiselect,
