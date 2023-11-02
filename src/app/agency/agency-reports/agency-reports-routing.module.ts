@@ -7,6 +7,7 @@ import { InvoiceSummaryComponent } from "../../admin/analytics/invoice-summary/i
 import { InvoiceSummaryReportComponent } from "./invoice-summary-report/invoice-summary-report.component";
 import { MissingCredentialsAgencyComponent } from "./missing-credentials-agency/missing-credentials-agency.component";
 import { CredientialExpiryAgencyComponent } from "./crediential-expiry-agency/crediential-expiry-agency.component";
+import { UserActivityComponent } from "./user-activity/user-activity.component";
 
 const routes: Routes = [ 
   {
@@ -37,6 +38,13 @@ const routes: Routes = [
       {
         path: 'credentials-expiry-agency',
         component: CredientialExpiryAgencyComponent,
+        data: {
+          isAgencyArea: true,
+        }
+      },
+      {
+        path: 'useractivity',
+        component: UserActivityComponent,
         data: {
           isAgencyArea: true,
         }
