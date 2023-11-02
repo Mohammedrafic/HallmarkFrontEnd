@@ -104,9 +104,8 @@
                     ></app-export-button>
                   </div>
 
-                  <div class="close-details-wrapper">
+                  <div class="close-details-wrapper" *ngIf="!previewAttachemnt">
                     <button
-                      *ngIf="!previewAttachemnt"
                       ejs-button
                       type="submit"
                       class="e-flat close-button close-details"
