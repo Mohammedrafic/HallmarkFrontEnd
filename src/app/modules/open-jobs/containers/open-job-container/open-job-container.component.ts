@@ -4,7 +4,7 @@ import { ActivatedRoute, Data } from '@angular/router';
 import { filter, map, switchMap, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
 
-import { OpenJobPage } from '@shared/models';
+import { OpenJob, OpenJobPage } from '@shared/models';
 import { OutsideZone } from '@core/decorators';
 import { Destroyable } from '@core/helpers';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
@@ -21,6 +21,8 @@ export class OpenJobContainerComponent extends Destroyable implements OnInit {
   public openJobsPage: OpenJobPage;
   public showFilterDialog = false;
   public appliedFiltersAmount = 0;
+  public showEmployeeDetailsDialog = false;
+  public selectedEmployeeDetails: OpenJob | null;
 
   constructor(
     private store: Store,
@@ -37,6 +39,7 @@ export class OpenJobContainerComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.watchForPreservedFilters();
     this.watchForFilterState();
+    this.watchForEmployeeDetails();
   }
 
   public showFilters(): void {
@@ -70,6 +73,16 @@ export class OpenJobContainerComponent extends Destroyable implements OnInit {
 
       this.jobFilterService.setFilters(filters);
       this.appliedFiltersAmount = appliedFiltersAmount;
+    });
+  }
+
+  private watchForEmployeeDetails(): void {
+    this.employeeService.getEmployeeDetailsEventStream().pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe((job: OpenJob | null) => {
+      this.selectedEmployeeDetails = job;
+      this.showEmployeeDetailsDialog = !!job;
+      this.cdr.markForCheck();
     });
   }
 

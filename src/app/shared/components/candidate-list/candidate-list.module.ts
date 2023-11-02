@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { FeatherModule } from 'angular-feather';
 import { User } from 'angular-feather/icons';
-import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, ChipListModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { SharedModule } from '../../shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import { CandidateListService } from './services/candidate-list.service';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { CheckBoxAllModule  } from '@syncfusion/ej2-angular-buttons';
 import { GridPaginationModule } from '../grid/grid-pagination/grid-pagination.module';
+import { DialogModule } from '@syncfusion/ej2-angular-popups';
 
 const COMPONENTS = [CandidateListComponent];
 const icons = { User };
@@ -37,6 +38,9 @@ const icons = { User };
     NgxsModule.forFeature([CandidateListState]),
     CheckBoxAllModule,
     GridPaginationModule,
+    DialogModule,
+    DatePickerModule,
+    CheckBoxModule,
   ],
   declarations: [...COMPONENTS],
   exports: [...COMPONENTS],

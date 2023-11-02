@@ -20,7 +20,6 @@ import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 import {
   JobDistributionIrpOnly,
   JobDistributionIrpVms,
-  TierInternal,
   TitleField,
 } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { ButtonType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
@@ -48,15 +47,6 @@ export const getAgencyIdFiled = (config: OrderFormsConfig): OrderFormInput => {
     return control.field === 'agencyId';
   }) as OrderFormInput;
 };
-
-export const mapDepartmentStructure = (departments: Department[]): Department[] => {
-  return departments.map((department: Department) => ({
-    ...department,
-    id: department.departmentId,
-    name: department.departmentName,
-  }));
-};
-
 
 export const mapReasonsStructure = (reasons: RejectReason[]): RejectReason[] => {
   return reasons.map((reason: RejectReason) => ({
@@ -88,11 +78,9 @@ export const mapSpecialProjectStructure = (data: ProjectSpecialData): SpecialPro
   };
 };
 
-
-
 const mapSpecialProjectDataToCorrectFormat =
   <T extends {
-    includeInIRP: boolean; id: number;includeInVMS: boolean 
+    includeInIRP: boolean; id: number;includeInVMS: boolean
 }, U extends keyof T>(list: T[], key: U) => {
     return list.map((itm: T) => ({
       id: itm.id,
@@ -186,11 +174,11 @@ export const viewDistributiondelay =
 };
 
 
-export const viewDistributiontoVMS =
-  (value: boolean, selectedConfig: OrderFormsConfig): void => {
-    const distributionDelayConfigControl = getDistibutionDelayFiled(selectedConfig);
+export const viewDistributiontoVMS = (value: boolean, selectedConfig: OrderFormsConfig): void => {
+  const distributionDelayConfigControl = getDistibutionDelayFiled(selectedConfig);
   const distributionDelayValueControl = getDistibutionDelayValueFiled(selectedConfig);
   distributionDelayValueControl.show = value;
+  distributionDelayConfigControl.show = value;
 };
 
 export const showHideFormAction = (config: OrderFormsArrayConfig, list: FormGroup[]): void => {

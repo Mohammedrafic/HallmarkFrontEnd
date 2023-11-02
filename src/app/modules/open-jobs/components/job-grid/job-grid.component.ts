@@ -6,6 +6,7 @@ import { ColDef, SortChangedEvent } from '@ag-grid-community/core';
 import { OpenJob, OpenJobPage } from '@shared/models';
 import { Destroyable } from '@core/helpers';
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { PageSettings } from '../../interfaces';
 import { JobGridConfig } from './contants';
 import { JobPageSettings } from '../../constants';
@@ -20,7 +21,6 @@ import { EmployeeService, JobFilterService } from '../../services';
 export class JobGridComponent extends Destroyable {
   @Input() jobsPage: OpenJobPage;
 
-  public openJobsPage: OpenJobPage;
   public gridDefs: ColDef[] = JobGridConfig;
   public pageSettings: PageSettings = JobPageSettings;
 
@@ -35,6 +35,12 @@ export class JobGridComponent extends Destroyable {
     this.context = {
       componentParent: this,
     };
+  }
+
+  public showAcceptDetails(event: { data : OpenJob}): void {
+    if (event.data.status === CandidatStatus.Offered) {
+      this.employeeService.setEmployeeDetailsEvent(event.data);
+    }
   }
 
   public applyEmployeeJob(job: OpenJob): void {

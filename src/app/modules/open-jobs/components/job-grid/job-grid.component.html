@@ -1,6 +1,7 @@
 <section class="grid-table-container">
   <ag-grid-angular
     (sortChanged)="handleSortChanged($event)"
+    (rowClicked)="showAcceptDetails($event)"
     [columnDefs]="gridDefs"
     [rowData]="jobsPage?.items ?? []"
     [rowHeight]="64"

@@ -39,7 +39,7 @@ export type AgencyDetails = {
   state: string;
   country: number;
   city: string;
-  zipCode: string;
+  zipcode: string;
   phone1Ext: string;
   phone2Ext: string;
   fax: string;
@@ -56,7 +56,7 @@ export type AgencyBillingDetails = {
   country: number;
   state: string;
   city: string;
-  zipCode: string;
+  zipcode: string;
   phone1: string;
   phone2: string;
   ext: string;
@@ -124,6 +124,7 @@ export type AgencyListFilters = {
   statuses?: string[];
   cities?: string[];
   contacts?: string[];
+  isMSPAgencies?: boolean;
 };
 
 export class AgencyFilteringOptions {

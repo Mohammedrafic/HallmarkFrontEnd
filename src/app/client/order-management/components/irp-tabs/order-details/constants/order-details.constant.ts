@@ -62,3 +62,5 @@ export const EditablePerDiemFields = [
   'shiftStartTime',
   'shiftEndTime',
 ];
+
+export const SpecialProjectFieldsToValidation = ['projectTypeId', 'projectNameId'];

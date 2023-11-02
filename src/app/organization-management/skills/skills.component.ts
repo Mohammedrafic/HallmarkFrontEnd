@@ -321,6 +321,9 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
           let selectedskillstodelete = this.selectedItems.map((val) => (val.masterSkill?.id ?? 0));
           this.store.dispatch(new BulkDeleteAssignedSkill(selectedskillstodelete));
         }
+        else{
+          this.clearSelection(this.grid);
+        }
         this.removeActiveCssClass();
       });
   }

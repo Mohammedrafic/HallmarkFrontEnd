@@ -368,9 +368,9 @@ import { GridErroredCellListComponent } from "@shared/components/import-dialog-c
       resizable: true
       },
       {
-        field: 'terminationDate',
+        field: 'inactivationDate',
         width: 130,
-        headerName: 'Termination Date',
+        headerName: 'Inactivation Date',
         filter: 'agTextColumnFilter',
       filterParams: {
         buttons: ['reset'],
@@ -381,9 +381,9 @@ import { GridErroredCellListComponent } from "@shared/components/import-dialog-c
       resizable: true
       },
       {
-        field: 'terminationReason',
+        field: 'inactivationReason',
         width: 130,
-        headerName: 'Termination Reason',
+        headerName: 'Inactivation Reason',
         filter: 'agTextColumnFilter',
       filterParams: {
         buttons: ['reset'],

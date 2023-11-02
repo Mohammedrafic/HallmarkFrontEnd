@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } 
 import { FormGroup } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { Subject, switchMap, take, Observable, filter, takeUntil, map } from 'rxjs';
+import { Subject, switchMap, take, Observable, filter, takeUntil, map, distinctUntilChanged } from 'rxjs';
 
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { PagerConfig } from '../../constants';
@@ -157,6 +157,9 @@ export class PayRateHistoryComponent extends AbstractPermission implements OnIni
           pageNumber: this.pagingData.pageNumber,
           pageSize: this.pagingData.pageSize,
         })),
+        distinctUntilChanged((prevCommitment, currCommitment) => {
+          return prevCommitment.employeeWorkCommitmentId === currCommitment.employeeWorkCommitmentId;
+        }),
         switchMap((payload) => this.payRateApiService.getPayRateRecords(payload)),
         handleHttpError(this.store)
       );

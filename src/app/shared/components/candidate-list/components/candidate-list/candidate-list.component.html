@@ -38,7 +38,7 @@
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat secondary-icon-button enabled-button"
-              [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id)">
+              [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id, data.hireDate)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
             <ng-container *ngIf="data.hasRedFlag">
@@ -408,3 +408,66 @@
 
 <app-export-dialog [columns]="isIRP ? isSourcingEnabled  ? columnsToExportIrpSourcing :  columnsToExportIrp : columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
   (export)="export($event)"></app-export-dialog>
+
+<ejs-dialog
+  #inactivationDialog
+  cssClass="confirm-dialog"
+  [animationSettings]='animationSettings'
+  isModal="true"
+  [visible]="false"
+  showCloseIcon="true"
+  width="520px"
+  (close)="cancelInactivation()"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Inactivate the Employee</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <form
+    [formGroup]="inactivationForm"
+    class="formGroup bootstrap">
+    <div class="input-container">
+      <label for="inactivationReason">Inactivation Reason <span class="required">*</span></label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          appValidateWithMessage
+          formControlName="inactivationReasonId"
+          [allowFiltering]="true"
+          [fields]="reasonFields"
+          [dataSource]="(inactivationReasons$ | async)?.items"
+        ></ejs-dropdownlist>
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="inactivationReason">Inactivation Date <span class="required">*</span></label>
+      <ejs-datepicker
+        class="datepicker"
+        format="MM/dd/yyyy"
+        placeholder="MM/DD/YYYY"
+        [enableMask]="true"
+        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+        formControlName="inactivationDate">
+          
+      </ejs-datepicker>
+    </div>
+    </form>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <div class="bootstrap replacement-checkbox" [formGroup]="inactivationForm">
+        <ejs-checkbox label="Create replacement Order" formControlName="createReplacement"></ejs-checkbox>
+      </div>
+      <div class="e-card-content">
+        <button ejs-button cssClass="e-outline" (click)="cancelInactivation()">Cancel</button>
+        <button ejs-button cssClass="e-danger" (click)="inactivateIrpEmployee()">Inactivate</button>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>

@@ -32,7 +32,7 @@ export interface CategoryNoteValue {
   isRedFlag?: boolean;
 }
 
-export interface TerminatedValue {
+export interface InactivatedValue {
   id?: number | null;
   reason: string;
   defaultValue?: boolean;
@@ -84,7 +84,7 @@ export interface ReasonFormConfigMap {
   [ReasonFormType.CategoryNoteReason] : ReasonFormConfig[];
   [ReasonFormType.InternalTransferReason] : ReasonFormConfig[];
   [ReasonFormType.ManualInvoiceReason] : ReasonFormConfig[];
-  [ReasonFormType.TerminatedReason] : ReasonFormConfig[];
+  [ReasonFormType.InactivatedReason] : ReasonFormConfig[];
   [ReasonFormType.SourcingReason] : ReasonFormConfig[];
   [ReasonFormType.RecruiterReason] : ReasonFormConfig[];
   [ReasonFormType.CancelEmployeeReasons]: ReasonFormConfig[];

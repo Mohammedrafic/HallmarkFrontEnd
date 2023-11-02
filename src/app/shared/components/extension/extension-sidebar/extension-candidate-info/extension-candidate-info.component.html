@@ -6,7 +6,8 @@
         {{ candidateJob?.candidateProfile?.firstName }}, {{ candidateJob?.candidateProfile?.lastName }}
       </span>
     </div>
-    <div class="sub-title">Candidate Name</div>
+    <div *ngIf="system === 'IRP'" class="sub-title">Employee Name</div>
+    <div *ngIf="system !== 'IRP'" class="sub-title">Candidate Name</div>
   </div>
   <div class="section" *ngIf="system !== 'IRP'">
     <div class="title">

@@ -22,6 +22,9 @@ import { LogiReportModule } from '../../shared/components/logi-report/logi-repor
 import { InvoiceSummaryReportComponent } from './invoice-summary-report/invoice-summary-report.component';
 import { MissingCredentialsAgencyComponent } from './missing-credentials-agency/missing-credentials-agency.component';
 import { CredientialExpiryAgencyComponent } from './crediential-expiry-agency/crediential-expiry-agency.component';
+import { UserActivityComponent } from './user-activity/user-activity.component';
+import { AgGridModule } from '@ag-grid-community/angular';
+import { useractivityReportState } from '@admin/store/userlog-activity.state';
 
 
 @NgModule({
@@ -30,7 +33,8 @@ import { CredientialExpiryAgencyComponent } from './crediential-expiry-agency/cr
     FinancialTimesheetReportComponent,
     InvoiceSummaryReportComponent,
     MissingCredentialsAgencyComponent,
-    CredientialExpiryAgencyComponent
+    CredientialExpiryAgencyComponent,
+    UserActivityComponent
   ],
   imports: [
     CommonModule,   
@@ -48,7 +52,8 @@ import { CredientialExpiryAgencyComponent } from './crediential-expiry-agency/cr
     RadioButtonModule,
     LogiReportModule,
     SwitchModule,
-    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState]),
+    AgGridModule,
+    NgxsModule.forFeature([OrganizationManagementState, UserState, SecurityState, LogiReportState,useractivityReportState]),
   ],
   providers: [
     ScheduleApiService

@@ -20,8 +20,8 @@ export class SettingsViewService {
       SettingKeys: settingKeys,
       HierarchyId: id,
       HierarchyLevel: hierarchyLevel,
+      IsIRPConfiguration: includeInIrp,
       ...organizationId ? { OrganizationId: organizationId } : {},
-      ...includeInIrp ? { IsIRPConfiguration: includeInIrp } : {},
       ...jobId ? { JobId: jobId } : {}
     };
     const url = includeInIrp ? '/api/OrganizationSettings/hierarchy/byKeys' : '/api/OrganizationSettings/byKeys';

@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@a
 import { ofActionSuccessful, Select } from "@ngxs/store";
 import { Observable, takeWhile } from "rxjs";
 import {
-  GetTerminationReasons,
-  RemoveTerminationReasons,
-  SaveTerminatedReasonError,
-  UpdateTerminationReasonsSuccess,
+  GetInactivationReasons,
+  RemoveInactivationReasons,
+  SaveInactivatedReasonError,
+  UpdateInactivationReasonsSuccess,
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
@@ -20,27 +20,27 @@ import { ReasonsComponent } from '@organization-management/reasons/models/reason
 export class EmpTerminationComponent extends ReasonsComponent implements OnInit,OnDestroy {
 
 
-  @Select(RejectReasonState.terminationReasons)
+  @Select(RejectReasonState.inactivationReasons)
   public reasons$: Observable<RejectReasonPage>;
 
   protected getData(): void {
-    this.store.dispatch(new GetTerminationReasons(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetInactivationReasons(this.currentPage, this.pageSize));
   }
 
   protected remove(id: number): void {
-    this.store.dispatch(new RemoveTerminationReasons(id));
+    this.store.dispatch(new RemoveInactivationReasons(id));
   }
 
   protected subscribeOnSaveReasonError(): void {
     this.actions$.pipe(
-      ofActionSuccessful(SaveTerminatedReasonError),
+      ofActionSuccessful(SaveInactivatedReasonError),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.setReasonControlError());
   }
 
   protected subscribeOnUpdateReasonSuccess(): void {
     this.actions$.pipe(
-      ofActionSuccessful(UpdateTerminationReasonsSuccess),
+      ofActionSuccessful(UpdateInactivationReasonsSuccess),
       takeWhile(() => this.isAlive),
     ).subscribe(() => this.getData());
   }

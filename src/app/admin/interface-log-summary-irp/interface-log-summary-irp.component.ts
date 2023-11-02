@@ -148,7 +148,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = this.datePipe?.transform(params.data.createdAt, 'MM/dd/yyyy HH:mm') as string
+        const str = this.datePipe?.transform(params.data.createdAt, 'MM/dd/yyyy h:mm a') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,

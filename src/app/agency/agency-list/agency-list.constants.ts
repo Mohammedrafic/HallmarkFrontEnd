@@ -53,6 +53,7 @@ export const agencyListFilterColumns: FilterColumnsModel = {
   statuses: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
   cities: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
   contacts: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+  isMSPAgencies: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'MSP Agencies'},
 };
 
 export const MSPMenuOptions = (
@@ -61,7 +62,7 @@ export const MSPMenuOptions = (
   mSPMenuOption: [
     { text: MSPMenuType[0], id: '0' },
     { text: MSPMenuType[1], id: '1', disabled: isMSP },
-    { text: MSPMenuType[2], id: '2', disabled: true },//re add after implementation - disabled: !isMSP
+    //{ text: MSPMenuType[2], id: '2', disabled: !isMSP },//re add after implementation
     { text: MSPMenuType[3], id: '3' },
   ]
 });
@@ -70,6 +71,6 @@ export enum MSPMenuType {
   'Edit',
   'Convert to MSP',
   'Unlink from MSP',
-  'History'
+  'View History'
 }
 

@@ -1,0 +1,73 @@
+@import "colors";
+
+.wrapper {
+  padding: 10px 20px;
+
+  .header-modal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sub-title {
+    display: flex;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+
+    .type {
+      background-color: $secondary-dark-blue-20;
+      border-radius: 50%;
+      color: $white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 0 7px;
+      margin-left: 12px;
+    }
+  }
+
+  .content-modal {
+    .times {
+      background-color: $secondary-dark-blue-50;
+      padding: 12px;
+      border-radius: 4px;
+      margin: 12px 0;
+
+      .icon {
+        color: $secondary-dark-blue-20;
+        width: 14px;
+        height: 14px;
+      }
+
+      .time-item {
+        display: flex;
+        gap: 12px;
+        width: 205px;
+      }
+    }
+
+    .jobs {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+}
+
+.text-wrapper {
+  margin-top: 12px;
+}
+
+.text {
+  color: $black;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 18px;
+
+  .text-title {
+    margin-top: 5px;
+    color: $secondary-dark-blue-20;
+    font-size: 12px;
+    font-weight: 400;
+  }
+}

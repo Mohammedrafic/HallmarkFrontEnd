@@ -110,7 +110,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="flex-width" *ngIf="activeSystem !== systemTypes.IRP">
+                  <div class="flex-width" *ngIf="activeSystems !== systemTypes.IRP">
                     <div class="input-container bootstrap">
                       <label class="input-group">Offered Bill Rate</label>
                       <div
@@ -143,8 +143,8 @@
                     </div>
                   </div>
                 </div>
-                <div class="d-flex">
-                  <div class="input-container bootstrap" *ngIf="isAgency || isAccepted || isOnBoard || isOffboard && activeSystem !== systemTypes.IRP">
+                <div class="d-flex" *ngIf="activeSystems !== systemTypes.IRP">
+                  <div class="input-container bootstrap" *ngIf="isAgency || isAccepted || isOnBoard || isOffboard">
                     <label class="input-group">Leave request comments</label>
                     <div class="input-group">
                       <input appValidateWithMessage formControlName="comments" class="e-input" type="text" />
@@ -152,9 +152,9 @@
                   </div>
                 </div>
 
-                <div class="d-flex" *ngIf="(isAccepted && !isAgency) || isOnBoard || isOffboard && activeSystem !== systemTypes.IRP">
+                <div class="d-flex" *ngIf="(isAccepted && !isAgency) || isOnBoard || isOffboard">
                   <div class="f-grow-2 flex-width">
-                    <div class="input-container bootstrap flex-width-date">
+                    <div class="input-container bootstrap flex-width-date" *ngIf="activeSystems !== systemTypes.IRP">
                       <label class="input-group">Guaranted Work Week</label>
                       <div class="input-group">
                         <input
@@ -166,7 +166,7 @@
                         />
                       </div>
                     </div>
-                    <div class="d-flex" *ngIf="activeSystem !== systemTypes.IRP">
+                    <div class="d-flex" *ngIf="activeSystems !== systemTypes.IRP">
                       <div class="input-container bootstrap">
                         <label class="input-group">Actual Start Date</label>
                         <div class="input-group">
@@ -201,7 +201,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="input-container bootstrap">
+                    <div class="input-container bootstrap"  *ngIf="activeSystems !== systemTypes.IRP">
                       <ejs-checkbox
                         formControlName="allowDeployCredentials"
                         label="Allow deploy w/o credentials"
@@ -210,7 +210,7 @@
                     </div>
                   </div>
                   <div>
-                    <div class="input-container bootstrap">
+                    <div class="input-container bootstrap"  *ngIf="activeSystems !== systemTypes.IRP">
                       <label>Clock ID</label>
                       <div class="input-group">
                         <input
@@ -296,7 +296,7 @@
         </e-accordionitems>
       </ejs-accordion>
     </div>
-    <div class="comments">
+    <div class="comments" *ngIf="activeSystems !== systemTypes.IRP">
       <app-comments
         *ngIf="candidateJob"
         [comments]="comments"
@@ -304,8 +304,18 @@
         [commentContainerId]="candidateJob.commentContainerId || 0"
       ></app-comments>
     </div>
+    <div class="comments" *ngIf="activeSystems === systemTypes.IRP">
+      <app-comments-irp
+        [comments]="comments"
+        [commentContainerId]="currentOrder?.commentContainerId || 0"
+        [useBackground]="false"
+        [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
+        [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
+      ></app-comments-irp>
+    </div>
+
   </section>
-  <section class="bill-rates" *ngIf="activeSystem !== systemTypes.IRP">
+  <section class="bill-rates" *ngIf="activeSystems !== systemTypes.IRP">
     <ng-container [ngTemplateOutlet]="isAgency || isRejected || isCancelled ? billRates : editBillRates"></ng-container>
     <ng-template #billRates>
       <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
@@ -315,7 +325,7 @@
         [billRates]="billRatesData"
         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
         [isActive]="true"
-        [isExtension]="!!currentOrder.extensionFromId"
+        [isExtension]="!!currentOrder?.extensionFromId"
         [readOnlyMode]="isReadOnlyBillRates"
       ></app-bill-rates>
     </ng-template>

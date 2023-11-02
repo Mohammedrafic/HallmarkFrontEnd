@@ -47,7 +47,7 @@ export class BillingDetailsGroupComponent implements OnInit, OnDestroy {
       country: new FormControl('', [Validators.required]),
       state: new FormControl('', [Validators.required]),
       city: new FormControl('', [Validators.required, Validators.maxLength(20)]),
-      zipCode: new FormControl('', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
+      zipcode: new FormControl('', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
       phone1: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       phone2: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       fax: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),

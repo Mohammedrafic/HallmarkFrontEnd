@@ -10,6 +10,7 @@ import { OpenJobsRoutingModule } from '../../open-jobs-routing.module';
 import { JobFiltersModule } from '../../components/job-filters/job-filters.module';
 import { JobGridModule } from '../../components/job-grid/job-grid.module';
 import { EmployeeService } from '../../services';
+import { EmployeeDetailsModalModule } from '../../components/employee-details-modal/employee-details-modal.module';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { EmployeeService } from '../../services';
     JobFiltersModule,
     JobGridModule,
     ButtonAllModule,
-    FeatherModule.pick({ Sliders }),
+    EmployeeDetailsModalModule,
+    FeatherModule.pick({Sliders}),
   ],
   providers: [EmployeeService],
 })

@@ -98,6 +98,7 @@ import {
   UpdateRegRateSucceeded,
   GetOrderComments,
   ClearPredefinedBillRates,
+  GetIrpOrderExtensionCandidates,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -702,7 +703,7 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   this.dispatchAgencyOrderCandidatesList(orderData.orderId, orderData.organizationId, true);
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
-  this.openDetails.next(true);
+  this.openDetails.next(false);
   this.selectedRowRef = Data;
 }
 
@@ -2746,8 +2747,18 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed,
       ""
     ));
-    if (isIrp) {
+    if (isIrp && (this.selectedOrder?.extensionFromId === null)) {
       this.store.dispatch(new GetIrpOrderCandidates(
+        orderId,
+        organizationId,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
+        this.employeeToggleState?.isAvailable,
+        this.employeeToggleState?.includeDeployed,
+        ""
+      )); 
+    } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)){
+      this.store.dispatch(new GetIrpOrderExtensionCandidates(
         orderId,
         organizationId,
         GRID_CONFIG.initialPage,
