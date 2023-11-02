@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ShiftExportColumns } from "@organization-management/shifts/shifts.constants";
+import { ShiftExportColumns,InactivateColFormat } from "@organization-management/shifts/shifts.constants";
 import { ShiftsService } from "@organization-management/shifts/shifts.service";
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
@@ -56,6 +56,7 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
   public columnsToExport: ExportColumn[] = ShiftExportColumns;
   public fileName: string;
   public defaultFileName: string;
+  public inactivateColformat = InactivateColFormat;
 
   constructor(protected override store: Store,
               private actions$: Actions,
@@ -128,7 +129,7 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
       startTime: startDate,
       endTime: endDate,
       onCall: data.onCall,
-    });
+      inactiveDate:data.inactiveDate || ''   });
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -223,4 +224,4 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
     });
   }
-}
+ }

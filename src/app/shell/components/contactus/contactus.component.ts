@@ -32,7 +32,7 @@ export class ContactusComponent implements OnInit,AfterViewInit {
   public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
   public disableSaveButton = false;
   public ContactFormGroup: FormGroup;
-  public commonFields: FieldSettingsModel = { text: 'title', value: 'id' };
+  public commonFields: FieldSettingsModel = { text: 'title', value: 'title' };
 
   private uploaderErrorMessageElement: HTMLElement;
   private file: any;
@@ -112,11 +112,11 @@ private manageNotifications(): void {
        //this.menuItems=[];
         menu.menuItems.forEach(element => {
           this.menuItems.push({"id":element.id,"title":element.title})
-          if(element.children.length>0){
-            element.children.forEach(element => {
-              this.menuItems.push({"id":element.id,"title":element.title});
-            });
-          }
+          // if(element.children.length>0){
+          //   element.children.forEach(element => {
+          //     this.menuItems.push({"id":element.id,"title":element.title});
+          //   });
+          // }
         });
       }
     });

@@ -258,6 +258,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
       statuses: this.filters.statuses || [],
       cities: this.filters.cities || [],
       contacts: this.filters.contacts || [],
+      isMSPAgencies: this.filters.isMSPAgencies || null,
     });
     this.filteredItems = this.filterService.generateChips(this.agencyListFilterFormGroup, this.filterColumns);
     this.filteredItems$.next(this.filteredItems.length);
@@ -368,6 +369,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
       statuses: new FormControl([]),
       cities: new FormControl([]),
       contacts: new FormControl([]),
+      isMSPAgencies: new FormControl(false)
     });
   }
 }

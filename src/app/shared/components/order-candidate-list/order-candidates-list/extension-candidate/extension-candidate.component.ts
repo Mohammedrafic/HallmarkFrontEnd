@@ -510,7 +510,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private subsToCandidate(): void {
-    if(this.activeSystem == undefined){
+    if(this.activeSystem == undefined && !this.isAgency){
       this.activeSystem = this.activeSystems;
     }
         const state$ = this.isAgency ? this.orderCandidatePage$ : (this.activeSystem === OrderManagementIRPSystemId.IRP ? this.getIrpCandidatesforExtension$ : this.clientOrderCandidatePage$);
