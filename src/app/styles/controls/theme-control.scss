@@ -18,6 +18,7 @@ body.light {
   --button-group-border: #{$secondary-dark-blue-45};
   --button-group-background: #{$white};
   --button-group-color: #{$secondary-dark-blue-10};
+  --file-container: #{$secondary-dark-blue-50};
 
   --bg-primary-btn-disabled: #{$primary-active-blue-70};
   --color-primary-btn-disabled: #{$white};
@@ -77,6 +78,7 @@ body.dark {
   --button-group-border: #{$primary-active-blue-40};
   --button-group-background: #{$sidebar-background};
   --button-group-color: #{$primary-active-blue-10};
+  --file-container: #{$widget-dark-tooltip};
 
   --bg-primary-btn-disabled: #{$secondary-dark-blue-10-2};
   --color-primary-btn-disabled: #{$secondary-dark-blue-30};

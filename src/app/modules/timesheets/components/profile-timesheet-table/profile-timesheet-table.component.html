@@ -1,19 +1,7 @@
 <section class="table-container">
   <div class="table-block">
     <div class="table-header">
-      <div class="tab-wrapper">
-        <ejs-tab id="tab_default" #tabs (selected)="onTabSelect($event)">
-          <e-tabitems>
-            <e-tabitem *ngFor="let tab of tabsConfig; trackBy: trackByTitle">
-              <ng-template #headerText>
-                <div>{{ tab.title }}</div>
-              </ng-template>
-              <ng-template #content> </ng-template>
-            </e-tabitem>
-          </e-tabitems>
-        </ejs-tab>
-      </div>
-
+      <h3>{{ titleMapper[currentTab] }}</h3>
       <div class="action-buttons" *ngIf="currentTab !== tableTypes.HistoricalData">
         <ng-container *ngIf="isTablet && !isSmallContentWidth">
           <ng-container *ngTemplateOutlet="dropdownButton"></ng-container>

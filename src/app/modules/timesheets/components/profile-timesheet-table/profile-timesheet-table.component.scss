@@ -6,6 +6,12 @@
 
 .table-container {
   margin-bottom: 25px;
+
+  ::ng-deep {
+    .wrapper ejs-timepicker.e-timepicker .e-input-group.e-control-wrapper.e-time-wrapper {
+      width: 114px !important;
+    }
+  }
 }
 
 .table-block {
@@ -19,11 +25,13 @@
 
 .table-header {
   @include table-header;
+  padding: 14px 16px;
+  border-bottom: unset;
 
   h3 {
     font-size: 16px;
     font-weight: 700;
-    line-height: 28px;
+    line-height: 33px;
   }
 
   .button-cancel {

@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: space-between;;
   padding: 28px 20px 28px 20px;
-  border-top: 1px solid $secondary-dark-blue-45;
+  border-top: 1px solid var(--separator);
   background-color: #fff;
 
   .prev, .next {

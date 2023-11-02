@@ -6,6 +6,13 @@ $chip-margin: 8px;
 .main-body{
   display: flex;
   clear: both;
+  height: calc(100vh - 80px);
+
+  .timesheet-details-container,
+  .file-viewer-container {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .header-container {
@@ -14,14 +21,25 @@ $chip-margin: 8px;
   z-index: 3;
   padding:24px 24px 20px 24px;
   background-color: var(--bg-default);
-  box-shadow: 0px 4px 4px -3px var(--shadow);
   border-bottom: 1px solid var(--header-border);
 }
 
 .content-container {
   overflow-y: auto;
-  padding: 24px;
-  width: calc(100% - 60px);
+  padding: 10px 24px 20px;
+
+  .content-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .controls-wrapper {
+      display: flex;
+      align-items: center;
+    }
+  }
 }
 
 .e-dialog.dialog .container {
@@ -87,11 +105,6 @@ $chip-margin: 8px;
     }
   }
 
-  &__chip-list,
-  &__mobile-date-picker {
-    margin-top: 10px;
-  }
-
   &__upload-container {
     display: flex;
     align-items: baseline;
@@ -108,14 +121,6 @@ $chip-margin: 8px;
     &:first-child {
       margin-right: 20px;
     }
-  }
-
-  .menu-mobile {
-    margin: -2px 0 0 12px;
-    border: 1px solid $primary-active-blue-40;
-    border-radius: 8px;
-    width: 40px;
-    padding-top: 3px;
   }
 
   .e-chip-list:not(.e-chip) {
@@ -148,41 +153,14 @@ $chip-margin: 8px;
   border-radius: 8px;
 }
 
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 15px;
-  margin-bottom: 10px;
-
-  .order-id,
-  .week-dates {
-    font-weight: 700;
-    font-size: 16px;
-  }
-
-  .week-dates {
-    margin-left: 20px;
-  }
-
-  .reject-button {
-    margin-right: 12px;
-  }
-}
-
-.order-meta {
-  display: flex;
-  align-items: center;
-}
-
 .job-general-info {
+  margin-top: 20px;
   padding: 25px;
 }
 
 .profile-hours-statistics {
   display: flex;
-  margin-top: 15px;
-  margin-bottom: 10px;
+  margin: 16px 0;
 
   .profile-invoices,
   .miles {
@@ -194,27 +172,6 @@ $chip-margin: 8px;
     flex-shrink: 0;
   }
 
-  .profile-attachments {
-    min-width: 150px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 12px 0 12px 16px;
-    box-sizing: border-box;
-
-    .attachments-title {
-      font-weight: 700;
-      font-size: 14px;
-      color: $black;
-      margin: 0 0 12px;
-    }
-
-    app-attachments-list {
-      flex-grow: 1;
-      padding-right: 18px;
-    }
-  }
-
   .tile-dark-blue {
     min-height: 210px;
 
@@ -224,15 +181,12 @@ $chip-margin: 8px;
   }
 }
 
-.checkbox-block {
-  margin-right: 12px;
-  margin-left: 16px;
+.profile-attachments {
+  margin-bottom: 20px;
 }
 
-.controls-block {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.checkbox-block {
+  margin-left: 16px;
 }
 
 .e-switch-wrapper.e-wrapper {
@@ -243,10 +197,6 @@ $chip-margin: 8px;
   .e-dlg-content {
     display: flex;
     flex-direction: column;
-
-    section.container {
-      overflow: auto;
-    }
   }
 }
 
@@ -256,6 +206,7 @@ app-date-week-picker {
 
 app-navigation-panel {
   margin-top: auto;
+  z-index: 1;
 }
 
 .reject-reason-block {
@@ -280,18 +231,11 @@ app-navigation-panel {
   background-color: $secondary-dark-blue-50;
   padding: 10px 17px;
   width: auto;
-  max-width: 700px;
+  max-width: 400px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   display: inline-block;
-}
-
-.controls-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  max-width: 87%;
 }
 
 .hide-elem {
@@ -323,22 +267,41 @@ app-navigation-panel {
     }
   }
 
-  .order-header {
-    flex-wrap: wrap;
-    gap: 10px;
-
-    .controls-wrapper{
-      width: 100%;
-      justify-content: space-between;
-    }
-  }
-
   .profile-details {
     .menu-mobile {
       margin: 0 0 0 12px;
       border: none;
       padding-top: 6px;
     }
+  }
+
+  .reason-text {
+    max-width: 120px;
+  }
+
+  .header-container,
+  .content-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .close-details {
+    right: 16px !important;
+  }
+}
+
+.mobile-upload-icon {
+  margin-left: 0 !important;
+}
+
+.close-details-wrapper {
+  width: 40px;
+  height: 40px;
+
+  .close-details {
+    position: absolute;
+    top: 34px;
+    right: 24px;
   }
 }
 
@@ -359,19 +322,38 @@ app-navigation-panel {
   width: auto;
   overflow: scroll;
 }
-.preview-content-container{
-  max-height: 51.5vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
-.closeButton{
-  position: absolute;
-  right: 30px;
-  top: 35px;
-}
 
 .comments {
-  margin-top: 12px;
-  overflow: auto;
+  flex-grow: 1;
+}
+
+.timesheet-details-dialog .profile-attachments {
+  app-attachments-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  ::ng-deep {
+    .attachment {
+      box-sizing: border-box;
+      width: 270px;
+      background-color: var(--file-container);
+      border-radius: 12px;
+      padding: 24px !important;
+      display: flex;
+      gap: 12px;
+
+      .file-name {
+        padding-left: 0 !important;
+      }
+
+      .delete-icon {
+        i-feather {
+         margin-left: 0 !important;
+        }
+      }
+    }
+  }
 }
