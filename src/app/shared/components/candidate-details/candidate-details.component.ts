@@ -445,6 +445,9 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       filter(({ active }: NavigationTabModel) => active === 0 || !!active),
       tap((selectedTab: NavigationTabModel) => {
         this.selectedTab = selectedTab.active;
+        if(this.selectedTab){
+          this.pageNumber = 1;
+        }
         !this.isNavigationFromAnotherPage() && this.updatePage();
       })
     );
