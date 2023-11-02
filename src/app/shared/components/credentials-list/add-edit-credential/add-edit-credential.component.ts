@@ -264,6 +264,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
     if (!permission) {
       this.credentialForm.get('credentialTypeId')?.disable();
       this.credentialForm.get('name')?.disable();
+      this.credentialForm.get('isPublic')?.disable();
     }
   }
 
