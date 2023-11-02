@@ -255,6 +255,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       }
       return;
     }
+    debugger
     this.isOrgUser = false;
     if (this.groupEmailTemplateForm.emailBody != '' && this.groupEmailTemplateForm.emailTo != '' && this.groupEmailTemplateForm.emailSubject != '') {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
@@ -264,7 +265,12 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         this.isOrgUser = true;
       }
       if (formValues.businessUnit == 4)
-        businessUnitId = this.isOrgUser == true ? user?.businessUnitId : formValues.businesses[0]
+        if(user?.businessUnitType == BusinessUnitType.MSP){
+          businessUnitId = formValues.business == 0 ? null : user?.businessUnitId
+        }
+        else{
+          businessUnitId = this.isOrgUser == true ? user?.businessUnitId : formValues.businesses[0]
+        }
       if (formValues.businessUnit == 3)
         businessUnitId = formValues.business == 0 ? null : formValues.business
       if (formValues.businessUnit == BusinessUnitType.MSP)
