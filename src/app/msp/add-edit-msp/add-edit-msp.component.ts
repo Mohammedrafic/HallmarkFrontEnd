@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -26,7 +26,7 @@ import { AdminState } from '@admin/store/admin.state';
 import { AppState } from 'src/app/store/app.state';
 import { GetOrganizationById, GetOrganizationLogo, SaveOrganization, SetDirtyState, SetBillingStatesByCountry, SetGeneralStatesByCountry, UploadOrganizationLogo, RemoveOrganizationLogo, GetOrganizationByIdSucceeded, GetOrganizationLogoSucceeded, GetBusinessUnitList, GetDBConnections, SaveOrganizationSucceeded } from '@admin/store/admin.actions';
 import { AddEditMSPService } from '../services/msp-addedit.service';
-import { SaveMSP, SaveMSPSucceeded } from '../store/actions/msp.actions';
+import { GetMspById, GetMSPByIdSucceeded, GetMspLogo, GetMspLogoSucceeded, SaveMSP, SaveMSPSucceeded, UploadMspLogo } from '../store/actions/msp.actions';
 import { MSP } from '../store/model/msp.model';
 
 @Component({
@@ -123,6 +123,7 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
     private fb: FormBuilder,
     private addEditMspService: AddEditMSPService,
     private confirmService: ConfirmService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     super(store);
 
@@ -140,8 +141,8 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
       if (route.snapshot.paramMap.get('id')) {
         this.title = 'Edit';
         const businessUnitId = parseInt(route.snapshot.paramMap.get('id') as string);
-        store.dispatch(new GetOrganizationById(businessUnitId));
-        store.dispatch(new GetOrganizationLogo(businessUnitId));
+        store.dispatch(new GetMspById(businessUnitId));
+        store.dispatch(new GetMspLogo(businessUnitId));
       } else {
         this.initForms();
       }
@@ -189,6 +190,8 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
            this.GeneralInformationFormGroup.getRawValue(),
             this.BillingDetailsFormGroup.getRawValue(),
             this.ContactFormArray.getRawValue(),
+            this.currentBusinessUnitId as number,
+            this.isSameAsOrg,
           )
         )
       );
@@ -298,7 +301,7 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
   public uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
-      this.store.dispatch(new UploadOrganizationLogo(this.filesDetails[0] as Blob, businessUnitId));
+      this.store.dispatch(new UploadMspLogo(this.filesDetails[0] as Blob, businessUnitId));
     } else if (this.logo && this.logoToDelete) {
       this.store.dispatch(new RemoveOrganizationLogo(businessUnitId));
     }
@@ -316,28 +319,35 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
 
 
-  private initForms(organization?: Organization): void {
+  private initForms(organization?: MSP): void {
     let businessUnitId: string | number = '';
-    if (organization?.createUnder?.parentUnitId) {
-      businessUnitId = organization.createUnder.parentUnitId;
-    } else if (organization?.createUnder?.parentUnitId === null) {
+    if (organization?.mspDetails?.id) {
+      businessUnitId = organization.mspDetails.id;
+    } else if (organization?.mspDetails?.id === null) {
       businessUnitId = 0;
     }
 
-
-
-
     this.GeneralInformationFormGroup = this.addEditMspService.createGeneralInfoGroup(organization, this.user);
-    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
+  
+   this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
     });
-    this.BillingDetailsFormGroup = this.addEditMspService.createBillingDetailForm(organization);
+    if(this.title=='Edit')
+    {
+      this.changeDetectorRef.detectChanges()
+    }
+     this.BillingDetailsFormGroup = this.addEditMspService.createBillingDetailForm(organization);
+
     this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
     });
+    if(this.title=='Edit')
+    {
+      this.changeDetectorRef.detectChanges()
+    }
     if (organization) {
       this.ContactFormGroup = this.fb.group({
-        contacts: new FormArray(this.generateContactsFormArray(organization.contactDetails)),
+        contacts: new FormArray(this.generateContactsFormArray(organization.mspContactDetails)),
       });
     } else {
       this.ContactFormGroup = this.fb.group({
@@ -351,18 +361,23 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
  
 
-    this.isInitStatusIsActive = organization?.generalInformation.status === OrganizationStatus.Active;
-
+    this.isInitStatusIsActive = organization?.mspDetails.status === OrganizationStatus.Active;
+    
+    if(this.title=='Edit')
+    {
+      this.changeDetectorRef.detectChanges()
+    }
     if (organization) {
       //Populate state dropdown with values based on selected country
-      this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
-      this.store.dispatch(new SetBillingStatesByCountry(organization.billingDetails.country));
+      this.store.dispatch(new SetGeneralStatesByCountry(organization.mspDetails.country));
+      this.store.dispatch(new SetBillingStatesByCountry(organization.mspDetails.country));
       this.store.dispatch(new SetDirtyState(false));
     } else {
       this.store.dispatch(new SetGeneralStatesByCountry(Country.USA));
       this.store.dispatch(new SetBillingStatesByCountry(Country.USA));
       this.store.dispatch(new SetDirtyState(false));
     }
+
   }
 
   private subscribeOnUser(): void {
@@ -376,12 +391,11 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
   private startGetOrgByIdActionWatching(): void {
     this.actions$
-      .pipe(ofActionSuccessful(GetOrganizationByIdSucceeded), takeUntil(this.componentDestroy()))
-      .subscribe((organization: { payload: Organization }) => {
-        console.log("PayloD")
-        this.currentBusinessUnitId = organization.payload.organizationId as number;
+      .pipe(ofActionSuccessful(GetMSPByIdSucceeded), takeUntil(this.componentDestroy()))
+      .subscribe((organization: { payload: MSP }) => {
+        this.currentBusinessUnitId = organization.payload.mspDetails.id as number;
         this.initForms(organization.payload);
-        this.isSameAsOrg = organization.payload.billingDetails.sameAsOrganization;
+        this.isSameAsOrg = organization.payload.mspBillingDetails.SameAsMsp;
         if (this.isSameAsOrg) {
           this.disableBillingForm();
         }
@@ -393,9 +407,10 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
   private startGetOrgLogoActionWatching(): void {
     this.actions$
-      .pipe(ofActionSuccessful(GetOrganizationLogoSucceeded), takeUntil(this.componentDestroy()))
+      .pipe(ofActionSuccessful(GetMspLogoSucceeded), takeUntil(this.componentDestroy()))
       .subscribe((logo: { payload: Blob }) => {
         this.logo = logo.payload;
+        this.changeDetectorRef.detectChanges()
       });
   }
 
@@ -403,8 +418,8 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
     this.profileMode = true;
     this.store.dispatch(new SetHeaderState({ iconName: 'organization', custom: true, title: 'Organization Profile' }));
     const user = this.store.selectSnapshot(UserState.user);
-    this.store.dispatch(new GetOrganizationById(user?.businessUnitId as number));
-    this.store.dispatch(new GetOrganizationLogo(user?.businessUnitId as number));
+    this.store.dispatch(new GetMspById(user?.businessUnitId as number));
+    this.store.dispatch(new GetMspLogo(user?.businessUnitId as number));
   }
 
   private orgListActions(): void {

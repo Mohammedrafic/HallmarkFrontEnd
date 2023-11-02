@@ -1,9 +1,8 @@
 import { Injectable } from "@angular/core";
 import { MspService } from "../../services/msp.services";
-import { Observable, catchError, tap } from "rxjs";
-import { MspListDto } from "../../constant/msp.constant";
+import { Observable, catchError, of, tap } from "rxjs";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { GetMsps, SaveMSP, SaveMSPSucceeded } from "../actions/msp.actions";
+import { GetMSPByIdSucceeded, GetMspById, GetMspLogo, GetMspLogoSucceeded, GetMsps, RemoveMspLogo, SaveMSP, SaveMSPSucceeded, UploadMspLogo } from "../actions/msp.actions";
 import { MSP, MspListPage } from "../model/msp.model";
 import { AdminStateModel } from "@admin/store/admin.state";
 import { RECORD_ADDED, RECORD_MODIFIED } from "@shared/constants";
@@ -47,8 +46,11 @@ export class MspState {
     return this.mspService.saveOrganization(payload).pipe(tap((payloadResponse) => {
       patchState({ isOrganizationLoading: false });
       dispatch([new SaveMSPSucceeded(payloadResponse)]);
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-    
+        if (payload.organizationId) {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        } else {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        }
       return payloadResponse;
     }),
     catchError((error: HttpErrorResponse) => {
@@ -61,4 +63,39 @@ export class MspState {
     }));
   }
 
+  @Action(GetMspById)
+  GetOrganizationById({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: GetMspById): Observable<MSP> {
+    patchState({ isOrganizationLoading: true });
+    return this.mspService.getOrganizationById(payload).pipe(tap((payload) => {
+       patchState({ isOrganizationLoading: false, });
+      dispatch(new GetMSPByIdSucceeded(payload));
+      return payload;
+    }));
+  }
+
+  @Action(GetMspLogo)
+  GetOrganizationLogo({ dispatch }: StateContext<AdminStateModel>, { payload }: GetMspLogo): Observable<any> {
+    return this.mspService.getMspLogo(payload).pipe(tap((payload) => {
+      dispatch(new GetMspLogoSucceeded(payload));
+      return payload;
+    }));
+  }
+
+  @Action(UploadMspLogo)
+  UploadOrganizationLogo({ patchState }: StateContext<AdminStateModel>, { file, businessUnitId }: UploadMspLogo): Observable<any> {
+    patchState({ isOrganizationLoading: true });
+    return this.mspService.saveMspLogo(file, businessUnitId).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false });
+      return payload;
+    }));
+  }
+
+  
+  @Action(RemoveMspLogo)
+  RemoveOrganizationLogo({ dispatch }: StateContext<AdminStateModel>, { payload }: RemoveMspLogo): Observable<any> {
+    return this.mspService.removeMspLogo(payload).pipe(
+      tap((payload) => payload),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Logo cannot be deleted'))))
+    );
+  }
 }
