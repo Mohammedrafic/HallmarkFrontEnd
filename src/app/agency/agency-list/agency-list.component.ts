@@ -19,7 +19,7 @@ import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AgencyStatus, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { Agency, AgencyFilteringOptions, AgencyListFilters, AgencyPage } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowMSPCustomSideDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
@@ -88,6 +88,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public filteredItems$ = new Subject<number>();
   public menuOption: Record<string, ItemModel[]>;
   public currentAgency: Agency;
+  public convertMspHeader: string = "Convert To MSP";
 
   private filters: AgencyListFilters = {};
   private pageSubject = new Subject<number>();
@@ -275,7 +276,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
         break;
       case MSPMenuType['Convert to MSP']:
         this.currentAgency = data;
-        this.store.dispatch(new ShowSideDialog(true));
+        this.store.dispatch(new ShowMSPCustomSideDialog(true));
         break;
       case MSPMenuType['Unlink from MSP']:
         /*to be implemented*/
@@ -286,8 +287,8 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     }
   }
 
-  public onConvertAgencyToMSPFormCancelClick(): void {
-    this.store.dispatch(new ShowSideDialog(false));
+  public onMspSideDialogClose(): void {
+    this.store.dispatch(new ShowMSPCustomSideDialog(false));
   }
 
   public onConvertAgencyToMSPFormSaveClick(): void {
@@ -295,8 +296,8 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     var netSuiteId = this.currentAgency.netSuiteId ?? null;
     var name = this.currentAgency.agencyDetails.name;
     this.store.dispatch(new ConvertAgencyToMSP(agencyId, netSuiteId, name));
+    this.store.dispatch(new ShowMSPCustomSideDialog(false));
     this.updatePage();
-    this.store.dispatch(new ShowSideDialog(false));
   }
 
   private initMenuItems(): void {

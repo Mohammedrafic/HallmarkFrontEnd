@@ -134,10 +134,9 @@
 </mat-menu>
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
-<app-side-dialog [disableSaveButton]="!userPermission[userPermissions.CanCreateMSP]"
-                 (formCancelClicked)="onConvertAgencyToMSPFormCancelClick()"
-                 (formSaveClicked)="onConvertAgencyToMSPFormSaveClick()"
-                 [header]="'Convert To MSP'"
+<app-msp-custom-side-dialog 
+                 (close)="onMspSideDialogClose()"
+                 [headerText]="convertMspHeader"
                  [width]="'523px'">
   <form class="form-container" id="convertAgencyToMSPForm" [formGroup]="convertAgencyToMSPFormGroup">
     <div class="msp-text-box">
@@ -156,7 +155,7 @@
       <button ejs-button [isPrimary]="true" [disabled]="!userPermission[userPermissions.CanCreateMSP]" (click)="onConvertAgencyToMSPFormSaveClick()" [formGroup]="convertAgencyToMSPFormGroup">Convert To MSP</button>
     </div>
   </form>
-</app-side-dialog>
+</app-msp-custom-side-dialog>
 
 <app-filter-dialog
   [items]="filteredItems"
