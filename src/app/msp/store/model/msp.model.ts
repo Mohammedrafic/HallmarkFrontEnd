@@ -9,15 +9,19 @@ export class MSP {
     mspBillingDetails: BillingDetails;
     mspContactDetails: ContactDetails[];
     isOrganizationUsed?: boolean;
-    businessUnit:businessUnit
+    businessUnit:businessUnit;
+    mspId?: number | null;
     constructor(
       mspDetails: GeneralInformation,
       mspBillingDetails: BillingDetails,
       mspContactDetails: ContactDetails[],
       isSameAsOrg: boolean,
-      businessUnit:businessUnit
+      businessUnit:businessUnit,
+      mspId:number,
     ) {
-     
+      if (mspId) {
+        this.mspId = mspId;
+      }
       this.mspDetails = mspDetails;
       if (this.mspDetails.externalId === '') {
         this.mspDetails.externalId = null;
