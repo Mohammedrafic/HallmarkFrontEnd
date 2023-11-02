@@ -230,7 +230,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       const aid = navigateAgencyId || lastSelectedAgencyId;
       const currentAgency = organizationsAgencies.find((agency) => agency.id === aid);
       newOrganizationAgencyControlValue = currentAgency ? aid : organizationsAgencies[0]?.id || null;
-
+      this.eliteBusinessUnitId=0;
       this.setAgencyStatus(currentAgency);
     } else {
       const navigateOrgId = this.route.snapshot.queryParams['orgId'] ? Number(this.route.snapshot.queryParams['orgId'])

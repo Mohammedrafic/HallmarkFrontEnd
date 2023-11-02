@@ -65,7 +65,9 @@ export enum OrganizationSettingKeys {
   AutomatedDistributionToVMS,
   ShowDeployedEmployees,
   OrganizationCanCarryClockIDFromParent,
-  AllowDuplicateClockIdforOrganization
+  AllowDuplicateClockIdforOrganization,
+  MandatorySpecialProjectDetails,
+  MarkZeroDollarInvoicetoPaidOnApproval
 }
 
 export enum OrganizationalHierarchy {

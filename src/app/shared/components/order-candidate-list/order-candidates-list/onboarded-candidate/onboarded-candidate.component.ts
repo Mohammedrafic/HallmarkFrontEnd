@@ -117,6 +117,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() canEditBillRate = false;
   @Input() canEditClosedBillRate = false;
   @Input() order: Order;
+  @Input() reloadOnUpdate = false;
 
   private readonly permissions = UserPermissions;
   public ordersystemId = OrderManagementIRPSystemId;
@@ -293,6 +294,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.form.disable();
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
+      if (!this.reloadOnUpdate) {
+        this.closeDialog();
+      }
       this.updateDetails.emit();
     }
   }
@@ -473,6 +477,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   candidatePayRate: this.candidateJob.candidatePayRate,
                 })
               );
+
+              if (!this.reloadOnUpdate) {
+                this.closeDialog();
+              }
             } else {
               this.jobStatusControl.reset();
               this.selectedApplicantStatus = null;

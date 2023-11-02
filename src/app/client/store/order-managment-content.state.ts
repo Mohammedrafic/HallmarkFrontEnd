@@ -85,7 +85,9 @@ import {
   GetOrderCredentialDetailSucceeded,
   GetOrderContactDetailSucceeded,
   GetOrderBillRateDetailSucceeded,
-  GetParentOrderById
+  GetParentOrderById,
+  GetIrpOrderExtensionCandidates,
+  GetJobDistributionValues
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -109,6 +111,7 @@ import {
   OrderManagementPage,
   OrderWorkLocationAuditHistory,
   OrdersJourneyPage,
+  OrgStructureDto,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -172,6 +175,7 @@ export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
   ordersJourneyPage: OrdersJourneyPage | null;
   selectedOrder: Order | null;
+  OrgStructure: OrgStructureDto |null;
   selectedParentOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
   applicantStatuses: ApplicantStatus[];
@@ -208,7 +212,8 @@ export interface OrderManagementContentStateModel {
   OrderContactAuditHistory: OrderContactAuditHistory[];
   OrderWorkLocationAuditHistory: OrderWorkLocationAuditHistory[];
   OrderJobDistributionAuditHistory: OrderJobDistributionAuditHistory[],
-  OrderClassificationAuditHistory: OrderClassificationAuditHistory[]
+  OrderClassificationAuditHistory: OrderClassificationAuditHistory[];
+  irpCandidatesforExtension: OrderCandidatesListPage | null,
 }
 
 @State<OrderManagementContentStateModel>({
@@ -217,6 +222,7 @@ export interface OrderManagementContentStateModel {
     ordersPage: null,
     ordersJourneyPage: null,
     selectedOrder: null,
+    OrgStructure:null,
     selectedParentOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
@@ -258,6 +264,7 @@ export interface OrderManagementContentStateModel {
     OrderWorkLocationAuditHistory: [],
     OrderJobDistributionAuditHistory: [],
     OrderClassificationAuditHistory: [],
+    irpCandidatesforExtension: null
   },
 })
 @Injectable()
@@ -290,6 +297,11 @@ export class OrderManagementContentState {
   @Selector()
   static orderCandidatePage(state: OrderManagementContentStateModel): OrderCandidatesListPage | null {
     return state.orderCandidatesListPage;
+  }
+
+  @Selector()
+  static irpCandidatesforExtension(state: OrderManagementContentStateModel): OrderCandidatesListPage | null {
+    return state.irpCandidatesforExtension;
   }
 
   @Selector()
@@ -456,6 +468,10 @@ export class OrderManagementContentState {
   static getOrderAuditHistoryDetails(state: OrderManagementContentStateModel): OrderAuditHistory[] {
     return state.OrderAuditHistory;
   }
+  @Selector()
+  static selectedDistribution(state: OrderManagementContentStateModel): OrgStructureDto | null {
+    return state.OrgStructure;
+  }
 
   @Selector()
   static getOrderCredentialAuditHistory(state: OrderManagementContentStateModel): OrderCredentialAuditHistory[] {
@@ -584,6 +600,20 @@ export class OrderManagementContentState {
     );
   }
 
+  @Action(GetJobDistributionValues)
+  GetJobDistributionValue({ patchState, dispatch }: StateContext<OrderManagementContentStateModel>, { payload }:
+    GetJobDistributionValues): Observable<OrgStructureDto | void> {
+    return this.orderManagementService.getJobDistributionValues(payload).pipe(
+      tap((payloads) => {
+        patchState({ OrgStructure: payloads });
+        dispatch(new GetOrderJobDistributionDetailSucceeded());
+        return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      }));
+  }
+
   @Action(SetLock)
   SetLock(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
@@ -647,6 +677,30 @@ export class OrderManagementContentState {
       })
     );
   }
+
+
+  @Action(GetIrpOrderExtensionCandidates)
+  GetIrpOrderExtensionCandidates(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderId, pageNumber, pageSize, isAvailable, includeDeployed, searchTerm }: GetIrpOrderExtensionCandidates
+  ): Observable<OrderCandidatesListPage> {
+    const params: IrpCandidatesParams = {
+      PageSize: pageSize,
+      PageNumber: pageNumber,
+      includeDeployed,
+      isAvailable,
+      searchTerm,
+    };
+
+    return this.orderManagementService.getIrpExtensionCandidates(orderId, params)
+    .pipe(
+      tap((payload) => {
+        patchState({irpCandidatesforExtension: payload});
+        return payload;
+      })
+    );
+  }
+
 
   @Action(ClearOrderCandidatePage)
   ClearOrderCandidatePage({ patchState }: StateContext<OrderManagementContentStateModel>): void {

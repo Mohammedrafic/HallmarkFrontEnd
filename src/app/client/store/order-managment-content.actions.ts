@@ -5,6 +5,7 @@ import {
   AuditLogPayload,
   CreateOrderDto,
   EditOrderDto,
+  JobDistributionfilters,
   OnboardCandidateEmail,
   Order,
   OrderFilter,
@@ -87,6 +88,20 @@ export class GetAgencyOrderCandidatesList {
 }
 
 export class GetIrpOrderCandidates {
+  static readonly type = '[order management] Get IRP order Candidates';
+
+  constructor(
+    public orderId: number,
+    public organizationId: number,
+    public pageNumber: number,
+    public pageSize: number,
+    public isAvailable: boolean,
+    public includeDeployed?: boolean,
+    public searchTerm?: string
+  ) {}
+}
+
+export class GetIrpOrderExtensionCandidates {
   static readonly type = '[order management] Get IRP order Candidates';
 
   constructor(
@@ -529,4 +544,8 @@ export class GetOrderJobDistributionDetailSucceeded {
 export class GetOrderWorkLocationDetailSucceeded {
   static readonly type = '[order management] Get Order WorkLocation Detail Succeeded';
   constructor() {}
+}
+export class GetJobDistributionValues {
+  static readonly type = '[order management] Get Order Job Distribution values';
+  constructor(public payload: JobDistributionfilters) {}
 }

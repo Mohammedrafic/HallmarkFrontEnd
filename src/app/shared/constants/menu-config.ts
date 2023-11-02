@@ -140,7 +140,7 @@ export const MENU_CONFIG: any = {
     29: {
       // MSP List
       icon: '',
-      route: '',
+      route: 'msp/msp-list',
     },
     30: {
       // Roles & Permissions
@@ -633,7 +633,7 @@ export const MENU_CONFIG: any = {
     29: {
       // MSP List
       icon: '',
-      route: '',
+      route: 'msp/msp-list',
     },
     30: {
       // Roles & Permissions
@@ -665,6 +665,171 @@ export const MENU_CONFIG: any = {
       icon: 'users',
       route: 'agency/candidate-details',
     },
+    40: {
+      // Custom Reports
+      icon: 'pie-chart',
+      route: '/analytics',
+    },
+    41: {
+      // Accrual Report
+      icon: 'pie-chart',
+      route: '/analytics/financial-time-sheet-report',
+    },
+    42: {
+      // Invoice Summary
+      icon: '',
+      route: '/analytics/invoice-summary',
+    },
+    43: {
+      // Aging Details
+      icon: '',
+      route: '/analytics/aging-details',
+    },
+    48: {
+      // Client Finance Rreport
+      icon: '',
+      route: '/analytics/client-finance-report',
+    },
+    49: {
+      // Credential Expiry
+      icon: '',
+      route: '/analytics/credential-expiry',
+    },
+    50: {
+      // Timesheet Report
+      icon: '',
+      route: '/analytics/timesheet-report',
+    },
+    51: {
+      // VMS Invoice Report
+      icon: '',
+      route: '/analytics/vms-invoice-report',
+    },
+    53: {
+      // Fill Rate
+      icon: '',
+      route: '/analytics/candidate-journey',
+    },
+    54: {
+      // YTD Summary
+      icon: '',
+      route: '/analytics/ytd-summary',
+    },
+    55: {
+      // Missing Credentials
+      icon: '',
+      route: '/analytics/missing-credentials',
+    },
+    56: {
+      // Head Count
+      icon: '',
+      route: '/analytics/head-count',
+    },
+    58: {
+      // Candidate List
+      icon: '',
+      route: '/analytics/candidate-list',
+    },
+    59: {
+      // Vendor Scorecard
+      icon: '',
+      route: '/analytics/vendor-scorecard',
+    },
+    60: {
+      // Job Event
+      icon: '',
+      route: '/analytics/job-event',
+    },
+    61: {
+      // General Comments
+      icon: '',
+      route: '/analytics/general-comments',
+    },
+    62: {
+      // YTD Report
+      icon: '',
+      route: '/analytics/ytd-report',
+    },
+    63: {
+      // Agency & Department Spent Hours
+      icon: '',
+      route: '/analytics/agency-department-spent-hours',
+    },
+    64: {
+      // Staffing Summary
+      icon: '',
+      route: '/analytics/staffing-summary',
+    },
+    65: {
+      // Predicted Contract Labor Spent
+      icon: '',
+      route: '/analytics/predicted-contract-labor-spent',
+    },
+    66: {
+      // Job Summary
+      icon: '',
+      route: '/analytics/job-summary',
+    },
+    67: {
+      // Event Log
+      icon: '',
+      route: '/analytics/event-log',
+    },
+    68: {
+      // Missing Kronos ID's
+      icon: '',
+      route: '/analytics/missing-kronos-ids',
+    },
+    69: {
+      // Benchmarking Rate By State
+      icon: '',
+      route: '/analytics/benchmarking-rate-by-state',
+    },
+    70: {
+      // Organization Invoice
+      icon: '',
+      route: '/analytics/organization-invoice',
+    },
+    71: {
+      // Job - Compliance
+      icon: '',
+      route: '/analytics/job-compliance',
+    },
+    72: {
+      // Job - Fill Ratio
+      icon: '',
+      route: '/analytics/job-fill-ratio',
+    },
+    73: {
+      // Job - Job Details
+      icon: '',
+      route: '/analytics/job-details',
+    },
+    74: {
+      // Job - Job Details Summary
+      icon: '',
+      route: '/analytics/credential-summary',
+    },
+    75: {
+      // Labor Utilization
+      icon: '',
+      route: '/analytics/labor-utilization',
+    },
+    76: {
+      // Message History
+      icon: '',
+      route: '/analytics/message-history',
+    },
+    78: {
+      // Overall Status
+      icon: '',
+      route: '/analytics/overall-status',
+    },
+    79: {
+      // Overtime
+      icon: '',
+      route: '/analytics/overtime',
+    },
     45: {
       // Alerts
       icon: 'alert-circle',
@@ -685,11 +850,6 @@ export const MENU_CONFIG: any = {
       // Alerts Template
       icon: '',
       route: '/alerts/alerts-template',
-    },
-    51: {
-      // VMS Invoice Report
-      icon: '',
-      route: '/analytics/vms-invoice-report',
     },
     81: {
       // Document Management

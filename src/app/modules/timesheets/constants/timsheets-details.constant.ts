@@ -9,7 +9,7 @@ import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { AttachmentsListComponent } from '@shared/components/attachments';
 import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
 import { BillRateCalculationType } from '@shared/models';
-import { InvoiceRecordState } from 'src/app/modules/timesheets/enums';
+import { InvoiceHistoricalSubmission, InvoiceRecordState } from 'src/app/modules/timesheets/enums';
 import { ActionsCellComponent } from '../components/cell-editors/actions-cell/actions-cell.component';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
 import { GridDateEditorComponent } from '../components/cell-editors/grid-date-editor/grid-date-editor.component';
@@ -367,6 +367,57 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     resizable: true,
     type: 'rightAligned',
     cellClass: ['common-cell', 'bold'],
+  },
+  {
+    field: 'dateOfAction',
+    headerName: 'Date of Action',
+    width: 200,
+    minWidth: 90,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: ['common-cell'],
+    valueFormatter: (data) => {
+      return data.value ? formatDate(data.value, 'MM/dd/yyyy HH:mm:ss', 'en-US', 'UTC') : '';
+    }
+  },
+  {
+    field: 'user',
+    headerName: 'User',
+    width: 200,
+    minWidth: 90,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: ['common-cell'],
+  },
+  {
+    field: 'submission',
+    headerName: 'Submission',
+    width: 140,
+    minWidth: 90,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: ['common-cell'],
+    valueFormatter: (data) => {
+      return InvoiceHistoricalSubmission[data.value];
+    }
+  },
+  {
+    field: 'location',
+    headerName: 'Location',
+    width: 120,
+    minWidth: 90,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: ['common-cell'],
+  },
+  {
+    field: 'costCenter',
+    headerName: 'Cost Center',
+    width: 140,
+    minWidth: 90,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: ['common-cell'],
   },
 ]);
 

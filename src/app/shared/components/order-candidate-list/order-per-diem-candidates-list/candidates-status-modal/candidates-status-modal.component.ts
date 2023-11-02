@@ -498,6 +498,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   }
 
   private setValueForm(orderCandidateJob: OrderCandidateJob): void {
+    if (!this.sideDialog.visible) {
+      return;
+    }
     this.getComments();
     this.form?.patchValue({
       jobId: `${orderCandidateJob.organizationPrefix}-${orderCandidateJob.orderPublicId}`,

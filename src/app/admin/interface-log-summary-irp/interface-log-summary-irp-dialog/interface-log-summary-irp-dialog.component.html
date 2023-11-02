@@ -12,7 +12,8 @@
       <section class="header-container">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title preview-title">Interface Log Summary IRP Details</h3>
+            <h3 class="e-card-title preview-title" *ngIf="selectedType == 0">Interface Log Summary IRP Details</h3>
+            <h3 class="e-card-title preview-title" *ngIf="selectedType != 0">{{getSelectedTypeName}} Records Details</h3>
           </div>
           <div class="e-card-content">
             <button
@@ -60,7 +61,7 @@
   <div *ngIf="hidePreviousDialog">
   <app-dialog-next-previous
   *ngIf="logDialogOptions$ | async as options"
-  [title]="'Interface Error'"
+  [title]="'Interface Records'"
   [options]="options"
   (nextEvent)="onNextPreviousLog(true)"
   (previousEvent)="onNextPreviousLog(false)"

@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil, take } from 'rxjs';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import {
   ExportAgencyList,
@@ -11,20 +13,24 @@ import {
   GetAgencyFilteringOptions,
   SaveAgency,
   SaveAgencySucceeded,
+  ConvertAgencyToMSP
 } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AgencyStatus, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { Agency, AgencyFilteringOptions, AgencyListFilters, AgencyPage } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { agencyListFilterColumns, agencyStatusMapper } from '@agency/agency-list/agency-list.constants';
+import { agencyListFilterColumns, agencyStatusMapper, MSPMenuOptions, MSPMenuType } from '@agency/agency-list/agency-list.constants';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
+import { UserState } from '../../store/user.state';
+import { BusinessUnitType } from '../../shared/enums/business-unit-type';
+
 
 @Component({
   selector: 'app-agency-list',
@@ -33,6 +39,14 @@ import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
 })
 export class AgencyListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
+  @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
+    convertAgencyToMSPFormGroup: FormGroup;
+
+  onScroll() {
+    if (this.trigger) {
+      this.trigger.closeMenu();
+    }
+  }
 
   public readonly statusEnum = AgencyStatus;
   public readonly statusMapper = agencyStatusMapper;
@@ -72,10 +86,16 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public filterColumns = agencyListFilterColumns;
   public agencyListFilterFormGroup: FormGroup;
   public filteredItems$ = new Subject<number>();
+  public menuOption: Record<string, ItemModel[]>;
+  public currentAgency: Agency;
 
   private filters: AgencyListFilters = {};
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
+  public agencyData = new Subject<Agency>();
+  public businessUnitType: BusinessUnitType;
+  public isBusinessUnitTypeMSP: boolean = false;
+  public isBusinessUnitTypeHallmark: boolean = false;
 
   @Select(AgencyState.agencies)
   agencies$: Observable<AgencyPage>;
@@ -99,11 +119,13 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   override ngOnInit(): void {
     super.ngOnInit();
     this.initAgencyListFilterFormGroup();
+    this.initMenuItems();
     this.updatePage();
     this.subscribeOnPageChanges();
     this.subscribeOnAgencyFilteringOptions();
     this.subscribeOnSuccessAgencyByPage();
     this.setFileName();
+    this.setBusinessUnitType();
   }
 
   ngOnDestroy(): void {
@@ -118,6 +140,16 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public dataBound(): void {
     this.contentLoadedHandler();
     this.grid.hideScroll();
+  }
+
+  public setBusinessUnitType(): void {
+    this.businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    if (this.businessUnitType == BusinessUnitType.Hallmark) {
+      this.isBusinessUnitTypeHallmark = true;
+    }
+    else if (this.businessUnitType == BusinessUnitType.MSP) {
+      this.isBusinessUnitTypeMSP = true;
+    }
   }
 
   public changeGridSize(page: number): void {
@@ -226,6 +258,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
       statuses: this.filters.statuses || [],
       cities: this.filters.cities || [],
       contacts: this.filters.contacts || [],
+      isMSPAgencies: this.filters.isMSPAgencies || null,
     });
     this.filteredItems = this.filterService.generateChips(this.agencyListFilterFormGroup, this.filterColumns);
     this.filteredItems$.next(this.filteredItems.length);
@@ -233,6 +266,48 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
 
   public override updatePage(): void {
     this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+  }
+
+  public menuOptionSelected(id: MSPMenuType, data: Agency): void {
+    switch (Number(id)) {
+      case MSPMenuType['Edit']:
+        this.onEdit(data);
+        break;
+      case MSPMenuType['Convert to MSP']:
+        this.currentAgency = data;
+        this.store.dispatch(new ShowSideDialog(true));
+        break;
+      case MSPMenuType['Unlink from MSP']:
+        /*to be implemented*/
+        break;
+      case MSPMenuType['View History']:
+        this.agencyData.next(data);
+        break;
+    }
+  }
+
+  public onConvertAgencyToMSPFormCancelClick(): void {
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  public onConvertAgencyToMSPFormSaveClick(): void {
+    var agencyId = this.currentAgency.agencyDetails.id ?? null;
+    var netSuiteId = this.currentAgency.netSuiteId ?? null;
+    var name = this.currentAgency.agencyDetails.name;
+    this.store.dispatch(new ConvertAgencyToMSP(agencyId, netSuiteId, name));
+    this.updatePage();
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  private initMenuItems(): void {
+    this.agencies$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (data?.items) {
+        data.items.forEach((item) => {
+          this.menuOption = MSPMenuOptions(item.isMsp ? item.isMsp : false);
+          item.menuItems = this.menuOption['mSPMenuOption'];
+        });
+      }
+    });
   }
 
   private getDefaultFileName(): string {
@@ -294,6 +369,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
       statuses: new FormControl([]),
       cities: new FormControl([]),
       contacts: new FormControl([]),
+      isMSPAgencies: new FormControl(false)
     });
   }
 }

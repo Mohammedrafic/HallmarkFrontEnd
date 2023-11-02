@@ -1,9 +1,6 @@
 .extension-grid {
   --ag-range-selection-border-color: transparent;
   ::ng-deep {
-    .extension-buttons {
-      border-left: 1px solid var(--grid-border-color);
-    }
     .ag-root-wrapper.ag-layout-normal {
       border-bottom-left-radius: 0 !important;
       border-bottom-right-radius: 0 !important;

@@ -40,6 +40,10 @@ html {
   height: 6px;
 }
 
+*::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
 *::-webkit-scrollbar-track {
   background-color: transparent;
 }
@@ -339,6 +343,10 @@ body {
       background: $sidebar-background !important;
     }
 
+    .comments-header .bootstrap .e-input-group.e-control-wrapper {
+      background: unset !important;
+    }
+
     .custom-chip,
     .candidates-additional-info .container-row,
     .search, .credentials-container,
@@ -434,7 +442,7 @@ body.light .header-item .e-menu-item.e-selected {
 }
 
 hr {
-  background-color: $secondary-dark-blue-45;
+  background-color: var(--separator);
   height: 1px;
   border: 0;
   margin: 12px 0;
@@ -624,7 +632,12 @@ body.dark .title, body.dark .contact-name {
 #Upcoming_exp_creds .app-widget-wrapper__header {
   padding: 0% 3%;
 }
-
+@media screen and (min-width: 0px) and (max-width: 810px)  {
+  .app-widget-wrapper__header h3{
+    font-size: 12px !important;
+  }
+}
+  
 #Upcoming_exp_creds .widget__type {
   padding: 0% 3%;
   color: #1a1b2e;
@@ -721,4 +734,8 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 .orderStatusSummaryReport .ag-body-viewport {
   max-height: calc( 60vh ) !important;
   overflow: auto;
+}
+
+.separator {
+  background-color: var(--separator) !important;
 }

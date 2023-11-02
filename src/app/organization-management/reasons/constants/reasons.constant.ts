@@ -60,6 +60,14 @@ export const UnavaliabilityGridConfig: ColDef[] = [
     cellRenderer: ToggleIconRendererComponent,
     ...commonCell,
   },
+  {
+    field: 'sendThroughIntegration',
+    headerName: 'Send Through Integration',
+    width: 280,
+    type: 'leftAligned',
+    cellRenderer: ToggleIconRendererComponent,
+    ...commonCell,
+  },
 ];
 
 export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
@@ -69,7 +77,7 @@ export const ReasonFormsTypeMap: ReasonsFormTypesMap = {
   3: ReasonFormType.ClosureReason,
   4: ReasonFormType.ManualInvoiceReason,
   5: ReasonFormType.Unavailability,
-  6: ReasonFormType.TerminatedReason,
+  6: ReasonFormType.InactivatedReason,
   7: ReasonFormType.InternalTransferReason,
   8: ReasonFormType.CategoryNoteReason,
   9: ReasonFormType.SourcingReason,
@@ -83,7 +91,7 @@ export const NewReasonsActionsMap = {
   [ReasonsNavigationTabs.Rejection]: ReasonActions.SaveRejectReasons,
   [ReasonsNavigationTabs.Requisition]: ReasonActions.SaveOrderRequisition,
   [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.SaveInternalTransferReasons,
-  [ReasonsNavigationTabs.Termination]: ReasonActions.SaveTerminationReasons,
+  [ReasonsNavigationTabs.Inactivation]: ReasonActions.SaveInactivationReasons,
   [ReasonsNavigationTabs.CategoryNote]: ReasonActions.SaveCategoryNoteReasons,
   [ReasonsNavigationTabs.SourcingReason]: ReasonActions.SaveSourcingReasons,
   [ReasonsNavigationTabs.RecruiterReason]: ReasonActions.SaveRecuriterReasons,
@@ -96,7 +104,7 @@ export const UpdateReasonsActionsMap = {
   [ReasonsNavigationTabs.Rejection]: ReasonActions.UpdateRejectReasons,
   [ReasonsNavigationTabs.Requisition]: ReasonActions.SaveOrderRequisition,
   [ReasonsNavigationTabs.InternalTransfer]: ReasonActions.UpdateInternalTransferReasons,
-  [ReasonsNavigationTabs.Termination]: ReasonActions.UpdateTerminationReasons,
+  [ReasonsNavigationTabs.Inactivation]: ReasonActions.UpdateInactivationReasons,
   [ReasonsNavigationTabs.CategoryNote]: ReasonActions.UpdateCategoryNoteReasons,
   [ReasonsNavigationTabs.SourcingReason]: ReasonActions.UpdateSourcingReasons,
   [ReasonsNavigationTabs.RecruiterReason]: ReasonActions.UpdateRecuriterReasons,
@@ -142,6 +150,12 @@ export const UnavailabilityDialogConfig: ReasonFormConfig[] = [
     required: false,
     fieldType: FieldType.Toggle,
   },
+  {
+    field: 'sendThroughIntegration',
+    title: 'Send Through Integration',
+    required: false,
+    fieldType: FieldType.Toggle,
+  },
 ];
 
 export const defaultDialogConfig: ReasonFormConfig[]  = [
@@ -178,13 +192,28 @@ export const InternalDialogConfig: ReasonFormConfig[]  = [
   },
 ];
 
-export const TerminatedDialogConfig: ReasonFormConfig[]  = [
+export const InactivatedDialogConfig: ReasonFormConfig[]  = [
   {
     field: 'reason',
     title: 'Reason',
     required: true,
     fieldType: FieldType.Input,
   },
+  {
+    field: 'defaultValue',
+    title: 'Default',
+    required: false,
+    fieldType: FieldType.Toggle,
+  },
+];
+
+export const SourcingDialogConfig: ReasonFormConfig[]  = [
+  {
+    field: 'reason',
+    title: 'Reason',
+    required: true,
+    fieldType: FieldType.Input,
+  }
 ];
 
 export const ManualInvoiceDialogConfig: ReasonFormConfig[]  = [
@@ -281,9 +310,9 @@ export const ReasonDialogConfig: ReasonFormConfigMap = {
   [ReasonFormType.ClosureReason]: closureDialogConfig,
   [ReasonFormType.CategoryNoteReason]: categoryNoteDialogConfig,
   [ReasonFormType.ManualInvoiceReason] : ManualInvoiceDialogConfig,
-  [ReasonFormType.TerminatedReason] : TerminatedDialogConfig,
+  [ReasonFormType.InactivatedReason] : InactivatedDialogConfig,
   [ReasonFormType.InternalTransferReason] : InternalDialogConfig,
-  [ReasonFormType.SourcingReason] : TerminatedDialogConfig,
-  [ReasonFormType.RecruiterReason] : TerminatedDialogConfig,
+  [ReasonFormType.SourcingReason] : SourcingDialogConfig,
+  [ReasonFormType.RecruiterReason] : SourcingDialogConfig,
   [ReasonFormType.CancelEmployeeReasons]: CancelEmployeeReasonDialogConfig
 };

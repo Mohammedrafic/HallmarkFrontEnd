@@ -42,17 +42,17 @@ import {
   RemoveInternalTransferReasons,
   UpdateInternalTransferReasons,
   UpdateInternalTransferReasonsSuccess,
-  GetTerminationReasons,
-  SaveTerminationReasons,
-  RemoveTerminationReasons,
-  UpdateTerminationReasons,
-  UpdateTerminationReasonsSuccess,
+  GetInactivationReasons,
+  SaveInactivationReasons,
+  RemoveInactivationReasons,
+  UpdateInactivationReasons,
+  UpdateInactivationReasonsSuccess,
   GetCategoryNoteReasons,
   SaveCategoryNoteReasons,
   RemoveCategoryNoteReasons,
   UpdateCategoryNoteReasons,
   UpdateCategoryNoteReasonsSuccess,
-  SaveTerminatedReasonError,
+  SaveInactivatedReasonError,
   UpdateInternalTransferReasonsError,
   UpdateCategoryNoteReasonsError,
   GetSourcingReasons,
@@ -105,7 +105,7 @@ export interface RejectReasonStateModel {
   unavailabilityReasons: PageOfCollections<UnavailabilityReasons> | null;
   cancelEmployeeReasons: PageOfCollections<CancelEmployeeReasons> | null;
   internalTransfer: RejectReasonPage | null;
-  terminationReasons: RejectReasonPage | null;
+  inactivationReasons: RejectReasonPage | null;
   souringReason: any | null;
   categoryNote: RejectReasonPage | null;
   recuriterReasonsPage: RecuriterReasonPage | null;
@@ -125,7 +125,7 @@ export interface RejectReasonStateModel {
     unavailabilityReasons: null,
     cancelEmployeeReasons: null,
     internalTransfer: null,
-    terminationReasons: null,
+    inactivationReasons: null,
     categoryNote: null,
     souringReason:  null,
     recuriterReasonsPage:null,
@@ -183,8 +183,8 @@ export class RejectReasonState {
   }
 
   @Selector()
-  static terminationReasons(state: RejectReasonStateModel) : RejectReasonPage | null {
-    return state.terminationReasons;
+  static inactivationReasons(state: RejectReasonStateModel) : RejectReasonPage | null {
+    return state.inactivationReasons;
   }
 
   @Selector()
@@ -704,16 +704,16 @@ export class RejectReasonState {
     );
   }
 
-  @Action(GetTerminationReasons)
-  GetTerminationReasons(
+  @Action(GetInactivationReasons)
+  GetInactivationReasons(
     { patchState }: StateContext<RejectReasonStateModel>,
-    { pageNumber, pageSize }: GetTerminationReasons
+    { pageNumber, pageSize }: GetInactivationReasons
   ): Observable<RejectReasonPage> {
     patchState({ isReasonLoading: true });
 
-    return this.rejectReasonService.getTerminationReason(pageNumber, pageSize).pipe(
+    return this.rejectReasonService.getInactivationReason(pageNumber, pageSize).pipe(
       tap((payload) => {
-        patchState({terminationReasons: payload});
+        patchState({inactivationReasons: payload});
         return payload;
       })
     );
@@ -722,7 +722,7 @@ export class RejectReasonState {
   @Action(GetSourcingReasons)
   GetSourcingReasons(
     { patchState }: StateContext<RejectReasonStateModel>,
-    {}: GetTerminationReasons
+    {}: GetInactivationReasons
   ): Observable<any> {
     patchState({ isReasonLoading: true });
 
@@ -733,52 +733,52 @@ export class RejectReasonState {
       })
     );
   }
-  @Action(SaveTerminationReasons)
-  SaveTerminationReasons(
+  @Action(SaveInactivationReasons)
+  SaveInactivationReasons(
     { dispatch}: StateContext<RejectReasonStateModel>,
-    { payload }: SaveTerminationReasons
+    { payload }: SaveInactivationReasons
   ): Observable<RejectReason | void> {
-    return this.rejectReasonService.saveTerminationReason(payload).pipe(
+    return this.rejectReasonService.saveInactivationReason(payload).pipe(
       tap(payload => {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-        dispatch(new UpdateTerminationReasonsSuccess());
+        dispatch(new UpdateInactivationReasonsSuccess());
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
-        dispatch(new SaveTerminatedReasonError());
+        dispatch(new SaveInactivatedReasonError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
 
-  @Action(RemoveTerminationReasons)
-  RemoveTerminationReasons(
+  @Action(RemoveInactivationReasons)
+  RemoveInactivationReasons(
     { dispatch }: StateContext<RejectReasonStateModel>,
-    { id }: RemoveTerminationReasons
+    { id }: RemoveInactivationReasons
   ): Observable<void> {
-    return this.rejectReasonService.removeTerminationReason(id).pipe(
+    return this.rejectReasonService.removeInactivationReason(id).pipe(
       tap(() => {
-        dispatch(new UpdateTerminationReasonsSuccess());
+        dispatch(new UpdateInactivationReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       }),
       catchError((error: HttpErrorResponse) => {
-        dispatch(new SaveTerminatedReasonError())
+        dispatch(new SaveInactivatedReasonError())
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );  }
 
-  @Action(UpdateTerminationReasons)
-  UpdateTerminationReasons(
+  @Action(UpdateInactivationReasons)
+  UpdateInactivationReasons(
     { dispatch }: StateContext<RejectReasonStateModel>,
-    { payload }: UpdateTerminationReasons
+    { payload }: UpdateInactivationReasons
   ): Observable<void> {
-    return this.rejectReasonService.updateTerminationReason(payload).pipe(
+    return this.rejectReasonService.updateInactivationReason(payload).pipe(
       tap(() => {
-        dispatch(new UpdateTerminationReasonsSuccess());
+        dispatch(new UpdateInactivationReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       }),
       catchError((error: HttpErrorResponse) => {
-        dispatch(new SaveTerminatedReasonError());
+        dispatch(new SaveInactivatedReasonError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );

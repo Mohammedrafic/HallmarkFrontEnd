@@ -154,3 +154,9 @@
   width: 16px;
   height: 16px;
 }
+
+::ng-deep {
+  body.dark .candidates-list .app-grid-pagination {
+    border-color: $grid-border-color;
+  }
+}

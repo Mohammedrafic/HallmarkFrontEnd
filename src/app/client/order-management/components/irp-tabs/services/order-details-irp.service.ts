@@ -1,18 +1,22 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { ONLY_NUMBER } from '@shared/constants';
+import { NUMBER_AND_TWO_DECIMAL, ONLY_NUMBER } from '@shared/constants';
 import { Duration } from '@shared/enums/durations';
 import { jobDistributionValidator } from '@client/order-management/components/irp-tabs/order-details/validators';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { Order } from '@shared/models/order-management.model';
-import { EditablePerDiemFields } from '@client/order-management/components/irp-tabs/order-details/constants';
+import {
+  EditablePerDiemFields,
+  SpecialProjectFieldsToValidation
+} from '@client/order-management/components/irp-tabs/order-details/constants';
 import { Router } from '@angular/router';
+import { OrderFormInput, OrderFormsConfig } from '@client/order-management/interfaces';
 
 @Injectable()
 export class OrderDetailsIrpService {
   constructor(private router: Router,private formBuilder: FormBuilder) {}
-  public isTemplate : boolean=false;    
+  public isTemplate : boolean=false;
   public createOrderTypeForm(): FormGroup {
     return this.formBuilder.group({
       orderType: [IrpOrderType.LongTermAssignment, Validators.required],
@@ -59,8 +63,10 @@ export class OrderDetailsIrpService {
       jobDistribution: [null, Validators.required],
       agencyId: [null],
       hourlyRate: [null],
+      distributeToVMS: [null,[Validators.pattern(NUMBER_AND_TWO_DECIMAL)]],
+      distributionDelay: [null],
     },{
-      validators: jobDistributionValidator('jobDistribution',this.isTemplate),
+      validators: jobDistributionValidator('jobDistribution','distributeToVMS','distributionDelay',this.isTemplate),
     });
   }
 
@@ -70,8 +76,10 @@ export class OrderDetailsIrpService {
       jobDistribution: [null, Validators.required ],
       agencyId: [null],
       billRate: [null],
+      distributeToVMS: [null,[Validators.pattern(NUMBER_AND_TWO_DECIMAL)]],
+      distributionDelay: [null],
     }, {
-        validators: jobDistributionValidator('jobDistribution',this.isTemplate),
+        validators: jobDistributionValidator('jobDistribution','distributeToVMS','distributionDelay',this.isTemplate),
     });
   }
 
@@ -152,6 +160,26 @@ export class OrderDetailsIrpService {
       EditablePerDiemFields.forEach((field: string) => {
         form.controls[field].disable();
       });
+    }
+  }
+
+  public updateSpecialProjectValidation(
+    config: OrderFormsConfig,
+    projectControls: Record<string, FormControl>,
+    projectSetting: boolean
+  ): void {
+    config.fields.filter((field: OrderFormInput) => {
+      return SpecialProjectFieldsToValidation.includes(field.field);
+    }).forEach((field: OrderFormInput) => {
+      field.required = projectSetting;
+    });
+
+    if (projectSetting) {
+      SpecialProjectFieldsToValidation.forEach((controlName: string) => {
+        projectControls[controlName].addValidators(Validators.required);
+      });
+
+      return;
     }
   }
 }

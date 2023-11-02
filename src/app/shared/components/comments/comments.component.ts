@@ -42,7 +42,6 @@ export class CommentsComponent {
   @Input() disabled = false;
   @Input() orderId: number;
   public commentData: Comment[] = [];
-  @Input() canVmsCreateOrders: boolean;
   @Output() commentSaveCheck = new EventEmitter<boolean>();
   @Input() set comments(value: Comment[]) {
     if (value?.length) {

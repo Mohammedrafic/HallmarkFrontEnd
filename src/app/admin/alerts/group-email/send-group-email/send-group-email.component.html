@@ -270,14 +270,20 @@
                              appValidateWithMessage
                              [fields]="userDataFields"
                              [dataSource]="userData"
-                             [selectAllText]='allOption'
-                             showSelectAll=true
-                             maximumSelectionLength="50000" >
+                             maximumSelectionLength="50000">
             </ejs-multiselect>
           </div>
         </div>
+        <div class="switch" *ngIf="isOrgCandidatesType || isAgencyCandidatesType || isEmployeeType" >
+          <ejs-switch
+            name="allCandidate"
+            [checked]="allCandidate"
+            (change)="allCandidateChange($event)"
+            label="All"
+          ></ejs-switch>
+          <label for="allCandidate" class="switch-text">All</label>
+        </div>
       </div>
-
       <div class="input-container bootstrap top-container">
         <label>To<span class="required">*</span></label>
         <div class="input-group">

@@ -81,6 +81,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isOrderOverlapped: boolean;
   @Input() order: Order;
   @Input() isCandidatePayRateVisible: boolean;
+  @Input() reloadOnUpdate = false;
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -369,6 +370,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       this.form.patchValue({ rejectReason: value });
       this.store.dispatch(new RejectCandidateJob(payload));
 
+      if (!this.reloadOnUpdate) {
+        this.closeDialog();
+      }
+      
       this.updateDetails.emit();
     }
   }
@@ -423,6 +428,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         takeUntil(this.unsubscribe$)
       ).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
+        this.closeDialog();
       });
       this.updateDetails.emit();
   }

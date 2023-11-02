@@ -62,8 +62,8 @@ export class CandidateProfileFormService {
         isContract: [false],
         holdStartDate: [null],
         holdEndDate: [null],
-        terminationDate: [null],
-        terminationReasonId: [null],
+        inactivationDate: [null],
+        inactivationReasonId: [null],
         contractStartDate: [null, [Validators.required]],
         contractEndDate: [null, [Validators.required]],
         address1: [null, [Validators.maxLength(100)]],
@@ -109,7 +109,7 @@ export class CandidateProfileFormService {
   }
 
   public removeValidators(): void {
-    const controls = ['holdStartDate', 'terminationDate', 'terminationReasonId'];
+    const controls = ['holdStartDate', 'inactivationDate', 'inactivationReasonId'];
 
     controls.forEach(() => {
       this.candidateForm.removeValidators(Validators.required);

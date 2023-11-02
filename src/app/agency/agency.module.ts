@@ -105,7 +105,10 @@ import { OrderReOrdersContainerModule } from '@shared/components/order-reorders-
 import { AgencySettingsModule } from './settings/agency-settings.module';
 import { EmployeeImportService } from '@client/candidates/services/employee-import.service';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
-
+import { MatMenuModule } from '@angular/material/menu';
+import { TextareaModule } from '../shared/components/form-controls/textarea/textarea.module';
+import { AgencyHistoryDetailsComponent } from './agency-list/agency-history-details/agency-history-details.component';
+import { AgGridModule } from '@ag-grid-community/angular';
 
 
 const sidebarIcons = {
@@ -162,6 +165,7 @@ const sidebarIcons = {
     OrderCandidatesComponent,
     AgencyOrderFiltersComponent,
     AgencyListFiltersComponent,
+    AgencyHistoryDetailsComponent,
 
     ElectronicFormComponent,
     ManualFormComponent,
@@ -205,6 +209,10 @@ const sidebarIcons = {
     TooltipContainerModule,
     ScrollToTopModule,
     AgencySettingsModule,
+    MatMenuModule,
+    TextareaModule,
+    AgGridModule,
+    GridPaginationModule,
 
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),

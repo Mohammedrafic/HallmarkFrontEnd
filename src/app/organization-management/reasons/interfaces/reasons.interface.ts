@@ -16,6 +16,7 @@ export interface UnavailabilityValue {
   calculateTowardsWeeklyHours: boolean;
   eligibleToBeScheduled: boolean;
   visibleForIRPCandidates: boolean;
+  sendThroughIntegration:boolean;
 }
 
 export interface CancelEmployeeReasonValue {
@@ -29,6 +30,12 @@ export interface CategoryNoteValue {
   isRedFlagCategory: boolean;
   categoryName : string;
   isRedFlag?: boolean;
+}
+
+export interface InactivatedValue {
+  id?: number | null;
+  reason: string;
+  defaultValue?: boolean;
 }
 
 
@@ -77,7 +84,7 @@ export interface ReasonFormConfigMap {
   [ReasonFormType.CategoryNoteReason] : ReasonFormConfig[];
   [ReasonFormType.InternalTransferReason] : ReasonFormConfig[];
   [ReasonFormType.ManualInvoiceReason] : ReasonFormConfig[];
-  [ReasonFormType.TerminatedReason] : ReasonFormConfig[];
+  [ReasonFormType.InactivatedReason] : ReasonFormConfig[];
   [ReasonFormType.SourcingReason] : ReasonFormConfig[];
   [ReasonFormType.RecruiterReason] : ReasonFormConfig[];
   [ReasonFormType.CancelEmployeeReasons]: ReasonFormConfig[];

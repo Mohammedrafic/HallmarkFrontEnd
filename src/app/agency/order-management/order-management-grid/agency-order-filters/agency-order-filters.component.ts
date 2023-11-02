@@ -1,5 +1,5 @@
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
@@ -37,6 +37,7 @@ enum RLDLevel {
   selector: 'app-agency-order-filters',
   templateUrl: './agency-order-filters.component.html',
   styleUrls: ['./agency-order-filters.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [MaskedDateTimeService],
 })
 export class AgencyOrderFiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
@@ -92,7 +93,12 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.form.get('departmentsIds') as AbstractControl;
   }
 
-  constructor(private store: Store, private actions$: Actions, private orderManagementAgencyService: OrderManagementAgencyService) {
+  constructor(
+    private store: Store, 
+    private actions$: Actions, 
+    private orderManagementAgencyService: OrderManagementAgencyService,
+    private cd: ChangeDetectorRef,
+  ) {
     super();
   }
 
@@ -122,6 +128,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         } else {
           this.store.dispatch(new GetOrganizationStructure(value));
         }
+        this.cd.detectChanges();
       })
     );
   }
@@ -137,6 +144,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           );
           this.filterColumns.locationIds.dataSource = sortByField(getLocationsFromRegions(regions), 'name');
         }
+        this.cd.detectChanges();
       })
     );
   }
@@ -152,6 +160,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           );
           this.filterColumns.departmentsIds.dataSource = sortByField(getDepartmentFromLocations(locations), 'name');
         }
+        this.cd.detectChanges();
       })
     );
   }
@@ -162,6 +171,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       tap(() => {
         const regions = this.store.selectSnapshot(OrderManagementState.gridFilterRegions);
         this.filterColumns.regionIds.dataSource = sortByField(regions, 'name');
+        this.cd.detectChanges();
       })
     );
   }
@@ -253,11 +263,15 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         this.filterColumns.poNumberIds.dataSource = poNumbers;
         this.filterColumns.shift.dataSource = this.shift;
         this.setDefaultFilter();
+        this.cd.detectChanges();
       });
   }
 
   private setDefaultFilter(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+    if (!this.activeTab) {
+      return;
+    }
     if (!selectedOrderAfterRedirect) {
       const statuses = this.filterColumns.orderStatuses.dataSource.filter((data:any) => data !== FilterOrderStatusText["Closed"]);
       this.form.get('orderStatuses')?.setValue(statuses);

@@ -1,5 +1,5 @@
 import { ImportResult } from '@shared/models/import.model';
-import { CandidateListExport, CandidateListRequest, CandidateListTableState } from '../types/candidate-list.model';
+import { CandidateListExport, CandidateListRequest, CandidateListTableState, InactivateEmployeeDto } from '../types/candidate-list.model';
 import { CandidateStatus } from '@shared/enums/status';
 import { EmployeeImportDto, EmployeeImportSaveResult, ImportedEmployee } from '@shared/models/imported-employee';
 
@@ -38,7 +38,7 @@ export class GetRegionList {
 
 export class DeleteIRPCandidate {
   static readonly type = '[candidate list] Delete IRP Candidate';
-  constructor(public id: number) {}
+  constructor(public readonly dto: InactivateEmployeeDto) {}
 
 }
 
@@ -107,4 +107,8 @@ export class SourceConfig{
 export class SaveEmployeeImportLogResult {
   static readonly type = '[candidate list] Save Employee Import Result';
   constructor(public payload:EmployeeImportSaveResult) {}
+}
+
+export class EmployeeInactivationSuccessful {
+  static readonly type = '[candidate list] Employee inactivation successful';
 }

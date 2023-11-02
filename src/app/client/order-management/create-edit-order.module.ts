@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule, CheckBoxModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
@@ -83,6 +83,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MultiDatePickerModule,
     ValidateDirectiveModule,
     DocumentUploaderModule,
+    SwitchModule,
   ],
   providers: [
     OrderDetailsIrpService,

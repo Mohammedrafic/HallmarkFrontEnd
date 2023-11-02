@@ -20,7 +20,6 @@ import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 import {
   JobDistributionIrpOnly,
   JobDistributionIrpVms,
-  TierInternal,
   TitleField,
 } from '@client/order-management/components/irp-tabs/order-details/constants';
 import { ButtonType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
@@ -48,15 +47,6 @@ export const getAgencyIdFiled = (config: OrderFormsConfig): OrderFormInput => {
     return control.field === 'agencyId';
   }) as OrderFormInput;
 };
-
-export const mapDepartmentStructure = (departments: Department[]): Department[] => {
-  return departments.map((department: Department) => ({
-    ...department,
-    id: department.departmentId,
-    name: department.departmentName,
-  }));
-};
-
 
 export const mapReasonsStructure = (reasons: RejectReason[]): RejectReason[] => {
   return reasons.map((reason: RejectReason) => ({
@@ -90,7 +80,7 @@ export const mapSpecialProjectStructure = (data: ProjectSpecialData): SpecialPro
 
 const mapSpecialProjectDataToCorrectFormat =
   <T extends {
-    includeInIRP: boolean; id: number;includeInVMS: boolean 
+    includeInIRP: boolean; id: number;includeInVMS: boolean
 }, U extends keyof T>(list: T[], key: U) => {
     return list.map((itm: T) => ({
       id: itm.id,
@@ -138,6 +128,18 @@ export const modifyJobDistribution = (selectedOrder: Order) => {
       index === selectedDistribution.jobDistributionValue?.indexOf(distribution)),
   };
 };
+export const getDistibutionDelayFiled = (config: OrderFormsConfig): OrderFormInput => {
+  return config?.fields.find((control: OrderFormInput) => {
+    return control.field === 'distributionDelay';
+  }) as OrderFormInput;
+};
+
+export const getDistibutionDelayValueFiled = (config: OrderFormsConfig): OrderFormInput => {
+  return config?.fields.find((control: OrderFormInput) => {
+    return control.field === 'distributeToVMS';
+  }) as OrderFormInput;
+};
+
 
 export const setDefaultPrimaryContact = (forms: FormGroup[]): void => {
   const isPrimarySelected = forms.map((currentForm: FormGroup) => {
@@ -155,12 +157,28 @@ export const mapperForContactDetail = (contactDetails: Department): ContactDetai
   mobilePhone: contactDetails.facilityPhoneNo,
 });
 
-export const getDataSourceForJobDistribution = (selectedSystem: SelectSystem, tieringLogicEnabled: boolean) => {
+export const getDataSourceForJobDistribution = (selectedSystem: SelectSystem, tieringLogicEnabled: boolean,isDistributionActivate?:boolean) => {
   if (selectedSystem.isIRP && selectedSystem.isVMS) {
     return JobDistributionIrpVms(tieringLogicEnabled);
   }
 
   return JobDistributionIrpOnly(tieringLogicEnabled);
+};
+
+export const viewDistributiondelay =
+  (value: boolean, selectedConfig: OrderFormsConfig): void => {
+  const distributionDelayConfigControl = getDistibutionDelayFiled(selectedConfig);
+  const distributionDelayValueControl = getDistibutionDelayValueFiled(selectedConfig);
+    distributionDelayConfigControl.show = value;
+    distributionDelayValueControl.show = value;
+};
+
+
+export const viewDistributiontoVMS = (value: boolean, selectedConfig: OrderFormsConfig): void => {
+  const distributionDelayConfigControl = getDistibutionDelayFiled(selectedConfig);
+  const distributionDelayValueControl = getDistibutionDelayValueFiled(selectedConfig);
+  distributionDelayValueControl.show = value;
+  distributionDelayConfigControl.show = value;
 };
 
 export const showHideFormAction = (config: OrderFormsArrayConfig, list: FormGroup[]): void => {

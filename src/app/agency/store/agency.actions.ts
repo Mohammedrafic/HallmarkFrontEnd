@@ -1,10 +1,25 @@
-import { Agency, AgencyListFilters } from 'src/app/shared/models/agency.model';
+import { Agency, AgencyAuditPayload, AgencyListFilters } from 'src/app/shared/models/agency.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { FormGroup } from '@angular/forms';
 
 export class SaveAgency {
   static readonly type = '[agency] Save Agency';
   constructor(public payload: Agency) {}
+}
+
+export class ConvertAgencyToMSP {
+  static readonly type = '[agency] Successfully converted Agency To MSP';
+  constructor(public agencyId: number | null, public netSuiteId: number | null, public name: string) { }
+}
+
+export class GetAgencyAuditHistory {
+  static readonly type = '[agency] Get Agency AuditHistory';
+  constructor(public payload: AgencyAuditPayload) { }
+}
+
+export class GetAgencyAuditHistoryDetailSucceeded {
+  static readonly type = '[agency] Get Agency Audit History Detail Succeeded';
+  constructor() { }
 }
 
 export class SaveAgencySucceeded {

@@ -218,13 +218,16 @@ ejs-textbox.e-control {
 }
 
 .job-distribution-wrapper {
-  width: 70%;
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 1fr;
   gap: 16px;
 }
-
+.input-container.toggle_field {
+  display: flex;
+  align-items: center;
+}
 .job-description-wrapper {
   display: grid;
   align-items: center;
@@ -372,6 +375,15 @@ ejs-textbox.e-control {
       @include description_responsive;
     }
   }
+  .e-switch-wrapper {
+    height: 14px !important;
+    width: 34px !important;
+  }
+
+  .e-switch-handle {
+    height: 20px !important;
+    width: 20px !important;
+  }
 }
 
 @media #{$max-tablet} {
@@ -466,7 +478,23 @@ ejs-textbox.e-control {
     width: 100%;
   }
 }
-
+.e-switch-wrapper {
+  height: 14px !important;
+  width: 34px !important;
+}
+.switch {
+  display: flex;
+  align-items: center;
+  color: darkblue;
+}
+.e-switch-handle {
+  height: 20px !important;
+  width: 20px !important;
+}
+.switch-text {
+  color: $secondary-dark-blue-30;
+  width: 120px !important;
+}
 @media #{$max-mobile} {
 
   .general-information-po-wrapper,
@@ -477,7 +505,7 @@ ejs-textbox.e-control {
   .job-description-wrapper {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 100%!important;
 
     .input-container,
     .checkbox-container {

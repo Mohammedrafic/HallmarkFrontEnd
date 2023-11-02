@@ -280,7 +280,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
     this.selectWorkCommitmentStartDate = this.setWorkCommitmentStartDate();
     this.minimumDate = this.setMinimumDate();
 
-    const terminationDate = this.candidateService.getTerminationDate();
+    const terminationDate = this.candidateService.getInactivationDate();
     if (terminationDate) {
       this.maximumDate = DateTimeHelper.setCurrentTimeZone(terminationDate);
     } else {

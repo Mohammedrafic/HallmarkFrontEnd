@@ -1,18 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { CandidateList, CandidateListFilters, CandidateListRequest, IRPCandidateList } from '../types/candidate-list.model';
+import { CandidateList, CandidateListFilters, CandidateListRequest, EmployeeInactivateData, InactivateEmployeeDto, IRPCandidateList } from '../types/candidate-list.model';
 import { AssignedSkillsByOrganization } from '../../../models/skill.model';
 import { CandidateStatus } from '../../../enums/status';
 import { ExportPayload } from '../../../models/export.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { sortBy } from '@shared/helpers/sort-array.helper';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { CredentialType } from '@shared/models/credential-type.model';
+import { CustomFormGroup } from '@core/interface';
 
 @Injectable()
 export class CandidateListService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private fb: FormBuilder,
+  ) {}
 
   /**
    * Get candidates by page number
@@ -43,8 +47,10 @@ export class CandidateListService {
    * Delete IRP candidate by id
    * @return list of IRP candidates
    */
-  public deleteIRPCandidate(id: number): Observable<void> {
-    return this.http.delete<void>(`/api/Employee/delete/${id}`);
+  public deleteIRPCandidate(dto: InactivateEmployeeDto): Observable<void> {
+    return this.http.delete<void>('/api/Employee/delete', {
+      body: dto,
+    });
   }
 
   /**
@@ -125,4 +131,12 @@ export class CandidateListService {
     });
   }
  
+  public createInactivateForm(): CustomFormGroup<EmployeeInactivateData> {
+    return this.fb.group({
+      inactivationDate: [null, Validators.required],
+      inactivationReasonId: [null, Validators.required],
+      createReplacement: [false],
+      hireDate: [null],
+    }) as CustomFormGroup<EmployeeInactivateData>;
+  }
 }

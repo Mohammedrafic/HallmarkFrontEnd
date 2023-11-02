@@ -161,6 +161,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public showEmployeeTab = true;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   private secondHasOpenedOnes = false;
+  activeSystems: OrderManagementIRPSystemId | null;
 
   public get isReOrder(): boolean {
     return !isNil(this.order?.reOrderFromId) && this.order?.reOrderFromId !== 0;
@@ -282,7 +283,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.showCloseButton = hasStatus || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate));
 
       if (this.chipList) {
-        const status = this.order.irpOrderMetadata?.statusText
+        const status = this.order.irpOrderMetadata?.statusText && this.activeSystem === OrderManagementIRPSystemId.IRP
           ? this.order.irpOrderMetadata.statusText
           : this.order.statusText;
 

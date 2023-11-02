@@ -1,5 +1,16 @@
 <app-grid
+  *ngIf="activeSystems !== OrderManagementIRPSystem.IRP"
   [columnDefinitions]="columnDefinitions"
+  [rowData]="data"
+  [totalRecordsCount]="data?.length"
+  [adjustColumnsWidth]="true"
+  gridTitle="Extensions"
+  class="extension-grid"
+></app-grid>
+
+<app-grid
+  *ngIf="activeSystems === OrderManagementIRPSystem.IRP"
+  [columnDefinitions]="columnDefinitionsforIRP"
   [rowData]="data"
   [totalRecordsCount]="data?.length"
   [adjustColumnsWidth]="true"

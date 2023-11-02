@@ -172,15 +172,15 @@ export const EmployeesColumnsConfig: ColDef[] = [
         cellRenderer: GridErroredCellComponent,
       },
       {
-        field: 'terminationDate',
+        field: 'inactivationDate',
         width: 70,
-        headerName: 'Termination Date',
+        headerName: 'Inactivation Date',
         cellRenderer: GridErroredCellComponent,
       },
       {
-        field: 'terminationReason',
+        field: 'inactivationReason',
         width: 70,
-        headerName: 'Termination Reason',
+        headerName: 'Inactivation Reason',
         cellRenderer: GridErroredCellComponent,
       },
       // {
@@ -364,15 +364,15 @@ export const EmployeesColumnsConfig: ColDef[] = [
         cellRenderer: GridErroredCellComponent,
       },
       {
-        field: 'terminationDate',
+        field: 'inactivationDate',
         width: 70,
-        headerName: 'Termination Date',
+        headerName: 'Inactivation Date',
         cellRenderer: GridErroredCellComponent,
       },
       {
-        field: 'terminationReason',
+        field: 'inactivationReason',
         width: 70,
-        headerName: 'Termination Reason',
+        headerName: 'Inactivation Reason',
         cellRenderer: GridErroredCellComponent,
       },
       // {

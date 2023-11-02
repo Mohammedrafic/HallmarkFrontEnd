@@ -3,7 +3,7 @@
 
 .app-grid-pagination {
   background-color: var(--pagination-background);
-  border: 1px solid var(--grid-row-border);
+  border: 1px solid var(--grid-header-border) !important;
   padding: 5px 0 5px 16px;
   border-bottom-left-radius: var(--grid-border-radius);
   border-bottom-right-radius: var(--grid-border-radius);

@@ -135,8 +135,8 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
       this.selectedTab = ReasonsNavigationTabs.ManualInvoice;
     } else if(selectedTab.selectedItem.innerText === "Unavailability"){
       this.selectedTab = ReasonsNavigationTabs.Unavailability;
-    } else if(selectedTab.selectedItem.innerText === "Terminated Reason"){
-      this.selectedTab = ReasonsNavigationTabs.Termination;
+    } else if(selectedTab.selectedItem.innerText === "Inactivation Reason"){
+      this.selectedTab = ReasonsNavigationTabs.Inactivation;
     } else if(selectedTab.selectedItem.innerText === "Internal Transfer/Recruitment"){
       this.selectedTab = ReasonsNavigationTabs.InternalTransfer;
     } else if(selectedTab.selectedItem.innerText === "Category Note"){
@@ -233,6 +233,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         calculateTowardsWeeklyHours: !!reason.calculateTowardsWeeklyHours,
         eligibleToBeScheduled: !!reason.eligibleToBeScheduled,
         visibleForIRPCandidates: !!reason.visibleForIRPCandidates,
+        sendThroughIntegration : !!reason.sendThroughIntegration
       });
     } else if (this.selectedTab === ReasonsNavigationTabs.CancelEmployeeReasons) {
       const reason  = data as CancelEmployeeReasonValue;
@@ -287,6 +288,13 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         agencyFeeApplicable: !!reason.agencyFeeApplicable,
         agencyFeeApplicableSwitch: reason.agencyFeeApplicable === false ? false : true,
       });
+    } else if((this.selectedTab === ReasonsNavigationTabs.Inactivation)) {
+      const reason  = data as RejectReason;
+      this.reasonForm.patchValue({
+        id: (data as RejectReason).id,
+        reason: reason.reason,
+        defaultValue : reason.defaultValue
+        });
     } else {
       this.reasonForm.patchValue({
         id: (data as RejectReason).id,
@@ -369,7 +377,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit{
         ReasonActions.UpdateManualInvoiceRejectReasonSuccess,
         ReasonActions.UpdateOrderRequisitionSuccess,
         ReasonActions.UpdateInternalTransferReasonsSuccess,
-        ReasonActions.UpdateTerminationReasonsSuccess,
+        ReasonActions.UpdateInactivationReasonsSuccess,
         ReasonActions.UpdateCategoryNoteReasonsSuccess,
         ReasonActions.SavePenaltySuccess,
         ReasonActions.SaveCancelEmployeeReason,

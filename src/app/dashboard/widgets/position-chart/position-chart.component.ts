@@ -7,6 +7,9 @@ import { DashboardService } from '../../services/dashboard.service';
 import { GlobalWindow } from '@core/tokens';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { DASHBOARD_FILTER_STATE } from '@shared/constants';
+import { PositionTrendTypeEnum } from '../../enums/position-trend-type.enum';
+import { OrderStatus } from '@shared/enums/order-management';
+import { CandidatStatus, InProgress } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-position-chart',
@@ -61,6 +64,34 @@ export class PositionChartComponent {
       } else {
         this.dashboardService.redirectToUrl('client/order-management/', this.chartData === undefined ? 0 : this.chartData.orderStatus);
       }
+    }
+  }
+
+  public navigateToUrl(event: MouseEvent,status:string){
+    let candidatesStatusDataSet:any = []
+    let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
+    let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
+    if (filteredList.length > 0) {
+      let organizations = filteredList.filter((ele: any) => ele.column == "organizationIds").sort((a: any, b: any) => a.value - b.value);
+      if (organizations.length > 0 && organizations[0].value != lastSelectedOrganizationId) {
+        this.store.dispatch(
+          new SetLastSelectedOrganizationAgencyId({
+            lastSelectedAgencyId: null,
+            lastSelectedOrganizationId: organizations[0].value
+          })
+        );
+      }
+    }
+    if(status == PositionTrendTypeEnum.OPEN){
+      window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true))
+      this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
+    } else if (status == InProgress.IN_PROGRESS) {
+      candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
+      candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
+      candidatesStatusDataSet.push({"value":CandidatStatus.CustomStatus});
+      window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+      window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true))
+      this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.InProgress]);
     }
   }
 }

@@ -4,6 +4,7 @@ import {
   PaymentDetails,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
 import { AgencyStatus, FilterOrderStatusText } from "@shared/enums/status";
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 export type Agency = {
   isMsp?: boolean,
@@ -17,6 +18,7 @@ export type Agency = {
   agencyJobDistribution: AgencyRegionSkills;
   contactPerson?: string;
   netSuiteId?: number;
+  menuItems?: ItemModel[]; // use only in UI for context menu datasource
 };
 
 export type AgencyCreateUnder = {
@@ -37,7 +39,7 @@ export type AgencyDetails = {
   state: string;
   country: number;
   city: string;
-  zipCode: string;
+  zipcode: string;
   phone1Ext: string;
   phone2Ext: string;
   fax: string;
@@ -54,7 +56,7 @@ export type AgencyBillingDetails = {
   country: number;
   state: string;
   city: string;
-  zipCode: string;
+  zipcode: string;
   phone1: string;
   phone2: string;
   ext: string;
@@ -122,6 +124,7 @@ export type AgencyListFilters = {
   statuses?: string[];
   cities?: string[];
   contacts?: string[];
+  isMSPAgencies?: boolean;
 };
 
 export class AgencyFilteringOptions {
@@ -150,4 +153,31 @@ export interface AgencyConfig {
   isHallmarkUser: boolean;
   agencyIsMsp: boolean;
   isEditMode: boolean;
+}
+
+export interface AgencyAuditHistory {
+  changeType: string;
+  modifiedOn: string;
+  modifiedBy: string;
+  businessUnitId: number;
+  businessUnitType: number;
+  businessUnitName: string;
+  parentUnitId: number;
+  logoId: string;
+  businessUnitCreatedAt: string;
+  businessUnitCreatedBy: string;
+  businessUnitLastModifiedAt: string;
+  businessUnitLastModifiedBy: string;
+  dbConnectionName: string;
+  organizationPrefix: string;
+  netSuiteId: string;
+  isIRPEnabled: boolean;
+  isVMSEnabled: boolean;
+  netSuiteEnabled: boolean;
+  isMspSource: boolean;
+}
+
+export interface AgencyAuditPayload {
+  entityTypeName: string;
+  searchValue: string;
 }

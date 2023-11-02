@@ -77,6 +77,8 @@ import { Configuration } from '@shared/models/organization-settings.model';
 import { Location } from "@shared/models/location.model"
 import { GetRejectReasonsForOrganisation } from '@client/store/order-managment-content.actions';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
+import { OrderStatus } from '@shared/enums/order-management';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -92,6 +94,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   @Input() set orderDetails(orderDetails : Order) {
     if(orderDetails){
+      this.orderDetailsData = orderDetails;
       this.getOrderDetails(orderDetails);
       this.getLocationDetails(orderDetails);
     }
@@ -138,6 +141,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   public isTurnedOn : boolean;
   public payrateData: Configuration[];
   public RegionDetails: Location[];
+  public readonly profileStatus = ProfileStatusesEnum;
 
   //Calculation Variables
   public AtpCalcForm: FormGroup;
@@ -174,6 +178,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   private candidateDetails: CandidateDetails;
   private actualStartDateSubscription: Subscription | null;
   private offeredDateSubscription: Subscription | null;
+  private orderDetailsData: Order;
 
   constructor(
     private editIrpCandidateService: EditIrpCandidateService,
@@ -472,6 +477,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     });
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private getCandidateDetails(): void {
     this.orderCandidateApiService.getIrpCandidateDetails(
       this.candidateModelState.order.id, this.candidateModelState.candidate.candidateProfileId,this.isIRPLTAOrder)
@@ -595,14 +601,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       UpdateVisibilityConfigFields(this.dialogConfig, fieldsToShow);
 
       this.candidateForm.patchValue({
-        ...this.candidateDetails,
+        ...this.candidateDetails, 
         status: CandidatStatus.Rejected,
-        rejectedReason: this.candidateDetails.rejectionReasonId
+        rejectedReason: this.candidateDetails.rejectionReasonId,
       }, { emitEvent: false, onlySelf: true });
 
-
-      this.disableSaveButton = true;
-      DisableControls(fieldsToShow, this.candidateForm);
+      const enableStatusControl = this.orderDetailsData.orderType === OrderType.LongTermAssignment
+      && this.candidateModelState.candidate.profileStatus !== this.profileStatus.OnHold
+      && this.orderDetailsData.status !== OrderStatus.Filled && this.orderDetailsData.status !== OrderStatus.Cancelled;
+      this.disableSaveButton = !enableStatusControl;
+      DisableControls(fieldsToShow, this.candidateForm, enableStatusControl);
     }
   }
 
@@ -768,14 +776,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       const fieldsToShow = isCandidateCancelled ? [...OnboardConfigFieldsToShow, CancelReasonField] : OnboardConfigFieldsToShow;
 
       UpdateVisibilityConfigFields(this.dialogConfig, fieldsToShow);
-      DisableControls(OfferedDates, this.candidateForm);
+      DisableControls(OfferedDates, this.candidateForm, false);
 
       return;
     }
 
     if (status === CandidatStatus.Accepted) {
       UpdateVisibilityConfigFields(this.dialogConfig, AcceptConfigFieldsToShow);
-      DisableControls(OfferedDates, this.candidateForm);
+      DisableControls(OfferedDates, this.candidateForm, false);
       return;
     }
 

@@ -15,16 +15,15 @@
     <ng-template #orders_pending_custom_status>
         <section class="m-0">
           <header class="tableHeader">
-            <div class="col w-50">
+            <div class="col w-30">
               <div class="middle-col-header pos-center">
                 <div class="row middle-cell"><span class="customStatus"></span></div>
                 <div class="row flex-container">
-                  
-                  <div class="orderStatus"><span class="customStatus ">ORDER STATUS</span></div>
+                  <div class="orderStatus"><span class="customStatus">ORDER STATUS</span></div>
                 </div>
               </div>
             </div>
-            <div class="col w-50">
+            <div class="col w-30">
               <div class="middle-col-header pos-center">
                 <div class="row middle-cell"><span class="customStatus">INITIAL</span></div>
                 <div class="row flex-container">
@@ -33,7 +32,7 @@
                 </div>
               </div>
             </div>
-            <div class="col w-50">
+            <div class="col w-30">
               <div class="middle-col-header pos-center">
                 <div class="row middle-cell"><span class="customStatus">EXTENSION</span></div>
                 <div class="row flex-container">
@@ -45,7 +44,11 @@
           </header>
           <div class="table-section">
          <div class="row" *ngFor="let data of chartData?.chartData">
-            <div class="col">{{data.customStatus}}</div>
+            <div class="col">
+              <div class="status">
+                <span title="{{data.customStatus}}">{{data.customStatus}}</span>
+              </div>
+            </div>
             <div  class="col">
               <div class="middle-col">
                 <div class="row flex-container">

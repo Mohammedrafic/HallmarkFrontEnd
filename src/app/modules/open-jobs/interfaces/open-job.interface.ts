@@ -1,9 +1,11 @@
 import { ValueType } from '@syncfusion/ej2-angular-grids';
+import { Observable } from 'rxjs';
 
 import { OrderJobType } from '@shared/enums';
 import { FieldType } from '@core/enums';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { DropdownOption } from '@core/interface';
+import { EmployeeAction } from '../enums';
 
 export interface PageSettings {
   pageNumber: number;
@@ -72,11 +74,6 @@ export interface UpdateLtaEmployeeDTO {
   employeeTime?: string | null;
 }
 
-export interface EmployeeScheduledDays {
-  employeeId: number | string;
-  dates: string[];
-}
-
 export interface PerDiemEmployeeDto {
   orderId: number;
   employeeTime?: string | null;
@@ -85,4 +82,20 @@ export interface PerDiemEmployeeDto {
 export interface WithdrawPerDiemEmployeeDto {
   orderId: number;
   employeeTime?: string | null;
+}
+
+export interface RejectEmployeeDto {
+  organizationId: number | string;
+  employeeId: number;
+}
+
+export interface EmployeeButton {
+  title: string;
+  type: EmployeeAction;
+  cssClass: string
+}
+
+export interface EmployeeServiceMethods {
+  acceptEmployee(): Observable<void | Error>;
+  rejectEmployee(): Observable<void | Error>;
 }

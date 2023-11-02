@@ -172,7 +172,10 @@ export interface SelectedStructureState {
   skillId: number | null;
 }
 
-
+export interface SelectedDistributionState {
+  distributeToVMS: boolean | null;
+  distributionDelay: number | null;
+}
 export interface JobDistributionOption {
   id: IrpOrderJobDistribution;
   name: string;

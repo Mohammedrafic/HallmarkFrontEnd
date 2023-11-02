@@ -19,19 +19,7 @@
       <ng-template #content>
         <!-- General info step -->
         <form [formGroup]="agencyForm" id="agencyFormFirstStep">
-          <div class="dropdown-container bootstrap create-under" *ngIf="createUnderAvailable && !agencyConfig.isEditMode">
-            <label>Create Under<span class="required">*</span></label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist
-                appValidateWithMessage
-                formControlName="parentBusinessUnitId"
-                [fields]="createUnderFields"
-                [allowFiltering]="true"
-                [dataSource]="businessUnits$ | async"
-              ></ejs-dropdownlist>
-            </div>
-          </div>
-
+          
           <section class="general-info-container">
             <div class="left">
               <div class="e-card">
@@ -51,8 +39,8 @@
                 <div class="e-card-content">
                   <app-general-info-group
                     [agencyConfig]="agencyConfig"
-                    [formGroup]="$any(agencyControl)"
-                    (mspCheckboxEmitter)="onMspCheckboxChecked($event)"></app-general-info-group>
+                    [formGroup]="$any(agencyControl)">
+                  </app-general-info-group>
 
                   <div class="e-card-title-wrapper">
                     <div class="e-card-title">Job Distribution</div>

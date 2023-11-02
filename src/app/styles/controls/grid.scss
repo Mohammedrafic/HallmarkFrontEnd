@@ -97,6 +97,10 @@ body.dark {
           background-color: $secondary-dark-blue-45;
         }
 
+        .e-emptyrow {
+          background-color: $secondary-dark-blue-45;
+        }
+
         .e-virtualtrack {
           height: 0 !important;
         }
@@ -625,6 +629,12 @@ body.dark {
     }
 
     .e-gridcontent {
+      .e-content {
+          &:has(.e-table>tbody>.e-emptyrow) {
+            background-color: $alert-side-bar-bgcolor;
+          }
+      }
+
       .e-table {
         .e-emptyrow {
           background-color: $sidebar-background !important;

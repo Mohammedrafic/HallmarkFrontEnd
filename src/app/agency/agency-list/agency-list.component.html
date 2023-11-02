@@ -24,7 +24,7 @@
     <app-tooltip-container
       [message]="toolTipMessage"
       [showToolTip]="!userPermission[userPermissions.CanCreateDeleteAgency]">
-      <button ejs-button appHideBeforeSyncfusionLoad [disabled]="!userPermission[userPermissions.CanCreateDeleteAgency]" [isPrimary]="true" (click)="navigateToAgencyForm()">Add Agency</button>
+      <button ejs-button appHideBeforeSyncfusionLoad *ngIf="!isBusinessUnitTypeMSP" [disabled]="!userPermission[userPermissions.CanCreateDeleteAgency]" [isPrimary]="true" (click)="navigateToAgencyForm()">Add Agency</button>
     </app-tooltip-container>
   </ng-container>
 </app-page-toolbar>
@@ -47,19 +47,29 @@
     >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      <e-column textAlign="Right" width="100">
+      <e-column textAlign="Right" width="130">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button
-              ejs-button
-              cssClass="e-flat secondary-icon-button inactive-btn"
-              [disabled]="data.agencyDetails.status === statusEnum.Inactive || !userPermission[userPermissions.CanEditAgencyProfile]"
-              (click)="onRemove(data)"
-            >
+            <button ejs-button
+                    cssClass="e-flat secondary-icon-button inactive-btn"
+                    [disabled]="data.agencyDetails.status === statusEnum.Inactive || !userPermission[userPermissions.CanEditAgencyProfile]"
+                    (click)="onRemove(data)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button
+                    *ngIf="isBusinessUnitTypeHallmark"
+                    [matMenuTriggerFor]="menu"
+                    (click)="$event.stopPropagation()"
+                    [disabled]="false"
+                    [matMenuTriggerData]="{
+                      data: data,
+                      items: data.menuItems
+                    }"
+                    cssClass="e-flat primary-icon-button">
+              <span><i-feather name="more-vertical" class="icon"></i-feather></span>
             </button>
           </div>
         </ng-template>
@@ -112,8 +122,41 @@
     (pageSizeChangeEmitter)="changeGridSize($event)"
   ></app-grid-pagination>
 </section>
-
+<mat-menu #menu="matMenu">
+  <ng-template matMenuContent let-items="items" let-data="data">
+    <button mat-menu-item
+            *ngFor="let item of items"
+            [disabled]="item.disabled"
+            (click)="menuOptionSelected(item.id, data)">
+      {{ item.text }}
+    </button>
+  </ng-template>
+</mat-menu>
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
+<app-side-dialog [disableSaveButton]="!userPermission[userPermissions.CanCreateMSP]"
+                 (formCancelClicked)="onConvertAgencyToMSPFormCancelClick()"
+                 (formSaveClicked)="onConvertAgencyToMSPFormSaveClick()"
+                 [header]="'Convert To MSP'"
+                 [width]="'523px'">
+  <form class="form-container" id="convertAgencyToMSPForm" [formGroup]="convertAgencyToMSPFormGroup">
+    <div class="msp-text-box">
+      <h2 class="msp-note-text">NOTE:</h2>
+      This action will convert the current Agency to MSP.
+      <br />
+      <br />
+      The User for this MSP will need to be created again. The existing users of the Agency can also be converted to MSP User from User Management Screen by changing their Business Unit Type from Agency to MSP.
+      <br />
+      <br />
+      Note that the same users can not be part of both Agency and MSP.
+      <br />
+      <br />
+    </div>
+    <div class="msp-button-container">
+      <button ejs-button [isPrimary]="true" [disabled]="!userPermission[userPermissions.CanCreateMSP]" (click)="onConvertAgencyToMSPFormSaveClick()" [formGroup]="convertAgencyToMSPFormGroup">Convert To MSP</button>
+    </div>
+  </form>
+</app-side-dialog>
 
 <app-filter-dialog
   [items]="filteredItems"
@@ -127,3 +170,5 @@
 </app-filter-dialog>
 
 <app-scroll-to-top></app-scroll-to-top>
+
+<app-agency-history-details [agencyHD]="agencyData"></app-agency-history-details>

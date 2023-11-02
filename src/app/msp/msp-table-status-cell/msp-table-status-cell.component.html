@@ -1,0 +1,8 @@
+<div *ngIf="cellValue" class="status-cell">
+    <ejs-chiplist>
+      <e-chips>
+        <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>
+      </e-chips>
+    </ejs-chiplist>
+  </div>
+  

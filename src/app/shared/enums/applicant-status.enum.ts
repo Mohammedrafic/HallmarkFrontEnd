@@ -42,3 +42,7 @@ export enum ConfigurationValues {
   Accept = "Accept",
   Apply = "Apply"
 }
+
+export enum InProgress{
+  IN_PROGRESS = 'In progress'
+}

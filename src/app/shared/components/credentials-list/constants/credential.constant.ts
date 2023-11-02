@@ -63,6 +63,11 @@ export const FiltersColumns: FilterColumnsModel = {
     valueType: ValueType.Text,
     checkBoxTitle: 'Expiry Date Applicable',
   },
+  isPublic: {
+    type: ControlTypes.Checkbox,
+    valueType: ValueType.Text,
+    checkBoxTitle: 'Is Public',
+  },
 };
 export const FilterColumnsIncludeIRP: FilterColumnsModel = {
   includeInIRP: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'IRP'},

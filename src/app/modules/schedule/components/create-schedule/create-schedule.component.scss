@@ -164,9 +164,7 @@ app-schedule-open-positions {
 
 .input-container .input-group.input-readonly {
   .e-input[readonly] {
-    background-color: $secondary-dark-blue-50;
-    color: $secondary-dark-blue-30;
-    border: 1px solid $secondary-dark-blue-40 !important;
+    @include readonlyInput;
   }
 }
 

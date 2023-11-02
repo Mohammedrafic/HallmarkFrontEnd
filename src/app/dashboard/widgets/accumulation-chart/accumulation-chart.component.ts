@@ -73,7 +73,7 @@ export class AccumulationChartComponent
 
   }
 
-  public redirectToSourceContent(status: string): void {
+  public redirectToSourceContent(status: WidgetLegengDataModel): void {
     let candidatesStatusDataSet:any = []
     let activeOrderStatus:any = []
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
@@ -90,34 +90,40 @@ export class AccumulationChartComponent
       }
     }
     const user = this.store.selectSnapshot(UserState.user);
-    if (this.chartData?.title == "Active Positions") {
+    if (this.chartData?.title == "Active Positions" || this.chartData?.title == ' Average Days of Active Positions with Custom Workflow') {
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {
         window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
-        if(OrderStatus[OrderStatus.Open] ===  status){
+        if(OrderStatus[OrderStatus.Open] ===  status.label){
           this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.OrdersOpenPositions]);
         }
-        else if(status === PositionTrendTypeEnum.IN_PROGRESS){
+        else if(status.label === PositionTrendTypeEnum.IN_PROGRESS){
           candidatesStatusDataSet.push({"value":CandidatStatus.Applied});
           candidatesStatusDataSet.push({"value":CandidatStatus.Shortlisted});
-          candidatesStatusDataSet.push({"value":CandidatStatus.CustomStatus});
+          if(this.chartData?.title == 'Active Positions'){
+            candidatesStatusDataSet.push({"value":CandidatStatus.CustomStatus});
+          }
         }
-        else if(status === 'In Progress (Pending)'){
+        else if(status.label === 'In Progress (Pending)'){
           candidatesStatusDataSet.push({"value":CandidatStatus.Offered});
         }
-        else if(status === 'In Progress (Accepted)'){
+        else if(status.label === 'In Progress (Accepted)'){
           candidatesStatusDataSet.push({"value":CandidatStatus.Accepted});
         }
-        else if(OrderStatus[OrderStatus.Filled] === status){
+        else if(OrderStatus[OrderStatus.Filled] === status.label){
           candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
           activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
           window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(activeOrderStatus));
         }
+        else{
+          activeOrderStatus.push({ value: OrderStatus.InProgress, name: PositionTrendTypeEnum.IN_PROGRESS });
+          window.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(activeOrderStatus));
+        }
       }
-      if(status !=  OrderStatus[OrderStatus.Open]){
+      if(status.label !=  OrderStatus[OrderStatus.Open]){
         window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
-        this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
+        this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, candidatesStatusDataSet.length > 0 ? status.label : undefined,status.customStatus);
       }
     }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status" ||  this.chartData?.title==="Average Days for Active Candidates in a Status"){
         let candidatesDataset:any = [];
@@ -137,7 +143,7 @@ export class AccumulationChartComponent
           }); 
         }        
 
-        let candidatesChartInfo = candidatesDataset.find((ele:any)=>ele.status == status);
+        let candidatesChartInfo = candidatesDataset.find((ele:any)=>ele.status == status.label);
         candidatesOrderDataSet.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
         if(candidatesChartInfo?.applicantStatus === OrderStatus.Onboard){
           candidatesOrderDataSet.push({"value":OrderStatus.Filled, "name": PositionTrendTypeEnum.FILLED});

@@ -22,13 +22,13 @@
         <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
-        <div class="column last-column">
+        <div class="column last-column" *ngIf="activeSystems !== systemType.IRP">
           <ng-container [ngTemplateOutlet]="billRate"></ng-container>
         </div>
         <ng-container [ngTemplateOutlet]="region"></ng-container>
         <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
-        <div class="column last-column second-row" *ngIf="regularRates.regularLocal && regularRates.regular && system !== systemType.IRP">
+        <div class="column last-column second-row" *ngIf="regularRates.regularLocal && regularRates.regular && activeSystems !== systemType.IRP">
           <div class="cost">${{ regularRates.regularLocal | number: '1.2-2' }}</div>
           <div class="sup-title">Regular Local Bill Rate</div>
         </div>
@@ -67,7 +67,7 @@
         </div>
         <div class="sup-title">Start / End Bonus</div>
       </div>
-      <div class="column">
+      <div class="column" *ngIf="activeSystems !== systemType.IRP">
         <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
@@ -137,6 +137,12 @@
   </section>
   <section class="candidates-additional-info" *ngIf="orderInformation">
     <div class="container-row justify-content-space-between">
+      <div class="column">
+        <div class="title accent positions">
+          {{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}
+        </div>
+        <div class="sup-title">Open Positions</div>
+      </div>
       <div class="column">
         <div class="title">{{ orderInformation.onCallRequired | boolValueToText }}</div>
         <div class="sup-title">On-Call</div>
@@ -320,13 +326,13 @@
 <ng-template #orderInfo>
   <div class="column links" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension || orderInformation.hasParentExtension">
     <div class="column link-wrapper" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
-      <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
+      <div *ngIf="orderInformation?.extensionInitialOrderId && activeSystems !== systemType.IRP" class="accent link" (click)="moveToInitialOrder()">
         Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionInitialOrderPublicId }}
       </div>
       <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
         Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
       </div>
-    </div>      
+    </div>
   </div>
 </ng-template>
 

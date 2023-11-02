@@ -198,7 +198,8 @@ export class PendingInvoiceRowDetailsGridHelper {
             columnDefs: PendingInvoiceRowDetailsGridHelper.getRowDetailsColumnDefinitions(timesheetType, config),
           },
           getDetailRowData: (params: GetDetailRowDataParams) => params.successCallback(
-            (params.data as PendingInvoice).invoiceRecords,
+            (params.data as PendingInvoice).invoiceRecords.map((rec) => ({ ...rec, timesheetType: timesheetType,
+              parentId: params.data.id  })),
           ),
         };
       },

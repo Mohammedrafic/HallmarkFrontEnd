@@ -24,8 +24,6 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
   @Input() public agencyConfig: AgencyConfig;
 
-  @Output() private mspCheckboxEmitter: EventEmitter<boolean> = new EventEmitter();
-
   public countries = COUNTRIES;
   public priceUtils = PriceUtils;
   public states$ = new Subject();
@@ -36,6 +34,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   };
 
   private isAlive = true;
+  private countryChanged = false;
 
   @Select(AgencyState.isAgencyCreated)
   public isAgencyCreated$: Observable<boolean>;
@@ -48,6 +47,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.isAlive = false;
+    this.countryChanged = false;
   }
 
   public onCountryChange(): void {
@@ -56,8 +56,11 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       ?.valueChanges.pipe(takeWhile(() => this.isAlive))
       .subscribe((value) => {
         const statesValue = value === Country.USA ? UsaStates : CanadaStates;
-        this.formGroup.get('state')?.reset();
+        if (this.countryChanged) {
+          this.formGroup.get('state')?.reset();
+        }
         this.states$.next(statesValue);
+        this.countryChanged = true;
       });
   }
 
@@ -85,7 +88,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       country: new FormControl('', [Validators.required]),
       state: new FormControl('', [Validators.required]),
       city: new FormControl('', [Validators.required, Validators.max(20)]),
-      zipCode: new FormControl('', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
+      zipcode: new FormControl('', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
       phone1Ext: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       phone2Ext: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       fax: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
@@ -97,9 +100,5 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
 
   private setDefultStatus(): void {
     this.formGroup.get('status')?.patchValue(0);
-  }
-
-  public onChangeMspCheckbox(event: ChangeEventArgs): void {
-    this.mspCheckboxEmitter.emit(event.checked);
   }
 }

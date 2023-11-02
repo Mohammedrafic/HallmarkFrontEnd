@@ -49,7 +49,6 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 import { AppState } from 'src/app/store/app.state';
 
 type AgencyFormValue = {
-  parentBusinessUnitId: number;
   agencyDetails: AgencyDetails;
   isBillingPopulated: boolean;
   agencyBillingDetails: Omit<AgencyBillingDetails, 'sameAsAgency'>;
@@ -141,7 +140,6 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     this.generateAgencyForm();
     this.checkAgencyUser();
     this.onBillingPopulatedChange();
-    this.enableCreateUnderControl();
     this.getAgencyRegionsSkills();
     this.getActiveUser();
     this.setHeaderTitle();
@@ -195,16 +193,6 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   override ngOnDestroy(): void {
     this.isAlive = false;
     this.isRemoveLogo = false;
-  }
-
-  public enableCreateUnderControl(): void {
-    const user = this.store.selectSnapshot(UserState.user) as User;
-    const parentBusinessUnitIdControl = this.agencyForm.get('parentBusinessUnitId');
-    parentBusinessUnitIdControl?.patchValue(user.businessUnitId);
-
-    if (!DISABLED_BUSINESS_TYPES.includes(user?.businessUnitType)) {
-      this.createUnderAvailable = true;
-    }
   }
 
   public onStepperCreated(): void {
@@ -291,9 +279,11 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
             });
           this.agencyControl?.updateValueAndValidity();
           this.billingControl?.disable();
+          this.populateBillingFromGeneral();
         } else {
           this.populatedSubscription?.unsubscribe();
           this.billingControl?.enable();
+          this.populateBillingFromGeneral();
         }
       });
   }
@@ -307,7 +297,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       country: agency.country,
       state: agency.state,
       city: agency.city,
-      zipCode: agency.zipCode,
+      zipcode: agency.zipcode,
       phone1: agency.phone1Ext,
       phone2: agency.phone2Ext,
       fax: agency.fax,
@@ -317,7 +307,6 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
 
   private generateAgencyForm(): void {
     this.agencyForm = this.fb.group({
-      parentBusinessUnitId: this.fb.control(null, [Validators.required]),
       agencyDetails: GeneralInfoGroupComponent.createFormGroup(),
       isBillingPopulated: false,
       agencyBillingDetails: BillingDetailsGroupComponent.createFormGroup(),
@@ -349,7 +338,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       agencyContactDetails,
       agencyPaymentDetails,
       agencyId: id,
-      parentBusinessUnitId: agencyFormValue.parentBusinessUnitId,
+      parentBusinessUnitId: 0,
     };
   }
 
@@ -359,11 +348,9 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     agencyContactDetails,
     agencyPaymentDetails,
     agencyJobDistribution,
-    createUnder
   }: Agency) {
     const paymentDetailsForms = this.createPaymentDetails(agencyPaymentDetails);
 
-    this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.parentUnitId || 0);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
     this.distributionControl?.patchValue({ ...agencyJobDistribution });
     this.agencyControl?.patchValue({ ...agencyDetails });
@@ -406,15 +393,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   }
 
   public onMspCheckboxChecked(event: boolean): void {
-    this.agencyConfig.agencyIsMsp = event;
-    const parentBusinessUnitControl = this.agencyForm.get('parentBusinessUnitId');
-    if (this.agencyConfig.agencyIsMsp) {
-      parentBusinessUnitControl?.setValue(0);
-      parentBusinessUnitControl?.disable();
-    } else {
-      parentBusinessUnitControl?.reset();
-      parentBusinessUnitControl?.enable();
-    }
+    this.agencyConfig.agencyIsMsp = false;
   }
 
   private setHeaderTitle(): void {

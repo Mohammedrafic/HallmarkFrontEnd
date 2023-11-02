@@ -99,7 +99,7 @@
       <ng-template #content>
         <app-credentials-grid
           [isNavigatedFromOrganizationArea]="isNavigatedFromOrganizationArea"
-          [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed"
+          [areAgencyActionsAllowed]="agencyActionsAllowed"
           [isCandidateAssigned]="isCandidateAssigned"
           [orderId]="orderId"
           [userPermission]="userPermission"

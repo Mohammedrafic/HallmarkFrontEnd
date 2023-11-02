@@ -16,6 +16,7 @@ import {
   IrpCandidatesParams,
   IrpOrderCandidate,
   IrpOrderCandidateDto,
+  JobDistributionfilters,
   OnboardCandidateEmail,
   Order,
   OrderAuditHistory,
@@ -32,6 +33,7 @@ import {
   OrderManagementPage,
   OrdersJourneyPage,
   OrderWorkLocationAuditHistory,
+  OrgStructureDto,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
@@ -158,7 +160,7 @@ export class OrderManagementContentService {
     }
 
     if(searchTerm) {
-      params = { ...params, searchTerm }
+      params = { ...params, searchTerm };
     }
     return this.http.get<OrderCandidatesListPage>(
       `/api/CandidateProfile/order/${orderId}/organization/${organizationId}`,
@@ -256,6 +258,14 @@ export class OrderManagementContentService {
       params,
     });
   }
+
+  public getIrpExtensionCandidates(orderId: number,
+    paramsData: IrpCandidatesParams): Observable<OrderCandidatesListPage> {
+    return this.http.get<OrderCandidatesListPage>(`/api/IRPOrders/${orderId}/candidates`, {
+      params: GetQueryParams(paramsData),
+    })
+  }
+
 
   public getIrpCandidates(orderId: number,
     paramsData: IrpCandidatesParams): Observable<PageOfCollections<IrpOrderCandidate>> {
@@ -611,4 +621,8 @@ export class OrderManagementContentService {
     public getOrderClassificationAuditHistory(payload: AuditLogPayload): Observable<OrderClassificationAuditHistory[]> {
      return this.http.post<OrderClassificationAuditHistory[]>('/api/Audit/OrderClassificationAuditHistory', payload);
     }
+
+    public getJobDistributionValues(payload: JobDistributionfilters): Observable<OrgStructureDto> {
+      return this.http.post<OrgStructureDto>('/api/OrganizationSettings/GetOrganizationDistributionvalue', payload);
+     }
 }

@@ -5,7 +5,7 @@ export const candidateDateFields: ReadonlyArray<string> = [
     'contractEndDate',
     'holdStartDate',
     'holdEndDate',
-    'terminationDate',
+    'inactivationDate',
     'organizationOrientationDate',
   ];
   
