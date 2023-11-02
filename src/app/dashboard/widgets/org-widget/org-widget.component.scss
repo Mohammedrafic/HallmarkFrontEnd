@@ -75,6 +75,11 @@
     white-space: nowrap;
     overflow: hidden;
 }
+@media screen and (min-width : 0px) and (max-width : 1000px) {
+  .orgname {
+    overflow: auto !important;
+  }
+}
 .widget__type {
     display: flex;
     width: 100%;
