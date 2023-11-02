@@ -256,6 +256,12 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
     this.removeActiveCssClass();
   }
 
+  public ShouldDisableIsPublicCheckbox(isMasterCredential?: boolean): boolean {
+    return (!this.userPermission[this.userPermissions.CanEditMasterCredentials]
+      && !this.userPermission[this.userPermissions.CanEditCredentials])
+      || (!!isMasterCredential && this.isCredentialSettings);
+  }
+
   private getActiveRowsPerPage(): number {
     return parseInt(this.activeRowsPerPageDropDown);
   }
