@@ -25,4 +25,11 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     route: './credentials-expiry-agency',
     permissionKeys: ['CanViewAgencyCredentialExpire'],
   },
+  {
+    text: 'User Activity Report',
+    id: 5,
+    route: './useractivity',
+    permissionKeys: ['CanuseractivityReport'],
+
+  },
 ];
