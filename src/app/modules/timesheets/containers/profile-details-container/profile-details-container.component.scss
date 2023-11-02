@@ -162,6 +162,10 @@ $chip-margin: 8px;
   display: flex;
   margin: 16px 0;
 
+  .statistic-wrapper {
+    width: 50%;
+  }
+
   .profile-invoices,
   .miles {
     flex-grow: 1;
