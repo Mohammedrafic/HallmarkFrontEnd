@@ -27,7 +27,7 @@ import { AppState } from 'src/app/store/app.state';
 import { GetOrganizationById, GetOrganizationLogo, SaveOrganization, SetDirtyState, SetBillingStatesByCountry, SetGeneralStatesByCountry, UploadOrganizationLogo, RemoveOrganizationLogo, GetOrganizationByIdSucceeded, GetOrganizationLogoSucceeded, GetBusinessUnitList, GetDBConnections, SaveOrganizationSucceeded } from '@admin/store/admin.actions';
 import { AddEditMSPService } from '../services/msp-addedit.service';
 import { GetMspById, GetMSPByIdSucceeded, GetMspLogo, GetMspLogoSucceeded, SaveMSP, SaveMSPSucceeded, UploadMspLogo } from '../store/actions/msp.actions';
-import { MSP } from '../store/model/msp.model';
+import { businessUnit, MSP } from '../store/model/msp.model';
 
 @Component({
   selector: 'app-add-edit-msp',
@@ -72,6 +72,7 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
   private showDataBaseControlValue: boolean = false;
   private logoToDelete: boolean = false;
   private user: User | null;
+  businessvalue:businessUnit
 
   @Select(AdminState.countries)
   countries$: Observable<string[]>;
@@ -190,8 +191,9 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
            this.GeneralInformationFormGroup.getRawValue(),
             this.BillingDetailsFormGroup.getRawValue(),
             this.ContactFormArray.getRawValue(),
-            this.currentBusinessUnitId as number,
             this.isSameAsOrg,
+            this.businessvalue,
+            this.currentBusinessUnitId as number,
           )
         )
       );
@@ -393,9 +395,10 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
     this.actions$
       .pipe(ofActionSuccessful(GetMSPByIdSucceeded), takeUntil(this.componentDestroy()))
       .subscribe((organization: { payload: MSP }) => {
+        this.businessvalue=organization.payload.businessUnit
         this.currentBusinessUnitId = organization.payload.mspDetails.id as number;
         this.initForms(organization.payload);
-        this.isSameAsOrg = organization.payload.mspBillingDetails.SameAsMsp;
+        this.isSameAsOrg = organization.payload.mspBillingDetails.sameAsMsp;
         if (this.isSameAsOrg) {
           this.disableBillingForm();
         }

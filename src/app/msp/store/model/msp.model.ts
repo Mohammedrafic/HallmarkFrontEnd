@@ -8,30 +8,45 @@ export class MSP {
     mspDetails: GeneralInformation;
     mspBillingDetails: BillingDetails;
     mspContactDetails: ContactDetails[];
-    organizationId?: number | null;
     isOrganizationUsed?: boolean;
+    businessUnit:businessUnit;
+    mspId?: number | null;
     constructor(
       mspDetails: GeneralInformation,
       mspBillingDetails: BillingDetails,
       mspContactDetails: ContactDetails[],
-      organizationId: number,
       isSameAsOrg: boolean,
+      businessUnit:businessUnit,
+      mspId:number,
     ) {
-      if (organizationId) {
-        this.organizationId = organizationId;
+      if (mspId) {
+        this.mspId = mspId;
       }
       this.mspDetails = mspDetails;
       if (this.mspDetails.externalId === '') {
         this.mspDetails.externalId = null;
       }
+     
+      this.businessUnit=businessUnit
       this.mspBillingDetails = mspBillingDetails;
-      this.mspBillingDetails.organizationId = organizationId || 0;
-      this.mspBillingDetails.SameAsMsp= isSameAsOrg;
+      this.mspBillingDetails.organizationId = businessUnit?.id || 0;
+      this.mspBillingDetails.sameAsMsp= isSameAsOrg;
       this.mspContactDetails = mspContactDetails;
     }
   }
 
-  
+  export class businessUnit{
+    id: number;
+    organizationPrefix: string;
+    businessUnitType: number;
+    isVMSEnabled: boolean;
+    isIRPEnabled: boolean;
+    name: string;
+    agencyStatus: boolean;
+    parentUnitId: number;
+    dbConnectionName: string;
+    netSuiteId: number
+}
 export class GeneralInformation {
     id?: number;
     organizationId?: number;
@@ -57,7 +72,7 @@ export class GeneralInformation {
     id?: number;
     organizationId: number;
     adminUserId: number;
-    SameAsMsp: boolean;
+    sameAsMsp: boolean;
     name: string;
     address: string;
     country: number;

@@ -21,7 +21,7 @@ export class MspService {
    */
     public saveOrganization(msp: MSP): Observable<MSP> {
       // return this.http.post<MSP>(`/api/MSP`, msp);
-      return msp.organizationId ?
+      return msp.mspId?
         this.http.put<MSP>(`/api/MSP`, msp) :
         this.http.post<MSP>(`/api/MSP`, msp);
     }
