@@ -255,7 +255,6 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       }
       return;
     }
-    debugger
     this.isOrgUser = false;
     if (this.groupEmailTemplateForm.emailBody != '' && this.groupEmailTemplateForm.emailTo != '' && this.groupEmailTemplateForm.emailSubject != '') {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
