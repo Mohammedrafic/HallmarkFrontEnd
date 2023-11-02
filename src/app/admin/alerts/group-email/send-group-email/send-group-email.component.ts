@@ -636,7 +636,7 @@ export class SendGroupEmailComponent
           } else {
             this.store.dispatch(new GetBusinessByUnitType(value));
             this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-              this.businessData = data;
+              // this.businessData = data;
               if (!this.isBusinessFormDisabled && data.length > 0) {
                 if (this.groupEmailTemplateForm.controls['business'].value != data[0].id) {
                   this.groupEmailTemplateForm.controls['business'].setValue(data[0].id);
