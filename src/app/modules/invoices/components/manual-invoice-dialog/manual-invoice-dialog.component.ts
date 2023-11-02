@@ -157,7 +157,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     const regions = this.store.snapshot().invoices.regions as OrganizationRegion[];
     const [, orderId] = ManualInvoiceAdapter.parseOrderId(this.form?.get('orderId')?.value);
 
-    const candidateLocationId = this.searchOptions.find((item) => {
+    const candidateLocationId = this.searchOptions?.find((item) => {
       return (item.orderPublicId === orderId
       && item.candidateId === Number(id));
     })?.locationId;
@@ -274,7 +274,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       this.form?.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
     }
 
-    const items = this.searchOptions.filter((item: ManualInvoiceMeta) => {
+    const items = this.searchOptions?.filter((item: ManualInvoiceMeta) => {
       const [orgPrefix, orderId, position] = ManualInvoiceAdapter.parseOrderId(item.formattedOrderIdFull);
       const orgPrefixMatch: boolean = currentOrgPrefix ? currentOrgPrefix === orgPrefix : true;
       const orderIdMatch: boolean = currentOrderId === orderId;
@@ -284,9 +284,9 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     });
 
     setTimeout(() => {
-      if (!items.length) {
+      if (!items?.length) {
         this.postionSearch = null;
-        const basedOnOrder = this.searchOptions.filter((item) => item.orderPublicId.toString() === concatenatedValue) || [];
+        const basedOnOrder = this.searchOptions?.filter((item) => item.orderPublicId.toString() === concatenatedValue) || [];
   
         this.strategy.populateOptions(basedOnOrder, this.dropDownOptions,
           this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, false);
@@ -311,7 +311,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         linkedInvoiceId: link,
         vendorFeeApplicable: vendorFee,
         reasonId,
-        comment,
+        comment,    
+        locationId,
       } = this.invoiceToEdit;
 
       this.form?.patchValue({
@@ -322,6 +323,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         reasonId,
         description: comment,
       }, { emitEvent: false });
+      this.form?.controls['locationId']?.patchValue(locationId);
+      this.cd.markForCheck();
     }
   }
 
@@ -390,18 +393,27 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   private populateDepartments(id: number): void {
     const locations: OrganizationLocation[] = this.store.snapshot().invoices.organizationLocations;
     const deps = locations.find((location) => location.id === id)?.departments as OrganizationDepartment[];
+    if(deps.length){
+      this.dropDownOptions.invoiceDepartments=[];
+      this.dropDownOptions.invoiceDepartments = sortByField(InvoiceMetaAdapter.createDepartmentsOptions(deps), 'text'); 
+      this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
+      this.dropDownOptions.invoiceDepartments = [...this.dropDownOptions.invoiceDepartments];
+      this.updateOptions();
+    }
 
-    this.dropDownOptions.invoiceDepartments = sortByField(InvoiceMetaAdapter.createDepartmentsOptions(deps), 'text');
-    this.updateOptions();
   }
 
   private updateOptions(): void {
     this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
-    if (this.postionSearch) {
-      this.form?.get('departmentId')?.patchValue(this.postionSearch.departmentId);
-    } else {
-      this.form?.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
-    }
+    if(this.invoiceToEdit?.departmentId){
+      this.form?.get('departmentId')?.patchValue(this.invoiceToEdit?.departmentId);
+    }else{
+      if (this.postionSearch) {
+        this.form?.get('departmentId')?.patchValue(this.postionSearch.departmentId);
+      } else {
+        this.form?.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
+      }
+    }  
     this.cd.markForCheck();
   }
 
