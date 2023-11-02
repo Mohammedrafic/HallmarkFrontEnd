@@ -59,7 +59,7 @@
         </div>
         <div class="sup-title">Shift</div>
       </div>
-      <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
+      <div *ngIf="orderInformation.orderType !== orderType.PermPlacement && activeSystems !== systemType.IRP" class="column">
         <div class="title">
           ${{ orderInformation.joiningBonus || 0 | currency: '':'' }} / ${{
             orderInformation.compBonus || 0 | currency: '':''
