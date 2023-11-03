@@ -163,6 +163,8 @@ export interface BaseInvoice {
   id: number;
   agencyId: number;
   agencyName: string;
+  parentTimesheetId: number | null;
+  timesheetType: number;
 
   candidateId: number;
   candidateFirstName: string;
@@ -251,6 +253,7 @@ export interface InvoiceRecord {
   amount: number;
   timesheetId?: number;
   attachments: Attachment[];
+  parentTimesheetId: number | null;
   timesheetRecords: InvoiceRecordTimesheetEntry[];
 }
 

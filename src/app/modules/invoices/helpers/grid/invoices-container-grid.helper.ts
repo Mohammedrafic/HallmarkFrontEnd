@@ -10,6 +10,7 @@ import { GridOrderIdCellComponent } from '../../components/grid-order-id-cell/gr
 import { BaseInvoice } from '../../interfaces';
 import { PendingInvoice } from '../../interfaces';
 import { InvoiceType } from '../../enums/invoice-type.enum';
+import { GetParentRecordsId } from '../invoice.helper';
 
 type BaseInvoiceColDefsKeys = keyof Pick<
   BaseInvoice,
@@ -103,14 +104,16 @@ export class InvoicesContainerGridHelper {
           ${GridValuesHelper.formatDate(date, 'MM/dd/yyyy')}`;
         },
         cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
-          const { id, organizationId } = params.data as BaseInvoice;
+          const { id, organizationId, timesheetType, invoiceRecords } = params.data;
+          const parentID = !!invoiceRecords?.length ? GetParentRecordsId(invoiceRecords) : null;
+          const navigateId = timesheetType === InvoiceType.Timesheet ? id : parentID;
 
-          if (params.data.timesheetType !== InvoiceType.Manual) {
+          if (navigateId) {
             return {
               ...params,
               link: agency ? `/agency/timesheets` : `/client/timesheets`,
               navigationExtras: {
-                state: { timesheetId: id, organizationId },
+                state: { timesheetId: navigateId, organizationId },
               },
             };
           }
