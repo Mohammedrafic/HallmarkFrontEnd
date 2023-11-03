@@ -201,7 +201,7 @@ export const InactivatedDialogConfig: ReasonFormConfig[]  = [
   },
   {
     field: 'defaultValue',
-    title: 'Default',
+    title: 'Default Value',
     required: false,
     fieldType: FieldType.Toggle,
   },
