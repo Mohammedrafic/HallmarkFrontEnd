@@ -19,7 +19,7 @@
       </ng-container>
 
       <ng-container *ngSwitchDefault>
-        <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="jobInfoTemplate" *ngIf="activeSystems !== systemType.IRP"></ng-container>
         <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
         <div class="column last-column" *ngIf="activeSystems !== systemType.IRP">
@@ -326,7 +326,7 @@
 <ng-template #orderInfo>
   <div class="column links" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension || orderInformation.hasParentExtension">
     <div class="column link-wrapper" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
-      <div *ngIf="orderInformation?.extensionInitialOrderId && activeSystems !== systemType.IRP" class="accent link" (click)="moveToInitialOrder()">
+      <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
         Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionInitialOrderPublicId }}
       </div>
       <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
