@@ -55,5 +55,15 @@ export class MspService {
     public removeMspLogo(businessUnitId: number): Observable<never> {
       return this.http.delete<never>(`/api/BusinessUnit/${businessUnitId}/logo`);
     }
+
+          /**
+   * Remove holiday by its id
+   * @param id
+   */
+  public removeMsp(id:number): Observable<any> {
+    return this.http.delete<any>(`/api/msp/deleteMsp/${id}`);
+  }
+
+
   
 }

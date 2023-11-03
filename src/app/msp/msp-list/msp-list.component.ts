@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Actions, Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
@@ -13,8 +13,9 @@ import { SpecialProjectMessages } from '@organization-management/specialproject/
 import { AppState } from 'src/app/store/app.state';
 import { GRID_CONFIG } from '@shared/constants';
 import { MspState } from '../store/state/msp.state';
-import { GetMsps } from '../store/actions/msp.actions';
-import { MspListPage } from '../store/model/msp.model';
+import { GetMsps, RemoveMspSucceeded } from '../store/actions/msp.actions';
+import { MSP, MspListPage } from '../store/model/msp.model';
+import { AgencyStatus } from '@shared/enums/status';
 @Component({
   selector: 'app-msp-list',
   templateUrl: './msp-list.component.html',
@@ -47,21 +48,44 @@ export class MspListComponent extends AbstractPermissionGrid implements OnInit, 
     this.store.dispatch(new SetHeaderState({ title: 'MSP List', iconName: 'briefcase' }));
   }
 
+
   override ngOnInit(): void {
     super.ngOnInit();
     this.store.dispatch(new GetMsps());
     this.subscribeOnMspList(); 
+    this.startGetDeleteActionWatching()
   }
 
   private subscribeOnMspList(): void {
     this.mspLists$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: MspListPage) => {        
-        this.rowData = data?.items;        
+      .subscribe((data: MspListPage) => {
+        this.rowData = data?.items;    
+        this.rowData?.forEach((msp) => {
+          msp.status = this.getStatusString(msp.status);
+        });
         this.totalRecordsCount = data?.totalCount;
         this.gridApi?.setRowData(this.rowData);
       });
   }
+
+
+   getStatusString(status: AgencyStatus | null): string {
+    if (status === null) {
+      return ''; 
+    }
+    return AgencyStatus[status]; 
+  }
+  
+  private startGetDeleteActionWatching(): void {
+    this.actions$
+      .pipe(ofActionSuccessful(RemoveMspSucceeded))
+      .subscribe((logo: { payload: MSP }) => {
+    this.store.dispatch(new GetMsps());
+    this.subscribeOnMspList()
+      });
+  }
+
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
