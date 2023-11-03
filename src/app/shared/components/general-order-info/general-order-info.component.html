@@ -59,7 +59,7 @@
         </div>
         <div class="sup-title">Shift</div>
       </div>
-      <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
+      <div *ngIf="orderInformation.orderType !== orderType.PermPlacement && activeSystems !== systemType.IRP" class="column">
         <div class="title">
           ${{ orderInformation.joiningBonus || 0 | currency: '':'' }} / ${{
             orderInformation.compBonus || 0 | currency: '':''
@@ -71,7 +71,6 @@
         <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
-      <ng-container [ngTemplateOutlet]="workflowName"></ng-container>
     </div>
     <div class="container-row">
       <ng-container *ngIf="orderInformation.orderType !== orderType.ReOrder">
@@ -187,7 +186,6 @@
         [ngTemplateOutlet]="linkedId"
         [ngTemplateOutletContext]="{ linkedID: orderInformation.linkedId }"
       ></ng-container>
-      <ng-container [ngTemplateOutlet]="workflowName"></ng-container>
     </div>
   </section>
 </ng-template>
@@ -352,12 +350,5 @@
   <div class="column">
     <div class="title">{{ linkedID || '-' }}</div>
     <div class="sup-title">Linked ID</div>
-  </div>
-</ng-template>
-
-<ng-template #workflowName>
-  <div class="column">
-    <div class="title">{{ orderInformation.workflowName || '-' }}</div>
-    <div class="sup-title">Workflow</div>
   </div>
 </ng-template>

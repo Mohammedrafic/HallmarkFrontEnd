@@ -92,6 +92,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   @Select(AppState.headerState)
   headerState$: Observable<HeaderState | null>;
+  public header$: Observable<HeaderState | null>;
 
   @Select(AppState.isFirstLoad)
   isFirstLoad$: Observable<boolean>;
@@ -215,6 +216,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   ngOnInit(): void {
+    this.header$ = this.headerState$.pipe(debounceTime(300));
     this.getDeviceScreen();
     this.observeOrderNavigation();
     this.observeThemeChange();

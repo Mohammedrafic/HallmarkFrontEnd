@@ -331,7 +331,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         durationSecondary?.reset();
         durationTertiary?.reset();
         this.extensionFormIRP.get('startDate')?.markAsPristine();
-        this.extensionFormIRP.get('endDate')?.markAsPristine();
+        this.extensionFormIRP.get('endDate')?.setValue('');
       } else {
         durationSecondary?.disable();
         durationTertiary?.disable();

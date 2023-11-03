@@ -216,7 +216,7 @@ export const JobDistributionConfigLTA = (selectedSystem: SelectSystem,isDistribu
       title: 'Job Distribution',
       required: true,
       type: FieldType.MultiCheckBoxDropdown,
-      dataSource: getDataSourceForJobDistribution(selectedSystem, false),
+      dataSource: getDataSourceForJobDistribution(selectedSystem, false, false, true),
     },
     {
       field: 'agencyId',
@@ -263,7 +263,7 @@ export const JobDistributionConfigPO = (selectedSystem: SelectSystem,isDistribut
       title: 'Job Distribution',
       required: true,
       type: FieldType.MultiCheckBoxDropdown,
-      dataSource: getDataSourceForJobDistribution(selectedSystem, false),
+      dataSource: getDataSourceForJobDistribution(selectedSystem, false, false, true),
     },
     {
       field: 'agencyId',

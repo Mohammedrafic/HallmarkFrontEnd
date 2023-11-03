@@ -102,7 +102,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
     const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
-        if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+      if (user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP) {
           this.store.dispatch(
             new SetLastSelectedOrganizationAgencyId({
               lastSelectedAgencyId: data.agencyId,
@@ -137,7 +137,7 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
     const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? 'client/candidates/edit' : 'client/candidates/edit';
-        if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+      if (user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP) {
           this.store.dispatch(
             new SetLastSelectedOrganizationAgencyId({
               lastSelectedAgencyId: data.agencyId,

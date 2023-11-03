@@ -90,7 +90,7 @@ export class AccumulationChartComponent
       }
     }
     const user = this.store.selectSnapshot(UserState.user);
-    if (this.chartData?.title == "Active Positions" || this.chartData?.title == ' Average Days of Active Positions with Custom Workflow') {
+    if (this.chartData?.title == "Active Positions" || this.chartData?.title == ' Average Days of Active Positions with Custom Workflow' || this.chartData?.title == 'Average Days of Active Positions without Custom Workflow') {
       if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
         this.dashboardService.redirectToUrl('agency/candidate-details');
       } else {

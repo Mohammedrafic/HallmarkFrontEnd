@@ -58,6 +58,11 @@ export class SaveWorkflowMapping {
   constructor(public payload: WorkflowMappingPost, public filters: WorkflowFilters) {}
 }
 
+export class UpdateWorkflowMapping {
+  static readonly type = '[workflow] Update Workflow Mapping';
+  constructor(public payload: WorkflowMappingPost, public filters: WorkflowFilters) {}
+}
+
 export class SaveWorkflowMappingSucceed {
   static readonly type = '[workflow] Save Workflow Mapping Succeed';
   constructor() {}

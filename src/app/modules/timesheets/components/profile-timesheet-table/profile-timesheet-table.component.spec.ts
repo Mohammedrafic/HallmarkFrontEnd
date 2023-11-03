@@ -7,7 +7,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 
 import { NgxsModule, Store } from '@ngxs/store';
 import { Observable, of } from 'rxjs';
-import { MenuEventArgs, SelectingEventArgs, TabAllModule, TabComponent, TabModule } from '@syncfusion/ej2-angular-navigations';
+import { MenuEventArgs, TabAllModule, TabComponent, TabModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ColDef, GridApi } from '@ag-grid-community/core';
@@ -29,6 +29,19 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
 
 const gridIcons = {
   MoreVertical,
+};
+
+const mockRecords = {
+  timesheets: {
+    editMode: [
+      { id: 1, name: 'Record 1' },
+      { id: 2, name: 'Record 2' }
+    ],
+    viewMode: [
+      { id: 1, name: 'Record 1' },
+      { id: 2, name: 'Record 2' }
+    ],
+  },
 };
 
 const timesheetDetailsMock: TimesheetDetailsModel = {
@@ -259,8 +272,8 @@ class TimesheetDetailsStubApiService {
     return of(true);
   }
 }
-// TODO: will be fixed in scope of EIN-24644
-xdescribe('ProfileTimesheetTableComponent', () => {
+
+describe('ProfileTimesheetTableComponent', () => {
   let component: ProfileTimesheetTableComponent;
   let fixture: ComponentFixture<ProfileTimesheetTableComponent>;
   let confirmService: ConfirmService;
@@ -318,8 +331,9 @@ xdescribe('ProfileTimesheetTableComponent', () => {
     fixture = TestBed.createComponent(ProfileTimesheetTableComponent);
     component = fixture.componentInstance;
     component.timesheetDetails = timesheetDetailsMock;
+    component.tableRecords = mockRecords as unknown as TimesheetRecordsDto;
 
-    gridApi = jasmine.createSpyObj('GridApi', ['setRowData', 'setColumnDefs']);
+    gridApi = jasmine.createSpyObj('GridApi', ['setRowData', 'setColumnDefs', 'hideOverlay']);
     Object.defineProperty(component, 'gridApi', { value: gridApi });
 
     confirmService = TestBed.inject(ConfirmService);
@@ -328,6 +342,8 @@ xdescribe('ProfileTimesheetTableComponent', () => {
     store = TestBed.inject(Store);
 
     spyOn(store, 'dispatch').and.callThrough();
+    spyOn(store, 'snapshot').and.returnValue(initialState);
+    spyOn(JSON, 'parse').and.returnValue(mockRecords);
     fixture.detectChanges();
   });
 
@@ -339,7 +355,7 @@ xdescribe('ProfileTimesheetTableComponent', () => {
     spyOn(timesheetRecordService, 'checkFormsValidation').and.returnValue(true);
     spyOn(confirmService, 'confirm');
 
-    component.currentTab = RecordFields.Miles;
+    component.timesheetDetails.status = TimesheetStatus.Missing;
     component.saveChanges();
 
     expect(confirmService.confirm).not.toHaveBeenCalled()
@@ -472,22 +488,7 @@ xdescribe('ProfileTimesheetTableComponent', () => {
   });
 
   it('should set edit mode properties and update grid data', () => {
-    const mockRecords = {
-      timesheets: {
-        editMode: [
-          { id: 1, name: 'Record 1' },
-          { id: 2, name: 'Record 2' }
-        ],
-        viewMode: [
-          { id: 1, name: 'Record 1' },
-          { id: 2, name: 'Record 2' }
-        ],
-      },
-    };
-
     component.currentMode = RecordsMode.Edit;
-    spyOn(JSON, 'parse').and.returnValue(mockRecords);
-    store.reset(initialState);
 
     component.editTimesheets();
 

@@ -23,6 +23,7 @@ import {
   RemoveWorkflowMapping,
   SaveWorkflowMapping,
   SaveWorkflowMappingSucceed,
+  UpdateWorkflowMapping,
 } from '../../store/workflow.actions';
 import { UserState } from '../../../store/user.state';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
@@ -551,7 +552,12 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
         workflowGroupId: this.workflowMappingFormGroup.controls['workflowName'].value, // workflowName contains selected workflow id, on the BE workflowGroupId is just workflowId
         stepMappings: this.getStepMappings(),
       };
-      this.store.dispatch(new SaveWorkflowMapping(workflowMapping, this.filters));
+
+      if (this.editedRecordId) {
+        this.store.dispatch(new UpdateWorkflowMapping(workflowMapping, this.filters));
+      } else {
+        this.store.dispatch(new SaveWorkflowMapping(workflowMapping, this.filters));
+      }
     } else {
       this.workflowMappingFormGroup.markAllAsTouched();
     }

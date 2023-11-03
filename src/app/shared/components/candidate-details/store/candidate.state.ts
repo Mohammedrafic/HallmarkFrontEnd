@@ -4,13 +4,12 @@ import {
   ExportCandidateAssignment,
   GetAssociateOrganizations,
   GetCandidateDetailsPage,
-  GetCandidateRegions,
   Getcandidatesearchbytext,
   GetCandidateSkills,
   SelectNavigation,
   SetNavigation,
   SetPageNumber,
-  SetPageSize
+  SetPageSize,
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { Observable, tap } from 'rxjs';
 import { CandidateDetailsTabs } from '@shared/enums/candidate-tabs.enum';
@@ -152,16 +151,6 @@ export class CandidateDetailsState {
     patchState({ pageSize });
   }
 
-
-  @Action(GetCandidateRegions)
-  GetCandidateRegions({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<CandidatesDetailsRegions[]> {
-    return this.candidateDetailsApiService.getRegions().pipe(
-      tap((payload: CandidatesDetailsRegions[]) => {
-        patchState({ candidateRegions: payload });
-        return payload;
-      })
-    );
-  }
   @Action(Getcandidatesearchbytext)
   getDoNotCandidateListSearch({ patchState }: StateContext<CandidateDetailsStateModel>, { filter }:Getcandidatesearchbytext): Observable<DoNotReturnSearchCandidate[]> {
     return this.candidateDetailsApiService.getcandidatesearchbytext(filter).pipe(tap((payload: DoNotReturnSearchCandidate[]) => {
