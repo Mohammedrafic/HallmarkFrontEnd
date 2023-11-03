@@ -623,7 +623,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       orderId: this.filters?.orderId || null,
     });
     this.filtersForm.patchValue({
-      organizationIds: this.filters?.organizationIds || [],
+      organizationIds: this.filters?.organizationIds || null,
     }, { emitEvent: false });
     if (this.isAgency) {
       this.orgAgencyId = Number(this.lastAgencyId);
