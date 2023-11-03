@@ -1074,14 +1074,9 @@ export class SendGroupEmailComponent
             this.candidateControl.patchValue([]);
             if(this.isOrgUser){
               const user = this.store.selectSnapshot(UserState.user);
-              this.businessControl.patchValue(user?.businessUnitId);
-              businessId = this.businessControl.value;
+              businessId = user?.businessUnitId
               this.store.dispatch(new GetGroupEmailSkills(businessId, 0));
             }
-            // else if(this.isAgencyCandidatesType == true){
-            //   businessId =  this.bussinessesId
-            //   this.store.dispatch(new GetGroupEmailSkills(businessId, 0));
-            // }
             else{
               const user = this.store.selectSnapshot(UserState.user);
               this.store.dispatch(new GetGroupEmailSkills(businessId, 1));
