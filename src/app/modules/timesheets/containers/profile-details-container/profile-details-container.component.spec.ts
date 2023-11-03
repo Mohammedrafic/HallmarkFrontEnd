@@ -7,16 +7,17 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { NgxsModule,  Store } from '@ngxs/store';
 import { SwitchComponent } from '@syncfusion/ej2-angular-buttons';
+import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
 import Spy = jasmine.Spy;
-import { MessageTypes } from '@shared/enums/message-types';
 
+import { MessageTypes } from '@shared/enums/message-types';
 import { SettingsViewService } from '@shared/services';
 import { AddDialogHelperService } from '@core/services';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DialogAction } from '@core/enums';
 import { ProfileDetailsContainerComponent } from './profile-details-container.component';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { TimesheetDetailsApiService, TimesheetDetailsService, TimesheetsApiService } from '../../services';
+import { TimesheetDetailsApiService, TimesheetDetailsService, TimesheetRecordsService, TimesheetsApiService } from '../../services';
 import { ExportColumn } from '@shared/models/export.model';
 import { AddRecordBillRate, Attachment, TabCountConfig, TimesheetDetailsModel } from '../../interface';
 import { DropdownOption, FileForUpload } from '@core/interface';
@@ -24,13 +25,13 @@ import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import {
   ConfirmApprovedTimesheetDeleteDialogContent,
   ConfirmDeleteTimesheetDialogContent,
-  rejectTimesheetDialogData
+  rejectTimesheetDialogData, TimesheetConfirmMessages,
 } from '../../constants';
 import {  TimeSheetsPage } from '../../store/model/timesheets.model';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ShowToast } from '../../../../store/app.actions';
-import { HourOccupationType, TimesheetTargetStatus } from '../../enums';
+import { HourOccupationType, RecordFields, TimesheetTargetStatus } from '../../enums';
 import * as TimesheetInt from '../../interface';
 
 @Component({
@@ -124,6 +125,11 @@ class TimesheetDetailsStubService {
     return of(true);
   }
 }
+
+const selectEvent = {
+  selectedIndex: 1,
+  previousIndex: 0,
+}  as SelectingEventArgs;
 
 const timesheetDetailsMock: TimesheetDetailsModel = {
   id: 70180,
@@ -275,6 +281,14 @@ const timesheetDetailsMock: TimesheetDetailsModel = {
   ]
 };
 
+class TimesheetRecordsStubService {
+  getCurrentTabName(): RecordFields {
+    return  RecordFields.Time;
+  }
+
+  controlTabsVisibility(): void {}
+}
+
 class TimesheetDetailsApiStubService {
   getDetailsByDate(): Observable<TimesheetDetailsModel> {
     return of({} as TimesheetDetailsModel);
@@ -338,8 +352,7 @@ class SettingsViewStubService {
   }
 }
 
-// TODO: will be fixed in scope of EIN-24644
-xdescribe('ProfileDetailsContainerComponent', () => {
+describe('ProfileDetailsContainerComponent', () => {
   let component: ProfileDetailsContainerComponent;
   let fixture: ComponentFixture<ProfileDetailsContainerComponent>;
   let store: Store;
@@ -371,6 +384,7 @@ xdescribe('ProfileDetailsContainerComponent', () => {
         { provide: SettingsViewService, useClass: SettingsViewStubService},
         { provide: TimesheetsApiService, useClass: TimesheetsApiStubService},
         { provide: TimesheetDetailsApiService, useClass: TimesheetDetailsApiStubService},
+        { provide: TimesheetRecordsService, useClass: TimesheetRecordsStubService },
         { provide:  AddDialogHelperService, useValue: {}},
         { provide: ActivatedRoute, useValue: { snapshot: { data: { isAgencyArea: false } } }},
         { provide: Router, useClass: MockRouter },
@@ -602,6 +616,37 @@ xdescribe('ProfileDetailsContainerComponent', () => {
     ]);
     expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
       getTimesheetDetailsAction
+    );
+  });
+
+  it('selectTab - should handle tab change with unsaved changes', () => {
+    spyOn(confirmService, 'confirm').and.returnValue(of(false));
+
+    component.selectTab(selectEvent);
+
+    expect(confirmService.confirm).not.toHaveBeenCalledWith(
+      TimesheetConfirmMessages.confirmTabChange,
+      {
+        title: 'Unsaved Progress',
+        okButtonLabel: 'Proceed',
+        okButtonClass: 'delete-button',
+      }
+    );
+  });
+
+  it('selectTab - should handle tab change with saved changes', () => {
+    spyOn(confirmService, 'confirm').and.returnValue(of(true));
+    Object.defineProperty(component, 'isChangesSaved', { value: false });
+
+    component.selectTab(selectEvent);
+
+    expect(confirmService.confirm).toHaveBeenCalledWith(
+      TimesheetConfirmMessages.confirmTabChange,
+      {
+        title: 'Unsaved Progress',
+        okButtonLabel: 'Proceed',
+        okButtonClass: 'delete-button',
+      }
     );
   });
 })
