@@ -32,7 +32,8 @@
          <div class="row" *ngFor="let data of chartData?.chartData">
             <div class="col" >
               <div [ngStyle]="{ background: data.color }" *ngIf="data" class="mlr-20 label">
-                <span   >{{data.label}}</span>
+                <span (mousedown)="defineMousePosition($event)"
+                (click)="navigateUrl($event,data.label)">{{data.label}}</span>
               </div>
             </div>
             <div class="middle-col">
