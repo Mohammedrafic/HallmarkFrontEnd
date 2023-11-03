@@ -648,7 +648,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
               this.changeDetection.markForCheck();
             });
           } else {
-            this.jobDistributionForm.get('distributeToVMS')?.setValue(null);
+            this.jobDistributionForm.get('distributeToVMS')?.setValue("");
             this.jobDistributionForm.get('distributionDelay')?.setValue(false);
           }
           if (!departmentsId && this.generalInformationForm.get('skillId')?.value) {
@@ -740,13 +740,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
              this.changeDetection.markForCheck();
            });
          } else {
-           this.jobDistributionForm.get('distributeToVMS')?.setValue(null);
+           this.jobDistributionForm.get('distributeToVMS')?.setValue("");
            this.jobDistributionForm.get('distributeToVMS')?.disable();
            this.jobDistributionForm.get('distributionDelay')?.setValue(false);
          }
        }
       } else if (!value) {
-        this.jobDistributionForm.get('distributeToVMS')?.setValue(null);
+        this.jobDistributionForm.get('distributeToVMS')?.setValue("");
         this.jobDistributionForm.get('distributeToVMS')?.disable();
       }
       this.changeDetection.markForCheck();
