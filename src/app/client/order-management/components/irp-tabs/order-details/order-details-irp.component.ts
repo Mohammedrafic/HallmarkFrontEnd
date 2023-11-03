@@ -203,6 +203,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public isTemplate : boolean=false;
   @Input() public externalCommentConfiguration?: boolean | null;
 
+  private specialProjectConfigurationSettings = false;
   private dataSourceContainer: OrderDataSourceContainer = {};
   private selectedSystem: SelectSystem;
   private isTieringLogicLoad = true;
@@ -433,7 +434,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         this.selectedOrder,
         this.generalInformationForm
       );
-
+      this.updateSpecialProjectValidation(this.specialProjectConfigurationSettings);
       this.changeDetection.markForCheck();
     });
   }
@@ -1017,6 +1018,7 @@ if(!this.isEdit){
       }),
       takeUntil(this.componentDestroy())
     ).subscribe(({MandatorySpecialProjectDetails}) => {
+      this.specialProjectConfigurationSettings = JSON.parse(MandatorySpecialProjectDetails);
       this.orderTypeForm.disable();
       this.commentContainerId = this.selectedOrder.commentContainerId as number;
       this.getComments();
@@ -1026,7 +1028,7 @@ if(!this.isEdit){
       this.patchFormValues(this.selectedOrder);
       this.createPatchContactDetails(this.selectedOrder);
       this.createPatchWorkLocation(this.selectedOrder);
-      this.updateSpecialProjectValidation(JSON.parse(MandatorySpecialProjectDetails));
+      this.updateSpecialProjectValidation(this.specialProjectConfigurationSettings);
     });
   }
 
@@ -1077,7 +1079,7 @@ if(!this.isEdit){
       distributionDelay: selectedOrder.distributionDelay,
       distributeToVMS: selectedOrder.distributeToVMS,
     });
-    
+
     if (selectedOrder.distributeToVMS !=null) {
       const Distributiondelay = this.getSelectedFormConfig(JobDistributionForm);
       viewDistributiontoVMS(true, Distributiondelay);
@@ -1180,6 +1182,7 @@ if(!this.isEdit){
       }),
       takeUntil(this.componentDestroy())
     ).subscribe(({MandatorySpecialProjectDetails}) => {
+      this.specialProjectConfigurationSettings = JSON.parse(MandatorySpecialProjectDetails);
       const orderTypeToPrePopulate =
         this.orderManagementService.getOrderTypeToPrePopulate() || IrpOrderType.LongTermAssignment;
       this.orderManagementService.clearOrderTypeToPrePopulate();
@@ -1194,7 +1197,7 @@ if(!this.isEdit){
       this.jobDescriptionForm.reset();
       this.specialProjectForm.reset();
 
-      this.updateSpecialProjectValidation(JSON.parse(MandatorySpecialProjectDetails));
+      this.updateSpecialProjectValidation(this.specialProjectConfigurationSettings);
       this.changeDetection.markForCheck();
     });
   }

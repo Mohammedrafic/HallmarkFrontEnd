@@ -108,7 +108,8 @@ export const DisabledSettingsByDefault = [
   'ShowDeployedEmployees',
   'OrganizationCanCarryClockIDFromParent',
   'AllowDuplicateClockIdforOrganization',
-  'MarkZeroDollarInvoicetoPaidOnApproval'
+  'MarkZeroDollarInvoicetoPaidOnApproval',
+  'MandatorySpecialProjectDetails'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {
