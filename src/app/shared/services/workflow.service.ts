@@ -55,6 +55,10 @@ export class WorkflowService {
     return this.http.post<WorkflowMappingPost | void>(`/api/WorkflowMapping`, workflowMapping);
   }
 
+  public updateWorkflowMapping(workflowMapping: WorkflowMappingPost): Observable<WorkflowMappingPost | void> {
+    return this.http.put<WorkflowMappingPost | void>(`/api/WorkflowMapping`, workflowMapping);
+  }
+
   public removeWorkflowMapping(mappingId: number): Observable<void> {
     return this.http.delete<void>(`/api/WorkflowMapping/${mappingId}`);
   }

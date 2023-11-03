@@ -80,7 +80,7 @@ export class TimesheetRecordsService {
           if (timeOutKey && !!dataItem[keyValue] && !!values[keyValue]) {
             const dataTime = DateTimeHelper.setUtcTimeZone(dataItem[keyValue] as string);
             const formTime = DateTimeHelper.setUtcTimeZone(values[keyValue] as string);
-            
+
             if (dataTime !== formTime) {
               diffValues[keyValue] = values[keyValue] as string;
             }
@@ -123,8 +123,10 @@ export class TimesheetRecordsService {
     return Object.keys(controls).some((key) => controls[key].touched);
   }
 
-  getCurrentTabName(idx: TableTabIndex): RecordFields {
+  getCurrentTabName(idx: TableTabIndex): RecordFields | 'details' {
     switch (idx) {
+      case TableTabIndex.ProfileDetails:
+        return 'details';
       case TableTabIndex.HistoricalData:
         return RecordFields.HistoricalData;
       case TableTabIndex.Miles:

@@ -8,5 +8,6 @@ export interface TitleValueParams {
 }
 
 export interface TitleValueCellRendererParams extends ICellRendererParams {
+  parentTimesheetId?: number | null;
   titleValueParams?: TitleValueParams;
 }

@@ -85,7 +85,7 @@
                         <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" maxlength="50" [readOnly]="isOnBoarded"/>
                       </div>
                     </div>
-                    <div class="input-container bootstrap">
+                    <div class="input-container bootstrap" *ngIf="activeSystems !== ordersystemId.IRP">
                       <label class="input-group">Available Start Date</label>
                       <div class="input-group input-readonly">
                         <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" readonly/>

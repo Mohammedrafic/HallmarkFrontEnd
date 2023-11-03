@@ -103,14 +103,16 @@ export class InvoicesContainerGridHelper {
           ${GridValuesHelper.formatDate(date, 'MM/dd/yyyy')}`;
         },
         cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
-          const { id, organizationId } = params.data as BaseInvoice;
+          const { id, organizationId, timesheetType, invoiceRecords } = params.data;
+          const parentID = !!invoiceRecords?.length ? invoiceRecords[0].parentTimesheetId : null;
+          const navigateId = timesheetType === InvoiceType.Timesheet ? id : parentID;
 
-          if (params.data.timesheetType !== InvoiceType.Manual) {
+          if (navigateId) {
             return {
               ...params,
               link: agency ? `/agency/timesheets` : `/client/timesheets`,
               navigationExtras: {
-                state: { timesheetId: id, organizationId },
+                state: { timesheetId: navigateId, organizationId },
               },
             };
           }

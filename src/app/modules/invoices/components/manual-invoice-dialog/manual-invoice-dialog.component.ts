@@ -80,7 +80,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   ngOnInit(): void {
     this.strategy = this.injector.get<ManualInvoiceStrategy>(
       ManualInvoiceStrategyMap.get(this.isAgency) as ProviderToken<ManualInvoiceStrategy>);
-     
+
     this.form = this.addService.createForm(this.isAgency) as CustomFormGroup<AddManInvoiceForm>;
 
     this.watchForSearch();
@@ -123,7 +123,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         }
 
         if (this.invoiceToEdit) {
-          this.store.dispatch(new Invoices.UpdateManualInvoice({            
+          this.store.dispatch(new Invoices.UpdateManualInvoice({
             ...dto,
             timesheetId: this.invoiceToEdit.id,
           }, this.agencyOrganizationIds, this.filesForUpload, this.filesForDelete, this.isAgency));
@@ -216,7 +216,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         this.dialogShown = true;
         if(agencyOrganizationIds){
           this.agencyOrganizationIds = agencyOrganizationIds;
-        }        
+        }
         this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
         this.sideAddDialog.show();
         this.cd.markForCheck();
@@ -287,17 +287,17 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       if (!items?.length) {
         this.postionSearch = null;
         const basedOnOrder = this.searchOptions?.filter((item) => item.orderPublicId.toString() === concatenatedValue) || [];
-  
+
         this.strategy.populateOptions(basedOnOrder, this.dropDownOptions,
           this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, false);
-  
+
       } else {
         this.postionSearch = items[0];
-        
+
         this.strategy.populateOptions(items, this.dropDownOptions,
           this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, true);
       }
-  
+
       this.setFormValuesOnEdit();
     });
     this.cd.markForCheck();
@@ -311,7 +311,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         linkedInvoiceId: link,
         vendorFeeApplicable: vendorFee,
         reasonId,
-        comment,    
+        comment,
         locationId,
       } = this.invoiceToEdit;
 
@@ -323,7 +323,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         reasonId,
         description: comment,
       }, { emitEvent: false });
-      this.form?.controls['locationId']?.patchValue(locationId);
+      this.form?.get('locationId')?.patchValue(locationId);
       this.cd.markForCheck();
     }
   }
@@ -395,7 +395,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     const deps = locations.find((location) => location.id === id)?.departments as OrganizationDepartment[];
     if(deps.length){
       this.dropDownOptions.invoiceDepartments=[];
-      this.dropDownOptions.invoiceDepartments = sortByField(InvoiceMetaAdapter.createDepartmentsOptions(deps), 'text'); 
+      this.dropDownOptions.invoiceDepartments = sortByField(InvoiceMetaAdapter.createDepartmentsOptions(deps), 'text');
       this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
       this.dropDownOptions.invoiceDepartments = [...this.dropDownOptions.invoiceDepartments];
       this.updateOptions();
@@ -413,7 +413,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       } else {
         this.form?.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
       }
-    }  
+    }
     this.cd.markForCheck();
   }
 

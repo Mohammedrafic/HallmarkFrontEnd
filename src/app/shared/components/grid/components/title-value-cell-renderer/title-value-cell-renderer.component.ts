@@ -36,10 +36,10 @@ export class TitleValueCellRendererComponent extends GridCellRenderer<TitleValue
   public handleNavigation(event: Event): void {
     const data = this.params.data;
     event.stopImmediatePropagation();
-    const id = data.timesheetType === InvoiceType.Timesheet ? data.timesheetId : data.parentId;
+    const id = data.timesheetType === InvoiceType.Timesheet ? data.timesheetId : data?.parentTimesheetId;
     const organizationId = this.params.titleValueParams?.organizationId;
-    
-    if (id && data.timesheetType !== InvoiceType.Manual) {
+
+    if (id) {
       this.router.navigate(['../timesheets'], {
         relativeTo: this.route,
         state: { timesheetId: id, organizationId },

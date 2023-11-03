@@ -24,7 +24,7 @@
             <ejs-dropdownlist appValidateWithMessage
                               formControlName="business"
                               [fields]="businessDataFields"
-                              [dataSource]="businessData$ | async"
+                              [dataSource]="businessData"
                               [value]="defaultBusinessValue"
                               [allowFiltering]="true"
                               placeholder="Business">
@@ -37,7 +37,7 @@
             <ejs-multiselect mode="CheckBox" appValidateWithMessage
                              formControlName="businesses"
                              [fields]="businessDataFields"
-                             [dataSource]="businessData"
+                             [dataSource]="businessData$ | async"
                              [allowFiltering]="true"
                              placeholder="Business"
                              [showDropDownIcon]="true"
@@ -270,7 +270,8 @@
                              appValidateWithMessage
                              [fields]="userDataFields"
                              [dataSource]="userData"
-                             maximumSelectionLength="50000">
+                             maximumSelectionLength="50000"
+                             (filtering)="OnFiltering($event)">
             </ejs-multiselect>
           </div>
         </div>

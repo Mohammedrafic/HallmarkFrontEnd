@@ -20,6 +20,7 @@ import {
   SaveWorkflowMappingSucceed,
   SaveWorkflowSucceed,
   UpdateWorkflow,
+  UpdateWorkflowMapping,
 } from './workflow.actions';
 import { WorkflowService } from '@shared/services/workflow.service';
 import { ShowToast } from '../../store/app.actions';
@@ -233,6 +234,28 @@ export class WorkflowState {
     { payload, filters }: SaveWorkflowMapping
   ): Observable<WorkflowMappingPost | void> {
     return this.workflowService.saveWorkflowMapping(payload).pipe(
+      tap((payloadResponse) => {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        dispatch(new GetWorkflowMappingPages(filters));
+        dispatch(new SaveWorkflowMappingSucceed());
+        return payloadResponse;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        if (error.error && error.error.errors && error.error.errors.SkillIds[0]) {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.errors.SkillIds[0]));
+        } else {
+          return dispatch(new ShowToast(MessageTypes.Error, RECORD_CANNOT_BE_SAVED));
+        }
+      })
+    );
+  }
+
+  @Action(UpdateWorkflowMapping)
+  UpdateWorkflowMapping(
+    { dispatch }: StateContext<WorkflowStateModel>,
+    { payload, filters }: SaveWorkflowMapping
+  ): Observable<WorkflowMappingPost | void> {
+    return this.workflowService.updateWorkflowMapping(payload).pipe(
       tap((payloadResponse) => {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         dispatch(new GetWorkflowMappingPages(filters));

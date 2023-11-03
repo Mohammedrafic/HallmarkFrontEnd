@@ -5,10 +5,10 @@
   display: flex;
   width: 100%;
   flex-wrap: wrap;
-  
+  justify-content: space-between;
+
   .job-info-section {
     display: flex;
-    margin: 0px 0px 24px 24px;
   }
 
   i-feather {

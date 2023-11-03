@@ -157,12 +157,13 @@ export const mapperForContactDetail = (contactDetails: Department): ContactDetai
   mobilePhone: contactDetails.facilityPhoneNo,
 });
 
-export const getDataSourceForJobDistribution = (selectedSystem: SelectSystem, tieringLogicEnabled: boolean,isDistributionActivate?:boolean) => {
+export const getDataSourceForJobDistribution = (selectedSystem: SelectSystem,
+  tieringLogicIrpEnabled: boolean,isDistributionActivate?:boolean, tieringLogicVmsEnabled?: boolean) => {
   if (selectedSystem.isIRP && selectedSystem.isVMS) {
-    return JobDistributionIrpVms(tieringLogicEnabled);
+    return JobDistributionIrpVms(tieringLogicIrpEnabled, tieringLogicVmsEnabled);
   }
 
-  return JobDistributionIrpOnly(tieringLogicEnabled);
+  return JobDistributionIrpOnly(tieringLogicIrpEnabled);
 };
 
 export const viewDistributiondelay =

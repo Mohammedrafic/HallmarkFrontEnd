@@ -3,7 +3,7 @@
   #candidateDialog
   cssClass="dialog timesheet-details-dialog"
   [target]="targetElement"
-  [width]="previewAttachemnt ? '99%' : '1180px'"
+  [width]="previewAttachemnt ? '100%' : '1548px'"
   [visible]="false"
   [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -12,7 +12,7 @@
   <ng-template #content>
     <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate" #resize>
       <div class="main-body">
-        <div [ngClass]="previewAttachemnt ? 'w-50' : 'w-100'">
+        <div class="timesheet-details-container" [ngClass]="previewAttachemnt ? 'w-50' : 'w-100'">
           <div class="header-container">
             <div class="profile-details">
               <div class="profile-details__wraper">
@@ -28,26 +28,17 @@
                       <h3 class="username">
                         {{ timesheetDetails.candidateLastName }}, {{ timesheetDetails.candidateFirstName }}
                       </h3>
-                      <ng-container *ngIf="!isMobile">
-                        <ng-container
-                          [ngTemplateOutlet]="chipListTmplt"
-                          [ngTemplateOutletContext]="{ timesheetDetails }"
-                        ></ng-container>
-                      </ng-container>
+                      <ng-container
+                        [ngTemplateOutlet]="chipListTmplt"
+                        [ngTemplateOutletContext]="{ timesheetDetails }"
+                      ></ng-container>
                     </div>
-                  </div>
-                  <div *ngIf="isMobile" class="profile-details__chip-list">
-                    <ng-container
-                      [ngTemplateOutlet]="chipListTmplt"
-                      [ngTemplateOutletContext]="{ timesheetDetails }"
-                    ></ng-container>
                   </div>
                 </div>
 
                 <div class="profile-details__header-controls">
                   <div class="profile-details__upload-container" #uploadContainer>
                     <app-date-week-picker
-                      *ngIf="!isMobile"
                       [initDates]="weekPeriod"
                       [emitOnSetInit]="false"
                       [availibleDates]="workWeeks"
@@ -81,16 +72,16 @@
                       [showToolTip]="!hasEditTimesheetRecordsPermission"
                     >
                       <button
-                        ejs-dropdownbutton
-                        iconCss="e-icons"
-                        cssClass="e-caret-hide primary-icon-button menu-mobile"
-                        [items]="mobileMenu"
+                        #uploadBtn
+                        ejs-button
+                        cssClass="e-outline"
+                        class="profile-details__upload-button"
                         [disabled]="
                           disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles
                         "
-                        (select)="onMobileMenuSelect($event)"
+                        (click)="openFileUploadArea()"
                       >
-                        <i-feather name="more-vertical" class="icon"></i-feather>
+                        <i-feather name="upload" class="icon mobile-upload-icon"></i-feather>
                       </button>
                     </app-tooltip-container>
 
@@ -113,32 +104,33 @@
                     ></app-export-button>
                   </div>
 
-                  <button
-                    ejs-button
-                    type="submit"
-                    class="e-flat close-button"
-                    (click)="handleProfileClose()"
-                    [ngClass]="{ closeButton: previewAttachemnt }"
-                  >
-                    <i-feather name="x" class="icon"></i-feather>
-                  </button>
+                  <div class="close-details-wrapper" *ngIf="!previewAttachemnt">
+                    <button
+                      ejs-button
+                      type="submit"
+                      class="e-flat close-button close-details"
+                      (click)="handleProfileClose()"
+                    >
+                      <i-feather name="x" class="icon"></i-feather>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div *ngIf="isMobile" class="profile-details__mobile-date-picker">
-                <app-date-week-picker
-                  [initDates]="weekPeriod"
-                  [availibleDates]="workWeeks"
-                  [rangeType]="rangeType"
-                  [isAbleToChange]="isChangesSaved"
-                >
-                </app-date-week-picker>
               </div>
             </div>
           </div>
-          <div class="content-container" [ngClass]="{ 'preview-content-container': previewAttachemnt }">
-            <div class="order-header">
-              <div class="order-meta">
-                <h2 class="order-id">Job ID: {{ timesheetDetails?.formattedId }}</h2>
+          <div class="content-container">
+            <div class="content-header">
+              <div class="tab-wrapper">
+                <ejs-tab #tabs id="tab_default" heightAdjustMode="Auto" overflowMode="Scrollable" (selected)="selectTab($event)">
+                  <e-tabitems>
+                    <e-tabitem *ngFor="let tab of tabsConfig; trackBy: trackByTitle">
+                      <ng-template #headerText>
+                        <div>{{ tab.title }}</div>
+                      </ng-template>
+                      <ng-template #content> </ng-template>
+                    </e-tabitem>
+                  </e-tabitems>
+                </ejs-tab>
               </div>
 
               <div class="controls-wrapper">
@@ -148,120 +140,82 @@
                     <span class="reason-text">{{ rejectReason }}</span>
                   </ejs-tooltip>
                 </div>
-
-                <div class="controls-block">
-                  <div class="checkbox-block">
-                    <ejs-switch
-                      #dnwSwitch
-                      class="toggle"
-                      [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission || !isDNWEnabled"
-                      [checked]="timesheetDetails.noWorkPerformed"
-                      (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
-                    ></ejs-switch>
-                    <span>DNW</span>
-                  </div>
+                <div class="checkbox-block">
+                  <ejs-switch
+                    #dnwSwitch
+                    class="toggle"
+                    [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission || !isDNWEnabled"
+                    [checked]="timesheetDetails.noWorkPerformed"
+                    (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
+                  ></ejs-switch>
+                  <span>DNW</span>
                 </div>
               </div>
             </div>
-
-            <div class="job-general-info tile-dark-blue">
-              <app-profile-details-job-info
-                [isAgency]="isAgency"
-                [jobData]="timesheetDetails"
-              ></app-profile-details-job-info>
-            </div>
-
-            <div class="profile-hours-statistics" [ngClass]="{ 'job-general-scroll': previewAttachemnt }">
-              <div class="tile-dark-blue statistic-wrapper">
-                <app-profile-cumulative-hours
-                  [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
-                ></app-profile-cumulative-hours>
-              </div>
-
-              <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
-                <app-profile-miles [milesData]="milesData"></app-profile-miles>
-              </div>
-
-              <div
-                class="tile-dark-blue profile-attachments"
-                *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length && !previewAttachemnt"
-              >
-                <h3 class="attachments-title">Attachments</h3>
-
-                <app-attachments-list
-                  [attachments]="timesheetDetails.attachments"
-                  [attachmentsListConfig]="attachmentsListConfig$ | async"
-                  [openTheAttachment$]="navigateTheAttachment$"
-                  [deleteIconColor]="'#FF5858'"
-                  [disableDelete]="disableAnyAction || !hasEditTimesheetRecordsPermission"
-                  (previewAttachmentEvent)="onPreviewAttchementClick($event)"
-                ></app-attachments-list>
-              </div>
-
-              <div
-                class="tile-dark-blue profile-invoices"
-                *ngIf="timesheetDetails?.invoices?.length && !previewAttachemnt"
-              >
-                <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
-              </div>
-            </div>
-            <div class="d-flex">
-              <ejs-accordion expandMode="Single" (expanded)="onExpanded($event)">
-                <e-accordionitems>
-                  <e-accordionitem>
-                    <ng-template #header>
-                      <div>Comments</div>
-                    </ng-template>
-                    <ng-template #content>
-                      <app-comments
-                        [comments]="comments"
-                        [orderId]="timesheetDetails.id"
-                        [commentContainerId]="timesheetDetails.commentContainerId || 0"
-                        [externalCommentConfiguration]="timesheetDetails.externalCommentsConfiguration"
-                        (commentSaveCheck)="getOrderComments()"
-                        [useStyle]="true"
-                      ></app-comments>
-                    </ng-template>
-                  </e-accordionitem>
-                </e-accordionitems>
-              </ejs-accordion>
-            </div>
-
-            <section class="profile-table-container">
-              <app-profile-timesheet-table
-                [isAgency]="isAgency"
-                [timesheetDetails]="timesheetDetails"
-                [actionsDisabled]="timesheetDetails.noWorkPerformed"
-                [disableAnyAction]="disableAnyAction"
-                [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
-                [hasApproveRejectRecordsPermission]="hasApproveRejectTimesheetRecordsPermission"
-                [hasApproveRejectMileagesPermission]="
+            <section *ngIf="currentTab !== 'details'; else details" class="profile-table-container">
+              <div>
+                <div
+                  class="profile-attachments"
+                  *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length"
+                >
+                  <ejs-accordion expandMode="Single">
+                    <e-accordionitems>
+                      <e-accordionitem>
+                        <ng-template #header>
+                          <div>Attachments</div>
+                        </ng-template>
+                        <ng-template #content>
+                          <app-attachments-list
+                            [attachments]="timesheetDetails.attachments"
+                            [attachmentsListConfig]="attachmentsListConfig$ | async"
+                            [openTheAttachment$]="navigateTheAttachment$"
+                            [deleteIconColor]="'#FF5858'"
+                            [disableDelete]="disableAnyAction || !hasEditTimesheetRecordsPermission"
+                            (previewAttachmentEvent)="onPreviewAttchementClick($event)"
+                          ></app-attachments-list>
+                        </ng-template>
+                      </e-accordionitem>
+                    </e-accordionitems>
+                  </ejs-accordion>
+                </div>
+                <app-profile-timesheet-table
+                  [selectedTab]="currentTab"
+                  [tableRecords]="tableRecords"
+                  [isAgency]="isAgency"
+                  [timesheetDetails]="timesheetDetails"
+                  [actionsDisabled]="timesheetDetails.noWorkPerformed"
+                  [disableAnyAction]="disableAnyAction"
+                  [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
+                  [hasApproveRejectRecordsPermission]="hasApproveRejectTimesheetRecordsPermission"
+                  [hasApproveRejectMileagesPermission]="
                   isAgency ? true : userPermission[userPermissions.CanOrganizationApproveRejectMileages]
                 "
-                [canRecalculateTimesheet]="canRecalculateTimesheet"
-                (openAddSideDialog)="openAddDialog($event)"
-                (uploadSideDialog)="openUploadSideDialog($event)"
-                (changesSaved)="handleEditChanges($event)"
-                (timeSheetChanged)="handleTimeSheetChange()"
-                (rejectEvent)="onRejectButtonClick($event)"
-                (approveEvent)="handleApprove($event)"
-                (closeDetails)="closeDialog()"
-                (orgSubmitting)="orgSubmit()"
-                [disableEditButton]="disableEditButton"
-              >
-              </app-profile-timesheet-table>
+                  [canRecalculateTimesheet]="canRecalculateTimesheet"
+                  (openAddSideDialog)="openAddDialog($event)"
+                  (uploadSideDialog)="openUploadSideDialog($event)"
+                  (changesSaved)="handleEditChanges($event)"
+                  (timeSheetChanged)="handleTimeSheetChange()"
+                  (rejectEvent)="onRejectButtonClick($event)"
+                  (approveEvent)="handleApprove($event)"
+                  (closeDetails)="closeDialog()"
+                  (orgSubmitting)="orgSubmit()"
+                  [disableEditButton]="disableEditButton"
+                >
+                </app-profile-timesheet-table>
+              </div>
             </section>
           </div>
           <app-navigation-panel
             prevLabel="Previous Timesheet"
             nextLabel="Next Timesheet"
+            [isMobile]="isMobile"
             [prevDisabled]="currentSelectedRowIndex === 0"
             [nextDisabled]="isNextDisabled"
             (prevClick)="onNextPreviousOrder(false)"
             (nextClick)="onNextPreviousOrder(true)"
           ></app-navigation-panel>
         </div>
-        <div [ngClass]="{ 'w-50': previewAttachemnt }">
+        <div class="file-viewer-container" [ngClass]="{ 'w-50': previewAttachemnt }">
           <app-timesheet-file-viewer
             [preViewDoc]="previewAttachemnt"
             (previewCloseEvent)="this.previewAttachemnt = false"
@@ -323,4 +277,44 @@
       </e-chips>
     </ejs-chiplist>
   </ejs-tooltip>
+</ng-template>
+
+
+<ng-template #details>
+  <div class="job-general-info tile-dark-blue">
+    <app-profile-details-job-info
+      [isAgency]="isAgency"
+      [jobData]="timesheetDetails"
+    ></app-profile-details-job-info>
+  </div>
+
+  <div class="profile-hours-statistics" [ngClass]="{ 'job-general-scroll': previewAttachemnt }">
+    <div class="tile-dark-blue statistic-wrapper">
+      <app-profile-cumulative-hours
+        [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
+      ></app-profile-cumulative-hours>
+    </div>
+
+    <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
+      <app-profile-miles [milesData]="milesData"></app-profile-miles>
+    </div>
+
+    <div
+      class="tile-dark-blue profile-invoices"
+      *ngIf="timesheetDetails?.invoices?.length && !previewAttachemnt"
+    >
+      <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
+    </div>
+  </div>
+  <div class="d-flex">
+    <app-comments
+      class="comments"
+      [comments]="comments"
+      [orderId]="timesheetDetails.id"
+      [commentContainerId]="timesheetDetails.commentContainerId || 0"
+      [externalCommentConfiguration]="timesheetDetails.externalCommentsConfiguration"
+      (commentSaveCheck)="getOrderComments()"
+      [useStyle]="true"
+    ></app-comments>
+  </div>
 </ng-template>
