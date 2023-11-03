@@ -200,8 +200,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     this.roleFormGroup.patchValue({
       ...editedValue,
     });
-
-    if (role.isDefault) {
+    if (role.isDefault || role.isSelfRole) {
       this.roleFormGroup.disable();
     }
 
