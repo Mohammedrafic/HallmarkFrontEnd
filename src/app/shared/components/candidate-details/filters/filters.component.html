@@ -1,21 +1,10 @@
 <form [formGroup]="filtersForm">
   <div class="input-container" *ngIf="isAgency"  >
     <label>Organization</label>
-    <div class="input-group multiselect bootstrap">
-      <ejs-multiselect
-        #organizationMultiselect
-        mode="CheckBox"
-        selectAllText="All"
-        [showSelectAll]="true"
-        formControlName="organizationIds"
-        placeholder="All"
-        [fields]="optionFields"
-        [allowFiltering]="true"
-        [showDropDownIcon]="true"
-        [changeOnBlur]="false"
-        [dataSource]="filterColumns.organizationIds.dataSource"
-      >
-      </ejs-multiselect>
+    <div class="input-group  multiselect bootstrap">
+      <ejs-dropdownlist  formControlName="organizationIds" [fields]="optionFields"
+        [allowFiltering]="true" [dataSource]="filterColumns.organizationIds.dataSource">
+      </ejs-dropdownlist>
     </div>
   </div>
   <div class="input-container bootstrap" hidden ="true"  *ngIf="!isAgency">

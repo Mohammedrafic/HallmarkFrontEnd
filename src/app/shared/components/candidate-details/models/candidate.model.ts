@@ -50,7 +50,7 @@ export type FiltersModal = {
   startDate?: string;
   endDate?: string;
   orderTypes?: Array<number>;
-  organizationIds?: Array<number>;
+  organizationIds?: number;
   locationIds?: Array<number>;
   departmentIds?: Array<number>;
   applicantStatuses?: Array<number>;

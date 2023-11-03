@@ -30,8 +30,8 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
   @ViewChild('locationDropdown') public  locationDropdown: MultiSelectComponent;
   @ViewChild('departmentDropdown') public  departmentDropdown: MultiSelectComponent;
   public optionFields = {
-    text: 'name',
-    value: 'id',
+    text: 'text',
+    value: 'value',
   };
   
   public typeFields: FieldSettingsModel = { text: 'name', value: 'id' };
