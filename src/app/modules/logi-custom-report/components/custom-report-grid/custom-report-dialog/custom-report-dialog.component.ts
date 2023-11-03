@@ -42,10 +42,10 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
   private unsubscribe$: Subject<void> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public paramsData: any = {
-    'OrganizationParam': "",
-    'RegionsParam': "",
-    'LocationsParam': "",
-    'DepartmentsParam': "",
+    '@OrganizationId': "",
+    '@RegionIds': "",
+    '@LocationIds': "",
+    '@DepartmentIDs': "",
   };
   public catelogName: LogiReportFileDetails;
   public reportName: LogiReportFileDetails;
