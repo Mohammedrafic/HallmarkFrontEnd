@@ -1,3 +1,5 @@
+/* eslint-disable max-lines-per-function */
+/* eslint-disable max-len */
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -8,7 +10,7 @@ import {
 } from '@angular/core';
 import { AbstractControl,FormGroup } from '@angular/forms';
 
-import { combineLatest, distinctUntilChanged, filter, map, Observable, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, forkJoin, map, Observable, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -742,16 +744,21 @@ if(!this.isEdit){
       filter((id) => !!id),
       map((id: number) => this.getContactDetailsById(id)),
       switchMap((id: number) => {
-        return this.settingsViewService.getViewSettingKey(
-          OrganizationSettingKeys.TieringLogic,
-          OrganizationalHierarchy.Department,
-          id, undefined, true);
+        return forkJoin([
+          this.settingsViewService.getViewSettingKey(
+            OrganizationSettingKeys.TieringLogic,
+            OrganizationalHierarchy.Department,
+            id, undefined, true),
+            this.settingsViewService.getViewSettingKey(
+              OrganizationSettingKeys.TieringLogic,
+              OrganizationalHierarchy.Department,
+              id, undefined, false),
+        ]);
       }),
       takeUntil(this.componentDestroy())
-    ).subscribe(({ TieringLogic }) => {
+    ).subscribe((logic) => {
       const jobDistributionForm = this.getSelectedFormConfig(JobDistributionForm);
-      const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem, TieringLogic === 'true');
-
+      const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem, logic[0]['TieringLogic'] === 'true', false, logic[1]['TieringLogic'] === 'true');
       setDataSource(jobDistributionForm.fields, 'jobDistribution', sourceForJobDistribution);
 
       this.setJobDistributionValue();
