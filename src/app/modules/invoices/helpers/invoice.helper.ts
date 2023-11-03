@@ -1,6 +1,6 @@
 import { DataSourceItem } from '@core/interface';
 import { VendorFee } from '../enums';
-import { InvoiceDetail, InvoiceDetailDto, InvoiceRecord, InvoiceSummaryItem } from '../interfaces';
+import { InvoiceDetail, InvoiceDetailDto, InvoiceSummaryItem } from '../interfaces';
 
 export const CreateInvoiceReasonList = (reasons: DataSourceItem[]): DataSourceItem[] => {
   return reasons ? reasons.map((value: DataSourceItem) => ({
@@ -32,9 +32,4 @@ export const CreateInvoiceData = (invoiceDto: InvoiceDetailDto): InvoiceDetail =
     totals: invoiceDto.totals,
     summary: summary,
   });
-};
-
-export const GetParentRecordsId = (records: InvoiceRecord[]): number | null => {
-  const recordIds = records.map((record: InvoiceRecord) => record.parentTimesheetId);
-  return recordIds[0];
 };

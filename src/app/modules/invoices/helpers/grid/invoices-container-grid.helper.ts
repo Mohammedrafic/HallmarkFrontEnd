@@ -10,7 +10,6 @@ import { GridOrderIdCellComponent } from '../../components/grid-order-id-cell/gr
 import { BaseInvoice } from '../../interfaces';
 import { PendingInvoice } from '../../interfaces';
 import { InvoiceType } from '../../enums/invoice-type.enum';
-import { GetParentRecordsId } from '../invoice.helper';
 
 type BaseInvoiceColDefsKeys = keyof Pick<
   BaseInvoice,
@@ -105,7 +104,7 @@ export class InvoicesContainerGridHelper {
         },
         cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
           const { id, organizationId, timesheetType, invoiceRecords } = params.data;
-          const parentID = !!invoiceRecords?.length ? GetParentRecordsId(invoiceRecords) : null;
+          const parentID = !!invoiceRecords?.length ? invoiceRecords[0].parentTimesheetId : null;
           const navigateId = timesheetType === InvoiceType.Timesheet ? id : parentID;
 
           if (navigateId) {
