@@ -77,7 +77,7 @@ export class PositionsCountDayRangeComponent implements OnInit {
     }
     if(status !=  OrderStatus[OrderStatus.Open]){
       window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
-      this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, activeOrderStatus.length>0 ? status:OrderStatus[OrderStatus.InProgress]  );
+      this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, activeOrderStatus.length>0 ? status:OrderStatus[OrderStatus.InProgress]);
     }
   }
 }
