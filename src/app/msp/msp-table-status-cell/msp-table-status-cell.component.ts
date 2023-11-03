@@ -14,12 +14,14 @@ export class MspTableStatusCellComponent implements ICellRendererAngularComp {
   public isEChipShown = false;
 
   agInit(params: ICellRendererParams): void {
-    this.cellValue = params.value==null ?"": AgencyStatus[params.value].toString() ;  
+    this.cellValue = params.valueFormatted || params.value;
+
+    this.isEChipShown = params.data?.extensionFromId;
   }
 
   refresh(params: ICellRendererParams): boolean {
-    this.cellValue = params.value==null ?"": AgencyStatus[params.value].toString();
+    this.cellValue = params.value;
+
     return true;
   }
 }
-

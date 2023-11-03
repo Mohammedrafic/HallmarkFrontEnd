@@ -43,3 +43,13 @@ export class RemoveMspLogo {
   static readonly type = '[admin] Remove Msp Logo ';
   constructor(public payload: number) { }
 }
+
+export class RemoveMsp {
+  static readonly type = '[admin] Remove Msp';
+  constructor(public id: number){}
+}
+
+export class RemoveMspSucceeded {
+  static readonly type = '[admin] Remove Msp Succeeded';
+  constructor(public id: number) { }
+}

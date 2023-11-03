@@ -1,6 +1,5 @@
 import { ColDef, ICellRendererParams } from "@ag-grid-community/core";
 import { ColumnDefinitionModel } from "@shared/components/grid/models";
-import { AgencyStatus } from "@shared/enums/status";
 import { ActionCellrenderComponent } from "src/app/modules/document-library/components/cell-render/action-cellrender/action-cellrender.component";
 import { StatusTextCellrenderComponent } from "src/app/modules/document-library/components/cell-render/status-text-cellrender/status-text-cellrender.component";
 import { MspactionCellrenderComponent } from "../cell-render/mspaction-cellrender/mspaction-cellrender.component";
@@ -25,7 +24,7 @@ const commonColumn: ColDef = {
 
   export enum MspListColumnHeaderText {
     Id = 'Id',
-    Name = 'Name',
+    Name = 'MSP Name',
     Status = 'Status',
     TaxId = 'Tax Id',
     NetSuiteId = 'Netsuite Id',
@@ -62,14 +61,14 @@ const commonColumn: ColDef = {
         maxWidth:150
       },
       
-      {
-        field: MspListColumnField.Id,
-        headerName: MspListColumnHeaderText.Id,
-        hide: true,
-        sortable: true,
-        resizable: false,
-        filter: false,
-      },
+      // {
+      //   field: MspListColumnField.Id,
+      //   headerName: MspListColumnHeaderText.Id,
+      //   hide: true,
+      //   sortable: true,
+      //   resizable: false,
+      //   filter: false,
+      // },
       
       {
         field: MspListColumnField.Name,
@@ -116,5 +115,5 @@ export class MspListDto {
     linkedAgencyName?: string | null;
     LinkedAgencyNetSuiteId?: string | null;
     taxId: string;
-    status: AgencyStatus;
+    status: any
   }
