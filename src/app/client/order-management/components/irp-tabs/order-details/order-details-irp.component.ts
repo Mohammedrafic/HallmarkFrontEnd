@@ -946,6 +946,13 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           this.changeDetection.markForCheck();
         }
       });
+    if(this.selectedOrder?.status === OrderStatus.Filled){
+      this.generalInformationForm.get('regionId')?.disable();
+      this.generalInformationForm.get('locationId')?.disable();
+      this.generalInformationForm.get('departmentId')?.disable();
+      this.generalInformationForm.get('skillId')?.disable();
+      this.generalInformationForm.get('jobEndDate')?.disable();
+    }
   }
 
   private showDistributionErrorMessage(): void {
