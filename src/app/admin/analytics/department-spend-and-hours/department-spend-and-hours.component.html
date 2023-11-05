@@ -44,7 +44,7 @@
                 <label>Region</label>
                 <div class="input-group dropdown">
                     <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage
-                        placeholder="All" [allowFiltering]="true" [showDropDownIcon]="true"
+                        placeholder="All" [allowFiltering]="true" [showDropDownIcon]="true"showSelectAll=true [value]="defaultRegions"
                         [dataSource]="filterColumns.regionIds.dataSource" [fields]="regionFields">
                     </ejs-multiselect>
                 </div>
@@ -55,7 +55,7 @@
                 <label>Location</label>
                 <div class="input-group dropdown">
                     <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
-                        [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
+                        [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"showSelectAll=true
                         [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields">
                     </ejs-multiselect>
                 </div>
@@ -66,7 +66,8 @@
                 <label>Department</label>
                 <div class="input-group dropdown">
                     <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage
-                        placeholder="All" [allowFiltering]="true" [showDropDownIcon]="true"
+                        placeholder="All" [allowFiltering]="true" [showDropDownIcon]="true" showSelectAll=true
+                        [value]="defaultDepartments"
                         [dataSource]="filterColumns.departmentIds.dataSource" [fields]="departmentFields">
                     </ejs-multiselect>
                 </div>
@@ -90,7 +91,7 @@
                     <label>Timesheet Service Date To</label>
                     <div class="input-group datepicker">
                         <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="endDate"
+                             formControlName="endDate"
                             [min]="departmentspendhourReportForm.controls['startDate'].value">
                         </ejs-datepicker>
                     </div>
@@ -104,6 +105,7 @@
                     <div class="input-group dropdown">
                         <ejs-multiselect mode="CheckBox" formControlName="skillCategoryIds" placeholder="All"
                             [allowFiltering]="true" [showDropDownIcon]="true"
+                            [value]="defaultSkillCategories"
                             [dataSource]="filterColumns.skillCategoryIds.dataSource" [fields]="commonFields"
                             [selectAllText]='allOption' showSelectAll=true>
                         </ejs-multiselect>
@@ -113,7 +115,7 @@
                     <label>Skills</label>
                     <div class="input-group dropdown">
                         <ejs-multiselect mode="CheckBox" formControlName="skillIds" placeholder="All"
-                            [allowFiltering]="true" [showDropDownIcon]="true"
+                            [allowFiltering]="true" [showDropDownIcon]="true" [value]="defaultSkills"
                             [dataSource]="filterColumns.skillIds.dataSource" [fields]="commonFields"
                             [selectAllText]='allOption' showSelectAll=true>
                         </ejs-multiselect>

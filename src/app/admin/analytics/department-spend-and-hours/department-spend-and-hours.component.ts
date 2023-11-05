@@ -36,7 +36,6 @@ import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
   selector: 'app-department-spend-and-hours',
   templateUrl: './department-spend-and-hours.component.html',
   styleUrls: ['./department-spend-and-hours.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DepartmentSpendAndHoursComponent implements OnInit {
   public paramsData: any = {
@@ -143,6 +142,7 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
   public masterDepartmentsList: Department[] = [];
   
   public defaultSkillCategories: (number | undefined)[] = [];
+  public defaultSkills: (number | undefined)[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   
   constructor(private store: Store,
@@ -185,7 +185,7 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
 
   private initForm(): void {
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 14);
+    startDate.setDate(startDate.getDate() - 30);
     this.departmentspendhourReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
@@ -193,8 +193,8 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),       
         agencyIds: new FormControl([]),       
-        startDate: new FormControl([]),
-        endDate: new FormControl([]),
+        startDate: new FormControl(startDate,[]),
+        endDate: new FormControl(new Date(Date.now()),[]),
         skillCategoryIds: new FormControl(null),
         skillIds: new FormControl([]),
       }
@@ -224,7 +224,6 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departmentspendhourReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       if (data != null && typeof data === 'number' && data != this.previousOrgId) {
-        this.filterColumns.agencyIds.dataSource = [];
 
         this.isAlive = true;
         this.previousOrgId = data;
@@ -269,28 +268,27 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
 
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.grantFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
-            this.filterColumns.agencyIds.dataSource = [];
 
             if (data != null) {
               this.isAlive = true;
               this.filterOptionsData = data;
               let agencyIds = data?.agencies;
-              this.filterColumns.agencyIds.dataSource = data?.agencies;
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-              this.filterColumns.invoiceStatusIds.dataSource=data?.invoiceStatuses;
               this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.id);
-              debugger;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+              this.defaultSkills=data.masterSkills.map((list)=>list.id);
               let masterSkills = this.filterOptionsData.masterSkills;
               let skills = masterSkills.filter((i) => this.defaultSkillCategories?.includes(i.skillCategoryId));
               this.filterColumns.skillIds.dataSource = skills;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+
               setTimeout(() => { this.SearchReport() }, 3000);
             }
           });
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
+          this.defaultRegions=this.regions.map(x=>x.id);
         }
         else {
           this.isClearAll = false;
@@ -353,7 +351,7 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
       }
     }
     let { departmentIds,locationIds,
-      regionIds, startDate, endDate, agencyIds, skillIds,skillCategories } = this.departmentspendhourReportForm.getRawValue();
+      regionIds, startDate, endDate, agencyIds, skillIds,skillCategoryIds } = this.departmentspendhourReportForm.getRawValue();
     
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
@@ -361,6 +359,8 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     
     this.isResetFilter = false;
+    let _sDate=formatDate(startDate, 'MM/dd/yyyy', 'en-US')
+    let _eDate=formatDate(endDate, 'MM/dd/yyyy', 'en-US')
     this.paramsData =
     {
 
@@ -375,10 +375,10 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
       "RegionIdDS": regionIds.length == 0 ? "null" : regionIds,
       "LocationIdDS": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentIdDS": departmentIds.length == 0 ? "null" : departmentIds,   
-      "TimsheetServiceDateFromDS":  formatDate(startDate, 'MM/dd/yyyy', 'en-US') ,
-      "TimsheetServiceDateToDS":formatDate(endDate, 'MM/dd/yyyy', 'en-US') ,
+      "TimsheetServiceDateFromDS": _sDate ,
+      "TimsheetServiceDateToDS": _eDate,
       "SkillDS": skillIds.length == 0 ? "null" : skillIds.join(","),
-      "SkillCategoryDS": skillCategories.length == 0 ? "null" : skillCategories.join(","),
+      "SkillCategoryDS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
       "UserIdDS": this.user?.id
 
     };
@@ -446,7 +446,6 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
   }
 
   public showFilters(): void {
-    debugger;
     // if (this.isResetFilter) {
       this.onFilterControlValueChangedHandler();
     // }
