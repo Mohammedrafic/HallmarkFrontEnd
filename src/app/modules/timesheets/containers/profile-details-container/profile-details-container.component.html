@@ -307,14 +307,25 @@
     </div>
   </div>
   <div class="d-flex">
-    <app-comments
-      class="comments"
-      [comments]="comments"
-      [orderId]="timesheetDetails.id"
-      [commentContainerId]="timesheetDetails.commentContainerId || 0"
-      [externalCommentConfiguration]="timesheetDetails.externalCommentsConfiguration"
-      (commentSaveCheck)="getOrderComments()"
-      [useStyle]="true"
-    ></app-comments>
+    <ejs-accordion expandMode="Single">
+      <e-accordionitems>
+        <e-accordionitem>
+          <ng-template #header>
+            <div>Comments</div>
+          </ng-template>
+         <ng-template #content>
+           <app-comments
+            class="comments"
+            [comments]="comments"
+            [orderId]="timesheetDetails.id"
+            [commentContainerId]="timesheetDetails.commentContainerId || 0"
+            [externalCommentConfiguration]="timesheetDetails.externalCommentsConfiguration"
+            (commentSaveCheck)="getOrderComments()"
+            [useStyle]="true"
+            ></app-comments>
+         </ng-template>
+        </e-accordionitem>
+      </e-accordionitems>
+    </ejs-accordion>
   </div>
 </ng-template>
