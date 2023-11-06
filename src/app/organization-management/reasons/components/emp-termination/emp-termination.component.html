@@ -29,7 +29,12 @@
           </ng-template>
         </e-column>
         <e-column field="reason" headerText="Reason" textAlign="Left" width="100%"></e-column>
-        <e-column field="defaultValue" headerText="Default Value" textAlign="Left" width="100%"></e-column>
+        <e-column headerText="Default Value" textAlign="Left" width="100%">
+          <ng-template #template let-data>
+            <div *ngIf="data.defaultValue">Yes</div>
+            <div *ngIf="!data.defaultValue">No</div>
+          </ng-template>
+        </e-column>
       </e-columns>
   
       <ng-template #pagerTemplate let-data>
