@@ -41,7 +41,7 @@ export const FilterColumnsDefinition = {
 
   },
   agencyIds: {
-    type: ControlTypes.Multiselect,
+    type: ControlTypes.Dropdown,
     valueType: ValueType.Id,
     dataSource: [],
     valueField: 'agencyName',
@@ -86,7 +86,7 @@ export const FilterColumnsDefinition = {
     valueId: 'id',
   },
   organizationIds:{
-    type: ControlTypes.Multiselect,
+    type: ControlTypes.Dropdown,
     valueType: ValueType.Id,
     dataSource: [],
     valueField: 'name',
