@@ -218,7 +218,7 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
   private generateContactsFormArray(contacts: ContactDetails[]): Array<FormGroup> {
     const formArray: FormGroup[] = [];
-    contacts.forEach((contact: ContactDetails) => {
+    contacts?.forEach((contact: ContactDetails) => {
       formArray.push(this.newContactFormGroup(contact));
     });
     return formArray;
@@ -328,10 +328,8 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
     } else if (organization?.mspDetails?.id === null) {
       businessUnitId = 0;
     }
-
     this.GeneralInformationFormGroup = this.addEditMspService.createGeneralInfoGroup(organization, this.user);
-  
-   this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
+    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
     });
     if(this.title=='Edit')
@@ -347,9 +345,9 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
     {
       this.changeDetectorRef.detectChanges()
     }
-    if (organization) {
+    if (organization && organization.mspContactDetails.length >= 1) {
       this.ContactFormGroup = this.fb.group({
-        contacts: new FormArray(this.generateContactsFormArray(organization.mspContactDetails)),
+        contacts: new FormArray(this.generateContactsFormArray(organization?.mspContactDetails)),
       });
     } else {
       this.ContactFormGroup = this.fb.group({
@@ -363,7 +361,7 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
  
 
-    this.isInitStatusIsActive = organization?.mspDetails.status === OrganizationStatus.Active;
+    this.isInitStatusIsActive = organization?.mspDetails?.status === OrganizationStatus.Active;
     
     if(this.title=='Edit')
     {
@@ -371,8 +369,8 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
     }
     if (organization) {
       //Populate state dropdown with values based on selected country
-      this.store.dispatch(new SetGeneralStatesByCountry(organization.mspDetails.country));
-      this.store.dispatch(new SetBillingStatesByCountry(organization.mspDetails.country));
+      this.store.dispatch(new SetGeneralStatesByCountry(organization.mspDetails?.country));
+      this.store.dispatch(new SetBillingStatesByCountry(organization.mspDetails?.country));
       this.store.dispatch(new SetDirtyState(false));
     } else {
       this.store.dispatch(new SetGeneralStatesByCountry(Country.USA));
@@ -396,9 +394,9 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
       .pipe(ofActionSuccessful(GetMSPByIdSucceeded), takeUntil(this.componentDestroy()))
       .subscribe((organization: { payload: MSP }) => {
         this.businessvalue=organization.payload.businessUnit
-        this.currentBusinessUnitId = organization.payload.mspDetails.id as number;
+        this.currentBusinessUnitId = organization.payload.businessUnit?.id as number;
         this.initForms(organization.payload);
-        this.isSameAsOrg = organization.payload.mspBillingDetails.sameAsMsp;
+        this.isSameAsOrg = organization.payload.mspBillingDetails?.sameAsMsp;
         if (this.isSameAsOrg) {
           this.disableBillingForm();
         }

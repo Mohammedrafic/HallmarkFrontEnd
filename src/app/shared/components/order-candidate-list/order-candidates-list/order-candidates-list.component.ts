@@ -180,6 +180,17 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     this.emitGetCandidatesList();
   }
 
+  protected override emitGetCandidatesList(): void {
+    this.getCandidatesList.emit({
+      orderId: this.order.orderId,
+      organizationId: this.order.organizationId,
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+      excludeDeployed: false,
+      isAvailable: this.isAvailable,
+    });
+  }
+
   public onCloseDialog(): void {
     this.clearDeployedCandidateOrderInfo();
     this.sideDialog.hide();

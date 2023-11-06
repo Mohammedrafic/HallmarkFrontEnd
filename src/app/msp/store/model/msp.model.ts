@@ -26,9 +26,10 @@ export class MSP {
       if (this.mspDetails.externalId === '') {
         this.mspDetails.externalId = null;
       }
-     
-      this.businessUnit=businessUnit
       this.mspBillingDetails = mspBillingDetails;
+      this.businessUnit=businessUnit;
+      this.mspDetails.id=mspDetails?.id || 0;
+      this.mspBillingDetails.id=mspBillingDetails?.id  || 0;
       this.mspBillingDetails.organizationId = businessUnit?.id || 0;
       this.mspBillingDetails.sameAsMsp= isSameAsOrg;
       this.mspContactDetails = mspContactDetails;

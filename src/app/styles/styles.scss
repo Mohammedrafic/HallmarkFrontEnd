@@ -739,3 +739,10 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 .separator {
   background-color: var(--separator) !important;
 }
+
+.order-irp .status-cell .e-chip.e-progress, .order-irp .status-cell .e-chip.e-success, .order-irp .status-cell .e-chip.e-default, .order-irp .status-cell .e-chip.e-filled, .order-irp .status-cell .e-chip.e-warning {
+  width: 74% !important;
+}
+.order-irp .status-cell .e-chip.e-warning.ex{
+  width: 17% !important;
+}

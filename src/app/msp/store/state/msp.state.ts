@@ -2,13 +2,14 @@ import { Injectable } from "@angular/core";
 import { MspService } from "../../services/msp.services";
 import { Observable, catchError, of, tap } from "rxjs";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { GetMSPByIdSucceeded, GetMspById, GetMspLogo, GetMspLogoSucceeded, GetMsps, RemoveMspLogo, SaveMSP, SaveMSPSucceeded, UploadMspLogo } from "../actions/msp.actions";
+import { GetMSPByIdSucceeded, GetMspById, GetMspLogo, GetMspLogoSucceeded, GetMsps, RemoveMsp, RemoveMspLogo, RemoveMspSucceeded, SaveMSP, SaveMSPSucceeded, UploadMspLogo } from "../actions/msp.actions";
 import { MSP, MspListPage } from "../model/msp.model";
 import { AdminStateModel } from "@admin/store/admin.state";
-import { RECORD_ADDED, RECORD_MODIFIED } from "@shared/constants";
+import { RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from "@shared/constants";
 import { MessageTypes } from "@shared/enums/message-types";
 import { ShowToast } from "src/app/store/app.actions";
 import { HttpErrorResponse } from "@angular/common/http";
+import { getAllErrors } from "@shared/utils/error.utils";
 
 export interface MspStateModel {
     mspList:MspListPage | null;
@@ -98,4 +99,22 @@ export class MspState {
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Logo cannot be deleted'))))
     );
   }
+
+
+  @Action(RemoveMsp)
+  deletMspid({ patchState, dispatch }: StateContext<AdminStateModel>, { id }: RemoveMsp): Observable<void>{
+    patchState({ isOrganizationLoading: true });
+    return this.mspService.removeMsp(id).pipe(tap((payload) => {
+       patchState({ isOrganizationLoading: false, });
+       dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      dispatch(new RemoveMspSucceeded(id));
+      return payload;
+    }),
+    catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+
+    );
+  }
+
+
 }
+

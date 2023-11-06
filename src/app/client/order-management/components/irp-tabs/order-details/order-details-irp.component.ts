@@ -177,7 +177,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public distributionFilter: JobDistributionfilters;
   public isDistributionActivate: boolean = false;
   public distributionIds: number[] | null;
-  public isEdit: boolean = false;
+  public isDistributionDelay: boolean = false;
+  public isDistributionToVMS: boolean = false;
   private selectedDistributionState: SelectedDistributionState;
   public readonly optionFields: FieldSettingsModel = OptionFields;
   public readonly orderTypesDataSource: OrderTypes[] = OrderTypeList;
@@ -647,7 +648,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
               this.changeDetection.markForCheck();
             });
           } else {
-            this.jobDistributionForm.get('distributeToVMS')?.setValue(null);
+            this.jobDistributionForm.get('distributeToVMS')?.setValue("");
             this.jobDistributionForm.get('distributionDelay')?.setValue(false);
           }
           if (!departmentsId && this.generalInformationForm.get('skillId')?.value) {
@@ -704,38 +705,48 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     .subscribe((value: boolean) => {
       const Distributiondelay = this.getSelectedFormConfig(JobDistributionForm);
       if (value) {
-if(!this.isEdit){
-        viewDistributiontoVMS(true, Distributiondelay);
-        if (this.isDistributionActivate) {
-          this.distributionFilter = {
-            regionId: this.generalInformationForm.get('departmentId')?.value
-              ? this.generalInformationForm.get('regionId')?.value
-              : null,
-            locationId: this.generalInformationForm.get('departmentId')?.value
-              ? this.generalInformationForm.get('locationId')?.value
-              : null,
-            departmentId: this.generalInformationForm.get('departmentId')?.value
-              ? this.generalInformationForm.get('departmentId')?.value
-              : null,
-          };
+       if (this.isDistributionToVMS) {
+         this.isDistributionToVMS = false;
+       } else {
+         viewDistributiontoVMS(true, Distributiondelay);
+         if (this.isDistributionActivate) {
+           this.distributionFilter = {
+             regionId: this.generalInformationForm.get('departmentId')?.value
+               ? this.generalInformationForm.get('regionId')?.value
+               : null,
+             locationId: this.generalInformationForm.get('departmentId')?.value
+               ? this.generalInformationForm.get('locationId')?.value
+               : null,
+             departmentId: this.generalInformationForm.get('departmentId')?.value
+               ? this.generalInformationForm.get('departmentId')?.value
+               : null,
+           };
 
-          this.store.dispatch(new GetJobDistributionValues(this.distributionFilter));
-          this.selectedDistribution$.pipe(takeUntil(this.unsubscribe$)).subscribe((orgStructure: OrgStructureDto) => {
-            if (orgStructure != null) {
-              this.jobDistributionForm.get('distributeToVMS')?.setValue(orgStructure.distributionConfigs.value);
-              this.jobDistributionForm.get('distributeToVMS')?.enable();
-              this.jobDistributionForm.get('distributionDelay')?.setValue(true);
-            }
-            this.changeDetection.markForCheck();
-          });
-        } else {
-          this.jobDistributionForm.get('distributeToVMS')?.setValue(null);
-          this.jobDistributionForm.get('distributeToVMS')?.disable();
-          this.jobDistributionForm.get('distributionDelay')?.setValue(false);
-        }
-      }
+           this.store.dispatch(new GetJobDistributionValues(this.distributionFilter));
+           this.selectedDistribution$.pipe(takeUntil(this.unsubscribe$)).subscribe((orgStructure: OrgStructureDto) => {
+             if (orgStructure != null) {
+               if (!this.isDistributionDelay) {
+                 this.jobDistributionForm.get('distributeToVMS')?.setValue(orgStructure.distributionConfigs.value);
+                 this.jobDistributionForm.get('distributeToVMS')?.enable();
+                 this.jobDistributionForm.get('distributionDelay')?.setValue(true);
+                 this.jobDistributionForm.get('distributionDelay')?.enable();
+               } else {
+                 this.jobDistributionForm.get('distributeToVMS')?.setValue(orgStructure.distributionConfigs.value);
+                 this.jobDistributionForm.get('distributeToVMS')?.disable();
+                 this.jobDistributionForm.get('distributionDelay')?.setValue(true);
+                 this.jobDistributionForm.get('distributionDelay')?.disable();
+               }
+             }
+             this.changeDetection.markForCheck();
+           });
+         } else {
+           this.jobDistributionForm.get('distributeToVMS')?.setValue("");
+           this.jobDistributionForm.get('distributeToVMS')?.disable();
+           this.jobDistributionForm.get('distributionDelay')?.setValue(false);
+         }
+       }
       } else if (!value) {
-        this.jobDistributionForm.get('distributeToVMS')?.setValue(null);
+        this.jobDistributionForm.get('distributeToVMS')?.setValue("");
         this.jobDistributionForm.get('distributeToVMS')?.disable();
       }
       this.changeDetection.markForCheck();
@@ -777,32 +788,44 @@ if(!this.isEdit){
           this.distributionIds?.includes(IrpOrderJobDistribution.SelectedExternal)
         ) {
           if (this.isDistributionActivate) {
-            if(!this.isEdit)
-            {
-            viewDistributiondelay(true, selecteddistributiondelay);
-            this.distributionFilter = {
-              regionId: this.generalInformationForm.get('departmentId')?.value
-                ? this.generalInformationForm.get('regionId')?.value
-                : null,
-              locationId: this.generalInformationForm.get('departmentId')?.value
-                ? this.generalInformationForm.get('locationId')?.value
-                : null,
-              departmentId: this.generalInformationForm.get('departmentId')?.value
-                ? this.generalInformationForm.get('departmentId')?.value
-                : null,
-            };
+            if (this.isDistributionDelay) {
+              this.isDistributionDelay = false;
+            }
+            else{
+              viewDistributiondelay(true, selecteddistributiondelay);
+              this.distributionFilter = {
+                regionId: this.generalInformationForm.get('departmentId')?.value
+                  ? this.generalInformationForm.get('regionId')?.value
+                  : null,
+                locationId: this.generalInformationForm.get('departmentId')?.value
+                  ? this.generalInformationForm.get('locationId')?.value
+                  : null,
+                departmentId: this.generalInformationForm.get('departmentId')?.value
+                  ? this.generalInformationForm.get('departmentId')?.value
+                  : null,
+              };
 
-            this.store.dispatch(new GetJobDistributionValues(this.distributionFilter));
-            this.selectedDistribution$.pipe(takeUntil(this.unsubscribe$)).subscribe((orgStructure: OrgStructureDto) => {
-              if (orgStructure != null) {
-                this.jobDistributionForm.get('distributeToVMS')?.setValue(orgStructure.distributionConfigs.value);
-                this.jobDistributionForm.get('distributionDelay')?.setValue(true);
-              }
-              this.changeDetection.markForCheck();
-            });
-          }
+              this.store.dispatch(new GetJobDistributionValues(this.distributionFilter));
+              this.selectedDistribution$
+                .pipe(takeUntil(this.unsubscribe$))
+                .subscribe((orgStructure: OrgStructureDto) => {
+                  if (orgStructure != null) {
+                    this.jobDistributionForm.get('distributeToVMS')?.setValue(orgStructure.distributionConfigs.value);
+                    this.jobDistributionForm.get('distributionDelay')?.setValue(true);
+                    this.jobDistributionForm.get('distributeToVMS')?.enable();
+                    this.jobDistributionForm.get('distributionDelay')?.enable();
+                  }
+                  this.changeDetection.markForCheck();
+                });
+            }
+            
           }
         } else {
+          if (this.isDistributionDelay) {
+            this.isDistributionDelay = false;
+          }
+          this.jobDistributionForm.get('distributeToVMS')?.setValue("");
+          this.jobDistributionForm.get('distributionDelay')?.setValue(false);
           viewDistributiondelay(false, selecteddistributiondelay);
         }
       const internalLogicIncompatible = value.includes(TierInternal.id)
@@ -923,6 +946,13 @@ if(!this.isEdit){
           this.changeDetection.markForCheck();
         }
       });
+    if(this.selectedOrder?.status === OrderStatus.Filled){
+      this.generalInformationForm.get('regionId')?.disable();
+      this.generalInformationForm.get('locationId')?.disable();
+      this.generalInformationForm.get('departmentId')?.disable();
+      this.generalInformationForm.get('skillId')?.disable();
+      this.generalInformationForm.get('jobEndDate')?.disable();
+    }
   }
 
   private showDistributionErrorMessage(): void {
@@ -1033,7 +1063,8 @@ if(!this.isEdit){
   }
 
   private patchFormValues(selectedOrder: Order): void {
-    this.isEdit=true;
+    this.isDistributionDelay=true;
+    this.isDistributionToVMS=true;
     this.orderTypeForm.patchValue(selectedOrder);
     this.generalInformationForm.patchValue({
       jobStartDate: selectedOrder.jobStartDate,
