@@ -733,10 +733,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         windowScrollTop();
         this.sideDialog.show();
         disabledBodyOverflow(true);
-        if(this.order.orderType === OrderType.LongTermAssignment){
-          this.tab.select(2);
-          this.changeDetectorRef.detectChanges();
-        }   
       } else {
         this.sideDialog.hide();
         this.selectedTemplate = null;
