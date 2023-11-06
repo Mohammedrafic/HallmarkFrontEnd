@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Order, RegularRatesData } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { Select, Store } from '@ngxs/store';
@@ -18,10 +18,11 @@ import { BillRate } from '@shared/models';
   templateUrl: './general-reorder-info.component.html',
   styleUrls: ['../general-order-info/general-order-info.component.scss'],
 })
-export class GeneralReorderInfoComponent extends DestroyableDirective implements OnChanges {
+export class GeneralReorderInfoComponent extends DestroyableDirective {
   @Input() public set order(order: Order) {
     this.orderInformation = order;
     this.setRegularRates(order.billRates, order.jobStartDate);
+    this.agencies = getAgencyNameList(this.orderInformation);
   }
 
   @Input() system: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
@@ -45,18 +46,6 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
     private orderManagementAgencyService: OrderManagementAgencyService
   ) {
     super();
-  }
-
-  public ngOnChanges(changes: SimpleChanges): void {
-    const { orderInformation } = changes;
-
-    if (orderInformation) {
-      this.agencies = this.getAgencyNames();
-    }
-  }
-
-  public getAgencyNames(): { name: string; tooltip: string } {
-    return getAgencyNameList(this.orderInformation);
   }
 
   public moveToPerDiem(): void {
