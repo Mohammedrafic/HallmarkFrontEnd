@@ -155,8 +155,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
   private culture = 'en-US';
   private nullValue = "null";
   private joinString = ",";
-  private culture = 'en-US';
-
+  
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
