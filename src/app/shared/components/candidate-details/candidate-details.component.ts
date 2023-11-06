@@ -162,6 +162,11 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     value: string | number;
   }[]=[];
 
+  agencyDropdownDatasource:{
+      text: string;
+      value: string | number;
+  }[]=[];
+
   constructor(
     store: Store,
     private router: Router,
@@ -503,7 +508,14 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   private subscribeOnAgency(): Observable<AssociateAgency[]> {
     return this.associateAgencies$.pipe(
       tap((page: AssociateAgency[]) => {
-        this.filterColumns.agencyIds.dataSource = page;
+        this.agencyDropdownDatasource = [];
+        page?.forEach(dataset =>
+              this.agencyDropdownDatasource.push( {
+                  text: dataset.agencyName,
+                  value: dataset.agencyId
+                })
+            );
+        this.filterColumns.agencyIds.dataSource = this.agencyDropdownDatasource;
       })
     );
   }
@@ -533,7 +545,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       departmentIds: [null],
       applicantStatuses: [null],
       candidateNames: [null],
-      agencyIds: [null],
+      agencyIds: null,
       orderId: [null],
       organizationIds:null
     });
@@ -619,7 +631,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
       locationIds: this.filters?.locationIds || [],
       departmentIds: this.filters?.departmentIds || [],
       candidateNames: this.filters?.candidateNames || null,
-      agencyIds: this.filters?.agencyIds || [],
+      agencyIds: this.filters?.agencyIds || null,
       orderId: this.filters?.orderId || null,
     });
     this.filtersForm.patchValue({
@@ -705,7 +717,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
           locationIds: (state?.locationIds && [...state.locationIds]) || [],
           departmentIds: (state?.departmentIds && [...state.departmentIds]) || [],
           candidateNames: state.candidateNames,
-          agencyIds: (state?.agencyIds && [...state.agencyIds]) || [],
+          agencyIds: state?.agencyIds,
           orderId: (state?.orderId ),
         };
         this.setCandidateStatusFilter();

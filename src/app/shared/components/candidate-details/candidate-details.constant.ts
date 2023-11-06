@@ -41,7 +41,7 @@ export const FilterColumnsDefinition = {
 
   },
   agencyIds: {
-    type: ControlTypes.Multiselect,
+    type: ControlTypes.Dropdown,
     valueType: ValueType.Id,
     dataSource: [],
     valueField: 'agencyName',

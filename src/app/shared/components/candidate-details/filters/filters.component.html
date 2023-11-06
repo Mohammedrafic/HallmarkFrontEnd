@@ -16,11 +16,9 @@
   <div class="input-container bootstrap" *ngIf="!isAgency">
     <label>Agency</label>
     <div class="input-group dropdown">
-      <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  appValidateWithMessage
-                       [allowFiltering]="true" [showDropDownIcon]="true" 
-                       [dataSource]="filterColumns.agencyIds.dataSource"
-                       [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true placeholder="All"  >
-      </ejs-multiselect>
+      <ejs-dropdownlist  formControlName="agencyIds" [fields]="optionFields"
+        [allowFiltering]="true" [dataSource]="filterColumns.agencyIds.dataSource">
+      </ejs-dropdownlist>
     </div>
   </div>
 

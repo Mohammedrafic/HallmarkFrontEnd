@@ -20,6 +20,9 @@ export class CandidateDetailsApiService {
     if(candidatePayload.organizationIds){
       candidatePayload.organizationIds = [candidatePayload.organizationIds]
     }
+    if(candidatePayload.agencyIds){
+      candidatePayload.agencyIds = [candidatePayload.agencyIds]
+    }
     return this.http.post<CandidateDetailsPage>(`/api/CandidateProfile/profiles/details`, candidatePayload);
   }
   
