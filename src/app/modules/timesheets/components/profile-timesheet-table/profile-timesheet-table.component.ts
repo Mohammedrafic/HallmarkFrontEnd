@@ -14,7 +14,12 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 import { RecordFields, RecordsMode, SubmitBtnText, TIMETHEETS_STATUSES, RecordStatus } from '../../enums';
-import { TableTitleMapper, TimesheetConfirmMessages, TimesheetRecordsColdef } from '../../constants';
+import {
+  RecordRosStatusClass,
+  TableTitleMapper,
+  TimesheetConfirmMessages,
+  TimesheetRecordsColdef
+} from '../../constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import {
@@ -153,7 +158,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public isSmallContentWidth = false;
 
-  public readonly getRowStyle = (params: any) => {
+  public readonly getRowStyle = (params: { data: {stateText: RecordStatus}}) => {
     if (params.data.stateText === RecordStatus.New) {
       return { 'background-color': '#F2FAF2'};
     }
@@ -162,6 +167,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     }
     return { 'background-color': 'inherit'};
   };
+
+  public readonly getRowClass = (params: { data: {stateText: RecordStatus}}) => {
+    return RecordRosStatusClass[params.data.stateText];
+  }
 
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
 

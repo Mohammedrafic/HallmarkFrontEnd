@@ -68,6 +68,7 @@
         [modules]="modules"
         [pagination]="false"
         [getRowStyle]="getRowStyle"
+        [getRowClass]="getRowClass"
         [class.empty-table]="!recordsToShow[currentTab][currentMode].length"
         [overlayNoRowsTemplate]="gridEmptyMessage"
         (gridReady)="setGridApi($event)"

@@ -39,4 +39,5 @@ export enum RecordStatus {
   New = 'New',
   Deleted = 'Deleted',
   None = 'None',
+  NotChanged = 'NotChanged'
 }

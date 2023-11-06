@@ -132,6 +132,26 @@
       background-color: var(--bg-grid);
     }
 
+    .ag-row,
+    .ag-header {
+      border-color: var(--grid-header-border) !important;
+    }
+
+    .deleted-record-row,
+    .new-record-row {
+      .ag-cell-value {
+        color: $black !important;
+
+        .cell-value {
+          color: $black !important;
+        }
+
+        .main {
+          color: var(--sub-title-2) !important;
+        }
+      }
+    }
+
     .ag-cell-value {
       color: var(--text) !important;
     }
