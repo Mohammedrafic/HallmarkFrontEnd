@@ -135,6 +135,10 @@
     .ag-cell-value {
       color: var(--text) !important;
     }
+
+    .ag-body-viewport {
+      max-height: 465px;
+    }
   }
 }
 
