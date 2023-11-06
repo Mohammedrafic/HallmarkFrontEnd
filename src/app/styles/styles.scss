@@ -622,6 +622,10 @@ body.dark .title, body.dark .contact-name {
 
 #Already_expired_creds .app-widget-wrapper__header {
   padding: 0% 3%;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index : 99;
 }
 
 #Already_expired_creds .widget__type {
@@ -631,6 +635,10 @@ body.dark .title, body.dark .contact-name {
 
 #Upcoming_exp_creds .app-widget-wrapper__header {
   padding: 0% 3%;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index : 99;
 }
 @media screen and (min-width: 0px) and (max-width: 810px)  {
   .app-widget-wrapper__header h3{
