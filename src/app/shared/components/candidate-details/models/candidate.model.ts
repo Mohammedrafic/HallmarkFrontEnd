@@ -55,7 +55,7 @@ export type FiltersModal = {
   departmentIds?: Array<number>;
   applicantStatuses?: Array<number>;
   candidateNames?:number
-  agencyIds?: Array<number>;
+  agencyIds?: number;
   orderId?:string;
   orderBy?:string;
 };
