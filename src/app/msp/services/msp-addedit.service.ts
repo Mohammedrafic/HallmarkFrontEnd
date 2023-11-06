@@ -43,7 +43,7 @@ export class AddEditMSPService {
   createGeneralInfoGroup(organization?: MSP, user?: User | null): FormGroup {
     return this.fb.group({
       id: new FormControl(organization ? organization.mspDetails?.id : 0),
-      name: new FormControl(organization ? organization.mspDetails?.name : '', [Validators.required]),
+      name: new FormControl(organization ? (organization.mspDetails?.name ||  organization.businessUnit?.name || ''):'', [Validators.required]),
       externalId: new FormControl(organization ? organization.mspDetails?.externalId : ''),
       taxId: new FormControl(organization ? organization.mspDetails?.taxId : '', [
         Validators.required,
@@ -76,6 +76,7 @@ export class AddEditMSPService {
       ]),
       status: new FormControl(organization ? organization.mspDetails?.status : 0, [Validators.required]),
       website: new FormControl(organization ? organization.mspDetails?.website : ''),
+      netSuiteId: new FormControl(organization ? (organization.mspDetails?.netSuiteId ||  organization.businessUnit?.netSuiteId || ''):''),
     });
   }
 

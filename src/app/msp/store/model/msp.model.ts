@@ -52,6 +52,7 @@ export class GeneralInformation {
     id?: number;
     organizationId?: number;
     externalId?: number | string | null;
+    netSuiteId?:number | string | null;
     taxId: string;
     name: string;
     organizationType: string;

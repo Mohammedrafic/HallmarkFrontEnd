@@ -46,7 +46,16 @@
                   [allowFiltering]="true"
                 ></ejs-dropdownlist>
               </div> -->
-
+              <div class="input-container">
+                <label>NetSuite ID</label>
+                <input
+                appValidateWithMessage
+                  formControlName="netSuiteId"
+                  class="e-input"
+                  type="text"
+                  [attr.disabled]="true"
+                />
+              </div>
               <div class="input-container">
                 <label>External ID</label>
                 <input
