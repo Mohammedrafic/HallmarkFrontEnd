@@ -4,16 +4,13 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { debounceTime, Observable, takeUntil } from 'rxjs';
-import { take } from 'rxjs/operators';
-
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Titles } from '@shared/enums/title';
 import { OrganizationTypes } from '@shared/enums/organization-type';
 import { User } from '@shared/models/user-managment-page.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { SHOULD_LOC_DEP_INCLUDE_IRP } from '@shared/constants';
-import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
+
 import { OrganizationStatus } from '@shared/enums/status';
 
 import { AbstractPermission } from "@shared/helpers/permissions";
@@ -24,10 +21,10 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { AdminState } from '@admin/store/admin.state';
 import { AppState } from 'src/app/store/app.state';
-import { GetOrganizationById, GetOrganizationLogo, SaveOrganization, SetDirtyState, SetBillingStatesByCountry, SetGeneralStatesByCountry, UploadOrganizationLogo, RemoveOrganizationLogo, GetOrganizationByIdSucceeded, GetOrganizationLogoSucceeded, GetBusinessUnitList, GetDBConnections, SaveOrganizationSucceeded } from '@admin/store/admin.actions';
 import { AddEditMSPService } from '../services/msp-addedit.service';
-import { GetMspById, GetMSPByIdSucceeded, GetMspLogo, GetMspLogoSucceeded, SaveMSP, SaveMSPSucceeded, UploadMspLogo } from '../store/actions/msp.actions';
+import { GetMspById, GetMSPByIdSucceeded, GetMspLogo, GetMspLogoSucceeded, RemoveMspLogo, SaveMSP, SaveMSPSucceeded, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry, UploadMspLogo } from '../store/actions/msp.actions';
 import { businessUnit, MSP } from '../store/model/msp.model';
+import { MspState } from '../store/state/msp.state';
 
 @Component({
   selector: 'app-add-edit-msp',
@@ -74,23 +71,17 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
   private user: User | null;
   businessvalue:businessUnit
 
-  @Select(AdminState.countries)
+  @Select(MspState.countries)
   countries$: Observable<string[]>;
 
-  @Select(AdminState.statesGeneral)
+  @Select(MspState.statesGeneral)
   statesGeneral$: Observable<string[]>;
 
-  @Select(AdminState.statesBilling)
+  @Select(MspState.statesBilling)
   statesBilling$: Observable<string[]>;
 
   @Select(AdminState.businessUnits)
   businessUnits$: Observable<BusinessUnit[]>;
-
-  @Select(AdminState.sendDocumentAgencies)
-  sendDocumentAgencies$: Observable<[]>;
-
-  @Select(AdminState.days)
-  days$: Observable<[]>;
 
   @Select(AdminState.organizationStatuses)
   public organizationStatuses$: Observable<[]>;
@@ -98,8 +89,6 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
   @Select(UserState.user)
   user$: Observable<User>;
 
-  @Select(AdminState.dataBaseConnections)
-  dataBaseConnections$: Observable<string[]>;
 
   @Select(AppState.isSidebarOpened)
   isSidebarOpened$:Observable<boolean>;
@@ -305,7 +294,7 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
     if (this.filesDetails.length) {
       this.store.dispatch(new UploadMspLogo(this.filesDetails[0] as Blob, businessUnitId));
     } else if (this.logo && this.logoToDelete) {
-      this.store.dispatch(new RemoveOrganizationLogo(businessUnitId));
+      this.store.dispatch(new RemoveMspLogo(businessUnitId));
     }
   }
 
@@ -425,8 +414,6 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
   private orgListActions(): void {
     this.store.dispatch(new SetHeaderState({ iconName: 'organization', custom: true, title: ' MSP List' }));
-    this.store.dispatch(new GetBusinessUnitList());
-    this.store.dispatch(new GetDBConnections());
   }
 
   private startSaveOrgActionWatching(): void {

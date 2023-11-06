@@ -1,3 +1,4 @@
+import { Country } from "@shared/enums/states";
 import { MSP } from "../model/msp.model";
 
 export class GetMsps {
@@ -6,50 +7,64 @@ export class GetMsps {
   }
 
   export class SaveMSP {
-    static readonly type = '[admin] Save Msp';
+    static readonly type = '[msp] Save Msp';
     constructor(public payload: MSP) { }
   }
   export class SaveMSPSucceeded {
-    static readonly type = '[admin] Save Organization Succeeded';
+    static readonly type = '[msp] Save Msp Succeeded';
     constructor(public payload: MSP) { }
   }
 
   export class GetMspById {
-    static readonly type = '[admin] Get Msp by ID';
+    static readonly type = '[msp] Get Msp by ID';
     constructor(public payload: number) { }
   }
   
 export class GetMSPByIdSucceeded {
-  static readonly type = '[admin] Get Organization by ID Succeeded';
+  static readonly type = '[msp] Get Msp by ID Succeeded';
   constructor(public payload: MSP) { }
 }
 
 export class GetMspLogo {
-  static readonly type = '[admin] Get Msp Logo';
+  static readonly type = '[msp] Get Msp Logo';
   constructor(public payload: number) { }
 }
 export class GetMspLogoSucceeded {
-  static readonly type = '[admin] Get Msp Logo Succeeded';
+  static readonly type = '[msp] Get Msp Logo Succeeded';
   constructor(public payload: Blob) { }
 }
 
 export class UploadMspLogo {
-  static readonly type = '[admin] Upload Msp Logo';
+  static readonly type = '[msp] Upload Msp Logo';
   constructor(public file: Blob, public businessUnitId: number) { }
 }
 
 
 export class RemoveMspLogo {
-  static readonly type = '[admin] Remove Msp Logo ';
+  static readonly type = '[msp] Remove Msp Logo ';
   constructor(public payload: number) { }
 }
 
 export class RemoveMsp {
-  static readonly type = '[admin] Remove Msp';
+  static readonly type = '[msp] Remove Msp';
   constructor(public id: number){}
 }
 
+export class SetGeneralStatesByCountry {
+  static readonly type = '[msp] Set General States By Country';
+  constructor(public payload: Country) { }
+}
+
+export class SetDirtyState {
+  static readonly type = '[msp] Set Dirty State Of The Form';
+  constructor(public payload: boolean) { }
+}
+
+export class SetBillingStatesByCountry {
+  static readonly type = '[msp] Set Billing States By Country';
+  constructor(public payload: Country) { }
+}
 export class RemoveMspSucceeded {
-  static readonly type = '[admin] Remove Msp Succeeded';
+  static readonly type = '[msp] Remove Msp Succeeded';
   constructor(public id: number) { }
 }
