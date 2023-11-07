@@ -1,16 +1,23 @@
-@import "colors";
-.app-header{
+@import 'colors';
+.app-header {
   width: 100%;
 }
-.padt-10{
+.padt-10 {
   padding-top: 10%;
 }
-.padt-5{
+.padt-5 {
   padding-top: 4%;
 }
-.app-accumulation-chart__title{
-  text-align: center;   
-   margin-left: 10px;
+.app-accumulation-chart__title {
+  text-align: center;
+  margin-left: 10px;
+  .widget-header {
+    &__title:hover {
+      background-color: #c5d9ff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  }
 }
 .widget {
   display: flex;
@@ -38,10 +45,10 @@
     @media screen and (max-width: 1550px) {
       font-size: 12px;
     }
-    &__padd{
+    &__padd {
       padding: 5%;
     }
-    &__paddtop{
+    &__paddtop {
       padding-top: 2%;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -49,24 +56,29 @@
       font-size: 12px;
       color: $secondary-dark-blue-20;
     }
-  } 
+  }
+  &__type:hover {
+    background-color: #c5d9ff;
+      border-radius: 4px;
+      cursor: pointer;
+  }
 }
-.tooltip_lta{
+.tooltip_lta {
   position: relative;
   bottom: 10px;
   left: 4%;
 }
 
-  .app-widget-wrapper {
-    &__tooltip {
-      text-align: right;
-      float: right;
-      width: 100%
-    }
+.app-widget-wrapper {
+  &__tooltip {
+    text-align: right;
+    float: right;
+    width: 100%;
   }
+}
 
-  .tooltip_pos{
-    position: relative;
-    top: 6px;
-    right: 6px;
-  }
+.tooltip_pos {
+  position: relative;
+  top: 6px;
+  right: 6px;
+}
