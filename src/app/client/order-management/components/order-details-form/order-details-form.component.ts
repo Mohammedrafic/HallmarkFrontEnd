@@ -1059,7 +1059,6 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   private watchForOrderFormsChanges(): void {
     this.orderTypeForm.valueChanges.pipe(
-      throttleTime(500),
       takeUntil(this.componentDestroy())
     ).subscribe((val) => {
       const hourlyRate = this.generalInformationForm.value.hourlyRate;
