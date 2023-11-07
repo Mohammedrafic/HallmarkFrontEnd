@@ -940,7 +940,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private getMissingCredentialsRequestBody(): MissingCredentialsRequestBody {
     return {
       orderId: this.order.orderId || this.order.id,
-      candidateProfileId: this.candidate.candidateId,
+      candidateProfileId: this.candidate.candidateProfileId || this.candidate.candidateId,
       validateForDate: DateTimeHelper.setInitHours(
         DateTimeHelper.setUtcTimeZone(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
       ),
