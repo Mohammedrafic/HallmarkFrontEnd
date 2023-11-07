@@ -177,26 +177,6 @@ export const GridCellsSystemIRPTabPerDiem = (
   },
   {
     ...DefaultOrderCol,
-    field: 'startDate',
-    headerName: 'START DATE',
-    width: 155,
-    minWidth: 135,
-    maxWidth: 200,
-    valueFormatter: (params: ValueFormatterParams) =>
-      formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
-  },
-  {
-    ...DefaultOrderCol,
-    field: 'endDate',
-    headerName: 'END DATE',
-    width: 155,
-    minWidth: 135,
-    maxWidth: 200,
-    valueFormatter: (params: ValueFormatterParams) =>
-      params.value ? formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC') : '',
-  },
-  {
-    ...DefaultOrderCol,
     field: 'jobDate',
     headerName: 'JOB DATE',
     width: 155,

@@ -206,8 +206,6 @@ export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Region', column: 'Region' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
-  { text: 'Start Date', column: 'StartDate' },
-  { text: 'End Date', column: 'EndDate' },
   { text: 'Job Date', column: 'JobDate' },
   { text: 'Actual Start Date', column: 'ActualStartDate' },
   { text: 'Actual End Date', column: 'ActualEndDate' },
