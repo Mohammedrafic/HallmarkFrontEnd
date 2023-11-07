@@ -237,7 +237,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
   private isTimesheetOrMileagesUpdate = true;
-
+  private isFirstOpen = true;
   private slectingindex: number;
 
   constructor(
@@ -311,6 +311,11 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         });
     } else {
       this.currentTab = this.timesheetRecordsService.getCurrentTabName(selectEvent.selectedIndex);
+
+      if (this.currentTab === 'details') {
+        this.previewAttachemnt = false;
+      }
+
       this.cd.detectChanges();
     }
   }
@@ -844,8 +849,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         this.tableRecords = records;
         this.timesheetRecordsService.controlTabsVisibility(billrates, this.tabs, this.tableRecords);
 
-        if (this.currentTab === 'details') {
+        if (this.isFirstOpen) {
           this.tabs.select(TableTabIndex.Time);
+          this.isFirstOpen = false;
         }
 
         this.asyncRefresh();

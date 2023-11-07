@@ -54,7 +54,7 @@
     }
 
     &.charts-legend {
-      padding: 0 12px 0 0;
+      padding: 24px 24px 0 0;
 
       h3 {
         visibility: hidden;
@@ -159,7 +159,6 @@
 
     .charts-legend {
       flex-grow: 1;
-      padding: 0 !important;
 
       .legend-wrapper {
         display: flex;
@@ -183,6 +182,10 @@
       &.cumulative-hours {
         padding-left: 0;
       }
+    }
+
+    .charts-legend {
+      padding: 0 !important;
     }
   }
 }

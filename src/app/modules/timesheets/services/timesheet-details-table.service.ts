@@ -65,7 +65,7 @@ export class TimesheetDetailsTableService {
       },
       {
         ...amountColdef('Miles'),
-        width: 200,
+        width: 260,
         cellRenderer: InputEditorComponent,
         cellRendererParams: {
           editMode: true,
