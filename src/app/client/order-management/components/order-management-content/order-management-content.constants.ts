@@ -186,7 +186,7 @@ export const irpAllOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Actual Start Date', column: 'ActualStartDate' },
   { text: 'Actual End Date', column: 'ActualEndDate' },
   { text: 'Name', column: 'Name' },
-  { text: 'Position ID', column: 'PositionID' },  
+  { text: 'Position ID', column: 'PositionID' },
   { text: 'Shift', column: 'Shift' },
   { text: 'Irp Candid', column: 'IRPCand' },
   { text: 'VMS Candid', column: 'VMSCand' },
@@ -194,7 +194,7 @@ export const irpAllOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
   { text: 'System', column: 'System' },
-  {text:'Position Status',column:'PositionStatus'} 
+  {text:'Position Status',column:'PositionStatus'}
 ];
 
 export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
@@ -206,11 +206,13 @@ export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Region', column: 'Region' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
+  { text: 'Start Date', column: 'StartDate' },
+  { text: 'End Date', column: 'EndDate' },
   { text: 'Job Date', column: 'JobDate' },
   { text: 'Actual Start Date', column: 'ActualStartDate' },
   { text: 'Actual End Date', column: 'ActualEndDate' },
   { text: 'Name', column: 'Name' },
-  { text: 'Position ID', column: 'PositionID' },  
+  { text: 'Position ID', column: 'PositionID' },
   { text: 'Shift', column: 'Shift' },
   { text: 'Irp Candid', column: 'IRPCand' },
   { text: 'VMS Candid', column: 'VMSCand' },
@@ -218,7 +220,7 @@ export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
   { text: 'System', column: 'System' },
-  {text:'Position Status',column:'PositionStatus'} 
+  {text:'Position Status',column:'PositionStatus'}
 ];
 
 export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
@@ -235,7 +237,7 @@ export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Actual Start Date', column: 'ActualStartDate' },
   { text: 'Actual End Date', column: 'ActualEndDate' },
   { text: 'Name', column: 'Name' },
-  { text: 'Position ID', column: 'PositionID' },  
+  { text: 'Position ID', column: 'PositionID' },
   { text: 'Shift', column: 'Shift' },
   { text: 'Irp Candid', column: 'IRPCand' },
   { text: 'VMS Candid', column: 'VMSCand' },
@@ -243,7 +245,7 @@ export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
   { text: 'System', column: 'System' },
-  {text:'Position Status',column:'PositionStatus'} 
+  {text:'Position Status',column:'PositionStatus'}
 ];
 
 export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
@@ -268,7 +270,7 @@ export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Creation date', column: 'CreationDate' },
   { text: 'Order Locked?', column: 'OrderLocked' },
   { text: 'Linked ID', column: 'LinkedId' },
-  {text:'Position Status',column:'PositionStatus'} 
+  {text:'Position Status',column:'PositionStatus'}
 ];
 
 export const orderJourneyColumnsToExport: ExportColumn[] = [
