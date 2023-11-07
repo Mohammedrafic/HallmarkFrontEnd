@@ -406,14 +406,14 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
   private orgProfileActions(): void {
     this.profileMode = true;
-    this.store.dispatch(new SetHeaderState({ iconName: 'organization', custom: true, title: 'Organization Profile' }));
+    this.store.dispatch(new SetHeaderState({ iconName: 'msp', custom: true, title: 'msp Profile' }));
     const user = this.store.selectSnapshot(UserState.user);
     this.store.dispatch(new GetMspById(user?.businessUnitId as number));
     this.store.dispatch(new GetMspLogo(user?.businessUnitId as number));
   }
 
   private orgListActions(): void {
-    this.store.dispatch(new SetHeaderState({ iconName: 'organization', custom: true, title: ' MSP List' }));
+    this.store.dispatch(new SetHeaderState({ iconName: 'msp', custom: true, title: ' MSP List' }));
   }
 
   private startSaveOrgActionWatching(): void {
