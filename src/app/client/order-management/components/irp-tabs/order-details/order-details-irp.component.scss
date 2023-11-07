@@ -378,6 +378,12 @@ ejs-textbox.e-control {
   .e-switch-wrapper {
     height: 14px !important;
     width: 34px !important;
+   
+
+  }
+  .e-switch-wrapper.e-switch-active
+  {
+    background-color: #3e7fff;
   }
 
   .e-switch-handle {
@@ -472,6 +478,7 @@ ejs-textbox.e-control {
   .job-distribution-wrapper {
     grid-template-columns: 1fr 1fr;
     width: 100%
+    
   }
 
   .special-project-wrapper {
@@ -481,6 +488,16 @@ ejs-textbox.e-control {
 .e-switch-wrapper {
   height: 14px !important;
   width: 34px !important;
+}
+.e-switch-on {
+  color: $primary-active-blue-70 !important;
+}
+span.e-switch-handle.e-switch-active {
+  background-color: #3e7fff !important;
+}
+
+.e-switch-off {
+  color: $black !important;
 }
 .switch {
   display: flex;

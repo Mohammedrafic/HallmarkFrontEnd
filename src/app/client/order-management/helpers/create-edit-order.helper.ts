@@ -111,12 +111,6 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
   const jobEndDate = endDate ? new Date(new Date(endDate)?.setHours(0, 0, 0, 0)) : endDate;
   const jobStartDate = startDate ? new Date(new Date(startDate).setHours(0, 0, 0, 0)) : startDate;
   const jobDates = formState.generalInformationForm.get('jobDates')?.value;
-  const distributeToVMS =
-    formState.jobDescriptionForm.get('distributionDelay') && formState.jobDescriptionForm.get('distributeToVMS') != null
-      ? formState.jobDescriptionForm.get('distributeToVMS')?.value.length === 0
-        ? null
-        : formState.jobDescriptionForm.get('distributeToVMS')
-      : null;
   return {
     ...formState.orderType.getRawValue(),
     ...formState.generalInformationForm.getRawValue(),
@@ -124,7 +118,6 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
     ...formState.jobDistributionForm.getRawValue(),
     ...formState.specialProjectForm.getRawValue(),
     ...getBillRateValue(formState),
-    distributeToVMS: distributeToVMS,
     jobEndDate: jobEndDate ? DateTimeHelper.setUtcTimeZone(jobEndDate) : null,
     jobStartDate: jobStartDate ? DateTimeHelper.setUtcTimeZone(jobStartDate) : null,
     jobDistributions: createJobDistributionList(formState.jobDistributionForm),
