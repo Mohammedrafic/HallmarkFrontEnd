@@ -57,7 +57,8 @@ export class TimesheetDetailsTableService {
               preview: (file: Attachment) => this.store.dispatch(new Timesheets.PreviewAttachment(
                 params.data.timesheetRecordId,
                 organizationId,
-                file
+                file,
+                true
               )),
             },
           } as AttachmentsListParams;

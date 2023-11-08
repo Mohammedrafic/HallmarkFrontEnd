@@ -540,7 +540,7 @@ export class TimesheetsState {
   @Action(Timesheets.PreviewAttachment)
   PreviewAttachment(
     { dispatch }: StateContext<TimesheetsModel>,
-    { timesheetRecordId, organizationId, payload: { id, fileName } }: Timesheets.PreviewAttachment
+    { timesheetRecordId, organizationId, payload: { id, fileName }, triggeredFromTable }: Timesheets.PreviewAttachment
   ): Observable<void> {
     return dispatch(
       new FileViewer.Open({
@@ -555,6 +555,7 @@ export class TimesheetsState {
           fileId: id,
           organizationId,
         }),
+        triggeredFromTable,
       })
     );
   }

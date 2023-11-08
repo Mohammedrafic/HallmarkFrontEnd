@@ -224,8 +224,8 @@
             *ngIf="previewAttachemnt"
             prevLabel="Previous Document"
             nextLabel="Next Document"
-            [prevDisabled]="currentSelectedAttachmentIndex === 0"
-            [nextDisabled]="isAttachmentNextDisabled(timesheetDetails.attachments)"
+            [prevDisabled]="currentSelectedAttachmentIndex === 0 || isTableAttachmentOpen"
+            [nextDisabled]="isAttachmentNextDisabled(timesheetDetails.attachments) || isTableAttachmentOpen"
             (prevClick)="onNextPreviousAttachments(false)"
             (nextClick)="onNextPreviousAttachments(true)"
           ></app-navigation-panel>
