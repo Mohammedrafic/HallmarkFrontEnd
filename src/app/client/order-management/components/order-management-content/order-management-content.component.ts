@@ -1258,7 +1258,7 @@ public RedirecttoIRPOrder(order:Order)
         if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length == this.selectedItems.length){
           this.openregrateupdate = false;
         }
-        if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length >0){
+        if(this.selectedItems.filter(ele=> ele.children.length > 0).length >0){
           this.reorderFilledStatus = true;
         }
         if (this.selectedItems.length === 0) {
