@@ -1,5 +1,5 @@
 import { Country } from "@shared/enums/states";
-import { MSP } from "../model/msp.model";
+import { MSP, MSPAssociateOrganizationsAgency } from "../model/msp.model";
 
 export class GetMsps {
     static readonly type = '[msp-list] Get MSPList';
@@ -47,7 +47,7 @@ export class RemoveMspLogo {
 
 export class RemoveMsp {
   static readonly type = '[msp] Remove Msp';
-  constructor(public id: number){}
+  constructor(public id: number) {}
 }
 
 export class SetGeneralStatesByCountry {
@@ -67,4 +67,28 @@ export class SetBillingStatesByCountry {
 export class RemoveMspSucceeded {
   static readonly type = '[msp] Remove Msp Succeeded';
   constructor(public id: number) { }
+}
+
+export class GetMSPAssociateListPage {
+  static readonly type = '[MSP] Get MSP Associate List by page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class DeleteMspAssociateOrganizationsAgencyById {
+  static readonly type = '[MSP] Delete MSP Associate by Id';
+  constructor(public id: number) { }
+}
+
+export class GetMspAssociateAgency {
+  static readonly type = '[Msp] Get Agencies to associate';
+  constructor() { }
+}
+
+export class AssociateAgencyToMsp {
+  static readonly type = '[Msp] Associated Agency to MSP';
+  constructor(public agencyIds: number[]) { }
+}
+export class AssociateAgencyToMspSucceeded {
+  static readonly type = '[Msp] Associated Agency to MSP successfully';
+  constructor(public payload: MSPAssociateOrganizationsAgency[]) { }
 }

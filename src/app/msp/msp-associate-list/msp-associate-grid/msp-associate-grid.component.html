@@ -1,0 +1,51 @@
+<div class="associated-grid"
+     [ngClass]="{'empty-grid': mspAgencyData.items.length < 1}">
+  <ejs-grid #grid
+            [dataSource]="mspAgencyData.items"
+            [allowSorting]="true"
+            [allowResizing]="true"
+            [allowSelection]="false"
+            [resizeSettings]="resizeSettings"
+            [enableVirtualization]="false"
+            [pageSettings]="pageSettings"
+            [height]="fullScreenGridHeight"
+            (actionBegin)="actionBegin($event)"
+            class="e-gridwithheader e-gridsubheader">
+    <e-columns>
+      <e-column textAlign="Right" width="100">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button
+                    appHideBeforeSyncfusionLoad
+                    cssClass="e-flat secondary-icon-button"
+                    (click)="onRemove(data)"
+                    [disabled]="!userPermission[userPermissions.CanCreateMSP]">
+              <span><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="name" headerText="Name" width="150" textAlign="left"></e-column>
+      <e-column field="id" headerText="Business Unit Id" width="150" textAlign="Left"></e-column>
+      <e-column field="agencyStatus" headerText="Agency Status" width="150" textAlign="Left">
+        <ng-template #template let-data>
+          BusinessUnitType[data.agencyStatus].toString();
+        </ng-template>
+      </e-column>
+      <e-column field="organizationPrefix" headerText="Organization Prefix" width="150" textAlign="left"></e-column>
+      <e-column field="businessUnitType" headerText="Business Unit Type" width="150" textAlign="Left"></e-column>
+      <e-column field="isVMSEnabled" headerText="VMS Enabled" width="150" textAlign="left"></e-column>
+      <e-column field="isIRPEnabled" headerText="IRP Enabled" width="150" textAlign="Left"></e-column>
+      <e-column field="parentUnitId" headerText="Parent Unit Id" width="150" textAlign="left"></e-column>
+      <e-column field="dbConnectionName" headerText="DB Connection Name" width="150" textAlign="Left"></e-column>
+      <e-column field="netSuiteId" headerText="Net Suite Id" width="150" textAlign="left"></e-column>
+    </e-columns>
+  </ejs-grid>
+  <app-grid-pagination [currentPage]="currentPage"
+                       [pageSize]="pageSize"
+                       [totalRecordsCount]="(mspAssociateListPage$ | async)?.totalCount ?? 0"
+                       (navigateToPageEmitter)="changeGridPage($event)"
+                       (pageSizeChangeEmitter)="changeGridSize($event)"></app-grid-pagination>
+</div>
+
+<app-msp-invite-dialog [openEvent]="openMspAssociateAgencyDialog"></app-msp-invite-dialog>

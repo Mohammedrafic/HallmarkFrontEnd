@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MspComponent } from './msp.component';
 import { MspListComponent } from './msp-list/msp-list.component';
 import { AddEditMspComponent } from './add-edit-msp/add-edit-msp.component';
+import { MSPAssociateListComponent } from './msp-associate-list/msp-associate-list.component';
 
  const routes: Routes = [  
   {
@@ -20,6 +21,13 @@ import { AddEditMspComponent } from './add-edit-msp/add-edit-msp.component';
       {
         path: 'msp-edit/edit/:id',
         component: AddEditMspComponent,
+      },
+      {
+        path: 'msp-associate-list',
+        component: MSPAssociateListComponent,
+        data: {
+          isMSPArea: true,
+        },
       },
     ],
   },

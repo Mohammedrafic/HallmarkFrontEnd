@@ -10,6 +10,7 @@ import { MENU_CONFIG } from '@shared/constants';
 import {
   AGENCY_ID_STORAGE_KEY,
   LAST_SELECTED_BUSINESS_UNIT_TYPE,
+  MSP_ID_STORAGE_KEY,
   ORG_ID_STORAGE_KEY,
   USER_STORAGE_KEY
 } from '@shared/constants/local-storage-keys';
@@ -24,14 +25,17 @@ import {
   GetOrganizationStructure, GetOrgTierStructure,
   GetUserAgencies,
   GetUserMenuConfig,
+  GetUserMsps,
   GetUserOrganizations,
   GetUsersAssignedToRole,
   LastSelectedOrganisationAgency,
   LogoutUser,
+  SaveLastSelectedMspId,
   SaveLastSelectedOrganizationAgencyId,
   SetAgencyActionsAllowed,
   SetAgencyInvoicesActionsAllowed,
   SetCurrentUser,
+  SetLastSelectedMspId,
   SetLastSelectedOrganizationAgencyId,
   SetUserPermissions
 } from './user.actions';
@@ -43,15 +47,19 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Permission } from '@core/interface';
 import { UserPermissionsService } from '@core/services';
 import { PermissionsAdapter } from '@core/helpers/adapters';
+import { LastSelectedMspID, UserMsp } from '../shared/models/user-msp.model';
 
 export interface UserStateModel {
   user: User | null;
   menu: Menu;
   agencies: UserAgencyOrganization | null;
   organizations: UserAgencyOrganization | null;
+  msps: UserMsp | null;
   lastSelectedOrganisationAgency: string | null;
+  lastSelectedMsp: string | null;
   lastSelectedOrganizationId: number | null;
   lastSelectedAgencyId: number | null;
+  lastSelectedMspId: number | null;
   organizationStructure: OrganizationStructure | null;
   usersAssignedToRole: UsersAssignedToRole | null;
   permissions: CurrentUserPermission[];
@@ -71,9 +79,12 @@ const AGENCY = 'Agency';
     menu: { menuItems: [] },
     agencies: null,
     organizations: null,
+    msps: null,
     lastSelectedOrganisationAgency: window.localStorage.getItem(LAST_SELECTED_BUSINESS_UNIT_TYPE) || null,
+    lastSelectedMsp: window.localStorage.getItem(LAST_SELECTED_BUSINESS_UNIT_TYPE) || null,
     lastSelectedOrganizationId: parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null,
     lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string) || null,
+    lastSelectedMspId: parseInt(window.localStorage.getItem(MSP_ID_STORAGE_KEY) as string) || null,
     organizationStructure: null,
     tireOrganizationStructure: null,
     usersAssignedToRole: null,
@@ -116,6 +127,11 @@ export class UserState {
   }
 
   @Selector()
+  static mspName(state: UserStateModel): string {
+    return state.msps?.businessUnits.find((item) => item.id === state.lastSelectedMspId)?.name || '';
+  }
+
+  @Selector()
   static menu(state: UserStateModel): Menu {
     return state.menu;
   }
@@ -131,6 +147,11 @@ export class UserState {
   }
 
   @Selector()
+  static msps(state: UserStateModel): UserMsp | null {
+    return state.msps;
+  }
+
+  @Selector()
   static lastSelectedOrganizationId(state: UserStateModel): number | null {
     return state.lastSelectedOrganizationId;
   }
@@ -141,6 +162,11 @@ export class UserState {
   }
 
   @Selector()
+  static lastSelectedMspId(state: UserStateModel): number | null {
+    return state.lastSelectedMspId;
+  }
+
+  @Selector()
   static organizationStructure(state: UserStateModel): OrganizationStructure | null {
     return state.organizationStructure;
   }
@@ -148,6 +174,11 @@ export class UserState {
   @Selector()
   static lastSelectedOrganizationAgency(state: UserStateModel): string | null {
     return state.lastSelectedOrganisationAgency;
+  } 
+
+  @Selector()
+  static lastSelectedMsp(state: UserStateModel): string | null {
+    return state.lastSelectedMsp;
   }
 
   @Selector()
@@ -223,8 +254,10 @@ export class UserState {
       user: null,
       lastSelectedAgencyId: null,
       lastSelectedOrganizationId: null,
+      lastSelectedMspId: null,
       organizations: null,
       agencies: null,
+      msps: null,
       menu: { menuItems: [] },
     });
   }
@@ -283,6 +316,15 @@ export class UserState {
     );
   }
 
+  @Action(GetUserMsps)
+  GetUserMsps({ patchState }: StateContext<UserStateModel>): Observable<UserMsp> {
+    return this.userService.getUserMsps().pipe(
+      tap((msps: UserMsp) => {
+        return patchState({ msps });
+      })
+    );
+  }
+
   @Action(SetLastSelectedOrganizationAgencyId)
   SetLastSelectedOrganizationAgencyId(
     { patchState }: StateContext<UserStateModel>,
@@ -309,6 +351,30 @@ export class UserState {
         if (isOrganizationId) {
           dispatch(new GetOrganizationStructure());
         }
+        return payload;
+      })
+    );
+  }
+
+  @Action(SetLastSelectedMspId)
+  SetLastSelectedMspId(
+    { patchState }: StateContext<UserStateModel>,
+    { payload }: SaveLastSelectedMspId
+  ): void {
+    if (payload.lastSelectedMspId) {
+      window.localStorage.setItem(MSP_ID_STORAGE_KEY, payload.lastSelectedMspId?.toString() as string);
+      patchState({ lastSelectedMspId: payload.lastSelectedMspId });
+    }
+  }
+
+  @Action(SaveLastSelectedMspId)
+  SaveLastSelectedMspId(
+    { dispatch }: StateContext<UserStateModel>,
+    { payload }: SaveLastSelectedMspId
+  ): Observable<LastSelectedMspID> {
+    return this.userService.saveLastSelectedMspId(payload).pipe(
+      map(() => {
+        dispatch(new SetLastSelectedMspId(payload));
         return payload;
       })
     );

@@ -1,6 +1,7 @@
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { LasSelectedOrganizationAgency } from "@shared/models/user-agency-organization.model";
 import { User } from "@shared/models/user.model";
+import { LastSelectedMspID } from "../shared/models/user-msp.model";
 
 export class SetCurrentUser {
   static readonly type = '[user] Set Current User';
@@ -30,8 +31,18 @@ export class GetUserOrganizations {
   constructor() { }
 }
 
+export class GetUserMsps {
+  static readonly type = '[user] Get User Msps';
+  constructor() { }
+}
+
 export class UserOrganizationsAgenciesChanged {
   static readonly type = '[user] User Organizations/Agencies Changed';
+  constructor() { }
+}
+
+export class UserMspsChanged {
+  static readonly type = '[user] User MSPs Changed';
   constructor() { }
 }
 
@@ -43,6 +54,16 @@ export class SetLastSelectedOrganizationAgencyId {
 export class SaveLastSelectedOrganizationAgencyId {
   static readonly type = '[user] Save Last Selected Organization Or Agency Id';
   constructor(public payload: LasSelectedOrganizationAgency, public isOrganizationId: boolean) { }
+}
+
+export class SetLastSelectedMspId {
+  static readonly type = '[user] Set Last Selected Msp Id';
+  constructor(public payload: LastSelectedMspID) { }
+}
+
+export class SaveLastSelectedMspId {
+  static readonly type = '[user] Save Last Selected Msp Id';
+  constructor(public payload: LastSelectedMspID) { }
 }
 
 export class GetOrganizationStructure {

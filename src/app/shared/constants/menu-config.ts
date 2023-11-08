@@ -519,7 +519,12 @@ export const MENU_CONFIG: any = {
       // Interface log summary for IRP
       icon: '',
       route: '/admin/interfacelogirp', 
-   }
+    },
+    120: {
+      // MSP List
+      icon: '',
+      route: 'msp/msp-associate-list',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -955,7 +960,12 @@ export const MENU_CONFIG: any = {
       // Interface log summary for IRP
       icon: '',
       route: '/admin/interfacelogirp', 
-   }
+    },
+    120: {
+      // MSP List
+      icon: '',
+      route: 'msp/msp-associate-list',
+    },
   },
   
 

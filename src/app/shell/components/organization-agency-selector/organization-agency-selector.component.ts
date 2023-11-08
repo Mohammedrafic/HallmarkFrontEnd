@@ -22,7 +22,11 @@ import {
   UserOrganizationsAgenciesChanged,
   SetAgencyActionsAllowed,
   SetAgencyInvoicesActionsAllowed,
-  SetLastSelectedOrganizationAgencyId
+  SetLastSelectedOrganizationAgencyId,
+  GetUserMsps,
+  UserMspsChanged,
+  SaveLastSelectedMspId,
+  SetLastSelectedMspId,
 } from 'src/app/store/user.actions';
 
 import { AppState } from 'src/app/store/app.state';
@@ -42,6 +46,8 @@ import { ActivatedRoute } from '@angular/router';
 import { IOrganizationAgency } from './unit-selector.interface';
 import { UnitSelectorHelper } from './unit-selector.helper';
 import { GetUserMenuConfig } from '../../../store/user.actions';
+import { UserMsp } from '../../../shared/models/user-msp.model';
+import { IsMspAreaStateModel } from '../../../shared/models/is-msp-area-state.model';
 
 @Component({
   selector: 'app-organization-agency-selector',
@@ -67,9 +73,14 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   public organizationAgency: IOrganizationAgency;
   public isAgencyOrOrganization = true;
+  public isAgencyOrOrganizationOrMsp = true;
+  public isMsp = false;
 
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
+
+  @Select(AppState.isMspArea)
+  isMspArea$: Observable<IsMspAreaStateModel>;
 
   @Select(UserState.user)
   user$: Observable<User>;
@@ -80,11 +91,16 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   @Select(UserState.organizations)
   organizations$: Observable<UserAgencyOrganization>;
 
+  @Select(UserState.msps)
+  msps$: Observable<UserMsp>;
+
   private organizations: IOrganizationAgency[] = [];
   private agencies: IOrganizationAgency[] = [];
+  private msps: IOrganizationAgency[] = [];
 
   private userOrganizations: UserAgencyOrganization;
   private userAgencies: UserAgencyOrganization;
+  private userMsps: UserMsp;
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -104,7 +120,9 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     const user = this.store.selectSnapshot(UserState.user);
     this.subscribeUserChange();
     this.isOrganizationAgencyAreaChange();
+    this.isMspAreaChange();
     this.subscribeOrganizationAgencies();
+    this.subscribeMsps();
     this.observeSelectorControl();
 
   }
@@ -131,16 +149,31 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetUserAgencies());
     });
 
+    this.actions$
+      .pipe(
+        ofActionDispatched(UserMspsChanged),
+        takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.store.dispatch(new GetUserMsps());
+    })
+
     this.user$
     .pipe(
       filter((user) => !!user),
       takeUntil(this.unsubscribe$),
     ).subscribe((user) => {
       const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
+      const agencyOrganizationMsps = [BusinessUnitType.Agency, BusinessUnitType.Organization, BusinessUnitType.MSP];
       this.isAgencyOrOrganization = agencyOrganizations.includes(user.businessUnitType);
+      this.isAgencyOrOrganizationOrMsp = agencyOrganizationMsps.includes(user.businessUnitType);
+
+      if (user.businessUnitType == BusinessUnitType.MSP) {
+        this.isMsp = true;
+      }
 
       this.store.dispatch(new GetUserOrganizations());
       this.store.dispatch(new GetUserAgencies());
+      this.store.dispatch(new GetUserMsps());
     });
   }
 
@@ -172,6 +205,44 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     });
   }
 
+  private isMspAreaChange(): void {
+    debugger
+    this.isMspArea$
+      .pipe(
+        distinctUntilChanged((prev, next) => {
+          return prev.isMSPArea === next.isMSPArea;
+        }),
+        takeUntil(this.unsubscribe$),
+      )
+      .subscribe((area) => {
+        const isMspArea = area.isMSPArea;
+
+        if (isMspArea) {
+          this.applyMsps(isMspArea);
+          return;
+        }
+      });
+  }
+
+  private subscribeMsps(): void {
+    zip(this.msps$).pipe(
+      filter((value) => {
+        const dataExist = Array.isArray(value);
+        return dataExist;
+      }),
+      takeUntil(this.unsubscribe$),
+    )
+      .subscribe((userMspsData) => {
+        this.userMsps = userMspsData[0];
+        this.msps = UnitSelectorHelper.createMsps(this.userMsps.businessUnits);
+
+        const area = this.store.selectSnapshot(AppState.isMspArea);
+        this.applyMsps(area.isMSPArea);
+
+        this.cd.markForCheck();
+      });
+  }
+
   private subscribeOrganizationAgencies(): void {
     zip(this.agencies$, this.organizations$)
       .pipe(
@@ -188,7 +259,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         this.userOrganizations = userAgenciesAndOrganizations[1];
 
         this.agencies = UnitSelectorHelper.createAgencies(this.userAgencies.businessUnits);
-        this.organizations = UnitSelectorHelper.createOrganizations(this.userOrganizations.businessUnits);
+        this.organizations = UnitSelectorHelper.createOrganizations(this.userOrganizations.businessUnits);        
 
         const area = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
         this.applyOrganizationsAgencies(area.isOrganizationArea, area.isAgencyArea);
@@ -253,6 +324,47 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     setTimeout(() => this.cd.markForCheck());
   }
 
+  private applyMsps(isMspArea: boolean): void {
+    if (!isMspArea) {
+      return;
+    }
+
+    let mspsData: IOrganizationAgency[] = [];
+
+    mspsData = [...mspsData, ...this.msps];
+    
+
+    if (this.isMsp) {
+      this.organizationAgency = this.msps[0];
+    } else {
+      this.organizationsAgencies$.next(mspsData.sort((a, b) => a.name.localeCompare(b.name)));
+    }
+
+    const lastSelectedMspId = this.store.selectSnapshot(UserState.lastSelectedMspId);
+
+    let newOrganizationAgencyControlValue: number | null;
+    debugger
+    var navi = this.route.snapshot;
+
+    const navigateMspId = this.route.snapshot.queryParams['mspId'] ? Number(this.route.snapshot.queryParams['mspId'])
+        : null;
+    const mspId = navigateMspId || lastSelectedMspId;
+
+    newOrganizationAgencyControlValue = mspsData.find((i) => i.id === mspId)
+        ? mspId
+      : mspsData[0]?.id || null;
+
+    if (this.eliteBusinessUnitId > 0) {
+      newOrganizationAgencyControlValue = mspsData.find((i) => i.id === this.eliteBusinessUnitId)
+        ? this.eliteBusinessUnitId
+        : mspsData[0]?.id || null;
+    }
+
+    this.organizationAgencyControl.patchValue(newOrganizationAgencyControlValue);
+
+    setTimeout(() => this.cd.markForCheck());
+  }
+
   private setAgencyStatus(agency: IOrganizationAgency | undefined): void {
     const agencyIsActive = agency?.status !== AgencyStatus.Inactive && agency?.status !== AgencyStatus.Terminated;
     const userUnit = (this.store.snapshot(). user as UserStateModel).user?.businessUnitType;
@@ -282,7 +394,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       )
       .subscribe((user) => {
         const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
-
+                
         if (agencyOrganizations.includes(user.businessUnitType)) {
           this.store.dispatch(new LastSelectedOrganisationAgency(user.businessUnitName));
           const isAgency = user.businessUnitType === BusinessUnitType.Agency;
@@ -297,14 +409,22 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
             )
           );
         }
+        else if (user.businessUnitType == BusinessUnitType.MSP) {
+          this.store.dispatch(new LastSelectedOrganisationAgency(user.businessUnitName));          
+          this.store.dispatch(
+            new SaveLastSelectedMspId(
+              {
+                lastSelectedMspId: user.businessUnitId ?? null,
+              },
+            )
+          );
+        }
 
         const selectedOrganizationAgencyId: number = this.organizationAgencyControl.value;
 
         const selectedOrganizationAgency = this.organizationsAgencies$
           .getValue()
           .find((i) => i.id === selectedOrganizationAgencyId);
-
-
 
         if (!selectedOrganizationAgency) {
           return;
@@ -319,8 +439,28 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         if (selectedType === 'Agency') {
           this.selectAgency(selectedType, selectedOrganizationAgencyId, selectedOrganizationAgency);
         }
+
+        if (selectedType === 'MSP') {
+          this.selectMSP(selectedOrganizationAgencyId);
+        }
+
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType,false));
       });
+  }
+
+  private selectMSP(selectedId: number): void {
+    this.store.dispatch(new LastSelectedOrganisationAgency('MSP'));
+    this.store.dispatch(
+      new SetLastSelectedMspId({
+        lastSelectedMspId: selectedId,
+      }));
+    this.store.dispatch(
+      new SaveLastSelectedMspId(
+        {
+          lastSelectedMspId: selectedId,
+        },
+      )
+    );
   }
 
   private selectOrganization(type: 'Organization' | 'Agency', selectedId: number): void {

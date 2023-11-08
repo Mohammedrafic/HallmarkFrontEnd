@@ -95,4 +95,18 @@ export class GeneralInformation {
     email: string;
     phoneNumberExt: string;
   }
-  
+
+export type MSPAssociateOrganizationsAgency = {
+  id?: number;
+  organizationPrefix: string;
+  businessUnitType: number;
+  isVMSEnabled: boolean;
+  isIRPEnabled: boolean;
+  name: string;
+  agencyStatus?: string;
+  parentUnitId: number;
+  dbConnectionName: string;
+  netSuiteId: string;
+};
+
+export type MSPAssociateOrganizationsAgencyPage = PageOfCollections<MSPAssociateOrganizationsAgency>;
