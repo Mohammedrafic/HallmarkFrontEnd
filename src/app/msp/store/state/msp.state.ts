@@ -3,7 +3,7 @@ import { MspService } from "../../services/msp.services";
 import { Observable, catchError, of, tap } from "rxjs";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { GetMSPByIdSucceeded, GetMspById, GetMspLogo, GetMspLogoSucceeded, GetMsps, RemoveMsp, RemoveMspLogo, RemoveMspSucceeded, SaveMSP, SaveMSPSucceeded, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry, UploadMspLogo, GetMSPAssociateListPage, GetMspAssociateAgency, DeleteMspAssociateOrganizationsAgencyById, AssociateAgencyToMsp, AssociateAgencyToMspSucceeded } from "../actions/msp.actions";
-import { MSP, MSPAssociateOrganizationsAgency, MSPAssociateOrganizationsAgencyPage, MspListPage } from "../model/msp.model";
+import { MSP, MspListPage, MSPAssociateOrganizationsAgency, MSPAssociateOrganizationsAgencyPage } from "../model/msp.model";
 import { AdminStateModel } from "@admin/store/admin.state";
 import { GeneralPhoneTypes, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED, RECORD_SAVED } from "@shared/constants";
 import { MessageTypes } from "@shared/enums/message-types";
@@ -68,42 +68,6 @@ export interface MspStateModel {
 export class MspState {
   constructor(private mspService: MspService) { }
 
-  @Selector()
-  static getMspList(state: MspStateModel): MspListPage | null {  
-    return state.mspList;
-  }
-
-  @Selector()
-  static mspAssociateListPage(
-    state: MspStateModel
-  ): MSPAssociateOrganizationsAgencyPage | { items: MSPAssociateOrganizationsAgencyPage['items'] } {
-    debugger
-    return state.mspAssociateListPage;
-  }
-
-  @Selector()
-  static mspAssociateAgency(state: MspStateModel): { id: number, name: string }[] {
-    return state.mspAssociateAgency;
-  }
-
-  @Selector()
-  static countries(state: MspStateModel): DropdownOption[] { return state.countries; }
-
-  @Selector()
-  static statesGeneral(state: MspStateModel): string[] | null { return state.statesGeneral; }
-
-  @Selector()
-  static phoneTypes(state: MspStateModel): string[] | null { return state.phoneTypes; }
-
-  @Selector()
-  static organizationStatuses(state: MspStateModel): DropdownOption[] { return state.organizationStatuses; }
-
-  @Selector()
-  static statesBilling(state: MspStateModel): string[] | null { return state.statesBilling; }
-
-  @Selector()
-  static businessUnits(state: MspStateModel): BusinessUnit[] { return state.businessUnits; }
-
   @Action(SetGeneralStatesByCountry)
   SetGeneralStatesByCountry({ patchState }: StateContext<MspStateModel>, { payload }: SetGeneralStatesByCountry): void {
     patchState({ statesGeneral: payload === Country.USA ? UsaStates : CanadaStates });
@@ -119,8 +83,44 @@ export class MspState {
     patchState({ isDirty: payload });
   }
 
+  @Selector()
+  static countries(state: MspStateModel): DropdownOption[] { return state.countries; }
+
+  @Selector()
+  static statesGeneral(state: MspStateModel): string[] | null { return state.statesGeneral; }
+
+  @Selector()
+  static phoneTypes(state: MspStateModel): string[] | null { return state.phoneTypes; }
+
+  @Selector()
+  static getMspList(state: MspStateModel): MspListPage | null {
+    return state.mspList;
+  }
+
+  @Selector()
+  static organizationStatuses(state: MspStateModel): DropdownOption[] { return state.organizationStatuses; }
+
+  @Selector()
+  static statesBilling(state: MspStateModel): string[] | null { return state.statesBilling; }
+
+  @Selector()
+  static businessUnits(state: MspStateModel): BusinessUnit[] { return state.businessUnits; }
+
+  @Selector()
+  static mspAssociateListPage(
+    state: MspStateModel
+  ): MSPAssociateOrganizationsAgencyPage | { items: MSPAssociateOrganizationsAgencyPage['items'] } {
+    debugger
+    return state.mspAssociateListPage;
+  }
+
+  @Selector()
+  static mspAssociateAgency(state: MspStateModel): { id: number, name: string }[] {
+    return state.mspAssociateAgency;
+  }
+
   @Action(GetMsps)
-  GetMsps({ patchState }: StateContext<MspStateModel>,{ }: GetMsps): Observable<MspListPage> {    
+  GetMsps({ patchState }: StateContext<MspStateModel>, { }: GetMsps): Observable<MspListPage> {    
     return this.mspService.GetMspList().pipe(
       tap((payload) => {
         patchState({ mspList: payload });

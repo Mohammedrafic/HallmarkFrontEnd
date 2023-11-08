@@ -11,7 +11,7 @@ export class GetMsps {
     constructor(public payload: MSP) { }
   }
   export class SaveMSPSucceeded {
-    static readonly type = '[msp] Save MSP Succeeded';
+    static readonly type = '[msp] Save Msp Succeeded';
     constructor(public payload: MSP) { }
   }
 
@@ -47,7 +47,7 @@ export class RemoveMspLogo {
 
 export class RemoveMsp {
   static readonly type = '[msp] Remove Msp';
-  constructor(public id: number) { }
+  constructor(public id: number) {}
 }
 
 export class SetGeneralStatesByCountry {
