@@ -20,7 +20,7 @@ export class AddEditMSPService {
       country: new FormControl(organization ? organization?.mspBillingDetails?.country : 0, [Validators.required]),
       state: new FormControl(organization ? organization?.mspBillingDetails?.state : '', [Validators.required]),
       city: new FormControl(organization ? organization?.mspBillingDetails?.city : '', [Validators.required]),
-      zipCode: new FormControl(organization ? organization?.mspBillingDetails?.zipCode : '', [
+      zipCode: new FormControl(organization ? organization?.mspBillingDetails?.zipcode : '', [
         Validators.minLength(5),
         Validators.pattern(/^[0-9]+$/),
       ]),
@@ -58,7 +58,7 @@ export class AddEditMSPService {
       country: new FormControl(organization ? organization.mspDetails?.country : 0, [Validators.required]),
       state: new FormControl(organization ? organization.mspDetails?.state : '', [Validators.required]),
       city: new FormControl(organization ? organization.mspDetails?.city : '', [Validators.required]),
-      zipCode: new FormControl(organization ? organization.mspDetails?.zipCode : '', [
+      zipCode: new FormControl(organization ? organization.mspDetails?.zipcode : '', [
         Validators.minLength(5),
         Validators.pattern(/^[0-9]+$/),
       ]),
