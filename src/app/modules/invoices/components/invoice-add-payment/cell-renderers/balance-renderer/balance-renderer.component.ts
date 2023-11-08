@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
-import { distinctUntilChanged, takeUntil } from 'rxjs';
+import { distinctUntilChanged, startWith, takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 
@@ -42,6 +42,7 @@ export class BalanceRendererComponent extends Destroyable implements ICellRender
     .pipe(
       distinctUntilChanged(),
       takeUntil(this.componentDestroy()),
+      startWith(this.group.get('amount')?.value)
     ).subscribe((value) => {
       this.balance = this.initialAmount - value;
       this.group.get('balance')?.patchValue(this.balance, { emitEvent: false, onlySelf: true });
