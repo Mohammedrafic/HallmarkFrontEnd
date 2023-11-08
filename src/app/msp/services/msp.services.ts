@@ -58,6 +58,14 @@ export class MspService {
   }
 
   /**
+   * Remove holiday by its id
+   * @param id
+   */
+  public removeMsp(id: number): Observable<any> {
+    return this.http.delete<any>(`/api/msp/deleteMsp/${id}`);
+  }
+
+  /**
    * @param pageNumber,
    * @param pageSize
    * @return msp associate list
