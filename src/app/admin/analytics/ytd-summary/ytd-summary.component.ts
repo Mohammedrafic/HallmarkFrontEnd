@@ -421,8 +421,8 @@ export class YtdSummaryComponent implements OnInit, OnDestroy {
 
       "organizationNameYTDS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
       //"reportPulledMessageYTDS": "Data for 01/01/" + year.toString() + " - " + String(selectedMonthDate.getMonth() + 1).padStart(2, '0') + "/" + selectedMonthDate.getDate() + "/" + year.toString() + " pulled on " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString()
-      "reportPulledMessageVMSIR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
-      "DateRangeVMSIR": (("Jan") + " " + "01" + ", " + year.toString()).trim() + " - " + (formatDate(selectedMonthDate, "MMM", this.culture) + " " + selectedMonthDate.getDate() + ", " + selectedMonthDate.getFullYear().toString()).trim()
+      "reportPulledMessageYTDS": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
+      "DateRangeYTDS": (("Jan") + " " + "01" + ", " + year.toString()).trim() + " - " + (formatDate(selectedMonthDate, "MMM", this.culture) + " " + selectedMonthDate.getDate() + ", " + selectedMonthDate.getFullYear().toString()).trim()
 
     };
     this.logiReportComponent.paramsData = this.paramsData;
