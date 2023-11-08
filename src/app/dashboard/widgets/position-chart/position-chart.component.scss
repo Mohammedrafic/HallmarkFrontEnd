@@ -11,14 +11,8 @@
 .app-accumulation-chart__title {
   text-align: center;
   margin-left: 10px;
-  .widget-header {
-    &__title:hover {
-      background-color: #c5d9ff;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  }
 }
+
 .widget {
   display: flex;
   flex-direction: column;
@@ -57,11 +51,6 @@
       color: $secondary-dark-blue-20;
     }
   }
-  &__type:hover {
-    background-color: #c5d9ff;
-      border-radius: 4px;
-      cursor: pointer;
-  }
 }
 .tooltip_lta {
   position: relative;
@@ -81,4 +70,9 @@
   position: relative;
   top: 6px;
   right: 6px;
+}
+:host ::ng-deep .app-widget-wrapper__projection-wrapper:hover {
+  background-color: #c5d9ff;
+  border-radius: 4px;
+  cursor: pointer;
 }
