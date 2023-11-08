@@ -61,7 +61,7 @@ export class GeneralInformation {
     state: string;
     country: number;
     city: string;
-    zipCode: string;
+    zipcode: string;
     phone1Ext: string;
     phone2Ext: string;
     fax: string;
@@ -80,7 +80,7 @@ export class GeneralInformation {
     country: number;
     state: string;
     city: string;
-    zipCode: string;
+    zipcode: string;
     phone1: string;
     phone2: string;
     ext: string;

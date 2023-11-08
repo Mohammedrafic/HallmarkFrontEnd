@@ -624,14 +624,12 @@
     </button>
     <app-tooltip-container
       class="tooltip"
-      [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
     >
       <button
         ejs-button
         appHideBeforeSyncfusionLoad
         class="save-button"
         id="saveButton"
-        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
         [isPrimary]="true"
         (click)="save()"
       >
