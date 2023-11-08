@@ -17,6 +17,7 @@
             <img *ngIf="data.hasLogo; else noLogo"
               [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo?lastUpdateTicks=' + data.lastUpdateTicks"
               alt="logo"
+              loading="lazy"
             />
           </div>
           <div class="details">
@@ -31,6 +32,7 @@
             <img *ngIf="data.hasLogo; else noLogo"
               [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo?lastUpdateTicks=' + data.lastUpdateTicks"
               alt="logo"
+              loading="lazy"
             />
           </div>
 
@@ -47,6 +49,7 @@
       <img *ngIf="organizationAgency.hasLogo; else noLogo"
         [src]="baseUrl + '/api/BusinessUnit/' + organizationAgency.id + '/logo?lastUpdateTicks=' + organizationAgency.lastUpdateTicks"
         alt="logo"
+        loading="lazy"
       />
     </div>
     <p class="title">{{ organizationAgency?.name }}</p>
