@@ -385,8 +385,11 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
         this.businessvalue=organization.payload.businessUnit
         this.currentBusinessUnitId = organization.payload.businessUnit?.id as number;
         this.initForms(organization.payload);
+    
         this.isSameAsOrg = organization.payload.mspBillingDetails?.sameAsMsp;
+    
         if (this.isSameAsOrg) {
+          this.changeDetectorRef.detectChanges();
           this.disableBillingForm();
         }
         if (this.profileMode) {
