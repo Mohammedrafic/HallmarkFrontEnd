@@ -288,7 +288,7 @@
     ></app-profile-details-job-info>
   </div>
 
-  <div class="profile-hours-statistics" [ngClass]="{ 'job-general-scroll': previewAttachemnt }">
+  <div class="profile-hours-statistics">
     <div class="tile-dark-blue statistic-wrapper">
       <app-profile-cumulative-hours
         [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
@@ -299,10 +299,7 @@
       <app-profile-miles [milesData]="milesData"></app-profile-miles>
     </div>
 
-    <div
-      class="tile-dark-blue profile-invoices"
-      *ngIf="timesheetDetails?.invoices?.length && !previewAttachemnt"
-    >
+    <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
       <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
     </div>
   </div>

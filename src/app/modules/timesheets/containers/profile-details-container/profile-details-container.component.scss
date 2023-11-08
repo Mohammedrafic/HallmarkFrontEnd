@@ -53,6 +53,7 @@ $chip-margin: 8px;
 
 .profile-table-container {
   padding-bottom: 0;
+  margin-top: 2px;
 
   ::ng-deep {
     ag-grid-angular {
@@ -165,10 +166,6 @@ $chip-margin: 8px;
   display: flex;
   margin: 16px 0;
 
-  .statistic-wrapper {
-    width: 50%;
-  }
-
   .profile-invoices,
   .miles {
     flex-grow: 1;
@@ -249,7 +246,7 @@ app-navigation-panel {
   display: none;
 }
 
-@media #{$max-desktop-small} {
+@media #{$max-tablet} {
   .profile-hours-statistics {
     flex-wrap: wrap;
     gap: 12px;
@@ -324,10 +321,6 @@ app-navigation-panel {
 }
 .w-40{
   width: 40%;
-}
-.job-general-scroll{
-  width: auto;
-  overflow: scroll;
 }
 
 .comments {
