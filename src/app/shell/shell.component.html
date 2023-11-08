@@ -7,7 +7,7 @@
   </div>
 
   <div class="stick-right header-content">
-    <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
+    <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea || (isMspArea$ | async)?.isMSPArea)">
       <ng-container *ngIf="isDekstop$ | async">
         <app-organization-agency-selector [isDarkTheme]="isDarkTheme"></app-organization-agency-selector>
       </ng-container>
