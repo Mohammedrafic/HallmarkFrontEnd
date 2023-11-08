@@ -54,7 +54,10 @@ export class CandidateListComponent implements OnInit, OnDestroy {
     "BusinessUnitIdParamCL": "",
     "HostNameCL": "",
     "InActiveInCompleteCL": "",
-    "IsExactMatchCL": ""
+    "IsExactMatchCL": "",
+    "organizationNameCL": "",
+    "reportPulledMessageCL": ""
+    
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateList/CandidateList.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateList/CandidateList.cat" };
@@ -144,6 +147,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
   public selectedSearchByOption: number;
   public searchByControl: AbstractControl;
   public inActiveInCompleteControl: AbstractControl;
+  private culture = 'en-US';
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -295,7 +299,8 @@ export class CandidateListComponent implements OnInit, OnDestroy {
       candidateNameValue = [candidateName];
       isExactMatch = "2";
     }
-    
+    let currentDate = new Date(Date.now());
+
     this.paramsData =
     {
       "BearerParamCL": auth,
@@ -308,7 +313,13 @@ export class CandidateListComponent implements OnInit, OnDestroy {
       "SkillCL": skillIds.length == 0 ? "null" : skillIds.join(","),
       "CandidateNameCL": candidateNameValue,
       "IsExactMatchCL": isExactMatch,
-      "InActiveInCompleteCL": inActiveInComplete == true ? "2" : "1"
+      "InActiveInCompleteCL": inActiveInComplete == true ? "2" : "1",
+      "organizationNameCL": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      //"reportPulledMessageMSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
+      "reportPulledMessageCL": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+
+      //"DateRangeCL": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
