@@ -881,6 +881,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/vendor-activity',
     },
+    86: {
+      // DNR Details
+      icon: 'user-x',
+      route: 'client/dnr-details',
+    },
     87: {
       // Staff Schedule By Shift Report
       icon: '',
