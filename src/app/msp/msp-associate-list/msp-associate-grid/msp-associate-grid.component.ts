@@ -8,13 +8,15 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { TiersException } from '@shared/components/associate-list/store/associate.actions';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { AgencyStatus } from '@shared/enums/status';
+import { AgencyStatus, Status } from '@shared/enums/status';
 import { UserPermissions } from "@core/enums";
 import { Permission } from "@core/interface";
 import { MSPAssociateOrganizationsAgency, MSPAssociateOrganizationsAgencyPage } from '../../store/model/msp.model';
 import { MspState } from '../../store/state/msp.state';
 import { DeleteMspAssociateOrganizationsAgencyById, GetMspAssociateAgency, GetMSPAssociateListPage } from '../../store/actions/msp.actions';
 import { UserState } from '../../../store/user.state';
+import { PartnershipStatus } from '../../../shared/enums/partnership-settings';
+import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-msp-associate-grid',
@@ -42,9 +44,18 @@ export class MSPAssociateGridComponent extends AbstractGridConfigurationComponen
   public readonly userPermissions = UserPermissions;
   public readonly agencyStatus = AgencyStatus;
   public openMspAssociateAgencyDialog = new EventEmitter<boolean>();
+  public readonly agencyStatuses = AgencyStatus;
+  public readonly businessUnitType = BusinessUnitType;
 
   private isAlive = true;
   private pageSubject = new Subject<number>();
+  public agencyStatusValueAccess = (_: string, { agencyStatus }: MSPAssociateOrganizationsAgency) => {
+    return AgencyStatus[agencyStatus];
+  };
+
+  public businessUnitValueAccess = (_: string, { businessUnitType }: MSPAssociateOrganizationsAgency) => {
+    return BusinessUnitType[businessUnitType];
+  };
 
   constructor(private confirmService: ConfirmService, private store: Store, private actions$: Actions) {
     super();

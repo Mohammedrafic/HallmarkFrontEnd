@@ -73,8 +73,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   public organizationAgency: IOrganizationAgency;
   public isAgencyOrOrganization = true;
-  public isAgencyOrOrganizationOrMsp = true;
-  public isMsp = false;
+  public isMsp = true;
 
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
@@ -163,13 +162,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       takeUntil(this.unsubscribe$),
     ).subscribe((user) => {
       const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
-      const agencyOrganizationMsps = [BusinessUnitType.Agency, BusinessUnitType.Organization, BusinessUnitType.MSP];
       this.isAgencyOrOrganization = agencyOrganizations.includes(user.businessUnitType);
-      this.isAgencyOrOrganizationOrMsp = agencyOrganizationMsps.includes(user.businessUnitType);
-
-      if (user.businessUnitType == BusinessUnitType.MSP) {
-        this.isMsp = true;
-      }
+      this.isMsp = user.businessUnitType == BusinessUnitType.MSP ? true : false;
 
       this.store.dispatch(new GetUserOrganizations());
       this.store.dispatch(new GetUserAgencies());
@@ -219,6 +213,15 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         if (isMspArea) {
           this.applyMsps(isMspArea);
           return;
+        }
+        if (isMspArea) {
+          const currentArea = 'MSP';
+
+          this.store.dispatch(new LastSelectedOrganisationAgency(currentArea)).pipe(
+            takeUntil(this.unsubscribe$),
+          ).subscribe(() => {
+            this.applyMsps(isMspArea);
+          });
         }
       });
   }
