@@ -7,7 +7,7 @@ export class UserMspBusinessUnit {
 
 export class UserMsp {
   businessUnits: UserMspBusinessUnit[];
-  selectedMspId: number;
+  lastSelectedMspId: number;
 }
 
 export class LastSelectedMspID {

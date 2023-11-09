@@ -206,7 +206,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private isMspAreaChange(): void {
-    debugger
     this.isMspArea$
       .pipe(
         distinctUntilChanged((prev, next) => {
@@ -225,13 +224,16 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private subscribeMsps(): void {
-    zip(this.msps$).pipe(
-      filter((value) => {
-        const dataExist = Array.isArray(value);
-        return dataExist;
-      }),
-      takeUntil(this.unsubscribe$),
-    )
+    zip(this.msps$)
+      .pipe(
+        filter((value) => {
+          const dataExist = Array.isArray(value);
+          const valueExists = !!value[0];
+
+          return dataExist && valueExists;
+        }),
+        takeUntil(this.unsubscribe$),
+      )
       .subscribe((userMspsData) => {
         this.userMsps = userMspsData[0];
         this.msps = UnitSelectorHelper.createMsps(this.userMsps.businessUnits);
@@ -343,8 +345,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     const lastSelectedMspId = this.store.selectSnapshot(UserState.lastSelectedMspId);
 
     let newOrganizationAgencyControlValue: number | null;
-    debugger
-    var navi = this.route.snapshot;
 
     const navigateMspId = this.route.snapshot.queryParams['mspId'] ? Number(this.route.snapshot.queryParams['mspId'])
         : null;
