@@ -8,7 +8,7 @@ import {
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
+import { DoNotReturnSearchCandidate, GetCandidateOrgSearch } from '@shared/models/donotreturn.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
@@ -37,6 +37,10 @@ export class CandidateDetailsApiService {
     return this.http.post<DoNotReturnSearchCandidate[]>(`/api/CandidateProfile/candidatesearchbytext`, filter);
   }
   
+  public getcandidateOrgsearchbytext(filter: any): Observable<GetCandidateOrgSearch[]> {
+    return this.http.post<GetCandidateOrgSearch[]>(`/api/CandidateProfile/CandidateOrgSearchByText`, filter);
+  }
+
   public export(payload: ExportPayload): Observable<Blob> {
     if (payload.ids) {
       return this.http.post(`/api/CandidateProfile/profiles/export`, payload, { responseType: 'blob' });

@@ -4,6 +4,7 @@ import {
   ExportCandidateAssignment,
   GetAssociateOrganizations,
   GetCandidateDetailsPage,
+  GetcandidateOrgSearchbytext,
   Getcandidatesearchbytext,
   GetCandidateSkills,
   SelectNavigation,
@@ -23,7 +24,7 @@ import {
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
 import { CandidateDetailsApiService } from '../services/candidate-details-api.service';
-import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
+import { DoNotReturnSearchCandidate, GetCandidateOrgSearch } from '@shared/models/donotreturn.model';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
@@ -38,6 +39,7 @@ interface CandidateDetailsStateModel {
   candidateLocations: CandidatesDetailsLocations[] | null;
   candidateDepartments: CandidatesDetailsDepartments[] | null;
   searchCandidates:DoNotReturnSearchCandidate[]|null
+  searchOrgCandidates:GetCandidateOrgSearch[]|null
   associateOrganizations: AgencyOrderFilteringOptions|null;
 }
 
@@ -58,6 +60,7 @@ interface CandidateDetailsStateModel {
     candidateLocations:null,
     candidateDepartments:null,
     searchCandidates:null,
+    searchOrgCandidates:null,
     associateOrganizations:null,
   },
 })
@@ -159,6 +162,14 @@ export class CandidateDetailsState {
     }));
   }
   
+  @Action(GetcandidateOrgSearchbytext)
+  GetcandidateOrgsearchbytext({ patchState }: StateContext<CandidateDetailsStateModel>, { filter }:GetcandidateOrgSearchbytext): Observable<GetCandidateOrgSearch[]> {
+    return this.candidateDetailsApiService.getcandidateOrgsearchbytext(filter).pipe(tap((payload: GetCandidateOrgSearch[]) => {
+      patchState({ searchOrgCandidates: payload });
+      return payload
+    }));
+  }
+
   @Action(GetCandidateSkills)
   GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization[]> {
     return this.skillsService.getSortedAssignedSkillsByOrganization().pipe(
