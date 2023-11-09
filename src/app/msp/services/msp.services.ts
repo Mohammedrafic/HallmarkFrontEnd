@@ -71,7 +71,6 @@ export class MspService {
    * @return msp associate list
    */
   public getMSPAssociateListByPage(pageNumber: number, pageSize: number): Observable<MSPAssociateOrganizationsAgencyPage> {
-    debugger
     return this.http.post<any>(
       `/api/msp/MspAssociatedAgencies`, { params: { pageNumber, pageSize } }
     );

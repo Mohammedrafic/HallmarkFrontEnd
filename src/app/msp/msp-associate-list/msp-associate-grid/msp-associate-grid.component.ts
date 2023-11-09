@@ -61,10 +61,6 @@ export class MSPAssociateGridComponent extends AbstractGridConfigurationComponen
     this.isAlive = false;
   }
 
-  public override updatePage(): void {
-    this.dispatchNewPage();
-  }
-
   public onRemove({ index, ...row }: { index: string } & MSPAssociateOrganizationsAgency): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
@@ -123,7 +119,6 @@ export class MSPAssociateGridComponent extends AbstractGridConfigurationComponen
   }
 
   private getAgencies(): void {
-    debugger
     this.mspAssociateListPage$
       .pipe(
         map((data) => {
