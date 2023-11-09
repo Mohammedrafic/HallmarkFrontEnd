@@ -28,6 +28,7 @@ import {
   ConvertAgencyToMSP,
   GetAgencyAuditHistory,
   GetAgencyAuditHistoryDetailSucceeded,
+  ConvertAgencyToMSPSucceeded,
 } from './agency.actions';
 import { AdminStateModel } from '@admin/store/admin.state';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -254,6 +255,7 @@ export class AgencyState {
         tap((res) => {
           if (res) {
             dispatch([new ShowToast(MessageTypes.Success, AGENCY_CONVERTED_TO_MSP), new UserMspsChanged()]);
+            dispatch(new ConvertAgencyToMSPSucceeded(agencyId, netSuiteId, name));
           } else {
             dispatch(new ShowToast(MessageTypes.Warning, AGENCY_CONVERTED_TO_MSP_FAIL));
           }
