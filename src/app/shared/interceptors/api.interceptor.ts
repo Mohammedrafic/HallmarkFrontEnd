@@ -46,7 +46,7 @@ export class ApiInterceptor implements HttpInterceptor {
       if(request.headers.has('selected-businessunit-id')) {
         headers['selected-businessunit-id'] = request.headers.get('selected-businessunit-id') as string;
       }
-      debugger
+      
       if (isMspArea && lastSelectedMspId && isMsp) {
         headers['selected-businessunit-id'] = lastSelectedMspId.toString();
       }
