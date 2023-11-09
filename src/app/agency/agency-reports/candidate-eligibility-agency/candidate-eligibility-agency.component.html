@@ -32,15 +32,6 @@
   <form [formGroup]="agencyCandidateEligibilityReportForm" class="filter-form-dialog form-container bootstrap">
     <div class="form-elemet">
       <div class="group">
-        <div class="input-container bootstrap">
-          <label>Candidate Name</label>
-          <div class="input-group dropdown">
-            <ejs-autocomplete formControlName="candidateName"
-                              [dataSource]="filterColumns.candidateName.dataSource"
-                              filterType='StartsWith' [fields]='candidateNameFields' [autofill]='true'
-                              [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
-          </div>
-        </div>
         <div class="input-container dropdown">
           <label>Order Id</label>
           <div class="input-group">
@@ -49,6 +40,15 @@
                    appValidateWithMessage
                    maxlength="50"
                    formControlName="jobId" />
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label>Candidate Name</label>
+          <div class="input-group dropdown">
+            <ejs-autocomplete formControlName="candidateName"
+                              [dataSource]="filterColumns.candidateName.dataSource"
+                              filterType='StartsWith' [fields]='candidateNameFields' [autofill]='true'
+                              [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
           </div>
         </div>
       </div>
