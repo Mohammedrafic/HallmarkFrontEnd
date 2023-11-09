@@ -3,7 +3,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { militaryToStandard } from '@shared/utils/date-time.utils';
 import { catchError, Observable, of, tap } from "rxjs";
 
-import { RECORD_ADDED, RECORD_MODIFIED, usedByOrderErrorMessage } from "src/app/shared/constants/messages";
+import { RECORD_ADDED, RECORD_MODIFIED,RECORD_DELETE, usedByOrderErrorMessage } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { Shift, ShiftsPage } from 'src/app/shared/models/shift.model';
 import { ShowToast } from "src/app/store/app.actions";
@@ -76,6 +76,7 @@ export class ShiftsState {
     patchState({ isShiftLoading: true });
     return this.shiftsService.removeShift(payload).pipe(tap((payload) => {
         patchState({ isShiftLoading: false });
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         dispatch(new DeleteShiftSucceeded(payload));
         return payload;
       }),
