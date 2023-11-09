@@ -433,7 +433,6 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   }
   private watchForSaveEvents(): void {
     this.handleSaveEvents$.pipe(takeUntil(this.componentDestroy())).subscribe((saveType: MenuEventArgs | void) => {
-      console.log(saveType)
       this.irpStateService.saveEvents.next();
       const formState = this.irpStateService.getFormState();
       const saveOrderAstemplate = this.irpStateService.getOrderTemplateFormState();
