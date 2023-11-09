@@ -2,7 +2,8 @@
   <ng-template #header>
     <div *ngIf="chartData" [ngClass]="isLTAOrderEnding ? 'app-header padt-10' : 'app-header padt-5' ">
       <div class="app-accumulation-chart__title" (click)="isLTAOrderEnding ? navigateToUrl($event,chartData.statusName) : toSourceContent($event)">
-        <h3 class="widget-header__title">{{ chartData?.count }}</h3>
+        <h3 class="widget-header__title" (mousedown)="defineMousePosition($event)"
+        (click)="navigateToUrl($event,chartData.statusName)">{{ chartData?.count }}</h3>
       </div>
     </div>
       <div  *ngIf="description.length>0">
@@ -19,8 +20,7 @@
     <div class="widget">
       
       <span class="widget__type" *ngIf="isLTAOrderEnding && chartData"
-            (mousedown)="defineMousePosition($event)"
-            (click)="navigateToUrl($event,chartData.statusName)">{{ chartData?.statusName | titlecase }} Positions</span>
+            >{{ chartData?.statusName | titlecase }} Positions</span>
       <span class="widget__type" *ngIf="!isLTAOrderEnding"
             (mousedown)="defineMousePosition($event)"
             (click)="toSourceContent($event)">Positions ending in next  45  days</span>
