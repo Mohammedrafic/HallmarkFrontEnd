@@ -61,7 +61,7 @@ export class GeneralInformation {
     state: string;
     country: number;
     city: string;
-    zipCode: string;
+    zipcode: string;
     phone1Ext: string;
     phone2Ext: string;
     fax: string;
@@ -80,7 +80,7 @@ export class GeneralInformation {
     country: number;
     state: string;
     city: string;
-    zipCode: string;
+    zipcode: string;
     phone1: string;
     phone2: string;
     ext: string;
@@ -95,4 +95,18 @@ export class GeneralInformation {
     email: string;
     phoneNumberExt: string;
   }
-  
+
+export type MSPAssociateOrganizationsAgency = {
+  id?: number;
+  organizationPrefix: string;
+  businessUnitType: number;
+  isVMSEnabled: boolean;
+  isIRPEnabled: boolean;
+  name: string;
+  agencyStatus?: string;
+  parentUnitId: number;
+  dbConnectionName: string;
+  netSuiteId: string;
+};
+
+export type MSPAssociateOrganizationsAgencyPage = PageOfCollections<MSPAssociateOrganizationsAgency>;

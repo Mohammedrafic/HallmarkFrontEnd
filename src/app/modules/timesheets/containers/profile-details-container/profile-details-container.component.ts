@@ -19,7 +19,7 @@ import { OutsideZone } from '@core/decorators';
 import { DialogAction, FileSize } from '@core/enums';
 import { DateTimeHelper } from '@core/helpers';
 import { DropdownOption, FileForUpload, Permission } from '@core/interface';
-import { Actions, ofActionCompleted, Select, Store } from '@ngxs/store';
+import { Actions, ofActionCompleted, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { Attachment, AttachmentsListConfig } from '@shared/components/attachments';
 import { UploadFileAreaComponent } from '@shared/components/upload-file-area/upload-file-area.component';
 import { GRID_CONFIG, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
@@ -32,6 +32,7 @@ import { AgencyStatus } from '@shared/enums/status';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { OrganizationStructure } from '@shared/models/organization.model';
+import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
@@ -145,6 +146,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public currentTab: RecordFields | 'details' = 'details';
 
   public tableRecords: TimesheetRecordsDto;
+
+  public isTableAttachmentOpen = false;
 
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
 
@@ -275,6 +278,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.observeRecordsLoad();
     this.observeDetails();
     this.sideBarObserver();
+    this.watchForTableAttachmentPreview();
   }
 
   public ngAfterViewInit(): void {
@@ -864,5 +868,18 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     setTimeout(() => {
       this.tabs.refreshActiveTabBorder();
     }, 100);
+  }
+
+  private watchForTableAttachmentPreview(): void {
+    this.actions
+      .pipe(
+        ofActionSuccessful(FileViewer.Open),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(({ payload }) => {
+        this.isTableAttachmentOpen =  payload.triggeredFromTable;
+        this.previewAttachemnt = true;
+        this.cd.markForCheck();
+      });
   }
 }

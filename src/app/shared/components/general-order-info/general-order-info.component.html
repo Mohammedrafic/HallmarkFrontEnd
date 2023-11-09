@@ -71,6 +71,17 @@
         <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
+
+      <div class="column" *ngIf="activeSystems === systemType.IRP">
+        <div class="title">{{ orderInformation.weekend || false | boolValueToText }}</div>
+        <div class="sup-title">Weekend</div>
+      </div>
+
+      <div class="column" *ngIf="activeSystems === systemType.IRP">
+        <div class="title">{{ orderInformation.holiday || false | boolValueToText }}</div>
+        <div class="sup-title">Holiday</div>
+      </div>
+
     </div>
     <div class="container-row">
       <ng-container *ngIf="orderInformation.orderType !== orderType.ReOrder">
@@ -132,6 +143,7 @@
           <div class="sup-title">Shift</div>
         </div>
       </div>
+      <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
     </div>
   </section>
   <section class="candidates-additional-info" *ngIf="orderInformation">

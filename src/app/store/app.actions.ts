@@ -1,6 +1,7 @@
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { MessageTypes } from '../shared/enums/message-types';
 import { HeaderState } from '../shared/models/header-state.model';
+import { IsMspAreaStateModel } from '../shared/models/is-msp-area-state.model';
 
 export class ToggleMobileView {
   static readonly type = '[app] Toggle mobile view layout';
@@ -68,6 +69,11 @@ export class ShowMSPCustomSideDialog {
 export class SetIsOrganizationAgencyArea {
   static readonly type = '[app] Set Is Organization/Agency Area';
   constructor(public payload: IsOrganizationAgencyAreaStateModel) { }
+}
+
+export class SetIsMspArea {
+  static readonly type = '[app] Set Is  MSP Area';
+  constructor(public payload: IsMspAreaStateModel) { }
 }
 
 export class ShowEmailSideDialog {

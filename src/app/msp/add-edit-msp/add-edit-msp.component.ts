@@ -366,7 +366,10 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
       this.store.dispatch(new SetBillingStatesByCountry(Country.USA));
       this.store.dispatch(new SetDirtyState(false));
     }
-
+    if(this.title=='Edit')
+    {
+      this.changeDetectorRef.detectChanges()
+    }
   }
 
   private subscribeOnUser(): void {
@@ -385,8 +388,11 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
         this.businessvalue=organization.payload.businessUnit
         this.currentBusinessUnitId = organization.payload.businessUnit?.id as number;
         this.initForms(organization.payload);
+    
         this.isSameAsOrg = organization.payload.mspBillingDetails?.sameAsMsp;
+    
         if (this.isSameAsOrg) {
+          this.changeDetectorRef.detectChanges();
           this.disableBillingForm();
         }
         if (this.profileMode) {

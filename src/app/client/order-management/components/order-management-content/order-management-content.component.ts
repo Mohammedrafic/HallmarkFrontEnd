@@ -701,7 +701,7 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   const orderData = Data as IRPOrderPosition;
 
   this.store.dispatch(new GetOrderById(orderData.orderId, orderData.organizationId));
-  this.dispatchAgencyOrderCandidatesList(orderData.orderId, orderData.organizationId, true);
+  this.onSelectedOrderDataLoadHandler();
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
   this.openDetails.next(false);
@@ -1258,7 +1258,7 @@ public RedirecttoIRPOrder(order:Order)
         if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length == this.selectedItems.length){
           this.openregrateupdate = false;
         }
-        if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length >0){
+        if(this.selectedItems.filter(ele=> ele.children.length > 0).length >0){
           this.reorderFilledStatus = true;
         }
         if (this.selectedItems.length === 0) {
@@ -2313,7 +2313,10 @@ public RedirecttoIRPOrder(order:Order)
         this.selectFirstRow();
         this.isRedirectedFromVmsSystem = false;
       }
-
+      if(this.selectedOrder){
+        this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number,
+          !!this.selectedOrder.irpOrderMetadata);
+      }
       this.cd$.next(true);
     });
   }

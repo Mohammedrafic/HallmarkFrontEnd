@@ -98,7 +98,7 @@ describe('TimesheetDetailsTableService', () => {
 
     attachmentsListConfig.preview(attachmentMock);
     expect(storeMock.dispatch).toHaveBeenCalledWith(
-      new Timesheets.PreviewAttachment(1, organizationId, attachmentMock)
+      new Timesheets.PreviewAttachment(1, organizationId, attachmentMock, true)
     );
   });
 });

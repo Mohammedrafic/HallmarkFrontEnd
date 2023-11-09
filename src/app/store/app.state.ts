@@ -19,6 +19,7 @@ import {
   GetAlertsCountForCurrentUser,
   SaveMainContentElement,
   SetHelpSystem,
+  SetIsMspArea,
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -26,6 +27,7 @@ import { map, Observable, tap } from 'rxjs';
 import { IS_DARK_THEME } from '@shared/constants';
 import { BreakpointObserverService } from '@core/services';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
+import { IsMspAreaStateModel } from '../shared/models/is-msp-area-state.model';
 
 export interface AppStateModel {
   isMobile: boolean;
@@ -35,6 +37,7 @@ export interface AppStateModel {
   isFirstLoad: boolean;
   isSidebarOpened: boolean;
   isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
+  isMspsArea: IsMspAreaStateModel;
   getAlertsForCurrentUser: GetAlertsForUserStateModel[];
   getAlertsCountForCurrentUser: number;
   isMobileScreen: boolean;
@@ -65,6 +68,7 @@ export interface AppStateModel {
       isOrganizationArea: false,
       isAgencyArea: false,
     },
+    isMspsArea: { isMSPArea: false },
     getAlertsForCurrentUser: [],
     getAlertsCountForCurrentUser:0,
     isMobileScreen: false,
@@ -119,6 +123,11 @@ export class AppState {
   @Selector()
   static isOrganizationAgencyArea(state: AppStateModel): IsOrganizationAgencyAreaStateModel {
     return state.isOrganizationAgencyArea;
+  } 
+
+  @Selector()
+  static isMspArea(state: AppStateModel): IsMspAreaStateModel {
+    return state.isMspsArea;
   }
 
   @Selector()
@@ -203,6 +212,14 @@ export class AppState {
     { payload }: SetIsOrganizationAgencyArea
   ): void {
     patchState({ isOrganizationAgencyArea: payload });
+  }
+
+  @Action(SetIsMspArea)
+  SetIsMspArea(
+    { patchState }: StateContext<AppStateModel>,
+    { payload }: SetIsMspArea
+  ): void {
+    patchState({ isMspsArea: payload });
   }
 
   @Action(GetAlertsForCurrentUser)

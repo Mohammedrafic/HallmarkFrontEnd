@@ -16,4 +16,5 @@ export class UserAgencyOrganization {
 export class LasSelectedOrganizationAgency {
   lastSelectedOrganizationId: number | null;
   lastSelectedAgencyId: number | null;
+  lastSelectedMspId?: number | null;
 }
