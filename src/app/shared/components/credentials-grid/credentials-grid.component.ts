@@ -717,7 +717,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       .subscribe((credential: { payload: CandidateCredential }) => {
         const isEdit = this.isEdit;
         this.credentialId = credential.payload.id as number;
-        this.isPublic = credential.payload.isPublic as boolean;
         this.disabledCopy = false;
         this.selectedItems = [];
 
@@ -726,12 +725,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           return;
         }
 
-        if(this.isPublic) {
-          this.store.dispatch(new ShowToast(MessageTypes.Warning, RECORD_UNSAVED ));
-        }else{
-          this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADDED : RECORD_MODIFIED));
-        }
-
+        this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADDED : RECORD_MODIFIED));
         this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
         this.addCredentialForm.markAsPristine();
         this.closeDialog();
