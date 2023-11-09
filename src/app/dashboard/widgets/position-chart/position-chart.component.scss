@@ -71,7 +71,8 @@
   top: 6px;
   right: 6px;
 }
-:host ::ng-deep .app-widget-wrapper__projection-wrapper:hover {
+
+.widget-header__title:hover{
   background-color: #c5d9ff;
   border-radius: 4px;
   cursor: pointer;
