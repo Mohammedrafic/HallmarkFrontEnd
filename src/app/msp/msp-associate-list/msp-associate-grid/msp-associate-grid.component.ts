@@ -2,20 +2,18 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, ViewChild } from '@a
 import {
   AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { combineLatest, debounceTime, filter, map, Observable, Subject, take, takeWhile } from 'rxjs';
+import { Actions, Select, Store } from '@ngxs/store';
+import { debounceTime, filter, map, Observable, Subject, take, takeWhile } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
-import { TiersException } from '@shared/components/associate-list/store/associate.actions';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { AgencyStatus, Status } from '@shared/enums/status';
+import { AgencyStatus } from '@shared/enums/status';
 import { UserPermissions } from "@core/enums";
 import { Permission } from "@core/interface";
 import { MSPAssociateOrganizationsAgency, MSPAssociateOrganizationsAgencyPage } from '../../store/model/msp.model';
 import { MspState } from '../../store/state/msp.state';
 import { DeleteMspAssociateOrganizationsAgencyById, GetMspAssociateAgency, GetMSPAssociateListPage } from '../../store/actions/msp.actions';
 import { UserState } from '../../../store/user.state';
-import { PartnershipStatus } from '../../../shared/enums/partnership-settings';
 import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 
 @Component({
