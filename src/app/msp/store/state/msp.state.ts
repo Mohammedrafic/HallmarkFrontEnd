@@ -24,6 +24,7 @@ interface DropdownOption {
 }
 
 export interface MspStateModel {
+  selectedMspAgency: MSPAssociateOrganizationsAgency | null;
   mspList: MspListPage | null;
   countries: DropdownOption[];
   organizationStatuses: DropdownOption[];
@@ -44,7 +45,8 @@ export interface MspStateModel {
 
 @State<MspStateModel>({
     name: 'msp',
-    defaults: {
+  defaults: {
+      selectedMspAgency: null,
       mspList: null,
       countries: COUNTRIES,
       organizationStatuses: Object.keys(OrganizationStatus).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
@@ -110,13 +112,17 @@ export class MspState {
   static mspAssociateListPage(
     state: MspStateModel
   ): MSPAssociateOrganizationsAgencyPage | { items: MSPAssociateOrganizationsAgencyPage['items'] } {
-    debugger
     return state.mspAssociateListPage;
   }
 
   @Selector()
   static mspAssociateAgency(state: MspStateModel): { id: number, name: string }[] {
     return state.mspAssociateAgency;
+  }
+
+  @Selector()
+  static getSelectedMspAgency(state: MspStateModel): MSPAssociateOrganizationsAgency | null {
+    return state.selectedMspAgency;
   }
 
   @Action(GetMsps)
@@ -202,7 +208,6 @@ export class MspState {
     { patchState }: StateContext<MspStateModel>,
     { pageNumber, pageSize }: GetMSPAssociateListPage
   ): Observable<MSPAssociateOrganizationsAgencyPage> {
-    debugger
     patchState({ mspAssociateListPage: { items: [] } })
     return this.mspService.getMSPAssociateListByPage(pageNumber, pageSize).pipe(
       tap((payload) => {
@@ -238,7 +243,6 @@ export class MspState {
   GetMspAssociateAgency(
     { patchState, dispatch }: StateContext<MspStateModel>
   ): Observable<void | { id: number, name: string }[]> {
-    debugger
     return this.mspService.getMspAssociateAgency().pipe(
       tap((payload: { id: number, name: string }[]) => {
         patchState({ mspAssociateAgency: payload });
@@ -260,7 +264,7 @@ export class MspState {
       tap((payload) => {
         const mspAssociateListPage = {
           ...state.mspAssociateListPage,
-          items: [...state.mspAssociateListPage.items, ...payload],
+          items: [...state.mspAssociateListPage.items, ...(payload || [])],
         };
 
         patchState({ mspAssociateListPage });

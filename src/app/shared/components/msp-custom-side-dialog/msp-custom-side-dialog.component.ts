@@ -32,7 +32,6 @@ export class MspCustomSideDialogComponent extends DestroyableDirective implement
   }
 
   ngOnInit(): void {
-    debugger
     this.action$.pipe(ofActionDispatched(ShowMSPCustomSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
         this.mspCustomSideDialog.show();

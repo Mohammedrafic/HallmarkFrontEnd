@@ -9,7 +9,7 @@ import { AssociateListState } from '@shared/components/associate-list/store/asso
 import { Router } from '@angular/router';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
-import { AssociateAgencyToMsp, AssociateAgencyToMspSucceeded } from '../../../store/actions/msp.actions';
+import { AssociateAgencyToMsp, AssociateAgencyToMspSucceeded, GetMSPAssociateListPage } from '../../../store/actions/msp.actions';
 import { UserState } from '../../../../store/user.state';
 import { MspState } from '../../../store/state/msp.state';
 
@@ -96,6 +96,7 @@ export class MspInviteDialogComponent extends DestroyableDirective implements On
       ofActionSuccessful(AssociateAgencyToMspSucceeded),
       takeUntil(this.destroy$)
     ).subscribe(() => {
+      this.store.dispatch(GetMSPAssociateListPage);
       this.sideDialog.hide();
     });
   }
