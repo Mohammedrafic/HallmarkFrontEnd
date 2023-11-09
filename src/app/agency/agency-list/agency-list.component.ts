@@ -13,7 +13,8 @@ import {
   GetAgencyFilteringOptions,
   SaveAgency,
   SaveAgencySucceeded,
-  ConvertAgencyToMSP
+  ConvertAgencyToMSP,
+  ConvertAgencyToMSPSucceeded
 } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AgencyStatus, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
@@ -127,6 +128,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.subscribeOnSuccessAgencyByPage();
     this.setFileName();
     this.setBusinessUnitType();
+    this.subscribeOnSuccessAgencyConvertedToMspByPage();
   }
 
   ngOnDestroy(): void {
@@ -341,6 +343,14 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAgencySucceeded))
       .subscribe((agency: { payload: Agency }) => {
+        this.updatePage();
+      });
+  }
+
+  private subscribeOnSuccessAgencyConvertedToMspByPage(): void {
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ConvertAgencyToMSPSucceeded))
+      .subscribe(() => {
         this.updatePage();
       });
   }
