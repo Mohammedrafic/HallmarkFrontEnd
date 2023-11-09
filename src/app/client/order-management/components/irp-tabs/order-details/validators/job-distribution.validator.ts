@@ -13,7 +13,7 @@ export function jobDistributionValidator(controlName: string,distributeToVMS:str
   return (formGroup: AbstractControl): ValidationErrors | null => {
     const control = formGroup.get(controlName);
     const value = control?.value;
-console.log(value);
+    
     const allInternalSelected = value && value?.includes(IrpOrderJobDistribution.AllInternal)
     && value?.includes(IrpOrderJobDistribution.TieringLogicInternal);
 
