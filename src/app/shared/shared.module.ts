@@ -182,6 +182,7 @@ import {
 } from '@shared/components/order-candidate-list/components/eligibility-message/eligibility-message.module';
 import { FileListModule } from './components/file-list/file-list.module';
 import { GridErroredCellListComponent } from './components/import-dialog-content/grid-errored-cell-list/grid-errored-cell-list.component';
+import { MspCustomSideDialogComponent } from './components/msp-custom-side-dialog/msp-custom-side-dialog.component';
 
 const icons = {
   AlertCircle,
@@ -226,6 +227,7 @@ const COMPONENTS = [
   ClickOutsideDirective,
   ImageUploaderComponent,
   SideDialogComponent,
+  MspCustomSideDialogComponent,
   CloseOrderSideDialogComponent,
   MessageToastComponent,
   FileUploadDialogComponent,

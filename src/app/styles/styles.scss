@@ -622,6 +622,10 @@ body.dark .title, body.dark .contact-name {
 
 #Already_expired_creds .app-widget-wrapper__header {
   padding: 0% 3%;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index : 99;
 }
 
 #Already_expired_creds .widget__type {
@@ -631,8 +635,17 @@ body.dark .title, body.dark .contact-name {
 
 #Upcoming_exp_creds .app-widget-wrapper__header {
   padding: 0% 3%;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index : 99;
 }
-
+@media screen and (min-width: 0px) and (max-width: 810px)  {
+  .app-widget-wrapper__header h3{
+    font-size: 12px !important;
+  }
+}
+  
 #Upcoming_exp_creds .widget__type {
   padding: 0% 3%;
   color: #1a1b2e;
@@ -733,4 +746,11 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 
 .separator {
   background-color: var(--separator) !important;
+}
+
+.order-irp .status-cell .e-chip.e-progress, .order-irp .status-cell .e-chip.e-success, .order-irp .status-cell .e-chip.e-default, .order-irp .status-cell .e-chip.e-filled, .order-irp .status-cell .e-chip.e-warning {
+  width: 74% !important;
+}
+.order-irp .status-cell .e-chip.e-warning.ex{
+  width: 17% !important;
 }

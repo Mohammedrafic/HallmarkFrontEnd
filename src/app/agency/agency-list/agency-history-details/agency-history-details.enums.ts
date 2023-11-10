@@ -1,0 +1,21 @@
+export enum BusinessUnitAuditHistoryTableColumns {
+  changeType = "Change Type",
+  modifiedOn = "Modified On",
+  modifiedBy = "Modified By",
+  businessUnitId = "Business Unit Id",
+  businessUnitType = "Business Unit Type",
+  businessUnitName = "Agency Name",
+  parentUnitId = "Parent Unit Id",
+  logoId = "Logo Id",
+  businessUnitCreatedAt = "Agency CreatedAt",
+  businessUnitCreatedBy = "Agency CreatedBy",
+  businessUnitLastModifiedAt = "Agency LastModifiedAt",
+  businessUnitLastModifiedBy = "Agency LastModifiedBy",
+  dbConnectionName = "DB ConnectionName",
+  organizationPrefix = "Organization Prefix",
+  netSuiteId = "NetSuite Id",
+  isIRPEnabled = "IRP Enabled",
+  isVMSEnabled = "VMS Enabled",
+  netSuiteEnabled = "NetSuite Enabled",
+  isMspSource = "MSP"
+}

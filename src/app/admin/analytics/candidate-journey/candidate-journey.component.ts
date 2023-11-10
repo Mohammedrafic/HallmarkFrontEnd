@@ -55,7 +55,10 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     "BearerParamCJR": "",
     "BusinessUnitIdParamCJR": "",
     "HostName": "",
-    "TodayCJR": ""
+    "TodayCJR": "",
+    "organizationNameCJR": "",
+    "reportPulledMessageCJR": "",
+    "DateRangeCJR": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.cat" };
@@ -142,7 +145,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-
+  
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   filterOptionsData: CommonReportFilterOptions;
@@ -400,6 +403,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
     skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
 
+    let currentDate = new Date(Date.now());
 
     this.paramsData =
     {
@@ -421,7 +425,10 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "TodayCJR": formatDate(new Date(), this.dateFormat, this.culture)
+      "TodayCJR": formatDate(new Date(), this.dateFormat, this.culture),
+      "organizationNameCREXP": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageCREXP": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeCREXP": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

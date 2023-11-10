@@ -6,6 +6,12 @@
 
 .table-container {
   margin-bottom: 25px;
+
+  ::ng-deep {
+    .wrapper ejs-timepicker.e-timepicker .e-input-group.e-control-wrapper.e-time-wrapper {
+      width: 114px !important;
+    }
+  }
 }
 
 .table-block {
@@ -19,11 +25,13 @@
 
 .table-header {
   @include table-header;
+  padding: 14px 16px;
+  border-bottom: unset;
 
   h3 {
     font-size: 16px;
     font-weight: 700;
-    line-height: 28px;
+    line-height: 33px;
   }
 
   .button-cancel {
@@ -82,10 +90,6 @@
       }
     }
 
-    .amount-input {
-      width: 190px !important;
-    }
-
     .ag-center-cols-clipper,
     .ag-center-cols-container {
       min-height: 0px;
@@ -124,8 +128,32 @@
       background-color: var(--bg-grid);
     }
 
+    .ag-row,
+    .ag-header {
+      border-color: var(--grid-header-border) !important;
+    }
+
+    .deleted-record-row,
+    .new-record-row {
+      .ag-cell-value {
+        color: $black !important;
+
+        .cell-value {
+          color: $black !important;
+        }
+
+        .main {
+          color: var(--sub-title-2) !important;
+        }
+      }
+    }
+
     .ag-cell-value {
       color: var(--text) !important;
+    }
+
+    .ag-body-viewport {
+      max-height: 465px;
     }
   }
 }

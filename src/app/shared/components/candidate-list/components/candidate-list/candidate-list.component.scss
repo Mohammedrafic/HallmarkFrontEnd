@@ -1,5 +1,6 @@
 @import 'colors';
 @import 'adaptive-response';
+@import 'mixins';
 
 .user-photo {
   background-color: $secondary-dark-blue-40;
@@ -97,4 +98,8 @@ ejs-checkbox.e-checkbox-wrapper.e-wrapper {
       }
     }
   }
+}
+
+.confirm-dialog {
+  @include defaultConfirmDialog
 }

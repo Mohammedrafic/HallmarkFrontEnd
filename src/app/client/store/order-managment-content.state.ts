@@ -86,6 +86,7 @@ import {
   GetOrderContactDetailSucceeded,
   GetOrderBillRateDetailSucceeded,
   GetParentOrderById,
+  GetIrpOrderExtensionCandidates,
   GetJobDistributionValues
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -211,7 +212,8 @@ export interface OrderManagementContentStateModel {
   OrderContactAuditHistory: OrderContactAuditHistory[];
   OrderWorkLocationAuditHistory: OrderWorkLocationAuditHistory[];
   OrderJobDistributionAuditHistory: OrderJobDistributionAuditHistory[],
-  OrderClassificationAuditHistory: OrderClassificationAuditHistory[]
+  OrderClassificationAuditHistory: OrderClassificationAuditHistory[];
+  irpCandidatesforExtension: OrderCandidatesListPage | null,
 }
 
 @State<OrderManagementContentStateModel>({
@@ -262,6 +264,7 @@ export interface OrderManagementContentStateModel {
     OrderWorkLocationAuditHistory: [],
     OrderJobDistributionAuditHistory: [],
     OrderClassificationAuditHistory: [],
+    irpCandidatesforExtension: null
   },
 })
 @Injectable()
@@ -294,6 +297,11 @@ export class OrderManagementContentState {
   @Selector()
   static orderCandidatePage(state: OrderManagementContentStateModel): OrderCandidatesListPage | null {
     return state.orderCandidatesListPage;
+  }
+
+  @Selector()
+  static irpCandidatesforExtension(state: OrderManagementContentStateModel): OrderCandidatesListPage | null {
+    return state.irpCandidatesforExtension;
   }
 
   @Selector()
@@ -669,6 +677,30 @@ export class OrderManagementContentState {
       })
     );
   }
+
+
+  @Action(GetIrpOrderExtensionCandidates)
+  GetIrpOrderExtensionCandidates(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderId, pageNumber, pageSize, isAvailable, includeDeployed, searchTerm }: GetIrpOrderExtensionCandidates
+  ): Observable<OrderCandidatesListPage> {
+    const params: IrpCandidatesParams = {
+      PageSize: pageSize,
+      PageNumber: pageNumber,
+      includeDeployed,
+      isAvailable,
+      searchTerm,
+    };
+
+    return this.orderManagementService.getIrpExtensionCandidates(orderId, params)
+    .pipe(
+      tap((payload) => {
+        patchState({irpCandidatesforExtension: payload});
+        return payload;
+      })
+    );
+  }
+
 
   @Action(ClearOrderCandidatePage)
   ClearOrderCandidatePage({ patchState }: StateContext<OrderManagementContentStateModel>): void {
@@ -1343,9 +1375,9 @@ export class OrderManagementContentState {
         else if (count == 0 && payload.perDiemIds.length === 0)
           dispatch(new ShowToast(MessageTypes.Error, TravelerContracttoPermOrdersSucceedMessage));
         else if (payload.perDiemIds.length === payload.orderIds.length && count === payload.perDiemIds.length)
-          dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReordersucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReordersucceedcount(count)));
+          dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReorderOpensucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReordersucceedcount(count)));
         else if (payload.perDiemIds.length === payload.orderIds.length && count > 0)
-          dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReorderOpensucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReorderOpensucceedcount(count)));
+          dispatch(new ShowToast(MessageTypes.Success, reorderFilled ? UpdateRegularRateReorderOpensucceedcount(count) + UpdateReorderFilled : UpdateRegularRateReordersucceedcount(count)));
         else if (count == 0 && payload.perDiemIds.length === payload.orderIds.length)
           dispatch(new ShowToast(MessageTypes.Error, ReOrdersErrorMessage));
         else if (count > 0 && payload.perDiemIds.length > 0)

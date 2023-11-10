@@ -16,7 +16,14 @@ import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 export class CandidateDetailsApiService {
   constructor(private http: HttpClient) {}
   public getCandidateDetails(payload: FiltersPageModal): Observable<CandidateDetailsPage> {
-    return this.http.post<CandidateDetailsPage>(`/api/CandidateProfile/profiles/details`, payload);
+    let candidatePayload:any = Object.assign({},payload)
+    if(candidatePayload.organizationIds){
+      candidatePayload.organizationIds = [candidatePayload.organizationIds]
+    }
+    if(candidatePayload.agencyIds){
+      candidatePayload.agencyIds = [candidatePayload.agencyIds]
+    }
+    return this.http.post<CandidateDetailsPage>(`/api/CandidateProfile/profiles/details`, candidatePayload);
   }
   
   public getSkills(): Observable<MasterSkillByOrganization[]> {

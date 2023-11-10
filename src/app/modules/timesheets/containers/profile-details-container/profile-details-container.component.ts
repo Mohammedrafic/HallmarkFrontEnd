@@ -1,11 +1,13 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { formatDate } from '@angular/common';
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
+  NgZone,
   OnInit,
   Output,
   ViewChild,
@@ -13,10 +15,11 @@ import {
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 
 import { FileExtensionsString } from '@core/constants';
+import { OutsideZone } from '@core/decorators';
 import { DialogAction, FileSize } from '@core/enums';
 import { DateTimeHelper } from '@core/helpers';
-import { FileForUpload, Permission } from '@core/interface';
-import { Actions, ofActionCompleted, Select, Store } from '@ngxs/store';
+import { DropdownOption, FileForUpload, Permission } from '@core/interface';
+import { Actions, ofActionCompleted, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { Attachment, AttachmentsListConfig } from '@shared/components/attachments';
 import { UploadFileAreaComponent } from '@shared/components/upload-file-area/upload-file-area.component';
 import { GRID_CONFIG, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
@@ -28,11 +31,13 @@ import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { AgencyStatus } from '@shared/enums/status';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
+import { OrganizationStructure } from '@shared/models/organization.model';
+import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
-import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
+import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import {
   combineLatest,
   distinctUntilChanged,
@@ -46,27 +51,29 @@ import {
   takeUntil,
   tap,
   throttleTime,
+  withLatestFrom,
 } from 'rxjs';
 import { SettingsViewService } from '../../../../shared/services/settings-view.service';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import {
   ConfirmApprovedTimesheetDeleteDialogContent,
   ConfirmDeleteTimesheetDialogContent,
+  RecordsTabConfig,
   rejectTimesheetDialogData,
   SwitchingDnwOffForApprovedTimesheetDialogContent,
   TimesheetConfirmMessages,
   TimesheetDetailsExportOptions,
 } from '../../constants';
-import { TimesheetTargetStatus, TIMETHEETS_STATUSES } from '../../enums';
+import { RecordFields, TableTabIndex, TimesheetTargetStatus, TIMETHEETS_STATUSES } from '../../enums';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
+import { TabConfig, TimesheetRecordsDto } from '../../interface';
 import * as TimesheetInt from '../../interface';
-import { TimesheetDetailsService } from '../../services';
+import { TimesheetDetailsService, TimesheetRecordsService } from '../../services';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
 import { AppState } from 'src/app/store/app.state';
-import { ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { Comment } from '@shared/models/comment.model';
 
 @Component({
@@ -75,7 +82,7 @@ import { Comment } from '@shared/models/comment.model';
   styleUrls: ['./profile-details-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileDetailsContainerComponent extends AbstractPermission implements OnInit {
+export class ProfileDetailsContainerComponent extends AbstractPermission implements OnInit, AfterViewInit {
   @ViewChild('candidateDialog')
   public candidateDialog: DialogComponent;
 
@@ -93,6 +100,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   @ViewChild(UploadFileAreaComponent)
   public readonly uploadFileArea: UploadFileAreaComponent;
+
+  @ViewChild('tabs')
+  public readonly tabs: TabComponent;
 
   @Input() currentSelectedRowIndex: number | null = null;
 
@@ -131,6 +141,14 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public workWeeks: TimesheetInt.WorkWeek<Date>[];
 
+  public tabsConfig: TabConfig[] = [];
+
+  public currentTab: RecordFields | 'details' = 'details';
+
+  public tableRecords: TimesheetRecordsDto;
+
+  public isTableAttachmentOpen = false;
+
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
 
   public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -166,6 +184,15 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   @Select(TimesheetsState.timesheetDetailsMilesStatistics)
   public readonly milesData$: Observable<TimesheetInt.CandidateMilesData>;
+
+  @Select(TimesheetsState.tmesheetRecords)
+  public readonly timesheetRecords$: Observable<TimesheetRecordsDto>;
+
+  @Select(TimesheetsState.billRateTypes)
+  private readonly billRates$: Observable<DropdownOption[]>;
+
+  @Select(TimesheetsState.organizationStructure)
+  private readonly organizationStructure$: Observable<OrganizationStructure>;
 
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
 
@@ -205,7 +232,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   previewAttachemnt: boolean = false;
   currentSelectedAttachmentIndex: number = 0;
   navigateTheAttachment$: Subject<number> = new Subject<number>();
-  private eventsHandler: Subject<void> = new Subject();
   private unsubscribe$: Subject<void> = new Subject();
   sideBar:boolean = false;
 
@@ -214,6 +240,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
   private isTimesheetOrMileagesUpdate = true;
+  private isFirstOpen = true;
+  private slectingindex: number;
 
   constructor(
     protected override store: Store,
@@ -221,10 +249,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     private confirmService: ConfirmService,
     private router: Router,
     private timesheetDetailsService: TimesheetDetailsService,
+    private timesheetRecordsService: TimesheetRecordsService,
     private breakpointObserver: BreakpointObserver,
     private cd: ChangeDetectorRef,
     private actions: Actions,
     private settingsViewService: SettingsViewService,
+    private ngZone: NgZone,
   ) {
     super(store);
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
@@ -248,18 +278,50 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.observeRecordsLoad();
     this.observeDetails();
     this.sideBarObserver();
+    this.watchForTableAttachmentPreview();
   }
 
-  public onExpanded(event: ExpandedEventArgs): void {
-    if (event.isExpanded) {
-      this.eventsHandler.next();
-    }
-
+  public ngAfterViewInit(): void {
+    this.getTimesheetTableRecords();
   }
 
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
     this.resizeObserver.detach();
+  }
+
+  public trackByTitle(index: number, item: TabConfig): string {
+    return item.title;
+  }
+
+  public selectTab(selectEvent: SelectingEventArgs): void {
+    if (!this.isChangesSaved && (this.slectingindex !== selectEvent.selectedIndex)) {
+      this.confirmService.confirm(TimesheetConfirmMessages.confirmTabChange, {
+        title: 'Unsaved Progress',
+        okButtonLabel: 'Proceed',
+        okButtonClass: 'delete-button',
+      })
+        .pipe(take(1),)
+        .subscribe((submitted) => {
+          if (submitted) {
+            this.isChangesSaved = true;
+            this.currentTab = this.timesheetRecordsService.getCurrentTabName(selectEvent.selectedIndex);
+          } else {
+            this.slectingindex = selectEvent.previousIndex;
+            this.tabs.select(selectEvent.previousIndex);
+          }
+
+          this.cd.detectChanges();
+        });
+    } else {
+      this.currentTab = this.timesheetRecordsService.getCurrentTabName(selectEvent.selectedIndex);
+
+      if (this.currentTab === 'details') {
+        this.previewAttachemnt = false;
+      }
+
+      this.cd.detectChanges();
+    }
   }
 
   public onOpen(args: { preventFocus: boolean }): void {
@@ -513,13 +575,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.previewAttachemnt = false;
   }
 
-  public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {
-    if (text === MobileMenuItems.Upload) {
-      setTimeout(() => this.openFileUploadArea());
-    }
-    this.previewAttachemnt = false;
-  }
-
   public closeDialog(): void {
     this.store
       .dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
@@ -671,6 +726,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
           currentStatus === this.timesheetStatus.PendingApprovalAsterix;
         this.canRecalculateTimesheet = isTimesheetSubmitted && this.canRecalculate;
         this.timesheetDetails = details;
+        this.tabsConfig = [{ title: `Job ID ${this.timesheetDetails?.formattedId}` }, ...RecordsTabConfig];
         this.timesheetId = details.id;
         this.commentContainerId=details.commentContainerId;
         this.mileageTimesheetId = details.mileageTimesheetId;
@@ -783,6 +839,47 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         } else {
           this.refreshData();
         }
+      });
+  }
+
+  private getTimesheetTableRecords(): void {
+    this.timesheetRecords$
+      .pipe(
+        withLatestFrom(this.billRates$, this.organizationStructure$),
+        filter(() => !!this.tabs),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(([records, billrates]) => {
+        this.tableRecords = records;
+        this.timesheetRecordsService.controlTabsVisibility(billrates, this.tabs, this.tableRecords);
+
+        if (this.isFirstOpen) {
+          this.tabs.select(TableTabIndex.Time);
+          this.isFirstOpen = false;
+        }
+
+        this.asyncRefresh();
+        this.cd.markForCheck();
+      });
+  }
+
+  @OutsideZone
+  private asyncRefresh(): void {
+    setTimeout(() => {
+      this.tabs.refreshActiveTabBorder();
+    }, 100);
+  }
+
+  private watchForTableAttachmentPreview(): void {
+    this.actions
+      .pipe(
+        ofActionSuccessful(FileViewer.Open),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(({ payload }) => {
+        this.isTableAttachmentOpen =  payload.triggeredFromTable;
+        this.previewAttachemnt = true;
+        this.cd.markForCheck();
       });
   }
 }

@@ -111,7 +111,6 @@ export const createOrderDTO = (formState: ListOfKeyForms, credentials: IOrderCre
   const jobEndDate = endDate ? new Date(new Date(endDate)?.setHours(0, 0, 0, 0)) : endDate;
   const jobStartDate = startDate ? new Date(new Date(startDate).setHours(0, 0, 0, 0)) : startDate;
   const jobDates = formState.generalInformationForm.get('jobDates')?.value;
-
   return {
     ...formState.orderType.getRawValue(),
     ...formState.generalInformationForm.getRawValue(),

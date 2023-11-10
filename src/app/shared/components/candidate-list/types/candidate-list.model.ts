@@ -151,3 +151,21 @@ export interface CandidateListStateModel {
   tableState: CandidateListTableState | null;
   listOfCredentialTypes: CredentialType[] | null;
 }
+
+export interface EmployeeInactivateData {
+  inactivationDate: string;
+  inactivationReasonId: number;
+  createReplacement: boolean;
+}
+
+export interface InactivateEmployeeDto {
+  id: number;
+  inactivationDate: string;
+  inactivationReasonId: number;
+  createReplacement: boolean;
+}
+
+export interface InactivationEvent {
+  id: number | null;
+  hireDate: string | null;
+}

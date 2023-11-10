@@ -9,6 +9,7 @@ import { GridValuesHelper } from '@core/helpers';
 import { GridOrderIdCellComponent } from '../../components/grid-order-id-cell/grid-order-id-cell.component';
 import { BaseInvoice } from '../../interfaces';
 import { PendingInvoice } from '../../interfaces';
+import { InvoiceType } from '../../enums/invoice-type.enum';
 
 type BaseInvoiceColDefsKeys = keyof Pick<
   BaseInvoice,
@@ -26,6 +27,7 @@ const commonColumn: ColDef = {
 };
 
 export class InvoicesContainerGridHelper {
+  // eslint-disable-next-line max-lines-per-function
   public static getColDefsMap(agency: boolean): {[key in ColDefKey]: ColDef} {
     return {
       regionName: {
@@ -101,14 +103,23 @@ export class InvoicesContainerGridHelper {
           ${GridValuesHelper.formatDate(date, 'MM/dd/yyyy')}`;
         },
         cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
-          const { id, organizationId } = params.data as BaseInvoice;
+          const { id, organizationId, timesheetType, invoiceRecords } = params.data;
+          const parentID = !!invoiceRecords?.length ? invoiceRecords[0].parentTimesheetId : null;
+          const navigateId = timesheetType === InvoiceType.Timesheet ? id : parentID;
+
+          if (navigateId) {
+            return {
+              ...params,
+              link: agency ? `/agency/timesheets` : `/client/timesheets`,
+              navigationExtras: {
+                state: { timesheetId: navigateId, organizationId },
+              },
+            };
+          }
 
           return {
             ...params,
-            link: agency ? `/agency/timesheets` : `/client/timesheets`,
-            navigationExtras: {
-              state: { timesheetId: id, organizationId },
-            },
+            link: null,
           };
         },
         ...commonColumn,

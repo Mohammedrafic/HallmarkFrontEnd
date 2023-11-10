@@ -72,8 +72,22 @@
     width: max-content;
     width: 90%;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: break-spaces;
+}
+@media screen and (min-width : 1001px) {
+  .orgname {
     overflow: hidden;
+  }
+}
+@media screen and (min-width : 0px) and (max-width : 1000px) {
+  .app-widget-wrapper__org-chart {
+    overflow: auto !important;
+  }
+}
+@media screen and (min-width : 0px) and (max-width : 1000px) {
+  .orgname {
+    overflow: auto !important;
+  }
 }
 .widget__type {
     display: flex;

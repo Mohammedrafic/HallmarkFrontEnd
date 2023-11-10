@@ -461,7 +461,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
       isSubmit: !saveType,
     };
-
+    createdOrder.distributeToVMS = createdOrder.distributeToVMS !=null ? createdOrder.distributeToVMS.length===0 ? null : createdOrder.distributeToVMS : null;
     if (this.selectedOrder) {
       this.canOpenPositionsEdited(createdOrder);
     } else {
@@ -471,7 +471,6 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       let jobstartdate = createdOrder.jobStartDate ? createdOrder.jobStartDate : createdOrder.jobDates;
       let departmentID = createdOrder.departmentId;
       this.isAddTemplate = this.router.url.includes('fromTemplate');
-      createdOrder.distributeToVMS = createdOrder.distributeToVMS.length===0 ? null : createdOrder.distributeToVMS;
       if(this.isAddTemplate && createdOrder.jobDates)
       {
       createdOrder.jobDates = [createdOrder.jobDates];

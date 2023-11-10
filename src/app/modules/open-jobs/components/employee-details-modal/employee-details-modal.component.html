@@ -1,0 +1,35 @@
+<ejs-dialog
+  #destroyableDialog
+  class="employee-details-dialog"
+  cssClass="employee-details-dialog"
+  isModal="true"
+  visible="false"
+  showCloseIcon="true"
+  width="541px"
+  closeOnEscape
+  (close)="closeModal()"
+>
+  <ng-template #header>
+    <div class="title">
+      {{selectedEmployeeDetails?.title}}
+    </div>
+  </ng-template>
+  <ng-template #content>
+    <ng-container [ngSwitch]="selectedEmployeeDetails?.status">
+      <ng-template [ngSwitchCase]="candidateStatus.Offered">
+        <app-offered-template [selectedEmployeeDetails]="selectedEmployeeDetails"></app-offered-template>
+      </ng-template>
+    </ng-container>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <div class="modal-action">
+      <ng-container *ngFor="let button of buttonConfig; trackBy:trackByTitle">
+        <button
+          class="{{button.cssClass}}"
+          ejs-button
+          (click)="handleModalAction(button.type)"
+        >{{button.title}}</button>
+      </ng-container>
+    </div>
+  </ng-template>
+</ejs-dialog>

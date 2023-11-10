@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GridCellRenderer, TitleValueCellRendererParams } from '../../models';
+import { InvoiceType } from 'src/app/modules/invoices/enums/invoice-type.enum';
 
 @Component({
   selector: 'app-title-value-cell-renderer',
@@ -9,9 +10,9 @@ import { GridCellRenderer, TitleValueCellRendererParams } from '../../models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TitleValueCellRendererComponent extends GridCellRenderer<TitleValueCellRendererParams> {
-  public title: string = '';
+  public title = '';
 
-  public showCell: boolean = false;
+  public showCell = false;
 
   constructor(
     private router: Router,
@@ -23,19 +24,19 @@ export class TitleValueCellRendererComponent extends GridCellRenderer<TitleValue
   public override agInit(params: TitleValueCellRendererParams): void {
     super.agInit(params);
     const titleValueParams = params.titleValueParams;
-
     this.title = titleValueParams?.title || params.colDef?.headerName || '';
 
     if (this.title === 'Rate' && params.data.timesheetTypeText === 'Expenses') {
-      this.title = 'Reason'
+      this.title = 'Reason';
     }
     this.value = [titleValueParams?.value, this.value].find((value: unknown) => value != null && value !== '') as string;
     this.showCell = this.value != null && this.value !== '';
   }
 
   public handleNavigation(event: Event): void {
+    const data = this.params.data;
     event.stopImmediatePropagation();
-    const id = this.params.data.timesheetId;
+    const id = data.timesheetType === InvoiceType.Timesheet ? data.timesheetId : data?.parentTimesheetId;
     const organizationId = this.params.titleValueParams?.organizationId;
 
     if (id) {

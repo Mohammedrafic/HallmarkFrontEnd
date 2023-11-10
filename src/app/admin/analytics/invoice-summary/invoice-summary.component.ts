@@ -390,7 +390,7 @@ export class InvoiceSummaryComponent implements OnInit, OnDestroy {
       "InvoiceStartDateISD": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "invoiceEndDateISD": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "organizationNameISD": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
-      "reportPulledMessageISD": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "reportPulledMessageISD": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
       "DateRangeISD": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
 
     };

@@ -11,13 +11,13 @@ import {
   SaveClosureReasons,
   SaveOrderRequisition,
   SavePenalty,
-  SaveTerminationReasons,
+  SaveInactivationReasons,
   SaveUnavailabilityReason,
   UpdateCategoryNoteReasons,
   UpdateManualInvoiceRejectReason,
   UpdateRecuriterReasons,
   UpdateSourcingReasons,
-  UpdateTerminationReasons
+  UpdateInactivationReasons,
 } from '@organization-management/store/reject-reason.actions';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
@@ -31,7 +31,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { NewReasonsActionsMap, UpdateReasonsActionsMap } from '../constants';
 import { ReasonsNavigationTabs } from '../enums';
-import { CancelEmployeeReasonValue, CategoryNoteValue, Closurevalue, SaveReasonParams, TerminatedValue, UnavailabilityValue } from '../interfaces';
+import { CancelEmployeeReasonValue, CategoryNoteValue, Closurevalue, SaveReasonParams, InactivatedValue, UnavailabilityValue } from '../interfaces';
 
 @Injectable()
 export class ReasonsService {
@@ -242,16 +242,16 @@ export class ReasonsService {
           agencyFeeApplicable: !!valueRR.agencyFeeApplicable,
         }));
       }
-    } else if (params.selectedTab === ReasonsNavigationTabs.Termination) {
-      const value = params.formValue as TerminatedValue;
+    } else if (params.selectedTab === ReasonsNavigationTabs.Inactivation) {
+      const value = params.formValue as InactivatedValue;
       if (value.id != undefined || null) {
-        this.store.dispatch(new UpdateTerminationReasons({
+        this.store.dispatch(new UpdateInactivationReasons({
           id: value.id || undefined,
           reason: value.reason,
           defaultValue : !!value.defaultValue
         }));
       } else {
-        this.store.dispatch(new SaveTerminationReasons({
+        this.store.dispatch(new SaveInactivationReasons({
           reason: value.reason,
           defaultValue : !!value.defaultValue
         }));

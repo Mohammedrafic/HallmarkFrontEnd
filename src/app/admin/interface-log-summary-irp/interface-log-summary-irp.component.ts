@@ -72,11 +72,6 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
   // public rowData: LogInterfacePage[]=[];
   public readonly columnDefs: ColumnDefinitionModel[] = [
     {
-      field: 'id',
-      hide: true,
-      filter: false,
-    },
-    {
       headerName: 'View',
       cellRenderer: ButtonRendererComponent,
       width: 100,
@@ -99,7 +94,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
       filter: false,
     },
     {
-      headerName: 'organizationId',
+      headerName: 'Organization ID',
       field: 'organizationId',
       minWidth: 100,
       hide: true,
@@ -107,7 +102,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
     },
     {
       headerName: 'File Name',
-      field: 'documentName',
+      field: 'originalFileName',
       minWidth: 250,
       filter: 'agTextColumnFilter',
       cellRenderer: ButtonRendererComponent,
@@ -153,7 +148,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = this.datePipe?.transform(params.data.createdAt, 'MM/dd/yyyy HH:mm') as string
+        const str = this.datePipe?.transform(params.data.createdAt, 'MM/dd/yyyy h:mm a') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,

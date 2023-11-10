@@ -285,6 +285,7 @@ export interface OrderManagementChild  {
   positionClosureReason?: string;
   positionClosureReasonId?: number;
   commentContainerId?: number;
+  candidateProfileId? : number
 };
 
 export type OrderCandidatesList = {

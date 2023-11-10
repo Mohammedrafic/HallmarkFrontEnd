@@ -136,10 +136,6 @@
         <div class="sup-title">Exp. Req.</div>
       </div>
       <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
-      <div class="column">
-        <div class="title">{{ orderInformation.workflowName || '-' }}</div>
-        <div class="sup-title">Workflow</div>
-      </div>
     </div>
   </section>
 
@@ -240,6 +236,14 @@
       <section class="candidates-additional-info" *ngIf="orderInformation">
         <div class="container-row justify-content-normal">
           <div class="column">
+            <div>
+              <div class="title accent positions">
+                {{ orderInformation?.acceptedPositions }}/{{ orderInformation?.openPositions }}
+              </div>
+              <div class="sup-title">Open Positions</div>
+            </div>
+          </div>
+          <div class="column">
             <div class="title">{{ orderInformation.onCallRequired | boolValueToText }}</div>
             <div class="sup-title">On-Call</div>
           </div>
@@ -280,10 +284,6 @@
           </div>
 
           <ng-container [ngTemplateOutlet]="linkedId"></ng-container>
-          <div class="column">
-            <div class="title">{{ orderInformation.workflowName || '-' }}</div>
-            <div class="sup-title">Workflow</div>
-          </div>
         </div>
       </section>
     </ng-template>

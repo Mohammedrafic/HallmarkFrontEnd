@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-navigation-panel',
@@ -8,16 +8,19 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output
 })
 export class NavigationPanelComponent {
   @Input()
-  public prevLabel: string = 'Previous';
+  public isMobile = false;
 
   @Input()
-  public nextLabel: string = 'Next';
+  public prevLabel = 'Previous';
 
   @Input()
-  public prevDisabled: boolean = false;
+  public nextLabel = 'Next';
 
   @Input()
-  public nextDisabled: boolean = false;
+  public prevDisabled = false;
+
+  @Input()
+  public nextDisabled = false;
 
   @Output()
   public readonly prevClick: EventEmitter<void> = new EventEmitter<void>();

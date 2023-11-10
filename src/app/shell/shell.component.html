@@ -1,7 +1,7 @@
 <div class="header" [class.expanded]="sidebar?.isOpen || false">
   <div class="header-item">
     <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleSidebar()"></div>
-    <ng-container *ngIf="headerState$ | async as headerState">
+    <ng-container *ngIf="header$ | async as headerState">
       <h1 class="header-title">{{ headerState.title }}</h1>
     </ng-container>
   </div>

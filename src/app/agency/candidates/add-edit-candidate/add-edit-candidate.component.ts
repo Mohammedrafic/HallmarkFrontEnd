@@ -1,12 +1,11 @@
 import { positionIdStatuses } from "@agency/candidates/add-edit-candidate/add-edit-candidate.constants";
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, ViewChild, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { OutsideZone } from "@core/decorators";
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { SelectNavigation } from '@shared/components/candidate-details/store/candidate.actions';
@@ -115,7 +114,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     private location: Location,
     private agencySettingsService: AgencySettingsService,
     private cd: ChangeDetectorRef,
-    private ngZone: NgZone,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -128,9 +126,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
             lastSelectedOrganizationId: null
           })
         );
-      };
-
-  })
+      }
+    });
   }
 
   override ngOnInit(): void {
@@ -505,7 +502,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       });
   }
 
-  @OutsideZone
   private selectCredentialsTab(): void {
     const credentialTabIndex = 3;
     setTimeout(() => this.tab.select(credentialTabIndex));

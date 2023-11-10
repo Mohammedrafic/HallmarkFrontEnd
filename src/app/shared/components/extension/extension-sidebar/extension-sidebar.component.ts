@@ -103,7 +103,9 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     this.listenDurationChangesIRP();
     this.listenStartEndDatesChanges();
     this.listenStartEndDatesChangesIRP();
-    this.subsToBillRateControlChange();
+    if(this.activeSystems !== OrderManagementIRPSystemId.IRP){
+      this.subsToBillRateControlChange();
+    }
   }
 
   public hourlyRateToOrderSync(event: { value: string; billRate?: BillRate }): void {
@@ -247,20 +249,32 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       linkedId: [this.order.linkedId, Validators.maxLength(20)],
 
     })
+    if(this.activeSystems !== OrderManagementIRPSystemId.IRP){
+      const candidateBillRate = this.getBillRate(this.candidateJob.billRates, startDateValue)?.rateHour;
+      this.extensionForm = this.formBuilder.group({
+        durationPrimary: [Duration.Other],
+        durationSecondary: [],
+        durationTertiary: [],
+        startDate: [startDateValue, [Validators.required]],
+        endDate: ['', [Validators.required]],
+        billRate: [candidateBillRate, [Validators.required]],
+        comments: [null],
+        linkedId: [this.order.linkedId, Validators.maxLength(20)],
+      });  
+    } else {
+      this.extensionForm = this.formBuilder.group({
+        durationPrimary: [Duration.Other],
+        durationSecondary: [],
+        durationTertiary: [],
+        startDate: [startDateValue, [Validators.required]],
+        endDate: ['', [Validators.required]],
+        comments: [null],
+        linkedId: [this.order.linkedId, Validators.maxLength(20)],
+      });  
 
-    const candidateBillRate = this.getBillRate(this.candidateJob.billRates, startDateValue)?.rateHour;
+    }
     this.maxEndDate = addDays(startDate as Date, 14) as Date;
 
-    this.extensionForm = this.formBuilder.group({
-      durationPrimary: [Duration.Other],
-      durationSecondary: [],
-      durationTertiary: [],
-      startDate: [startDateValue, [Validators.required]],
-      endDate: ['', [Validators.required]],
-      billRate: [candidateBillRate, [Validators.required]],
-      comments: [null],
-      linkedId: [this.order.linkedId, Validators.maxLength(20)],
-    });
   }
 
   private listenPrimaryDuration(): void {
@@ -317,7 +331,7 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         durationSecondary?.reset();
         durationTertiary?.reset();
         this.extensionFormIRP.get('startDate')?.markAsPristine();
-        this.extensionFormIRP.get('endDate')?.markAsPristine();
+        this.extensionFormIRP.get('endDate')?.setValue('');
       } else {
         durationSecondary?.disable();
         durationTertiary?.disable();

@@ -77,8 +77,8 @@ export class CandidatesService {
     return this.getProfileData()?.hireDate ?? '';
   }
 
-  public getTerminationDate(): string {
-    return this.getProfileData()?.terminationDate ?? '';
+  public getInactivationDate(): string {
+    return this.getProfileData()?.inactivationDate ?? '';
   }
 
   public getGridPageNumber(items: number, pageNumber: number): number {

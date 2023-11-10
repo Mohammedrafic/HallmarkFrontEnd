@@ -4,12 +4,10 @@
       <h3 class="widget-header__title">My Tasks</h3>
     </div>
     <div class="app-widget-wrapper__tooltip" *ngIf="description.length>0">
-      <ejs-tooltip [content]="description" position='TopCenter'>
         <span class="mytooltip">
           <i-feather name="info" id="info"
             [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
         </span>
-      </ejs-tooltip>
     </div>
 
   </ng-template>
@@ -18,57 +16,48 @@
       <div class="widget"  *ngIf="selectedSystem.isVMS">
         <span class="widget__type" (mousedown)="defineMousePosition($event)"
           (click)="toSourceContent('OrdersforApproval')">
-          <ejs-tooltip id="tooltip" content="Pending Order(s) Approval" position="TopCenter">
             <ul>
               <li>
               </li>
             </ul> 
             <p class="orgname">Pending Order(s) Approval</p>
             <p class="orgcount">{{chartData?.pendingOrders}}</p>
-          </ejs-tooltip>
         </span>
       </div>
       <div class="widget"  *ngIf="selectedSystem.isVMS">
         <span class="widget__type" (mousedown)="defineMousePosition($event)" (click)="toSourceContent('ManualInvoice')">
-          <ejs-tooltip id="tooltip" content="Pending Manual Invoice(s) Approval" position="TopCenter">
             <ul>
               <li>
               </li>
             </ul> 
             <p class="orgname">Pending Manual Invoice(s) Approval</p>
             <p class="orgcount">{{chartData?.pendingManualInvoices}}</p>
-          </ejs-tooltip>
         </span>
       </div>
       <div class="widget"  *ngIf="selectedSystem.isVMS">
         <span class="widget__type" (mousedown)="defineMousePosition($event)" (click)="toSourceContent('pendingInvoice')">
-          <ejs-tooltip id="tooltip" content="Pending Invoice(s) Approval" position="TopCenter">
             <ul>
               <li>
               </li>
             </ul> 
             <p class="orgname">Pending Invoice(s) Approval</p>
             <p class="orgcount">{{chartData?.pendingOrganizationInvoices}}</p>  
-          </ejs-tooltip>
         </span>
       </div>
       <div class="widget"  *ngIf="selectedSystem.isVMS">
         <span class="widget__type" (mousedown)="defineMousePosition($event)"
           (click)="toSourceContent('Pending Timesheet')">
-          <ejs-tooltip id="tooltip" content="Pending Timesheet(s) Approval" position="TopCenter">
             <ul>
               <li>
               </li>
             </ul> 
               <p class="orgname">Pending Timesheet(s) Approval</p>
               <p class="orgcount">{{chartData?.pendingTimeSheets}}</p>
-          </ejs-tooltip>
         </span>
       </div>
       <div class="widget" *ngIf="selectedSystem.isIRP">
         <span class="widget__type" (mousedown)="defineMousePosition($event)"
           (click)="toSourceContent('Unassignedworkcommitment')">
-          <ejs-tooltip id="tooltip" content="Employee list work commitment not assigned" position="TopCenter">
             <ul>
               <li>
               </li>
@@ -76,27 +65,23 @@
             <p class="orgname">Employee list work commitment not assigned</p>
             
             <p class="orgcount">{{chartData?.workCommitmentUnAssignedEmployeeCount}}</p>
-          </ejs-tooltip>
         </span>
       </div>
       <div class="widget" *ngIf="selectedSystem.isIRP && isOrgUser">
           <span class="widget__type" (mousedown)="defineMousePosition($event)"
             (click)="toSourceContent('NoOfLongTermOrders')">
-            <ejs-tooltip id="tooltip" content="No. of Long Term Orders in Next 30 Days" position="TopCenter">
               <ul>
                 <li>
                 </li>
               </ul> 
               <p class="orgname">No. of Long Term Orders in Next 30 Days</p>
               <p class="orgcount">{{chartData?.quickLinkNoOfLongTermOrdersInNext30Days}}</p>
-            </ejs-tooltip>
           </span>
       </div>
     </div>
     <div class="widget" *ngIf="selectedSystem.isIRP">
       <span class="widget__type" (mousedown)="defineMousePosition($event)"
         (click)="toSourceContent('NoOfUnAssignedEmployee')">
-        <ejs-tooltip id="tooltip" content="Departments Unassigned Employee Count" position="TopCenter">
           <ul>
             <li>
             </li>
@@ -104,31 +89,26 @@
           <p class="orgname">Departments Unassigned Employee Count</p>
           
           <p class="orgcount">{{chartData?.departmentUnAssignedEmployeeCount}}</p>
-        </ejs-tooltip>
       </span>
     </div>
     
     <div class="widget" *ngIf="isAgencyUser">
       <span class="widget__type" (mousedown)="defineMousePosition($event)">
-        <ejs-tooltip id="tooltip" content="Credentials Expiring in next 30 days" position="TopCenter">
           <ul>
             <li>
             </li>
           </ul> 
             <p class="orgname">Credentials Expiring in next 30 days </p>
             <p class="orgcount">{{chartData?.expiringCredentialsCount}}</p>
-        </ejs-tooltip>
       </span>
       <span class="widget__type" *ngFor="let missingdata of chartData?.missingTimeSheet"
         (mousedown)="defineMousePosition($event)" (click)="toTimesheetcontent(missingdata.organizationId)">
-        <ejs-tooltip [content]="missingdata?.organizationName" position="TopCenter">
           <ul>
             <li>
             </li>
           </ul> 
            <p class="orgname">Timesheet missing - {{missingdata?.organizationName}}</p>
           <p class="orgcount">{{missingdata?.count}}</p>
-        </ejs-tooltip>
       </span>
     </div>
   </ng-template>

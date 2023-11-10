@@ -161,6 +161,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public showEmployeeTab = true;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   private secondHasOpenedOnes = false;
+  activeSystems: OrderManagementIRPSystemId | null;
 
   public get isReOrder(): boolean {
     return !isNil(this.order?.reOrderFromId) && this.order?.reOrderFromId !== 0;
@@ -214,7 +215,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   get desktopSmallMenu(): { text: string }[] {
     let menu: { text: string }[] = [];
 
-    if (!this.disableCloseOrder && this.activeSystem !== this.systemType.IRP) {
+    if (!this.disableCloseOrder) {
       menu = [...menu, { text: MobileMenuItems.CloseOrder }];
     }
     if (this.canReOpen) {
@@ -223,12 +224,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     if (this.showCreateReOrder && !this.disableCreateReOrder) {
       menu = [...menu, { text: MobileMenuItems.CreateReOrder }];
     }
-    if (!this.showCloseButton && this.activeSystem !== this.systemType.IRP) {
+    if (!this.showCloseButton) {
       menu = [...menu, { text: MobileMenuItems.Delete }];
     }
     if (!this.disabledLock && this.showLockOrder && this.activeSystem !== this.systemType.IRP) {
       menu = [...menu, { text: this.order?.isLocked ? MobileMenuItems.Unlock : MobileMenuItems.Lock }];
     }
+
     return menu;
   }
 
@@ -242,6 +244,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get mobileMenu(): { text: string }[] {
     let menu: { text: string }[] = this.tabletMenu;
+
     if (!this.disableEdit  &&  this.activeSystem === this.systemType.IRP) {
       menu = [...menu, { text: MobileMenuItems.Edit }, { text: MobileMenuItems.CloseOrder}];
     }

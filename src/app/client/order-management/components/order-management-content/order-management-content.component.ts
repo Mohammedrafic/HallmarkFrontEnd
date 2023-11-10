@@ -6,8 +6,8 @@ import {
   OnInit,
   ViewChild,
   Inject,
-  NgZone,
   ChangeDetectionStrategy,
+  NgZone,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DOCUMENT, DatePipe, Location } from '@angular/common';
@@ -98,6 +98,7 @@ import {
   UpdateRegRateSucceeded,
   GetOrderComments,
   ClearPredefinedBillRates,
+  GetIrpOrderExtensionCandidates,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -114,7 +115,9 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
+import { 
+  DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG, ViewOrderIRP_PERMISSION, ViewOrderVMS_PERMISSION 
+} from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderStatus } from '@shared/enums/order-management';
@@ -124,12 +127,13 @@ import {
   OrderManagementIRPTabsIndex,
   OrganizationOrderManagementTabs,
   orderLockList,
-  orderDistributionList
+  orderDistributionList,
 } from '@shared/enums/order-management-tabs.enum';
 import { FilterIrpOrderTypes, OrderType, OrderTypeOptions, VmsOrderTypeTooltipMessage } from '@shared/enums/order-type';
 import { SettingsKeys } from '@shared/enums/settings';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import {
+  CandidatesStatusText,
   FilterOrderStatusText,
   LocalStorageStatus,
   STATUS_COLOR_GROUP,
@@ -243,12 +247,7 @@ import { ReOrderState } from '@shared/components/order-reorders-container/store/
 import { ButtonGroupComponent } from '@shared/components/button-group/button-group.component';
 import { OrderLinkDetails } from '@client/order-management/interfaces';
 import { CurrentUserPermission } from '@shared/models/permission.model';
-import { DialogComponent, DialogUtility } from '@syncfusion/ej2-angular-popups';
-import { CandidatesStatusText } from '@shared/enums/status';
-import {
-  ViewOrderIRP_PERMISSION,
-  ViewOrderVMS_PERMISSION
-} from '@shared/constants';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/interfaces';
 import { OrderManagementIRPRowPositionService } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.service';
 
@@ -271,6 +270,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @ViewChild('exportTooLargeWarning') exportWarning: DialogComponent;
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
+  includeDeployed: boolean = false;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -444,10 +444,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public userSearch$ = new Subject<FilteringEventArgs>();
 
   private isRedirectedFromDashboard: boolean;
-  private isRedirectedFromDashboardWidget: boolean;
   private isRedirectedFromVmsSystem = false;
   private orderStaus: number;
-  private xtraOrderStatus: number;
   private numberArr: number[] = [];
 
   private previousSelectedSystemId: OrderManagementIRPSystemId | null;
@@ -470,8 +468,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private alertTitle: string;
   private orderManagementPagerState: OrderManagementPagerState | null;
   private orderPositionStatus: string | null;
-  private orderPositionWidgetStatus: string | null;
-  private orderPositionXtraStatus: string | null;
   private organizationId: number;
   private employeeToggleState: IrpEmployeeToggleState;
   public isCondidateTab: boolean = false;
@@ -523,8 +519,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
     private cd: ChangeDetectorRef,
+    private ngZone: NgZone,
     private breakpointService: BreakpointObserverService,
-    private readonly ngZone: NgZone,
     private preservedOrderService: PreservedOrderService,
     private ordergridsystemstateservice:OrderGridSystemStateService,
     public orderManagementIRPRowPositionService: OrderManagementIRPRowPositionService,
@@ -542,13 +538,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.activeIRPTabIndex =parseInt(routerState?.['irpActiveTab'])
     }
     this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
-    this.isRedirectedFromDashboardWidget = routerState?.['redirectedFromDashboard'] || false;
     this.orderStaus = routerState?.['orderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
     this.quickOrderId = routerState?.['publicId'];
     this.prefix = routerState?.['prefix'];
     this.orderPositionStatus = routerState?.['status'];
-    this.orderPositionWidgetStatus = routerState?.['status'];
     (routerState?.['status'] == "In Progress (Pending)" || routerState?.['status'] == "In Progress (Accepted)") ? this.SelectedStatus.push("InProgress") : routerState?.['status'] == "In Progress" ? this.SelectedStatus.push("InProgress") : routerState?.['status'] ? this.SelectedStatus.push(routerState?.['status']) : "";
     this.candidateStatusId = routerState?.['candidateStatusId'] || '';
     routerState?.['candidateStatus'] != undefined && routerState?.['candidateStatus'] != '' ? this.SelectedCandiateStatuses.push(routerState?.['candidateStatus']) : "";
@@ -707,10 +701,10 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   const orderData = Data as IRPOrderPosition;
 
   this.store.dispatch(new GetOrderById(orderData.orderId, orderData.organizationId));
-  this.dispatchAgencyOrderCandidatesList(orderData.orderId, orderData.organizationId, true);
+  this.onSelectedOrderDataLoadHandler();
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
-  this.openDetails.next(true);
+  this.openDetails.next(false);
   this.selectedRowRef = Data;
 }
 
@@ -834,7 +828,6 @@ public RedirecttoIRPOrder(order:Order)
     }
 
     if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
-      // TODO new export for IRP system
       this.defaultFileName = `Organization Management/${this.activeIRPtabs} ` + this.generateDateTime(this.datePipe);
       this.fileName = this.defaultFileName;
       this.store.dispatch(new ShowExportDialog(true));
@@ -962,11 +955,11 @@ public RedirecttoIRPOrder(order:Order)
     }
   }
 
-  public createReorder(data: any): void {
+  public createReorder(data: OrderManagement): void {
     this.openReOrderDialog(data.id, data.organizationId);
     this.addEditReOrderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.AddReOrder);
     this.creatingReorder = true;
-    this.gridWithChildRow.selectRow(parseInt(data.index));
+    this.gridWithChildRow.selectRow(parseInt((data as OrderManagement & { index: string }).index));
   }
 
   public searchOrders(event: KeyboardEvent): void {
@@ -1265,7 +1258,7 @@ public RedirecttoIRPOrder(order:Order)
         if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length == this.selectedItems.length){
           this.openregrateupdate = false;
         }
-        if(this.selectedItems.filter(ele=> ele.statusText == "Filled" || ele.statusText == "Closed").length >0){
+        if(this.selectedItems.filter(ele=> ele.children.length > 0).length >0){
           this.reorderFilledStatus = true;
         }
         if (this.selectedItems.length === 0) {
@@ -1383,7 +1376,7 @@ public RedirecttoIRPOrder(order:Order)
     const { selectedOrderAfterRedirect } = this.orderManagementService;
     if (selectedOrderAfterRedirect && this.ordersPage?.items) {
       const orderAllOrders = this.ordersPage.items.find(
-        (order: any) => order.publicId === selectedOrderAfterRedirect.orderId
+        (order: OrderManagement) => order.publicId === selectedOrderAfterRedirect.orderId
       );
       if (orderAllOrders) {
         const candidate = orderAllOrders.children.find(
@@ -1548,8 +1541,7 @@ public RedirecttoIRPOrder(order:Order)
     this.checkSelectedChildrenItem();
   }
 
-
-  public onRowDeselect(event: any, grid: any) {
+  public onRowDeselect(event: RowSelectEventArgs, grid: GridComponent) {
     this.rowDeselected(event, grid);
     this.checkSelectedChildrenItem();
   }
@@ -2321,7 +2313,10 @@ public RedirecttoIRPOrder(order:Order)
         this.selectFirstRow();
         this.isRedirectedFromVmsSystem = false;
       }
-
+      if(this.selectedOrder){
+        this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number,
+          !!this.selectedOrder.irpOrderMetadata);
+      }
       this.cd$.next(true);
     });
   }
@@ -2756,14 +2751,31 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed,
       ""
     ));
-    if (isIrp) {
+    if(this.employeeToggleState?.includeDeployed){
+      if(this.employeeToggleState.includeDeployed !== null){
+        this.includeDeployed = this.employeeToggleState.includeDeployed;
+      } else {
+        this.includeDeployed = false;
+      }
+    }
+    if (isIrp && (this.selectedOrder?.extensionFromId === null)) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
         organizationId,
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.employeeToggleState?.includeDeployed,
+        this.includeDeployed,
+        ""
+      )); 
+    } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)){
+      this.store.dispatch(new GetIrpOrderExtensionCandidates(
+        orderId,
+        organizationId,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
+        this.employeeToggleState?.isAvailable,
+        this.includeDeployed,
         ""
       ));
     }

@@ -30,6 +30,7 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
+              *ngIf="!isAgency"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
               [disabled]="disableAddExtension || isAgencySuspended"

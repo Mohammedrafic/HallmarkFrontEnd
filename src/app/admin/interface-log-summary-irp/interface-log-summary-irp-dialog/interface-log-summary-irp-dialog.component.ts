@@ -110,13 +110,17 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
   { text: 'Profile Status', column: 'ProfileStatus' },
   { text: 'Hold Start Date', column: 'HoldStartDate' },
   { text: 'Hold End Date', column: 'HoldEndDate' },
-  { text: 'Termination Date', column: 'TerminationDate' },
-  { text: 'Termination Reason', column: 'TerminationReason' },
+  { text: 'Inactivation Date', column: 'InactivationDate' },
+  { text: 'Inactivation Reason', column: 'InactivationReason' },
   { text: 'Status', column: 'Status' },
   { text: 'Error Descriptions', column: 'ErrorDescriptions' }
    ];
    get hidePreviousDialog(): boolean {
     return  this.selectedType == LogStatusEnum.OverAll
+
+  }
+  get getSelectedTypeName(): string {
+    return this.selectedType==LogStatusEnum.Errored ? "Error" : LogStatusEnum[this.selectedType]
 
   }
   constructor(
@@ -184,7 +188,7 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
 
   public override customExport(): void {
     const currentDateTime = this.generateDateTime(this.datePipe);
-    this.fileName = `EmployeeImportDetails_${currentDateTime}`;
+    this.fileName = this.hidePreviousDialog ?`InterfaceLogSummaryIRPDetails_${currentDateTime}`: this.getSelectedTypeName+`RecordDetails_${currentDateTime}`;
     this.store.dispatch(new ShowExportDialog(true));
   }
 
@@ -199,7 +203,7 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = `EmployeeImportDetails_${this.generateDateTime(this.datePipe)}`;
+    this.defaultFileName = this.hidePreviousDialog ?`InterfaceLogSummaryIRPDetails_${this.generateDateTime(this.datePipe)}`: this.getSelectedTypeName+`RecordDetails_${this.generateDateTime(this.datePipe)}`;
     this.store.dispatch(
       new ExportEmployeeImportDetails(
         new ExportPayload(

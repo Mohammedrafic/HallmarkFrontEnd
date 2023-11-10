@@ -9,7 +9,7 @@ import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { AttachmentsListComponent } from '@shared/components/attachments';
 import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
 import { BillRateCalculationType } from '@shared/models';
-import { InvoiceHistoricalSubmission, InvoiceRecordState } from 'src/app/modules/timesheets/enums';
+import { InvoiceHistoricalSubmission, InvoiceRecordState, RecordFields } from 'src/app/modules/timesheets/enums';
 import { ActionsCellComponent } from '../components/cell-editors/actions-cell/actions-cell.component';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
 import { GridDateEditorComponent } from '../components/cell-editors/grid-date-editor/grid-date-editor.component';
@@ -155,7 +155,7 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     headerName: 'Time in',
     ...commonColumn,
     width: 125,
-    minWidth: 85,
+    minWidth: 125,
     cellRenderer: GridDateEditorComponent,
     type: 'rightAligned',
     headerClass: 'custom-wrap',
@@ -170,7 +170,7 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     headerName: 'Time out',
     ...commonColumn,
     width: 125,
-    minWidth: 85,
+    minWidth: 125,
     cellRenderer: GridDateEditorComponent,
     type: 'rightAligned',
     headerClass: 'custom-wrap',
@@ -508,4 +508,11 @@ const invoiceRecordStateColorMapper = {
 
 const getStateCellColor = (state: InvoiceRecordState): string => {
   return invoiceRecordStateColorMapper[state];
+};
+
+export const TableTitleMapper = {
+  [RecordFields.Time]: 'Timesheet',
+  [RecordFields.HistoricalData]: 'Historical Data',
+  [RecordFields.Miles]: 'Miles',
+  [RecordFields.Expenses]: 'Expenses',
 };

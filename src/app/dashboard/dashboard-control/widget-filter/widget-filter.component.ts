@@ -35,6 +35,8 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { User } from '@shared/models/user.model';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 
 @Component({
@@ -54,6 +56,8 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   @Input() public allSkills: AllOrganizationsSkill[];
   @Input() public orderedFilters: Record<FilterName, FilteredItem[]>;
 
+  @Select(UserState.user) public readonly user$: Observable<User | null>;
+
   @Select(UserState.organizationStructure) private readonly organizationStructure$: Observable<OrganizationStructure>;
 
   @Select(SecurityState.organisations) public readonly allOrganizations$: Observable<UserStateModel['organizations']>;
@@ -64,7 +68,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   private regions: OrganizationRegion[] = [];
   private sortedSkillsByOrgId: Record<string, AllOrganizationsSkill[]> = {};
   private filterIsApplied = false;
-
+  public userIsAgency: boolean = false;
   public widgetFilterFormGroup: FormGroup;
   public filterColumns: IFilterColumnsDataModel = {} as IFilterColumnsDataModel;
   public orderedFilterChips: (string | FilteredItem)[][] = [];
@@ -306,6 +310,11 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   private onAllOrganizationsDataLoadHandler(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    this.userIsAgency = user?.businessUnitType === BusinessUnitType.Agency;
+    if(this.userIsAgency){
+      this.allOrganizations = this.allOrganizations.filter((item)=> item.regions.length>0);
+    }
     if (this.allOrganizations && this.filterColumns.organizationIds) {
       this.filterColumns.organizationIds.dataSource = this.allOrganizations;
     }

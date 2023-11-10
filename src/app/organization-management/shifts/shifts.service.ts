@@ -13,6 +13,7 @@ export class ShiftsService {
       startTime: new FormControl(null, [ Validators.required ]),
       endTime: new FormControl(null, [ Validators.required ]),
       onCall: new FormControl(false),
+      inactiveDate:new FormControl('')
     });
   }
 }

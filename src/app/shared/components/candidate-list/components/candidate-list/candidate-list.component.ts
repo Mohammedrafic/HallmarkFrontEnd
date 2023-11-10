@@ -20,6 +20,7 @@ import {
   Subject,
   Subscription,
   switchMap,
+  take,
   takeUntil,
   takeWhile,
   tap,
@@ -33,7 +34,7 @@ import { UserPermissions } from '@core/enums';
 import { FilterPageName } from '@core/enums/filter-page-name.enum';
 import { DateTimeHelper } from '@core/helpers';
 import { getIRPOrgItems } from '@core/helpers/org-structure.helper';
-import { Permission } from '@core/interface';
+import { CustomFormGroup, Permission } from '@core/interface';
 import { PreservedFiltersByPage } from '@core/interface/preserved-filters.interface';
 import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 import { GlobalWindow } from '@core/tokens';
@@ -80,6 +81,9 @@ import {
   IRPCandidateList,
   CandidatePagingState,
   CandidateListStateModel,
+  EmployeeInactivateData,
+  InactivateEmployeeDto,
+  InactivationEvent,
 } from '../../types/candidate-list.model';
 import {
   CandidatesExportCols, CandidatesTableFilters, filterColumns,
@@ -87,11 +91,14 @@ import {
 } from './candidate-list.constants';
 import { CandidateListScroll } from './candidate-list.enum';
 import { CredentialType } from '@shared/models/credential-type.model';
-import { GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
+import { GetInactivationReasons, GetSourcingReasons } from '@organization-management/store/reject-reason.actions';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { ProfileStatuses, ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { Credential } from '@shared/models/credential.model';
 import { CredentialTypeFilter } from '@shared/models/credential.model';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { endTimeValidator } from '@shared/validators/date.validator';
 @Component({
   selector: 'app-candidate-list',
   templateUrl: './candidate-list.component.html',
@@ -100,6 +107,7 @@ import { CredentialTypeFilter } from '@shared/models/credential.model';
 export class CandidateListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('regionMultiselect') public readonly regionMultiselect: MultiSelectComponent;
+  @ViewChild('inactivationDialog') inactivationDialog: DialogComponent;
 
   @Select(CandidateListState.candidates)
   private _candidates$: Observable<CandidateList>;
@@ -141,6 +149,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(PreservedFiltersState.preservedFiltersByPageName)
   private readonly preservedFiltersByPageName$: Observable<PreservedFiltersByPage<CandidateListFilters>>;
   public filterType: string = 'Contains';
+
+  @Select(RejectReasonState.inactivationReasons)
+  public inactivationReasons$: Observable<RejectReasonPage>;
 
   @Input() public credEndDate: string;
   @Input() public credStartDate: string;
@@ -189,13 +200,23 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public readonly optionFields = optionFields;
   public readonly regionFields = regionFields;
   public unassignedworkCommitment: any;
+  public animationSettings: Object = { effect: 'Zoom', duration: 400, delay: 0 };
+  public inactivationForm: CustomFormGroup<EmployeeInactivateData>;
+  public reasonFields = {
+    text: 'reason',
+    value: 'id',
+  };
   private pageSubject = new Subject<number>();
   private includeDeployedCandidates = true;
   private unsubscribe$: Subject<void> = new Subject();
   private isAlive = true;
   private activeTab: number;
   private scrollSubscription: Subscription;
-  private redirectfromDashboard: boolean
+  private redirectfromDashboard: boolean;
+  private inactivationData: InactivationEvent = {
+    id: null,
+    hireDate: null,
+  };
   public isSourcingEnabled = false;
   constructor(
     private store: Store,
@@ -212,11 +233,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   ) {
     super();
     this.unassignedworkCommitment = JSON.parse(localStorage.getItem('unassignedworkcommitment') || 'false') as boolean;
+    this.inactivationForm = this.candidateListService.createInactivateForm();
   }
 
   ngOnInit(): void {
-
-
     this.initCandidateFilterForm();
     this.getRegions();
     this.getCredentialTypes();
@@ -378,20 +398,29 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     );
   }
 
-  public onRemove(id: number): void {
-    this.confirmService
-      .confirm('Are you sure you want to inactivate the Candidate?', {
-        okButtonLabel: 'Inactivate',
-        okButtonClass: 'delete-button',
-        title: 'Inactivate the Candidate',
-      })
-      .pipe(
-        filter((confirm) => !!confirm),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe(() => {
-        this.inactivateCandidate(id);
-      });
+  public onRemove(id: number, employeeHireData: string | null = null): void {
+    if (!this.isIRP) {
+      this.confirmService
+        .confirm('Are you sure you want to inactivate the Candidate?', {
+          okButtonLabel: 'Inactivate',
+          okButtonClass: 'delete-button',
+          title: 'Inactivate the Candidate',
+        })
+        .pipe(
+          filter((confirm) => !!confirm),
+          takeUntil(this.unsubscribe$)
+        )
+        .subscribe(() => {
+          this.inactivateCandidate(id);
+        });
+    } else {
+      this.store.dispatch(new GetInactivationReasons(1, 1000));
+      this.inactivationData = { id: id, hireDate: employeeHireData};
+      this.inactivationForm.get('hireDate')?.patchValue(employeeHireData);
+      this.inactivationForm.get('inactivationDate')?.patchValue(new Date(new Date().setHours(0, 0, 0)));
+      this.inactivationForm.get('inactivationDate')?.setValidators(endTimeValidator(this.inactivationForm, 'hireDate'));
+      this.inactivationDialog.show();
+    }
   }
 
   public closeExport(): void {
@@ -447,6 +476,38 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public regionTrackBy(index: number, region: string): string {
     return region;
+  }
+
+  public cancelInactivation(): void {
+    this.inactivationData = { id: null, hireDate: null};
+    this.inactivationForm.reset();
+    this.inactivationDialog.hide();
+  }
+
+  public inactivateIrpEmployee(): void {
+    if (!this.inactivationForm.valid || this.inactivationData.id === null) {
+      this.inactivationForm.markAllAsTouched();
+      return;
+    }
+    const data = this.inactivationForm.value;
+    const dto: InactivateEmployeeDto = {
+      id: this.inactivationData.id,
+      inactivationDate: DateTimeHelper.setUtcTimeZone(data.inactivationDate),
+      inactivationReasonId: data.inactivationReasonId,
+      createReplacement: !!data.createReplacement,
+    };
+    
+    this.store.dispatch(new CandidateListActions.DeleteIRPCandidate(dto));
+    this.inactivationData = { id: null, hireDate: null};
+    this.cancelInactivation();
+
+    this.actions$.pipe(
+      ofActionDispatched(CandidateListActions.EmployeeInactivationSuccessful),
+      take(1),
+    )
+    .subscribe(() => {
+      this.dispatchNewPage();
+    });
   }
 
   private initCandidateFilterForm(): void {
@@ -551,12 +612,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private inactivateCandidate(id: number) {
-    const ChangeCandidateStatusAction = this.isIRP
-      ? new CandidateListActions.DeleteIRPCandidate(id)
-      : new CandidateListActions.ChangeCandidateProfileStatus(id, CandidateStatus.Inactive);
-
     this.store
-      .dispatch(ChangeCandidateStatusAction)
+      .dispatch(new CandidateListActions.ChangeCandidateProfileStatus(id, CandidateStatus.Inactive))
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.dispatchNewPage();

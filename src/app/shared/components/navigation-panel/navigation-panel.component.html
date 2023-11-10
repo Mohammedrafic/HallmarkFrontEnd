@@ -2,12 +2,12 @@
      (click)="prevClick.emit()"
      class="prev">
     <i-feather name="arrow-left" class="icon"></i-feather>
-    {{prevLabel}}
+    {{ isMobile ? 'Previous' : prevLabel }}
 </div>
 
 <div [class.disabled]="nextDisabled"
      (click)="nextClick.emit()"
      class="next">
-    {{nextLabel}}
+    {{ isMobile ? 'Next' : nextLabel }}
     <i-feather name="arrow-right" class="icon"></i-feather>
 </div>

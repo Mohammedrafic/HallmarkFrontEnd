@@ -34,13 +34,30 @@ export const JobDistributionIrpOnly = (tieringEnabled: boolean) => {
   return [AllInternalJob];
 };
 
-export const JobDistributionIrpVms = (tieringEnabled: boolean): JobDistributionOption[] => {
-  if (tieringEnabled) {
+export const JobDistributionIrpVms = (tieringIrpEnabled: boolean, tieringVmsEnabled?: boolean): JobDistributionOption[] => {
+  if (tieringIrpEnabled && tieringVmsEnabled) {
     return [
       AllInternalJob,
       TierInternal,
       { id: IrpOrderJobDistribution.AllExternal, name: 'All External' },
       { id: IrpOrderJobDistribution.TieringLogicExternal, name: 'Tiering logic External' },
+      { id: IrpOrderJobDistribution.SelectedExternal, name: 'Selected External' },
+    ];
+  }
+
+  if (tieringIrpEnabled && !tieringVmsEnabled) {
+    return [
+      AllInternalJob,
+      TierInternal,
+      { id: IrpOrderJobDistribution.AllExternal, name: 'All External' },
+      { id: IrpOrderJobDistribution.SelectedExternal, name: 'Selected External' },
+    ];
+  }
+
+  if (!tieringIrpEnabled && !tieringVmsEnabled) {
+    return [
+      AllInternalJob,
+      { id: IrpOrderJobDistribution.AllExternal, name: 'All External' },
       { id: IrpOrderJobDistribution.SelectedExternal, name: 'Selected External' },
     ];
   }
@@ -62,3 +79,5 @@ export const EditablePerDiemFields = [
   'shiftStartTime',
   'shiftEndTime',
 ];
+
+export const SpecialProjectFieldsToValidation = ['projectTypeId', 'projectNameId'];

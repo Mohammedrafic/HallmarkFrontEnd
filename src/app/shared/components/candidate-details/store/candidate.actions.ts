@@ -28,10 +28,6 @@ export class SetPageSize {
   constructor(public pageSize: number) {}
 }
 
-export class GetCandidateRegions {
-  static readonly type = '[candidate details] Get Candidate Regions';
-  constructor() {}
-}
 export class Getcandidatesearchbytext {
   static readonly type ='[candidate details] Get Candidate Search';
   constructor(public filter: DoNotReturnCandidateSearchFilter) { }

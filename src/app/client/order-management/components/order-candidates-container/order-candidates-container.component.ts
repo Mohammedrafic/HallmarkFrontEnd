@@ -70,7 +70,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
     this.orderManagementService.excludeDeployed = event.excludeDeployed;
     this.orderManagementService.updateEmployeeToggleState({
       isAvailable: event.isAvailable,
-      includeDeployed: event.includeDeployed ?? false
+      includeDeployed: event.includeDeployed ? (event.includeDeployed !== null ? event.includeDeployed : false) : false
     })    
       this.store.dispatch(new GetAgencyOrderCandidatesList(
         event.orderId,
@@ -88,7 +88,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
           event.currentPage,
           event.pageSize,
           event.isAvailable,
-          event.includeDeployed,
+          event.includeDeployed ? (event.includeDeployed !== null ? event.includeDeployed : false) : false,
           event.searchTerm||""
         ));
       } 

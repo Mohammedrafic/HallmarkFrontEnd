@@ -27,6 +27,7 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { User } from '@shared/models/user.model';
 import { uniqBy } from 'lodash';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-aging-details',
@@ -41,7 +42,10 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     "DepartmentParamAR": "",
     "BearerParamAR": "",
     "BusinessUnitIdParamJD": "",
-    "HostName": ""
+    "HostName": "",
+    "organizationNameAR": "",
+    "reportPulledMessageAR": ""
+   
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AgingReport/AgingReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AgingReport/Aging.cat" };
@@ -99,6 +103,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public user: User | null;
   public isResetFilter: boolean = false;
   private previousOrgId: number = 0;
+  private culture = 'en-US';
 
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
@@ -288,7 +293,8 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     regionIds =        regionIds.length > 0 ? regionIds.join(",") :  "null"; 
     locationIds = locationIds.length > 0 ? locationIds.join(",") :"null"; 
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") :"null"; 
-    
+
+    let currentDate = new Date(Date.now());
 
     this.paramsData =
     {
@@ -302,7 +308,10 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
           this.organizations[0].organizationId.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "AgingGroupAR":agingGroupIds==null?"null":agingGroupIds.toString()
+      "AgingGroupAR": agingGroupIds == null ? "null" : agingGroupIds.toString(),
+      "organizationNameAR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageAR": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

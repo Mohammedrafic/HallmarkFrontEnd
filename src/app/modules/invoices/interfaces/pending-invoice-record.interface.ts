@@ -45,6 +45,7 @@ export interface PendingInvoiceRecord {
   timesheetId: number;
   attachments: InvoiceAttachment[];
   timesheetRecordId: number;
+  timesheetType?: number;
 }
 
 export interface TimeSpan {

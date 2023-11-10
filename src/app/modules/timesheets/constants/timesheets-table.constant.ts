@@ -5,7 +5,10 @@ import { ColDef, ValueGetterParams } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
 import {
-  FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns,
+  FilteringOptionsFields,
+  RecordStatus,
+  TimesheetsTableColumns,
+  TimesheetsTableFiltersColumns,
   TIMETHEETS_STATUSES
 } from '../enums';
 import { FilterColumns, TimesheetsFilterState } from '../interface';
@@ -249,4 +252,11 @@ export const filteringOptionsMapping: Map<FilteringOptionsFields, TimesheetsTabl
 
 export const BulkApproveSuccessMessage = {
   successMessage: 'Success. Timesheets Approved',
+};
+
+export const RecordRosStatusClass: Record<RecordStatus, string> = {
+  [RecordStatus.New]: 'new-record-row',
+  [RecordStatus.Deleted]: 'deleted-record-row',
+  [RecordStatus.None]: 'default-record-row',
+  [RecordStatus.NotChanged]: 'default-record-row'
 };

@@ -7,12 +7,12 @@ import { JobGridModule } from './components/job-grid/job-grid.module';
 import { JobFilterService, OpenJobApiService } from './services';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    OpenJobContainerModule,
-    JobFiltersModule,
-    JobGridModule,
-  ],
-  providers: [OpenJobApiService, JobFilterService],
+    imports: [
+      CommonModule,
+      OpenJobContainerModule,
+      JobFiltersModule,
+      JobGridModule,
+    ],
+    providers: [OpenJobApiService, JobFilterService],
 })
 export class OpenJobsModule { }

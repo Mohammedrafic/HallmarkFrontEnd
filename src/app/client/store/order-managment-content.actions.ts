@@ -101,6 +101,20 @@ export class GetIrpOrderCandidates {
   ) {}
 }
 
+export class GetIrpOrderExtensionCandidates {
+  static readonly type = '[order management] Get IRP order Candidates';
+
+  constructor(
+    public orderId: number,
+    public organizationId: number,
+    public pageNumber: number,
+    public pageSize: number,
+    public isAvailable: boolean,
+    public includeDeployed?: boolean,
+    public searchTerm?: string
+  ) {}
+}
+
 export class GetSelectedOrderById {
   static readonly type = '[order management] Get Selected Order By Id';
   constructor(

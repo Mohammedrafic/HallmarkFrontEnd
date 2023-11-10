@@ -55,7 +55,10 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     "CandidateStatusCREXP": "",
     "JobIdCREXP": "",
     "OpCredFlagEXP": "",
-    "UserId": ""
+    "UserId": "",
+    "organizationNameCREXP": "",
+    "reportPulledMessageCREXP": "",
+    "DateRangeCREXP": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cat" };
@@ -132,7 +135,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-  private fixedCandidateStatusesIncluded: string[] = ['Accepted','Onboard','Applied','Cancelled','Custom','Offboard','Offered','Shortlisted'];
+  private fixedCandidateStatusesIncluded: string[] = ['Accepted', 'Onboard', 'Applied', 'Cancelled', 'Custom', 'Offboard', 'Offered', 'Shortlisted'];
+  private culture = 'en-US';
+
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'statusText' };
@@ -377,6 +382,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
 
+    let currentDate = new Date(Date.now());
+
+
       this.paramsData =
       {
       "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
@@ -394,6 +402,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       window.localStorage.getItem("lastSelectedOrganizationId"),
         "OpCredFlagEXP": opcredFlag == "" ? "false" : opcredFlag.toString(),
         "UserId": this.user?.id,
+        "organizationNameCREXP": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+        "reportPulledMessageCREXP": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+        "DateRangeCREXP": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();

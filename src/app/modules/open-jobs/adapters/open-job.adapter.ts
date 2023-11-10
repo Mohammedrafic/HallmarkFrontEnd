@@ -1,6 +1,6 @@
 import { DateTimeHelper } from '@core/helpers';
 import { OpenJob, OpenJobPage } from '@shared/models';
-import { OrderJobName } from '../constants';
+import { GetDurationText, OrderJobName } from '../constants';
 
 export class OpenJobsAdapter {
   static adaptOpenJobPage(openJobPage: OpenJobPage): OpenJobPage {
@@ -12,6 +12,8 @@ export class OpenJobsAdapter {
           startDate: DateTimeHelper.setUtcTimeZone(item.startDate),
           endDate: DateTimeHelper.setUtcTimeZone(item.endDate),
           orderTypeName: OrderJobName[item.orderType],
+          title: item.skillName,
+          durationText: GetDurationText(item.duration),
         };
       }),
     };

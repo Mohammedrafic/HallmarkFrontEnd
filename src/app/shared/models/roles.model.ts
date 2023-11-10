@@ -11,6 +11,7 @@ export type Role = {
   businessUnitId: number;
   businessUnitName: string;
   permissions: Permissions;
+  isSelfRole:boolean;
 };
 
 export type RoleDTO = Omit<Role, 'isDefault' | 'businessUnitName'>;

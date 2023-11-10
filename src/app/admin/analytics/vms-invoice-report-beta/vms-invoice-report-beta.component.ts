@@ -55,7 +55,8 @@ export class VmsInvoiceReportBetaComponent implements OnInit, OnDestroy {
     "BusinessUnitIdParamVMSIR": "",
     "HostName": "",
     "organizationNameVMSIR": "",
-    "reportPulledMessageVMSIR": ""
+    "reportPulledMessageVMSIR": "",
+    "DateRangeVMSIR": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReportBeta/VMSInvoiceReportBeta.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReportBeta/VMSInvoiceReportBeta.cat" };
@@ -141,6 +142,7 @@ export class VmsInvoiceReportBetaComponent implements OnInit, OnDestroy {
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
   private previousOrgId: number = 0;
+  private culture = 'en-US';
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -412,7 +414,9 @@ export class VmsInvoiceReportBetaComponent implements OnInit, OnDestroy {
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
       "organizationNameVMSIR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
-      "reportPulledMessageVMSIR": "Report pulled on " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString()
+      "reportPulledMessageVMSIR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
+      "DateRangeVMSIR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

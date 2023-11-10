@@ -19,10 +19,10 @@
       </ng-container>
 
       <ng-container *ngSwitchDefault>
-        <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="jobInfoTemplate" *ngIf="activeSystems !== systemType.IRP"></ng-container>
         <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
-        <div class="column last-column">
+        <div class="column last-column" *ngIf="activeSystems !== systemType.IRP">
           <ng-container [ngTemplateOutlet]="billRate"></ng-container>
         </div>
         <ng-container [ngTemplateOutlet]="region"></ng-container>
@@ -59,7 +59,7 @@
         </div>
         <div class="sup-title">Shift</div>
       </div>
-      <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
+      <div *ngIf="orderInformation.orderType !== orderType.PermPlacement && activeSystems !== systemType.IRP" class="column">
         <div class="title">
           ${{ orderInformation.joiningBonus || 0 | currency: '':'' }} / ${{
             orderInformation.compBonus || 0 | currency: '':''
@@ -67,11 +67,10 @@
         </div>
         <div class="sup-title">Start / End Bonus</div>
       </div>
-      <div class="column">
+      <div class="column" *ngIf="activeSystems !== systemType.IRP">
         <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
-      <ng-container [ngTemplateOutlet]="workflowName"></ng-container>
     </div>
     <div class="container-row">
       <ng-container *ngIf="orderInformation.orderType !== orderType.ReOrder">
@@ -138,6 +137,12 @@
   <section class="candidates-additional-info" *ngIf="orderInformation">
     <div class="container-row justify-content-space-between">
       <div class="column">
+        <div class="title accent positions">
+          {{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}
+        </div>
+        <div class="sup-title">Open Positions</div>
+      </div>
+      <div class="column">
         <div class="title">{{ orderInformation.onCallRequired | boolValueToText }}</div>
         <div class="sup-title">On-Call</div>
       </div>
@@ -181,7 +186,6 @@
         [ngTemplateOutlet]="linkedId"
         [ngTemplateOutletContext]="{ linkedID: orderInformation.linkedId }"
       ></ng-container>
-      <ng-container [ngTemplateOutlet]="workflowName"></ng-container>
     </div>
   </section>
 </ng-template>
@@ -326,7 +330,7 @@
       <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
         Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
       </div>
-    </div>      
+    </div>
   </div>
 </ng-template>
 
@@ -346,12 +350,5 @@
   <div class="column">
     <div class="title">{{ linkedID || '-' }}</div>
     <div class="sup-title">Linked ID</div>
-  </div>
-</ng-template>
-
-<ng-template #workflowName>
-  <div class="column">
-    <div class="title">{{ orderInformation.workflowName || '-' }}</div>
-    <div class="sup-title">Workflow</div>
   </div>
 </ng-template>

@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 
 import { DateTimeHelper } from "@core/helpers";
 import { OrganizationManagementState } from "@organization-management/store/organization-management.state";
-import { ExpiredCredentialsMessage } from "@shared/components/child-order-dialog/child-order-dialog.constants";
+import { ExpiredCredentialsEmpMessage, ExpiredCredentialsMessage } from "@shared/components/child-order-dialog/child-order-dialog.constants";
 import { ChildOrderDialogService } from "@shared/components/child-order-dialog/child-order-dialog.service";
 import { MissingCredentialsRequestBody, MissingCredentialsResponse } from "@shared/models/credential.model";
 import {
@@ -106,7 +106,7 @@ import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.util
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { catchError, distinctUntilChanged, EMPTY, Observable, Subject, take, takeWhile, takeUntil } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
@@ -116,6 +116,7 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 import { SettingsViewService } from '@shared/services';
 import { UserPermissions } from '@core/enums';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 enum Template {
   accept,
@@ -220,9 +221,11 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public readonly orderStatus = OrderStatus;
 
   private isAlive = true;
+  private isActive = false;
   private isLastExtension = false;
   private ignoreMissingCredentials = false;
   private readonly permissions = UserPermissions;
+  confirmationMessage: string;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -712,7 +715,13 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private onOpenEvent(): void {
-    this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+    this.openEvent.pipe(
+      filter((data) => {
+        this.isActive = !!data;
+        return this.isActive;
+      }),
+      takeWhile(() => this.isAlive),
+    ).subscribe((data) => {
       if (data) {
         this.tab.select(1);
         const [order, candidate, system] = data;
@@ -731,13 +740,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.clearOrderCandidateList();
         this.clearCandidateJobState();
       }
-      this.isAlive = !!data;
     });
     this.jobStatusControl = new FormControl('');
   }
 
   private getComments(): void {
-    if (this.isReorderType && this.candidateJob?.commentContainerId) {
+    if (this.isReorderType && this.candidateJob?.commentContainerId && this.isActive) {
       this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .pipe(takeUntil(this.componentDestroy()))
@@ -798,7 +806,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
         ? candidateBillRate
         : offeredBillRate;
-    const orderDate = this.order.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate;
+    const orderDate = this.order?.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate;
 
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
@@ -904,8 +912,13 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private showMissingCredentialsWarningMessage(): void {
+    if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+      this.confirmationMessage = ExpiredCredentialsEmpMessage;
+    } else {
+      this.confirmationMessage = ExpiredCredentialsMessage;
+    }
     this.confirmService
-      .confirm(ExpiredCredentialsMessage, {
+      .confirm(this.confirmationMessage, {
         title: 'Add Extension',
         okButtonLabel: 'Yes',
         okButtonClass: 'delete-button',
@@ -923,7 +936,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private getMissingCredentialsRequestBody(): MissingCredentialsRequestBody {
     return {
       orderId: this.order.orderId || this.order.id,
-      candidateProfileId: this.candidate.candidateId,
+      candidateProfileId: this.candidate.candidateProfileId || this.candidate.candidateId,
       validateForDate: DateTimeHelper.setInitHours(
         DateTimeHelper.setUtcTimeZone(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
       ),

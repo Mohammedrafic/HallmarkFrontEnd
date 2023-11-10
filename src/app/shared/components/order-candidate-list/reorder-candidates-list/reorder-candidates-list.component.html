@@ -234,7 +234,7 @@
             </ng-container>
             <ng-template #matchOverlap>
               <ejs-tooltip [content]="data.availabilityOverlap?.tooltip || ''" position="TopCenter">
-                <span class="matchOverlap">{{ data.availabilityOverlap?.overlapHours }}</span>
+                <span class="matchOverlap">{{ data.availabilityOverlap?.overlapHours  | number: '1.2-2' }}</span>
               </ejs-tooltip>
             </ng-template>
           </ng-template>

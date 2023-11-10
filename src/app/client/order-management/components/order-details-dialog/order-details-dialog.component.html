@@ -190,7 +190,7 @@
                 [disabled]="!canCreateOrderIRP || !CanOrganizationEditOrdersIRP"
                 (select)="onMobileMenuSelect($event)"
                 iconCss="e-icons"
-                cssClass="e-caret-hide primary-icon-button menu-mobile sdfsdf"
+                cssClass="e-caret-hide primary-icon-button menu-mobile"
               >
                 <i-feather name="more-vertical" class="icon"></i-feather>
               </button>
@@ -228,7 +228,7 @@
                 <span *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">{{ order?.extensionFromId ? 'Employee' : 'Employees' }}</span>
                 <span *ngIf="activeSystem !== OrderManagementIRPSystemId.IRP">{{ order?.extensionFromId ? 'Candidate' : 'Candidates' }}</span>
                 <span class="e-badge e-badge-success e-badge-pill">{{
-                  activeSystem ===  systemType.IRP? (irpCandidatesCount$ | async) : (orderCandidatesLength$ | async)
+                  activeSystem ===  systemType.IRP ? order?.extensionFromId ? 1 : (irpCandidatesCount$ | async) : (orderCandidatesLength$ | async)
                 }}</span>
               </ng-template>
               <ng-template #content>
@@ -275,7 +275,7 @@
                   <app-general-order-info [order]="order" [system]="activeSystem"></app-general-order-info>
                 </section>
                 <hr />
-                <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>
+                <app-extension-grid [system]="activeSystem" [data]="extensions" class="extension-grid"></app-extension-grid>
               </ng-template>
             </e-tabitem>
           </e-tabitems>

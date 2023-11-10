@@ -9,9 +9,7 @@ import { AbstractContactDetails } from '@client/candidates/candidate-profile/can
 import {
   ProfileStatuses,
   ProfileStatusesEnum,
-  recruitContent,
-  sourceContent,
-  TerminationReasons,
+  InactivationReasons,
 } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { JobClassifications } from '@client/order-management/constants';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -19,7 +17,7 @@ import { ListOfSkills } from '@shared/models/skill.model';
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
-import { GetSourcingReasons, GetTerminationReasons } from '@organization-management/store/reject-reason.actions';
+import { GetSourcingReasons, GetInactivationReasons } from '@organization-management/store/reject-reason.actions';
 import { endDateValidator, endTimeValidator, startDateValidator } from '@shared/validators/date.validator';
 import { CandidatesService } from '@client/candidates/services/candidates.service';
 import { DateTimeHelper } from '@core/helpers';
@@ -32,12 +30,12 @@ import { DateTimeHelper } from '@core/helpers';
 })
 export class GeneralInfoComponent extends AbstractContactDetails implements OnInit, OnDestroy {
   public isOnHoldSelected: boolean;
-  public isTerminatedSelected: boolean;
+  public isInactivatedSelected: boolean;
   public minEndDate = new Date(new Date().setHours(0, 0, 0, 0));
   fieldsSettingsTeminated: FieldSettingsModel = { text: 'reason', value: 'id' };
   currentPage = 1;
   pageSize = 100;
-  @Select(RejectReasonState.terminationReasons)
+  @Select(RejectReasonState.inactivationReasons)
   public reasons$: Observable<RejectReasonPage>;
 
 
@@ -54,7 +52,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   public recruitContent: any;
   public sourceContent: any;
   public readonly companyCodes = ProfileStatuses;
-  public readonly terminationReason = TerminationReasons;
+  public readonly inactivationReason = InactivationReasons;
   public readonly today = new Date();
   public isSourceValidated = false;
   public isSourceConfig = false;
@@ -72,7 +70,8 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
   }
 
   public override ngOnInit(): void {
-    let Status =[ProfileStatusesEnum.Sourcing,ProfileStatusesEnum.Prospect,ProfileStatusesEnum.Onboarding,ProfileStatusesEnum.ClearedForOrientation,ProfileStatusesEnum.OrientationScheduled,ProfileStatusesEnum.DoNotHire,ProfileStatusesEnum.FallOffOnboarding,ProfileStatusesEnum.VerbalOfferMade]
+    let Status =[ProfileStatusesEnum.Sourcing,ProfileStatusesEnum.Prospect,ProfileStatusesEnum.Onboarding,ProfileStatusesEnum.ClearedForOrientation,
+      ProfileStatusesEnum.OrientationScheduled,ProfileStatusesEnum.DoNotHire,ProfileStatusesEnum.FallOffOnboarding,ProfileStatusesEnum.VerbalOfferMade]
     this.profileStatuses = this.profileStatuses.filter(f => !Status.includes(f.id));
     this.profileStatuses =this.profileStatuses.sort((a, b) => a.name.localeCompare(b.name))
     super.ngOnInit();
@@ -80,7 +79,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.listenSkillsChanges();
     this.subscribeOnSkills();
     this.subscribeOnHoldDates();
-    this.store.dispatch(new GetTerminationReasons(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetInactivationReasons(this.currentPage, this.pageSize));
     this.store.dispatch(new GetSourcingReasons());
 
   }
@@ -135,14 +134,12 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       ?.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((profileStatus: ProfileStatusesEnum) => {
         this.isSourceConfig = false;
-        this.isTerminatedSelected = false;
+        this.isInactivatedSelected = false;
         this.isOnHoldSelected = false;
         const handlers = {
           [ProfileStatusesEnum.OnHold]: () => this.handleOnHoldProfileStatus(),
-          [ProfileStatusesEnum.Terminated]: () => this.handleTerminatedProfileStatus(),
           [ProfileStatusesEnum.Active]: () => this.reset(),
-          [ProfileStatusesEnum.Inactive]: () => this.reset(),
-
+          [ProfileStatusesEnum.Inactive]: () => this.handleInactivationProfileStatus(),
           [ProfileStatusesEnum.Sourcing]: () => this.handleSourceStatus(),
           [ProfileStatusesEnum.Prospect]: () => this.handleSourceStatus(),
           [ProfileStatusesEnum.VerbalOfferMade]: () => this.handleSourceStatus(),
@@ -150,7 +147,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
           [ProfileStatusesEnum.ClearedForOrientation]: () => this.handleSourceStatus(),
           [ProfileStatusesEnum.OrientationScheduled]: () => this.handleSourceStatus(),
           [ProfileStatusesEnum.DoNotHire]: () => this.handleSourceStatus(),
-          [ProfileStatusesEnum.FallOffOnboarding]: () => this.handleTerminatedProfileStatus(),
+          [ProfileStatusesEnum.FallOffOnboarding]: () => this.handleInactivationProfileStatus(),
         };
 
         handlers[profileStatus]();
@@ -197,7 +194,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       : null;
 
     this.isOnHoldSelected = true;
-    this.isTerminatedSelected = false;
+    this.isInactivatedSelected = false;
     this.candidateForm.get('holdStartDate')?.setValue(startDate);
     this.candidateForm.get('holdStartDate')?.setValidators([
       Validators.required,
@@ -206,10 +203,10 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     ]);
     this.candidateForm.get('holdEndDate')?.setValue(endDate);
     this.candidateForm.get('holdEndDate')?.setValidators(endDateValidator(this.candidateForm, 'holdStartDate'));
-    this.removeValidatorsAndReset(['terminationDate', 'terminationReasonId']);
+    this.removeValidatorsAndReset(['inactivationDate', 'inactivationReasonId']);
   }
 
-  private handleTerminatedProfileStatus(): void {
+  private handleInactivationProfileStatus(): void {
     this.candidateForm.get('employeeId')?.enable();
     this.candidateForm.get('employeeId')?.addValidators(Validators.required);
     this.candidateForm.get('hireDate')?.addValidators(Validators.required);
@@ -218,19 +215,19 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
 
     this.sourceIdUpdateListener$?.unsubscribe();
     const profileData = this.candidatesService.getProfileData();
-    const startDate = profileData?.terminationDate
-      ? DateTimeHelper.setCurrentTimeZone(profileData.terminationDate)
+    const startDate = profileData?.inactivationDate
+      ? DateTimeHelper.setCurrentTimeZone(profileData.inactivationDate)
       : this.today;
 
-    this.isTerminatedSelected = true;
+    this.isInactivatedSelected = true;
     this.isOnHoldSelected = false;
-    this.candidateForm.get('terminationDate')?.setValue(startDate);
-    this.candidateForm.get('terminationDate')?.setValidators([
+    this.candidateForm.get('inactivationDate')?.setValue(startDate);
+    this.candidateForm.get('inactivationDate')?.setValidators([
       Validators.required,
       endTimeValidator(this.candidateForm, 'hireDate'),
     ]);
-    this.candidateForm.get('terminationReasonId')?.setValue(profileData?.terminationReasonId);
-    this.candidateForm.get('terminationReasonId')?.setValidators(Validators.required);
+    this.candidateForm.get('inactivationReasonId')?.setValue(profileData?.inactivationReasonId);
+    this.candidateForm.get('inactivationReasonId')?.setValidators(Validators.required);
     this.removeValidatorsAndReset(['holdStartDate', 'holdEndDate']);
   }
 
@@ -252,10 +249,10 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
     this.candidateForm.get('employeeSourceId')?.updateValueAndValidity();
     this.employeeIdRequired = true;
     this.sourceIdUpdateListener$?.unsubscribe();
-    this.isTerminatedSelected = false;
+    this.isInactivatedSelected = false;
     this.isOnHoldSelected = false;
 
-    this.removeValidatorsAndReset(['holdStartDate', 'terminationDate', 'terminationReasonId', 'holdEndDate']);
+    this.removeValidatorsAndReset(['holdStartDate', 'inactivationDate', 'inactivationReasonId', 'holdEndDate']);
   }
 
   private subscribeOnHoldDates(): void {

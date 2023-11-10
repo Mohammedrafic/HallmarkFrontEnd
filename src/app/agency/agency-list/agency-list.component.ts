@@ -19,7 +19,7 @@ import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AgencyStatus, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { Agency, AgencyFilteringOptions, AgencyListFilters, AgencyPage } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowMSPCustomSideDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
@@ -28,6 +28,8 @@ import { FilterService } from '@shared/services/filter.service';
 import { agencyListFilterColumns, agencyStatusMapper, MSPMenuOptions, MSPMenuType } from '@agency/agency-list/agency-list.constants';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
+import { UserState } from '../../store/user.state';
+import { BusinessUnitType } from '../../shared/enums/business-unit-type';
 
 
 @Component({
@@ -86,10 +88,15 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public filteredItems$ = new Subject<number>();
   public menuOption: Record<string, ItemModel[]>;
   public currentAgency: Agency;
+  public convertMspHeader: string = "Convert To MSP";
 
   private filters: AgencyListFilters = {};
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
+  public agencyData = new Subject<Agency>();
+  public businessUnitType: BusinessUnitType;
+  public isBusinessUnitTypeMSP: boolean = false;
+  public isBusinessUnitTypeHallmark: boolean = false;
 
   @Select(AgencyState.agencies)
   agencies$: Observable<AgencyPage>;
@@ -119,6 +126,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     this.subscribeOnAgencyFilteringOptions();
     this.subscribeOnSuccessAgencyByPage();
     this.setFileName();
+    this.setBusinessUnitType();
   }
 
   ngOnDestroy(): void {
@@ -133,6 +141,16 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public dataBound(): void {
     this.contentLoadedHandler();
     this.grid.hideScroll();
+  }
+
+  public setBusinessUnitType(): void {
+    this.businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    if (this.businessUnitType == BusinessUnitType.Hallmark) {
+      this.isBusinessUnitTypeHallmark = true;
+    }
+    else if (this.businessUnitType == BusinessUnitType.MSP) {
+      this.isBusinessUnitTypeMSP = true;
+    }
   }
 
   public changeGridSize(page: number): void {
@@ -241,6 +259,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
       statuses: this.filters.statuses || [],
       cities: this.filters.cities || [],
       contacts: this.filters.contacts || [],
+      isMSPAgencies: this.filters.isMSPAgencies || null,
     });
     this.filteredItems = this.filterService.generateChips(this.agencyListFilterFormGroup, this.filterColumns);
     this.filteredItems$.next(this.filteredItems.length);
@@ -256,20 +275,20 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
         this.onEdit(data);
         break;
       case MSPMenuType['Convert to MSP']:
-        this.store.dispatch(new ShowSideDialog(true));
         this.currentAgency = data;
+        this.store.dispatch(new ShowMSPCustomSideDialog(true));
         break;
       case MSPMenuType['Unlink from MSP']:
-        /**/
+        /*to be implemented*/
         break;
-      case MSPMenuType['History']:
-        /**/
+      case MSPMenuType['View History']:
+        this.agencyData.next(data);
         break;
     }
   }
 
-  public onConvertAgencyToMSPFormCancelClick(): void {
-    this.store.dispatch(new ShowSideDialog(false));
+  public onMspSideDialogClose(): void {
+    this.store.dispatch(new ShowMSPCustomSideDialog(false));
   }
 
   public onConvertAgencyToMSPFormSaveClick(): void {
@@ -277,8 +296,8 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
     var netSuiteId = this.currentAgency.netSuiteId ?? null;
     var name = this.currentAgency.agencyDetails.name;
     this.store.dispatch(new ConvertAgencyToMSP(agencyId, netSuiteId, name));
+    this.store.dispatch(new ShowMSPCustomSideDialog(false));
     this.updatePage();
-    this.store.dispatch(new ShowSideDialog(false));
   }
 
   private initMenuItems(): void {
@@ -351,6 +370,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
       statuses: new FormControl([]),
       cities: new FormControl([]),
       contacts: new FormControl([]),
+      isMSPAgencies: new FormControl(false)
     });
   }
 }

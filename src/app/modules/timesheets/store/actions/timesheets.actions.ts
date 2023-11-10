@@ -75,6 +75,7 @@ export namespace Timesheets {
       public readonly timesheetRecordId: number,
       public readonly organizationId: number | null,
       public readonly payload: Attachment,
+      public readonly triggeredFromTable = false,
     ) {}
   }
 
