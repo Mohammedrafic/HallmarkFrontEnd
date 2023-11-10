@@ -55,7 +55,11 @@ export class GeneralCommentsComponent implements OnInit {
     Commentby: '',
     OrderId: '',
     CandidateName: '',
-    Userid: ''
+    Userid: '',
+    organizationNameGCR: '',
+    reportPulledMessageGCR: '',
+    DateRangeGCR:''
+
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/GeneralComments/GeneralComments.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/GeneralComments/GeneralComments.cat" };
@@ -154,6 +158,7 @@ export class GeneralCommentsComponent implements OnInit {
   public masterDepartmentsList: Department[] = [];
   candidateSearchData: SearchCandidate[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
+  private culture = 'en-US';
 
   constructor(private store: Store,
     private formBuilder: FormBuilder,
@@ -368,7 +373,8 @@ export class GeneralCommentsComponent implements OnInit {
       Commentedby,
       OrderId,
       candidateName,
-      Userid
+      Userid,
+      
     }
       = this.generalcmntReportForm.getRawValue();
     if (!this.generalcmntReportForm.dirty) {
@@ -378,7 +384,7 @@ export class GeneralCommentsComponent implements OnInit {
       this.isResetFilter = false;
       this.message = ""
     }
-
+    let currentDate = new Date(Date.now());
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : '';
     locationIds = locationIds.length > 0 ? locationIds.join(",") : '';
@@ -399,7 +405,10 @@ export class GeneralCommentsComponent implements OnInit {
       Commentby: Commentedby == "0" ? "All" : Commentedby == "1" ? "Organization" : "Agency",
       OrderId: OrderId == null || OrderId == "" ? '' : OrderId,
       CandidateName: candidateName == null || candidateName == "" ? '' : candidateName.toString(),
-      Userid: this.user?.id
+      Userid: this.user?.id,
+      organizationNameGCR: this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name, 
+      reportPulledMessageGCR: ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(), 
+      DateRangeGCR: (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
