@@ -20,7 +20,7 @@ export class MSPAssociateListComponent extends AbstractPermission implements OnI
     return 'Agencies';
   }
 
-  constructor(protected override store: Store, private router: Router) {
+  constructor(protected override store: Store) {
     super(store);
 
     this.setHeaderName();
@@ -28,10 +28,6 @@ export class MSPAssociateListComponent extends AbstractPermission implements OnI
 
   override ngOnInit(): void {
     super.ngOnInit();
-
-    if (this.isAgency) {
-      this.checkForAgencyStatus();
-    }
   }
 
   public addNew(): void {
@@ -40,16 +36,7 @@ export class MSPAssociateListComponent extends AbstractPermission implements OnI
 
   private setHeaderName(): void {
     this.store.dispatch(
-      new SetHeaderState({ title: `MSP Associated Agencies`, iconName: 'briefcase' })
+      new SetHeaderState({ title: `MSP Linked Agencies`, iconName: 'briefcase' })
     ) 
-  }
-
-  private checkForAgencyStatus(): void {
-    this.store
-      .select(UserState.agencyActionsAllowed)
-      .pipe(distinctUntilChanged(), takeUntil(this.componentDestroy()))
-      .subscribe((value) => {
-        this.mspAgencyActionsAllowed = value;
-      });
   }
 }
