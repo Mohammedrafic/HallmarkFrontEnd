@@ -307,7 +307,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.organizationSettingService.getOrganizationSettings().subscribe(data => {
       this.payrateData = data.filter(settingdata => settingdata.settingKey === SettingsKeys.ATPRateCalculation);
       this.configdata = Object.assign({},...this.payrateData);
-      this.configdata = JSON.parse(this.configdata.value);
+      this.configdata = this.configdata.value && JSON.parse(this.configdata.value);
       if(this.configdata){
         this.benefitpercentofsw = this.configdata.benefitPercent;
         this.costSaving = this.configdata.costSavings;

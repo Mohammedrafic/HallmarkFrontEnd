@@ -139,7 +139,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([agOrder, orgOrder]) => {
         this.selectedOrder = agOrder ?? orgOrder;
-        this.isIRPLTAorder = this.selectedOrder.orderType === this.orderTypes.LongTermAssignment;
+        this.isIRPLTAorder = this.selectedOrder?.orderType === this.orderTypes.LongTermAssignment;
         this.initPredefinedBillRates();
       });
     if (this.isAgency) {
