@@ -146,7 +146,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         this.candidateForm.markAsPristine();
       });
     this.actions$
-      .pipe(delay(300), takeUntil(this.componentDestroy()), ofActionSuccessful(GetCandidateByIdSucceeded))
+      .pipe(delay(500), takeUntil(this.componentDestroy()), ofActionSuccessful(GetCandidateByIdSucceeded))
       .subscribe((candidate: { payload: Candidate }) => {
         this.fetchedCandidate = candidate.payload;
         !this.isNavigatedFromOrganizationArea && this.getCandidateLoginSetting(candidate.payload.id as number);
@@ -396,6 +396,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     });
     this.candidateForm.get('profSummary')?.patchValue({ professionalSummary });
     this.candidateForm.get('agency')?.patchValue({ agencyId });
+    this.cd.detectChanges();
   }
 
   //TODO: remove any

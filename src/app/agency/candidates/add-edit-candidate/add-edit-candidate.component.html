@@ -16,10 +16,9 @@
     </div>
   </ng-container>
   <ng-container right>
-    <ng-container
-      *ngIf="!readonlyMode && showSaveProfileButtons && !(isMobile$ | async)"
-      [ngTemplateOutlet]="actionButtons"
-    ></ng-container>
+    <ng-container *ngIf="!(isMobile$ | async)">
+      <ng-container *ngIf="!readonlyMode && showSaveProfileButtons; then actionButtons"></ng-container>
+    </ng-container>
   </ng-container>
 </app-page-toolbar>
 <!-- Candidate Profile step -->
@@ -111,13 +110,8 @@
   </e-tabitems>
 </ejs-tab>
 
-<div
-  *ngIf="(isMobile$ | async) && !readonlyMode && showSaveProfileButtons"
-  class="mobile-buttons"
->
-  <ng-container
-    [ngTemplateOutlet]="actionButtons"
-  ></ng-container>
+<div *ngIf="(isMobile$ | async)" class="mobile-buttons">
+  <ng-container *ngIf="!readonlyMode && showSaveProfileButtons; then actionButtons"></ng-container>
 </div>
 
 <ng-template #actionButtons>
