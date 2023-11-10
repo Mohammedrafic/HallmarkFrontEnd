@@ -27,7 +27,11 @@ export class NotificationResolver implements Resolve<boolean> {
         }
         if(data.title){
             window.localStorage.setItem("alertTitle",JSON.stringify(data.alertTitle));
-        }      
+        } 
+        if(data.id){
+          window.localStorage.setItem("alertId",JSON.stringify(data.id));
+        }     
+
         this.router.navigate([routeSnapshot[0]]);
         return true;
       }),catchError(err => {
