@@ -36,6 +36,7 @@ export class ShowToast {
     public isQuickOrder?: boolean,
     public organizationPrefix?: string,
     public publicId?: number,
+    public htmlContent?: true,
   ) { }
 }
 
