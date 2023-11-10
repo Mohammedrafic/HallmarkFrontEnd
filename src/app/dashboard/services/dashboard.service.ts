@@ -323,8 +323,8 @@ export class DashboardService {
     };
     const user = this.store.selectSnapshot(UserState.user);
     const title =user?.businessUnitType==BusinessUnitType.Agency? "Candidate Home State": "Applicant’s Home State";
-    const description = "";
-    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description,totalCandidates:totalcandidatesWithState+unknownStateCandidates };
+    const description = "";    
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description,totalCandidates:totalcandidatesWithState+(unknownStateCandidates ||0) };
   }
 
   private getFormattedPostionsByStatesWidgetAggregatedData({

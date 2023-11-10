@@ -666,6 +666,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if((this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Open']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Closed']].trim().toLowerCase()
+       ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order public comments']].trim().toLowerCase()
       ){
         this.isOrderDetailsTab=true;
       }
@@ -1495,7 +1496,7 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed = false;
     }
 
-    if (this.creatingReorder || event.rowIndex === event.previousRowIndex) {
+    if ((this.creatingReorder || event.rowIndex === event.previousRowIndex) && this.eliteOrderId == 0) {
       this.creatingReorder = false;
       return;
     }
@@ -2026,9 +2027,9 @@ public RedirecttoIRPOrder(order:Order)
       if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast && !this.preservedOrderService.isOrderPreserved()) {
         this.clearFilters();
       }
-
-      this.openDetails.next(false);
-
+      if(this.eliteOrderId == 0){
+        this.openDetails.next(false);
+      }
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
       this.orderManagementService.setPreviousOrganizationId(id);
@@ -2056,6 +2057,7 @@ public RedirecttoIRPOrder(order:Order)
         if (this.eliteOrderId > 0 ) {
           this.ordersPage.items = this.ordersPage.items.filter(x => x.id == this.eliteOrderId);
           const data = this.ordersPage.items;
+          this.ordersPage.totalCount = data.length;
           if(this.gridApi && data){
             this.eliteOrderPublicId=data[0]?.publicId!;
             this.redirectedIrporder=this.eliteOrderId;
@@ -2352,7 +2354,7 @@ public RedirecttoIRPOrder(order:Order)
         switchMap(() => this.preservedFiltersByPageName$),
         filter(({ dispatch }) => dispatch),
         tap(({ isNotPreserved, state }) => {
-          if (!this.preservedOrderService.isOrderPreserved()) {
+          if (!this.preservedOrderService.isOrderPreserved() && this.eliteOrderId == 0) {
             this.prepareFiltersToDispatch(state);
           }
 

@@ -232,3 +232,11 @@ export class DoNotReturnSearchCandidate{
   dob: Date|null;
 }
 
+export class GetCandidateOrgSearch{
+  id:number;
+  firstName:string;
+  middleName:string|null;
+  lastName:string;
+  fullName:string;
+  email:string|null;
+}

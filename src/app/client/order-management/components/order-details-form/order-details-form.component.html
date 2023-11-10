@@ -891,7 +891,7 @@
   <div class="right-section">
     <app-document-uploader
       uploaderTitle="Documents"
-      [disabled]="!settings[SettingsKeys.AllowDocumentUpload]?.value"
+      [disabled]="!uploadSettingValue"
       [documents]="order?.documents"
       [maxFileAmount]="5"
       (selectDocuments)="onDocumentsSelected($event)"

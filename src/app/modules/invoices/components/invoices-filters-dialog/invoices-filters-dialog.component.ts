@@ -259,18 +259,6 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       takeUntil(this.componentDestroy())
     )
       .subscribe((filters) => {
-        if((filters?.state?.issueDateFrom==null ||filters?.state?.issueDateFrom==undefined)|| (filters?.state?.issueDateTo==null ||filters?.state?.issueDateTo==undefined))
-        {
-         const today = new Date(new Date().toDateString());
-         const priorDate = new Date(new Date().setDate(today.getDate() - 30));
-         this.formGroup.controls['issueDateFrom'].setValue(priorDate);
-         this.formGroup.controls['issueDateTo'].setValue(today);   
-         this.updateTableByFilters.emit(InvoiceFiltersAdapter.prepareFilters(this.formGroup));
-         this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
-         this.appliedFiltersAmount.emit(this.filteredItems.length);
-         this.formGroup.markAsPristine();
-         this.cdr.markForCheck();
-         }
         this.applyPreservedFilters(filters?.state || {});
         if(filters?.state?.agencyOrganizationIds != null){
           this.agencyOrganizationIds = filters?.state?.agencyOrganizationIds;

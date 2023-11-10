@@ -103,7 +103,7 @@ export type MSPAssociateOrganizationsAgency = {
   isVMSEnabled: boolean;
   isIRPEnabled: boolean;
   name: string;
-  agencyStatus?: string;
+  agencyStatus: number;
   parentUnitId: number;
   dbConnectionName: string;
   netSuiteId: string;

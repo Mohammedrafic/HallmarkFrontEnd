@@ -213,6 +213,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public projectNames: SpecialProject[];
   public poNumbers: SpecialProject[];
   public readonly datepickerMask = datepickerMask;
+  public uploadSettingValue = false;
 
   private selectedRegion: Region;
   private selectedSkills: SkillCategory;
@@ -467,6 +468,10 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
         filter((settings: Configuration[]) => !!settings.length),
         map((settings: Configuration[]) => {
           this.settings = SettingsHelper.mapSettings(settings);
+
+          const uploadParentSetting = this.settings[SettingsKeys.AllowDocumentUpload];
+          const childSetting = uploadParentSetting?.children?.find((sett) => !sett.isIRPConfigurationValue);
+          this.uploadSettingValue = childSetting?.value || uploadParentSetting?.value;
         }),
         switchMap(() => {
           return this.settingsViewService.getViewSettingKey(

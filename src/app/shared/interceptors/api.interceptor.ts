@@ -31,7 +31,7 @@ export class ApiInterceptor implements HttpInterceptor {
     const lastSelectedMspId = this.store.selectSnapshot(UserState.lastSelectedMspId);
     const isAgency = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Agency';
     const isOrganization = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Organization';
-    const isMsp = this.store.selectSnapshot(UserState.lastSelectedMsp) === 'MSP';
+    const isMsp = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'MSP';
 
     if (userId) {
       const currentPage = this.store.selectSnapshot(AppState.headerState)?.title || 'Login';
@@ -46,7 +46,7 @@ export class ApiInterceptor implements HttpInterceptor {
       if(request.headers.has('selected-businessunit-id')) {
         headers['selected-businessunit-id'] = request.headers.get('selected-businessunit-id') as string;
       }
-
+      
       if (isMspArea && lastSelectedMspId && isMsp) {
         headers['selected-businessunit-id'] = lastSelectedMspId.toString();
       }
