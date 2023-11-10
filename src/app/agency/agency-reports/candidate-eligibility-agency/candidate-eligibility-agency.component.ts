@@ -176,7 +176,7 @@ export class CandidateEligibilityAgencyComponent implements OnInit, OnDestroy {
     this.agencyCandidateEligibilityReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        candidateName: new FormControl(null),
+        candidateName: new FormControl(null, [Validators.required]),
         jobId: new FormControl('', [Validators.required])
       }
     );
