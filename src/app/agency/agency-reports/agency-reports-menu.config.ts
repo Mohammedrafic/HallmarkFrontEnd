@@ -32,4 +32,12 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     permissionKeys: ['CanuseractivityReport'],
 
   },
+  {
+    text: 'Candidate Eligibility',
+    id: 6,
+    route: './candidate-eligibility-agency',
+    permissionKeys: ['CanViewAgencyCandidateEligibility'],
+
+  },
+  
 ];

@@ -8,8 +8,9 @@ import { InvoiceSummaryReportComponent } from "./invoice-summary-report/invoice-
 import { MissingCredentialsAgencyComponent } from "./missing-credentials-agency/missing-credentials-agency.component";
 import { CredientialExpiryAgencyComponent } from "./crediential-expiry-agency/crediential-expiry-agency.component";
 import { UserActivityComponent } from "./user-activity/user-activity.component";
+import { CandidateEligibilityAgencyComponent } from "./candidate-eligibility-agency/candidate-eligibility-agency.component";
 
-const routes: Routes = [ 
+const routes: Routes = [
   {
     path: '',
     component: AgencyReportsComponent,
@@ -45,6 +46,13 @@ const routes: Routes = [
       {
         path: 'useractivity',
         component: UserActivityComponent,
+        data: {
+          isAgencyArea: true,
+        }
+      },
+      {
+        path: 'candidate-eligibility-agency',
+        component: CandidateEligibilityAgencyComponent,
         data: {
           isAgencyArea: true,
         }
