@@ -13,6 +13,12 @@ $chip-margin: 8px;
     display: flex;
     flex-direction: column;
   }
+
+  .file-viewer-container {
+    border-left: 1px solid var(--header-border);
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+    z-index: 3;
+  }
 }
 
 .header-container {
@@ -244,6 +250,18 @@ app-navigation-panel {
 
 .hide-elem {
   display: none;
+}
+
+@media #{$max-desktop-small} {
+  .preview-attachment-mode {
+    .timesheet-details-container {
+      display: none;
+    }
+
+    .file-viewer-container {
+      width: 100%;
+    }
+  }
 }
 
 @media #{$max-tablet} {

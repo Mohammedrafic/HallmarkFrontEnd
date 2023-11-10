@@ -1,11 +1,20 @@
 <section class="table-container">
   <div class="table-block">
     <div class="table-header">
-      <h3>{{ titleMapper[currentTab] }}</h3>
+      <div class="title-wrapper">
+        <h3 *ngIf="showTitle">{{ titleMapper[currentTab] }}</h3>
+      </div>
       <div class="action-buttons" *ngIf="currentTab !== tableTypes.HistoricalData">
-        <ng-container *ngIf="isTablet && !isSmallContentWidth">
-          <ng-container *ngTemplateOutlet="dropdownButton"></ng-container>
-        </ng-container>
+        <button
+          *ngIf="isTablet"
+          ejs-dropdownbutton
+          iconCss="e-icons"
+          cssClass="e-caret-hide primary-icon-button menu-mobile dropdown-btn"
+          [items]="dropDownBtnActionItems"
+          (select)="selectDropDownBtnActionItem($event)"
+        >
+          <i-feather name="more-vertical" class="icon"></i-feather>
+        </button>
 
         <button
           *ngIf="canRecalculateTimesheet && !isTablet"
@@ -16,6 +25,7 @@
           <i-feather name="refresh-cw" class="icon"></i-feather>
           <span>Recalculate</span>
         </button>
+
         <ng-container *ngIf="isEditEnabled">
           <app-tooltip-container
             [showToolTip]="!hasEditPermissions"
@@ -45,14 +55,58 @@
                 <span class="action-text">Edit</span>
               </button>
             </app-tooltip-container>
-            <div class="edit-handler-buttons" *ngIf="isEditOn && !isSmallContentWidth">
-              <ng-container *ngTemplateOutlet="editHandlers"></ng-container>
+            <div class="edit-handler-buttons" *ngIf="isEditOn">
+              <button ejs-button cssClass="e-outline flex-grow-1" (click)="cancelChanges()">Cancel</button>
+              <button (click)="saveChanges()" ejs-button [isPrimary]="true" class="spinner-btn" cssClass="flex-grow-1">
+                <div #spinner class="spinner-container" *ngIf="loading; else savetext"></div>
+                <ng-template #savetext>
+                  <span>Save</span>
+                </ng-template>
+              </button>
             </div>
           </ng-container>
         </ng-container>
 
-        <div class="desktop-tablet-btn-group" *ngIf="!isSmallContentWidth">
-          <ng-container *ngTemplateOutlet="btnGroup"></ng-container>
+        <div class="btn-group"
+             *ngIf="currentTab !== tableTypes.Expenses && !isEditOn && timesheetDetails.status !== timesheetStatuses.Incomplete">
+          <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isRejectBtnEnabled && !actionsDisabled">
+            <button
+              ejs-button
+              [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions || noMilesReported"
+              cssClass="e-outline privilege"
+              (click)="reject()"
+            >
+              Reject
+            </button>
+          </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isApproveBtnEnabled">
+            <button
+              ejs-button
+              [isPrimary]="true"
+              [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions || noMilesReported"
+              cssClass="spinner-btn privilege"
+              (click)="approve()"
+            >
+              <div #spinner class="spinner-container" *ngIf="loading; else approvetext"></div>
+              <ng-template #approvetext>
+                <span>{{ submitText }}</span>
+              </ng-template>
+            </button>
+          </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!hasEditPermissions" *ngIf="!isApproveBtnEnabled && isOrgSubmitBtnEnabled">
+            <button
+              ejs-button
+              [isPrimary]="true"
+              [disabled]="disableAnyAction || actionButtonDisabled || !hasEditPermissions ||disableEditButton"
+              cssClass="spinner-btn privilege"
+              (click)="orgSubmit()"
+            >
+              <div #spinner class="spinner-container" *ngIf="loading; else submittext"></div>
+              <ng-template #submittext>
+                <span>Submit</span>
+              </ng-template>
+            </button>
+          </app-tooltip-container>
         </div>
       </div>
     </div>
@@ -77,80 +131,5 @@
       >
       </ag-grid-angular>
     </div>
-    <div [ngClass]="{ 'mobile-btn-group': true, 'small-tablet': isSmallContentWidth }">
-      <ng-container *ngIf="isMobile && currentTab !== tableTypes.HistoricalData">
-        <ng-container  *ngTemplateOutlet="dropdownButton"></ng-container>
-      </ng-container>
-      <ng-container *ngTemplateOutlet="btnGroup"></ng-container>
-      <ng-container *ngIf="isSmallContentWidth && !actionsDisabled && recordsToShow?.[currentTab]?.[modeValues.Edit]?.length && isEditOn">
-        <ng-container  *ngTemplateOutlet="editHandlers"></ng-container>
-      </ng-container>
-    </div>
   </div>
 </section>
-
-<ng-template #btnGroup>
-  <div class="btn-group"
-    *ngIf="currentTab !== tableTypes.Expenses && !isEditOn && timesheetDetails.status !== timesheetStatuses.Incomplete">
-    <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isRejectBtnEnabled && !actionsDisabled">
-      <button
-        ejs-button
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions || noMilesReported"
-        cssClass="e-outline privilege"
-        (click)="reject()"
-      >
-        Reject
-      </button>
-    </app-tooltip-container>
-    <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isApproveBtnEnabled">
-      <button
-        ejs-button
-        [isPrimary]="true"
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions || noMilesReported"
-        cssClass="spinner-btn privilege"
-        (click)="approve()"
-      >
-        <div #spinner class="spinner-container" *ngIf="loading; else approvetext"></div>
-        <ng-template #approvetext>
-          <span>{{ submitText }}</span>
-        </ng-template>
-      </button>
-    </app-tooltip-container>
-    <app-tooltip-container [showToolTip]="!hasEditPermissions" *ngIf="!isApproveBtnEnabled && isOrgSubmitBtnEnabled">
-      <button
-        ejs-button
-        [isPrimary]="true"
-        [disabled]="disableAnyAction || actionButtonDisabled || !hasEditPermissions ||disableEditButton"
-        cssClass="spinner-btn privilege"
-        (click)="orgSubmit()"
-      >
-        <div #spinner class="spinner-container" *ngIf="loading; else submittext"></div>
-        <ng-template #submittext>
-          <span>Submit</span>
-        </ng-template>
-      </button>
-    </app-tooltip-container>
-  </div>
-</ng-template>
-
-<ng-template #dropdownButton>
-  <button
-    ejs-dropdownbutton
-    iconCss="e-icons"
-    cssClass="e-caret-hide primary-icon-button menu-mobile dropdown-btn"
-    [items]="dropDownBtnActionItems"
-    (select)="selectDropDownBtnActionItem($event)"
-  >
-    <i-feather name="more-vertical" class="icon"></i-feather>
-  </button>
-</ng-template>
-
-<ng-template #editHandlers>
-    <button ejs-button cssClass="e-outline flex-grow-1" (click)="cancelChanges()">Cancel</button>
-    <button (click)="saveChanges()" ejs-button [isPrimary]="true" class="spinner-btn" cssClass="flex-grow-1">
-      <div #spinner class="spinner-container" *ngIf="loading; else savetext"></div>
-      <ng-template #savetext>
-        <span>Save</span>
-      </ng-template>
-    </button>
-</ng-template>

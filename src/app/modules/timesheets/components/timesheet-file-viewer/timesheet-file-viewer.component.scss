@@ -7,7 +7,7 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    padding: 24px 0px 0px 0px !important;
+
     P{
       margin: 5px;
       font-weight: 400;
@@ -44,9 +44,8 @@
 
         .file-viewer {
           height: 100%;
-          border: 1px solid $secondary-dark-blue-45;
-          box-shadow: 0px 3px 28px rgba(0, 0, 0, 0.04);
-          border-radius: 12px;
+          border-top: 1px solid var(--header-border);
+
           .pdfDocSection{
             display: block;
             height: 100%;
