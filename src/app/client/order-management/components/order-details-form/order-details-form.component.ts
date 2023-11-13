@@ -471,7 +471,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
           const uploadParentSetting = this.settings[SettingsKeys.AllowDocumentUpload];
           const childSetting = uploadParentSetting?.children?.find((sett) => !sett.isIRPConfigurationValue);
-          this.uploadSettingValue = childSetting?.value || uploadParentSetting?.value;
+          this.uploadSettingValue = childSetting ? childSetting?.value === 'true' : uploadParentSetting?.value;
         }),
         switchMap(() => {
           return this.settingsViewService.getViewSettingKey(
