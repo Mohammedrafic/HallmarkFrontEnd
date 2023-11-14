@@ -3,7 +3,9 @@
         <section class="header-container">
             <div class="e-card-header">
                 <div class="e-card-header-caption">
-                    <h3 class="e-card-title" *ngIf="fileName" title="{{fileName}}">{{fileName}}</h3>
+                    <ejs-tooltip *ngIf="fileName" [content]="fileName" position="BottomCenter">
+                        <h3 class="e-card-title">{{ fileName }}</h3>
+                    </ejs-tooltip>
                     <p>Document Preview</p>
                 </div>
                 <div class="e-card-content">

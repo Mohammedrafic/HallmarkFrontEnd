@@ -1,4 +1,5 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 .main-body{
   max-height: 79vh;
@@ -16,6 +17,11 @@
     }
     .header-container {
       margin-bottom: 18px;
+
+      .e-card-header-caption {
+        max-width: 60%;
+      }
+
       .e-card-title{
         white-space: nowrap;
         overflow: hidden;
@@ -52,14 +58,12 @@
           }
 
           .image-container {
-            display: flex;
-            justify-content: center;
+            width: 100%;
             height: 100%;
+            overflow: auto;
 
             img {
-              max-width: 100%;
-              max-height: 100%;
-              object-fit: none;
+              width: 100%;
             }
           }
         }
@@ -67,4 +71,11 @@
     }
   }
 
+}
+
+
+@media #{$max-mobile} {
+  .e-card-header-caption {
+    max-width: 40% !important;
+  }
 }
