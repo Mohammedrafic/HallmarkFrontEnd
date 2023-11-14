@@ -6,24 +6,31 @@
 
 .table-container {
   margin-bottom: 25px;
+
+  ::ng-deep {
+    .wrapper ejs-timepicker.e-timepicker .e-input-group.e-control-wrapper.e-time-wrapper {
+      width: 114px !important;
+    }
+  }
 }
 
 .table-block {
   display: flex;
   flex-direction: column;
-
-  .mobile-btn-group {
-    display: none;
-  }
 }
 
 .table-header {
   @include table-header;
+  padding: 14px 16px;
+  border-bottom: unset;
+
+  .title-wrapper {
+    height: 40px;
+  }
 
   h3 {
     font-size: 16px;
     font-weight: 700;
-    line-height: 28px;
   }
 
   .button-cancel {
@@ -82,10 +89,6 @@
       }
     }
 
-    .amount-input {
-      width: 190px !important;
-    }
-
     .ag-center-cols-clipper,
     .ag-center-cols-container {
       min-height: 0px;
@@ -124,8 +127,32 @@
       background-color: var(--bg-grid);
     }
 
+    .ag-row,
+    .ag-header {
+      border-color: var(--grid-header-border) !important;
+    }
+
+    .deleted-record-row,
+    .new-record-row {
+      .ag-cell-value {
+        color: $black !important;
+
+        .cell-value {
+          color: $black !important;
+        }
+
+        .main {
+          color: var(--sub-title-2) !important;
+        }
+      }
+    }
+
     .ag-cell-value {
       color: var(--text) !important;
+    }
+
+    .ag-body-viewport {
+      max-height: 465px;
     }
   }
 }
@@ -179,71 +206,5 @@ button.dropdown-btn {
         stroke: #fff !important;
       }
     }
-  }
-}
-
-.small-tablet {
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  padding-top: 20px;
-  width: 100%;
-  gap: 12px;
-
-  .btn-group {
-    display: flex;
-
-    .spinner-btn {
-      width: 100px !important;
-    }
-
-    .privilege {
-      width: 100px;
-      margin: 0;
-    }
-
-    > *:not(:first-child) {
-      margin-left: 12px;
-    }
-  }
-
-  .add-action {
-    &.spaced {
-      width: auto;
-      margin: 0;
-    }
-  }
-}
-
-.middle-tablet {
-  .action-text {
-    display: none;
-  }
-
-  .add-action {
-    &.spaced {
-      width: auto;
-      margin: 0;
-    }
-  }
-
-  button.e-btn.e-control.e-action-button {
-    width: 40px;
-    padding: 8px 8px 8px 3px;
-  }
-}
-
-@media #{$max-mobile} {
-  .table-block {
-    .btn-group {
-      .privilege {
-        min-width: 38vw;
-        margin: 0;
-      }
-    }
-  }
-
-  .desktop-tablet-btn-group {
-    display: none;
   }
 }

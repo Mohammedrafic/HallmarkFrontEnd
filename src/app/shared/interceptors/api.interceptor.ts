@@ -28,8 +28,10 @@ export class ApiInterceptor implements HttpInterceptor {
     const userId = this.store.selectSnapshot(UserState.user)?.id;
     const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
     const lastSelectedAgencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
+    const lastSelectedMspId = this.store.selectSnapshot(UserState.lastSelectedMspId);
     const isAgency = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Agency';
     const isOrganization = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Organization';
+    const isMsp = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'MSP';
 
     if (userId) {
       const currentPage = this.store.selectSnapshot(AppState.headerState)?.title || 'Login';
@@ -39,9 +41,14 @@ export class ApiInterceptor implements HttpInterceptor {
       };
 
       const { isOrganizationArea, isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+      const isMspArea = this.store.selectSnapshot(AppState.isMspArea);
 
       if(request.headers.has('selected-businessunit-id')) {
         headers['selected-businessunit-id'] = request.headers.get('selected-businessunit-id') as string;
+      }
+      
+      if (isMspArea && lastSelectedMspId && isMsp) {
+        headers['selected-businessunit-id'] = lastSelectedMspId.toString();
       }
 
       if (isOrganizationArea && lastSelectedOrganizationId && isOrganization) {

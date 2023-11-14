@@ -17,10 +17,11 @@ export enum RecordFields {
 }
 
 export enum TableTabIndex {
-  Time = 0,
-  HistoricalData = 1,
-  Miles = 2,
-  Expenses = 3,
+  ProfileDetails = 0,
+  Time = 1,
+  HistoricalData = 2,
+  Miles = 3,
+  Expenses = 4,
 }
 
 export enum TimesheetRecordType {
@@ -38,4 +39,5 @@ export enum RecordStatus {
   New = 'New',
   Deleted = 'Deleted',
   None = 'None',
+  NotChanged = 'NotChanged'
 }

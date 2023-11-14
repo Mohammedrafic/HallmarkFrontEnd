@@ -1,0 +1,31 @@
+@import 'adaptive-response';
+
+:host {
+  height: 100%;
+
+  .associate {
+    margin-top: 24px;
+    height: calc(100% - 165px);
+
+    .actions {
+      button {
+        background-color: transparent;
+      }
+    }
+
+    .e-gridcustomheader {
+      width: unset;
+    }
+  }
+
+  @media #{$max-mobile} {
+    .e-gridcustomheader {
+      width: 90%;
+      justify-content: center;
+    }
+
+    .title {
+      display: none;
+    }
+  }
+}

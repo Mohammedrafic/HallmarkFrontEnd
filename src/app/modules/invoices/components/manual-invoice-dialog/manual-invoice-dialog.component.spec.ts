@@ -221,7 +221,7 @@ describe('ManualInvoiceDialogComponent', () => {
     component.setOrderIdOnEdit();
     tick();
 
-    expect(patchValueSpy).toHaveBeenCalledTimes(3);
+    expect(patchValueSpy).toHaveBeenCalledTimes(4);
     expect(component['strategy'].populateOptions).toHaveBeenCalled();
     expect(formSpy.patchValue).toHaveBeenCalledTimes(1);
   }));

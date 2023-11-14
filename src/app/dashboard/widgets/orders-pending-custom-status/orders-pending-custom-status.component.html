@@ -46,7 +46,8 @@
          <div class="row" *ngFor="let data of chartData?.chartData">
             <div class="col">
               <div class="status">
-                <span title="{{data.customStatus}}">{{data.customStatus}}</span>
+                <span title="{{data.customStatus}}" (mousedown)="defineMousePosition($event)"
+                (click)="redirectToUrl($event,data.customStatus)">{{data.customStatus}}</span>
               </div>
             </div>
             <div  class="col">

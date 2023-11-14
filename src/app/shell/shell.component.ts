@@ -60,6 +60,7 @@ import { UserService } from '@shared/services/user.service';
 import { BreakpointObserverService } from '@core/services';
 import { HeaderState } from '@shared/models/header-state.model';
 import { HelpNavigationService } from '@shared/services';
+import { IsMspAreaStateModel } from '../shared/models/is-msp-area-state.model';
 
 @Component({
   selector: 'app-shell',
@@ -92,6 +93,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   @Select(AppState.headerState)
   headerState$: Observable<HeaderState | null>;
+  public header$: Observable<HeaderState | null>;
 
   @Select(AppState.isFirstLoad)
   isFirstLoad$: Observable<boolean>;
@@ -116,6 +118,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
+
+  @Select(AppState.isMspArea)
+  isMspArea$: Observable<IsMspAreaStateModel>;
 
   @Select(AppState.isMobileScreen)
   public isMobile$: Observable<boolean>;
@@ -215,6 +220,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   ngOnInit(): void {
+    this.header$ = this.headerState$.pipe(debounceTime(300));
     this.getDeviceScreen();
     this.observeOrderNavigation();
     this.observeThemeChange();
@@ -503,7 +509,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.store.dispatch(new ShowCustomSideDialog(true));
   }
 
-  getContentDetails(businessUnitId?: number,orderId?: number,title?:string): void {
+  getContentDetails(businessUnitId?: number,orderId?: number,title?:string,alertId?:number): void {
     if (businessUnitId) {
         this.alertSideBarCloseClick();
         window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
@@ -513,6 +519,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     }
     if(title){
      window.localStorage.setItem("alertTitle",JSON.stringify(title));
+    }
+    if(alertId){
+      window.localStorage.setItem("alertId",JSON.stringify(alertId));
     }
   }
 

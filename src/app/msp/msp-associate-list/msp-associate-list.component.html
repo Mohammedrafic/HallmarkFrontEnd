@@ -1,0 +1,16 @@
+<section class="associate">
+  <div class="e-gridcustomheader">
+    <div class="title">
+      <h3>MSP Linked {{getTitle}}</h3>
+    </div>
+    <div class="actions">
+      <button ejs-button
+              [disabled]="!userPermission[userPermissions.CanCreateMSP]"
+              class="action-link" (click)="addNew()">
+        <i-feather name="plus" class="icon"></i-feather>
+        Link {{getTitle}}
+      </button>
+    </div>
+  </div>
+  <app-msp-associate-grid [areMSPAgencyActionsAllowed]="mspAgencyActionsAllowed" [userPermission]="userPermission" [mspAssociateEvent$]="mspAssociateEvent"></app-msp-associate-grid>
+</section>

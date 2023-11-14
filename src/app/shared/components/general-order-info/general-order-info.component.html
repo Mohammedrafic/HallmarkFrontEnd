@@ -19,7 +19,7 @@
       </ng-container>
 
       <ng-container *ngSwitchDefault>
-        <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+        <ng-container [ngTemplateOutlet]="jobInfoTemplate" *ngIf="activeSystems !== systemType.IRP"></ng-container>
         <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
         <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
         <div class="column last-column" *ngIf="activeSystems !== systemType.IRP">
@@ -59,7 +59,7 @@
         </div>
         <div class="sup-title">Shift</div>
       </div>
-      <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
+      <div *ngIf="orderInformation.orderType !== orderType.PermPlacement && activeSystems !== systemType.IRP" class="column">
         <div class="title">
           ${{ orderInformation.joiningBonus || 0 | currency: '':'' }} / ${{
             orderInformation.compBonus || 0 | currency: '':''
@@ -71,7 +71,17 @@
         <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
-      <ng-container [ngTemplateOutlet]="workflowName"></ng-container>
+
+      <div class="column" *ngIf="activeSystems === systemType.IRP">
+        <div class="title">{{ orderInformation.weekend || false | boolValueToText }}</div>
+        <div class="sup-title">Weekend</div>
+      </div>
+
+      <div class="column" *ngIf="activeSystems === systemType.IRP">
+        <div class="title">{{ orderInformation.holiday || false | boolValueToText }}</div>
+        <div class="sup-title">Holiday</div>
+      </div>
+
     </div>
     <div class="container-row">
       <ng-container *ngIf="orderInformation.orderType !== orderType.ReOrder">
@@ -133,6 +143,7 @@
           <div class="sup-title">Shift</div>
         </div>
       </div>
+      <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
     </div>
   </section>
   <section class="candidates-additional-info" *ngIf="orderInformation">
@@ -187,7 +198,6 @@
         [ngTemplateOutlet]="linkedId"
         [ngTemplateOutletContext]="{ linkedID: orderInformation.linkedId }"
       ></ng-container>
-      <ng-container [ngTemplateOutlet]="workflowName"></ng-container>
     </div>
   </section>
 </ng-template>
@@ -326,7 +336,7 @@
 <ng-template #orderInfo>
   <div class="column links" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension || orderInformation.hasParentExtension">
     <div class="column link-wrapper" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
-      <div *ngIf="orderInformation?.extensionInitialOrderId && activeSystems !== systemType.IRP" class="accent link" (click)="moveToInitialOrder()">
+      <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
         Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionInitialOrderPublicId }}
       </div>
       <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
@@ -352,12 +362,5 @@
   <div class="column">
     <div class="title">{{ linkedID || '-' }}</div>
     <div class="sup-title">Linked ID</div>
-  </div>
-</ng-template>
-
-<ng-template #workflowName>
-  <div class="column">
-    <div class="title">{{ orderInformation.workflowName || '-' }}</div>
-    <div class="sup-title">Workflow</div>
   </div>
 </ng-template>

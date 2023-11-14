@@ -50,7 +50,9 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
     "CandidateNameParamTS": "",
     "StartDateParamTS": "",
     "EndDateParamTS": "",
-    "organizationNameYTDS":""
+    "organizationNameTS": "",
+    "reportPulledMessageTS": "",
+    "DateRangeTS": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cat" };
@@ -143,6 +145,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
   public isResetFilter: boolean = false;
+  private culture = 'en-US';
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -396,7 +399,9 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
 
     var statusArray = Array.isArray(timesheetStatuses) 
     ? (timesheetStatuses?.length > 0 ? timesheetStatuses : []) 
-    : (isNaN(timesheetStatuses) == false ? [timesheetStatuses] : []);
+      : (isNaN(timesheetStatuses) == false ? [timesheetStatuses] : []);
+
+    let currentDate = new Date(Date.now());
     this.paramsData =
     {
       "OrganizationParamTS": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
@@ -413,6 +418,9 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
       "BusinessUnitIdParamTS": businessIds,
       "HostName": this.baseUrl,
       "organizationNameTS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageTS": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeTS": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

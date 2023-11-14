@@ -54,7 +54,7 @@ export class TimesheetDetailsService {
 
   public submitTimesheet(timesheetId: number, orgId: number, isTimesheetOrMileagesUpdate: boolean): Observable<void> {
     const { title, submitButtonText, confirmMessage,
-      successMessage } = submitTimesheetDialogData(isTimesheetOrMileagesUpdate);//
+      successMessage } = submitTimesheetDialogData(isTimesheetOrMileagesUpdate);
 
     return this.confirmService.confirm(confirmMessage, {
       title,

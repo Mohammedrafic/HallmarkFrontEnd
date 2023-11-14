@@ -80,6 +80,13 @@ export enum AgencyStatus {
   Suspended,
   Terminated,
 }
+export enum Mspstatus {
+  'InProgress',
+  'Inactive',
+  'Active',
+  'Suspended',
+  'Terminated'
+}
 
 export enum AgencyPartnershipStatus {
   Inactive,

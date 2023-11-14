@@ -57,7 +57,8 @@ export class TimesheetDetailsTableService {
               preview: (file: Attachment) => this.store.dispatch(new Timesheets.PreviewAttachment(
                 params.data.timesheetRecordId,
                 organizationId,
-                file
+                file,
+                true
               )),
             },
           } as AttachmentsListParams;
@@ -65,7 +66,7 @@ export class TimesheetDetailsTableService {
       },
       {
         ...amountColdef('Miles'),
-        width: 200,
+        width: 260,
         cellRenderer: InputEditorComponent,
         cellRendererParams: {
           editMode: true,

@@ -2,13 +2,12 @@
 @import 'adaptive-response';
 
 .job-info-container {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-  
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, auto));
+  gap: 16px;
+
   .job-info-section {
     display: flex;
-    margin: 0px 0px 24px 24px;
   }
 
   i-feather {
@@ -25,15 +24,7 @@
   .value {
     font-weight: 700;
     font-size: 12px;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
     color: $black;
-  }
-}
-
-@media #{$max-desktop-small} {
-  .job-info-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
   }
 }

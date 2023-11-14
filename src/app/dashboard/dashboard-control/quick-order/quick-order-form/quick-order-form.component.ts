@@ -712,7 +712,12 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     ).subscribe((settings: Configuration[]) => {
       const projectFields = ['projectTypeId', 'projectNameId', 'poNumberId'];
       this.settings = SettingsHelper.mapSettings(settings);
-      this.quickOrderConditions.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+
+      const uploadParentSetting = this.settings[SettingsKeys.MandatorySpecialProjectDetails];
+      const childSetting = uploadParentSetting?.children?.find((sett) => !sett.isIRPConfigurationValue);
+      this.quickOrderConditions.isSpecialProjectFieldsRequired = childSetting ? childSetting?.value === 'true'
+      : uploadParentSetting?.value;
+
       if (this.specialProjectForm != null) {
         if (this.quickOrderConditions.isSpecialProjectFieldsRequired) {
           projectFields.forEach((control) =>

@@ -69,6 +69,7 @@ export class PositionChartComponent {
 
   public navigateToUrl(event: MouseEvent,status:string){
     let candidatesStatusDataSet:any = []
+    let activeOrderStatus:any = []
     let lastSelectedOrganizationId = window.localStorage.getItem("lastSelectedOrganizationId");
     let filteredList = JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [];
     if (filteredList.length > 0) {
@@ -92,6 +93,13 @@ export class PositionChartComponent {
       window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
       window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true))
       this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, OrderStatus[OrderStatus.InProgress]);
+    }else if(status == PositionTrendTypeEnum.FILLED){
+      candidatesStatusDataSet.push({"value":CandidatStatus.OnBoard});
+      activeOrderStatus.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
+      window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
+      window.localStorage.setItem('candidatesOrderStatusListFromDashboard', JSON.stringify(activeOrderStatus));
+      window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true))
+      this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, status);
     }
   }
 }

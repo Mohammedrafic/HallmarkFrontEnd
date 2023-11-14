@@ -519,7 +519,12 @@ export const MENU_CONFIG: any = {
       // Interface log summary for IRP
       icon: '',
       route: '/admin/interfacelogirp', 
-   }
+    },
+    120: {
+      // MSP List
+      icon: '',
+      route: 'msp/msp-associate-list',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -876,6 +881,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/vendor-activity',
     },
+    86: {
+      // DNR Details
+      icon: 'user-x',
+      route: 'client/dnr-details',
+    },
     87: {
       // Staff Schedule By Shift Report
       icon: '',
@@ -955,7 +965,12 @@ export const MENU_CONFIG: any = {
       // Interface log summary for IRP
       icon: '',
       route: '/admin/interfacelogirp', 
-   }
+    },
+    120: {
+      // MSP List
+      icon: '',
+      route: 'msp/msp-associate-list',
+    },
   },
   
 

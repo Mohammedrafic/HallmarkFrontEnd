@@ -12,6 +12,11 @@ export class ConvertAgencyToMSP {
   constructor(public agencyId: number | null, public netSuiteId: number | null, public name: string) { }
 }
 
+export class ConvertAgencyToMSPSucceeded {
+  static readonly type = '[agency] Conversion of Agency To MSP Succeeded';
+  constructor(public agencyId: number | null, public netSuiteId: number | null, public name: string) { }
+}
+
 export class GetAgencyAuditHistory {
   static readonly type = '[agency] Get Agency AuditHistory';
   constructor(public payload: AgencyAuditPayload) { }

@@ -116,7 +116,7 @@ describe('TimesheetDetailsService', () => {
     expect(service).toBeTruthy();
   });
 
-  xit('approveTimesheet - should approve timesheet', fakeAsync(() => {
+  it('approveTimesheet - should approve timesheet', fakeAsync(() => {
     const fakeTimesheetId = 1;
     const fakeIsTimesheetOrMileagesUpdate = true;
     const fakeApproveDialogData = {
@@ -127,7 +127,6 @@ describe('TimesheetDetailsService', () => {
     };
     const fakeDispatchAction = new TimesheetDetails.OrganizationApproveTimesheet(fakeTimesheetId, null);
     const fakeToastAction = new ShowToast(MessageTypes.Success, fakeApproveDialogData.successMessage);
-    const fakeGetAllAction = new Timesheets.GetAll();
 
     spyOn(confirmService, 'confirm').and.returnValue(of(true));
 
@@ -145,10 +144,13 @@ describe('TimesheetDetailsService', () => {
     );
 
     expect(store.dispatch).toHaveBeenCalledWith(fakeDispatchAction);
-    expect(store.dispatch).toHaveBeenCalledWith([fakeToastAction, fakeGetAllAction]);
+
+    tick();
+
+    expect(store.dispatch).toHaveBeenCalledWith(fakeToastAction);
   }));
 
-  xit('submitTimesheet - should submit timesheet', fakeAsync(() => {
+  it('submitTimesheet - should submit timesheet', fakeAsync(() => {
     const fakeTimesheetId = 1;
     const fakeOrgId = 2;
     const fakeIsTimesheetOrMileagesUpdate = true;
@@ -178,7 +180,10 @@ describe('TimesheetDetailsService', () => {
     );
 
     expect(store.dispatch).toHaveBeenCalledWith(fakeDispatchAction);
-    expect(store.dispatch).toHaveBeenCalledWith([fakeToastAction, fakeGetAllAction]);
+
+    tick();
+
+    expect(store.dispatch).toHaveBeenCalledWith(fakeToastAction);
   }));
 
   it('getAttachmentsListConfig - should return AttachmentsListConfig with delete, download, and preview methods', () => {

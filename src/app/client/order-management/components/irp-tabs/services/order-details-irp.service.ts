@@ -177,8 +177,11 @@ export class OrderDetailsIrpService {
     if (projectSetting) {
       SpecialProjectFieldsToValidation.forEach((controlName: string) => {
         projectControls[controlName].addValidators(Validators.required);
+        projectControls[controlName].updateValueAndValidity({
+          onlySelf: false,
+          emitEvent: false
+        });
       });
-
       return;
     }
   }

@@ -58,6 +58,9 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
     "HostName": "",
     "TodayMSR": "",
     "IsOptionalRequred": "",
+    "organizationNameMSR": "",
+    "reportPulledMessageMSR": "",
+    "DateRangeMSR": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/MissingCredentials/MissingCredentials.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/MissingCredentials/MissingCredentials.cat" };
@@ -152,8 +155,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
   private culture = 'en-US';
   private nullValue = "null";
   private joinString = ",";
-
-
+  
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
@@ -364,6 +366,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
     locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
 
+    let currentDate = new Date(Date.now());
 
     this.paramsData =
     {
@@ -384,7 +387,13 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
       "TodayMSR": formatDate(new Date(), this.dateFormat, this.culture),
-      "ISOptionalRequired": IsOptionalRequred
+      "ISOptionalRequired": IsOptionalRequred,
+      "organizationNameMSR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      //"reportPulledMessageMSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
+      "reportPulledMessageMSR": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+
+      "DateRangeMSR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

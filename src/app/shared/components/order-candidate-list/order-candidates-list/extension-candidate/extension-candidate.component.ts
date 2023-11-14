@@ -607,7 +607,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
   public onViewNavigation(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+    if (user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP) {
       this.agencyId = this.currentOrder.candidates?.find((c) => c.id === this.candidate?.candidateId)?.agencyId;
       this.store.dispatch(
         new SetLastSelectedOrganizationAgencyId({

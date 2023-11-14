@@ -7,6 +7,7 @@ import {
   combineLatest,
   debounceTime,
   filter,
+  map,
   Observable,
   pairwise,
   skip,
@@ -131,8 +132,6 @@ import { PartialSearchDataType } from '@shared/models/partial-search-data-source
 import { PermissionService } from '../../../../security/services/permission.service';
 import { OrderManagementService } from '../order-management-content/order-management.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
-import { UserPermissions } from '@core/enums';
-import { Permission } from '@core/interface';
 
 @Component({
   selector: 'app-order-details-form',
@@ -214,6 +213,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public projectNames: SpecialProject[];
   public poNumbers: SpecialProject[];
   public readonly datepickerMask = datepickerMask;
+  public uploadSettingValue = false;
 
   private selectedRegion: Region;
   private selectedSkills: SkillCategory;
@@ -461,12 +461,29 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   }
 
   private subscribeForSettings(): Observable<ProjectSpecialData> {
+    const orgId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId) as number;
+
     return this.organizationSettings$
       .pipe(
         filter((settings: Configuration[]) => !!settings.length),
-        switchMap((settings: Configuration[]) => {
+        map((settings: Configuration[]) => {
           this.settings = SettingsHelper.mapSettings(settings);
-          this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+
+          const uploadParentSetting = this.settings[SettingsKeys.AllowDocumentUpload];
+          const childSetting = uploadParentSetting?.children?.find((sett) => !sett.isIRPConfigurationValue);
+          this.uploadSettingValue = childSetting ? childSetting?.value === 'true' : uploadParentSetting?.value;
+        }),
+        switchMap(() => {
+          return this.settingsViewService.getViewSettingKey(
+            OrganizationSettingKeys.MandatorySpecialProjectDetails,
+            OrganizationalHierarchy.Organization,
+            orgId,
+            orgId,
+            false
+          );
+        }),
+        switchMap(({MandatorySpecialProjectDetails}) => {
+          this.isSpecialProjectFieldsRequired = JSON.parse(MandatorySpecialProjectDetails);
           return this.projectSpecialData$;
         }),
         tap((data: ProjectSpecialData) => {
@@ -488,10 +505,6 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
       this.specialProjectCategories = this.isSpecialProjectFieldsRequired
         ? data.specialProjectCategories.filter(f => f.includeInVMS == true)
         : [{ id: null, projectType: '' }, ...data.specialProjectCategories.filter(f => f.includeInVMS == true)];
-
-      // this.projectNames = this.isSpecialProjectFieldsRequired
-      //   ? data.projectNames.filter(f => f.includeInVMS == true)
-      //   : [{ id: null, projectName: '' }, ...data.projectNames.filter(f => f.includeInVMS == true)];
 
       this.poNumbers = this.isSpecialProjectFieldsRequired
         ? data.poNumbers
@@ -776,7 +789,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           ) as Department;
           this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
         });
-  
+
         this.store.dispatch(
           new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId)
         );
@@ -1051,7 +1064,6 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
 
   private watchForOrderFormsChanges(): void {
     this.orderTypeForm.valueChanges.pipe(
-      throttleTime(500),
       takeUntil(this.componentDestroy())
     ).subscribe((val) => {
       const hourlyRate = this.generalInformationForm.value.hourlyRate;

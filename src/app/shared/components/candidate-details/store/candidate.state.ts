@@ -4,13 +4,13 @@ import {
   ExportCandidateAssignment,
   GetAssociateOrganizations,
   GetCandidateDetailsPage,
-  GetCandidateRegions,
+  GetcandidateOrgSearchbytext,
   Getcandidatesearchbytext,
   GetCandidateSkills,
   SelectNavigation,
   SetNavigation,
   SetPageNumber,
-  SetPageSize
+  SetPageSize,
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { Observable, tap } from 'rxjs';
 import { CandidateDetailsTabs } from '@shared/enums/candidate-tabs.enum';
@@ -24,7 +24,7 @@ import {
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
 import { CandidateDetailsApiService } from '../services/candidate-details-api.service';
-import { DoNotReturnSearchCandidate } from '@shared/models/donotreturn.model';
+import { DoNotReturnSearchCandidate, GetCandidateOrgSearch } from '@shared/models/donotreturn.model';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
@@ -39,6 +39,7 @@ interface CandidateDetailsStateModel {
   candidateLocations: CandidatesDetailsLocations[] | null;
   candidateDepartments: CandidatesDetailsDepartments[] | null;
   searchCandidates:DoNotReturnSearchCandidate[]|null
+  searchOrgCandidates:GetCandidateOrgSearch[]|null
   associateOrganizations: AgencyOrderFilteringOptions|null;
 }
 
@@ -59,6 +60,7 @@ interface CandidateDetailsStateModel {
     candidateLocations:null,
     candidateDepartments:null,
     searchCandidates:null,
+    searchOrgCandidates:null,
     associateOrganizations:null,
   },
 })
@@ -152,16 +154,6 @@ export class CandidateDetailsState {
     patchState({ pageSize });
   }
 
-
-  @Action(GetCandidateRegions)
-  GetCandidateRegions({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<CandidatesDetailsRegions[]> {
-    return this.candidateDetailsApiService.getRegions().pipe(
-      tap((payload: CandidatesDetailsRegions[]) => {
-        patchState({ candidateRegions: payload });
-        return payload;
-      })
-    );
-  }
   @Action(Getcandidatesearchbytext)
   getDoNotCandidateListSearch({ patchState }: StateContext<CandidateDetailsStateModel>, { filter }:Getcandidatesearchbytext): Observable<DoNotReturnSearchCandidate[]> {
     return this.candidateDetailsApiService.getcandidatesearchbytext(filter).pipe(tap((payload: DoNotReturnSearchCandidate[]) => {
@@ -170,6 +162,14 @@ export class CandidateDetailsState {
     }));
   }
   
+  @Action(GetcandidateOrgSearchbytext)
+  GetcandidateOrgsearchbytext({ patchState }: StateContext<CandidateDetailsStateModel>, { filter }:GetcandidateOrgSearchbytext): Observable<GetCandidateOrgSearch[]> {
+    return this.candidateDetailsApiService.getcandidateOrgsearchbytext(filter).pipe(tap((payload: GetCandidateOrgSearch[]) => {
+      patchState({ searchOrgCandidates: payload });
+      return payload
+    }));
+  }
+
   @Action(GetCandidateSkills)
   GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization[]> {
     return this.skillsService.getSortedAssignedSkillsByOrganization().pipe(

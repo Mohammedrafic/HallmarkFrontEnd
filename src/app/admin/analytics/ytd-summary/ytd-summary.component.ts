@@ -52,7 +52,8 @@ export class YtdSummaryComponent implements OnInit, OnDestroy {
     "yearYTDS": "",
     "monthYTDS": "",
     "organizationNameYTDS": "",
-    "reportPulledMessageYTDS":""
+    "reportPulledMessageYTDS": "",
+    "DateRangeYTDS": ""
     
   };
 
@@ -137,6 +138,7 @@ export class YtdSummaryComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+  private culture = 'en-US';
 
   public yearList: Year[] = [];
   public monthList: Month[] = [];
@@ -399,7 +401,7 @@ export class YtdSummaryComponent implements OnInit, OnDestroy {
 
     let currentDate = new Date(Date.now());
     let selectedMonthDate = new Date(year, month, 0);
-
+    let startDate = "01 / 01 / " + year.toString();
     this.paramsData =
     {
       "HostName": this.baseUrl,
@@ -418,7 +420,14 @@ export class YtdSummaryComponent implements OnInit, OnDestroy {
       "monthYTDS": month,
 
       "organizationNameYTDS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
-      "reportPulledMessageYTDS": "Data for 01/01/" + year.toString() + " - " + String(selectedMonthDate.getMonth() + 1).padStart(2, '0') + "/" + selectedMonthDate.getDate() + "/" + year.toString() + " pulled on " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString()
+      //"reportPulledMessageYTDS": "Data for 01/01/" + year.toString() + " - " + String(selectedMonthDate.getMonth() + 1).padStart(2, '0') + "/" + selectedMonthDate.getDate() + "/" + year.toString() + " pulled on " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString()
+
+     // "reportPulledMessageVMSIR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
+      "reportPulledMessageYTDS": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+
+      "DateRangeYTDS": (("Jan") + " " + "01" + ", " + year.toString()).trim() + " - " + (formatDate(selectedMonthDate, "MMM", this.culture) + " " + selectedMonthDate.getDate() + ", " + selectedMonthDate.getFullYear().toString()).trim()
+
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

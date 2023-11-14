@@ -1,0 +1,68 @@
+<ejs-dialog #sideDialog
+            id="invite-dialog"
+            cssClass="dialog responsive"
+            [width]="'538px'"
+            [target]="targetElement"
+            [visible]="false"
+            [isModal]="true"
+            [animationSettings]="{ effect: 'SlideRight' }">
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">Link {{title}}</h3>
+          </div>
+          <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
+          <button tabindex="-1" ejs-button cssClass="e-flat mobile-close-button" (click)="onCancel()">
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
+        </div>
+      </section>
+
+      <section class="invite bootstrap">
+        <div class="input-container">
+          <label>{{'MSP'}}</label>
+          <div class="input-group">
+            <input class="e-input" type="text" placeholder="MSP" disabled [value]="mspName$ | async" />
+          </div>
+        </div>
+        <div class="dropdown-container">
+          <label>{{title}}</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect appValidateWithMessage
+                             mode="CheckBox"
+                             [formControl]="control"
+                             [allowFiltering]="true"
+                             [fields]="optionFields"
+                             [dataSource]="mspAssociateAgency$ | async"
+                             [showDropDownIcon]="true"></ejs-multiselect>
+          </div>
+        </div>
+      </section>
+    </section>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <ng-container [ngTemplateOutlet]="actionBtn"></ng-container>
+  </ng-template>
+</ejs-dialog>
+
+<ng-template #actionBtn>
+  <div class="e-card-content mobile-button-group">
+    <button ejs-button
+            cssClass="e-outline action-btn button-cancel"
+            id="cancelFormButton"
+            (click)="onCancel()">
+      Cancel
+    </button>
+
+    <button ejs-button
+            id="addFormButton"
+            type="submit"
+            class="action-btn"
+            [isPrimary]="true"
+            (click)="onInvite()">
+      Save
+    </button>
+  </div>
+</ng-template>

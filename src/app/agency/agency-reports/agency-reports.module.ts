@@ -25,6 +25,7 @@ import { CredientialExpiryAgencyComponent } from './crediential-expiry-agency/cr
 import { UserActivityComponent } from './user-activity/user-activity.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { useractivityReportState } from '@admin/store/userlog-activity.state';
+import { CandidateEligibilityAgencyComponent } from './candidate-eligibility-agency/candidate-eligibility-agency.component';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ import { useractivityReportState } from '@admin/store/userlog-activity.state';
     InvoiceSummaryReportComponent,
     MissingCredentialsAgencyComponent,
     CredientialExpiryAgencyComponent,
-    UserActivityComponent
+    UserActivityComponent,
+    CandidateEligibilityAgencyComponent
   ],
   imports: [
     CommonModule,   

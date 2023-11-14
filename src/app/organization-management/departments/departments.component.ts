@@ -696,7 +696,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
             OrganizationSettingKeys.DepartmentSkillRequired,
             OrganizationalHierarchy.Organization,
             id,
-            id
+            id,
+            true
           );
         }),
         tap((data) => {

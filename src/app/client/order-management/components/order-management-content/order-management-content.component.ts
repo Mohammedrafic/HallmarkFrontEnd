@@ -270,6 +270,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @ViewChild('exportTooLargeWarning') exportWarning: DialogComponent;
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
+  includeDeployed: boolean = false;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -665,6 +666,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       if((this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Open']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Closed']].trim().toLowerCase()
+       ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order public comments']].trim().toLowerCase()
       ){
         this.isOrderDetailsTab=true;
       }
@@ -700,7 +702,7 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   const orderData = Data as IRPOrderPosition;
 
   this.store.dispatch(new GetOrderById(orderData.orderId, orderData.organizationId));
-  this.dispatchAgencyOrderCandidatesList(orderData.orderId, orderData.organizationId, true);
+  this.onSelectedOrderDataLoadHandler();
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
   this.openDetails.next(false);
@@ -1494,7 +1496,7 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed = false;
     }
 
-    if (this.creatingReorder || event.rowIndex === event.previousRowIndex) {
+    if ((this.creatingReorder || event.rowIndex === event.previousRowIndex) && this.eliteOrderId == 0) {
       this.creatingReorder = false;
       return;
     }
@@ -2025,9 +2027,9 @@ public RedirecttoIRPOrder(order:Order)
       if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast && !this.preservedOrderService.isOrderPreserved()) {
         this.clearFilters();
       }
-
-      this.openDetails.next(false);
-
+      if(this.eliteOrderId == 0){
+        this.openDetails.next(false);
+      }
       this.store.dispatch(new GetAssignedSkillsByOrganization());
 
       this.orderManagementService.setPreviousOrganizationId(id);
@@ -2055,6 +2057,7 @@ public RedirecttoIRPOrder(order:Order)
         if (this.eliteOrderId > 0 ) {
           this.ordersPage.items = this.ordersPage.items.filter(x => x.id == this.eliteOrderId);
           const data = this.ordersPage.items;
+          this.ordersPage.totalCount = data.length;
           if(this.gridApi && data){
             this.eliteOrderPublicId=data[0]?.publicId!;
             this.redirectedIrporder=this.eliteOrderId;
@@ -2312,7 +2315,10 @@ public RedirecttoIRPOrder(order:Order)
         this.selectFirstRow();
         this.isRedirectedFromVmsSystem = false;
       }
-
+      if(this.selectedOrder){
+        this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number,
+          !!this.selectedOrder.irpOrderMetadata);
+      }
       this.cd$.next(true);
     });
   }
@@ -2348,7 +2354,7 @@ public RedirecttoIRPOrder(order:Order)
         switchMap(() => this.preservedFiltersByPageName$),
         filter(({ dispatch }) => dispatch),
         tap(({ isNotPreserved, state }) => {
-          if (!this.preservedOrderService.isOrderPreserved()) {
+          if (!this.preservedOrderService.isOrderPreserved() && this.eliteOrderId == 0) {
             this.prepareFiltersToDispatch(state);
           }
 
@@ -2747,6 +2753,13 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed,
       ""
     ));
+    if(this.employeeToggleState?.includeDeployed){
+      if(this.employeeToggleState.includeDeployed !== null){
+        this.includeDeployed = this.employeeToggleState.includeDeployed;
+      } else {
+        this.includeDeployed = false;
+      }
+    }
     if (isIrp && (this.selectedOrder?.extensionFromId === null)) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
@@ -2754,7 +2767,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.employeeToggleState?.includeDeployed,
+        this.includeDeployed,
         ""
       )); 
     } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)){
@@ -2764,7 +2777,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.employeeToggleState?.includeDeployed,
+        this.includeDeployed,
         ""
       ));
     }

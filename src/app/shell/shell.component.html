@@ -1,13 +1,13 @@
 <div class="header" [class.expanded]="sidebar?.isOpen || false">
   <div class="header-item">
     <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleSidebar()"></div>
-    <ng-container *ngIf="headerState$ | async as headerState">
+    <ng-container *ngIf="header$ | async as headerState">
       <h1 class="header-title">{{ headerState.title }}</h1>
     </ng-container>
   </div>
 
   <div class="stick-right header-content">
-    <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
+    <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea || (isMspArea$ | async)?.isMSPArea)">
       <ng-container *ngIf="isDekstop$ | async">
         <app-organization-agency-selector [isDarkTheme]="isDarkTheme"></app-organization-agency-selector>
       </ng-container>
@@ -240,7 +240,7 @@
         </div>
         <div
           class="alert-content alert-title-header-body-color"
-          (click)="getContentDetails(item.organizationId, item.orderId,item.alertTitle)"
+          (click)="getContentDetails(item.organizationId, item.orderId,item.alertTitle,item.id)"
           [innerHTML]="item.content"
         ></div>
       </section>

@@ -58,6 +58,9 @@ import { CredentialListModule } from '@shared/components/credentials-list/creden
 import { InputModule } from '@shared/components/form-controls/input/input.module';
 import { TimesheetsModule } from '../modules/timesheets/timesheets.module';
 import { MspTableStatusCellComponent } from './msp-table-status-cell/msp-table-status-cell.component';
+import { MSPAssociateListComponent } from './msp-associate-list/msp-associate-list.component';
+import { MSPAssociateGridComponent } from './msp-associate-list/msp-associate-grid/msp-associate-grid.component';
+import { MspInviteDialogComponent } from './msp-associate-list/msp-associate-grid/msp-invite-dialog/msp-invite-dialog.component';
 const sidebarIcons = {    
   Edit ,
   Download,
@@ -81,6 +84,9 @@ const sidebarIcons = {
     MspListComponent,
     MspactionCellrenderComponent,
     AddEditMspComponent,
+    MSPAssociateListComponent,
+    MSPAssociateGridComponent,
+    MspInviteDialogComponent,
     MspTableStatusCellComponent
   ],  
   imports: [

@@ -22,7 +22,7 @@ export class UploadFileAreaComponent {
 
 
   @Output() private readonly filesSelected: EventEmitter<FileForUpload[]> = new EventEmitter<FileForUpload[]>();
-  
+
   @ViewChild('uploadTooltip') private readonly uploadTooltip: TooltipComponent;
   @ViewChild('fileUploader') private readonly fileUploader: FileUploaderComponent;
 
@@ -31,16 +31,16 @@ export class UploadFileAreaComponent {
     if (this.isMobile) {
       this.fileUploader.browseFiles();
     } else {
-      this.uploadTooltip.open();
+      this.uploadTooltip?.open();
     }
   }
 
   public close(): void {
-    this.uploadTooltip.close();
+    this.uploadTooltip?.close();
   }
 
   public emitSelectedFiles(files: FileForUpload[]): void {
-    this.uploadTooltip.close();
+    this.uploadTooltip?.close();
     this.filesSelected.emit(files);
   }
 }

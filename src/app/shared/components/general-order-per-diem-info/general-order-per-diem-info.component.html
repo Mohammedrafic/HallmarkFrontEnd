@@ -94,10 +94,6 @@
         <div class="title">{{ orderInformation.minYrsRequired }}</div>
         <div class="sup-title">Exp. Req.</div>
       </div>
-      <div class="column">
-        <div class="title">{{ orderInformation.workflowName || '-' }}</div>
-        <div class="sup-title">Workflow</div>
-      </div>
     </div>
   </section>
 </ng-container>
@@ -225,10 +221,6 @@
           <div class="column" *ngIf="orderInformation.minYrsRequired">
             <div class="title">{{ orderInformation.minYrsRequired }}</div>
             <div class="sup-title">Exp. Req.</div>
-          </div>
-          <div class="column">
-            <div class="title">{{ orderInformation.workflowName || '-' }}</div>
-            <div class="sup-title">Workflow</div>
           </div>
         </div>
       </section>

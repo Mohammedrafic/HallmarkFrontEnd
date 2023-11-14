@@ -46,7 +46,16 @@
                   [allowFiltering]="true"
                 ></ejs-dropdownlist>
               </div> -->
-
+              <div class="input-container">
+                <label>NetSuite ID</label>
+                <input
+                appValidateWithMessage
+                  formControlName="netSuiteId"
+                  class="e-input"
+                  type="text"
+                  [attr.disabled]="true"
+                />
+              </div>
               <div class="input-container">
                 <label>External ID</label>
                 <input
@@ -388,11 +397,11 @@
             <div class="title">Contact Details</div>
             <app-tooltip-container
               class="stick-right"
-              [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+              [showToolTip]="!userPermission[userPermissions.CanCreateMSP]"
             >
               <button
                 ejs-button
-                [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+                [disabled]="!userPermission[userPermissions.CanCreateMSP]"
                 cssClass="e-outline add-contact-link"
                 (click)="addContact()"
               >
@@ -481,13 +490,13 @@
                   class="input-container remove-button-container"
                 >
                   <app-tooltip-container
-                    [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
+                    [showToolTip]="!userPermission[userPermissions.CanCreateMSP]">
                     <button
                       ejs-button
                       appHideBeforeSyncfusionLoad
                       cssClass="e-outline"
                       class="icon-button"
-                      [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+                      [disabled]="!userPermission[userPermissions.CanCreateMSP]"
                       (click)="removeContact(i)"
                     >
                       <i-feather name="trash2" class="icon"></i-feather>
@@ -615,16 +624,16 @@
     </button>
     <app-tooltip-container
       class="tooltip"
-      [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+      [showToolTip]="!userPermission[userPermissions.CanCreateMSP]"
     >
       <button
         ejs-button
         appHideBeforeSyncfusionLoad
         class="save-button"
         id="saveButton"
-        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
         [isPrimary]="true"
         (click)="save()"
+        [disabled]="!userPermission[userPermissions.CanCreateMSP]"
       >
         Save
       </button>

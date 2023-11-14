@@ -40,9 +40,11 @@ import {
   ERROR_CAN_NOT_Edit_OpenPositions,
   ExtensionStartDateValidation,
   JOB_DISTRIBUTION_TITLE,
+  Message_With_Fields,
   ORDER_DISTRIBUTED_TO_ALL,
   PROCEED_FOR_ALL_AGENCY,
   PROCEED_FOR_TIER_LOGIC,
+  Toast_With_Message,
 } from '@shared/constants';
 import { OrderCredentialsService } from "@client/order-management/services";
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
@@ -306,15 +308,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private showOrderFormValidationMessage(fieldsString?: string): void {
-    const fields = fieldsString || this.collectInvalidFields().join(',\n');
+    const fields = fieldsString || this.collectInvalidFields().join(',<br>');
 
     if (fields && fields.length) {
-      ToastUtility.show({
-        title: 'Error',
-        content: 'Please fill in the required fields in Order Details tab:\n' + fields,
-        position: { X: 'Center', Y: 'Top' },
-        cssClass: 'error-toast',
-      });
+      this.store.dispatch(new ShowToast(MessageTypes.Error, Message_With_Fields(fields),false,'',0,true));
+      return;
     }
   }
 
@@ -326,12 +324,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }).map((controlName) => `\u2022 ${FieldName[controlName as keyof typeof FieldName]}`);
 
     if (invalidFields && invalidFields.length) {
-      ToastUtility.show({
-        title: 'Error',
-        content: 'Please fill in a correct value in Order Details tab:\n' + invalidFields.join(',\n'),
-        position: { X: 'Center', Y: 'Top' },
-        cssClass: 'error-toast',
-      });
+      this.store.dispatch(new ShowToast(MessageTypes.Error, Message_With_Fields(invalidFields),false,'',0,true));
+      return;
     }
   }
 
@@ -340,21 +334,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ? ValidationCredentialOption
       : ValidationExistenceCredential;
 
-    ToastUtility.show({
-      title: 'Error',
-      content: message,
-      position: { X: 'Center', Y: 'Top' },
-      cssClass: 'error-toast',
-    });
+    this.store.dispatch(new ShowToast(MessageTypes.Error, Toast_With_Message(message)));
+    return;
   }
 
   private showBillRatesValidationMessage(): void {
-    ToastUtility.show({
-      title: 'Error',
-      content: 'Please set up at least one Regular Bill Rate in Organization Settings',
-      position: { X: 'Center', Y: 'Top' },
-      cssClass: 'error-toast',
-    });
+    this.store.dispatch(new ShowToast(MessageTypes.Error, Toast_With_Message('Please set up at least one Regular Bill Rate in Organization Settings')));
+    return;
   }
 
   public save(): void {
@@ -856,20 +842,15 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.workLocationForm.valid &&
       this.orderDetailsFormComponent.specialProject.valid;
 
-    if (!billRatesValid) {
-      this.showBillRatesValidationMessage();
-    }
-
-    if (!credentialsValid || !hasSelectedCredentialFlag) {
-      this.showCredentialsValidationMessage(!!credentialsValid && !hasSelectedCredentialFlag);
-    }
-
     if (!orderValid) {
       this.showOrderFormValidationMessage();
       this.showInvalidValueMessage();
-    }
-
-    if(this.orderDetailsFormComponent.isEditMode && this.order.disableNumberOfOpenPositions && this.order.openPositions != this.orderDetailsFormComponent.generalInformationForm.getRawValue().openPositions){
+    }else if (!credentialsValid || !hasSelectedCredentialFlag) {
+      this.showCredentialsValidationMessage(!!credentialsValid && !hasSelectedCredentialFlag);
+    }   
+    else if (!billRatesValid) {
+      this.showBillRatesValidationMessage();
+    }else if(this.orderDetailsFormComponent.isEditMode && this.order.disableNumberOfOpenPositions && this.order.openPositions != this.orderDetailsFormComponent.generalInformationForm.getRawValue().openPositions){
       this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
       return;
     }
