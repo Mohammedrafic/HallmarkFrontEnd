@@ -10,7 +10,7 @@ import { AgencyStatus } from 'src/app/shared/enums/status';
 import { agencyStatusCreationOptions, agencyStatusOptions } from '../../agency-list.constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { AgencyConfig, AgencyStatusesModel } from "@shared/models/agency.model";
-import { MIN_DIGITS_LENGTH_ONLY_NINE, TaxIdValidationMessage } from '@shared/constants';
+import { MIN_DIGITS_LENGTH_ONLY_TWELVE, TaxIdValidationMessage } from '@shared/constants';
 import { COUNTRIES } from '@shared/constants/countries-list';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
 import { patternMessageValidator } from '@shared/validators/pattern-message.validator';
@@ -41,8 +41,8 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.onCountryChange();
-    this.isAgencyCreatedCahnge();
-    this.setDefultStatus();
+    this.isAgencyCreatedChange();
+    this.setDefaultStatus();
   }
 
   ngOnDestroy(): void {
@@ -64,7 +64,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       });
   }
 
-  public isAgencyCreatedCahnge(): void {
+  public isAgencyCreatedChange(): void {
     this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive)).subscribe((isCreated) => {
       this.statuses = isCreated ? agencyStatusOptions : agencyStatusCreationOptions;
 
@@ -80,7 +80,8 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       externalId: new FormControl('', [Validators.maxLength(10)]),
       taxId: new FormControl('', [
         Validators.required,
-        patternMessageValidator(MIN_DIGITS_LENGTH_ONLY_NINE, TaxIdValidationMessage),
+        patternMessageValidator(MIN_DIGITS_LENGTH_ONLY_TWELVE, TaxIdValidationMessage),
+        Validators.maxLength(12),
       ]),
       baseFee: new FormControl(''),
       addressLine1: new FormControl('', [Validators.required, Validators.maxLength(100)]),
@@ -98,7 +99,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setDefultStatus(): void {
+  private setDefaultStatus(): void {
     this.formGroup.get('status')?.patchValue(0);
   }
 }

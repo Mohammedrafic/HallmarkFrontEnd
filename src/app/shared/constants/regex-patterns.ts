@@ -6,6 +6,7 @@ export const NUMBER_AND_ONE_DECIMAL = /^(\d)*(\.)?([0-9]{1})?$/;
 export const NUMBER_AND_TWO_DECIMAL = /^[0-9]*(\.[0-9]{0,2})?$/;
 export const ALPHANUMERIC = /^[a-zA-Z0-9]+$/;
 export const MIN_DIGITS_LENGTH_ONLY_NINE =/^[0-9]{9}$/;
+export const MIN_DIGITS_LENGTH_ONLY_TWELVE = /^[0-9]{12}$/;
 export const DOCUMENT_NAME_PATTERN =/^[a-zA-Z0-9+-_. ]+$/;
 export const EMPTY_SPACE_PATTERN=/^(\s+\S+\s*)*(?!\s).*$/;
 export const ALPHANUMERIC_8_11_SYMBOLS = /^[a-zA-Z0-9]{8,11}$/;
