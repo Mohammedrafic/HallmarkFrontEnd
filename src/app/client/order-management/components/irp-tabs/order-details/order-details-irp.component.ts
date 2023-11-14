@@ -1125,6 +1125,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         this.jobDistributionForm.get('jobDistribution')?.enable();
       }
     }
+    if(!selectedOrder.isIRPOnly && selectedOrder?.status === OrderStatus.Filled)
+    {
+      this.jobDistributionForm.get('jobDistribution')?.disable();
+    }
   }
 
   private setConfigType(selectedOrder: Order): void {
