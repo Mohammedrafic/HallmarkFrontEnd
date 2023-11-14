@@ -135,16 +135,21 @@ export interface IRPCandidateForPosition {
 }
 
 export interface IRPOrderPosition {
+  isTemplate: any;
   orderId: number;
   organizationId: number;
   candidateStatus: number | string;
+  candidateJobId : number;
+  candidateProfileId : number;
   candidateStatusValue : number | string;
+  status : number;
   orderPublicId: number | string;
   orderStatus: number | string;
   employeeId: number;
   firstName: string;
   businessUnitName: string;
-  middleName: string;
+  middleName: string; 
+  jobId?: number;
   lastName: string;
   primarySkillId: number;
   primarySkillName: string;
@@ -165,6 +170,9 @@ export interface IRPOrderPosition {
   billRate?: number | string | null;
   actualStartDate?: Date | string | null;
   actualEndDate?: Date | string | null;
+  closeDate?: string;
+  positionClosureReason?: string;
+  positionClosureReasonId?: number;
 }
 
 export interface IrpPositionSkillName {
@@ -209,6 +217,10 @@ export class OrderManagementFilter {
   orderId: number;
   skillIds: number[];
   orderTypes: number[];
+}
+
+export interface IRPOrderPositionpage {
+  items : IRPOrderPosition[];
 }
 
 export type OrderManagementPage = PageOfCollections<OrderManagement>;

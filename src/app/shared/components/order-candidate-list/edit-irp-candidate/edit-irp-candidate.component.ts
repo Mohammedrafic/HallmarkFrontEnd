@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { catchError, distinctUntilChanged, filter, of, skip, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -81,6 +81,7 @@ import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candid
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { BillRate } from '@shared/models';
+import { Duration } from '@shared/enums/durations';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -211,6 +212,19 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   public watchForValueChanges(){
+    this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: Date) => {
+      const duration = this.orderDetailsData.duration;
+
+      if (isNaN(duration) || !(value instanceof Date)) {
+        return;
+      }
+
+      this.autoSetupJobEndDateControl(duration, value);
+      this.cdr.markForCheck();
+    });
+
     if(this.AtpCalcForm){
       this.AtpCalcForm.get("hoursWorked")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
@@ -379,6 +393,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       }
     });
   }
+  
+
+  private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
+    const jobStartDateValue = new Date(jobStartDate.getTime());
+    const jobEndDateControl = this.candidateForm.get('actualEndDate') as AbstractControl;
+
+    const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
+    jobEndDateControl.patchValue(jobEndDate);
+  }
+
 
   private performCalculations(): void {
     this.salaryWagesandBenefits = (!Number.isNaN(this.ratePerHour * this.hoursWorked != null)) ? this.ratePerHour * this.hoursWorked : 0;
