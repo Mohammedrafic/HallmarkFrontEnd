@@ -3031,7 +3031,8 @@ public RedirecttoIRPOrder(order:Order)
         candidateStatuses = [];
       }
     } else {
-      statuses = data.orderStatuses;
+      data.orderStatuses.forEach((val:any)=> val.status = val.status.trim());
+      statuses=data.orderStatuses;
       candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
     }
 
