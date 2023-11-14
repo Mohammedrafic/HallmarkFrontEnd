@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { filter, takeUntil } from 'rxjs';
@@ -9,6 +9,7 @@ import { SideMenuService } from '@shared/components/side-menu/services';
 import { Destroyable } from '@core/helpers';
 import { Tooltip, TooltipEventArgs } from '@syncfusion/ej2-angular-popups';
 import { charLength } from '@core/enums';
+import { VMSReportsMenuId } from '@shared/constants';
 
 @Component({
   selector: 'app-side-menu',
@@ -41,18 +42,29 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
   ngOnInit(): void {
     this.watchForMenuItems();
   }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['config'] && changes['config'].currentValue && this.isAnalytics) {
+      this.handleConfigChanges(changes['config'].currentValue);
+    }
+  }
 
-  ngAfterViewInit(): void {
-    if (this.config.length > 0) {
-      let selection = this.config[0];
-      if (this.navigateTo) {
+
+  private handleConfigChanges(config: MenuSettings[]): void {
+    if (config.length > 0) {
+      const menuId=localStorage.getItem("menuId")
+      let selection = (this.isAnalytics && Number(menuId) === VMSReportsMenuId) ? this.config[1] : this.config[0];  
+          if (this.navigateTo) {
         const navigateToSubMenu = this.config.find((item) => item.route === this.navigateTo);
         if (navigateToSubMenu) {
           selection = navigateToSubMenu;
         }
       }
-      this.listBox.selectItems([selection['text'] as string]);
       this.router.navigate([(selection as any).route], { relativeTo: this.route });
+      this.listBox?.selectItems([selection['text'] as string],false);
+      setTimeout(() => {
+        this.listBox?.selectItems([selection['text'] as string]);
+    }, 10);  
     }
     if(this.isAnalytics === true){
       this.tooltip = new Tooltip({
@@ -63,6 +75,9 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
     });
     this.tooltip.appendTo('body');
     }
+  }
+  ngAfterViewInit(): void {
+    this.handleConfigChanges(this.config);
   }
 
     onBeforeRender(args: TooltipEventArgs): void {

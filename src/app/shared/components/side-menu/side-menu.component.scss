@@ -34,3 +34,24 @@
     }
   }
 }
+
+
+$blue-color: rgba(33, 150, 243, 0.1);
+
+.analyticslist [data-value] {
+  &.bold-text {
+    background: $blue-color !important;
+    font-weight: bold;
+    pointer-events: none;
+  }
+  
+  &[data-value="Orders"],
+  &[data-value="Candidate"],
+  &[data-value="Credentials"],
+  &[data-value="Timesheets"],
+  &[data-value="Invoices/Financials"],
+  &[data-value="Vendor"],
+  &[data-value="Audit Logs"] {
+    @extend .bold-text;
+  }
+}
