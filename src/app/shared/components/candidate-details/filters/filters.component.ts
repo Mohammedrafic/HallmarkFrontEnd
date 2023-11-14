@@ -8,7 +8,7 @@ import { debounceTime, delay, distinctUntilChanged, takeUntil } from 'rxjs';
 import { EmitType } from '@syncfusion/ej2-base';
 import { OutsideZone } from '@core/decorators';
 import { DoNotReturnCandidateSearchFilter } from '@shared/models/donotreturn.model';
-import { Getcandidatesearchbytext } from '../store/candidate.actions';
+import { GetcandidateOrgSearchbytext, Getcandidatesearchbytext } from '../store/candidate.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
@@ -71,14 +71,27 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
         searchText: e.text,
         businessUnitId: this.isAgency ? this.lastAgencyId : this.lastOrgId,
       };
-      this.store.dispatch(new Getcandidatesearchbytext(filter))
+      if(this.isAgency){
+        this.store.dispatch(new Getcandidatesearchbytext(filter))
         .pipe(
           delay(500),
           distinctUntilChanged(),
           takeUntil(this.destroy$)
         ).subscribe((result) => {
           e.updateData(result.candidateDetails.searchCandidates);
+
         });
+      }else{
+        this.store.dispatch(new GetcandidateOrgSearchbytext(filter))
+        .pipe(
+          delay(500),
+          distinctUntilChanged(),
+          takeUntil(this.destroy$)
+        ).subscribe((result) => {
+            e.updateData(result.candidateDetails.searchOrgCandidates);
+        });
+      }
+  
     }
   }
 

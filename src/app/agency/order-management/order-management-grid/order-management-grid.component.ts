@@ -229,6 +229,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         : 0;
         if(this.alertOrderId>0 ){
           this.ordersPage.items= this.ordersPage.items.filter(x=>x.orderId===this.alertOrderId);
+          this.ordersPage.totalCount = this.ordersPage.items.length;
           this.gridWithChildRow.dataSource=this.ordersPage.items;
           this.onRowClick({data:this.ordersPage.items[0],isInteracted:false})
         }
@@ -289,6 +290,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
        || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Applied']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
        || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Custom Status']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
        || (AlertIdEnum[AlertIdEnum['Candidate Status Update: End']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
+       || (alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Candidate Level Comments']].trim().toLowerCase()
       )
       this.previousSelectedOrderId = this.alertOrderId;
       else{
@@ -436,7 +438,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       PreservedFiltersState.preservedFiltersByPageName
     ) as PreservedFiltersByPage<AgencyOrderFilters>;
 
-    if (!preservedFiltes.isNotPreserved) {
+    if (!preservedFiltes.isNotPreserved && this.alertOrderId == 0) {
       const { state } = preservedFiltes;
       const orderStatuses = Array.isArray(state.orderStatuses) ? [...state.orderStatuses] : [];
       const filterState = { ...state, orderStatuses };

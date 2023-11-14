@@ -54,7 +54,7 @@ import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-manage
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrganizationStructureService } from '@shared/services/organization-structure.service';
 import { ShowToast } from '../../../../store/app.actions';
-import { set } from 'lodash';
+import { set, template } from 'lodash';
 import { SaveTemplateDialogService } from '@client/order-management/components/save-template-dialog/save-template-dialog.service';
 import { Item, MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { ToastUtility } from '@syncfusion/ej2-notifications';
@@ -104,6 +104,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public isLocation = false;
   public isLocationAndDepartment = false;
   public isSaveForTemplate = false;
+  public istemp =false;
   public isIRPtab =true;
   public isAddTemplate=false;
   private isCredentialsChanged = false;
@@ -232,6 +233,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
       isSubmit: false,
     };
+    createdOrder.distributeToVMS = createdOrder.distributeToVMS !=null ? createdOrder.distributeToVMS.length===0 ? null : createdOrder.distributeToVMS : null;
     let location = this.organizationStructureService.getTemplateLocationsById(createdOrder.regionId,createdOrder.locationId);
     let department = this.organizationStructureService.getTemplateDepartment(createdOrder.locationId,createdOrder.departmentId);
     createdOrder.isTemplate = true;
@@ -437,8 +439,12 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       const formGroupList = getFormsList(formState);
       const saveOrderAsTemplateGrouplist = getSaveasTemplateFormsList(saveOrderAstemplate);
       let savetypes: any;
-      savetypes = saveType;
-      if (isFormsValid(formGroupList)) {
+      savetypes = saveType !=null && saveType != undefined ? saveType : null;
+      if(savetypes != undefined && savetypes != null)
+      {
+       this.istemp = SubmitButton.SaveAsTemplate == savetypes.item.id ? true : false;
+      }
+      if (isFormsValid(formGroupList) && !this.istemp) {
         this.saveOrder(formState, saveType);
       } else if ((savetypes != undefined || savetypes != null) && SubmitButton.SaveAsTemplate == savetypes.item.id) {
         if (this.isSaveForTemplate) {

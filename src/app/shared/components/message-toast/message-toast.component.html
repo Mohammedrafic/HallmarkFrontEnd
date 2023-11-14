@@ -21,11 +21,13 @@
       </div>
     </ng-template>
     <ng-template #content>
-      <div>
+      <div *ngIf="!htmlContent">
         <span *ngIf="isQuickOrder" class="order-id" (click)="navigateToAllOrders()">
           {{ organizationPrefix }}-{{ publicId }}
         </span>
         {{ messageContent }}
+      </div>
+      <div *ngIf="htmlContent" [innerHTML]="messageContent">        
       </div>
     </ng-template>
   </ejs-toast>

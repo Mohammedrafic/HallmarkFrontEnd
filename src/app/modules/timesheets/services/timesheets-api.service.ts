@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 
 
 import { DataSourceItem, DropdownOption } from '@core/interface';
@@ -16,9 +16,13 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { ExportPayload } from '@shared/models/export.model';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import { OrganizationStructure } from '@shared/models/organization.model';
+import { TAB_ADMIN_TIMESHEETS } from '../constants';
 
 @Injectable()
 export class TimesheetsApiService {
+  private pendingApproval = 1;
+  private missing = 2;
+  private rejected = 3;
 
   constructor(
     private http: HttpClient,
@@ -34,9 +38,29 @@ export class TimesheetsApiService {
 
   public getTabsCounts(filters: TimesheetsFilterState): Observable<TabCountConfig> {
     const mappedFilters = this.mapTimeSheetsFilters(filters);
-    return this.http.post<TabCountConfig>('/api/Timesheets/tabcounters', {
-      ...mappedFilters,
-    });
+    const url = '/api/Timesheets/tabcounter';
+    const tabsCounts$ = [
+      this.http.post<number>(url, {
+        ...mappedFilters,
+        statusIds: TAB_ADMIN_TIMESHEETS[this.pendingApproval].value,
+      }),
+      this.http.post<number>(url, {
+        ...mappedFilters,
+        statusIds: TAB_ADMIN_TIMESHEETS[this.missing].value,
+      }),
+      this.http.post<number>(url, {
+        ...mappedFilters,
+        statusIds: TAB_ADMIN_TIMESHEETS[this.rejected].value,
+      }),
+    ];
+    return forkJoin(tabsCounts$).pipe(map((counts: number[]) => {
+        return {
+          pending: counts[0],
+          missing: counts[1],
+          rejected: counts[2],
+        };
+      }
+    ));
   }
 
   public getTimesheetRecords(

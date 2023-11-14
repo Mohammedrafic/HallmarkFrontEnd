@@ -18,7 +18,7 @@ import { CreatedCandidateStatus } from '@shared/enums/status';
 import { CredentialStorageFacadeService } from "@agency/services/credential-storage-facade.service";
 import { CandidateCredentialResponse } from "@shared/models/candidate-credential.model";
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { distinctUntilChanged, filter, Observable, takeUntil, switchMap, take, map, Subject } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, takeUntil, switchMap, take, map, Subject, delay } from 'rxjs';
 import { CandidateGeneralInfoComponent } from
   'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from
@@ -146,7 +146,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         this.candidateForm.markAsPristine();
       });
     this.actions$
-      .pipe(takeUntil(this.componentDestroy()), ofActionSuccessful(GetCandidateByIdSucceeded))
+      .pipe(delay(500), takeUntil(this.componentDestroy()), ofActionSuccessful(GetCandidateByIdSucceeded))
       .subscribe((candidate: { payload: Candidate }) => {
         this.fetchedCandidate = candidate.payload;
         !this.isNavigatedFromOrganizationArea && this.getCandidateLoginSetting(candidate.payload.id as number);
@@ -164,8 +164,6 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
     if (this.route.snapshot.paramMap.get('id')) {
       this.title = 'Edit';
-      this.store.dispatch(new GetCandidateById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
-      this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
     }else{
       this.customMaskChar = '00000';
     }
@@ -327,6 +325,11 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
             this.reloadCredentials$.next(true);
       }
     });
+
+    if (this.route.snapshot.paramMap.get('id')) {
+      this.store.dispatch(new GetCandidateById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
+      this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
+    }
   }
 
   private generateCandidateForm(): void {
@@ -393,6 +396,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     });
     this.candidateForm.get('profSummary')?.patchValue({ professionalSummary });
     this.candidateForm.get('agency')?.patchValue({ agencyId });
+    this.cd.detectChanges();
   }
 
   //TODO: remove any

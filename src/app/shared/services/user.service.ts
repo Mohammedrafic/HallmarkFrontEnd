@@ -8,6 +8,7 @@ import { Menu } from '../models/menu.model';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import { AlertsModel } from '@shared/models/alerts-model';
 import { HelpSiteUrl } from '@shared/models/help-site-url.model';
+import { LastSelectedMspID, UserMsp } from '../models/user-msp.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -54,6 +55,14 @@ export class UserService {
   }
 
   /**
+   * Get list of user's msps
+   * @returns list of user's msps
+   */
+  public getUserMsps(): Observable<UserMsp> {
+    return this.http.get<UserMsp>(`/api/Users/msps`);
+  }
+
+  /**
    * Add User Organization Access Setting
    * @param lasSelectedOrganizationAgency
    * @returns void
@@ -61,7 +70,17 @@ export class UserService {
   public saveLastSelectedOrganizationAgencyId(lasSelectedOrganizationAgency: LasSelectedOrganizationAgency): Observable<void> {
     const { lastSelectedOrganizationId, lastSelectedAgencyId } = lasSelectedOrganizationAgency;
     return this.http.post<void>('/api/Users/savestate', { lastSelectedOrganizationId, lastSelectedAgencyId });
-  }
+  } 
+
+  /**
+   * Add User Msp Access Setting
+   * @param lastSelectedMspID
+   * @returns void
+   */
+  public saveLastSelectedMspId(lastSelectedMspID: LastSelectedMspID): Observable<void> {
+    const lastSelectedMspId = lastSelectedMspID;
+    return this.http.post<void>('/api/Users/savestate', lastSelectedMspId);
+  } 
 
   /**
    * Get Users Assigned To Role

@@ -95,6 +95,8 @@ import {
   ApplicantStatus as ApplicantStatusModel,
   MergedOrder,
   OrderManagement,
+  IRPOrderPosition,
+  IRPOrderPositionpage,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
@@ -140,6 +142,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() order: MergedOrder;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
+  @Input() candidateirp: IRPOrderPosition;
   @Input() activeSystem: OrderManagementIRPSystemId;
   @Input() orderComments: Comment[] = [];
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild, string] | null>;
@@ -177,6 +180,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   @Select(OrderManagementState.deployedCandidateOrderInfo)
   public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
+
+  @Select(OrderManagementContentState.irpCandidatesforExtension)
+  public getIrpCandidatesforExtension$ : Observable<IRPOrderPositionpage>
+
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public irpOrderType = IrpOrderType;
   public system: string;
@@ -190,6 +197,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public selectedOrder$: Observable<Order>;
   public orderStatusText = OrderStatusText;
   public disabledCloseButton = true;
+  public disabledCloseButtonforIRP = true;
   public acceptForm = AcceptFormComponent.generateFormGroup();
   public candidateJob: OrderCandidateJob | null;
   public candidateStatus = CandidatStatus;
@@ -205,6 +213,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public agencyActionsAllowed = true;
   public canCreateOrder: boolean;
   public canCloseOrder: boolean;
+  public canCloseOrderforIRP: boolean;
   public isClosedOrder = false;
   public selectedApplicantStatus: ApplicantStatusModel | null = null;
   public isCandidatePayRateVisible: boolean;
@@ -226,6 +235,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private ignoreMissingCredentials = false;
   private readonly permissions = UserPermissions;
   confirmationMessage: string;
+  irpCandidates: IRPOrderPosition;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -255,6 +265,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     return !this.isAgency && !this.canReOpen;
   }
 
+  get showCloseOrderforIRP(): boolean {
+    return !this.isAgency && !this.canReOpenforIRP;
+  }
+
   get mobileMenu(): any {
     let menu: { text: string }[] = [];
     if (this.showAddExtension && !this.disableAddExtension) {
@@ -279,6 +293,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.candidate?.orderStatus !== OrderStatus.Closed &&
       Boolean(this.candidate?.positionClosureReasonId) &&
       !this.isAgency
+    );
+  }
+
+  get canReOpenforIRP(): boolean {
+    return (
+      this.order?.status !== OrderStatus.Closed && Boolean(this.irpCandidates?.positionClosureReasonId)  && !this.isAgency
     );
   }
 
@@ -310,6 +330,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.getIRPCandidates();
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
@@ -328,6 +349,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.subscribeOnSelectedOrder();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnPermissions();
+    this.setCloseOrderButtonState();
 
     if (this.isAgency) {
       this.checkForAgencyStatus();
@@ -349,6 +371,17 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.orderStatusText[changes['candidate'].currentValue.orderStatus]
         );
       }
+    } 
+    const irpcandidate = changes["irpCandidates"]?.currentValue;
+    if(irpcandidate){
+      this.setCloseOrderButtonStateforIRP();      
+      this.setAddExtensionBtnState(irpcandidate);
+      if (this.chipList) {
+        this.chipList.cssClass = this.chipsCssClass.transform(
+          this.orderStatusText[changes['irpCandidates'].currentValue.orderStatus]
+        );
+      }
+
     }
   }
 
@@ -359,8 +392,15 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public setCloseOrderButtonState(): void {
     this.disabledCloseButton =
       !!this.candidate?.positionClosureReasonId ||
-      this.candidate.orderStatus !== OrderStatus.Filled ||
+      this.candidate?.orderStatus !== OrderStatus.Filled ||
       !!this.order?.orderCloseDate;
+  }
+
+  public setCloseOrderButtonStateforIRP(): void {
+    this.disabledCloseButtonforIRP =
+      !!this.irpCandidates?.positionClosureReasonId ||
+      this.order?.status !== OrderStatus.Filled ||
+      !!this.order?.orderCloseDate ;
   }
 
   public closeOrder(order: MergedOrder): void {
@@ -552,6 +592,13 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     } else {
       this.store.dispatch(new GetOrganizationExtensions(this.candidateJob.jobId, this.candidateJob.orderId));
     }
+  }
+
+  public getExtensionsforIRP(): void {
+    if (!this.irpCandidates?.candidateJobId) {
+      return;
+    }
+    this.store.dispatch(new GetOrganizationExtensions(this.irpCandidates.candidateJobId as number, this.order?.id));
   }
 
   public updateGrid(): void {
@@ -756,17 +803,52 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
   }
 
+  private getCommentsforIRP(): void {
+    if (this.isReorderType && this.order.commentContainerId && this.isActive) {
+      this.commentsService
+      .getComments(this.order.commentContainerId as number, null)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+        this.changeDetectorRef.markForCheck();
+      });
+    }
+  }
+
+  private getIRPCandidates(){
+    this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
+      if(irpCandidates){
+        irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+        this.setCloseOrderButtonStateforIRP();
+        this.getExtensionsforIRP();
+        this.getCommentsforIRP();
+      }
+    });
+
+  }
+
   private subscribeOnCandidateJob(): void {
     if (this.isOrganization) {
-      this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
-        this.candidateJob = orderCandidateJob;
-        if (orderCandidateJob) {
-          this.getExtensions();
-          this.getComments();
-          this.setAcceptForm(orderCandidateJob);
-        }
-        this.changeDetectorRef.detectChanges();
-      });
+      if(this.activeSystem === OrderManagementIRPSystemId.VMS){
+        this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
+          this.candidateJob = orderCandidateJob;
+          if (orderCandidateJob) {
+            this.getExtensions();
+            this.getComments();
+            this.setAcceptForm(orderCandidateJob);
+          }
+          this.changeDetectorRef.detectChanges();
+        });  
+      } else {
+        this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
+          if(irpCandidates){
+            irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+            this.setCloseOrderButtonStateforIRP();
+            this.getExtensionsforIRP();
+            this.getCommentsforIRP();
+          }
+        });
+      }
     }
     if (this.isAgency) {
       this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
@@ -891,9 +973,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions()
       .pipe(takeUntil(this.componentDestroy()))
-      .subscribe(({ canCloseOrder, canCreateOrder }) => {
+      .subscribe(({ canCloseOrder, canCreateOrder, canCloseOrderIRP }) => {
         this.canCreateOrder = canCreateOrder;
         this.canCloseOrder = canCloseOrder;
+        this.canCloseOrderforIRP = canCloseOrderIRP;
       });
   }
 
@@ -936,9 +1019,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private getMissingCredentialsRequestBody(): MissingCredentialsRequestBody {
     return {
       orderId: this.order.orderId || this.order.id,
-      candidateProfileId: this.candidate.candidateProfileId || this.candidate.candidateId,
+      candidateProfileId: this.irpCandidates?.candidateProfileId || this.candidate.candidateId,
       validateForDate: DateTimeHelper.setInitHours(
-        DateTimeHelper.setUtcTimeZone(addDays(this.candidateJob?.actualEndDate as string, 1) as Date)
+        DateTimeHelper.setUtcTimeZone(addDays(this.candidateJob?.actualEndDate ? this.candidateJob?.actualEndDate : this.candidate?.actualEndDate as string, 1) as Date)
       ),
     };
   }

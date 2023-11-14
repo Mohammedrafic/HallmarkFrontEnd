@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { catchError, distinctUntilChanged, filter, of, skip, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -79,6 +79,9 @@ import { GetRejectReasonsForOrganisation } from '@client/store/order-managment-c
 import { SystemType } from '@shared/enums/system-type.enum';
 import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { OrderStatus } from '@shared/enums/order-management';
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
+import { BillRate } from '@shared/models';
+import { Duration } from '@shared/enums/durations';
 
 @Component({
   selector: 'app-edit-irp-candidate',
@@ -191,6 +194,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     private durationService: DurationService,
     private commentsService: CommentsService,
     private organizationSettingService: OrganizationSettingsService,
+    private orderManagementContentService: OrderManagementContentService,
     private formBuilder: FormBuilder
   ) {
     super();
@@ -208,6 +212,19 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   public watchForValueChanges(){
+    this.candidateForm.get('actualStartDate')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((value: Date) => {
+      const duration = this.orderDetailsData.duration;
+
+      if (isNaN(duration) || !(value instanceof Date)) {
+        return;
+      }
+
+      this.autoSetupJobEndDateControl(duration, value);
+      this.cdr.markForCheck();
+    });
+
     if(this.AtpCalcForm){
       this.AtpCalcForm.get("hoursWorked")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
@@ -304,7 +321,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     this.organizationSettingService.getOrganizationSettings().subscribe(data => {
       this.payrateData = data.filter(settingdata => settingdata.settingKey === SettingsKeys.ATPRateCalculation);
       this.configdata = Object.assign({},...this.payrateData);
-      this.configdata = JSON.parse(this.configdata.value);
+      this.configdata = this.configdata.value && JSON.parse(this.configdata.value);
       if(this.configdata){
         this.benefitpercentofsw = this.configdata.benefitPercent;
         this.costSaving = this.configdata.costSavings;
@@ -316,14 +333,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
   }
 
   public getOrderDetails(orderDetails : Order){
-      this.editIrpCandidateService.getPredefinedBillRatesforRatePerHour(IrpOrderTypeforPayRate.LongTermAssignment, orderDetails.departmentId, orderDetails.skillId).pipe(
-        takeUntil(this.componentDestroy()),
-        take(1)
-      ).subscribe(data => {
-        if(data) {
-          this.ratePerHour = data.amountMultiplier;
-        }
-      }) ;
+    const jobStartDate = DateTimeHelper.setUtcTimeZone(orderDetails.jobStartDate);
+    const jobEndDate = DateTimeHelper.setUtcTimeZone(orderDetails.jobEndDate);
+    this.orderManagementContentService
+      .getRegularBillRate(OrderType.LongTermAssignment, orderDetails.departmentId, orderDetails.skillId, jobStartDate, jobEndDate)
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((billRate: BillRate) => {
+        this.ratePerHour = parseInt(billRate?.rateHour.toFixed(2)) || 0;
+      });
     }
 
   private getATPstipendRate() {
@@ -376,6 +393,16 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       }
     });
   }
+  
+
+  private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
+    const jobStartDateValue = new Date(jobStartDate.getTime());
+    const jobEndDateControl = this.candidateForm.get('actualEndDate') as AbstractControl;
+
+    const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
+    jobEndDateControl.patchValue(jobEndDate);
+  }
+
 
   private performCalculations(): void {
     this.salaryWagesandBenefits = (!Number.isNaN(this.ratePerHour * this.hoursWorked != null)) ? this.ratePerHour * this.hoursWorked : 0;

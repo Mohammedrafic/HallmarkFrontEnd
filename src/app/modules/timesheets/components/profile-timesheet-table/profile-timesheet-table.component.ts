@@ -58,6 +58,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @ViewChild('spinner') readonly spinner: ElementRef;
 
+  @Input() showTitle = true;
+
   @Input() timesheetDetails: TimesheetDetailsModel;
 
   @Input() isAgency: boolean;

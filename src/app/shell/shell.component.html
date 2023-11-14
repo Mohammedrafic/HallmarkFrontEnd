@@ -7,7 +7,7 @@
   </div>
 
   <div class="stick-right header-content">
-    <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
+    <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea || (isMspArea$ | async)?.isMSPArea)">
       <ng-container *ngIf="isDekstop$ | async">
         <app-organization-agency-selector [isDarkTheme]="isDarkTheme"></app-organization-agency-selector>
       </ng-container>
@@ -240,7 +240,7 @@
         </div>
         <div
           class="alert-content alert-title-header-body-color"
-          (click)="getContentDetails(item.organizationId, item.orderId,item.alertTitle)"
+          (click)="getContentDetails(item.organizationId, item.orderId,item.alertTitle,item.id)"
           [innerHTML]="item.content"
         ></div>
       </section>

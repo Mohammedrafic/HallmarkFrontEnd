@@ -40,6 +40,7 @@ import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { DateTimeHelper } from '@core/helpers';
 import { GetCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
+import { UserService } from '@shared/services/user.service';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -126,6 +127,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     private settingsViewService: SettingsViewService,
     private cdr: ChangeDetectorRef,
     private actions: Actions,
+    private userService:UserService,
   ) {
     super(store, router, globalWindow);
     this.setIrpFeatureFlag();
@@ -137,7 +139,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([agOrder, orgOrder]) => {
         this.selectedOrder = agOrder ?? orgOrder;
-        this.isIRPLTAorder = this.selectedOrder.orderType === this.orderTypes.LongTermAssignment;
+        this.isIRPLTAorder = this.selectedOrder?.orderType === this.orderTypes.LongTermAssignment;
         this.initPredefinedBillRates();
       });
     if (this.isAgency) {
@@ -151,6 +153,21 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
 
     if(this.orderDetails?.commentContainerId != undefined){
     this.commentContainerId = this.orderDetails.commentContainerId;
+    }
+
+    let alertId = JSON.parse((localStorage.getItem('alertId') || '0')) as number;
+    if(alertId > 0){
+      this.userService.getAlertDetailsForId(alertId).subscribe((data:any)=>{
+        window.localStorage.setItem("alertId", JSON.stringify(""));
+        if(this.candidatesList && data.candidateId){
+          let candidate:any = this.candidatesList.items.find(ele=>ele.candidateId == data.candidateId);
+          if(candidate){
+            candidate.index = this.candidatesList.items.findIndex(ele=>ele.candidateId == data.candidateId);
+            this.onEdit(candidate);
+          }
+        }
+       
+      })
     }
   }
 

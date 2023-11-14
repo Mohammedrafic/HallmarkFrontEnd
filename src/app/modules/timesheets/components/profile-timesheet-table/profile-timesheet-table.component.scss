@@ -17,10 +17,6 @@
 .table-block {
   display: flex;
   flex-direction: column;
-
-  .mobile-btn-group {
-    display: none;
-  }
 }
 
 .table-header {
@@ -28,10 +24,13 @@
   padding: 14px 16px;
   border-bottom: unset;
 
+  .title-wrapper {
+    height: 40px;
+  }
+
   h3 {
     font-size: 16px;
     font-weight: 700;
-    line-height: 33px;
   }
 
   .button-cancel {
@@ -207,71 +206,5 @@ button.dropdown-btn {
         stroke: #fff !important;
       }
     }
-  }
-}
-
-.small-tablet {
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  padding-top: 20px;
-  width: 100%;
-  gap: 12px;
-
-  .btn-group {
-    display: flex;
-
-    .spinner-btn {
-      width: 100px !important;
-    }
-
-    .privilege {
-      width: 100px;
-      margin: 0;
-    }
-
-    > *:not(:first-child) {
-      margin-left: 12px;
-    }
-  }
-
-  .add-action {
-    &.spaced {
-      width: auto;
-      margin: 0;
-    }
-  }
-}
-
-.middle-tablet {
-  .action-text {
-    display: none;
-  }
-
-  .add-action {
-    &.spaced {
-      width: auto;
-      margin: 0;
-    }
-  }
-
-  button.e-btn.e-control.e-action-button {
-    width: 40px;
-    padding: 8px 8px 8px 3px;
-  }
-}
-
-@media #{$max-mobile} {
-  .table-block {
-    .btn-group {
-      .privilege {
-        min-width: 38vw;
-        margin: 0;
-      }
-    }
-  }
-
-  .desktop-tablet-btn-group {
-    display: none;
   }
 }

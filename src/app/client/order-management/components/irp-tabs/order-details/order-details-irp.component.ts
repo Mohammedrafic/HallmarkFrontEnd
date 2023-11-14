@@ -1119,14 +1119,14 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       if (!selectedOrder.isIRPOnly) {
         this.jobDistributionForm.get('distributionDelay')?.disable();
         this.jobDistributionForm.get('distributeToVMS')?.disable();
-        this.jobDistributionForm.get('jobDistribution')?.disable();
       } else {
         this.jobDistributionForm.get('distributionDelay')?.enable();
         this.jobDistributionForm.get('distributeToVMS')?.enable();
         this.jobDistributionForm.get('jobDistribution')?.enable();
       }
     }
-    if (selectedOrder.distributeToVMS == null && !selectedOrder.isIRPOnly) {
+    if(!selectedOrder.isIRPOnly && selectedOrder?.status === OrderStatus.Filled)
+    {
       this.jobDistributionForm.get('jobDistribution')?.disable();
     }
   }

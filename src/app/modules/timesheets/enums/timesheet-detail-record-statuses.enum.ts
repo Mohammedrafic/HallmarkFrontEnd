@@ -4,6 +4,6 @@ export enum TimesheetDetailRecordStatuses {
 }
 
 export enum InvoiceHistoricalSubmission {
-  Integration = 0,
-  Manual = 1
+  Manual = 0,
+  Integration = 1,
 }

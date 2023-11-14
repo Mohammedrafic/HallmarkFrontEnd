@@ -1,4 +1,5 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 .main-body{
   max-height: 79vh;
@@ -7,7 +8,7 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    padding: 24px 0px 0px 0px !important;
+
     P{
       margin: 5px;
       font-weight: 400;
@@ -16,6 +17,11 @@
     }
     .header-container {
       margin-bottom: 18px;
+
+      .e-card-header-caption {
+        max-width: 60%;
+      }
+
       .e-card-title{
         white-space: nowrap;
         overflow: hidden;
@@ -44,23 +50,20 @@
 
         .file-viewer {
           height: 100%;
-          border: 1px solid $secondary-dark-blue-45;
-          box-shadow: 0px 3px 28px rgba(0, 0, 0, 0.04);
-          border-radius: 12px;
+          border-top: 1px solid var(--header-border);
+
           .pdfDocSection{
             display: block;
             height: 100%;
           }
 
           .image-container {
-            display: flex;
-            justify-content: center;
+            width: 100%;
             height: 100%;
+            overflow: auto;
 
             img {
-              max-width: 100%;
-              max-height: 100%;
-              object-fit: none;
+              width: 100%;
             }
           }
         }
@@ -68,4 +71,11 @@
     }
   }
 
+}
+
+
+@media #{$max-mobile} {
+  .e-card-header-caption {
+    max-width: 40% !important;
+  }
 }

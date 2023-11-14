@@ -25,7 +25,7 @@ import { endDateValidator, startDateValidator } from '@shared/validators/date.va
 import { patternMessageValidator } from '@shared/validators/pattern-message.validator';
 import {
   ALPHANUMERIC_8_11_SYMBOLS,
-  MIN_DIGITS_LENGTH_ONLY_NINE,
+  NumberValidatorRegExp,
   NUMERIC_10_12_DIGITS,
   NumberValidationMessage,
   RoutingNumberMessage,
@@ -85,7 +85,8 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         bankName: ['', [Validators.required]],
         routingNumber: ['', [
           Validators.required,
-          patternMessageValidator(MIN_DIGITS_LENGTH_ONLY_NINE, RoutingNumberMessage),
+          patternMessageValidator(NumberValidatorRegExp(20), RoutingNumberMessage),
+          Validators.maxLength(20),
         ]],
         bankAddress1: ['', [Validators.required]],
         bankAddress2: [''],

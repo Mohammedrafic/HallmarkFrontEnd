@@ -5,9 +5,10 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
-import { NgxsModule,  Store } from '@ngxs/store';
+import { NgxsModule, Store } from '@ngxs/store';
 import { SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { TooltipComponent } from '@syncfusion/ej2-angular-popups/src/tooltip/tooltip.component';
 import Spy = jasmine.Spy;
 
 import { MessageTypes } from '@shared/enums/message-types';
@@ -19,7 +20,7 @@ import { ProfileDetailsContainerComponent } from './profile-details-container.co
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimesheetDetailsApiService, TimesheetDetailsService, TimesheetRecordsService, TimesheetsApiService } from '../../services';
 import { ExportColumn } from '@shared/models/export.model';
-import { AddRecordBillRate, Attachment, TabCountConfig, TimesheetDetailsModel } from '../../interface';
+import { AddRecordBillRate, Attachment, TabCountConfig, TimesheetDetailsModel, TimesheetRecordsDto } from '../../interface';
 import { DropdownOption, FileForUpload } from '@core/interface';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import {
@@ -27,12 +28,14 @@ import {
   ConfirmDeleteTimesheetDialogContent,
   rejectTimesheetDialogData, TimesheetConfirmMessages,
 } from '../../constants';
-import {  TimeSheetsPage } from '../../store/model/timesheets.model';
+import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { ShowToast } from '../../../../store/app.actions';
-import { HourOccupationType, RecordFields, TimesheetTargetStatus } from '../../enums';
+import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
+import { HourOccupationType, RecordFields, TimesheetTargetStatus, TIMETHEETS_STATUSES } from '../../enums';
 import * as TimesheetInt from '../../interface';
+import { OrganizationStructure } from '@shared/models/organization.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 @Component({
   selector: 'app-export-dialog',
@@ -42,8 +45,9 @@ class FakeExportDialogComponent {
   @Input() columns: ExportColumn[];
   @Input() fileName: string;
   @Output() cancel: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output() export:EventEmitter<ExportColumn[]> = new EventEmitter<ExportColumn[]>();
+  @Output() export: EventEmitter<ExportColumn[]> = new EventEmitter<ExportColumn[]>();
 }
+
 @Component({
   selector: 'ejs-dialog',
   template: '<ng-content></ng-content>'
@@ -86,7 +90,7 @@ class FakeRejectReasonInputDialogComponent {
   template: '<ng-content></ng-content>'
 })
 class FakeAddTimesheetComponent {
- @Input() container: HTMLElement;
+  @Input() container: HTMLElement;
 }
 
 @Component({
@@ -102,8 +106,8 @@ class MockRouter {
 }
 
 class TimesheetDetailsStubService {
-  watchRangeStream(): Observable<any> {
-    return of({})
+  watchRangeStream(): Observable<[string, string]> {
+    return of(['2023-11-01T00:00:00+00:00', '2023-11-01T00:00:00+00:00']);
   }
 
   submitTimesheet(
@@ -124,12 +128,16 @@ class TimesheetDetailsStubService {
   orgSubmitEmptyTimesheet(): Observable<boolean> {
     return of(true);
   }
+
+  confirmTimesheetLeave(): Observable<boolean> {
+    return of(true);
+  }
 }
 
 const selectEvent = {
   selectedIndex: 1,
   previousIndex: 0,
-}  as SelectingEventArgs;
+} as SelectingEventArgs;
 
 const timesheetDetailsMock: TimesheetDetailsModel = {
   id: 70180,
@@ -137,7 +145,7 @@ const timesheetDetailsMock: TimesheetDetailsModel = {
   orderLocationId: 2,
   mileageTimesheetId: 0,
   statusText: "Approved",
-  mileageStatusText: "No mileages exist",
+  mileageStatusText: TIMETHEETS_STATUSES.APPROVED,
   canEditTimesheet: true,
   canEditMileage: true,
   canApproveTimesheet: false,
@@ -174,7 +182,7 @@ const timesheetDetailsMock: TimesheetDetailsModel = {
   weekStartDate: "2023-07-31T00:00:00+00:00",
   weekEndDate: "2023-08-06T00:00:00+00:00",
   unitName: "Solid Nurses",
-  commentContainerId:0,
+  commentContainerId: 0,
   timesheetStatistic: {
     weekHours: 1.500000000000000,
     cumulativeHours: 74.366666666666670,
@@ -283,15 +291,16 @@ const timesheetDetailsMock: TimesheetDetailsModel = {
 
 class TimesheetRecordsStubService {
   getCurrentTabName(): RecordFields {
-    return  RecordFields.Time;
+    return RecordFields.Time;
   }
 
-  controlTabsVisibility(): void {}
+  controlTabsVisibility(): void {
+  }
 }
 
 class TimesheetDetailsApiStubService {
   getDetailsByDate(): Observable<TimesheetDetailsModel> {
-    return of({} as TimesheetDetailsModel);
+    return of(timesheetDetailsMock);
   }
 
   noWorkPerformed(): Observable<void> {
@@ -310,12 +319,13 @@ class TimesheetDetailsApiStubService {
     return of({
       status: TimesheetStatus.Approved,
       organizationId: 1,
+      mileageStatusText: TIMETHEETS_STATUSES.APPROVED,
       candidateWorkPeriods: [
         {
-          weekEndDate:"2023-08-05T00:00:00+00:00",
-          weekStartDate:"2023-07-30T00:00:00+00:00"
+          weekEndDate: "2023-08-05T00:00:00+00:00",
+          weekStartDate: "2023-07-30T00:00:00+00:00"
         }
-    ]
+      ]
     } as TimesheetDetailsModel);
   }
 }
@@ -335,6 +345,14 @@ class TimesheetsApiStubService {
 
   getTabsCounts(): Observable<TabCountConfig> {
     return of({} as TabCountConfig);
+  }
+
+  getTimesheetRecords(): Observable<TimesheetRecordsDto> {
+    return of({} as TimesheetRecordsDto);
+  }
+
+  getOrganizationsStructure(): Observable<OrganizationStructure> {
+    return of({} as OrganizationStructure);
   }
 }
 
@@ -374,20 +392,20 @@ describe('ProfileDetailsContainerComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        NgxsModule.forRoot([TimesheetsState], { developmentMode: true }),
+        NgxsModule.forRoot([TimesheetsState], {developmentMode: true}),
       ],
       providers: [
         BreakpointObserver,
-        { provide: ConfirmService, useClass: ConfirmServiceStub },
-        { provide: Router, useValue: {}},
-        { provide: TimesheetDetailsService, useClass: TimesheetDetailsStubService},
-        { provide: SettingsViewService, useClass: SettingsViewStubService},
-        { provide: TimesheetsApiService, useClass: TimesheetsApiStubService},
-        { provide: TimesheetDetailsApiService, useClass: TimesheetDetailsApiStubService},
-        { provide: TimesheetRecordsService, useClass: TimesheetRecordsStubService },
-        { provide:  AddDialogHelperService, useValue: {}},
-        { provide: ActivatedRoute, useValue: { snapshot: { data: { isAgencyArea: false } } }},
-        { provide: Router, useClass: MockRouter },
+        {provide: ConfirmService, useClass: ConfirmServiceStub},
+        {provide: Router, useValue: {}},
+        {provide: TimesheetDetailsService, useClass: TimesheetDetailsStubService},
+        {provide: SettingsViewService, useClass: SettingsViewStubService},
+        {provide: TimesheetsApiService, useClass: TimesheetsApiStubService},
+        {provide: TimesheetDetailsApiService, useClass: TimesheetDetailsApiStubService},
+        {provide: TimesheetRecordsService, useClass: TimesheetRecordsStubService},
+        {provide: AddDialogHelperService, useValue: {}},
+        {provide: ActivatedRoute, useValue: {snapshot: {data: {isAgencyArea: false}}}},
+        {provide: Router, useClass: MockRouter},
       ],
       declarations: [
         ProfileDetailsContainerComponent,
@@ -417,79 +435,179 @@ describe('ProfileDetailsContainerComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  xit('onDWNCheckboxSelectedChange - should call confirmService.confirm and perform necessary actions when checked is true', () => {
-    const timesheetDetails$ = of({
-      status: TimesheetStatus.Approved,
-      organizationId: 1,
-      candidateWorkPeriods: [
-        {
-          weekEndDate:"2023-08-05T00:00:00+00:00",
-          weekStartDate:"2023-07-30T00:00:00+00:00"
-        }
-      ]
-    }) as Observable<TimesheetDetailsModel>;
-    const switchComponent = new FakeSwitchComponent();
-    const approved = true;
+  it('should set tooltip content based on index', () => {
+    const parentNodeMock = document.createElement('div');
+    const mockEvent = {
+      target: document.createElement('div'),
+    };
 
-    component.timesheetId = 1;
-    component.organizationId = 1;
-    spyOnProperty(component, 'timesheetDetails$').and.returnValue(timesheetDetails$);
-    spyOn(confirmService, 'confirm').and.returnValue(of(true));
+    component.tooltip = {content: ''} as TooltipComponent;
 
-    component.onDWNCheckboxSelectedChange({ checked: true }, switchComponent as SwitchComponent);
+    spyOnProperty(mockEvent.target, 'parentNode').and.returnValue(parentNodeMock);
 
-    expect(confirmService.confirm).toHaveBeenCalledWith(
-      approved ? ConfirmApprovedTimesheetDeleteDialogContent : ConfirmDeleteTimesheetDialogContent,
-      {
-        title: 'Delete Timesheet',
-        okButtonLabel: approved ? 'Yes' : 'Proceed',
-        okButtonClass: 'delete-button',
-      }
-    );
+    const childrenMock = [document.createElement('div'), mockEvent.target];
+    spyOnProperty(parentNodeMock, 'children').and.returnValue(childrenMock as unknown as HTMLCollection);
 
-    expect(store.dispatch).toHaveBeenCalledTimes(5);
-    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual(
-      new TimesheetDetails.NoWorkPerformed(true, 1, 1)
-    );
-    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
-      new Timesheets.GetAll()
-    );
-    expect(dispatchSpy.calls.argsFor(3)[0]).toEqual(
-      new Timesheets.GetTimesheetDetails(1,1,false)
-    );
-    expect(dispatchSpy.calls.argsFor(4)[0]).toEqual(
-      new Timesheets.ToggleCandidateDialog(DialogAction.Close)
-    );
+    component.beforeRender(mockEvent);
+
+    expect(component.tooltip.content).toBe('Miles Status');
   });
 
-  xit('onDWNCheckboxSelectedChange - should perform necessary actions when checked is false',() => {
+  it('should close dialog if changes are saved', () => {
+    component.isChangesSaved = true;
+    spyOn(component, 'closeDialog');
+    spyOn(timesheetDetailsService, 'confirmTimesheetLeave');
+
+    component.handleProfileClose();
+
+    expect(timesheetDetailsService.confirmTimesheetLeave).not.toHaveBeenCalled();
+    expect(component.closeDialog).toHaveBeenCalled();
+    expect(component.previewAttachemnt).toBe(false);
+  });
+
+  it('should confirm leave and close dialog if changes are not saved', () => {
+    component.isChangesSaved = false;
+    spyOn(timesheetDetailsService, 'confirmTimesheetLeave').and.returnValue(of(true));
+    spyOn(component, 'closeDialog');
+
+    component.handleProfileClose();
+
+    expect(timesheetDetailsService.confirmTimesheetLeave).toHaveBeenCalledWith(TimesheetConfirmMessages.confirmUnsavedChages);
+    expect(component.closeDialog).toHaveBeenCalled();
+    expect(component.previewAttachemnt).toBe(false);
+  });
+
+  it('should emit nextPreviousOrderEvent if changes are saved', () => {
+    component.isChangesSaved = true;
+    spyOn(timesheetDetailsService, 'confirmTimesheetLeave')
+    spyOn(component.nextPreviousOrderEvent, 'emit');
+
+    component.onNextPreviousOrder(true);
+
+    expect(timesheetDetailsService.confirmTimesheetLeave).not.toHaveBeenCalled();
+    expect(component.nextPreviousOrderEvent.emit).toHaveBeenCalledWith(true);
+    expect(component.previewAttachemnt).toBe(false);
+  });
+
+
+  it('should confirm leave and emit nextPreviousOrderEvent if changes are not saved', () => {
+    component.isChangesSaved = false;
+    spyOn(timesheetDetailsService, 'confirmTimesheetLeave').and.returnValue(of(true));
+
+    spyOn(component.nextPreviousOrderEvent, 'emit');
+
+    component.onNextPreviousOrder(false);
+
+    expect(timesheetDetailsService.confirmTimesheetLeave).toHaveBeenCalledWith(TimesheetConfirmMessages.confirmOrderChange);
+    expect(component.nextPreviousOrderEvent.emit).toHaveBeenCalledWith(false);
+    expect(component.previewAttachemnt).toBe(false);
+  });
+
+  it('should call closeExport and exportProfileDetails with the correct parameters', () => {
+    const mockEvent: TimesheetInt.CustomExport = {
+      columns: [],
+      fileName: 'test',
+      fileType: ExportedFileType.csv,
+    };
+
+    spyOn(component, 'closeExport');
+    spyOn(component, 'exportProfileDetails');
+
+    component.customExport(mockEvent);
+
+    expect(component.closeExport).toHaveBeenCalled();
+    expect(component.exportProfileDetails).toHaveBeenCalledWith(mockEvent.fileType);
+  });
+
+  it('should dispatch ShowExportDialog action and set fileName', () => {
+    const mockDate = new Date(2023, 0, 1, 12, 34, 56);
+    const expectedFileName = `Timesheet 01/01/2023 12:34`;
+    const showExportDialogAction = new ShowExportDialog(true);
+
+    jasmine.clock().install();
+    jasmine.clock().mockDate(mockDate);
+
+    component.showCustomExportDialog();
+
+    expect(component.fileName).toBe(expectedFileName);
+    expect(store.dispatch).toHaveBeenCalledWith(showExportDialogAction);
+
+    jasmine.clock().uninstall();
+  });
+
+  it('onDWNCheckboxSelectedChange - should call confirmService.confirm and perform necessary actions when checked is true',
+    () => {
+      const timesheetDetails$ = of({
+        status: TimesheetStatus.Approved,
+        organizationId: 1,
+        mileageStatusText: TIMETHEETS_STATUSES.APPROVED,
+        candidateWorkPeriods: [
+          {
+            weekEndDate: "2023-08-05T00:00:00+00:00",
+            weekStartDate: "2023-07-30T00:00:00+00:00"
+          }
+        ]
+      }) as Observable<TimesheetDetailsModel>;
+      const switchComponent = new FakeSwitchComponent();
+      const approved = true;
+
+      component.timesheetId = 1;
+      component.organizationId = 1;
+      spyOnProperty(component, 'timesheetDetails$').and.returnValue(timesheetDetails$);
+      spyOn(confirmService, 'confirm').and.returnValue(of(true));
+
+      component.onDWNCheckboxSelectedChange({checked: true}, switchComponent as SwitchComponent);
+
+      expect(confirmService.confirm).toHaveBeenCalledWith(
+        approved ? ConfirmApprovedTimesheetDeleteDialogContent : ConfirmDeleteTimesheetDialogContent,
+        {
+          title: 'Delete Timesheet',
+          okButtonLabel: approved ? 'Yes' : 'Proceed',
+          okButtonClass: 'delete-button',
+        }
+      );
+      expect(store.dispatch).toHaveBeenCalledTimes(10);
+      expect(dispatchSpy.calls.argsFor(4)[0]).toEqual(
+        new TimesheetDetails.NoWorkPerformed(true, 1, 1)
+      );
+      expect(dispatchSpy.calls.argsFor(5)[0]).toEqual([
+        new Timesheets.GetAll(),
+        new Timesheets.GetTabsCounts()
+      ]);
+      expect(dispatchSpy.calls.argsFor(6)[0]).toEqual(
+        new Timesheets.GetTimesheetDetails(1, 1, false)
+      );
+      expect(dispatchSpy.calls.argsFor(9)[0]).toEqual(
+        new Timesheets.ToggleCandidateDialog(DialogAction.Close)
+      );
+    });
+
+  it('onDWNCheckboxSelectedChange - should perform necessary actions when checked is false', () => {
     const switchComponent = new FakeSwitchComponent();
     component.timesheetId = 1;
     component.organizationId = 1;
 
-    component.onDWNCheckboxSelectedChange({ checked: false }, switchComponent as SwitchComponent);
+    component.onDWNCheckboxSelectedChange({checked: false}, switchComponent as SwitchComponent);
 
-
-    expect(store.dispatch).toHaveBeenCalledTimes(3);
-
-    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual(
+    expect(store.dispatch).toHaveBeenCalledTimes(7);
+    expect(dispatchSpy.calls.argsFor(4)[0]).toEqual(
       new TimesheetDetails.NoWorkPerformed(false, 1, 1)
     );
-    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
-      new Timesheets.GetTimesheetDetails(1, 1, false)
-    );
-    expect(dispatchSpy.calls.argsFor(4)[0]).not.toEqual(
+    expect(dispatchSpy.calls.argsFor(5)[0]).toEqual([
+      new Timesheets.GetAll(), new Timesheets.GetTabsCounts()
+    ]);
+    expect(dispatchSpy.calls.argsFor(6)[0]).toEqual(
       new Timesheets.ToggleCandidateDialog(DialogAction.Close)
     );
   });
 
-  xit('handleReject - should handle reject correctly', () => {
+  it('handleReject - should handle reject correctly', () => {
     const reason = 'Rejected for some reason';
     component.timesheetId = 1;
     component.organizationId = 1;
     component.handleReject(reason);
 
-    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(4)[0]).toEqual(
       new TimesheetDetails.ChangeTimesheetStatus({
         timesheetId: 1,
         organizationId: 1,
@@ -497,12 +615,11 @@ describe('ProfileDetailsContainerComponent', () => {
         reason
       })
     );
-    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual([
-        new ShowToast(
-          MessageTypes.Success,
-          rejectTimesheetDialogData(true).successMessage
-        ),
-        new Timesheets.GetAll()
+    expect(dispatchSpy.calls.argsFor(5)[0]).toEqual([
+      new ShowToast(
+        MessageTypes.Success,
+        rejectTimesheetDialogData(true).successMessage
+      ),
     ]);
   });
 
@@ -525,7 +642,7 @@ describe('ProfileDetailsContainerComponent', () => {
     );
   });
 
-   it('handleApprove - should handle approve without organizationId correctly', () => {
+  it('handleApprove - should handle approve without organizationId correctly', () => {
     const isTimesheetOrMileagesUpdate = false;
     const updateId = isTimesheetOrMileagesUpdate ? component.timesheetId : component.mileageTimesheetId;
     component.organizationId = null;
@@ -538,9 +655,9 @@ describe('ProfileDetailsContainerComponent', () => {
       updateId,
       isTimesheetOrMileagesUpdate
     );
-     expect(dispatchSpy.calls.argsFor(0)[0]).toEqual(
-       new Timesheets.ToggleCandidateDialog(DialogAction.Close)
-     );
+    expect(dispatchSpy.calls.argsFor(0)[0]).toEqual(
+      new Timesheets.ToggleCandidateDialog(DialogAction.Close)
+    );
   });
 
   it('orgSubmit - should call orgSubmitEmptyTimesheetWarning when timesheetDetails is empty and not noWorkPerformed', () => {
@@ -548,7 +665,7 @@ describe('ProfileDetailsContainerComponent', () => {
 
     component.orgSubmit();
 
-   expect(store.dispatch).not.toHaveBeenCalledWith(new Timesheets.GetAll())
+    expect(store.dispatch).not.toHaveBeenCalledWith(new Timesheets.GetAll())
   });
 
   it('orgSubmit - should call orgSubmitTimesheet when timesheetDetails is not empty', fakeAsync(() => {
@@ -566,7 +683,7 @@ describe('ProfileDetailsContainerComponent', () => {
     expect(store.dispatch).toHaveBeenCalledWith(new Timesheets.GetAll());
   }));
 
-  xit('onFilesSelected - should dispatch actions and subscribe to them on onFilesSelected method', fakeAsync(() => {
+  it('onFilesSelected - should dispatch actions and subscribe to them on onFilesSelected method', fakeAsync(() => {
     store.reset(initialState);
     const timesheetId = 1;
     const organizationId = 2;
@@ -584,7 +701,7 @@ describe('ProfileDetailsContainerComponent', () => {
 
     component.onFilesSelected(files);
 
-    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(4)[0]).toEqual(
       uploadFilesAction
     )
     tick();
@@ -592,7 +709,7 @@ describe('ProfileDetailsContainerComponent', () => {
     expect(store.dispatch).toHaveBeenCalledWith(getTimesheetDetailsAction);
   }));
 
-  xit('saveFilesOnRecord - should dispatch actions and subscribe to them on saveFilesOnRecord method', () => {
+  it('saveFilesOnRecord - should dispatch actions and subscribe to them on saveFilesOnRecord method', () => {
     const uploadData = {
       fileForUpload: [],
       filesForDelete: [],
@@ -611,10 +728,10 @@ describe('ProfileDetailsContainerComponent', () => {
 
     component.saveFilesOnRecord(uploadData as TimesheetInt.UploadDocumentsModel);
 
-    expect(dispatchSpy.calls.argsFor(1)[0]).toEqual([
-        uploadMilesAttachmentsAction,
+    expect(dispatchSpy.calls.argsFor(4)[0]).toEqual([
+      uploadMilesAttachmentsAction,
     ]);
-    expect(dispatchSpy.calls.argsFor(2)[0]).toEqual(
+    expect(dispatchSpy.calls.argsFor(5)[0]).toEqual(
       getTimesheetDetailsAction
     );
   });
@@ -636,7 +753,7 @@ describe('ProfileDetailsContainerComponent', () => {
 
   it('selectTab - should handle tab change with saved changes', () => {
     spyOn(confirmService, 'confirm').and.returnValue(of(true));
-    Object.defineProperty(component, 'isChangesSaved', { value: false });
+    Object.defineProperty(component, 'isChangesSaved', {value: false});
 
     component.selectTab(selectEvent);
 

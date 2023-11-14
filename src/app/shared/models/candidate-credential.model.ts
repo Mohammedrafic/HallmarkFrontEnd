@@ -31,7 +31,7 @@ export interface CandidateCredential {
   certifiedUntil?: string;
   departmentMatch?: DepartmentMatchStatus;
   credentialType?: CredentialType;
-  isPublic?:boolean;
+  isCredentialExists?: boolean;
 }
 
 export interface CandidateCredentialGridItem extends CandidateCredential {

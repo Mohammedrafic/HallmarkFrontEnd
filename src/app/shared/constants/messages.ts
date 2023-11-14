@@ -1,7 +1,7 @@
 export const RECORD_ADDED = 'Record has been added';
 export const RECORDS_ADDED = 'Records have been added';
 export const RECORD_MODIFIED = 'Record has been modified';
-export const RECORD_UNSAVED = 'Untagged credentials are not allowed to be added';
+export const RECORD_UNSAVED = 'Credential added successfully : Only credentials associated with the order will be displayed';
 export const SETUPS_ACTIVATED = 'Setups were successfully activated';
 export const RECORD_SAVED = 'Record has been saved';
 export const RECORD_DELETE = 'Record has been deleted';
@@ -156,9 +156,12 @@ export const ERROR_CAN_NOT_ADD_MANAGENOTE_WITHOUT_VIEWNOTE="We can't add the man
 export const AgencyPartnershipSuspended = 'Agency Partnership is suspended';
 export const ViewOrderIRP_PERMISSION = 'Additional permission is required (CanOrganizationViewOrdersIRP)';
 export const ViewOrderVMS_PERMISSION = 'Additional permission is required (CanOrganizationViewOrderVMS)';
-export const TaxIdValidationMessage = '9-digit number';
+export const TaxIdValidationMessage = '12-digit number';
 export const NumberValidationMessage = '10-12 digit number';
 export const SwiftCodeValidationMessage = '8-11 alphanumeric code for international payments';
-export const RoutingNumberMessage = '9-digit code to identify financial institution';
+export const RoutingNumberMessage = '20-digit code to identify financial institution';
 export const Bulk_Update_Skills = 'Selected Records are modified';
 export const Bulk_Delete_Skills = 'Selected Records are deleted';
+
+export const Message_With_Fields = (template: any) => `Please fill in the required fields in Order Details tab:<br>${template} `;
+export const Toast_With_Message= (message: any) => `${message} `;
