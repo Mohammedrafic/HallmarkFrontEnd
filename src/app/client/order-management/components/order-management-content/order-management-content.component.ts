@@ -148,6 +148,7 @@ import {
   FilterStatus,
   IRPOrderManagement,
   IRPOrderPosition,
+  IRPOrderPositionpage,
   Order,
   OrderCandidateJob,
   OrderFilter,
@@ -271,6 +272,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
   includeDeployed: boolean = false;
+  selectedCandidateforIRP: IRPOrderPosition;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -323,6 +325,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
+  
+  @Select(OrderManagementContentState.irpCandidatesforExtension)
+  public getIrpCandidatesforExtension$ : Observable<IRPOrderPositionpage>
+
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly contactPersonFields: FieldSettingsModel = { text: 'fullName', value: 'email' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
@@ -492,6 +498,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public redirecttovmsfromIRP:boolean=true;
   public redirecttoIRPfromVMS:boolean=true;
   public isOrderDetailsTab: boolean = false;
+  public orderData: IRPOrderPosition;
+  public irpSubOrder: Order;
+  public systemType: string;
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -692,7 +701,9 @@ private watchForOrderGridSystemClickEvent()
 public watchForOrderIRPSubRowClickEvent(){
   this.orderManagementIRPRowPositionService.handleStatusClickEvent.pipe(
     takeUntil(this.unsubscribe$)).subscribe(({Order, orderData, system}) => {
-      console.log(Order, orderData);
+      this.orderData = orderData;
+      this.irpSubOrder = Order;
+      this.systemType = system;
     if(orderData.system === 'IRP' && Order.orderType === OrderType.LongTermAssignment){
       this.openIrpSubrowDetails(Order, orderData, system)
     }
@@ -2682,6 +2693,28 @@ public RedirecttoIRPOrder(order:Order)
     });
   }
 
+  updatePositionDetailsforIRP(position: IRPOrderPosition): void{
+    this.getOrders(true);
+    this.store.dispatch(new GetOrderById(position.orderId, position.organizationId));
+    this.getIrpCandidatesforExtension$.pipe(take(2), filter(Boolean)).subscribe((res) => {
+      res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
+      const orderData = this.selectedCandidateforIRP as IRPOrderPosition;
+      if (orderData.isTemplate) {
+        this.store.dispatch(new GetSelectedOrderById(position.orderId, true));
+        this.navigateToOrderTemplateForm(position.orderId, true);
+      }
+      else {
+        this.selectedDataRow = orderData as unknown as IRPOrderManagement;
+        this.dispatchAgencyOrderCandidatesList(position.orderId, orderData.organizationId, true);
+        this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
+        this.openChildDialog.next(false);
+        this.orderPositionSelected$.next({ state: false });
+        this.openDetails.next(true);
+    }
+    });
+   }
+
+
   private handleRedirectFromQuickOrderToast(): void {
     if (this.isRedirectedFromToast) {
       const prefix = this.prefix || '';
@@ -2732,19 +2765,26 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   private subscribeToCandidateJob(): void {
-    this.candidatesJob$.pipe(
-      filter(Boolean),
-      take(1)
-    ).subscribe((data) => {
-      this.selectedCandidate = {
-        ...this.selectedCandidate,
-        actualStartDate: data.actualStartDate,
-        actualEndDate: data.actualEndDate,
-      };
-    });
+    if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+      this.getIrpCandidatesforExtension$.pipe(take(2), filter(Boolean)).subscribe((res) => {
+        res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
+      });
+  
+    } else {
+      this.candidatesJob$.pipe(
+        filter(Boolean),
+        take(1)
+      ).subscribe((data) => {
+        this.selectedCandidate = {
+          ...this.selectedCandidate,
+          actualStartDate: data.actualStartDate,
+          actualEndDate: data.actualEndDate,
+        };
+      });  
+    }
   }
 
-  private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number, isIrp = false): void {
+  private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number, isIrp: boolean): void {
     this.store.dispatch(new GetAgencyOrderCandidatesList(
       orderId,
       organizationId,

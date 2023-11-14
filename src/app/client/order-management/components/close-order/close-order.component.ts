@@ -21,7 +21,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { OrderType, OrderTypeTitlesMap } from '@shared/enums/order-type';
 import { Comment } from '@shared/models/comment.model';
-import { Order, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
+import { IRPOrderPosition, Order, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
 import { RejectReasonPage, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -42,7 +42,9 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   @Input() currentSystem: OrderManagementIRPSystemId;
   @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<
     Order | OrderManagement>();
+  @Input() orderData: IRPOrderPosition;
   @Output() private closePositionSuccess: EventEmitter<OrderManagementChild> = new EventEmitter<OrderManagementChild>();
+  @Output() private closePositionSuccessforIRP: EventEmitter<IRPOrderPosition> = new EventEmitter<IRPOrderPosition>();
 
   @Select(UserState.lastSelectedOrganizationId)
   public organizationId$: Observable<number>;
@@ -64,6 +66,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public closureReasons: RejectReasonwithSystem[];
   public canCreateOrder: boolean;
   public isDialogShown = false;
+  JobId: number;
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -178,7 +181,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     let maxDate;
     if (this.order.orderType === OrderType.ReOrder) {
       maxDate = this.getReorderMaxDate();
-    } else if (this.isPosition) {
+    } else if (this.isPosition && this.candidate !== null) {
       maxDate = this.getPositionMaxDate();
     } else {
       maxDate = this.order.jobEndDate;
@@ -189,7 +192,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   private getComments(): void {
     let entity;
     this.comments = [];
-    if (this.isPosition) {
+    if (this.isPosition && this.candidate !== null) {
       this.commentContainerId = this.candidate.commentContainerId as number;
       entity = this.candidate;
     } else {
@@ -260,7 +263,12 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   private closePosition(formData: ClosePositionPayload): void {
-    this.closeOrderService.closePosition({ ...formData, jobId: this.candidate.jobId })
+    if(this.candidate == null){
+      this.JobId = this.orderData.jobId || 0;
+    } else {
+      this.JobId = this.candidate.jobId;
+    }
+    this.closeOrderService.closePosition({ ...formData, jobId: this.JobId })
       .pipe(
         catchError((err) => {
           this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
@@ -269,7 +277,11 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
         takeUntil(this.destroy$),
       )
       .subscribe(() => {
-        this.closePositionSuccess.emit(this.candidate);
+        if(this.currentSystem === OrderManagementIRPSystemId.IRP){
+          this.closePositionSuccessforIRP.emit(this.orderData)
+        } else if(this.currentSystem === OrderManagementIRPSystemId.VMS){
+          this.closePositionSuccess.emit(this.candidate);
+        }
         this.closeDialog();
       });
   }

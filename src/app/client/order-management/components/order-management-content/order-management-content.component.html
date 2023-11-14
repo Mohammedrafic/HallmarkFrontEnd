@@ -1593,6 +1593,7 @@
 
 <app-child-order-dialog
   [order]="$any(selectedOrder)"
+  [candidateirp]="orderData"
   [orderComments]="orderComments"
   [candidate]="selectedCandidate"
   [openEvent]="openChildDialog"
@@ -1605,9 +1606,11 @@
 <app-close-order
   [order]="selectedOrder"
   [currentSystem]="activeSystem"
+  [orderData]="orderData"
   [candidate]="selectedCandidate"
   (closeOrderSuccess)="updateOrderDetails($event)"
   (closePositionSuccess)="updatePositionDetails($event)"
+  (closePositionSuccessforIRP)="updatePositionDetailsforIRP($event)"
 >
 </app-close-order>
 

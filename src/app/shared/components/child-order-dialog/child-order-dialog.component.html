@@ -18,11 +18,19 @@
               Position ID {{ candidate?.positionId }}
             </h3>
             <div class="order-statuses">
-              <ejs-chiplist #chipList class="events-off" *ngIf="candidate?.orderStatus">
+              <ejs-chiplist #chipList class="events-off" *ngIf="candidate?.orderStatus && activeSystem !== OrderManagementIRPSystemId.IRP">
                 <e-chips>
                   <e-chip
                     [text]="orderStatusText[candidate.orderStatus]"
                     [cssClass]="orderStatusText[candidate.orderStatus] | chipsCssClass"
+                  ></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+              <ejs-chiplist #chipList class="events-off" *ngIf="order?.status && activeSystem === OrderManagementIRPSystemId.IRP">
+                <e-chips>
+                  <e-chip
+                    [text]="orderStatusText[order.status]"
+                    [cssClass]="orderStatusText[order.status] | chipsCssClass"
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
@@ -39,13 +47,24 @@
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="showCloseOrder"
+              *ngIf="showCloseOrder && activeSystem !== OrderManagementIRPSystemId.IRP"
               [disabled]="disabledCloseButton || !canCloseOrder"
               (click)="closeOrder(order)"
             >
               Close Position
             </button>
-            <button ejs-button cssClass="e-outline" *ngIf="canReOpen" (click)="reOpenPosition()">Re-Open</button>
+
+            <button
+              ejs-button
+              cssClass="e-outline"
+              *ngIf="showCloseOrderforIRP && activeSystem === OrderManagementIRPSystemId.IRP"
+              [disabled]="disabledCloseButtonforIRP || !canCloseOrderforIRP"
+              (click)="closeOrder(order)"
+            >
+              Close Position
+            </button>
+            <button ejs-button cssClass="e-outline" *ngIf="canReOpen && activeSystem !== OrderManagementIRPSystemId.IRP" (click)="reOpenPosition()">Re-Open</button>
+            <button ejs-button cssClass="e-outline" *ngIf="canReOpenforIRP && activeSystem === OrderManagementIRPSystemId.IRP" (click)="reOpenPosition()">Re-Open</button>
 
             <button
               *ngIf="mobileMenu.length"
@@ -93,9 +112,18 @@
                     <hr />
                   </ng-container>
                   <app-order-details
+                    *ngIf="activeSystem !== OrderManagementIRPSystemId.IRP"
                     [isPosition]="true"
                     [currentOrder]="currentOrder"
                     [jobId]="candidateJob?.jobId!"
+                    [comments]="orderComments"
+                  ></app-order-details>
+
+                  <app-order-details
+                    *ngIf="activeSystem === OrderManagementIRPSystemId.IRP"
+                    [isPosition]="true"
+                    [currentOrder]="currentOrder"
+                    [jobId]="irpCandidates?.candidateJobId!"
                     [comments]="orderComments"
                   ></app-order-details>
                 </section>
@@ -114,6 +142,7 @@
                       <app-onboarded-candidate
                         *ngIf="!isReorderType"
                         [candidate]="$any(candidate)"
+                        [irpCandidate]="$any(irpCandidates)"
                         [isTab]="true"
                         appUnsavedForm
                         (closeModalEvent)="onClose()"

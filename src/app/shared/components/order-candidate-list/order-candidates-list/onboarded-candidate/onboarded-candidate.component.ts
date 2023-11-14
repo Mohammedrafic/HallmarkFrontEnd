@@ -23,7 +23,7 @@ import {
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, IRPOrderPosition, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { formatDate, formatNumber } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -105,6 +105,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Output() updateDetails = new EventEmitter<void>();
 
   @Input() candidate: OrderCandidatesList;
+  @Input() irpCandidate: IRPOrderPosition;
   @Input() isTab = false;
   @Input() isAgency = false;
   @Input() orderDuration: Duration;
