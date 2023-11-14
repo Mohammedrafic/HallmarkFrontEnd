@@ -272,8 +272,9 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         }
       if (formValues.businessUnit == 3)
         businessUnitId = formValues.business == 0 ? null : formValues.business
-      if (formValues.businessUnit == BusinessUnitType.MSP)
-        businessUnitId = formValues.business == 0 ? null : formValues.business
+        if(user?.businessUnitType == BusinessUnitType.MSP){
+          businessUnitId = formValues.business == 0 ? null : user?.businessUnitId
+        }      
       const sendGroupEmailDto: SendGroupEmailRequest = {
         businessUnitId: businessUnitId,
         bodyMail: formValues.emailBody,
