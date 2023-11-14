@@ -613,7 +613,7 @@ describe('InvoicesContainerComponent', () => {
 
     component.changeMultiSelection(nodes);
 
-    expect(component.gridSelections.selectedInvoiceIds).toEqual([invoiceId]);
+    expect(component.gridSelections.selectedInvoiceIds).toEqual([id]);
     expect(component.gridSelections.rowNodes).toEqual(nodes);
   });
 
