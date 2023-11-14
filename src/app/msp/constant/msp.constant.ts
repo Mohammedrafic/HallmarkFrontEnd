@@ -33,24 +33,7 @@ const commonColumn: ColDef = {
   }
 
   export const MspListColumnsDefinition = (): ColumnDefinitionModel[] => {
-    return [
-      {
-        headerName: '',
-        width: 50,
-        minWidth: 50,
-        headerCheckboxSelection: true,
-        headerCheckboxSelectionFilteredOnly: true,
-        checkboxSelection: function (params: any) {
-          if (params.data.isSharedWithMe || params.data.status == 'Inactive') {
-            return false;
-          }
-          return true;
-        },
-        sortable: false,
-        resizable: false,
-        filter: false,
-      }, 
-      
+    return [      
       {
         field: '',
         headerName: '',
@@ -60,15 +43,6 @@ const commonColumn: ColDef = {
         filter: false,
         maxWidth:150
       },
-      
-      // {
-      //   field: MspListColumnField.Id,
-      //   headerName: MspListColumnHeaderText.Id,
-      //   hide: true,
-      //   sortable: true,
-      //   resizable: false,
-      //   filter: false,
-      // },
       
       {
         field: MspListColumnField.Name,
