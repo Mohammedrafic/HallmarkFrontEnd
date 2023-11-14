@@ -29,7 +29,7 @@ export class TimesheetFileViewerComponent extends Destroyable implements OnInit 
   public readonly pdfViewerControl: PdfViewerComponent;
 
 
-  @Output() 
+  @Output()
   previewCloseEvent = new EventEmitter<boolean>();
 
   public isFullScreen: boolean;
@@ -46,26 +46,29 @@ export class TimesheetFileViewerComponent extends Destroyable implements OnInit 
     private store: Store,
     private actions$: Actions,
     private cdr: ChangeDetectorRef,
-  ) { 
+  ) {
     super();
   }
 
-  ngOnInit(): void {    
-    this.actionSubscriber(); 
+  ngOnInit(): void {
+    this.actionSubscriber();
   }
 
   public actionSubscriber(){
     this.actions$.pipe(
-      ofActionSuccessful(FileViewer.Open),      
+      ofActionSuccessful(FileViewer.Open),
       switchMap(({ payload: { fileName, getPDF, getOriginal } }: FileViewer.Open) => {
         this.fileName = fileName;
         this.getOriginalFile = getOriginal;
         this.preViewDoc = true;
         const image: boolean = this.isImage = FileHelper.isImage(fileName);
+        this.cdr.markForCheck();
 
         const pdfObs = getPDF?.().pipe(
           switchMap((file: Blob) => ObservableHelper.blobToBase64Observable(file)),
-          tap((base64Str: string) => this.pdfViewerControl?.load(base64Str, '')),
+          tap((base64Str: string) => {
+            this.pdfViewerControl.load(base64Str, '');
+          }),
         );
 
         const originalObs = getOriginal?.().pipe(
@@ -95,6 +98,6 @@ export class TimesheetFileViewerComponent extends Destroyable implements OnInit 
       )
       .subscribe((file: Blob) => downloadBlobFile(file, this.fileName));
   }
-  
+
 
 }
