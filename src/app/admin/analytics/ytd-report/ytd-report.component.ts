@@ -75,7 +75,9 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     LocationIdsYT: '',
     YearYT: '',
     MonthsYT: '',    
-    UserIdYT: ''
+    UserIdYT: '',
+    organizationNameYT: '',
+    reportPulledMessageYT: ''  
 
 
   };
@@ -163,6 +165,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+  private culture = 'en-US';
 
   public yearList: Year[] = [];
   public monthList: Month[] = [];
@@ -455,8 +458,10 @@ export class YtdReportComponent implements OnInit, OnDestroy {
       LocationIdsYT: locationIds.length == 0 ? '' : locationIds,      
       YearYT: year,
       MonthsYT: month,
-      UserIdYT: this.user?.id
-
+      UserIdYT: this.user?.id,
+       organizationNameYT: this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      reportPulledMessageYT: ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim()
+     // DateRangeYT: (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
     };    
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
