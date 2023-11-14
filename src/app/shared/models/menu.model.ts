@@ -24,6 +24,7 @@ export class ChildMenuItem {
   icon?: string;
   count?: number;
   id?: any;
+  children?: MenuItem[] | ChildMenuItem[];
 }
 export class overallMenuItems{
   id: any;

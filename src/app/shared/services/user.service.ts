@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CurrentUserPermission } from "@shared/models/permission.model";
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { User, UsersAssignedToRole, UsersPage } from 'src/app/shared/models/user.model';
 import { BusinessUnitType } from '../enums/business-unit-type';
 import { Menu } from '../models/menu.model';
@@ -14,6 +14,15 @@ import { LastSelectedMspID, UserMsp } from '../models/user-msp.model';
 export class UserService {
 
   constructor(private http: HttpClient) { }
+  private dataSubject = new BehaviorSubject<any>(null);
+  public data$ = this.dataSubject.asObservable();
+
+  setData(data: any): void {
+    this.dataSubject.next(data);
+  }
+  getData() {
+    return this.dataSubject.asObservable();
+  }
 
   /**
    * Get users

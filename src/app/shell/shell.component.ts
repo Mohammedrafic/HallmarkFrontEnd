@@ -27,7 +27,7 @@ import { OrderManagementService,
 import { ToggleChatDialog, UnreadMessage } from '@core/actions';
 import { OutsideZone } from "@core/decorators";
 import { Destroyable } from '@core/helpers';
-import { AnalyticsMenuId } from '@shared/constants/menu-config';
+import { AnalyticsMenuId, IRPReportsMenuId, VMSReportsMenuId } from '@shared/constants/menu-config';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -329,7 +329,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
     this.setSideBarForFirstLoad(menuItem.route as string);
 
-    if (menuItem.id == AnalyticsMenuId) {
+    if (menuItem.id == VMSReportsMenuId || menuItem.id == IRPReportsMenuId) {
+      const menuId = menuItem.id;
+      localStorage.setItem("menuId", String(menuId))
+      this.userService.setData(menuItem);
       this.router.navigate([menuItem.route]);
     } else if (!menuItem.children?.length) {
         this.router.navigate([menuItem.route]).then(() => {
@@ -346,7 +349,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   showContextMenu(data: MenuItem, event: MouseEvent): void {
     this.contextmenu.items = [];
 
-    if (data.id != AnalyticsMenuId && data.children && data.children.length > 0 && !this.sidebar.isOpen) {
+    if (data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = (event.target as HTMLElement).getBoundingClientRect();
       this.contextmenu.items =
@@ -363,7 +366,11 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   onBeforeContextMenuClose(event: any): void {
    let selectedMenuItem = event.items.find((data:any)=>data.id == this.selectedItem);
-
+   if (selectedMenuItem?.properties.id === VMSReportsMenuId || IRPReportsMenuId) {
+    const menuId = selectedMenuItem?.properties?.id;
+    localStorage.setItem("menuId", String(menuId))
+    this.userService.setData(selectedMenuItem);
+  }
     if (selectedMenuItem) {
       this.setSideBarForFirstLoad(selectedMenuItem.route);
       this.router.navigate([selectedMenuItem.route]);
@@ -595,11 +602,18 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   private hideAnalyticsSubMenuItems(): void {
-    const element = this.tree?.element.querySelector('[data-uid="Analytics"]');
+    const element = this.tree?.element.querySelector('[data-uid="Analytics/VMS Reports"]');
     element?.querySelectorAll('ul li').forEach((el: any) => {
       el.style.display = 'none';
     });
     element?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => {
+      el.style.display = 'none';
+    });
+    const element1 = this.tree?.element.querySelector('[data-uid="Analytics/IRP Reports"]');
+    element1?.querySelectorAll('ul li').forEach((el: any) => {
+      el.style.display = 'none';
+    });
+    element1?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => {
       el.style.display = 'none';
     });
   }

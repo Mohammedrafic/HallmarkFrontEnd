@@ -525,6 +525,15 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'msp/msp-associate-list',
     },
+    121: {
+      // VMS Reports
+      icon: '',
+      route: '/analytics',
+    }, 122: {
+      // IRP Reports
+      icon: '',
+      route: '/analytics',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -970,6 +979,15 @@ export const MENU_CONFIG: any = {
       // MSP List
       icon: '',
       route: 'msp/msp-associate-list',
+    },
+    121: {
+      // VMS Reports
+      icon: '',
+      route: '/analytics',
+    }, 122: {
+      // IRP Reports
+      icon: '',
+      route: '/analytics',
     },
   },
   
@@ -1449,7 +1467,16 @@ export const MENU_CONFIG: any = {
       // Interface log summary for IRP
       icon: '',
       route: '/admin/interfacelogirp', 
-   }
+   },
+   121: {
+    // VMS Reports
+    icon: '',
+    route: '/analytics',
+  }, 122: {
+    // IRP Reports
+    icon: '',
+    route: '/analytics',
+  },
   },
 
   [BusinessUnitType.Agency]: {
@@ -1704,6 +1731,15 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/user-activity',
     },
+    121: {
+      // VMS Reports
+      icon: '',
+      route: '/analytics',
+    }, 122: {
+      // IRP Reports
+      icon: '',
+      route: '/analytics',
+    },
   },
 
   [BusinessUnitType.Employee]: {
@@ -1726,3 +1762,5 @@ export const MENU_CONFIG: any = {
 };
 
 export const AnalyticsMenuId: number = 40;
+export const VMSReportsMenuId: number = 120;
+export const IRPReportsMenuId: number = 121;

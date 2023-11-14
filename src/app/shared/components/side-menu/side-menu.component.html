@@ -1,4 +1,4 @@
-<section class="side-menu">
+<section class="side-menu" [ngClass]="{'analyticslist': isAnalytics}">
   <ejs-listbox #listBox
                class="list-box"
                [dataSource]="config"
