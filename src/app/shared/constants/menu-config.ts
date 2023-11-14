@@ -677,7 +677,7 @@ export const MENU_CONFIG: any = {
     37: {
       // Candidate Details
       icon: 'users',
-      route: 'agency/candidate-details',
+      route: 'client/candidate-details',
     },
     40: {
       // Custom Reports
