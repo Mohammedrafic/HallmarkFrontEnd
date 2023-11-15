@@ -4,8 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 
 import { CreateWorkflowService } from '@organization-management/workflow/components/create-workflow/services/create-workflow.service';
-import { ApplicabilityValidator } from '@organization-management/workflow/components/create-workflow/validators';
-import { WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
+import { ApplicabilityItemType, WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
 import { SaveEditedWorkflow } from '@organization-management/store/workflow.actions';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 
@@ -36,9 +35,8 @@ describe('CreateWorkflowService', () => {
     const expectedForm = fb.group({
       id: [null],
       workflow: [null, [Validators.required, Validators.maxLength(50)]],
-      initialOrders: [false],
-      extensions: [false],
-    }, { validator: ApplicabilityValidator });
+      applicability: [ApplicabilityItemType.InitialOrder, [Validators.required]],
+    });
     const resultForm = service.createWorkflowForm(WorkflowNavigationTabs.VmsOrderWorkFlow);
 
     expect(resultForm.value).toEqual(expectedForm.value);
@@ -68,8 +66,6 @@ describe('CreateWorkflowService', () => {
    it('should save edited workflow when form is valid', () => {
     const mockForm = fb.group({
       id: [1],
-      initialOrders: [false],
-      extensions: [false],
       workflow: ['Sample Workflow', [Validators.required, Validators.maxLength(50)]],
     });
     const resetSpy = spyOn(mockForm, 'reset');
@@ -80,7 +76,7 @@ describe('CreateWorkflowService', () => {
       initialOrders: false,
       extensions: false,
       isIRP: true,
-    }
+    };
 
     service.saveWorkflow(WorkflowNavigationTabs.IrpOrderWorkFlow, mockForm);
 

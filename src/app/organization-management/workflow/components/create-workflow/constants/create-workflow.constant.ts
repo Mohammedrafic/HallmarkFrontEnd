@@ -4,10 +4,11 @@ import {
   GroupWorkflowField,
   WorkflowField,
 } from '@organization-management/workflow/interfaces/create-workflow.inteface';
-import { WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
+import { Applicability, ApplicabilityItemType, WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
 
 export const CustomStepType = 1;
 export const CustomOfferedStep = 5;
+export const ApplicabilityControl = 'applicability';
 export const CustomOfferedStepName = 'Offered';
 export const WorkflowConfigField: WorkflowField = {
     field: 'workflow',
@@ -19,18 +20,22 @@ export const WorkflowConfigField: WorkflowField = {
 
 export const ApplicabilityFields: WorkflowField[] = [
   {
-    field: 'initialOrders',
-    title: 'Initial Order',
+    field: ApplicabilityControl,
+    name: ApplicabilityControl,
+    title: Applicability.Order,
+    value: ApplicabilityItemType.InitialOrder,
     disabled: false,
     required: false,
-    type: FieldType.CheckBox,
+    type: FieldType.RadioButton,
   },
   {
-    field: 'extensions',
-    title: 'Extensions',
+    field: ApplicabilityControl,
+    name: ApplicabilityControl,
+    title: Applicability.Extension,
+    value: ApplicabilityItemType.Extension,
     disabled: false,
     required: false,
-    type: FieldType.CheckBox,
+    type: FieldType.RadioButton,
   },
 ];
 
