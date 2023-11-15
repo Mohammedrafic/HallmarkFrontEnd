@@ -15,7 +15,6 @@ export class MspTableStatusCellComponent implements ICellRendererAngularComp {
 
   agInit(params: ICellRendererParams): void {
     this.cellValue = params.valueFormatted || params.value;
-    console.log("Ce;;",this.cellValue)
     this.isEChipShown = params.data?.extensionFromId;
   }
 
