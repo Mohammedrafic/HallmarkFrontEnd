@@ -30,9 +30,12 @@ Promise.resolve()
     const reportServerUrl = settings.LOGIREPORT_BASE_URL;
     return Promise.all([{ host, reportServerUrl }, fetch(APP_SETTINGS_B2C_CONFIG_URL(host)).then((res) => res.json())]);
   })
-  .then(([settings, config]) => {
-    const B2C_STATIC_PROVIDERS = MSAL_STATIC_PROVIDERS(settings.host, config);
-
+  .then(([settings, configs]) => {
+    if (window.location.pathname.includes('/provider-1')) {
+      window.localStorage.setItem('provider', '1');
+    }
+    const index = parseInt(window.localStorage.getItem('provider') || '0');
+    const B2C_STATIC_PROVIDERS = MSAL_STATIC_PROVIDERS(settings.host, configs[index]);
     platformBrowserDynamic([{ provide: APP_SETTINGS, useValue: settings }, ...B2C_STATIC_PROVIDERS])
       .bootstrapModule(AppModule)
       .catch((err) => console.error(err));
