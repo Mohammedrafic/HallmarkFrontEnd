@@ -17,6 +17,7 @@ export class WidgetLegendComponent {
   @Input() public description: string;
   @Input() public slideBar: any = false;
   @Input() public averageFlag: boolean =false;
+  @Input() public averageactiveFlag:boolean=false;
   @Input() public initialExtended: boolean =false;
 
   @Input() public isBillRateTrend: boolean =false;
