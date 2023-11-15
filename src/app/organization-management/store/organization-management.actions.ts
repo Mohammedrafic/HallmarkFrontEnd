@@ -104,7 +104,7 @@ export class GetRegionsPage {
 }
 
 export class GetMasterRegions {
-  static readonly type = '[organizationManagement] Get The List Of Regions';
+  static readonly type = '[organizationManagement] Get The List Of Master Regions';
   constructor() {}
 }
 

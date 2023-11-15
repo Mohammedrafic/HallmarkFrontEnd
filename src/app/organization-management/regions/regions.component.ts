@@ -1,8 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
@@ -12,7 +11,7 @@ import { Region, regionFilter, regionsPage } from '@shared/models/region.model';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import {
   ClearLocationList, DeleteRegionById, ExportRegions, GetMasterRegions, GetOrganizationById,
-  GetRegions, GetRegionsPage, SaveRegion, SetGeneralStatesByCountry, UpdateRegion,
+  GetRegionsPage, SaveRegion, SetGeneralStatesByCountry, UpdateRegion,
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 
@@ -46,12 +45,6 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
   @ViewChild('addRegionDialog') addRegionDialog: DialogComponent;
-
-  @Select(OrganizationManagementState.statesGeneral)
-  statesGeneral$: Observable<string[]>;
-
-  @Select(OrganizationManagementState.phoneTypes)
-  phoneTypes$: Observable<FieldSettingsModel[]>;
 
   defaultValue: any;
 
@@ -113,7 +106,7 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
   };
 
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
-  public orgStructure: OrganizationStructure;
+
   constructor(
     protected override store: Store,
     @Inject(FormBuilder) private builder: FormBuilder,
@@ -132,9 +125,7 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.getRegions();
-
     });
-    this.getMasterRegionData();
     this.filterColumns = {
       names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
     };
@@ -148,19 +139,19 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
       this.getOrganization();
       this.clearFilters();
       this.getMasterRegionData();
+      this.getRegions();
     });
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization?.generalInformation?.country));
-      this.store.dispatch(new GetRegionsPage(this.filters));
     });
 
     this.organizationStructure$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((structure: OrganizationStructure) => {
-        this.orgStructure = structure;
         this.regions = structure.regions;
       });
     this.customAttributes = {class: 'grideditcolumn'};
+    this.subscribeOnMasterRegions();
   }
 
   ngOnDestroy(): void {
@@ -177,12 +168,10 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     }
   }
 
-  public getMasterRegionData() {
-    this.store.dispatch(new GetMasterRegions());
-    this.store.dispatch(new GetRegions());
+  private subscribeOnMasterRegions(): void {
     this.masterRegions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.masterRegion = data;
-      this.allRegions$.pipe(takeUntil(this.unsubscribe$))
+      this.allRegions$.pipe(take(1))
         .subscribe((regionsData) => {
           let filterMasterData: Region[] = [];
           if (regionsData && regionsData.length > 0) {
@@ -196,6 +185,10 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
           this.changeDetectorRef.detectChanges();
         });
     });
+  }
+
+  public getMasterRegionData() {
+    this.store.dispatch(new GetMasterRegions());
   }
 
   public override updatePage(): void {
@@ -278,15 +271,6 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     this.store.dispatch([new GetRegionsPage(this.filters)]);
   }
 
-  onRegionDropDownChanged(event: ChangeEventArgs): void {
-    this.selectedRegion = event.itemData as Region;
-    if (this.selectedRegion?.id) {
-      this.onFilterClearAll();
-    } else {
-      this.store.dispatch(new ClearLocationList());
-    }
-  }
-
   onAddRegionClick(): void {
     this.regionFormGroup.controls["region"].setValue([]);
     this.store.dispatch(new ShowSideDialog(true));
@@ -300,10 +284,6 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     this.importDialogEvent.next(true);
   }
 
-  onAddDepartmentClick(): void {
-    this.store.dispatch(new ShowSideDialog(true));
-  }
-
   onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.grid.pageSettings.pageSize = this.pageSize;
@@ -315,7 +295,7 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     }
   }
 
-  onEditButtonClick(region: Region, event: any): void {
+  onEditButtonClick(region: Region, event: Event): void {
     this.addActiveCssClass(event);
     this.regionFormGroup.controls["region"].setValue([this.masterRegion.filter(i => i.name == region?.name)[0]?.id])
     this.editedRegionId = region?.id;
@@ -323,7 +303,7 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onRemoveButtonClick(region: Region, event: any): void {
+  onRemoveButtonClick(region: Region, event: Event): void {
     this.addActiveCssClass(event);
 
     this.confirmService
@@ -373,15 +353,9 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     }
   }
 
-  public noWhitespaceValidator(control: FormControl) {
-    const isWhitespace = (control.value || '').trim().length === 0;
-    const isValid = !isWhitespace;
-    return isValid ? null : { 'whitespace': true };
-  }
-
   onFormSaveClick(): void {
     this.submited = true;
-    this.regionFormGroup.markAllAsTouched()
+    this.regionFormGroup.markAllAsTouched();
     if (this.regionFormGroup.invalid) {
       return;
     }
@@ -423,7 +397,6 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     this.regionFormGroup = this.formBuilder.group({
       id: [''],
       region: ['', [Validators.required]],
-
     });
 
     this.regionFilterFormGroup = this.formBuilder.group({
