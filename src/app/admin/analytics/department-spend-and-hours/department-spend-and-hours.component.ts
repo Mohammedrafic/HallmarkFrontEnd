@@ -1,4 +1,3 @@
-
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -276,8 +275,8 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
               this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.id);
-              this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-              this.defaultSkills=data.masterSkills.map((list)=>list.id);
+             // this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+              //this.defaultSkills=data.masterSkills.map((list)=>list.id);
               let masterSkills = this.filterOptionsData.masterSkills;
               let skills = masterSkills.filter((i) => this.defaultSkillCategories?.includes(i.skillCategoryId));
               this.filterColumns.skillIds.dataSource = skills;
@@ -343,6 +342,13 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
 
 
   public SearchReport(): void {
+    if (!this.departmentspendhourReportForm.dirty) {
+      this.message = "Default filter selected with all regions, locations and departments for 30 days";
+    }
+    else {
+      this.isResetFilter = false;
+      this.message = ""
+    }
     this.filteredItems = [];
     let auth = "Bearer ";
     for (let x = 0; x < window.localStorage.length; x++) {
@@ -458,8 +464,8 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
-    this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    startDate.setDate(startDate.getDate() - 30);
+    this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.RegionIds)?.setValue([]);
     this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.LocationIds)?.setValue([]);
     this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.LocationIds)?.setValue([]);
     this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.DepartmentIds)?.setValue([]);    
