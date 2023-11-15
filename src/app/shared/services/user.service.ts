@@ -7,7 +7,7 @@ import { BusinessUnitType } from '../enums/business-unit-type';
 import { Menu } from '../models/menu.model';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import { AlertsModel } from '@shared/models/alerts-model';
-import { HelpSiteUrl } from '@shared/models/help-site-url.model';
+import { DomainLinks } from '@shared/models/help-site-url.model';
 import { LastSelectedMspID, UserMsp } from '../models/user-msp.model';
 
 @Injectable({ providedIn: 'root' })
@@ -79,7 +79,7 @@ export class UserService {
   public saveLastSelectedOrganizationAgencyId(lasSelectedOrganizationAgency: LasSelectedOrganizationAgency): Observable<void> {
     const { lastSelectedOrganizationId, lastSelectedAgencyId } = lasSelectedOrganizationAgency;
     return this.http.post<void>('/api/Users/savestate', { lastSelectedOrganizationId, lastSelectedAgencyId });
-  } 
+  }
 
   /**
    * Add User Msp Access Setting
@@ -89,7 +89,7 @@ export class UserService {
   public saveLastSelectedMspId(lastSelectedMspID: LastSelectedMspID): Observable<void> {
     const lastSelectedMspId = lastSelectedMspID;
     return this.http.post<void>('/api/Users/savestate', lastSelectedMspId);
-  } 
+  }
 
   /**
    * Get Users Assigned To Role
@@ -128,7 +128,7 @@ export class UserService {
     return this.http.get<CurrentUserPermission[]>('/api/Permissions/orderscope/' + orderId);
   }
 
-  public getHelpSiteUrl(): Observable<HelpSiteUrl> {
-    return this.http.get<HelpSiteUrl>('/api/Help/link');
+  public getHelpSiteUrl(): Observable<DomainLinks> {
+    return this.http.get<DomainLinks>('/api/Help/links');
   }
 }

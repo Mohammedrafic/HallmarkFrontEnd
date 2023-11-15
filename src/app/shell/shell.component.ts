@@ -28,7 +28,6 @@ import { ToggleChatDialog, UnreadMessage } from '@core/actions';
 import { OutsideZone } from "@core/decorators";
 import { Destroyable } from '@core/helpers';
 import { AnalyticsMenuId, IRPReportsMenuId, VMSReportsMenuId } from '@shared/constants/menu-config';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
@@ -60,7 +59,8 @@ import { UserService } from '@shared/services/user.service';
 import { BreakpointObserverService } from '@core/services';
 import { HeaderState } from '@shared/models/header-state.model';
 import { HelpNavigationService } from '@shared/services';
-import { IsMspAreaStateModel } from '../shared/models/is-msp-area-state.model';
+import { IsMspAreaStateModel } from '@shared/models/is-msp-area-state.model';
+import { DomainLinks } from '@shared/models/help-site-url.model';
 
 @Component({
   selector: 'app-shell',
@@ -419,11 +419,11 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .pipe(
       take(1),
     )
-    .subscribe(({ url }) => {
+    .subscribe((links: DomainLinks) => {
       const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-      this.helpService.navigateHelpPage(appArea?.isAgencyArea, url);
+      this.helpService.navigateHelpPage(appArea?.isAgencyArea, links);
     });
-    
+
 
   }
 
