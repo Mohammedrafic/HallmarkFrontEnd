@@ -1762,5 +1762,5 @@ export const MENU_CONFIG: any = {
 };
 
 export const AnalyticsMenuId: number = 40;
-export const VMSReportsMenuId: number = 120;
-export const IRPReportsMenuId: number = 121;
+export const VMSReportsMenuId: number = 121;
+export const IRPReportsMenuId: number = 122;

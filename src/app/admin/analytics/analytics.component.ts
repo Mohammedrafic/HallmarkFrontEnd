@@ -79,6 +79,9 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
               const item = this.findItemById(menuFilter, Number(topLevelParentId));
               const flattenedMenuItems = this.flattenChildren(item.children);
               this.sideMenuConfig = flattenedMenuItems;
+           }else{
+               this.sideMenuConfig=[];
+               this.router.navigate(['/']);
            }
           }
         }
