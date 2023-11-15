@@ -147,7 +147,7 @@ button.e-control.e-btn.e-dropdown-btn {
   }
 }
 
-.dark {
+body.dark {
   .e-control.e-btn.e-outline {
     color: $primary-active-blue-10 !important;
     border-color: $primary-active-blue-40;
@@ -158,7 +158,7 @@ button.e-control.e-btn.e-dropdown-btn {
     }
 
     &:active {
-      border-color: $primary-active-blue !important;
+      border-color: $alert-side-bar-bgcolor !important;
       background-color: $sidebar-background;
       color: $primary-active-blue !important;
     }
