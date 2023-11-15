@@ -17,13 +17,11 @@ export class RegionService {
    * @return Array of regions
    */
   public getRegionsByOrganizationId(filter:any): Observable<Region[]| regionFilter> {
-
     if(filter){
       return this.http.post<regionFilter>(`/api/Regions/filter`, filter);
     }else{
       return this.http.get<Region[]>(`/api/Regions`);
     }
-   
   }
 
   /**
