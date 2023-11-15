@@ -72,7 +72,7 @@ export class MspService {
    */
   public getMSPAssociateListByPage(pageNumber: number, pageSize: number): Observable<MSPAssociateOrganizationsAgencyPage> {
     return this.http.post<any>(
-      `/api/msp/MspAssociatedAgencies`, { params: { pageNumber, pageSize } }
+      `/api/msp/MspAssociatedAgencies`, {  pageNumber, pageSize  }
     );
   }
 
