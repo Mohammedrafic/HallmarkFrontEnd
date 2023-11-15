@@ -913,8 +913,7 @@ export class SendGroupEmailComponent
 
   public OnFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
     var result = this.filterUserData.filter(function(user){
-      user.fullName = user.fullName.toLowerCase();
-     return user.fullName.indexOf(e.text.toLowerCase()) > -1; 
+     return user.fullName.toLowerCase().indexOf(e.text.toLowerCase()) > -1; 
   });
     this.userData = result;
   }
