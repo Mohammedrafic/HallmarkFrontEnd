@@ -17,3 +17,5 @@ export const NUMERIC_10_12_DIGITS = /^\d{10,12}$/;
  */
 export const ALPHANUMERICS_AND_SYMBOLS = /^([\w\s-_,.;:`@!#$%^&*)(?\\\\/|"\[\]~}{'><]*]*)(?=(.*\w){1})(?=(.*[a-zA-Z]))[a-zA-Z0-9]{3,}([\w\s-_,.;:`@!#$%^&*)(?\\\\/|"\[\]~}{'><]*]*)$/;
 export const NumberValidatorRegExp = (digitNumber: number) => new RegExp(`^[0-9]{${digitNumber}}$`);
+export const NumberRangeRegExp = (minDigits: number, maxDigits: number) =>
+new RegExp(`[0-9]{${minDigits},${maxDigits}}$`);
