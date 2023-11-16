@@ -183,6 +183,7 @@ import {
 import { FileListModule } from './components/file-list/file-list.module';
 import { GridErroredCellListComponent } from './components/import-dialog-content/grid-errored-cell-list/grid-errored-cell-list.component';
 import { MspCustomSideDialogComponent } from './components/msp-custom-side-dialog/msp-custom-side-dialog.component';
+import { BulkLocationActiondialogComponent } from '@organization-management/locations/bulk-location-actiondialog/bulk-location-actiondialog.component';
 
 const icons = {
   AlertCircle,
@@ -213,6 +214,7 @@ const icons = {
 };
 
 const COMPONENTS = [
+  BulkLocationActiondialogComponent,
   OrderTypeName,
   PayOrderTypeName,
   CandidateStatusName,

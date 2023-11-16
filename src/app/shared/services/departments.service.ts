@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 import {
+  BulkDepartmentAction,
   Department,
   DepartmentFilter,
   DepartmentFilterOptions,
@@ -72,7 +73,19 @@ export class DepartmentsService {
   public deleteDepartmentById(departmentId?: number): Observable<void> {
     return this.http.delete<void>(`/api/Departments/${departmentId}`);
   }
+/**
+ * Bulk Update Department
+ */
+public bulkupdateDepartments(selectedItems: Department[]): Observable<BulkDepartmentAction> {
+  return  this.http.put<BulkDepartmentAction>(`/api/Departments/bulk-update-department`, selectedItems)
+}
 
+/**
+ * Bulk Delete Department
+ */
+public bulkdeleteDepartments(selectedItems: Number[]): Observable<BulkDepartmentAction> {
+  return  this.http.delete<BulkDepartmentAction>(`/api/Departments/bulk-delete-department`,  { body: selectedItems })
+}
   /**
    * Export departments
    */

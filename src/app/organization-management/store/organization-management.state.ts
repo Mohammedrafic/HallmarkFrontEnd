@@ -131,10 +131,25 @@ import {
   UploadRegionsFile,
   UploadRegionsFileSucceeded,
   BulkDeleteAssignedSkill,
+  BulkUpdateLocation,
+  BulkUpdateAssignedLocationucceeded,
+  BulkUpdateAssignedLocationFailed,
+  BulkDeleteLocation,
+  BulkDeleteLocationucceeded,
+  BulkDeleteLocationFailed,
+  BulkDeleteDepartmentsucceeded,
+  BulkDeleteDepartment,
+  BulkDeleteDepartmentFailed,
+  BulkUpdateDepartmentsucceeded,
+  BulkUpdateDepartmentFailed,
+  BulkUpdateDepartment,
+
+
 } from './organization-management.actions';
-import { Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
+import { BulkDepartmentAction, Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter, regionsPage } from '@shared/models/region.model';
 import {
+  BulkLocationsAction,
   ImportedLocation,
   Location,
   LocationFilterOptions,
@@ -168,6 +183,10 @@ import {
   Bulk_Update_Skills,
   Bulk_Delete_Skills,
   usedByOrderErrorMessage,
+  Bulk_Update_Locations,
+  Bulk_Update_Department,
+  Bulk_Delete_Locations,
+  Bulk_Delete_Department,
 } from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { Configuration } from '@shared/models/organization-settings.model';
@@ -843,7 +862,126 @@ export class OrganizationManagementState {
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
     );
   }
-
+  @Action(BulkUpdateLocation)
+  BulkUpdateLocation(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { selectedLocationItems }: BulkUpdateLocation
+  ): Observable<BulkLocationsAction | void> {
+    patchState({ isOrganizationLoading: true });
+    return this.locationService.bulkupdatelocations(selectedLocationItems).pipe(
+      tap((payload) => {
+        if(payload){
+            if(payload.bulkactionresult){
+              dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Locations));
+              dispatch(new BulkUpdateAssignedLocationucceeded(payload));
+            }
+            else{
+              if(payload.hasValidRecords){
+                dispatch(new BulkUpdateAssignedLocationucceeded(payload));
+              }
+              else{
+                dispatch(new BulkUpdateAssignedLocationFailed(payload));
+              }
+            }
+        }
+        return payload;
+      }),
+      catchError((error) => {
+        const errorObj = error.error;
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
+      })
+    );
+  }
+  @Action(BulkDeleteLocation)
+  BulkDeleteLocation(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { selectedLocationItems }: BulkDeleteLocation
+  ): Observable<BulkLocationsAction | void> {
+    patchState({ isOrganizationLoading: true });
+    return this.locationService.bulkdeletelocations(selectedLocationItems).pipe(
+      tap((payload) => {
+        if(payload){
+            if(payload.bulkactionresult){
+              dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Locations));
+              dispatch(new BulkDeleteLocationucceeded(payload));
+            }
+            else{
+              if(payload.hasValidRecords){
+                dispatch(new BulkDeleteLocationucceeded(payload));
+              }
+              else{
+                dispatch(new BulkDeleteLocationFailed(payload));
+              }
+            }
+        }
+        return payload;
+      }),
+      catchError((error) => {
+        const errorObj = error.error;
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
+      })
+    );
+  }
+  @Action(BulkUpdateDepartment)
+  BulkUpdateDepartment(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { selectedDepartmentItems }: BulkUpdateDepartment
+  ): Observable<BulkDepartmentAction | void> {
+    patchState({ isOrganizationLoading: true });
+    return this.departmentService.bulkupdateDepartments(selectedDepartmentItems).pipe(
+      tap((payload) => {
+        if(payload){
+            if(payload.bulkactionresult){
+              dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Department));
+              dispatch(new BulkUpdateDepartmentsucceeded(payload));
+            }
+            else{
+              if(payload.hasValidRecords){
+                dispatch(new BulkUpdateDepartmentsucceeded(payload));
+              }
+              else{
+                dispatch(new BulkUpdateDepartmentFailed(payload));
+              }
+            }
+        }
+        return payload;
+      }),
+      catchError((error) => {
+        const errorObj = error.error;
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
+      })
+    );
+  }
+  @Action(BulkDeleteDepartment)
+  BulkDeleteDepartment(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { selectedDepartmentItems }: BulkDeleteDepartment
+  ): Observable<BulkDepartmentAction | void> {
+    patchState({ isOrganizationLoading: true });
+    return this.departmentService.bulkdeleteDepartments(selectedDepartmentItems).pipe(
+      tap((payload) => {
+        if(payload){
+            if(payload.bulkactionresult){
+              dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Department));
+              dispatch(new BulkDeleteDepartmentsucceeded(payload));
+            }
+            else{
+              if(payload.hasValidRecords){
+                dispatch(new BulkDeleteDepartmentsucceeded(payload));
+              }
+              else{
+                dispatch(new BulkDeleteDepartmentFailed(payload));
+              }
+            }
+        }
+        return payload;
+      }),
+      catchError((error) => {
+        const errorObj = error.error;
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
+      })
+    );
+  }
   @Action(UpdateLocation)
   UpdateLocation(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
