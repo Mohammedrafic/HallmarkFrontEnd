@@ -713,7 +713,7 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   const orderData = Data as IRPOrderPosition;
 
   this.store.dispatch(new GetOrderById(orderData.orderId, orderData.organizationId));
-  this.onSelectedOrderDataLoadHandler();
+  this.dispatchAgencyOrderCandidatesList(Order.id, Order.organizationId as number, true);
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
   this.openDetails.next(false);
@@ -2326,10 +2326,6 @@ public RedirecttoIRPOrder(order:Order)
         this.selectFirstRow();
         this.isRedirectedFromVmsSystem = false;
       }
-      if(this.selectedOrder){
-        this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number,
-          !!this.selectedOrder.irpOrderMetadata);
-      }
       this.cd$.next(true);
     });
   }
@@ -2766,7 +2762,7 @@ public RedirecttoIRPOrder(order:Order)
 
   private subscribeToCandidateJob(): void {
     if(this.activeSystem === OrderManagementIRPSystemId.IRP){
-      this.getIrpCandidatesforExtension$.pipe(take(2), filter(Boolean)).subscribe((res) => {
+      this.getIrpCandidatesforExtension$.pipe(take(1), filter(Boolean)).subscribe((res) => {
         res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
       });
   
