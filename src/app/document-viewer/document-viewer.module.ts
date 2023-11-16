@@ -42,7 +42,7 @@ const icons = {
 
 @NgModule({
   declarations: [DocumentViewerComponent, FailedDocumentViewerComponent, StatusComponentComponent],
-  exports: [DocumentViewerComponent, FailedDocumentViewerComponent],
+  exports: [DocumentViewerComponent, FailedDocumentViewerComponent, StatusComponentComponent],
   imports: [
     DialogModule,
     ButtonModule,

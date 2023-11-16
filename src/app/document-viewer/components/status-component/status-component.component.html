@@ -1,11 +1,13 @@
 <section class="container">
-   <form [formGroup]="statusForm">
-    <div class="">
-        <label for="">Job Id: </label>
-        <input class="e-input" type="text" placeholder="Enter JOb Id" formControlName="jobId">
+   <form [formGroup]="statusForm" (ngSubmit)="onSubmit()">
+    <div>
+        <label for="">Job ID: </label>
+        <input class="e-input" type="text" placeholder="Enter Job ID" formControlName="jobId">
     </div>
     <div>
-        <button type="submit">Submit</button>
+        <button  ejs-button
+        [isPrimary]="true"
+        >Submit</button>
     </div>
    </form>
 </section>

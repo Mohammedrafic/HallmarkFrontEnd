@@ -8,14 +8,17 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatusComponentComponent implements OnInit {
-  statusForm = new FormGroup({})
-
+  statusForm = new FormGroup({});
   constructor(private fb:FormBuilder) { }
 
   ngOnInit(): void {
     this.statusForm = this.fb.group({
       jobId: [''],
     });
+  }
+
+  onSubmit(){
+    console.log(this.statusForm)
   }
 
 }
