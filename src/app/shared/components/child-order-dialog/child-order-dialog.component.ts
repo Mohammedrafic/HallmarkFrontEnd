@@ -330,7 +330,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.getIRPCandidates();
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
@@ -813,18 +812,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.changeDetectorRef.markForCheck();
       });
     }
-  }
-
-  private getIRPCandidates(){
-    this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
-      if(irpCandidates){
-        irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
-        this.setCloseOrderButtonStateforIRP();
-        this.getExtensionsforIRP();
-        this.getCommentsforIRP();
-      }
-    });
-
   }
 
   private subscribeOnCandidateJob(): void {
