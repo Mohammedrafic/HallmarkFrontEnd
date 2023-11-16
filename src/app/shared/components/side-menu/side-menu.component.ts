@@ -50,10 +50,20 @@ export class SideMenuComponent extends Destroyable implements AfterViewInit, OnI
   }
 
 
+// Helper function to find the first non-empty item
+private findFirstNonEmptyItem(items: any[]): any {
+  for (const item of items) {
+    if (item.route) {
+      return item;
+    }
+  }
+  return null;
+}
+
   private handleConfigChanges(config: MenuSettings[]): void {
     if (config.length > 0) {
-      const menuId=localStorage.getItem("menuId")
-      let selection = (this.isAnalytics && Number(menuId) === VMSReportsMenuId) ? this.config[1] : this.config[0];  
+      const menuId=window.localStorage.getItem("menuId")
+      let selection = (this.isAnalytics && Number(menuId) === VMSReportsMenuId) ? this.findFirstNonEmptyItem(this.config) : this.config[0];  
           if (this.navigateTo) {
         const navigateToSubMenu = this.config.find((item) => item.route === this.navigateTo);
         if (navigateToSubMenu) {

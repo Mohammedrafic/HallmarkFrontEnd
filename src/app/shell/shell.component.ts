@@ -331,7 +331,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
     if (menuItem.id == VMSReportsMenuId || menuItem.id == IRPReportsMenuId) {
       const menuId = menuItem.id;
-      localStorage.setItem("menuId", String(menuId))
+      window.localStorage.setItem("menuId", String(menuId))
       this.userService.setData(menuItem);
       this.router.navigate([menuItem.route]);
     } else if (!menuItem.children?.length) {
@@ -368,7 +368,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
    let selectedMenuItem = event.items.find((data:any)=>data.id == this.selectedItem);
    if (selectedMenuItem?.properties.id === VMSReportsMenuId || IRPReportsMenuId) {
     const menuId = selectedMenuItem?.properties?.id;
-    localStorage.setItem("menuId", String(menuId))
+    window.localStorage.setItem("menuId", String(menuId))
     this.userService.setData(selectedMenuItem);
   }
     if (selectedMenuItem) {
