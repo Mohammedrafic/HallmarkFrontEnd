@@ -25,6 +25,7 @@ import {
 } from 'angular-feather/icons';
 import { NgxsModule } from '@ngxs/store';
 import { DocumentViewerState } from './store/document-viewer.state';
+import { StatusComponentComponent } from './components/status-component/status-component.component';
 
 const icons = {
   X,
@@ -40,7 +41,7 @@ const icons = {
 };
 
 @NgModule({
-  declarations: [DocumentViewerComponent, FailedDocumentViewerComponent],
+  declarations: [DocumentViewerComponent, FailedDocumentViewerComponent, StatusComponentComponent],
   exports: [DocumentViewerComponent, FailedDocumentViewerComponent],
   imports: [
     DialogModule,
