@@ -1,97 +1,54 @@
 <section class="flex-column">
   <section class="toolbar">
     <section class="details bootstrap">
-      <ejs-dropdownlist
-        id="regionsDropDown"
-        class="region-dropdown"
-        placeholder="Region"
-        [allowFiltering]="true"
-        [dataSource]="regions$ | async"
-        [fields]="regionFields"
-        (change)="changeRegion($event)"
-        [value]="defaultValue"
-      ></ejs-dropdownlist>
-      <button
-        ejs-button
-        cssClass="e-flat button-with-icon"
-        (click)="openAddRegionDialog()"
-        [class.hidden]="true"
-        ><i-feather name="plus" class="icon"></i-feather> Add Region</button>
+      <ejs-dropdownlist id="regionsDropDown" class="region-dropdown" placeholder="Region" [allowFiltering]="true"
+        [dataSource]="regions$ | async" [fields]="regionFields" (change)="changeRegion($event)"
+        [value]="defaultValue"></ejs-dropdownlist>
+      <button ejs-button cssClass="e-flat button-with-icon" (click)="openAddRegionDialog()"
+        [class.hidden]="true"><i-feather name="plus" class="icon"></i-feather> Add Region</button>
     </section>
 
     <section [class.hidden]="!isLoaded">
-      <button
-        ejs-button
-        id="filterButton"
-        cssClass="e-outline button-filter"
-        (click)="showFilters()">
+      <button ejs-button id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
         <div class="filter-button-content">
-          <span
-            *ngIf="filteredItems.length"
-            class="e-badge e-badge-success e-badge-pill align-text">
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill align-text">
             {{ filteredItems.length }}
           </span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <button
-        ejs-button
-        id="importButton"
-        cssClass="e-outline button-import"
-        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
-        (click)="openImportDialog()">Import <i-feather name="download" class="icon"></i-feather></button>
-      <button
-        ejs-dropdownbutton
-        [items]="exportOptions"
-        (select)="exportSelected($event)"
-        id="exportButton"
+      <button ejs-button id="importButton" cssClass="e-outline button-import"
+        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]" (click)="openImportDialog()">Import
+        <i-feather name="download" class="icon"></i-feather></button>
+      <button ejs-dropdownbutton [items]="exportOptions" (select)="exportSelected($event)" id="exportButton"
         cssClass="e-outline button-export">
         <div class="button-export-container">
           Export <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
-      <button
-        ejs-button
-        id="addDepartmentButton"
-        [isPrimary]="true"
+      <button ejs-button id="addDepartmentButton" [isPrimary]="true"
         [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
         (click)='openAddLocationDialog()'>Add Location</button>
     </section>
   </section>
 
-  <ejs-grid class="grid grid-component"
-    #grid
-    [dataSource]="(locations$ | async)?.items"
-    [allowPaging]="allowPaging"
-    [pageSettings]="pageSettings"
-    [height]="fullScreenGridHeight"
-    [rowHeight]="rowHeight"
-    [enableVirtualization]="false"
-    [resizeSettings]="resizeSettings"
-    [allowSorting]="allowSorting"
-    [allowResizing]="allowResizing"
-    (actionBegin)="actionBegin($event)"
-    (rowSelected)="rowSelected($event, grid)"
-    (rowDeselected)="rowDeselected($event, grid)"
-    (dataBound)="gridDataBound(grid)"
-    [selectionSettings]="selectionSettings"
-  >
+  <ejs-grid class="grid grid-component" #grid [dataSource]="(locations$ | async)?.items" [allowPaging]="allowPaging"
+    [pageSettings]="pageSettings" [height]="fullScreenGridHeight" [rowHeight]="rowHeight" [enableVirtualization]="false"
+    [resizeSettings]="resizeSettings" [allowSorting]="allowSorting" [allowResizing]="allowResizing"
+    (actionBegin)="actionBegin($event)" (rowSelected)="rowSelected($event, grid)"
+    (rowDeselected)="rowDeselected($event, grid)" (dataBound)="gridDataBound(grid)"
+    [selectionSettings]="selectionSettings">
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button 
-              ejs-button
-              cssClass="e-flat primary-icon-button"
+            <button ejs-button cssClass="e-flat primary-icon-button"
               [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
               (click)="editLocation(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button
-              ejs-button
-              cssClass="e-flat secondary-icon-button"
-              (click)="deleteLocation(data, $event)"
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteLocation(data, $event)"
               [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
@@ -127,45 +84,41 @@
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
+        <div *ngIf="selectedItems.length > 1">
+          <section class="bulk-section">
+            <h3 class="bulk-section__rowscount">{{ selectedItems.length }} Rows Selected</h3>
+            <button ejs-button class="edit-button" cssClass="e-flat primary-icon-button" (click)="OnBulkEdit()">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather>Edit</span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="OnBulkDelete()">
+              <span class="delete-button"><i-feather name="trash-2" class="icon"></i-feather>Delete</span>
+            </button>
+            <section class="gridrightpager">
+              <ejs-pager id="gridPager" #gridPager [pageSize]="pageSize"
+                [totalRecordsCount]="(locations$ | async)?.totalCount" [enablePagerMessage]="false"
+                [currentPage]="currentPage">
+              </ejs-pager>
+            </section>
+          </section>
+        </div>
         <div class="control-section">
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
-              <ejs-dropdownlist
-                id="rowsPerPage"
-                class="dropdown-no-border"
-                [allowFiltering]="true"
-                [dataSource]="rowsPerPageDropDown"
-                [(value)]="activeRowsPerPageDropDown"
-                (change)="changeRowsPerPage()"
-              >
+              <ejs-dropdownlist id="rowsPerPage" class="dropdown-no-border" [allowFiltering]="true"
+                [dataSource]="rowsPerPageDropDown" [(value)]="activeRowsPerPageDropDown" (change)="changeRowsPerPage()">
               </ejs-dropdownlist>
-              <ejs-numerictextbox
-                id="goToPage"
-                class="numeric-input-no-border"
-                format="#"
-                [validateDecimalOnType]="validateDecimalOnType"
-                [decimals]="decimals"
-                placeholder="Go to:"
-                min="1"
-                [max]="(locations$ | async)?.totalPages"
-                [showSpinButton]="false"
-                (change)="selectPage($event)"
-              >
+              <ejs-numerictextbox id="goToPage" class="numeric-input-no-border" format="#"
+                [validateDecimalOnType]="validateDecimalOnType" [decimals]="decimals" placeholder="Go to:" min="1"
+                [max]="(locations$ | async)?.totalPages" [showSpinButton]="false" (change)="selectPage($event)">
               </ejs-numerictextbox>
               <div class="total-rows">
                 Total Rows: {{(locations$ | async)?.totalCount}}
               </div>
             </section>
             <section class="right-side-pager-controls">
-              <ejs-pager
-                id="gridPager"
-                #gridPager
-                [pageSize]="pageSize"
-                [totalRecordsCount]="(locations$ | async)?.totalCount"
-                [enablePagerMessage]="false"
-                [currentPage]="currentPage"
-                (click)="selectPage($event)"
-              >
+              <ejs-pager id="gridPager" #gridPager [pageSize]="pageSize"
+                [totalRecordsCount]="(locations$ | async)?.totalCount" [enablePagerMessage]="false"
+                [currentPage]="currentPage" (click)="selectPage($event)">
               </ejs-pager>
             </section>
           </div>
@@ -175,115 +128,74 @@
   </ejs-grid>
 </section>
 
-<app-export-dialog
-  [columns]="columnsToExport"
-  [fileName]="fileName"
-  (cancel)="closeExport()"
-  (export)="export($event)">
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)">
 </app-export-dialog>
 
-<app-filter-dialog
-  [items]="filteredItems"
-  [count]="(locations$ | async)?.totalCount"
-  (deleteFilter)="deleteFilter($event)"
-  (clearAllFiltersClicked)="clearFilter()"
-  (applyFilterClicked)="applyFilter()"
-  (closeDialogClicked)="closeFilter()"
->
+<app-filter-dialog [items]="filteredItems" [count]="(locations$ | async)?.totalCount"
+  (deleteFilter)="deleteFilter($event)" (clearAllFiltersClicked)="clearFilter()" (applyFilterClicked)="applyFilter()"
+  (closeDialogClicked)="closeFilter()">
   <form class="bootstrap" [formGroup]="locationFilterForm">
     <div class="input-container">
       <label>Location Id</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="externalIds"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.externalIds.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="externalIds" placeholder="All" [allowFiltering]="true"
+          [showDropDownIcon]="true" [dataSource]="filterColumns.externalIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container" *ngIf="isOrgVMSEnabled || !isFeatureIrpEnabled">
       <label>Invoice Location ID</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="invoiceIds"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.invoiceIds.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="invoiceIds" placeholder="All" [allowFiltering]="true"
+          [showDropDownIcon]="true" [dataSource]="filterColumns.invoiceIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>Location Name</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="names"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.names.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="names" placeholder="All" [allowFiltering]="true"
+          [showDropDownIcon]="true" [dataSource]="filterColumns.names.dataSource">
         </ejs-multiselect>
       </div>
     </div>
-     <div class="input-container">
+    <div class="input-container">
       <label>Address 1</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="addresses1"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.addresses1.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="addresses1" placeholder="All" [allowFiltering]="true"
+          [showDropDownIcon]="true" [dataSource]="filterColumns.addresses1.dataSource">
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>City</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="cities"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.cities.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="cities" placeholder="All" [allowFiltering]="true"
+          [showDropDownIcon]="true" [dataSource]="filterColumns.cities.dataSource">
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>State</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="states"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.states.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="states" placeholder="All" [allowFiltering]="true"
+          [showDropDownIcon]="true" [dataSource]="filterColumns.states.dataSource">
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>Zip</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="zipCodes"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.zipCodes.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="zipCodes" placeholder="All" [allowFiltering]="true"
+          [showDropDownIcon]="true" [dataSource]="filterColumns.zipCodes.dataSource">
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>Contact Person</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="contactPeople"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.contactPeople.dataSource">
+        <ejs-multiselect mode="CheckBox" formControlName="contactPeople" placeholder="All" [allowFiltering]="true"
+          [showDropDownIcon]="true" [dataSource]="filterColumns.contactPeople.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -291,168 +203,160 @@
     <div class="input-container" *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled && isOrgVMSEnabled">
       <label>Include in IRP</label>
       <div class="input-group multiselect">
-        <ejs-dropdownlist mode="CheckBox"
-                         formControlName="includeInIRP"
-                         placeholder="All"
-                         [fields]="dropDownfields"
-                         [allowFiltering]="true"
-                         [dataSource]="filterColumns.includeInIRP.dataSource">
+        <ejs-dropdownlist mode="CheckBox" formControlName="includeInIRP" placeholder="All" [fields]="dropDownfields"
+          [allowFiltering]="true" [dataSource]="filterColumns.includeInIRP.dataSource">
         </ejs-dropdownlist>
       </div>
     </div>
   </form>
 </app-filter-dialog>
 
-<app-side-dialog
-  (formCancelClicked)="cancelEditLocation()"
-  (formSaveClicked)="saveLocation()"
-  [header]="dialogHeader"
-  [width]="'832px'"
->
-  <form
-    class="form-container bootstrap"
-    id="addEditRecordForm"
-    [formGroup]="locationDetailsFormGroup"
-  >
-    <div class="form-block"
-      [ngClass]="{ 'no-inid': !isOrgVMSEnabled && isFeatureIrpEnabled, 'prev-form-view': !isFeatureIrpEnabled }">
-      <ng-container *ngFor="let control of locationDialogConfig.baseForm; trackBy: trackByField">
-        <ng-container [ngSwitch]="control.fieldType">
+<app-side-dialog (formCancelClicked)="cancelEditLocation()" (formSaveClicked)="saveLocation()" [header]="dialogHeader"
+  [width]="'832px'">
+  <div *ngIf="isbulkedit;then bulkEdit else notBulkEdit">
+  </div>
 
-          <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-            <div class="input-container form-dropdown" [ngStyle]="{'grid-area': control.gridAreaName}">
-              <label [for]="control.field">
-                {{control.title}}
-                <span class="required" *ngIf="control.required">*</span>
-              </label>
-              <div class="input-group dropdown" *ngIf="control.sourceKey">
-                <ejs-dropdownlist
-                  appValidateWithMessage
-                  [dataSource]="formSourcesMap[control.sourceKey]"
-                  [fields]="dropDownfields"
-                  [allowFiltering]="true"
-                  [showClearButton]="true"
-                  [formControlName]="control.field">
-                </ejs-dropdownlist>
+  <ng-template #bulkEdit>
+    <form class="form-container bootstrap" id="locationDetailsFormGroup" [formGroup]="locationDetailsFormGroup">
+      <div>
+        <div class="input-container toggle-wrapper">
+          <ejs-switch class="toggle" formControlName="includeInIRP"></ejs-switch>
+          <span>Include in IRP</span>
+        </div>
+      </div>
+      <div class="input-container calendar inactive-date">
+        <label for="inactiveDate">Inactivation Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker #inactivationDatepicker id="inactiveDate" class="datepicker" [format]="formatDate"
+            [placeholder]="placeholderDate" [enableMask]="true" [maskPlaceholder]="datepickerMask" appValidateWithMessage
+            formControlName="inactiveDate">
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div>
+        <div class="input-container">
+          <label for="skillDescription">GL Number</label>
+          <input 
+                          class="e-input" type="text" 
+                          formControlName="glNumber" />
+        </div>
+      </div>
+  
+    </form>
+  </ng-template>
+  <ng-template #notBulkEdit>
+     <form class="form-container bootstrap" id="addEditRecordForm" [formGroup]="locationDetailsFormGroup">
+      <div class="form-block"
+        [ngClass]="{ 'no-inid': !isOrgVMSEnabled && isFeatureIrpEnabled, 'prev-form-view': !isFeatureIrpEnabled }">
+        <ng-container *ngFor="let control of locationDialogConfig.baseForm; trackBy: trackByField">
+          <ng-container [ngSwitch]="control.fieldType">
+  
+            <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+              <div class="input-container form-dropdown" [ngStyle]="{'grid-area': control.gridAreaName}">
+                <label [for]="control.field">
+                  {{control.title}}
+                  <span class="required" *ngIf="control.required">*</span>
+                </label>
+                <div class="input-group dropdown" *ngIf="control.sourceKey">
+                  <ejs-dropdownlist appValidateWithMessage [dataSource]="formSourcesMap[control.sourceKey]"
+                    [fields]="dropDownfields" [allowFiltering]="true" [showClearButton]="true"
+                    [formControlName]="control.field">
+                  </ejs-dropdownlist>
+                </div>
               </div>
-            </div>
-          </ng-template>
-
-          <ng-template [ngSwitchCase]="FieldTypes.Input">
-            <div class="input-container" [ngStyle]="{'grid-area': control.gridAreaName}">
-              <label [for]="control.field">
-                {{control.title}}
-                <span class="required" *ngIf="control.required">*</span>
-              </label>
-              <div class="input-group">
-                <input
-                  [attr.maxlength]="control.maxLen || null"
-                  [pattern]="control.pattern || '.*'"
-                  class="e-input"
-                  type="text"
-                  appValidateWithMessage
-                  [formControlName]="control.field"/>
+            </ng-template>
+  
+            <ng-template [ngSwitchCase]="FieldTypes.Input">
+              <div class="input-container" [ngStyle]="{'grid-area': control.gridAreaName}">
+                <label [for]="control.field">
+                  {{control.title}}
+                  <span class="required" *ngIf="control.required">*</span>
+                </label>
+                <div class="input-group">
+                  <input [attr.maxlength]="control.maxLen || null" [pattern]="control.pattern || '.*'" class="e-input"
+                    type="text" appValidateWithMessage [formControlName]="control.field" />
+                </div>
               </div>
+            </ng-template>
+  
+            <ng-template [ngSwitchCase]="FieldTypes.Toggle">
+              <div class="input-container blue-text" [ngStyle]="{'grid-area': control.gridAreaName}">
+                <ejs-switch appValidateWithMessage [formControlName]="control.field"></ejs-switch>
+                <label [for]="control.field">{{ control.title }} <span *ngIf="control.required" class="required">*</span>
+                </label>
+              </div>
+  
+            </ng-template>
+  
+          </ng-container>
+        </ng-container>
+      </div>
+  
+      <ng-container *ngIf="locationDialogConfig.subForms?.length ">
+        <ng-container *ngFor="let subForm of locationDialogConfig.subForms; trackBy: trackByKey">
+          <div>
+            <h3 class="title">{{subForm.formTitle}}</h3>
+            <div [ngClass]="subForm.containerClass">
+              <ng-container *ngFor="let control of subForm.controls; trackBy: trackByField">
+  
+                <ng-container [ngSwitch]="control.fieldType">
+                  <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+                    <div class="input-container form-dropdown" [ngStyle]="{'grid-area': control.gridAreaName}">
+                      <label [for]="control.field">
+                        {{control.title}}
+                        <span class="required" *ngIf="control.required">*</span>
+                      </label>
+                      <div class="input-group dropdown">
+                        <ejs-dropdownlist *ngIf="control.sourceKey" appValidateWithMessage
+                          [dataSource]="formSourcesMap[control.sourceKey]" [formControlName]="control.field">
+                        </ejs-dropdownlist>
+                      </div>
+                    </div>
+                  </ng-template>
+  
+                  <ng-template [ngSwitchCase]="FieldTypes.Input">
+                    <div class="input-container" [ngStyle]="{'grid-area': control.gridAreaName}">
+                      <label [for]="control.field">
+                        {{control.title}}
+                        <span class="required" *ngIf="control.required">*</span>
+                      </label>
+                      <div class="input-group">
+                        <input [attr.maxlength]="control.maxLen || null" [pattern]="control.pattern || '.*'"
+                          class="e-input" [type]="control.inputType || 'text'" appValidateWithMessage
+                          [formControlName]="control.field" />
+                      </div>
+                    </div>
+                  </ng-template>
+  
+                  <ng-template [ngSwitchCase]="FieldTypes.Date">
+                    <div class="input-container calendar" [ngStyle]="{'grid-area': control.gridAreaName}">
+                      <label [for]="control.field">
+                        {{control.title}}
+                        <span class="required" *ngIf="control.required">*</span>
+                      </label>
+                      <div class="input-group datepicker">
+                        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                          [formControlName]="control.field" appValidateWithMessage>
+                        </ejs-datepicker>
+                      </div>
+                    </div>
+                  </ng-template>
+                </ng-container>
+  
+              </ng-container>
             </div>
-          </ng-template>
-
-          <ng-template [ngSwitchCase]="FieldTypes.Toggle">
-            <div class="input-container blue-text" [ngStyle]="{'grid-area': control.gridAreaName}">
-              <ejs-switch
-                appValidateWithMessage
-                [formControlName]="control.field"
-              ></ejs-switch>
-              <label [for]="control.field">{{ control.title }} <span *ngIf="control.required" class="required">*</span>
-              </label>
-            </div>
-          </ng-template>
-
+          </div>
         </ng-container>
       </ng-container>
-    </div>
+    </form>
+  </ng-template>
+ 
 
-    <ng-container *ngIf="locationDialogConfig.subForms?.length">
-      <ng-container *ngFor="let subForm of locationDialogConfig.subForms; trackBy: trackByKey">
-        <div>
-          <h3 class="title">{{subForm.formTitle}}</h3>
-          <div [ngClass]="subForm.containerClass">
-            <ng-container *ngFor="let control of subForm.controls; trackBy: trackByField">
-
-              <ng-container [ngSwitch]="control.fieldType">
-                <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-                  <div class="input-container form-dropdown" [ngStyle]="{'grid-area': control.gridAreaName}">
-                    <label [for]="control.field">
-                      {{control.title}}
-                      <span class="required" *ngIf="control.required">*</span>
-                    </label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        *ngIf="control.sourceKey"
-                        appValidateWithMessage
-                        [dataSource]="formSourcesMap[control.sourceKey]"
-                        [formControlName]="control.field">
-                      </ejs-dropdownlist>
-                    </div>
-                  </div>
-                </ng-template>
-
-                <ng-template [ngSwitchCase]="FieldTypes.Input">
-                  <div class="input-container" [ngStyle]="{'grid-area': control.gridAreaName}">
-                    <label [for]="control.field">
-                      {{control.title}}
-                      <span class="required" *ngIf="control.required">*</span>
-                    </label>
-                    <div class="input-group">
-                      <input
-                        [attr.maxlength]="control.maxLen || null"
-                        [pattern]="control.pattern || '.*'"
-                        class="e-input"
-                        [type]="control.inputType || 'text'"
-                        appValidateWithMessage
-                        [formControlName]="control.field"/>
-                    </div>
-                  </div>
-                </ng-template>
-
-                <ng-template [ngSwitchCase]="FieldTypes.Date">
-                  <div class="input-container calendar" [ngStyle]="{'grid-area': control.gridAreaName}">
-                    <label [for]="control.field">
-                      {{control.title}}
-                      <span class="required" *ngIf="control.required">*</span>
-                    </label>
-                    <div class="input-group datepicker">
-                      <ejs-datepicker
-                        class="datepicker"
-                        format="MM/dd/yyyy"
-                        placeholder="MM/DD/YYYY"
-                        [formControlName]="control.field"
-                        appValidateWithMessage
-                      >
-                      </ejs-datepicker>
-                    </div>
-                  </div>
-                </ng-template>
-              </ng-container>
-
-            </ng-container>
-          </div>
-        </div>
-      </ng-container>
-    </ng-container>
-  </form>
+ 
 </app-side-dialog>
 
-<ejs-dialog
-  id="addRegionDialog"
-  cssClass="add-region-dialog"
-  #addRegionDialog
-  isModal="true"
-  [visible]="false"
-  showCloseIcon="true"
-  (overlayClick)="hideRegionDialog()"
-  width="448px"
-  height="282px"
->
+<ejs-dialog id="addRegionDialog" cssClass="add-region-dialog" #addRegionDialog isModal="true" [visible]="false"
+  showCloseIcon="true" (overlayClick)="hideRegionDialog()" width="448px" height="282px">
   <ng-template #header>
     <section class="header-container">
       <div class="e-card-header">
@@ -467,37 +371,24 @@
     <div class="input-container bootstrap" [formGroup]="regionFormGroup">
       <label for="invoiceNote">Region</label>
       <div class="input-group">
-        <input id="addRegion"
-               class="e-input"
-               type="text"
-               maxlength="50"
-               required
-               appValidateWithMessage
-               formControlName="newRegionName"/>
+        <input id="addRegion" class="e-input" type="text" maxlength="50" required appValidateWithMessage
+          formControlName="newRegionName" />
       </div>
     </div>
   </ng-template>
 
   <ng-template #footerTemplate>
     <div class="e-card-content">
-      <button
-        id="cancelDialogButton"
-        ejs-button
-        cssClass="e-outline"
-        (click)="hideRegionDialog()">Cancel</button>
-      <button
-        id="okDialogButton"
-        ejs-button
-        [isPrimary]="true"
-        (click)="saveRegion()">Save</button>
+      <button id="cancelDialogButton" ejs-button cssClass="e-outline" (click)="hideRegionDialog()">Cancel</button>
+      <button id="okDialogButton" ejs-button [isPrimary]="true" (click)="saveRegion()">Save</button>
     </div>
   </ng-template>
 </ejs-dialog>
 
-<app-import-locations
-  [dialogEvent]="importDialogEvent"
-  [irpFlagEnabled]="isFeatureIrpEnabled"
-  [orgIrpEnabled]="isOrgIrpEnabled"
-  [orgVMSEnabled]="isOrgVMSEnabled"
-  (reloadItemsList)="updatePage()">
+<app-import-locations [dialogEvent]="importDialogEvent" [irpFlagEnabled]="isFeatureIrpEnabled"
+  [orgIrpEnabled]="isOrgIrpEnabled" [orgVMSEnabled]="isOrgVMSEnabled" (reloadItemsList)="updatePage()">
 </app-import-locations>
+<app-bulk-location-actiondialog [message]="bulkactionmessage" [locationNames]="bulkactionnotvalidlocationnmaes"
+  [bulkAction]="bulkaction" [isDepartment]="isDepartment">
+
+</app-bulk-location-actiondialog>
