@@ -350,6 +350,7 @@ const COMPONENTS = [
     ChipsCssClassPipeModule,
     OrderCloseReasonInfoModule,
     GeneralOrderPerDiemInfoModule,
+    LocalDateTimePipe,
   ],
   declarations: [
     ...COMPONENTS,

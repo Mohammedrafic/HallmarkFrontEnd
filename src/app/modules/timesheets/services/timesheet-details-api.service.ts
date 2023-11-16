@@ -13,6 +13,7 @@ import {
   MileageCreateResponse,
   TimesheetDetailsModel,
   TimesheetFileData,
+  TimesheetHistoricalEvent,
 } from '../interface';
 
 @Injectable()
@@ -122,6 +123,60 @@ export class TimesheetDetailsApiService {
 
   public recalculateTimesheet(jobId: number): Observable<boolean> {
     return this.http.post<boolean>('/api/Timesheets/performRecalculation', { jobIds: [jobId] });
+  }
+
+  public getTimesheetHistoricalEvents(id: number): Observable<TimesheetHistoricalEvent[]> {
+    // TODO
+    return of([
+      {
+        content: 'Timesheet status changed to Approved by Organization User',
+        dateTime: '2023-02-14T17:18:37.12045+00:00',
+        localDateTime: '2023-02-14T12:18:37.12045-05:00',
+        userName: 'SuperAdmin, Hallmark',
+      },
+      {
+        content: 'Timesheet status changed to Approved by Organization User',
+        dateTime: '2023-02-14T17:18:37.12045+00:00',
+        localDateTime: '2023-02-14T12:18:37.12045-05:00',
+        userName: 'SuperAdmin, Hallmark',
+      },
+      {
+        content: 'Timesheet status changed to Rejected by Organization User,\nRejection reason: ‘Missed Meal for 20th July’',
+        dateTime: '2023-02-14T17:18:37.12045+00:00',
+        localDateTime: '2023-02-14T12:18:37.12045-05:00',
+        userName: 'SuperAdmin, Hallmark',
+      },
+      {
+        content: 'Timesheet status changed to Pending Approval by Agency User',
+        dateTime: '2023-02-14T17:18:37.12045+00:00',
+        localDateTime: '2023-02-14T12:18:37.12045-05:00',
+        userName: 'SuperAdmin, Hallmark',
+      },
+      {
+        content: 'Timesheet status changed to Approved by Organization User',
+        dateTime: '2023-02-14T17:18:37.12045+00:00',
+        localDateTime: '2023-02-14T12:18:37.12045-05:00',
+        userName: 'SuperAdmin, Hallmark',
+      },
+      {
+        content: 'Timesheet status changed to Approved by Organization User',
+        dateTime: '2023-02-14T17:18:37.12045+00:00',
+        localDateTime: '2023-02-14T12:18:37.12045-05:00',
+        userName: 'SuperAdmin, Hallmark',
+      },
+      {
+        content: 'Timesheet status changed to Rejected by Organization User, Rejection reason: ‘Missed Meal for 20th July’',
+        dateTime: '2023-02-14T17:18:37.12045+00:00',
+        localDateTime: '2023-02-14T12:18:37.12045-05:00',
+        userName: 'SuperAdmin, Hallmark',
+      },
+      {
+        content: 'Timesheet status changed to Pending Approval by Agency User',
+        dateTime: '2023-02-14T17:18:37.12045+00:00',
+        localDateTime: '2023-02-14T12:18:37.12045-05:00',
+        userName: 'SuperAdmin, Hallmark',
+      },
+    ]);
   }
 
   private organizationDownloadAttachment(fileId: number): Observable<Blob> {

@@ -82,6 +82,8 @@ import { TimesheetTableApproveCellComponent } from
   './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimesheetTableLinkComponent } from
   './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
+import { TimesheetHistoricalEventsModule } from
+    './components/timesheet-historical-events/timesheet-historical-events.module';
 import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { FileViewerModule } from '@shared/modules/file-viewer/file-viewer.module';
 import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
@@ -203,7 +205,8 @@ const gridIcons = {
     TooltipContainerModule,
     UploadFileAreaModule,
     SwitchEditorModule,
-    AccordionModule
+    AccordionModule,
+    TimesheetHistoricalEventsModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

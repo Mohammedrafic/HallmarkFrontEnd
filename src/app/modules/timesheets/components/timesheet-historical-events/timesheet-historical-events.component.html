@@ -1,0 +1,12 @@
+<div class="historical-events">
+  <ng-container *ngIf="historicalEvents?.length; else noData">
+    <div class="event" *ngFor="let event of historicalEvents">
+      <span class="local-date-time">{{ event.localDateTime | localDateTime : 'MM/dd/yyyy, HH:mm:ss'}} </span>
+      <span [innerText]="event.content"></span>
+    </div>
+  </ng-container>
+  <ng-template #noData>
+    <div>No data yet</div>
+  </ng-template>
+</div>
+

@@ -6,7 +6,7 @@
         <span *ngIf="!event?.userId; else name">{{ event?.actionDescription }} by System</span>
         <ng-template #name>
           {{ event?.actionDescription }} by {{ businessUnitValues[event.userType] }} User
-          <span class="hyperlink"> {{ event?.firstName }} {{ event?.lastName }}</span>
+          <span> {{ event?.firstName }} {{ event?.lastName }}</span>
         </ng-template>
       </p>
     </ng-container>

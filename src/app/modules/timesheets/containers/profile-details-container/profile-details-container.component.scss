@@ -139,6 +139,11 @@ $chip-margin: 8px;
   }
 }
 
+.accordions-section {
+  display: flex;
+  gap: 16px;
+}
+
 .container {
   padding-bottom: 0 !important;
 }
@@ -186,7 +191,7 @@ $chip-margin: 8px;
     min-height: 210px;
 
     &:not(:last-of-type) {
-      margin-right: 8px;
+      margin-right: 16px;
     }
   }
 }
@@ -277,6 +282,10 @@ app-navigation-panel {
     .miles {
       margin: 0 !important;
     }
+  }
+
+  .accordions-section {
+    flex-wrap: wrap;
   }
 }
 
