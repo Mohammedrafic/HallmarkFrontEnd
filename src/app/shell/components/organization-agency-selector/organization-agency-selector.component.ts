@@ -211,10 +211,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         const isMspArea = area.isMSPArea;
 
         if (isMspArea) {
-          this.applyMsps(isMspArea);
-          return;
-        }
-        if (isMspArea) {
           const currentArea = 'MSP';
 
           this.store.dispatch(new LastSelectedOrganisationAgency(currentArea)).pipe(
