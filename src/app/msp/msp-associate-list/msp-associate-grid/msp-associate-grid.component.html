@@ -26,7 +26,6 @@
         </ng-template>
       </e-column>
       <e-column field="name" headerText="Name" width="200" textAlign="left"></e-column>
-      <e-column field="id" headerText="Business Unit Id" width="150" textAlign="Left"></e-column>
       <e-column field="agencyStatus" headerText="Agency Status" width="150" textAlign="Left">
         <ng-template #template let-data>
           <div class="status-cell">
@@ -38,17 +37,9 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="organizationPrefix" headerText="Organization Prefix" width="200" textAlign="left"></e-column>
-      <e-column field="businessUnitType" headerText="Business Unit Type" width="170" textAlign="Left">
-        <ng-template #template let-data>
-          {{ businessUnitType[data.businessUnitType] }}
-        </ng-template>
-      </e-column>
-      <e-column field="isVMSEnabled" headerText="VMS Enabled" width="150" textAlign="left"></e-column>
-      <e-column field="isIRPEnabled" headerText="IRP Enabled" width="150" textAlign="Left"></e-column>
-      <e-column field="parentUnitId" headerText="Parent Unit Id" width="150" textAlign="left"></e-column>
-      <e-column field="dbConnectionName" headerText="DB Connection Name" width="190" textAlign="Left"></e-column>
       <e-column field="netSuiteId" headerText="Net Suite Id" width="150" textAlign="left"></e-column>
+      <e-column field="externalId" headerText="External Id" width="150" textAlign="left"></e-column>
+      <e-column field="contactPerson" headerText="Contact Person" width="150" textAlign="left"></e-column>
     </e-columns>
   </ejs-grid>
   <app-grid-pagination [currentPage]="currentPage"
