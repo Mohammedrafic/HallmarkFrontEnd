@@ -368,7 +368,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
    let selectedMenuItem = event.items.find((data:any)=>data.id == this.selectedItem);
    if (selectedMenuItem?.properties.id === VMSReportsMenuId || IRPReportsMenuId) {
     const menuId = selectedMenuItem?.properties?.id;
-    localStorage.setItem("menuId", String(menuId))
+    window.localStorage.setItem("menuId", String(menuId))
     this.userService.setData(selectedMenuItem);
   }
     if (selectedMenuItem) {
