@@ -37,7 +37,7 @@ import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '@client/client.config';
 import { Menu, MenuItem } from '@shared/models/menu.model';
 import { User } from '@shared/models/user.model';
-import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser } from '../store/user.actions';
+import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser, SetLastSelectedOrganizationAgencyId } from '../store/user.actions';
 import { UserState } from '../store/user.state';
 import { DismissAlert, DismissAllAlerts } from '@admin/store/alerts.actions';
 import { DismissAlertDto } from '@shared/models/alerts-template.model';
@@ -520,6 +520,12 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     if (businessUnitId) {
         this.alertSideBarCloseClick();
         window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
+        this.store.dispatch(
+          new SetLastSelectedOrganizationAgencyId({
+            lastSelectedAgencyId: null,
+            lastSelectedOrganizationId: businessUnitId
+          })
+        );
     }
     if(orderId){
       window.localStorage.setItem("OrderId",JSON.stringify(orderId));
@@ -533,6 +539,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     if(publicId){
       window.localStorage.setItem("OrderPublicId",JSON.stringify(publicId));
     }
+
   }
 
   private getAlertsForUser(): void {
