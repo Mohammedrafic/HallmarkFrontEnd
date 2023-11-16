@@ -1,6 +1,13 @@
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
-import { SystemFlags, WorkflowTabName, WorkflowTypeList } from '@organization-management/workflow/interfaces';
+import {
+  ApplicabilityFieldsConfig,
+  ApplicabilitySourceList,
+  SystemFlags,
+  WorkflowTabName,
+  WorkflowTypeList
+} from '@organization-management/workflow/interfaces';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { Applicability, ApplicabilityItemType } from '@organization-management/workflow/enumns';
 
 export const WorkflowTabNames: WorkflowTabName = {
   vmsWorkflow: 'VMS Order Workflow',
@@ -18,7 +25,24 @@ export const VmsWorkflowType: WorkflowTypeList = {
   text: WorkflowTabNames.vmsWorkflow,
 };
 
-export const ApplicabilitySources = ['Initial Order', 'Extension'];
+export const ApplicabilityLists: string[] = ['Initial Order', 'Extension'];
+export const ApplicabilitySources: ApplicabilitySourceList[] = [
+  {
+    name: Applicability.Order,
+    id: ApplicabilityItemType.InitialOrder
+  },
+  {
+    name: Applicability.Extension,
+    id: ApplicabilityItemType.Extension
+  }
+];
+
+export const CreateApplicabilityFieldConfig = (): ApplicabilityFieldsConfig => {
+  return {
+    showField: false,
+    sources: ApplicabilitySources
+  };
+};
 
 export const CreateWorkflowTypeList = (irpFlag: boolean, systemFlags: SystemFlags): WorkflowTypeList[] => {
   const workflowType = [];

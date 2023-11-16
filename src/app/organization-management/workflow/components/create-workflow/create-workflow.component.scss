@@ -44,10 +44,10 @@
         .sources {
           display: flex;
 
-          .checkbox-container {
+          .radio-container {
             padding-top: 5px;
 
-            ejs-checkbox {
+            ejs-radiobutton {
               min-width: 120px;
             }
           }

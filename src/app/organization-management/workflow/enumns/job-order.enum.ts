@@ -13,3 +13,8 @@ export enum TypeFlow {
   orderWorkflow = 1,
   applicationWorkflow = 2
 }
+
+export enum ApplicabilityItemType {
+  InitialOrder = 0,
+  Extension = 1
+}

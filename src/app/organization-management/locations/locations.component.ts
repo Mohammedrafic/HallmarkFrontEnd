@@ -29,7 +29,6 @@ import {
   Location, LocationFilter, LocationFilterOptions, LocationsPage,
   LocationType, TimeZoneModel,
 } from '@shared/models/location.model';
-import { Organization } from '@shared/models/organization.model';
 import { Region } from '@shared/models/region.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { FilterService } from '@shared/services/filter.service';
@@ -78,9 +77,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   @Select(OrganizationManagementState.locationsByRegionId)
   public readonly locations$: Observable<LocationsPage>;
-
-  @Select(OrganizationManagementState.organization)
-  public readonly organization$: Observable<Organization>;
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
@@ -139,7 +135,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   private pageSubject = new Subject<number>();
   private componentDestroy: () => Observable<unknown>;
 
-
   get dialogHeader(): string {
     return this.isEdit ? 'Edit Location' : 'Add Location';
   }
@@ -163,7 +158,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.watchForPageChange();
     this.populateFilterOptions();
     this.watchForOrgChange();
-    this.watchForOrganizations();
     this.populateFormOptions();
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
@@ -223,6 +217,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   }
 
   changeRegion(event: ChangeEventArgs): void {
+    if (this.selectedRegion?.id === (event.itemData as Region).id) {
+      return;
+    }
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion?.id) {
       this.clearFilter();
@@ -584,15 +581,11 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   private getOrganization(): void {
     this.store.dispatch(new GetOrganizationById(
       this.businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number
-    ));
-  }
-
-  private watchForOrganizations(): void {
-    this.organization$
-    .pipe(
+    )).pipe(
       filter(Boolean),
       delay(100),
-      tap((organization) => {
+      tap((state) => {
+        const organization = state.organizationManagement.organization;
         this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
         if (this.isFeatureIrpEnabled) {
           this.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
@@ -612,11 +605,11 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       tap((data) => {
         this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
         this.selectedRegion = data.organizationManagement.regions[0];
-
+        this.filters.regionId = this.selectedRegion?.id;
       }),
       filter(() => !!this.selectedRegion),
       tap(() => { this.getLocations(); }),
-      takeUntil(this.componentDestroy()),
+      take(1),
     ).subscribe();
   }
 

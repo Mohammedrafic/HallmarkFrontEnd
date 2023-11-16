@@ -1,5 +1,6 @@
 export const RECORD_ADDED = 'Record has been added';
 export const RECORDS_ADDED = 'Records have been added';
+export const RECORD_ADD = 'Credential added successfully';
 export const RECORD_MODIFIED = 'Record has been modified';
 export const RECORD_UNSAVED = 'Credential added successfully : Only credentials associated with the order will be displayed';
 export const SETUPS_ACTIVATED = 'Setups were successfully activated';
@@ -156,7 +157,7 @@ export const ERROR_CAN_NOT_ADD_MANAGENOTE_WITHOUT_VIEWNOTE="We can't add the man
 export const AgencyPartnershipSuspended = 'Agency Partnership is suspended';
 export const ViewOrderIRP_PERMISSION = 'Additional permission is required (CanOrganizationViewOrdersIRP)';
 export const ViewOrderVMS_PERMISSION = 'Additional permission is required (CanOrganizationViewOrderVMS)';
-export const TaxIdValidationMessage = '12-digit number';
+export const TaxIdValidationMessage = '9-12-digit number';
 export const NumberValidationMessage = '10-12 digit number';
 export const SwiftCodeValidationMessage = '8-11 alphanumeric code for international payments';
 export const RoutingNumberMessage = '20-digit code to identify financial institution';

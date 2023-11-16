@@ -471,6 +471,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private candidateStatusIds: string[] = [];
   private SelectedCandiateStatuses: any[] = [];
   private eliteOrderId: number;
+  private orderPublicId:string;
   private alertTitle: string;
   private orderManagementPagerState: OrderManagementPagerState | null;
   private orderPositionStatus: string | null;
@@ -590,8 +591,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   override ngOnInit(): void {
     this.eliteOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
+    this.orderPublicId = JSON.parse((localStorage.getItem('OrderPublicId') || '""')) as string;
     (!this.eliteOrderId) ? this.eliteOrderId = 0 : "";
+    (!this.orderPublicId)?this.orderPublicId='':"";
     window.localStorage.setItem("OrderId", JSON.stringify(""));
+    window.localStorage.setItem("OrderPublicId", JSON.stringify(""));
     this.getalerttitle();
     super.ngOnInit();
 
@@ -2062,19 +2066,15 @@ public RedirecttoIRPOrder(order:Order)
         });
       }
       if (this.ordersPage?.items) {
-        this.eliteOrderId = this.ordersPage.items.find((i) => i.id === this.eliteOrderId)
-          ? this.eliteOrderId
-          : this.redirectedfromnotification ? this.eliteOrderId : 0;
-        if (this.eliteOrderId > 0 ) {
-          this.ordersPage.items = this.ordersPage.items.filter(x => x.id == this.eliteOrderId);
-          const data = this.ordersPage.items;
-          this.ordersPage.totalCount = data.length;
+         const filteredOrder = this.ordersPage.items.find(x => x.id == this.eliteOrderId);
+        if (this.eliteOrderId > 0 && filteredOrder) {
+         const data = this.ordersPage.items;
           if(this.gridApi && data){
             this.eliteOrderPublicId=data[0]?.publicId!;
             this.redirectedIrporder=this.eliteOrderId;
           }
           if(this.gridWithChildRow){
-            this.gridWithChildRow.dataSource = data;
+            this.gridWithChildRow.dataSource = this.ordersPage.items;
             this.onRowClick({ data });
           }
 
@@ -2121,7 +2121,7 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   private adjustFilters(isNotPreservedFilter: boolean): void {
-    if (isNotPreservedFilter) {
+    if (isNotPreservedFilter && this.eliteOrderId == 0) {
       this.setDefaultFilter();
     }
     this.patchFilterForm(!!this.filters?.contactEmails);
@@ -2368,6 +2368,11 @@ public RedirecttoIRPOrder(order:Order)
           if (!this.preservedOrderService.isOrderPreserved() && this.eliteOrderId == 0) {
             this.prepareFiltersToDispatch(state);
           }
+          if(this.eliteOrderId > 0){
+            this.filters.orderPublicId = this.orderPublicId;
+            this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.orderPublicId);
+            this.getOrders(true);            
+         }
 
           if (!isNotPreserved ) {
             this.getOrders(true);
@@ -2384,7 +2389,7 @@ public RedirecttoIRPOrder(order:Order)
 
         const filterState = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersByPageName) as
           PreservedFiltersByPage<OrderFilter>;
-
+console.log('filterState',filterState)
         if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
           this.adjustFilters(filterState.isNotPreserved);
         } else {

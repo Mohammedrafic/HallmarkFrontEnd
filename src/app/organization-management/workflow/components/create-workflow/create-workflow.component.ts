@@ -66,7 +66,7 @@ export class CreateWorkflowComponent extends DestroyDialog implements OnInit {
   }
 
   public saveWorkflow(): void {
-    this.createWorkflowService.saveWorkflow(this.selectedTab, this.workflowForm);
+   this.createWorkflowService.saveWorkflow(this.selectedTab, this.workflowForm);
   }
 
   public closeModal(): void {
@@ -102,12 +102,6 @@ export class CreateWorkflowComponent extends DestroyDialog implements OnInit {
       this.isEditModal,
       this.selectedCard as WorkflowWithDetails
     );
-
-    //todo: remove this logic, when full flow will be implemented
-    if(this.isEditModal && this.selectedTab === WorkflowNavigationTabs.VmsOrderWorkFlow) {
-      this.workflowForm.get('initialOrders')?.disable();
-      this.workflowForm.get('extensions')?.disable();
-    }
   }
 
   private closeWorkflowDialog(): void {

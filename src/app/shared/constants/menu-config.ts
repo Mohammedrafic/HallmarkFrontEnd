@@ -634,6 +634,11 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: 'agency/invoices',
     },
+    26: {
+      // Reports
+      icon: 'pie-chart',
+      route: 'agency/reports/financial-timesheet-report',
+    },
     27: {
       // Settings
       icon: 'settings',

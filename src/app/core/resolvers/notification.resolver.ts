@@ -5,15 +5,17 @@ import {
   ActivatedRouteSnapshot,
   ActivatedRoute
 } from '@angular/router';
+import { Store } from '@ngxs/store';
 import { UserService } from '@shared/services/user.service';
 import { Observable, catchError, map, of } from 'rxjs';
+import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationResolver implements Resolve<boolean> {
   
-  constructor(private router: Router, private userService:UserService) {}
+  constructor(private router: Router, private userService:UserService, private store: Store,) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
     let routeSnapshot = state.url.split('/notification/'+route.params['notificationId']);
@@ -21,6 +23,12 @@ export class NotificationResolver implements Resolve<boolean> {
       map((data) => {
         if (data.organizationId) {
             window.localStorage.setItem("BussinessUnitID",JSON.stringify(data.organizationId));
+            this.store.dispatch(
+              new SetLastSelectedOrganizationAgencyId({
+                lastSelectedAgencyId: null,
+                lastSelectedOrganizationId: data.organizationId
+              })
+            );
         }
         if(data.orderId){
             window.localStorage.setItem("OrderId",JSON.stringify(data.orderId));
@@ -31,6 +39,9 @@ export class NotificationResolver implements Resolve<boolean> {
         if(data.id){
           window.localStorage.setItem("alertId",JSON.stringify(data.id));
         }     
+        if(data.publicId){
+          window.localStorage.setItem("OrderPublicId",JSON.stringify(data.publicId));
+        }
 
         this.router.navigate([routeSnapshot[0]]);
         return true;

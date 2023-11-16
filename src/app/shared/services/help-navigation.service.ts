@@ -6,6 +6,8 @@ import { Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { HelpIterator } from '@shared/helpers/iterator';
 import { HelpDomain, HelpNavigationLinks } from '@shell/shell.constant';
+import { DomainLinks } from '@shared/models/help-site-url.model';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { AppState } from 'src/app/store/app.state';
 
 @Injectable()
@@ -15,7 +17,10 @@ export class HelpNavigationService {
     private store: Store,
   ) {}
 
-  navigateHelpPage(isAgency: boolean, orgHelpDomain: string): void {
+  navigateHelpPage(isAgency: boolean, links: DomainLinks): void {
+    const { isIRPEnabled, isVMCEnabled } =
+    this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+    const selectedDomain = this.resolveDomain(links, isAgency, isIRPEnabled, isVMCEnabled);
     const currentUrl = this.router.url;
     const fragments = currentUrl.split('/').filter((fragment) => !!fragment);
 
@@ -29,6 +34,12 @@ export class HelpNavigationService {
     const iterator = new HelpIterator(fragments, true);
     let keyFound = false;
 
+    //TODO: A temporary solution for a redirect when an organization is created for VMS and IRP.
+    // Should implement resolve context, after IRP implementation
+    if(!!isIRPEnabled && !!isVMCEnabled && !isAgency) {
+      this.redirectToDefaultSelectedDomain(isAgency, selectedDomain);
+    }
+
     while (!helpUrls[iterator.getCurrent()] && iterator.hasNext()) {
       const urlKey = iterator.getNext();
       const isComplexUrl = urlKey === 'add' || urlKey === 'edit';
@@ -37,16 +48,39 @@ export class HelpNavigationService {
         keyFound = true;
         const helpPage = !isComplexUrl ? helpUrls[urlKey] as string
         : (helpUrls[urlKey] as Record<string, string>)[iterator.getNext()];
-        const url = this.constructUrl(isAgency, helpPage, orgHelpDomain);
-
+        const url = this.constructUrl(isAgency, helpPage, selectedDomain);
         window.open(url, '_blank', 'noopener');
         break;
       }
     }
 
     if (!keyFound) {
-      const url = this.constructUrl(isAgency, '', orgHelpDomain);
-      window.open(url, '_blank', 'noopener');
+      this.redirectToDefaultSelectedDomain(isAgency, selectedDomain);
+    }
+  }
+
+  private redirectToDefaultSelectedDomain(isAgency: boolean, selectedDomain: string): void {
+    const url = this.constructUrl(isAgency, '', selectedDomain);
+    window.open(url, '_blank', 'noopener');
+  }
+
+  private resolveDomain(
+    domainLinks: DomainLinks,
+    isAgency: boolean,
+    isIRPEnabled = false,
+    isVMCEnabled = false
+  ): string {
+    switch (true) {
+      case isAgency:
+        return domainLinks.agency;
+      case isIRPEnabled && isVMCEnabled:
+        return domainLinks.both;
+      case isIRPEnabled:
+        return domainLinks.irp;
+      case isVMCEnabled:
+        return domainLinks.vms;
+      default:
+        return domainLinks.vms;
     }
   }
 

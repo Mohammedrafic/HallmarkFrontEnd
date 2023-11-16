@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { WorkFlowFilterOption, WorkflowTypeList } from '@organization-management/workflow/interfaces';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
@@ -19,6 +19,8 @@ import {
 } from '@shared/models/workflow-mapping.model';
 import { isEmpty } from 'lodash';
 import { User } from '@shared/models/user-managment-page.model';
+import { WorkflowWithDetails } from '@shared/models/workflow.model';
+import { ApplicabilityItemType } from '@organization-management/workflow/enumns';
 
 @Injectable()
 export class WorkflowMappingService {
@@ -83,6 +85,26 @@ export class WorkflowMappingService {
     });
   }
 
+  public updateWorkflowMappingControls(form: FormGroup, type: WorkflowGroupType): void {
+    if (type === WorkflowGroupType.VMSOrderWorkflow) {
+      form.addControl('workflowApplicability', new FormControl('', Validators.required));
+      return;
+    }
+
+    form.removeControl('workflowApplicability');
+  }
+
+  public populateWorkflowApplicabilityField(
+    type: WorkflowGroupType,
+    initialOrder: boolean,
+    form: FormGroup
+  ): void {
+    if (type === WorkflowGroupType.VMSOrderWorkflow) {
+      const applicabilityValue = initialOrder ? ApplicabilityItemType.InitialOrder : ApplicabilityItemType.Extension;
+      form.controls['workflowApplicability'].setValue(applicabilityValue);
+    }
+  }
+
   public getDepartmentsBaseOnType(
     form: FormGroup,
     locations: OrganizationLocation[],
@@ -126,6 +148,17 @@ export class WorkflowMappingService {
       [WorkflowGroupType.VMSOrderWorkflow]: usersWithPermission.vmsUsers,
       [WorkflowGroupType.IRPOrderWorkflow]: usersWithPermission.irpUsers,
     };
+  }
+
+  public getWorkflowsBaseOnApplicability(
+    workflows: WorkflowWithDetails[],
+    applicability: ApplicabilityItemType
+    ): WorkflowWithDetails[] {
+    const isInitialOrder = applicability === ApplicabilityItemType.InitialOrder;
+
+    return workflows.filter((workflow: WorkflowWithDetails) => {
+      return isInitialOrder ? workflow.initialOrders : workflow.extensions;
+    });
   }
 
   public getRolesBaseOnWorkflow(

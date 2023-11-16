@@ -20,6 +20,7 @@ export interface WorkflowMappingGet {
   stepMappings: StepMapping[];
   initialOrders?: boolean;
   extensions?: boolean;
+  affectiveDate?: string;
 }
 
 export class WorkflowSkill {
