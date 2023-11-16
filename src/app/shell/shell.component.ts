@@ -516,7 +516,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.store.dispatch(new ShowCustomSideDialog(true));
   }
 
-  getContentDetails(businessUnitId?: number,orderId?: number,title?:string,alertId?:number): void {
+  getContentDetails(businessUnitId?: number,orderId?: number,title?:string,alertId?:number,publicId?:string): void {
     if (businessUnitId) {
         this.alertSideBarCloseClick();
         window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
@@ -529,6 +529,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     }
     if(alertId){
       window.localStorage.setItem("alertId",JSON.stringify(alertId));
+    }
+    if(publicId){
+      window.localStorage.setItem("OrderPublicId",JSON.stringify(publicId));
     }
   }
 
