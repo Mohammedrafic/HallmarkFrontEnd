@@ -1,5 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-status-component',
@@ -9,15 +11,32 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 })
 export class StatusComponentComponent implements OnInit {
   statusForm = new FormGroup({});
-  constructor(private fb:FormBuilder) { }
+  private unsubscribe$: Subject<void> = new Subject();
+  public isValid: boolean = false;
+
+  constructor(private fb:FormBuilder, private activeRoute:ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.subscribeEvent();
     this.statusForm = this.fb.group({
-      jobId: [''],
+      jobId: ['', Validators.required],
+    });
+  }
+
+  private subscribeEvent(): void {
+    this.activeRoute.params.pipe(takeUntil(this.unsubscribe$)).subscribe((params) => {
+      if (params['id']) {
+        // this.fileHash = params['id'];
+        // this.store.dispatch(new GetGroupedFiles(this.fileHash));
+        // this.initialFileId = params['initialId'];
+      }
     });
   }
 
   onSubmit(){
+    if(!this.statusForm.valid){
+      this.isValid=true
+    }
     console.log(this.statusForm)
   }
 

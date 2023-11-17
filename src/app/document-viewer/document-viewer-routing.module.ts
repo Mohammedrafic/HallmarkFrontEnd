@@ -6,6 +6,11 @@ import { StatusComponentComponent } from './components/status-component/status-c
 
 const routes: Routes = [
   {
+    path: 'status',
+    component: StatusComponentComponent,
+    data: { skipAuthentication: true },
+  },
+  {
     path: '',
     component: FailedDocumentViewerComponent,
     data: { skipAuthentication: true },
@@ -15,11 +20,6 @@ const routes: Routes = [
     component: DocumentViewerComponent,
     data: { skipAuthentication: true },
   },
-  {
-    path: 'status',
-    component: StatusComponentComponent,
-    data: { skipAuthentication: true },
-  }
 ];
 
 @NgModule({

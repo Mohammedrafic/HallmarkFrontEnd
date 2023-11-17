@@ -14,3 +14,9 @@ export interface DocumentViewerFile {
   name: string;
   fileId: string;
 }
+
+export interface Status{
+  orderId: number;
+  statusText: string;
+  jobId: number;
+}
