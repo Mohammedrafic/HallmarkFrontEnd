@@ -57,24 +57,31 @@ private findFirstNonEmptyItem(items: any[]): any {
       return item;
     }
   }
-  return null;
+  return '/analytics';
 }
 
   private handleConfigChanges(config: MenuSettings[]): void {
     if (config.length > 0) {
       const menuId=window.localStorage.getItem("menuId")
       let selection = (this.isAnalytics && Number(menuId) === VMSReportsMenuId) ? this.findFirstNonEmptyItem(this.config) : this.config[0];  
-          if (this.navigateTo) {
+      if (this.navigateTo) {
         const navigateToSubMenu = this.config.find((item) => item.route === this.navigateTo);
         if (navigateToSubMenu) {
           selection = navigateToSubMenu;
         }
       }
-      this.router.navigate([(selection as any).route], { relativeTo: this.route });
-      this.listBox?.selectItems([selection['text'] as string],false);
-      setTimeout(() => {
-        this.listBox?.selectItems([selection['text'] as string]);
-    }, 10);  
+      if(selection=='/analytics')
+      {
+        this.router.navigate(['/analytics'], { relativeTo: this.route });
+      }
+      else{
+        this.router.navigate([(selection as any).route], { relativeTo: this.route });
+        this.listBox?.selectItems([selection['text'] as string],false);
+        setTimeout(() => {
+          this.listBox?.selectItems([selection['text'] as string]);
+      }, 10);  
+      }
+     
     }
     if(this.isAnalytics === true){
       this.tooltip = new Tooltip({
