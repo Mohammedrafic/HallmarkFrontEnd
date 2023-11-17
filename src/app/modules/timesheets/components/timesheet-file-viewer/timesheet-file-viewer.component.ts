@@ -58,6 +58,7 @@ export class TimesheetFileViewerComponent extends Destroyable implements OnInit 
     this.actions$.pipe(
       ofActionSuccessful(FileViewer.Open),
       switchMap(({ payload: { fileName, getPDF, getOriginal } }: FileViewer.Open) => {
+        this.imageSrs = '';
         this.fileName = fileName;
         this.getOriginalFile = getOriginal;
         this.preViewDoc = true;
