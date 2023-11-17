@@ -26,6 +26,7 @@ import {
 import { NgxsModule } from '@ngxs/store';
 import { DocumentViewerState } from './store/document-viewer.state';
 import { StatusComponentComponent } from './components/status-component/status-component.component';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
 const icons = {
   X,
@@ -55,6 +56,7 @@ const icons = {
     ToolbarModule,
     ListBoxModule,
     PdfViewerModule,
+    ValidateDirectiveModule,
     ReactiveFormsModule,
     FeatherModule.pick(icons),
     CommonModule,

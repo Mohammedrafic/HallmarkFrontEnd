@@ -12,7 +12,6 @@ import { Subject, takeUntil } from 'rxjs';
 export class StatusComponentComponent implements OnInit {
   statusForm = new FormGroup({});
   private unsubscribe$: Subject<void> = new Subject();
-  public isValid: boolean = false;
 
   constructor(private fb:FormBuilder, private activeRoute:ActivatedRoute) { }
 
@@ -34,10 +33,9 @@ export class StatusComponentComponent implements OnInit {
   }
 
   onSubmit(){
-    if(!this.statusForm.valid){
-      this.isValid=true
+    if(this.statusForm.valid){
+      console.log(this.statusForm)
     }
-    console.log(this.statusForm)
   }
 
 }
