@@ -194,7 +194,7 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
         agencyIds: new FormControl([]),       
         startDate: new FormControl(startDate,[]),
         endDate: new FormControl(new Date(Date.now()),[]),
-        skillCategoryIds: new FormControl(null),
+        skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
       }
     );
