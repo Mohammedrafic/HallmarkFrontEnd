@@ -47,6 +47,7 @@ import {
   INACTIVE_MESSAGE,
   INACTIVEDATE,
   INACTIVEDATE_DEPARTMENT,
+  INACTIVEDATE_SHIFT
 } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
@@ -72,6 +73,8 @@ import {
   GetOrganizationSettings,
 } from '@organization-management/store/organization-management.actions';
 import { OrderStatus } from '@shared/enums/order-management';
+import{ ShiftsService } from '@organization-management/shifts/shifts.service'
+import { ScheduleShift } from '@shared/models/schedule-shift.model';
 export enum SubmitButton {
   SaveForLater = '0',
   Save = '1',
@@ -101,6 +104,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public dates: string;
   public locationdates: string;
   public departmentdates: string;
+  public shiftdates: string;
   public isLocation = false;
   public isLocationAndDepartment = false;
   public isSaveForTemplate = false;
@@ -112,6 +116,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
   public settings: { [key in SettingsKeys]?: Configuration };
   private IsSettingsEnabledByOrganisation=false;
   private IsSettingEnabledByRegLocDept=false;
+  public ltaInactiveshift:ScheduleShift| null | undefined;
 
 
   constructor(
@@ -126,7 +131,9 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     private irpContainerApiService: IrpContainerApiService,
     private organizationStructureService: OrganizationStructureService,
     private datePipe: DatePipe,
-    private settingsViewService: SettingsViewService
+    private settingsViewService: SettingsViewService,
+    private shiftservice:ShiftsService
+   
   ) {
     super();
   }
@@ -238,7 +245,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     let department = this.organizationStructureService.getTemplateDepartment(createdOrder.locationId,createdOrder.departmentId);
     createdOrder.isTemplate = true;
     createdOrder.templateTitle = event.templateTitle;
-    this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(),"",undefined,undefined,true));
+    this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(),"","",true));
     this.closeSaveTemplateDialog();
   }
 
@@ -516,42 +523,68 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           ? this.organizationStructureService.getDepartmentByStartdate(locationid, jobstartdate,jobEndate, departmentID)
           : null;
 
+        this.ltaInactiveshift = createdOrder.jobStartDate
+       ?this.shiftservice.getshiftsbyStartDateAndEndDate(this.orderDetailsFormComponent.allShifts,
+            createdOrder.shift,createdOrder.jobStartDate,createdOrder.jobEndDate)
+            :null; 
+        const perdiemInactiveshift= createdOrder.jobDates?
+        this.shiftservice.getInactiveshift(this.orderDetailsFormComponent.allShifts,
+          createdOrder.shift)
+          :null; 
+
       let locationreactivateDate = createdOrder.jobDates ? createdOrder.jobDates : null;
       let departmentreactivateDate = createdOrder.jobDates ? createdOrder.jobDates : null;
       let isPerDiem =
         createdOrder.jobDates &&
         (location?.isInActivate ||
-          department?.isInActivate);
+          department?.isInActivate
+          || perdiemInactiveshift);
+       
       if ((ltaInActivelocations!=null && ltaInActivelocations.isInActivate) ||(ltaInactiveAndDweactivatelocations!=null && (ltaInactiveAndDweactivatelocations.isFInActivate || ltaInactiveAndDweactivatelocations.isCInActivate))) 
       {
-       
         let dates = ltaInActivelocations!=null ? this.datePipe.transform(ltaInActivelocations.inActiveDate,"MM/dd/yyyy"):this.datePipe.transform(ltaInactiveAndDweactivatelocations?.inActiveDate,"MM/dd/yyyy");
+        let validationmessage=this.GenerateLocationDepartmentShiftValidationMessage(true,false,dates,'');
         this.confirmService
-          .confirm(INACTIVEDATE + dates + INACTIVE_MESSAGE, {
+          .confirm(validationmessage, {
             title: 'Confirm',
             okButtonLabel: 'Yes',
             okButtonClass: '',
           })
           .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
           .subscribe(() => {
-            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates))
           });
       } 
       else if((ltaInActiveDeparment!=null && ltaInActiveDeparment.isInActivate) ||(ltaInactiveAndReactivatedepartment!=null && (ltaInactiveAndReactivatedepartment.isFInActivate || ltaInactiveAndReactivatedepartment.isCInActivate)))
       {
         let dates = ltaInActiveDeparment!=null ? this.datePipe.transform(ltaInActiveDeparment.inActiveDate,"MM/dd/yyyy"):this.datePipe.transform(ltaInactiveAndReactivatedepartment?.inActiveDate,"MM/dd/yyyy");
+        let validationmessage=this.GenerateLocationDepartmentShiftValidationMessage(false,true,'',dates);
         this.confirmService
-          .confirm(INACTIVEDATE_DEPARTMENT + dates + INACTIVE_MESSAGE, {
+          .confirm(validationmessage, {
             title: 'Confirm',
             okButtonLabel: 'Yes',
             okButtonClass: '',
           })
           .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
           .subscribe(() => {
-            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates))
           });
       }
-      else if (isPerDiem && (location.isInActivate || department.inActiveDate)) {
+      else if(this.ltaInactiveshift!=null)
+      {
+        let validationmessage=this.GenerateLocationDepartmentShiftValidationMessage(false,false,'','');
+        this.confirmService
+          .confirm(validationmessage, {
+            title: 'Confirm',
+            okButtonLabel: 'Yes',
+            okButtonClass: '',
+          })
+          .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+          .subscribe(() => {
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates))
+          });
+      }
+      else if (isPerDiem && (location.isInActivate || department.inActiveDate || perdiemInactiveshift)) {
         if (location.isInActivate && location.reActiveDate) {
           createdOrder.jobDates = createdOrder.jobDates.filter(
             (f: Date) =>
@@ -609,29 +642,85 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
             .map((m: string | number | Date) => this.datePipe.transform(m, 'MM/dd/yyyy'))
             .join(',');
         }
-        this.isLocationAndDepartment = this.locationdates && this.departmentdates ? true : false
-        this.isLocation = this.locationdates ? true : false
-        if (this.locationdates && this.departmentdates) {
-          this.dates = this.locationdates.trim() + ',' + this.departmentdates.trim();
+        if(perdiemInactiveshift!=null){
+         
+          createdOrder.jobDates = createdOrder.jobDates.filter(
+            (f: Date) =>
+              new Date(f) < new Date(perdiemInactiveshift.inactiveDate ?? ''));
+            this.shiftdates = this.datePipe.transform(perdiemInactiveshift.inactiveDate, 'MM/dd/yyyy') ?? '';
+        }
+        let expirymessage:string='';
+         if(this.locationdates){
+          this.dates=this.locationdates.trim();
+          expirymessage='Location'
+         }
+         if(this.departmentdates){
+          this.dates=this.dates ? this.dates + ',' + this.departmentdates.trim() : this.departmentdates;
+          expirymessage=expirymessage!='' ? 'Location and Department' : 'Department'
+         }
+         if(this.shiftdates){
+          this.dates=this.dates ? this.dates + ',' + this.shiftdates.trim() : this.shiftdates;
+          expirymessage=expirymessage!='' ? expirymessage + ' and Shift': 'Shift';
+         }
+         if(this.dates && this.dates.indexOf(',')!=-1){
           let cancatDates= this.dates.split(",");
           cancatDates=[...new Set(cancatDates)];
           let caoncatDates= cancatDates.map((m: string|number|Date) => m.toString()).join(', ')
           this.dates= caoncatDates.toString();
-        } else if (this.locationdates && !this.departmentdates) {
-          this.dates = this.locationdates;
-        } else if (!this.locationdates && this.departmentdates) {
-          this.dates = this.departmentdates;
-        }
-        this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates,this.isLocation,this.isLocationAndDepartment));
+         }
+        this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates,expirymessage));
       }
       else {
         this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments()));
       }
     }
   }
+  private GenerateLocationDepartmentShiftValidationMessage(
+    isLocationInActive: boolean, isDepartmentInActive: boolean,
+    locationDate: string | null, departmentDate: string | null): string {
+    let message: string = '';
+    let shiftdate = this.datePipe.transform(this.ltaInactiveshift?.inactiveDate, "MM/dd/yyyy") ?? '';
+    if (isLocationInActive) {
+      if (shiftdate) {
+        let isLocationAndShiftSame: boolean = locationDate === shiftdate;
+        if (isLocationAndShiftSame) {
+          message = `Location and Shift will be inactivated at ${locationDate}. Are you sure you want to proceed?`;
+        }
+        else {
+          message = `Location will be inactivated at ${locationDate} and Shift will be inactivated at ${shiftdate}. Are you sure you want to proceed?`;
+        }
+      }
+      else {
+        message = `Location will be inactivated at ${locationDate}. Are you sure you want to proceed?`;
+      }
+    }
+    else if (isDepartmentInActive) {
+      if (shiftdate) {
+        let isDepartmentAndShiftSame: boolean = departmentDate === shiftdate;
+        if (isDepartmentAndShiftSame) {
+          message = `Department and Shift will be inactivated at ${departmentDate}. Are you sure you want to proceed?`;
+        }
+        else {
+          message = `Department will be inactivated at ${departmentDate} and Shift will be inactivated at ${shiftdate}. Are you sure you want to proceed?`;
+        }
+      }
+      else {
+        message = `Department will be inactivated at ${departmentDate}. Are you sure you want to proceed?`;
+      }
+
+    }
+    else if (shiftdate) {
+      message = `Shift will be inactivated at ${shiftdate}. Are you sure you want to proceed?`;
+    }
+    return message;
+  }
+  
+
+
+
 private canOpenPositionsEdited(order: CreateOrderDto){
   const fixedJobStatusesIncluded: number[] = [OrderStatus.Open,OrderStatus.InProgress,OrderStatus.Filled];
-if((this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.LongTermAssignment || this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.PerDiem) && (fixedJobStatusesIncluded.includes(this.selectedOrder.irpOrderMetadata?.status!))){
+  if((this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.LongTermAssignment || this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.PerDiem) && (fixedJobStatusesIncluded.includes(this.selectedOrder.irpOrderMetadata?.status!))){
     if(order.openPositions !=this.selectedOrder.openPositions){
   this.getSettings(order);
       if(this.IsSettingsEnabledByOrganisation || this.IsSettingEnabledByRegLocDept){
