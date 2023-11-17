@@ -23,7 +23,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { UNIT_FIELDS } from 'src/app/security/user-list/user-list.constants';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { DefaultUseractivityGridColDef, SideBarConfig } from './user-activity.constant';
+import { BUSINESS_UNITS_MSP_VALUES, DefaultUseractivityGridColDef, SideBarConfig } from './user-activity.constant';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { RolesPerUser } from '@shared/models/user-managment-page.model';
@@ -64,7 +64,8 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
 
   @Select(useractivityReportState.CustomReportPage)
   public logInterfacePage$: Observable<useractivitlogreportPage>;
-
+  @Select(UserState.lastSelectedOrganizationId)
+  public organizationId$: Observable<string | null>;
   // @Select(SecurityState.businessUserData)
   // public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
   @Select(AlertsState.GetGroupRolesByOrgId)
@@ -292,6 +293,10 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       this.businessControl.disable();
       this.isOrgage = true;
     }
+    if(businessUnitType==BusinessUnitType.MSP)
+    {
+      this.businessUnits=BUSINESS_UNITS_MSP_VALUES
+    }
 
 
 
@@ -402,6 +407,8 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         const user = this.store.selectSnapshot(UserState.user) as User;
 
         this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+          this.roleData=[];
+          this.changeDetectorRef.detectChanges();
           this.roleData = data;
           this.changeDetectorRef.detectChanges();
           if (this.isOrgage) {
