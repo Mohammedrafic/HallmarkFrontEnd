@@ -203,6 +203,13 @@
                     <i-feather name="compass" class="icon"></i-feather>
                   </ejs-tooltip>
                 </ng-container>
+                <app-tooltip-container
+                  *ngIf="data.showOnHoldMessage"
+                  class="tooltip-with-icon"
+                  [message]="data.onHoldMessage"
+                  [showToolTip]="true">
+                  <span><i-feather name="pause-circle" class="icon black"></i-feather></span>
+                </app-tooltip-container>
               </div>
             </div>
           </ng-template>

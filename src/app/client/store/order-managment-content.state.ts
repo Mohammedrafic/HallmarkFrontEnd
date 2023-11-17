@@ -161,7 +161,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrderImportService } from '@client/order-management/components/order-import/order-import.service';
 import { OrderImportResult } from '@shared/models/imported-order.model';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
-import { createFormData } from '@client/order-management/helpers';
+import { CreateTooltipForOnHold, createFormData } from '@client/order-management/helpers';
 import { PageOfCollections } from '@shared/models/page.model';
 import { UpdateRegRateService } from '@client/order-management/components/update-reg-rate/update-reg-rate.service';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
@@ -671,6 +671,8 @@ export class OrderManagementContentState {
 
     return this.orderManagementService.getIrpCandidates(orderId, params).pipe(
       tap((response) => {
+        CreateTooltipForOnHold(response.items);
+
         patchState({
           irpCandidates: response,
         });

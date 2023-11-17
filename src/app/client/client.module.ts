@@ -38,6 +38,7 @@ import {
   UserX,
   X,
   XCircle,
+  PauseCircle,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -157,6 +158,7 @@ const gridIcons = {
   Mail,
   Compass,
   ArrowUp,
+  PauseCircle,
 };
 
 @NgModule({

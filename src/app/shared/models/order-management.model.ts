@@ -15,6 +15,7 @@ import { JobDistributionModel } from './job-distribution.model';
 import { IrpPrimarySkill } from './skill.model';
 import { CandidateProfileContactDetail } from './candidate.model';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 /**
  * TODO: rework classes with interfaces.
  */
@@ -847,7 +848,7 @@ export interface IrpOrderCandidateDto {
   firstName: string;
   middleName: string;
   lastName: string;
-  profileStatus: number;
+  profileStatus: ProfileStatusesEnum;
   primarySkill: IrpPrimarySkill;
   option: string;
   status: CandidatStatus;
@@ -867,6 +868,11 @@ export interface IrpOrderCandidateDto {
   organizationOrientationDate: string | null;
   departmentOrientationDate: string | null;
   availabilityOverlap: OrderAvailabilityOverlap | null;
+  profileStatusText: string;
+  holdEndDate: string | null;
+  holdStartDate: string | null;
+  showOnHoldMessage: boolean;
+  onHoldMessage?: string;
 }
 
 export interface OrderAvailabilityOverlap {
