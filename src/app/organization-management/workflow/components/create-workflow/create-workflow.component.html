@@ -61,18 +61,17 @@
             <div class="group-container">
               <label>{{group.groupName}} <span *ngIf="group.required" class="required">*</span></label>
               <div class="sources">
-                <ng-container *ngFor="let field of group.fieldSources; trackBy: trackByField">
+                <ng-container *ngFor="let field of group.fieldSources; let i = index; trackBy: trackByField">
                   <ng-container [ngSwitch]="field.type">
-                    <ng-template [ngSwitchCase]="fieldTypes.CheckBox">
-                      <div class="checkbox-container bootstrap">
-                        <ejs-checkbox
-                          [cssClass]="workflowForm.controls[field.field].touched &&
-                          workflowForm.controls[field.field].invalid && 'box-error'"
-                          [disabled]="field.disabled"
-                          [label]="field.title"
-                          appValidateWithMessage
+                    <ng-template [ngSwitchCase]="fieldTypes.RadioButton">
+                      <div class="radio-container bootstrap">
+                        <ejs-radiobutton
                           [formControlName]="field.field"
-                        ></ejs-checkbox>
+                          [label]="field.title"
+                          [value]="field.value"
+                          [disabled]="field.disabled"
+                          [name]="field.name">
+                        </ejs-radiobutton>
                       </div>
                     </ng-template>
                   </ng-container>

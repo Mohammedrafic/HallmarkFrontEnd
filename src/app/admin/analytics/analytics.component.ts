@@ -57,15 +57,10 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
     )
     .subscribe(([menu, data]) => {
       this.sideMenuConfig = [];
-      if(data!=null)
-      {
-        const flattenedMenuItems = this.flattenChildren(data?.children);
-        this.sideMenuConfig = flattenedMenuItems;
-      }else{
         if (menu.menuItems.length) {
           let analyticsMenuItem = menu.menuItems.filter((item: MenuItem) => item.id == AnalyticsMenuId);
           const menuFilter = analyticsMenuItem[0].children;
-          const menuId = localStorage.getItem("menuId");
+          const menuId = window.localStorage.getItem("menuId");
   
           if (menuId) {
             const item = this.findItemById(menuFilter, Number(menuId));
@@ -79,15 +74,18 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
               const item = this.findItemById(menuFilter, Number(topLevelParentId));
               const flattenedMenuItems = this.flattenChildren(item.children);
               this.sideMenuConfig = flattenedMenuItems;
+           }else{
+               this.sideMenuConfig=[];
+               this.router.navigate(['/']);
            }
           }
-        }
+        
       }
 
   
       if (this.router.url == '/analytics') {
         const menuId = localStorage.getItem("menuId")
-        const route = (Number(menuId) === VMSReportsMenuId) ? this.sideMenuConfig[1].route : this.sideMenuConfig[0].route
+        const route = (Number(menuId) === VMSReportsMenuId) ? this.findFirstNonEmptyRoute(this.sideMenuConfig) : this.sideMenuConfig[0].route
         this.router.navigate([route]);
       } else if (this.sideMenuConfig.length == 0) {
         this.router.navigate(['/']);
@@ -97,6 +95,15 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
     });
 
   }
+  private findFirstNonEmptyRoute(items: any[]): string {
+    for (const item of items) {
+      if (item.route) {
+        return item.route;
+      }
+    }
+    return '';
+  }
+
   findTopLevelParentId(menuItems: any[], route: string): number | null {
     for (const menuItem of menuItems) {
       if (menuItem.route === route) {

@@ -1,8 +1,7 @@
 <div *ngIf="cellValue" class="status-cell">
   <ejs-chiplist>
     <e-chips>
-      <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>
-      <e-chip *ngIf="isEChipShown" text="E" cssClass="e-warning ex"></e-chip>
-    </e-chips>
+      <e-chip [text]="cellValue" [cssClass]="getChipCssClass(cellValue)">
+      </e-chip> </e-chips>
   </ejs-chiplist>
 </div>

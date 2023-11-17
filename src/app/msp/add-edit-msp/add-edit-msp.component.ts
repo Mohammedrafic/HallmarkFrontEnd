@@ -25,6 +25,8 @@ import { AddEditMSPService } from '../services/msp-addedit.service';
 import { GetMspById, GetMSPByIdSucceeded, GetMspLogo, GetMspLogoSucceeded, RemoveMspLogo, SaveMSP, SaveMSPSucceeded, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry, UploadMspLogo } from '../store/actions/msp.actions';
 import { businessUnit, MSP } from '../store/model/msp.model';
 import { MspState } from '../store/state/msp.state';
+import { agencyStatusOptions } from '@agency/agency-list/agency-list.constants';
+import { AgencyStatusesModel } from '@shared/models/agency.model';
 
 @Component({
   selector: 'app-add-edit-msp',
@@ -88,6 +90,7 @@ export class AddEditMspComponent extends AbstractPermission implements OnInit, O
 
   @Select(UserState.user)
   user$: Observable<User>;
+  public statuses: AgencyStatusesModel[] = agencyStatusOptions;
 
 
   @Select(AppState.isSidebarOpened)

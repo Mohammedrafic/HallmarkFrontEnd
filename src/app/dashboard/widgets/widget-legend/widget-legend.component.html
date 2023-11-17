@@ -4,7 +4,8 @@
       <div class="widget-legend__row">
         <div class="widget-legend__averageFlagHead"></div>
         <div class="widget-legend__averageFlagHead"></div>
-        <div class="widget-legend__averageFlagHead w-25">Total<br>Positions</div>
+        <div class="widget-legend__averageFlagHead w-25" *ngIf="!averageactiveFlag">Total<br>Positions</div>
+        <div class="widget-legend__averageFlagHead w-25" *ngIf="averageactiveFlag">Total<br>Candidates</div>
         <div class="widget-legend__averageFlagHead w-11">Average<br>Days</div>
       </div>
     </div>

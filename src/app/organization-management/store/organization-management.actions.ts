@@ -3,9 +3,9 @@ import { Country } from 'src/app/shared/enums/states';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { BulkSkillsAction, Skill, SkillFilters } from 'src/app/shared/models/skill.model';
-import { Department, DepartmentFilter, ImportedDepartment } from '@shared/models/department.model';
+import { BulkDepartmentAction, Department, DepartmentFilter, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter } from '@shared/models/region.model';
-import { ImportedLocation, Location, LocationFilter } from '@shared/models/location.model';
+import { BulkLocationsAction, ImportedLocation, Location, LocationFilter } from '@shared/models/location.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
@@ -104,7 +104,7 @@ export class GetRegionsPage {
 }
 
 export class GetMasterRegions {
-  static readonly type = '[organizationManagement] Get The List Of Regions';
+  static readonly type = '[organizationManagement] Get The List Of Master Regions';
   constructor() {}
 }
 
@@ -626,3 +626,53 @@ export class BulkDeleteAssignedSkill {
   constructor(public selectedskillItems: Number[]) {}
 }
 
+
+export class BulkUpdateAssignedLocationucceeded {
+  static readonly type = '[organizationManagement] Bulk Update Location Succeeded';
+  constructor(public payload:BulkLocationsAction) {}
+}
+export class BulkUpdateAssignedLocationFailed {
+  static readonly type = '[organizationManagement] Bulk Update Assigned Location Failed';
+  constructor(public payload:BulkLocationsAction) {}
+}
+export class BulkDeleteLocationucceeded {
+  static readonly type = '[organizationManagement] Bulk Delete Location Succeeded';
+  constructor(public payload:BulkLocationsAction) {}
+}
+export class BulkDeleteLocationFailed {
+  static readonly type = '[organizationManagement] Bulk Delete Location Failed';
+  constructor(public payload:BulkLocationsAction) {}
+}
+export class BulkUpdateLocation {
+  static readonly type = '[organizationManagement] Bulk Update Location';
+  constructor(public selectedLocationItems: Location[]) {}
+}
+export class BulkDeleteLocation {
+  static readonly type = '[organizationManagement] Bulk Delete Location';
+  constructor(public selectedLocationItems: Number[]) {}
+}
+
+export class BulkUpdateDepartmentsucceeded {
+  static readonly type = '[organizationManagement] Bulk Update Department Succeeded';
+  constructor(public payload:BulkDepartmentAction) {}
+}
+export class BulkUpdateDepartmentFailed {
+  static readonly type = '[organizationManagement] Bulk Update Department Failed';
+  constructor(public payload:BulkDepartmentAction) {}
+}
+export class BulkDeleteDepartmentsucceeded {
+  static readonly type = '[organizationManagement] Bulk Delete Department Succeeded';
+  constructor(public payload:BulkDepartmentAction) {}
+}
+export class BulkDeleteDepartmentFailed {
+  static readonly type = '[organizationManagement] Bulk Delete Department Failed';
+  constructor(public payload:BulkDepartmentAction) {}
+}
+export class BulkUpdateDepartment {
+  static readonly type = '[organizationManagement] Bulk Update Department';
+  constructor(public selectedDepartmentItems: Department[]) {}
+}
+export class BulkDeleteDepartment {
+  static readonly type = '[organizationManagement] Bulk Delete Department';
+  constructor(public selectedDepartmentItems: Number[]) {}
+}

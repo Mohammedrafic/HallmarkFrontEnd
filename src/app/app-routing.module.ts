@@ -63,6 +63,17 @@ const routes: Routes = [
   },
 ];
 
+function providerMatcher(url: UrlSegment[]) {
+  // Assuming your URLs are like '/provider-1', '/provider-2', etc.
+  const regex = /^provider-\d+$/;
+  if (url.length === 1 && regex.test(url[0].path)) {
+    return {
+      consumed: url,
+    };
+  }
+  return null;
+}
+
 @NgModule({
   imports: [RouterModule.forRoot(routes, {
     // useHash: true,
