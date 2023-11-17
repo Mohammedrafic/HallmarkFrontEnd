@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ChangedEventArgs, DatePickerComponent, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -33,6 +33,8 @@ import { TakeUntilDestroy } from '@core/decorators';
   templateUrl: './experience-grid.component.html',
   styleUrls: ['./experience-grid.component.scss'],
   providers: [MaskedDateTimeService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 @TakeUntilDestroy
 export class ExperienceGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
