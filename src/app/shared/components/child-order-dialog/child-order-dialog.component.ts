@@ -398,7 +398,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public setCloseOrderButtonStateforIRP(): void {
     this.disabledCloseButtonforIRP =
       !!this.irpCandidates?.positionClosureReasonId ||
-      this.order?.status !== OrderStatus.Filled ||
       !!this.order?.orderCloseDate ;
   }
 
