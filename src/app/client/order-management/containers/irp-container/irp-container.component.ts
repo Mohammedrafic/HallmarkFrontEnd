@@ -42,6 +42,7 @@ import { OrderCandidatesCredentialsState } from '@order-credentials/store/creden
 import { IOrderCredentialItem } from '@order-credentials/types';
 import {
   CONFIRM_REVOKE_ORDER,
+  DISTRIBUTETOVMS,
   ERROR_CAN_NOT_Edit_OpenPositions,
   ERROR_CAN_NOT_REVOKED,
   INACTIVE_MESSAGE,
@@ -719,17 +720,40 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
 
 private canOpenPositionsEdited(order: CreateOrderDto){
-  const fixedJobStatusesIncluded: number[] = [OrderStatus.Open,OrderStatus.InProgress,OrderStatus.Filled];
-  if((this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.LongTermAssignment || this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.PerDiem) && (fixedJobStatusesIncluded.includes(this.selectedOrder.irpOrderMetadata?.status!))){
-    if(order.openPositions !=this.selectedOrder.openPositions){
-  this.getSettings(order);
-      if(this.IsSettingsEnabledByOrganisation || this.IsSettingEnabledByRegLocDept){
-      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
-      return;
+  const fixedJobStatusesIncluded: number[] = [OrderStatus.Open, OrderStatus.InProgress, OrderStatus.Filled];
+  const isDistributiondelay = order.distributionDelay;
+  const isDistributiondelayEdited =
+    this.orderDetailsFormComponent.jobDistributionForm.get('distributionDelay')?.dirty &&
+    this.orderDetailsFormComponent.jobDistributionForm.get('distributionDelay')?.touched
+      ? true
+      : false;
+  if (
+    (this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.LongTermAssignment ||
+      this.orderDetailsFormComponent.orderTypeForm.get('orderType')?.value === IrpOrderType.PerDiem) &&
+    fixedJobStatusesIncluded.includes(this.selectedOrder.irpOrderMetadata?.status!)
+  ) {
+    if (order.openPositions != this.selectedOrder.openPositions) {
+      this.getSettings(order);
+      if (this.IsSettingsEnabledByOrganisation || this.IsSettingEnabledByRegLocDept) {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
+        return;
       }
     }
-}
-this.showRevokeMessageForEditOrder(order);
+  }
+  if (!isDistributiondelay && isDistributiondelayEdited) {
+    this.confirmService
+      .confirm(DISTRIBUTETOVMS, {
+        title: 'Confirm',
+        okButtonLabel: 'Yes',
+        okButtonClass: '',
+      })
+      .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.showRevokeMessageForEditOrder(order);
+      });
+  } else {
+    this.showRevokeMessageForEditOrder(order);
+  }
 }
 private getSettings(order:CreateOrderDto) {
   this.store.dispatch(new GetOrganizationSettings());
