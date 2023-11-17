@@ -1,9 +1,11 @@
 import { Injectable, Inject } from '@angular/core';
 import { filter, Observable, tap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 import { MsalBroadcastService, MsalGuardConfiguration, MsalService, MSAL_GUARD_CONFIG } from '@azure/msal-angular';
 import {
   AuthenticationResult,
+  AuthenticationScheme,
   EventMessage,
   EventType,
   InteractionStatus,
@@ -39,7 +41,29 @@ export class B2CAuthService {
       }
     } else {
       if (this.msalGuardConfig.authRequest) {
-        this.authService.loginRedirect({ ...this.msalGuardConfig.authRequest, ...userFlowRequest } as RedirectRequest);
+        const provider = localStorage.getItem('sso');
+        const domainHint = localStorage.getItem('domainHint');
+        const apiScope = localStorage.getItem('apiScope');
+        if (!provider || !domainHint || !apiScope) {
+          //Default login page
+          this.authService.loginRedirect({ ...this.msalGuardConfig.authRequest, ...userFlowRequest } as RedirectRequest);
+          return;
+        } else {
+          const userflow  = {
+            domainHint: domainHint,
+            redirectUri: environment.production ? '/ui/sso' : '/sso',
+            scopes: [
+              'openid',
+              'offline_access',
+              apiScope,
+            ],
+          };
+
+          this.authService.loginRedirect(userflow as RedirectRequest);
+          return;
+        }
+
+
       } else {
         this.authService.loginRedirect(userFlowRequest);
       }
