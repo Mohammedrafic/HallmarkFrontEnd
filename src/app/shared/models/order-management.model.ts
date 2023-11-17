@@ -848,7 +848,7 @@ export interface IrpOrderCandidateDto {
   firstName: string;
   middleName: string;
   lastName: string;
-  profileStatus: ProfileStatusesEnum;
+  profileStatus: number;
   primarySkill: IrpPrimarySkill;
   option: string;
   status: CandidatStatus;
@@ -868,11 +868,6 @@ export interface IrpOrderCandidateDto {
   organizationOrientationDate: string | null;
   departmentOrientationDate: string | null;
   availabilityOverlap: OrderAvailabilityOverlap | null;
-  profileStatusText: string;
-  holdEndDate: string | null;
-  holdStartDate: string | null;
-  showOnHoldMessage: boolean;
-  onHoldMessage?: string;
 }
 
 export interface OrderAvailabilityOverlap {

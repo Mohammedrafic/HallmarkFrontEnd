@@ -33,7 +33,6 @@ import { getDialogNextPreviousOption } from '@shared/helpers/canidate-navigation
 import { DateTimeHelper } from '@core/helpers';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import {IrpEmployeeToggleState} from "@shared/components/order-candidate-list/interfaces";
-import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -81,7 +80,6 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   private isOrgVMSEnabled = false;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public activeSystem: OrderManagementIRPSystemId;
-  public readonly profileStatuses = ProfileStatusesEnum;
 
   constructor(
     protected override store: Store,

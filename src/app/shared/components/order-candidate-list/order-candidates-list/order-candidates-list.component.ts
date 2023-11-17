@@ -42,7 +42,6 @@ import { DateTimeHelper } from '@core/helpers';
 import { GetCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
 import { UserService } from '@shared/services/user.service';
 import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
-import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -110,7 +109,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   private isOrgVMSEnabled = false;
   private readonly permissions = UserPermissions;
   private selectedIndex: number;
-  private readonly profileStatuses = ProfileStatusesEnum;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
