@@ -34,7 +34,6 @@ import { TakeUntilDestroy } from '@core/decorators';
   styleUrls: ['./experience-grid.component.scss'],
   providers: [MaskedDateTimeService],
   changeDetection: ChangeDetectionStrategy.OnPush,
-
 })
 @TakeUntilDestroy
 export class ExperienceGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
