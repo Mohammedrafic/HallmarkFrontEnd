@@ -17,9 +17,17 @@ export class BillRatesSyncService {
     const jobStartDateTimeStamp = jobStartDate ? jobStartDate.getTime() : new Date().getTime();
     let billRateForSync: BillRate | null = null;
     const billRateType = isLocal ? BillRateCalculationType.RegularLocal : BillRateCalculationType.Regular;
-    const sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
+    let sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
       (billRate) => billRate.billRateConfig.id === billRateType
     );
+
+    if (!sortedBillRates.length) {
+      const revertType = !isLocal ? BillRateCalculationType.RegularLocal : BillRateCalculationType.Regular;
+      sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
+        (billRate) => billRate.billRateConfig.id === revertType
+      );
+    }
+    
     for (const billRate of sortedBillRates) {
       const timeStamp = new Date(billRate.effectiveDate).getTime();
       if (timeStamp < jobStartDateTimeStamp) {
