@@ -87,7 +87,7 @@
                       </div>
                     </div>
                     <div class="input-container bootstrap" *ngIf="activeSystems !== ordersystemId.IRP">
-                      <label class="input-group">Guaranteed Work Week</label>
+                      <label class="input-group">Expected Work Week</label>
                       <div class="input-group" [ngClass]="{'input-readonly': isOnBoarded}">
                         <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" maxlength="50" [readOnly]="isOnBoarded"/>
                       </div>

@@ -112,6 +112,14 @@ export const GeneralInformationConfigLTA = (): OrderFormsConfig  => ({
       type: FieldType.Input,
       maxLength: 20,
     },
+    {
+      field: 'ExpectedWorkWeek',
+      title: 'Expected Work Week',
+      cssClass: 'item13',
+      required: false,
+      show: true,
+      type: FieldType.Input,
+    },
   ],
 });
 

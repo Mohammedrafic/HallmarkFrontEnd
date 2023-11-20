@@ -392,9 +392,23 @@
                       </div>
                     </div>
                   </div>
+                  </div>
+                  <div 
+                  class="input-container bootstrap form-line-item-20"
+                  *ngIf="!isPermPlacementOrder">
+                  <label>Expected Work Week</label>
+                  <div class="input-group">
+                    <input
+                      class="e-input"
+                      formControlName="ExpectedWorkWeek"
+                      maxlength="20"
+                      type="text"
+                    />
+                  </div>
                 </div>
               </ng-container>
 
+       
               <ng-template #duration>
                 <!-- Duration -->
                 <div class="input-container bootstrap form-line-item-45">
