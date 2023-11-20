@@ -925,14 +925,7 @@ export class SendGroupEmailComponent
        e.updateData(users as [], query);
   };
 
-
-  // public OnFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
-  //   var result = this.filterUserData.filter(function(user){
-  //    return user.fullName.toLowerCase().indexOf(e.text.toLowerCase()) > -1; 
-  // });
-  //   this.userData = result;
-  // }
-
+ 
   private onRolesValueChanged(): void {
     this.rolesControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       this.groupEmailTemplateForm.controls['emailTo'].setValue('');
