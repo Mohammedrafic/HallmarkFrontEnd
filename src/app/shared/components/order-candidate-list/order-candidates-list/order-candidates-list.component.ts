@@ -3,11 +3,13 @@ import { ClearDeployedCandidateOrderInfo, GetCandidateJob,
 import { OrderManagementState } from '@agency/store/order-management.state';
 import {ChangeDetectorRef, Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
-import { GetAvailableSteps, GetOrganisationCandidateJob,
-  GetPredefinedBillRates, 
-  UpdateOrganisationCandidateJob} from '@client/store/order-managment-content.actions';
+import {
+  GetAvailableSteps,
+  GetOrganisationCandidateJob,
+  GetPredefinedBillRates,
+} from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
+import { Actions, Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -41,7 +43,6 @@ import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { DateTimeHelper } from '@core/helpers';
 import { GetCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
 import { UserService } from '@shared/services/user.service';
-import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -167,7 +168,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
             this.onEdit(candidate);
           }
         }
-       
+
       })
     }
   }
@@ -245,7 +246,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           OrganizationSettingKeys.ShowDeployedEmployees,
           OrganizationalHierarchy.Organization,
           id,
-          id
+          id,
+          true
         );
       }),
       takeUntil(this.unsubscribe$),
