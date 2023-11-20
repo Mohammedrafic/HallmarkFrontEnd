@@ -909,14 +909,29 @@ export class SendGroupEmailComponent
         this.loadSkillsAndWorkCommitments(businessId);
       }
     }
-  }
+  } 
 
-  public OnFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
-    var result = this.filterUserData.filter(function(user){
-     return user.fullName.toLowerCase().indexOf(e.text.toLowerCase()) > -1; 
-  });
-    this.userData = result;
-  }
+
+  public OnFiltering(e: FilteringEventArgs): void {
+    const char = e.text.length + 1;
+    let query: Query = new Query();
+    query =
+      e.text !== ''
+        ? query.where('fullName', 'contains', e.text, true)
+        : query;
+        let users = this.filterUserData.filter(function(user){
+          return user.fullName.toLowerCase().indexOf(e.text.toLowerCase()) > -1; 
+       });    
+       e.updateData(users as [], query);
+  };
+
+
+  // public OnFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
+  //   var result = this.filterUserData.filter(function(user){
+  //    return user.fullName.toLowerCase().indexOf(e.text.toLowerCase()) > -1; 
+  // });
+  //   this.userData = result;
+  // }
 
   private onRolesValueChanged(): void {
     this.rolesControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
