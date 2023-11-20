@@ -274,11 +274,12 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
               let agencyIds = data?.agencies;
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
+              debugger;
               this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.id);
-             // this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-              //this.defaultSkills=data.masterSkills.map((list)=>list.id);
+              // this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+              // this.defaultSkills=data.masterSkills.map((list)=>list.id);
               let masterSkills = this.filterOptionsData.masterSkills;
-              let skills = masterSkills.filter((i) => this.defaultSkillCategories?.includes(i.skillCategoryId));
+              let skills = masterSkills.filter((i) => data.skillCategories.map((list) => list.id)?.includes(i.skillCategoryId));
               this.filterColumns.skillIds.dataSource = skills;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
 
@@ -356,6 +357,7 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
+    debugger;
     let { departmentIds,locationIds,
       regionIds, startDate, endDate, agencyIds, skillIds,skillCategoryIds } = this.departmentspendhourReportForm.getRawValue();
     
