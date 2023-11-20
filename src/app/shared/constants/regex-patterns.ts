@@ -11,6 +11,7 @@ export const DOCUMENT_NAME_PATTERN =/^[a-zA-Z0-9+-_. ]+$/;
 export const EMPTY_SPACE_PATTERN=/^(\s+\S+\s*)*(?!\s).*$/;
 export const ALPHANUMERIC_8_11_SYMBOLS = /^[a-zA-Z0-9]{8,11}$/;
 export const NUMERIC_10_12_DIGITS = /^\d{10,12}$/;
+export const PUBLIC_ORDER_ID = /^[a-zA-Z]{3}-\d+/;
 
 /**
  * TODO: test and think if it is needed.
