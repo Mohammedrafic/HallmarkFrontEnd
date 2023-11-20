@@ -450,7 +450,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     this.editedRecordId = data.mappingId;
 
     setTimeout(() => {
-      const foundWorkflow = this.workflows.find((w) => w.name === data.workflowName);
+      const foundWorkflow = this.workflows.find((w) => w.id === data.workflowGroupId);
 
       this.workflowMappingFormGroup.controls['workflowType'].setValue(data.workflowGroupType);
       this.workflowMappingService.populateWorkflowApplicabilityField(
