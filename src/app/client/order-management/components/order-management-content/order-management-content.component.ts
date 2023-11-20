@@ -725,7 +725,8 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
 }
 
 public watchForOrderFromNotification(){
-	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
+	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()
+   || (AlertIdEnum[AlertIdEnum['Upon Cancelling']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
     this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
     this.activeSystem = OrderManagementIRPSystemId.IRP;
     this.redirectedfromnotification=true;
@@ -2070,7 +2071,7 @@ public RedirecttoIRPOrder(order:Order)
         if (this.eliteOrderId > 0 && filteredOrder) {
          const data = this.ordersPage.items;
           if(this.gridApi && data){
-            this.eliteOrderPublicId=data[0]?.publicId!;
+            this.eliteOrderPublicId=filteredOrder?.publicId!;
             this.redirectedIrporder=this.eliteOrderId;
           }
           if(this.gridWithChildRow){
