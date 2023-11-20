@@ -347,6 +347,10 @@ export const ReOrdersColumnsConfig = [
     visible: true,
   },
   {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
+  },
+  {
     fieldName: 'billRate',
     visible: true,
   },
@@ -426,6 +430,10 @@ export const AllOrdersColumnsConfig = [
     visible: true,
   },
   {
+    fieldName: 'expectedWorkWeek',
+    visible: true,
+  },
+  {
     fieldName: 'billRate',
     visible: true,
   },
@@ -482,6 +490,10 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'openPositions',
+    visible: false,
+  },
+  {
+    fieldName: 'expectedWorkWeek',
     visible: false,
   },
   {
@@ -560,6 +572,10 @@ export const orderTemplateColumnsConfig = [
     visible: false,
   },
   {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
+  },
+  {
     fieldName: 'billRate',
     visible: false,
   },
@@ -573,6 +589,10 @@ export const orderTemplateColumnsConfig = [
   },
   {
     fieldName: 'openPositions',
+    visible: false,
+  },
+  {
+    fieldName: 'expectedWorkWeek',
     visible: false,
   },
   {
@@ -657,6 +677,10 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'openPositions',
     visible: true,
+  },
+  {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
   },
   {
     fieldName: 'billRate',

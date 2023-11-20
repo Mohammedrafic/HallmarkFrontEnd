@@ -302,6 +302,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       annualSalaryRangeTo,
       orderPlacementFee,
       linkedId,
+      ExpectedWorkWeek,
     } = allValues;
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
       const {
@@ -375,6 +376,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       orderPlacementFee,
       isTemplate: false,
       linkedId,
+      ExpectedWorkWeek,
     };
 
     if (this.orderDetailsFormComponent.order?.isTemplate) {

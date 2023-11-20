@@ -298,7 +298,8 @@ export interface OrderManagementChild  {
   positionClosureReason?: string;
   positionClosureReasonId?: number;
   commentContainerId?: number;
-  candidateProfileId? : number
+  candidateProfileId? : number;
+  guaranteedWorkWeek?:number | string | null;
 };
 
 export type OrderCandidatesList = {
@@ -542,7 +543,9 @@ export class Order {
   disableNumberOfOpenPositions?: boolean | null;
   workflowName?: string;
   distributeToVMS?:number | null;
-  distributionDelay?:boolean
+  distributionDelay?:boolean;
+  ExpectedWorkWeek?:number | null;
+  expectedWorkWeek?:number | null;
 }
 
 export class ReOrder {

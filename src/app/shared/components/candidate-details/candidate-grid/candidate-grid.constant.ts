@@ -114,7 +114,7 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
     },
     {
       field: 'guaranteedWorkWeek',
-      headerName: 'Guaranteed Work Week',
+      headerName: 'Expected Work Week',
       width: 160,
       sortable: true,
     },
@@ -147,7 +147,7 @@ export const CandidateAgencyExportColumns: CandidateExportColumn[] = [
   { text: 'Assignment', column: 'Assignment' },
   { text: 'Organization Name', column: 'Organizationname' },
   { text: 'Skill', column: 'Skill' },
-  { text: 'Guaranteed Work Week', column: 'GuaranteedWorkWeek' },
+  { text: 'Expected Work Week', column: 'ExpectedWorkWeek' },
   { text: 'Leave Request Comments', column: 'RequestComment' },
   { text: 'Primary Contact', column: 'PrimaryContactName' },
 ];
@@ -167,7 +167,7 @@ export const CandidateOrgExportColumns: CandidateExportColumn[] = [
   { text: 'Assignment', column: 'Assignment' },
   { text: 'Agency Name', column: 'Agencyname' },
   { text: 'Skill', column: 'Skill' },
-  { text: 'Guaranteed Work Week', column: 'GuaranteedWorkWeek' },
+  { text: 'Expected Work Week', column: 'ExpectedWorkWeek' },
   { text: 'Leave Request Comments', column: 'RequestComment' },  
   { text: 'Primary Contact', column: 'PrimaryContactName' },
 ];

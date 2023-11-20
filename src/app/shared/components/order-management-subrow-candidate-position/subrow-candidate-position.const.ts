@@ -44,6 +44,11 @@ export const OrderManagementIRPSubGridCells: ColDef[] = [
     headerName: 'Work Commitment',
     width: 180,
   },
+  {
+    field: 'guaranteedWorkWeek',
+    headerName: 'Expected Work Week',
+    width: 140,
+  },
 ];
 
 export const OrderManagementVMSSubGridCells: ColDef[] = [
@@ -63,6 +68,11 @@ export const OrderManagementVMSSubGridCells: ColDef[] = [
     field: 'candidateBillRate',
     headerName: 'Bill Rate $',
     width: 100,
+  },
+  {
+    field: 'guaranteedWorkWeek',
+    headerName: 'Expected Work Week',
+    width: 140,
   },
   {
     field: 'actualStartDate',

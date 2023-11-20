@@ -38,6 +38,7 @@ export class OrderDetailsIrpService {
       shiftStartTime: [null, Validators.required],
       shiftEndTime: [null, Validators.required],
       linkedId: [null, Validators.maxLength(20)],
+      ExpectedWorkWeek:[null, [Validators.maxLength(50)]]
     });
   }
 

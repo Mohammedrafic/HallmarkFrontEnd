@@ -584,6 +584,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderPlacementFee,
       linkedId,
       AllowToUpdateDept,
+      ExpectedWorkWeek,
     } = allValues;
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
       const {
@@ -661,6 +662,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       isTemplate: false,
       linkedId,
       AllowToUpdateDept,
+      ExpectedWorkWeek,
     };
 
     if (this.orderDetailsFormComponent.order?.isTemplate) {
