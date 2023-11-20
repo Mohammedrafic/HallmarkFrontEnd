@@ -76,6 +76,7 @@ import {
 import { OrderStatus } from '@shared/enums/order-management';
 import{ ShiftsService } from '@organization-management/shifts/shifts.service'
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 export enum SubmitButton {
   SaveForLater = '0',
   Save = '1',
@@ -494,6 +495,12 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       createdOrder = {
         ...this.saveTemplateDialogService.resetOrderPropertyIds(createdOrder),
       }
+      const isDistributionValidation =
+      (createdOrder.jobDistribution?.includes(IrpOrderJobDistribution.AllExternal) ||
+        createdOrder.jobDistribution?.includes(IrpOrderJobDistribution.SelectedExternal)) &&
+      !createdOrder.distributionDelay
+        ? true
+        : false;
       const location = this.organizationStructureService.getLocation(regionid, locationid);
       const department = this.organizationStructureService.getDepartment(locationid, departmentID);
       const ltaInactiveAndDweactivatelocations =
@@ -555,7 +562,22 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           })
           .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
           .subscribe(() => {
-            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates))
+            if(isDistributionValidation)
+            {
+              this.confirmService
+              .confirm(DISTRIBUTETOVMS, {
+                title: 'Confirm',
+                okButtonLabel: 'Yes',
+                okButtonClass: '',
+              })
+              .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+              .subscribe(() => {
+                this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+              });
+            }
+            else{
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+            }
           });
       } 
       else if((ltaInActiveDeparment!=null && ltaInActiveDeparment.isInActivate) ||(ltaInactiveAndReactivatedepartment!=null && (ltaInactiveAndReactivatedepartment.isFInActivate || ltaInactiveAndReactivatedepartment.isCInActivate)))
@@ -570,7 +592,22 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           })
           .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
           .subscribe(() => {
-            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates))
+            if(isDistributionValidation)
+            {
+              this.confirmService
+              .confirm(DISTRIBUTETOVMS, {
+                title: 'Confirm',
+                okButtonLabel: 'Yes',
+                okButtonClass: '',
+              })
+              .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+              .subscribe(() => {
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+              });
+            }
+            else{
+              this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates));
+            }
           });
       }
       else if(this.ltaInactiveshift!=null)
@@ -584,7 +621,23 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           })
           .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
           .subscribe(() => {
+            if(isDistributionValidation)
+            {
+              this.confirmService
+              .confirm(DISTRIBUTETOVMS, {
+                title: 'Confirm',
+                okButtonLabel: 'Yes',
+                okButtonClass: '',
+              })
+              .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+              .subscribe(() => {
             this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates))
+              });    
+          }
+          else
+          {
+            this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates)) 
+          }
           });
       }
       else if (isPerDiem && (location.isInActivate || department.inActiveDate || perdiemInactiveshift)) {
@@ -671,10 +724,42 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
           let caoncatDates= cancatDates.map((m: string|number|Date) => m.toString()).join(', ')
           this.dates= caoncatDates.toString();
          }
-        this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates,expirymessage));
+         if (isDistributionValidation) {
+           this.confirmService
+             .confirm(DISTRIBUTETOVMS, {
+               title: 'Confirm',
+               okButtonLabel: 'Yes',
+               okButtonClass: '',
+             })
+             .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+             .subscribe(() => {
+               this.store.dispatch(
+                 new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates, expirymessage)
+               );
+             });
+         }
+         else{
+          this.store.dispatch(
+            new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(), this.dates, expirymessage));
+         }
       }
       else {
+        if(isDistributionValidation)
+        {
+          this.confirmService
+          .confirm(DISTRIBUTETOVMS, {
+            title: 'Confirm',
+            okButtonLabel: 'Yes',
+            okButtonClass: '',
+          })
+          .pipe(filter(Boolean), takeUntil(this.componentDestroy()))
+          .subscribe(() => {
         this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments()));
+          });
+        }
+        else{
+          this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments()));
+        }
       }
     }
   }
