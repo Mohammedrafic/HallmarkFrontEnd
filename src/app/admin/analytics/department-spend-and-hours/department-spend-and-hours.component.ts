@@ -274,7 +274,6 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
               let agencyIds = data?.agencies;
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-              debugger;
               this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.id);
               // this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               // this.defaultSkills=data.masterSkills.map((list)=>list.id);
@@ -357,14 +356,13 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    debugger;
     let { departmentIds,locationIds,
       regionIds, startDate, endDate, agencyIds, skillIds,skillCategoryIds } = this.departmentspendhourReportForm.getRawValue();
     
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : null;
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : null;
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : null;
     
     this.isResetFilter = false;
     let _sDate=formatDate(startDate, 'MM/dd/yyyy', 'en-US')
@@ -379,14 +377,14 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
 
-      "OrganizationIdDS": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionIdDS": regionIds.length == 0 ? "null" : regionIds,
-      "LocationIdDS": locationIds.length == 0 ? "null" : locationIds,
-      "DepartmentIdDS": departmentIds.length == 0 ? "null" : departmentIds,   
+      "OrganizationIdDS": this.selectedOrganizations.length == 0 ? null : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "RegionIdDS": regionIds == null ? null : regionIds,
+      "LocationIdDS": locationIds == null ? null : locationIds,
+      "DepartmentIdDS": departmentIds == null ? null : departmentIds,   
       "TimsheetServiceDateFromDS": _sDate ,
       "TimsheetServiceDateToDS": _eDate,
-      "SkillDS": skillIds.length == 0 ? "null" : skillIds.join(","),
-      "SkillCategoryDS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
+      "SkillDS": skillIds.length == 0 ? null : skillIds.join(","),
+      "SkillCategoryDS": skillCategoryIds.length == 0 ? null : skillCategoryIds.join(","),
       "UserIdDS": this.user?.id
 
     };
