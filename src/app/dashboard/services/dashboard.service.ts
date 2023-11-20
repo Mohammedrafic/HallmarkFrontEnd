@@ -322,7 +322,7 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
     const user = this.store.selectSnapshot(UserState.user);
-    const title =user?.businessUnitType==BusinessUnitType.Agency? "Candidate Home State": "Applicant’s Home State";
+    const title =user?.businessUnitType==BusinessUnitType.Agency? "Candidates Home State": "Applicant’s Home State";
     const description = "";    
     return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description,totalCandidates:totalcandidatesWithState+(unknownStateCandidates ||0) };
   }
