@@ -205,8 +205,9 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       organizationId: this.order.organizationId,
       currentPage: this.currentPage,
       pageSize: this.pageSize,
-      excludeDeployed: false,
+      excludeDeployed: !this.includeDeployedCandidates,
       isAvailable: this.isAvailable,
+      includeDeployed: this.includeDeployed,
     });
   }
 

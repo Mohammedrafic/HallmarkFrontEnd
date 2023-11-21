@@ -271,7 +271,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @ViewChild('exportTooLargeWarning') exportWarning: DialogComponent;
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
-  includeDeployed: boolean = false;
   selectedCandidateforIRP: IRPOrderPosition;
 
   @HostListener('window:wheel', ['$event'])
@@ -2795,13 +2794,6 @@ console.log('filterState',filterState)
       this.orderManagementService.excludeDeployed,
       ""
     ));
-    if(this.employeeToggleState?.includeDeployed){
-      if(this.employeeToggleState.includeDeployed !== null){
-        this.includeDeployed = this.employeeToggleState.includeDeployed;
-      } else {
-        this.includeDeployed = false;
-      }
-    }
     if (isIrp && (this.selectedOrder?.extensionFromId === null)) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
@@ -2809,7 +2801,7 @@ console.log('filterState',filterState)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.includeDeployed,
+        this.employeeToggleState?.includeDeployed,
         ""
       )); 
     } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)){
@@ -2819,7 +2811,7 @@ console.log('filterState',filterState)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.includeDeployed,
+        this.employeeToggleState?.includeDeployed,
         ""
       ));
     }
