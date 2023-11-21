@@ -700,10 +700,15 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
         }
         if(perdiemInactiveshift!=null){
          
+          let shiftinactivedates=createdOrder.jobDates.filter(
+            (f: Date) =>
+            new Date(f) >= new Date(perdiemInactiveshift.inactiveDate))
           createdOrder.jobDates = createdOrder.jobDates.filter(
             (f: Date) =>
               new Date(f) < new Date(perdiemInactiveshift.inactiveDate ?? ''));
+            if(shiftinactivedates && shiftinactivedates.length>0){
             this.shiftdates = this.datePipe.transform(perdiemInactiveshift.inactiveDate, 'MM/dd/yyyy') ?? '';
+          }
         }
         let expirymessage:string='';
          if(this.locationdates){
