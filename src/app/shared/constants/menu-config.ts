@@ -521,7 +521,7 @@ export const MENU_CONFIG: any = {
       route: '/admin/interfacelogirp', 
     },
     120: {
-      // MSP List
+      // MSP linked agencies List
       icon: '',
       route: 'msp/msp-associate-list',
     },
@@ -981,7 +981,7 @@ export const MENU_CONFIG: any = {
       route: '/admin/interfacelogirp', 
     },
     120: {
-      // MSP List
+      // MSP linked agencies List
       icon: '',
       route: 'msp/msp-associate-list',
     },
