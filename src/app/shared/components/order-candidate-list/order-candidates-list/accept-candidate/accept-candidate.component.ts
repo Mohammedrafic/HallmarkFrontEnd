@@ -156,6 +156,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       this.candidateStatus === ApplicantStatusEnum.Shortlisted ||
       this.candidateStatus === ApplicantStatusEnum.PreOfferCustom ||
       this.candidateStatus === ApplicantStatusEnum.Offered ||
+      this.candidateStatus === ApplicantStatusEnum.Accepted ||
       this.isOnboard
     );
   }
