@@ -98,6 +98,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   public businessUnitType: BusinessUnitType;
   public isBusinessUnitTypeMSP: boolean = false;
   public isBusinessUnitTypeHallmark: boolean = false;
+  public canConvertAgencyToMSP: boolean = false;
 
   @Select(AgencyState.agencies)
   agencies$: Observable<AgencyPage>;
@@ -121,6 +122,7 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   override ngOnInit(): void {
     super.ngOnInit();
     this.initAgencyListFilterFormGroup();
+    this.setPermissions();
     this.initMenuItems();
     this.updatePage();
     this.subscribeOnPageChanges();
@@ -134,6 +136,10 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public setPermissions(): void {
+    this.canConvertAgencyToMSP = this.userPermission[this.userPermissions.CanConvertAgencyToMSP] ? true : false;
   }
 
   public navigateToAgencyForm(): void {
@@ -303,14 +309,26 @@ export class AgencyListComponent extends AbstractPermissionGrid implements OnIni
   }
 
   private initMenuItems(): void {
-    this.agencies$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data?.items) {
-        data.items.forEach((item) => {
-          this.menuOption = MSPMenuOptions(item.isMsp ? item.isMsp : false);
-          item.menuItems = this.menuOption['mSPMenuOption'];
-        });
-      }
-    });
+    if (this.canConvertAgencyToMSP) {
+      this.agencies$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        if (data?.items) {
+          data.items.forEach((item) => {
+            this.menuOption = MSPMenuOptions(item.isMsp ? item.isMsp : false);
+            item.menuItems = this.menuOption['mSPMenuOptionConvertToMsp'];
+          });
+        }
+      });
+    }
+    else {
+      this.agencies$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        if (data?.items) {
+          data.items.forEach((item) => {
+            this.menuOption = MSPMenuOptions(item.isMsp ? item.isMsp : false);
+            item.menuItems = this.menuOption['mSPMenuOption'];
+          });
+        }
+      });
+    }
   }
 
   private getDefaultFileName(): string {

@@ -1,8 +1,8 @@
 <div class="action-cell">   
-    <button ejs-button  style="color: #3e7fff;"  cssClass="e-flat primary-icon-button custom-button" cssClass="e-flat primary-icon-button"  (click)="editMsp($event)">
+    <button ejs-button style="color: #3e7fff;"  cssClass="e-flat primary-icon-button custom-button" [disabled]="!userPermission[userPermissions.CanManageMspList]" (click)="editMsp($event)">
         <span><i-feather name="edit" class="icon"></i-feather></span>
       </button>
-      <button ejs-button style="color: #ff5858;" (click)="deleteMsp()" [disabled]="params.data.status=='Inactive'"
+      <button ejs-button style="color: #ff5858;" (click)="deleteMsp()" [disabled]="params.data.status=='Inactive' || !userPermission[userPermissions.CanManageMspList]"
         cssClass="e-flat secondary-icon-button enabled-button">
         <span><i-feather name="trash-2" class="icon"></i-feather></span>
       </button>
