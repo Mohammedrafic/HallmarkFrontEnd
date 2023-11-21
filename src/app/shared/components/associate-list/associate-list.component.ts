@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { SetHeaderState } from '../../../store/app.actions';
 import { Router } from '@angular/router';
@@ -10,6 +10,7 @@ import { AbstractPermission } from "@shared/helpers/permissions";
   selector: 'app-associate-list',
   templateUrl: './associate-list.component.html',
   styleUrls: ['./associate-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssociateListComponent extends AbstractPermission implements OnInit {
   public isAgency = false;
