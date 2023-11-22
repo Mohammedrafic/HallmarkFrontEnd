@@ -419,7 +419,6 @@ export class CredentialExpiryIrpComponent implements OnInit {
       EmployeeParam: employee,
       WorkCommitmentParam: workCommitmentParam,
     };
-    console.log(this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }

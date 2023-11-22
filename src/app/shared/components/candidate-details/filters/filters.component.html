@@ -45,7 +45,7 @@
         <ng-template #itemTemplate let-data>
           <div class="region-option-container" [class.admin]="isAgency">
             <span class="region-name">{{ data?.name }}</span>
-            <span *ngIf="isAgency" class="org-name">{{ data?.orgName }}</span>
+            <span *ngIf="isAgency" class="org-name">{{ data?.organisationName }}</span>
           </div>
         </ng-template>
 

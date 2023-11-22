@@ -426,7 +426,6 @@ export class DocumentLibraryState {
   GetSharedDocumentsByCognitiveSearch({ dispatch, patchState }: StateContext<DocumentLibraryStateModel>, { keyword, businessUnitType, businessUnitId, folderId, }: GetSharedDocumentsByCognitiveSearch): Observable<ShareDocumentInfoPage | void> {
     return this.documentLibraryService.GetSharedDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId, folderId).pipe(
       tap((payload) => {
-        console.log(payload);
         patchState({ shareDocumentInfoPage: payload });
       }),
       catchError((error: HttpErrorResponse) => {

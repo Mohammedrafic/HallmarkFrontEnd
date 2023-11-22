@@ -2386,7 +2386,6 @@ public RedirecttoIRPOrder(order:Order)
 
         const filterState = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersByPageName) as
           PreservedFiltersByPage<OrderFilter>;
-console.log('filterState',filterState)
         if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
           this.adjustFilters(filterState.isNotPreserved);
         } else {
