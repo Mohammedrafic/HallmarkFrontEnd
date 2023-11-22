@@ -248,3 +248,4 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
       this.pageSubject.next(event.currentPage || event.value);
     }
   }
+}
