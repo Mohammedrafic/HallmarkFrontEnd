@@ -166,9 +166,6 @@ export const RoutingNumberMessage = '20-digit code to identify financial institu
 export const Bulk_Update_Skills = 'Selected Records are modified';
 export const Bulk_Delete_Skills = 'Selected Records are deleted';
 
-export const Message_With_Fields = (template: any) => `Please fill in the required fields in Order Details tab:<br>${template} `;
-export const Toast_With_Message = (message: any) => `${message} `;
-
 export const Bulk_Update_Locations = 'Selected Records are modified';
 export const Bulk_Delete_Locations = 'Selected Records are deleted';
 
