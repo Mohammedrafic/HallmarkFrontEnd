@@ -28,7 +28,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { AgencyDto, CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
 import { OutsideZone } from "@core/decorators";
-import { vmsInvoiceConstants, analyticsConstants, Month, Year, InvoiceStatus } from '../constants/analytics.constant';
+import { vmsInvoiceConstants, analyticsConstants, Month, Year, InvoiceStatus, Period } from '../constants/analytics.constant';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { uniqBy } from 'lodash';
 
@@ -94,6 +94,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   yearFields: FieldSettingsModel = { text: 'name', value: 'name' };
+  periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
   monthFields: FieldSettingsModel = { text: 'name', value: 'id' };
   invoiceStatusFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedDepartments: Department[];
@@ -136,6 +137,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
 
   public yearList: Year[] = [];
   public monthList: Month[] = [];
+  public periodList: Period[] = [];
   public invoiceStatusList: InvoiceStatus[] = [];
 
   public masterRegionsList: Region[] = [];
@@ -143,7 +145,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
   public masterDepartmentsList: Department[] = [];
   private previousOrgId: number = 0;
   private culture = 'en-US';
- 
+  public periodIsDefault: boolean = false;
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -167,6 +169,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.orderFilterColumnsSetup();
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.loadperiod();
       this.loadYearAndMonth();
       this.loadInvoiceStatus();
 
@@ -181,7 +184,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
             let currentDate = new Date();
             this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.Month)?.setValue(currentDate.getMonth() + 1);
             this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
-              this.SearchReport(); 
+            this.SearchReport();
             this.isInitialLoad = false;
           }
         }
@@ -218,7 +221,8 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
         year: new FormControl(null),
         month: new FormControl(null),
         invoiceStatus: new FormControl(null),
-        invoiceId: new FormControl(null)
+        invoiceId: new FormControl(null),
+        period: new FormControl(null)
       }
     );
   }
@@ -227,6 +231,22 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
+  selectPeriod() {
+    this.periodIsDefault = this.vmsInvoiceReportForm.controls['period'].value == "Custom" ? true : false;
+  }
+  private loadperiod(): void {
+    this.periodList = [];
+    this.periodList.push({ id: 0, name: 'Custom' });
+    this.periodList.push({ id: 1, name: 'Last 30 days' });
+    this.periodList.push({ id: 2, name: 'Last 60 days' });
+    this.periodList.push({ id: 3, name: 'Last 90 days' });
+    this.periodList.push({ id: 4, name: 'MTD' });
+    this.periodList.push({ id: 5, name: 'Last Quarter' });
+    this.periodList.push({ id: 6, name: 'Year Till Date' });
+    this.periodList.push({ id: 7, name: 'Last Completed 6 Months' });
+    this.periodList.push({ id: 8, name: 'Last Completed 12 months' });
+    this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.Period)?.setValue("Custom");
+  }
   private loadYearAndMonth(): void {
     this.yearList = [];
     this.monthList = []
@@ -267,46 +287,61 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
-        this.vmsInvoiceReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        // this.vmsInvoiceReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.vmsInvoiceReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
         this.changeDetectorRef.detectChanges();
       }
     });
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.vmsInvoiceReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
-      if (typeof data === 'number' && data != this.previousOrgId) {
+
+      this.selectedOrganizations = [];
+      // if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      if (data && data.length > 0) {
         this.previousOrgId = data;
         if (!this.isClearAll) {
-          let orgList = this.organizations?.filter((x) => data == x.organizationId);
-          this.selectedOrganizations = orgList;
+          // let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          // this.selectedOrganizations = orgList;
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
           let departmentsList: Department[] = [];
-          orgList.forEach((value) => {
-            regionsList.push(...value.regions);
-            locationsList = regionsList.map(obj => {
-              return obj.locations.filter(location => location.regionId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-            departmentsList = locationsList.map(obj => {
-              return obj.departments.filter(department => department.locationId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-          });
-          this.regionsList = sortByField(regionsList, "name");
-          this.locationsList = sortByField(locationsList, 'name');
-          this.departmentsList = sortByField(departmentsList, 'name');
+          this.selectedOrganizations = data;
+          if (data.length == 1) {
+            let orgList = this.organizations?.filter((x) => data[0] == x.organizationId);
+            orgList.forEach((value) => {
+              regionsList.push(...value.regions);
+              locationsList = regionsList.map(obj => {
+                return obj.locations.filter(location => location.regionId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+              departmentsList = locationsList.map(obj => {
+                return obj.departments.filter(department => department.locationId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+            });
+            // this.regionsList = sortByField(regionsList, "name");
+            // this.locationsList = sortByField(locationsList, 'name');
+            // this.departmentsList = sortByField(departmentsList, 'name');
+          }
+          this.regionsList = regionsList.length > 0 ? sortByField(regionsList, "name") : [];
+          this.locationsList = locationsList.length > 0 ? sortByField(locationsList, 'name') : [];
+          this.departmentsList = departmentsList.length > 0 ? sortByField(departmentsList, 'name') : [];
 
           this.masterRegionsList = this.regionsList;
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
-
-          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-          }
-          else {
-            this.isResetFilter = true;
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          if (this.bussinessControl?.value.length == "1") {
+            if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+              this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+            }
+            else {
+              this.isResetFilter = true;
+            }
           }
           let businessIdData = [];
-          businessIdData.push(data);
+          // businessIdData.push(data);
+          businessIdData = data;
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
@@ -314,7 +349,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           if (this.isInitialLoad) {
-               this.SearchReport()
+            this.SearchReport()
             this.isInitialLoad = false;
           }
           this.changeDetectorRef.detectChanges();
@@ -379,7 +414,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
       }
     }
     let { departmentIds, locationIds,
-      regionIds, agencyIds, startDate, endDate, year, month, invoiceStatus, invoiceId } = this.vmsInvoiceReportForm.getRawValue();
+      regionIds, agencyIds, startDate, endDate, year, month, invoiceStatus, invoiceId, period } = this.vmsInvoiceReportForm.getRawValue();
     if (!this.vmsInvoiceReportForm.dirty) {
       this.message = "Default filter selected with all regions ,locations and departments for last 7 days";
     }
@@ -394,10 +429,10 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
 
     let currentDate = new Date(Date.now());
-
+    var orgName = this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "";
     this.paramsData =
     {
-      "OrganizationParamVMSIR": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "OrganizationParamVMSIR": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.join(","),
       "StartDateParamVMSIR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamVMSIR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionParamVMSIR": regionIds.length == 0 ? "null" : regionIds,
@@ -414,9 +449,10 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "organizationNameVMSIR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "organizationNameVMSIR": orgName,
       "reportPulledMessageVMSIR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
-      "DateRangeVMSIR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+      "DateRangeVMSIR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "PeriodParamVMSIR": this.periodList.filter(x => x.name == period).map(y => y.id).toString()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -480,6 +516,13 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
         dataSource: [],
         valueField: 'name',
         valueId: 'id',
+      },
+      period: {
+        type: ControlTypes.Dropdown,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
       }
     }
   }
@@ -508,6 +551,8 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     startDate.setDate(startDate.getDate() - 6);
     let endDate = new Date(Date.now());
     endDate.setDate(endDate.getDate());
+    this.vmsInvoiceReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.vmsInvoiceReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.LocationIds)?.setValue([]);
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.DepartmentIds)?.setValue([]);
@@ -518,6 +563,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.Month)?.setValue(null);
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.InvoiceStatus)?.setValue(null);
     this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.InvoiceId)?.setValue(null);
+    this.vmsInvoiceReportForm.get(vmsInvoiceConstants.formControlNames.Period)?.setValue("Custom");
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
