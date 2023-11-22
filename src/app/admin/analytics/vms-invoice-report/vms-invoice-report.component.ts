@@ -30,7 +30,7 @@ import { AgencyDto, CommonReportFilter, CommonReportFilterOptions } from '../mod
 import { OutsideZone } from "@core/decorators";
 import { vmsInvoiceConstants, analyticsConstants, Month, Year, InvoiceStatus, Period } from '../constants/analytics.constant';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { uniqBy } from 'lodash';
+import { toNumber, uniqBy } from 'lodash';
 
 @Component({
   selector: 'app-vms-invoice-report',
@@ -424,25 +424,25 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     }
 
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : null;
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : null;
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : null;
 
     let currentDate = new Date(Date.now());
     var orgName = this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "";
     this.paramsData =
     {
-      "OrganizationParamVMSIR": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.join(","),
+      "OrganizationParamVMSIR": this.selectedOrganizations?.length == 0 ? null : this.selectedOrganizations?.join(","),
       "StartDateParamVMSIR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamVMSIR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamVMSIR": regionIds.length == 0 ? "null" : regionIds,
-      "LocationParamVMSIR": locationIds.length == 0 ? "null" : locationIds,
-      "DepartmentParamVMSIR": departmentIds.length == 0 ? "null" : departmentIds,
-      "AgencyParamVMSIR": agencyIds.length == 0 ? "null" : agencyIds.join(","),
-      "YearParamVMSIR": year == null ? "null" : year.toString(),
-      "MonthParamVMSIR": month == null ? "null" : month.toString(),
-      "InvoiceStatusParamVMSIR": invoiceStatus == null ? "null" : invoiceStatus.toString(),
-      "InvoiceIdParamVMSIR": invoiceId == null ? "null" : invoiceId,
+      "RegionParamVMSIR": regionIds == null ? null : regionIds,
+      "LocationParamVMSIR": locationIds == null ? null : locationIds,
+      "DepartmentParamVMSIR": departmentIds == null ? null : departmentIds,
+      "AgencyParamVMSIR": agencyIds.length == 0 ? null : agencyIds.join(","),
+      "YearParamVMSIR": year == null ? null : year.toString(),
+      "MonthParamVMSIR": month == null ? null : month.toString(),
+      "InvoiceStatusParamVMSIR": invoiceStatus == null ? null : invoiceStatus.toString(),
+      "InvoiceIdParamVMSIR": invoiceId == null ? null : invoiceId,
       "BearerParamVMSIR": auth,
       "BusinessUnitIdParamVMSIR": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
@@ -451,8 +451,9 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
       "HostName": this.baseUrl,
       "organizationNameVMSIR": orgName,
       "reportPulledMessageVMSIR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
-      "DateRangeVMSIR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
-      "PeriodParamVMSIR": this.periodList.filter(x => x.name == period).map(y => y.id).toString()
+      "DateRangeParamVMSIR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "PeriodParamVMSIR": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
+      "UserIdParamVMSIR": this.user?.id,
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
