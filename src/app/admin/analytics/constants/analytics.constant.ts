@@ -108,7 +108,8 @@ export const vmsInvoiceConstants = {
     InvoiceStatus: 'invoiceStatus',
     InvoiceId: 'invoiceId',
     StartDate: 'startDate',
-    EndDate: 'endDate'
+    EndDate: 'endDate',
+    Period: 'period',
   }
 }
 
@@ -327,7 +328,10 @@ export type Month = {
   id: number;
   name: string;
 };
-
+export type Period = {
+  id: number;
+  name: string;
+};
 export type InvoiceStatus = {
   id: number;
   name: string;
