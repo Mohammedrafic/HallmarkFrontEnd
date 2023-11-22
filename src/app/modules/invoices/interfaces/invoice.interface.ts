@@ -77,6 +77,7 @@ export interface InvoicesFilterState {
   aggregateByType?: number[];
   invoiceIds?: number[];
   agencyIds?: number[];
+  checkData?:boolean;
   issueDateFrom?: string;
   issueDateTo?: string;
   dueDateFrom?: string;
