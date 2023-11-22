@@ -248,8 +248,3 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
       this.pageSubject.next(event.currentPage || event.value);
     }
   }
-}
-function thrittleTime(arg0: number): import("rxjs").OperatorFunction<number, unknown> {
-  throw new Error('Function not implemented.');
-}
-
