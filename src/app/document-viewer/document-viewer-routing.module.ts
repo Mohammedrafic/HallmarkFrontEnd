@@ -6,7 +6,7 @@ import { StatusComponentComponent } from './components/status-component/status-c
 
 const routes: Routes = [
   {
-    path: 'status/:orderId/:statusText',
+    path: 'status',
     component: StatusComponentComponent,
     data: { skipAuthentication: true },
   },

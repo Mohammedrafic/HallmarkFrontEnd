@@ -11,6 +11,8 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class StatusComponentComponent implements OnInit {
   statusForm = new FormGroup({});
+  orderId:number;
+  statusText:string;
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private fb:FormBuilder, private activeRoute:ActivatedRoute) { }
@@ -23,9 +25,10 @@ export class StatusComponentComponent implements OnInit {
   }
 
   private subscribeEvent(): void {
-    this.activeRoute.params.pipe(takeUntil(this.unsubscribe$)).subscribe((params) => {
-      if (params['id']) {
-        // this.fileHash = params['id'];
+    this.activeRoute.queryParams.pipe(takeUntil(this.unsubscribe$)).subscribe((params) => {
+      if (params['orderId']&& params['statusText']) {
+        this.orderId = params['orderId'];
+        this.statusText= params['statusText'];
         // this.store.dispatch(new GetGroupedFiles(this.fileHash));
         // this.initialFileId = params['initialId'];
       }
