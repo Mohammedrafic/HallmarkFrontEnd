@@ -647,7 +647,11 @@ export class DashboardService {
   private getAvergaeDayActivecandidateStatusWidgetData(filter: DashboartFilterDto): Observable<any> {
     return this.httpClient.post<AveragedayActivecandidateInfo[]>(`${this.baseUrl}/GetAverageDaysforActiveCandidatesInStatus`, { ...filter }).pipe(
       map((candidatesInfo: AveragedayActivecandidateInfo[]) => {
-         this.candidatesavgForActivePositions$.next(candidatesInfo);
+        const desiredOrder = ["Applied", "Shortlisted", "Interview", "Others", "Offered", "Accepted", "Onboard"];
+        const sortedArray = candidatesInfo.sort((a, b) => {
+        return desiredOrder.indexOf(a.status) - desiredOrder.indexOf(b.status);
+        });
+         this.candidatesavgForActivePositions$.next(sortedArray);
         return {
           id: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS,
            title: 'Average Days for Active Candidates in a Status',
