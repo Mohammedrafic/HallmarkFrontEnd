@@ -341,13 +341,15 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
 
   private onBusinesstypeValueChanged(): void {
     this.businessValue = [];
-    this.changeDetectorRef.detectChanges()
+    this.changeDetectorRef.detectChanges();
+    this.roleData=[]
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       value && this.store.dispatch(new GetBusinessByUnitType(value));
       if (!this.isBusinessFormDisabled) {
         const user = this.store.selectSnapshot(UserState.user) as User;
         this.businessControl.patchValue(user?.businessUnitId || 0);
       }
+      this.rolesControl.patchValue([]);
     });
 
   }

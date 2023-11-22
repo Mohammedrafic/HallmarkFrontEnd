@@ -72,7 +72,6 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: Permission) => {
         this.permissionList = data;
-        //console.log(this.permissionList[this.userPermissions.EditAgencyNetsuitePaymentId]);
       });
   }
 

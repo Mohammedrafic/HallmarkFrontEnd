@@ -12,14 +12,13 @@
             (actionBegin)="actionBegin($event)"
             class="e-gridwithheader e-gridsubheader">
     <e-columns>
-      <e-column textAlign="Right" width="70">
+      <e-column textAlign="Right" width="70" *ngIf="userPermission[userPermissions.CanManageLinkedAgencies]">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button
                     appHideBeforeSyncfusionLoad
                     cssClass="e-flat secondary-icon-button"
-                    (click)="onRemove(data)"
-                    [disabled]="!userPermission[userPermissions.CanCreateMSP]">
+                    (click)="onRemove(data)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>

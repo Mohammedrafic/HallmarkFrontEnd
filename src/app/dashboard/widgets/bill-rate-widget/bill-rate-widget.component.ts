@@ -132,8 +132,6 @@ export class BillRateWidgetComponent extends AbstractSFComponentDirective<ChartC
     this.chartLegend = this.generateLegendData(this.chartData);
     this.handleChartDataChanges(this.chartData);
     const maximumDataValue = this.getMaximumDataValue();
-    console.log(maximumDataValue)
-    console.log(maximumDataValue)
     const correctorChartHeight = Math.floor(maximumDataValue * 0.10);
     this.primaryYAxis = {
       ...this.primaryYAxis,

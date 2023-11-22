@@ -12,6 +12,7 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Organization', column: 'Organization' },
   { text: '# of Positions ', column: 'NumberOfPositions' },
+  { text: 'Expected Work Week', column: 'ExpectedWorkWeek' },
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Skill', column: 'OrderSkill' },

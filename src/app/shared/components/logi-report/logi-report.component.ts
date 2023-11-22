@@ -74,7 +74,6 @@ export class LogiReportComponent implements OnInit {
     if (!app) return;
     app.close(function () {
       var linkPathEle = document.getElementById("linkPath");
-      console.log(linkPathEle)
     });
   }
   private CustomizeSaveAs(options: any,  entryId: any): void {
@@ -85,7 +84,6 @@ export class LogiReportComponent implements OnInit {
     rptset.saveAs(options, this.CallbackSaveAs);
   }
   private CallbackSaveAs(status: any) {
-    console.log(status);
   }
   public RenderReport():void
   {
