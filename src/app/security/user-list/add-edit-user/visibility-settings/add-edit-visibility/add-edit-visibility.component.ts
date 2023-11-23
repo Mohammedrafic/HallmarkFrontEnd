@@ -369,7 +369,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
   private subscribeOnOrganizations(): void {
     this.organizations$.pipe(takeUntil(this.destroy$)).subscribe((organisations: Organisation[]) => {
       this.organisations =
-        this.isOrganisationUser || organisations.length < 2
+        this.isOrganisationUser || organisations.length < 2 || this.createdUser?.businessUnitType === BusinessUnitType.MSP
           ? [...organisations]
           : [{ name: 'All', organizationId: this.allOrganisationId, regions: [] }, ...organisations];
     });
