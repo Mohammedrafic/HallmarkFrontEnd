@@ -286,7 +286,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         fromMail: this.userObj?.email == undefined ? "" : this.userObj?.email,
         selectedFile: formValues.fileUpload,
         businessUnitType: formValues.businessUnit == 0 ? null : formValues.businessUnit,
-        userType: formValues.userType
+        userType: formValues.userType,
+        selectedBusinessUnitId: formValues.businesses.join(',')
       };
       this.emailBodyRequiredFlag$.next(false);
       this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));

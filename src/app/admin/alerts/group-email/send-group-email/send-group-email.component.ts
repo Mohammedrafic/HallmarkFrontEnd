@@ -640,6 +640,7 @@ export class SendGroupEmailComponent
           } else {
             this.store.dispatch(new GetBusinessByUnitType(value));
             this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+              debugger
               // this.businessData = data;
               if (!this.isBusinessFormDisabled && data.length > 0) {
                 if(this.isBusinessUnitTypeAgency == true){
@@ -674,6 +675,7 @@ export class SendGroupEmailComponent
                 
               }
               if (this.userBusinessUnitType === BusinessUnitType.Agency){
+                debugger
                 var defaultAgencies = data.map((list) => list.id);
                 this.businessesControl.setValue(defaultAgencies);
               }
@@ -702,6 +704,7 @@ export class SendGroupEmailComponent
                 this.businessData = businessUnits;
               }
               if(this.businessUnit != undefined) {
+                debugger
                 let businessUnits : (number | undefined)[] = [];
                 businessUnits.push(this.businessUnit)
                 this.groupEmailTemplateForm.controls['businesses'].setValue(businessUnits);
@@ -710,8 +713,13 @@ export class SendGroupEmailComponent
           } else {
             this.store.dispatch(new GetBusinessByUnitType(value));
             this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-              if(this.businessUnit != undefined)
+              debugger
+              if(this.businessUnit != undefined){
+                // let businessUnits : (number | undefined)[] = [29,31,1760];
+                // businessUnits.push(this.businessUnit)
                 this.groupEmailTemplateForm.controls['business'].setValue(this.businessUnit);
+              }
+              
             });
           }
         }
@@ -1218,6 +1226,7 @@ export class SendGroupEmailComponent
 
     var businessUnitId = [];
     if(this.isAgencyCandidatesType)
+    
       businessUnitId = this.businessesControl.value;
     else
       businessUnitId.push(this.businessControl.value);
