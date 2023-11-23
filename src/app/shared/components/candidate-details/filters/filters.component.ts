@@ -20,6 +20,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
   @Input() public filterColumns: FilterColumnsModel;
   @Input() public filtersForm: FormGroup;
   @Input() public isAgency: boolean;
+  @Input() public loginAsAgency: boolean;
   @Input() public orgAgencyName:string;
   @Input() public lastOrgId:number;
   @Input() public lastAgencyId:number;
