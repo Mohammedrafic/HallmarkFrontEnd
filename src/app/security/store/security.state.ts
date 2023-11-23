@@ -96,6 +96,7 @@ interface SecurityStateModel {
   businessIdDetails:GetBusinessUnitIdDetails|null;
   interfaceLogSummaryIRP:InterfaceLogSummaryIRPPage |null;
   isAgencyVisibilityEnabled:boolean;
+  isOrganizaionsLoaded:boolean;
 }
 
 @State<SecurityStateModel>({
@@ -127,7 +128,8 @@ interface SecurityStateModel {
     businessIdDetails:null,
     interfaceLogSummaryIRP:null,
     logSummaryDetailsPage:null,
-    isAgencyVisibilityEnabled:false
+    isAgencyVisibilityEnabled:false,
+    isOrganizaionsLoaded:false
   },
 })
 @Injectable()
@@ -174,6 +176,11 @@ export class SecurityState {
   @Selector()
   static organisations(state: SecurityStateModel): Organisation[] {
     return state.organizations;
+  }
+  
+  @Selector()
+  static isOrganizaionsLoaded(state: SecurityStateModel):boolean{
+    return state.isOrganizaionsLoaded;
   }
 
   @Selector()
@@ -616,7 +623,7 @@ export class SecurityState {
         payload.forEach(item => {
           item.regions.forEach(region => region.organisationName = item.name);
         });
-        patchState({ organizations: payload });
+        patchState({ organizations: payload, isOrganizaionsLoaded:true });
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
