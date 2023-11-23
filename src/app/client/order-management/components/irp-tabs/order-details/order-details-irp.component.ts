@@ -831,7 +831,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
                   this.changeDetection.markForCheck();
                 });
             }
-            
+
           }
         } else {
           if (this.isDistributionDelay) {

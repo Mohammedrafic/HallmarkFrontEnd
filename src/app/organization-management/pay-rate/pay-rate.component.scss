@@ -9,7 +9,7 @@
   margin-top: 20px;
 
   h3 {
-    color: $title-black;
+    color: var(--text);
     margin: 8px;
   }
 
@@ -74,5 +74,3 @@
   line-height: normal;
   color: $supportive-red;
 }
-
-

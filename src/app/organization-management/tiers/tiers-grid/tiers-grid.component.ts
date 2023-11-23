@@ -17,6 +17,7 @@ import { SystemType } from "@shared/enums/system-type.enum";
 @Component({
   selector: 'app-tiers-grid',
   templateUrl: './tiers-grid.component.html',
+  styleUrls: ['./tiers-grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TiersGridComponent extends DestroyableDirective implements OnInit {
@@ -93,7 +94,7 @@ export class TiersGridComponent extends DestroyableDirective implements OnInit {
         this.editTier.emit(tier);
       });
     }
-    
+
   }
 
   private watchForUpdatePage(): void {

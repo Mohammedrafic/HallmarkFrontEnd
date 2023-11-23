@@ -6,7 +6,7 @@
 
 .e-row {
   .e-customized-expand-cell {
-    border-top: 1px solid $grid-row-border;
+    border-top: 1px solid var(--grid-header-border);
   }
 
   &:last-of-type .e-customized-expand-cell,
@@ -22,7 +22,7 @@
 
   td.e-detailrowcollapse {
     div.e-icons.e-dtdiagonalright.e-icon-grightarrow::before {
-      color: $white !important;
+      border-bottom: 1px solid var(--grid-header-border) !important;
     }
   }
 
@@ -54,9 +54,10 @@
   .e-gridheader{
     border: none !important;
   }
-  .e-table tbody{
-    background-color: #f6f7fb !important;
+  .e-table tbody {
+    background-color: var(--bg-sub-row) !important;
   }
+
   .e-columnheader{
     display: none;
   }
