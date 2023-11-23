@@ -104,15 +104,15 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
 
   public onFormSaveClick(): void {
     this.form.markAllAsTouched();
-
     if (this.form.valid) {
+      const result = this.organisations.map(x => x.organizationId).filter(x => x!=-1);
       const value = this.form.getRawValue();
       this.store.dispatch(
         new SaveUserVisibilitySettings({
           regionIds: this.allRegions ? null : value.regionIds,
           locationIds: this.allLocations ? null : value.locationIds,
           departmentIds: this.allDepartments ? null : value.departmentIds,
-          organisationIds: value.organisationIds === this.allOrganisationId ? [] : [value.organisationIds],
+          organisationIds: value.organisationIds === this.allOrganisationId ? result : [value.organisationIds],
           userId: this.createdUser?.id as string,
           id: (this.editVisibility?.id as number) || null,
         })
