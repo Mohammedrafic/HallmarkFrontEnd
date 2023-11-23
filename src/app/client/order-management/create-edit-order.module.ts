@@ -47,7 +47,7 @@ import { IrpContainerApiService } from '@client/order-management/containers/irp-
 import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
 import { SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ReactiveFormsModule } from '@angular/forms';
-
+import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 
 @NgModule({
   declarations: [
@@ -84,6 +84,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     ValidateDirectiveModule,
     DocumentUploaderModule,
     SwitchModule,
+    ToastModule,
   ],
   providers: [
     OrderDetailsIrpService,

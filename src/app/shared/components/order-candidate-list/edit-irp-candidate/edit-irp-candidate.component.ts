@@ -44,7 +44,6 @@ import {
   CLOSE_IRP_POSITION,
   CloseOrderIRP_PERMISSION,
   DELETE_CONFIRM_TITLE,
-  INVALID_ZIP,
   ManageOrderIRP_PERMISSION,
   RECORD_MODIFIED,
 } from '@shared/constants';
@@ -67,7 +66,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { CustomFormGroup } from '@core/interface';
 import { OrderManagementService, } from '@client/order-management/components/order-management-content/order-management.service';
 import { DurationService } from '@shared/services/duration.service';
-import { IrpOrderTypeforPayRate, OrderType } from '@shared/enums/order-type';
+import { OrderType } from '@shared/enums/order-type';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { Order, OrderCandidateJob } from '@shared/models/order-management.model';
 import { CommentsService } from '@shared/services/comments.service';
@@ -393,7 +392,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       }
     });
   }
-  
+
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
     const jobStartDateValue = new Date(jobStartDate.getTime());
@@ -628,7 +627,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       UpdateVisibilityConfigFields(this.dialogConfig, fieldsToShow);
 
       this.candidateForm.patchValue({
-        ...this.candidateDetails, 
+        ...this.candidateDetails,
         status: CandidatStatus.Rejected,
         rejectedReason: this.candidateDetails.rejectionReasonId,
       }, { emitEvent: false, onlySelf: true });

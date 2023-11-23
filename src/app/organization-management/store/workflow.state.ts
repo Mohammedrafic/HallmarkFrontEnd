@@ -247,8 +247,8 @@ export class WorkflowState {
         return payloadResponse;
       }),
       catchError((error: HttpErrorResponse) => {
-        if (error.error && error.error.errors && error.error.errors.SkillIds[0]) {
-          return dispatch(new ShowToast(MessageTypes.Error, error.error.errors.SkillIds[0]));
+        if (error.error && error.error.errors && error.error.errors.skillIds[0]) {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.errors.skillIds[0]));
         } else {
           return dispatch(new ShowToast(MessageTypes.Error, RECORD_CANNOT_BE_SAVED));
         }

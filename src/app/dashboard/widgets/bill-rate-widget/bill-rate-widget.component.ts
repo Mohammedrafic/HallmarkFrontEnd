@@ -132,8 +132,6 @@ export class BillRateWidgetComponent extends AbstractSFComponentDirective<ChartC
     this.chartLegend = this.generateLegendData(this.chartData);
     this.handleChartDataChanges(this.chartData);
     const maximumDataValue = this.getMaximumDataValue();
-    console.log(maximumDataValue)
-    console.log(maximumDataValue)
     const correctorChartHeight = Math.floor(maximumDataValue * 0.10);
     this.primaryYAxis = {
       ...this.primaryYAxis,
@@ -171,13 +169,13 @@ export class BillRateWidgetComponent extends AbstractSFComponentDirective<ChartC
       const [previousValue, currentValue] = value.slice(-2);
       const coefficient = previousValue.value === 0 ? 1 : previousValue.value;      
       const paletteColor = skillCategoryTrendLegendPalette[index];
-      this.palettes.push(paletteColor);     
+      this.palettes.push(paletteColor); 
       return {
         label: key,
         value: ((currentValue?.value - previousValue?.value) / coefficient) * 100,
         text: " ",
-        color: paletteColor,
-        totalCount: parseFloat(value.reduce((count, current) => { return count + current.value; }, 0).toFixed(2)) 
+        color: paletteColor, 
+        totalCount: parseFloat(value.reduce((count, current) => { return current.value; }, 0).toFixed(2))     
       };
     });
   }

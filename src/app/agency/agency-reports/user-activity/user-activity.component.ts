@@ -281,7 +281,6 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         this.defaultBusinessValue = this.businessValue[0]?.id
       });
     const user = this.store.selectSnapshot(UserState.user) as User;
-    console.log(user)
     this.businessUnitControl.patchValue(user?.businessUnitType);
     this.businessControl.patchValue(user?.businessUnitId || 0);
     const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;

@@ -1,4 +1,4 @@
-<div *ngIf="!isAgencyOrOrganization; else agencyOrOrganization" class="dropdown-container bootstrap org-agency-selector">
+<div *ngIf="(!isAgencyOrOrganization && !isMspAndMspArea); else agencyOrOrganization" class="dropdown-container bootstrap org-agency-selector">
   <div class="input-group dropdown">
     <ejs-dropdownlist
       id="organization-agency-dropdown"

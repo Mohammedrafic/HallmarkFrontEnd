@@ -16,6 +16,10 @@
 
 .input-container {
   margin-bottom: 15px;
+
+  label {
+    color: var(--sub-title-2) !important;
+  }
 }
 
 .row {
@@ -54,6 +58,14 @@
   }
 }
 
+.checkbox-container {
+  .input-group {
+    .e-label {
+      color: var(--sub-title-3) !important;
+    }
+  }
+}
+
 .form-container {
   padding-top: 24px;
 
@@ -83,9 +95,13 @@
       width: 100%;
 
       ejs-numerictextbox {
+        span.e-input-group input {
+          height: 38px !important;
+        }
+
         span.e-disabled {
-          border: 1px solid $grey;
-          background-color: $secondary-dark-blue-50;
+          background-color: var(--bg-input-field-disabled) !important;
+          border: 1px solid var(--input-border-color) !important;
         }
       }
     }
