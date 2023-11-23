@@ -1,4 +1,8 @@
 <section class="flex-column penalties-grid">
-  <app-grid [gridOptions]="gridOptions"
-  [suppressRowClickSelection]="true" [columnDefinitions]="columnDefinitions" [rowData]="(reasons$ | async)?.items || []"></app-grid>
+  <app-grid
+    [gridOptions]="gridOptions"
+    [suppressRowClickSelection]="true"
+    [columnDefinitions]="columnDefinitions"
+    [rowData]="(reasons$ | async)?.items || []"
+  ></app-grid>
 </section>

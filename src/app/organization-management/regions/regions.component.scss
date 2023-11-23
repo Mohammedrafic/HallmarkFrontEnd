@@ -1,14 +1,17 @@
-@import "../../styles/variables/colors";
+@import "colors";
+
 .flex-column {
   .toolbar {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
     padding-bottom: 10px;
+
     h3 {
-      color: $title-black;
+      color: var(--text);
       margin: 8px;
     }
+
     .details {
       display: flex;
       align-items: center;
@@ -30,7 +33,7 @@
         padding-top: 5px;
       }
     }
-    
+
     .button-filter {
       margin-left: 12px;
       margin-right: 6px;
@@ -45,15 +48,14 @@
       margin-right: 12px;
     }
   }
- 
+
   .grid-component {
     overflow-y: auto;
   }
 }
-.e-grid .grideditcolumn  
-{
+
+.e-grid .grideditcolumn {
   width:10% !important;
-  
 }
 
 

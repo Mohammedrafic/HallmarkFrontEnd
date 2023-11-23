@@ -14,7 +14,7 @@
 
       .e-list-item {
         height: 48px;
-        border-bottom: 1px solid $secondary-dark-blue-45;
+        border-bottom: 1px solid var(--grid-header-border);
         padding: 17px 23px;
         white-space: nowrap;
         overflow: hidden;
@@ -44,7 +44,7 @@ $blue-color: rgba(33, 150, 243, 0.1);
     font-weight: bold;
     pointer-events: none;
   }
-  
+
   &[data-value="Orders"],
   &[data-value="Candidate"],
   &[data-value="Credentials"],

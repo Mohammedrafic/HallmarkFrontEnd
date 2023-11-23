@@ -68,3 +68,21 @@
   (closeEmitter)="closeSaveTemplateDialog()"
   (createEmitter)="createTemplate($event)"
 ></app-save-template-dialog>
+
+<section class="bootstrap">
+  <ejs-toast
+    class="error-toast"
+    #toastObj
+    showCloseButton="true"
+    [newestOnTop]="false"
+    [position]="{ X: 'Center', Y: 'Top' }"
+    width="330"
+  >
+    <ng-template #title>
+      <div>
+        <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+        <div>Error</div>
+      </div>
+    </ng-template>
+  </ejs-toast>
+</section>

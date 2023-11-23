@@ -6,6 +6,7 @@
   margin-top: 20px;
 
   h3 {
+    color: var(--text);
     margin: 8px;
   }
 }
@@ -56,7 +57,7 @@ app-configuration-grid {
       align-items: center;
 
       .switch-label {
-        color: $black !important;
+        color: var(--sub-title-2);
       }
     }
   }
