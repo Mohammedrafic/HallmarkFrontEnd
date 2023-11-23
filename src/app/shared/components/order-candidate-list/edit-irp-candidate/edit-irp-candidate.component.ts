@@ -228,7 +228,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.AtpCalcForm.get("hoursWorked")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
           this.hoursWorked = data;
-          console.log("atpstipendrate4");
           this.getATPstipendRate();
         }
       })
@@ -236,7 +235,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.AtpCalcForm.get("costSaving")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
           this.costSaving = data;
-          console.log("atpstipendrate3");
           this.getATPstipendRate();
         }
       });
@@ -252,14 +250,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           this.showbenefits = true;
           this.shownonbenefits = true;
         }
-        console.log("atpstipendrate2");
         this.getATPstipendRate();
       });
 
       this.candidateForm.get("actualStartDate")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
           this.candidateDetails.actualStartDate = data;
-          console.log("atpstipendrate1");
           if(this.candidateForm.get('status')?.value === ApplicantStatus.OnBoarded){
             this.getATPstipendRate();
           }
@@ -517,7 +513,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
         filter(Boolean),
         tap((candidateDetails: CandidateDetails) => {
           this.candidateDetails = candidateDetails;
-          console.log("atpstipendrate5");
           this.getATPstipendRate();
           this.updateVisibilityConfig(this.candidateModelState.candidate.status, candidateDetails);
           this.handleOfferedStatus(
@@ -667,7 +662,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       distinctUntilChanged(),
       takeUntil(this.componentDestroy()),
     ).subscribe((status : string) => {
-      console.log(status);
       if(JSON.parse(status) == ApplicantStatus.OnBoarded){
         if(this.meal !== 0){
           this.showATPform = true;
