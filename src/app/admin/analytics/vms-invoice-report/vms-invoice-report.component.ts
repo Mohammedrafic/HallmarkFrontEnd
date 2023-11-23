@@ -58,7 +58,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     "reportPulledMessageVMSIR": "",
     "DateRangeVMSIR": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoiceReport.wls" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoiceReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoiceReport.cat" };
   public title: string = "VMS Invoice Report";
   public message: string = "";
@@ -211,7 +211,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     endDate.setDate(endDate.getDate());
     this.vmsInvoiceReportForm = this.formBuilder.group(
       {
-        businessIds: new FormControl([Validators.required]),
+        businessIds: new FormControl([]),
         startDate: new FormControl(startDate, [Validators.required]),
         endDate: new FormControl(endDate, [Validators.required]),
         regionIds: new FormControl([]),
