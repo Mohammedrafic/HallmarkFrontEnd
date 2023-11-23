@@ -34,12 +34,12 @@ import { GlobalWindow } from '@core/tokens';
 
 export class CandidateCardComponent implements OnInit, OnChanges {
   isMobileScreen: any;
-  
- 
+
+
   isAgency: any;
   order: any;
   orderManagementPagerState: any;
-  
+
   @Input() set candidate(schedule: ScheduleModel) {
     this.candidateData = PrepareCandidate(schedule.candidate);
   }
@@ -57,7 +57,7 @@ export class CandidateCardComponent implements OnInit, OnChanges {
     private store: Store,
     private dateWeekService:DateWeekService,
     private cdr: ChangeDetectorRef,
-    protected router: Router, 
+    protected router: Router,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {}
 
@@ -84,13 +84,13 @@ export class CandidateCardComponent implements OnInit, OnChanges {
   }
 
   public onViewNavigation(data: any): void {
-  
+
 
     if(this.isMobileScreen){
       return;
     }
     const user = this.store.selectSnapshot(UserState.user);
-    
+
     const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? 'client/candidates/edit' : 'client/candidates/edit';
@@ -104,21 +104,21 @@ export class CandidateCardComponent implements OnInit, OnChanges {
         }
     const pageToBack = this.router.url;
     const state = {
-          
+
             pageToBack,
-            
+
           };
     this.globalWindow.localStorage.setItem('navigationState', JSON.stringify(state));
     this.router.navigate([url, data.id], {
       state: state,
     });
     disabledBodyOverflow(false);
-  
+
   }
 
   private createToolTipForSchedule(schedule: ScheduleModel, filters: ScheduleFilters ): void {
     this.candidateTypeTooltip = GetCandidateTypeTooltip(
-      schedule.candidate.ltaAssignment,
+      schedule.candidate.ltaAssignments || [],
       filters.startDate as string,
       filters.endDate as string,
     );

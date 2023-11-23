@@ -29,6 +29,7 @@ export interface ScheduleCandidate {
   firstName: string;
   lastName: string;
   ltaAssignment: LtaAssignment | null;
+  ltaAssignments: LtaAssignment[];
   skill: string;
   skillId: number;
   orientationDate: string;
@@ -374,6 +375,6 @@ export interface ScheduleAttributes {
   onCall : boolean;
   charge : boolean;
   preceptor : boolean;
-  meal : boolean; 
+  meal : boolean;
 }
 
