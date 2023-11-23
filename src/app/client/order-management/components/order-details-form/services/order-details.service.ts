@@ -7,7 +7,7 @@ import {
   JobDistributionDTO,
   OrderTypeDTO, SpecialProjectDTO,
 } from '@client/order-management/components/order-details-form/interfaces';
-import { ONLY_NUMBER, ONLY_NUMBER_AND_DOT } from '@shared/constants';
+import { NUMBER_AND_TWO_DECIMAL, ONLY_NUMBER, ONLY_NUMBER_AND_DOT } from '@shared/constants';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 import { OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
 import { ValidatorsListForNumberWithDots } from '@client/order-management/components/order-details-form/constants';
@@ -52,6 +52,7 @@ export class OrderDetailsService {
         shiftStartTime: [null, Validators.required],
         shiftEndTime: [null, Validators.required],
         linkedId: [null, Validators.maxLength(20)],
+        ExpectedWorkWeek:[null, [Validators.maxLength(50)]]
       },
       { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
     ) as CustomFormGroup<GeneralInformationDTO>;

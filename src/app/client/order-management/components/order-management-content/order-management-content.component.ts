@@ -717,7 +717,7 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   const orderData = Data as IRPOrderPosition;
 
   this.store.dispatch(new GetOrderById(orderData.orderId, orderData.organizationId));
-  this.onSelectedOrderDataLoadHandler();
+  this.dispatchAgencyOrderCandidatesList(Order.id, Order.organizationId as number, true);
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
   this.openDetails.next(false);
@@ -725,7 +725,8 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
 }
 
 public watchForOrderFromNotification(){
-	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
+	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()
+   || (AlertIdEnum[AlertIdEnum['Upon Cancelling']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
     this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
     this.activeSystem = OrderManagementIRPSystemId.IRP;
     this.redirectedfromnotification=true;
@@ -2070,7 +2071,7 @@ public RedirecttoIRPOrder(order:Order)
         if (this.eliteOrderId > 0 && filteredOrder) {
          const data = this.ordersPage.items;
           if(this.gridApi && data){
-            this.eliteOrderPublicId=data[0]?.publicId!;
+            this.eliteOrderPublicId=filteredOrder?.publicId!;
             this.redirectedIrporder=this.eliteOrderId;
           }
           if(this.gridWithChildRow){
@@ -2325,10 +2326,6 @@ public RedirecttoIRPOrder(order:Order)
       if (this.isRedirectedFromVmsSystem) {
         this.selectFirstRow();
         this.isRedirectedFromVmsSystem = false;
-      }
-      if(this.selectedOrder){
-        this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number,
-          !!this.selectedOrder.irpOrderMetadata);
       }
       this.cd$.next(true);
     });
@@ -2771,7 +2768,7 @@ console.log('filterState',filterState)
 
   private subscribeToCandidateJob(): void {
     if(this.activeSystem === OrderManagementIRPSystemId.IRP){
-      this.getIrpCandidatesforExtension$.pipe(take(2), filter(Boolean)).subscribe((res) => {
+      this.getIrpCandidatesforExtension$.pipe(take(1), filter(Boolean)).subscribe((res) => {
         res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
       });
   

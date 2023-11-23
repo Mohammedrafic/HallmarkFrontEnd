@@ -12,6 +12,11 @@ export class GetWorkflows {
   constructor(public payload: WorkflowFlags) {}
 }
 
+export class PreviousSelectedWorkflow {
+  static readonly type = '[workflow] Get Workflow before update';
+  constructor(public workflow: WorkflowWithDetails) {}
+}
+
 export class GetWorkflowsSucceed {
   static readonly type = '[workflow] Get Workflow list by businessUnitId Succeeded';
   constructor(public payload: WorkflowWithDetails[]) {}

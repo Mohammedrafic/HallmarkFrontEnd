@@ -53,6 +53,10 @@
     <div class="title">Onboard %</div>
   </div>
   <div class="info" *ngIf="order.orderType == CPorderType ||order.orderType == LTAorderType">
+    <div class="data">{{candidat?.guaranteedWorkWeek}}</div>
+    <div class="title">Expected Work week </div>
+  </div>
+  <div class="info" *ngIf="order.orderType == CPorderType ||order.orderType == LTAorderType">
     <span class="data" *ngIf="candidat.actualStartDate === null">{{ order.startDate | date: 'MM/dd/yyyy':'UTC'}}</span>
     <span class="data" *ngIf="candidat.actualStartDate !== null">{{candidat.actualStartDate  | date: 'MM/dd/yyyy':'UTC'}}</span>
     <div class="title">Actual Start Date </div>

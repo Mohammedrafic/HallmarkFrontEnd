@@ -20,7 +20,7 @@ export class MapsChartComponent {
   constructor(private readonly dashboardService: DashboardService) {}
 
   public redirectToSourceContent(): void {
-    if(this.chartData?.title!=="Candidate Home State" && this.userType!==BusinessUnitType.Agency)
+    if(this.chartData?.title!=="Candidates Home State" && this.userType!==BusinessUnitType.Agency)
       this.dashboardService.redirectToUrl('client/order-management');
   }
 }

@@ -142,6 +142,29 @@
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
+        <div   *ngIf="selectedItems.length > 1">
+          <section class="bulk-section">
+            <h3 class="bulk-section__rowscount">{{ selectedItems.length }} Rows Selected</h3>
+            <button ejs-button class="edit-button" cssClass="e-flat primary-icon-button" (click)="OnBulkEdit()" >
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather>Edit</span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="OnBulkDelete()" >
+              <span class="delete-button"><i-feather name="trash-2" class="icon"></i-feather>Delete</span>
+            </button>
+            <section class="gridrightpager">
+                <ejs-pager
+                id="gridPager"
+                #gridPager
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(departments$ | async)?.totalCount" 
+                [enablePagerMessage]="false"
+                [currentPage]="currentPage"
+              
+              >
+              </ejs-pager>
+            </section>
+          </section>
+        </div>
         <div class="control-section">
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
@@ -309,7 +332,7 @@
       </div>
     </div>
     <div>
-      <div class="input-container">
+      <div class="input-container" *ngIf="!isbulkedit">
         <label for="extDepartmentId">Ext Department ID <span class="required">*</span></label>
         <div class="input-group">
           <input id="extDepartmentId"
@@ -323,7 +346,7 @@
     </div>
 
     <div *ngIf="isInvoiceDepartmentIdFieldShow">
-      <div class="input-container">
+      <div class="input-container" *ngIf="!isbulkedit">
         <label for="invoiceDepartmentId">Invoice Department ID <span *ngIf="!isIRPFlagEnabled" class="required">*</span></label>
         <div class="input-group">
           <input id="invoiceDepartmentId"
@@ -337,7 +360,7 @@
     </div>
 
     <div>
-      <div class="input-container">
+      <div class="input-container" *ngIf="!isbulkedit">
         <label for="departmentName">Department Name <span class="required">*</span></label>
         <div class="input-group">
           <input id="departmentName"
@@ -351,7 +374,7 @@
     </div>
 
     <div>
-      <div class="input-container">
+      <div class="input-container" *ngIf="!isbulkedit">
         <label for="facilityContact">Department Contact</label>
         <div class="input-group">
           <input
@@ -367,7 +390,7 @@
     </div>
 
     <div>
-      <div class="input-container">
+      <div class="input-container" *ngIf="!isbulkedit">
         <label for="facilityEmail">Department Email</label>
         <div class="input-group">
           <input
@@ -382,7 +405,7 @@
     </div>
 
     <div>
-      <div class="input-container facility-phone">
+      <div class="input-container facility-phone" *ngIf="!isbulkedit">
         <label for="facilityPhoneNumber">Department Phone No</label>
         <div class="input-group">
           <input
@@ -397,7 +420,7 @@
       </div>
     </div>
 
-    <div *ngIf="isIRPFlagEnabled">
+    <div *ngIf="isIRPFlagEnabled && !isbulkedit">
       <div class="input-container">
         <label for="skillDescription">Unit Description</label>
         <ejs-textbox
@@ -414,12 +437,12 @@
 
 
     <div class="dates-message-container" *ngIf="selectedLocation?.isDeactivated && isEdit">
-      <span>
+      <span *ngIf="!isbulkedit">
         Department is inactivated due to Location inactivation on {{ maxInactivateDate }} <span *ngIf="minReactivateDate">to {{ minReactivateDate }}</span>
       </span>
     </div>
 
-    <div class="dates-container">
+    <div class="dates-container" >
       <div class="input-container calendar inactive-date">
         <label for="inactiveDate">Inactivation Date</label>
         <div class="input-group datepicker">
@@ -438,7 +461,7 @@
           </ejs-datepicker>
         </div>
       </div>
-      <div class="input-container calendar">
+      <div class="input-container calendar" *ngIf="!isbulkedit">
         <label for="inactiveDate">Reactivation date</label>
         <div class="input-group datepicker">
           <ejs-datepicker
@@ -459,7 +482,7 @@
     </div>
 
     <div *ngIf="areSkillsAvailable">
-      <div class="input-container">
+      <div class="input-container"  *ngIf="!isbulkedit">
         <label>Primary Skill <span *ngIf="isPrimarySkillRequired" class="required">*</span> </label>
         <div class="input-group multiselect">
           <ejs-multiselect
@@ -474,7 +497,7 @@
           </ejs-multiselect>
         </div>
       </div>
-      <div class="input-container">
+      <div class="input-container" *ngIf="!isbulkedit">
         <label>Secondary Skill</label>
         <div class="input-group multiselect">
           <ejs-multiselect
@@ -506,3 +529,11 @@
   (confirm)="departmentChangeConfirm$.next($event)"
   [(replaceChecked)]="replaceOrder"
 ></app-replacement-order-confirmation>
+
+<app-bulk-location-actiondialog
+[message]="bulkactionmessage"
+[locationNames]="bulkactionnotvalidlocationnmaes"
+[bulkAction]="bulkaction"
+[isDepartment]="isDepartment"
+>
+</app-bulk-location-actiondialog>

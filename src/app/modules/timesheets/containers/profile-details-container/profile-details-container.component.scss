@@ -281,6 +281,10 @@ app-navigation-panel {
 }
 
 @media #{$max-mobile} {
+  .main-body {
+    height: 100vh;
+  }
+
   .profile-hours-statistics {
     flex-direction: column;
 

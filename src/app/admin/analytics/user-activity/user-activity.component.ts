@@ -23,7 +23,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { UNIT_FIELDS } from 'src/app/security/user-list/user-list.constants';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { DefaultUseractivityGridColDef, SideBarConfig } from './user-activity.constant';
+import { BUSINESS_UNITS_MSP_VALUES, DefaultUseractivityGridColDef, SideBarConfig } from './user-activity.constant';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { RolesPerUser } from '@shared/models/user-managment-page.model';
@@ -64,7 +64,8 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
 
   @Select(useractivityReportState.CustomReportPage)
   public logInterfacePage$: Observable<useractivitlogreportPage>;
-
+  @Select(UserState.lastSelectedOrganizationId)
+  public organizationId$: Observable<string | null>;
   // @Select(SecurityState.businessUserData)
   // public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
   @Select(AlertsState.GetGroupRolesByOrgId)
@@ -277,11 +278,13 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         takeWhile(() => this.isAlive)
       )
       .subscribe((value) => {
+        this.businessValue=[];
+        this.changeDetectorRef.detectChanges()
         this.businessValue = value;
-        this.defaultBusinessValue = this.businessValue[0]?.id
+        this.defaultBusinessValue = this.businessValue[0]?.id;
+        this.changeDetectorRef.detectChanges()
       });
     const user = this.store.selectSnapshot(UserState.user) as User;
-    console.log(user)
     this.businessUnitControl.patchValue(user?.businessUnitType);
     this.businessControl.patchValue(user?.businessUnitId || 0);
     const businessUnitType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
@@ -289,6 +292,10 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
       this.businessUnitControl.disable();
       this.businessControl.disable();
       this.isOrgage = true;
+    }
+    if(businessUnitType==BusinessUnitType.MSP)
+    {
+      this.businessUnits=BUSINESS_UNITS_MSP_VALUES
     }
 
 
@@ -333,7 +340,8 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
   }
 
   private onBusinesstypeValueChanged(): void {
-    this.businessValue = []
+    this.businessValue = [];
+    this.changeDetectorRef.detectChanges()
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       value && this.store.dispatch(new GetBusinessByUnitType(value));
       if (!this.isBusinessFormDisabled) {
@@ -350,8 +358,12 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         this.dispatchUserPage([]);
       }
       else {
+        if(value != null)
+        {
         this.dispatchUserPage([value]);
+        }
         this.userData = [];
+        this.changeDetectorRef.detectChanges();
       }
 
       if (!this.isInitialloadCalled) {
@@ -363,8 +375,9 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
             const user = this.store.selectSnapshot(UserState.user) as User;
             if (this.businessUnitControl.value == user.businessUnitType) {
               this.userControl.patchValue(user.id)
+              this.changeDetectorRef.detectChanges()
             } else {
-              this.userControl.patchValue(this.userData[0].id)
+              this.userControl.patchValue(this.userData[0]?.id)
             }
             if (!this.isInitialloadCalled) {
               setTimeout(() => {
@@ -394,7 +407,10 @@ export class UserActivityComponent extends AbstractGridConfigurationComponent im
         const user = this.store.selectSnapshot(UserState.user) as User;
 
         this.roleData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+          this.roleData=[];
+          this.changeDetectorRef.detectChanges();
           this.roleData = data;
+          this.changeDetectorRef.detectChanges();
           if (this.isOrgage) {
             const roleIds = user?.roles.map((role: { id: any; }) => role.id) || [];
             this.rolesControl.patchValue(roleIds);

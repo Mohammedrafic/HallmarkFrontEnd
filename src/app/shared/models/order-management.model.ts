@@ -15,6 +15,7 @@ import { JobDistributionModel } from './job-distribution.model';
 import { IrpPrimarySkill } from './skill.model';
 import { CandidateProfileContactDetail } from './candidate.model';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
+import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 /**
  * TODO: rework classes with interfaces.
  */
@@ -297,7 +298,8 @@ export interface OrderManagementChild  {
   positionClosureReason?: string;
   positionClosureReasonId?: number;
   commentContainerId?: number;
-  candidateProfileId? : number
+  candidateProfileId? : number;
+  guaranteedWorkWeek?:number | string | null;
 };
 
 export type OrderCandidatesList = {
@@ -541,7 +543,9 @@ export class Order {
   disableNumberOfOpenPositions?: boolean | null;
   workflowName?: string;
   distributeToVMS?:number | null;
-  distributionDelay?:boolean
+  distributionDelay?:boolean;
+  ExpectedWorkWeek?:number | null;
+  expectedWorkWeek?:number | null;
 }
 
 export class ReOrder {

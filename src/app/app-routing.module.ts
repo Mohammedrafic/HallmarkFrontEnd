@@ -58,7 +58,7 @@ const routes: Routes = [
     component: LoginPageComponent
   },
   {
-    matcher: providerMatcher,
+    path: 'sso',
     redirectTo: 'login',
   },
 ];

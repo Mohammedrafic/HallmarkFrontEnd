@@ -661,7 +661,7 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
           regionFormControl?.patchValue(order.regionId);
         }
       });
-
+    this.generalInformationForm.controls['ExpectedWorkWeek'].patchValue(order?.expectedWorkWeek);
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
     this.populateOpenPositions(order);
     this.generalInformationForm.controls['minYrsRequired'].patchValue(order.minYrsRequired);

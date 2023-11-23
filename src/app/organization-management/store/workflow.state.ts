@@ -10,6 +10,7 @@ import {
   GetWorkflowMappingPages,
   GetWorkflows,
   GetWorkflowsSucceed,
+  PreviousSelectedWorkflow,
   RemoveWorkflow,
   RemoveWorkflowDeclined,
   RemoveWorkflowMapping,
@@ -167,10 +168,15 @@ export class WorkflowState {
   ): Observable<WorkflowWithDetails | void> {
     return this.workflowService.updateWorkflow(workflow).pipe(
       tap((payloadResponse) => {
-        payloadResponse?.requireMappingsUpdate && !isRemoveStep
-          ? dispatch(new ShowToast(MessageTypes.Warning, usedInMappingMessage('Workflow')))
-          : dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-        dispatch(new GetWorkflows(GetWorkflowFlags(workflow.isIRP)));
+        const messageAction = payloadResponse?.requireMappingsUpdate && !isRemoveStep
+          ? new ShowToast(MessageTypes.Warning, usedInMappingMessage('Workflow'))
+          : new ShowToast(MessageTypes.Success, RECORD_MODIFIED);
+
+        dispatch([
+          new PreviousSelectedWorkflow(payloadResponse as WorkflowWithDetails),
+          messageAction,
+          new GetWorkflows(GetWorkflowFlags(workflow.isIRP))
+        ]);
         return payloadResponse;
       }),
       catchError((error: any) => {

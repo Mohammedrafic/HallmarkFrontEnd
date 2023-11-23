@@ -135,7 +135,9 @@ export const AGENCY_CONVERTED_TO_MSP_FAIL = 'Failed to convert Agency to MSP.'
 export const RECORD_SAVED_SUCCESS = 'Record saved successfully';
 export const INACTIVEDATE = 'Location will be inactivated at '
 export const INACTIVEDATE_DEPARTMENT = 'Department will be inactivated at '
+export const INACTIVEDATE_SHIFT = 'Shift will be inactivated at '
 export const INACTIVE_MESSAGE = '. Are you sure you want to proceed?'
+export const DISTRIBUTETOVMS = 'Order will be distributed to VMS immediately. Do you like to proceed'
 export const UpdateClosedPositionRate = 'Are you sure you want to update the Bill rate '
 + 'for Closed Position? This may lead to recalculating values and generating new invoice records.';
 export const HaveScheduleBooking =
@@ -165,4 +167,10 @@ export const Bulk_Update_Skills = 'Selected Records are modified';
 export const Bulk_Delete_Skills = 'Selected Records are deleted';
 
 export const Message_With_Fields = (template: any) => `Please fill in the required fields in Order Details tab:<br>${template} `;
-export const Toast_With_Message= (message: any) => `${message} `;
+export const Toast_With_Message = (message: any) => `${message} `;
+
+export const Bulk_Update_Locations = 'Selected Records are modified';
+export const Bulk_Delete_Locations = 'Selected Records are deleted';
+
+export const Bulk_Update_Department = 'Selected Records are modified';
+export const Bulk_Delete_Department = 'Selected Records are deleted';

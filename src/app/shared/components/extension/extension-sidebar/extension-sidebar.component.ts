@@ -250,14 +250,13 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
 
     })
     if(this.activeSystems !== OrderManagementIRPSystemId.IRP){
-      const candidateBillRate = this.getBillRate(this.candidateJob.billRates, startDateValue)?.rateHour;
       this.extensionForm = this.formBuilder.group({
         durationPrimary: [Duration.Other],
         durationSecondary: [],
         durationTertiary: [],
         startDate: [startDateValue, [Validators.required]],
         endDate: ['', [Validators.required]],
-        billRate: [candidateBillRate, [Validators.required]],
+        billRate: [null, [Validators.required]],
         comments: [null],
         linkedId: [this.order.linkedId, Validators.maxLength(20)],
       });  
@@ -441,6 +440,14 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy()),
     )
     .subscribe((rates) => {
+      const { actualEndDate } = this.candidateJob || {};
+      const startDate = addDays(actualEndDate, 1);
+      const startDateValue = startDate ? DateTimeHelper.setCurrentTimeZone(startDate.toString()) : undefined;
+
+      const rate = this.billRatesSyncService.getBillRateForSync(
+        rates, startDateValue, this.candidateJob.isLocal
+      );
+      this.extensionForm.get('billRate')?.patchValue(rate?.rateHour, { emitEvent: false, onlySelf: true });
       this.candidateRates = rates;
       this.cd.markForCheck();
     });

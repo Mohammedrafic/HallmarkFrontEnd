@@ -46,6 +46,7 @@ import {
   XCircle,
   ZoomIn,
   ZoomOut,
+  PauseCircle,
 } from 'angular-feather/icons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -146,6 +147,7 @@ const sidebarIcons = {
   ChevronLeft,
   ChevronsLeft,
   ChevronsRight,
+  PauseCircle,
 };
 
 @NgModule({

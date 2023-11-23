@@ -250,6 +250,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
         initialAmount: response.check.initialAmount,
         paymentMode: response.check.paymentMode,
         isRefund: response.check.isRefund,
+        date: DateTimeHelper.setCurrentTimeZone(response.payments[0]?.paymentDate)
       });
 
       this.initialAmount = response.check.initialAmount;

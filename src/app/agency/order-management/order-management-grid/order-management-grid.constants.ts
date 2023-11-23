@@ -176,6 +176,10 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: true,
   },
   {
+    fieldName: 'expectedWorkWeek',
+    visible: true,
+  },
+  {
     fieldName: 'orderType',
     visible: true,
   },
@@ -274,6 +278,10 @@ export const PerDiemColumnsConfig = [
     fieldName: 'annualSalaryRangeTo',
     visible: false,
   },
+  {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
+  },
 ];
 
 export const PermPlacementColumnsConfig = [
@@ -329,4 +337,9 @@ export const PermPlacementColumnsConfig = [
     fieldName: 'annualSalaryRangeTo',
     visible: true,
   },
+  {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
+  },
 ];
+
