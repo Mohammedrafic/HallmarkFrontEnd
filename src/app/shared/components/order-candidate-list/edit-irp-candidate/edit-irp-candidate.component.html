@@ -154,16 +154,6 @@
         </ng-container>
       </form>
     </div>
-    <app-comments-irp
-      *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId"
-      [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
-      [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
-      [comments]="comments"
-      [commentContainerId]="candidateCommentContainerId"
-      [candidateJobId]="candidateJobId"
-      [useBackground]="true"
-      [externalCommentConfiguration]="externalCommentConfiguration"
-    ></app-comments-irp>
 
     <div *ngIf="showATPform && isTurnedOn">
       <form [formGroup]="AtpCalcForm" class="atpcalc-form">
@@ -218,32 +208,45 @@
           </div>
         </div>
       </form>
+      <app-comments-irp
+        *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId"
+        [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
+        [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
+        [comments]="comments"
+        [commentContainerId]="candidateCommentContainerId"
+        [candidateJobId]="candidateJobId"
+        [useBackground]="true"
+        [externalCommentConfiguration]="externalCommentConfiguration"
+      ></app-comments-irp>
+
       <div class="class_table">
         <table>
           <thead>
-            <th>Rate Per Hour</th>
-            <th>Benefit Percent of SW</th>
-            <th>Wage Percent(Non-Benefit Only)</th>
+            <th><span>Rate Per Hour</span></th>
+            <th><span>Benefit Percent of SW</span></th>
+            <th><span>Wage Percent(Non-Benefit Only)</span></th>
+            <th><span>Stipend Hourly Rate</span></th>
           </thead>
           <tbody>
             <tr>
               <td>{{ratePerHour}}</td>
               <td>{{benefitpercentofsw}}</td>
               <td>{{wagePercent}}</td>
+              <td>{{stipendHourlyRate | number:'1.2-2'}}</td>
             </tr>
           </tbody>
         </table>
 
         <table>
           <thead>
-            <th>Costs</th>
-            <th>Salary Wages and Benefits</th>
-            <th>Benefits</th>
-            <th>Cost Saving</th>
-            <th>Meal</th>
-            <th>Lodging</th>
-            <th>Stipends</th>
-            <th>Adjusted Total</th>
+            <th><span>Costs </span></th>
+            <th><span>Salary Wages and Benefits</span></th>
+            <th><span>Benefits</span></th>
+            <th><span>Cost Saving</span></th>
+            <th><span>Meal</span></th>
+            <th><span>Lodging</span></th>
+            <th><span>Stipends</span></th>
+            <th><span>Adjusted Total</span></th>
           </thead>
           <tbody>
             <tr *ngIf="showbenefits">
@@ -271,52 +274,23 @@
 
         <table>
           <thead>
-            <th>
-              Stipend Hourly Rate
-            </th>
+            <th><span>Costs</span></th>
+            <th><span>Contract Labor Rate Comparision Gross</span></th>
+            <th><span>Fully Loaded Blended Rate Gross</span></th>
           </thead>
           <tbody>
-            <tr>
-              <td>{{stipendHourlyRate | number:'1.2-2'}}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <table>
-          <thead>
-            <th colspan="2">
-              Contract Labor Rate Comparision Gross
-            </th>
-          </thead>
-          <thead>
-            <th *ngIf="showbenefits">Benefit Rate</th>
-            <th *ngIf="shownonbenefits">Non-Benefit Rate</th>
-          </thead>
-          <tbody>
-            <tr>
-              <td *ngIf="showbenefits">{{contractLabourBenefit  | number:'1.2-2'}}</td>
-              <td *ngIf="shownonbenefits">{{contractLabourNonBenefit  | number:'1.2-2'}}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <table>
-          <thead>
-            <th colspan="2">
-              Fully Loaded Blended Rate Gross
-            </th>
-          </thead>
-          <thead>
-            <th  *ngIf="showbenefits">Benefit Rate</th>
-            <th *ngIf="shownonbenefits">Non-Benefit Rate</th>
-          </thead>
-          <tbody>
-            <tr>
-              <td *ngIf="showbenefits">{{fullyLoadedBenefit  | number:'1.2-2'}}</td>
-              <td *ngIf="shownonbenefits">{{fullyLoadedNonBenefit  | number:'1.2-2'}}</td>
-            </tr>
-          </tbody>
-        </table>
+          <tr *ngIf="showbenefits">
+            <td >Benefit Rate</td>
+            <td>{{contractLabourBenefit  | number:'1.2-2'}}</td>
+            <td>{{fullyLoadedBenefit  | number:'1.2-2'}}</td>
+          </tr>
+          <tr *ngIf="shownonbenefits">
+            <td >Non-Benefit Rate</td>
+            <td>{{contractLabourNonBenefit  | number:'1.2-2'}}</td>
+            <td>{{fullyLoadedNonBenefit  | number:'1.2-2'}}</td>
+          </tr>
+        </tbody>
+      </table>
       </div>
     </div>
     <div class="invaliderror" *ngIf="showError && isTurnedOn">

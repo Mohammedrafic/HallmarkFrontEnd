@@ -256,7 +256,9 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       this.candidateForm.get("actualStartDate")?.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
         if(data){
           this.candidateDetails.actualStartDate = data;
-          this.getATPstipendRate();
+          if(this.candidateForm.get('status')?.value === ApplicantStatus.OnBoarded){
+            this.getATPstipendRate();
+          }
         }
       });
     }

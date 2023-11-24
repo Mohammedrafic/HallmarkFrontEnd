@@ -149,7 +149,7 @@ export interface IRPOrderPosition {
   employeeId: number;
   firstName: string;
   businessUnitName: string;
-  middleName: string; 
+  middleName: string;
   jobId?: number;
   lastName: string;
   primarySkillId: number;
@@ -1032,12 +1032,23 @@ export interface OrderAuditHistory{
   export interface OrgStructureDto {
     distributionConfigs : DistributionConfig
   }
+
   export interface DistributionConfig {
     value?: number;
     isEnabled?: boolean;
   }
+
   export interface JobDistributionfilters {
     regionId?: number;
     locationId?: number;
     departmentId?: number;
+  }
+
+  export interface OrderFilterDateList {
+    jobStartDate: null | string;
+    jobEndDate: null | string;
+    creationDateFrom: null | string;
+    creationDateTo: null | string;
+    distributedOnFrom: null | string;
+    distributedOnTo: null | string;
   }
