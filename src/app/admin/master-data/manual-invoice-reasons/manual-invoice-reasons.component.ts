@@ -26,7 +26,7 @@ import { AbstractPermissionGrid } from '../../../shared/helpers/permissions';
 })
 export class ManualInvoiceReasonsComponent extends AbstractPermissionGrid implements OnInit {
   @Select(ManualInvoiceReasonsState.manualInvoiceReasons)
-  public manualInvoiceReasons$: Observable<ManualInvoiceReasonPage>
+  public manualInvoiceReasons$: Observable<ManualInvoiceReasonPage>;
 
   @Select(UserState.lastSelectedOrganizationId)
   private lastSelectedOrganizationId$: Observable<number>;
@@ -35,7 +35,7 @@ export class ManualInvoiceReasonsComponent extends AbstractPermissionGrid implem
   allOrganizations$: Observable<UserAgencyOrganization>;
 
   public form: FormGroup;
-  public title: string = '';
+  public title = '';
 
   private isEdit = false;
   private isAlive = true;
@@ -63,7 +63,6 @@ export class ManualInvoiceReasonsComponent extends AbstractPermissionGrid implem
     this.subscribeOnUpdateReasonSuccess();
     this.subscribeOnSaveReasonSuccess();
     this.subscribeOnBusinessUnitChange();
-
   }
 
   private getOrganizationList(): void {
@@ -112,7 +111,7 @@ export class ManualInvoiceReasonsComponent extends AbstractPermissionGrid implem
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .subscribe((confirm: boolean) => {
         if (confirm) {
@@ -121,14 +120,16 @@ export class ManualInvoiceReasonsComponent extends AbstractPermissionGrid implem
       });
   }
 
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+  public onRowsDropDownChanged(size: number): void {
+    this.pageSize = size;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+    this.currentPage = 1;
     this.initGrid();
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
+  public onGoToClick(page: number): void {
+    if (this.currentPage !== page) {
+      this.currentPage = page;
       this.initGrid();
     }
   }
@@ -140,13 +141,15 @@ export class ManualInvoiceReasonsComponent extends AbstractPermissionGrid implem
     }
 
     if (!this.isEdit) {
-      this.store.dispatch(new ManualInvoiceReasons.Save({ reason: this.form.value.reason, agencyFeeApplicable: this.form.value.agencyFeeApplicable }));
+      this.store.dispatch(new ManualInvoiceReasons.Save(
+        { reason: this.form.value.reason, agencyFeeApplicable: this.form.value.agencyFeeApplicable }
+      ));
     } else if(this.isEdit) {
       const payload = {
         id: this.form.value.id,
         reason: this.form.value.reason,
-        agencyFeeApplicable: this.form.value.agencyFeeApplicable
-      }
+        agencyFeeApplicable: this.form.value.agencyFeeApplicable,
+      };
 
       this.store.dispatch( new ManualInvoiceReasons.Update(payload));
     }
@@ -172,9 +175,11 @@ export class ManualInvoiceReasonsComponent extends AbstractPermissionGrid implem
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(null),
-      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)]),
-      agencyFeeApplicable: new FormControl(true)
-    })
+      reason: new FormControl(
+        '', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)]
+      ),
+      agencyFeeApplicable: new FormControl(true),
+    });
   }
 
   private subscribeOnSaveReasonError(): void {

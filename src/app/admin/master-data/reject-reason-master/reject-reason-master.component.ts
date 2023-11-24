@@ -74,7 +74,7 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
       const payload = {
         id: this.form.value.id,
         reason: this.form.value.reason,
-      }
+      };
 
       this.store.dispatch( new UpdateRejectMasterReasons(payload));
     }
@@ -124,14 +124,16 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
       });
   }
 
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+  public onRowsDropDownChanged(size: number): void {
+    this.pageSize = size;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+    this.currentPage = 1;
     this.initGrid();
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
+  public onGoToClick(page: number): void {
+    if (this.currentPage !== page) {
+      this.currentPage = page;
       this.initGrid();
     }
   }
@@ -144,8 +146,7 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
     this.form = new FormGroup({
       id: new FormControl(null),
       reason: new FormControl(
-        '', 
-        [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)]
+        '', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)]
       ),
     });
   }
