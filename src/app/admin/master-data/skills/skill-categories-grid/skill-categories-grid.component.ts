@@ -1,12 +1,12 @@
-import { DatePipe } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { formatDate } from '@angular/common';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, delay, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { delay, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { ExportSkillCategories, GetSkillsCategoriesByPage, RemoveSkillsCategory, RemoveSkillsCategorySucceeded, SaveSkillsCategory, SaveSkillsCategorySucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -27,7 +27,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
-  @Input() isActive: boolean = false;
+  @Input() isActive = false;
   @Input() export$: Subject<ExportedFileType>;
   @Input() userPermission: Permission;
 
@@ -39,7 +39,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
 
   public CategoryFormGroup: FormGroup;
   public columnsToExport: ExportColumn[] = [
-    { text:'Category Name', column: 'Name'}
+    { text:'Category Name', column: 'Name'},
   ];
   public fileName: string;
   public defaultFileName: string;
@@ -49,7 +49,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService,
-              private datePipe: DatePipe) {
+              public cd: ChangeDetectorRef) {
     super();
     this.CategoryFormGroup = this.fb.group({
       id: new FormControl(0),
@@ -68,17 +68,20 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
       if (val.isDialogShown) {
-        this.defaultFileName = 'Skills/Skill Categories ' + this.generateDateTime(this.datePipe);
+        this.defaultFileName = 'Skills/Skill Categories ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
         this.fileName = this.defaultFileName;
       }
     });
     this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
+    this.pageSubject.pipe(
+      throttleTime(100),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));
     });
     this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
-      this.defaultFileName = 'Skills/Skill Categories ' + this.generateDateTime(this.datePipe);
+      this.defaultFileName = 'Skills/Skill Categories ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
       this.defaultExport(event);
     });
   }
@@ -109,22 +112,22 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
     this.clearSelection(this.grid);
   }
 
-  public editCategory(data: SkillCategory, event: any): void {
+  public editCategory(data: SkillCategory, event: Event): void {
     this.addActiveCssClass(event);
     this.CategoryFormGroup.setValue({
       id: data.id,
-      name: data.name
+      name: data.name,
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public deleteCategory(data: SkillCategory, event: any): void {
+  public deleteCategory(data: SkillCategory, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
     .confirm(DELETE_RECORD_TEXT, {
        title: DELETE_RECORD_TITLE,
        okButtonLabel: 'Delete',
-       okButtonClass: 'delete-button'
+       okButtonClass: 'delete-button',
     }).pipe(
       takeUntil(this.unsubscribe$)
     ).subscribe((confirm) => {
@@ -141,7 +144,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
       .confirm(CANCEL_CONFIRM_TEXT, {
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(
         filter(confirm => !!confirm),
         takeUntil(this.unsubscribe$)

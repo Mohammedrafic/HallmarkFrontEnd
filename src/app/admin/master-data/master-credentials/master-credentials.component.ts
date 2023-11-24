@@ -32,11 +32,16 @@ export class MasterCredentialsComponent extends AbstractPermissionGrid {
     map((count) => count.payload)
   );
 
-  constructor(private router: Router, private route: ActivatedRoute, private actions$: Actions, protected override store: Store) {
+  constructor(
+    private router: Router, 
+    private route: ActivatedRoute, 
+    private actions$: Actions, 
+    protected override store: Store,
+  ) {
     super(store);
   }
 
-  public onTabSelected(selectedTab: any): void {
+  public onTabSelected(selectedTab: { selectedIndex: CredentialsNavigationTabs }): void {
     if (selectedTab.selectedIndex === CredentialsNavigationTabs.Types) {
       this.navigationTabs.selectedItem = CredentialsNavigationTabs.Types;
       this.router.navigate(['types'], { relativeTo: this.route });

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { DialogMode } from "@shared/enums/dialog-mode.enum";
 import { ShowSideDialog } from "../../../store/app.actions";
@@ -33,7 +33,7 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
   }
 
   public form: FormGroup;
-  public title: string = '';
+  public title = '';
 
   private isEdit = false;
   private isAlive = true;
@@ -41,7 +41,8 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
   constructor(
     private confirmService: ConfirmService,
     protected override store: Store,
-    private actions$: Actions
+    private actions$: Actions,
+    public cd: ChangeDetectorRef,
   ) {
     super(store);
   }
@@ -72,7 +73,7 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
     } else if(this.isEdit) {
       const payload = {
         id: this.form.value.id,
-        reason: this.form.value.reason
+        reason: this.form.value.reason,
       }
 
       this.store.dispatch( new UpdateRejectMasterReasons(payload));
@@ -91,10 +92,10 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
           filter((confirm:boolean) => !!confirm),
           takeWhile(() => this.isAlive)
         ).subscribe(() => {
-          this.closeSideDialog()
+          this.closeSideDialog();
         });
     } else {
-      this.closeSideDialog()
+      this.closeSideDialog();
     }
   }
 
@@ -103,7 +104,7 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
     this.title = DialogMode.Edit;
     this.form.patchValue({
       id: data.id,
-      reason: data.reason
+      reason: data.reason,
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -113,7 +114,7 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(
         takeWhile(() => this.isAlive)
       ).subscribe((confirm: boolean) => {
@@ -142,8 +143,11 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(null),
-      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)])
-    })
+      reason: new FormControl(
+        '', 
+        [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)]
+      ),
+    });
   }
 
   private closeSideDialog(): void {
