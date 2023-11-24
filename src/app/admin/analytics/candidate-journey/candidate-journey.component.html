@@ -155,27 +155,28 @@
           </div>
         </div>
       </div>
-      <div class="form-element">
-        <div class="group">
+    </div>
+    <div class="form-element">
+      <div class="group">
 
-          <div class="input-container bootstrap">
-            <label>Candidate Status</label>
-            <div class="input-group dropdown">
-              <ejs-multiselect mode="CheckBox" formControlName="candidateStatuses" placeholder="All"
-                               [allowFiltering]="true" [showDropDownIcon]="true"
-                               [dataSource]="filterColumns.candidateStatuses.dataSource" [fields]="candidateStatusesFields"
-                               [selectAllText]='allOption' showSelectAll=true>
-              </ejs-multiselect>
-            </div>
+        <div class="input-container bootstrap">
+          <label>Candidate Status</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" formControlName="candidateStatuses" placeholder="All"
+                             [allowFiltering]="true" [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.candidateStatuses.dataSource" [fields]="candidateStatusesFields"
+                             [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
           </div>
-          <div class="input-container dropdown">
-            <label>Order Id</label>
-            <div class="input-group">
-              <input class="e-input" type="text" appValidateWithMessage maxlength="50" formControlName="jobId" />
-            </div>
+        </div>
+        <div class="input-container dropdown">
+          <label>Order Id</label>
+          <div class="input-group">
+            <input class="e-input" type="text" appValidateWithMessage maxlength="50" formControlName="jobId" />
           </div>
         </div>
       </div>
     </div>
+
   </form>
 </app-filter-dialog>
