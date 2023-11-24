@@ -12,6 +12,7 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Organization', column: 'Organization' },
   { text: '# of Positions ', column: 'NumberOfPositions' },
+  { text: 'Expected Work Week', column: 'ExpectedWorkWeek' },
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Skill', column: 'OrderSkill' },
@@ -176,6 +177,10 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: true,
   },
   {
+    fieldName: 'expectedWorkWeek',
+    visible: true,
+  },
+  {
     fieldName: 'orderType',
     visible: true,
   },
@@ -274,6 +279,10 @@ export const PerDiemColumnsConfig = [
     fieldName: 'annualSalaryRangeTo',
     visible: false,
   },
+  {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
+  },
 ];
 
 export const PermPlacementColumnsConfig = [
@@ -329,4 +338,9 @@ export const PermPlacementColumnsConfig = [
     fieldName: 'annualSalaryRangeTo',
     visible: true,
   },
+  {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
+  },
 ];
+

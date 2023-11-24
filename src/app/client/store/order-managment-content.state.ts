@@ -955,7 +955,7 @@ export class OrderManagementContentState {
   @Action(SaveIrpOrder)
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents, inActivedatestr, isLocation, isLocationAndDepartment, isTemplate }: SaveIrpOrder
+    { order, documents, inActivedatestr,expiryMessage,isTemplate }: SaveIrpOrder
   ): Observable<void | Blob[] | Order> {
     return this.orderManagementService.saveIrpOrder(order).pipe(
       switchMap((order: Order[]) => {
@@ -970,14 +970,10 @@ export class OrderManagementContentState {
                 order[0].publicId?.toString() +
                 ' has been added'
                 : inActivedatestr?.toString() != '' && inActivedatestr?.toString() != undefined
-                  ? isLocationAndDepartment
-                    ? RECORD_ADDED +
-                    ' Due to location and Department Expiry ' +
+                ? RECORD_ADDED +
+                ` Due to ${expiryMessage} Expiry `+
                     inActivedatestr +
                     ' Dates orders not added.'
-                    : isLocation
-                      ? RECORD_ADDED + ' Due to Location Expiry ' + inActivedatestr + ' Dates orders not added.'
-                      : RECORD_ADDED + ' Due to Department Expiry ' + inActivedatestr + ' Dates orders not added.'
                   : RECORD_ADDED
               : 'Template ' +
               order[0].organizationPrefix?.toString() +
@@ -985,6 +981,7 @@ export class OrderManagementContentState {
               order[0].publicId?.toString() +
               ' has been added'
           ),
+        
           new SaveIrpOrderSucceeded(),
         ]);
         if (documents.length) {

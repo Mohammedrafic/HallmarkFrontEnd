@@ -115,8 +115,8 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
-import { 
-  DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG, ViewOrderIRP_PERMISSION, ViewOrderVMS_PERMISSION 
+import {
+  DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG, ViewOrderIRP_PERMISSION, ViewOrderVMS_PERMISSION
 } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -206,7 +206,12 @@ import {
   reOrdersColumnsToExport,
   ROW_HEIGHT,
 } from './order-management-content.constants';
-import { OrderManagementIrpGridHelper, OrderManagementIrpSubrowHelper } from '@client/order-management/helpers';
+import {
+  GetOrderFilterDatesInUts,
+  OrderManagementIrpGridHelper,
+  OrderManagementIrpSubrowHelper,
+  PrepareOrderFilterDates
+} from '@client/order-management/helpers';
 import {
   AllOrdersDefaultStatuses,
   DetectActiveSystem,
@@ -223,6 +228,8 @@ import {
   ThreeDotsMenuOptionsIRP,
   initOrderManagementFilterColumns,
   AllCandidateStatuses,
+  OrderManagementFilterDates,
+  OrderJourneyFilterDates,
 } from '@client/order-management/constants';
 import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 import { BreakpointObserverService } from '@core/services';
@@ -271,7 +278,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @ViewChild('exportTooLargeWarning') exportWarning: DialogComponent;
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
-  includeDeployed: boolean = false;
   selectedCandidateforIRP: IRPOrderPosition;
 
   @HostListener('window:wheel', ['$event'])
@@ -325,7 +331,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
-  
+
   @Select(OrderManagementContentState.irpCandidatesforExtension)
   public getIrpCandidatesforExtension$ : Observable<IRPOrderPositionpage>
 
@@ -725,7 +731,8 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
 }
 
 public watchForOrderFromNotification(){
-	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
+	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()
+   || (AlertIdEnum[AlertIdEnum['Upon Cancelling']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
     this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
     this.activeSystem = OrderManagementIRPSystemId.IRP;
     this.redirectedfromnotification=true;
@@ -994,10 +1001,6 @@ public RedirecttoIRPOrder(order:Order)
   public getOrders(cleared?: boolean): void {
     this.filters.orderBy = this.orderBy;
     this.filters.orderPublicId = this.filters.orderPublicId ? this.filters.orderPublicId.toUpperCase() : null;
-    this.filters.jobStartDate ? this.filters.jobStartDate : null;
-    this.filters.jobEndDate ? this.filters.jobEndDate : null;
-    this.filters.billRateFrom ? this.filters.billRateFrom : null;
-    this.filters.billRateTo ? this.filters.billRateTo : null;
     this.filters.pageNumber = this.currentPage;
     this.filters.agencyType =
       this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
@@ -1058,8 +1061,6 @@ public RedirecttoIRPOrder(order:Order)
     } else if (this.activeSystem === OrderManagementIRPSystemId.OrderJourney) {
       this.filtersOrderJourney.orderBy = this.orderBy;
       this.filtersOrderJourney.orderPublicId = this.filtersOrderJourney.orderPublicId ? this.filtersOrderJourney.orderPublicId.toUpperCase() : null;
-      this.filtersOrderJourney.jobStartDate ? this.filtersOrderJourney.jobStartDate : null;
-      this.filtersOrderJourney.jobEndDate ? this.filtersOrderJourney.jobEndDate : null;
       this.filtersOrderJourney.pageNumber = this.currentPage;
       this.filtersOrderJourney.pageSize = this.pageSize;
       this.isIncomplete = false;
@@ -1318,6 +1319,7 @@ public RedirecttoIRPOrder(order:Order)
     if (this.OrderFilterFormGroup.dirty) {
       this.currentPage = 1;
       this.refreshFilterState();
+      this.filters = PrepareOrderFilterDates(this.filters, OrderManagementFilterDates);
       this.saveFiltersByPageName();
       this.getOrders(true);
       this.store.dispatch(new ShowFilterDialog(false));
@@ -2070,7 +2072,7 @@ public RedirecttoIRPOrder(order:Order)
         if (this.eliteOrderId > 0 && filteredOrder) {
          const data = this.ordersPage.items;
           if(this.gridApi && data){
-            this.eliteOrderPublicId=data[0]?.publicId!;
+            this.eliteOrderPublicId=filteredOrder?.publicId!;
             this.redirectedIrporder=this.eliteOrderId;
           }
           if(this.gridWithChildRow){
@@ -2318,7 +2320,7 @@ public RedirecttoIRPOrder(order:Order)
       takeUntil(this.unsubscribe$)
     ).subscribe((order: Order) => {
       this.selectedOrder = order;
-     
+
       if (this.selectedOrder?.commentContainerId) {
         this.getOrderComments();
       }
@@ -2362,12 +2364,18 @@ public RedirecttoIRPOrder(order:Order)
         filter(({ dispatch }) => dispatch),
         tap(({ isNotPreserved, state }) => {
           if (!this.preservedOrderService.isOrderPreserved() && this.eliteOrderId == 0) {
-            this.prepareFiltersToDispatch(state);
+            const updatedFilterDates = GetOrderFilterDatesInUts(state, OrderManagementFilterDates) as Partial<OrderFilter>;
+            const updatedFilterState = {
+              ...state,
+              ...updatedFilterDates
+            }
+
+            this.prepareFiltersToDispatch(updatedFilterState);
           }
           if(this.eliteOrderId > 0){
             this.filters.orderPublicId = this.orderPublicId;
             this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.orderPublicId);
-            this.getOrders(true);            
+            this.getOrders(true);
          }
 
           if (!isNotPreserved ) {
@@ -2385,7 +2393,6 @@ public RedirecttoIRPOrder(order:Order)
 
         const filterState = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersByPageName) as
           PreservedFiltersByPage<OrderFilter>;
-console.log('filterState',filterState)
         if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
           this.adjustFilters(filterState.isNotPreserved);
         } else {
@@ -2770,7 +2777,7 @@ console.log('filterState',filterState)
       this.getIrpCandidatesforExtension$.pipe(take(1), filter(Boolean)).subscribe((res) => {
         res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
       });
-  
+
     } else {
       this.candidatesJob$.pipe(
         filter(Boolean),
@@ -2781,7 +2788,7 @@ console.log('filterState',filterState)
           actualStartDate: data.actualStartDate,
           actualEndDate: data.actualEndDate,
         };
-      });  
+      });
     }
   }
 
@@ -2794,13 +2801,6 @@ console.log('filterState',filterState)
       this.orderManagementService.excludeDeployed,
       ""
     ));
-    if(this.employeeToggleState?.includeDeployed){
-      if(this.employeeToggleState.includeDeployed !== null){
-        this.includeDeployed = this.employeeToggleState.includeDeployed;
-      } else {
-        this.includeDeployed = false;
-      }
-    }
     if (isIrp && (this.selectedOrder?.extensionFromId === null)) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
@@ -2808,9 +2808,9 @@ console.log('filterState',filterState)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.includeDeployed,
+        this.employeeToggleState?.includeDeployed,
         ""
-      )); 
+      ));
     } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)){
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
         orderId,
@@ -2818,7 +2818,7 @@ console.log('filterState',filterState)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.includeDeployed,
+        this.employeeToggleState?.includeDeployed,
         ""
       ));
     }
@@ -2837,7 +2837,7 @@ console.log('filterState',filterState)
       this.isOrgVMSEnabled = !!isVMCEnabled;
       if(!this.isRedirectedFromDashboard){
         this.setPreviousSelectedSystem();
-      }    
+      }
       if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && !this.isOrgIRPEnabled) {
         this.activeSystem = OrderManagementIRPSystemId.VMS;
       } else if (this.previousSelectedSystemId === OrderManagementIRPSystemId.IRP && this.isOrgIRPEnabled) {
@@ -2871,7 +2871,7 @@ console.log('filterState',filterState)
       }
       if(this.canViewOrderIRP && !this.canViewOrderVMS){
         this.activeSystem = OrderManagementIRPSystemId.IRP;
-      } 
+      }
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       this.cd.detectChanges();
       this.setOrderTypesFilterDataSource();
@@ -3165,6 +3165,7 @@ console.log('filterState',filterState)
     }
     if (this.OrderJourneyFilterFormGroup.dirty) {
       this.refreshOrderJourneyFilterState();
+      this.filters = PrepareOrderFilterDates(this.filtersOrderJourney, OrderJourneyFilterDates);
       this.saveFiltersOrdersJourneyByPageName();
       this.getOrders(true);
       this.store.dispatch(new ShowFilterDialog(false));

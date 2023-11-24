@@ -500,6 +500,22 @@
               />
             </div>
           </div>
+          <!-- Expected Work week -->
+          <div 
+          *ngIf="!quickOrderConditions.isOpenPerDiem && !quickOrderConditions.isPermPlacementOrder"
+          class="input-container bootstrap form-line-item-17"
+        >
+          <label>Expected Work Week</label>
+          <div class="input-group">
+            <input
+              class="e-input"
+              formControlName="ExpectedWorkWeek"
+              maxlength="20"
+              appValidateWithMessage
+              type="text"
+            />
+          </div>
+        </div>
         </div>
       </form>
     </div>

@@ -251,7 +251,7 @@
       <div class="input-container">
         <div class="input-group switch">
           <ejs-switch id="switcher" class="switch" formControlName="isEnabled" (change)="disableSettingsValue($event,undefined)"></ejs-switch>
-          <label class="switch-label">Turned {{ switchedValueForm.get('isEnabled')?.value ? 'on' : 'off' }}</label>
+          <label class="switch-label">Turned {{ switchedValueForm.get('isEnabled')?.value ? 'On' : 'Off' }}</label>
         </div>
       </div>
     </form>
@@ -267,7 +267,7 @@
       <div class="input-container">
         <div class="input-group switch">
           <ejs-switch id="switcher" class="switch" formControlName="isEnabled"></ejs-switch>
-          <label class="switch-label">Turned {{ checkboxValueForm.get('isEnabled')?.value ? 'on' : 'off' }}</label>
+          <label class="switch-label">Turned {{ checkboxValueForm.get('isEnabled')?.value ? 'On' : 'Off' }}</label>
         </div>
       </div>
       <ng-container *ngIf="checkboxValueForm.get('isEnabled')?.value == true">
@@ -306,6 +306,43 @@
   </div>
  </form>
 
+  <form [formGroup]="startsOnFormGroup" *ngIf="formControlType === organizationSettingControlType.StartsOnDate">
+    <div class="input-container bootstrap">
+      <label for="datepicker">Starts On<span class="required">*</span></label>
+      <div class="input-group datepicker">
+        <ejs-datepicker
+          id="datepicker"
+          class="datepicker"
+          format="MM/dd/yyyy"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="false"
+          formControlName="startsOn"
+        ></ejs-datepicker>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <div class="input-group switch">
+        <ejs-switch formControlName="isEnabled"></ejs-switch>
+        <label class="switch-label">Turned {{ startsOnFormGroup.get('isEnabled')?.value ? 'On' : 'Off' }}</label>
+      </div>
+    </div>
+
+    <div class="toggle-message">
+      <div class="toggle-message__item">
+        “On” will split Timesheet records into the current Bill Rate record and
+        the new Bill Rate record at midnight.
+      </div>
+      <div class="toggle-message__item">
+        “Off” will consider the Bill Rate as of the shift's Start Date and will apply it to the whole shift.
+      </div>
+      <div class="toggle-message__item">
+        Note: Upon configuration change, records in all Timesheets created up to the change date
+        and time will be displayed according to the previous configuration.
+      </div>
+    </div>
+  </form>
+
  <form [formGroup]="aTPRateCalculationFormGroup"
     *ngIf="formControlType === organizationSettingControlType.ATPRateCalculation">
   <div class="row">
@@ -342,7 +379,7 @@
     <div class="input-container">
       <div class="input-group switch">
         <ejs-switch id="switcher" class="switch" formControlName="isEnabled" (change)="disableSettingsValue($event,undefined)"></ejs-switch>
-        <label class="switch-label">Turned {{ aTPRateCalculationFormGroup.get('isEnabled')?.value ? 'on' : 'off' }}</label>
+        <label class="switch-label">Turned {{ aTPRateCalculationFormGroup.get('isEnabled')?.value ? 'On' : 'Off' }}</label>
       </div>
     </div>
     </div>

@@ -119,6 +119,7 @@ import { SettingsViewService } from '@shared/services';
 import { UserPermissions } from '@core/enums';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 enum Template {
   accept,
@@ -236,6 +237,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private readonly permissions = UserPermissions;
   confirmationMessage: string;
   irpCandidates: IRPOrderPosition;
+  activeSystems: OrderManagementIRPSystemId | null;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -324,12 +326,14 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     private changeDetectorRef: ChangeDetectorRef,
     private childOrderDialogService: ChildOrderDialogService,
     private settingService: SettingsViewService,
+    private orderManagementService : OrderManagementService
   ) {
     super(store);
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
@@ -398,7 +402,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public setCloseOrderButtonStateforIRP(): void {
     this.disabledCloseButtonforIRP =
       !!this.irpCandidates?.positionClosureReasonId ||
-      this.order?.status !== OrderStatus.Filled ||
       !!this.order?.orderCloseDate ;
   }
 
@@ -816,7 +819,16 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private subscribeOnCandidateJob(): void {
     if (this.isOrganization) {
-      if(this.activeSystem === OrderManagementIRPSystemId.VMS){
+      if(this.activeSystems === OrderManagementIRPSystemId.IRP){
+        this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
+          if(irpCandidates){
+            irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+            this.setCloseOrderButtonStateforIRP();
+            this.getExtensionsforIRP();
+            this.getCommentsforIRP();
+          }
+        });
+      } else {
         this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
           this.candidateJob = orderCandidateJob;
           if (orderCandidateJob) {
@@ -826,15 +838,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           }
           this.changeDetectorRef.detectChanges();
         });  
-      } else {
-        this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
-          if(irpCandidates){
-            irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
-            this.setCloseOrderButtonStateforIRP();
-            this.getExtensionsforIRP();
-            this.getCommentsforIRP();
-          }
-        });
       }
     }
     if (this.isAgency) {

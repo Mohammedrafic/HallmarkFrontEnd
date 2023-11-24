@@ -40,11 +40,9 @@ import {
   ERROR_CAN_NOT_Edit_OpenPositions,
   ExtensionStartDateValidation,
   JOB_DISTRIBUTION_TITLE,
-  Message_With_Fields,
   ORDER_DISTRIBUTED_TO_ALL,
   PROCEED_FOR_ALL_AGENCY,
   PROCEED_FOR_TIER_LOGIC,
-  Toast_With_Message,
 } from '@shared/constants';
 import { OrderCredentialsService } from "@client/order-management/services";
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
@@ -55,6 +53,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
 import { ValidationCredentialOption, ValidationExistenceCredential }
   from '@order-credentials/constants/credential-message.constant';
+import { ToastComponent } from '@syncfusion/ej2-angular-notifications';
 
 
 enum SelectedTab {
@@ -123,6 +122,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private isCredentialsChanged = false;
   private isBillRatesChanged = false;
+  @ViewChild('toastObj') toastObj: ToastComponent;
 
   public constructor(
     private orderCredentialsService: OrderCredentialsService,
@@ -311,8 +311,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     const fields = fieldsString || this.collectInvalidFields().join(',<br>');
 
     if (fields && fields.length) {
-      this.store.dispatch(new ShowToast(MessageTypes.Error, Message_With_Fields(fields),false,'',0,true));
-      return;
+      this.toastObj.content =  '<div>'+'Please fill in the required fields in Order Details tab:\n' + fields+'</div',
+      this.toastObj.show();
     }
   }
 
@@ -324,8 +324,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }).map((controlName) => `\u2022 ${FieldName[controlName as keyof typeof FieldName]}`);
 
     if (invalidFields && invalidFields.length) {
-      this.store.dispatch(new ShowToast(MessageTypes.Error, Message_With_Fields(invalidFields),false,'',0,true));
-      return;
+      this.toastObj.content =  '<div>'+'Please fill in a correct value in Order Details tab:' +'\n'+invalidFields.join(',\n')+'</div',
+      this.toastObj.show();
     }
   }
 
@@ -333,14 +333,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     const message = credentialState
       ? ValidationCredentialOption
       : ValidationExistenceCredential;
-
-    this.store.dispatch(new ShowToast(MessageTypes.Error, Toast_With_Message(message)));
-    return;
+      this.toastObj.content =  '<div>'+message+'</div',
+      this.toastObj.show();
   }
 
   private showBillRatesValidationMessage(): void {
-    this.store.dispatch(new ShowToast(MessageTypes.Error, Toast_With_Message('Please set up at least one Regular Bill Rate in Organization Settings')));
-    return;
+      this.toastObj.content =  '<div>'+'Please set up at least one Regular Bill Rate in Organization Settings'+'</div',
+      this.toastObj.show();
   }
 
   public save(): void {
@@ -584,6 +583,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderPlacementFee,
       linkedId,
       AllowToUpdateDept,
+      ExpectedWorkWeek,
     } = allValues;
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
       const {
@@ -661,6 +661,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       isTemplate: false,
       linkedId,
       AllowToUpdateDept,
+      ExpectedWorkWeek,
     };
 
     if (this.orderDetailsFormComponent.order?.isTemplate) {
@@ -845,13 +846,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!orderValid) {
       this.showOrderFormValidationMessage();
       this.showInvalidValueMessage();
-    }else if (!credentialsValid || !hasSelectedCredentialFlag) {
+    }
+     if (!credentialsValid || !hasSelectedCredentialFlag) {
       this.showCredentialsValidationMessage(!!credentialsValid && !hasSelectedCredentialFlag);
     }   
-    else if (!billRatesValid) {
+    if (!billRatesValid) {
       this.showBillRatesValidationMessage();
-    }else if(this.orderDetailsFormComponent.isEditMode && this.order.disableNumberOfOpenPositions && this.order.openPositions != this.orderDetailsFormComponent.generalInformationForm.getRawValue().openPositions){
-      this.store.dispatch(new ShowToast(MessageTypes.Error, ERROR_CAN_NOT_Edit_OpenPositions));
+    }
+     if(this.orderDetailsFormComponent.isEditMode && this.order.disableNumberOfOpenPositions && this.order.openPositions != this.orderDetailsFormComponent.generalInformationForm.getRawValue().openPositions){
+      this.toastObj.content =  '<div>'+ERROR_CAN_NOT_Edit_OpenPositions+'</div',
+      this.toastObj.show();
       return;
     }
 
@@ -867,7 +871,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           let parentOrderEndDate = new Date(positionOrder?.actualEndDate);
           let twoWeekDate = new Date(parentOrderEndDate.setDate(parentOrderEndDate.getDate() + 14));
           if(this.startDate && this.startDate > twoWeekDate ){
-              this.store.dispatch(new ShowToast(MessageTypes.Error, ExtensionStartDateValidation));
+             this.toastObj.content =  '<div>'+ExtensionStartDateValidation+'</div',
+              this.toastObj.show();
               return;
            }
         }

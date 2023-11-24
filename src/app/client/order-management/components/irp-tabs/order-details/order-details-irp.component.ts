@@ -138,6 +138,7 @@ import { Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { SubmitButtonItem } from '@client/order-management/components/irp-tabs/order-details/enums';
+import{ ShiftsService } from '@organization-management/shifts/shifts.service'
 
 @Component({
   selector: 'app-order-details-irp',
@@ -255,6 +256,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     private settingsViewService: SettingsViewService,
     private skillsService: SkillsService,
     private orderManagementService: OrderManagementService,
+    private shiftservice:ShiftsService
   ) {
     super();
   }
@@ -471,7 +473,16 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     ).subscribe((state: ScheduleShift[]) => {
 
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
-
+      const jobStartDate = this.generalInformationForm.get('jobStartDate')?.value ? this.generalInformationForm.get('jobStartDate')?.value : this.generalInformationForm.get('jobDates')?.value;
+      state = this.generalInformationForm.get('jobDates')?.value && jobStartDate.length ?this.shiftservice.getactiveshiftsbyJobDates(state,jobStartDate ?? new Date) : this.shiftservice.getactiveshifts(state, jobStartDate ?? new Date);
+      const shiftId=this.generalInformationForm.get('shift')?.value;
+      if(shiftId){
+        const isshiftshow=state.some(x=>x.id == shiftId);
+        if(!isshiftshow){
+          this.generalInformationForm.get('shift')?.reset();
+        }
+   }
+      
       this.updateDataSourceFormList('shift', [{ name: 'Custom', id: 0 }, ...state]);
       setDataSource(selectedForm.fields, 'shift', [{ name: 'Custom', id: 0 }, ...state]);
 
@@ -691,6 +702,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.generalInformationForm.get('jobStartDate')?.valueChanges.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe((value: Date) => {
+      this.getAllShifts();
       const duration = this.generalInformationForm.get('duration')?.value;
 
       if (isNaN(parseInt(duration)) || !(value instanceof Date)) {
@@ -819,7 +831,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
                   this.changeDetection.markForCheck();
                 });
             }
-            
+
           }
         } else {
           if (this.isDistributionDelay) {
@@ -946,6 +958,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           setDataSource(selectedForm.fields, 'departmentId', deparment);
           this.changeDetection.markForCheck();
         }
+        this.getAllShifts();
       });
     if(this.selectedOrder?.status === OrderStatus.Filled){
       this.generalInformationForm.get('regionId')?.disable();
@@ -1054,9 +1067,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.commentContainerId = this.selectedOrder.commentContainerId as number;
       this.getComments();
       this.orderStatus = this.selectedOrder.statusText;
-      this.getAllShifts();
       this.setConfigType(this.selectedOrder);
       this.patchFormValues(this.selectedOrder);
+      this.getAllShifts();
       this.createPatchContactDetails(this.selectedOrder);
       this.createPatchWorkLocation(this.selectedOrder);
       this.updateSpecialProjectValidation(this.specialProjectConfigurationSettings);
@@ -1075,7 +1088,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       departmentId: selectedOrder.departmentId,
       skillId: selectedOrder.skillId,
       openPositions: selectedOrder.openPositions,
-      linkedId: selectedOrder.linkedId
+      linkedId: selectedOrder.linkedId,
+      ExpectedWorkWeek:selectedOrder.expectedWorkWeek
     });
     setTimeout(() => {
       this.generalInformationForm.patchValue({
@@ -1126,6 +1140,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       }
     }
     if(!selectedOrder.isIRPOnly && selectedOrder?.status === OrderStatus.Filled)
+    {
+      this.jobDistributionForm.get('jobDistribution')?.disable();
+    }
+    if(selectedOrder?.status === OrderStatus.Filled)
     {
       this.jobDistributionForm.get('jobDistribution')?.disable();
     }

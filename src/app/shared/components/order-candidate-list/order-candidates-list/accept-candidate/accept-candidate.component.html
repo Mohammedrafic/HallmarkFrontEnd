@@ -178,7 +178,7 @@
                       <ng-container [ngTemplateOutlet]="actualEndDate"></ng-container>
                     </div>
                   </div>
-                  <ng-container *ngIf="isAccepted" [ngTemplateOutlet]="offeredStartDate"></ng-container>
+                  <!-- <ng-container *ngIf="isAccepted" [ngTemplateOutlet]="offeredStartDate"></ng-container> -->
                   <div class="input-container bootstrap" *ngIf="isCandidatePayRateVisible && showCandidatePayRate">
                     <label>Candidate Pay Rate ($) <span *ngIf="candidatePayRateRequired" class="required">*</span></label>
                     <div class="input-group">
@@ -203,7 +203,7 @@
                 </div>
                 <div *ngIf="showGuaranteedWorkWeek" class="d-flex">
                   <div class="input-container bootstrap f-grow-2">
-                    <label>Guaranteed Work Week</label>
+                    <label>Expected Work Week</label>
                     <div class="input-group input-readonly">
                       <input appValidateWithMessage formControlName="guaranteedWorkWeek" class="e-input" type="text" readonly/>
                     </div>

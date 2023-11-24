@@ -13,7 +13,7 @@
           Export <i-feather name="upload" class="icon"></i-feather>
         </div>
       </button>
-        <button ejs-button appHideBeforeSyncfusionLoad  [isPrimary]="true" (click)="addMsp()">Add MSP</button>
+        <button ejs-button appHideBeforeSyncfusionLoad *ngIf="userPermission[userPermissions.CanManageMspList]" [isPrimary]="true" (click)="addMsp()">Add MSP</button>
       </app-tooltip-container>
     </ng-container>
   </app-page-toolbar>
@@ -41,4 +41,3 @@
 
  
  
-  

@@ -68,7 +68,5 @@ export class CreateWorkflowService {
     } else {
       this.store.dispatch(new SaveWorkflow(workflowWithDetails));
     }
-
-    workflowForm.reset();
   }
 }

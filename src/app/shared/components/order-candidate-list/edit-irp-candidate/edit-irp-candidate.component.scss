@@ -47,7 +47,7 @@
     }
 
     .form {
-      display: grid;
+      display: inline-flex;
       grid-auto-columns: 1fr;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
@@ -68,23 +68,42 @@
 }
 
 .class_table{
+  color: #6f778e;
   table {
-    border: 1px solid gainsboro;
     margin: 20px 0px 0px 0px;
+    border-collapse: separate;
+    border: 1px solid gainsboro;
+    border-radius: 10px;
+    font-size: 12px;
   }
   table thead{
-    background: #3E7FFF;
-    color: white;
+    text-transform: uppercase;
   }
   table th {
-    padding: 10px;
-    vertical-align: top;
-    text-align: left;
+    // border-right: 1px solid gainsboro;
+    position: relative;
+  }
+  table th:last-child{
+    border: none;
   }
   tr td {
-    border: 1px solid gainsboro;
-    padding: 5px;
+    border-top: 1px solid gainsboro;
+    font-weight: 500;
+    text-align: right;
   }
+  th:last-child::after {
+    background-color: white !important;
+  }
+  th::after {
+    content: "";
+    position: absolute;
+    width: 0.5px;
+    height: 17px;
+    background-color: #6f778e;
+    top: 50%;
+    right: 0;
+    transform: translate(-50%, -50%);
+}
 }
 .atpformfield {
   width: 100%;
@@ -110,4 +129,11 @@ app-comments-irp {
   color: white;
   padding: 10px;
   font-weight: bold;
+}
+
+table th,table td {
+  padding: 10px;
+}
+td:first-child {
+  text-align: left !important;
 }

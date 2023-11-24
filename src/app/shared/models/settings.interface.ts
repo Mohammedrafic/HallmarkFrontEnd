@@ -36,6 +36,12 @@ export interface PayPeriodPayload {
   noOfWeek: number;
   date: Date;
 }
+
+export interface StartsOnPayload {
+  isEnabled: boolean;
+  startsOn: Date;
+}
+
 export interface ATPRateCalculationPayload {
   isEnabled: boolean;
   benefitPercent: number | null;

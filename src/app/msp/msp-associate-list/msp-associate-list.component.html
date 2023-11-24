@@ -5,7 +5,7 @@
     </div>
     <div class="actions">
       <button ejs-button
-              [disabled]="!userPermission[userPermissions.CanCreateMSP]"
+              *ngIf="userPermission[userPermissions.CanManageLinkedAgencies]"
               class="action-link" (click)="addNew()">
         <i-feather name="plus" class="icon"></i-feather>
         Link {{getTitle}}

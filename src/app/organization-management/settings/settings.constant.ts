@@ -10,6 +10,7 @@ export const TierSettingsKey = 'TieringLogic';
 export const BillingSettingsKey = 'BillingContactEmails';
 export const InvoiceGeneratingSettingsKey = 'InvoiceAutoGeneration';
 export const DepartmentSkillRequired = OrganizationSettingKeys[OrganizationSettingKeys.DepartmentSkillRequired];
+export const SplitReportedTimeOnBillRateEffectiveDate = 'SplitReportedTimeOnBillRateEffectiveDate';
 
 export const SettingsSystemFilterCols = {
   includeInIRP: {
@@ -108,7 +109,8 @@ export const DisabledSettingsByDefault = [
   'OrganizationCanCarryClockIDFromParent',
   'AllowDuplicateClockIdforOrganization',
   'MarkZeroDollarInvoicetoPaidOnApproval',
-  'MandatorySpecialProjectDetails'
+  'MandatorySpecialProjectDetails',
+  'SplitReportedTimeOnBillRateEffectiveDate',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

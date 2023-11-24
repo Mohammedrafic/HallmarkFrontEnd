@@ -201,10 +201,13 @@ export class SettingsDataAdapter {
         displayValue = SettingsDataAdapter
           .getPayPeriodDisplayValue(SettingsDataAdapter.getParentSettingParsedValue(setting, orgSystems.IRP));
         break;
-        case OrganizationSettingControlType.ATPRateCalculation:
-          displayValue=SettingsDataAdapter
-          .geATPRateCalculationdisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
-          break;
+      case OrganizationSettingControlType.StartsOnDate:
+        displayValue = SettingsDataAdapter.getStartsOnDateDisplayValue(SettingsDataAdapter.getParsedValue(setting.value));
+        break;
+      case OrganizationSettingControlType.ATPRateCalculation:
+        displayValue = SettingsDataAdapter
+        .geATPRateCalculationdisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
+        break;
       default:
         displayValue = '';
     }
@@ -363,6 +366,12 @@ export class SettingsDataAdapter {
 
   private static getPayPeriodDisplayValue(parsedValue: { isEnabled: boolean }): CheckboxValue {
     const result = parsedValue?.isEnabled ? CheckboxValue.Yes : CheckboxValue.No;
+
+    return result;
+  }
+
+  private static getStartsOnDateDisplayValue(value: { IsEnabled: boolean, StartsOn: string }): CheckboxValue {
+    const result = value?.IsEnabled ? CheckboxValue.Yes : CheckboxValue.No;
 
     return result;
   }

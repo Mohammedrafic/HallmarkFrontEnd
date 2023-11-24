@@ -173,6 +173,16 @@ export const GridCellsSystemIRPTabAll = (
   },
   {
     ...DefaultOrderCol,
+    field: 'expectedWorkWeek',
+    headerName: 'Expected Work Week',
+    type: 'leftAligned',
+    width: 135,
+    minWidth: 110,
+    maxWidth: 180,
+  },
+  
+  {
+    ...DefaultOrderCol,
     field: 'regionName',
     headerName: 'REGION',
     width: 150,

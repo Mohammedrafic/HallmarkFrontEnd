@@ -105,6 +105,7 @@
 .toggle-wrapper {
   display: flex;
   align-items: center;
+  color: var(--sub-title-2);
 
   & span {
     font-size: 14px;
@@ -152,6 +153,8 @@
 position:absolute;
 right:0;
 }
+
 .e-pager{
-border-radius: 12px !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
 }

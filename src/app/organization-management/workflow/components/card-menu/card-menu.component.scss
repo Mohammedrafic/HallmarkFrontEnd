@@ -8,12 +8,17 @@
   }
 
   .card.e-card {
-    border: 1px solid $secondary-dark-blue-45;
+    border: 1px solid var(--header-border);
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
     width: 256px;
 
     &:hover {
       background-color: $primary-active-blue-80;
+      cursor: pointer;
+
+      h4 {
+        color: $black !important;
+      }
     }
 
     h4 {
@@ -39,6 +44,12 @@
 
     &.active-card {
       background-color:$primary-active-blue;
+
+      &:hover {
+        h4 {
+          color: $white !important;
+        }
+      }
 
       h4,
       .card-info {

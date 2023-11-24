@@ -68,7 +68,6 @@ describe('CreateWorkflowService', () => {
       id: [1],
       workflow: ['Sample Workflow', [Validators.required, Validators.maxLength(50)]],
     });
-    const resetSpy = spyOn(mockForm, 'reset');
     const saveDetailsDto = {
       id: 1,
       name: 'Sample Workflow',
@@ -79,8 +78,6 @@ describe('CreateWorkflowService', () => {
     };
 
     service.saveWorkflow(WorkflowNavigationTabs.IrpOrderWorkFlow, mockForm);
-
-     expect(resetSpy).toHaveBeenCalled();
-     expect(storeSpy.dispatch).toHaveBeenCalledOnceWith(new SaveEditedWorkflow(saveDetailsDto));
+    expect(storeSpy.dispatch).toHaveBeenCalledOnceWith(new SaveEditedWorkflow(saveDetailsDto));
   });
 });

@@ -22,6 +22,7 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Skill', column: 'Skill' },
   { text: 'Region', column: 'Region' },
   { text: '# of Positions', column: 'Availablepos' },
+  { text: 'Expected Work Week', column: 'ExpectedWorkWeek' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
   { text: 'Type', column: 'OrderType' },
@@ -178,6 +179,7 @@ export const irpAllOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Type', column: 'Type' },
   { text: 'Skill', column: 'Skill' },
   { text: 'Avail pos', column: 'AvailPos' },
+  { text: 'Expected Work Week', column: 'ExpectedWorkWeek' },
   { text: 'Region', column: 'Region' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
@@ -227,6 +229,7 @@ export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Critical', column: 'Critical' },
   { text: 'Skill', column: 'Skill' },
   { text: 'Avail pos', column: 'AvailPos' },
+  { text: 'Expected Work Week', column: 'ExpectedWorkWeek' },
   { text: 'Region', column: 'Region' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
@@ -347,6 +350,10 @@ export const ReOrdersColumnsConfig = [
     visible: true,
   },
   {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
+  },
+  {
     fieldName: 'billRate',
     visible: true,
   },
@@ -426,6 +433,10 @@ export const AllOrdersColumnsConfig = [
     visible: true,
   },
   {
+    fieldName: 'expectedWorkWeek',
+    visible: true,
+  },
+  {
     fieldName: 'billRate',
     visible: true,
   },
@@ -482,6 +493,10 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'openPositions',
+    visible: false,
+  },
+  {
+    fieldName: 'expectedWorkWeek',
     visible: false,
   },
   {
@@ -560,6 +575,10 @@ export const orderTemplateColumnsConfig = [
     visible: false,
   },
   {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
+  },
+  {
     fieldName: 'billRate',
     visible: false,
   },
@@ -573,6 +592,10 @@ export const orderTemplateColumnsConfig = [
   },
   {
     fieldName: 'openPositions',
+    visible: false,
+  },
+  {
+    fieldName: 'expectedWorkWeek',
     visible: false,
   },
   {
@@ -657,6 +680,10 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'openPositions',
     visible: true,
+  },
+  {
+    fieldName: 'expectedWorkWeek',
+    visible: false,
   },
   {
     fieldName: 'billRate',
