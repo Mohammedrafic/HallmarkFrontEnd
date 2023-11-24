@@ -387,7 +387,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.emailTo = data.toList == null ? "" : data.toList;
     this.groupEmailTemplateForm.emailCc = data.ccList == null ? "" : data.ccList;
     this.groupEmailTemplateForm.businessUnitType = data.businessUnitType;
-    this.groupEmailTemplateForm.businessUnit = data.businessUnitId;
+    this.groupEmailTemplateForm.businessUnit = data.selectedBussinessUnitIds;
     this.groupEmailTemplateForm.userTypeInput = data.userType;
     this.groupEmailTemplateForm.fileNameInput = data.fileName;
     this.groupEmailTemplateForm.fileName = data.fileName == null ? "" : data.fileName;

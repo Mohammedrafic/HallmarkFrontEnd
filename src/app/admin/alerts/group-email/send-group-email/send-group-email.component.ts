@@ -631,7 +631,8 @@ export class SendGroupEmailComponent
                     name:item.agencyName,
                     businessUnitType: 0,
                     parentUnitId:0,
-                    agencyStatus:0
+                    agencyStatus:0,
+                    selectedBussinessUnitIds: ""
                   });
                 });
                 this.businessData = businessUnits;
@@ -698,7 +699,8 @@ export class SendGroupEmailComponent
                     name:item.agencyName,
                     businessUnitType: 0,
                     parentUnitId:0,
-                    agencyStatus:0
+                    agencyStatus:0,
+                    selectedBussinessUnitIds: ""
                   });
                 });
                 this.businessData = businessUnits;
@@ -707,7 +709,7 @@ export class SendGroupEmailComponent
                 debugger
                 let businessUnits : (number | undefined)[] = [];
                 businessUnits.push(this.businessUnit)
-                this.groupEmailTemplateForm.controls['businesses'].setValue(businessUnits);
+                this.groupEmailTemplateForm.controls['businesses'].setValue(this.businessUnit.toString().split(",").map(Number));
               }
             });
           } else {
@@ -717,7 +719,7 @@ export class SendGroupEmailComponent
               if(this.businessUnit != undefined){
                 // let businessUnits : (number | undefined)[] = [29,31,1760];
                 // businessUnits.push(this.businessUnit)
-                this.groupEmailTemplateForm.controls['business'].setValue(this.businessUnit);
+                  this.groupEmailTemplateForm.controls['business'].setValue(this.businessUnit.toString().split(",").map(Number));
               }
               
             });
@@ -1193,6 +1195,7 @@ export class SendGroupEmailComponent
   }
 
   private getCandidates(): void {
+    debugger
     this.candidateControl.patchValue([]);
     this.userData = [];
     var agencies =
@@ -1223,7 +1226,7 @@ export class SendGroupEmailComponent
       this.jobIDControl.value != null && this.jobIDControl.value != undefined && this.jobIDControl.value != ''
         ? this.jobIDControl.value
         : 'null';
-
+    
     var businessUnitId = [];
     if(this.isAgencyCandidatesType)
     
