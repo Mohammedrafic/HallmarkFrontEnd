@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -820,14 +820,14 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       )
       .subscribe((event: ExportedFileType) => {
         const type = this.isIRP ? 'Employees' : 'Candidates';
-        this.defaultFileName = `${type} ${this.generateDateTime(this.datePipe)}`;
+        this.defaultFileName = `${type} ${formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US')}`;
         this.defaultExport(event);
       });
   }
 
   private setFileName(): void {
     const type = this.isIRP ? 'Employees' : 'Candidates';
-    this.fileName = `${type} ${this.generateDateTime(this.datePipe)}`;
+    this.fileName = `${type} ${formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US')}`;
   }
 
   private subscribeOnOrgStructure(): void {
