@@ -1,12 +1,14 @@
 <section class="flex-column">
   <section class="toolbar">
     <section class="toolbar-header">
-      <div class="toolbar-header-div">{{title }}
-      </div>     
+      <div class="toolbar-header-div">
+        {{title }}
+      </div>
     </section>
     <section class="toolbar-message">
-      <div class="toolbar-message-div">{{message}}
-      </div> 
+      <div class="toolbar-message-div">
+        {{message}}
+      </div>
     </section>
     <section class="toolbar-buttons">
       <button ejs-button
@@ -22,19 +24,23 @@
 </section>
 <section class="candidate-journey-section">
   <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName"
-    [reportType]="reportType"></app-logi-report>
+                   [reportType]="reportType"></app-logi-report>
   <router-outlet></router-outlet>
 </section>
 <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
-  (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+                   (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
   <form [formGroup]="candidateJourneyForm" class="filter-form-dialog form-container bootstrap">
     <div class="form-element">
       <div class="input-container bootstrap">
-        <label>Organization Name<span class="required">*</span></label>
+        <label>Organization Name</label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
-            [dataSource]="filterColumns.businessIds.dataSource" [allowFiltering]="true" placeholder="Business">
-          </ejs-dropdownlist>
+          <!--<ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
+                            [dataSource]="filterColumns.businessIds.dataSource" [allowFiltering]="true" placeholder="Business">
+          </ejs-dropdownlist>-->
+          <ejs-multiselect mode="CheckBox" formControlName="businessIds" placeholder="Business"
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.businessIds.dataSource"
+                           [fields]="organizationFields" [selectAllText]='allOption' showSelectAll=true>
+          </ejs-multiselect>
         </div>
       </div>
     </div>
@@ -43,8 +49,8 @@
         <label>Region</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
-            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
-            [fields]="regionFields">
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
+                           [fields]="regionFields" [enabled]="bussinessControl?.value.length == 1">
           </ejs-multiselect>
         </div>
       </div>
@@ -54,8 +60,8 @@
         <label>Location</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage placeholder="All"
-            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.locationIds.dataSource"
-            [fields]="locationFields">
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.locationIds.dataSource"
+                           [fields]="locationFields" [enabled]="bussinessControl?.value.length == 1">
           </ejs-multiselect>
         </div>
       </div>
@@ -65,8 +71,8 @@
         <label>Department</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="All"
-            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
-            [fields]="departmentFields">
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
+                           [fields]="departmentFields" [enabled]="bussinessControl?.value.length == 1">
           </ejs-multiselect>
         </div>
       </div>
@@ -77,8 +83,8 @@
           <label>Skill Category</label>
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="skillCategoryIds" placeholder="All"
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillCategoryIds.dataSource"
-              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillCategoryIds.dataSource"
+                             [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
@@ -86,9 +92,22 @@
           <label>Skills</label>
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="skillIds" placeholder="All" [allowFiltering]="true"
-              [showDropDownIcon]="true" [dataSource]="filterColumns.skillIds.dataSource" [fields]="commonFields"
-              [selectAllText]='allOption' showSelectAll=true>
+                             [showDropDownIcon]="true" [dataSource]="filterColumns.skillIds.dataSource" [fields]="commonFields"
+                             [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-element">
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label>Period</label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist (change)="selectPeriod()" formControlName="period" appValidateWithMessage placeholder="All"
+                              [allowFiltering]="true" [dataSource]="periodList"
+                              [fields]="periodFields" showSelectAll=true>
+            </ejs-dropdownlist>
           </div>
         </div>
       </div>
@@ -99,7 +118,8 @@
           <label>Order Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-              appValidateWithMessage formControlName="startDate">
+                            appValidateWithMessage formControlName="startDate" [disabled]="periodIsDefault"
+                            [enabled]="candidateJourneyForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
         </div>
@@ -107,7 +127,8 @@
           <label>Order End Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-              formControlName="endDate" [min]="candidateJourneyForm.controls['startDate'].value">
+                            formControlName="endDate" [min]="candidateJourneyForm.controls['startDate'].value"
+                            [enabled]="candidateJourneyForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
         </div>
@@ -119,8 +140,8 @@
           <label>Order Type</label>
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="orderTypes" placeholder="All" [allowFiltering]="true"
-              [showDropDownIcon]="true" [dataSource]="filterColumns.orderTypes.dataSource" [fields]="commonFields"
-              [selectAllText]='allOption' showSelectAll=true>
+                             [showDropDownIcon]="true" [dataSource]="filterColumns.orderTypes.dataSource" [fields]="commonFields"
+                             [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
@@ -128,8 +149,8 @@
           <label>Order Status</label>
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="jobStatuses" placeholder="All" [allowFiltering]="true"
-              [showDropDownIcon]="true" [dataSource]="filterColumns.jobStatuses.dataSource" [fields]="jobStatusesFields"
-              [selectAllText]='allOption' showSelectAll=true>
+                             [showDropDownIcon]="true" [dataSource]="filterColumns.jobStatuses.dataSource" [fields]="jobStatusesFields"
+                             [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
@@ -141,9 +162,9 @@
             <label>Candidate Status</label>
             <div class="input-group dropdown">
               <ejs-multiselect mode="CheckBox" formControlName="candidateStatuses" placeholder="All"
-                [allowFiltering]="true" [showDropDownIcon]="true"
-                [dataSource]="filterColumns.candidateStatuses.dataSource" [fields]="candidateStatusesFields"
-                [selectAllText]='allOption' showSelectAll=true>
+                               [allowFiltering]="true" [showDropDownIcon]="true"
+                               [dataSource]="filterColumns.candidateStatuses.dataSource" [fields]="candidateStatusesFields"
+                               [selectAllText]='allOption' showSelectAll=true>
               </ejs-multiselect>
             </div>
           </div>
