@@ -875,7 +875,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Locations));
+
               dispatch(new BulkUpdateAssignedLocationucceeded(payload));
             }
             else{
@@ -905,7 +905,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Locations));
+            
               dispatch(new BulkDeleteLocationucceeded(payload));
             }
             else{
@@ -935,7 +935,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Department));
+           
               dispatch(new BulkUpdateDepartmentsucceeded(payload));
             }
             else{
@@ -965,7 +965,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Department));
+            
               dispatch(new BulkDeleteDepartmentsucceeded(payload));
             }
             else{
