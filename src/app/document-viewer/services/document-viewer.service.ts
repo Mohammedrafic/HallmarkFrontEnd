@@ -37,5 +37,11 @@ export class DocumentViewerService {
     const url = this.baseUrl + '/api/document-viewer';
     return this.http.get<FileGroup[]>(url, params);
   }
+
+  public saveStatus(orderId: number | null, jobId: number | null, statusText: string): Observable<boolean> {
+    return this.http.post<boolean>(`/api/AppliedCandidates/updateCandidateJobFromMail`, { orderId, jobId, statusText });
+  }
+  
+
 }
 

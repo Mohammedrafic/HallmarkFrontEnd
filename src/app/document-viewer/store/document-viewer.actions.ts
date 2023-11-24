@@ -1,3 +1,5 @@
+import { Status } from "./document-viewer.state.model";
+
 export class GetFiles {
   static readonly type = '[document-viewer] Get Files';
   constructor(public fileHash: string, public fileId: string) {}
@@ -22,4 +24,18 @@ export class GetPdfFilesSucceeded {
 export class GetGroupedFiles {
   static readonly type = '[document-viewer] Get Grouped Files';
   constructor(public fileHash: string) {}
+}
+
+export class SaveStatus {
+  static readonly type = '[status] Save Status';
+  constructor(public orderId: number | null, public jobId: number | null, public statusText: string) {}
+}
+
+export class SaveStatusSucceeded {
+  static readonly type = '[status] Save Status Succeeded';
+  constructor(public orderId: number | null, public jobId: number | null, public statusText: string) {}
+}
+
+export class SaveStatusFailed {
+  static readonly type = '[status] Save Status Failed';
 }
