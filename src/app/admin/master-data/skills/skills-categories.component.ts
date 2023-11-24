@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -27,7 +27,7 @@ export class SkillsCategoriesComponent extends AbstractPermissionGrid implements
   public filteredItems$ = new Subject<number>();
   public canAddSkillOrCategories = true;
 
-  constructor(protected override store: Store) {
+  constructor(protected override store: Store, private cd: ChangeDetectorRef) {
     super(store);
   }
 
@@ -68,5 +68,6 @@ export class SkillsCategoriesComponent extends AbstractPermissionGrid implements
     this.canAddSkillOrCategories = this.currentTab === 0 ?
       this.userPermission[this.userPermissions.CanEditMasterSkills] :
       this.userPermission[this.userPermissions.CanEditSkillCategories];
+    this.cd.detectChanges();
   }
 }

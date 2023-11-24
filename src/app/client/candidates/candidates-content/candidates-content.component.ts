@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -23,6 +23,7 @@ import { GetIRPCandidatesByPage } from '@shared/components/candidate-list/store/
   selector: 'app-candidates-content',
   templateUrl: './candidates-content.component.html',
   styleUrls: ['./candidates-content.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidatesContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   public includeDeployedCandidates$: Subject<boolean> = new Subject<boolean>();

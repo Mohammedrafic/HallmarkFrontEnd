@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
@@ -55,7 +55,11 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
 
   protected componentDestroy: () => Observable<unknown>;
 
-  constructor(private store: Store, private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private confirmService: ConfirmService,
+    public cd: ChangeDetectorRef,
+  ) {
     super();
   }
 

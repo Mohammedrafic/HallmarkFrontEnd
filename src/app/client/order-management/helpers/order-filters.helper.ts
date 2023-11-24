@@ -18,6 +18,10 @@ export const GetOrderFilterDatesInUts = (
   filters: OrderFilter,
   filterControls: string[],
 ): OrderFilterDateList => {
+  if (!filters) {
+    return filters;
+  }
+
   return filterControls.reduce((acc: OrderFilterDateList, current: string) => {
     const filterValue = filters[current as keyof OrderFilter];
     acc[current as keyof OrderFilterDateList] = filterValue ?

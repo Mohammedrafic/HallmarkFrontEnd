@@ -138,7 +138,7 @@
                  (close)="onMspSideDialogClose()"
                  [headerText]="convertMspHeader"
                  [width]="'523px'">
-  <form class="form-container" id="convertAgencyToMSPForm" [formGroup]="convertAgencyToMSPFormGroup">
+  <form class="form-container" id="convertAgencyToMSPForm">
     <div class="msp-text-box">
       <h2 class="msp-note-text">NOTE:</h2>
       This action will convert the current Agency to MSP.
@@ -152,7 +152,7 @@
       <br />
     </div>
     <div class="msp-button-container">
-      <button ejs-button [isPrimary]="true" [disabled]="!userPermission[userPermissions.CanConvertAgencyToMSP]" (click)="onConvertAgencyToMSPFormSaveClick()" [formGroup]="convertAgencyToMSPFormGroup">Convert To MSP</button>
+      <button ejs-button [isPrimary]="true" [disabled]="!userPermission[userPermissions.CanConvertAgencyToMSP]" (click)="onConvertAgencyToMSPFormSaveClick()">Convert To MSP</button>
     </div>
   </form>
 </app-msp-custom-side-dialog>

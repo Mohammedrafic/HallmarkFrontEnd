@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { Select, Store } from '@ngxs/store';
+import { Select } from '@ngxs/store';
 import { delay, distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
@@ -55,8 +55,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   @Input() maskSSNPattern: string = '000-00-0000';
   @Input() maskedSSN: string = '';
 
-  constructor(private store: Store,
-              private candidateGeneralInfoService: CandidateGeneralInfoService) {
+  constructor(private candidateGeneralInfoService: CandidateGeneralInfoService) {
     super();
   }
 

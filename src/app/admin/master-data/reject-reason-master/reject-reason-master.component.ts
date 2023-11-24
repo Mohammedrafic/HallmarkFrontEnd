@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { DialogMode } from "@shared/enums/dialog-mode.enum";
 import { ShowSideDialog } from "../../../store/app.actions";
@@ -41,7 +41,8 @@ export class RejectReasonMasterComponent extends AbstractPermissionGrid implemen
   constructor(
     private confirmService: ConfirmService,
     protected override store: Store,
-    private actions$: Actions
+    private actions$: Actions,
+    public cd: ChangeDetectorRef,
   ) {
     super(store);
   }
