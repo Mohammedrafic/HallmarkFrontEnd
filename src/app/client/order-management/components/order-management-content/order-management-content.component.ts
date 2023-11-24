@@ -732,7 +732,9 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
 
 public watchForOrderFromNotification(){
 	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()
-   || (AlertIdEnum[AlertIdEnum['Upon Cancelling']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
+   || (AlertIdEnum[AlertIdEnum['Upon Cancelling']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()
+   || (AlertIdEnum[AlertIdEnum['Communication Open Needs LTA order']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()
+   || (AlertIdEnum[AlertIdEnum['Communication Open Needs PerDiem order']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
     this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
     this.activeSystem = OrderManagementIRPSystemId.IRP;
     this.redirectedfromnotification=true;
