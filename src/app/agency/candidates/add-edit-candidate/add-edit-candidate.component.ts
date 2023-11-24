@@ -1,7 +1,7 @@
 import { positionIdStatuses } from "@agency/candidates/add-edit-candidate/add-edit-candidate.constants";
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
@@ -56,6 +56,7 @@ import { SetLastSelectedOrganizationAgencyId } from "src/app/store/user.actions"
   selector: 'app-add-edit-candidate',
   templateUrl: './add-edit-candidate.component.html',
   styleUrls: ['./add-edit-candidate.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddEditCandidateComponent extends AbstractPermission implements OnInit, OnDestroy {
 
@@ -144,6 +145,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         this.candidateName = this.getCandidateName(this.fetchedCandidate);
         this.uploadImages(this.fetchedCandidate.id as number);
         this.candidateForm.markAsPristine();
+        this.cd.detectChanges();
       });
     this.actions$
       .pipe(delay(500), takeUntil(this.componentDestroy()), ofActionSuccessful(GetCandidateByIdSucceeded))
@@ -160,6 +162,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       .pipe(takeUntil(this.componentDestroy()), ofActionSuccessful(GetCandidatePhotoSucceeded))
       .subscribe((photo: { payload: Blob }) => {
         this.photo = photo.payload;
+        this.cd.detectChanges();
       });
 
     if (this.route.snapshot.paramMap.get('id')) {
@@ -203,6 +206,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     }
     this.candidateForm.get('contactDetails')?.disable();
     this.candidateForm.get('profSummary')?.disable();
+    this.cd.detectChanges();
   }
 
   public clearForm(): void {
@@ -257,6 +261,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
     } else {
       this.candidateForm.markAllAsTouched();
+      this.cd.detectChanges();   
     }
   }
 
@@ -324,6 +329,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
             window.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
             this.reloadCredentials$.next(true);
       }
+      this.cd.detectChanges();
     });
 
     if (this.route.snapshot.paramMap.get('id')) {
@@ -339,6 +345,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       contactDetails: CandidateContactDetailsComponent.createFormGroup(),
       profSummary: CandidateProfessionalSummaryComponent.createFormGroup(),
     });
+    this.candidateForm.valueChanges.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => this.cd.markForCheck());
   }
 
   private uploadImages(businessUnitId: number): void {
@@ -554,6 +563,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       .subscribe((candidateProfile) => {
         this.patchAgencyFormValue(candidateProfile);
         this.getCandidateLoginSetting(candidateProfile.id as number);
+        this.cd.detectChanges();
       });
   }
 }

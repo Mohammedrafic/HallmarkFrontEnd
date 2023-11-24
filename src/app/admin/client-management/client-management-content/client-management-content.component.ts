@@ -186,7 +186,7 @@ export class ClientManagementContentComponent
   }
 
   public override customExport(): void {
-    this.defaultFileName = 'Organization List ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US', 'UTC');
+    this.defaultFileName = 'Organization List ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -202,7 +202,7 @@ export class ClientManagementContentComponent
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = 'Organization List ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US', 'UTC');
+    this.defaultFileName = 'Organization List ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
     this.store.dispatch(
       new ExportOrganizations(
         new ExportPayload(

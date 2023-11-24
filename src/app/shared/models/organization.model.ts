@@ -189,6 +189,15 @@ export class OrganizationRegion {
   organizationId?: number;
   regionId?: number | null;
 }
+export class AgencyOrganizationRegion {
+  id: number | null;
+  name?: string;
+  organisationName?: string;
+  locations: OrganizationLocation[] | null;
+  organizationId?: number;
+  regionId?: number | null;
+}
+
 
 export class OrganizationStructure {
   organizationId: number;

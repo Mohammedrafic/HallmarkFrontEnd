@@ -45,20 +45,20 @@
           .default-icon-button {
             width: 40px;
             height: 40px;
-            border: 1px solid $primary-active-blue-40;
+            border: 1px solid $supportive-red;;
             border-radius: 8px;
-            color: $primary-active-blue-10;
-            background-color: $white;
+            color: $supportive-red;
+            background-color: var(--bg-steper);
 
             &.e-active,
             &:focus {
-              color: $white;
-              background-color: $primary-active-blue;
+              color: $supportive-red-20;
+              border-color: $supportive-red-20;
             }
 
             &:hover {
-              color: $primary-active-blue-10;
-              background-color: $primary-active-blue-70;
+              color: $supportive-red-20;
+              border-color: $supportive-red-20;
             }
           }
         }
@@ -66,14 +66,28 @@
     }
 
     .input-container {
+      &:disabled {
+        border-color: var(--input-border-color) !important;
+      }
+
+      .e-input {
+        border-color: var(--input-border-color);
+
+        &:hover,
+        &:focus {
+          border: 1px solid $primary-active-blue-10 !important;
+        }
+      }
+
       .input-group.input-readonly {
         .e-input[readonly] {
-          background-color: $secondary-dark-blue-50;
+          background-color: var(--bg-input-field-disabled);
           color: $secondary-dark-blue-10;
+          border-color: var(--input-border-color);
 
           &:hover,
           &:focus {
-            border: 1px solid $secondary-dark-blue-40 !important;
+            border: 1px solid var(--input-border-color) !important;
           }
         }
       }

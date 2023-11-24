@@ -34,6 +34,12 @@
       </div>
       <div class="buttons-group" [class.top-margin]="!isAgency">
         <div class="buttons-container">
+          <div class="e-checkbox-wrapper e-css" _ngcontent-yyg-c377="">
+            <input class="e-checkselectall" style="height:19px;width:33px;margin-top:11px;"_ngcontent-yyg-c377="" type="checkbox" aria-label="checkbox" 
+                   value="ShowDetails"                 
+                   (click)="toggleField($event)"/>
+             <span class="e-label" style="color: #3e7fff !important;font-size: 16px; margin-bottom: 10px;" _ngcontent-yyg-c377=""> Show Details</span>
+            </div>
           <button ejs-button  [disabled]="noorgSelection"
                   appHideBeforeSyncfusionLoad
                   cssClass="e-outline button-filter button--no-wrap button-only-icon"

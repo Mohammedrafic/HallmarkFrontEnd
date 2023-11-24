@@ -41,14 +41,15 @@ export const isCandidateOriented = (startDate: string , orientationDate: string 
 };
 
 export const GetCandidateTypeTooltip = (
-  ltaAssignment: LtaAssignment | null,
+  ltaAssignments: LtaAssignment[],
   filterStartDate: string,
   filterEndDate: string
 ): string => {
-  if (
-    !ltaAssignment
-    || !isOrderDateMatchedWithFilter(ltaAssignment.startDate, ltaAssignment.endDate, filterStartDate, filterEndDate)
-  ) {
+  const ltaAssignment = ltaAssignments.find((item: LtaAssignment) => {
+    return isOrderDateMatchedWithFilter(item.startDate, item.endDate, filterStartDate, filterEndDate);
+  });
+
+  if (!ltaAssignment) {
     return '';
   }
 

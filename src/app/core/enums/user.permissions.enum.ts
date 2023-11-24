@@ -244,6 +244,12 @@ export enum UserPermissions {
   //Allow update to order form
   AllowToUpdateDept = 8137,
 
-  //CanCreateMSP
-  CanCreateMSP = 8140,
+  //MSP
+  MspList = 8139,
+  CanViewMSPList = 8140,
+  CanConvertAgencyToMSP = 8141,
+  CanManageMspList = 8142,
+  LinkedAgencies = 8143,
+  CanViewLinkedAgencies = 8144,
+  CanManageLinkedAgencies = 8145,
 }

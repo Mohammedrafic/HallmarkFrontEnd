@@ -1,0 +1,18 @@
+.tiers-grid {
+  ::ng-deep {
+    .ag-icon {
+      color: var(--text) !important;
+    }
+
+    .ag-menu, .ag-tabs-header {
+      background-color: var(--bg-default) !important;
+      color: var(--text) !important;
+      box-shadow: none !important;
+    }
+
+    .app-grid__component {
+      border-top-left-radius: var(--grid-border-radius) !important;
+      border-top-right-radius: var(--grid-border-radius) !important;
+    }
+  }
+}

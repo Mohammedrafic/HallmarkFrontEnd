@@ -16,8 +16,22 @@
     }
 
     & ag-grid-angular {
+      border: 1px solid var(--grid-header-border) !important;
+      border-top-left-radius: 12px !important;
+      border-top-right-radius: 12px !important;
+      width: calc(99% - 1px);
+
+      .ag-root-wrapper {
+        background-color: var(--bg-default) !important;
+        border-color: var(--grid-header-border) !important;
+      }
+
       & .ag-row-selected {
         background: $primary-active-blue-70 !important;
+      }
+
+      .ag-cell-value {
+        color: var(--text) !important;
       }
 
       .ag-cell {
@@ -45,7 +59,6 @@
       border-bottom-right-radius: 0px;
       border-bottom-left-radius: 0px;
       border: 1px solid var(--grid-border-color);
-      border-top: 1px solid var(--grid-border-color)!important;
     }
 
     .ag-header-cell-text {
@@ -57,20 +70,25 @@
     .ag-root-wrapper,
     .ag-row,
     .ag-header {
-      border-color: var(--grid-border-color);
+      border-color: var(--grid-header-border) !important;
     }
 
     .ag-cell {
       padding-top: 10px;
       padding-bottom: 10px;
     }
-  
+
     .ag-row {
       background-color: inherit;
+      border-color: var(--grid-header-border) !important;
     }
-  
+
     .ag-row-hover {
       background-color: var(--grid-row-background-color-hover);
+
+      .ag-cell-value {
+        color: $black !important;
+      }
     }
   }
 

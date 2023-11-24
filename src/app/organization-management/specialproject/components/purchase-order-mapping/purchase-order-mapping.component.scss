@@ -1,0 +1,22 @@
+.special-project-grid {
+  ::ng-deep {
+    .ag-root-wrapper {
+      border: 1px solid var(--grid-header-border) !important;
+    }
+
+    .ag-paging-panel {
+      border-top-color: var(--grid-header-border) !important;
+    }
+    .ag-menu, .ag-tabs-header {
+      background-color: var(--bg-default) !important;
+      color: var(--text) !important;
+      box-shadow: none !important;
+    }
+
+    .ag-tool-panel-wrapper,
+    .ag-filter-toolpanel-group-wrapper {
+      background-color: var(--bg-default) !important;
+      color: var(--text) !important;
+    }
+  }
+}

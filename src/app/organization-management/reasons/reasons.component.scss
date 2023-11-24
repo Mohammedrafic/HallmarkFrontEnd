@@ -65,6 +65,11 @@
   }
 }
 
+.controls-group-title {
+  font-size: 14px;
+  color: var(--sub-title-2);
+}
+
 .location-option-container {
   display: inline-block;
   position: relative;
@@ -151,4 +156,10 @@
   margin-left: 8px;
   font-size: 14px;
   font-weight: 400;
+}
+
+.wide {
+  label {
+    margin-left: 3px;
+  }
 }

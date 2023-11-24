@@ -17,6 +17,12 @@
     align-items: center;
   }
 
+  ejs-radiobutton {
+    .e-label {
+      color: var(--sub-title-2);
+    }
+  }
+
   .dropdown-wrapper {
     display: flex;
 

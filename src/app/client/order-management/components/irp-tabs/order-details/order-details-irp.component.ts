@@ -474,7 +474,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
       const jobStartDate = this.generalInformationForm.get('jobStartDate')?.value ? this.generalInformationForm.get('jobStartDate')?.value : this.generalInformationForm.get('jobDates')?.value;
-      state = this.generalInformationForm.get('jobDates')?.value ? this.shiftservice.getactiveshiftsbyJobDates(state,jobStartDate ?? new Date) : this.shiftservice.getactiveshifts(state, jobStartDate ?? new Date);
+      state = this.generalInformationForm.get('jobDates')?.value && jobStartDate.length ?this.shiftservice.getactiveshiftsbyJobDates(state,jobStartDate ?? new Date) : this.shiftservice.getactiveshifts(state, jobStartDate ?? new Date);
       const shiftId=this.generalInformationForm.get('shift')?.value;
       if(shiftId){
         const isshiftshow=state.some(x=>x.id == shiftId);
@@ -831,7 +831,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
                   this.changeDetection.markForCheck();
                 });
             }
-            
+
           }
         } else {
           if (this.isDistributionDelay) {
@@ -956,9 +956,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
           setDataSource(selectedForm.fields, 'locationId', locations);
           setDataSource(selectedForm.fields, 'departmentId', deparment);
-          this.getAllShifts();
           this.changeDetection.markForCheck();
         }
+        this.getAllShifts();
       });
     if(this.selectedOrder?.status === OrderStatus.Filled){
       this.generalInformationForm.get('regionId')?.disable();
@@ -1140,6 +1140,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       }
     }
     if(!selectedOrder.isIRPOnly && selectedOrder?.status === OrderStatus.Filled)
+    {
+      this.jobDistributionForm.get('jobDistribution')?.disable();
+    }
+    if(selectedOrder?.status === OrderStatus.Filled)
     {
       this.jobDistributionForm.get('jobDistribution')?.disable();
     }

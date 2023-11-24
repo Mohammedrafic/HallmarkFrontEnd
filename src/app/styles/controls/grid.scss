@@ -335,6 +335,12 @@ body.dark {
           margin-left: 16px;
           align-items: center;
 
+          ejs-dropdownlist {
+            .e-input-group {
+              background-color: transparent !important;
+            }
+          }
+
           #goToPage {
             margin-left: 35px;
             width: 100px;

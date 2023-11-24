@@ -1,5 +1,5 @@
-import { DatePipe } from '@angular/common';
-import { Component, Inject, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DatePipe, formatDate } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -103,6 +103,7 @@ import { endTimeValidator } from '@shared/validators/date.validator';
   selector: 'app-candidate-list',
   templateUrl: './candidate-list.component.html',
   styleUrls: ['./candidate-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidateListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
@@ -229,6 +230,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     private candidateListService: CandidateListService,
     private scrollService: ScrollRestorationService,
     private readonly ngZone: NgZone,
+    private cd: ChangeDetectorRef,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super();
@@ -467,7 +469,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       this.isIRP
         ? new CandidateListActions.GetIRPCandidatesByPage(candidateListRequest)
         : new CandidateListActions.GetCandidatesByPage(candidateListRequest)
-    );
+    ).pipe(take(1)).subscribe(() => {
+      this.cd.detectChanges();
+    });
 
     if (!firstDispatch) {
       this.onFilterClose();
@@ -650,6 +654,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     } else {
       this.refreshGridColumns(VMSCandidates, this.grid);
     }
+    this.cd.detectChanges();
   }
 
   private subscribeOnSaveState(): void {
@@ -714,6 +719,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       !this.isAgency && this.IRPVMSGridHandler();
       this.updateCandidates();
       this.candidateListService.refreshFilters(this.isIRP, this.CandidateFilterFormGroup, this.filters);
+      this.cd.detectChanges();
     });
   }
 
@@ -814,14 +820,14 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       )
       .subscribe((event: ExportedFileType) => {
         const type = this.isIRP ? 'Employees' : 'Candidates';
-        this.defaultFileName = `${type} ${this.generateDateTime(this.datePipe)}`;
+        this.defaultFileName = `${type} ${formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US')}`;
         this.defaultExport(event);
       });
   }
 
   private setFileName(): void {
     const type = this.isIRP ? 'Employees' : 'Candidates';
-    this.fileName = `${type} ${this.generateDateTime(this.datePipe)}`;
+    this.fileName = `${type} ${formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US')}`;
   }
 
   private subscribeOnOrgStructure(): void {

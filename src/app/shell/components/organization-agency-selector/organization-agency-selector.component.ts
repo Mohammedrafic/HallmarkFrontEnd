@@ -73,7 +73,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   public organizationAgency: IOrganizationAgency;
   public isAgencyOrOrganization = true;
-  public isMsp = true;
+  public isMspAndMspArea = false;
+  public isMsp = false;
 
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
@@ -123,7 +124,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     this.subscribeOrganizationAgencies();
     this.subscribeMsps();
     this.observeSelectorControl();
-
   }
 
   public selectBusinesUnitType(): void {
@@ -270,6 +270,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private applyOrganizationsAgencies(isOrganizationArea: boolean, isAgencyArea: boolean): void {
+    this.isMspAndMspArea = false;
     if (!isOrganizationArea && !isAgencyArea) {
       return;
     }
@@ -322,10 +323,12 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
     this.organizationAgencyControl.patchValue(newOrganizationAgencyControlValue);
 
+    this.cd.detectChanges();
     setTimeout(() => this.cd.markForCheck());
   }
 
   private applyMsps(isMspArea: boolean): void {
+    this.isMspAndMspArea = isMspArea && this.isMsp;
     if (!isMspArea) {
       return;
     }
@@ -361,6 +364,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
     this.organizationAgencyControl.patchValue(newOrganizationAgencyControlValue);
 
+    this.cd.detectChanges();
     setTimeout(() => this.cd.markForCheck());
   }
 

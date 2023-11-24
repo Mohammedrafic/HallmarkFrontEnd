@@ -30,7 +30,19 @@
 
 .penalties-grid {
   height: 100%;
-  
+
+  ::ng-deep {
+    .ag-menu, .ag-tabs-header {
+      background-color: var(--bg-default) !important;
+      color: var(--text) !important;
+      box-shadow: none !important;
+    }
+
+    ag-grid-angular {
+      border-top-left-radius: 12px !important;
+      border-top-right-radius: 12px !important;
+    }
+  }
   app-grid {
     margin-top: 20px;
   }
