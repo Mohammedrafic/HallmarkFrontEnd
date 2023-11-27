@@ -231,7 +231,9 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
         .getViewSettingKey(
           OrganizationSettingKeys.ScheduleOnlyWithAvailability,
           OrganizationalHierarchy.Location,
-          this.scheduleFilters?.locationIds[0]
+          this.scheduleFilters?.locationIds[0],
+          undefined,
+          true
         )
         .pipe(
           filter(({ ScheduleOnlyWithAvailability }) => !!ScheduleOnlyWithAvailability),

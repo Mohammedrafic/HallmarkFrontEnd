@@ -76,7 +76,6 @@ import {
   SettingsAppliedToPermissions,
   SettingsFilterCols,
   SettingsSystemFilterCols,
-  SplitReportedTimeOnBillRateEffectiveDate,
   TextOptionFields,
   TierSettingsKey,
 } from './settings.constant';
@@ -86,7 +85,7 @@ import {
   PayPeriodPayload,
   StartsOnPayload,
   SwitchValuePayload,
-} from '../../shared/models/settings.interface';
+} from '@shared/models/settings.interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { mapKeys, camelCase } from 'lodash';
 /**
@@ -133,7 +132,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   readonly dropdownCheckboxValueDataSource = DropdownCheckboxValueDataSource;
   readonly organizationSettingControlType = OrganizationSettingControlType;
   readonly disabledSettings = DisabledSettingsByDefault;
-
 
   organizationSettingsFormGroup: FormGroup;
   regionFormGroup: FormGroup;
@@ -1442,39 +1440,22 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       this.store.dispatch(new ClearDepartmentList());
     }
+
     if (this.IsSettingKeyCreatePartialOrder) {
       if (childRecord.departmentId == null) {
         this.allDepartmentSelected = true;
         this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].disable();
-
       }
       else {
         this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue([childRecord.departmentId]);
-
       }
     }
 
-
     if (childRecord.departmentId) {
-
       this.departmentChanged(childRecord.departmentId, true);
-
-
     }
   }
 
-  setDepartmentvalue(departmentId: number) {
-    if (departmentId == null) {
-      this.allDepartmentSelected = true;
-      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue(null);
-
-
-    }
-    else {
-      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue([departmentId]);
-
-    }
-  }
   private closeSettingDialog(): void {
     this.store.dispatch(new ShowSideDialog(false));
     this.setSelectedRecords();
