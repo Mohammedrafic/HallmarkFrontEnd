@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, SetHelpSystem, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -66,6 +66,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
     this.credEndDate = routerState?.['endDate'];
     this.credType = routerState?.['type'];
     this.redirectedFromDashboard = routerState?.['redirectedFromDashboard'];
+    this.store.dispatch(new SetHelpSystem(true));
   }
 
   ngOnInit(): void {
