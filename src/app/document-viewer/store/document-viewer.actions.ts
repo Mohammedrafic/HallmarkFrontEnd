@@ -28,12 +28,12 @@ export class GetGroupedFiles {
 
 export class SaveStatus {
   static readonly type = '[status] Save Status';
-  constructor(public orderId: number | null, public jobId: number | null, public statusText: string) {}
+  constructor(public orderId: number | null, public jobId: number | null, public statusText: string, public statusId: number | null) {}
 }
 
 export class SaveStatusSucceeded {
   static readonly type = '[status] Save Status Succeeded';
-  constructor(public orderId: number | null, public jobId: number | null, public statusText: string) {}
+  constructor(public orderId: number | null, public jobId: number | null, public statusText: string, statusId: number | null) {}
 }
 
 export class SaveStatusFailed {

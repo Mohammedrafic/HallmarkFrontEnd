@@ -90,12 +90,12 @@ export class DocumentViewerState {
   @Action(SaveStatus)
   SaveStatus(
     { dispatch }: StateContext<Status>,
-    { orderId, jobId, statusText }: SaveStatus
+    { orderId, jobId, statusText, statusId }: SaveStatus
   ): Observable<boolean | void> {
-    return this.documentViewerService.saveStatus(orderId, jobId, statusText).pipe(
+    return this.documentViewerService.saveStatus(orderId, jobId, statusText, statusId).pipe(
       tap((res) => {
         if (res) {
-          dispatch(new SaveStatusSucceeded(orderId, jobId, statusText));
+          dispatch(new SaveStatusSucceeded(orderId, jobId, statusText, statusId));
         }
       }),
       catchError((err: HttpErrorResponse) => {

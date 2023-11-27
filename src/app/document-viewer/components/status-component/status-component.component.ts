@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { SaveStatus } from '../../store/document-viewer.actions';
 import { Store } from '@ngxs/store';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-status-component',
@@ -37,7 +38,19 @@ export class StatusComponentComponent implements OnInit {
 
   onSubmit() {
     if (this.statusForm.valid) {
-      this.store.dispatch(new SaveStatus(this.orderId, this.statusForm.value.jobId, this.statusText));
+      if (this.statusText == 'shortlisted') {
+        this.store.dispatch(
+          new SaveStatus(this.orderId, this.statusForm.value.jobId, this.statusText, CandidatStatus.Shortlisted)
+        );
+      } else if (this.statusText == 'offered') {
+        this.store.dispatch(
+          new SaveStatus(this.orderId, this.statusForm.value.jobId, this.statusText, CandidatStatus.Offered)
+        );
+      } else {
+        this.store.dispatch(
+          new SaveStatus(this.orderId, this.statusForm.value.jobId, this.statusText, CandidatStatus.Rejected)
+        );
+      }
     }
   }
 }

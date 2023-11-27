@@ -38,8 +38,8 @@ export class DocumentViewerService {
     return this.http.get<FileGroup[]>(url, params);
   }
 
-  public saveStatus(orderId: number | null, jobId: number | null, statusText: string): Observable<boolean> {
-    return this.http.post<boolean>(`/api/AppliedCandidates/updateCandidateJobFromMail`, { orderId, jobId, statusText });
+  public saveStatus(orderId: number | null, jobId: number | null, statusText: string, statusId: number | null): Observable<boolean> {
+    return this.http.post<boolean>(`/api/AppliedCandidates/updateCandidateJobFromMail`, { orderId, jobId, statusText, statusId });
   }
   
 
