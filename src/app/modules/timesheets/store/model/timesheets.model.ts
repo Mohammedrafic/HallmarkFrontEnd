@@ -1,4 +1,4 @@
-import { DataSourceItem, DropdownOption } from '@core/interface';
+import { AgencyDataSourceItem, DataSourceItem, DropdownOption } from '@core/interface';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { RecordFields } from '../../enums';
@@ -43,6 +43,7 @@ export interface TimesheetsModel {
   timesheetsFiltersColumns: FilterColumns;
   timesheetDetails: TimesheetDetailsModel | null;
   organizations: DataSourceItem[];
+  agencyOrganizations: AgencyDataSourceItem[];
   selectedOrganizationId: number;
   filterOptions: TimesheetsFilteringOptions | null;
   displayTimesheetHistoricalData: boolean;

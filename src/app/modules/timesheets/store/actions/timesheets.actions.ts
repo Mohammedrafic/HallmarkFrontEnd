@@ -189,6 +189,12 @@ export namespace Timesheets {
     static readonly type = TIMESHEETS_ACTIONS.GET_ORGANIZATIONS;
   }
 
+  export class GetOrganizationsForAgency {
+    static readonly type = TIMESHEETS_ACTIONS.GET_AGENCY_ORGANIZATIONS;
+    constructor(public readonly userId: string) {
+    }
+  }
+
   export class SelectOrganization {
     static readonly type = TIMESHEETS_ACTIONS.SELECT_ORGANIZATION;
 

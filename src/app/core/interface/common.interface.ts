@@ -22,6 +22,12 @@ export interface DataSourceItem {
   reason?: string;
 }
 
+export interface AgencyDataSourceItem {
+  name: string;
+  organizationId?: number;
+  regions:[]
+}
+
 export interface CommonDialogConformMessages {
   confirmUnsavedChages: string;
   confirmTabChange: string;
