@@ -42,7 +42,8 @@ export class OvertimeComponent implements OnInit ,OnDestroy {
     "DepartmentParamOTR": "",
     "BearerParamOTR": "",
     "BusinessUnitIdParamOTR": "",
-    "HostName": ""
+    "HostName": "",
+    "CandidateNameParamOTR":""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/OverTime/OverTime.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/OverTime/OverTime.cat" };
@@ -139,7 +140,8 @@ export class OvertimeComponent implements OnInit ,OnDestroy {
         endDate: new FormControl(new Date(Date.now()), [Validators.required]),
         regionIds: new FormControl([], [Validators.required]),
         locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required])
+        departmentIds: new FormControl([], [Validators.required]),
+        candidateName: new FormControl([])
       }
     );
   }
@@ -212,7 +214,7 @@ export class OvertimeComponent implements OnInit ,OnDestroy {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { startDate, endDate } = this.overtimeReportForm.getRawValue();
+    let { startDate, endDate,candidateName } = this.overtimeReportForm.getRawValue();
     this.paramsData =
     {
       "OrganizationParamOTR": this.selectedOrganizations?.map((list) => list.id),
@@ -226,7 +228,8 @@ export class OvertimeComponent implements OnInit ,OnDestroy {
                                 ?this.organizations!=null &&this.organizations[0]?.id!=null?
                                 this.organizations[0].id.toString():"1": 
                                 window.localStorage.getItem("lastSelectedOrganizationId"),
-      "HostName": this.baseUrl
+      "HostName": this.baseUrl,
+      "CandidateNameParamOTR":candidateName.toString()==""?"null":candidateName.toString()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -260,6 +263,13 @@ export class OvertimeComponent implements OnInit ,OnDestroy {
         dataSource: [],
         valueField: 'departmentName',
         valueId: 'departmentId',
+      },
+      candidateName: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: '',
+        valueId: '',
       },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
@@ -327,6 +337,7 @@ export class OvertimeComponent implements OnInit ,OnDestroy {
     this.overtimeReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.overtimeReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.overtimeReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.overtimeReportForm.get(analyticsConstants.formControlNames.CandidateName)?.setValue("");
     this.filteredItems = [];
   }
   public onFilterApply(): void {
