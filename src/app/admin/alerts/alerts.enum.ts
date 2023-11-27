@@ -50,6 +50,8 @@ export enum AlertEnum {
     "Invoice: Organization Paid"=30,
    "Order Comments-IRP"=59,
    "Upon Cancelling" = 55,
+    "Communication Open Needs LTA order"=57,
+    "Communication Open Needs PerDiem order"=58,
    "Missing Credentials: Daily Alerts" = 64,
    "Missing Credentials: Weekly Alerts" = 65,
    "Expiry Credentials: Weekly Alerts" = 66,
