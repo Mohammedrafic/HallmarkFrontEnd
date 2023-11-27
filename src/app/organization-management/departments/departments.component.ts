@@ -442,6 +442,32 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     this.isbulkedit=true;
     this.bulkaction=0;
     this.isEdit = true;
+    let departmentsDetail: Department[] = this.selectedItems.map(val => ({
+      id: val.id,
+      editedLocationId: val.id,
+      departmentId: val.departmentId,
+      locationId: val.locationId,
+      extDepartmentId: val.extDepartmentId,
+      invoiceDepartmentId: val.invoiceDepartmentId,
+      departmentName: val.departmentName,
+      facilityContact: val.facilityContact,
+      facilityEmail: val.facilityEmail,
+      facilityPhoneNo: val.facilityPhoneNo,
+      inactiveDate: val.inactiveDate ,
+      reactivateDate: val.reactivateDate,
+      unitDescription: val.unitDescription,
+      locationIncludeInIRP: val.locationIncludeInIRP,
+      isDeactivated:val.isDeactivated,
+      ignoreValidationWarning: val.ignoreValidationWarning,
+      primarySkills: val.primarySkills,
+      secondarySkills: val.secondarySkills,
+      primarySkillNames: val.primarySkillNames,
+      secondarySkillNames: val.secondarySkillNames,
+      createReplacement:val.createReplacement,
+     includeInIRP: val.includeInIRP,
+    }));
+    let includeInIRPStatus=  departmentsDetail.every(x=>x.includeInIRP==true);
+    this.departmentsDetailsFormGroup.controls['includeInIRP'].setValue(includeInIRPStatus);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
