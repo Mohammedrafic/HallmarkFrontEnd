@@ -280,7 +280,7 @@
     </e-column>
     <e-column field="creationDate" headerText="Creation Date" width="150" minWidth="140" maxWidth="200">
       <ng-template #template let-data>
-        <span>{{ data.creationDate | date: formatDate }}</span>
+        <span>{{ data.creationDate | localDateTime: formatDate }}</span>
       </ng-template>
     </e-column>
   </e-columns>

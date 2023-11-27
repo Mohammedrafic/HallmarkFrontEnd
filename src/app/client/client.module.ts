@@ -124,6 +124,7 @@ import { DocumentUploaderModule } from '@shared/components/document-uploader/doc
 import { OrderHistoryDetailsComponent } from './order-management/components/order-history-details/order-history-details.component';
 import { OrderGridSystemStateService } from './order-management/containers/irp-container/services/order-grid-system-state.service';
 import{ ShiftsService } from '@organization-management/shifts/shifts.service'
+import { LocalDateTimePipeModule } from '@shared/pipes/local-date-time/bool-values-pipe.module';
 const gridIcons = {
   MessageSquare,
   Lock,
@@ -241,6 +242,7 @@ const gridIcons = {
     OrderManagementIrpRowPositionModule,
     SwitchEditorModule,
     BoolValuePipeModule,
+    LocalDateTimePipeModule,
     OrganizationCandidatesModule,
     OrderManagementSubrowCandidatePositionModule,
     ScrollToTopModule,

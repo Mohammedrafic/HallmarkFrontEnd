@@ -68,7 +68,7 @@
         <div class="sup-title">Start / End Bonus</div>
       </div>
       <div class="column" *ngIf="activeSystems !== systemType.IRP">
-        <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
+        <div class="title">{{ orderInformation.orderOpenDate ? (orderInformation.orderOpenDate.toString() | localDateTime: 'MM/dd/yyy') : '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
 
