@@ -711,7 +711,10 @@ export class OrganizationManagementState {
     return this.departmentService.deleteDepartmentById(department.departmentId).pipe(
       tap((payload) => {
         patchState({ isDepartmentLoading: false });
-        dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
+        dispatch([
+          new GetDepartmentsByLocationId(department.locationId, filters),
+          new ShowToast(MessageTypes.Success, RECORD_DELETE),
+        ]);
         return payload;
       }),
       catchError((error: any) => {
@@ -872,7 +875,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Locations));
+
               dispatch(new BulkUpdateAssignedLocationucceeded(payload));
             }
             else{
@@ -902,7 +905,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Locations));
+            
               dispatch(new BulkDeleteLocationucceeded(payload));
             }
             else{
@@ -932,7 +935,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Department));
+           
               dispatch(new BulkUpdateDepartmentsucceeded(payload));
             }
             else{
@@ -962,7 +965,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Department));
+            
               dispatch(new BulkDeleteDepartmentsucceeded(payload));
             }
             else{

@@ -70,7 +70,11 @@ app-button-group {
 
 .toggle-message {
   font-weight: 400;
-  font-size: 13px;
+  font-size: 12px;
+
+  &__item {
+    margin-bottom: 16px;
+  }
 
   .link {
     color: $primary-active-blue-10;

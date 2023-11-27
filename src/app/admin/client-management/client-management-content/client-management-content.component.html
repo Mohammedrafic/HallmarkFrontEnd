@@ -59,7 +59,7 @@
       [height]="fullScreenGridHeight"
       (rowSelected)="rowSelected($event, grid)"
       (rowDeselected)="rowDeselected($event, grid)"
-      (dataBound)="gridDataBound(grid)"
+      (dataBound)="gridDataBound(grid, cd)"
       [selectionSettings]="selectionSettings"
       (actionBegin)="actionBegin($event)"
     >

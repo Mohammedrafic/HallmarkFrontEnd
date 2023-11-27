@@ -352,7 +352,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         ).subscribe((confirm) => {
           if (confirm) {
       
-            let selectedlocationstodelete = this.selectedItems.map((val) => (val?.departmentId ?? 0));
+         let selectedlocationstodelete = this.selectedItems.map((val) => (val?.id ?? 0));
            
             this.store.dispatch(new BulkDeleteLocation(selectedlocationstodelete));
           }

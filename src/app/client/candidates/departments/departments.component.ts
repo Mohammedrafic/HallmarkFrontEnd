@@ -31,11 +31,9 @@ import {
 import { ShowFilterDialog, ShowSideDialog, ShowToast } from '../../../store/app.actions';
 import {
   ALL_DEPARTMENTS_SELECTED,
+  BULK_RECORD_DELETE,
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
-  DELETE_MULTIPLE_RECORDS_TEXT,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
   formatDate,
   GRID_CONFIG,
   NO_ACTIVE_WORK_COMMITMET,
@@ -251,13 +249,15 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
   }
 
   private deleteAssignedDepartments(departmentIds: number[] | null, isBulkAction?: boolean): void {
-    const text = isBulkAction ? DELETE_MULTIPLE_RECORDS_TEXT : DELETE_RECORD_TEXT;
+    const text = isBulkAction
+      ? 'Are you sure you want to remove these departments?'
+      : 'Are you sure you want to remove this department?';
     const filters = isBulkAction ? this.filters : null;
     this.confirmService
       .confirm(text, {
-        okButtonLabel: 'Delete',
+        okButtonLabel: 'Remove',
         okButtonClass: 'delete-button',
-        title: DELETE_RECORD_TITLE,
+        title: isBulkAction ? 'Remove Departments' : 'Remove Department',
       })
       .pipe(
         filter(Boolean),
@@ -266,8 +266,9 @@ export class DepartmentsComponent extends AbstractPermission implements OnInit {
         take(1)
       )
       .subscribe((departments) => {
+        const message = isBulkAction ? BULK_RECORD_DELETE : RECORD_DELETE;
         this.updateGridState(departments);
-        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+        this.store.dispatch(new ShowToast(MessageTypes.Success, message));
       });
   }
 

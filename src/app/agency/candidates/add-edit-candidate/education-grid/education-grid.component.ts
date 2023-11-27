@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -38,6 +38,7 @@ import { TakeUntilDestroy } from '@core/decorators';
   templateUrl: './education-grid.component.html',
   styleUrls: ['./education-grid.component.scss'],
   providers: [MaskedDateTimeService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EducationGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() readonlyMode = false;

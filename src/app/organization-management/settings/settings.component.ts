@@ -76,10 +76,17 @@ import {
   SettingsAppliedToPermissions,
   SettingsFilterCols,
   SettingsSystemFilterCols,
+  SplitReportedTimeOnBillRateEffectiveDate,
   TextOptionFields,
   TierSettingsKey,
 } from './settings.constant';
-import { ATPRateCalculationPayload, AutoGenerationPayload, PayPeriodPayload, SwitchValuePayload } from '../../shared/models/settings.interface';
+import {
+  ATPRateCalculationPayload,
+  AutoGenerationPayload,
+  PayPeriodPayload,
+  StartsOnPayload,
+  SwitchValuePayload,
+} from '../../shared/models/settings.interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { mapKeys, camelCase } from 'lodash';
 /**
@@ -140,6 +147,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   RegionLocationSettingsMultiFormGroup: FormGroup;
   payPeriodFormGroup: FormGroup;
   aTPRateCalculationFormGroup : FormGroup;
+  startsOnFormGroup: FormGroup;
 
   dropdownDataSource: OrganizationSettingValueOptions[];
   allRegions: OrganizationRegion[] = [];
@@ -194,7 +202,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   regionBasedDepartment: any;
   public filterType: string = 'Contains';
   get switcherValue(): string {
-    return this.organizationSettingsFormGroup.controls['value'].value ? 'on' : 'off';
+    return this.organizationSettingsFormGroup.controls['value'].value ? 'On' : 'Off';
   }
 
   constructor(
@@ -301,10 +309,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.locationFormGroup.reset();
     this.departmentFormGroup.reset();
     this.payPeriodFormGroup.reset();
+    this.startsOnFormGroup.reset();
     this.aTPRateCalculationFormGroup.reset();
     this.store.dispatch(new ClearLocationList());
     this.store.dispatch(new ClearDepartmentList());
-  
+
     this.setFormValuesForOverride(data);
     this.store.dispatch(new ShowSideDialog(true));
     if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
@@ -371,7 +380,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder || this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition) {
       this.switchedValueForm.get('value')?.addValidators(Validators.maxLength(2));
       this.maxFieldLength = 2;
-    }     
+    }
     else {
       this.switchedValueForm.get('value')?.clearValidators();
     }
@@ -393,7 +402,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.pushStartDateFormGroup.touched ||
       this.invoiceGeneratingFormGroup.touched ||
       this.RegionLocationSettingsMultiFormGroup.touched ||
-      this.payPeriodFormGroup.touched||
+      this.payPeriodFormGroup.touched ||
+      this.startsOnFormGroup.touched ||
       this.aTPRateCalculationFormGroup.touched
 
     ) {
@@ -516,6 +526,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.RegionLocationSettingsMultiFormGroup.markAllAsTouched();
     this.regionRequiredFormGroup.markAllAsTouched();
     this.payPeriodFormGroup.markAllAsTouched();
+    this.startsOnFormGroup.markAllAsTouched();
     this.validatePushStartDateForm();
     this.validateInvoiceGeneratingForm();
   }
@@ -642,8 +653,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       case OrganizationSettingControlType.PayPeriod:
         dynamicValue = JSON.stringify(this.createPayPeriodPayload());
         break;
-        case OrganizationSettingControlType.ATPRateCalculation:
+      case OrganizationSettingControlType.ATPRateCalculation:
         dynamicValue = JSON.stringify(this.createATPRateConfigurationdPayload());
+        break;
+      case OrganizationSettingControlType.StartsOnDate:
+        dynamicValue = JSON.stringify(this.createStartsOnPayload());
         break;
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
@@ -805,10 +819,21 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
       dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isPayPeriod: true };
     }
+
+    if (this.formControlType === OrganizationSettingControlType.StartsOnDate) {
+      const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
+
+      dynamicValue = SettingsDataAdapter.getParsedValue(valueOptions);
+      this.startsOnFormGroup.setValue({
+        startsOn: dynamicValue.StartsOn ? new Date(dynamicValue.StartsOn) : new Date(),
+        isEnabled: dynamicValue.IsEnabled ? dynamicValue.IsEnabled : false,
+      });
+    }
+
     if (this.formControlType === OrganizationSettingControlType.ATPRateCalculation) {
       const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
       dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isATPRateCalculation: true };
-      
+
     }
 
     if (dynamicValue?.isCheckboxValue) {
@@ -895,6 +920,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.pushStartDateFormGroup.reset();
     this.invoiceGeneratingFormGroup.reset();
     this.payPeriodFormGroup.reset();
+    this.startsOnFormGroup.reset();
     this.switchedValueForm.reset();
     this.checkboxValueForm.reset();
     this.aTPRateCalculationFormGroup.reset();
@@ -944,6 +970,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.payPeriodFormGroup = this.formBuilder.group({
       noOfWeek: [null],
       date: [null]
+    });
+    this.startsOnFormGroup = this.formBuilder.group({
+      startsOn: [null, Validators.required],
+      isEnabled: [null],
     });
 
     // Remove this validation after be implementation. This is be bug.
@@ -1122,6 +1152,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       date: this.payPeriodFormGroup.controls['date'].value
     });
   }
+
+  private createStartsOnPayload(): StartsOnPayload {
+    return this.startsOnFormGroup.getRawValue();
+  }
+
   private createATPRateConfigurationdPayload(): ATPRateCalculationPayload {
     return ({
       isEnabled: !!this.aTPRateCalculationFormGroup.controls['isEnabled'].value,
@@ -1550,7 +1585,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           groupingBy: dynamicValue.groupingBy,
         });
       }
-      
+
       if(dynamicValue && dynamicValue.IsEnabled){
         dynamicValue = mapKeys(dynamicValue, (val, key) =>camelCase(key));
       }

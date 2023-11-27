@@ -191,7 +191,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       this.onFilterLocationChangedHandler();
       this.onFilterSkillCategoryChangedHandler();
 
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || BusinessUnitType.MSP ? this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
@@ -458,11 +458,13 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "TodayCJR": formatDate(new Date(), this.dateFormat, this.culture),
-      "organizationNameCJR": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
-      "reportPulledMessageCJR": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
-      "DateRangeCJR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "TodayParamCJR": formatDate(new Date(), this.dateFormat, this.culture),
+      "organizationNameParamCJR": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
+      "reportPulledMessageParamCJR": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeParamCJR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
       "PeriodParamCJR": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
+      "UserIdParamCJR": this.user?.id
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

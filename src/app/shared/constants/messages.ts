@@ -6,6 +6,7 @@ export const RECORD_UNSAVED = 'Credential added successfully : Only credentials 
 export const SETUPS_ACTIVATED = 'Setups were successfully activated';
 export const RECORD_SAVED = 'Record has been saved';
 export const RECORD_DELETE = 'Record has been deleted';
+export const BULK_RECORD_DELETE = 'Records have been deleted';
 export const RECORD_CANNOT_BE_DELETED = 'Record cannot be deleted';
 export const RECORD_CANNOT_BE_SAVED = 'Record cannot be saved';
 export const RECORD_ALREADY_EXISTS = 'Record already exists';
