@@ -48,3 +48,7 @@ export interface ATPRateCalculationPayload {
   wagePercent: number| null;
   costSavings: number| null;
 }
+export interface AutoRejectOtherEmployeesWhenFilledPayload {
+  isEnabled: boolean;
+  rejectReason: number | null;
+}
