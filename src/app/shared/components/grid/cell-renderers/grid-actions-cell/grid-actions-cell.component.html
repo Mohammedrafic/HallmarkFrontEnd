@@ -1,5 +1,6 @@
 <ng-container *ngFor="let actionData of actionsConfig; trackBy: trackBy">
   <ng-container *ngIf="!actionData.menuItems?.length; else threeDotsMenu">
+    {{!!actionData.disabled}}
     <button
       *ngIf="actionData.title || actionData.iconName"
       ejs-button
