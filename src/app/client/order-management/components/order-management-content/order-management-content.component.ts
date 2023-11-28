@@ -685,6 +685,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     if (Object.values(AlertIdEnum).includes(this.alertTitle)) {
       if((this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim().toLowerCase()
+       ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Custom']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Open']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Closed']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order public comments']].trim().toLowerCase()
