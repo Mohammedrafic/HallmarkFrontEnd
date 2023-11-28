@@ -32,11 +32,16 @@
   <form [formGroup]="vmsInvoiceReportForm" class="filter-form-dialog form-container bootstrap">
     <div class="form-elemet">
       <div class="input-container bootstrap">
-        <label>Organization Name<span class="required">*</span></label>
+        <label>Organization Name</label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
+          <ejs-multiselect mode="CheckBox" formControlName="businessIds" placeholder="Business"
+          [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.businessIds.dataSource"
+          [fields]="organizationFields" [selectAllText]='allOption' showSelectAll=true>
+        </ejs-multiselect>
+
+          <!-- <ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
                             [dataSource]="filterColumns.businessIds.dataSource" placeholder="Business">
-          </ejs-dropdownlist>
+          </ejs-dropdownlist> -->
         </div>
       </div>
     </div>
@@ -46,7 +51,7 @@
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
                            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
-                           [fields]="regionFields">
+                           [fields]="regionFields" [enabled]="bussinessControl?.value.length == 1">
           </ejs-multiselect>
         </div>
       </div>
@@ -57,7 +62,7 @@
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
                            [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields">
+                           [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields" [enabled]="bussinessControl?.value.length == 1">
           </ejs-multiselect>
         </div>
       </div>
@@ -68,7 +73,7 @@
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="All"
                            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
-                           [fields]="departmentFields">
+                           [fields]="departmentFields" [enabled]="bussinessControl?.value.length == 1">
           </ejs-multiselect>
         </div>
       </div>
@@ -122,7 +127,7 @@
                               [fields]="commonFields"
                               [dataSource]="invoiceStatusList"
                               [allowFiltering]="true"
-                              placeholder="Invoice Status">
+                              placeholder="Invoice Status">                              
             </ejs-dropdownlist>
           </div>
         </div>
@@ -139,12 +144,24 @@
       </div>
     </div>
     <div class="form-elemet">
+      <div class="input-container bootstrap">
+        <label>Period</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist (change)="selectPeriod()"  formControlName="period" appValidateWithMessage placeholder="All"
+                           [allowFiltering]="true"  [dataSource]="periodList"
+                           [fields]="periodFields"  showSelectAll=true>
+          </ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+    <div class="form-elemet">
       <div class="group">
         <div class="input-container calendar">
           <label>Invoice Generated Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="startDate">
+                            appValidateWithMessage formControlName="startDate" [disabled]="periodIsDefault"
+                            [enabled]="vmsInvoiceReportForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
         </div>
@@ -153,7 +170,9 @@
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             appValidateWithMessage formControlName="endDate"
-                            [min]="vmsInvoiceReportForm.controls['startDate'].value">
+                            [min]="vmsInvoiceReportForm.controls['startDate'].value"
+                           [enabled]="vmsInvoiceReportForm.controls['period'].value=='Custom'"
+                           >
             </ejs-datepicker>
           </div>
         </div>

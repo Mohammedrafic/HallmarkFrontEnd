@@ -286,6 +286,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.subscribeOnJobUpdate();
   }
 
+  override ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+
   observeOrderManagementPagerState() {
     this.orderManagementPagerState$
     .pipe(takeUntil(this.destroy$))
@@ -516,6 +522,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         const state$ = this.isAgency ? this.orderCandidatePage$ : (this.activeSystem === OrderManagementIRPSystemId.IRP ? this.getIrpCandidatesforExtension$ : this.clientOrderCandidatePage$);
           this.candidate$ = state$.pipe(
             filter(Boolean),
+            takeUntil(this.destroy$),
             map((res) => {
               const items = res?.items || this.candidateOrder?.items;
               const candidate = items?.find((candidate) => candidate.candidateJobId);

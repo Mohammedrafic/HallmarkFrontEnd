@@ -25,11 +25,12 @@ import { endDateValidator, startDateValidator } from '@shared/validators/date.va
 import { patternMessageValidator } from '@shared/validators/pattern-message.validator';
 import {
   ALPHANUMERIC_8_11_SYMBOLS,
-  MIN_DIGITS_LENGTH_ONLY_NINE,
+  NumberValidatorRegExp,
   NUMERIC_10_12_DIGITS,
   NumberValidationMessage,
   RoutingNumberMessage,
   SwiftCodeValidationMessage,
+  NumberRangeRegExp,
 } from '@shared/constants';
 
 @Component({
@@ -59,8 +60,8 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
   public readonly placeholderInput = PLACEHOLDER;
   public readonly zipCodeMask = ZIP_CODE_MASK;
   public readonly holderPhoneMask = PHONE_MASK;
-  public isControlDisabled: boolean = true;
-  private hasEditAgencyNetsuitePaymentId: boolean = false;
+  public isControlDisabled = true;
+  private hasEditAgencyNetsuitePaymentId = false;
   
   constructor(private formBuilder: FormBuilder, private changeDetectorRef: ChangeDetectorRef, private store: Store) {
     super();
@@ -85,7 +86,8 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         bankName: ['', [Validators.required]],
         routingNumber: ['', [
           Validators.required,
-          patternMessageValidator(MIN_DIGITS_LENGTH_ONLY_NINE, RoutingNumberMessage),
+          patternMessageValidator(NumberValidatorRegExp(20), RoutingNumberMessage),
+          Validators.maxLength(20),
         ]],
         bankAddress1: ['', [Validators.required]],
         bankAddress2: [''],
@@ -96,7 +98,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         accountHolderName: ['', [Validators.required]],
         accountHolderNumber: ['', [
           Validators.required,
-          patternMessageValidator(NUMERIC_10_12_DIGITS, NumberValidationMessage),
+          patternMessageValidator(NumberRangeRegExp(10, 12), NumberValidationMessage),
         ]],
         accountHolderPhone: ['', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]],
         accountHolderAddress1: [''],
@@ -107,7 +109,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         accountHolderZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
         fee: [''],
         swiftCode: ['', [
-          patternMessageValidator(ALPHANUMERIC_8_11_SYMBOLS, SwiftCodeValidationMessage),
+          patternMessageValidator(NumberRangeRegExp(8, 11), SwiftCodeValidationMessage),
         ]],
         netSuiteId: [{ value: '', disabled: true }],
       },

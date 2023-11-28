@@ -29,11 +29,10 @@
     [height]="fullScreenGridHeight"
     [allowSelection]="false"
     [resizeSettings]="resizeSettings"
-    [allowPaging]="allowPaging"
     [enableVirtualization]="false"
     [pageSettings]="pageSettings"
     [rowHeight]="rowHeight"
-    (dataBound)="gridDataBound($event)"
+    (dataBound)="gridDataBound($event, cd)"
     (actionBegin)="actionBegin($event)"
   >
     <e-columns>
@@ -51,52 +50,15 @@
       </e-column>
       <e-column field="reason" headerText="Reason" textAlign="Left" ></e-column>
     </e-columns>
-    <ng-template #pagerTemplate let-data>
-      <div class="e-pagertemplate">
-        <div class="control-section">
-          <div class="content-wrapper">
-            <section class="left-side-pager-controls">
-              <ejs-dropdownlist
-                id="rowsPerPage"
-                class="dropdown-no-border"
-                [dataSource]="rowsPerPageDropDown"
-                [allowFiltering]="true"
-                [(value)]="activeRowsPerPageDropDown"
-                (change)="onRowsDropDownChanged()"
-              >
-              </ejs-dropdownlist>
-              <ejs-numerictextbox
-                id="goToPage"
-                class="numeric-input-no-border"
-                format="#"
-                placeholder="Go to:"
-                min="1"
-                [max]="(rejectReasonPage$ | async)?.totalCount"
-                [showSpinButton]="false"
-                (change)="onGoToClick($event)"
-              >
-              </ejs-numerictextbox>
-              <div class="total-rows">
-                Total Rows: {{(rejectReasonPage$ | async)?.totalCount}}
-              </div>
-            </section>
-            <section class="right-side-pager-controls">
-              <ejs-pager
-                id="gridPager"
-                #gridPager
-                [pageSize]="pageSize"
-                [totalRecordsCount]="(rejectReasonPage$ | async)?.totalPages"
-                [enablePagerMessage]="false"
-                [currentPage]="currentPage"
-                (click)="onGoToClick($event)"
-              >
-              </ejs-pager>
-            </section>
-          </div>
-        </div>
-      </div>
-    </ng-template>
   </ejs-grid>
+
+  <app-grid-pagination
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    [totalRecordsCount]="(rejectReasonPage$ | async)?.totalCount ?? 0"
+    (navigateToPageEmitter)="onGoToClick($event)"
+    (pageSizeChangeEmitter)="onRowsDropDownChanged($event)"
+  ></app-grid-pagination>
 </section>
 
 <app-side-dialog

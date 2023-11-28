@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store,ofActionSuccessful } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
@@ -15,7 +15,8 @@ import { FieldType } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { GetAllBusinessLines } from '@organization-management/store/business-lines.action';
 import { BusinessLinesState } from '@organization-management/store/business-lines.state';
-import {
+import {  Bulk_Delete_Locations,
+  Bulk_Update_Locations,
   CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE,
 } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -29,14 +30,19 @@ import {
   Location, LocationFilter, LocationFilterOptions, LocationsPage,
   LocationType, TimeZoneModel,
 } from '@shared/models/location.model';
-import { Organization } from '@shared/models/organization.model';
 import { Region } from '@shared/models/region.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { FilterService } from '@shared/services/filter.service';
 import { AppState } from 'src/app/store/app.state';
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
+import { ShowBulkLocationActionDialog, ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { UserState } from '../../store/user.state';
 import {
+  BulkDeleteLocation,
+  BulkDeleteLocationFailed,
+  BulkDeleteLocationucceeded,
+  BulkUpdateAssignedLocationFailed,
+  BulkUpdateAssignedLocationucceeded,
+  BulkUpdateLocation,
   ClearLocationList, DeleteLocationById, ExportLocations, GetLocationFilterOptions,
   GetLocationsByRegionId, GetLocationTypes, GetOrganizationById, GetRegions, GetUSCanadaTimeZoneIds,
   SaveLocation, SaveLocationConfirm, SaveLocationSucceeded, SaveRegion, SetGeneralStatesByCountry, UpdateLocation,
@@ -55,6 +61,10 @@ import { LocationsService } from './locations.service';
 import { DateTimeHelper } from '@core/helpers';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
+enum BulkSkillsActionConfig {
+  'Ediit',
+  'Delete'
+}
 @Component({
   selector: 'app-locations',
   templateUrl: './locations.component.html',
@@ -78,9 +88,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   @Select(OrganizationManagementState.locationsByRegionId)
   public readonly locations$: Observable<LocationsPage>;
-
-  @Select(OrganizationManagementState.organization)
-  public readonly organization$: Observable<Organization>;
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
@@ -139,6 +146,12 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   private pageSubject = new Subject<number>();
   private componentDestroy: () => Observable<unknown>;
 
+  public bulkaction: BulkSkillsActionConfig = 0;
+  public isbulkedit=false;
+  public isbulkdelete=false;
+  public bulkactionmessage:string;
+  public bulkactionnotvalidlocationnmaes:string[];
+  public isDepartment=false;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit Location' : 'Add Location';
@@ -163,7 +176,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.watchForPageChange();
     this.populateFilterOptions();
     this.watchForOrgChange();
-    this.watchForOrganizations();
     this.populateFormOptions();
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
@@ -223,6 +235,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   }
 
   changeRegion(event: ChangeEventArgs): void {
+    if (this.selectedRegion?.id === (event.itemData as Region).id) {
+      return;
+    }
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion?.id) {
       this.clearFilter();
@@ -258,6 +273,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   }
 
   openAddLocationDialog(): void {
+    this.isbulkedit =false;
     if (this.selectedRegion) {
       this.locationDetailsFormGroup.controls['inactiveDate'].enable();
       this.store.dispatch(new ShowSideDialog(true));
@@ -280,8 +296,44 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       this.pageSubject.next(event.currentPage || event.value);
     }
   }
+  OnBulkEdit(){
+    this.isbulkedit=true;
+    this.bulkaction=0;
+    this.isEdit = true;
+    let locationsDetails: Location[] = this.selectedItems.map(val => ({
+      id: val.id,
+      editedLocationId: val.id,
+      regionId:  val.regionId, 
+      invoiceId: val.invoiceId, 
+      externalId: val.externalId,
+      name: val.name,
+      businessLineId: val.businessLineId,
+      address1: val.address1,
+      address2: val.address2,
+      zip: val.zip,
+      city: val.city,
+      state: val.state,
+      glNumber: this.locationDetailsFormGroup.controls['glNumber'].value,
+      ext:val.ext,
+      contactEmail: val.contactEmail,
+      contactPerson: val.contactPerson,
+      reactivateDate: val.reactivateDate,
+      phoneNumber: val.phoneNumber,
+      phoneType:val.phoneType,
+      timeZone:val.timeZone,
+      locationTypeId:val.locationTypeId,
+      organizationId : val.organizationId,
+      includeInIRP: val.includeInIRP,
+    }));
 
+  let includeInIRPStatus=  locationsDetails.every(x=>x.includeInIRP==true);
+ this.locationDetailsFormGroup.controls['includeInIRP'].setValue(includeInIRPStatus);
+
+    this.store.dispatch(new ShowSideDialog(true));
+  }
+  
   editLocation(location: Location, event: Event): void {
+    this.isbulkedit=false;
     this.addActiveCssClass(event);
 
     this.locationDetailsFormGroup.setValue({
@@ -316,6 +368,26 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     location.inactiveDate, location.reactivateDate, location.timeZone);
   }
 
+  OnBulkDelete(){
+      this.isbulkdelete=true;
+      this.bulkaction=1;
+      this.confirmService
+        .confirm(DELETE_RECORD_TEXT, {
+          title: DELETE_RECORD_TITLE,
+          okButtonLabel: 'Delete',
+          okButtonClass: 'delete-button',
+        }).pipe(
+          take(1)
+        ).subscribe((confirm) => {
+          if (confirm) {
+      
+         let selectedlocationstodelete = this.selectedItems.map((val) => (val?.id ?? 0));
+           
+            this.store.dispatch(new BulkDeleteLocation(selectedlocationstodelete));
+          }
+          this.removeActiveCssClass();
+        });
+    }
   deleteLocation(location: Location, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
@@ -335,6 +407,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   }
 
   cancelEditLocation(): void {
+    this.isbulkedit=false;
     if (this.locationDetailsFormGroup.dirty) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -363,6 +436,44 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   }
 
   saveLocation(ignoreWarning = false): void {
+    if(this.isbulkedit)
+    {
+      const inactiveDate = this.locationDetailsFormGroup.controls['inactiveDate'].value;
+    const reactivateDate = this.locationDetailsFormGroup.controls['reactivateDate'].value;
+  
+    let locationsDetails: Location[] = this.selectedItems.map(val => ({
+
+    
+      id: val.id,
+      editedLocationId: val.id,
+      regionId:  val.regionId, 
+      invoiceId: val.invoiceId, 
+      externalId: val.externalId,
+      name: val.name,
+      businessLineId: val.businessLineId,
+      address1: val.address1,
+      address2: val.address2,
+      zip: val.zip,
+      city: val.city,
+      state: val.state,
+      glNumber: this.locationDetailsFormGroup.controls['glNumber'].value,
+      ext:val.ext,
+      contactEmail: val.contactEmail,
+      contactPerson: val.contactPerson,
+      inactiveDate: inactiveDate ? DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(inactiveDate)) : undefined,
+      reactivateDate: val.reactivateDate,
+      phoneNumber: val.phoneNumber,
+      phoneType:val.phoneType,
+      timeZone:val.timeZone,
+      locationTypeId:val.locationTypeId,
+      organizationId : val.organizationId,
+      includeInIRP: this.createIrpValue(this.locationDetailsFormGroup.controls['includeInIRP'].value),
+    }));
+ 
+    this.store.dispatch(new BulkUpdateLocation(locationsDetails));
+ 
+
+    }
     if (this.locationDetailsFormGroup.valid) {
       const inactiveDate = this.locationDetailsFormGroup.controls['inactiveDate'].value;
       const reactivateDate = this.locationDetailsFormGroup.controls['reactivateDate'].value;
@@ -558,6 +669,73 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.action$.pipe(ofActionDispatched(SaveLocationConfirm), takeUntil(this.componentDestroy())).subscribe(() => {
         this.saveLocation(true);
     });
+    this.action$
+    .pipe(
+      ofActionSuccessful(BulkUpdateAssignedLocationucceeded),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+      this.locationDetailsFormGroup.reset();
+
+      this.clearSelection(this.grid);
+
+      let locationNames=payload.payload.locationNames;
+      if(locationNames && locationNames.length > 0){
+        this.bulkaction=0;
+        this.bulkactionnotvalidlocationnmaes=locationNames;
+        this.bulkactionmessage = payload.payload.message;
+        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+      }
+      else{
+        this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Locations));
+      }
+      this.getLocations();
+      this.store.dispatch(new ShowSideDialog(false));
+    });
+    this.action$
+    .pipe(
+      ofActionSuccessful(BulkUpdateAssignedLocationFailed),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+        this.bulkactionmessage = payload.payload.message;
+        this.bulkactionnotvalidlocationnmaes=[];
+        this.bulkaction=0;
+        this.clearSelection(this.grid);
+        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+        this.getLocations();
+        this.store.dispatch(new ShowSideDialog(false));
+    });
+    this.action$
+    .pipe(
+      ofActionSuccessful(BulkDeleteLocationucceeded),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+      this.locationDetailsFormGroup.reset();
+      this.clearSelection(this.grid);
+      let locationNames=payload.payload.locationNames;
+      if(locationNames && locationNames.length > 0){
+        this.bulkaction=1;
+        this.bulkactionnotvalidlocationnmaes=locationNames;
+        this.bulkactionmessage = payload.payload.message;
+        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+      }
+      else{
+        this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Locations));
+      }
+      this.getLocations();
+    });
+    this.action$
+    .pipe(
+      ofActionSuccessful(BulkDeleteLocationFailed),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+      let locationNames=payload.payload.locationNames;
+        this.bulkactionmessage = payload.payload.message;
+        this.bulkactionnotvalidlocationnmaes=locationNames;
+        this.bulkaction=1;
+        this.clearSelection(this.grid);
+        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+        this.getLocations();
+    });
   }
 
   private populateFilterOptions(): void {
@@ -584,15 +762,11 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   private getOrganization(): void {
     this.store.dispatch(new GetOrganizationById(
       this.businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number
-    ));
-  }
-
-  private watchForOrganizations(): void {
-    this.organization$
-    .pipe(
+    )).pipe(
       filter(Boolean),
       delay(100),
-      tap((organization) => {
+      tap((state) => {
+        const organization = state.organizationManagement.organization;
         this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
         if (this.isFeatureIrpEnabled) {
           this.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
@@ -612,11 +786,11 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       tap((data) => {
         this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
         this.selectedRegion = data.organizationManagement.regions[0];
-
+        this.filters.regionId = this.selectedRegion?.id;
       }),
       filter(() => !!this.selectedRegion),
       tap(() => { this.getLocations(); }),
-      takeUntil(this.componentDestroy()),
+      take(1),
     ).subscribe();
   }
 

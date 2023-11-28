@@ -18,4 +18,5 @@ export interface OrderManagementChildCandidate {
   organizationId: number;
   statusName: string;
   agencyName: string;
+  guaranteedWorkWeek?: number | string| null;
 }

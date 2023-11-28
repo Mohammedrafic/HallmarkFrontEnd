@@ -373,7 +373,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       rejectReason: data.rejectReason,
       yearsOfExperience: data.yearsOfExperience,
       expAsTravelers: data.expAsTravelers,
-      guaranteedWorkWeek: data.guaranteedWorkWeek,
+      guaranteedWorkWeek: data.applicantStatus.applicantStatus === ApplicantStatusEnum.Applied ? data.guaranteedWorkWeek || data.order.expectedWorkWeek : data.guaranteedWorkWeek, 
       offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate
         || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
       candidatePayRate: data.candidatePayRate,

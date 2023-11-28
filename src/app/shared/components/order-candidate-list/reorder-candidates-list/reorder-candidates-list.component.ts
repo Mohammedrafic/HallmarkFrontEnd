@@ -139,7 +139,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public getPartnershipMessage(data: OrderCandidatesList): string {
     return `Partnership was suspended on ${DateTimeHelper.formatDateUTC(data.suspentionDate, 'MM/dd/yyyy')}`;
   }
-  
+
   private watchForEmployeeToggleState(): void {
     this.orderManagementService.getEmployeeToggleStateStream().pipe(
       takeUntil(this.unsubscribe$)
@@ -179,6 +179,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
       OrganizationalHierarchy.Location,
       this.selectedOrder.locationId,
       this.selectedOrder.organizationId,
+      true
     ).pipe(
       filter(({ScheduleOnlyWithAvailability}) => !!ScheduleOnlyWithAvailability),
       take(1),

@@ -4,6 +4,7 @@ import { ColDef, ValueFormatterParams } from '@ag-grid-community/core';
 
 import { PaymentMode } from '../../enums';
 import { EditPaymentRendererComponent } from './cell-renderers/edit-payment-renderer/edit-payment-renderer.component';
+import { DateTimeHelper } from '../../../../core/helpers/date-time.helper';
 
 const commonCol = {
   sortable: false,
@@ -31,7 +32,7 @@ export const PaymentTableDefs: ColDef[] = [
     type: 'rightAligned',
     width: 150,
     ...commonCol,
-    valueFormatter: (params: ValueFormatterParams) => formatDate(params.value, 'MM/dd/yyyy', 'en-US'),
+    valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/yyyy'),
   },
   {
     field: 'paymentMode',
@@ -54,7 +55,7 @@ export const PaymentTableDefs: ColDef[] = [
     width: 130,
     type: 'rightAligned',
     ...commonCol,
-    valueFormatter: (params: ValueFormatterParams) => formatDate(params.value, 'MM/dd/yyyy', 'en-US'),
+    valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/yyyy'),
   },
   {
     field: 'payment',

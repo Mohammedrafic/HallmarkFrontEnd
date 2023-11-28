@@ -177,6 +177,11 @@ export class SecurityState {
   static organisations(state: SecurityStateModel): Organisation[] {
     return state.organizations;
   }
+  
+  @Selector()
+  static isOrganizaionsLoaded(state: SecurityStateModel):boolean{
+    return state.isOrganizaionsLoaded;
+  }
 
   @Selector()
   static isOrganizaionsLoaded(state: SecurityStateModel):boolean{

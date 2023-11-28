@@ -364,13 +364,14 @@ describe('InvoicesContainerComponent', () => {
       pageNumber: GRID_CONFIG.initialPage,
       pageSize: GRID_CONFIG.initialRowsPerPage,
       orderBy: '',
+      checkData: false,
       invoiceIds: [component.navigatedInvoiceId],
       organizationId: component['navigatedOrgId'],
     }));
   });
 
   it('resetFilters method should reset and keep Filters', () => {
-    const filters = { orderBy: 'orderBy' };
+    const filters = { orderBy: 'orderBy', checkData: false };
     storeSpy.dispatch.calls.reset();
     filterServiceSpy.composeFilterState.calls.reset();
     filterServiceSpy.composeFilterState.and.returnValue(filters);
@@ -613,7 +614,7 @@ describe('InvoicesContainerComponent', () => {
 
     component.changeMultiSelection(nodes);
 
-    expect(component.gridSelections.selectedInvoiceIds).toEqual([invoiceId]);
+    expect(component.gridSelections.selectedInvoiceIds).toEqual([id]);
     expect(component.gridSelections.rowNodes).toEqual(nodes);
   });
 

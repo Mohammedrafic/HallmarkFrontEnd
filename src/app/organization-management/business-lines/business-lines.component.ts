@@ -55,7 +55,6 @@ export class BusinessLinesComponent extends AbstractGridConfigurationComponent i
   }
 
   public ngOnInit(): void {
-    this.getData();
     this.subscribeOnOrganization();
   }
 

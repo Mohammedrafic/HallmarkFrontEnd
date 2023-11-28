@@ -373,6 +373,15 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       });
   }
 
+  isExpandedGrid = false;
+  public toggleField(event:any):void 
+  { 
+    this.isExpandedGrid=false;
+    if(event.target.checked){
+    this.isExpandedGrid=true;
+    }
+    this.resetFilters(true);
+  }
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -444,7 +453,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       new Invoices.UpdateFiltersState({
         pageNumber: GRID_CONFIG.initialPage,
         pageSize: GRID_CONFIG.initialRowsPerPage,
-        orderBy: '',
+        orderBy: '', checkData:this.isExpandedGrid,
         ...this.navigatedInvoiceId !== null ? { invoiceIds: [this.navigatedInvoiceId] } : filters,
         ...this.isAgency && this.navigatedOrgId ? { organizationId: this.navigatedOrgId } : filters,
       })
@@ -570,8 +579,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public changeMultiSelection(nodes: RowNode[]): void {
     if (nodes.length) {
-      if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords)
-      this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.id);
+      if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords || this.selectedTabIdx === OrganizationInvoicesGridTab.Manual )
+      this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.id);  
       else
         this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
       this.gridSelections.rowNodes = nodes;

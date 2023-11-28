@@ -5,6 +5,8 @@ import { map, Observable } from 'rxjs';
 
 import { ImportResult } from "@shared/models/import.model";
 import {
+
+  BulkLocationsAction,
   ImportedLocation,
   Location,
   LocationFilter,
@@ -80,6 +82,20 @@ export class LocationService {
     }
     return this.http.post(`/api/Locations/export`, payload, { responseType: 'blob' });
   }
+/**
+ * Bulk Update Location
+ */
+public bulkupdatelocations(selectedItems: Location[]): Observable<BulkLocationsAction> {
+  return  this.http.put<BulkLocationsAction>(`/api/Locations/bulk-update-Location`, selectedItems)
+}
+
+/**
+ * Bulk Delete Location
+ */
+public bulkdeletelocations(selectedItems: Number[]): Observable<BulkLocationsAction> {
+  return  this.http.delete<BulkLocationsAction>(`/api/Locations/bulk-delete-Location`,  { body: selectedItems })
+}
+
 
   /**
    * Get Location Filtering Options

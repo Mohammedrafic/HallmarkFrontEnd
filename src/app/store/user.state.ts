@@ -270,33 +270,46 @@ export class UserState {
         const faq = 10;
         const businessUnitType = isEmployee ? BusinessUnitType.Employee : payload;
         if (businessUnitType) {
-          menu.menuItems = menu.menuItems
-            .filter((menuItem: MenuItem) => menuItem.id !== education && menuItem.id !== faq)
-            .map((menuItem: MenuItem) => {
-              menuItem.icon = MENU_CONFIG[businessUnitType][menuItem.id]?.icon;
-              menuItem.route = MENU_CONFIG[businessUnitType][menuItem.id]?.route;
-              menuItem.anch = menuItem.title;
-              menuItem.custom = MENU_CONFIG[businessUnitType][menuItem.id]?.custom;
-              if (menuItem.children) {
-                menuItem.children = menuItem.children.map((child: any) => {
-                  return {
-                    id: child.id,
-                    title: child.title,
-                    route: MENU_CONFIG[businessUnitType][child.id]?.route,
-                    icon: '',
-                    anch: `${menuItem.title}/${child.title}`,
-                  };
-                }) as ChildMenuItem[];
-              } else {
-                menuItem.children = [];
-              }
-              return menuItem;
-            });
-        }
-        return patchState({ menu: menu });
-      })
-    );
-  }
+            // Define a recursive function to process children values 
+            const processChildren = (items: any[],parentTitle:string): ChildMenuItem[] => {
+              return items.map((child: any) => {
+                const processedChild: ChildMenuItem = {
+                  id: child.id,
+                  title: child.title,
+                  route: MENU_CONFIG[businessUnitType][child.id]?.route || '',
+                  icon: '',
+                  anch: `${parentTitle}/${child.title}`,
+                };
+      
+                // If the child has children, recursively process started here
+                if (child.children && child.children.length > 0) {
+                  processedChild.children = processChildren(child.children,child.title);
+                }
+      
+                return processedChild;
+              });
+            };
+            menu.menuItems = menu.menuItems
+              .filter((menuItem: MenuItem) => menuItem.id !== education && menuItem.id !== faq)
+              .map((menuItem: MenuItem) => {
+                menuItem.icon = MENU_CONFIG[businessUnitType][menuItem.id]?.icon || '';
+                menuItem.route = MENU_CONFIG[businessUnitType][menuItem.id]?.route || '';
+                menuItem.anch = menuItem.title;
+                menuItem.custom = MENU_CONFIG[businessUnitType][menuItem.id]?.custom || '';
+                if (menuItem.children && menuItem.children.length > 0) {
+                  menuItem.children = processChildren(menuItem.children,menuItem.title);
+               
+                } else {
+                  menuItem.children = [];
+                }
+                return menuItem;
+              });
+          }
+          return patchState({ menu: menu });
+        })
+      );
+    }
+  
 
   @Action(GetUserAgencies)
   GetUserAgencies({ patchState }: StateContext<UserStateModel>): Observable<UserAgencyOrganization> {

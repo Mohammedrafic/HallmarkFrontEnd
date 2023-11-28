@@ -1,10 +1,12 @@
 export const RECORD_ADDED = 'Record has been added';
 export const RECORDS_ADDED = 'Records have been added';
+export const RECORD_ADD = 'Credential added successfully';
 export const RECORD_MODIFIED = 'Record has been modified';
 export const RECORD_UNSAVED = 'Credential added successfully : Only credentials associated with the order will be displayed';
 export const SETUPS_ACTIVATED = 'Setups were successfully activated';
 export const RECORD_SAVED = 'Record has been saved';
 export const RECORD_DELETE = 'Record has been deleted';
+export const BULK_RECORD_DELETE = 'Records have been deleted';
 export const RECORD_CANNOT_BE_DELETED = 'Record cannot be deleted';
 export const RECORD_CANNOT_BE_SAVED = 'Record cannot be saved';
 export const RECORD_ALREADY_EXISTS = 'Record already exists';
@@ -134,7 +136,9 @@ export const AGENCY_CONVERTED_TO_MSP_FAIL = 'Failed to convert Agency to MSP.'
 export const RECORD_SAVED_SUCCESS = 'Record saved successfully';
 export const INACTIVEDATE = 'Location will be inactivated at '
 export const INACTIVEDATE_DEPARTMENT = 'Department will be inactivated at '
+export const INACTIVEDATE_SHIFT = 'Shift will be inactivated at '
 export const INACTIVE_MESSAGE = '. Are you sure you want to proceed?'
+export const DISTRIBUTETOVMS = 'Order will be distributed to VMS immediately. Do you like to proceed'
 export const UpdateClosedPositionRate = 'Are you sure you want to update the Bill rate '
 + 'for Closed Position? This may lead to recalculating values and generating new invoice records.';
 export const HaveScheduleBooking =
@@ -156,12 +160,15 @@ export const ERROR_CAN_NOT_ADD_MANAGENOTE_WITHOUT_VIEWNOTE="We can't add the man
 export const AgencyPartnershipSuspended = 'Agency Partnership is suspended';
 export const ViewOrderIRP_PERMISSION = 'Additional permission is required (CanOrganizationViewOrdersIRP)';
 export const ViewOrderVMS_PERMISSION = 'Additional permission is required (CanOrganizationViewOrderVMS)';
-export const TaxIdValidationMessage = '9-digit number';
+export const TaxIdValidationMessage = '9-12-digit number';
 export const NumberValidationMessage = '10-12 digit number';
 export const SwiftCodeValidationMessage = '8-11 alphanumeric code for international payments';
-export const RoutingNumberMessage = '9-digit code to identify financial institution';
+export const RoutingNumberMessage = '20-digit code to identify financial institution';
 export const Bulk_Update_Skills = 'Selected Records are modified';
 export const Bulk_Delete_Skills = 'Selected Records are deleted';
 
-export const Message_With_Fields = (template: any) => `Please fill in the required fields in Order Details tab:<br>${template} `;
-export const Toast_With_Message= (message: any) => `${message} `;
+export const Bulk_Update_Locations = 'Selected Records are modified';
+export const Bulk_Delete_Locations = 'Selected Records are deleted';
+
+export const Bulk_Update_Department = 'Selected Records are modified';
+export const Bulk_Delete_Department = 'Selected Records are deleted';

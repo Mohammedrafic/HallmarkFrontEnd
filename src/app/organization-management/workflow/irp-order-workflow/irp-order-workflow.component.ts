@@ -9,7 +9,7 @@ import { UserPermissions } from '@core/enums';
 import { WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
 import { WorkflowWithDetails } from '@shared/models/workflow.model';
 import { WorkflowStateService } from '@organization-management/workflow/services';
-import { GetWorkflowsSucceed, RemoveWorkflowSucceed } from '@organization-management/store/workflow.actions';
+import { GetWorkflowsSucceed, PreviousSelectedWorkflow, RemoveWorkflowSucceed } from '@organization-management/store/workflow.actions';
 import { GetSelectedCardIndex } from '@organization-management/workflow/helpers';
 
 @Component({
@@ -40,6 +40,7 @@ export class IrpOrderWorkflowComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.watchForSucceedActionWorkflow();
     this.watchForRemoveWorkflowAction();
+    this.watchForPreviousSelectedWorkflow();
   }
 
   public selectWorkflowCard(workflow: WorkflowWithDetails): void {
@@ -73,6 +74,16 @@ export class IrpOrderWorkflowComponent extends Destroyable implements OnInit {
     });
   }
 
+  private watchForPreviousSelectedWorkflow(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(PreviousSelectedWorkflow),
+      filter(({workflow}) => !!workflow && this.activeTab === WorkflowNavigationTabs.IrpOrderWorkFlow),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(({workflow}) => {
+      this.selectedCard = workflow;
+    });
+  }
+
   private watchForSucceedActionWorkflow(): void {
     this.actions$.pipe(
       filter(() => this.activeTab === WorkflowNavigationTabs.IrpOrderWorkFlow),
@@ -83,7 +94,6 @@ export class IrpOrderWorkflowComponent extends Destroyable implements OnInit {
 
       if (this.selectedCard) {
         const selectedCardIndex = GetSelectedCardIndex(this.workflowsWithDetails, this.selectedCard.id as number);
-
         this.selectWorkflowCard(this.workflowsWithDetails[selectedCardIndex]);
       } else {
         this.selectWorkflowCard(this.workflowsWithDetails[0]);

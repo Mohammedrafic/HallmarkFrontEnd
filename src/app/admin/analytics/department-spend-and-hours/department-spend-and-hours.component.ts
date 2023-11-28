@@ -1,4 +1,3 @@
-
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -195,7 +194,7 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
         agencyIds: new FormControl([]),       
         startDate: new FormControl(startDate,[]),
         endDate: new FormControl(new Date(Date.now()),[]),
-        skillCategoryIds: new FormControl(null),
+        skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
       }
     );
@@ -276,10 +275,10 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
               this.selectedAgencies = agencyIds;
               this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
               this.defaultInvoiceStausIds=data?.invoiceStatuses.map((list)=>list.id);
-              this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-              this.defaultSkills=data.masterSkills.map((list)=>list.id);
+              // this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+              // this.defaultSkills=data.masterSkills.map((list)=>list.id);
               let masterSkills = this.filterOptionsData.masterSkills;
-              let skills = masterSkills.filter((i) => this.defaultSkillCategories?.includes(i.skillCategoryId));
+              let skills = masterSkills.filter((i) => data.skillCategories.map((list) => list.id)?.includes(i.skillCategoryId));
               this.filterColumns.skillIds.dataSource = skills;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
 
@@ -343,6 +342,13 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
 
 
   public SearchReport(): void {
+    if (!this.departmentspendhourReportForm.dirty) {
+      this.message = "Default filter selected with all regions, locations and departments for 30 days";
+    }
+    else {
+      this.isResetFilter = false;
+      this.message = ""
+    }
     this.filteredItems = [];
     let auth = "Bearer ";
     for (let x = 0; x < window.localStorage.length; x++) {
@@ -354,9 +360,9 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
       regionIds, startDate, endDate, agencyIds, skillIds,skillCategoryIds } = this.departmentspendhourReportForm.getRawValue();
     
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : null;
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : null;
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : null;
     
     this.isResetFilter = false;
     let _sDate=formatDate(startDate, 'MM/dd/yyyy', 'en-US')
@@ -371,14 +377,14 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
 
-      "OrganizationIdDS": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionIdDS": regionIds.length == 0 ? "null" : regionIds,
-      "LocationIdDS": locationIds.length == 0 ? "null" : locationIds,
-      "DepartmentIdDS": departmentIds.length == 0 ? "null" : departmentIds,   
+      "OrganizationIdDS": this.selectedOrganizations.length == 0 ? null : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "RegionIdDS": regionIds == null ? null : regionIds,
+      "LocationIdDS": locationIds == null ? null : locationIds,
+      "DepartmentIdDS": departmentIds == null ? null : departmentIds,   
       "TimsheetServiceDateFromDS": _sDate ,
       "TimsheetServiceDateToDS": _eDate,
-      "SkillDS": skillIds.length == 0 ? "null" : skillIds.join(","),
-      "SkillCategoryDS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
+      "SkillDS": skillIds.length == 0 ? null : skillIds.join(","),
+      "SkillCategoryDS": skillCategoryIds.length == 0 ? null : skillCategoryIds.join(","),
       "UserIdDS": this.user?.id
 
     };
@@ -458,8 +464,8 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
-    this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    startDate.setDate(startDate.getDate() - 30);
+    this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.RegionIds)?.setValue([]);
     this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.LocationIds)?.setValue([]);
     this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.LocationIds)?.setValue([]);
     this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.DepartmentIds)?.setValue([]);    

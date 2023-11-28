@@ -27,8 +27,7 @@ import { OrderManagementService,
 import { ToggleChatDialog, UnreadMessage } from '@core/actions';
 import { OutsideZone } from "@core/decorators";
 import { Destroyable } from '@core/helpers';
-import { AnalyticsMenuId } from '@shared/constants/menu-config';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AnalyticsMenuId, IRPReportsMenuId, VMSReportsMenuId } from '@shared/constants/menu-config';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
@@ -38,7 +37,7 @@ import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '@client/client.config';
 import { Menu, MenuItem } from '@shared/models/menu.model';
 import { User } from '@shared/models/user.model';
-import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser } from '../store/user.actions';
+import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser, SetLastSelectedOrganizationAgencyId } from '../store/user.actions';
 import { UserState } from '../store/user.state';
 import { DismissAlert, DismissAllAlerts } from '@admin/store/alerts.actions';
 import { DismissAlertDto } from '@shared/models/alerts-template.model';
@@ -60,7 +59,10 @@ import { UserService } from '@shared/services/user.service';
 import { BreakpointObserverService } from '@core/services';
 import { HeaderState } from '@shared/models/header-state.model';
 import { HelpNavigationService } from '@shared/services';
-import { IsMspAreaStateModel } from '../shared/models/is-msp-area-state.model';
+import { IsMspAreaStateModel } from '@shared/models/is-msp-area-state.model';
+import { DomainLinks } from '@shared/models/help-site-url.model';
+import { GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import { GetOrganizationById } from '@admin/store/admin.actions';
 
 @Component({
   selector: 'app-shell',
@@ -247,6 +249,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
           }
 
         });
+    this.getOrganization();
   }
 
   ngAfterViewInit(): void {
@@ -329,7 +332,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
     this.setSideBarForFirstLoad(menuItem.route as string);
 
-    if (menuItem.id == AnalyticsMenuId) {
+    if (menuItem.id == VMSReportsMenuId || menuItem.id == IRPReportsMenuId) {
+      const menuId = menuItem.id;
+      window.localStorage.setItem("menuId", String(menuId))
+      this.userService.setData(menuItem);
       this.router.navigate([menuItem.route]);
     } else if (!menuItem.children?.length) {
         this.router.navigate([menuItem.route]).then(() => {
@@ -346,7 +352,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   showContextMenu(data: MenuItem, event: MouseEvent): void {
     this.contextmenu.items = [];
 
-    if (data.id != AnalyticsMenuId && data.children && data.children.length > 0 && !this.sidebar.isOpen) {
+    if (data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = (event.target as HTMLElement).getBoundingClientRect();
       this.contextmenu.items =
@@ -363,7 +369,11 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   onBeforeContextMenuClose(event: any): void {
    let selectedMenuItem = event.items.find((data:any)=>data.id == this.selectedItem);
-
+   if (selectedMenuItem?.properties.id === VMSReportsMenuId || IRPReportsMenuId) {
+    const menuId = selectedMenuItem?.properties?.id;
+    window.localStorage.setItem("menuId", String(menuId))
+    this.userService.setData(selectedMenuItem);
+  }
     if (selectedMenuItem) {
       this.setSideBarForFirstLoad(selectedMenuItem.route);
       this.router.navigate([selectedMenuItem.route]);
@@ -412,11 +422,11 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     .pipe(
       take(1),
     )
-    .subscribe(({ url }) => {
+    .subscribe((links: DomainLinks) => {
       const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-      this.helpService.navigateHelpPage(appArea?.isAgencyArea, url);
+      this.helpService.navigateHelpPage(appArea?.isAgencyArea, links);
     });
-    
+
 
   }
 
@@ -509,10 +519,16 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.store.dispatch(new ShowCustomSideDialog(true));
   }
 
-  getContentDetails(businessUnitId?: number,orderId?: number,title?:string,alertId?:number): void {
+  getContentDetails(businessUnitId?: number,orderId?: number,title?:string,alertId?:number,publicId?:string): void {
     if (businessUnitId) {
         this.alertSideBarCloseClick();
         window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
+        this.store.dispatch(
+          new SetLastSelectedOrganizationAgencyId({
+            lastSelectedAgencyId: null,
+            lastSelectedOrganizationId: businessUnitId
+          })
+        );
     }
     if(orderId){
       window.localStorage.setItem("OrderId",JSON.stringify(orderId));
@@ -523,6 +539,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     if(alertId){
       window.localStorage.setItem("alertId",JSON.stringify(alertId));
     }
+    if(publicId){
+      window.localStorage.setItem("OrderPublicId",JSON.stringify(publicId));
+    }
+
   }
 
   private getAlertsForUser(): void {
@@ -595,11 +615,18 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   private hideAnalyticsSubMenuItems(): void {
-    const element = this.tree?.element.querySelector('[data-uid="Analytics"]');
+    const element = this.tree?.element.querySelector('[data-uid="Analytics/VMS Reports"]');
     element?.querySelectorAll('ul li').forEach((el: any) => {
       el.style.display = 'none';
     });
     element?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => {
+      el.style.display = 'none';
+    });
+    const element1 = this.tree?.element.querySelector('[data-uid="Analytics/IRP Reports"]');
+    element1?.querySelectorAll('ul li').forEach((el: any) => {
+      el.style.display = 'none';
+    });
+    element1?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => {
       el.style.display = 'none';
     });
   }
@@ -817,5 +844,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   private navigateToEmployeeProfile(): void {
     this.router.navigate(['employee/profile/information']);
+  }
+
+  private getOrganization(): void {
+    const id = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+    this.store.dispatch(new GetOrganizationById(id));
   }
 }

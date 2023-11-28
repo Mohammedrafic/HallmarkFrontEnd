@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
-import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, RadioButtonAllModule } from '@syncfusion/ej2-angular-buttons';
 
 import {
   CreateWorkflowService,
@@ -18,14 +18,15 @@ import { CreateWorkflowComponent } from './create-workflow.component';
   exports: [
     CreateWorkflowComponent,
   ],
-  imports: [
-    CommonModule,
-    DialogModule,
-    ButtonModule,
-    ReactiveFormsModule,
-    ValidateDirectiveModule,
-    CheckBoxModule,
-  ],
+    imports: [
+        CommonModule,
+        DialogModule,
+        ButtonModule,
+        ReactiveFormsModule,
+        ValidateDirectiveModule,
+        CheckBoxModule,
+        RadioButtonAllModule,
+    ],
   providers: [CreateWorkflowService],
 })
 export class CreateWorkflowModule { }

@@ -4,12 +4,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 
 import { WorkflowWithDetails } from '@shared/models/workflow.model';
-import { WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
+import { ApplicabilityItemType, WorkflowNavigationTabs } from '@organization-management/workflow/enumns';
 import { SaveEditedWorkflow, SaveWorkflow } from '@organization-management/store/workflow.actions';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
-import {
-  ApplicabilityValidator,
-} from '@organization-management/workflow/components/create-workflow/validators';
 
 @Injectable()
 export class CreateWorkflowService {
@@ -24,12 +21,13 @@ export class CreateWorkflowService {
     card?: WorkflowWithDetails
   ): FormGroup {
     if(tab === WorkflowNavigationTabs.VmsOrderWorkFlow) {
+      const applicabilityValue = isEdit && card?.extensions ? ApplicabilityItemType.Extension : ApplicabilityItemType.InitialOrder;
+
       return this.formBuilder.group({
         id: [isEdit ? card?.id: null],
         workflow: [isEdit ? card?.name : null, [Validators.required, Validators.maxLength(50)]],
-        initialOrders: [isEdit ? card?.initialOrders : false],
-        extensions: [isEdit ? card?.extensions : false],
-      }, { validator: ApplicabilityValidator});
+        applicability: [applicabilityValue, [Validators.required]],
+      });
     }
 
     return this.formBuilder.group({
@@ -54,13 +52,14 @@ export class CreateWorkflowService {
   ): void {
     const workflowType = selectedTab === WorkflowNavigationTabs.IrpOrderWorkFlow ?
       WorkflowGroupType.IRPOrderWorkflow : WorkflowGroupType.VMSOrderWorkflow;
-    const {id,workflow, initialOrders, extensions} = workflowForm.getRawValue();
+    const { id,workflow, applicability } = workflowForm.getRawValue();
+
     const workflowWithDetails = {
       id,
       name: workflow,
       type: workflowType,
-      initialOrders,
-      extensions,
+      initialOrders: selectedTab !== WorkflowNavigationTabs.IrpOrderWorkFlow ? !applicability : false,
+      extensions: selectedTab !== WorkflowNavigationTabs.IrpOrderWorkFlow ? !!applicability : false,
       isIRP: selectedTab === WorkflowNavigationTabs.IrpOrderWorkFlow,
     };
 
@@ -69,7 +68,5 @@ export class CreateWorkflowService {
     } else {
       this.store.dispatch(new SaveWorkflow(workflowWithDetails));
     }
-
-    workflowForm.reset();
   }
 }

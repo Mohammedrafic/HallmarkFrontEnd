@@ -6,11 +6,18 @@
             {{candidate?.lastName}}, {{candidate?.firstName}}
             <i-feather name="briefcase" class="icon deployed-icon" *ngIf="candidate?.deployedCandidateInfo && !isOnBoarded"></i-feather>
           </h3>
-        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus" [text]="candidatStatus[candidate.candidateStatus]">
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus && activeSystems !== ordersystemId.IRP" [text]="candidatStatus[candidate.candidateStatus]">
           <e-chips>
             <e-chip [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>
         </ejs-chiplist>
+        <div *ngIf="irpCandidate">
+          <ejs-chiplist *ngIf="isTab && irpCandidate.status && activeSystems === ordersystemId.IRP" [text]="candidatStatus[irpCandidate.status]">
+            <e-chips>
+              <e-chip [cssClass]="candidatStatus[irpCandidate.status] | chipsCssClass"></e-chip>
+            </e-chips>
+          </ejs-chiplist>
+        </div>
       </div>
       <div class="e-card-content button-container">
         <div class="input-group dropdown bootstrap input-readonly" *ngIf="!isRejected && !isCancelled">
@@ -80,7 +87,7 @@
                       </div>
                     </div>
                     <div class="input-container bootstrap" *ngIf="activeSystems !== ordersystemId.IRP">
-                      <label class="input-group">Guaranteed Work Week</label>
+                      <label class="input-group">Expected Work Week</label>
                       <div class="input-group" [ngClass]="{'input-readonly': isOnBoarded}">
                         <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" maxlength="50" [readOnly]="isOnBoarded"/>
                       </div>

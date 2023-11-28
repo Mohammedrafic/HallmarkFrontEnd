@@ -41,7 +41,7 @@ import { CredentialGridService } from '@agency/services/credential-grid.service'
 import { AbstractGridConfigurationComponent } from
   '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { 
-  DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED, RECORD_MODIFIED, RECORD_UNSAVED
+  DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADD, RECORD_MODIFIED, RECORD_UNSAVED
 } from '@shared/constants/messages';
 import { optionFields } from '@shared/constants';
 import { FileStatusCode } from '@shared/enums/file.enum';
@@ -727,7 +727,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         }
 
         if(this.isCredentialExists) {
-          this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADDED : RECORD_MODIFIED));
+          this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADD : RECORD_MODIFIED));
         }else{
           this.store.dispatch(new ShowToast(MessageTypes.Warning, RECORD_UNSAVED ));
         }

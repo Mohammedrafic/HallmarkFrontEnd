@@ -6,10 +6,19 @@ import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.mo
 import { OrderManagementIRPSystemId, OrderManagementIRPTabs } from '@shared/enums/order-management-tabs.enum';
 import { OrderManagement } from '@shared/models/order-management.model';
 import { OrderStatus } from '@shared/enums/order-management';
-import { OrderType } from '@shared/enums/order-type';
 import {
   MoreMenuType,
 } from '@client/order-management/components/order-management-content/order-management-content.constants';
+
+export const OrderManagementFilterDates: string[] = [
+  'jobStartDate',
+  'jobEndDate',
+  'creationDateFrom',
+  'creationDateTo',
+  'distributedOnFrom',
+  'distributedOnTo'
+];
+export const OrderJourneyFilterDates: string[] = ['jobStartDate', 'jobEndDate'];
 
 export const SystemGroupConfig = (
   isIRPIncluded = false,

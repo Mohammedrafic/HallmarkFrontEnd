@@ -1,6 +1,6 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
+import { combineLatest, filter, map, Observable, of, Subject, switchMap, take, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
@@ -54,14 +54,16 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { Query } from "@syncfusion/ej2-data";
 import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
 import {
-  ApplicabilitySources,
+  ApplicabilityLists,
+  CreateApplicabilityFieldConfig,
   CreateWorkflowTypeList,
   FiltersColumnsConfig,
   VmsWorkflowType,
 } from '@organization-management/workflow/workflow-mapping/constants';
 import { WorkflowMappingService } from '@organization-management/workflow/workflow-mapping/services';
-import { SystemFlags } from '@organization-management/workflow/interfaces';
+import { ApplicabilityFieldsConfig, SystemFlags } from '@organization-management/workflow/interfaces';
 import { CreateNextStepStatusForWorkflows } from '@organization-management/workflow/helpers';
+import { ApplicabilityItemType } from '@organization-management/workflow/enumns';
 
 @Component({
   selector: 'app-workflow-mapping',
@@ -142,6 +144,8 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   public maxDepartmentsLength = 1000;
   public query: Query = new Query().take(this.maxDepartmentsLength);
   public filterType: string = 'Contains';
+  public applicabilityFieldConfig: ApplicabilityFieldsConfig = CreateApplicabilityFieldConfig();
+  public selectedWorkflowType: WorkflowGroupType;
 
   private formBuilder: FormBuilder;
   private pageSubject = new Subject<number>();
@@ -446,9 +450,14 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     this.editedRecordId = data.mappingId;
 
     setTimeout(() => {
-      const foundWorkflow = this.workflows.find((w) => w.name === data.workflowName);
+      const foundWorkflow = this.workflows.find((w) => w.id === data.workflowGroupId);
 
       this.workflowMappingFormGroup.controls['workflowType'].setValue(data.workflowGroupType);
+      this.workflowMappingService.populateWorkflowApplicabilityField(
+        data.workflowGroupType,
+        data.initialOrders,
+        this.workflowMappingFormGroup
+      );
       this.workflowMappingFormGroup.controls['workflowName'].setValue(foundWorkflow?.id);
 
       this.allRegionsChange({ checked: !data.regionId });
@@ -791,7 +800,6 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
         regionIds,
       );
 
-
       this.locations = sortByField(locations, 'name');
       this.workflowMappingService.setControlNullValue(
         ['locations', 'departments'],
@@ -802,16 +810,51 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
 
   private watchForWorkflowType(): void {
     this.workflowMappingFormGroup.get('workflowType')?.valueChanges.pipe(
-      filter(Boolean),
-      takeUntil(this.unsubscribe$)
-    ).subscribe((value: WorkflowGroupType) => {
-      this.usersWithRoles = this.usersWithRolesList[value];
-      this.workflowMappingService.resetControls(
-        ['regions', 'locations', 'departments', 'skills', 'workflowName'],
-        this.workflowMappingFormGroup
-      );
-      this.setWorkflowSources(value);
+      filter((type: WorkflowGroupType) => !!type),
+      map((type: WorkflowGroupType) => {
+        return this.updateWorkflowTypesAndControls(type);
+      }),
+      switchMap((type: WorkflowGroupType) => {
+        this.updateApplicabilityFieldAndControl(type);
+        return this.workflowMappingFormGroup.get('workflowApplicability')?.valueChanges ?? of(null);
+      }),
+      filter((applicability: ApplicabilityItemType) => applicability !== null),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((applicability: ApplicabilityItemType) => {
+      this.workflowMappingFormGroup.get('workflowName')?.reset();
+      this.updateWorkflowSourcesBaseOnApplicability(applicability);
     });
+  }
+
+  private updateWorkflowSourcesBaseOnApplicability(applicability: ApplicabilityItemType): void {
+    this.setWorkflowSources(this.selectedWorkflowType);
+    this.workflowSources = this.workflowMappingService.getWorkflowsBaseOnApplicability(
+      this.workflowSources,
+      applicability
+    );
+  }
+
+  private updateApplicabilityFieldAndControl(value: WorkflowGroupType): void {
+    this.applicabilityFieldConfig = {
+      ...CreateApplicabilityFieldConfig(),
+      showField: value === WorkflowGroupType.VMSOrderWorkflow
+    };
+    this.workflowMappingService.updateWorkflowMappingControls(
+      this.workflowMappingFormGroup,
+      value
+    );
+  }
+
+  private updateWorkflowTypesAndControls(value: WorkflowGroupType): WorkflowGroupType {
+    this.selectedWorkflowType = value;
+    this.usersWithRoles = this.usersWithRolesList[value];
+    this.workflowMappingService.resetControls(
+      ['regions', 'locations', 'departments', 'skills', 'workflowName'],
+      this.workflowMappingFormGroup
+    );
+    this.setWorkflowSources(value);
+
+    return value;
   }
 
   private setWorkflowSources(value: WorkflowGroupType): void {
@@ -844,7 +887,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   }
 
   private setApplicabilitySources(): void {
-    this.filterColumns.workflowApplicability.dataSource = ApplicabilitySources;
+    this.filterColumns.workflowApplicability.dataSource = ApplicabilityLists;
   }
 
   private watchForChangePage(): void {

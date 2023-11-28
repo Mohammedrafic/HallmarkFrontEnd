@@ -52,6 +52,7 @@ export class QuickOrderService {
         annualSalaryRangeFrom: [null, Validators.required],
         annualSalaryRangeTo: [null, Validators.required],
         linkedId: [null, Validators.maxLength(20)],
+        ExpectedWorkWeek:[null, [Validators.maxLength(50)]]
       },
       { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
     ) as CustomFormGroup<OrderInformationDTO>;

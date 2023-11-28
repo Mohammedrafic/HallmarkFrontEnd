@@ -185,6 +185,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private alertOrderId:number;
+  private orderPublicId:string;
 
   constructor(
     private store: Store,
@@ -230,13 +231,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.ordersPage = data;
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
       if(this.ordersPage?.items){
-        this.alertOrderId= this.ordersPage.items.find((i) => i.orderId === this.alertOrderId)
-        ? this.alertOrderId
-        : 0;
-        if(this.alertOrderId>0 ){
-          this.ordersPage.items= this.ordersPage.items.filter(x=>x.orderId===this.alertOrderId);
-          this.ordersPage.totalCount = this.ordersPage.items.length;
-          this.gridWithChildRow.dataSource=this.ordersPage.items;
+        const filteredOrder= this.ordersPage.items.find((i) => i.orderId === this.alertOrderId);
+        if(this.alertOrderId>0 && filteredOrder){
+         this.gridWithChildRow.dataSource=this.ordersPage.items;
           this.onRowClick({data:this.ordersPage.items[0],isInteracted:false})
         }
       }
@@ -283,8 +280,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public getAlertOrderId():void{
     let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
     this.alertOrderId = JSON.parse((localStorage.getItem('OrderId') || '0')) as number;
-    (!this.alertOrderId)?this.alertOrderId=0:""
+    this.orderPublicId = JSON.parse((localStorage.getItem('OrderPublicId') || '""')) as string;
+    (!this.alertOrderId)?this.alertOrderId=0:"";
+    (!this.orderPublicId)?this.orderPublicId='':"";
     window.localStorage.setItem("OrderId", JSON.stringify(""));
+    window.localStorage.setItem("OrderPublicId", JSON.stringify(""));
     if(this.alertOrderId>0){
       if((AlertIdEnum[AlertIdEnum['Candidate Status Update: Shortlisted']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
        || (AlertIdEnum[AlertIdEnum['Candidate Status Update: Onboard']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()
@@ -475,6 +475,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.dispatchNewPage();
       return;
     }
+    if(this.alertOrderId > 0){
+      this.filters.orderPublicId = this.orderPublicId;
+      this.dispatchNewPage();
+      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.orderPublicId);
+      this.generateFilterChips();
+   }
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     if (this.redirectFromPerDiem || selectedOrderAfterRedirect) {
       this.redirectFromPerDiem = false;
@@ -1026,6 +1032,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         }
       }
       this.alertOrderId = 0;
+      this.orderPublicId = '';
     });
   }
 

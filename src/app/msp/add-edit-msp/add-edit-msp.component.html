@@ -99,7 +99,7 @@
                     appValidateWithMessage
                     formControlName="status"
                     [fields]="optionFields"
-                    [dataSource]="organizationStatuses$ | async"
+                    [dataSource]="statuses"
                     [allowFiltering]="true"
                   ></ejs-dropdownlist>
                 </div>
@@ -397,11 +397,11 @@
             <div class="title">Contact Details</div>
             <app-tooltip-container
               class="stick-right"
-              [showToolTip]="!userPermission[userPermissions.CanCreateMSP]"
+              [showToolTip]="!userPermission[userPermissions.CanManageMspList]"
             >
               <button
                 ejs-button
-                [disabled]="!userPermission[userPermissions.CanCreateMSP]"
+                [disabled]="!userPermission[userPermissions.CanManageMspList]"
                 cssClass="e-outline add-contact-link"
                 (click)="addContact()"
               >
@@ -490,13 +490,13 @@
                   class="input-container remove-button-container"
                 >
                   <app-tooltip-container
-                    [showToolTip]="!userPermission[userPermissions.CanCreateMSP]">
+                    [showToolTip]="!userPermission[userPermissions.CanManageMspList]">
                     <button
                       ejs-button
                       appHideBeforeSyncfusionLoad
                       cssClass="e-outline"
                       class="icon-button"
-                      [disabled]="!userPermission[userPermissions.CanCreateMSP]"
+                      [disabled]="!userPermission[userPermissions.CanManageMspList]"
                       (click)="removeContact(i)"
                     >
                       <i-feather name="trash2" class="icon"></i-feather>
@@ -624,7 +624,7 @@
     </button>
     <app-tooltip-container
       class="tooltip"
-      [showToolTip]="!userPermission[userPermissions.CanCreateMSP]"
+      [showToolTip]="!userPermission[userPermissions.CanManageMspList]"
     >
       <button
         ejs-button
@@ -633,7 +633,7 @@
         id="saveButton"
         [isPrimary]="true"
         (click)="save()"
-        [disabled]="!userPermission[userPermissions.CanCreateMSP]"
+        [disabled]="!userPermission[userPermissions.CanManageMspList]"
       >
         Save
       </button>

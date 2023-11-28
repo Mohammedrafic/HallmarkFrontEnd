@@ -521,9 +521,18 @@ export const MENU_CONFIG: any = {
       route: '/admin/interfacelogirp', 
     },
     120: {
-      // MSP List
+      // MSP linked agencies List
       icon: '',
       route: 'msp/msp-associate-list',
+    },
+    121: {
+      // VMS Reports
+      icon: '',
+      route: '/analytics',
+    }, 122: {
+      // IRP Reports
+      icon: '',
+      route: '/analytics',
     },
   },
 
@@ -625,6 +634,11 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: 'agency/invoices',
     },
+    26: {
+      // Reports
+      icon: 'pie-chart',
+      route: 'agency/reports/financial-timesheet-report',
+    },
     27: {
       // Settings
       icon: 'settings',
@@ -668,7 +682,7 @@ export const MENU_CONFIG: any = {
     37: {
       // Candidate Details
       icon: 'users',
-      route: 'agency/candidate-details',
+      route: 'client/candidate-details',
     },
     40: {
       // Custom Reports
@@ -967,9 +981,18 @@ export const MENU_CONFIG: any = {
       route: '/admin/interfacelogirp', 
     },
     120: {
-      // MSP List
+      // MSP linked agencies List
       icon: '',
       route: 'msp/msp-associate-list',
+    },
+    121: {
+      // VMS Reports
+      icon: '',
+      route: '/analytics',
+    }, 122: {
+      // IRP Reports
+      icon: '',
+      route: '/analytics',
     },
   },
   
@@ -1449,7 +1472,16 @@ export const MENU_CONFIG: any = {
       // Interface log summary for IRP
       icon: '',
       route: '/admin/interfacelogirp', 
-   }
+   },
+   121: {
+    // VMS Reports
+    icon: '',
+    route: '/analytics',
+  }, 122: {
+    // IRP Reports
+    icon: '',
+    route: '/analytics',
+  },
   },
 
   [BusinessUnitType.Agency]: {
@@ -1704,6 +1736,15 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/user-activity',
     },
+    121: {
+      // VMS Reports
+      icon: '',
+      route: '/analytics',
+    }, 122: {
+      // IRP Reports
+      icon: '',
+      route: '/analytics',
+    },
   },
 
   [BusinessUnitType.Employee]: {
@@ -1726,3 +1767,5 @@ export const MENU_CONFIG: any = {
 };
 
 export const AnalyticsMenuId: number = 40;
+export const VMSReportsMenuId: number = 121;
+export const IRPReportsMenuId: number = 122;

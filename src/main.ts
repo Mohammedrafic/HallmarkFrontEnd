@@ -30,9 +30,18 @@ Promise.resolve()
     const reportServerUrl = settings.LOGIREPORT_BASE_URL;
     return Promise.all([{ host, reportServerUrl }, fetch(APP_SETTINGS_B2C_CONFIG_URL(host)).then((res) => res.json())]);
   })
-  .then(([settings, config]) => {
-    const B2C_STATIC_PROVIDERS = MSAL_STATIC_PROVIDERS(settings.host, config);
+  .then(([settings, configs]) => {
+    //When the user provides a url like this, we imply that they want to use SSO
+    const urlParams = new URLSearchParams(window.location.search);
+    const domainHint = urlParams.get('domainHint');
+    if (window.location.pathname.includes('/sso') && domainHint !== null) {
+      window.localStorage.setItem('sso', '1');
+      window.localStorage.setItem('domainHint', domainHint);
+      window.localStorage.setItem('apiScope', configs[0].apiScope);
+    }
 
+    const index = parseInt(window.localStorage.getItem('sso') || '0');
+    const B2C_STATIC_PROVIDERS = MSAL_STATIC_PROVIDERS(settings.host, configs[index]);
     platformBrowserDynamic([{ provide: APP_SETTINGS, useValue: settings }, ...B2C_STATIC_PROVIDERS])
       .bootstrapModule(AppModule)
       .catch((err) => console.error(err));

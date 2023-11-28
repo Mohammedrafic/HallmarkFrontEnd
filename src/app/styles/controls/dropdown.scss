@@ -267,6 +267,12 @@ body.dark {
         }
       }
     }
+
+    .input-group.dropdown.input-readonly {
+      .e-multiselect {
+        background-color: $bg-gray-200 !important
+      }
+    }
   }
 
   #organization-agency-dropdown {

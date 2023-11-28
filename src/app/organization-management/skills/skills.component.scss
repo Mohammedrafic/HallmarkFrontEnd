@@ -7,7 +7,7 @@
     margin-top: 20px;
 
     h3 {
-      color: $title-black;
+      color: var(--text);
       margin: 8px;
     }
 
@@ -56,7 +56,7 @@
 
 .controls-group-title {
   font-size: 14px;
-  color: $secondary-dark-blue-15;
+  color: var(--sub-title-2);
 }
 
 .required {
@@ -90,6 +90,8 @@
   position:absolute;
   right:0;
 }
+
 .e-pager{
-  border-radius: 12px !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
 }

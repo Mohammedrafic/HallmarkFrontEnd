@@ -10,6 +10,7 @@ import {
   GetWorkflowMappingPages,
   GetWorkflows,
   GetWorkflowsSucceed,
+  PreviousSelectedWorkflow,
   RemoveWorkflow,
   RemoveWorkflowDeclined,
   RemoveWorkflowMapping,
@@ -167,10 +168,15 @@ export class WorkflowState {
   ): Observable<WorkflowWithDetails | void> {
     return this.workflowService.updateWorkflow(workflow).pipe(
       tap((payloadResponse) => {
-        payloadResponse?.requireMappingsUpdate && !isRemoveStep
-          ? dispatch(new ShowToast(MessageTypes.Warning, usedInMappingMessage('Workflow')))
-          : dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-        dispatch(new GetWorkflows(GetWorkflowFlags(workflow.isIRP)));
+        const messageAction = payloadResponse?.requireMappingsUpdate && !isRemoveStep
+          ? new ShowToast(MessageTypes.Warning, usedInMappingMessage('Workflow'))
+          : new ShowToast(MessageTypes.Success, RECORD_MODIFIED);
+
+        dispatch([
+          new PreviousSelectedWorkflow(payloadResponse as WorkflowWithDetails),
+          messageAction,
+          new GetWorkflows(GetWorkflowFlags(workflow.isIRP))
+        ]);
         return payloadResponse;
       }),
       catchError((error: any) => {
@@ -241,8 +247,8 @@ export class WorkflowState {
         return payloadResponse;
       }),
       catchError((error: HttpErrorResponse) => {
-        if (error.error && error.error.errors && error.error.errors.SkillIds[0]) {
-          return dispatch(new ShowToast(MessageTypes.Error, error.error.errors.SkillIds[0]));
+        if (error.error && error.error.errors && error.error.errors.skillIds[0]) {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.errors.skillIds[0]));
         } else {
           return dispatch(new ShowToast(MessageTypes.Error, RECORD_CANNOT_BE_SAVED));
         }

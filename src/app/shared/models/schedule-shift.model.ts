@@ -6,4 +6,5 @@ export interface ScheduleShift {
   endTime: string;
   onCall: boolean;
   onCallText: string;
+  inactiveDate:string;
 }

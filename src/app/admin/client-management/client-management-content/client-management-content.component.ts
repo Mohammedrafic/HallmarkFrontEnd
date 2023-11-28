@@ -1,5 +1,5 @@
-import { DatePipe } from '@angular/common';
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { formatDate } from '@angular/common';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
@@ -30,6 +30,7 @@ import { BreakpointObserverService } from '@core/services';
   templateUrl: './client-management-content.component.html',
   styleUrls: ['./client-management-content.component.scss'],
   providers: [SortService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClientManagementContentComponent
   extends AbstractPermissionGrid
@@ -61,7 +62,7 @@ export class ClientManagementContentComponent
   statuses$: Observable<string[]>;
 
   @Select(UserState.currentUserPermissions)
-  currentUserPermissions$: Observable<any[]>;
+  currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
   @ViewChild('grid')
   public grid: GridComponent;
@@ -78,14 +79,14 @@ export class ClientManagementContentComponent
     protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
-    private datePipe: DatePipe,
     private filterService: FilterService,
     private fb: FormBuilder,
-    private breakpointService: BreakpointObserverService
+    private breakpointService: BreakpointObserverService,
+    public cd: ChangeDetectorRef,
   ) {
     super(store);
     this.idFieldName = 'organizationId';
-    this.fileName = 'Organizations ' + datePipe.transform(Date.now(), 'MM/dd/yyyy');
+    this.fileName = 'Organizations ' + formatDate(Date.now(), 'MM/dd/yyyy', 'en-US', 'UTC');
     store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'organization', custom: true }));
     this.OrganizationFilterFormGroup = this.fb.group({
       searchTerm: new FormControl(''),
@@ -162,7 +163,6 @@ export class ClientManagementContentComponent
     this.filteredItems = this.filterService.generateChips(
       this.OrganizationFilterFormGroup,
       this.filterColumns,
-      this.datePipe
     );
   }
 
@@ -186,7 +186,7 @@ export class ClientManagementContentComponent
   }
 
   public override customExport(): void {
-    this.defaultFileName = 'Organization List ' + this.generateDateTime(this.datePipe);
+    this.defaultFileName = 'Organization List ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -202,7 +202,7 @@ export class ClientManagementContentComponent
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = 'Organization List ' + this.generateDateTime(this.datePipe);
+    this.defaultFileName = 'Organization List ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
     this.store.dispatch(
       new ExportOrganizations(
         new ExportPayload(
@@ -245,7 +245,7 @@ export class ClientManagementContentComponent
   }
 
   private getFiltersForExport(): OrganizationFilter & { organizationNames: string[] } {
-    const { businessUnitNames, ...filtersRest } = this.filters;
+    const { ...filtersRest } = this.filters;
 
     return { ...filtersRest, organizationNames: this.filters.businessUnitNames as string[] };
   }

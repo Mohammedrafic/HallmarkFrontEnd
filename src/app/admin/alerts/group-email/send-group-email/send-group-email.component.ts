@@ -909,16 +909,23 @@ export class SendGroupEmailComponent
         this.loadSkillsAndWorkCommitments(businessId);
       }
     }
-  }
+  } 
 
-  public OnFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
-    var result = this.filterUserData.filter(function(user){
-      user.fullName = user.fullName.toLowerCase();
-     return user.fullName.indexOf(e.text.toLowerCase()) > -1; 
-  });
-    this.userData = result;
-  }
 
+  public OnFiltering(e: FilteringEventArgs): void {
+    const char = e.text.length + 1;
+    let query: Query = new Query();
+    query =
+      e.text !== ''
+        ? query.where('fullName', 'contains', e.text, true)
+        : query;
+        let users = this.filterUserData.filter(function(user){
+          return user.fullName.toLowerCase().indexOf(e.text.toLowerCase()) > -1; 
+       });    
+       e.updateData(users as [], query);
+  };
+
+ 
   private onRolesValueChanged(): void {
     this.rolesControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       this.groupEmailTemplateForm.controls['emailTo'].setValue('');
@@ -1139,7 +1146,7 @@ export class SendGroupEmailComponent
     if (this.allCandidate) {
       this.candidateControl.setValue(null);
       this.candidateControl.disable();
-      this.emailTo = this.userData
+      this.emailTo = this.filterUserData
       ?.map((item) => item.email)
       ?.join(', ');
     } else {
@@ -1229,7 +1236,7 @@ export class SendGroupEmailComponent
       )
     );
     this.candidateData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.userData = data;
+      this.userData = data != undefined ? data.slice(0,100) : [];
       this.filterUserData = data;
     });
   }

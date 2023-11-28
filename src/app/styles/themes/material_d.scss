@@ -1,3 +1,5 @@
+@import 'colors';
+
 $primary: rgba(232,29,98,1);
 $primary-font: #000;
 $accent: #3E7FFF;
@@ -26685,7 +26687,8 @@ $drop-down-btn-bigger-popup-margin-top: 0 !default;
             background-color: $drop-down-btn-li-hover-bgcolor;
           }
           @else {
-            background-color: $drop-down-btn-li-bgcolor;
+            background-color: $primary-active-blue-70;
+            color: $primary-active-blue-10!important;
           }
           color: $drop-down-btn-li-selection-font-color;
         }
@@ -56857,6 +56860,7 @@ $listbox-filter-select-all-height: calc(100% - 79px) !default;
   .e-listbox-container {
     font-family: $listview-font-family;
     font-size: $listview-font-size;
+    border: 0.5px solid #616161!important;
     @at-root {
       & .e-list-header {
         background-color: $listview-header-bg;
@@ -56894,9 +56898,13 @@ $listbox-filter-select-all-height: calc(100% - 79px) !default;
 
       & .e-list-item:hover:not(.e-selected):not(.e-disabled),
       & .e-list-item:hover.e-selected.e-checklist:not(.e-disabled) {
-        background-color: $listview-item-hover-bg;
+        background-color: $primary-active-blue-70;
+        color: $primary-active-blue-10!important;
         border-color: $listview-hover-border-color;
-        color: $listview-text-hover-color;
+
+        .group-option-name{
+          color: $primary-active-blue-10!important;
+        }
       }
 
       & .e-list-item.e-selected {

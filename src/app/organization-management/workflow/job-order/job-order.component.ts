@@ -8,6 +8,7 @@ import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import {
   GetWorkflows,
   GetWorkflowsSucceed,
+  PreviousSelectedWorkflow,
   RemoveWorkflow,
   RemoveWorkflowSucceed,
   UpdateWorkflow,
@@ -87,6 +88,7 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
     this.watchForSucceedActionWorkflow();
     this.watchForSelectedIrpCard();
     this.watchForRemoveWorkflowAction();
+    this.watchForPreviousSelectedWorkflow();
   }
 
   override ngOnDestroy(): void {
@@ -234,6 +236,16 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
   private getOrganizationById(businessUnitId: number): Observable<Organization> {
     const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
     return this.store.dispatch(new GetOrganizationById(id));
+  }
+
+  private watchForPreviousSelectedWorkflow(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(PreviousSelectedWorkflow),
+      filter(({workflow}) => !!workflow && this.activeTab === WorkflowNavigationTabs.VmsOrderWorkFlow),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(({workflow}) => {
+      this.selectedCard = workflow;
+    });
   }
 
   private watchForSucceedActionWorkflow(): void {

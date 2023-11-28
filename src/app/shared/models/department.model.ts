@@ -75,3 +75,10 @@ export class DepartmentsByLocationsFilter {
   pageNumber?: number;
   getAll?:boolean;
 }
+export class BulkDepartmentAction{
+  bulkactionresult:boolean;
+  hasValidRecords:boolean;
+  isInProgressRecordsExists:boolean;
+  message:string;
+  names:string[];
+}

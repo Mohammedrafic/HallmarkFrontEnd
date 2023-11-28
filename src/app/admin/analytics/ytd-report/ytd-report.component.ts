@@ -75,7 +75,9 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     LocationIdsYT: '',
     YearYT: '',
     MonthsYT: '',    
-    UserIdYT: ''
+    UserIdYT: '',
+    organizationNameYT: '',
+    reportPulledMessageYT: ''  
 
 
   };
@@ -150,6 +152,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   public defaultOrganizations: number;
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
+  public defaultMonth: (number | undefined)[] = [];
   //public defaultDepartments: (number | undefined)[] = [];
   //public defaultSkillCategories: (number | undefined)[] = [];
   //public defaultOrderTypes: (number | undefined)[] = [];
@@ -163,6 +166,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private isAlive = true;
   private previousOrgId: number = 0;
+  private culture = 'en-US';
 
   public yearList: Year[] = [];
   public monthList: Month[] = [];
@@ -185,9 +189,9 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
+    this.loadYearAndMonth();
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
-      this.loadYearAndMonth();
+      
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
       this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
@@ -199,7 +203,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
           //this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
           //this.defaultSkills = data.masterSkills.map((list) => list.id)
           let currentDate = new Date();
-          this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue(currentDate.getMonth() + 1);
+          this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([currentDate.getMonth() + 1]);
           this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
           if (this.isInitialLoad) {
             setTimeout(() => { this.SearchReport(); }, 3000)
@@ -454,9 +458,12 @@ export class YtdReportComponent implements OnInit, OnDestroy {
       RegionIdsYT: regionIds.length == 0 ? '' : regionIds,
       LocationIdsYT: locationIds.length == 0 ? '' : locationIds,      
       YearYT: year,
-      MonthsYT: month,
-      UserIdYT: this.user?.id
-
+     // MonthsYT: month,
+      MonthsYT: month.length == 0 ? "null" : month.join(","),
+      UserIdYT: this.user?.id,
+       organizationNameYT: this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      reportPulledMessageYT: ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim()
+     // DateRangeYT: (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
     };    
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -513,7 +520,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
         valueId: 'id',
       },
       month: {
-        type: ControlTypes.Dropdown,
+        type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'name',
@@ -522,7 +529,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
       //,
       //searchby: {
       //  type: ControlTypes.Dropdown,
-      //  valueType: ValueType.Id,
+      //  valueType: ValueType.Id
       //  dataSource: [],
       //  valueField: 'name',
       //  valueId: 'id',
@@ -546,7 +553,8 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
     this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Year)?.setValue([]);
-    this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([]);
+   // this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([]);
+    this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([this.defaultMonth]);
    // this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SearchBy)?.setValue([]);
     this.filteredItems = [];
     this.locations = [];

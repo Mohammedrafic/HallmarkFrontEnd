@@ -7,6 +7,10 @@ $grid-box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
 
 body.light,
 body.dark {
+  ejs-grid.no-radius {
+    border-radius: 0!important;
+  }
+
   .e-grid.e-resize-lines {
     .e-headercell .e-rhandler {
       height: 20px !important;
@@ -330,6 +334,12 @@ body.dark {
           display: flex;
           margin-left: 16px;
           align-items: center;
+
+          ejs-dropdownlist {
+            .e-input-group {
+              background-color: transparent !important;
+            }
+          }
 
           #goToPage {
             margin-left: 35px;

@@ -98,15 +98,11 @@ export class GeneralInformation {
 
 export type MSPAssociateOrganizationsAgency = {
   id?: number;
-  organizationPrefix: string;
-  businessUnitType: number;
-  isVMSEnabled: boolean;
-  isIRPEnabled: boolean;
   name: string;
   agencyStatus: number;
-  parentUnitId: number;
-  dbConnectionName: string;
   netSuiteId: string;
+  externalId: string;
+  contactPerson: string;
 };
 
 export type MSPAssociateOrganizationsAgencyPage = PageOfCollections<MSPAssociateOrganizationsAgency>;

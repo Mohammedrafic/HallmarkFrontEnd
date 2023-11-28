@@ -46,9 +46,9 @@
       [resizeSettings]="resizeSettings"
       [pageSettings]="pageSettings"
       [height]="fullScreenGridHeight"
-      (dataBound)="gridDataBound($event)"
+      (dataBound)="gridDataBound($event, cd)"
       (actionBegin)="actionBegin($event)"
-      class="e-gridwithheader"
+      class="e-gridwithheader no-radius"
     >
       <e-columns>
         <e-column textAlign="Right" width="120">

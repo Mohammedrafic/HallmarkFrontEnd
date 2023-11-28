@@ -38,6 +38,7 @@ import {
   UserX,
   X,
   XCircle,
+  PauseCircle,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -122,6 +123,8 @@ import { ImportEmployeeComponent } from './candidates/import-employee/import-emp
 import { DocumentUploaderModule } from '@shared/components/document-uploader/document-uploader.module';
 import { OrderHistoryDetailsComponent } from './order-management/components/order-history-details/order-history-details.component';
 import { OrderGridSystemStateService } from './order-management/containers/irp-container/services/order-grid-system-state.service';
+import{ ShiftsService } from '@organization-management/shifts/shifts.service'
+import { LocalDateTimePipeModule } from '@shared/pipes/local-date-time/bool-values-pipe.module';
 const gridIcons = {
   MessageSquare,
   Lock,
@@ -157,6 +160,7 @@ const gridIcons = {
   Mail,
   Compass,
   ArrowUp,
+  PauseCircle,
 };
 
 @NgModule({
@@ -238,6 +242,7 @@ const gridIcons = {
     OrderManagementIrpRowPositionModule,
     SwitchEditorModule,
     BoolValuePipeModule,
+    LocalDateTimePipeModule,
     OrganizationCandidatesModule,
     OrderManagementSubrowCandidatePositionModule,
     ScrollToTopModule,
@@ -266,7 +271,8 @@ const gridIcons = {
     DoNotReturnFormService,
     PreservedOrderService,
     CreateEditOrderResolver,
-    OrderGridSystemStateService
+    OrderGridSystemStateService,
+    ShiftsService
   ],
 })
 export class ClientModule {}

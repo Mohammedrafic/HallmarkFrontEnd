@@ -322,7 +322,7 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
     const user = this.store.selectSnapshot(UserState.user);
-    const title =user?.businessUnitType==BusinessUnitType.Agency? "Candidate Home State": "Applicant’s Home State";
+    const title =user?.businessUnitType==BusinessUnitType.Agency? "Candidates Home State": "Applicant’s Home State";
     const description = "";    
     return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description,totalCandidates:totalcandidatesWithState+(unknownStateCandidates ||0) };
   }
@@ -647,7 +647,11 @@ export class DashboardService {
   private getAvergaeDayActivecandidateStatusWidgetData(filter: DashboartFilterDto): Observable<any> {
     return this.httpClient.post<AveragedayActivecandidateInfo[]>(`${this.baseUrl}/GetAverageDaysforActiveCandidatesInStatus`, { ...filter }).pipe(
       map((candidatesInfo: AveragedayActivecandidateInfo[]) => {
-         this.candidatesavgForActivePositions$.next(candidatesInfo);
+        const desiredOrder = ["Applied", "Shortlisted", "Interview", "Others", "Offered", "Accepted", "Onboard"];
+        const sortedArray = candidatesInfo.sort((a, b) => {
+        return desiredOrder.indexOf(a.status) - desiredOrder.indexOf(b.status);
+        });
+         this.candidatesavgForActivePositions$.next(sortedArray);
         return {
           id: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS,
            title: 'Average Days for Active Candidates in a Status',

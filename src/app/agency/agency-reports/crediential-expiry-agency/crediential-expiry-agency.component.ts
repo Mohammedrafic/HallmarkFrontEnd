@@ -431,7 +431,6 @@ export class CredientialExpiryAgencyComponent implements OnInit {
       "OptionalCE":opcredFlag==""?"false":opcredFlag.toString(),
       
     };
-    console.log( this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
