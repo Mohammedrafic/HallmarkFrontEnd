@@ -1151,8 +1151,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         'distributionDelay',
         'distributeToVMS',
         'agencyId',
-        'hourlyRate'
+        'hourlyRate',
+        'billRate'
       ];
+      
       for (const control of formControls) {
         this.jobDistributionForm.get(control)?.disable();
       }
