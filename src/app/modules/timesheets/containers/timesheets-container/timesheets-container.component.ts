@@ -358,7 +358,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         takeUntil(this.componentDestroy())
       )
       .subscribe((res) => {
-        console.log(res)
         const orgId = this.routerState?.["condition"] === "setOrg"
           ? this.routerState?.["orderStatus"]
           : this.getOrganizationIdFromState() || res[0].id;
