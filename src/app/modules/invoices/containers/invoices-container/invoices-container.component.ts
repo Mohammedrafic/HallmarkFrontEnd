@@ -58,6 +58,10 @@ import { FilterService } from '@shared/services/filter.service';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { SecurityState } from 'src/app/security/store/security.state';
+import { Organisation } from '@shared/models/visibility-settings.model';
+import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-invoices-container',
@@ -72,8 +76,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   @ViewChild(RejectReasonInputDialogComponent)
   public rejectReasonInputDialogComponent: RejectReasonInputDialogComponent;
 
-  @Select(InvoicesState.invoicesOrganizations)
-  public readonly organizations$: Observable<DataSourceItem[]>;
+  /*@Select(InvoicesState.invoicesOrganizations)
+  public readonly organizations$: Observable<DataSourceItem[]>;*/
+
+  @Select(SecurityState.organisations)
+  agencyOrganizations$: Observable<Organisation[]>;
 
   @Select(InvoicesState.pendingInvoicesData)
   public readonly pendingInvoicesData$: Observable<Interfaces.PendingInvoicesData>;
@@ -134,7 +141,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public groupInvoicesBy: GroupInvoicesOption;
 
-  public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
+  // public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
+
+  public readonly unitOrganizationsFields: FieldSettingsModel = { text: 'name', value: 'organizationId' };
 
   public readonly bulkActionConfig: BulkActionConfig = {
     approve: true,
@@ -165,7 +174,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public businessUnitId?: number;
   public agencyOrganizationIds:Array<number> = [];
 
-  public organizationsList: DataSourceItem[];
+  public organizationsList: Organisation[];
 
   public navigatedInvoiceId: number | null;
 
@@ -280,6 +289,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public watchAgencyId(): void {
     if (this.isAgency) {
+      const user = this.store.selectSnapshot(UserState.user);      
       this.agencyId$
         .pipe(
           distinctUntilChanged(),
@@ -291,10 +301,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             this.showmsg = true;
             this.store.dispatch(new Invoices.SelectOrganization(0));
           }),
-         switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
-          switchMap(() => this.organizations$),
-          tap((organizations: DataSourceItem[]) => {
+         switchMap(() => this.store.dispatch(new GetOrganizationsStructureAll(user?.id!))),
+          switchMap(() => this.agencyOrganizations$),
+          tap((organizations: Organisation[]) => {
             this.organizationsList = organizations;
+            this.organizationsList.map(ele=>ele.id = ele.organizationId);
             if(organizations.length == 0 && this.showmsg){
               this.store.dispatch(new Invoices.ClearInvoices())
               this.showmsg = false;
@@ -303,7 +314,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
               this.agencyOrganizationIds = [];
             }
           }),
-          map(([firstOrganization]: DataSourceItem[]) => firstOrganization ? firstOrganization.id : 0),
+          map(([firstOrganization]: Organisation[]) => firstOrganization ? firstOrganization.organizationId : 0),
           takeUntil(this.componentDestroy()),
         )
         .subscribe((orgId: number) => {

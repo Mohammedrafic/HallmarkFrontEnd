@@ -47,6 +47,8 @@ import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { SecurityState } from 'src/app/security/store/security.state';
+import { Organisation } from '@shared/models/visibility-settings.model';
 
 @Component({
   selector: 'app-invoices-filters-dialog',
@@ -63,6 +65,9 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
 
   @Select(InvoicesState.organizationStructure)
   public selectedOrgStructure$: Observable<OrganizationStructure | null>;
+
+  @Select(SecurityState.organisations)
+  agencyOrganizations$: Observable<Organisation[]>;
 
   @Select(InvoicesState.invoicesOrganizations)
   public readonly organizations$: Observable<DataSourceItem[]>;
@@ -94,7 +99,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   public skillOptionFields = SkillFilterOptionFields;
   public isAgency = false;
   public filterType: string = 'Contains';
-
+  agencyOrgStructure:Organisation[]=[];
   private regions: OrganizationRegion[] = [];
   public agencyOrganizationIds:Array<number> = [];
   constructor(
@@ -116,12 +121,13 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
 
   ngOnInit(): void {
     this.initFiltersDataSources();
-    this.initFiltersColumns();
+
     this.watchForOrganizationStructure();
     this.watchForControlsValueChanges();
     this.setFormGroupValidators();
     this.startFormGroupWatching();
     this.getAgencyOrgStructure();
+    this.initFiltersColumns();
   }
 
   ngOnChanges(): void {
@@ -135,6 +141,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   clearAllFilters(eventEmmit = true): void {
+    console.log('at clearAllFilters');
     if (this.formGroup.controls['issueDateFrom'] && this.formGroup.controls['issueDateTo']) {
       this.formGroup.reset();
       const today = new Date(new Date().toDateString());
@@ -250,7 +257,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
         this.filterColumns.regionIds.dataSource = this.regions;
         this.initFormConfig();
       }),
-      switchMap(() => this.getOrganizationStructure()),
+      switchMap(() => this.isAgency ? this.agencyOrganizations$ : this.organizationStructure$),
       filter((structure) => !!structure),
       switchMap(() => this.preservedFiltersByPageName$),
       filter((filters) => !!filters),
@@ -259,7 +266,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
       takeUntil(this.componentDestroy())
     )
       .subscribe((filters) => {
-        this.applyPreservedFilters(filters?.state || {});
+        
         if(filters?.state?.agencyOrganizationIds != null){
           this.agencyOrganizationIds = filters?.state?.agencyOrganizationIds;
           if(filters?.state?.agencyOrganizationIds.length > 1){
@@ -272,8 +279,24 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
             this.appliedFiltersAmount.emit(this.filteredItems.length);
           }
           this.initFormConfig();
+          if(this.agencyOrganizationIds){
+            this.regions = this.agencyOrgStructure.find(ele=>ele.organizationId == this.agencyOrganizationIds[0])?.regions ?? [];
+            this.filterColumns.regionIds.dataSource = [...this.regions];
+          }
+          
+          if(filters?.state && filters?.state?.locationIds && filters?.state?.locationIds?.length > 0){
+            const locationDepartments: OrganizationDepartment[] = [];
+            this.filterColumns.locationIds.dataSource.forEach((location: OrganizationLocation) => {
+              locationDepartments.push(...(location?.departments as []));
+            });  
+            this.filterColumns.departmentIds.dataSource = sortByField(locationDepartments, 'name');
+          }
         }
-        this.cdr.detectChanges();
+        console.log('filters?.state',filters?.state);
+        setTimeout(() => {
+          this.applyPreservedFilters(filters?.state || {});
+          this.cdr.detectChanges();
+        },1000);
       });
   }
 
@@ -283,12 +306,31 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
   }
 
   private watchForOrganizationStructure(): void {
-    this.getOrganizationStructure()
-      .pipe(
+    if(this.isAgency){
+      this.agencyOrganizations$.pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((structure: Organisation[]) => {
+        console.log('structure',structure);
+        this.agencyOrgStructure = structure;
+        this.formGroup.reset();
+        this.filteredItems = [];
+        this.appliedFiltersAmount.emit(this.filteredItems.length);
+        /*if(this.agencyOrganizationIds){
+          this.regions = structure.find(ele=>ele.organizationId == this.agencyOrganizationIds[0])?.regions ?? [];
+          this.filterColumns.regionIds.dataSource = [...this.regions];
+        }*/
+        this.checkForNavigatedInvoice();
+        this.cdr.markForCheck();
+      });
+    }else{
+      this.organizationStructure$.pipe(
         filter(Boolean),
         takeUntil(this.componentDestroy())
       )
       .subscribe((structure: OrganizationStructure) => {
+        console.log('structure',structure);
         this.formGroup.reset();
         this.filteredItems = [];
         this.appliedFiltersAmount.emit(this.filteredItems.length);
@@ -297,14 +339,15 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
         this.checkForNavigatedInvoice();
         this.cdr.markForCheck();
       });
+    }
   }
 
   private watchForControlsValueChanges(): void {
     this.formGroup.get('regionIds')?.valueChanges
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((val: number[]) => {
-        this.filterColumns.locationIds.dataSource = [];
 
+        console.log('regionIds',val);
         if (val?.length) {
           const regionLocations: OrganizationLocation[] = [];
           const selectedRegions: OrganizationRegion[] = val.map((id) => {
@@ -320,6 +363,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
 
           this.filterColumns.locationIds.dataSource = sortByField(regionLocations, 'name');
         } else {
+          this.filterColumns.locationIds.dataSource = [];
           this.formGroup.get('locationIds')?.setValue([]);
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
         }
@@ -330,7 +374,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
     this.formGroup.get('locationIds')?.valueChanges
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((val: number[]) => {
-        this.filterColumns.departmentIds.dataSource = [];
+
 
         if (val?.length) {
           const locationDepartments: OrganizationDepartment[] = [];
@@ -346,6 +390,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
           this.filterColumns.departmentIds.dataSource = sortByField(locationDepartments, 'name');
         } else {
           this.formGroup.get('departmentIds')?.setValue([]);
+          this.filterColumns.departmentIds.dataSource = [];
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns, this.datePipe);
         }
 

@@ -616,7 +616,7 @@ export class SecurityState {
         payload.forEach(item => {
           item.regions.forEach(region => region.organisationName = item.name);
         });
-        patchState({ organizations: payload });
+        patchState({ organizations: payload.filter(org=>org.regions.length > 0) });
         return payload;
       }),
       catchError((error: HttpErrorResponse) => {
