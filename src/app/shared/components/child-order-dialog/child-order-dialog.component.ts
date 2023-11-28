@@ -757,6 +757,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.selectedTemplate = Template.offerDeployment;
         } else if (allowedOnboardedStatuses.includes(this.candidate.candidateStatus)) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.jobId));
+          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.jobId));
           this.selectedTemplate = Template.onboarded;
         }
       }
