@@ -641,7 +641,6 @@ export class SendGroupEmailComponent
           } else {
             this.store.dispatch(new GetBusinessByUnitType(value));
             this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-              debugger
               // this.businessData = data;
               if (!this.isBusinessFormDisabled && data.length > 0) {
                 if(this.isBusinessUnitTypeAgency == true){
@@ -673,10 +672,8 @@ export class SendGroupEmailComponent
                     }
                   }
                 }
-                
               }
               if (this.userBusinessUnitType === BusinessUnitType.Agency){
-                debugger
                 var defaultAgencies = data.map((list) => list.id);
                 this.businessesControl.setValue(defaultAgencies);
               }
@@ -706,27 +703,35 @@ export class SendGroupEmailComponent
                 this.businessData = businessUnits;
               }
               if(this.businessUnit != undefined) {
-                debugger
                 let businessUnits : (number | undefined)[] = [];
                 businessUnits.push(this.businessUnit)
                 this.groupEmailTemplateForm.controls['businesses'].setValue(this.businessUnit.toString().split(",").map(Number));
               }
             });
-          } else {
+          }
+          else if (this.isOrgUser && value == 3){
+            this.isBusinessUnitTypeAgency = false;
+            this.groupEmailTemplateForm.controls['business'].setValue(this.businessUnit); 
+          }
+          else {
             this.store.dispatch(new GetBusinessByUnitType(value));
             this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-              debugger
               if(this.businessUnit != undefined){
-                // let businessUnits : (number | undefined)[] = [29,31,1760];
-                // businessUnits.push(this.businessUnit)
-                  this.groupEmailTemplateForm.controls['business'].setValue(this.businessUnit.toString().split(",").map(Number));
+                if(this.businessUnitType == 4){
+                  this.isBusinessUnitTypeAgency = true;
+                  this.groupEmailTemplateForm.controls['businesses'].setValue(this.businessUnit.toString().split(",").map(Number));
+                }
+                else if(this.businessUnitType == 3){
+                  this.isBusinessUnitTypeAgency = false;
+                  this.groupEmailTemplateForm.controls['business'].setValue(this.businessUnit);                }
               }
               
             });
           }
         }
-        if (value == 3)
+        if (value == 3){
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == false);
+        }
         if (value == 4)
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == true);
       }
@@ -735,7 +740,6 @@ export class SendGroupEmailComponent
   private onBusinessesValueChanged(): void {
     this.businessesControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
       if(this.isSend == true){
-
         this.clearFields();
         this.userTypeControl.patchValue(null);
         if(this.isAgencyCandidatesType)
@@ -1195,7 +1199,6 @@ export class SendGroupEmailComponent
   }
 
   private getCandidates(): void {
-    debugger
     this.candidateControl.patchValue([]);
     this.userData = [];
     var agencies =
