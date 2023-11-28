@@ -10,6 +10,7 @@ import { ScheduleGridService } from 'src/app/modules/schedule/components/schedul
 import { DatesRangeType } from '@shared/enums/week-range.enum';
 import { DatesByWeekday, ScheduleExport } from 'src/app/modules/schedule/interface/index';
 import { GlobalWindow } from '@core/tokens';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-base-export',
@@ -42,6 +43,7 @@ export class BaseExportComponent implements OnInit {
               private store: Store,
               private scheduleGridService: ScheduleGridService,
               private scheduleItemsService: ScheduleItemsService,
+              private titleService: Title,
               @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
               private cdr : ChangeDetectorRef) { 
               const scheduleStorage = JSON.parse((this.globalWindow.localStorage.getItem('Schedule_Export') || ''));   
@@ -49,6 +51,7 @@ export class BaseExportComponent implements OnInit {
                 this.getExportDetails(scheduleStorage);
                 this.scheduleFilters = scheduleStorage.scheduleFilters;
               }
+              this.titleService.setTitle('IRP - Einstein II');
   }
 
   public getExportDetails(data: { data: ScheduleInt.ScheduleExport[]; dateRange: ScheduleInt.DateRangeOption[]; activePeriod: DatesRangeType; startDate: Date; endDate : Date}){
@@ -67,6 +70,11 @@ export class BaseExportComponent implements OnInit {
   ngOnInit(): void {
     this.checkOrgPreferences();
     this.getHeaderInfo();
+    
+  }
+
+  ngOnDestroy(): void {
+    this.titleService.setTitle('VMS - Einstein II');
   }
 
   public getHeaderInfo():void {
