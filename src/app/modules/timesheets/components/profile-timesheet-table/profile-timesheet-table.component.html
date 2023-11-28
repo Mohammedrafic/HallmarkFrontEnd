@@ -31,15 +31,24 @@
             [showToolTip]="!hasEditPermissions"
             *ngIf="!actionsDisabled && currentTab !== tableTypes.Expenses && !isTablet"
           >
-            <button
+            <button *ngIf="titleMapper[currentTab] == 'Timesheet'"
               class="add-action spaced"
               cssClass="e-action-button"
               ejs-button
               [disabled]="disableAnyAction || !hasEditPermissions ||disableEditButton"
               (click)="openAddDialog()"
             >
-              <i-feather name="plus" class="icon"></i-feather> <span class="action-text">Add Record</span>
+              <i-feather name="plus" class="icon"></i-feather> <span class="action-text">Add Records</span>
             </button>
+            <button *ngIf="titleMapper[currentTab] == 'Miles'"
+            class="add-action spaced"
+            cssClass="e-action-button"
+            ejs-button
+            [disabled]="!hasEditPermissions"
+            (click)="openAddDialog()"
+          >
+            <i-feather name="plus" class="icon"></i-feather> <span class="action-text">Add Record</span>
+          </button>
           </app-tooltip-container>
 
           <ng-container *ngIf="!actionsDisabled && (recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn)">
