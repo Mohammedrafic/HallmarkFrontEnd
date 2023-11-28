@@ -1,9 +1,9 @@
-import { DatePipe } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DatePipe, formatDate } from '@angular/common';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, delay, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { delay, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 
 import { UserPermissions } from '@core/enums';
 import { CustomFormGroup, Permission } from '@core/interface';
@@ -83,9 +83,9 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   constructor(private store: Store,
               private actions$: Actions,
               private confirmService: ConfirmService,
-              private datePipe: DatePipe,
               private filterService: FilterService,
-              private skillsService: MasterSkillsService) {
+              private skillsService: MasterSkillsService,
+              public cd: ChangeDetectorRef) {
     super();
     this.skillFormGroup = this.skillsService.createMasterSkillsForm();
     this.skillFilterFormGroup = this.skillsService.createMasterSkillsFilterForm();
@@ -119,7 +119,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       skillAbbreviations: this.filters.skillAbbreviations || [],
       skillDescriptions: this.filters.skillDescriptions || [],
     });
-    this.filteredItems = this.filterService.generateChips(this.skillFilterFormGroup, this.filterColumns, this.datePipe);
+    this.filteredItems = this.filterService.generateChips(this.skillFilterFormGroup, this.filterColumns);
     this.filteredItems$.next(this.filteredItems.length);
   }
 
@@ -165,25 +165,25 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     this.clearSelection(this.grid);
   }
 
-  public editSkill(data: any, event: any): void {
+  public editSkill(data: Skill, event: Event): void {
     this.addActiveCssClass(event);
     this.skillFormGroup.setValue({
       id: data.id,
       isDefault: data.isDefault,
       skillAbbr: data.skillAbbr,
-      skillCategoryId: data.skillCategory.id,
+      skillCategoryId: data.skillCategory?.id,
       skillDescription: data.skillDescription,
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public deleteSkill(data: any, event: any): void {
+  public deleteSkill(data: Skill, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
          title: DELETE_RECORD_TITLE,
          okButtonLabel: 'Delete',
-         okButtonClass: 'delete-button'
+         okButtonClass: 'delete-button',
       }).pipe(
         takeUntil(this.unsubscribe$)
       ).subscribe((confirm) => {
@@ -200,7 +200,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       .confirm(CANCEL_CONFIRM_TEXT, {
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(
         filter(confirm => !!confirm),
         takeUntil(this.unsubscribe$)
@@ -266,7 +266,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   private watchForPaging(): void {
     this.pageSubject
     .pipe(
-      debounceTime(1),
+      throttleTime(100),
       takeUntil(this.unsubscribe$),
     ).subscribe((page) => {
       this.currentPage = page;
@@ -291,7 +291,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       filter((value) => value.isDialogShown),
       takeUntil(this.unsubscribe$),
     ).subscribe(() => {
-      this.defaultFileName = 'Skills/Master Skills ' + this.generateDateTime(this.datePipe);
+      this.defaultFileName = 'Skills/Master Skills ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
       this.fileName = this.defaultFileName;
     });
   }
@@ -309,7 +309,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     this.export$.pipe(
       takeUntil(this.unsubscribe$),
     ).subscribe((event: ExportedFileType) => {
-      this.defaultFileName = 'Skills/Master Skills ' + this.generateDateTime(this.datePipe);
+      this.defaultFileName = 'Skills/Master Skills ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
       this.defaultExport(event);
     });
   }

@@ -15,7 +15,7 @@ import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
-import { SetHeaderState, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
+import { SetHeaderState, SetHelpSystem, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
 import { FilterErrorMessage } from '../../constants';
 import * as ScheduleInt from '../../interface';
@@ -26,6 +26,8 @@ import { ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatesRangeType } from '@shared/enums';
 import { GlobalWindow } from '@core/tokens';
+import { any } from 'lodash/fp';
+import { Data, dataBound } from '@syncfusion/ej2-angular-grids';
 
 @Component({
   selector: 'app-schedule-container',
@@ -34,7 +36,6 @@ import { GlobalWindow } from '@core/tokens';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleContainerComponent extends AbstractPermission implements OnInit {
-
   scheduleData: ScheduleInt.ScheduleModelPage | null;
 
   scheduledShift: ScheduledItem | null;
@@ -80,16 +81,17 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     private scheduleFiltersService: ScheduleFiltersService,
     private createScheduleService: CreateScheduleService,
     private settingService: SettingsViewService,
-    private router : Router,
-    @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
+    private router: Router,
+    @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis
   ) {
     super(store);
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
-    if(routerState?.["EmpId"]){
+    if (routerState?.['EmpId']) {
       this.showSingleEmp = true;
-      this.routeData = routerState?.["EmpId"];
+      this.routeData = routerState?.['EmpId'];
     }
     store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'calendar' }));
+    this.store.dispatch(new SetHelpSystem(true));
   }
 
   public override ngOnInit(): void {
@@ -133,38 +135,41 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     }
   }
 
- selectCells(cells: ScheduleInt.ScheduleSelectedSlots, closeBar= true): void {
-   if (this.canNotSelectCells(cells)) {
-     this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
-     return;
-   }
+  selectCells(cells: ScheduleInt.ScheduleSelectedSlots, closeBar = true): void {
+    if (this.canNotSelectCells(cells)) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
+      return;
+    }
 
     this.scheduleSelectedSlots = cells;
 
-   if(cells.dates.length && closeBar) {
-     this.setSideBarSettings(true,false);
-   } else if(!cells.dates.length && !closeBar) {
-     this.setSideBarSettings(true,false);
-   } else {
-     this.setSideBarSettings(false,false);
-   }
+    if (cells.dates.length && closeBar) {
+      this.setSideBarSettings(true, false);
+    } else if (!cells.dates.length && !closeBar) {
+      this.setSideBarSettings(true, false);
+    } else {
+      this.setSideBarSettings(false, false);
+    }
 
     this.cdr.markForCheck();
   }
 
   setSelectedCells(selectedCells: SelectedCells): void {
-    const {cells, sideBarState} = selectedCells;
+    const { cells, sideBarState } = selectedCells;
     this.selectCells(cells, sideBarState);
     this.scheduledShift = null;
   }
 
   editScheduledItem(scheduledItem: ScheduledItem): void {
-    if ((HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) && !this.isEmployee) {
+    if (
+      (HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) &&
+      !this.isEmployee
+    ) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, FilterErrorMessage));
       return;
     }
 
-    this.setSideBarSettings(true,true);
+    this.setSideBarSettings(true, true);
     this.scheduledShift = scheduledItem;
 
     this.cdr.markForCheck();
@@ -202,18 +207,18 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   private availableCandidates(): void {
     this.setDateLimitation();
-    if(this.routeData){
+    if (this.routeData) {
       const selectedCandidates = {
         ...this.routeData,
-        id : this.routeData.employeeId
-      }
+        id: this.routeData.employeeId,
+      };
       this.selectedCandidate = selectedCandidates;
       this.availableEmp = this.selectedCandidate;
       this.getEmployeeOrganizationStructure(this.routeData.employeeId);
-      this.detectWhatDataNeeds();  
+      this.detectWhatDataNeeds();
     }
   }
-  datesRanges(date : ScheduleInt.DateRangeOption[]): void {
+  datesRanges(date: ScheduleInt.DateRangeOption[]): void {
     this.dateRange = date;
   }
 
@@ -222,44 +227,49 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private checkIsScheduleAvailabilityTurn(): void {
-    if(this.scheduleFilters?.locationIds?.length) {
-      this.settingService.getViewSettingKey(
-        OrganizationSettingKeys.ScheduleOnlyWithAvailability,
-        OrganizationalHierarchy.Location,
-        this.scheduleFilters?.locationIds[0],
-      ).pipe(
-        filter(({ScheduleOnlyWithAvailability}) => !!ScheduleOnlyWithAvailability),
-        take(1),
-      ).subscribe(({ScheduleOnlyWithAvailability}) => {
-        this.scheduleOnlyWithAvailability = JSON.parse(ScheduleOnlyWithAvailability);
-        this.cdr.markForCheck();
-      });
+    if (this.scheduleFilters?.locationIds?.length) {
+      this.settingService
+        .getViewSettingKey(
+          OrganizationSettingKeys.ScheduleOnlyWithAvailability,
+          OrganizationalHierarchy.Location,
+          this.scheduleFilters?.locationIds[0],
+          undefined,
+          true
+        )
+        .pipe(
+          filter(({ ScheduleOnlyWithAvailability }) => !!ScheduleOnlyWithAvailability),
+          take(1)
+        )
+        .subscribe(({ ScheduleOnlyWithAvailability }) => {
+          this.scheduleOnlyWithAvailability = JSON.parse(ScheduleOnlyWithAvailability);
+          this.cdr.markForCheck();
+        });
     }
   }
 
   private initScheduleData(isLoadMore = false): void {
-    this.scheduleApiService.getScheduleEmployees(this.scheduleFilters)
-    .pipe(
-      take(1),
-      switchMap((candidates: ScheduleInt.ScheduleCandidatesPage) =>
-        this.getSchedulesByEmployeesIds(candidates)
-      ),
-      takeUntil(this.componentDestroy()),
-    ).subscribe((scheduleData: ScheduleInt.ScheduleModelPage) => {
-      if (isLoadMore) {
-        this.scheduleData = {
-          ...scheduleData,
-          items: [...(this.scheduleData?.items || []), ...scheduleData.items],
-        };
-      } else {
-        this.scheduleData = scheduleData;
-      }
+    this.scheduleApiService
+      .getScheduleEmployees(this.scheduleFilters)
+      .pipe(
+        take(1),
+        switchMap((candidates: ScheduleInt.ScheduleCandidatesPage) => this.getSchedulesByEmployeesIds(candidates)),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((scheduleData: ScheduleInt.ScheduleModelPage) => {
+        if (isLoadMore) {
+          this.scheduleData = {
+            ...scheduleData,
+            items: [...(this.scheduleData?.items || []), ...scheduleData.items],
+          };
+        } else {
+          this.scheduleData = scheduleData;
+        }
 
-      this.updateScheduledShift();
-      this.totalCount = scheduleData.totalCount;
-      this.availableCandidates();
-      this.cdr.detectChanges();
-    });
+        this.updateScheduledShift();
+        this.totalCount = scheduleData.totalCount;
+        this.availableCandidates();
+        this.cdr.detectChanges();
+      });
   }
 
   private initSelectedCandidateScheduleData(): void {
@@ -268,12 +278,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       totalCount: 1,
     } as ScheduleInt.ScheduleCandidatesPage;
 
-    this.getSchedulesByEmployeesIds(candidatesPage)
-      .subscribe((scheduleData: ScheduleInt.ScheduleModelPage) => {
-        this.scheduleData = scheduleData;
-        this.totalCount = scheduleData.totalCount;
-        this.updateScheduledShift();
-        this.cdr.detectChanges();
+    this.getSchedulesByEmployeesIds(candidatesPage).subscribe((scheduleData: ScheduleInt.ScheduleModelPage) => {
+      this.scheduleData = scheduleData;
+      this.totalCount = scheduleData.totalCount;
+      this.updateScheduledShift();
+      this.cdr.detectChanges();
     });
   }
 
@@ -291,67 +300,76 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private watchForCloseSideBarAction(): void {
-    this.createScheduleService.closeSideBarEvent.pipe(
-      takeUntil(this.componentDestroy()),
-    ).subscribe((value: boolean) => {
-      if(value) {
-        this.selectCells({
-          candidates: [],
-          dates: [],
-        });
-        this.setSideBarSettings(false,false);
-      } else {
-        this.setDateLimitation();
-        this.detectWhatDataNeeds();
-        this.selectCells({
-          candidates: [],
-          dates: [],
-        }, false);
-      }
+    this.createScheduleService.closeSideBarEvent
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((value: boolean) => {
+        if (value) {
+          this.selectCells({
+            candidates: [],
+            dates: [],
+          });
+          this.setSideBarSettings(false, false);
+        } else {
+          this.setDateLimitation();
+          this.detectWhatDataNeeds();
+          this.selectCells(
+            {
+              candidates: [],
+              dates: [],
+            },
+            false
+          );
+        }
 
-      this.scheduledShift = null;
-    });
+        this.scheduledShift = null;
+      });
   }
 
   private getSchedulesByEmployeesIds(
-    candidates: ScheduleInt.ScheduleCandidatesPage,
+    candidates: ScheduleInt.ScheduleCandidatesPage
   ): Observable<ScheduleInt.ScheduleModelPage> {
     this.candidateDetails = candidates;
-    return this.scheduleApiService.getSchedulesByEmployeesIds(
-      candidates.items.map(candidate => candidate.id),
-      GetScheduleFilterByEmployees(this.scheduleFilters),
-    ).pipe(
-      take(1),
-      map((candidateSchedules: ScheduleInt.CandidateSchedules[]): ScheduleInt.ScheduleModelPage =>
-        ScheduleGridAdapter.combineCandidateData(candidates, candidateSchedules)
-      ),
-      takeUntil(this.componentDestroy()),
-    );
+    return this.scheduleApiService
+      .getSchedulesByEmployeesIds(
+        candidates.items.map((candidate) => candidate.id),
+        GetScheduleFilterByEmployees(this.scheduleFilters)
+      )
+      .pipe(
+        take(1),
+        map(
+          (candidateSchedules: ScheduleInt.CandidateSchedules[]): ScheduleInt.ScheduleModelPage =>
+            ScheduleGridAdapter.combineCandidateData(candidates, candidateSchedules)
+        ),
+        takeUntil(this.componentDestroy())
+      );
   }
 
   private setDateLimitation(): void {
     if (this.scheduleFilters.startDate && this.scheduleFilters.endDate) {
       this.datePickerLimitations = {
         minDate: DateTimeHelper.setInitDateHours(new Date(this.scheduleFilters.startDate)),
-        maxDate: DateTimeHelper.setInitDateHours(new  Date(this.scheduleFilters.endDate)),
+        maxDate: DateTimeHelper.setInitDateHours(new Date(this.scheduleFilters.endDate)),
       };
     }
   }
 
   private detectIsRequiredFiltersExist(): boolean {
-    return !!this.selectedCandidate
-      || !!this.scheduleFilters.firstLastNameOrId
-      || !!this.scheduleFilters.regionIds?.length
-      || !!this.scheduleFilters.locationIds?.length;
+    return (
+      !!this.selectedCandidate ||
+      !!this.scheduleFilters.firstLastNameOrId ||
+      !!this.scheduleFilters.regionIds?.length ||
+      !!this.scheduleFilters.locationIds?.length
+    );
   }
 
   private watchForPermissions(): void {
     this.getPermissionStream()
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((permissions: Permission) => {
-        this.hasSchedulePermission = permissions[this.userPermissions.CanAddAvailability]
-          || permissions[this.userPermissions.CanAddUnavailability]
-          || permissions[this.userPermissions.CanAddShift];
+        this.hasSchedulePermission =
+          permissions[this.userPermissions.CanAddAvailability] ||
+          permissions[this.userPermissions.CanAddUnavailability] ||
+          permissions[this.userPermissions.CanAddShift];
         this.hasViewPermission = permissions[this.userPermissions.CanViewSchedule] || this.hasSchedulePermission;
       });
   }
@@ -378,7 +396,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private getEmployeeOrganizationStructure(employeeId: number): void {
-    this.scheduleApiService.getEmployeesStructure(employeeId)
+    this.scheduleApiService
+      .getEmployeesStructure(employeeId)
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((employeeOrganizationStructure: OrganizationStructure) => {
         this.scheduleFiltersService.setEmployeeOrganizationStructure(employeeOrganizationStructure);
@@ -386,53 +405,61 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   private canNotSelectCells(cells: ScheduleInt.ScheduleSelectedSlots): boolean {
-    const filterError = ((HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters))
-      && !!cells.dates.length);
+    const filterError =
+      (HasMultipleFilters(this.scheduleFilters) || HasNotMandatoryFilters(this.scheduleFilters)) &&
+      !!cells.dates.length;
 
     return !this.isEmployee && !!filterError;
   }
 
-  activePeriod(activePeriod: DatesRangeType) : void {
+  activePeriod(activePeriod: DatesRangeType): void {
     this.activeTimePeriod = activePeriod;
   }
 
-  public exportTable(){
-    this.scheduleApiService.exportSchedule(
-      this.candidateDetails.items.map(candidate => candidate.id),
-      GetScheduleFilterByEmployees(this.scheduleFilters),
-    ).pipe(
-      takeUntil(this.componentDestroy()),
-    ).subscribe((data) => {
-      this.sortData(data);
-      const state = { 
-        data : data, 
-        dateRange : this.dateRange, 
-        scheduleFilters : this.chipsData, 
-        activePeriod : this.activeTimePeriod, 
-        startDate : this.scheduleFilters.startDate,
-        endDate : this.scheduleFilters.endDate
-      };
-      this.globalWindow.localStorage.setItem('Schedule_Export',JSON.stringify(state));
-      if(window.location.pathname.includes("ui")){
-        window.open(window.location.origin + '/ui/schedule-export', '_blank');
-      } else {
-        window.open(window.location.origin + '/schedule-export', '_blank');
-      }
-    });
+  public exportTable() {
+    this.scheduleFilters.pageSize = this.totalCount;
+    this.scheduleApiService
+      .getScheduleEmployees(this.scheduleFilters)
+      .subscribe((scheduleData: ScheduleInt.ScheduleCandidatesPage) => {
+        this.scheduleFilters.pageSize = this.totalCount;
+        this.scheduleApiService
+          .exportSchedule(
+            scheduleData.items.map((c) => c.id),
+            GetScheduleFilterByEmployees(this.scheduleFilters)
+          )
+          .pipe(takeUntil(this.componentDestroy()))
+          .subscribe((exportData) => {
+            this.sortData(exportData);
+            const state = {
+              data: exportData,
+              dateRange: this.dateRange,
+              scheduleFilters: this.chipsData,
+              activePeriod: this.activeTimePeriod,
+              startDate: this.scheduleFilters.startDate,
+              endDate: this.scheduleFilters.endDate,
+            };
+            this.globalWindow.localStorage.setItem('Schedule_Export', JSON.stringify(state));
+            if (window.location.pathname.includes('ui')) {
+              window.open(window.location.origin + '/ui/schedule-export', '_blank');
+            } else {
+              window.open(window.location.origin + '/schedule-export', '_blank');
+            }
+          });
+      });
   }
 
   public sortData(data: ScheduleExport[]) {
-    data.sort((Emp1: { lastName: string; } , Emp2: { lastName: string; } ) => {
-        const nameA = Emp1.lastName.toLowerCase();
-        const nameB = Emp2.lastName.toLowerCase();
-      
-        if (nameA < nameB) {
-          return -1;
-        } else if (nameA > nameB) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
+    data.sort((Emp1: { lastName: string }, Emp2: { lastName: string }) => {
+      const nameA = Emp1.lastName.toLowerCase();
+      const nameB = Emp2.lastName.toLowerCase();
+
+      if (nameA < nameB) {
+        return -1;
+      } else if (nameA > nameB) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
   }
 }

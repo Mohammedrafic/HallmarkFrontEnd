@@ -20,13 +20,13 @@ import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { analyticsConstants } from '../constants/analytics.constant';
+import { analyticsConstants, Period } from '../constants/analytics.constant';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto, OrderTypeOptionsForReport } from '../models/common-report.model';
 import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
-import { uniqBy } from 'lodash';
+import { toNumber, uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
@@ -60,7 +60,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     "reportPulledMessageCJR": "",
     "DateRangeCJR": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.wls" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.cat" };
   public message: string = "";
   public title: string = "Candidate Journey";
@@ -141,11 +141,14 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
   private fixedJobStatusesIncluded: number[] = [3, 4, 7, 8];
   private fixedCandidateStatusesIncluded: number[] = [1, 2, 3, 4, 5, 7, 10, 11, 12, 13];
   private orderTypesList = OrderTypeOptionsForReport.filter(i => i.id != 1);
+  periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
 
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-  
+  public periodList: Period[] = [];
+  public periodIsDefault: boolean = false;
+
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   filterOptionsData: CommonReportFilterOptions;
@@ -168,8 +171,10 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.loadperiod();
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
+
       //this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
@@ -186,7 +191,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       this.onFilterLocationChangedHandler();
       this.onFilterSkillCategoryChangedHandler();
 
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || BusinessUnitType.MSP ? this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
@@ -206,7 +211,8 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
         orderTypes: new FormControl([]),
         jobStatuses: new FormControl([]),
         candidateStatuses: new FormControl([]),
-        jobId: new FormControl(null)
+        jobId: new FormControl(null),
+        period: new FormControl(null)
       }
     );
   }
@@ -217,6 +223,23 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
   }
 
 
+  selectPeriod() {
+    this.periodIsDefault = this.candidateJourneyForm.controls['period'].value == "Custom" ? true : false;
+  }
+  private loadperiod(): void {
+    this.periodList = [];
+    this.periodList.push({ id: 0, name: 'Custom' });
+    this.periodList.push({ id: 1, name: 'Last 30 days' });
+    this.periodList.push({ id: 2, name: 'Last 60 days' });
+    this.periodList.push({ id: 3, name: 'Last 90 days' });
+    this.periodList.push({ id: 4, name: 'MTD' });
+    this.periodList.push({ id: 5, name: 'Last Quarter' });
+    this.periodList.push({ id: 6, name: 'YTD' });
+    this.periodList.push({ id: 7, name: 'Last 6 Month' });
+    this.periodList.push({ id: 8, name: 'Last 12 Months' });
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
+  }
+
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
@@ -225,50 +248,60 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
-        this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
         this.changeDetectorRef.detectChanges();
       }
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.candidateJourneyForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
-      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      this.selectedOrganizations = [];
+      //if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      if (data && data.length > 0) {
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
-          let orgList = this.organizations?.filter((x) => data == x.organizationId);
-          this.selectedOrganizations = orgList;
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
           let departmentsList: Department[] = [];
+          this.selectedOrganizations = data;
+          if (data.length == 1) {
+            let orgList = this.organizations?.filter((x) => data[0] == x.organizationId);
+            orgList.forEach((value) => {
+              regionsList.push(...value.regions);
+              locationsList = regionsList.map(obj => {
+                return obj.locations.filter(location => location.regionId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+              departmentsList = locationsList.map(obj => {
+                return obj.departments.filter(department => department.locationId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+            });
 
-          orgList.forEach((value) => {
-            regionsList.push(...value.regions);
-            locationsList = regionsList.map(obj => {
-              return obj.locations.filter(location => location.regionId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-            departmentsList = locationsList.map(obj => {
-              return obj.departments.filter(department => department.locationId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-          });
-
-          this.regionsList = sortByField(regionsList, "name");
-          this.locationsList = sortByField(locationsList, 'name');
-          this.departmentsList = sortByField(departmentsList, 'name');
+            //this.regionsList = sortByField(regionsList, "name");
+            //this.locationsList = sortByField(locationsList, 'name');
+            //this.departmentsList = sortByField(departmentsList, 'name');
+          }
+          this.regionsList = regionsList.length > 0 ? sortByField(regionsList, "name") : [];
+          this.locationsList = locationsList.length > 0 ? sortByField(locationsList, 'name') : [];
+          this.departmentsList = departmentsList.length > 0 ? sortByField(departmentsList, 'name') : [];
 
           this.masterRegionsList = this.regionsList;
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
-
-          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-          }
-          else {
-            this.isResetFilter = true;
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          if (this.bussinessControl?.value.length == "1") {
+            if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+              this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+            }
+            else {
+              this.isResetFilter = true;
+            }
           }
           let businessIdData = [];
-          businessIdData.push(data);
+          //businessIdData.push(data);
+          businessIdData = data;
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
@@ -284,11 +317,10 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
               this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
               this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons.filter(i => this.fixedJobStatusesIncluded.includes(i.status));
               this.defaultOrderTypes = this.orderTypesList.map((list) => list.id);
-               this.SearchReport();
+              this.SearchReport();
             }
           });
-          this.regions = this.regionsList;
-          this.filterColumns.regionIds.dataSource = this.regions;
+
         }
         else {
           this.isClearAll = false;
@@ -384,7 +416,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       }
     }
     let { businessIds, candidateStatuses, departmentIds, jobId,
-      jobStatuses, locationIds, orderTypes, regionIds, skillCategoryIds, skillIds, startDate, endDate }
+      jobStatuses, locationIds, orderTypes, regionIds, skillCategoryIds, skillIds, startDate, endDate, period }
       = this.candidateJourneyForm.getRawValue();
     if (!this.candidateJourneyForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 30 days";
@@ -407,7 +439,8 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
 
     this.paramsData =
     {
-      "OrganizationParamCJR": this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
+      "OrganizationParamCJR": this.selectedOrganizations?.length == 0 ? "null" :
+        this.selectedOrganizations?.join(","),
       "StartDateParamCJR": formatDate(startDate, this.dateFormat, this.culture),
       "EndDateParamCJR": endDate == null ? "01/01/0001" : formatDate(endDate, this.dateFormat, this.culture),
       "RegionParamCJR": regionIds.length == 0 ? "null" : regionIds,
@@ -425,10 +458,13 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "TodayCJR": formatDate(new Date(), this.dateFormat, this.culture),
-      "organizationNameCREXP": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
-      "reportPulledMessageCREXP": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
-      "DateRangeCREXP": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+      "TodayParamCJR": formatDate(new Date(), this.dateFormat, this.culture),
+      "organizationNameParamCJR": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
+      "reportPulledMessageParamCJR": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeParamCJR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "PeriodParamCJR": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
+      "UserIdParamCJR": this.user?.id
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -536,6 +572,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 30);
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
@@ -547,6 +584,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

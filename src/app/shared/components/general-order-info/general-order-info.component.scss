@@ -132,6 +132,7 @@ section {
   .container-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
 
     &.justify-content-normal {
       .column {
@@ -163,7 +164,6 @@ section {
       flex-wrap: wrap;
 
       .column {
-        min-width: calc(100% / 3);
         margin-bottom: 20px;
       }
     }

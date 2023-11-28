@@ -119,6 +119,7 @@ import { SettingsViewService } from '@shared/services';
 import { UserPermissions } from '@core/enums';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 enum Template {
   accept,
@@ -143,7 +144,21 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
   @Input() candidateirp: IRPOrderPosition;
-  @Input() activeSystem: OrderManagementIRPSystemId;
+  private _activeSystem: any;
+  activeSystems: OrderManagementIRPSystemId | null;
+  public get activeSystem() {
+    return this._activeSystem;
+  }
+ 
+  @Input() public set activeSystem(val: any) {
+    this._activeSystem = val;
+    if(this._activeSystem === OrderManagementIRPSystemId.IRP){
+      this.subscribeOnCandidates();
+    } else {
+      this.subscribeOnCandidateJob();
+    }
+  }
+
   @Input() orderComments: Comment[] = [];
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild, string] | null>;
   @Output() saveEmitter = new EventEmitter<void>();
@@ -324,12 +339,14 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     private changeDetectorRef: ChangeDetectorRef,
     private childOrderDialogService: ChildOrderDialogService,
     private settingService: SettingsViewService,
+    private orderManagementService : OrderManagementService
   ) {
     super(store);
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
@@ -343,7 +360,11 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.extensions = extensions.filter((extension: Order) => extension.id !== this.order?.id);
         this.isLastExtension = !this.extensions.map((ex) => ex.extensionFromId).includes(this.order?.id);
       });
-    this.subscribeOnCandidateJob();
+      if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+        this.subscribeOnCandidates();
+      } else {
+        this.subscribeOnCandidateJob();
+      }
     this.onOpenEvent();
     this.subscribeOnSelectedOrder();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
@@ -813,9 +834,19 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
   }
 
+  private subscribeOnCandidates(): void {
+    this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
+      if(irpCandidates){
+        irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+        this.setCloseOrderButtonStateforIRP();
+        this.getExtensionsforIRP();
+        this.getCommentsforIRP();
+      }
+    });
+  }
+
   private subscribeOnCandidateJob(): void {
     if (this.isOrganization) {
-      if(this.activeSystem === OrderManagementIRPSystemId.VMS){
         this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
           this.candidateJob = orderCandidateJob;
           if (orderCandidateJob) {
@@ -825,17 +856,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           }
           this.changeDetectorRef.detectChanges();
         });  
-      } else {
-        this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
-          if(irpCandidates){
-            irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
-            this.setCloseOrderButtonStateforIRP();
-            this.getExtensionsforIRP();
-            this.getCommentsforIRP();
-          }
-        });
       }
-    }
     if (this.isAgency) {
       this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
         this.candidateJob = orderCandidateJob;

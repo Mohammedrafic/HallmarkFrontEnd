@@ -9,6 +9,7 @@ import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
+import { RejectReasonService } from '@shared/services/reject-reason.service';
 
 import {
   ClearAssignedSkillsByOrganization,
@@ -143,8 +144,7 @@ import {
   BulkUpdateDepartmentsucceeded,
   BulkUpdateDepartmentFailed,
   BulkUpdateDepartment,
-
-
+  GetRejectReasons
 } from './organization-management.actions';
 import { BulkDepartmentAction, Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter, regionsPage } from '@shared/models/region.model';
@@ -204,6 +204,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import { ImportedBillRate } from '@shared/models';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
 
 interface DropdownOption {
   id: number;
@@ -260,6 +261,7 @@ export interface OrganizationManagementStateModel {
   filteringAssignedSkillsByOrganization: ListOfSkills[];
   credentialSettingPage: CredentialPage | null;
   bulkupdateskills:BulkUpdateAssignedSkill[] | null;
+  rejectionReasonsList: RejectReason[] | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -319,7 +321,8 @@ export interface OrganizationManagementStateModel {
     assignedSkillsByOrganization: [],
     filteringAssignedSkillsByOrganization: [],
     credentialSettingPage: null,
-    bulkupdateskills:null
+    bulkupdateskills:null,
+    rejectionReasonsList: null
   },
 })
 @Injectable()
@@ -521,6 +524,11 @@ export class OrganizationManagementState {
   static locationTypes(state: OrganizationManagementStateModel): LocationType[] | null {
     return state.loctionTypes;
   }
+  
+  @Selector()
+  static rejectionReasonsList(state: OrganizationManagementStateModel): RejectReason[] | null {
+    return state.rejectionReasonsList;
+  }
 
   constructor(
     private organizationService: OrganizationService,
@@ -533,7 +541,8 @@ export class OrganizationManagementState {
     private skillGroupService: SkillGroupService,
     private organizationSettingsService: OrganizationSettingsService,
     private nodatimeService: NodatimeService,
-    private billRatesService: BillRatesService
+    private billRatesService: BillRatesService,
+    private rejectReasonService:RejectReasonService
   ) {}
 
   @Action(SetGeneralStatesByCountry)
@@ -711,7 +720,10 @@ export class OrganizationManagementState {
     return this.departmentService.deleteDepartmentById(department.departmentId).pipe(
       tap((payload) => {
         patchState({ isDepartmentLoading: false });
-        dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
+        dispatch([
+          new GetDepartmentsByLocationId(department.locationId, filters),
+          new ShowToast(MessageTypes.Success, RECORD_DELETE),
+        ]);
         return payload;
       }),
       catchError((error: any) => {
@@ -872,7 +884,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Locations));
+
               dispatch(new BulkUpdateAssignedLocationucceeded(payload));
             }
             else{
@@ -902,7 +914,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Locations));
+            
               dispatch(new BulkDeleteLocationucceeded(payload));
             }
             else{
@@ -932,7 +944,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Department));
+           
               dispatch(new BulkUpdateDepartmentsucceeded(payload));
             }
             else{
@@ -962,7 +974,7 @@ export class OrganizationManagementState {
       tap((payload) => {
         if(payload){
             if(payload.bulkactionresult){
-              dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Department));
+            
               dispatch(new BulkDeleteDepartmentsucceeded(payload));
             }
             else{
@@ -1965,6 +1977,18 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Regions were not imported'))))
+    );
+  }
+  @Action(GetRejectReasons)
+  GetRejectReasonsForOrganisation(
+    { patchState}: StateContext<OrganizationManagementStateModel>,
+    { systemType }: GetRejectReasons
+    ): Observable<RejectReasonPage> {
+    return this.rejectReasonService.getAllRejectReasons(systemType).pipe(
+      tap((reasons) => {
+        patchState({ rejectionReasonsList: reasons.items });
+        return reasons;
+      })
     );
   }
 }

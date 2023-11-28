@@ -61,6 +61,8 @@ import { HeaderState } from '@shared/models/header-state.model';
 import { HelpNavigationService } from '@shared/services';
 import { IsMspAreaStateModel } from '@shared/models/is-msp-area-state.model';
 import { DomainLinks } from '@shared/models/help-site-url.model';
+import { GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import { GetOrganizationById } from '@admin/store/admin.actions';
 
 @Component({
   selector: 'app-shell',
@@ -247,6 +249,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
           }
 
         });
+    this.getOrganization();
   }
 
   ngAfterViewInit(): void {
@@ -841,5 +844,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   private navigateToEmployeeProfile(): void {
     this.router.navigate(['employee/profile/information']);
+  }
+
+  private getOrganization(): void {
+    const id = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+    this.store.dispatch(new GetOrganizationById(id));
   }
 }

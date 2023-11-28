@@ -49,13 +49,13 @@
     [enableVirtualization]="false"
     (rowSelected)="rowSelected($event, grid)"
     (rowDeselected)="rowDeselected($event, grid)"
-    (dataBound)="gridDataBound(grid)"
+    (dataBound)="gridDataBound(grid, cd)"
     (actionBegin)="actionBegin($event)"
     [selectionSettings]="selectionSettings"
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      <e-column textAlign="Right" width="120">
+      <e-column textAlign="Right" width="80">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]=!isLoaded>
             <button ejs-button [disabled]="!userPermission[userPermissions.CanEditMasterHolidays]" cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">

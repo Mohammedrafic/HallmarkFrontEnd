@@ -199,11 +199,13 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   }
 
   private getBillRate(billRates: BillRate[], startDate?: Date): BillRate | null {
-    const isLocal = this.candidateJob.isLocal;
-    const billRate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
-      billRates, startDate, isLocal
+    const regularRate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+      billRates, startDate, false
     );
-    return billRate;
+    const regularLocalRate = this.billRatesSyncService.getBillRateForSync(
+      billRates, startDate, true
+    );
+    return regularRate ?? regularLocalRate;
   }
 
   private subsToBillRateControlChange(): void {

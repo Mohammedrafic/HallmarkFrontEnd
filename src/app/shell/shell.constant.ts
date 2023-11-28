@@ -65,64 +65,121 @@ export const AllBusinessTypeRoles: BusinessUnitType[] = [
 ];
 
 export const HelpDomain: Record<keyof BusinessUnitType | string, string> = {
-  [BusinessUnitType.Agency]: 'https://eiiahelp.einsteinii.org/Topics_Agency/',
+  [BusinessUnitType.Agency]: 'https://eiiahelp.einsteinii.org',
   agencyFallbackUrl: 'https://eiiahelp.einsteinii.org',
 };
 
-export const HelpNavigationLinks = (isAgency: boolean) => {
-  if (!isAgency) {
+// eslint-disable-next-line max-lines-per-function
+export const HelpNavigationLinks = (
+  isAgency: boolean,
+  isIrp: boolean,
+  isVms: boolean,
+  isIrpHelp: boolean
+): Record<string, string | Record<string, string>> => {
+  if (!isAgency && isIrp && !isVms) {
+    return {
+      'dashboard': 'Topics_IRP/Getting_Started_IRP.html',
+      'candidates': 'Topics_IRP/Employees.html',
+      'add': {
+        'candidates': 'Topics_IRP/Employees.html',
+        'order-management': 'Topics_IRP/Create_order.html',
+      },
+      'edit': {
+        'candidates': 'Topics_IRP/Employees.html',
+        'order-management': 'Topics_IRP/Order_Management_IRP.html',
+      },
+      'scheduling': 'Topics_IRP/Scheduling.html',
+      'order-management': 'Topics_IRP/Order_Management_IRP.html',
+      'analytics': 'Topics_IRP/Analytics.html',
+      'security': 'Topics_IRP/Administration_IRP.html',
+      'user-list': 'Topics_IRP/User_List_IRP.html',
+      'alerts': 'Topics_IRP/Communication.html',
+      'group-email': 'Topics_IRP/Group_Email_IRP.html',
+      'profile': 'Topics_IRP/Organization_Profile_IRP.html',
+    };
+  }
+
+  if (!isAgency && !isIrp && isVms) {
     return ({
-      irpLinks: {
-    
+      'dashboard': '/Topics_Org/Dashboard.html',
+      'order-management': '/Topics_Org/Order_management.html',
+      'add': {
+        'order-management': '/Topics_Org/Create_order.html',
       },
-      vmsLinks: {
-        'dashboard': 'Dashboard.html',
-        'order-management': 'Order_management.html',
-        'add': {
-          'order-management': 'Create_order.html',
-        },
-        'edit': {
-          'order-management': 'Create_order.html',
-          'candidates': 'Candidate_assignment.html',
-        },
-        'candidate-details': 'Candidate_assignment.html',
-        'candidates': 'Candidate_assignment.html',
-        'associate-list': 'Associated_agencies.html',
-        'timesheets': 'Timesheets.html',
-        'invoices': 'Invoices.html',
-        'user-list': 'User_List.html',
-        'security': 'Administration.html',
-        'group-email': 'Group_Email.html',
-        'profile': 'Organization_Profile.html',
-        'document-library': 'Document_Library.html',
-        'analytics': 'Analytics.html',
+      'edit': {
+        'order-management': '/Topics_Org/Create_order.html',
+        'candidates': '/Topics_Org/Candidate_assignment.html',
       },
+      'candidate-details': '/Topics_Org/Candidate_assignment.html',
+      'candidates': '/Topics_Org/Candidate_assignment.html',
+      'associate-list': '/Topics_Org/Associated_agencies.html',
+      'timesheets': '/Topics_Org/Timesheets.html',
+      'invoices': '/Topics_Org/Invoices.html',
+      'user-list': '/Topics_Org/User_List.html',
+      'security': '/Topics_Org/Administration.html',
+      'group-email': '/Topics_Org/Group_Email.html',
+      'profile': '/Topics_Org/Organization_Profile.html',
+      'document-library': '/Topics_Org/Document_Library.html',
+      'analytics': '/Topics_Org/Analytics.html',
+      'alerts': 'Topics_Org/Communication.html',
     });
   }
 
-  return ({
-    irpLinks: {
-  
-    },
-    vmsLinks: {
-      'dashboard': 'Dashboard.html',
-      'order-management': 'Order_management.html',
+  if (!isAgency && isIrp && isVms) {
+    if (isIrpHelp) {
+      return ({
+        'candidates': 'Topics_IRP/Employees.html',
+        'add': {
+          'candidates': 'Topics_IRP/Employees.html',
+          'order-management': 'Topics_IRP/Create_order.html',
+        },
+        'edit': {
+          'candidates': 'Topics_IRP/Employees.html',
+          'order-management': 'Topics_IRP/Order_Management_IRP.html',
+        },
+        'scheduling': 'Topics_IRP/Scheduling.html',
+        'order-management': 'Topics_IRP/Order_Management_IRP.html',
+      });
+    }
+
+    return ({
+      'order-management': '/Topics_Org/Order_management.html',
       'add': {
-        'candidates': 'Add_Candidate.html',
+        'order-management': '/Topics_Org/Create_order.html',
       },
       'edit': {
-        'order-management': 'Create_order.html',
-        'candidates': 'Candidate_assignment.html',
-        'agency-list': 'Profile.html',
+        'order-management': '/Topics_Org/Create_order.html',
+        'candidates': '/Topics_Org/Candidate_assignment.html',
       },
-      'candidate-details': 'Candidate_assignment.html',
-      'candidates': 'Candidates.html',
-      'associate-list': 'Associated_Organizations.html',
-      'timesheets': 'Timesheets.html',
-      'invoices': 'Invoices.html',
-      'user-list': 'User_List.html',
-      'document-library': 'Document_Library.html',
+      'candidate-details': '/Topics_Org/Candidate_assignment.html',
+      'associate-list': '/Topics_Org/Associated_agencies.html',
+      'timesheets': '/Topics_Org/Timesheets.html',
+      'invoices': '/Topics_Org/Invoices.html',
+    });
+  }
+
+  if (!isAgency && !isIrp && !isVms) {
+    return ({});
+  }
+
+  return ({
+    'dashboard': '/Topics_Agency/Dashboard.html',
+    'order-management': '/Topics_Agency/Order_management.html',
+    'add': {
+      'candidates': '/Topics_Agency/Add_Candidate.html',
     },
+    'edit': {
+      'order-management': '/Topics_Agency/Create_order.html',
+      'candidates': '/Topics_Agency/Candidate_assignment.html',
+      'agency-list': '/Topics_Agency/Profile.html',
+    },
+    'candidate-details': '/Topics_Agency/Candidate_assignment.html',
+    'candidates': '/Topics_Agency/Candidates.html',
+    'associate-list': '/Topics_Agency/Associated_Organizations.html',
+    'timesheets': '/Topics_Agency/Timesheets.html',
+    'invoices': '/Topics_Agency/Invoices.html',
+    'user-list': '/Topics_Agency/User_List.html',
+    'document-library': '/Topics_Agency/Document_Library.html',
   });
 };
 

@@ -55,7 +55,7 @@ import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { OrganizationStructureService } from '@shared/services/organization-structure.service';
-import { ShowToast } from '../../../../store/app.actions';
+import { SetHelpSystem, ShowToast } from '../../../../store/app.actions';
 import { set, template } from 'lodash';
 import { SaveTemplateDialogService } from '@client/order-management/components/save-template-dialog/save-template-dialog.service';
 import { Item, MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
@@ -144,6 +144,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
     this.watchForSaveEvents();
     this.watchForSucceededSaveOrder();
     this.watchForPredefinedCredentials();
+    this.store.dispatch(new SetHelpSystem(true));
   }
 
   ngOnChanges(changes: SimpleChanges) {

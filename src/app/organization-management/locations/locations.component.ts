@@ -296,10 +296,39 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       this.pageSubject.next(event.currentPage || event.value);
     }
   }
- OnBulkEdit(){
+  OnBulkEdit(){
     this.isbulkedit=true;
     this.bulkaction=0;
     this.isEdit = true;
+    let locationsDetails: Location[] = this.selectedItems.map(val => ({
+      id: val.id,
+      editedLocationId: val.id,
+      regionId:  val.regionId, 
+      invoiceId: val.invoiceId, 
+      externalId: val.externalId,
+      name: val.name,
+      businessLineId: val.businessLineId,
+      address1: val.address1,
+      address2: val.address2,
+      zip: val.zip,
+      city: val.city,
+      state: val.state,
+      glNumber: this.locationDetailsFormGroup.controls['glNumber'].value,
+      ext:val.ext,
+      contactEmail: val.contactEmail,
+      contactPerson: val.contactPerson,
+      reactivateDate: val.reactivateDate,
+      phoneNumber: val.phoneNumber,
+      phoneType:val.phoneType,
+      timeZone:val.timeZone,
+      locationTypeId:val.locationTypeId,
+      organizationId : val.organizationId,
+      includeInIRP: val.includeInIRP,
+    }));
+
+  let includeInIRPStatus=  locationsDetails.every(x=>x.includeInIRP==true);
+ this.locationDetailsFormGroup.controls['includeInIRP'].setValue(includeInIRPStatus);
+
     this.store.dispatch(new ShowSideDialog(true));
   }
   
@@ -352,7 +381,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         ).subscribe((confirm) => {
           if (confirm) {
       
-            let selectedlocationstodelete = this.selectedItems.map((val) => (val?.departmentId ?? 0));
+         let selectedlocationstodelete = this.selectedItems.map((val) => (val?.id ?? 0));
            
             this.store.dispatch(new BulkDeleteLocation(selectedlocationstodelete));
           }

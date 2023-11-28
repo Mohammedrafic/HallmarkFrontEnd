@@ -7,8 +7,8 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { HelpIterator } from '@shared/helpers/iterator';
 import { HelpDomain, HelpNavigationLinks } from '@shell/shell.constant';
 import { DomainLinks } from '@shared/models/help-site-url.model';
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { AppState } from 'src/app/store/app.state';
+import { AdminState } from '@admin/store/admin.state';
 
 @Injectable()
 export class HelpNavigationService {
@@ -19,8 +19,19 @@ export class HelpNavigationService {
 
   navigateHelpPage(isAgency: boolean, links: DomainLinks): void {
     const { isIRPEnabled, isVMCEnabled } =
-    this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
-    const selectedDomain = this.resolveDomain(links, isAgency, isIRPEnabled, isVMCEnabled);
+    this.store.selectSnapshot(AdminState.organization)?.preferences || {};
+
+    let isIrpHelpSystem = false;
+
+    if (isIRPEnabled && !isVMCEnabled) {
+      isIrpHelpSystem = true;
+    }
+
+    if (isIRPEnabled && isVMCEnabled) {
+      isIrpHelpSystem = this.store.selectSnapshot(AppState.getHelpSystem);
+    }
+
+    const selectedDomain = this.resolveDomain(links, isAgency, isIrpHelpSystem);
     const currentUrl = this.router.url;
     const fragments = currentUrl.split('/').filter((fragment) => !!fragment);
 
@@ -28,16 +39,16 @@ export class HelpNavigationService {
       return;
     }
 
-    const isIrpHelpSystem = this.store.selectSnapshot(AppState.getHelpSystem);
     const helpUrls: Record<string, string | Record<string, string>>
-    = isIrpHelpSystem ? HelpNavigationLinks(isAgency).irpLinks : HelpNavigationLinks(isAgency).vmsLinks;
+    = HelpNavigationLinks(isAgency, !!isIRPEnabled, !!isVMCEnabled, isIrpHelpSystem);
+
+
     const iterator = new HelpIterator(fragments, true);
     let keyFound = false;
 
-    //TODO: A temporary solution for a redirect when an organization is created for VMS and IRP.
-    // Should implement resolve context, after IRP implementation
-    if(!!isIRPEnabled && !!isVMCEnabled && !isAgency) {
-      this.redirectToDefaultSelectedDomain(isAgency, selectedDomain);
+    if(!isIRPEnabled && !isVMCEnabled && !isAgency) {
+      this.redirectToFallBackUrl(isAgency, links, !!isIRPEnabled, !!isVMCEnabled);
+      return;
     }
 
     while (!helpUrls[iterator.getCurrent()] && iterator.hasNext()) {
@@ -55,16 +66,32 @@ export class HelpNavigationService {
     }
 
     if (!keyFound) {
-      this.redirectToDefaultSelectedDomain(isAgency, selectedDomain);
+      this.redirectToFallBackUrl(isAgency, links, !!isIRPEnabled, !!isVMCEnabled);
     }
   }
 
-  private redirectToDefaultSelectedDomain(isAgency: boolean, selectedDomain: string): void {
-    const url = this.constructUrl(isAgency, '', selectedDomain);
+  private redirectToFallBackUrl(isAgency: boolean, links: DomainLinks, isIrp: boolean, isVms: boolean): void {
+    const domain = this.resolveFallbackDomain(links, isAgency, isIrp, isVms);
+    const url = this.constructUrl(isAgency, '', domain);
     window.open(url, '_blank', 'noopener');
   }
 
   private resolveDomain(
+    domainLinks: DomainLinks,
+    isAgency: boolean,
+    isIrp: boolean,
+  ): string {
+    switch (true) {
+      case isAgency:
+        return domainLinks.agency;
+      case isIrp:
+        return domainLinks.irp;
+      default:
+        return domainLinks.vms;
+    }
+  }
+
+  private resolveFallbackDomain(
     domainLinks: DomainLinks,
     isAgency: boolean,
     isIRPEnabled = false,
@@ -75,18 +102,18 @@ export class HelpNavigationService {
         return domainLinks.agency;
       case isIRPEnabled && isVMCEnabled:
         return domainLinks.both;
-      case isIRPEnabled:
+      case isIRPEnabled && !isVMCEnabled:
         return domainLinks.irp;
-      case isVMCEnabled:
+      case isVMCEnabled && !isIRPEnabled:
         return domainLinks.vms;
       default:
-        return domainLinks.vms;
+        return domainLinks.both;
     }
   }
 
   private constructUrl(isAgency: boolean, helpLink: string, orgDomain?: string): string {
     if (helpLink && !isAgency) {
-       return `${orgDomain}/.auth/login/aadb2c?post_login_redirect_uri=${encodeURIComponent(`/Topics_Org/${helpLink}`)}`;
+       return `${orgDomain}/.auth/login/aadb2c?post_login_redirect_uri=${encodeURIComponent(helpLink)}`;
     } else if (helpLink && isAgency) {
       return `${HelpDomain[BusinessUnitType.Agency]}${helpLink}`;
     }

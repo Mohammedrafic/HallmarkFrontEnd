@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import PriceUtils from '@shared/utils/price.utils';
-import { AgencyStatusText, JOB_DISTRIBUTION_COLUMNS } from '@shared/components/associate-list/associate-grid/associated-org-grid.constant';
+import { JOB_DISTRIBUTION_COLUMNS } from '@shared/components/associate-list/associate-grid/associated-org-grid.constant';
 import {
   AssociateOrganizationsAgency,
   AssociateOrganizationsAgencyPage,
@@ -26,6 +26,7 @@ import { CreateSuspensionTooltip } from '../helpers';
   selector: 'app-associate-grid',
   templateUrl: './associate-grid.component.html',
   styleUrls: ['./associate-grid.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssociateGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() public associateEvent$: Subject<boolean>;
@@ -92,7 +93,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
     this.grid.clearRowSelection();
   }
 
-  public onRemove({ index, ...row }: { index: string } & AssociateOrganizationsAgency): void {
+  public onRemove({ ...row }: AssociateOrganizationsAgency): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,

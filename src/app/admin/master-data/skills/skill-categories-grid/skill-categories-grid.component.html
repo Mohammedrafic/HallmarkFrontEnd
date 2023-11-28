@@ -9,7 +9,7 @@
   [enableVirtualization]="false"
   (rowSelected)="rowSelected($event, grid)"
   (rowDeselected)="rowDeselected($event, grid)"
-  (dataBound)="gridDataBound(grid)"
+  (dataBound)="gridDataBound(grid, cd)"
   [selectionSettings]="selectionSettings"
 >
   <e-columns>

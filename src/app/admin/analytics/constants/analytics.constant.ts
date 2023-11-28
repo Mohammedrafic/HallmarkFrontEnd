@@ -32,8 +32,8 @@ export const analyticsConstants = {
     jobId: 'jobId',
     jobStatuses: 'jobStatuses',
     opcredFlag: 'opcredFlag',
-    IsOptionalRequred:'IsOptionalRequred'
-
+    IsOptionalRequred:'IsOptionalRequred',
+    Period: 'period',
   }
 }
 
