@@ -249,7 +249,6 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
           }
 
         });
-    this.getOrganization();
   }
 
   ngAfterViewInit(): void {
@@ -844,10 +843,5 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   private navigateToEmployeeProfile(): void {
     this.router.navigate(['employee/profile/information']);
-  }
-
-  private getOrganization(): void {
-    const id = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
-    this.store.dispatch(new GetOrganizationById(id));
   }
 }

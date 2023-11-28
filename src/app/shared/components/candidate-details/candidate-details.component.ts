@@ -84,7 +84,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { uniqBy } from 'lodash';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
-import { GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+
 @Component({
   selector: 'app-candidate-details',
   templateUrl: './candidate-details.component.html',
