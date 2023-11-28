@@ -208,6 +208,15 @@ export class SettingsDataAdapter {
         displayValue = SettingsDataAdapter
         .geATPRateCalculationdisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
+        case OrganizationSettingControlType.ATPRateCalculation:
+          displayValue=SettingsDataAdapter
+          .geATPRateCalculationdisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
+          break;
+          case OrganizationSettingControlType.AutoRejectOtherEmployeesWhenFilled:
+            displayValue=SettingsDataAdapter
+            .getAutoRejectEmployeeWhenFilleddisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
+            break;
+          
       default:
         displayValue = '';
     }
@@ -313,6 +322,9 @@ export class SettingsDataAdapter {
       case OrganizationSettingControlType.SwitchedValue:
         displayValue = SettingsDataAdapter.getSwitchedDisplayValue(child.parsedValue);
         break;
+        case OrganizationSettingControlType.AutoRejectOtherEmployeesWhenFilled:
+          displayValue = SettingsDataAdapter.getAutoRejectEmployeeWhenFilleddisplayValue(child.value);
+          break;
       default:
         displayValue = '';
     }
@@ -367,6 +379,12 @@ export class SettingsDataAdapter {
   private static getPayPeriodDisplayValue(parsedValue: { isEnabled: boolean }): CheckboxValue {
     const result = parsedValue?.isEnabled ? CheckboxValue.Yes : CheckboxValue.No;
 
+    return result;
+  }
+  private static getAutoRejectEmployeeWhenFilleddisplayValue(value: string): string {
+    const items = SettingsDataAdapter.getParsedValue(value);
+    const reason=items.rejectReason? items.rejectReason : items.RejectedReason;
+    const result=reason === 0 ? items.isEnabled?CheckboxValue.Yes : CheckboxValue.No : reason;
     return result;
   }
 

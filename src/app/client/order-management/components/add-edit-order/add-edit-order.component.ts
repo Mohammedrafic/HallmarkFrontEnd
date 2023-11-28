@@ -50,7 +50,7 @@ import { DateTimeHelper, GenerateLocationDepartmentOverlapMessage, IsStartEndDat
   from '@core/helpers';
 import { FieldName } from '@client/order-management/enums';
 import { MessageTypes } from '@shared/enums/message-types';
-import { ShowToast } from 'src/app/store/app.actions';
+import { SetHelpSystem, ShowToast } from 'src/app/store/app.actions';
 import { ValidationCredentialOption, ValidationExistenceCredential }
   from '@order-credentials/constants/credential-message.constant';
 import { ToastComponent } from '@syncfusion/ej2-angular-notifications';
@@ -194,6 +194,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       if (getPredefinedBillRatesData && !getPredefinedBillRatesData.ignoreUpdateBillRate) {
         this.store.dispatch(new GetPredefinedBillRates());
       }
+      this.store.dispatch(new SetHelpSystem(false));
     });
 
     this.subscribeOnPredefinedCredentials();

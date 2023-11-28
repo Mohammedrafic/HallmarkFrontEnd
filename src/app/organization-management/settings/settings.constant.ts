@@ -164,6 +164,10 @@ export const DropdownFields: FieldSettingsModel = {
   text: 'value',
   value: 'key',
 };
+export const RejectedReasonsFields: FieldSettingsModel = {
+  text: 'reason',
+  value: 'id',
+};
 
 export const OrganizationSystems = {
   IRP: false,

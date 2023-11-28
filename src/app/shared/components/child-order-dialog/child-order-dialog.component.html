@@ -57,15 +57,13 @@
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="showCloseOrderforIRP && activeSystem === OrderManagementIRPSystemId.IRP"
-              [disabled]="disabledCloseButtonforIRP || !canCloseOrderforIRP"
+              *ngIf="activeSystem === OrderManagementIRPSystemId.IRP"
+              [disabled]="!showCloseOrderforIRP || disabledCloseButtonforIRP || !canCloseOrderforIRP"
               (click)="closeOrder(order)"
             >
               Close Position
             </button>
             <button ejs-button cssClass="e-outline" *ngIf="canReOpen && activeSystem !== OrderManagementIRPSystemId.IRP" (click)="reOpenPosition()">Re-Open</button>
-            <button ejs-button cssClass="e-outline" *ngIf="canReOpenforIRP && activeSystem === OrderManagementIRPSystemId.IRP" (click)="reOpenPosition()">Re-Open</button>
-
             <button
               *ngIf="mobileMenu.length"
               ejs-dropdownbutton

@@ -1146,7 +1146,7 @@ export class SendGroupEmailComponent
     if (this.allCandidate) {
       this.candidateControl.setValue(null);
       this.candidateControl.disable();
-      this.emailTo = this.userData
+      this.emailTo = this.filterUserData
       ?.map((item) => item.email)
       ?.join(', ');
     } else {
@@ -1236,7 +1236,7 @@ export class SendGroupEmailComponent
       )
     );
     this.candidateData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.userData = data;
+      this.userData = data != undefined ? data.slice(0,100) : [];
       this.filterUserData = data;
     });
   }
