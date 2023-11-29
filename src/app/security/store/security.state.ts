@@ -184,11 +184,6 @@ export class SecurityState {
   }
 
   @Selector()
-  static isOrganizaionsLoaded(state: SecurityStateModel):boolean{
-    return state.isOrganizaionsLoaded;
-  }
-
-  @Selector()
   static copyRoleData(state: SecurityStateModel): Role[] {
     return state.copyRoleData;
   }
