@@ -72,11 +72,11 @@ body.dark {
     .e-toolbar {
       .e-toolbar-items {
         .e-toolbar-item {
-          background-color: $white;
+          background-color: var(--bg-steper);
           border-radius: 12px;
           padding: 16px !important;
           height: auto;
-          border: 1px solid $secondary-dark-blue-45;
+          border: 1px solid var(--header-border);
           box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
 
           .stepper-header {
@@ -93,7 +93,7 @@ body.dark {
 
             .stepper-title {
               font-size: 14px;
-              color: $secondary-dark-blue-10;
+              color: var(--title);
               font-weight: 590;
               line-height: 20px;
               margin-bottom: 2px;
@@ -122,10 +122,11 @@ body.dark {
           }
 
           &.e-disable {
-            background-color: $secondary-dark-blue-45;
+            opacity: 0.5;
+
             .stepper-header {
               .stepper-title {
-                color: $secondary-dark-blue-30;
+                color: var(--title) !important;
               }
             }
           }

@@ -21,14 +21,17 @@
         <div class="bootstrap dropdown-container" *ngIf="!isBusinessUnitTypeAgency">
           <div class="input-group dropdown">
             <label>{{isMspUsertype ? 'Current MSP Name' : 'Business Unit'}}<span class="required">*</span></label>
-            <ejs-dropdownlist appValidateWithMessage
-                              formControlName="business"
-                              [fields]="businessDataFields"
-                              [dataSource]="businessData"
-                              [value]="defaultBusinessValue"
-                              [allowFiltering]="true"
-                              placeholder="Business">
-            </ejs-dropdownlist>
+            <ejs-multiselect mode="CheckBox" appValidateWithMessage
+                             formControlName="business"
+                             [fields]="businessDataFields"
+                             [dataSource]="businessData"
+                             [allowFiltering]="true"
+                             placeholder="Business"
+                             [showDropDownIcon]="true"
+                             [selectAllText]='allOption'
+                             showSelectAll=true
+                             maximumSelectionLength="50000">
+            </ejs-multiselect>
           </div>
         </div>
         <div class="bootstrap dropdown-container" *ngIf="isBusinessUnitTypeAgency">

@@ -41,8 +41,10 @@ export class ClientManagementContentComponent
 
   public columnsToExport: ExportColumn[] = [
     { text: 'Organization Name', column: 'OrganizationName' },
+    { text: 'Organization Type', column: 'OrganizationType' },
     { text: 'Organization Status', column: 'OrganizationStatus' },
     { text: 'City', column: 'City' },
+    { text: 'Entity Name', column: 'Entity' },
     { text: 'Contact', column: 'Contact' },
     { text: 'Phone', column: 'Phone' },
   ];

@@ -42,7 +42,6 @@ export const editableCostCenterDef: ColDef = {
   minWidth: 100,
   filterValueGetter: (value) => value.data.costCenterFormattedName,
   cellRenderer: DropdownEditorComponent,
-  type: 'rightAligned',
   headerClass: 'custom-wrap',
   cellRendererParams: {
     editMode: true,
@@ -124,7 +123,6 @@ export const attachmentsCol: ColDef = {
   minWidth: 140,
   cellRenderer: AttachmentsListComponent,
   cellClass: 'invoice-records-attachments-list custom-scroll',
-  type: 'rightAligned',
   headerClass: 'custom-wrap',
 };
 
@@ -134,7 +132,6 @@ export const billRateTypeStatic: ColDef = {
   ...commonColumn,
   width: 180,
   minWidth: 105,
-  type: 'rightAligned',
   headerClass: 'custom-wrap',
 };
 
@@ -202,7 +199,6 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     width: 180,
     minWidth: 100,
     cellRenderer: DropdownEditorComponent,
-    type: 'rightAligned',
     headerClass: 'custom-wrap',
     cellRendererParams: {
       editMode: true,
@@ -218,7 +214,6 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     width: 180,
     minWidth: 110,
     filterValueGetter: (value) => { return value.data.billRateConfigName; },
-    type: 'rightAligned',
     headerClass: 'custom-wrap',
   },
   amountColdef('Hours'),
@@ -239,7 +234,6 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     headerName: 'Reason',
     ...commonColumn,
     width: 180,
-    type: 'rightAligned',
     headerClass: 'custom-wrap',
   },
   {
@@ -386,7 +380,6 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     width: 200,
     minWidth: 90,
     resizable: true,
-    type: 'rightAligned',
     cellClass: ['common-cell'],
   },
   {
@@ -395,7 +388,6 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     width: 140,
     minWidth: 90,
     resizable: true,
-    type: 'rightAligned',
     cellClass: ['common-cell'],
     valueFormatter: (data) => {
       return InvoiceHistoricalSubmission[data.value];
@@ -407,7 +399,6 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     width: 120,
     minWidth: 90,
     resizable: true,
-    type: 'rightAligned',
     cellClass: ['common-cell'],
   },
   {
@@ -416,7 +407,6 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     width: 140,
     minWidth: 90,
     resizable: true,
-    type: 'rightAligned',
     cellClass: ['common-cell'],
   },
 ]);

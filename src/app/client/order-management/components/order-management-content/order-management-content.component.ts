@@ -652,7 +652,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (isIrpEnabled === true) {
       this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
       this.activeSystem = OrderManagementIRPSystemId.IRP;
-      this.store.dispatch(true);
+      this.store.dispatch(new SetHelpSystem(true));
       this.getPreservedFiltersByPage();
       this.orderManagementService.setOrderManagementSystem(this.activeSystem);
       this.setOrderTypesFilterDataSource();
@@ -740,7 +740,7 @@ public watchForOrderFromNotification(){
    || (AlertIdEnum[AlertIdEnum['Communication Open Needs PerDiem order']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
     this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
     this.activeSystem = OrderManagementIRPSystemId.IRP;
-    this.store.dispatch(true);
+    this.store.dispatch(new SetHelpSystem(true));
     this.redirectedfromnotification=true;
      this.onFilterClearAll();
   }
@@ -2863,7 +2863,7 @@ public RedirecttoIRPOrder(order:Order)
 
       if (!this.previousSelectedSystemId) {
         this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
-        this.store.dispatch(this.activeSystem === OrderManagementIRPSystemId.IRP);
+        this.store.dispatch(new SetHelpSystem(this.activeSystem === OrderManagementIRPSystemId.IRP));
       }
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       if(!this.canViewOrderIRP){
@@ -2882,7 +2882,7 @@ public RedirecttoIRPOrder(order:Order)
       }
       if(this.canViewOrderIRP && !this.canViewOrderVMS){
         this.activeSystem = OrderManagementIRPSystemId.IRP;
-        this.store.dispatch(true);
+        this.store.dispatch(new SetHelpSystem(true));
       }
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       this.cd.detectChanges();
@@ -3233,10 +3233,10 @@ public RedirecttoIRPOrder(order:Order)
   onClickSystem(obj: any) {
     if (obj == "IRP") {
       this.activeSystem = OrderManagementIRPSystemId.IRP;
-      this.store.dispatch(true);
+      this.store.dispatch(new SetHelpSystem(true));
     } else if (obj == "VMS") {
       this.activeSystem = OrderManagementIRPSystemId.VMS;
-      this.store.dispatch(false);
+      this.store.dispatch(new SetHelpSystem(false));
     }
     this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem, this.canOrderJourney);
     this.clearFilters();

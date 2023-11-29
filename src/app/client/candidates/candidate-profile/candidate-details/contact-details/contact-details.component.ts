@@ -134,7 +134,8 @@ public id:any;
         fromMail: this.userObj?.email == undefined ? "" : this.userObj?.email,
         selectedFile: formValues.fileUpload,
         businessUnitType: BusinessUnitType.Organization,
-        userType: OrganizationUserType.Employees
+        userType: OrganizationUserType.Employees,
+        selectedBusinessUnitId: ""
       };
       this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
       this.store.dispatch(new ShowGroupEmailSideDialog(false));
