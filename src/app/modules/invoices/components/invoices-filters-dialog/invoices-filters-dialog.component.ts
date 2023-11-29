@@ -284,7 +284,7 @@ export class InvoicesFiltersDialogComponent extends Destroyable implements OnIni
             this.appliedFiltersAmount.emit(this.filteredItems.length);
           }
           this.initFormConfig();
-          if(this.isAgency){
+          if(this.isAgency && filters?.state?.agencyOrganizationIds.length == 1){
             this.agencyFilterColumns();
           }
 
