@@ -38,6 +38,7 @@ import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 
 import { InvoicesContainerComponent } from './invoices-container.component';
+import { Organisation } from '@shared/models/visibility-settings.model';
 
 class ActivatedRouteStub {
   get snapshot() {
@@ -100,7 +101,7 @@ class FakeFileViewerComponent {}
 
 const agencyId = 1;
 const orgId = 2;
-const organization = { id: orgId } as DataSourceItem;
+const organization = { id: orgId } as Organisation;
 
 const storeSelectMockFn = (selector: any) => {
   switch (selector) {
