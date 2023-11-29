@@ -223,6 +223,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public hasEditTimesheetRecordsPermission: boolean;
 
+  public hasViewTimesheetPermission: boolean;
+
   public hasApproveRejectTimesheetRecordsPermission: boolean;
 
   public canRecalculateTimesheet = false;
@@ -607,7 +609,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public getHistoricalEvents(event: ExpandedEventArgs): void {
     if (event.isExpanded) {
-      this.timesheetDetailsApiService.getTimesheetHistoricalEvents(this.timesheetId)
+      this.timesheetDetailsApiService.getTimesheetHistoricalEvents(this.isAgency, this.timesheetId, this.organizationId)
         .pipe(take(1))
         .subscribe((events: TimesheetHistoricalEvent[]) => {
           this.historicalEvents = events;
@@ -717,11 +719,13 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             permissions[this.userPermissions.CanAgencyAddEditDeleteTimesheetRecords];
           this.hasApproveRejectTimesheetRecordsPermission =
             permissions[this.userPermissions.CanAgencyAddEditDeleteTimesheetRecords];
+          this.hasViewTimesheetPermission = permissions[this.userPermissions.CanAgencyViewTimesheets];
         } else {
           this.hasEditTimesheetRecordsPermission =
             permissions[this.userPermissions.CanOrganizationAddEditDeleteTimesheetRecords];
           this.hasApproveRejectTimesheetRecordsPermission =
             permissions[this.userPermissions.CanOrganizationApproveRejectTimesheets];
+          this.hasViewTimesheetPermission = permissions[this.userPermissions.CanOrganizationViewTimesheets];
         }
 
         this.canRecalculate = permissions[this.userPermissions.CanRecalculateTimesheets];

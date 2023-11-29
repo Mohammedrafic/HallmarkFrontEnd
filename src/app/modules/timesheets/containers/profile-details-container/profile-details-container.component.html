@@ -327,7 +327,7 @@
     </ejs-accordion>
     <ejs-accordion #historicalEventsAccordion expandMode="Single" (expanded)="getHistoricalEvents($event)">
       <e-accordionitems>
-        <e-accordionitem>
+        <e-accordionitem [disabled]="!hasViewTimesheetPermission">
           <ng-template #header>
             <div>Historical Events</div>
           </ng-template>

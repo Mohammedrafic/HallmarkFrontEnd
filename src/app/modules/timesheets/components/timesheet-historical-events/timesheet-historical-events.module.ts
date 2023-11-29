@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { SharedModule } from '@shared/shared.module';
+import { LocalDateTimePipeModule } from '@shared/pipes/local-date-time/bool-values-pipe.module';
 
 import { TimesheetHistoricalEventsComponent } from './timesheet-historical-events.component';
 
@@ -11,7 +11,7 @@ import { TimesheetHistoricalEventsComponent } from './timesheet-historical-event
   ],
   imports: [
     CommonModule,
-    SharedModule,
+    LocalDateTimePipeModule,
   ],
   exports: [
     TimesheetHistoricalEventsComponent,
