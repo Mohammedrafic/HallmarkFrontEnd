@@ -211,6 +211,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private organizationSettingKey: OrganizationSettingKeys;
   regionBasedDepartment: any;
   public filterType: string = 'Contains';
+  public isIRPAutoDistribute : boolean = false;
   get switcherValue(): string {
     return this.organizationSettingsFormGroup.controls['value'].value ? 'On' : 'Off';
   }
@@ -308,6 +309,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   openOverrideSettingDialog(data: Configuration): void {
     this.setSelectedRecords(data);
+    this.isIRPAutoDistribute = OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey;
     this.setOrganizationSettingKey(data.settingKey);
     this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
     this.separateValuesInSystems = data.separateValuesInSystems;
@@ -362,7 +364,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
     this.setFormValidation(data);
   }
-
+  
   openEditSettingDialog(
     data: {
       parentRecord: Configuration,
@@ -371,6 +373,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   ): void {
     const {parentRecord, childRecord, event} = data;
+    this.isIRPAutoDistribute = OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == parentRecord.settingKey;
     this.setSelectedRecords(parentRecord, childRecord);
     this.setOrganizationSettingKey(parentRecord.settingKey);
     this.separateValuesInSystems = parentRecord.separateValuesInSystems;
