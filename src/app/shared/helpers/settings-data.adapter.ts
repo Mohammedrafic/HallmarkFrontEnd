@@ -216,7 +216,7 @@ export class SettingsDataAdapter {
             displayValue=SettingsDataAdapter
             .getAutoRejectEmployeeWhenFilleddisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
             break;
-          
+
       default:
         displayValue = '';
     }
@@ -318,6 +318,9 @@ export class SettingsDataAdapter {
         break;
       case OrganizationSettingControlType.DateTime:
         displayValue = formatDate(child.value, 'MM/dd/yyyy', 'en-US');
+        break;
+      case OrganizationSettingControlType.InvoiceAutoGeneration:
+        displayValue = SettingsDataAdapter.getInvoiceDisplayValue(child.value);
         break;
       case OrganizationSettingControlType.SwitchedValue:
         displayValue = SettingsDataAdapter.getSwitchedDisplayValue(child.parsedValue);
