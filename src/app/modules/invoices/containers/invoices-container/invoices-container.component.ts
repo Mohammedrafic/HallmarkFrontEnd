@@ -76,8 +76,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   @ViewChild(RejectReasonInputDialogComponent)
   public rejectReasonInputDialogComponent: RejectReasonInputDialogComponent;
 
-  /*@Select(InvoicesState.invoicesOrganizations)
-  public readonly organizations$: Observable<DataSourceItem[]>;*/
+  @Select(InvoicesState.invoicesOrganizations)
+  public readonly organizations$: Observable<DataSourceItem[]>;
 
   @Select(SecurityState.organisations)
   agencyOrganizations$: Observable<Organisation[]>;
@@ -450,7 +450,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       const preservedFilters = this.store.selectSnapshot(
         PreservedFiltersState.preservedFiltersByPageName) as
         PreservedFiltersByPage<Interfaces.InvoicesFilterState>;
-
       const filtersFormConfig = DetectFormConfigBySelectedType(this.selectedTabId, this.isAgency,this.agencyOrganizationIds?.length);
       this.filterState = this.filterService.composeFilterState(
         filtersFormConfig,
@@ -844,13 +843,24 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
               this.organizationMultiSelectControl.setValue(filterState.state.agencyOrganizationIds);
             }else{
               this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
-              this.resetFilters(true);
+              delete filterState.state?.locationIds;
+              delete filterState.state?.regionIds;
+              delete filterState.state?.departmentIds;
+              delete filterState.state?.skillIds;
+              delete filterState.state?.reasonCodeIds;
+              filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
+              filterState.state.agencyOrganizationIds = filters.agencyOrganizationIds;
+              this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filterState.state),);
             }
           }else if(filterState.state.agencyOrganizationIds != null && JSON.stringify(filterState.state.agencyOrganizationIds) != JSON.stringify(this.organizationMultiSelectControl.value)){
             filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
             filterState.state.agencyOrganizationIds = filters.agencyOrganizationIds;
             this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filterState.state),);
           }else{
+            if(this.organizationMultiSelectControl.value){
+              filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
+              this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
+            }
             this.resetFilters(true);
           }
           if(this.organizationMultiSelectControl?.value?.length > 1){

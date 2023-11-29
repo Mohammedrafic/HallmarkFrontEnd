@@ -23,13 +23,13 @@
             </ejs-multiselect>
         </div>
         <div class="input-container agency-dropDown" [class.hidden]="true">
-         <!--  <ejs-dropdownlist *ngIf="organizations$ | async as organizations"
+         <ejs-dropdownlist *ngIf="organizations$ | async as organizations"
                             placeholder="Select organization"
                             [allowFiltering]="true"
                             [dataSource]="organizations"
                             [fields]="unitOrganizationsFields"
                             [formControl]="organizationControl">
-          </ejs-dropdownlist>-->
+          </ejs-dropdownlist>
         </div>
       </div>
       <div class="buttons-group" [class.top-margin]="!isAgency">
@@ -221,7 +221,7 @@
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>
 
-<app-invoices-filters-dialog [selectedTabId]="selectedTabId"
+<app-invoices-filters-dialog [selectedTabId]="selectedTabId" [agencyOrganizations]="agencyOrganizationIds"
                              (appliedFiltersAmount)="changeFiltersAmount($event)"
                              (resetFilters)="resetFilters()"
                              (updateTableByFilters)="updateTableByFilters($event)">
