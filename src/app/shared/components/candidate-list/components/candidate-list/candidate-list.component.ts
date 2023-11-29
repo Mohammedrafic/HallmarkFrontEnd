@@ -315,9 +315,14 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
             this.filters.candidateName = this.filters.candidateName || null;
             this.filters.expiry = {
               type: this.filters.credType || [],
-              startDate: this.filters.startDate ? DateTimeHelper.setUtcTimeZone(this.filters.startDate) : null,
-              endDate: this.filters.endDate ? DateTimeHelper.setUtcTimeZone(this.filters.endDate) : null,
+              startDate: this.filters.startDate ? DateTimeHelper.setUtcTimeZone(
+                DateTimeHelper.setInitDateHours(this.filters.startDate)) : null,
+              endDate: this.filters.endDate ? DateTimeHelper.setUtcTimeZone(
+                DateTimeHelper.setInitDateHours(this.filters.endDate)) : null,
             };
+            this.filters.hireDate = this.filters.hireDate ? DateTimeHelper.setUtcTimeZone(
+              DateTimeHelper.setInitDateHours(this.filters.hireDate)
+            ) : null;
             this.saveFiltersByPageName(this.filters);
             this.dispatchNewPage();
             this.store.dispatch(new ShowFilterDialog(false));
