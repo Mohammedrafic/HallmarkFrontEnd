@@ -38,11 +38,11 @@ export class StatusComponentComponent implements OnInit {
 
   onSubmit() {
     if (this.statusForm.valid) {
-      if (this.statusText == 'shortlisted') {
+      if (this.statusText === 'shortlisted') {
         this.store.dispatch(
           new SaveStatus(this.orderId, this.statusForm.value.jobId, this.statusText, CandidatStatus.Shortlisted)
         );
-      } else if (this.statusText == 'offered') {
+      } else if (this.statusText === 'offered') {
         this.store.dispatch(
           new SaveStatus(this.orderId, this.statusForm.value.jobId, this.statusText, CandidatStatus.Offered)
         );
@@ -53,4 +53,37 @@ export class StatusComponentComponent implements OnInit {
       }
     }
   }
+
+  // private watchForCandidateActions(): void {
+  //   this.actions$
+  //     .pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded), takeUntil(this.unsubscribe$))
+  //     .subscribe((credential: { payload: CandidateCredential }) => {
+  //       const isEdit = this.isEdit;
+  //       this.credentialId = credential.payload.id as number;
+  //       this.isCredentialExists = credential.payload.isCredentialExists as boolean;
+  //       this.disabledCopy = false;
+  //       this.selectedItems = [];
+
+  //       if (this.removeExistingFiles) {
+  //         this.store.dispatch(new UploadCredentialFiles([], this.credentialId));
+  //         return;
+  //       }
+
+  //       if (this.isCredentialExists) {
+  //         this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADD : RECORD_MODIFIED));
+  //       } else {
+  //         this.store.dispatch(new ShowToast(MessageTypes.Warning, RECORD_UNSAVED));
+  //       }
+
+  //       this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
+  //       this.addCredentialForm.markAsPristine();
+  //       this.closeDialog();
+  //     });
+
+  //   this.actions$
+  //     .pipe(ofActionSuccessful(SaveCandidatesCredentialFailed), takeUntil(this.unsubscribe$))
+  //     .subscribe(() => {
+  //       this.disabledCopy = false;
+  //     });
+  // }
 }
