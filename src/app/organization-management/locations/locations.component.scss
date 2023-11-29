@@ -129,7 +129,7 @@
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(5, 1fr);
   gap: 15px;
-  grid-template-areas: 
+  grid-template-areas:
   "exteranlArea exteranlArea . irpArea"
   "invoiceArea nameArea businessLineArea ."
   "timeZoneArea timeZoneArea . ."
@@ -138,7 +138,7 @@
 
   &.no-inid {
     grid-template-rows: repeat(4, 1fr);
-    grid-template-areas: 
+    grid-template-areas:
     "exteranlArea exteranlArea . irpArea"
     "nameArea businessLineArea timeZoneArea timeZoneArea"
     "address1Area address1Area address2Area address2Area"
@@ -146,7 +146,7 @@
   }
 
   &.prev-form-view {
-    grid-template-areas: 
+    grid-template-areas:
     "exteranlArea exteranlArea . ."
     "invoiceArea nameArea businessLineArea ."
     "locationTypeArea locationTypeArea timeZoneArea timeZoneArea"
@@ -170,4 +170,36 @@
   .input-container {
     @include toggle;
   }
+}
+
+.bulk-section {
+  background-color: $primary-active-blue-10;
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+  margin-bottom: 10px;
+
+  &__rowscount {
+    margin-right: 60px;
+    margin-left:31px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.015em;
+    color: #fff
+  }
+  .edit-button,
+  .delete-button {
+    color:#fff
+  }
+}
+
+.gridrightpager{
+position:absolute;
+right:0;
+}
+
+.e-pager {
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
 }

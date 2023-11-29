@@ -9,8 +9,10 @@ export enum OrganizationSettingControlType {
   EmailAria = 8,
   SwitchedValue = 9,
   CheckboxValue = 10,
-  PayPeriod =11,
-  ATPRateCalculation=12
+  PayPeriod = 11,
+  ATPRateCalculation = 12,
+  AutoRejectOtherEmployeesWhenFilled=13,
+  StartsOnDate = 14,
 
 }
 

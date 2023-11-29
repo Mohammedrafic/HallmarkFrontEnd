@@ -112,6 +112,14 @@ export const GeneralInformationConfigLTA = (): OrderFormsConfig  => ({
       type: FieldType.Input,
       maxLength: 20,
     },
+    {
+      field: 'ExpectedWorkWeek',
+      title: 'Expected Work Week',
+      cssClass: 'item13',
+      required: false,
+      show: true,
+      type: FieldType.Input,
+    },
   ],
 });
 
@@ -244,7 +252,7 @@ export const JobDistributionConfigLTA = (selectedSystem: SelectSystem,isDistribu
     {
       field: 'distributeToVMS',
       title: 'Value',
-      cssClass: 'item10',
+      cssClass: '',
       required: true,
       show: false,
       type: FieldType.Input,
@@ -291,7 +299,7 @@ export const JobDistributionConfigPO = (selectedSystem: SelectSystem,isDistribut
     {
       field: 'distributeToVMS',
       title: 'Value',
-      cssClass: 'item10',
+      cssClass: '',
       required: true,
       show: false,
       type: FieldType.Input,

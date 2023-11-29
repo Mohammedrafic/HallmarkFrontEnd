@@ -83,7 +83,7 @@ const routes: Routes = [
         children: [
           {
             path: 'skills',
-            component: SkillsCategoriesComponent
+            component: SkillsCategoriesComponent,
           },
           {
             path: 'credentials',
@@ -96,27 +96,32 @@ const routes: Routes = [
               },
               {
                 path: 'types',
-                component: MasterCredentialsTypesComponent
-              }
-            ]
+                component: MasterCredentialsTypesComponent,
+              },
+            ],
           },
           {
             path: 'holidays',
-            component: MasterHolidaysComponent
+            component: MasterHolidaysComponent,
           },
           {
             path: 'reject-reason',
-            component: RejectReasonMasterComponent
+            component: RejectReasonMasterComponent,
           },
           {
             path: 'manual-invoice-reasons',
-            component: ManualInvoiceReasonsComponent
+            component: ManualInvoiceReasonsComponent,
           },
           {
             path: 'commitment',
-            component: CommitmentComponent
-          }
-        ]
+            component: CommitmentComponent,
+          },
+          {
+            path: '**',
+            redirectTo: 'master-data',
+            pathMatch: 'full',
+          },
+        ],
       },
       {
         path: 'timesheets',

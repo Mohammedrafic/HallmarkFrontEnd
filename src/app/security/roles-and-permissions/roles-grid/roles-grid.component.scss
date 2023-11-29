@@ -1,6 +1,17 @@
 @import "../../../styles/variables/colors.scss";
 
 .roles-grid {
+ ::ng-deep {
+    .ag-cell.ag-cell-last-left-pinned:not(.ag-cell-range-right):not(.ag-cell-range-single-cell),
+    .ag-pinned-left-header {
+      border-right-color: var(--grid-header-border) !important;
+    }
+
+    .ag-side-bar-right {
+      border-left-color: var(--grid-header-border) !important;
+    }
+  }
+
   .default-role {
     background-color: $secondary-dark-blue-50;
 

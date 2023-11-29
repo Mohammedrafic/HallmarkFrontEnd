@@ -20,6 +20,7 @@ export class SubrowCandidatePositionAdapter {
       actualStartDate: getCandidateDate(candidate.actualStartDate),
       actualEndDate: getCandidateDate(candidate.actualEndDate),
       candidateBillRate: Number(candidate.candidateBillRate).toFixed(2),
+      guaranteedWorkWeek: candidate?.guaranteedWorkWeek,
     };
   }
 }

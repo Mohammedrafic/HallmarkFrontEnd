@@ -6,7 +6,6 @@ import { Select } from '@ngxs/store';
 import { AppState } from '../../../../store/app.state';
 import { Observable } from 'rxjs';
 
-
 @Component({
   selector: 'app-group-email-table',
   templateUrl: './group-email-table.component.html',

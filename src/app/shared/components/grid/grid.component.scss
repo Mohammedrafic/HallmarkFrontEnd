@@ -69,6 +69,8 @@ app-grid {
     width: calc(100% - 2px) !important;
     flex: 1;
     border: 1px solid var(--grid-header-border);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
   }
 
   .ag-header {

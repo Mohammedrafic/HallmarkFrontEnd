@@ -912,6 +912,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     ).subscribe((page) => {
       this.currentPage = page;
       this.filters.pageNumber = page;
+      this.filters.pageSize = this.pageSize;
       this.store.dispatch(new GetBillRates(this.filters));
     });
   }

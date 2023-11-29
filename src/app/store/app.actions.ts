@@ -36,7 +36,6 @@ export class ShowToast {
     public isQuickOrder?: boolean,
     public organizationPrefix?: string,
     public publicId?: number,
-    public htmlContent?: true,
   ) { }
 }
 
@@ -150,4 +149,9 @@ export class SetHelpSystem {
 export class ShowBulkSkillActionDialog {
   static readonly type = '[app] Set BulkSkill Action Dialog Showing state';
   constructor(public isDialogShown: boolean,public message:string) { }
+}
+
+export class ShowBulkLocationActionDialog {
+  static readonly type = '[app] Set BulkLocation Action Dialog Showing state';
+  constructor(public isDialogShown: boolean, public message: string) { }
 }

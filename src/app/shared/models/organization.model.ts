@@ -10,6 +10,7 @@ export class Organization {
   };
   parentBusinessUnitId?: number;
   organizationId?: number | null;
+  entity?:string;
   generalInformation: GeneralInformation;
   billingDetails: BillingDetails;
   contactDetails: ContactDetails[];
@@ -189,6 +190,15 @@ export class OrganizationRegion {
   organizationId?: number;
   regionId?: number | null;
 }
+export class AgencyOrganizationRegion {
+  id: number | null;
+  name?: string;
+  organisationName?: string;
+  locations: OrganizationLocation[] | null;
+  organizationId?: number;
+  regionId?: number | null;
+}
+
 
 export class OrganizationStructure {
   organizationId: number;

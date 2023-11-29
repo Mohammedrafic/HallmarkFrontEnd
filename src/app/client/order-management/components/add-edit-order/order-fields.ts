@@ -21,6 +21,7 @@ enum CommonInfo {
   deleteDocumentsGuids,
   fromTemplateId,
   AllowToUpdateDept,
+  ExpectedWorkWeek
 }
 
 enum ContactToPermTravelerGeneralInfo {

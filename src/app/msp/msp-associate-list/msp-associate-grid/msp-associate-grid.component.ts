@@ -15,7 +15,6 @@ import { MspState } from '../../store/state/msp.state';
 import { DeleteMspAssociateOrganizationsAgencyById, GetMspAssociateAgency, GetMSPAssociateListPage } from '../../store/actions/msp.actions';
 import { UserState } from '../../../store/user.state';
 import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
-import { LastSelectedOrganisationAgency } from '../../../store/user.actions';
 
 @Component({
   selector: 'app-msp-associate-grid',
@@ -52,16 +51,11 @@ export class MSPAssociateGridComponent extends AbstractGridConfigurationComponen
     return AgencyStatus[agencyStatus];
   };
 
-  public businessUnitValueAccess = (_: string, { businessUnitType }: MSPAssociateOrganizationsAgency) => {
-    return BusinessUnitType[businessUnitType];
-  };
-
   constructor(private confirmService: ConfirmService, private store: Store, private actions$: Actions) {
     super();
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new LastSelectedOrganisationAgency('MSP'));
     this.getAgencies();
     this.subscribeOnMspAssociateAgencyDialogEvent();
     this.subscribeOnBusinessUnitChange();

@@ -128,6 +128,11 @@ const routes: Routes = [
           isOrganizationArea: true,
         },
       },
+      {
+        path: '**',
+        redirectTo: '',
+        pathMatch: 'full',
+      },
     ],
   },
 ];

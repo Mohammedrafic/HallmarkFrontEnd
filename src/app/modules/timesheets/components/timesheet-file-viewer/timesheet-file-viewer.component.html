@@ -28,7 +28,7 @@
                                 [serviceUrl]="service"
                                 [enableTextSelection]="false"
                     ></ejs-pdfviewer>
-                    <div *ngIf="isImage" class="image-container">
+                    <div *ngIf="isImage && imageSrs" class="image-container">
                         <img class="image" [src]="imageSrs"/>
                     </div>
                 </div>

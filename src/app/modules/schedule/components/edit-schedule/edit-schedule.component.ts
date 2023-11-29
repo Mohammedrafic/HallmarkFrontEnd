@@ -182,7 +182,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       this.settingsViewService.getViewSettingKey(
         OrganizationSettingKeys.CreateReplacementPerDiemOrder,
         OrganizationalHierarchy.Organization,
-        organizationId
+        organizationId,
+        organizationId,
+        true
       )
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe((data) => {

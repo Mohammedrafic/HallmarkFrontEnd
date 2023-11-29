@@ -5,6 +5,27 @@
 $grid-border-radius: 10px;
 $grid-box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
 
+.grid-custom-option {
+  ag-grid-angular {
+    border: 1px solid var(--grid-header-border);
+    border-radius: 12px;
+  }
+
+  .ag-menu, .ag-tabs-header {
+    background-color: var(--bg-default);
+    color: var(--text);
+    box-shadow: none;
+  }
+
+  .ag-paging-panel {
+    border-top-color: var(--grid-header-border);
+  }
+
+  .ag-side-bar-right {
+    border-left-color: var(--grid-header-border);
+  }
+}
+
 body.light,
 body.dark {
   ejs-grid.no-radius {
@@ -334,6 +355,12 @@ body.dark {
           display: flex;
           margin-left: 16px;
           align-items: center;
+
+          ejs-dropdownlist {
+            .e-input-group {
+              background-color: transparent !important;
+            }
+          }
 
           #goToPage {
             margin-left: 35px;

@@ -1,15 +1,22 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, switchMap, takeUntil, throttleTime, of, tap, debounceTime, take } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DatePicker, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
+import { ShowBulkLocationActionDialog, ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import {
+
+  BulkDeleteDepartment,
+  BulkDeleteDepartmentFailed,
+  BulkDeleteDepartmentsucceeded,
+  BulkUpdateDepartment,
+  BulkUpdateDepartmentFailed,
+  BulkUpdateDepartmentsucceeded,
   ClearDepartmentList,
   ClearLocationList,
   DeleteDepartmentById,
@@ -30,16 +37,15 @@ import { Location } from '@shared/models/location.model';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
+  Bulk_Delete_Department,
+  Bulk_Update_Department,
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
   IRP_DEPARTMENT_CHANGE_WARNING,
   OrganizationalHierarchy,
   OrganizationSettingKeys,
   RECORD_ADDED,
   RECORD_MODIFIED,
-  WARNING_TITLE,
 } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -62,7 +68,10 @@ import { SettingsViewService } from '@shared/services';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
-
+enum BulkDepartmentActionConfig {
+  'Ediit',
+  'Delete'
+}
 @TakeUntilDestroy
 @Component({
   selector: 'app-departments',
@@ -155,16 +164,24 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     this.checkIRPFlag();
   }
 
+  public bulkaction: BulkDepartmentActionConfig = 0;
+  public isbulkedit=false;
+  public isbulkdelete=false;
+  public bulkactionmessage:string;
+  public bulkactionnotvalidlocationnmaes:string[];
+  public isDepartment=true;
+
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.watchForDepartmentUpdate();
     this.createDepartmentsForm();
 
     this.filterColumns = this.departmentService.initFilterColumns(this.isIRPFlagEnabled);
-    this.watchForDepartmentUpdate();
+
     this.startDepartmentOptionsWatching();
     this.startPageNumberWatching();
     this.startOrgIdWatching();
@@ -279,6 +296,79 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
           this.onDepartmentFormSaveClick(true);
         });
     });
+    this.action$
+    .pipe(
+      ofActionSuccessful(BulkUpdateDepartmentsucceeded),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+      this.departmentsDetailsFormGroup.reset();
+
+      this.clearSelection(this.grid);
+
+      let locationNames=payload.payload.names;
+      if(locationNames && locationNames.length > 0){
+        this.bulkaction=0;
+        this.bulkactionnotvalidlocationnmaes=locationNames;
+        this.bulkactionmessage = payload.payload.message;
+
+        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+      }
+      else{
+        this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Department));
+      }
+      this.getDepartments();
+      this.store.dispatch(new ShowSideDialog(false));
+      this.isbulkedit=false;
+
+    });
+    this.action$
+    .pipe(
+      ofActionSuccessful(BulkUpdateDepartmentFailed),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+        this.bulkactionmessage = payload.payload.message;
+        this.bulkactionnotvalidlocationnmaes=[];
+        this.bulkaction=0;
+        this.clearSelection(this.grid);
+        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+        this.getDepartments();
+        this.isbulkedit=false;
+
+        this.store.dispatch(new ShowSideDialog(false));
+
+    });
+    this.action$
+    .pipe(
+      ofActionSuccessful(BulkDeleteDepartmentsucceeded),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+      this.departmentsDetailsFormGroup.reset();
+      this.clearSelection(this.grid);
+      let locationNames=payload.payload.names;
+      if(locationNames && locationNames.length > 0){
+        this.bulkaction=1;
+        this.bulkactionnotvalidlocationnmaes=locationNames;
+        this.bulkactionmessage = payload.payload.message;
+        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+      }
+      else{
+        this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Department));
+      }
+      this.getDepartments();
+    });
+    this.action$
+    .pipe(
+      ofActionSuccessful(BulkDeleteDepartmentFailed),
+      takeUntil(this.componentDestroy())
+    ).subscribe((payload) => {
+      let locationNames=payload.payload.names;
+        this.bulkactionmessage = payload.payload.message;
+        this.bulkactionnotvalidlocationnmaes=locationNames;
+        this.bulkaction=1;
+        this.clearSelection(this.grid);
+        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+        this.getDepartments();
+    });
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -348,6 +438,38 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       department.reactivateDate
     );
   }
+  OnBulkEdit(){
+    this.isbulkedit=true;
+    this.bulkaction=0;
+    this.isEdit = true;
+    let departmentsDetail: Department[] = this.selectedItems.map(val => ({
+      id: val.id,
+      editedLocationId: val.id,
+      departmentId: val.departmentId,
+      locationId: val.locationId,
+      extDepartmentId: val.extDepartmentId,
+      invoiceDepartmentId: val.invoiceDepartmentId,
+      departmentName: val.departmentName,
+      facilityContact: val.facilityContact,
+      facilityEmail: val.facilityEmail,
+      facilityPhoneNo: val.facilityPhoneNo,
+      inactiveDate: val.inactiveDate ,
+      reactivateDate: val.reactivateDate,
+      unitDescription: val.unitDescription,
+      locationIncludeInIRP: val.locationIncludeInIRP,
+      isDeactivated:val.isDeactivated,
+      ignoreValidationWarning: val.ignoreValidationWarning,
+      primarySkills: val.primarySkills,
+      secondarySkills: val.secondarySkills,
+      primarySkillNames: val.primarySkillNames,
+      secondarySkillNames: val.secondarySkillNames,
+      createReplacement:val.createReplacement,
+     includeInIRP: val.includeInIRP,
+    }));
+    let includeInIRPStatus=  departmentsDetail.every(x=>x.includeInIRP==true);
+    this.departmentsDetailsFormGroup.controls['includeInIRP'].setValue(includeInIRPStatus);
+    this.store.dispatch(new ShowSideDialog(true));
+  }
 
   private inactivateDateHandler(field: AbstractControl, value: string | null, reactivateValue: string | null): void {
     if (value) {
@@ -374,8 +496,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   onRemoveDepartmentClick(department: Department, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
-      .confirm(DELETE_RECORD_TEXT, {
-        title: DELETE_RECORD_TITLE,
+      .confirm('Are you sure you want to delete this department?', {
+        title: 'Delete Department',
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
@@ -443,16 +565,52 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   }
 
   onDepartmentFormSaveClick(ignoreWarning = false): void {
-    if (this.departmentsDetailsFormGroup.valid) {
-      const department: Department = DepartmentsAdapter.prepareToSave(
-        this.editedDepartmentId,
-        this.selectedLocation.id,
-        this.departmentsDetailsFormGroup,
-        this.areSkillsAvailable
-      );
-      this.saveOrUpdateDepartment(department, ignoreWarning);
-    } else {
-      this.departmentsDetailsFormGroup.markAllAsTouched();
+    const inactiveDate = this.departmentsDetailsFormGroup.controls['inactiveDate'].value;
+    if(this.isbulkedit)
+    {
+      let departments: Department[];
+      let departmentsDetails: Department[] = this.selectedItems.map(val => ({
+
+
+        id: val.id,
+        editedLocationId: val.id,
+        departmentId: val.departmentId,
+        locationId: val.locationId,
+        extDepartmentId: val.extDepartmentId,
+        invoiceDepartmentId: val.invoiceDepartmentId,
+        departmentName: val.departmentName,
+        facilityContact: val.facilityContact,
+        facilityEmail: val.facilityEmail,
+        facilityPhoneNo: val.facilityPhoneNo,
+        inactiveDate: inactiveDate ? DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(inactiveDate)) : null,
+        reactivateDate: val.reactivateDate,
+        unitDescription: val.unitDescription,
+        locationIncludeInIRP: val.locationIncludeInIRP,
+        isDeactivated:val.isDeactivated,
+        ignoreValidationWarning: val.ignoreValidationWarning,
+
+        primarySkills: val.primarySkills,
+        secondarySkills: val.secondarySkills,
+        primarySkillNames: val.primarySkillNames,
+        secondarySkillNames: val.secondarySkillNames,
+        createReplacement:val.createReplacement,
+       includeInIRP: this.departmentsDetailsFormGroup.controls['includeInIRP'].value,
+      }));
+     this.store.dispatch(new BulkUpdateDepartment(departmentsDetails));
+    }
+    else
+    {
+      if (this.departmentsDetailsFormGroup.valid) {
+        const department: Department = DepartmentsAdapter.prepareToSave(
+          this.editedDepartmentId,
+          this.selectedLocation.id,
+          this.departmentsDetailsFormGroup,
+          this.areSkillsAvailable
+        );
+        this.saveOrUpdateDepartment(department, ignoreWarning);
+      } else {
+        this.departmentsDetailsFormGroup.markAllAsTouched();
+      }
     }
   }
 
@@ -494,13 +652,34 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
   }
 
   private saveOrUpdateDepartment(department: Department, ignoreWarning: boolean): void {
+
     if (this.isEdit) {
       this.updateDepartment(department, ignoreWarning);
     } else {
       this.store.dispatch(new SaveDepartment(department, this.filters));
     }
   }
+  OnBulkDelete(){
+      this.isbulkdelete=true;
+      this.bulkaction=1;
+      this.confirmService
+        .confirm('Are you sure you want to delete these departments?', {
+          title: 'Delete Departments',
+          okButtonLabel: 'Delete',
+          okButtonClass: 'delete-button',
+        }).pipe(
+          take(1)
+        ).subscribe((confirm) => {
+          if (confirm) {
 
+            let selecteddepartmentstodelete = this.selectedItems.map((val) => (val?.departmentId
+              ?? 0));
+
+            this.store.dispatch(new BulkDeleteDepartment(selecteddepartmentstodelete));
+          }
+          this.removeActiveCssClass();
+        });
+    }
   private checkIRPFlag(): void {
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }

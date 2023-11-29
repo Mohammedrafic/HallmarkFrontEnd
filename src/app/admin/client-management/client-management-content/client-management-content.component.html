@@ -59,7 +59,7 @@
       [height]="fullScreenGridHeight"
       (rowSelected)="rowSelected($event, grid)"
       (rowDeselected)="rowDeselected($event, grid)"
-      (dataBound)="gridDataBound(grid)"
+      (dataBound)="gridDataBound(grid, cd)"
       [selectionSettings]="selectionSettings"
       (actionBegin)="actionBegin($event)"
     >
@@ -90,6 +90,8 @@
               </ejs-chiplist>
             </div>
           </ng-template>
+        </e-column>
+        <e-column field="entity" headerText="Entity Name" textAlign="Left" width="180">
         </e-column>
         <e-column field="contactDetails.0.contactPerson" headerText="Primary Contact" textAlign="Left" width="180"></e-column>
         <e-column field="contactDetails.0.email" headerText="Email" textAlign="Left" width="200"></e-column>

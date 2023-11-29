@@ -1,16 +1,16 @@
 import { DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, FilterChanged, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded, SetYearFilter } from '@admin/store/holidays.actions';
 import { HolidaysState } from '@admin/store/holidays.state';
-import { DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { formatDate } from '@angular/common';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { Holiday } from '@shared/models/holiday.model';
+import { Holiday, HolidaysPage } from '@shared/models/holiday.model';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetDirtyState } from 'src/app/admin/store/admin.actions';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -37,7 +37,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
   @ViewChild('grid') grid: GridComponent;
 
   @Select(HolidaysState.holidaysPage)
-  holidaysPage$: Observable<any>;
+  holidaysPage$: Observable<HolidaysPage>;
 
   public HolidayFormGroup: FormGroup;
   public title = '';
@@ -47,13 +47,13 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
   public maxDate = new Date(2099, 11, 31);
   public yearsList: number[] = [];
   public format = {
-    type:'date', format: 'MM/dd/yyyy HH:mm'
+    type:'date', format: 'MM/dd/yyyy HH:mm',
   };
   public showForm = true;
   public columnsToExport: ExportColumn[] = [
     { text:'Holiday Name', column: 'HolidayName'},
     { text:'Start Date & Time', column: 'StartDateTime'},
-    { text:'End Date & Time', column: 'EndDateTime'}
+    { text:'End Date & Time', column: 'EndDateTime'},
   ];
   public fileName: string;
   public defaultFileName: string;
@@ -64,7 +64,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService,
-              private datePipe: DatePipe) {
+              public cd: ChangeDetectorRef) {
     super(store);
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
@@ -94,7 +94,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
   override ngOnInit(): void {
     super.ngOnInit();
     this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
+    this.pageSubject.pipe(throttleTime(100), takeUntil(this.unsubscribe$)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
     });
@@ -117,7 +117,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
   }
 
   public override customExport(): void {
-    this.defaultFileName = 'Master Holidays ' + this.generateDateTime(this.datePipe);
+    this.defaultFileName = 'Master Holidays ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -133,7 +133,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = 'Master Holidays ' + this.generateDateTime(this.datePipe);
+    this.defaultFileName = 'Master Holidays ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
     this.store.dispatch(new ExportHolidays(new ExportPayload(
       fileType,
       {
@@ -148,7 +148,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
     this.clearSelection(this.grid);
   }
 
-  public copyHoliday(data: any, event: any): void {
+  public copyHoliday(data: Holiday, event: Event): void {
     this.showForm = true;
     this.title = 'Copy';
     this.addActiveCssClass(event);
@@ -173,7 +173,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public editHoliday(data: any, event: any): void {
+  public editHoliday(data: Holiday, event: Event): void {
     this.showForm = true;
     this.addActiveCssClass(event);
     this.title = 'Edit';
@@ -186,13 +186,13 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public deleteHoliday(data: any, event: any): void {
+  public deleteHoliday(data: Holiday, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .subscribe((confirm) => {
         if (confirm) {
@@ -208,7 +208,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
       .confirm(CANCEL_CONFIRM_TEXT, {
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(
         filter(confirm => !!confirm),
         takeUntil(this.unsubscribe$),

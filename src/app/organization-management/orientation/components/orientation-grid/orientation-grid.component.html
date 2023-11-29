@@ -1,8 +1,8 @@
 <app-grid
+  class="orientation-grid"
   [gridTitle]="gridTitle"
   [rowData]="dataSource?.items || []"
   [columnDefinitions]="columnDef"
-  [rowSelection]="'multiple'"
   [totalRecordsCount]="dataSource?.totalCount || 0"
   [pageSize]="filters.pageSize"
   [currentPage]="filters.pageNumber"
@@ -72,7 +72,7 @@
           </ejs-multiselect>
         </div>
       </div>
-      
+
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">

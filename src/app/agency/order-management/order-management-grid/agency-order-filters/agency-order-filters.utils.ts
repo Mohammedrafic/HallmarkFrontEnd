@@ -1,4 +1,4 @@
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { AgencyOrganizationRegion, OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 
 export const getRegionsFromOrganizationStructure = (structure: OrganizationStructure[]): OrganizationRegion[] => {
   let res: OrganizationRegion[] = [];
@@ -16,6 +16,20 @@ export const getLocationsFromRegions = (regions: OrganizationRegion[]): Organiza
       const data: OrganizationLocation[] = locations.map((location) => ({
         ...location,
         regionName: `${orgName} / ${name}`,
+      }));
+      locationsWithName = [...locationsWithName, ...data];
+    }
+  });
+  return locationsWithName;
+};
+
+export const getAgencyLocationsFromRegions = (regions: AgencyOrganizationRegion[]): OrganizationLocation[] => {
+  let locationsWithName: OrganizationLocation[] = [];
+  regions.forEach(({ name, organisationName, locations }) => {
+    if (locations) {
+      const data: OrganizationLocation[] = locations.map((location) => ({
+        ...location,
+        regionName: `${organisationName} / ${name}`,
       }));
       locationsWithName = [...locationsWithName, ...data];
     }

@@ -159,15 +159,15 @@ ejs-textbox.e-control {
 .general-information-wrapper {
   display: grid;
   grid-auto-columns: 1fr;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(12, 1fr);
   grid-template-rows: repeat(4, 1fr);
   gap: 16px;
   align-items: end;
   grid-template-areas:
-    "item1 item1 item2 item2"
-    "item3 item3 item4 item4"
-    "item5 item6 item7 item8"
-    "item9 item10 item11 .";
+  "item1 item1 item1 item1 item1 item1 item2 item2 item2 item2 item2 item2"
+  "item3 item3 item3 item3 item3 item3 item4 item4 item4 item4 item4 item4"
+  "item5 item5 item5 item6 item6 item6 item7 item7 item7 item8 item8 item8"
+  "item9 item9 item10 item10 item11 item11 item12 item12 item12 item13 item13 item13";
 }
 
 .item1 {
@@ -197,7 +197,7 @@ ejs-textbox.e-control {
     "item1 item1 item2 item2"
     "item3 item3 item4 item4"
     "item5 item6 item6 item6"
-    "item7 item8 item9 .";
+    "item7 item8 item9 item10";
 }
 
 .item5 {
@@ -207,7 +207,28 @@ ejs-textbox.e-control {
 .item6 {
   grid-area: item6
 }
+.item7 {
+  grid-area: item7
+}
 
+.item8 {
+  grid-area: item8
+}
+.item9 {
+  grid-area: item9
+}
+.item10 {
+  grid-area: item10
+}
+.item11 {
+  grid-area: item11
+}
+.item12 {
+  grid-area: item12
+}
+.item13 {
+  grid-area: item13
+}
 .special-project-wrapper {
   width: 70%;
   display: grid;

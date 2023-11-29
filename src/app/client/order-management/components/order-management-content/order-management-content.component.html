@@ -472,6 +472,16 @@
           </ng-template>
         </e-column>
         <e-column
+        field="expectedWorkWeek"
+        headerText="Expected work week"
+        headerTextAlign="Right"
+        width="135"
+        minWidth="110"
+        maxWidth="180"
+        textAlign="Left"
+      >
+      </e-column>
+        <e-column
           field="regionName"
           headerText="REGION"
           textAlign="Left"
@@ -609,7 +619,7 @@
         </e-column>
         <e-column field="creationDate" headerText="Creation Date" width="150" minWidth="140" maxWidth="200">
           <ng-template #template let-data>
-            <span>{{ data.creationDate | date: formatDate }}</span>
+            <span>{{ data.creationDate | localDateTime: formatDate }}</span>
           </ng-template>
         </e-column>
       </e-columns>

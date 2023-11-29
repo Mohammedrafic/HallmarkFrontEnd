@@ -111,3 +111,11 @@ export class LocationsByRegionsFilter {
   pageNumber?: number;
   getAll?:boolean;
 }
+
+export class BulkLocationsAction{
+  bulkactionresult:boolean;
+  hasValidRecords:boolean;
+  isInProgressRecordsExists:boolean;
+  message:string;
+  locationNames:string[];
+}

@@ -105,6 +105,7 @@
 .toggle-wrapper {
   display: flex;
   align-items: center;
+  color: var(--sub-title-2);
 
   & span {
     font-size: 14px;
@@ -125,4 +126,35 @@
   .input-container {
     @include toggle;
   }
+}
+
+.bulk-section {
+  background-color: $primary-active-blue-10;
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+  margin-bottom: 10px;
+
+  &__rowscount {
+    margin-right: 60px;
+    margin-left:31px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.015em;
+    color: #fff
+  }
+  .edit-button,
+  .delete-button {
+    color:#fff
+  }
+}
+.gridrightpager{
+position:absolute;
+right:0;
+}
+
+.e-pager{
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
 }

@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { AbstractPermissionGrid } from '../../../shared/helpers/permissions';
 import { RemoveMsp } from '../../store/actions/msp.actions';
 
 @Component({
@@ -12,14 +13,15 @@ import { RemoveMsp } from '../../store/actions/msp.actions';
   styleUrls: ['./mspaction-cellrender.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MspactionCellrenderComponent implements ICellRendererAngularComp {  
+export class MspactionCellrenderComponent extends AbstractPermissionGrid implements ICellRendererAngularComp {  
 
   public params: any;
 constructor(    private router: Router,
-  private route: ActivatedRoute,private confirmService:ConfirmService,private store:Store)
-  {
+  private route: ActivatedRoute, private confirmService: ConfirmService, protected override store:Store)
+{
+  super(store);
     
-  }
+}
   agInit(params: any): void {
     this.params = params;
   }

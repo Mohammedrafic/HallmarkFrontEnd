@@ -32,11 +32,9 @@
           <div class="cost">${{ regularRates.regularLocal | number: '1.2-2' }}</div>
           <div class="sup-title">Regular Local Bill Rate</div>
         </div>
-        <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
-        <ng-container [ngTemplateOutlet]="orderInfo" *ngIf="!regularRates.regularLocal || !regularRates.regular"></ng-container>
-
-
-        <ng-container [ngTemplateOutlet]="orderInfo" *ngIf="regularRates.regularLocal && regularRates.regular"></ng-container>
+        <ng-container [ngTemplateOutlet]="skillTemplate" *ngIf="!orderInformation.extensionFromId"></ng-container>
+        <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
+        <ng-container [ngTemplateOutlet]="skillTemplate" *ngIf="orderInformation.extensionFromId"></ng-container>
       </ng-container>
     </div>
   </section>
@@ -68,7 +66,7 @@
         <div class="sup-title">Start / End Bonus</div>
       </div>
       <div class="column" *ngIf="activeSystems !== systemType.IRP">
-        <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
+        <div class="title">{{ orderInformation.orderOpenDate ? (orderInformation.orderOpenDate.toString() | localDateTime: 'MM/dd/yyy') : '-' }}</div>
         <div class="sup-title">Distributed On</div>
       </div>
 

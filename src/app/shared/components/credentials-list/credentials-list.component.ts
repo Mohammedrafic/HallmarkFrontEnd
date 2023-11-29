@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatestWith, filter, Observable, Subject, takeUntil, tap, throttleTime } from 'rxjs';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -27,7 +27,6 @@ import {
 import { DatePipe } from '@angular/common';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
-import { PermissionService } from 'src/app/security/services/permission.service';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import {
   ExportColumns,
@@ -87,8 +86,8 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
               private confirmService: ConfirmService,
               private datePipe: DatePipe,
               private route: ActivatedRoute,
-              private permissionService: PermissionService,
-              private credentialFiltersService: CredentialFiltersService) {
+              private credentialFiltersService: CredentialFiltersService,
+              public cd: ChangeDetectorRef) {
     super(store);
   }
 

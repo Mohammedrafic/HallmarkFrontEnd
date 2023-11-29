@@ -20,6 +20,7 @@ export class BillRatesSyncService {
     const sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
       (billRate) => billRate.billRateConfig.id === billRateType
     );
+    
     for (const billRate of sortedBillRates) {
       const timeStamp = new Date(billRate.effectiveDate).getTime();
       if (timeStamp < jobStartDateTimeStamp) {

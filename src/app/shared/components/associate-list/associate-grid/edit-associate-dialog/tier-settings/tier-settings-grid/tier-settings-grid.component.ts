@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { filter, Observable, takeUntil } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -50,7 +50,8 @@ export class TierSettingsGridComponent extends DestroyableDirective implements O
   constructor(
     private store: Store,
     private actions$: Actions,
-    private router: Router
+    private router: Router,
+    private cd: ChangeDetectorRef,
   ) {
     super();
   }
@@ -91,6 +92,7 @@ export class TierSettingsGridComponent extends DestroyableDirective implements O
 
   public gridReady(grid: GridReadyEventModel): void {
     grid.api.sizeColumnsToFit();
+    this.cd.detectChanges();
   }
 
   private watchForRegionStructure(): void {

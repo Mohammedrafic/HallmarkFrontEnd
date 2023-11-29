@@ -6,14 +6,33 @@
 
   ::ng-deep {
     .ag-root-wrapper {
-      border: 1px solid var(--grid-border-color) !important;
+      border: 1px solid var(--grid-header-border) !important;
+      background-color: var(--bg-default) !important;
       border-top-left-radius: 14px !important;
       border-top-right-radius: 14px !important;
+    }
+
+    .ag-cell-value {
+      color: var(--text) !important;
+    }
+
+    .ag-header {
+      border-color: var(--grid-header-border) !important;
     }
 
     .ag-header-cell {
       color: $secondary-dark-blue-15;
       font-weight: 600;
+    }
+
+    .ag-row {
+      border-color: var(--grid-header-border) !important;
+    }
+
+    .ag-row-hover {
+     .ag-cell-value {
+        color: $black !important;
+      }
     }
 
     .ag-center-cols-viewport {

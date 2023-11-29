@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
@@ -27,7 +27,7 @@ import {
   UpdateCredentialType
 } from '@admin/store/admin.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { DatePipe } from '@angular/common';
+import { formatDate } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { TakeUntilDestroy } from '@core/decorators';
@@ -46,7 +46,6 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
   credentialType$: Observable<CredentialType[]>;
 
   public credentialTypeFormGroup: FormGroup;
-  public formBuilder: FormBuilder;
 
   public isEdit: boolean;
   public editedCredentialTypeId?: number;
@@ -55,7 +54,7 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
   public defaultFileName: string;
 
   public columnsToExport: ExportColumn[] = [
-    { text:'Types', column: 'Name'}
+    { text:'Types', column: 'Name'},
   ];
 
   protected componentDestroy: () => Observable<unknown>;
@@ -65,11 +64,10 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
   }
 
   constructor(protected override store: Store,
-              @Inject(FormBuilder) private builder: FormBuilder,
+              @Inject(FormBuilder) private formBuilder: FormBuilder,
               private confirmService: ConfirmService,
-              private datePipe: DatePipe) {
+              public cd: ChangeDetectorRef) {
     super(store);
-    this.formBuilder = builder;
     this.createTypeForm();
   }
 
@@ -80,7 +78,7 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
   }
 
   public override customExport(): void {
-    this.defaultFileName = 'Credential Types ' + this.generateDateTime(this.datePipe);
+    this.defaultFileName = 'Credential Types ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -96,7 +94,7 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = 'Credential Types ' + this.generateDateTime(this.datePipe);
+    this.defaultFileName = 'Credential Types ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
     this.store.dispatch(new ExportCredentialTypes(new ExportPayload(
       fileType,
       { },
@@ -111,10 +109,10 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onEditButtonClick(credentialType: CredentialType, event: any): void {
+  onEditButtonClick(credentialType: CredentialType, event: Event): void {
     this.addActiveCssClass(event);
     this.credentialTypeFormGroup.setValue({
-      credentialTypeName: credentialType.name
+      credentialTypeName: credentialType.name,
     });
     this.editedCredentialTypeId = credentialType.id;
     this.isEdit = true;
@@ -122,13 +120,13 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onRemoveButtonClick(credentialType: CredentialType, event: any): void {
+  onRemoveButtonClick(credentialType: CredentialType, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(
         takeUntil(this.componentDestroy())
       ).subscribe((confirm) => {
@@ -158,7 +156,7 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         }).pipe(
           filter(confirm => !!confirm),
           takeUntil(this.componentDestroy()),
@@ -180,8 +178,8 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
     if (this.credentialTypeFormGroup.valid) {
       const type: CredentialType = {
         id: this.editedCredentialTypeId,
-        name: this.credentialTypeFormGroup.controls['credentialTypeName'].value
-      }
+        name: this.credentialTypeFormGroup.controls['credentialTypeName'].value,
+      };
 
       if (this.isEdit) {
         this.store.dispatch(new UpdateCredentialType(type));
@@ -206,13 +204,14 @@ export class MasterCredentialsTypesComponent extends AbstractPermissionGrid impl
         this.lastAvailablePage = this.getLastPage(data);
         this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
         this.totalDataRecords = data.length;
+        this.cd.detectChanges();
       }
     });
   }
 
   private createTypeForm(): void {
     this.credentialTypeFormGroup = this.formBuilder.group({
-      credentialTypeName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]]
+      credentialTypeName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
     });
   }
 

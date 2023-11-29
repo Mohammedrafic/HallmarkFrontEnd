@@ -33,11 +33,12 @@ $chip-margin: 8px;
 .content-container {
   overflow-y: auto;
   padding: 0 24px 20px;
+  margin-top: -1px;
 
   .content-header {
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 2;
     background-color: var(--bg-default);
     padding: 10px 0 20px;
     display: flex;
@@ -241,9 +242,9 @@ app-navigation-panel {
 }
 
 .reason-text {
-  border: 1px solid $secondary-dark-blue-40;
+  border: 1px solid var(--input-border-color);
   border-radius: 8px;
-  background-color: $secondary-dark-blue-50;
+  background-color: var(--secondary-background);
   padding: 10px 17px;
   width: auto;
   max-width: 400px;
@@ -290,6 +291,10 @@ app-navigation-panel {
 }
 
 @media #{$max-mobile} {
+  .main-body {
+    height: 100vh;
+  }
+
   .profile-hours-statistics {
     flex-direction: column;
 

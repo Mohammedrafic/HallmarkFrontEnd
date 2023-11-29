@@ -46,6 +46,7 @@ import {
   XCircle,
   ZoomIn,
   ZoomOut,
+  PauseCircle,
 } from 'angular-feather/icons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -109,6 +110,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { TextareaModule } from '../shared/components/form-controls/textarea/textarea.module';
 import { AgencyHistoryDetailsComponent } from './agency-list/agency-history-details/agency-history-details.component';
 import { AgGridModule } from '@ag-grid-community/angular';
+import { LocalDateTimePipeModule } from '@shared/pipes/local-date-time/bool-values-pipe.module';
 
 
 const sidebarIcons = {
@@ -146,6 +148,7 @@ const sidebarIcons = {
   ChevronLeft,
   ChevronsLeft,
   ChevronsRight,
+  PauseCircle,
 };
 
 @NgModule({
@@ -220,6 +223,7 @@ const sidebarIcons = {
     CandidateListModule,
     ChildOrderDialogModule,
     BoolValuePipeModule,
+    LocalDateTimePipeModule,
     GridPaginationModule,
     CandidatesModule,
     AgencyReportsModule,

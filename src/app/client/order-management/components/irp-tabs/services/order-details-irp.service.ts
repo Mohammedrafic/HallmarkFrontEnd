@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { NUMBER_AND_TWO_DECIMAL, ONLY_NUMBER } from '@shared/constants';
+import { ONLY_NUMBER } from '@shared/constants';
 import { Duration } from '@shared/enums/durations';
 import { jobDistributionValidator } from '@client/order-management/components/irp-tabs/order-details/validators';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
@@ -38,6 +38,7 @@ export class OrderDetailsIrpService {
       shiftStartTime: [null, Validators.required],
       shiftEndTime: [null, Validators.required],
       linkedId: [null, Validators.maxLength(20)],
+      ExpectedWorkWeek:[null, [Validators.maxLength(50)]]
     });
   }
 
@@ -63,7 +64,7 @@ export class OrderDetailsIrpService {
       jobDistribution: [null, Validators.required],
       agencyId: [null],
       hourlyRate: [null],
-      distributeToVMS: [null,[Validators.pattern(NUMBER_AND_TWO_DECIMAL)]],
+      distributeToVMS: [null,[Validators.pattern(ONLY_NUMBER)]],
       distributionDelay: [null],
     },{
       validators: jobDistributionValidator('jobDistribution','distributeToVMS','distributionDelay',this.isTemplate),
@@ -76,7 +77,7 @@ export class OrderDetailsIrpService {
       jobDistribution: [null, Validators.required ],
       agencyId: [null],
       billRate: [null],
-      distributeToVMS: [null,[Validators.pattern(NUMBER_AND_TWO_DECIMAL)]],
+      distributeToVMS: [null,[Validators.pattern(ONLY_NUMBER)]],
       distributionDelay: [null],
     }, {
         validators: jobDistributionValidator('jobDistribution','distributeToVMS','distributionDelay',this.isTemplate),
