@@ -224,7 +224,6 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
       DepartmentsParam: this.departmentsList.map((list) => Number(list.id)),
 
     }; 
-    console.log(this.paramsData)
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
