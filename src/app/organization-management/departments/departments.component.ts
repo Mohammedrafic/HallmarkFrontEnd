@@ -319,6 +319,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       this.getDepartments();
       this.store.dispatch(new ShowSideDialog(false));
       this.isbulkedit=false;
+      this.isbulkdelete=false;
 
     });
     this.action$
@@ -355,6 +356,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Department));
       }
       this.getDepartments();
+      this.isbulkedit=false;
+      this.isbulkdelete=false;
     });
     this.action$
     .pipe(
