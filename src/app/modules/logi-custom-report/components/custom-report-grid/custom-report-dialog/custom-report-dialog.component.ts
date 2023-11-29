@@ -218,10 +218,12 @@ export class CustomReportDialogComponent extends AbstractPermissionGrid implemen
   {
     this.paramsData =
     {
-      OrganizationParam: [this.agencyOrganizationId],
-      RegionsParam: this.regionsList?.map((list) => Number(list.id)),
-      LocationsParam: this.locationsList.map((list) => Number(list.id)),
-      DepartmentsParam: this.departmentsList.map((list) => Number(list.id)),
+    
+      '@OrganizationId': [this.agencyOrganizationId],
+      '@RegionIds': this.regionsList?.map((list) => Number(list.id)),
+       '@LocationIds': this.locationsList.map((list) => Number(list.id)),
+      '@DepartmentIDs': this.departmentsList.map((list) => Number(list.id)),
+ 
 
     }; 
     this.logiReportComponent.paramsData = this.paramsData;
