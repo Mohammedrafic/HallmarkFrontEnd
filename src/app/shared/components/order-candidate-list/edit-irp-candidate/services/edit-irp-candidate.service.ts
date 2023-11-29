@@ -10,7 +10,6 @@ import {
   atpStipendRate,
   CandidateField,
   CandidateForm,
-  ratePerhourConfig
 } from '@shared/components/order-candidate-list/edit-irp-candidate/interfaces';
 import {
   CreateCandidateDto,
@@ -33,7 +32,7 @@ import { ApplicantStatus } from '@shared/models/order-management.model';
 import { CancelEmployeeReasons, RejectReason, RejectReasonwithSystem } from '@shared/models/reject-reason.model';
 import { OrderClosureReasonType } from '@shared/enums/order-closure-reason-type.enum';
 import { DateTimeHelper } from '@core/helpers';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Location } from "@shared/models/location.model"
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
@@ -346,15 +345,6 @@ export class EditIrpCandidateService {
       offeredEndDate
     };
   }
-
-    public getPredefinedBillRatesforRatePerHour(orderType: number, departmentId: number, skillId: number): Observable<ratePerhourConfig> {
-      let params = new HttpParams()
-        .append('orderType', orderType)
-        .append('departmentId', departmentId)
-        .append('skillId', skillId);
-
-      return this.http.get<ratePerhourConfig>('/api/PayRates/predefinedpayrate/forOrder', { params })
-    }
 
     public getATPstipendRate(zip: string, Actualstartdate: string) : Observable<atpStipendRate>{
       return this.http.get<atpStipendRate>('/api/IRPApplicants/atpstipendrate?zip='+ zip + '&ActualStartdate=' + Actualstartdate)
