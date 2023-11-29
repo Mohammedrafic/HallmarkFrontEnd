@@ -124,6 +124,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public credentialStatusOptions$ = new BehaviorSubject<FieldSettingsModel[]>([]);
   public existingFiles: CredentialFiles[] = [];
   public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
+  public hasNoOrderId: boolean = false;
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -135,7 +136,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private candidateProfileId: number;
   private credentialType: CredentialType;
   public isOrgOnlyIRPEnabled:boolean=false;
-  private isOrgVMSEnabled:boolean=false;
+  private isOrgVMSEnabled: boolean = false;
 
   @Select(CandidateState.candidateCredential)
   candidateCredential$: Observable<CandidateCredentialResponse>;
@@ -262,6 +263,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetCredentialTypes());
     this.addCredentialForm = this.credentialGridService.createAddCredentialForm();
     this.searchCredentialForm = this.credentialGridService.createSearchCredentialForm();
+    this.hasNoOrderId = !this.orderId;
     this.watchForPageChanges();
     this.watchForCandidateActions();
     this.watchForCredentialStatuses();
