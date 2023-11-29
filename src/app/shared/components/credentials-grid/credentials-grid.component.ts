@@ -8,7 +8,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest, EMPTY } from 'rxjs';
+import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest, EMPTY, BehaviorSubject } from 'rxjs';
 
 import { CustomFormGroup, Permission } from '@core/interface';
 import { FileSize, UserPermissions } from '@core/enums';
@@ -121,7 +121,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public openFileViewerDialog = new EventEmitter<number>();
   public disableAddCredentialButton: boolean;
   public requiredCertifiedFields: boolean;
-  public credentialStatusOptions: FieldSettingsModel[] = [];
+  public credentialStatusOptions$ = new BehaviorSubject<FieldSettingsModel[]>([]);
   public existingFiles: CredentialFiles[] = [];
   public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
 
@@ -779,7 +779,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$
       .pipe(ofActionSuccessful(GetCredentialStatusesSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((payload: { statuses: CredentialStatus[] }) => {
-        this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses, this.isIRP);
+        this.credentialStatusOptions$.next(this.credentialGridService.getCredentialStatusOptions(payload.statuses, this.isIRP));
         this.addCredentialForm.patchValue({ status: this.credentialStatus });
       });
   }
