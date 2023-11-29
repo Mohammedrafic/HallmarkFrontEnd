@@ -7,7 +7,6 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 import { MenuSettings } from '@shared/models';
 import { Permission } from '@core/interface';
 import { takeUntil } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-master-data-content',
@@ -21,12 +20,9 @@ export class MasterDataContentComponent extends AbstractPermission implements On
   constructor(
     protected override store: Store, 
     private cd: ChangeDetectorRef, 
-    private router: Router, 
-    private route: ActivatedRoute
   ) {
     super(store);
     store.dispatch(new SetHeaderState({ title: 'Master Data', iconName: 'server' }));
-    this.router.navigate(['./'], { relativeTo: this.route });
   }
 
   override ngOnInit(): void {
