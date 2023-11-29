@@ -237,9 +237,9 @@ app-navigation-panel {
 }
 
 .reason-text {
-  border: 1px solid $secondary-dark-blue-40;
+  border: 1px solid var(--input-border-color);
   border-radius: 8px;
-  background-color: $secondary-dark-blue-50;
+  background-color: var(--secondary-background);
   padding: 10px 17px;
   width: auto;
   max-width: 400px;

@@ -51,6 +51,7 @@ export const DefaultTimesheetState: TimesheetsModel = {
   timesheetsFiltersColumns: DefaultFilterColumns,
   timesheetDetails: null,
   organizations: [],
+  agencyOrganizations:[],
   selectedOrganizationId: 0,
   filterOptions: null,
   displayTimesheetHistoricalData: false,

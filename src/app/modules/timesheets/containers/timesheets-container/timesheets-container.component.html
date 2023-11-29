@@ -16,11 +16,10 @@
           <div class="input-container">
             <ejs-dropdownlist
               appHideBeforeSyncfusionLoad
-              *ngIf="organizations$ | async as organizations"
               placeholder="Select organization"
               [allowFiltering]="true"
               [dataSource]="organizations"
-              [fields]="unitOrganizationsFields"
+              [fields]="isAgency ? agencyFields : unitOrganizationsFields"
               [formControl]="organizationControl"
             >
             </ejs-dropdownlist>

@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 
 
-import { DataSourceItem, DropdownOption } from '@core/interface';
+import { AgencyDataSourceItem, DataSourceItem, DropdownOption } from '@core/interface';
 
 import {
   TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
@@ -136,6 +136,40 @@ export class TimesheetsApiService {
   public getOrganizations(): Observable<DataSourceItem[]> {
     return this.http.get<DataSourceItem[]>(`/api/Agency/partneredorganizations`);
   }
+
+    /**
+   * Get the list of Organisation
+   * @param userId
+   * @return UserVisibilitySettingsPage
+   */
+    public getUserVisibilitySettingsOrganisation(userId: string): Observable<AgencyDataSourceItem[]> {
+      return this.http
+        .get<AgencyDataSourceItem[]>(`/api/Organizations/structure/All/${userId}`)
+        .pipe(
+          map((organizations) =>
+            sortByField(organizations, 'name').map((org) => ({
+              ...org,
+              regions: sortByField(org.regions, 'name').map((region) => ({
+                ...region,
+                organizationId: org.organizationId,
+                regionId: region.id,
+                locations: sortByField(region.locations, 'name').map((location) => ({
+                  ...location,
+                  organizationId: org.organizationId,
+                  regionId: region.id,
+                  locationId: location.id,
+                  departments: sortByField(location.departments, 'name').map((department) => ({
+                    ...department,
+                    organizationId: org.organizationId,
+                    regionId: region.id,
+                    locationId: location.id,
+                  })),
+                })),
+              })),
+            }))
+          )
+        );
+    }
 
   public getCandidateBillRates(
     jobId: number,
