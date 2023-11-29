@@ -1,0 +1,7 @@
+.grid-custom-option {
+  ::ng-deep {
+    .ag-side-bar-right {
+      border-left-color: var(--grid-header-border);
+    }
+  }
+}

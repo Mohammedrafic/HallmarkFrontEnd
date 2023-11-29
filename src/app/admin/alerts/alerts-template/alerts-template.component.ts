@@ -46,7 +46,6 @@ import { BUSINESS_UNITS_VALUES_WITH_IRP } from '@shared/constants/business-unit-
 import { OutsideZone } from '@core/decorators';
 import { DetectActiveSystem, SystemGroupConfig } from '@client/order-management/constants';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { GetOrganizationById } from '@admin/store/alerts.actions';
 
 @Component({
@@ -144,7 +143,6 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   pagination: boolean;
   paginationPageSize: number;
   columnDefs: any;
-  filterText: string | undefined;
   frameworkComponents: any;
   sideBar: any;
   serverSideStoreType: any;

@@ -11,8 +11,7 @@ import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-
 import { GRID_CONFIG } from '@shared/constants';
 import { InterfaceLogSummary, InterfaceLogSummaryIRPPage } from '@shared/models/org-interface.model';
 import { downloadBlobFile } from '@shared/utils/file.utils';
-import { AnyARecord } from 'dns';
-import { BehaviorSubject, Observable, Subject, distinctUntilChanged, take, takeUntil, takeWhile, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, take, takeUntil, takeWhile } from 'rxjs';
 import { OrgInterfaceService } from 'src/app/security/services/org-interface.service';
 import { GetInterfaceLogDetails, GetInterfaceLogSummaryPage } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
@@ -42,7 +41,6 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
   private isAlive = true;
   public totalRecordsCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   public gridApi: any;
-  private gridColumnApi: any;
   defaultColDef: ColDef = DefaultUserGridColDef;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   cacheBlockSize: any;
@@ -50,7 +48,6 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
   frameworkComponents: any;
   serverSideStoreType: any;
   serverSideInfiniteScroll: any;
-  serverSideFilterOnServer: any;
   pagination: boolean;
   paginationPageSize: number;
   maxBlocksInCache: any;
@@ -64,12 +61,10 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
   public selectedType: number;
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
-  public downloadedFileName: string = '';
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
   };
-  // public rowData: LogInterfacePage[]=[];
   public readonly columnDefs: ColumnDefinitionModel[] = [
     {
       headerName: 'View',
@@ -266,7 +261,7 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
   ngOnInit(): void {
 
     this.subscribeOnBusinessUnitChange();
-  
+
     this.logInterfacePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
       this.itemList = data?.items?.sort(function (a: any, b: any) {
         return b.createdAt.localeCompare(a.createdAt);

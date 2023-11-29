@@ -21,7 +21,6 @@ import { UserState } from 'src/app/store/user.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 
-
 @Component({
   selector: 'app-log-interface',
   templateUrl: './log-interface.component.html',
@@ -59,7 +58,6 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   frameworkComponents: any;
   serverSideStoreType: any;
   serverSideInfiniteScroll: any;
-  serverSideFilterOnServer: any;
   pagination: boolean;
   paginationPageSize: number;
   maxBlocksInCache: any;
@@ -76,7 +74,7 @@ export class LogInterfaceComponent extends AbstractGridConfigurationComponent im
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
   };
-  // public rowData: LogInterfacePage[]=[];
+
   public readonly columnDefs: ColumnDefinitionModel[] = [
     {
       field: 'id',
