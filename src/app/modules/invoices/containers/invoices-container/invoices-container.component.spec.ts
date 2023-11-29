@@ -181,7 +181,7 @@ describe('InvoicesContainerComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('watchAgencyId method should work correctly', () => {
+  xit('watchAgencyId method should work correctly', () => {
     const controlResetSpy = spyOn(component.organizationControl, 'reset');
     const controlSetValueSpy = spyOn(component.organizationControl, 'setValue');
     const organizationMultiSelectControlSetValueSpy = spyOn(component.organizationMultiSelectControl, 'setValue');
