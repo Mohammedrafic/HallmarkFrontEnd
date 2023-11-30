@@ -679,7 +679,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       else {
         this.disableEditButton = false;
       }
-      
+
     })
   }
 
