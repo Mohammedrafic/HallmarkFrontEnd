@@ -32,7 +32,7 @@
           </ejs-dropdownlist>
         </div>
       </div>
-      <div class="buttons-group" [class.top-margin]="!isAgency">
+      <div class="buttons-group invoiceheader" [class.top-margin]="!isAgency">
         <div class="buttons-container">
           <div class="e-checkbox-wrapper e-css" _ngcontent-yyg-c377="">
             <input class="e-checkselectall" style="height:19px;width:33px;margin-top:11px;"_ngcontent-yyg-c377="" type="checkbox" aria-label="checkbox" 
@@ -118,7 +118,7 @@
         <!--      TODO: Move to component-->
         <ejs-tooltip [content]="getCreateInvoiceTooltip"
                      position="BottomCenter"
-                     [opensOn]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled ? 'Auto' : 'Custom'">
+                     [opensOn]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled ? 'Auto' : 'Custom'" class="tooltipcls" >
           <div class="invoices-split-button" *ngIf="tabConfig?.groupingEnabled && groupInvoicesBy">
             <button ejs-button
                     appHideBeforeSyncfusionLoad
