@@ -12,14 +12,11 @@
     font-size: 16px;
     font-weight: 700;
     line-height: 24px;
-    // width: 100%;
     width: 50%;
     text-align: right
   }
   &__head {
-   // font-size: 16px;
     font-weight: 700;
-  //  line-height: 24px;
     width: 100%;
     text-align: right
   }
@@ -62,7 +59,6 @@
   }
 
   &__point {
-    //width: 32px;
     width: 16px;
     min-width: 16px;
     height: 16px;
@@ -118,7 +114,7 @@
    align-items: center;
    width:100%;
    text-align:right;
-   
+
 }
 
 .widget_left{
@@ -144,7 +140,7 @@
 }
 .widget-legend__item-content.legent-sticky-header {
   position: sticky !important;
-  background: #fff !important;
+  background: var(--bg-widget) !important;
   z-index: 99 !important;
   top: 0 !important;
 }

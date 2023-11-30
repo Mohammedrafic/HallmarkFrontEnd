@@ -6,6 +6,7 @@ body.light {
   --info-background: #{$secondary-dark-blue-50};
   --bg-default: #{$white};
   --bg-container: #{$background};
+  --bg-widget: #{$white};
   --bg-sub-row: #{$white};
   --bg-upload-area: #{$primary-active-blue-90};
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
@@ -67,6 +68,7 @@ body.dark {
   --info-background: #{$widget-dark-tooltip};
   --bg-default: #{$sidebar-background};
   --bg-container: #{$bg-grey-100};
+  --bg-widget: #{$midnight-express};
   --bg-sub-row: #{$grid-detail-row-bgcolor};
   --bg-upload-area: #{$widget-dark-tooltip};
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
