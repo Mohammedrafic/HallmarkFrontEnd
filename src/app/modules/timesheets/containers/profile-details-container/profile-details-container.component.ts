@@ -679,9 +679,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       else {
         this.disableEditButton = false;
       }
+      
     })
   }
-
 
   private watchForPermissions(): void {
     this.getPermissionStream()
