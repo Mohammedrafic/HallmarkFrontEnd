@@ -204,6 +204,7 @@
             [rowSelection]="'multiple'"
             [bulkActionConfig]="bulkActionConfig"
             [gridOptions]="gridOptions"
+            [context]="context"
             [customRowsPerPageDropDownObject]="recordsPerPageOptions"></app-grid>
 </ng-template>
 
@@ -237,3 +238,4 @@
                          [invoicesToPay]="paymentRecords"
                          (destroyDialog)="closeAddPayment()">
 </app-invoice-add-payment>
+<app-invoice-history-detail [historyDetails]="invoiceDetails"></app-invoice-history-detail>
