@@ -43,6 +43,7 @@ import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { DateTimeHelper } from '@core/helpers';
 import { GetCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
 import { UserService } from '@shared/services/user.service';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -158,7 +159,9 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
 
     let alertId = JSON.parse((localStorage.getItem('alertId') || '0')) as number;
-    if(alertId > 0){
+    let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+    this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    if(alertId > 0 && (alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Candidate Level Comments']].trim().toLowerCase()){
       this.userService.getAlertDetailsForId(alertId).subscribe((data:any)=>{
         window.localStorage.setItem("alertId", JSON.stringify(""));
         if(this.candidatesList && data.candidateId){

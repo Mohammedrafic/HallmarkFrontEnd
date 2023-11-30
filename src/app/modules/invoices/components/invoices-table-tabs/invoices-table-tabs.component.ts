@@ -178,14 +178,15 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
     if ((AlertIdEnum[AlertIdEnum['Invoice: Generated & Pending Approval']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
-      if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
+     /* EIN-26156 changes
+     if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
         this.changeTab.emit(InvoicesOrgTabId.PendingApproval);
         this.tabComponent.selectedItem = InvoicesOrgTabId.PendingApproval;
       }
-      if (user?.businessUnitType === BusinessUnitType.Agency) {
+      if (user?.businessUnitType === BusinessUnitType.Agency) {*/
         this.changeTab.emit(InvoicesOrgTabId.ManualInvoicePending);
         this.tabComponent.selectedItem = InvoicesOrgTabId.ManualInvoicePending;
-      }
+      //}
       this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
     if ((AlertIdEnum[AlertIdEnum['Manual Invoice: Rejected']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
