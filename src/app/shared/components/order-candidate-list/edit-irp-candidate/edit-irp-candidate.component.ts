@@ -398,10 +398,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
     const jobStartDateValue = new Date(jobStartDate.getTime());
+    const jobEndDateValue = new Date(this.candidateDetails.actualEndDate);
     const jobEndDateControl = this.candidateForm.get('actualEndDate') as AbstractControl;
-
-    const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
-    jobEndDateControl.patchValue(jobEndDate);
+    if(this.candidateModelState.candidate.status === CandidatStatus.Cancelled){
+      jobEndDateControl.patchValue(jobEndDateValue);
+    } else {
+      const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
+      jobEndDateControl.patchValue(jobEndDate);
+    }
   }
 
 
