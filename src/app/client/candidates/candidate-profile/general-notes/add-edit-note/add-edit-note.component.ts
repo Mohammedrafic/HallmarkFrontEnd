@@ -63,7 +63,7 @@ export class AddEditNoteComponent extends DestroyableDirective implements OnInit
     this.noteForm = this.formBuilder.group({
       date: [note?.date ?? null, [Validators.required]],
       categoryId: [note?.categoryId ?? null, [Validators.required]],
-      note: [note?.note ?? null, [Validators.maxLength(250)]],
+      note: [note?.note ?? null, [Validators.required]],
       createdByName:[],
     });
   }
