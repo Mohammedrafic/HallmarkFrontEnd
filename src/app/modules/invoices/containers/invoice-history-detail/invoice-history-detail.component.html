@@ -1,0 +1,72 @@
+<ejs-dialog id="dialog" #sideDialog cssClass="dialog order-details-dialog history-dialog"
+  [target]="targetElement$ | async" [visible]="false" [animationSettings]="{ effect: 'SlideRight' }" [isModal]="true">
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">
+              Invoice ID {{invoiceDetails?.organizationPrefix}}-{{ invoiceDetails?.invoiceId }}<span
+                *ngIf="isAgency">-{{invoiceDetails?.agencySuffix}}</span>
+            </h3>
+          </div>
+          <div class="e-card-content dialog-controls contact-to-perm">
+            <button ejs-button type="submit" style="margin-left: 20px;" cssClass="e-flat close-button"
+              (click)="onClose()">
+              <i-feather name="x" class="ml-2 icon"></i-feather>
+            </button>
+          </div>
+        </div>
+      </section>
+      <div class="order-tabs">
+        <ng-container>
+          <ejs-accordion expandMode='Single' (expanding)="expanding($event)">
+            <e-accordionitems>
+              <e-accordionitem expanded='true'>
+                <ng-template #header>
+                  <div>{{title}} Invoice History</div>
+                </ng-template>
+                <ng-template #content>
+                  <section class="app-grid" *ngIf="!isAgency">
+                    <ag-grid-angular class="ag-theme-alpine grid app-grid__component" [gridOptions]="gridOptions"
+                      (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight"
+                      domLayout="autoHeight"></ag-grid-angular>
+
+                  </section>
+
+                  <section class="app-grid" *ngIf="isAgency">
+
+                    <ag-grid-angular class="ag-theme-alpine grid app-grid__component" [gridOptions]="agencygridOptions"
+                      (gridReady)="onagencyInvoicegrid($event)" [rowHeight]="gridConfig.initialRowHeight"
+                      domLayout="autoHeight" *ngIf="isAgency"></ag-grid-angular>
+                  </section>
+                </ng-template>
+              </e-accordionitem>
+              <e-accordionitem>
+                <ng-template #header>
+                  <div>Invoice Payment Log</div>
+                </ng-template>
+                <ng-template #content>
+                  <section class="app-grid" *ngIf="!isAgency">
+                    <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
+                      [gridOptions]="paymentDetailGridOptions" (gridReady)="onPaymentDetail($event)"
+                      [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
+                      *ngIf="!isAgency"></ag-grid-angular>
+
+                  </section>
+                  <section class="app-grid" *ngIf="isAgency">
+
+                    <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
+                      [gridOptions]="agencypaymentDetailGridOptions" (gridReady)="onagencyPaymentDetail($event)"
+                      [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
+                      *ngIf="isAgency"></ag-grid-angular>
+                  </section>
+                </ng-template>
+              </e-accordionitem>
+            </e-accordionitems>
+          </ejs-accordion>
+        </ng-container>
+      </div>
+    </section>
+  </ng-template>
+</ejs-dialog>

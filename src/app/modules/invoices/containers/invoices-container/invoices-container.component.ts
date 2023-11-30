@@ -19,6 +19,7 @@ import {
   tap,
   BehaviorSubject,
   skip,
+  Subject,
 } from 'rxjs';
 
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
@@ -39,7 +40,7 @@ import {
   CreatGroupingOptions, DetectFormConfigBySelectedType, GroupInvoicesOption,
   InvoiceDefaulPerPageOptions, InvoicesPerPageOptions,
 } from '../../constants';
-import { AgencyInvoicesGridTab, InvoicesAgencyTabId, OrganizationInvoicesGridTab } from '../../enums';
+import { AgencyInvoicesGridTab, InvoicesAgencyTabId, MoreMenuType, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
 import { InvoicePrintingService, InvoicesApiService, InvoicesService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
@@ -62,6 +63,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { PendingApprovalInvoice } from '../../interfaces';
 
 @Component({
   selector: 'app-invoices-container',
@@ -134,9 +136,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         ).flat();
     },
   };
-
+  public invoiceDetails =new Subject<PendingApprovalInvoice>();
   public gridOptions: GridOptions = {};
-
+  public context: { componentParent: InvoicesContainerComponent };
   public groupInvoicesOptions: GroupInvoicesOption[] = [];
 
   public groupInvoicesBy: GroupInvoicesOption;
@@ -215,7 +217,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private route: ActivatedRoute,
   ) {
     super(store);
-
+    this.context = { componentParent: this };
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
 
@@ -910,5 +912,16 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         }        
     })
   }
+  
+ menuOptionSelected(menUitem: MoreMenuType, invoiceDetails: PendingApprovalInvoice) {
+  
+  switch (Number(menUitem)) {
+    case MoreMenuType['View history']:
+      this.invoiceDetails.next(invoiceDetails);
+      break;
+
+  }
+}
+
 
 }

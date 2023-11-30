@@ -5,3 +5,7 @@ export enum ManInvoiceOptionsKeys {
   Agencies = 'invoiceAgencies',
   Reasons = 'reasons',
 }
+
+export enum MoreMenuType {
+  'View history'
+}
