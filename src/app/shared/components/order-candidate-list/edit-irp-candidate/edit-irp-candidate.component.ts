@@ -901,7 +901,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     const cancelReasonConfigField = this.getConfigField(CancelReasonField);
 
     if (status === CandidatStatus.Cancelled) {
-      startDateFormControl?.patchValue(this.candidateDetails?.actualStartDate);
+      startDateFormControl?.patchValue(DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualStartDate as string));
       startDateFormControl?.disable();
       endDateConfigField.required = true;
       cancelReasonConfigField.showField = true;
