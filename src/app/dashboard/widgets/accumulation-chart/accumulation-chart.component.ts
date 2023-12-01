@@ -126,14 +126,14 @@ export class AccumulationChartComponent
         window.localStorage.setItem("candidateStatusListFromDashboard",JSON.stringify(candidatesStatusDataSet));
         this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, candidatesStatusDataSet.length > 0 ? status.label : undefined,status.customStatus);
       }
-    }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status" ||  this.chartData?.title==="Average Days for Active Candidates in a Status"){
+    }else if(this.chartData?.title == "Candidates for Active Positions" || this.chartData?.title == "Candidate Overall Status" ||  this.chartData?.title==="Average Days for Active Candidates in a Status for Initial Orders "){
         let candidatesDataset:any = [];
         let candidatesOrderDataSet = [];
         if(this.chartData?.title == "Candidates for Active Positions"){
           this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
             candidatesDataset = data;
           }); 
-        }else if(this.chartData?.title==="Average Days for Active Candidates in a Status"){
+        }else if(this.chartData?.title==="Average Days for Active Candidates in a Status for Initial Orders "){
           this.dashboardService.candidatesavgForActivePositions$.subscribe(data=>{
             candidatesDataset = data;
           });

@@ -25,12 +25,18 @@ import {
 } from '../../interfaces/pending-approval-invoice.interface';
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
 import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
+import { MoreMenuType } from '../../enums';
 
 const commonColumn: ColDef = {
   sortable: true,
   comparator: () => 0,
 };
-
+const threeDotsMenuOptions=[
+  {
+      text: MoreMenuType[0],
+      id: "0",
+  },
+]
 interface PendingApprovalColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;
   actionTitle?: string;
@@ -362,6 +368,34 @@ export class PendingApprovalGridHelper {
         suppressMenu: true,
         filter: false,
         resizable: false,
+      },
+      {
+        headerName: '',
+        cellRenderer: GridActionsCellComponent,
+        cellClass: 'fat-icon-btn',
+        cellRendererParams: (params: ICellRendererParams) => {
+           return {
+            actionsConfig: [
+    
+              {
+                action: (itemId: number) => {
+                  console.log(itemId)
+                  params.context?.componentParent?.menuOptionSelected(itemId, params.data);
+                },
+                iconName: 'more-vertical',
+                buttonClass: 'e-flat primary-icon-button',
+                disabled: false,
+                menuItems: threeDotsMenuOptions,
+              },
+            ],
+          } as GridActionsCellConfig;
+        },
+        sortable: false,
+        suppressMenu: true,
+        filter: false,
+        resizable: false,
+        width: 40,
+  
       },
       {
         field: 'formattedInvoiceId',

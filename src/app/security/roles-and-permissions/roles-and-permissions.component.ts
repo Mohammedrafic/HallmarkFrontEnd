@@ -9,16 +9,16 @@ import { Role, RoleDTO } from '@shared/models/roles.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { filter, Observable, Subject, take, takeWhile } from 'rxjs';
 
-import { SetHeaderState, ShowFilterDialog, ShowSideDialog, ShowExportDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowSideDialog, ShowExportDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { GetBusinessByUnitType, GetBusinessIdDetails, GetPermissionsTree, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
+import { GetBusinessByUnitType, GetBusinessIdDetails, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
 import { SecurityState } from '../store/security.state';
 import { RoleFormComponent } from './role-form/role-form.component';
 import { AddRolesDialogTitle, BUSSINES_DATA_FIELDS,
   EditRolesDialogTitle, OPRION_FIELDS } from './roles-and-permissions.constants';
 import { RolesGridComponent } from './roles-grid/roles-grid.component';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
-import { BUSINESS_UNITS_VALUES, BUSINESS_UNITS_VALUES_USERS_ROLES } from '@shared/constants/business-unit-type-list';
+import { BUSINESS_UNITS_VALUES_USERS_ROLES } from '@shared/constants/business-unit-type-list';
 import { User } from '@shared/models/user.model';
 import { GetBusinessUnitIdDetails } from '@shared/models/user-managment-page.model';
 
@@ -41,7 +41,6 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
   public businessForm: FormGroup;
   public roleFormGroup: FormGroup;
   public isEditRole = false;
-  public isBusinessFormDisabled = false;
   public isBusinessDisabledForNewRole = false;
   public isOrgLogin = false;
   public isIRPEnabled = false;
@@ -96,7 +95,7 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     }
     if(user?.businessUnitType === BusinessUnitType.Organization){
       let orgEmpBusinessIDs =[BusinessUnitType.Organization,BusinessUnitType.Employee]
-      this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id));  
+      this.businessUnits = this.businessUnits.filter((item) => orgEmpBusinessIDs.includes(item.id));
       this.isOrgLogin=true
     }
 

@@ -77,6 +77,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   @Input() hasApproveRejectMileagesPermission: boolean;
 
   @Input() canRecalculateTimesheet: boolean;
+  public disableButton: boolean = false;
 
   @Input() set selectedTab(selectedTab: RecordFields) {
     this.currentTab = selectedTab;
@@ -250,6 +251,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.setActionBtnState();
       this.initEditBtnsState();
       this.subscribeForSettings();
+      this.subscribeAgency();
       this.cd.detectChanges();
     }
   }
@@ -552,6 +554,28 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.isEditEnabled = !!currentTabMapping.get(this.currentTab);
       this.cd.markForCheck();
     }
+  }
+
+  private subscribeAgency():void{
+    const { organizationId } = this.store.snapshot().timesheets.timesheetDetails;
+    this.settingsViewService.getViewSettingKey(
+      OrganizationSettingKeys.AgencyCanEditApprovedTimesheet,
+      OrganizationalHierarchy.Location,
+      organizationId as number,
+      organizationId as number,
+      false,
+    ).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(({ AgencyCanEditApprovedTimesheet }) => {
+      if (AgencyCanEditApprovedTimesheet == 'true') {
+        this.disableButton = true;
+      }
+      else {
+        this.disableButton = false;
+      }
+
+    })
+
   }
 
   private initEditBtnsState(): void {

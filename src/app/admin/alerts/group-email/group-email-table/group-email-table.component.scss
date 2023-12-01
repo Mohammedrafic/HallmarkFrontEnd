@@ -4,6 +4,12 @@
 
 .group-email-grid {
   margin-top: 20px;
+
+  ::ng-deep {
+    .ag-side-bar-right {
+      border-left-color: var(--grid-header-border) !important;
+    }
+  }
 }
 
 

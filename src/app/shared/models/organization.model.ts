@@ -10,6 +10,7 @@ export class Organization {
   };
   parentBusinessUnitId?: number;
   organizationId?: number | null;
+  entity?:string;
   generalInformation: GeneralInformation;
   billingDetails: BillingDetails;
   contactDetails: ContactDetails[];

@@ -144,8 +144,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public documentId: number = 0;
   public isShare: boolean = false;
   public shareDocumentIds: number[] = [];
-  public startDateField: AbstractControl;
-  public endDateField: AbstractControl;
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
   public isWordDoc: boolean = false;
@@ -211,11 +209,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     text: 'text',
     value: 'id',
   };
-  public orgsFields = {
-    text: 'name',
-    value: 'organizationId',
-  };
-
   public agencyFields = {
     text: 'agencyName',
     value: 'agencyId',
@@ -230,7 +223,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   @ViewChild('wordDocPreview', { static: true })
   public documentEditor!: DocumentEditorComponent;
 
-  
+
   public searchText: string = "";
   editLocationIds:any = [];
 
@@ -350,7 +343,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
                   const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
                   let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
                   this.store.dispatch(new GetDocumentsByCognitiveSearch(this.searchText, businessUnitType, businessUnitId, folderId));
-                }                              
+                }
                 else
                 this.getDocuments(this.filterSelectedBusinesUnitId);
               }
@@ -361,11 +354,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
                   const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
                   const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value
                   let folderId = this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null;
-                  this.store.dispatch(new GetSharedDocumentsByCognitiveSearch(this.searchText, businessUnitType, businessUnitId, folderId));       
+                  this.store.dispatch(new GetSharedDocumentsByCognitiveSearch(this.searchText, businessUnitType, businessUnitId, folderId));
                 }else{
                   this.getSharedDocuments(this.filterSelectedBusinesUnitId);
-                }  
-              }            
+                }
+              }
             }, 1000);
           }
           else {
@@ -545,7 +538,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
         }
       }
-      
+
     });
   }
 
@@ -862,7 +855,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         let showSharedDoc = false;
         if(selectedIds.length == 1){
           this.documentId = selectedIds[0];
-          showSharedDoc = true;   
+          showSharedDoc = true;
         }
         this.onAgencyChanges(showSharedDoc);
       }
@@ -870,8 +863,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       {
         let showSharedDoc = false;
         if(selectedIds.length == 1){
-          this.documentId = selectedIds[0];     
-          showSharedDoc = true;     
+          this.documentId = selectedIds[0];
+          showSharedDoc = true;
         }
         this.onOrganizationChanges(showSharedDoc);
       }
@@ -1057,8 +1050,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   private editDocument(docItem: DocumentLibraryDto) {
-    if (docItem) { 
-      this.editLocationIds = [];     
+    if (docItem) {
+      this.editLocationIds = [];
       this.currentDocumentData = docItem;
       this.isEditDocument = true;
       this.formDailogTitle = FormDailogTitle.EditDocument;
@@ -1506,10 +1499,10 @@ public onAgencyChanges(showSharedDoc=true)
           if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
           this.store.dispatch(new GetDocumentsByCognitiveSearch(q, businessUnitType, businessUnitId, folderId));
           else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID == -1) {
-            this.store.dispatch(new GetSharedDocumentsByCognitiveSearch(q, businessUnitType, businessUnitId, folderId));       
+            this.store.dispatch(new GetSharedDocumentsByCognitiveSearch(q, businessUnitType, businessUnitId, folderId));
           }
         }
-        if(q.length === 0){          
+        if(q.length === 0){
           if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
             this.getDocuments(this.filterSelectedBusinesUnitId);
           else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID == -1) {

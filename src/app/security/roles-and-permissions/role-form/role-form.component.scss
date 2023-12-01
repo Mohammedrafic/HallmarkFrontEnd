@@ -15,6 +15,7 @@
 
   .active-toggle {
     margin-top: 24px;
+    color: var(--redonly-text);
 
     .active-error {
       display: flex;
@@ -45,7 +46,7 @@
   }
   .divider {
     margin: 24px -24px;
-    background-color: $secondary-dark-blue-40;
+    background-color: var(--grid-header-border);
   }
 
   ejs-treeview {

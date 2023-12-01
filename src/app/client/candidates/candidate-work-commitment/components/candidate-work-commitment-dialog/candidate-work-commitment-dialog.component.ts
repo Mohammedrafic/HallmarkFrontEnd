@@ -381,7 +381,7 @@ export class CandidateWorkCommitmentDialogComponent extends DestroyableDirective
         this.candidateWorkCommitmentForm.controls['masterWorkCommitmentId'].setValue('' + id, { emitEvent: false });
         this.candidateWorkCommitmentForm.patchValue(candidateCommitment, { emitEvent: false });
         this.candidateWorkCommitmentForm.controls['startDate'].updateValueAndValidity({ onlySelf: true });
-        this.minimumDate = candidateCommitment.startDate as Date;
+       // this.minimumDate = candidateCommitment.startDate as Date;
       }
       this.refreshDatepicker();
       this.cd.detectChanges();

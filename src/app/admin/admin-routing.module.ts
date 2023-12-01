@@ -116,6 +116,11 @@ const routes: Routes = [
             path: 'commitment',
             component: CommitmentComponent,
           },
+          {
+            path: '**',
+            redirectTo: 'master-data',
+            pathMatch: 'full',
+          },
         ],
       },
       {

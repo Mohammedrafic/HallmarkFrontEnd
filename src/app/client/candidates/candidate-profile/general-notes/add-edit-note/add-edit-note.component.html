@@ -1,4 +1,4 @@
-<form class="note-form">
+<form class="note-form add-edit-noteform">
   <app-datepicker
     [formGroupInstance]="noteForm"
     [required]="true"
@@ -21,6 +21,7 @@
   </app-dropdown>
   <app-textarea
     [formGroupInstance]="noteForm"
+    [required]="true"
     maxlength="250"
     controlName="note"
     label="Note"

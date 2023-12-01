@@ -12,7 +12,7 @@ import { DialogAction, FilterPageName } from '@core/enums';
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { DataSourceItem, PreservedFiltersByPage } from '@core/interface';
+import { AgencyDataSourceItem, DataSourceItem, PreservedFiltersByPage } from '@core/interface';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
@@ -31,7 +31,7 @@ import { ProfileDetailsContainerComponent } from '../profile-details-container/p
 import { AppState } from '../../../../store/app.state';
 import { TimesheetsTabsComponent } from '../../components/timesheets-tabs/timesheets-tabs.component';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
+import { baseDropdownAgencyFieldsSettings, baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
 import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
@@ -71,6 +71,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(TimesheetsState.organizations)
   readonly organizations$!: Observable<DataSourceItem[]>;
 
+  @Select(TimesheetsState.agencyOrganizations)
+  readonly agencyOrganizations$!: Observable<AgencyDataSourceItem[]>;
+
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
 
@@ -91,6 +94,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public appliedFiltersAmount = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
   public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
+  public readonly agencyFields = baseDropdownAgencyFieldsSettings;
   public filters: TimesheetsFilterState | undefined;
   public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number> = this.timesheetsService.getSelectedTimesheetRowStream();
@@ -103,6 +107,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   };
   public OrganizationId:number;
   public allowSelecton:boolean = true;
+  public user: any;
+  organizations: AgencyDataSourceItem[];
   constructor(
     private store: Store,
     private timesheetsService: TimesheetsService,
@@ -319,7 +325,33 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private initOrganizationsList(): void {
-    this.store
+    if(this.isAgency){
+      this.user=this.store.selectSnapshot(UserState.user);
+      this.store
+      .dispatch(new Timesheets.GetOrganizationsForAgency(this.user.id))
+      .pipe(
+        switchMap(() => this.agencyOrganizations$.pipe(filter((res: AgencyDataSourceItem[]) => !!res.length))),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((res) => {
+        this.organizations= res.filter((item)=> item.regions.length>0)
+        const orgId = this.organizations[0].organizationId as number;
+        this.store.dispatch(new Timesheets.SelectOrganization(orgId));
+        this.organizationControl.setValue(orgId, { emitEvent: false });    
+
+        this.store.dispatch([
+          new Timesheets.UpdateFiltersState(
+            {
+              organizationId: orgId,
+              ...this.filters,
+            },
+            this.activeTabIdx !== 0
+          ),
+          new Timesheets.GetFiltersDataSource(),
+        ]);
+      });
+    }else{
+      this.store
       .dispatch(new Timesheets.GetOrganizations())
       .pipe(
         switchMap(() => this.organizations$.pipe(filter((res: DataSourceItem[]) => !!res.length))),
@@ -344,6 +376,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           new Timesheets.GetFiltersDataSource(),
         ]);
       });
+    }
   }
 
   private getOrganizationIdFromState(): number | null {
