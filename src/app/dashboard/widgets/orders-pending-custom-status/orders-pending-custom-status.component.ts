@@ -51,6 +51,7 @@ export class OrdersPendingCustomStatusComponent implements OnInit {
       }
     }
     if(status){
+      window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true))
       this.dashboardService.redirectToUrlWithActivePositions('client/order-management', undefined, "Custom-"+ status);
     }
   }
