@@ -22,3 +22,11 @@ export const BUSINESS_UNITS_VALUES_USERS_ROLES = [
   { id: BusinessUnitType.Organization, text: 'Organization' }, 
   { id: BusinessUnitType.Employee, text: 'Employee' }, 
 ];
+
+
+export const BUSINESS_UNITS_VALUES_WITH_MSP = [
+  { id: BusinessUnitType.Agency, text: 'Agency' },
+  { id: BusinessUnitType.MSP, text: 'MSP' },
+  { id: BusinessUnitType.Organization, text: 'Organization' },
+  { id: BusinessUnitType.Employee, text: 'Employee' },
+];
