@@ -49,6 +49,7 @@ export const VendorScorecardReportConstants = {
     OrderTypes: 'orderTypes',
     SkillIds: 'skillIds',
     ExcludeInactiveAgency: 'excludeInactiveAgency',
+    Period:"Period",
   }
 }
 
