@@ -19,15 +19,12 @@ import type {
 import type { ChartComponent } from '@syncfusion/ej2-angular-charts';
 import { Store } from '@ngxs/store';
 
-import type { PositionByTypeDataModel, PositionsByTypeAggregatedModel } from '../../models/positions-by-type-aggregated.model';
+import type { PositionByTypeDataModel } from '../../models/positions-by-type-aggregated.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { TimeSelectionEnum } from '../../enums/time-selection.enum';
-import { SwitchMonthWeekTimeSelection } from '../../store/dashboard.actions';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, Observable } from 'rxjs';
 import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
 import { DashboardService } from '../../services/dashboard.service';
-import { UserState } from '../../../store/user.state';
-import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 import { SkillCategoryTypeEnum } from '../../enums/skill-category-type.enum';
 import { skillCategoryTrendLegendPalette } from '../../constants/skill-category-legend-palette';
 import { BillRateBySkillCategoryTypeAggregatedModel } from '../../models/bill-rate-by-skill-category-type-aggregated.model';
@@ -123,7 +120,7 @@ export class BillRateWidgetComponent extends AbstractSFComponentDirective<ChartC
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    changes['chartData'] && this.handleChartDataChange();    
+    changes['chartData'] && this.handleChartDataChange();
   }
 
   private handleChartDataChange(): void {
@@ -154,28 +151,28 @@ export class BillRateWidgetComponent extends AbstractSFComponentDirective<ChartC
       max,
       thru((value: number) => Math.ceil(value / 50) * 50)
     )(this.chartData);
-  }  
+  }
 
   public onClickLegend(label: string): void {
     const currentValue = this.selectedEntries$.value;
     const nextValue = includes(label, currentValue)
       ? lodashFilter((currentValueLabel: string) => currentValueLabel !== label, currentValue)
       : [...(currentValue ?? []), label];
-    this.selectedEntries$.next(nextValue);   
+    this.selectedEntries$.next(nextValue);
   }
 
   public generateLegendData(chartData: BillRateBySkillCategoryTypeAggregatedModel): WidgetLegengDataModel[] {
-    return Object.entries(chartData).map(([key, value], index) => {      
+    return Object.entries(chartData).map(([key, value], index) => {
       const [previousValue, currentValue] = value.slice(-2);
-      const coefficient = previousValue.value === 0 ? 1 : previousValue.value;      
+      const coefficient = previousValue.value === 0 ? 1 : previousValue.value;
       const paletteColor = skillCategoryTrendLegendPalette[index];
-      this.palettes.push(paletteColor); 
+      this.palettes.push(paletteColor);
       return {
         label: key,
         value: ((currentValue?.value - previousValue?.value) / coefficient) * 100,
         text: " ",
-        color: paletteColor, 
-        totalCount: parseFloat(value.reduce((count, current) => { return current.value; }, 0).toFixed(2))     
+        color: paletteColor,
+        totalCount: parseFloat(value.reduce((count, current) => { return current.value; }, 0).toFixed(2))
       };
     });
   }

@@ -6,6 +6,7 @@
     display: flex;
     align-items: center;
     width: 100%;
+    color: var(--secondary-text);
   }
 
   &__score {
@@ -15,11 +16,13 @@
     width: 50%;
     text-align: right
   }
+
   &__head {
     font-weight: 700;
     width: 100%;
-    text-align: right
+    text-align: right;
   }
+
   &__averageFlagHead {
     font-weight: 700;
     width: 35%;
@@ -106,15 +109,14 @@
   }
 }
 
-.widget-item-count
-{
+.widget-item-count {
   font-size: 16px;
-    font-weight: 700;
-    line-height: 24px;
-   align-items: center;
-   width:100%;
-   text-align:right;
-
+  font-weight: 700;
+  line-height: 24px;
+  align-items: center;
+  width: 100%;
+  text-align: right;
+  color: var(--text);
 }
 
 .widget_left{

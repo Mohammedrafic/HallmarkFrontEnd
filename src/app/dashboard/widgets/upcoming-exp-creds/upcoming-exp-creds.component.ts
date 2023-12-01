@@ -1,10 +1,9 @@
-import { Component, Input, Inject, ChangeDetectionStrategy, ViewChild } from '@angular/core';
+import { Component, Input, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalWindow } from '@core/tokens';
 import { FilterService } from '@shared/services/filter.service';
-import { ProgressBar, AnimationModel, ILoadedEventArgs,ProgressTheme } from '@syncfusion/ej2-progressbar';
+import { AnimationModel, ILoadedEventArgs,ProgressTheme } from '@syncfusion/ej2-progressbar';
 import { ExpiryDetailsModel } from '../../models/expiry.model';
-
 
 @Component({
   selector: 'app-upcoming-exp-creds',
@@ -18,7 +17,6 @@ export class UpcomingExpCredsComponent {
   @Input() public description: string;
   @Input() public chartData: ExpiryDetailsModel[] | undefined;
   public expirydata:any;
-  public getexp:any;
   public type: string = 'Linear';
   public width: string = '100%';
   public height: string = '20px';
@@ -26,7 +24,6 @@ export class UpcomingExpCredsComponent {
   public progressThickness: number = 10;
   public min: number = 0;
   public max: number = 100;
-  public showProgressValue: boolean = true;
   public animation: AnimationModel = { enable: true, duration: 2000, delay: 0 };
 
   constructor(private readonly dashboardService: DashboardService,
@@ -38,7 +35,7 @@ export class UpcomingExpCredsComponent {
   redirect_to_candidate(name : string):void {
 
     var d = new Date();
-    var endDate = new Date(Date.now() + 29 * 24 * 60 * 60 * 1000)  
+    var endDate = new Date(Date.now() + 29 * 24 * 60 * 60 * 1000)
     const startDate = new Date();
 
     var type;

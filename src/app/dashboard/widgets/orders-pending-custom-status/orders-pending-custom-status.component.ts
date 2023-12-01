@@ -1,11 +1,8 @@
-import { Component, OnInit, OnChanges, ChangeDetectionStrategy,Input, SimpleChanges } from '@angular/core';
-import { activePositionsLegendDisplayText } from '../../constants/active-positions-legend-palette';
-import { OrdersPendingInCustomDataset } from '../../models/active-positions-dto.model';
+import { Component, OnInit, ChangeDetectionStrategy,Input } from '@angular/core';
 import { DASHBOARD_FILTER_STATE } from '@shared/constants';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { DashboardService } from '../../services/dashboard.service';
 import { Store } from '@ngxs/store';
-
 
 @Component({
   selector: 'app-orders-pending-custom-status',
@@ -14,23 +11,20 @@ import { Store } from '@ngxs/store';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrdersPendingCustomStatusComponent implements OnInit {
-
   @Input() public chartData: any ;
   @Input() isDarkTheme: boolean | false;
   @Input() description: string;
   @Input() public isLoading: boolean;
-  @Input() widgetData: any; 
+  @Input() widgetData: any;
   private mousePosition = {
     x: 0,
     y: 0,
   };
 
-  public readonly activePositionsLegend: typeof activePositionsLegendDisplayText = activePositionsLegendDisplayText;
-
   constructor(private readonly dashboardService: DashboardService, private store: Store) { }
 
   ngOnInit(): void { }
-  
+
   public defineMousePosition($event: MouseEvent): void {
     this.mousePosition.x = $event.screenX;
     this.mousePosition.y = $event.screenY;
