@@ -180,6 +180,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public isCandidatePayRateVisible: boolean;
   public canCreateOrder: boolean;
+  public irpdata : any;
 
   public applicantStatusEnum = ApplicantStatusEnum;
   public candidateSSNRequired: boolean;
@@ -689,6 +690,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
 
     if (this.form.valid) {
+      if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+        this.candidateJob.candidateBillRate = this.irpdata;
+      }
       const updatedValue = {
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
