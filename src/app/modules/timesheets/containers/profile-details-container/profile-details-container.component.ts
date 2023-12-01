@@ -37,7 +37,12 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
-import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import {
+  AccordionComponent,
+  ExpandedEventArgs,
+  SelectingEventArgs,
+  TabComponent,
+} from '@syncfusion/ej2-angular-navigations';
 import {
   combineLatest,
   distinctUntilChanged,
@@ -66,9 +71,9 @@ import {
 } from '../../constants';
 import { RecordFields, TableTabIndex, TimesheetTargetStatus, TIMETHEETS_STATUSES } from '../../enums';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
-import { TabConfig, TimesheetRecordsDto } from '../../interface';
+import { TabConfig, TimesheetHistoricalEvent, TimesheetRecordsDto } from '../../interface';
 import * as TimesheetInt from '../../interface';
-import { TimesheetDetailsService, TimesheetRecordsService } from '../../services';
+import { TimesheetDetailsApiService, TimesheetDetailsService, TimesheetRecordsService } from '../../services';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
@@ -103,6 +108,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   @ViewChild('tabs')
   public readonly tabs: TabComponent;
+
+  @ViewChild('historicalEventsAccordion')
+  private readonly historicalEventsAccordion: AccordionComponent;
 
   @Input() currentSelectedRowIndex: number | null = null;
 
@@ -140,6 +148,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public weekPeriod: [Date, Date] = [new Date(), new Date()];
 
   public workWeeks: TimesheetInt.WorkWeek<Date>[];
+
+  public historicalEvents: TimesheetHistoricalEvent[] = [];
 
   public tabsConfig: TabConfig[] = [];
 
@@ -213,6 +223,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public hasEditTimesheetRecordsPermission: boolean;
 
+  public hasViewTimesheetPermission: boolean;
+
   public hasApproveRejectTimesheetRecordsPermission: boolean;
 
   public canRecalculateTimesheet = false;
@@ -250,6 +262,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     private router: Router,
     private timesheetDetailsService: TimesheetDetailsService,
     private timesheetRecordsService: TimesheetRecordsService,
+    private timesheetDetailsApiService: TimesheetDetailsApiService,
     private breakpointObserver: BreakpointObserver,
     private cd: ChangeDetectorRef,
     private actions: Actions,
@@ -355,9 +368,11 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     if (!this.isChangesSaved) {
       this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmOrderChange).subscribe(() => {
         this.nextPreviousOrderEvent.emit(next);
+        this.collapseHistoricalEvents();
       });
     } else {
       this.nextPreviousOrderEvent.emit(next);
+      this.collapseHistoricalEvents();
     }
     this.previewAttachemnt = false;
   }
@@ -576,6 +591,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public closeDialog(): void {
+    this.collapseHistoricalEvents();
     this.store
       .dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
       .pipe(take(1))
@@ -589,6 +605,17 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public handleTimeSheetChange(): void {
     this.isTimeSheetChanged = true;
+  }
+
+  public getHistoricalEvents(event: ExpandedEventArgs): void {
+    if (event.isExpanded) {
+      this.timesheetDetailsApiService.getTimesheetHistoricalEvents(this.isAgency, this.timesheetId, this.organizationId)
+        .pipe(take(1))
+        .subscribe((events: TimesheetHistoricalEvent[]) => {
+          this.historicalEvents = events;
+          this.cd.markForCheck();
+        });
+    }
   }
 
   private refreshGrid(): void {
@@ -692,11 +719,13 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             permissions[this.userPermissions.CanAgencyAddEditDeleteTimesheetRecords];
           this.hasApproveRejectTimesheetRecordsPermission =
             permissions[this.userPermissions.CanAgencyAddEditDeleteTimesheetRecords];
+          this.hasViewTimesheetPermission = permissions[this.userPermissions.CanAgencyViewTimesheets];
         } else {
           this.hasEditTimesheetRecordsPermission =
             permissions[this.userPermissions.CanOrganizationAddEditDeleteTimesheetRecords];
           this.hasApproveRejectTimesheetRecordsPermission =
             permissions[this.userPermissions.CanOrganizationApproveRejectTimesheets];
+          this.hasViewTimesheetPermission = permissions[this.userPermissions.CanOrganizationViewTimesheets];
         }
 
         this.canRecalculate = permissions[this.userPermissions.CanRecalculateTimesheets];
@@ -881,5 +910,13 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         this.previewAttachemnt = true;
         this.cd.markForCheck();
       });
+  }
+
+  private collapseHistoricalEvents(): void {
+    if (!this.historicalEventsAccordion) {
+      return;
+    }
+
+    this.historicalEventsAccordion.expandItem(false, 0);
   }
 }
