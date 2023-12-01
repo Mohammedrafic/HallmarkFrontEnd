@@ -7,6 +7,7 @@ import { GroupInvoicesParams, InvoicePaymentData, InvoicePermissions,
   InvoicesFilterState, ManualInvoice, ManualInvoicePostDto, ManualInvoicePutDto, PaymentCreationDto,
   PrintingPostDto } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums';
+import { InvoiceAuditLogPayload } from '../../interfaces/invoice-auditlog.interface';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Invoices {
@@ -366,4 +367,20 @@ export namespace Invoices {
     ) {
     }
   }
+
+  export class GetInvoiceAuditHistory {
+    static readonly type = '[invoice] Get Invoice AuditHistory Details';
+    constructor(public payload: InvoiceAuditLogPayload,public isagency:boolean) {}
+  }
+
+  export class GetAgencyInvoiceAuditHistory {
+    static readonly type = '[invoice] Get AgecnyInvoice AuditHistory Details';
+    constructor(public payload: InvoiceAuditLogPayload,public isagency:boolean) {}
+  }
+
+  export class GetInvoiceHistoryDetailSucceeded {
+    static readonly type = '[invoice] Get Invoice History Detail Succeeded';
+    constructor() {}
+  }
+  
 }

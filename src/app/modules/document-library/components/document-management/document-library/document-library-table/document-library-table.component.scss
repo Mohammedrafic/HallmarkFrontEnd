@@ -1,0 +1,11 @@
+.doc-library-table {
+  ag-grid-angular {
+    border-radius: 0 0 12px 12px !important;
+  }
+
+  ::ng-deep {
+    .ag-side-bar-right {
+      border-left-color: var(--grid-header-border) !important;
+    }
+  }
+}

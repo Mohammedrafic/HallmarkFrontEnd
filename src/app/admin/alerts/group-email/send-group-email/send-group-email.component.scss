@@ -92,9 +92,6 @@
   }
 
   .droparea {
-    border: 1px dashed #3e7fff;
-    border-radius: 4px;
-    background-color: #ecf2ff;
     height: 118px;
     display: flex;
     justify-content: center;
@@ -144,14 +141,47 @@ h5{
 
 ::ng-deep {
   .invalidRichTextEditorDiv{
-    ejs-richtexteditor{    
+    ejs-richtexteditor {
       height: auto !important;
       border: 1px solid $supportive-red;
    }
-  } 
+  }
 }
 .switch {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.rich-text-container {
+  ::ng-deep {
+    ejs-richtexteditor {
+      background-color: var(--bg-default);
+
+      .e-toolbar-wrapper {
+        background-color: var(--bg-default);
+      }
+
+      .e-rte-content {
+        background-color: var(--bg-default);
+        border: 1px solid var(--grid-header-border);
+        border-bottom-left-radius: var(--grid-border-radius);
+        border-bottom-right-radius: var(--grid-border-radius);
+      }
+
+      #defaultGroupEmailRTE_toolbar {
+        background-color: var(--bg-default);
+        border: 1px solid var(--grid-header-border);
+        border-radius:  var(--grid-border-radius)  var(--grid-border-radius) 0 0;
+
+        .e-toolbar-items {
+          background-color: var(--bg-default);
+
+          .e-toolbar-item.e-overlay {
+            background-color: var(--bg-default);
+          }
+        }
+      }
+    }
+  }
 }

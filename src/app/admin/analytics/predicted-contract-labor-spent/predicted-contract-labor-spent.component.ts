@@ -80,7 +80,10 @@ export class PredictedContractLaborSpentComponent implements OnInit, OnDestroy {
     PCLDepartmentId: '',
     PCLSkillCategory: '',
     PCLSkillId: '',
-    PCLUserId: ''
+    PCLUserId: '',
+    PCLorganizationName: '',
+    PCLreportPulledMessage: '',
+    PCLDateRange: ''
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/PredictedContractLaborSpent/PredicatedContractLaborSpent.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/PredictedContractLaborSpent/PredictedContractLaborSpent.cat" };
@@ -396,6 +399,7 @@ export class PredictedContractLaborSpentComponent implements OnInit, OnDestroy {
     skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : '';
     skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : '';
 
+    let currentDate = new Date(Date.now());
 
     this.paramsData =
     {
@@ -407,7 +411,11 @@ export class PredictedContractLaborSpentComponent implements OnInit, OnDestroy {
       PCLRegionId: regionIds,
       PCLSkillId: skillIds,
       PCLUserId: this.user?.id,
-      PCLSkillCategory: skillCategoryIds.length == 0 ? '' : skillCategoryIds
+      PCLSkillCategory: skillCategoryIds.length == 0 ? '' : skillCategoryIds,
+      PCLorganizationName: this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      PCLreportPulledMessage: ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      PCLDateRange: (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

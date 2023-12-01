@@ -283,6 +283,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.orderPublicId = JSON.parse((localStorage.getItem('OrderPublicId') || '""')) as string;
     (!this.alertOrderId)?this.alertOrderId=0:"";
     (!this.orderPublicId)?this.orderPublicId='':"";
+    if((alertTitle.trim()).toLowerCase()!=AlertIdEnum[AlertIdEnum['Candidate Level Comments']].trim().toLowerCase()){
+      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
     window.localStorage.setItem("OrderId", JSON.stringify(""));
     window.localStorage.setItem("OrderPublicId", JSON.stringify(""));
     if(this.alertOrderId>0){

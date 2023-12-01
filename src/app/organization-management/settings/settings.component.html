@@ -239,11 +239,20 @@
 
     <form *ngIf="formControlType === organizationSettingControlType.SwitchedValue" [formGroup]="switchedValueForm">
 
-      <div class="input-container bootstrap">
+      <div class="input-container bootstrap"  *ngIf="!isIRPAutoDistribute">
         <label for="numeric">Value<span class="required" *ngIf="switchedValueForm.get('isEnabled')?.value">*</span></label>
         <div class="input-group">
           <ejs-numerictextbox id="numeric" class="numeric-input" min="0" [maxlength]="maxFieldLength"
           (keydown)="onlyNumerics($event)" [validateDecimalOnType]='true' decimals='0' format="#" [showSpinButton]="false" appValidateWithMessage
+            formControlName="value"></ejs-numerictextbox>
+        </div>
+      </div>
+
+      <div class="input-container bootstrap" *ngIf="isIRPAutoDistribute">
+        <label for="numeric">Value<span class="required" *ngIf="switchedValueForm.get('isEnabled')?.value">*</span></label>
+        <div class="input-group">
+          <ejs-numerictextbox id="numeric"  min="0" [maxlength]="maxFieldLength"
+           decimals='2' format="0.00" [showSpinButton]="false" appValidateWithMessage
             formControlName="value"></ejs-numerictextbox>
         </div>
       </div>
