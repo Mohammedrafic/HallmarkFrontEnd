@@ -300,6 +300,7 @@ export interface OrderManagementChild  {
   commentContainerId?: number;
   candidateProfileId? : number;
   guaranteedWorkWeek?:number | string | null;
+  extensionFromId?: number;
 };
 
 export type OrderCandidatesList = {
