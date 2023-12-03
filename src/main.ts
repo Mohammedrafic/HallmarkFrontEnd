@@ -8,6 +8,7 @@ import { registerLicense } from '@syncfusion/ej2-base';
 import { LicenseManager, ModuleRegistry, AllModules } from '@ag-grid-enterprise/all-modules';
 import { MSAL_STATIC_PROVIDERS, APP_SETTINGS_B2C_CONFIG_URL } from './app/b2c-auth/b2c-auth.providers';
 import { APP_SETTINGS, APP_SETTINGS_URL } from './app.settings';
+import { SsoManagement } from './app/b2c-auth/sso-management';
 
 // Registering AG-Grid enterprise license key
 LicenseManager.setLicenseKey(
@@ -34,13 +35,12 @@ Promise.resolve()
     //When the user provides a url like this, we imply that they want to use SSO
     const urlParams = new URLSearchParams(window.location.search);
     const domainHint = urlParams.get('domainHint');
-    if (window.location.pathname.includes('/sso') && domainHint !== null) {
-      window.localStorage.setItem('sso', '1');
-      window.localStorage.setItem('domainHint', domainHint);
-      window.localStorage.setItem('apiScope', configs[0].apiScope);
+    if (location.pathname.includes('/sso') && domainHint !== null) {
+      SsoManagement.setSsoInformation(domainHint, configs[0].apiScope);
     }
 
-    const index = parseInt(window.localStorage.getItem('sso') || '0');
+    SsoManagement.setRedirectUrl(location.pathname);
+    const index = SsoManagement.isSsoAvailable() ? 1 : 0;
     const B2C_STATIC_PROVIDERS = MSAL_STATIC_PROVIDERS(settings.host, configs[index]);
     platformBrowserDynamic([{ provide: APP_SETTINGS, useValue: settings }, ...B2C_STATIC_PROVIDERS])
       .bootstrapModule(AppModule)

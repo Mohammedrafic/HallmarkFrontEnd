@@ -2,12 +2,14 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { combineLatest, takeUntil, tap } from 'rxjs';
+import { filter, takeUntil, tap } from 'rxjs';
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { B2CAuthService } from 'src/app/b2c-auth/b2c-auth.service';
 import { UserState } from 'src/app/store/user.state';
+import { SsoManagement } from '../sso-management';
+import { InteractionType } from '@azure/msal-browser';
 
 @Component({
   selector: 'app-login-page',
@@ -28,22 +30,20 @@ export class LoginPageComponent extends DestroyableDirective implements AfterVie
       target: this.spiner.nativeElement,
     });
     // B2C Login
-    combineLatest([
-      this.b2CAuthService.onLoginSuccess().pipe(
-        takeUntil(this.destroy$),
-        tap(() => showSpinner(this.spiner.nativeElement)),
-        tap(() => this.navigateToDefaultPage())
-      ),
-      this.b2CAuthService.interactionStatusNone().pipe(
-        tap(() => {
-          if (!this.b2CAuthService.isLoggedIn()) {
-            this.loginWithSSO();
-          }
-        })
-      ),
-    ])
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
+    this.b2CAuthService.onLoginSuccess().pipe(
+      takeUntil(this.destroy$),
+      tap(() => showSpinner(this.spiner.nativeElement)),
+      filter((response) => (
+        response.interactionType === InteractionType.Redirect ||
+        response.interactionType === InteractionType.Popup)),
+      tap(() => this.navigateToDefaultPage())
+    ).subscribe();
+
+    this.b2CAuthService.interactionStatusNone().pipe(
+      takeUntil(this.destroy$),
+      filter(() => (!this.b2CAuthService.isLoggedIn())),
+      tap(() => this.loginWithSSO())
+    ).subscribe();
   }
 
   public loginWithSSO(): void {
@@ -53,9 +53,20 @@ export class LoginPageComponent extends DestroyableDirective implements AfterVie
 
   private navigateToDefaultPage(): void {
     const isEmployee = this.store.selectSnapshot(UserState.user)?.isEmployee;
-    const defaultUrl = isEmployee ? '/employee/scheduling' : '/';
 
-    this.router.navigate([defaultUrl]);
+    if (isEmployee) {
+      this.router.navigate(['/employee/scheduling']);
+      return;
+    } else {
+      const redirect = SsoManagement.getRedirectUrl();
+      if (redirect) {
+        SsoManagement.clearRedirectUrl();
+        this.router.navigate([redirect]);
+      } else {
+        this.router.navigate(['/']);
+      }
+      return;
+    }
   }
 }
 

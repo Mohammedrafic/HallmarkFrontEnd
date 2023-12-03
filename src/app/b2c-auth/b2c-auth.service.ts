@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment';
 import { MsalBroadcastService, MsalGuardConfiguration, MsalService, MSAL_GUARD_CONFIG } from '@azure/msal-angular';
 import {
   AuthenticationResult,
-  AuthenticationScheme,
+  EndSessionRequest,
   EventMessage,
   EventType,
   InteractionStatus,
@@ -14,6 +14,7 @@ import {
   RedirectRequest,
 } from '@azure/msal-browser';
 import { Router } from '@angular/router';
+import { SsoManagement } from './sso-management';
 
 @Injectable({
   providedIn: 'root',
@@ -41,29 +42,31 @@ export class B2CAuthService {
       }
     } else {
       if (this.msalGuardConfig.authRequest) {
-        const provider = localStorage.getItem('sso');
-        const domainHint = localStorage.getItem('domainHint');
-        const apiScope = localStorage.getItem('apiScope');
-        if (!provider || !domainHint || !apiScope) {
-          //Default login page
-          this.authService.loginRedirect({ ...this.msalGuardConfig.authRequest, ...userFlowRequest } as RedirectRequest);
+        if (!SsoManagement.isSsoAvailable()) {
+          if (SsoManagement.wasSetup()) {
+            SsoManagement.clearWasSetup();
+            //Application needs to be reloaded to rebuild the MSAL configuration
+            window.location.reload();
+          } else {
+            //Default login page
+            this.authService.loginRedirect({ ...this.msalGuardConfig.authRequest, ...userFlowRequest } as RedirectRequest);
+          }
           return;
         } else {
+          const ssoInfo = SsoManagement.getSsoInformation();
           const userflow  = {
-            domainHint: domainHint,
-            redirectUri: environment.production ? '/ui/sso' : '/sso',
+            domainHint: ssoInfo.domainHint,
+            redirectUri: (environment.production ? '/ui/login' : '/login'),
             scopes: [
               'openid',
               'offline_access',
-              apiScope,
+              ssoInfo.apiScope,
             ],
           };
 
           this.authService.loginRedirect(userflow as RedirectRequest);
           return;
         }
-
-
       } else {
         this.authService.loginRedirect(userFlowRequest);
       }
@@ -84,7 +87,7 @@ export class B2CAuthService {
     .pipe(
       filter((msg: EventMessage) => msg.eventType === EventType.ACQUIRE_TOKEN_FAILURE))
       .subscribe((result: EventMessage) => {
-        localStorage.clear();
+        SsoManagement.clearLocalStorageButPreserveSso();
         sessionStorage.clear();
         this.router.navigate(['/']);
       });
@@ -104,7 +107,14 @@ export class B2CAuthService {
     if (this.msalGuardConfig.interactionType === InteractionType.Popup) {
       this.authService.logout();
     } else {
-      this.authService.logoutRedirect();
+      if (SsoManagement.isSsoAvailable()) {
+        const logoutRequest: EndSessionRequest = {
+          postLogoutRedirectUri: '/logout',
+        };
+        this.authService.logoutRedirect(logoutRequest);
+      } else {
+        this.authService.logoutRedirect();
+      }
     }
   }
 
