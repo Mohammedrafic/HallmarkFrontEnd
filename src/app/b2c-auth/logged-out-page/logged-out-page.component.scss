@@ -1,0 +1,48 @@
+body {
+  font-family: Segoe UI, SegoeUI, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+//better header 1
+.title {
+  font-size: larger;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card {
+  min-width: 480px;
+  max-width: 980px;
+
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+
+}
+
+.logo {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+}
+
+.button-row {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 2rem;
+
+  button {
+    height: 48px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+}

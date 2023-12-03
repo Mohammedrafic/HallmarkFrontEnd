@@ -28,6 +28,8 @@ import {
   ArrowUp,
   Info,
   RotateCw,
+  LogIn,
+  Cloud,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -211,6 +213,8 @@ const icons = {
   ArrowUp,
   Info,
   RotateCw,
+  LogIn,
+  Cloud,
 };
 
 const COMPONENTS = [
