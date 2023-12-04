@@ -1051,6 +1051,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       )
       .subscribe(() => {
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        this.store.dispatch(new GetOrderById(this.selectedOrder.orderId as number, this.selectedOrder.organizationId));
         this.getCandidatesList(this.selectedOrder);
       });
   }
