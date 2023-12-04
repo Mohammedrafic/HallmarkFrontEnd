@@ -68,7 +68,8 @@ export class SsoManagement {
     localStorage.removeItem(SsoKeys.REDIRECT_URL);
   }
 
-  static setRedirectUrl(url: string) {
+  static setRedirectUrl(fullUrl: string) {
+    const url = fullUrl.replace('/ui', '') || '/';
     const blacklistedPaths = ['/', '/login', '/logout', '/error', '/state', '/code', '/sso', '/admin/dashboard'];
     if (url !== null && url !== undefined) {
       if (!blacklistedPaths.includes(url)) {
