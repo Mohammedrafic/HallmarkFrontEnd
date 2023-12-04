@@ -93,7 +93,7 @@
 
     <form [formGroup]="regionFormGroup" *ngIf="isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder ||  IsSettingKeyScheduleOnlyWithAvailability || IsSettingATPRateCalculation) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
-        <label for="region">Region<span *ngIf="IsSettingKeyAutomatedDistributedToVMS || IsSettingKeyAutoRejectEmployeesWhenFilled" class="required">*</span></label>
+        <label for="region">Region<span *ngIf="IsSettingKeyAutomatedDistributedToVMS" class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="region" [allowFiltering]="true" [dataSource]="regions$ | async"
                             [fields]="optionFields" (select)="changeRegion($event)" [enabled]="!isParentEdit"
@@ -389,28 +389,6 @@
       <div class="input-group switch">
         <ejs-switch id="switcher" class="switch" formControlName="isEnabled" (change)="disableSettingsValue($event,undefined)"></ejs-switch>
         <label class="switch-label">Turned {{ aTPRateCalculationFormGroup.get('isEnabled')?.value ? 'On' : 'Off' }}</label>
-      </div>
-    </div>
-    </div>
- </form>
-
- <form [formGroup]="autoRejectEmployeesWhenFilledFormGroup"
-    *ngIf="formControlType === organizationSettingControlType.AutoRejectOtherEmployeesWhenFilled">
-  <div class="row">
-    <div class="input-container bootstrap">
-      <label>Rejected Reason <span *ngIf="isRejectedReasonRequired" class="required">*</span></label>
-      <div class="input-group dropdown">
-        <ejs-dropdownlist appValidateWithMessage [allowFiltering]="true" [dataSource]="rejectionReasonsList$ | async"
-                          [fields]="rejectReasonOptionFields" formControlName="rejectedReason">
-        </ejs-dropdownlist>
-      </div>
-    </div>
-   </div>
-   <div class="row">
-    <div class="input-container">
-      <div class="input-group switch">
-        <ejs-switch id="switcher" class="switch" formControlName="isEnabled" (change)="disableSettingsValue($event,undefined)"></ejs-switch>
-        <label class="switch-label">Turned {{ autoRejectEmployeesWhenFilledFormGroup.get('isEnabled')?.value ? 'on' : 'off' }}</label>
       </div>
     </div>
     </div>
