@@ -1,17 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
-import { AnalyticsMenuId } from '../../shared/constants/menu-config';
-import { Menu, MenuItem } from '../../shared/models/menu.model';
-import { UserState } from '../../store/user.state';
 import { MenuSettings } from '@shared/models';
 import { SetHeaderState } from '../../store/app.actions';
 import { AbstractPermission } from '@shared/helpers/permissions';
-import { OrganizationManagementState } from '../../organization-management/store/organization-management.state';
-import { Organization } from '../../shared/models/organization.model';
 import { AGENCYREPORTS_SETTINGS } from './agency-reports-menu.config';
-import { filter, Observable, switchMap, takeUntil, Subject } from 'rxjs';
-import { GetOrganizationById } from '../../admin/store/admin.actions';
+import { filter, takeUntil, Subject } from 'rxjs';
 import { Router } from '@angular/router';
+import { Store } from '@ngxs/store';
 @Component({
   selector: 'app-agency-reports',
   templateUrl: './agency-reports.component.html',
@@ -19,16 +13,9 @@ import { Router } from '@angular/router';
 })
 export class AgencyReportsComponent extends AbstractPermission implements OnInit, OnDestroy {
 
-  @Select(UserState.lastSelectedOrganizationId)
-  private organizationId$: Observable<number>;
-  @Select(OrganizationManagementState.organization)
-  private organization$: Observable<Organization>;
-
-  public sideMenuConfig: MenuSettings[];
+  public sideMenuConfig: MenuSettings[] = [];
 
   private agencyReportSettings = AGENCYREPORTS_SETTINGS;
-  private isIRPFlagEnabled = false;
-  private isIRPForOrganizationEnabled = false;
   constructor(protected override store: Store, private router: Router) {
     super(store);
 
@@ -36,13 +23,10 @@ export class AgencyReportsComponent extends AbstractPermission implements OnInit
   }
 
   private unsubscribe$: Subject<void> = new Subject();
-  public isLoad: boolean = false;
 
   override ngOnInit(): void {
     super.ngOnInit();   
 
-      this.startOrgIdWatching();
-      this.setMenuConfig();
       this.watchForPermissions();
     
   }
@@ -54,8 +38,7 @@ export class AgencyReportsComponent extends AbstractPermission implements OnInit
         filter(() => this.sideMenuConfig.length <= itemsWithoutPermissions),
         takeUntil(this.componentDestroy())
       )
-      .subscribe((permissions) => {
-        this.userPermission = permissions;
+      .subscribe(() => {
         this.setMenuConfig();
       });
   }
@@ -66,22 +49,6 @@ export class AgencyReportsComponent extends AbstractPermission implements OnInit
     if (this.sideMenuConfig.length == 0) {
       this.router.navigate(['/']);
     }
-  }
-  private startOrgIdWatching(): void {
-    this.organizationId$
-      .pipe(
-        switchMap((id) =>
-          this.getOrganization(id)),
-        takeUntil(this.componentDestroy())
-      )
-      .subscribe(() => {
-        //this.checkOrgPreferences();
-      });
-  }
-  private getOrganization(businessUnitId: number): Observable<void> {
-    const id = businessUnitId || (this.store.selectSnapshot(UserState.user)?.businessUnitId as number);
-
-    return this.store.dispatch(new GetOrganizationById(id));
   }
 
   override ngOnDestroy(): void {
