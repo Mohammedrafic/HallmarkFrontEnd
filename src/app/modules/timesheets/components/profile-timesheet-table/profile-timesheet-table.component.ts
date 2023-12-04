@@ -564,6 +564,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       organizationId as number,
       organizationId as number,
       false,
+      this.timesheetDetails.jobId
     ).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(({ AgencyCanEditApprovedTimesheet }) => {
