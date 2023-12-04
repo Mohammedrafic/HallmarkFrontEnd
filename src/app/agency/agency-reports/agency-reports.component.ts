@@ -1,13 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { AnalyticsMenuId } from '../../shared/constants/menu-config';
-import { Menu, MenuItem } from '../../shared/models/menu.model';
 import { UserState } from '../../store/user.state';
 import { MenuSettings } from '@shared/models';
 import { SetHeaderState } from '../../store/app.actions';
 import { AbstractPermission } from '@shared/helpers/permissions';
-import { OrganizationManagementState } from '../../organization-management/store/organization-management.state';
-import { Organization } from '../../shared/models/organization.model';
 import { AGENCYREPORTS_SETTINGS } from './agency-reports-menu.config';
 import { filter, Observable, switchMap, takeUntil, Subject } from 'rxjs';
 import { GetOrganizationById } from '../../admin/store/admin.actions';
@@ -21,14 +17,10 @@ export class AgencyReportsComponent extends AbstractPermission implements OnInit
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
-  @Select(OrganizationManagementState.organization)
-  private organization$: Observable<Organization>;
 
-  public sideMenuConfig: MenuSettings[];
+  public sideMenuConfig: MenuSettings[] = [];
 
   private agencyReportSettings = AGENCYREPORTS_SETTINGS;
-  private isIRPFlagEnabled = false;
-  private isIRPForOrganizationEnabled = false;
   constructor(protected override store: Store, private router: Router) {
     super(store);
 
@@ -36,13 +28,11 @@ export class AgencyReportsComponent extends AbstractPermission implements OnInit
   }
 
   private unsubscribe$: Subject<void> = new Subject();
-  public isLoad: boolean = false;
 
   override ngOnInit(): void {
     super.ngOnInit();   
 
       this.startOrgIdWatching();
-      this.setMenuConfig();
       this.watchForPermissions();
     
   }
