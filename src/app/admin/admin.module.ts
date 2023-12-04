@@ -12,6 +12,7 @@ import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-
 import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
+import { ChartModule } from '@syncfusion/ej2-angular-charts'; 
 import {
   Download,
   Upload,
@@ -80,6 +81,8 @@ import { GridPaginationModule } from '@shared/components/grid/grid-pagination/gr
 import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 import { InterfaceLogSummaryIrpComponent } from './interface-log-summary-irp/interface-log-summary-irp.component';
 import { InterfaceLogSummaryIrpDialogComponent } from './interface-log-summary-irp/interface-log-summary-irp-dialog/interface-log-summary-irp-dialog.component';
+import { OrganizationIntegrationsComponent } from './organization-integrations/organization-integrations.component';
+import { MonthlyIntegrationsComponent } from './organization-integrations/widgets/monthly-integrations/monthly-integrations.component';
 
 const sidebarIcons = {
   Download,
@@ -121,7 +124,9 @@ const sidebarIcons = {
     OrgInterfaceDialogComponent,
     OrgInterfaceConfigurationComponent,
     InterfaceLogSummaryIrpComponent,
-    InterfaceLogSummaryIrpDialogComponent
+    InterfaceLogSummaryIrpDialogComponent,
+    OrganizationIntegrationsComponent,
+    MonthlyIntegrationsComponent
   ],
     imports: [
         CommonModule,
@@ -173,7 +178,8 @@ const sidebarIcons = {
         ]),
         ValidateDirectiveModule,
         GridPaginationModule,
-        ScrollToTopModule,
+      ScrollToTopModule,
+        ChartModule
     ],
   providers: [
     ResizeService,

@@ -22,6 +22,7 @@ import { CommitmentComponent } from './master-data/commitment/commitment.compone
 import { OrgInterfaceComponent } from './org-interface/org-interface.component';
 import { LogInterfaceComponent } from './log-interface/log-interface.component';
 import { InterfaceLogSummaryIrpComponent } from './interface-log-summary-irp/interface-log-summary-irp.component';
+import { OrganizationIntegrationsComponent } from './organization-integrations/organization-integrations.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -73,6 +74,13 @@ const routes: Routes = [
       {
         path: 'interfacelogirp',
         component : InterfaceLogSummaryIrpComponent,
+        data: {
+          isOrganizationArea: true,
+        },  
+      },
+      {
+        path: 'organization-integrations',
+        component: OrganizationIntegrationsComponent,
         data: {
           isOrganizationArea: true,
         },

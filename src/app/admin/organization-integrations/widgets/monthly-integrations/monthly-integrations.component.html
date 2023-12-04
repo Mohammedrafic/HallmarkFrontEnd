@@ -1,0 +1,15 @@
+<h3>Integration Runs last 12 Months</h3>
+<ejs-chart #sfComponent
+           [chartArea]="chartArea"
+           [primaryXAxis]="isDarkTheme ? primaryXAxisDarkTheme : primaryXAxis"
+           [primaryYAxis]="isDarkTheme ? primaryYAxisDarkTheme : primaryYAxis"
+           [legendSettings]="legendSettings"
+           [tooltip]="isDarkTheme ? tooltipDarkSettings : tooltipSettings"
+           class="app-active-positions-initial-extended__component"
+           [background]="isDarkTheme ? 'var(--chart-dark-bg)' : 'var(--chart-light-bg)'">
+  <e-series-collection>
+    <e-series [dataSource]='filteredChartData$ | async' type='StackingColumn' xName='label' yName='value' [fill]="'var(--primary-active-blue-10)'"   columnWidth=0.5> </e-series>
+    <!--<e-series [dataSource]='filteredChartData$ | async' type='StackingColumn' xName='label' yName='value' [fill]="'var(--supportive-orange)'"   columnWidth=0.5> </e-series>-->
+  </e-series-collection>
+</ejs-chart>
+

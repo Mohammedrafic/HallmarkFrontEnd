@@ -534,6 +534,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics',
     },
+    130: {
+      // IRP Reports
+      icon: '',
+      route: '/admin/organization-integrations',
+    },
   },
 
   [BusinessUnitType.MSP]: {
