@@ -209,7 +209,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   get disableCloseOrder(): boolean {
-    return !!(this.order?.orderClosureReasonId || this.order?.orderCloseDate) || this.disabledCloseButton;
+    return !!this.order?.orderClosureReasonId
+      || !!this.order?.orderCloseDate
+      || !!this.order?.irpOrderMetadata?.orderCloseDate
+      || this.disabledCloseButton;
   }
 
   get desktopSmallMenu(): { text: string }[] {
@@ -282,7 +285,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       const order = changes['order']?.currentValue;
       const orderstatusValue=order.statusText==null?order.irpOrderMetadata.statusText:order.statusText;
       const hasStatus = this.openInProgressFilledStatuses.includes(orderstatusValue?.toLowerCase());
-      this.showCloseButton = hasStatus || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate));
+      this.showCloseButton = hasStatus
+        || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate || order?.irpOrderMetadata?.orderCloseDate));
 
       if (this.chipList) {
         const status = this.order.irpOrderMetadata?.statusText && this.activeSystem === OrderManagementIRPSystemId.IRP

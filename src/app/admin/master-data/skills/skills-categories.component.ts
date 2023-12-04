@@ -2,10 +2,11 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { Subject } from 'rxjs';
+import { Subject, take } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetAllSkillsCategories } from '../../store/admin.actions';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { SelectEventArgs } from '@syncfusion/ej2-angular-navigations';
 
 enum Tabs {
   'Skills',
@@ -15,7 +16,7 @@ enum Tabs {
 @Component({
   selector: 'app-skills-categories',
   templateUrl: './skills-categories.component.html',
-  styleUrls: ['./skills-categories.component.scss']
+  styleUrls: ['./skills-categories.component.scss'],
 })
 export class SkillsCategoriesComponent extends AbstractPermissionGrid implements OnInit {
   public currentTab: Tabs = 0;
@@ -33,7 +34,7 @@ export class SkillsCategoriesComponent extends AbstractPermissionGrid implements
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.store.dispatch(new GetAllSkillsCategories());
+    this.getAllSkillsCategories();
     this.getPermissionSkillCategories();
   }
 
@@ -57,7 +58,7 @@ export class SkillsCategoriesComponent extends AbstractPermissionGrid implements
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public tabSelected(data: any): void {
+  public tabSelected(data: SelectEventArgs): void {
     this.isSkillsActive = this.tabs['Skills'] === data.selectedIndex;
     this.isCategoriesActive = this.tabs['Categories'] === data.selectedIndex;
     this.currentTab = data.selectedIndex;
@@ -69,5 +70,11 @@ export class SkillsCategoriesComponent extends AbstractPermissionGrid implements
       this.userPermission[this.userPermissions.CanEditMasterSkills] :
       this.userPermission[this.userPermissions.CanEditSkillCategories];
     this.cd.detectChanges();
+  }
+
+  private getAllSkillsCategories(): void {
+    this.store.dispatch(new GetAllSkillsCategories()).pipe(take(1)).subscribe(() => {
+      this.cd.detectChanges();
+    });
   }
 }

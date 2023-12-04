@@ -441,6 +441,7 @@ export interface IRPMetaData {
   skillId: number;
   orderOpenDate: Date;
   linkedId: string | null;
+  orderCloseDate: string;
 }
 
 export class Order {

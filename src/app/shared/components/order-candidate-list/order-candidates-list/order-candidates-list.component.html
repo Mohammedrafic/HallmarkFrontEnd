@@ -198,9 +198,8 @@
             <div class="row-tool-buttons">
               <div
                 [class.btn-icon__disabled]="
-                !data.isOriented &&
-                data.status !== offboardCandidate &&
-                data.status !== cancelledCandidate"
+                (!data.isOriented && data.status !== offboardCandidate && data.status !== cancelledCandidate)
+                || data.status === applicantStatus.NotApplied && isOrderClosed"
                 ejs-button
                 (click)="openEditCandidateModal(data)"
                 cssClass="e-flat primary-icon-button custom-button"
