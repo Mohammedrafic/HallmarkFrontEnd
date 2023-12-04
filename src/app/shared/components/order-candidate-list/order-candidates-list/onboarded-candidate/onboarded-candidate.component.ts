@@ -158,6 +158,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public CanOrganizationEditOrdersIRP: boolean;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public commentContainerId: number;
+  irpdata: any;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -449,6 +450,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private onAccept(): void {
     if (!this.form.errors && this.candidateJob) {
+      if(this.activeSystems === OrderManagementIRPSystemId.IRP){
+        this.form.get("candidateBillRate")?.setValue(this.irpdata);
+      }
       this.shouldChangeCandidateStatus()
         .pipe(take(1))
         .subscribe((isConfirm) => {
