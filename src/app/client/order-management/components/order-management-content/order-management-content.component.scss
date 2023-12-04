@@ -384,7 +384,7 @@
 
     & ag-grid-angular {
       & .ag-row-selected {
-        background: $grid-active-row-bgcolor !important;
+        background: $primary-active-blue-70 !important;
 
         .ag-cell-value,
         .ag-cell.name {
