@@ -109,7 +109,7 @@ export class B2CAuthService {
     } else {
       if (SsoManagement.isSsoAvailable()) {
         const logoutRequest: EndSessionRequest = {
-          postLogoutRedirectUri: '/logout',
+          postLogoutRedirectUri: environment.production ? '/ui/logout' : '/logout',
         };
         this.authService.logoutRedirect(logoutRequest);
       } else {
