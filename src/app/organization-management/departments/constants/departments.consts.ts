@@ -8,6 +8,9 @@ export const DepartmentsExportCols = (isIRPEnabled: boolean, isInvoiceDepartment
     { text:'Department Contact', column: 'FacilityContact'},
     { text:'Department Phone NO', column: 'FacilityPhoneNo'},
     { text:'Inactivation Date', column: 'InactiveDate'},
+    {text:"Primary Skill",column:"PrimarySkillNames"},
+    {text:"Secondary Skill",column:"SecondarySkillNames"},
+    {text:"Reactivation Date",column:"ReactivateDate"}
   ];
 
   if (isInvoiceDepartmentIdFieldShow) {
