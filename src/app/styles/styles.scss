@@ -754,3 +754,6 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 .order-irp .status-cell .e-chip.e-warning.ex{
   width: 17% !important;
 }
+.add-edit-noteform .textarea-wrapper span.error {
+  top : unset !important;
+}

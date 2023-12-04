@@ -34,6 +34,7 @@ import {
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { DateTimeHelper } from '@core/helpers';
 import { OrderType } from '@shared/enums/order-type';
+import { DefaultMaxDate, DefaultMinDate } from '@shared/constants';
 
 import { CandidateCancellationDialogService } from './candidate-cancellation-dialog.service';
 
@@ -210,10 +211,10 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
       ? DateTimeHelper.isFutureDate(this.candidateJob.actualStartDate)
       : false;
     this.endDateMin = this.candidateJob?.actualStartDate
-      ? new Date(this.candidateJob.actualStartDate)
-      : null;
+      ? DateTimeHelper.setCurrentTimeZone(this.candidateJob.actualStartDate)
+      : DefaultMinDate;
     this.endDateMax = this.candidateJob?.actualEndDate
-      ? new Date(this.candidateJob.actualEndDate)
-      : null;
+      ? DateTimeHelper.setCurrentTimeZone(this.candidateJob.actualEndDate)
+      : DefaultMaxDate;
   }
 }

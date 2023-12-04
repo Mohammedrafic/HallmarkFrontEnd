@@ -17,7 +17,7 @@ import {
 import { NumericTextBoxModule, TextBoxAllModule, UploaderAllModule } from '@syncfusion/ej2-angular-inputs';
 import { NgxsModule, Store } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
-import { TabModule } from '@syncfusion/ej2-angular-navigations';
+import { AccordionModule, TabModule } from '@syncfusion/ej2-angular-navigations';
 import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { DatePickerAllModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
@@ -85,6 +85,7 @@ import { InvoicePaymentDetailsModule } from './components/invoice-payment-detail
 import { InvoicesFiltersService } from './services/invoices-filters.service';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { InvoiceGridExportComponent } from './components/invoice-grid-export/invoice-grid-export.component';
+import { InvoiceHistoryDetailComponent } from './containers/invoice-history-detail/invoice-history-detail.component';
 
 @NgModule({
   declarations: [
@@ -101,6 +102,7 @@ import { InvoiceGridExportComponent } from './components/invoice-grid-export/inv
     AllInvoicesActionCellComponent,
     GridOrderIdCellComponent,
     InvoiceGridExportComponent,
+    InvoiceHistoryDetailComponent,
 
   ],
   imports: [
@@ -161,6 +163,7 @@ import { InvoiceGridExportComponent } from './components/invoice-grid-export/inv
     InvoiceAddPaymentModule,
     InvoicePaymentDetailsModule,
     ValidateDirectiveModule,
+    AccordionModule
   ],
   providers: [
     InvoicesService,

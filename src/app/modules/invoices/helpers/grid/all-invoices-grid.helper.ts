@@ -26,6 +26,8 @@ import { BaseInvoice, TypedColDef } from '../../interfaces';
 import { PendingApprovalInvoice, PendingApprovalInvoiceRecord } from '../../interfaces/pending-approval-invoice.interface';
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
 import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
+import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
+import { MoreMenuType } from '../../enums';
 
 interface AllColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;
@@ -37,9 +39,14 @@ const commonColumn: ColDef = {
   sortable: true,
   comparator: () => 0,
 };
-
+const threeDotsMenuOptions=[
+  {
+      text: MoreMenuType[0],
+      id: "0",
+  },
+]
 export class AllInvoicesGridHelper {
-  public static getColDefs(canPay: boolean, { pay }: AllColDefsConfig): TypedColDef<PendingApprovalInvoice>[] {
+  public static getColDefs(canPay: boolean,{ pay }: AllColDefsConfig): TypedColDef<PendingApprovalInvoice>[] {
     return [
       canPay ?  {
         headerName: '',
@@ -65,7 +72,33 @@ export class AllInvoicesGridHelper {
         checkboxSelection: true,
         width: 80,
         headerComponent: ToggleRowExpansionHeaderCellComponent,
+      },{
+      headerName: '',
+      cellRenderer: GridActionsCellComponent,
+      cellClass: 'fat-icon-btn',
+      cellRendererParams: (params: ICellRendererParams) => {
+         return {
+          actionsConfig: [
+  
+            {
+              action: (itemId: number) => {
+                params.context?.componentParent?.menuOptionSelected(itemId, params.data);
+              },
+              iconName: 'more-vertical',
+              buttonClass: 'e-flat primary-icon-button',
+              disabled: false,
+              menuItems: threeDotsMenuOptions,
+            },
+          ],
+        } as GridActionsCellConfig;
       },
+      sortable: false,
+      suppressMenu: true,
+      filter: false,
+      resizable: false,
+      width: 20,
+
+    },
       {
         field: 'formattedInvoiceId',
         minWidth: 160,

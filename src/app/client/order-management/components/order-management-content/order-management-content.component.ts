@@ -259,6 +259,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/interfaces';
 import { OrderManagementIRPRowPositionService } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.service';
+import { OrderJobType } from '@shared/enums';
 
 @Component({
   selector: 'app-order-management-content',
@@ -652,7 +653,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     if (isIrpEnabled === true) {
       this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
       this.activeSystem = OrderManagementIRPSystemId.IRP;
-      this.store.dispatch(true);
+      this.store.dispatch(new SetHelpSystem(true));
       this.getPreservedFiltersByPage();
       this.orderManagementService.setOrderManagementSystem(this.activeSystem);
       this.setOrderTypesFilterDataSource();
@@ -682,7 +683,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public getalerttitle(): void {
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
-    this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    if((this.alertTitle.trim()).toLowerCase()!=AlertIdEnum[AlertIdEnum['Candidate Level Comments']].trim().toLowerCase()){
+      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
     if (Object.values(AlertIdEnum).includes(this.alertTitle)) {
       if((this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Custom']].trim().toLowerCase()
@@ -740,7 +743,7 @@ public watchForOrderFromNotification(){
    || (AlertIdEnum[AlertIdEnum['Communication Open Needs PerDiem order']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
     this.systemGroupConfig = SystemGroupConfig(true, false, OrderManagementIRPSystemId.IRP);
     this.activeSystem = OrderManagementIRPSystemId.IRP;
-    this.store.dispatch(true);
+    this.store.dispatch(new SetHelpSystem(true));
     this.redirectedfromnotification=true;
      this.onFilterClearAll();
   }
@@ -2799,6 +2802,8 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number, isIrp: boolean): void {
+    const irpIncludeDeploy = this.selectedDataRow?.orderType === OrderJobType.PerDiem ? true : this.employeeToggleState?.includeDeployed;
+
     this.store.dispatch(new GetAgencyOrderCandidatesList(
       orderId,
       organizationId,
@@ -2814,17 +2819,17 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.employeeToggleState?.includeDeployed,
+        irpIncludeDeploy,
         ""
       ));
-    } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)){
+    } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)) {
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
         orderId,
         organizationId,
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.employeeToggleState?.includeDeployed,
+        irpIncludeDeploy,
         ""
       ));
     }
@@ -2863,7 +2868,7 @@ public RedirecttoIRPOrder(order:Order)
 
       if (!this.previousSelectedSystemId) {
         this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
-        this.store.dispatch(this.activeSystem === OrderManagementIRPSystemId.IRP);
+        this.store.dispatch(new SetHelpSystem(this.activeSystem === OrderManagementIRPSystemId.IRP));
       }
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       if(!this.canViewOrderIRP){
@@ -2882,7 +2887,7 @@ public RedirecttoIRPOrder(order:Order)
       }
       if(this.canViewOrderIRP && !this.canViewOrderVMS){
         this.activeSystem = OrderManagementIRPSystemId.IRP;
-        this.store.dispatch(true);
+        this.store.dispatch(new SetHelpSystem(true));
       }
       this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem,this.canOrderJourney);
       this.cd.detectChanges();
@@ -3233,10 +3238,10 @@ public RedirecttoIRPOrder(order:Order)
   onClickSystem(obj: any) {
     if (obj == "IRP") {
       this.activeSystem = OrderManagementIRPSystemId.IRP;
-      this.store.dispatch(true);
+      this.store.dispatch(new SetHelpSystem(true));
     } else if (obj == "VMS") {
       this.activeSystem = OrderManagementIRPSystemId.VMS;
-      this.store.dispatch(false);
+      this.store.dispatch(new SetHelpSystem(false));
     }
     this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem, this.canOrderJourney);
     this.clearFilters();

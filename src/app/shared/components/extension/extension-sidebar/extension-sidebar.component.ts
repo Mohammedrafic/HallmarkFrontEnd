@@ -445,10 +445,8 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       const { actualEndDate } = this.candidateJob || {};
       const startDate = addDays(actualEndDate, 1);
       const startDateValue = startDate ? DateTimeHelper.setCurrentTimeZone(startDate.toString()) : undefined;
+      const rate = this.getBillRate(rates, startDateValue);
 
-      const rate = this.billRatesSyncService.getBillRateForSync(
-        rates, startDateValue, this.candidateJob.isLocal
-      );
       this.extensionForm.get('billRate')?.patchValue(rate?.rateHour, { emitEvent: false, onlySelf: true });
       this.candidateRates = rates;
       this.cd.markForCheck();

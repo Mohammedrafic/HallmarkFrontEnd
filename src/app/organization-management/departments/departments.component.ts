@@ -319,6 +319,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       this.getDepartments();
       this.store.dispatch(new ShowSideDialog(false));
       this.isbulkedit=false;
+      this.isbulkdelete=false;
 
     });
     this.action$
@@ -335,6 +336,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.isbulkedit=false;
 
         this.store.dispatch(new ShowSideDialog(false));
+        this.isbulkedit=false;
+        this.isbulkdelete=false;
 
     });
     this.action$
@@ -355,6 +358,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Department));
       }
       this.getDepartments();
+      this.isbulkedit=false;
+      this.isbulkdelete=false;
     });
     this.action$
     .pipe(
@@ -368,6 +373,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.clearSelection(this.grid);
         this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
         this.getDepartments();
+        this.isbulkedit=false;
+        this.isbulkdelete=false;
     });
   }
 
@@ -533,7 +540,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     }
   }
 
-  onAddDepartmentClick(): void {
+  onAddDepartmentClick(): void {    
     if (this.selectedLocation && this.selectedRegion) {
       this.departmentsDetailsFormGroup.controls['inactiveDate'].enable();
       this.departmentsDetailsFormGroup.controls['includeInIRP']?.setValue(
@@ -547,7 +554,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     }
   }
 
-  onDepartmentFormCancelClick(): void {
+  onDepartmentFormCancelClick(): void { 
     if (this.departmentsDetailsFormGroup.dirty) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -562,6 +569,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     } else {
       this.closeDepartmentWindow();
     }
+    this.isbulkedit=false;
+    this.isbulkdelete=false;
   }
 
   onDepartmentFormSaveClick(ignoreWarning = false): void {

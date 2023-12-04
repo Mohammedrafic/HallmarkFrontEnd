@@ -11,3 +11,4 @@ export * from './organization-settings';
 export * from './masks';
 export * from './format-date';
 export * from './datepicker-mask';
+export * from './default-date';

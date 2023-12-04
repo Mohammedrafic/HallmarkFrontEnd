@@ -7,6 +7,7 @@ export interface CandidateCredential {
   id?: number;
   candidateProfileId?: number;
   status?: number;
+  completedBy?: string;
   completedDate?: string | null;
   masterName?: string;
   masterCredentialId: number;
@@ -32,6 +33,10 @@ export interface CandidateCredential {
   departmentMatch?: DepartmentMatchStatus;
   credentialType?: CredentialType;
   isCredentialExists?: boolean;
+  reviewedBy?: string;
+  reviewedDate?: string;
+  verifiedBy?: string;
+  verifiedDate?: string;
 }
 
 export interface CandidateCredentialGridItem extends CandidateCredential {

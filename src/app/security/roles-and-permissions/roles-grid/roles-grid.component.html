@@ -1,5 +1,5 @@
-<section class="table-wrapper" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
-  <div class="custom-grid">
+<section class="table-wrapper roles-grid" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
+  <div class="custom-grid grid-custom-option">
     <ag-grid-angular #agGridPagination
                      class="ag-theme-alpine grid app-grid__component"
                      [animateRows]="true"

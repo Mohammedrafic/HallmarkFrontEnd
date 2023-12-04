@@ -38,6 +38,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { GetQueryParams } from '@core/helpers/functions.helper';
 import { AgencyInvoicesGridTab, InvoicesAggregationType, OrganizationInvoicesGridTab } from '../enums';
+import { InvoiceAuditLogPayload, Invoicebase, agencyInvoicebase } from '../interfaces/invoice-auditlog.interface';
 
 @Injectable()
 export class InvoicesApiService {
@@ -225,4 +226,14 @@ export class InvoicesApiService {
   private agencyDeleteManualInvoice(id: number, organizationId: number | null): Observable<void> {
     return this.http.delete<void>(`/api/ManualInvoiceRecords/${id}/organizations/${organizationId}`);
   }
+  // Audit log api
+  public getInvoiceAuditHistory(payload: InvoiceAuditLogPayload,isagency:boolean): Observable<Invoicebase[]> {
+    const url = "/api/Audit/organizationInvoiceAuditHistory";
+    return this.http.post<Invoicebase[]>(url, payload);
+   }
+
+   public getAgencyInvoiceAuditHistory(payload: InvoiceAuditLogPayload,isagency:boolean): Observable<agencyInvoicebase[]> {
+    const url = "/api/Audit/agencyInvoiceAuditHistory"
+    return this.http.post<agencyInvoicebase[]>(url, payload);
+   }
 }

@@ -48,10 +48,10 @@
                                   [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
                                   [description]="widgetDescriptionEnum.ACTIVE_POSITIONS"></app-accumulation-chart>
 
-          <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS"
-                                  [chartData]="widgetsData?.[widgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS]"
+          <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS_FOR_INITIAL_ORDERS"
+                                  [chartData]="widgetsData?.[widgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS_FOR_INITIAL_ORDERS]"
                                   [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
-                                  [description]="widgetDescriptionEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS" [averageFlag]="true" [averageactiveFlag]="true">               
+                                  [description]="widgetDescriptionEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS_FOR_INITIAL_ORDERS" [averageFlag]="true" [averageactiveFlag]="true">               
          </app-accumulation-chart>
           <app-maps-chart *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
                           [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"

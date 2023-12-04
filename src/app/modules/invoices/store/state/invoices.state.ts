@@ -55,6 +55,7 @@ import { Attachment } from '@shared/components/attachments';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
 import { InvoiceFiltersAdapter } from '../../adapters';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import {  Invoicebase, agencyInvoicebase, commonInvoiceHistory } from '../../interfaces/invoice-auditlog.interface';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -166,6 +167,15 @@ export class InvoicesState {
   @Selector([InvoicesState])
   static organizationStructure(state: InvoicesModel): OrganizationStructure | null {
     return state.organizationStructure;
+  }
+  @Selector([InvoicesState])
+  static getInvoiceAuditHistory(state: commonInvoiceHistory): Invoicebase[] {
+    return state.Invoicebase;
+  }
+
+  @Selector([InvoicesState])
+  static getAgecnyInvoiceAuditHistory(state: commonInvoiceHistory): agencyInvoicebase[] {
+    return state.agencyInvoicebase;
   }
 
 
@@ -894,5 +904,35 @@ export class InvoicesState {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
+  }
+
+  //Audit History
+  @Action(Invoices.GetInvoiceAuditHistory)
+  GetInvoiceAuditHistory({ patchState, dispatch }: StateContext<commonInvoiceHistory>, { payload ,isagency}:
+    Invoices.GetInvoiceAuditHistory): Observable<Invoicebase[] | void> {
+    return this.invoicesAPIService.getInvoiceAuditHistory(payload,isagency).pipe(
+      tap((payloads) => {
+        patchState({ Invoicebase: payloads });
+        dispatch(new Invoices.GetInvoiceHistoryDetailSucceeded());
+        return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      }));
+  }
+
+  //agecny Invoice histoy
+  @Action(Invoices.GetAgencyInvoiceAuditHistory)
+  GetAgencyInvoiceAuditHistory({ patchState, dispatch }: StateContext<commonInvoiceHistory>, { payload ,isagency}:
+    Invoices.GetAgencyInvoiceAuditHistory): Observable<agencyInvoicebase[] | void> {
+    return this.invoicesAPIService.getAgencyInvoiceAuditHistory(payload,isagency).pipe(
+      tap((payloads) => {
+        patchState({ agencyInvoicebase: payloads });
+        dispatch(new Invoices.GetInvoiceHistoryDetailSucceeded());
+        return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      }));
   }
 }
