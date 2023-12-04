@@ -7,13 +7,13 @@
   padding: 0 !important;
 
     .widget-container {
-      background-color: $secondary-dark-blue-50;
+      background-color: var(--background);
       padding: 16px 24px;
 
       .e-mastertext {
         font-size: 14px;
         line-height: 20px;
-        color: $secondary-dark-blue-20;
+        color: var(--text);
         margin-bottom: 4px;
       }
 
@@ -36,7 +36,7 @@
         display: none;
       }
     }
-  
+
   .e-card-header {
     margin: 0;
   }

@@ -1,7 +1,7 @@
-import { Component, OnInit, Input, ChangeDetectorRef, Inject, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef, Inject, ViewChildren } from '@angular/core';
 import { CustomFormGroup } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
-import { Select, StateContext, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import {
   Observable,
   Subject,
@@ -41,7 +41,6 @@ import {
 import { ProgressBar } from '@syncfusion/ej2-angular-progressbar';
 import { FilteredItem } from '@shared/models/filter.model';
 import { DashboartFilterDto } from '../../models/dashboard-filter-dto.model';
-import { AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'app-rn-utilization-widget',
@@ -49,7 +48,7 @@ import { AbstractControl } from '@angular/forms';
   styleUrls: ['./rn-utilization-widget.component.scss'],
 })
 export class RnUtilizationWidgetComponent implements OnInit {
-  
+
   @Input() isLoading: boolean;
   @Input() isDarkTheme: boolean | false;
   @Input() description: string;
@@ -69,8 +68,6 @@ export class RnUtilizationWidgetComponent implements OnInit {
   @Select(DashboardState.filterData)
   filterData$: Observable<DashboartFilterDto>;
 
-  workcommitmentvalue: number[];
-  skillDatavalue: number[];
   noofPerDiemOrders: string = NOOFPERDIEMORDERS;
   targetPerDiemhrs: string = TARGETPERDIEMHOURS;
   actualPerDiemhrs: string = ACTUALPERDIEMHOURS;
@@ -78,7 +75,6 @@ export class RnUtilizationWidgetComponent implements OnInit {
   rnUtilizationForm: CustomFormGroup<RnUtilizationForm>;
   editMode = false;
   private unsubscribe$: Subject<void> = new Subject();
-  targetutilization = 60;
   allOption = 'All';
   readonly optionFields = DefaultOptionFields;
   skillsText = 'All';
@@ -124,7 +120,7 @@ export class RnUtilizationWidgetComponent implements OnInit {
       }),
       takeUntil(this.unsubscribe$)
     );
-   
+
     const skillsLookup = this.store.dispatch(new GetSkillData(data)).pipe(
       take(1),
       tap((result) => {

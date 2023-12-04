@@ -6,23 +6,23 @@
     display: flex;
     align-items: center;
     width: 100%;
+    color: var(--secondary-text);
   }
 
   &__score {
     font-size: 16px;
     font-weight: 700;
     line-height: 24px;
-    // width: 100%;
     width: 50%;
     text-align: right
   }
+
   &__head {
-   // font-size: 16px;
     font-weight: 700;
-  //  line-height: 24px;
     width: 100%;
-    text-align: right
+    text-align: right;
   }
+
   &__averageFlagHead {
     font-weight: 700;
     width: 35%;
@@ -62,7 +62,6 @@
   }
 
   &__point {
-    //width: 32px;
     width: 16px;
     min-width: 16px;
     height: 16px;
@@ -110,15 +109,14 @@
   }
 }
 
-.widget-item-count
-{
+.widget-item-count {
   font-size: 16px;
-    font-weight: 700;
-    line-height: 24px;
-   align-items: center;
-   width:100%;
-   text-align:right;
-   
+  font-weight: 700;
+  line-height: 24px;
+  align-items: center;
+  width: 100%;
+  text-align: right;
+  color: var(--text);
 }
 
 .widget_left{
@@ -144,7 +142,7 @@
 }
 .widget-legend__item-content.legent-sticky-header {
   position: sticky !important;
-  background: #fff !important;
+  background: var(--bg-widget) !important;
   z-index: 99 !important;
   top: 0 !important;
 }
