@@ -166,7 +166,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() public userPermission: Permission;
   @Input() public isIRP: boolean;
   @Input() public redirectedFromDashboard: boolean;
-
+  @Input() public disableNonlinkedagency:boolean;
   @Input()
   public set tab(tabIndex: number) {
     if (!isNil(tabIndex)) {
@@ -258,6 +258,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.syncFilterTagsWithControls();
     this.getSourcingConfig();
   }
+
 
   ngOnDestroy(): void {
     this.isAlive = false;

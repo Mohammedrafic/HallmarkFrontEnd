@@ -279,4 +279,9 @@ export class CandidateService {
   public getMissingCredentials(candidateProfileId: number): Observable<void> {
     return this.http.post<void>('/api/EmployeeCredentials/addMissingCredentials', { candidateProfileId });
   }
+  public getIsmsp(): Observable<any>
+  {
+    return this.http.get('/api/msp/isNonMSPAgency')
+  }
+
 }
