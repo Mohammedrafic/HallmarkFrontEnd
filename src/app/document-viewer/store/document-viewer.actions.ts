@@ -1,4 +1,4 @@
-import { Status } from "./document-viewer.state.model";
+import { Status, Statuses } from "./document-viewer.state.model";
 
 export class GetFiles {
   static readonly type = '[document-viewer] Get Files';
@@ -28,12 +28,12 @@ export class GetGroupedFiles {
 
 export class SaveStatus {
   static readonly type = '[status] Save Status';
-  constructor(public orderId: number | null, public jobId: number | null, public statusText: string, public statusId: number | null) {}
+  constructor(public payload:Statuses) {}
 }
 
 export class SaveStatusSucceeded {
   static readonly type = '[status] Save Status Succeeded';
-  constructor(public orderId: number | null, public jobId: number | null, public statusText: string, statusId: number | null) {}
+  constructor(public payload:Statuses) {}
 }
 
 export class SaveStatusFailed {

@@ -17,6 +17,7 @@ export class StatusComponentComponent implements OnInit {
   orderId: number;
   statusText: string;
   private unsubscribe$: Subject<void> = new Subject();
+  userId: string;
 
   constructor(private fb: FormBuilder, private activeRoute: ActivatedRoute, private store: Store) {}
 
@@ -32,6 +33,7 @@ export class StatusComponentComponent implements OnInit {
       if (params['orderId'] && params['statusText']) {
         this.orderId = params['orderId'];
         this.statusText = params['statusText'];
+        this.userId = params['userid'];
       }
     });
   }
@@ -40,15 +42,39 @@ export class StatusComponentComponent implements OnInit {
     if (this.statusForm.valid) {
       if (this.statusText === 'shortlisted') {
         this.store.dispatch(
-          new SaveStatus(this.orderId, this.statusForm.value.jobId, this.statusText, CandidatStatus.Shortlisted)
+          new SaveStatus({
+            orderId: this.orderId as number,
+            jobId: this.statusForm.value.jobId as number,
+            nextApplicantStatus: {
+              applicantStatus: CandidatStatus.Shortlisted,
+              statusText: this.statusText,
+            },
+            userId:this.userId
+          })
         );
       } else if (this.statusText === 'offered') {
         this.store.dispatch(
-          new SaveStatus(this.orderId, this.statusForm.value.jobId, this.statusText, CandidatStatus.Offered)
+          new SaveStatus({
+            orderId: this.orderId as number,
+            jobId: this.statusForm.value.jobId as number,
+            nextApplicantStatus: {
+              applicantStatus: CandidatStatus.Offered,
+              statusText: this.statusText,
+            },
+            userId:this.userId
+          })
         );
       } else {
         this.store.dispatch(
-          new SaveStatus(this.orderId, this.statusForm.value.jobId, this.statusText, CandidatStatus.Rejected)
+          new SaveStatus({
+            orderId: this.orderId as number,
+            jobId: this.statusForm.value.jobId as number,
+            nextApplicantStatus: {
+              applicantStatus: CandidatStatus.Rejected,
+              statusText: this.statusText,
+            },
+            userId:this.userId
+          })
         );
       }
     }

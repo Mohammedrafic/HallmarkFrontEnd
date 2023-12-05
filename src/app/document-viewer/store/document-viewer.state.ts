@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, catchError, tap } from 'rxjs';
 
-import { DocumentViewerModel, FileGroup, Status } from './document-viewer.state.model';
+import { DocumentViewerModel, FileGroup, Status, Statuses } from './document-viewer.state.model';
 import {
   GetFiles,
   GetFilesSucceeded,
@@ -89,13 +89,13 @@ export class DocumentViewerState {
 
   @Action(SaveStatus)
   SaveStatus(
-    { dispatch }: StateContext<Status>,
-    { orderId, jobId, statusText, statusId }: SaveStatus
+    { dispatch }: StateContext<Statuses>,
+    { payload }: SaveStatus
   ): Observable<boolean | void> {
-    return this.documentViewerService.saveStatus(orderId, jobId, statusText, statusId).pipe(
+    return this.documentViewerService.saveStatus(payload).pipe(
       tap((res) => {
         if (res) {
-          dispatch(new SaveStatusSucceeded(orderId, jobId, statusText, statusId));
+          dispatch(new SaveStatusSucceeded(payload));
         }
       }),
       catchError((err: HttpErrorResponse) => {

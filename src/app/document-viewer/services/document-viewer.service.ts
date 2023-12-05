@@ -1,7 +1,7 @@
 import { HttpClient, HttpBackend  } from '@angular/common/http';
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { FileGroup } from 'src/app/document-viewer/store/document-viewer.state.model';
+import { FileGroup, Statuses } from 'src/app/document-viewer/store/document-viewer.state.model';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 @Injectable({
@@ -38,8 +38,8 @@ export class DocumentViewerService {
     return this.http.get<FileGroup[]>(url, params);
   }
 
-  public saveStatus(orderId: number | null, jobId: number | null, statusText: string, statusId: number | null): Observable<boolean> {
-    return this.http.post<boolean>(`/api/AppliedCandidates/updateCandidateJobFromMail`, { orderId, jobId, statusText, statusId });
+  public saveStatus(payload: Statuses): Observable<boolean> {
+    return this.http.post<boolean>(`/api/AppliedCandidates/updateCandidateJobFromMail`, {payload});
   }
   
 
