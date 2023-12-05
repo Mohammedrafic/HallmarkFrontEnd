@@ -2421,7 +2421,8 @@ public RedirecttoIRPOrder(order:Order)
 
   private onApproveOrderHandler(): void {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApproveOrder)).subscribe(() => {
-      const [index] = this.gridWithChildRow.getSelectedRowIndexes();
+      const [index] = this.activeSystem === OrderManagementIRPSystemId.VMS ? this.gridWithChildRow.getSelectedRowIndexes()
+      : [null];
       this.selectedIndex = index;
       this.getOrders(true);
     });
