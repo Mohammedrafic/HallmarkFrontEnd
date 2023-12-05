@@ -13,6 +13,7 @@ import {
   MileageCreateResponse,
   TimesheetDetailsModel,
   TimesheetFileData,
+  TimesheetHistoricalEvent,
 } from '../interface';
 
 @Injectable()
@@ -122,6 +123,17 @@ export class TimesheetDetailsApiService {
 
   public recalculateTimesheet(jobId: number): Observable<boolean> {
     return this.http.post<boolean>('/api/Timesheets/performRecalculation', { jobIds: [jobId] });
+  }
+
+  public getTimesheetHistoricalEvents(
+    isAgency: boolean,
+    timesheetId: number,
+    organizationId: number | null
+  ): Observable<TimesheetHistoricalEvent[]> {
+    const endpoint = isAgency
+      ? `/api/timesheets/historicalData/${timesheetId}/${organizationId}`
+      : `/api/timesheets/historicalData/${timesheetId}`;
+    return this.http.get<TimesheetHistoricalEvent[]>(endpoint);
   }
 
   private organizationDownloadAttachment(fileId: number): Observable<Blob> {

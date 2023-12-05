@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -104,7 +105,8 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   constructor(private chipsCssClass: ChipsCssClass,
               protected override store: Store,
-              private commentsService: CommentsService,) {
+              private commentsService: CommentsService,
+              private cd: ChangeDetectorRef) {
     super(store);
   }
 
@@ -149,11 +151,18 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   private subsToSelectedOrder(): void {
     this.selectedOrder$
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        filter((order) => !!order),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe((order) => {
         this.currentOrder = order;
         this.currentOrder && this.getOrderComments();
         this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;
+        this.chipList.cssClass = this.chipsCssClass.transform(this.currentOrder.statusText);
+        this.chipList.text = this.currentOrder.statusText;
+        this.chipList?.refresh();
+        this.cd.detectChanges();
       });
   }
 

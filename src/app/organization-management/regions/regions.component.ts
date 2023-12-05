@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
+import { filter, finalize, Observable, Subject, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 
 import { MessageTypes } from '@shared/enums/message-types';
 import { Region, regionFilter, regionsPage } from '@shared/models/region.model';
@@ -169,22 +169,22 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
   }
 
   private subscribeOnMasterRegions(): void {
-    this.masterRegions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.masterRegion = data;
-      this.allRegions$.pipe(take(1))
-        .subscribe((regionsData) => {
-          let filterMasterData: Region[] = [];
-          if (regionsData && regionsData.length > 0) {
-            const regionNameData = regionsData.map(x => x.name);
-            const masterData = data;
-            filterMasterData = masterData.filter((item) => {
-              return !regionNameData.includes(item.name);
-            });
-            this.masterRegion = filterMasterData;
-          }
-          this.changeDetectorRef.detectChanges();
-        });
-    });
+    this.masterRegions$.pipe(
+      tap((data: Region[]) => this.masterRegion = data),
+      switchMap(() => this.regionsPageList$),
+      filter(regionsData => !!regionsData),
+      tap(({ items: regionsData }: regionsPage) => {
+        let filterMasterData: Region[] = [];
+        if (regionsData && regionsData.length > 0) {
+          const regionNameData = regionsData.map(x => x.name);
+          filterMasterData = this.masterRegion.filter((item) => {
+            return !regionNameData.includes(item.name);
+          });
+          this.masterRegion = filterMasterData;
+        }
+      }),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => this.changeDetectorRef.detectChanges());
   }
 
   public getMasterRegionData() {
@@ -263,12 +263,12 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  private getRegions() {
+  private getRegions(): Observable<any> {
     this.filters.orderBy = this.orderBy;
     this.filters.pageNumber = this.currentPage;
     this.filters.pageSize = this.pageSize;
     this.filters.getAll = false;
-    this.store.dispatch([new GetRegionsPage(this.filters)]);
+    return this.store.dispatch([new GetRegionsPage(this.filters)]);
   }
 
   onAddRegionClick(): void {
@@ -310,21 +310,17 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(
-        take(1)
-      ).subscribe((confirm) => {
-        if (confirm && region.id ) {
-          this.store.dispatch(new DeleteRegionById(region.id)).pipe(
-            takeUntil(this.unsubscribe$)
-          ).subscribe(() => {
-            this.getRegions();
-            this.getMasterRegionData();
-          });
-          this.regionFormGroup.reset();
-        }
-        this.removeActiveCssClass();
-      });
+        filter((confirm: boolean) => confirm && !!region.id),
+        switchMap(() =>
+          this.store.dispatch(new DeleteRegionById(region.id as number))
+        ),
+        switchMap(() => this.getRegions()),
+        tap(() => this.getMasterRegionData()),
+        take(1),
+        finalize(() => this.removeActiveCssClass())
+      ).subscribe();
   }
 
   onFormCancelClick(): void {

@@ -19,12 +19,12 @@ import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { VendorScorecardReportConstants, analyticsConstants, InvoiceStatus } from '../constants/analytics.constant';
+import { VendorScorecardReportConstants, analyticsConstants, InvoiceStatus,Period } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
-import { uniqBy } from 'lodash';
+import { toNumber, uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { CommonReportFilter, CommonReportFilterOptions, OrderTypeOptionsForReport } from '../models/common-report.model';
@@ -117,6 +117,8 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
   selectedAgencies: AssociateAgencyDto[];
   public defaultAgencyIds: (number | undefined)[] = [];
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  
+  periodFields: FieldSettingsModel = { text: 'name', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   selectedDepartments: Department[];
   @Select(UserState.lastSelectedOrganizationId)
@@ -164,6 +166,9 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
+  private culture = 'en-US';
+  public periodList: Period[] = [];
+  public periodIsDefault: boolean = false;
   //PREOGRESS BAR
   public startAngle: number = 0;
   public endAngle: number = 360;
@@ -250,6 +255,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
+      this.loadperiod();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
@@ -279,6 +285,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
         orderTypes: new FormControl([]),
         invoiceType: new FormControl('0'),
         excludeInactiveAgency: new FormControl(false),
+        period: new FormControl(null)
       }
     );
   }
@@ -287,7 +294,22 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
     this.isAlive = false;
   }
-
+  selectPeriod() {
+    this.periodIsDefault = this.VendorReportForm.controls['period'].value == "0" ? true : false;
+  }
+  private loadperiod(): void {
+    this.periodList = [];
+    this.periodList.push({ id: 0, name: 'Custom' });
+    this.periodList.push({ id: 1, name: 'Last 30 days' });
+    this.periodList.push({ id: 2, name: 'Last 60 days' });
+    this.periodList.push({ id: 3, name: 'Last 90 days' });
+    this.periodList.push({ id: 4, name: 'MTD' });
+    this.periodList.push({ id: 5, name: 'Last Quarter' });
+    this.periodList.push({ id: 6, name: 'Year Till Date' });
+    this.periodList.push({ id: 7, name: 'Last Completed 6 Months' });
+    this.periodList.push({ id: 8, name: 'Last Completed 12 months' });
+    this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.Period)?.setValue("0");
+  }
   public onFilterControlValueChangedHandler(): void {
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.ExcludeInactiveAgency)?.setValue(false);
     
@@ -299,7 +321,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
-        this.VendorReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.VendorReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
 
 
         this.changeDetectorRef.detectChanges();
@@ -308,20 +330,24 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.VendorReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
-      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
-        this.filterColumns.agencyIds.dataSource = [];
+      this.selectedOrganizations = [];
+      // if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      if (data && data.length > 0) {
+          this.filterColumns.agencyIds.dataSource = [];
         this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.AgencyIds)?.setValue([]);
 
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
-          let orgList = this.organizations?.filter((x) => data == x.organizationId);
-          this.selectedOrganizations = orgList;
+         
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
           let departmentsList: Department[] = [];
+          this.selectedOrganizations = data;
+          if (data.length == 1) {
 
+            let orgList = this.organizations?.filter((x) => data[0] == x.organizationId);
           orgList.forEach((value) => {
             regionsList.push(...value.regions);
             locationsList = regionsList.map(obj => {
@@ -333,21 +359,26 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
           });
 
 
-          this.regionsList = sortByField(regionsList, "name");
-          this.locationsList = sortByField(locationsList, 'name');
-          this.departmentsList = sortByField(departmentsList, 'name');
+        }
+        this.regionsList = regionsList.length > 0 ? sortByField(regionsList, "name") : [];
+        this.locationsList = locationsList.length > 0 ? sortByField(locationsList, 'name') : [];
+        this.departmentsList = departmentsList.length > 0 ? sortByField(departmentsList, 'name') : [];
 
 
           this.masterRegionsList = this.regionsList;
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
-
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          if (this.bussinessControl?.value.length == "1") {
+        
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
           }
           else {
             this.isResetFilter = true;
           }
+        }
           let businessIdData = [];
           businessIdData.push(data);
           let filter: CommonReportFilter = {
@@ -379,11 +410,8 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
               this.filterColumns.orderTypes.dataSource = this.orderTypesList;
               this.SearchReport();
             }
-            321
-          });
-          this.regions = this.regionsList;
-          this.filterColumns.regionIds.dataSource = this.regions;
-        }
+            });
+          }
         else {
           this.isClearAll = false;
           this.VendorReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
@@ -447,13 +475,15 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       }
     }
     let { departmentIds, locationIds,
-      regionIds, startDate, endDate, agencyIds, orderTypes, skillIds ,excludeInactiveAgency} = this.VendorReportForm.getRawValue();
+      regionIds, startDate, endDate, agencyIds, orderTypes, skillIds ,excludeInactiveAgency,period} = this.VendorReportForm.getRawValue();
 
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     this.isResetFilter = false;
+    var orgName = this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "";   
+    let currentDate = new Date(Date.now());
     this.paramsData =
     {
 
@@ -464,7 +494,8 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
 
-      "OrganizationsVSR": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "OrganizationsVSR": this.selectedOrganizations?.length == 0 ? "null" :
+      this.selectedOrganizations?.join(","),
       "RegionsVSR": regionIds.length == 0 ? "null" : regionIds,
       "LocationsVSR": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentsVSR": departmentIds.length == 0 ? "null" : departmentIds,
@@ -474,7 +505,13 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       "EndDateVSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "OrderTypeVSR": orderTypes == null || orderTypes == "" ? "null" : orderTypes,
       "SkillVSR": skillIds.length == 0 ? "null" : skillIds.join(","),
-      "ActiveAgencyVSR":excludeInactiveAgency==true?1:0
+      "ActiveAgencyVSR":excludeInactiveAgency==true?1:0,
+       "organizationNameVSR": orgName,
+       "reportPulledMekssageVSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
+       "DateRangeParamVSR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "PeriodParamVSR": period==null?0:period,
+      // "UserIdParamVMSIR": this.user?.id,
+    
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -535,8 +572,13 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
         valueField: 'name',
         valueId: 'id',
       },
-
-
+      period: {
+        type: ControlTypes.Dropdown,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
     }
   }
 
@@ -562,8 +604,11 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
+    debugger;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
+    this.VendorReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.VendorReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.LocationIds)?.setValue([]);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.DepartmentIds)?.setValue([]);
@@ -573,6 +618,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.OrderTypes)?.setValue(null);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.SkillIds)?.setValue([]);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.ExcludeInactiveAgency)?.setValue(false);
+    this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.Period)?.setValue(0);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
@@ -582,6 +628,11 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.departmentsList = this.masterDepartmentsList;
   }
   public onFilterApply(): void {
+    if (this.selectedOrganizations.length == 0) {
+      let error: any = "Organization is required";
+      this.store.dispatch(new ShowToast(MessageTypes.Error, error));
+      return;
+    }
     if (!this.istypeSetupTabActive) {
       this.VendorReportForm.markAllAsTouched();
       if (this.VendorReportForm?.invalid) {

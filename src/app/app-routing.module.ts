@@ -6,7 +6,7 @@ import { ClearCacheComponent } from '@shared/components/clear-cache/clear-cache.
 
 import { LoginGuard, UserGuard } from '@shared/guards';
 import { LoginPageComponent } from './b2c-auth/login-page/login-page.component';
-import { CanViewDocumentGuard } from './document-viewer/guards/can-view-document.guard';
+import { LoggedOutPageComponent } from './b2c-auth/logged-out-page/logged-out-page.component';
 
 const routes: Routes = [
   {
@@ -15,6 +15,7 @@ const routes: Routes = [
       {
         path: 'login',
         component: LoginPageComponent,
+        data: { skipAuthentication: true },
         canActivate: [ LoginGuard ],
       },
       {
@@ -43,6 +44,11 @@ const routes: Routes = [
     ],
   },
   {
+    path: 'logout',
+    component: LoggedOutPageComponent,
+    data: { skipAuthentication: true },
+  },
+  {
     // Needed for hash routing
     path: 'error',
     component: LoginPageComponent
@@ -60,6 +66,7 @@ const routes: Routes = [
   {
     path: 'sso',
     redirectTo: 'login',
+    data: { skipAuthentication: true },
   },
 ];
 

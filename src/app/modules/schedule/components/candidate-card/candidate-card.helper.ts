@@ -1,5 +1,6 @@
 import { formatDate } from '@angular/common';
 
+import { DateTimeHelper } from '@core/helpers';
 import { EmployeeIcons } from '../../enums';
 import { LtaAssignment, ScheduleCandidate } from '../../interface';
 
@@ -54,8 +55,10 @@ export const GetCandidateTypeTooltip = (
   }
 
   const { startDate, endDate, region, location, department } = ltaAssignment;
-  const formattedStartDate = formatDate(startDate, 'MM/dd/yyyy', 'en-US');
-  const formattedEndDate = formatDate(endDate, 'MM/dd/yyyy', 'en-US');
+  const startDateWithCurrentTimeZone = startDate ? DateTimeHelper.setCurrentTimeZone(startDate) : startDate;
+  const endDateWithCurrentTimeZone = endDate ? DateTimeHelper.setCurrentTimeZone(endDate) : endDate;
+  const formattedStartDate = formatDate(startDateWithCurrentTimeZone, 'MM/dd/yyyy', 'en-US');
+  const formattedEndDate = formatDate(endDateWithCurrentTimeZone, 'MM/dd/yyyy', 'en-US');
 
   return `${region} - ${location} - ${department}, ${formattedStartDate} - ${formattedEndDate}`;
 };

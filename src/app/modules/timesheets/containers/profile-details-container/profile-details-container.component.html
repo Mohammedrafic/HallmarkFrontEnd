@@ -304,7 +304,7 @@
       <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
     </div>
   </div>
-  <div class="d-flex">
+  <div class="accordions-section">
     <ejs-accordion expandMode="Single">
       <e-accordionitems>
         <e-accordionitem>
@@ -322,6 +322,18 @@
             [useStyle]="true"
             ></app-comments>
          </ng-template>
+        </e-accordionitem>
+      </e-accordionitems>
+    </ejs-accordion>
+    <ejs-accordion #historicalEventsAccordion expandMode="Single" (expanded)="getHistoricalEvents($event)">
+      <e-accordionitems>
+        <e-accordionitem [disabled]="!hasViewTimesheetPermission">
+          <ng-template #header>
+            <div>Historical Events</div>
+          </ng-template>
+          <ng-template #content>
+            <app-timesheet-historical-events [historicalEvents]="historicalEvents"></app-timesheet-historical-events>
+          </ng-template>
         </e-accordionitem>
       </e-accordionitems>
     </ejs-accordion>

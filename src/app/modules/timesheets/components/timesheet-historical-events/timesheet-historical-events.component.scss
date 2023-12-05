@@ -1,0 +1,15 @@
+.historical-events {
+  max-height: 264px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  overflow: auto;
+
+  .event {
+    margin-bottom: 14px;
+  }
+
+  .local-date-time {
+    font-weight: 700;
+  }
+}

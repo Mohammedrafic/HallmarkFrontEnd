@@ -38,7 +38,7 @@ import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-
 import { MessageTypes } from '@shared/enums/message-types';
 import { GRID_CONFIG, USER_SUBSCRIPTION_PERMISSION } from '@shared/constants';
 import { AppState } from '../../../store/app.state';
-import { BUSINESS_UNITS_VALUES_WITH_IRP } from '@shared/constants/business-unit-type-list';
+import { BUSINESS_UNITS_VALUES_WITH_IRP, BUSINESS_UNITS_VALUES_WITH_MSP } from '@shared/constants/business-unit-type-list';
 import { OutsideZone } from '@core/decorators';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { DetectActiveSystem, SystemGroupConfig } from '@client/order-management/constants';
@@ -321,6 +321,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
+      this.filteredBusinessUnits=BUSINESS_UNITS_VALUES_WITH_MSP
     }
 
     if (user?.businessUnitType !== BusinessUnitType.Hallmark) {

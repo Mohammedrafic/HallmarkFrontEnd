@@ -48,6 +48,7 @@ import { Permission } from '@core/interface';
 import { UserPermissionsService } from '@core/services';
 import { PermissionsAdapter } from '@core/helpers/adapters';
 import { LastSelectedMspID, UserMsp } from '../shared/models/user-msp.model';
+import { SsoManagement } from '../b2c-auth/sso-management';
 
 export interface UserStateModel {
   user: User | null;
@@ -174,7 +175,7 @@ export class UserState {
   @Selector()
   static lastSelectedOrganizationAgency(state: UserStateModel): string | null {
     return state.lastSelectedOrganisationAgency;
-  } 
+  }
 
   @Selector()
   static lastSelectedMsp(state: UserStateModel): string | null {
@@ -248,7 +249,7 @@ export class UserState {
       this.b2CAuthService.logout();
     }
 
-    window.localStorage.clear();
+    SsoManagement.clearLocalStorageButPreserveSso();
 
     patchState({
       user: null,
@@ -270,7 +271,7 @@ export class UserState {
         const faq = 10;
         const businessUnitType = isEmployee ? BusinessUnitType.Employee : payload;
         if (businessUnitType) {
-            // Define a recursive function to process children values 
+            // Define a recursive function to process children values
             const processChildren = (items: any[],parentTitle:string): ChildMenuItem[] => {
               return items.map((child: any) => {
                 const processedChild: ChildMenuItem = {
@@ -280,12 +281,12 @@ export class UserState {
                   icon: '',
                   anch: `${parentTitle}/${child.title}`,
                 };
-      
+
                 // If the child has children, recursively process started here
                 if (child.children && child.children.length > 0) {
                   processedChild.children = processChildren(child.children,child.title);
                 }
-      
+
                 return processedChild;
               });
             };
@@ -298,7 +299,7 @@ export class UserState {
                 menuItem.custom = MENU_CONFIG[businessUnitType][menuItem.id]?.custom || '';
                 if (menuItem.children && menuItem.children.length > 0) {
                   menuItem.children = processChildren(menuItem.children,menuItem.title);
-               
+
                 } else {
                   menuItem.children = [];
                 }
@@ -309,7 +310,7 @@ export class UserState {
         })
       );
     }
-  
+
 
   @Action(GetUserAgencies)
   GetUserAgencies({ patchState }: StateContext<UserStateModel>): Observable<UserAgencyOrganization> {

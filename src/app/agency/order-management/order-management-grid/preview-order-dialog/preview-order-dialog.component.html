@@ -15,14 +15,14 @@
             <div class="order-statuses">
               <ejs-chiplist #chipList class="events-off">
                 <e-chips>
-                  <e-chip [text]="order?.statusText"></e-chip>
-                  <e-chip *ngIf="order?.extensionFromId" text="E" cssClass="e-warning ex-chip"></e-chip>
+                  <e-chip [text]="currentOrder?.statusText"></e-chip> 
+                  <e-chip *ngIf="currentOrder?.extensionFromId" text="E" cssClass="e-warning ex-chip"></e-chip>
                 </e-chips>
               </ejs-chiplist>
               <div class="vertical-divider"></div>
-              <div *ngIf="order && !isReOrder" class="order-other-statuses">
-                <span class="custom-chip">{{ order.orderType | orderTypeName }}</span>
-                <span class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
+              <div *ngIf="currentOrder && !isReOrder" class="order-other-statuses">
+                <span class="custom-chip">{{ currentOrder.orderType | orderTypeName }}</span>
+                <span class="custom-chip"> {{currentOrder.isLocked ? "Locked" : "Unlocked"}}</span>
               </div>
             </div>
           </div>

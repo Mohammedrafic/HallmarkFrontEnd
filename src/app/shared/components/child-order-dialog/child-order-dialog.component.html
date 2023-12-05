@@ -26,14 +26,6 @@
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
-              <ejs-chiplist #chipList class="events-off" *ngIf="order?.status && activeSystem === OrderManagementIRPSystemId.IRP">
-                <e-chips>
-                  <e-chip
-                    [text]="orderStatusText[order.status]"
-                    [cssClass]="orderStatusText[order.status] | chipsCssClass"
-                  ></e-chip>
-                </e-chips>
-              </ejs-chiplist>
             </div>
           </div>
           <div class="e-card-content dialog-controls">

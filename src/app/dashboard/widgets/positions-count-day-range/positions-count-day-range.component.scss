@@ -17,7 +17,7 @@ section {
     width: 100%;
     margin-top: 10px;
   }
-  
+
   section > * {
     display: table-row;
   }
@@ -25,27 +25,22 @@ section {
   header .col {
     display: table-cell;
     border-bottom: solid 1px;
-    border-bottom-color: #babfc7;
-    border-bottom-color: var(--ag-border-color, #babfc7);
-    color: $secondary-dark-blue-15;
+    border-bottom-color: var(--grid-header-border) !important;
+    color: var(--secondary-text);
   }
+
   section .row .col:last-child {
     text-align: center;
-    color: $black;
+    color: var(--text);
     font-weight: 800;
   }
-  
+
   .row .col{
     display: table-cell;
-    background-color: $white;
-    background-color: var(--ag-background-color, $white);
-    color: $black-pearl;
-    color: var(--ag-data-color, var(--ag-foreground-color, $black-pearl));
-    border-width: 1px;
-    border-color: $primary-active-blue-90;
-    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, $primary-active-blue-90));
-    border-bottom-style: solid;
+    background-color: var(--bg-widget);
+    color: var(--secondary-text);
     padding: 6px 2px;
+
    .label{
         height: 20px;
         text-transform: uppercase;
@@ -55,7 +50,7 @@ section {
         border: 0 solid;
         border-radius: 14px;
         box-shadow: none;
-        box-sizing: border-box;     
+        box-sizing: border-box;
         line-height: 20px;
     }
   }
@@ -68,7 +63,7 @@ section {
 
   section .subcol {
     display: table-cell;
-    border-collapse: collapse;   
+    border-collapse: collapse;
   }
   .border-top{
     border-top: 1px solid $pure-black;
@@ -81,34 +76,30 @@ section {
   .middle-col{
     display: table;
     width: 100%;
-    background-color: $white;
-    background-color: var(--ag-background-color, $white);
-    color: $black-pearl;
-    color: var(--ag-data-color, var(--ag-foreground-color, $black-pearl));
-    border-width: 1px;
-    border-color: $primary-active-blue-90;
-    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, $primary-active-blue-90));
-    border-bottom-style: solid;
+    background-color: var(--bg-widget);
+    color: var(--text);
     padding: 10px 2px;
   }
 
   .flex-container {
     display: table-row;
   }
-  
+
   .flex-container>div {
     width: 20%;
     text-align: center;
     padding-right: 2px;
     display: table-cell;
   }
-  .range{
+
+  .range {
     border-left-style: solid;
-    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, $primary-active-blue-90));
+    border-color: var(--grid-header-border);
     border-width: 1px;
     font-weight: 800;
-    color: $secondary-dark-blue-15;
+    color: var(--secondary-text);
   }
+
   .middle-col-header .flex-container div{
     text-align:center;
     padding-right: 0px;
@@ -119,12 +110,7 @@ section {
     display: table-caption;
     font-weight: 800;
     line-height: 30px;
-    color: $black-pearl;
-    color: var(--ag-data-color, var(--ag-foreground-color, $black-pearl));
-    border-width: 1px;
-    border-color: $primary-active-blue-90;
-    border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, $primary-active-blue-90));
-    border-bottom-style: solid;
+    color: var(--text);
   }
   .pos-center{
     text-align: center;

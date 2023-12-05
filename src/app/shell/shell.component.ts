@@ -10,11 +10,12 @@ import {
 import { NavigationEnd, Router, RouterEvent, Event } from '@angular/router';
 
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import {
   ContextMenuComponent,
   MenuItemModel,
+  NodeExpandEventArgs,
   NodeSelectEventArgs,
   SidebarComponent,
   TreeViewComponent,
@@ -61,8 +62,7 @@ import { HeaderState } from '@shared/models/header-state.model';
 import { HelpNavigationService } from '@shared/services';
 import { IsMspAreaStateModel } from '@shared/models/is-msp-area-state.model';
 import { DomainLinks } from '@shared/models/help-site-url.model';
-import { GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
-import { GetOrganizationById } from '@admin/store/admin.actions';
+import { findItemInArrayTree } from './helpers/menu.helper';
 
 @Component({
   selector: 'app-shell',
@@ -161,21 +161,15 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   public showHelpIButton = false;
 
   private isClosingSearch = false;
-  private isContactOpen = false;
   private profileData: MenuItemModel[] = [];
   private activeMenuItemData: MenuItem;
   private isFirstLoad: boolean;
   private sideBarMenu: MenuItem[];
-  private faBan = faBan as IconDefinition;
   private userLogin: { firstName: string; lastName: string };
-  private addFormButton: HTMLElement;
-  private cancelFormButton: HTMLElement;
   private canManageOtherUserNotifications: boolean;
   private canManageNotificationTemplates: boolean;
-  private isDialogOpen = false;
   private permissions: CurrentUserPermission[] = [];
   private orderMenuItems: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
-  private irpVmsHelpSiteUrl = 'https://eiiohelp.einsteinii.org/';
 
   scrollData:boolean = false;
   loadMoreCotent:string = '';
@@ -281,6 +275,15 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     }
   }
 
+  public highlightActiveNode(event: { data: MenuItem[] }): void {
+    if (event.data.length) {
+      const menuItem = findItemInArrayTree(event.data, this.router.url);
+      if (menuItem) {
+        this.tree.selectedNodes = [menuItem.anch];
+      }
+    }
+  }
+
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
 
@@ -290,21 +293,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       this.sidebar.isOpen = isDocked;
     });
 
-
     this.isFirstLoad$
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((isFirstLoad) => {
       this.isFirstLoad = isFirstLoad;
-      if (isFirstLoad) {
-        // TODO: Should be decided after Login: CLIENT_SIDEBAR_MENU, ADMIN_SIDEBAR_MENU etc.
-        // const currentConfiguration = CLIENT_SIDEBAR_MENU;
-        // const activeMenuItem = currentConfiguration.find(item => item.isActive);
-        //
-        // if (activeMenuItem) {
-        //   this.route.navigate([activeMenuItem.route]);
-        //   this.tree.selectedNodes = [activeMenuItem.title];
-        // }
-      }
     });
   }
 
@@ -315,6 +307,13 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   toggleSidebar(): void {
     this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
     this.tree.collapseAll();
+  }
+
+  public expandSubMenu(args: NodeExpandEventArgs): void {
+    const selectedNode = this.tree.getTreeData(args.node)[0];
+    if (selectedNode) {
+      this.highlightActiveNode({ data: selectedNode['children'] as MenuItem[]});
+    }
   }
 
   toggleSubMenu(args: NodeSelectEventArgs): void {

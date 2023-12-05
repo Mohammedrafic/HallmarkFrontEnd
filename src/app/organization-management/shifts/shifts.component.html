@@ -60,7 +60,7 @@
       <e-column headerText="on call shift" width=100>
         <ng-template #template let-data>{{data.onCall ? 'Yes' : 'No'}}</ng-template>
       </e-column>
-      <e-column  field="inactiveDate" headerText="InactiveDate" width=100  type="date"  [format]="inactivateColformat"></e-column>
+      <e-column  field="inactiveDate" headerText="Inactive Date" width=100  type="date"  [format]="inactivateColformat"></e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">

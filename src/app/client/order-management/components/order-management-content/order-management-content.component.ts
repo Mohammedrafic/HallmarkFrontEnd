@@ -1484,7 +1484,9 @@ public RedirecttoIRPOrder(order:Order)
       this.selectedDataRow = orderData;
       const options = this.getDialogNextPreviousOption(orderData, true);
       this.store.dispatch(new GetOrderById(orderData.id, orderData.organizationId, options, true));
-      this.dispatchAgencyOrderCandidatesList(orderData.id, orderData.organizationId, true);
+      if (orderData.status !== OrderStatus.Incomplete) {
+        this.dispatchAgencyOrderCandidatesList(orderData.id, orderData.organizationId, true);
+      }
       this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
       this.openChildDialog.next(false);
       this.orderPositionSelected$.next({ state: false });
@@ -1551,8 +1553,8 @@ public RedirecttoIRPOrder(order:Order)
         const options = this.getDialogNextPreviousOption(data);
         this.store.dispatch(new GetOrderById(data.id, data.organizationId, options,
           this.activeSystem === OrderManagementIRPSystemId.IRP));
-        this.dispatchAgencyOrderCandidatesList(data.id, data.organizationId, !!data?.irpOrderMetadata);
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
+        this.dispatchAgencyOrderCandidatesList(data.id, data.organizationId, !!data?.irpOrderMetadata);
         this.openChildDialog.next(false);
         this.orderPositionSelected$.next({ state: false });
 

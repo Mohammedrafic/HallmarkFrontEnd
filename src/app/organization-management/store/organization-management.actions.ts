@@ -677,7 +677,4 @@ export class BulkDeleteDepartment {
   static readonly type = '[organizationManagement] Bulk Delete Department';
   constructor(public selectedDepartmentItems: Number[]) {}
 }
-export class GetRejectReasons {
-  static readonly type = '[organizationManagement] Get All Reject Reasons';
-  constructor(public readonly systemType?: SystemType) {}
-}
+

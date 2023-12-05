@@ -14,7 +14,6 @@
 section {
   display: table;
   width: 100%;
-  // margin-top: 10px;
 }
 
 section > * {
@@ -96,11 +95,9 @@ header .middle-cell {
   display: table-caption;
   font-weight: 800;
   line-height: 30px;
-  color: #181d1f;
-  color: var(--ag-data-color, var(--ag-foreground-color, #181d1f));
+  color: var(--secondary-text);
   border-width: 1px;
-  border-color: #dde2eb;
-  border-color: var(--ag-row-border-color, var(--ag-secondary-border-color, #dde2eb));
+  border-color: var(--grid-header-border);
   border-bottom-style: solid;
   text-align: left;
 }
@@ -117,8 +114,7 @@ header .middle-cell {
 }
 
 .customStatus {
-  // white-space: nowrap;
-  color: #4c5673;
+  color: var(--secondary-text);
 }
 
 .table-section {
@@ -154,7 +150,7 @@ header {
   height: calc(100% - 30%);
   width: 1px;
   top: 15%;
-  background: #ecf2ff;
+  background: var(--grid-header-border);
 }
 
 .row.middle-cell,
@@ -162,18 +158,24 @@ header {
   position: relative;
   display: block;
 }
+
 .orderStatus .customStatus:before {
   width: 0px;
 }
+
 .tableHeader .col {
-  background: #fffbfb !important;
+  background: var(--bg-widget) !important;
+  border-bottom-color: var(--grid-header-border) !important;
 }
+
 header.tableHeader .flex-container span {
   padding: 5px 0 !important;
 }
+
 .app-widget-wrapper__header {
   padding-bottom: 15px;
 }
+
 .status {
   width: 100px;
   height: 20px;
