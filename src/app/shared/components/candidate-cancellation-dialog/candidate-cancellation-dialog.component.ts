@@ -41,7 +41,10 @@ import { CandidateCancellationDialogService } from './candidate-cancellation-dia
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { EditIrpCandidateService } from '../order-candidate-list/edit-irp-candidate/services';
-import { SystemType } from '@shared/enums/system-type.enum';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
+import { PageOfCollections } from '@shared/models/page.model';
+import { CancelEmployeeReasons } from '@shared/models/reject-reason.model';
+import { GetCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
 
 interface DataSourceObject<T> {
   text: string;
@@ -67,6 +70,9 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   @Select(OrderManagementContentState.getCandidateCancellationReasons)
   private candidateCancellationReasons$: Observable<CandidateCancellationReason[] | null>;
 
+  @Select(RejectReasonState.getCancelEmployeeReasons)
+  public reasons$: Observable<PageOfCollections<CancelEmployeeReasons>>;
+
   public form: FormGroup;
   public isReasonSelected = false;
   public isPenaltyCriteriaSelected = false;
@@ -91,6 +97,8 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
 
   private predefinedPenalties: Penalty | null;
   activeSystem: any;
+  currentPage: number = 1;
+  pageSize: number = 100;
 
   constructor(
     private cd: ChangeDetectorRef,
@@ -109,9 +117,9 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     this.onOpenEvent();
   }
 
-  private getRejectedReasons(): void {
-    this.store.dispatch(new GetRejectReasonsForOrganisation(SystemType.IRP));
-  }  
+  protected getRejectedReasons(): void {
+    this.store.dispatch(new GetCancelEmployeeReason(this.currentPage, this.pageSize));
+  }
 
   public cancel(): void {
     this.form.reset();
@@ -156,7 +164,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
         takeUntil(this.destroy$)
       ).subscribe((cancellationReasons) => {
         if(this.activeSystem === OrderManagementIRPSystemId.IRP){
-           this.reasons = this.editIrpCandidateService.createReasonsOptionsforCancel(this.editIrpCandidateService.getRejectedReasons()) ?? [];
+           this.reasons = this.editIrpCandidateService.createReasonsOptionsforCancel(this.editIrpCandidateService.getCancelEmployeeReasons()) ?? [];
         } else {
           this.reasons = cancellationReasons ?? [];
         }
