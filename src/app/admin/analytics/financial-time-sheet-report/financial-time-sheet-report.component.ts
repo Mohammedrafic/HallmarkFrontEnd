@@ -20,14 +20,15 @@ import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { accrualReportTypesList, analyticsConstants } from '../constants/analytics.constant';
+import { accrualReportTypesList, analyticsConstants, Period } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
-import { uniqBy } from 'lodash';
+import { toNumber, uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
+
 import {
   CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions,
   MasterSkillDto, SearchCandidate, SkillCategoryDto, OrderTypeOptionsForReport
@@ -63,7 +64,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     "TimesheetStatusesFTS": "",
     "organizationNameFTS":"",
     "reportPulledMessageFTS":"",
-    "DateRangeFTS": ""
+    "DateRangeFTS": "",
+    "PeriodParamFTS":""
 
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
@@ -159,7 +161,9 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-
+  public periodList: Period[] = [];
+  public periodIsDefault: boolean = false;
+  periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   private culture = 'en-US';
 
@@ -189,7 +193,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         }
       });
       this.agencyOrganizationId = data;
-
+      this.loadperiod();
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
@@ -220,7 +224,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         jobId: new FormControl(''),
         accrualReportTypes: new FormControl(null, [Validators.required]),
         invoiceID: new FormControl(''),
-        timesheetStatuses: new FormControl([])
+        timesheetStatuses: new FormControl([]),
+        period: new FormControl(null)
       }
     );
   }
@@ -229,7 +234,22 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
     this.isAlive = false;
   }
-
+  selectPeriod() {
+    this.periodIsDefault = this.financialTimesheetReportForm.controls['period'].value == "Custom" ? true : false;
+  }
+  private loadperiod(): void {
+    this.periodList = [];
+    this.periodList.push({ id: 0, name: 'Custom' });
+    this.periodList.push({ id: 1, name: 'Last 30 days' });
+    this.periodList.push({ id: 2, name: 'Last 60 days' });
+    this.periodList.push({ id: 3, name: 'Last 90 days' });
+    this.periodList.push({ id: 4, name: 'MTD' });
+    this.periodList.push({ id: 5, name: 'Last Quarter' });
+    this.periodList.push({ id: 6, name: 'YTD' });
+    this.periodList.push({ id: 7, name: 'Last 6 Month' });
+    this.periodList.push({ id: 8, name: 'Last 12 Months' });
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
+  }
 
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
@@ -413,7 +433,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     }
 
     let { accrualReportTypes, businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds, orderTypes,
-      regionIds, skillCategoryIds, skillIds, startDate, endDate, invoiceID, timesheetStatuses } = this.financialTimesheetReportForm.getRawValue();
+      regionIds, skillCategoryIds, skillIds, startDate, endDate, invoiceID, timesheetStatuses, period } = this.financialTimesheetReportForm.getRawValue();
     if (!this.financialTimesheetReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
     }
@@ -459,8 +479,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       "organizationNameFTS": this.selectedOrganizations.length==1? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(","):"",
       
       "reportPulledMessageFTS": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
-      "DateRangeFTS": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
-
+      "DateRangeFTS": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "PeriodParamFTS": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id))
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -605,6 +625,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.InvoiceID)?.setValue(null);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue(this.defaultTimesheetStatuses);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
