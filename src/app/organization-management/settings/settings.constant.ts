@@ -164,7 +164,6 @@ export const DropdownFields: FieldSettingsModel = {
   text: 'value',
   value: 'key',
 };
-
 export const OrganizationSystems = {
   IRP: false,
   VMS: false,

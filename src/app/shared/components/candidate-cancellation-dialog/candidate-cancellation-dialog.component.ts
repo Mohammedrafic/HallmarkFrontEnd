@@ -30,12 +30,18 @@ import { Penalty } from '@shared/models/penalty.model';
 import {
   ClearCandidateCancellationReason,
   GetCandidateCancellationReason,
+  GetRejectReasonsForOrganisation,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { DateTimeHelper } from '@core/helpers';
 import { OrderType } from '@shared/enums/order-type';
+import { DefaultMaxDate, DefaultMinDate } from '@shared/constants';
 
 import { CandidateCancellationDialogService } from './candidate-cancellation-dialog.service';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { EditIrpCandidateService } from '../order-candidate-list/edit-irp-candidate/services';
+import { SystemType } from '@shared/enums/system-type.enum';
 
 interface DataSourceObject<T> {
   text: string;
@@ -73,7 +79,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     text: 'text',
     value: 'value',
   };
-
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public ReasonOptionFields = {
     text: 'name',
     value: 'id',
@@ -84,19 +90,28 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   public isReorder = false;
 
   private predefinedPenalties: Penalty | null;
+  activeSystem: any;
 
   constructor(
     private cd: ChangeDetectorRef,
     private orderService: OrderManagementContentService,
     private cancellationDialogService: CandidateCancellationDialogService,
-    private store: Store
+    private store: Store,
+    private orderManagementService: OrderManagementService,
+    private editIrpCandidateService: EditIrpCandidateService,
   ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.activeSystem = this.orderManagementService.getOrderManagementSystem();
+    this.getRejectedReasons();
     this.onOpenEvent();
   }
+
+  private getRejectedReasons(): void {
+    this.store.dispatch(new GetRejectReasonsForOrganisation(SystemType.IRP));
+  }  
 
   public cancel(): void {
     this.form.reset();
@@ -140,7 +155,11 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
         switchMap(() => this.candidateCancellationReasons$),
         takeUntil(this.destroy$)
       ).subscribe((cancellationReasons) => {
-        this.reasons = cancellationReasons ?? [];
+        if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+           this.reasons = this.editIrpCandidateService.createReasonsOptionsforCancel(this.editIrpCandidateService.getRejectedReasons()) ?? [];
+        } else {
+          this.reasons = cancellationReasons ?? [];
+        }
         this.cd.markForCheck();
       });
   }
@@ -210,10 +229,10 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
       ? DateTimeHelper.isFutureDate(this.candidateJob.actualStartDate)
       : false;
     this.endDateMin = this.candidateJob?.actualStartDate
-      ? new Date(this.candidateJob.actualStartDate)
-      : null;
+      ? DateTimeHelper.setCurrentTimeZone(this.candidateJob.actualStartDate)
+      : DefaultMinDate;
     this.endDateMax = this.candidateJob?.actualEndDate
-      ? new Date(this.candidateJob.actualEndDate)
-      : null;
+      ? DateTimeHelper.setCurrentTimeZone(this.candidateJob.actualEndDate)
+      : DefaultMaxDate;
   }
 }

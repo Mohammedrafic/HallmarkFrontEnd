@@ -61,8 +61,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
           let analyticsMenuItem = menu.menuItems.filter((item: MenuItem) => item.id == AnalyticsMenuId);
           const menuFilter = analyticsMenuItem[0].children;
           const menuId = window.localStorage.getItem("menuId");
-  
-          if (menuId) {
+          if (menuId!=='undefined' && menuId!=null) {
             const item = this.findItemById(menuFilter, Number(menuId));
             const flattenedMenuItems = this.flattenChildren(item?.children);
             this.sideMenuConfig = flattenedMenuItems;

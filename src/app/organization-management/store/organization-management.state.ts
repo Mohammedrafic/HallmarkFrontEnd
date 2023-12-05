@@ -10,6 +10,7 @@ import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 
+
 import {
   ClearAssignedSkillsByOrganization,
   ClearCredentialsAndTypes,
@@ -142,9 +143,8 @@ import {
   BulkDeleteDepartmentFailed,
   BulkUpdateDepartmentsucceeded,
   BulkUpdateDepartmentFailed,
-  BulkUpdateDepartment,
-
-
+  BulkUpdateDepartment
+  
 } from './organization-management.actions';
 import { BulkDepartmentAction, Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter, regionsPage } from '@shared/models/region.model';
@@ -319,7 +319,7 @@ export interface OrganizationManagementStateModel {
     assignedSkillsByOrganization: [],
     filteringAssignedSkillsByOrganization: [],
     credentialSettingPage: null,
-    bulkupdateskills:null
+    bulkupdateskills:null   
   },
 })
 @Injectable()
@@ -521,7 +521,7 @@ export class OrganizationManagementState {
   static locationTypes(state: OrganizationManagementStateModel): LocationType[] | null {
     return state.loctionTypes;
   }
-
+  
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
@@ -534,6 +534,7 @@ export class OrganizationManagementState {
     private organizationSettingsService: OrganizationSettingsService,
     private nodatimeService: NodatimeService,
     private billRatesService: BillRatesService
+   
   ) {}
 
   @Action(SetGeneralStatesByCountry)

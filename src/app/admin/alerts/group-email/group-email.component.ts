@@ -36,6 +36,7 @@ import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+
 @Component({
   selector: 'app-group-email',
   templateUrl: './group-email.component.html',
@@ -49,11 +50,9 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   public isOrgUser: boolean = false;
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
-  @Select()
 
   @Input() filterForm: FormGroup;
-  public businessForm: FormGroup;
-  public isBusinessFormDisabled = false;
+
   public businessUnits = BUSINESS_UNITS_VALUES;
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
@@ -95,9 +94,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   }
   emailBodyRequiredFlag$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private gridApi: GridApi;
-  private gridColumnApi: any;
   private isAlive = true;
-  private filters: GroupEmailFilters = {};
   public title: string = "Group Email";
   public export$ = new Subject<ExportedFileType>();
   defaultValue: any;
@@ -107,8 +104,6 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   cacheBlockSize: any;
   pagination: boolean;
   paginationPageSize: number;
-
-  filterText: string | undefined;
   frameworkComponents: any;
   serverSideStoreType: any;
   maxBlocksInCache: any;
@@ -274,7 +269,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         businessUnitId = formValues.business == 0 ? null : formValues.business
         if(user?.businessUnitType == BusinessUnitType.MSP){
           businessUnitId = formValues.business == 0 ? null : user?.businessUnitId
-        }      
+        }
       const sendGroupEmailDto: SendGroupEmailRequest = {
         businessUnitId: businessUnitId,
         bodyMail: formValues.emailBody,
@@ -286,7 +281,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         fromMail: this.userObj?.email == undefined ? "" : this.userObj?.email,
         selectedFile: formValues.fileUpload,
         businessUnitType: formValues.businessUnit == 0 ? null : formValues.businessUnit,
-        userType: formValues.userType
+        userType: formValues.userType,
+        selectedBusinessUnitId:  formValues.businesses != null ? formValues.businesses.join(',') : null
       };
       this.emailBodyRequiredFlag$.next(false);
       this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
@@ -386,7 +382,12 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.emailTo = data.toList == null ? "" : data.toList;
     this.groupEmailTemplateForm.emailCc = data.ccList == null ? "" : data.ccList;
     this.groupEmailTemplateForm.businessUnitType = data.businessUnitType;
-    this.groupEmailTemplateForm.businessUnit = data.businessUnitId;
+    if(data.businessUnitType == 4){
+      this.groupEmailTemplateForm.businessUnit = data.selectedBussinessUnitIds;
+    }
+    else{
+      this.groupEmailTemplateForm.businessUnit = data.businessUnitId;
+    }
     this.groupEmailTemplateForm.userTypeInput = data.userType;
     this.groupEmailTemplateForm.fileNameInput = data.fileName;
     this.groupEmailTemplateForm.fileName = data.fileName == null ? "" : data.fileName;

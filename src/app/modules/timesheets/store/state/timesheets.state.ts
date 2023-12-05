@@ -14,7 +14,7 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 import { DialogAction } from '@core/enums';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
-import { DataSourceItem, DropdownOption } from '@core/interface';
+import { AgencyDataSourceItem, DataSourceItem, DropdownOption } from '@core/interface';
 
 import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
 import { TimesheetDetailsApiService, TimesheetsApiService } from '../../services';
@@ -191,6 +191,11 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static organizations(state: TimesheetsModel): DataSourceItem[] {
     return state.organizations;
+  }
+
+  @Selector([TimesheetsState])
+  static agencyOrganizations(state: TimesheetsModel): AgencyDataSourceItem[] {
+    return state.agencyOrganizations;
   }
 
   @Selector([TimesheetsState])
@@ -749,6 +754,22 @@ export class TimesheetsState {
       catchError((err: HttpErrorResponse) => dispatch(
         new ShowToast(MessageTypes.Error, getAllErrors(err.error))
       )),
+    );
+  }
+
+
+  @Action(Timesheets.GetOrganizationsForAgency)
+  GetOrganizationsForAgency(
+    { dispatch, patchState }: StateContext<TimesheetsModel>,
+    { userId }: Timesheets.GetOrganizationsForAgency
+  ): Observable<AgencyDataSourceItem[] | void> {
+    return this.timesheetsApiService.getUserVisibilitySettingsOrganisation(userId).pipe(
+      tap((agencyOrganizations: AgencyDataSourceItem[]) => patchState({
+        agencyOrganizations,
+      })),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
     );
   }
 

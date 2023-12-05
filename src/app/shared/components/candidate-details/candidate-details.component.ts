@@ -28,7 +28,7 @@ import {
   take,
 } from 'rxjs';
 
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from '../../../store/app.actions';
+import { SetHeaderState, SetHelpSystem, ShowExportDialog, ShowFilterDialog } from '../../../store/app.actions';
 import {
   GetAssociateOrganizations,
   GetCandidateDetailsPage,
@@ -84,6 +84,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { uniqBy } from 'lodash';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
+
 @Component({
   selector: 'app-candidate-details',
   templateUrl: './candidate-details.component.html',
@@ -203,6 +204,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
     this.listenMediaQueryBreakpoints();
+    this.store.dispatch(new SetHelpSystem(false));
   }
 
   override ngOnInit(): void {

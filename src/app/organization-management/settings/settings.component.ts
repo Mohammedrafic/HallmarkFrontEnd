@@ -57,9 +57,10 @@ import {
   GetOrganizationSettings,
   GetOrganizationSettingsFilterOptions,
   GetRegions,
-  SaveOrganizationSettings,
+  SaveOrganizationSettings
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
+import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
 import { SettingsDataAdapter } from '../../shared/helpers/settings-data.adapter';
 import {
   AssociatedLink,
@@ -76,17 +77,16 @@ import {
   SettingsAppliedToPermissions,
   SettingsFilterCols,
   SettingsSystemFilterCols,
-  SplitReportedTimeOnBillRateEffectiveDate,
   TextOptionFields,
-  TierSettingsKey,
+  TierSettingsKey
 } from './settings.constant';
 import {
   ATPRateCalculationPayload,
   AutoGenerationPayload,
   PayPeriodPayload,
   StartsOnPayload,
-  SwitchValuePayload,
-} from '../../shared/models/settings.interface';
+  SwitchValuePayload
+} from '@shared/models/settings.interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { mapKeys, camelCase } from 'lodash';
 /**
@@ -119,6 +119,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
+ 
 
   readonly daysOfWeek = Days;
   readonly noOfWeek = Weeks;
@@ -133,7 +134,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   readonly dropdownCheckboxValueDataSource = DropdownCheckboxValueDataSource;
   readonly organizationSettingControlType = OrganizationSettingControlType;
   readonly disabledSettings = DisabledSettingsByDefault;
-
 
   organizationSettingsFormGroup: FormGroup;
   regionFormGroup: FormGroup;
@@ -183,7 +183,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   dialogHeader = 'Add Settings';
   numericValueLabel = 'Value';
 
-
   private readonly settingsAppliedToPermissions = SettingsAppliedToPermissions;
 
   private selectedParentRecord: Configuration | null;
@@ -201,6 +200,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private organizationSettingKey: OrganizationSettingKeys;
   regionBasedDepartment: any;
   public filterType: string = 'Contains';
+  public isIRPAutoDistribute : boolean = false;
   get switcherValue(): string {
     return this.organizationSettingsFormGroup.controls['value'].value ? 'On' : 'Off';
   }
@@ -231,7 +231,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.watchRegionControlChanges();
     this.watchForSystemControls();
   }
-
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -286,6 +285,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   openOverrideSettingDialog(data: Configuration): void {
     this.setSelectedRecords(data);
+    this.isIRPAutoDistribute = OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey;
     this.setOrganizationSettingKey(data.settingKey);
     this.setConfigurationSystemType(this.getParentConfigurationSystemType(), true);
     this.separateValuesInSystems = data.separateValuesInSystems;
@@ -338,7 +338,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
     this.setFormValidation(data);
   }
-
+  
   openEditSettingDialog(
     data: {
       parentRecord: Configuration,
@@ -347,6 +347,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   ): void {
     const {parentRecord, childRecord, event} = data;
+    this.isIRPAutoDistribute = OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == parentRecord.settingKey;
     this.setSelectedRecords(parentRecord, childRecord);
     this.setOrganizationSettingKey(parentRecord.settingKey);
     this.separateValuesInSystems = parentRecord.separateValuesInSystems;
@@ -405,8 +406,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.payPeriodFormGroup.touched ||
       this.startsOnFormGroup.touched ||
       this.aTPRateCalculationFormGroup.touched
-
-    ) {
+      )
+    {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
@@ -729,7 +730,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.formControlType === OrganizationSettingControlType.ATPRateCalculation) {
       this.observeATPRateToggleControl();
     }
-
     if (validators.length > 0) {
       this.organizationSettingsFormGroup.get('value')?.addValidators(validators);
     } else {
@@ -835,7 +835,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isATPRateCalculation: true };
 
     }
-
     if (dynamicValue?.isCheckboxValue) {
       this.checkboxValueForm.setValue({
         value: dynamicValue.value ? dynamicValue.value : '',
@@ -857,7 +856,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : dynamicValue.IsEnabled ? dynamicValue.IsEnabled : false ,
       });
     }
-
     this.updateFormOutsideZone(parentData, childData, dynamicValue);
   }
 
@@ -1115,7 +1113,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       || this.organizationSettingKey === OrganizationSettingKeys.OvertimeCalculation
       || this.organizationSettingKey === OrganizationSettingKeys.OTHours
       || this.organizationSettingKey === OrganizationSettingKeys.AutomatedDistributionToVMS
-      || this.organizationSettingKey === OrganizationSettingKeys.TimesheetSubmissionProcess) {
+      || this.organizationSettingKey === OrganizationSettingKeys.TimesheetSubmissionProcess
+      ) {
       this.departmentFormGroup.get('departmentId')?.disable();
     } else {
       this.departmentFormGroup.get('departmentId')?.enable();
@@ -1165,7 +1164,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       costSavings:this.aTPRateCalculationFormGroup.controls['costSavings'].value,
     });
   }
-
   private observeToggleControl(): void {
     this.switchedValueForm.get('isEnabled')?.valueChanges
       .pipe(
@@ -1442,37 +1440,19 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       this.store.dispatch(new ClearDepartmentList());
     }
+
     if (this.IsSettingKeyCreatePartialOrder) {
       if (childRecord.departmentId == null) {
         this.allDepartmentSelected = true;
         this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].disable();
-
       }
       else {
         this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue([childRecord.departmentId]);
-
       }
     }
 
-
     if (childRecord.departmentId) {
-
       this.departmentChanged(childRecord.departmentId, true);
-
-
-    }
-  }
-
-  setDepartmentvalue(departmentId: number) {
-    if (departmentId == null) {
-      this.allDepartmentSelected = true;
-      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue(null);
-
-
-    }
-    else {
-      this.RegionLocationSettingsMultiFormGroup.controls['departmentId'].setValue([departmentId]);
-
     }
   }
   private closeSettingDialog(): void {
@@ -1515,7 +1495,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         return;
       }
     }
-     else if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
+    else if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
       if (this.allLocationsSelected && this.allRegionsSelected) {
         this.organizationHierarchy = OrganizationHierarchy.Organization;
         this.organizationHierarchyId = this.organizationId;

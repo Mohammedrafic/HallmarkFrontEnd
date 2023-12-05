@@ -208,6 +208,10 @@ export class SettingsDataAdapter {
         displayValue = SettingsDataAdapter
         .geATPRateCalculationdisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
         break;
+        case OrganizationSettingControlType.ATPRateCalculation:
+          displayValue=SettingsDataAdapter
+          .geATPRateCalculationdisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
+          break;
       default:
         displayValue = '';
     }
@@ -310,6 +314,9 @@ export class SettingsDataAdapter {
       case OrganizationSettingControlType.DateTime:
         displayValue = formatDate(child.value, 'MM/dd/yyyy', 'en-US');
         break;
+      case OrganizationSettingControlType.InvoiceAutoGeneration:
+        displayValue = SettingsDataAdapter.getInvoiceDisplayValue(child.value);
+        break;
       case OrganizationSettingControlType.SwitchedValue:
         displayValue = SettingsDataAdapter.getSwitchedDisplayValue(child.parsedValue);
         break;
@@ -369,7 +376,6 @@ export class SettingsDataAdapter {
 
     return result;
   }
-
   private static getStartsOnDateDisplayValue(value: { IsEnabled: boolean, StartsOn: string }): CheckboxValue {
     const result = value?.IsEnabled ? CheckboxValue.Yes : CheckboxValue.No;
 

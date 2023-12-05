@@ -1,33 +1,35 @@
 @import 'colors';
+
 .business-dropdowns {
-    display: flex;
+  display: flex;
+  width: 100%;
+
+  .dropdown-container {
+    margin-right: 12px;
     width: 100%;
-  
-    .dropdown-container {
-      margin-right: 12px;
-      width: 100%;
-      max-width: 220px;
-    }
+    max-width: 220px;
   }
-  .user-subscription-top-padding {
-    padding-top: 10px;
-  }
+}
 
+.user-subscription-top-padding {
+  padding-top: 10px;
+}
 
-  :host {
-    .button-group {
-      margin-top: 24px;
-      display: block;
-      border-bottom: 1px solid $secondary-dark-blue-40;
-    }
+:host {
+  .button-group {
+    margin-top: 24px;
+    display: block;
+    border-bottom: 1px solid var(--grid-header-border);
   }
-  
-  .system-buttons {
-    position: relative;    
-    margin-top: 0 !important;
-    padding: 12px 24px;
-    background-color: $background;    
-  }
-.multiselects{
+}
+
+.system-buttons {
+  position: relative;
+  margin-top: 0 !important;
+  padding: 12px 24px;
+  background-color: var(--bg-container);
+}
+
+.multiselects {
   width: 200px;
 }

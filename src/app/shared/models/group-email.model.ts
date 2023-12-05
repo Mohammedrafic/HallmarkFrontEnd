@@ -33,7 +33,8 @@ export type GroupEmail = {
     businessUnitId: number | null
     selectedFile?: Blob | null,
     businessUnitType: number | null,
-    userType: number | null
+    userType: number | null,
+    selectedBusinessUnitId: string | null
   };
 
 export type GroupEmailRole = {

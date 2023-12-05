@@ -144,7 +144,21 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
   @Input() candidateirp: IRPOrderPosition;
-  @Input() activeSystem: OrderManagementIRPSystemId;
+  private _activeSystem: any;
+  activeSystems: OrderManagementIRPSystemId | null;
+  public get activeSystem() {
+    return this._activeSystem;
+  }
+ 
+  @Input() public set activeSystem(val: any) {
+    this._activeSystem = val;
+    if(this._activeSystem === OrderManagementIRPSystemId.IRP){
+      this.subscribeOnCandidates();
+    } else {
+      this.subscribeOnCandidateJob();
+    }
+  }
+
   @Input() orderComments: Comment[] = [];
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild, string] | null>;
   @Output() saveEmitter = new EventEmitter<void>();
@@ -237,7 +251,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private readonly permissions = UserPermissions;
   confirmationMessage: string;
   irpCandidates: IRPOrderPosition;
-  activeSystems: OrderManagementIRPSystemId | null;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -347,7 +360,11 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.extensions = extensions.filter((extension: Order) => extension.id !== this.order?.id);
         this.isLastExtension = !this.extensions.map((ex) => ex.extensionFromId).includes(this.order?.id);
       });
-    this.subscribeOnCandidateJob();
+      if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+        this.subscribeOnCandidates();
+      } else {
+        this.subscribeOnCandidateJob();
+      }
     this.onOpenEvent();
     this.subscribeOnSelectedOrder();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
@@ -757,6 +774,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.selectedTemplate = Template.offerDeployment;
         } else if (allowedOnboardedStatuses.includes(this.candidate.candidateStatus)) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.jobId));
+          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.jobId));
           this.selectedTemplate = Template.onboarded;
         }
       }
@@ -817,18 +835,19 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
   }
 
+  private subscribeOnCandidates(): void {
+    this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
+      if(irpCandidates){
+        irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+        this.setCloseOrderButtonStateforIRP();
+        this.getExtensionsforIRP();
+        this.getCommentsforIRP();
+      }
+    });
+  }
+
   private subscribeOnCandidateJob(): void {
     if (this.isOrganization) {
-      if(this.activeSystems === OrderManagementIRPSystemId.IRP){
-        this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
-          if(irpCandidates){
-            irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
-            this.setCloseOrderButtonStateforIRP();
-            this.getExtensionsforIRP();
-            this.getCommentsforIRP();
-          }
-        });
-      } else {
         this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
           this.candidateJob = orderCandidateJob;
           if (orderCandidateJob) {
@@ -839,7 +858,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.changeDetectorRef.detectChanges();
         });  
       }
-    }
     if (this.isAgency) {
       this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
         this.candidateJob = orderCandidateJob;

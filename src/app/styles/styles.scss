@@ -624,7 +624,7 @@ body.dark .title, body.dark .contact-name {
   padding: 0% 3%;
   position: sticky;
   top: 0;
-  background: white;
+  background: var(--bg-widget);
   z-index : 99;
 }
 
@@ -637,7 +637,7 @@ body.dark .title, body.dark .contact-name {
   padding: 0% 3%;
   position: sticky;
   top: 0;
-  background: white;
+  background: var(--bg-widget);
   z-index : 99;
 }
 @media screen and (min-width: 0px) and (max-width: 810px)  {
@@ -753,4 +753,7 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 }
 .order-irp .status-cell .e-chip.e-warning.ex{
   width: 17% !important;
+}
+.add-edit-noteform .textarea-wrapper span.error {
+  top : unset !important;
 }

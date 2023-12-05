@@ -28,6 +28,8 @@ import {
   ArrowUp,
   Info,
   RotateCw,
+  LogIn,
+  Cloud,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -158,7 +160,6 @@ import { ValidateDirectiveModule } from './directives/validate-directive/validat
 import { BoolValuePipeModule } from './pipes/bool-values/bool-values-pipe.module';
 import { ActionCellRendererComponent } from './components/cell-renderers/actions-cell/action-cellrenderer.component';
 import { TabsMobileShadowDirective } from './directives/tabs-mobile-shadow.directive';
-import { LocalDateTimePipe } from './pipes/local-date-time.pipe';
 import { NumericTextboxModule as CustomNumericTextboxModule} from './components/form-controls/numeric-textbox/numeric-textbox.module';
 import { ValidationErrorModule } from './pipes/validation-error/validation.error.module';
 import { GridPaginationModule } from './components/grid/grid-pagination/grid-pagination.module';
@@ -184,6 +185,7 @@ import { FileListModule } from './components/file-list/file-list.module';
 import { GridErroredCellListComponent } from './components/import-dialog-content/grid-errored-cell-list/grid-errored-cell-list.component';
 import { MspCustomSideDialogComponent } from './components/msp-custom-side-dialog/msp-custom-side-dialog.component';
 import { BulkLocationActiondialogComponent } from '@organization-management/locations/bulk-location-actiondialog/bulk-location-actiondialog.component';
+import { LocalDateTimePipeModule } from './pipes/local-date-time/bool-values-pipe.module';
 
 const icons = {
   AlertCircle,
@@ -211,6 +213,8 @@ const icons = {
   ArrowUp,
   Info,
   RotateCw,
+  LogIn,
+  Cloud,
 };
 
 const COMPONENTS = [
@@ -326,6 +330,7 @@ const COMPONENTS = [
     EditIrpCandidateModule,
     FontAwesomeModule,
     ChipsCssClassPipeModule,
+    LocalDateTimePipeModule,
     OrderCloseReasonInfoModule,
     GeneralOrderPerDiemInfoModule,
     RichTextEditorAllModule,
@@ -373,7 +378,6 @@ const COMPONENTS = [
     CustomSideDialogComponent,
     HideByCandidateStatusPipe,
     TabsMobileShadowDirective,
-    LocalDateTimePipe,
     CommentsComponent,
     CommentdataComponent,
     OnboardCandidateMessageDialogComponent,

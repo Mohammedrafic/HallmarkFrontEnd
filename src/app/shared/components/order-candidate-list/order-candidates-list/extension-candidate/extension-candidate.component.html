@@ -3,7 +3,7 @@
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
         <h3 class="e-card-title candidate-title link" (click)="onViewNavigation()">{{ candidate?.lastName }}, {{ candidate?.firstName }}</h3>
-        <ng-container *ngIf="candidate.workflowStepType">
+        <ng-container *ngIf="candidate.workflowStepType || activeSystems === systemTypes.IRP">
           <ejs-chiplist [text]="candidate.statusName">
             <e-chips>
               <e-chip [cssClass]="candidatStatus[candidate.status] | chipsCssClass"></e-chip>

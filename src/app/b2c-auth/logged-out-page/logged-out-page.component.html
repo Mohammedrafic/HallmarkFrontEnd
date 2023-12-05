@@ -1,0 +1,17 @@
+<div class="container">
+  <div class="card">
+    <img src="assets/logo-login.svg" class="logo" alt="Hallmark HCS E2" />
+    <span class="title">You have been logged out from Einstein II</span>
+
+    <div class="button-row">
+      <button ejs-button (click)="clearSsoAndLogin()" cssClass="e-outline e-large">
+        Login with Password<i-feather name="log-in" class="icon"></i-feather>
+      </button>
+      <button *ngIf="ssoAvailable" [routerLink]="['/', 'sso']" [queryParams]="{domainHint: domainHint}" ejs-button
+        cssClass="e-large e-outline">
+        Login with SSO <i-feather name="cloud" class="icon"></i-feather>
+      </button>
+    </div>
+
+  </div>
+</div>

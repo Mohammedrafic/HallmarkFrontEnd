@@ -51,251 +51,7 @@
       </section>
     </section>
 
-    <div class="col-lg-12 group" #screen id="demo" class="demo">
 
-      <div class="vendor-graph row" id="contentToConvert" class="myDivToPrint" style="width:1349.490px ">
-
-
-
-        <div class="graphs" [hidden]="!istypeSetupTabActive"
-          *ngFor="let agencies of VendorScorecardresponse;let i = index">
-          <div class="Toplayers head-line">
-            <h4 class="head">{{agencies.agencyName}}</h4>
-          </div>
-          <div class="Toplayer ">
-            <div class="col3 graph-heading">
-              <h4 class="head">{{agencies.agencyContact}}</h4>
-              <p class="head">{{agencies.phone}}|{{agencies.email}}</p>
-            </div>
-            <div class="col4 graph-heading">
-              <h2 class="font-color">Overall Score</h2>
-              <div class="" style=" height: 130px;;width:130px;margin: auto">
-                <div class="col-md-8" style="height: 140px">
-                  <ejs-accumulationchart id="container{{i}}" style="height: inherit !important">
-                    <e-accumulation-series-collection style='display:block;  width: 120px;height:120px '>
-                      <e-accumulation-series name='Browser'
-                        [dataSource]='[{ x: "", y: agencies.vendorOverallScorePercent  },{ x: "", y:  100-agencies.vendorOverallScorePercent }]'
-                        xName='x' yName='y' [startAngle]="startAngle" [endAngle]="endAngle" innerRadius="0%"
-                        radius="70%" [dataLabel]="dataLabel" [explode]='explode' explodeOffset='10%' [explodeIndex]='0'
-                        [palettes]='agencies.vendorOverallScorePercent>=80?["#15ce48","blue"]:agencies.vendorOverallScorePercent>=60?["#0f82bf","blue"]:
-                            agencies.vendorOverallScorePercent>=40?["#36b3ef","blue"]:
-                            agencies.vendorOverallScorePercent>=20?["#f9c679","blue"]:
-                            ["#f5602e","blue"]
-                            '>
-                      </e-accumulation-series>
-                    </e-accumulation-series-collection>
-                  </ejs-accumulationchart>
-                </div>
-                <!-- <div class="col-md-8">
-                    <ejs-accumulationchart id="container" #pie style="display:block;  width: 92%"
-                      [legendSettings]="legendSettings" [tooltip]="tooltip" [title]="titles" (load)="load($event)"
-                      [enableAnimation]="enableAnimation" [center]="center">
-                      <e-accumulation-series-collection>
-                        <e-accumulation-series name="Browser" [dataSource]="data" xName="x" yName="y"
-                          [startAngle]="startAngles" [endAngle]="endAngles" innerRadius="0%" radius="70%"
-                          [dataLabel]="dataLabel" [explode]="explode" explodeOffset="0%" [explodeIndex]="0"
-                          [palettes]="palette">
-                        </e-accumulation-series>
-                      </e-accumulation-series-collection>
-                    </ejs-accumulationchart>
-                  </div> -->
-
-                <!-- <ejs-progressbar id='mainprogress{{i}}' [startAngle]="startAngle" [endAngle]="endAngle" type='Circular'
-                  height='150' value={{agencies.vendorOverallScorePercent}} width="150" progressColor="{{agencies.vendorOverallScorePercent>=80 ?'#15ce48':
-                agencies.vendorOverallScorePercent>=60?'#0f82bf':
-                agencies.vendorOverallScorePercent>=40?'#36b3ef':
-                agencies.vendorOverallScorePercent>=20?'#f9c679':
-                '#f5602e'}}" progressThickness="15" trackThickness="15">
-                </ejs-progressbar> -->
-                <p class="font-color-dark">{{agencies.vendorOverallScorePercent}}%</p>
-              </div>
-            </div>
-            <div class="col3 graph-heading">
-              <h2 class="font-color">Overall Rating</h2>
-              <div class="Rating" [ngStyle]="{'color':agencies.vendorOverallScorePercent>=80 ?'#15ce48':
-              agencies.vendorOverallScorePercent>=60?'#0f82bf':
-              agencies.vendorOverallScorePercent>=40?'#36b3ef':
-              agencies.vendorOverallScorePercent>=20?'#f9c679':
-              '#f5602e'}">
-                <span class="font-inc">{{agencies.vendorOverallScorePercent>=80 ?'A':
-                  agencies.vendorOverallScorePercent>=60?'B':
-                  agencies.vendorOverallScorePercent>=40?'C':
-                  agencies.vendorOverallScorePercent>=20?'D':
-                  'E'}}</span>
-                <span class="font-color-dark">{{agencies.vendorOverallScore| uppercase}}</span>
-              </div>
-              <!-- <div class="vendor_details">
-                <div class="label-sec">
-                  <div style="background-color:#15ce48" class="widget-legend__point"><span>A</span></div>
-                  <p>- Excellent 81-100</p>
-                </div>
-                <div class="label-sec">
-                  <div style="background-color:#0f82bf" class="widget-legend__point"><span>B</span></div>
-                  <p>- Good 61-80</p>
-                </div>
-                <div class="label-sec">
-                  <div style="background-color:#36b3ef" class="widget-legend__point"><span>C</span></div>
-                  <p>- Average 41-60</p>
-                </div>
-                <div class="label-sec">
-                  <div style="background-color:#f9c679" class="widget-legend__point"><span>D</span></div>
-                  <p>- Fair 21-40</p>
-                </div>
-                <div class="label-sec">
-                  <div style="background-color:#f5602e" class="widget-legend__point"><span>E</span></div>
-                  <p>- Poor 0-20</p>
-                </div>
-              </div> -->
-            </div>
-          </div>
-          <div class="Toplayers heading">
-            <div class="vendor_details" style="float: right;display: flex;">
-              <div class="label-sec">
-                <div class="widget-legend__point" style="background-color: #15ce48;"><span>A</span></div>
-                <p>- Excellent 81-100</p>
-              </div>
-              <div class="label-sec">
-                <div class="widget-legend__point" style="background-color: #0f82bf;"><span>B</span></div>
-                <p>- Good 61-80</p>
-              </div>
-              <div class="label-sec">
-                <div class="widget-legend__point" style="background-color: #36b3ef;"><span>C</span></div>
-                <p>- Average 41-60</p>
-              </div>
-              <div class="label-sec">
-                <div class="widget-legend__point" style="background-color: #f9c679;"><span>D</span></div>
-                <p>- Fair 21-40</p>
-              </div>
-              <div class="label-sec">
-                <div class="widget-legend__point" style="background-color: #f5602e;"><span>E</span></div>
-                <p>- Poor 0-20</p>
-              </div>
-            </div>
-          </div>
-          <div class="Toplayer mb-3">
-            <div class="col7 row graphgrid">
-
-              <div class="graph-cards">
-                <div class="graphalign">
-                  <ejs-progressbar id='determinate1{{i}}' progressColor="{{agencies.submissionQualityPercent>80 ?'#15ce48':
-                  agencies.submissionQualityPercent>60?'#0f82bf':
-                  agencies.submissionQualityPercent>40?'#36b3ef':
-                  agencies.submissionQualityPercent>20?'#f9c679':
-                  '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                    value="{{agencies.submissionQualityPercent}}" width="120" progressThickness="15"
-                    trackThickness="15">
-                  </ejs-progressbar>
-                  <p class="subscore">{{agencies.submissionQualityPercent}}%</p>
-                  <span class="spantag">Submission Quality</span>
-                  <span></span>
-                </div>
-                <div class="graphalign">
-                  <ejs-progressbar id='determinate2{{i}}' progressColor="{{agencies.complianceRatingPercent>80 ?'#15ce48':
-                  agencies.complianceRatingPercent>60?'#0f82bf':
-                  agencies.complianceRatingPercent>40?'#36b3ef':
-                  agencies.complianceRatingPercent>20?'#f9c679':
-                  '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                    value={{agencies.complianceRatingPercent}} width="120" progressThickness="15" trackThickness="15">
-                  </ejs-progressbar>
-                  <p class="subscore">{{agencies.complianceRatingPercent}}%</p>
-                  <span class="spantag">Compliance Rating</span>
-                  <span class="spantag"></span>
-                </div>
-                <div class="graphalign">
-                  <ejs-progressbar id='determinate3{{i}}' progressColor="{{agencies.fillRatePercent>80 ?'#15ce48':
-                  agencies.fillRatePercent>60?'#0f82bf':
-                  agencies.fillRatePercent>40?'#36b3ef':
-                  agencies.fillRatePercent>20?'#f9c679':
-                  '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                    value={{agencies.fillRatePercent}} width="120" progressThickness="15" trackThickness="15">
-                  </ejs-progressbar>
-                  <p class="subscore">{{agencies.fillRatePercent}}%</p>
-                  <span class="spantag">Fill Rate</span>
-                  <span class="spantag"></span>
-                </div>
-                <div class="graphalign">
-                  <ejs-progressbar id='determinate4{{i}}' progressColor="{{agencies.costAdjustmentPercent>80 ?'#15ce48':
-                  agencies.costAdjustmentPercent>60?'#0f82bf':
-                  agencies.costAdjustmentPercent>40?'#36b3ef':
-                  agencies.costAdjustmentPercent>20?'#f9c679':
-                  '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                    value={{agencies.costAdjustmentPercent}} width="120" progressThickness="15" trackThickness="15">
-                  </ejs-progressbar>
-                  <p class="subscore">{{agencies.costAdjustmentPercent}}%</p>
-                  <span class="spantag">Cost Adjustment</span>
-                  <span class="spantag"></span>
-                </div>
-                <div class="graphalign">
-                  <ejs-progressbar id='determinate5{{i}}' progressColor="{{agencies.onTimeStartPercent>80 ?'#15ce48':
-                  agencies.onTimeStartPercent>60?'#0f82bf':
-                  agencies.onTimeStartPercent>40?'#36b3ef':
-                  agencies.onTimeStartPercent>20?'#f9c679':
-                  '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                    value={{agencies.onTimeStartPercent}} width="120" progressThickness="15" trackThickness="15">
-                  </ejs-progressbar>
-                  <p class="subscore">{{agencies.onTimeStartPercent}}%</p>
-                  <span class="spantag">On Time Start</span>
-                  <span class="spantag"></span>
-                </div>
-                <div class="graphalign">
-                  <ejs-progressbar id='determinate6{{i}}' progressColor="{{agencies.candidatesStartPercent>80 ?'#15ce48':
-                  agencies.candidatesStartPercent>60?'#0f82bf':
-                  agencies.candidatesStartPercent>40?'#36b3ef':
-                  agencies.candidatesStartPercent>20?'#f9c679':
-                  '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                    value={{agencies.candidatesStartPercent}} width="120" progressThickness="15" trackThickness="15">
-                  </ejs-progressbar>
-                  <p class="subscore">{{agencies.candidatesStartPercent}}%</p>
-                  <span class="spantag">Candidate Starts</span>
-                  <span class="spantag"></span>
-                </div>
-                <div class="graphalign">
-                  <ejs-progressbar id='determinate7{{i}}' progressColor="{{agencies.candidateRemainingonAssignmentPercent>80 ?'#15ce48':
-                  agencies.candidateRemainingonAssignmentPercent>60?'#0f82bf':
-                  agencies.candidateRemainingonAssignmentPercent>40?'#36b3ef':
-                  agencies.candidateRemainingonAssignmentPercent>20?'#f9c679':
-                  '#f5602e'}}" [startAngle]="startAngle" [endAngle]="endAngle" type='Circular' height='120'
-                    value={{agencies.candidateRemainingonAssignmentPercent}} width="120" progressThickness="15"
-                    trackThickness="15">
-                  </ejs-progressbar>
-                  <p class="subscore">{{agencies.candidateRemainingonAssignmentPercent}}%</p>
-                  <span class="spantag">Cand. Remaining on Assignment.</span>
-                  <span class="spantag"></span>
-                </div>
-              </div>
-            </div>
-            <div class="col4">
-              <div class="order-cound">
-                <h2 class="font-color">Stats</h2>
-                <!-- <h4>Order Count {{agencies.totalOrders}}</h4> -->
-                <h4>
-                  ( <span>{{VendorReportForm.controls['startDate'].value| date:'MMM d, y'}}</span> -
-                  <span>{{VendorReportForm.controls['endDate'].value| date:'MMM d, y'}}</span> )
-                </h4>
-                <h4 class="m-">Order Count :{{agencies.totalOrders}}</h4>
-                <h4 class="m-">Time to Submit :{{agencies.timetoSubmit}}</h4>
-                <h4 class="m-">Time to Start :{{agencies.timetoStart}}</h4>
-              </div>
-              <!-- <div class=" submit-wrapper">
-                <div class="col6">
-                  <p class="sub-time">Time to Submit</p>
-                  <p class="submit-value">{{agencies.timetoSubmit}}</p>
-                  <p class="sub-time">Days</p>
-                </div>
-                <div class="col6">
-                  <p class="sub-time">Time to Start</p>
-                  <p class="submit-value">{{agencies.timetoStart}}</p>
-                  <p class="sub-time">Days</p>
-                </div>
-              </div> -->
-              <div>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
     <div [hidden]="istypeSetupTabActive">
       <section class="vendor-report-section">
         <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName"
@@ -310,11 +66,22 @@
 
         <div class="form-elemet">
           <div class="input-container bootstrap">
+            <label>Organization</label>
+            <div class="input-group dropdown">
+              <ejs-multiselect mode="CheckBox" formControlName="businessIds" placeholder="Business"
+                [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.businessIds.dataSource"
+                [fields]="organizationFields" [selectAllText]='allOption' showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+        <div class="form-elemet">
+          <div class="input-container bootstrap">
             <label>Region</label>
             <div class="input-group dropdown">
               <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
                 [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
-                [fields]="regionFields">
+                [fields]="regionFields" [enabled]="bussinessControl?.value.length == 1">
               </ejs-multiselect>
             </div>
           </div>
@@ -325,7 +92,8 @@
             <div class="input-group dropdown">
               <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
                 [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
-                [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields">
+                [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields"
+                [enabled]="bussinessControl?.value.length == 1">
               </ejs-multiselect>
             </div>
           </div>
@@ -336,7 +104,7 @@
             <div class="input-group dropdown">
               <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="All"
                 [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
-                [fields]="departmentFields">
+                [fields]="departmentFields"[enabled]="bussinessControl?.value.length == 1">
               </ejs-multiselect>
             </div>
           </div>
@@ -369,7 +137,17 @@
           </div>
         </div>
 
-
+        <div class="form-elemet">
+          <div class="input-container bootstrap">
+            <label>Period</label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist (change)="selectPeriod()" formControlName="period" appValidateWithMessage
+                placeholder="All" [allowFiltering]="true" [dataSource]="periodList" [fields]="periodFields"
+                showSelectAll=true>
+              </ejs-dropdownlist>
+            </div>
+          </div>
+        </div>
 
         <div class="form-elemet">
           <div class="group">
@@ -377,7 +155,8 @@
               <label> Start Date<span class="required">*</span></label>
               <div class="input-group datepicker">
                 <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                  appValidateWithMessage formControlName="startDate">
+                  appValidateWithMessage formControlName="startDate"
+                  [enabled]="VendorReportForm.controls['period'].value=='0'">
                 </ejs-datepicker>
               </div>
             </div>
@@ -385,7 +164,8 @@
               <label> End Date<span class="required">*</span></label>
               <div class="input-group datepicker">
                 <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                  appValidateWithMessage formControlName="endDate" [min]="VendorReportForm.controls['startDate'].value">
+                  appValidateWithMessage formControlName="endDate" [min]="VendorReportForm.controls['startDate'].value"
+                  [enabled]="VendorReportForm.controls['period'].value=='0'">
                 </ejs-datepicker>
               </div>
             </div>
@@ -410,17 +190,7 @@
               </ejs-multiselect>
             </div>
           </div>
-        </div>
-        <div class="form-elemet">
-          <div class="input-container bootstrap">
-            <div class="inline-radio-container">
-              <ejs-radiobutton formControlName="invoiceType" label="Vendor Scorecard" name="invoiceType" value="0"
-                (change)="onTabSelected($event)"></ejs-radiobutton>
-              <ejs-radiobutton formControlName="invoiceType" label="Vendor Scorecard Graph" name="invoiceType" value="1"
-                (change)="onTabSelected($event)"></ejs-radiobutton>
-            </div>
-          </div>
-        </div>
+        </div>       
       </form>
     </app-filter-dialog>
   </div>

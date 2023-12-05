@@ -15,7 +15,7 @@ import { SettingsViewService } from '@shared/services';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
-import { SetHeaderState, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
+import { SetHeaderState, SetHelpSystem, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
 import { ScheduleGridAdapter } from '../../adapters';
 import { FilterErrorMessage } from '../../constants';
 import * as ScheduleInt from '../../interface';
@@ -91,6 +91,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
       this.routeData = routerState?.['EmpId'];
     }
     store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'calendar' }));
+    this.store.dispatch(new SetHelpSystem(true));
   }
 
   public override ngOnInit(): void {
@@ -231,7 +232,9 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
         .getViewSettingKey(
           OrganizationSettingKeys.ScheduleOnlyWithAvailability,
           OrganizationalHierarchy.Location,
-          this.scheduleFilters?.locationIds[0]
+          this.scheduleFilters?.locationIds[0],
+          undefined,
+          true
         )
         .pipe(
           filter(({ ScheduleOnlyWithAvailability }) => !!ScheduleOnlyWithAvailability),

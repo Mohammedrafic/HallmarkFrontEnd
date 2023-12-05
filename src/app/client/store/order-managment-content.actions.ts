@@ -102,7 +102,7 @@ export class GetIrpOrderCandidates {
 }
 
 export class GetIrpOrderExtensionCandidates {
-  static readonly type = '[order management] Get IRP order Candidates';
+  static readonly type = '[order management] Get ExtensionIRP order Candidates';
 
   constructor(
     public orderId: number,

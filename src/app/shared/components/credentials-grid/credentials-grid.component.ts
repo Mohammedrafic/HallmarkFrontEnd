@@ -8,7 +8,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest, EMPTY } from 'rxjs';
+import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil, combineLatest, EMPTY, BehaviorSubject } from 'rxjs';
 
 import { CustomFormGroup, Permission } from '@core/interface';
 import { FileSize, UserPermissions } from '@core/enums';
@@ -121,9 +121,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public openFileViewerDialog = new EventEmitter<number>();
   public disableAddCredentialButton: boolean;
   public requiredCertifiedFields: boolean;
-  public credentialStatusOptions: FieldSettingsModel[] = [];
+  public credentialStatusOptions$ = new BehaviorSubject<FieldSettingsModel[]>([]);
   public existingFiles: CredentialFiles[] = [];
   public isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
+  public hasNoOrderId: boolean = false;
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -135,7 +136,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private candidateProfileId: number;
   private credentialType: CredentialType;
   public isOrgOnlyIRPEnabled:boolean=false;
-  private isOrgVMSEnabled:boolean=false;
+  private isOrgVMSEnabled: boolean = false;
 
   @Select(CandidateState.candidateCredential)
   candidateCredential$: Observable<CandidateCredentialResponse>;
@@ -262,6 +263,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetCredentialTypes());
     this.addCredentialForm = this.credentialGridService.createAddCredentialForm();
     this.searchCredentialForm = this.credentialGridService.createSearchCredentialForm();
+    this.hasNoOrderId = !this.orderId;
     this.watchForPageChanges();
     this.watchForCandidateActions();
     this.watchForCredentialStatuses();
@@ -779,7 +781,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$
       .pipe(ofActionSuccessful(GetCredentialStatusesSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((payload: { statuses: CredentialStatus[] }) => {
-        this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses, this.isIRP);
+        this.credentialStatusOptions$.next(this.credentialGridService.getCredentialStatusOptions(payload.statuses, this.isIRP));
         this.addCredentialForm.patchValue({ status: this.credentialStatus });
       });
   }

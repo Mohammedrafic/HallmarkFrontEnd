@@ -11,7 +11,6 @@ import { GRID_CONFIG } from '@shared/constants/grid-config';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants/messages';
 import { Role, RolesFilters, RolesPage } from '@shared/models/roles.model';
-import { FilterService } from '@shared/services/filter.service';
 import { PermissionsTree } from '@shared/models/permission.model';
 import { rolesFilterColumns } from 'src/app/security/roles-and-permissions/roles-and-permissions.constants';
 
@@ -59,14 +58,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
 
-  public activeValueAccess = (_: string, { isActive }: Role) => {
-    return Active[Number(isActive)];
-  };
-  public businessValueAccess = (_: string, { businessUnitName }: Role) => {
-    return businessUnitName || 'All';
-  };
-  public selIndex: number[] = [];
-  public sortOptions = { columns: [{ field: 'businessUnitName', direction: 'Descending' }] };
   public filterColumns = rolesFilterColumns;
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
@@ -87,7 +78,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   defaultColDef: any;
   autoGroupColumnDef: any;
   columnDefs: any;
-  filterText: string | undefined;
   frameworkComponents: any;
   sideBar: any;
   serverSideStoreType: any;
@@ -107,7 +97,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     private store: Store,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
-    private filterService: FilterService
   ) {
     super();
     this.frameworkComponents = {

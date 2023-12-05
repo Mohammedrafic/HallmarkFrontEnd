@@ -2,7 +2,7 @@ import { GetBusinessForEmployeeType } from './../../../security/store/security.a
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, NgZone } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, NgZone, ChangeDetectorRef } from '@angular/core';
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -42,11 +42,10 @@ import { GRID_CONFIG, RECORD_ADDED, RECORD_MODIFIED, USER_ALERTS_PERMISSION } fr
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
-import { BUSINESS_UNITS_VALUES_WITH_IRP } from '@shared/constants/business-unit-type-list';
+import { BUSINESS_UNITS_VALUES_WITH_IRP, BUSINESS_UNITS_VALUES_WITH_MSP } from '@shared/constants/business-unit-type-list';
 import { OutsideZone } from '@core/decorators';
 import { DetectActiveSystem, SystemGroupConfig } from '@client/order-management/constants';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { GetOrganizationById } from '@admin/store/alerts.actions';
 
 @Component({
@@ -144,7 +143,6 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   pagination: boolean;
   paginationPageSize: number;
   columnDefs: any;
-  filterText: string | undefined;
   frameworkComponents: any;
   sideBar: any;
   serverSideStoreType: any;
@@ -317,6 +315,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
+     this.filteredBusinessUnits= BUSINESS_UNITS_VALUES_WITH_MSP
+
     }
     if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
       this.loadSystemButtons();

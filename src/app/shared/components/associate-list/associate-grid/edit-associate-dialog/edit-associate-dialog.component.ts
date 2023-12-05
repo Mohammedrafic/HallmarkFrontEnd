@@ -133,7 +133,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
       this.partnershipForm.markAllAsTouched();
       return;
     }
-      
+
     let switchTabVal=this.activeTab;
 
     switch (switchTabVal) {
@@ -343,7 +343,8 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
       OrganizationSettingKeys.TieringLogic,
       OrganizationalHierarchy.Organization,
       id,
-      id
+      id,
+      false
     ).pipe(
       takeWhile(() => this.isAlive)
     ).subscribe(({TieringLogic}) => {

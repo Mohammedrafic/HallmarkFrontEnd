@@ -26,6 +26,7 @@ import { ContactusState } from './store/contact-us.state';
 import { PreservedFiltersState } from './store/preserved-filters.state';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CustomErrorHandler } from '@core/interceptors';
+import { AdminState } from '@admin/store/admin.state';
 
 @NgModule({
   declarations: [AppComponent],
@@ -37,7 +38,7 @@ import { CustomErrorHandler } from '@core/interceptors';
     Spinnermodule,
 
     //STORE
-    NgxsModule.forRoot([AppState, UserState, RejectReasonState, ContactusState, PreservedFiltersState]),
+    NgxsModule.forRoot([AppState, UserState, RejectReasonState, ContactusState, PreservedFiltersState, AdminState]),
     NgxsReduxDevtoolsPluginModule.forRoot({
       disabled: environment.production,
     }),

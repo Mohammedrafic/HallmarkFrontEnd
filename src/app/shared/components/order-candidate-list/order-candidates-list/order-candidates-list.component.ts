@@ -1,7 +1,7 @@
 import { ClearDeployedCandidateOrderInfo, GetCandidateJob,
   GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import {ChangeDetectorRef, Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   GetAvailableSteps,
@@ -43,13 +43,14 @@ import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { DateTimeHelper } from '@core/helpers';
 import { GetCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
 import { UserService } from '@shared/services/user.service';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-order-candidates-list',
   templateUrl: './order-candidates-list.component.html',
   styleUrls: ['./order-candidates-list.component.scss'],
 })
-export class OrderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
+export class OrderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit, OnChanges {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('accept') accept: AcceptCandidateComponent;
   @ViewChild('apply') apply: ApplyCandidateComponent;
@@ -104,6 +105,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public commentContainerId = 0;
   public readonly partnershipStatus = PartnershipStatus;
   public showDeployedControl = false;
+  public isOrderClosed = false;
 
   private isOrgIRPEnabled = false;
   private previousSelectedSystemId: OrderManagementIRPSystemId | null;
@@ -158,7 +160,9 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
 
     let alertId = JSON.parse((localStorage.getItem('alertId') || '0')) as number;
-    if(alertId > 0){
+    let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+    this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    if(alertId > 0 && (alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Candidate Level Comments']].trim().toLowerCase()){
       this.userService.getAlertDetailsForId(alertId).subscribe((data:any)=>{
         window.localStorage.setItem("alertId", JSON.stringify(""));
         if(this.candidatesList && data.candidateId){
@@ -170,6 +174,13 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
         }
 
       })
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['orderDetails']?.currentValue) {
+      this.isOrderClosed = this.orderDetails?.status === OrderStatus.Closed
+        || this.orderDetails?.irpOrderMetadata?.status === OrderStatus.Closed;
     }
   }
 

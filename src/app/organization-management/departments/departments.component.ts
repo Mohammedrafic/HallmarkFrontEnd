@@ -319,6 +319,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       this.getDepartments();
       this.store.dispatch(new ShowSideDialog(false));
       this.isbulkedit=false;
+      this.isbulkdelete=false;
 
     });
     this.action$
@@ -335,6 +336,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.isbulkedit=false;
 
         this.store.dispatch(new ShowSideDialog(false));
+        this.isbulkedit=false;
+        this.isbulkdelete=false;
 
     });
     this.action$
@@ -355,6 +358,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Department));
       }
       this.getDepartments();
+      this.isbulkedit=false;
+      this.isbulkdelete=false;
     });
     this.action$
     .pipe(
@@ -368,6 +373,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.clearSelection(this.grid);
         this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
         this.getDepartments();
+        this.isbulkedit=false;
+        this.isbulkdelete=false;
     });
   }
 
@@ -442,6 +449,32 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     this.isbulkedit=true;
     this.bulkaction=0;
     this.isEdit = true;
+    let departmentsDetail: Department[] = this.selectedItems.map(val => ({
+      id: val.id,
+      editedLocationId: val.id,
+      departmentId: val.departmentId,
+      locationId: val.locationId,
+      extDepartmentId: val.extDepartmentId,
+      invoiceDepartmentId: val.invoiceDepartmentId,
+      departmentName: val.departmentName,
+      facilityContact: val.facilityContact,
+      facilityEmail: val.facilityEmail,
+      facilityPhoneNo: val.facilityPhoneNo,
+      inactiveDate: val.inactiveDate ,
+      reactivateDate: val.reactivateDate,
+      unitDescription: val.unitDescription,
+      locationIncludeInIRP: val.locationIncludeInIRP,
+      isDeactivated:val.isDeactivated,
+      ignoreValidationWarning: val.ignoreValidationWarning,
+      primarySkills: val.primarySkills,
+      secondarySkills: val.secondarySkills,
+      primarySkillNames: val.primarySkillNames,
+      secondarySkillNames: val.secondarySkillNames,
+      createReplacement:val.createReplacement,
+     includeInIRP: val.includeInIRP,
+    }));
+    let includeInIRPStatus=  departmentsDetail.every(x=>x.includeInIRP==true);
+    this.departmentsDetailsFormGroup.controls['includeInIRP'].setValue(includeInIRPStatus);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -507,7 +540,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     }
   }
 
-  onAddDepartmentClick(): void {
+  onAddDepartmentClick(): void {    
     if (this.selectedLocation && this.selectedRegion) {
       this.departmentsDetailsFormGroup.controls['inactiveDate'].enable();
       this.departmentsDetailsFormGroup.controls['includeInIRP']?.setValue(
@@ -521,7 +554,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     }
   }
 
-  onDepartmentFormCancelClick(): void {
+  onDepartmentFormCancelClick(): void { 
     if (this.departmentsDetailsFormGroup.dirty) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -536,6 +569,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     } else {
       this.closeDepartmentWindow();
     }
+    this.isbulkedit=false;
+    this.isbulkdelete=false;
   }
 
   onDepartmentFormSaveClick(ignoreWarning = false): void {

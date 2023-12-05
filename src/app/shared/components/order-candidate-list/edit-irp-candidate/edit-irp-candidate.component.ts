@@ -43,6 +43,8 @@ import {
   CANCEL_CONFIRM_TEXT,
   CLOSE_IRP_POSITION,
   CloseOrderIRP_PERMISSION,
+  DefaultMaxDate,
+  DefaultMinDate,
   DELETE_CONFIRM_TITLE,
   ManageOrderIRP_PERMISSION,
   RECORD_MODIFIED,
@@ -398,10 +400,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
     const jobStartDateValue = new Date(jobStartDate.getTime());
+    const jobEndDateValue = new Date(this.candidateDetails.actualEndDate);
     const jobEndDateControl = this.candidateForm.get('actualEndDate') as AbstractControl;
-
-    const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
-    jobEndDateControl.patchValue(jobEndDate);
+    if(this.candidateModelState.candidate.status === CandidatStatus.Cancelled){
+      jobEndDateControl.patchValue(jobEndDateValue);
+    } else {
+      const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
+      jobEndDateControl.patchValue(jobEndDate);
+    }
   }
 
 
@@ -895,14 +901,14 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     const cancelReasonConfigField = this.getConfigField(CancelReasonField);
 
     if (status === CandidatStatus.Cancelled) {
-      startDateFormControl?.patchValue(this.candidateDetails?.actualStartDate);
+      startDateFormControl?.patchValue(DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualStartDate as string));
       startDateFormControl?.disable();
       endDateConfigField.required = true;
       cancelReasonConfigField.showField = true;
       endDateConfigField.minDate = this.candidateDetails?.actualStartDate
-        ? DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualStartDate as string) : null;
+        ? DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualStartDate as string) : DefaultMinDate;
       endDateConfigField.maxDate = this.candidateDetails?.actualEndDate
-        ? DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualEndDate as string) : null;
+        ? DateTimeHelper.setCurrentTimeZone(this.candidateDetails.actualEndDate as string) : DefaultMaxDate;
       this.endDateFormControlValue = endDateFormControl?.value;
       endDateFormControl?.reset();
       endDateFormControl?.setValidators([Validators.required]);
@@ -923,8 +929,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
   private removeEndDateControlLimitations(endDateFormControl: FormControl, endDateConfigField: CandidateField): void {
     endDateConfigField.required = false;
-    endDateConfigField.minDate = null;
-    endDateConfigField.maxDate = null;
+    endDateConfigField.minDate = DefaultMinDate;
+    endDateConfigField.maxDate = DefaultMaxDate;
     endDateFormControl.setValidators([]);
   }
 

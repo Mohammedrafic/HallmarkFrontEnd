@@ -11,7 +11,8 @@ export enum OrganizationSettingControlType {
   CheckboxValue = 10,
   PayPeriod = 11,
   ATPRateCalculation = 12,
-  StartsOnDate = 13,
+  StartsOnDate = 13
+
 }
 
 export enum TextFieldTypeControl {

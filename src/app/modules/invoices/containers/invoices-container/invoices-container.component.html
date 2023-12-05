@@ -18,12 +18,12 @@
           <div class="input-container">
             <ejs-multiselect  id="regionIds" mode="CheckBox" [formControl]="organizationMultiSelectControl"
               placeholder="All" [fields]="unitOrganizationsFields" [allowFiltering]="true" [showDropDownIcon]="true"
-              [dataSource]="organizations$ | async" [selectAllText]='allOption'
+              [dataSource]="agencyOrganizations$ | async" [selectAllText]='allOption'
               [showSelectAll]="true" tabindex="2">
             </ejs-multiselect>
         </div>
         <div class="input-container agency-dropDown" [class.hidden]="true">
-         <!-- --> <ejs-dropdownlist *ngIf="organizations$ | async as organizations"
+         <ejs-dropdownlist *ngIf="organizations$ | async as organizations"
                             placeholder="Select organization"
                             [allowFiltering]="true"
                             [dataSource]="organizations"
@@ -32,7 +32,7 @@
           </ejs-dropdownlist>
         </div>
       </div>
-      <div class="buttons-group" [class.top-margin]="!isAgency">
+      <div class="buttons-group invoiceheader" [class.top-margin]="!isAgency">
         <div class="buttons-container">
           <div class="e-checkbox-wrapper e-css" _ngcontent-yyg-c377="">
             <input class="e-checkselectall" style="height:19px;width:33px;margin-top:11px;"_ngcontent-yyg-c377="" type="checkbox" aria-label="checkbox" 
@@ -118,7 +118,7 @@
         <!--      TODO: Move to component-->
         <ejs-tooltip [content]="getCreateInvoiceTooltip"
                      position="BottomCenter"
-                     [opensOn]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled ? 'Auto' : 'Custom'">
+                     [opensOn]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled ? 'Auto' : 'Custom'" class="tooltipcls" >
           <div class="invoices-split-button" *ngIf="tabConfig?.groupingEnabled && groupInvoicesBy">
             <button ejs-button
                     appHideBeforeSyncfusionLoad
@@ -204,6 +204,7 @@
             [rowSelection]="'multiple'"
             [bulkActionConfig]="bulkActionConfig"
             [gridOptions]="gridOptions"
+            [context]="context"
             [customRowsPerPageDropDownObject]="recordsPerPageOptions"></app-grid>
 </ng-template>
 
@@ -221,7 +222,7 @@
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>
 
-<app-invoices-filters-dialog [selectedTabId]="selectedTabId"
+<app-invoices-filters-dialog [selectedTabId]="selectedTabId" [agencyOrganizations]="agencyOrganizationIds"
                              (appliedFiltersAmount)="changeFiltersAmount($event)"
                              (resetFilters)="resetFilters()"
                              (updateTableByFilters)="updateTableByFilters($event)">
@@ -237,3 +238,4 @@
                          [invoicesToPay]="paymentRecords"
                          (destroyDialog)="closeAddPayment()">
 </app-invoice-add-payment>
+<app-invoice-history-detail [historyDetails]="invoiceDetails"></app-invoice-history-detail>

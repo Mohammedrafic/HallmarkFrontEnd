@@ -6,4 +6,5 @@ export class BusinessUnit {
   agencyStatus: number;
   isIRPEnabled?: boolean;
   isVMSEnabled?: boolean;
+  selectedBussinessUnitIds: string;
 }

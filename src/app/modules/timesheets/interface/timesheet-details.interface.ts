@@ -202,3 +202,10 @@ export interface OverlapErrorMessageDetails {
   title: string;
   message: string;
 }
+
+export interface TimesheetHistoricalEvent {
+  content: string;
+  dateTime: string;
+  localDateTime: string;
+  userName: string;
+}

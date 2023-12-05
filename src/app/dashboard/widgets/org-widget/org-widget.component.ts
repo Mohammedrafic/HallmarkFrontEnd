@@ -1,13 +1,12 @@
-import { ChangeDetectorRef, Component, Input, Inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { Actions, Select, Store } from '@ngxs/store';
+import { Component, Input, Inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Select, Store } from '@ngxs/store';
 import { OrgDetailsInfoModel } from '../../models/org-details-info.model';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalWindow } from '@core/tokens';
 import { LocalStorageStatus } from '@shared/enums/status';
 import { UserState } from '../../../store/user.state';
-import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
-import { AppState } from 'src/app/store/app.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Observable, filter, takeUntil } from 'rxjs';
 import { Organization } from '@shared/models/organization.model';
@@ -36,7 +35,6 @@ export class OrgWidgetComponent extends AbstractPermissionGrid implements OnDest
   public countzero = "Ordercountzero";
   public isAgencyUser: boolean = false;
   public isOrgUser: boolean = false;
-  public isIRPEnabledOrg: boolean = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   private mousePosition = {
     x: 0,
     y: 0,
@@ -45,8 +43,6 @@ export class OrgWidgetComponent extends AbstractPermissionGrid implements OnDest
   protected componentDestroy: () => Observable<unknown>;
 
   constructor(private readonly dashboardService: DashboardService,
-    private actions$: Actions,
-    private cdr: ChangeDetectorRef,
     protected override store: Store,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis) {
     super(store);

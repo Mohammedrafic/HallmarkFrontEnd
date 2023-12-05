@@ -76,7 +76,6 @@ export class OrgInterfaceComponent  extends AbstractGridConfigurationComponent i
   constructor(private store: Store,) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Organization Interfaces', iconName: 'file-text' }));
-    var self = this;
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
     };
