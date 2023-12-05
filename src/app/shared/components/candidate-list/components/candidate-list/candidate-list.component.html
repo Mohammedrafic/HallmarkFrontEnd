@@ -24,7 +24,7 @@
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button
-              [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard || !userPermission[userPermissions.CanEditCandidateProfile]"
+              [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard || !userPermission[userPermissions.CanEditCandidateProfile] || disableNonlinkedagency"
               cssClass="e-flat secondary-icon-button enabled-button" (click)="onRemove(data.candidateProfileId)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>

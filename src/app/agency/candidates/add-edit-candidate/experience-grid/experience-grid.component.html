@@ -11,7 +11,7 @@
         ejs-button
         class="action-link"
         *ngIf="!readonlyMode"
-        [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditExperience]"
+        [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditExperience] || disableNonlinkedagency"
         (click)="addNew()"
       >
         <i-feather name="plus" class="icon"></i-feather>
@@ -36,8 +36,8 @@
       <e-column textAlign="Right" *ngIf="!readonlyMode" maxWidth="50">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" [disabled]="!areAgencyActionsAllowed" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></button>
-            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditExperience]" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></button>
+            <button ejs-button cssClass="e-flat primary-icon-button" [disabled]="!areAgencyActionsAllowed || disableNonlinkedagency" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></button>
+            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditExperience] || disableNonlinkedagency" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></button>
           </div>
         </ng-template>
       </e-column>

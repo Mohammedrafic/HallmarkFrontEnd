@@ -51,6 +51,9 @@ import { JobDistributionMasterSkills } from '@shared/models/associate-organizati
 import { AppState } from 'src/app/store/app.state';
 import { AlertIdEnum } from "@admin/alerts/alerts.enum";
 import { SetLastSelectedOrganizationAgencyId } from "src/app/store/user.actions";
+import { BusinessUnitType } from "@shared/enums/business-unit-type";
+import { User } from "@shared/models/user.model";
+import { CandidateService } from "@agency/services/candidates.service";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -103,7 +106,13 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   @Select(CandidateState.candidateProfile)
   private candidateProfile$: Observable<Candidate>;
+  
+  @Select(UserState.lastSelectedAgencyId)
+  lastSelectedAgencyId$: Observable<number>;
 
+  public disableNonlinkedagency:boolean;
+
+  private unsubscribe$: Subject<void> = new Subject();
   constructor(
     protected override store: Store,
     private fb: FormBuilder,
@@ -115,6 +124,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     private location: Location,
     private agencySettingsService: AgencySettingsService,
     private cd: ChangeDetectorRef,
+    private candidate: CandidateService,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -172,7 +182,25 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     }
     this.pagePermissions();
     this.subscribeOnCandidateCredentialResponse();
+    this.getNonlinkedagency();
   }
+
+  getNonlinkedagency()
+  {
+    this.lastSelectedAgencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+    
+      const user = this.store.selectSnapshot(UserState.user) as User;
+        if(user.businessUnitType=== BusinessUnitType.MSP)
+        {
+        this.candidate.getIsmsp().subscribe(data=>{
+          this.disableNonlinkedagency=data;        
+        }) 
+        }  
+      
+    });
+      
+  }
+
 
   override ngOnDestroy(): void {
     super.ngOnDestroy();

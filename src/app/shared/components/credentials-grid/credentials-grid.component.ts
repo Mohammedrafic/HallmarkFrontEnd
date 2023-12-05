@@ -94,6 +94,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() isMobileLoginOn = false;
   @Input() reloadCredentials:Subject<boolean> = new Subject<boolean>();
   public isCredentialExists: boolean;
+  @Input() disableNonlinkedagency: boolean;
+
   @Input() set employeeId(value: number | null | undefined) {
     if (value) {
       this.candidateProfileId = value;
@@ -802,8 +804,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     })
   }
   private setDisableAddCredentialButton(): void {
+    console.log(this.areAgencyActionsAllowed,this.isOrgVMSEnabled,this.isOrganizationSide,this.isNavigatedFromCandidateProfile,this.isIRP)
     this.disableAddCredentialButton =
-      !this.areAgencyActionsAllowed
+      !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || (this.isOrgVMSEnabled && !this.hasPermissions())
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
       || (this.isOrgOnlyIRPEnabled && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile]);
@@ -833,7 +836,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
  }
   private disableCopy(item: CandidateCredential): boolean {
     return (
-      !this.areAgencyActionsAllowed
+      !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || this.disabledCopy
       || item.id === this.orderCredentialId
       || !this.hasPermissions()
@@ -844,7 +847,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private disableEdit(item: CandidateCredential): boolean {
     return (
-      !this.areAgencyActionsAllowed
+      !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || item.id === this.orderCredentialId
       || ((item.status === this.statusEnum.Reviewed) && !this.isOrganizationSide)
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
@@ -854,7 +857,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private disableDelete(item: CandidateCredential): boolean {
     return (
-      !this.areAgencyActionsAllowed
+      !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || item.id === this.orderCredentialId
       || !this.hasPermissions()
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
