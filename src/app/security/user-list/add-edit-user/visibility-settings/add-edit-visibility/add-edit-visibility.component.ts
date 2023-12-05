@@ -284,7 +284,6 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
         });
         this.locations = sortByField(locations, 'name');
         this.setControlValue(this.locationsControl as FormControl, this.locations, this.editVisibility?.uniqLocationId);
-        console.log(this.locations);
       } else {
         this.locationsControl?.setValue([]);
         this.locations = [];
