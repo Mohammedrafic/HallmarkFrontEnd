@@ -122,15 +122,12 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   ngOnInit(): void {
     this.onOrderFilteringOptionsChange();
     const user = this.store.selectSnapshot(UserState.user);
-    if(user?.businessUnitType === BusinessUnitType.Agency){
-      this.isAgency= true;
+    if(user){
       this.agencyOrganizations();
       this.isOrganizaionsLoaded$.pipe(takeUntil(this.destroy$)).subscribe((flag) => {
         if(!flag){               
-          if(this.isAgency){
             this.store.dispatch(new GetOrganizationsStructureAll(user?.id));  
-          }       
-        }
+         }
       });
     }
   }
@@ -155,7 +152,6 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         if (isEmpty(value)) {
           this.clearRLDByLevel(RLDLevel.Orginization);
         } else {
-          if(this.isAgency){
             let filteredOrg = this.partneredOrganizations.filter(el => {
               return value.find(element => {
                 return element == el.organizationId;
@@ -163,9 +159,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
             });
             const regions =  getRegionsFromOrganizationStructure(filteredOrg);
             this.filterColumns.regionIds.dataSource = sortByField(regions, 'name');
-         }else{
-          this.store.dispatch(new GetOrganizationStructure(value));
-         }
+         // this.store.dispatch(new GetOrganizationStructure(value));
         }
         this.cd.detectChanges();
       })
@@ -293,9 +287,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           candidateStatusesData = candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
         }
 
-        if(!this.isAgency){
-          this.filterColumns.organizationIds.dataSource = partneredOrganizations;
-        }
+        //  this.filterColumns.organizationIds.dataSource = partneredOrganizations;
         this.filterColumns.skillIds.dataSource = masterSkills;
         this.filterColumns.candidateStatuses.dataSource = candidateStatusesData;
         this.filterColumns.orderStatuses.dataSource = statuses;
@@ -367,15 +359,15 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     });
   }
 
-  static generateFilterColumns(isAgency:boolean = false): any {
+  static generateFilterColumns(): any {
     return {
       orderPublicId: { type: ControlTypes.Text, valueType: ValueType.Text },
       organizationIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: isAgency ? 'organizationName' : 'name',
-        valueId: isAgency ? 'organizationId' : 'id',
+        valueField: 'organizationName',
+        valueId: 'organizationId',
       },
       regionIds: {
         type: ControlTypes.Multiselect,

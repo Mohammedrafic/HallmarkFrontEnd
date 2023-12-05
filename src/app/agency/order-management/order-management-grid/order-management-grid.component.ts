@@ -160,7 +160,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public filters: AgencyOrderFilters = {
     includeReOrders: true,
   };
-  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns(this.isAgency);
+  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
   public columnsToExport: ExportColumn[];
   public fileName: string;
@@ -204,10 +204,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   ngOnInit(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    if(user?.businessUnitType === BusinessUnitType.Agency){
-      this.isAgency= true;
-      this.filterColumns = AgencyOrderFiltersComponent.generateFilterColumns(this.isAgency);
-    }
     this.getAlertOrderId();
     this.onOrderPreviewChange();
     this.onAgencyChange();
@@ -468,13 +464,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       if(this.ltaOrder){
         this.clearFilters();
       }
-      if(this.isAgency){
         this.patchFilterForm();
         this.prepopulateAgencyFilterFormStructure();
-      }else{
-        this.patchFilterForm(!!this.filters?.regionIds?.length);
-        this.prepopulateFilterFormStructure();
-      }
+        //this.patchFilterForm(!!this.filters?.regionIds?.length);
+        //this.prepopulateFilterFormStructure();
       this.dispatchNewPage();
       return;
     }
