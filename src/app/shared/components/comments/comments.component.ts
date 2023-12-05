@@ -175,6 +175,7 @@ export class CommentsComponent {
   }
 
   public send(): void {
+    debugger
     if (!this.message) {
       return;
     }
@@ -190,8 +191,8 @@ export class CommentsComponent {
       new: true,
       commentContainerId: this.commentContainerId,
       isRead: true,
-      BussinessUnitType: user.businessUnitType == 3 ? "Organization" : "" 
-      // BussinessUnitType: user.businessUnitType == 3 ? "Organization" : "" || user.businessUnitType == 4 ? "Agency" : "" || user.businessUnitType == 1 ? "Hallmark" : "" 
+      bussinessUnitType: user.businessUnitType == 3 ? "Organization" :  
+      user.businessUnitType == 4 ? "Agency" : user.businessUnitType == 1 ? "Hallmark" : "" 
     };
     this.comments.push(comment);
     if(this.useStyle === true){
