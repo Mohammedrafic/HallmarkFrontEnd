@@ -9,6 +9,7 @@ import {
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { Applicability, ApplicabilityItemType } from '@organization-management/workflow/enumns';
 
+export const PriorityMultipleStep = 1;
 export const WorkflowTabNames: WorkflowTabName = {
   vmsWorkflow: 'VMS Order Workflow',
   irpWorkflow: 'IRP Order Workflow',
