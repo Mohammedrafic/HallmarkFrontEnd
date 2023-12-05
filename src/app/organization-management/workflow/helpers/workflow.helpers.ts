@@ -117,7 +117,6 @@ export const CreateNextStepStatusForWorkflows = (
 ): Step[] => {
   const isIrpWorkflow = includeInIrp && type === TypeFlow.applicationWorkflow;
   const hasDuplicate = isIrpWorkflow ? hasDuplicateSteps(steps) : false;
-  console.log(hasDuplicate, 'hasDuplicate ->>')
 
   return CreateNextStepStatusField(steps, hasDuplicate, isIrpWorkflow, includeInIrp);
 }
