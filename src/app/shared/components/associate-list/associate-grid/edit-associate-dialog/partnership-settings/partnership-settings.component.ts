@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select } from '@ngxs/store';
 import { delay, Observable, takeUntil } from 'rxjs';
@@ -64,6 +64,12 @@ export class PartnershipSettingsComponent extends Destroyable implements OnInit 
 
   private partnershipSettings: PartnershipSettings;
 
+  constructor(
+    private cd: ChangeDetectorRef,
+  ) {
+    super();
+  }
+
   ngOnInit(): void {
     this.subscribeOnPartnershipSettings();
     this.observePartnerStatus();
@@ -121,6 +127,7 @@ export class PartnershipSettingsComponent extends Destroyable implements OnInit 
         dateControl?.removeValidators(Validators.required);
         dateControl?.patchValue(null);
       }
+      this.cd.detectChanges();
     });
   }
 }
