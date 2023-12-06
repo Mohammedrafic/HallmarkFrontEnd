@@ -311,7 +311,7 @@ export class SettingsDataAdapter {
         displayValue = SettingsDataAdapter.getMultiselectDisplayValue(child.value);
         break;
       case OrganizationSettingControlType.Select:
-        displayValue = child.value[0]?.text;
+        displayValue = child.value ? child.value[0]?.text : '';
         break;
       case OrganizationSettingControlType.Text:
         displayValue = child.value;
