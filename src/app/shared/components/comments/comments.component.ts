@@ -175,11 +175,9 @@ export class CommentsComponent {
   }
 
   public send(): void {
-    debugger
     if (!this.message) {
       return;
     }
-    debugger
     const user = this.store.selectSnapshot(UserState).user;
     const comment = {
       id: 0,
