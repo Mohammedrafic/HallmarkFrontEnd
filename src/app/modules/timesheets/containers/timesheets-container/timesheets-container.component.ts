@@ -358,7 +358,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       )
       .subscribe((res) => {
         this.organizations= res.filter((item)=> item.regions.length>0)
-        const orgId = this.organizations[0].organizationId as number;
+        const orgId = this.routerState?.["condition"] === "setOrg"
+        ? this.routerState?.["orderStatus"]
+        : this.getOrganizationIdFromState() || this.organizations[0].organizationId as number;
         this.store.dispatch(new Timesheets.SelectOrganization(orgId));
         this.organizationControl.setValue(orgId, { emitEvent: false });    
 
