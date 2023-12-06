@@ -100,6 +100,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public readonly currentSelectedTableRowIndex: Observable<number> = this.timesheetsService.getSelectedTimesheetRowStream();
   public isAgency: boolean;
   public businessUnitId?: number;
+  public timesheetId: number;
+  public orderPublicId: string = '';
   routerState:any;
   public gridSelections: Interfaces.TimesheetGridSelections = {
     selectedTimesheetIds: [],
@@ -134,6 +136,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     if (!this.businessUnitId) {
       this.businessUnitId = 0;
     }
+    this.timesheetId = JSON.parse(localStorage.getItem('TimesheetId') || '0') as number;
+    if (!this.timesheetId) {
+      this.timesheetId = 0;
+    }
+    this.orderPublicId = localStorage.getItem('OrderPublicId') ? JSON.parse(localStorage.getItem('OrderPublicId') || '') as string : '';
+    if (!this.orderPublicId) {
+      this.orderPublicId = '';
+    }
+
     this.document.defaultView?.localStorage.setItem('BussinessUnitID', JSON.stringify(''));
 
     this.onOrganizationChangedHandler();
@@ -141,6 +152,18 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.startFiltersWatching();
     this.calcTabsBadgeAmount();
     this.initOnRedirect();
+    this.timesheets$.subscribe(tableData=>{
+      if(tableData && this.timesheetId > 0){
+        let filterTimesheet = tableData.items.find(ele=>ele.id == this.timesheetId);
+        let filterTimesheetIndex = tableData.items.findIndex(ele=>ele.id == this.timesheetId);
+        if(filterTimesheet){
+          this.rowSelected({rowIndex:filterTimesheetIndex,data:filterTimesheet});
+          this.timesheetId = 0;
+          this.orderPublicId = '';
+        }  
+      }
+    })
+
   }
 
   public override ngOnDestroy() {
@@ -406,6 +429,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     if (this.isAgency) {
       this.initOrganizationsList();
     } else {
+      if(this.timesheetId > 0){
+        this.filters = {};
+        this.filters.orderIds = [this.orderPublicId];
+        this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(), this.filters));
+      }
       this.store.dispatch([
         new Timesheets.GetFiltersDataSource(),
         new Timesheets.UpdateFiltersState({ ...this.filters }),
