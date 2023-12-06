@@ -233,10 +233,6 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
   public createTemplate(event: { templateTitle: string }): void {
     const formState = this.irpStateService.getFormState();
-    const saveOrderAstemplate = this.irpStateService.getOrderTemplateFormState();
-    const formGroupList = getFormsList(formState);
-    const saveOrderAsTemplateGrouplist = getSaveasTemplateFormsList(saveOrderAstemplate);
-    let saveType: any;
     let createdOrder = {
       ...createOrderDTO(formState, this.orderCredentials),
       contactDetails: getValuesFromList(formState.contactDetailsList),
@@ -244,10 +240,28 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       isSubmit: false,
     };
     createdOrder.distributeToVMS = createdOrder.distributeToVMS !=null ? createdOrder.distributeToVMS.length===0 ? null : createdOrder.distributeToVMS : null;
-    let location = this.organizationStructureService.getTemplateLocationsById(createdOrder.regionId,createdOrder.locationId);
-    let department = this.organizationStructureService.getTemplateDepartment(createdOrder.locationId,createdOrder.departmentId);
     createdOrder.isTemplate = true;
     createdOrder.templateTitle = event.templateTitle;
+    if(createdOrder.jobDates && !Array.isArray(createdOrder.jobDates))
+    {
+    createdOrder.jobDates = [createdOrder.jobDates];
+    }
+    if(Array.isArray(createdOrder.workLocations))
+    {
+      createdOrder.workLocations.forEach((workLocation: any) => {
+        if (workLocation.id !== 0) {
+          workLocation.id = 0;
+        }
+      });
+    }
+    if(Array.isArray(createdOrder.contactDetails))
+    {
+      createdOrder.contactDetails.forEach((contactDetail: any) => {
+        if (contactDetail.id !== 0) {
+          contactDetail.id = 0;
+        }
+      });
+    }
     this.store.dispatch(new SaveIrpOrder(createdOrder, this.irpStateService.getDocuments(),"","",true));
     this.closeSaveTemplateDialog();
   }

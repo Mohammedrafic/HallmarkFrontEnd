@@ -45,6 +45,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
   @Input() areAgencyActionsAllowed: boolean;
   @Input() userPermission: Permission;
   @Input() isMobileLoginOn: boolean;
+  @Input() disableNonlinkedagency: boolean;
 
   @ViewChild('grid') grid: GridComponent;
 

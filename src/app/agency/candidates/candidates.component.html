@@ -18,7 +18,7 @@
           appHideBeforeSyncfusionLoad
           cssClass="e-outline import-button"
           (click)="onImport()"
-          [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]"
+          [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile] || disableNonlinkedagency" 
         >
         <span class="text-btn">
           Import 
@@ -60,7 +60,7 @@
           appHideBeforeSyncfusionLoad
           [isPrimary]="true"
           (click)="navigateToCandidateForm()"
-          [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]"
+          [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile] || disableNonlinkedagency"
         >
           Add Candidates
         </button>
@@ -81,6 +81,7 @@
     [isIRP]="false"
     [agencyActionsAllowed]="agencyActionsAllowed"
     [isMobileScreen]="(isMobile$ | async) ?? false"
+    [disableNonlinkedagency]="disableNonlinkedagency"
   ></app-candidate-list>
 </section>
 
