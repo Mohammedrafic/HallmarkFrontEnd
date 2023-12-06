@@ -76,7 +76,7 @@ export class DocumentViewerState {
   ): Observable<any> {
     return this.documentViewerService.saveStatus(payload).pipe(
       tap(() => {
-          dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'));
+          dispatch(new ShowToast(MessageTypes.Success, 'Candidate Status has been updated'));
       }),
       catchError((error) => {
         const errorMessage = error?.error?.errors.AlreadyUpdated[0];
