@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy, OnChanges, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged,of } from 'rxjs';
 
-import { map } from 'rxjs/operators';
+import { map, takeUntil, takeWhile } from 'rxjs/operators';
 import lodashFilter from 'lodash/fp/filter';
 import lodashMap from 'lodash/fp/map';
 import includes from 'lodash/fp/includes';
@@ -11,10 +11,12 @@ import { LegendPositionEnum } from '../../../../dashboard/enums/legend-position.
 import { ChartAccumulation, DonutChartData, } from '../../../../dashboard/models/chart-accumulation-widget.model';
 import { WidgetLegengDataModel } from '../../../../dashboard/models/widget-legend-data.model';
 import { DashboardService } from '../../../../dashboard/services/dashboard.service';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { AlertService } from '../../../../shared/services/alert.service';
 import { AbstractSFComponentDirective } from '../../../../shared/directives/abstract-sf-component.directive';
 import { ChartComponent } from '@syncfusion/ej2-angular-charts';
+import { IntegrationsState } from '../../../store/integrations.state';
+import { IntegrationFilterDto } from '../../../../shared/models/integrations.model';
  
  
 @Component({
@@ -23,10 +25,8 @@ import { ChartComponent } from '@syncfusion/ej2-angular-charts';
   styleUrls: ['./monthly-integrations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MonthlyIntegrationsComponent extends AbstractSFComponentDirective<ChartComponent> implements OnChanges, OnInit {
-
-  //@Input() public chartData: ChartAccumulation | undefined;
-  //@Input() public chartDatachanges: ChartAccumulation | undefined;
+export class MonthlyIntegrationsComponent extends AbstractSFComponentDirective<ChartComponent> implements OnChanges, OnInit, OnDestroy {
+   
    public isLoading: boolean;
    public isDarkTheme: boolean;
    public description: string;
@@ -93,23 +93,36 @@ export class MonthlyIntegrationsComponent extends AbstractSFComponentDirective<C
     super();
   }
 
+  @Select(IntegrationsState.chartAccumulation)
+  monthlyIntegrationRuns$: Observable<ChartAccumulation>;
+
+  private isAlive = true;
+   
   ngOnInit(): void {
     this.datalabel = { visible: true, position: 'Outside' };
-    this.filteredChartData$ = this.getFilteredChartData();
+     this.getFilteredChartData();
   }
-
+  public override ngOnDestroy(): void {
+    this.isAlive = false;
+  }
   public ngOnChanges(): void {
   }
     
-  private getFilteredChartData(): Observable<DonutChartData[]> {
-    //return combineLatest([this.chartData$, this.selectedEntries$]).pipe(
-    //  map(([chartData, selectedEntries]: [ChartAccumulation | null, string[] | null]) =>
-    //    lodashFilter((donut: DonutChartData) => includes(donut.label, selectedEntries), chartData?.chartData)
-    //  ),
-    //  distinctUntilChanged((previous: DonutChartData[], current: DonutChartData[]) => isEqual(previous, current))
-    //);
-
-    return of( [{
+  private getFilteredChartData()//: Observable<DonutChartData[]>
+  {
+    debugger;
+   
+    //console.log(this.monthlyIntegrationRuns$);
+    this.store.dispatch(new IntegrationFilterDto());
+    this.monthlyIntegrationRuns$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+      
+      if (data != null) {
+        debugger;
+        this.filteredChartData$ = of(data.chartData);
+        console.log(of(data.chartData));
+      }
+    });
+    this.filteredChartData$ =of( [{
         label: "Jan",
         value: 20,
         text: "Jan",
@@ -183,5 +196,5 @@ export class MonthlyIntegrationsComponent extends AbstractSFComponentDirective<C
         average: 30
       }]);
   }
-
+ 
 }

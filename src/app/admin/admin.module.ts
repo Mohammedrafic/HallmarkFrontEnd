@@ -83,6 +83,7 @@ import { InterfaceLogSummaryIrpComponent } from './interface-log-summary-irp/int
 import { InterfaceLogSummaryIrpDialogComponent } from './interface-log-summary-irp/interface-log-summary-irp-dialog/interface-log-summary-irp-dialog.component';
 import { OrganizationIntegrationsComponent } from './organization-integrations/organization-integrations.component';
 import { MonthlyIntegrationsComponent } from './organization-integrations/widgets/monthly-integrations/monthly-integrations.component';
+import { IntegrationsState } from './store/integrations.state';
 
 const sidebarIcons = {
   Download,
@@ -174,7 +175,8 @@ const sidebarIcons = {
             ManualInvoiceReasonsState,
             OrganizationManagementState,
             MasterCommitmentState,
-            DonotReturnState
+            DonotReturnState,
+            IntegrationsState
         ]),
         ValidateDirectiveModule,
         GridPaginationModule,
