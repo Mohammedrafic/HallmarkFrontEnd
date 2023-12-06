@@ -611,8 +611,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-      const startDate = this.generalInformationForm.get('jobStartDate')?.value ? this.generalInformationForm.get('jobStartDate')?.value : this.generalInformationForm.get('jobDates')?.value;
-      const locations = this.generalInformationForm.get('jobDates')?.value ? this.organizationStructureService.getLocationsByIdSet(value, startDate ?? new Date) : this.organizationStructureService.getLocationsById(value, startDate ?? new Date);
+      let startDate = this.generalInformationForm.get('jobStartDate')?.value ? this.generalInformationForm.get('jobStartDate')?.value : this.generalInformationForm.get('jobDates')?.value;
+      startDate = startDate ? startDate : new Date;
+      const locations = this.generalInformationForm.get('jobDates')?.value ? this.organizationStructureService.getLocationsByIdSet(value, [startDate] ?? new Date) : this.organizationStructureService.getLocationsById(value, startDate ?? new Date);
       this.generalInformationForm.get('locationId')?.reset();
       this.generalInformationForm.get('departmentId')?.reset();
 
@@ -627,8 +628,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
-      const startDate = this.generalInformationForm.get('jobStartDate')?.value ? this.generalInformationForm.get('jobStartDate')?.value : this.generalInformationForm.get('jobDates')?.value;
-      const departments = this.generalInformationForm.get('jobDates')?.value ? this.organizationStructureService.getDepartmentByIdSet(value, startDate ?? new Date) : this.organizationStructureService.getDepartmentsById(value, startDate ?? new Date);
+      let startDate = this.generalInformationForm.get('jobStartDate')?.value ? this.generalInformationForm.get('jobStartDate')?.value : this.generalInformationForm.get('jobDates')?.value;
+      startDate = startDate ? startDate : new Date;
+      const departments = this.generalInformationForm.get('jobDates')?.value ? this.organizationStructureService.getDepartmentByIdSet(value, [startDate] ?? new Date) : this.organizationStructureService.getDepartmentsById(value, startDate ?? new Date);
       this.generalInformationForm.get('departmentId')?.reset();
 
       this.updateDataSourceFormList('departments', departments);
