@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { Observable, catchError, tap } from 'rxjs';
+import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
+import { Observable, catchError, of, tap } from 'rxjs';
 
 import { DocumentViewerModel, FileGroup, Status, Statuses } from './document-viewer.state.model';
 import {
@@ -10,12 +10,9 @@ import {
   GetGroupedFiles,
   GetPdfFiles,
   GetPdfFilesSucceeded,
-  SaveStatus,
-  // SaveStatusFailed,
-  SaveStatusSucceeded,
+  SaveStatus
 } from './document-viewer.actions';
 import { DocumentViewerService } from 'src/app/document-viewer/services/document-viewer.service';
-import { getAllErrors } from '@shared/utils/error.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -27,20 +24,6 @@ import { HttpErrorResponse } from '@angular/common/http';
     fileHash: '',
   },
 })
-// export interface StatusModel {
-//   orderId:number | null;
-//   statusText:string;
-//   jobId:number | null;
-// }
-
-// @State<StatusModel>({
-//   name: 'status',
-//   defaults:{
-//     orderId: null,
-//     jobId: null,
-//     statusText: "",
-//   }
-// })
 
 @Injectable()
 export class DocumentViewerState {
@@ -49,7 +32,7 @@ export class DocumentViewerState {
     return state.groupedFiles;
   }
 
-  constructor(private documentViewerService: DocumentViewerService) {}
+  constructor(private documentViewerService: DocumentViewerService, private store: Store) {}
 
   @Action(GetFiles)
   GetFiles(
@@ -91,16 +74,14 @@ export class DocumentViewerState {
   SaveStatus(
     { dispatch }: StateContext<Statuses>,
     { payload }: SaveStatus
-  ): Observable<boolean | void> {
+  ): Observable<any> {
     return this.documentViewerService.saveStatus(payload).pipe(
-      tap((res) => {
-        if (res) {
-          dispatch(new SaveStatusSucceeded(payload));
-        }
+      tap(() => {
+          dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'));
       }),
-      catchError((err: HttpErrorResponse) => {
-        // dispatch(new SaveStatusFailed());
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+      catchError((error) => {
+        const errorMessage = error?.error?.errors.AlreadyUpdated[0];
+        return of(dispatch(new ShowToast(MessageTypes.Error, errorMessage)));
       })
     );
   }

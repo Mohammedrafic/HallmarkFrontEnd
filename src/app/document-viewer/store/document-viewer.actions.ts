@@ -31,11 +31,3 @@ export class SaveStatus {
   constructor(public payload:Statuses) {}
 }
 
-export class SaveStatusSucceeded {
-  static readonly type = '[status] Save Status Succeeded';
-  constructor(public payload:Statuses) {}
-}
-
-// export class SaveStatusFailed {
-//   static readonly type = '[status] Save Status Failed';
-// }

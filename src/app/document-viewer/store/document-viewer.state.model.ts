@@ -19,7 +19,7 @@ export interface Statuses{
   orderId: number;
   jobId: number;
   nextApplicantStatus: Status;
-  userId:string;
+  UserId:string;
 }
 
 export interface Status{

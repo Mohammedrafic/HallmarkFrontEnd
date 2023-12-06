@@ -39,7 +39,7 @@ export class DocumentViewerService {
   }
 
   public saveStatus(payload: Statuses): Observable<boolean> {
-    return this.http.post<boolean>(`/api/AppliedCandidates/updateCandidateJobFromMail`, {payload});
+    return this.http.post<boolean>(this.baseUrl +`/api/document-viewer/updateCandidateJobFromMail`, payload);
   }
   
 

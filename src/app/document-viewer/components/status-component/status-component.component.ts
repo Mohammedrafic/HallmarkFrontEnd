@@ -18,7 +18,7 @@ export class StatusComponentComponent implements OnInit {
   public statusText: string;
   public jobId: number
   private unsubscribe$: Subject<void> = new Subject();
-  public userId: string;
+  public UserId: string;
 
   constructor(private fb: FormBuilder, private activeRoute: ActivatedRoute, private store: Store) {}
 
@@ -34,7 +34,7 @@ export class StatusComponentComponent implements OnInit {
       if (params['orderId'] && params['statusText']) {
         this.orderId = params['orderId'];
         this.statusText = params['statusText'];
-        this.userId = params['userid'];
+        this.UserId = params['userid'];
         this.jobId = params['jobid']
       }
     });
@@ -51,7 +51,7 @@ export class StatusComponentComponent implements OnInit {
               applicantStatus: CandidatStatus.Shortlisted,
               statusText: this.statusText,
             },
-            userId:this.userId
+            UserId:this.UserId
           })
         );
       } else if (this.statusText === 'offered') {
@@ -63,7 +63,7 @@ export class StatusComponentComponent implements OnInit {
               applicantStatus: CandidatStatus.Offered,
               statusText: this.statusText,
             },
-            userId:this.userId
+            UserId:this.UserId
           })
         );
       } else {
@@ -75,43 +75,11 @@ export class StatusComponentComponent implements OnInit {
               applicantStatus: CandidatStatus.Rejected,
               statusText: this.statusText,
             },
-            userId:this.userId
+            UserId:this.UserId
           })
         );
       }
     }
+    this.statusForm.reset();
   }
-
-  // private watchForCandidateActions(): void {
-  //   this.actions$
-  //     .pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded), takeUntil(this.unsubscribe$))
-  //     .subscribe((credential: { payload: CandidateCredential }) => {
-  //       const isEdit = this.isEdit;
-  //       this.credentialId = credential.payload.id as number;
-  //       this.isCredentialExists = credential.payload.isCredentialExists as boolean;
-  //       this.disabledCopy = false;
-  //       this.selectedItems = [];
-
-  //       if (this.removeExistingFiles) {
-  //         this.store.dispatch(new UploadCredentialFiles([], this.credentialId));
-  //         return;
-  //       }
-
-  //       if (this.isCredentialExists) {
-  //         this.store.dispatch(new ShowToast(MessageTypes.Success, !isEdit ? RECORD_ADD : RECORD_MODIFIED));
-  //       } else {
-  //         this.store.dispatch(new ShowToast(MessageTypes.Warning, RECORD_UNSAVED));
-  //       }
-
-  //       this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
-  //       this.addCredentialForm.markAsPristine();
-  //       this.closeDialog();
-  //     });
-
-  //   this.actions$
-  //     .pipe(ofActionSuccessful(SaveCandidatesCredentialFailed), takeUntil(this.unsubscribe$))
-  //     .subscribe(() => {
-  //       this.disabledCopy = false;
-  //     });
-  // }
 }
