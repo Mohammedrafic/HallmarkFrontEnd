@@ -329,7 +329,10 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       );
     this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (!this.isBusinessFormDisabled) {
-        this.defaultValue = data[0]?.id;
+        this.defaultValue=null
+        setTimeout(() => {
+          this.defaultValue = data[0]?.id;
+        }, 500);
       }
     });
     this.emailTemplateFormGroup = AlertsEmailTemplateFormComponent.createForm();
