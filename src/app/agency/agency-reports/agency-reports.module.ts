@@ -26,6 +26,7 @@ import { UserActivityComponent } from './user-activity/user-activity.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { useractivityReportState } from '@admin/store/userlog-activity.state';
 import { CandidateEligibilityAgencyComponent } from './candidate-eligibility-agency/candidate-eligibility-agency.component';
+import { VendorScorecardComponent } from './vendor-scorecard/vendor-scorecard.component';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { CandidateEligibilityAgencyComponent } from './candidate-eligibility-age
     MissingCredentialsAgencyComponent,
     CredientialExpiryAgencyComponent,
     UserActivityComponent,
-    CandidateEligibilityAgencyComponent
+    CandidateEligibilityAgencyComponent,
+    VendorScorecardComponent
   ],
   imports: [
     CommonModule,   
