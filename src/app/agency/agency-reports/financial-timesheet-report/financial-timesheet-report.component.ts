@@ -91,6 +91,12 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
   @Select(LogiReportState.getOrganizationsByAgency)
   public organizationsByAgency$: Observable<DataSourceItem[]>;
 
+  @Select(SecurityState.organisations)
+  public organizationData$: Observable<Organisation[]>;
+
+  @Select(SecurityState.isOrganizaionsLoaded)
+  isOrganizaionsLoaded$: Observable<boolean>;
+
   @Select(LogiReportState.getOrganizationsStructure)
   public getOrganizationsStructure$: Observable<OrganizationStructure[]>;
 
@@ -158,7 +164,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
   public masterRegionsList: OrganizationRegion[] = [];
   public masterLocationsList: OrganizationLocation[] = [];
   public masterDepartmentsList: OrganizationDepartment[] = [];
-  public associatedOrganizations: DataSourceItem[]=[];
+  public associatedOrganizations: DataSourceItem[] | Organisation[] = [];
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -178,49 +184,69 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const user = this.store.selectSnapshot(UserState.user); //&& user?.businessUnitType == BusinessUnitType.Agency
+    if (user) {
+      this.isOrganizaionsLoaded$.pipe(takeUntil(this.unsubscribe$)).subscribe((flag) => {
+        if (!flag) {
+          this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
+        }
+      });
+    }
 
     this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.orderFilterColumnsSetup();
       if (data != null && data != undefined) {
         this.defaultAgency = data.toString();
-        
-        this.store.dispatch(new GetOrganizationsByAgency())
         this.store.dispatch(new ClearLogiReportState());
-        this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
+        //if(this.user?.businessUnitType == BusinessUnitType.Agency){
+        this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: Organisation[]) => {
           if (data != null && data != undefined) {
             this.associatedOrganizations = data;
-
-            this.store.dispatch(new GetOrganizationsStructureByOrgIds(data.map(i => i.id ?? 0)));
-            this.getOrganizationsStructure$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrganizationStructure[]) => {
-
-              if (data != undefined && data != null && data.length > 0) {
-                this.organizations = uniqBy(data, 'organizationId');
-                this.filterColumns.businessIds.dataSource = this.organizations;
-                this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
-                this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
-                this.changeDetectorRef.detectChanges();
-              }
-            });
+            let modifedOrgStructure = data.map(({ organizationId, name, regions }) => ({ organizationId: organizationId, organizationName: name, regions: regions }));
+            this.organizations = uniqBy(modifedOrgStructure, 'organizationId');
+            this.filterColumns.businessIds.dataSource = this.organizations;
+            this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
+            this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
+            this.changeDetectorRef.detectChanges();
           }
         });
+        /*}else{
+          this.store.dispatch(new GetOrganizationsByAgency())
+          this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
+            if (data != null && data != undefined) {
+              this.associatedOrganizations = data;  
+              this.store.dispatch(new GetOrganizationsStructureByOrgIds(data.map(i => i.id ?? 0)));
+              this.getOrganizationsStructure$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrganizationStructure[]) => {  
+                if (data != undefined && data != null && data.length > 0) {
+                  this.organizations = uniqBy(data, 'organizationId');
+                  this.filterColumns.businessIds.dataSource = this.organizations;
+                  this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
+                  this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
+                  this.changeDetectorRef.detectChanges();
+                }
+              });
+            }
+          });
+        }*/
+
       }
-     
-        
-        this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
-          if (data.length > 0) {
-            this.logiReportComponent.SetReportData(data);
-          }
-        });
-       
-        this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.AccrualReportTypes)?.setValue(1);
-        this.onFilterControlValueChangedHandler();
-        this.onFilterRegionChangedHandler();
-        this.onFilterLocationChangedHandler();
-        this.onFilterSkillCategoryChangedHandler();
-      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.enable() : this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.disable();
-      
+
+
+      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
+        if (data.length > 0) {
+          this.logiReportComponent.SetReportData(data);
+        }
       });
-  
+
+      this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.AccrualReportTypes)?.setValue(1);
+      this.onFilterControlValueChangedHandler();
+      this.onFilterRegionChangedHandler();
+      this.onFilterLocationChangedHandler();
+      this.onFilterSkillCategoryChangedHandler();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.enable() : this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.disable();
+
+    });
+
   }
 
   private initForm(): void {
@@ -257,7 +283,7 @@ export class FinancialTimesheetReportComponent implements OnInit, OnDestroy {
     this.bussinessControl = this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds) as AbstractControl;
     this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
     this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
-    
+
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.agencyFinancialTimesheetReportForm.get(financialTimesheetConstants.formControlNames.RegionIds)?.setValue([]);
