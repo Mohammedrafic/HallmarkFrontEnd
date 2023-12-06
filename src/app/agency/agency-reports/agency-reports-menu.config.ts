@@ -39,5 +39,12 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     permissionKeys: ['CanViewAgencyCandidateEligibility'],
 
   },
+  {
+    text: 'Vendor Scorecard ',
+    id: 6,
+    route: './vendor-scorecard',
+    permissionKeys: ['CanViewAgencyVendorScorecard'],
+
+  },
   
 ];
