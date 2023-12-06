@@ -746,7 +746,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             DialogAction.Open,
             this.isAgency,
             {
-              invoiceIds: this.gridSelections.selectedInvoiceIds,
+              invoiceIds: this.gridSelections.rowNodes.map((node) => node.data.invoiceId) ,
               organizationIds: [this.organizationId],
             },
             null,
