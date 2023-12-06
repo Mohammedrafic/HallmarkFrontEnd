@@ -11,7 +11,7 @@ import {
   GetPdfFiles,
   GetPdfFilesSucceeded,
   SaveStatus,
-  SaveStatusFailed,
+  // SaveStatusFailed,
   SaveStatusSucceeded,
 } from './document-viewer.actions';
 import { DocumentViewerService } from 'src/app/document-viewer/services/document-viewer.service';
@@ -99,7 +99,7 @@ export class DocumentViewerState {
         }
       }),
       catchError((err: HttpErrorResponse) => {
-        dispatch(new SaveStatusFailed());
+        // dispatch(new SaveStatusFailed());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       })
     );

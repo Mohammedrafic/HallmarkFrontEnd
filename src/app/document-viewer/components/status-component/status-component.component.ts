@@ -14,17 +14,18 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 })
 export class StatusComponentComponent implements OnInit {
   statusForm = new FormGroup({});
-  orderId: number;
-  statusText: string;
+  public orderId: number;
+  public statusText: string;
+  public jobId: number
   private unsubscribe$: Subject<void> = new Subject();
-  userId: string;
+  public userId: string;
 
   constructor(private fb: FormBuilder, private activeRoute: ActivatedRoute, private store: Store) {}
 
   ngOnInit(): void {
     this.subscribeEvent();
     this.statusForm = this.fb.group({
-      jobId: ['', Validators.required],
+      orderId: ['', Validators.required],
     });
   }
 
@@ -34,6 +35,7 @@ export class StatusComponentComponent implements OnInit {
         this.orderId = params['orderId'];
         this.statusText = params['statusText'];
         this.userId = params['userid'];
+        this.jobId = params['jobid']
       }
     });
   }
@@ -44,7 +46,7 @@ export class StatusComponentComponent implements OnInit {
         this.store.dispatch(
           new SaveStatus({
             orderId: this.orderId as number,
-            jobId: this.statusForm.value.jobId as number,
+            jobId: this.jobId as number,
             nextApplicantStatus: {
               applicantStatus: CandidatStatus.Shortlisted,
               statusText: this.statusText,
@@ -56,7 +58,7 @@ export class StatusComponentComponent implements OnInit {
         this.store.dispatch(
           new SaveStatus({
             orderId: this.orderId as number,
-            jobId: this.statusForm.value.jobId as number,
+            jobId: this.jobId as number,
             nextApplicantStatus: {
               applicantStatus: CandidatStatus.Offered,
               statusText: this.statusText,
@@ -68,7 +70,7 @@ export class StatusComponentComponent implements OnInit {
         this.store.dispatch(
           new SaveStatus({
             orderId: this.orderId as number,
-            jobId: this.statusForm.value.jobId as number,
+            jobId: this.jobId as number,
             nextApplicantStatus: {
               applicantStatus: CandidatStatus.Rejected,
               statusText: this.statusText,
