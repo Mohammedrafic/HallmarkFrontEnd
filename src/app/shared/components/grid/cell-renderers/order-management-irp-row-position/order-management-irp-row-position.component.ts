@@ -75,6 +75,16 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
       takeUntil(this.componentDestroy()),
     ).subscribe((candidatePositions: IRPCandidateForPosition[]) => {
       this.displayRows = candidatePositions;
+      const result = [
+        {rowsSource: []}
+      ];
+      this.displayRows.forEach((item) => {
+        result[0].rowsSource = result[0].rowsSource.concat(item.rowsSource);
+      });
+      result[0].rowsSource = result[0].rowsSource.sort((a : any, b : any) =>
+        a.positionId.localeCompare(b.positionId)
+      );
+      this.displayRows = result;
       this.cdr.detectChanges();
     });
   }
