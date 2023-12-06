@@ -119,9 +119,10 @@ export class MonthlyIntegrationsComponent extends AbstractSFComponentDirective<C
     this.monthlyIntegrationRuns$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       
       if (data != null) {
-        debugger;
+        
         this.filteredChartData$ = of(data.chartData);
-        console.log(of(data.chartData));
+        console.log("This is output");
+        console.log((data.chartData));
       }
     });
     //this.filteredChartData$ =of( [{
