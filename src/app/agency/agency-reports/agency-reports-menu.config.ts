@@ -29,7 +29,7 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     text: 'User Activity Report',
     id: 5,
     route: './useractivity',
-    permissionKeys: ['CanuseractivityReport'],
+    permissionKeys: ['CanViewAgencyUserActivity'],
 
   },
   {

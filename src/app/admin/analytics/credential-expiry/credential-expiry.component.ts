@@ -58,7 +58,8 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     "UserId": "",
     "organizationNameCREXP": "",
     "reportPulledMessageCREXP": "",
-    "DateRangeCREXP": ""
+    "DateRangeCREXP": "",
+    "PeriodParamCREXP":""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cat" };
@@ -460,7 +461,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         "organizationNameCREXP": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
         "reportPulledMessageCREXP": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
         "DateRangeCREXP": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
-         "PeriodParamCJR": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id))
+         "PeriodParamCREXP": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id))
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();

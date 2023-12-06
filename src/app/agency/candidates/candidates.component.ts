@@ -1,13 +1,16 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, Subject, takeWhile } from 'rxjs';
+import { distinctUntilChanged, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { CandidateListComponent } from '@shared/components/candidate-list/components/candidate-list/candidate-list.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from '../../store/user.state';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { AppState } from 'src/app/store/app.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { User } from '@shared/models/user.model';
+import { CandidateService } from '@agency/services/candidates.service';
 
 @Component({
   selector: 'app-candidates',
@@ -29,11 +32,17 @@ export class CandidatesComponent extends AbstractPermissionGrid implements OnIni
   private isAgency: boolean;
 
   public openImportDialog$: Observable<void> = this.openImportDialog.asObservable();
+  public disableNonlinkedagency:boolean;
 
   @Select(AppState.isMobileScreen)
   public readonly isMobile$: Observable<boolean>;
 
-  constructor(protected override store: Store, private router: Router, private route: ActivatedRoute) {
+  @Select(UserState.lastSelectedAgencyId)
+  lastSelectedAgencyId$: Observable<number>;
+
+  private unsubscribe$: Subject<void> = new Subject();
+
+  constructor(protected override store: Store, private router: Router, private route: ActivatedRoute,private candidate:CandidateService) {
     super(store);
   }
 
@@ -44,10 +53,29 @@ export class CandidatesComponent extends AbstractPermissionGrid implements OnIni
     if (this.isAgency) {
       this.checkForAgencyStatus();
     }
+    this.getNonlinkedagency()
+  }
+
+  getNonlinkedagency()
+  {
+    this.lastSelectedAgencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+    
+      const user = this.store.selectSnapshot(UserState.user) as User;
+        if(user.businessUnitType=== BusinessUnitType.MSP)
+        {
+        this.candidate.getIsmsp().subscribe(data=>{
+          this.disableNonlinkedagency=data
+        }) 
+        }  
+      
+    });
+      
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public reloadCandidatesList(): void {

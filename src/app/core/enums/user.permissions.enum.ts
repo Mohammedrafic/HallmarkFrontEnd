@@ -214,7 +214,7 @@ export enum UserPermissions {
   CanViewAgencymissingcredentials=7003,
   CanViewAgencyCredentialExpire = 7004,
   CanViewAgencyCandidateEligibility = 7005,
-  CanuseractivityReport=8117,
+  CanViewAgencyUserActivity = 7006, 
   //View Order Journey
   ViewOrderJourney = 8001,
 

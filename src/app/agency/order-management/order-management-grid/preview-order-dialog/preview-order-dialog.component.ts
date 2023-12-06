@@ -40,7 +40,7 @@ import { ReOrderPage } from '@shared/components/order-reorders-container/interfa
   templateUrl: './preview-order-dialog.component.html',
   styleUrls: ['./preview-order-dialog.component.scss'],
 })
-export class PreviewOrderDialogComponent extends AbstractPermission implements OnInit, OnChanges, OnDestroy {
+export class PreviewOrderDialogComponent extends AbstractPermission implements OnInit, OnDestroy {
   @Input() order: AgencyOrderManagement;
   @Input() openEvent: Subject<boolean>;
   @Input() orderPositionSelected$: Subject<boolean>;
@@ -128,12 +128,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
     this.checkForAgencyStatus();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.chipList && changes['order']?.currentValue) {
-      this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
-    }
-  }
-
   override ngOnDestroy(): void {
     this.isAlive = false;
     this.unsubscribe$.next();
@@ -160,8 +154,9 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         this.currentOrder && this.getOrderComments();
         this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;
         this.chipList.cssClass = this.chipsCssClass.transform(this.currentOrder.statusText);
-        this.chipList.text = this.currentOrder.statusText;
-        this.chipList?.refresh();
+        this.chipList.text = this.currentOrder.statusText.toUpperCase();
+        this.chipList.refresh();
+        this.chipList.ngAfterViewInit();
         this.cd.detectChanges();
       });
   }
