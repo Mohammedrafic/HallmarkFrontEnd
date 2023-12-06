@@ -15,7 +15,6 @@ import {
 import { DocumentViewerService } from 'src/app/document-viewer/services/document-viewer.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @State<DocumentViewerModel>({
   name: 'documentViewer',
