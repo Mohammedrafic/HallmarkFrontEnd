@@ -35,7 +35,7 @@ export class IntegrationsState {
   @Action(GetLast12MonthIntegrationRuns)
   getDashboardData({ patchState }: StateContext<IntegrationsStateModel>, { payload }: GetLast12MonthIntegrationRuns): Observable<ChartAccumulation> {
     patchState({ isDashboardLoading: true });
-    alert(1);
+    
     return this.orgintegrationsService.getMonthlyIntegrationRuns(payload).pipe(
       tap((payload) => {
         patchState({ isDashboardLoading: false, chartAccumulation: payload });

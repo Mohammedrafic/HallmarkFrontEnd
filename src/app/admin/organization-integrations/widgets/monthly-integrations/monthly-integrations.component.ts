@@ -17,6 +17,8 @@ import { AbstractSFComponentDirective } from '../../../../shared/directives/abst
 import { ChartComponent } from '@syncfusion/ej2-angular-charts';
 import { IntegrationsState } from '../../../store/integrations.state';
 import { IntegrationFilterDto } from '../../../../shared/models/integrations.model';
+import { GetLast12MonthIntegrationRuns } from '../../../store/integrations.actions';
+import { FilteredDataByOrganizationId } from '../../../../dashboard/models/group-by-organization-filter-data.model';
  
  
 @Component({
@@ -109,11 +111,11 @@ export class MonthlyIntegrationsComponent extends AbstractSFComponentDirective<C
   }
     
   private getFilteredChartData()//: Observable<DonutChartData[]>
-  {
-    debugger;
-   
-    //console.log(this.monthlyIntegrationRuns$);
-    this.store.dispatch(new IntegrationFilterDto());
+  { 
+    let inputPayload = new IntegrationFilterDto();
+    inputPayload.interfaceIds = [];
+    inputPayload.organizationFilter = [{ departmentsIds: [], locationIds: [], regionIds: [], organizationId: 16 }];
+    this.store.dispatch(new GetLast12MonthIntegrationRuns(inputPayload));
     this.monthlyIntegrationRuns$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       
       if (data != null) {
@@ -122,79 +124,79 @@ export class MonthlyIntegrationsComponent extends AbstractSFComponentDirective<C
         console.log(of(data.chartData));
       }
     });
-    this.filteredChartData$ =of( [{
-        label: "Jan",
-        value: 20,
-        text: "Jan",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Feb",
-        value: 35,
-        text: "Feb",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Mar",
-        value: 40,
-        text: "Mar",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Apr",
-        value: 50,
-        text: "Apr",
-        color: "Red",
-        average: 30
-      }, {
-        label: "May",
-        value: 20,
-        text: "May",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Jun",
-        value: 60,
-        text: "Jun",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Jul",
-        value: 40,
-        text: "Jul",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Aug",
-        value: 80,
-        text: "Aug",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Sep",
-        value: 90,
-        text: "Sep",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Oct",
-        value: 15,
-        text: "Oct",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Nov",
-        value: 90,
-        text: "Nov",
-        color: "Red",
-        average: 30
-      }, {
-        label: "Dec",
-        value: 120,
-        text: "Dec",
-        color: "Red",
-        average: 30
-      }]);
+    //this.filteredChartData$ =of( [{
+    //    label: "Jan",
+    //    value: 20,
+    //    text: "Jan",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Feb",
+    //    value: 35,
+    //    text: "Feb",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Mar",
+    //    value: 40,
+    //    text: "Mar",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Apr",
+    //    value: 50,
+    //    text: "Apr",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "May",
+    //    value: 20,
+    //    text: "May",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Jun",
+    //    value: 60,
+    //    text: "Jun",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Jul",
+    //    value: 40,
+    //    text: "Jul",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Aug",
+    //    value: 80,
+    //    text: "Aug",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Sep",
+    //    value: 90,
+    //    text: "Sep",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Oct",
+    //    value: 15,
+    //    text: "Oct",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Nov",
+    //    value: 90,
+    //    text: "Nov",
+    //    color: "Red",
+    //    average: 30
+    //  }, {
+    //    label: "Dec",
+    //    value: 120,
+    //    text: "Dec",
+    //    color: "Red",
+    //    average: 30
+    //  }]);
   }
  
 }

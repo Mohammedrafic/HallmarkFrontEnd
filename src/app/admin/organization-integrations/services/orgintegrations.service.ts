@@ -20,7 +20,7 @@ export class OrgintegrationsService {
   constructor(private readonly httpClient: HttpClient, private readonly router: Router, private readonly store: Store) { }
 
   public getMonthlyIntegrationRuns(filter: IntegrationFilterDto): Observable<ChartAccumulation> {
-    debugger;
+     
     return this.httpClient.post<CandidateTypeInfoModel[]>(`${this.baseUrl}/getMonthlyIntegrationRuns`, { ...filter }).pipe(
       map((candidatesInfo: CandidateTypeInfoModel[]) => {
         this.integrationsRunsLast12Months$.next(candidatesInfo);
