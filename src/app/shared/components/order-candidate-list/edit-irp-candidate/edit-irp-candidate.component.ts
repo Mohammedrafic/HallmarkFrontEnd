@@ -615,7 +615,6 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
     if(offeredStartDate && offeredEndDate) {
       this.offeredDateSubscription = offeredStartDate.valueChanges.pipe(
-        skip(1),
         distinctUntilChanged(),
         takeUntil(this.componentDestroy()),
       ).subscribe((value: string) => {

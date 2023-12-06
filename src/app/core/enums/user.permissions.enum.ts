@@ -252,4 +252,5 @@ export enum UserPermissions {
   LinkedAgencies = 8143,
   CanViewLinkedAgencies = 8144,
   CanManageLinkedAgencies = 8145,
+  CanViewAgencyVendorScorecard=9003,
 }

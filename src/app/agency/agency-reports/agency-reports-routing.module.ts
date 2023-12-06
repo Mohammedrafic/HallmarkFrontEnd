@@ -9,7 +9,7 @@ import { MissingCredentialsAgencyComponent } from "./missing-credentials-agency/
 import { CredientialExpiryAgencyComponent } from "./crediential-expiry-agency/crediential-expiry-agency.component";
 import { UserActivityComponent } from "./user-activity/user-activity.component";
 import { CandidateEligibilityAgencyComponent } from "./candidate-eligibility-agency/candidate-eligibility-agency.component";
-
+import { VendorScorecardComponent } from "./vendor-scorecard/vendor-scorecard.component";
 const routes: Routes = [
   {
     path: '',
@@ -53,6 +53,13 @@ const routes: Routes = [
       {
         path: 'candidate-eligibility-agency',
         component: CandidateEligibilityAgencyComponent,
+        data: {
+          isAgencyArea: true,
+        }
+      },
+      {
+        path: 'vendor-scorecard',
+        component: VendorScorecardComponent,
         data: {
           isAgencyArea: true,
         }
