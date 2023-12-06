@@ -85,8 +85,8 @@ export class StatusComponentComponent implements OnInit {
             })
           );
         }
-      }else{
-        this.store.dispatch(new ShowToast(MessageTypes.Warning, NO_RECORD))
+      } else {
+        this.store.dispatch(new ShowToast(MessageTypes.Warning, NO_RECORD));
       }
     }
   }
