@@ -72,7 +72,7 @@
             </button>
           </div>
         </div>
-        <div class="candidate-message" *ngIf="showAddExtension && !disableAddExtension && isAgencySuspended">
+        <div class="candidate-message" [ngClass]="(showAddExtension && !disableAddExtension && isAgencySuspended) ? '' : 'hideMessage'" *ngIf="showAddExtension && !disableAddExtension && isAgencySuspended">
           <i-feather name="info" class="icon"></i-feather>
           {{ getPartnershipMessage }}
         </div>
