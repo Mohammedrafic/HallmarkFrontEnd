@@ -1371,7 +1371,9 @@ public RedirecttoIRPOrder(order:Order)
       const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedCandidateMeta.order);
 
       if (rowIndex !== -1) {
-        this.gridWithChildRow.selectRow(rowIndex);
+        // focus row without select
+        const row = this.gridWithChildRow.getRowByIndex(rowIndex);
+        row.scrollIntoView(true);
         this.gridWithChildRow.detailRowModule.expand(rowIndex);
 
       }
@@ -1515,7 +1517,6 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   public onRowClick(event: RowSelectEventArgs): void {
-
     if(!this.redirecttoIRPfromVMS){
       this.redirecttoIRPfromVMS=!this.redirecttoIRPfromVMS;
      return;
