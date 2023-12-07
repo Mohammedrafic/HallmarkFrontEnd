@@ -26,6 +26,14 @@
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
+              <ejs-chiplist #chipList class="events-off" *ngIf="irpCandidates?.status && activeSystem === OrderManagementIRPSystemId.IRP">
+                <e-chips>
+                  <e-chip
+                    [text]="CandidatesStatusText[irpCandidates.status]"
+                    [cssClass]="CandidatesStatusText[irpCandidates.status] | chipsCssClass"
+                  ></e-chip>
+                </e-chips>
+              </ejs-chiplist>
             </div>
           </div>
           <div class="e-card-content dialog-controls">
@@ -72,7 +80,7 @@
             </button>
           </div>
         </div>
-        <div class="candidate-message" [ngClass]="(showAddExtension && !disableAddExtension && isAgencySuspended) ? '' : 'hideMessage'" *ngIf="showAddExtension && !disableAddExtension && isAgencySuspended">
+        <div class="candidate-message" *ngIf="showAddExtension && !disableAddExtension && isAgencySuspended">
           <i-feather name="info" class="icon"></i-feather>
           {{ getPartnershipMessage }}
         </div>

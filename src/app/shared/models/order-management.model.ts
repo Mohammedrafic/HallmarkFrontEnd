@@ -4,7 +4,7 @@ import { CandidateModel } from '@client/order-management/components/add-edit-reo
 import { ApplicantStatus as CandidateStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { Duration } from '@shared/enums/durations';
 import { JobClassification } from '@shared/enums/job-classification';
-import { OrderStatus } from '@shared/enums/order-management';
+import { OrderStatus, OrderStatusIRP } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
 import { AgencyStatus, CandidatesStatusText, FilterOrderStatusText } from '@shared/enums/status';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
@@ -144,7 +144,7 @@ export interface IRPOrderPosition {
   candidateJobId : number;
   candidateProfileId : number;
   candidateStatusValue : number | string;
-  status : number;
+  status : OrderStatusIRP;
   orderPublicId: number | string;
   orderStatus: number | string;
   employeeId: number;
