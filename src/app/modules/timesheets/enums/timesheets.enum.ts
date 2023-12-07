@@ -53,6 +53,7 @@ export enum TimesheetDetailsActions {
   RecalculateTimesheets = '[timesheet details] Recalculate timesheets by job id',
   ForceAddRecord = '[timesheet details] Force add overlaping record',
   ForceUpdateRecords = '[timesheet details] Force update overlaping records',
+  UpdateRecordSucceed = '[timesheet details] Update records succeed',
 }
 
 export enum TIMETHEETS_STATUSES {
