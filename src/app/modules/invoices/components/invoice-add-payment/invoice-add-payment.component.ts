@@ -91,14 +91,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit,
     this.organizationId = (this.store.snapshot().invoices as InvoicesModel).selectedOrganizationId;
     this.tableContext = {
       componentParent: this,
-    };
-  
-    this.apiService.getInvoiceData().pipe(
-      takeUntil(this.unsubscribe$)).subscribe(data => {
-        this.invoiceindividualData=data;
-      })
-
-     
+    };  
   }
 
   ngOnInit(): void {
@@ -111,6 +104,12 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit,
       this.checkForm.patchValue({ checkNumber: this.checkNumber });
     }
     this.getuserPermission();
+    
+    this.apiService.getInvoiceData().pipe(
+      takeUntil(this.unsubscribe$)).subscribe(data => {
+        this.invoiceindividualData=data;
+      })
+
   }
 
   savePayment(): void {
