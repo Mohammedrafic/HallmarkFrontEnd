@@ -227,6 +227,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         distinctUntilChanged(),
         filter(Boolean),
         tap((id) => {
+          id = id.filter((ele:any)=>ele != 0)
           if(id.length == 0){
             this.noorgSelection = true;
             this.store.dispatch(new Invoices.SelectOrganization(id));
@@ -860,8 +861,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filterState.state),);
           }else{
             if(this.organizationMultiSelectControl.value){
-              filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
-              this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
+              filters.agencyOrganizationIds = this.organizationMultiSelectControl.value.length > 0 ? this.organizationMultiSelectControl.value : [];
+              this.agencyOrganizationIds = this.organizationMultiSelectControl.value.length > 0 ? this.organizationMultiSelectControl.value : [];
             }
             this.resetFilters(true);
           }
