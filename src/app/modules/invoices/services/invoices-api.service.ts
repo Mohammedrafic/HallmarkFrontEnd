@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { PageOfCollections } from '@shared/models/page.model';
@@ -45,6 +45,17 @@ export class InvoicesApiService {
   constructor(
     private http: HttpClient,
   ) {}
+
+  private invoicedataSubject = new BehaviorSubject<any>(null);
+  public data$ = this.invoicedataSubject.asObservable();
+
+  setInvoiceData(data: any): void {
+    this.invoicedataSubject.next(data);
+  }
+  getInvoiceData() {
+    return this.invoicedataSubject.asObservable();
+  }
+
 
   public getFiltersDataSource(orgId: number | null): Observable<InvoicesFilteringOptions> {
     return this.http.post<InvoicesFilteringOptions>(`/api/Invoices/filteroptions`, {

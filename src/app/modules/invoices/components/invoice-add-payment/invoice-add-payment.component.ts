@@ -1,15 +1,15 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { GridApi, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Store } from '@ngxs/store';
-import { debounceTime, filter, of, switchMap, take, takeUntil } from 'rxjs';
+import { Subject, debounceTime, filter, of, switchMap, take, takeUntil } from 'rxjs';
 
 import { FieldType, UserPermissions } from '@core/enums';
 import { DateTimeHelper, DestroyDialog } from '@core/helpers';
 import { CustomFormGroup, Permission } from '@core/interface';
 import { PaymentsAdapter } from '../../helpers/payments.adapter';
-import { InvoicePaymentData } from '../../interfaces';
+import { InvoicePayment, InvoicePaymentData } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { AddPaymentFormConfig, CheckPaymentsDefs, PaymentMessages } from './invoice-add-payment.constant';
@@ -29,7 +29,7 @@ import { UserState } from '../../../../store/user.state';
   styleUrls: ['./invoice-add-payment.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit {
+export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit,OnDestroy {
   @Input() invoicesToPay: InvoicePaymentData[] = [];
 
   @Input() checkNumber: string | null;
@@ -68,8 +68,14 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
   public isAgency: boolean;
 
   public userPermission: Permission = {};
+
   public readonly userPermissions = UserPermissions;
+
   totalAmount: number;
+
+  private unsubscribe$: Subject<void> = new Subject();
+
+  public invoiceindividualData:InvoicePayment;
 
   constructor(
     private paymentService: InvoiceAddPaymentService,
@@ -86,6 +92,13 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
     this.tableContext = {
       componentParent: this,
     };
+  
+    this.apiService.getInvoiceData().pipe(
+      takeUntil(this.unsubscribe$)).subscribe(data => {
+        this.invoiceindividualData=data;
+      })
+
+     
   }
 
   ngOnInit(): void {
@@ -222,6 +235,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
       this.closeDialog();
     }
   }
+  
 
   private setTableData(): void {
     this.paymentsForm = this.paymentService.createPaymentsForm(this.invoicesToPay);
@@ -250,7 +264,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
         initialAmount: response.check.initialAmount,
         paymentMode: response.check.paymentMode,
         isRefund: response.check.isRefund,
-        date: DateTimeHelper.setCurrentTimeZone(response.payments[0]?.paymentDate)
+        date: DateTimeHelper.setCurrentTimeZone(this.invoiceindividualData?.paymentDate)
       });
 
       this.initialAmount = response.check.initialAmount;
@@ -297,4 +311,9 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
       this.userPermission = permissions;
     });
   }
+  override ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+ 
 }
