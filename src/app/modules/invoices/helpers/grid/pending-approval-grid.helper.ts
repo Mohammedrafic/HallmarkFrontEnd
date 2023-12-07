@@ -379,7 +379,6 @@ export class PendingApprovalGridHelper {
     
               {
                 action: (itemId: number) => {
-                  console.log(itemId)
                   params.context?.componentParent?.menuOptionSelected(itemId, params.data);
                 },
                 iconName: 'more-vertical',
