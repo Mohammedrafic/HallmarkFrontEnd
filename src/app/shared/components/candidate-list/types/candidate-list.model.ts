@@ -41,7 +41,7 @@ export type IRPCandidate = {
   departmentName?:string;
   sourceId?:number;
   recruiterId?:number
-  
+
 }
 
 export interface CandidateListRequest {
@@ -87,6 +87,7 @@ export type CandidateListFilters = {
   startDate?: string | null;
   endDate?: string | null;
   credType? : number[];
+  orderBy?: string;
   expiry? : {
     startDate?: string | null;
     endDate?: string | null;
