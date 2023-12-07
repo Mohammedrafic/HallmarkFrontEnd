@@ -86,8 +86,14 @@ import {
   InactivationEvent,
 } from '../../types/candidate-list.model';
 import {
-  CandidatesExportCols, CandidatesTableFilters, filterColumns,
-  IrpCandidateExportCols, IRPCandidates, IRPFilterColumns, IrpSourcingCandidateExportCols, VMSCandidates,
+  CandidatesExportCols,
+  CandidatesTableFilters,
+  filterColumns,
+  IrpCandidateExportCols,
+  IRPCandidates, IRPFilterColumns,
+  IrpSourcingCandidateExportCols,
+  ProfileStatusField,
+  VMSCandidates,
 } from './candidate-list.constants';
 import { CandidateListScroll } from './candidate-list.enum';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -99,6 +105,7 @@ import { CredentialTypeFilter } from '@shared/models/credential.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { endTimeValidator } from '@shared/validators/date.validator';
+
 @Component({
   selector: 'app-candidate-list',
   templateUrl: './candidate-list.component.html',
@@ -115,7 +122,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(CandidateListState.IRPCandidates)
   private _IRPCandidates$: Observable<IRPCandidateList>;
-
 
   @Select(RejectReasonState.sourcingReasons)
   public sourcing$: Observable<any>;
@@ -189,7 +195,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public columnsToExport = CandidatesExportCols;
   public columnsToExportIrp = IrpCandidateExportCols;
   public columnsToExportIrpSourcing = IrpSourcingCandidateExportCols;
-  public exportUsers$ = new Subject<ExportedFileType>();
   public defaultFileName: string;
   public fileName: string;
   public selectionOptions: SelectionSettingsModel = {
@@ -384,6 +389,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 
+  public override updatePage(clearedFilters?: boolean): void {
+    const isProfileStatus = this.orderBy?.split(' ')[0];
+
+    if (isProfileStatus === ProfileStatusField) {
+      this.filters.orderBy = this.orderBy;
+      this.dispatchNewPage();
+    }
+  }
+
   public changePageNumber(page: number): void {
     this.pageSubject.next(page);
   }
@@ -506,7 +520,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       inactivationReasonId: data.inactivationReasonId,
       createReplacement: !!data.createReplacement,
     };
-    
+
     this.store.dispatch(new CandidateListActions.DeleteIRPCandidate(dto));
     this.inactivationData = { id: null, hireDate: null};
     this.cancelInactivation();
@@ -815,7 +829,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
           this.filterColumns.credType.dataSource = credentialtypes;
         }
       });
-    
+
   }
 
   private subscribeOnExportAction(): void {
