@@ -789,7 +789,6 @@ export class OrderManagementContentState {
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { organizationId, jobId }: GetAvailableSteps
   ): Observable<ApplicantStatus[]> {
-    debugger;
     return this.orderManagementService.getAvailableSteps(organizationId, jobId).pipe(
       tap((payload) => {
         patchState({ applicantStatuses: payload });
