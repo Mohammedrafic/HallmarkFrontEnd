@@ -2816,7 +2816,7 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed,
       ""
     ));
-    if (isIrp && (this.selectedOrder?.extensionFromId === null)) {
+    if (isIrp && (this.selectedDataRow?.extensionFromId === null)) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
         organizationId,
@@ -2826,7 +2826,7 @@ public RedirecttoIRPOrder(order:Order)
         irpIncludeDeploy,
         ""
       ));
-    } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)) {
+    } else if(isIrp && (this.selectedDataRow?.extensionFromId !== null)) {
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
         orderId,
         organizationId,
