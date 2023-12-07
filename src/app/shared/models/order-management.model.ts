@@ -112,6 +112,7 @@ export interface IRPOrderManagement {
   isTemplate?: boolean;
   templateTitle?:string;
   system:string;
+  extensionFromId?: number | null;
 }
 
 export interface GetOrdersJourney{
