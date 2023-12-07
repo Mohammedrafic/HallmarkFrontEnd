@@ -114,7 +114,7 @@ export class MonthlyIntegrationsComponent extends AbstractSFComponentDirective<C
   { 
     let inputPayload = new IntegrationFilterDto();
     inputPayload.interfaceIds = [];
-    inputPayload.organizationFilter = [{ departmentsIds: [], locationIds: [], regionIds: [], organizationId: 16 }];
+    inputPayload.organizationFilter = [{ departmentsIds: [], locationIds: [], regionIds: [], organizationId: 107 }, { departmentsIds: [], locationIds: [], regionIds: [], organizationId: 93 }];
     this.store.dispatch(new GetLast12MonthIntegrationRuns(inputPayload));
      
   }

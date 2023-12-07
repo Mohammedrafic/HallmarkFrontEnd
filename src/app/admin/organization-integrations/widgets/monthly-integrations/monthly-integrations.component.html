@@ -1,6 +1,6 @@
-<h3>Integration Runs last 12 Months</h3>
 <div *ngIf="monthlyIntegrationRuns$ | async as monthlyIntegration">
-  <ejs-chart #sfComponent
+  <h3>{{monthlyIntegration.title}}</h3>
+  <ejs-chart 
              [chartArea]="chartArea"
              [primaryXAxis]="isDarkTheme ? primaryXAxisDarkTheme : primaryXAxis"
              [primaryYAxis]="isDarkTheme ? primaryYAxisDarkTheme : primaryYAxis"

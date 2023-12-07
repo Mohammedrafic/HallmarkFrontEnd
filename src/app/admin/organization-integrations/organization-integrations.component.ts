@@ -30,7 +30,7 @@ export class OrganizationIntegrationsComponent extends AbstractGridConfiguration
 
   constructor(private store: Store,) {
     super();
-    this.store.dispatch(new SetHeaderState({ title: 'Organization Integtrations', iconName: 'file-text' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Organization Integrations', iconName: 'file-text' }));
 
   }
 
