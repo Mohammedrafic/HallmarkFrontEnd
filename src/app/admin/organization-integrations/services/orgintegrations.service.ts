@@ -27,7 +27,7 @@ export class OrgintegrationsService {
         this.integrationsRunsLast12Months$.next(candidatesInfo);
         return {
           id: "",
-          title: 'Integration Runs last 12 Months',
+          title: 'Integration Runs By Month',
           chartData: lodashMapPlain(candidatesInfo, ({ monthlyIntegrationRunsCount, monthName }: IntegrationMonthReportModel, index: number) => ({
             label: monthName,
             value: monthlyIntegrationRunsCount,
