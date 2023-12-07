@@ -64,6 +64,7 @@ export enum OrganizationSettingKeys {
   ATPRateCalculation,
   AutomatedDistributionToVMS,
   ShowDeployedEmployees,
+  TimeLimitforManagerReviewEmail,
   OrganizationCanCarryClockIDFromParent,
   AllowDuplicateClockIdforOrganization,
   MandatorySpecialProjectDetails,

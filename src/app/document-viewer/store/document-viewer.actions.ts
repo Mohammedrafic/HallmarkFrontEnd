@@ -26,8 +26,4 @@ export class GetGroupedFiles {
   constructor(public fileHash: string) {}
 }
 
-export class SaveStatus {
-  static readonly type = '[status] Save Status';
-  constructor(public payload:Statuses) {}
-}
 

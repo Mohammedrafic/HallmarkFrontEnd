@@ -9,12 +9,9 @@ import {
   GetFilesSucceeded,
   GetGroupedFiles,
   GetPdfFiles,
-  GetPdfFilesSucceeded,
-  SaveStatus
+  GetPdfFilesSucceeded
 } from './document-viewer.actions';
 import { DocumentViewerService } from 'src/app/document-viewer/services/document-viewer.service';
-import { MessageTypes } from '@shared/enums/message-types';
-import { ShowToast } from 'src/app/store/app.actions';
 
 @State<DocumentViewerModel>({
   name: 'documentViewer',
@@ -69,19 +66,4 @@ export class DocumentViewerState {
     );
   }
 
-  @Action(SaveStatus)
-  SaveStatus(
-    { dispatch }: StateContext<Statuses>,
-    { payload }: SaveStatus
-  ): Observable<any> {
-    return this.documentViewerService.saveStatus(payload).pipe(
-      tap(() => {
-          dispatch(new ShowToast(MessageTypes.Success, 'Candidate Status has been updated'));
-      }),
-      catchError((error) => {
-        const errorMessage = error?.error?.errors.AlreadyUpdated[0];
-        return of(dispatch(new ShowToast(MessageTypes.Error, errorMessage)));
-      })
-    );
-  }
 }

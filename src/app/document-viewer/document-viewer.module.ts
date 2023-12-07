@@ -27,7 +27,8 @@ import { NgxsModule } from '@ngxs/store';
 import { DocumentViewerState } from './store/document-viewer.state';
 import { StatusComponentComponent } from './components/status-component/status-component.component';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
-import { SharedModule } from '@shared/shared.module';
+import { AppState } from '../store/app.state';
+import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 
 const icons = {
   X,
@@ -57,7 +58,7 @@ const icons = {
     ToolbarModule,
     ListBoxModule,
     PdfViewerModule,
-    SharedModule,
+    ToastModule,
     ValidateDirectiveModule,
     ReactiveFormsModule,
     FeatherModule.pick(icons),
@@ -65,6 +66,7 @@ const icons = {
     DocumentViewerRoutingModule,
     NgxsModule.forFeature([
       DocumentViewerState,
+      AppState
     ]),
   ],
 })
