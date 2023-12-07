@@ -1,4 +1,4 @@
-import { GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
+import { GetAgencyAvailableSteps, GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
 import { ChangeDetectorRef, Component, Inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
@@ -80,6 +80,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   private isOrgVMSEnabled = false;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public activeSystem: OrderManagementIRPSystemId;
+  public isHallmarkMspUser: boolean;
 
   constructor(
     protected override store: Store,
@@ -101,6 +102,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     this.onChangeCandidateJob().pipe(takeUntil(this.unsubscribe$)).subscribe();
     this.subscribeOnReloadAction();
     this.watchForEmployeeToggleState();
+    this.setHallmarkMspUserType();
 
     if (this.isAgency) {
       this.checkForAgencyStatus();
@@ -150,25 +152,36 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     });
   }
 
+  private setHallmarkMspUserType(): void {
+    this.isHallmarkMspUser = this.store.selectSnapshot(UserState.isHallmarkMspUser);
+  }
+
   private getCandidateJobData(): void {
     if (this.order && this.candidate) {
+      const isGetAvailableSteps = [CandidatStatus.BillRatePending,
+        CandidatStatus.OfferedBR, CandidatStatus.OnBoard, CandidatStatus.Rejected].includes(
+        this.candidate.status
+      );
       if (this.isAgency) {
-        this.store.dispatch(new GetCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
+        this.store.dispatch(new GetCandidateJob(this.order.organizationId, this.candidate.candidateJobId))
+          .pipe(
+            tap(() => {
+              if (isGetAvailableSteps && this.isHallmarkMspUser) {
+                this.store.dispatch(new GetAgencyAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+              }
+            }),
+            take(1),
+          ).subscribe();
       } else if (this.isOrganization) {
-        const isGetAvailableSteps = [CandidatStatus.BillRatePending,
-          CandidatStatus.OfferedBR, CandidatStatus.OnBoard, CandidatStatus.Rejected].includes(
-          this.candidate.status
-        );
-
         this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId))
-        .pipe(
-          tap(() => {
-            if (isGetAvailableSteps) {
-              this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
-            }
-          }),
-          take(1),
-        ).subscribe();
+          .pipe(
+            tap(() => {
+              if (isGetAvailableSteps) {
+                this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+              }
+            }),
+            take(1),
+          ).subscribe();
       }
     }
   }

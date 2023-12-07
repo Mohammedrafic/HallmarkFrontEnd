@@ -70,9 +70,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
+  @Select(OrderManagementState.availableSteps)
+  agencyApplicantStatuses$: Observable<ApplicantStatus[]>;
+
   @Input() openEvent: Subject<boolean>;
   @Input() candidate: OrderCandidatesList;
   @Input() isAgency = false;
+  @Input() isHallmarkMspUser = false;
   @Input() isTab = false;
   @Input() dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob) {
@@ -115,7 +119,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   get isBillRatePending(): boolean {
     return (
       [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard, CandidatStatus.Rejected]
-      .includes(this.currentCandidateApplicantStatus) && !this.isAgency);
+      .includes(this.currentCandidateApplicantStatus) && (!this.isAgency || this.isHallmarkMspUser));
   }
 
   get isOfferedBillRate(): boolean {
@@ -554,7 +558,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   private subscribeOnApplicantStatusesChanges(): Observable<ApplicantStatus[]> {
-    return this.applicantStatuses$.pipe(
+    return (this.isAgency ? this.agencyApplicantStatuses$ : this.applicantStatuses$).pipe(
       filter((statuses: ApplicantStatus[]) => !!statuses),
       tap((statuses: ApplicantStatus[]) => {
         this.defaultApplicantStatuses = this.candidate?.status !== CandidatStatus.OnBoard ?
