@@ -140,13 +140,17 @@
     }
 
     .e-list-template {
-      border: none;
+      border: none !important;
     }
 
     .e-list-item {
       padding: 14px;
       display: flex;
       align-items: center;
+
+      &.e-selected {
+        background-color: var(--selected-list-item) !important;
+      }
 
       .group-option-name {
         padding-right: 25px;
