@@ -7,7 +7,7 @@ import { Store } from '@ngxs/store';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { ChartAccumulation } from '../../../dashboard/models/chart-accumulation-widget.model';
-import { IntegrationFilterDto } from '../../../shared/models/integrations.model';
+import { IntegrationFilterDto, IntegraionFailFilterDto } from '../../../shared/models/integrations.model';
 import { IntegrationMonthReportModel } from '../models/IntegrationMonthReportModel';
  
 
@@ -17,6 +17,7 @@ import { IntegrationMonthReportModel } from '../models/IntegrationMonthReportMod
 export class OrgintegrationsService {
   private readonly baseUrl = '/api/Integrations';
   integrationsRunsLast12Months$: BehaviorSubject<IntegrationMonthReportModel[]> = new BehaviorSubject<IntegrationMonthReportModel[]>([]);
+  integrationsmonthlyFailureLast12Months$: BehaviorSubject<IntegrationMonthReportModel[]> = new BehaviorSubject<IntegrationMonthReportModel[]>([]);
   constructor(private readonly httpClient: HttpClient, private readonly router: Router, private readonly store: Store) { }
 
   public getMonthlyIntegrationRuns(filter: IntegrationFilterDto): Observable<ChartAccumulation> {
@@ -32,6 +33,24 @@ export class OrgintegrationsService {
             value: monthlyIntegrationRunsCount,
             text: monthName,
             color: 'blue'
+          })),
+        };
+      })
+    );
+  }
+
+  public getMonthlyIntegrationRunFailure(filter: IntegraionFailFilterDto): Observable<ChartAccumulation> {
+    return this.httpClient.post<IntegrationMonthReportModel[]>(`${this.baseUrl}/getMonthlyFailureIntegrationRuns`, { ...filter }).pipe(
+      map((candidatesInfo: IntegrationMonthReportModel[]) => {
+        this.integrationsmonthlyFailureLast12Months$.next(candidatesInfo);
+        return {
+          id: "",
+          title: 'Integration Runs last 12 Months with failure',
+          chartData: lodashMapPlain(candidatesInfo, ({ monthlyIntegrationRunsCount, monthName }: IntegrationMonthReportModel, index: number) => ({
+            label: monthName,
+            value: monthlyIntegrationRunsCount,
+            text: monthName,
+            color: 'Red'
           })),
         };
       })

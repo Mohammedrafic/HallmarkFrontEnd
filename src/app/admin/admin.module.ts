@@ -84,6 +84,7 @@ import { InterfaceLogSummaryIrpDialogComponent } from './interface-log-summary-i
 import { OrganizationIntegrationsComponent } from './organization-integrations/organization-integrations.component';
 import { MonthlyIntegrationsComponent } from './organization-integrations/widgets/monthly-integrations/monthly-integrations.component';
 import { IntegrationsState } from './store/integrations.state';
+import { MonthlyIntegrationsFailureComponent } from './organization-integrations/widgets/monthly-integrations-fail/monthly-integrations-fail.component';
 
 const sidebarIcons = {
   Download,
@@ -127,7 +128,8 @@ const sidebarIcons = {
     InterfaceLogSummaryIrpComponent,
     InterfaceLogSummaryIrpDialogComponent,
     OrganizationIntegrationsComponent,
-    MonthlyIntegrationsComponent
+    MonthlyIntegrationsComponent,
+    MonthlyIntegrationsFailureComponent
   ],
     imports: [
         CommonModule,

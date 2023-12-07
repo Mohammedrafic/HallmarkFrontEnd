@@ -4,3 +4,7 @@ export class IntegrationFilterDto {
   public organizationFilter: FilteredDataByOrganizationId[];
   public interfaceIds?: string[];
 }
+
+export class IntegraionFailFilterDto{
+  public organizationFilter: FilteredDataByOrganizationId[];
+}
