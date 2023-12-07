@@ -29,6 +29,7 @@
     [class.empty-table]="!rowData || !rowData.length"
     [domLayout]="gridDomLayout"
     class="ag-theme-alpine app-grid__component"
+    (tooltipInteraction)="tooltipInteraction"
   ></ag-grid-angular>
   <app-grid-pagination
     *ngIf="paginationPanel"
