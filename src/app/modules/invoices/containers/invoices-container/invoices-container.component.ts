@@ -227,7 +227,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         distinctUntilChanged(),
         filter(Boolean),
         tap((id) => {
-          id = id.filter((ele:any)=>ele != 0)
           if(id.length == 0){
             this.noorgSelection = true;
             this.store.dispatch(new Invoices.SelectOrganization(id));
@@ -239,7 +238,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           if(id.length == 1){ 
             this.addManualInvoiceDisable = false;
           }
-          if(id.length > 0){            
+          if(id.length > 0 && id[0] != 0){            
             this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
           }
         }),
