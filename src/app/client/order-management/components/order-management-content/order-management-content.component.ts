@@ -2708,7 +2708,7 @@ public RedirecttoIRPOrder(order:Order)
         orderStatus: res.orderStatus,
         candidateStatus: res.applicantStatus.applicantStatus,
       };
-
+      this.cd.detectChanges();
       this.dispatchAgencyOrderCandidatesList(this.selectedCandidate.orderId, this.selectedCandidate.organizationId,
         this.selectedCandidate.irpOrderMetadata);
     });
