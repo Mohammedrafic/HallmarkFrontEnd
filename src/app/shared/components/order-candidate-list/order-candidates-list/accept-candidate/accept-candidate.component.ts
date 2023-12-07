@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -56,7 +57,7 @@ import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-s
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { formatNumber } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
-import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListComponent, SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
@@ -68,7 +69,9 @@ import { OrderManagementService } from '@client/order-management/components/orde
 })
 export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
-
+  @ViewChild('statusSelect') set setStatusSelect (content: DropDownListComponent) {
+    this.statusSelect = content;
+  }
   @Output() closeModalEvent: EventEmitter<void> = new EventEmitter();
   @Output() updateDetails = new EventEmitter<void>();
 
@@ -113,6 +116,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public canCreateOrder : boolean;
   public optionFields = { text: 'statusText', value: 'statusText' };
   public comments: Comment[] = [];
+  private statusSelect: DropDownListComponent;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -236,9 +240,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           filter((confirm) => confirm),
           take(1)
         ).subscribe(() => {
+          this.statusSelect.value = null as unknown as number;
           this.closeDialog();
         });
     } else {
+      this.statusSelect.value = null as unknown as number;
       this.closeDialog();
     }
   }
@@ -596,6 +602,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.billRatesData = [];
     this.isReadOnly = false;
     this.isWithdraw = false;
+    this.statusSelect.value = null as unknown as number;
     this.form.markAsPristine();
   }
 
