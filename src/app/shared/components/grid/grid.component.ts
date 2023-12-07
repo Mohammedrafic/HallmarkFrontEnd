@@ -64,6 +64,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public disableRowsPerPageDropdown = false;
   @Input() public bulkActionConfig: BulkActionConfig = {};
   @Input() public showUpScrollButton = true;
+  @Input() public tooltipInteraction: boolean;
 
   @Input() set changeTableSelectedIndex(next: number | null) {
     if (next !== null) {
