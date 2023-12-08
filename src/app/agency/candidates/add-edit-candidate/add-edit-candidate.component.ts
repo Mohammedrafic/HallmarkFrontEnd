@@ -193,7 +193,12 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         if(user.businessUnitType=== BusinessUnitType.MSP)
         {
         this.candidate.getIsmsp().subscribe(data=>{
-          this.disableNonlinkedagency=data;        
+          this.disableNonlinkedagency=data;    
+          if(this.disableNonlinkedagency==true)
+          {
+            this.candidateForm.disable();
+            this.readonlyMode = true;
+          }    
         }) 
         }  
       
