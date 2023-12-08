@@ -138,7 +138,7 @@ import { Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { SubmitButtonItem } from '@client/order-management/components/irp-tabs/order-details/enums';
-import{ ShiftsService } from '@organization-management/shifts/shifts.service'
+import{ ShiftsService } from '@organization-management/shifts/shifts.service';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -209,7 +209,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private specialProjectConfigurationSettings = false;
   private dataSourceContainer: OrderDataSourceContainer = {};
   private selectedSystem: SelectSystem;
-  private isTieringLogicLoad = true;
   public AutopopulateId: number | undefined;
   private reason: OrderRequisitionReason[] = [];
   private unsubscribe$: Subject<void> = new Subject();
@@ -275,6 +274,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSpecialProjectCategory();
     this.setReasonAutopopulate();
     this.subscribeForSettings();
+    this.setDistributionBasedOnAgencyStatus();
   }
 
   private subscribeForSettings() {
@@ -386,7 +386,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
   private initGeneralForms(isLongTermAssignment: boolean): void {
     if (isLongTermAssignment) {
-      this.jobDistributionForm = this.orderDetailsService.createJobDistributionForm();
       this.generalInformationForm = this.orderDetailsService.createGeneralInformationForm();
       this.jobDescriptionForm = this.orderDetailsService.createJobDescriptionForm();
     } else {
@@ -394,6 +393,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.jobDistributionForm = this.orderDetailsService.createJobDistributionPOForm();
       this.jobDescriptionForm = this.orderDetailsService.createJobDescriptionPOForm();
     }
+
+    this.createDistributionForm(isLongTermAssignment);
   }
 
   public onSplitButtonSelect(args: MenuEventArgs): void {
@@ -788,7 +789,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem, logic[0]['TieringLogic'] === 'true', false, logic[1]['TieringLogic'] === 'true');
       setDataSource(jobDistributionForm.fields, 'jobDistribution', sourceForJobDistribution);
 
-      this.setJobDistributionValue();
       this.changeDetection.markForCheck();
     });
 
@@ -849,7 +849,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       if (internalLogicIncompatible) {
         this.store.dispatch(new ShowToast(MessageTypes.Error, InternalTieringError));
         const filteredValues = this.setCorrectDistributions(value);
-
         this.jobDistributionForm.get('jobDistribution')?.patchValue(filteredValues,
         { emitEvent: false });
       } else {
@@ -1267,8 +1266,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         new GetOrganizationStatesWithKeyCode(),
       ]);
 
+      if (!this.selectedOrder) {
+        this.jobDistributionForm.reset();
+      }
       this.generalInformationForm.reset();
-      this.jobDistributionForm.reset();
       this.jobDescriptionForm.reset();
       this.specialProjectForm.reset();
 
@@ -1293,13 +1294,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.store.dispatch(new GetContactDetails(id));
     }
     return id;
-  }
-
-  private setJobDistributionValue(): void {
-    if (this.isTieringLogicLoad && this.selectedOrder) {
-      this.jobDistributionForm.get('jobDistribution')?.patchValue(this.selectedOrder.jobDistributionValue);
-      this.isTieringLogicLoad = false;
-    }
   }
 
   private setSkillFilters(skills: ListOfSkills[]): void {
@@ -1389,5 +1383,42 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     const allInternalSelected = this.jobDistributionForm.get('jobDistribution')?.value?.includes(AllInternalJob.id);
 
     return internalTieringWasSelected && allInternalSelected;
+  }
+
+  private setDistributionBasedOnAgencyStatus(): void {
+    this.organization$
+    .pipe(
+      filter((struct) => !!struct),
+      switchMap(() => combineLatest([
+        this.selectedOrder$,
+        this.associateAgencies$,
+      ])),
+      filter((data) => !!data[0] && !!data[1]),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((data) => {
+      const orderDistributions = data[0].jobDistributions?.filter((dist): boolean => {
+        if ((dist.jobDistributionOption as unknown as IrpOrderJobDistribution) === IrpOrderJobDistribution.SelectedExternal) {
+          return !!data[1].find((agency) => agency.agencyId === dist.agencyId);
+        }
+
+        return !!dist;
+      }).map((option) => option.jobDistributionOption);
+      const uniqueOptions = Array.from(new Set(orderDistributions));
+
+      this.jobDistributionForm.get('jobDistribution')?.patchValue(uniqueOptions);
+    });
+  }
+
+  private createDistributionForm(isLongTermAssignment: boolean): void {
+    if (this.selectedOrder) {
+      return;
+    }
+
+    if (isLongTermAssignment) {
+      this.jobDistributionForm = this.orderDetailsService.createJobDistributionForm();
+    } else {
+      this.generalInformationForm = this.orderDetailsService.createGeneralInformationPOForm();
+    }
   }
 }
