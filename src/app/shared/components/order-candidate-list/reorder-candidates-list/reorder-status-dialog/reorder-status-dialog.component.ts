@@ -510,11 +510,15 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     const isCandidateRevert = this.orderCandidateJob.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected;
 
     if ((this.acceptForm.valid || isCandidateRevert) && this.orderCandidateJob && status) {
-      if (this.isAgency) {
-        this.updateAgencyCandidateJob();
-      } else {
-        this.updateOrganisationCandidateJob(isCandidateRevert, status);
-      }
+      this.updateCandidateJobHandler(isCandidateRevert, status);
+    }
+  }
+
+  private updateCandidateJobHandler(isCandidateRevert: boolean, status: ApplicantStatus): void {
+    if (this.isAgency) {
+      this.updateAgencyCandidateJob();
+    } else {
+      this.updateOrganisationCandidateJob(isCandidateRevert, status);
     }
   }
 
