@@ -378,7 +378,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public dataBound(): void {
     this.grid.hideScroll();
-    this.contentLoadedHandler();
+    this.contentLoadedHandler(this.cd);
     this.createScrollSubscription();
     this.checkScroll();
   }
