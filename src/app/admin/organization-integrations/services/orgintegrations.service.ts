@@ -8,8 +8,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { ChartAccumulation } from '../../../dashboard/models/chart-accumulation-widget.model';
 import { IntegrationFilterDto, IntegraionFailFilterDto } from '../../../shared/models/integrations.model';
-import { IntegrationMonthReportModel } from '../models/IntegrationMonthReportModel';
- 
+import { IntegrationMonthReportModel, NewInterfaceListModel, NewInterfaceListdata } from '../models/IntegrationMonthReportModel';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +17,7 @@ export class OrgintegrationsService {
   private readonly baseUrl = '/api/Integrations';
   integrationsRunsLast12Months$: BehaviorSubject<IntegrationMonthReportModel[]> = new BehaviorSubject<IntegrationMonthReportModel[]>([]);
   integrationsmonthlyFailureLast12Months$: BehaviorSubject<IntegrationMonthReportModel[]> = new BehaviorSubject<IntegrationMonthReportModel[]>([]);
+  NewInterfaceListdata$: BehaviorSubject<NewInterfaceListModel[]> = new BehaviorSubject<NewInterfaceListModel[]>([]);
   constructor(private readonly httpClient: HttpClient, private readonly router: Router, private readonly store: Store) { }
 
   public getMonthlyIntegrationRuns(filter: IntegrationFilterDto): Observable<ChartAccumulation> {
@@ -55,6 +55,27 @@ export class OrgintegrationsService {
         };
       })
     );
+  }
+
+  public getLatestInterfaceList(filter: IntegrationFilterDto): Observable<NewInterfaceListdata> {
+     
+    return this.httpClient.post<NewInterfaceListModel[]>(`${this.baseUrl}/getNewInterfacesList`, { ...filter }).pipe(
+      map((InterfaceListInfo: NewInterfaceListModel[]) => {
+        this.NewInterfaceListdata$.next(InterfaceListInfo);
+        return {
+          id: "",
+          title: 'New Interface List',
+          interfacedata: lodashMapPlain(InterfaceListInfo, ({ organizationId,organizationName,interfaceName,integrationType,interfaceId }: NewInterfaceListModel, index: number) => ({
+            interfaceId: interfaceId,
+            interfaceName: interfaceName,
+            organizationId: organizationId,
+            organizationName: organizationName,
+            integrationType:integrationType
+          })),
+        };
+      })
+    );
+
   }
 }
  

@@ -5,7 +5,8 @@ import { ChartAccumulation } from '../../dashboard/models/chart-accumulation-wid
 
 import { IntegrationFilterDto } from "../../shared/models/integrations.model";
 import { OrgintegrationsService } from '../organization-integrations/services/orgintegrations.service';
-import { GetLast12MonthIntegrationRuns, GetLast12MonthFailIntegrationRuns } from "./integrations.actions";
+import { GetLast12MonthIntegrationRuns, GetLast12MonthFailIntegrationRuns, GetNewInterfaceList } from "./integrations.actions";
+import { NewInterfaceListdata } from '@admin/organization-integrations/models/IntegrationMonthReportModel';
 
 export interface IntegrationsStateModel extends IntegrationStateModel {
 }
@@ -18,6 +19,7 @@ interface IntegrationStateModel {
   filterData: IntegrationFilterDto | null;
   chartAccumulation: ChartAccumulation | null;
   failureChartAccumulation: ChartAccumulation | null;
+  Latestinterfacedata:NewInterfaceListdata | null;
 }
 @State<IntegrationsStateModel>({
   name: 'integrations',
@@ -26,7 +28,8 @@ interface IntegrationStateModel {
     isDashboardLoading: false,
     filterData: null,
     chartAccumulation: null,
-    failureChartAccumulation: null
+    failureChartAccumulation: null,
+    Latestinterfacedata:null
   },
 })
 @Injectable()
@@ -61,6 +64,20 @@ export class IntegrationsState {
     return this.orgintegrationsService.getMonthlyIntegrationRunFailure(payload).pipe(
       tap((payload) => {
         patchState({ isDashboardLoading: false, failureChartAccumulation: payload });
+        return payload;
+      })
+    );
+  }
+  
+  @Selector()
+  static NewInterfaceListState(state: IntegrationsStateModel): NewInterfaceListdata | null { return state.Latestinterfacedata; }
+
+  @Action(GetNewInterfaceList)
+  getDashboardNewInterfaceList({ patchState }: StateContext<IntegrationsStateModel>, { payload }: GetNewInterfaceList): Observable<NewInterfaceListdata> {
+    patchState({ isDashboardLoading: true });    
+    return this.orgintegrationsService.getLatestInterfaceList(payload).pipe(
+      tap((payload) => {
+        patchState({ isDashboardLoading: false, Latestinterfacedata: payload });
         return payload;
       })
     );
