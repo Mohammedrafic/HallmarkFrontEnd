@@ -70,7 +70,9 @@ import { OrderManagementService } from '@client/order-management/components/orde
 export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
   @ViewChild('statusSelect') set setStatusSelect (content: DropDownListComponent) {
-    this.statusSelect = content;
+    if (content) {
+      this.statusSelect = content;
+    }
   }
   @Output() closeModalEvent: EventEmitter<void> = new EventEmitter();
   @Output() updateDetails = new EventEmitter<void>();
@@ -240,11 +242,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           filter((confirm) => confirm),
           take(1)
         ).subscribe(() => {
-          this.statusSelect.value = null as unknown as number;
+          this.resetStatusSelectValue();
           this.closeDialog();
         });
     } else {
-      this.statusSelect.value = null as unknown as number;
+      this.resetStatusSelectValue();
       this.closeDialog();
     }
   }
@@ -602,7 +604,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.billRatesData = [];
     this.isReadOnly = false;
     this.isWithdraw = false;
-    this.statusSelect.value = null as unknown as number;
+    this.resetStatusSelectValue();
     this.form.markAsPristine();
   }
 
@@ -616,5 +618,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
     });
+  }
+
+  private resetStatusSelectValue(): void {
+    if (this.statusSelect) {
+      this.statusSelect.value = null as unknown as number;
+    }
   }
 }
