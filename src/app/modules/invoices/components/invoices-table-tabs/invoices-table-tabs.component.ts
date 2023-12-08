@@ -178,15 +178,14 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
     if ((AlertIdEnum[AlertIdEnum['Invoice: Generated & Pending Approval']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
-     /* EIN-26156 changes
      if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark) {
         this.changeTab.emit(InvoicesOrgTabId.PendingApproval);
         this.tabComponent.selectedItem = InvoicesOrgTabId.PendingApproval;
       }
-      if (user?.businessUnitType === BusinessUnitType.Agency) {*/
+      if (user?.businessUnitType === BusinessUnitType.Agency) {
         this.changeTab.emit(InvoicesOrgTabId.ManualInvoicePending);
         this.tabComponent.selectedItem = InvoicesOrgTabId.ManualInvoicePending;
-      //}
+      }
       this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
     if ((AlertIdEnum[AlertIdEnum['Manual Invoice: Rejected']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()) {
@@ -194,6 +193,11 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
         this.changeTab.emit(InvoicesOrgTabId.ManualInvoicePending);
         this.tabComponent.selectedItem = InvoicesOrgTabId.ManualInvoicePending;
       }
+      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+    if((AlertIdEnum[AlertIdEnum['Manual Invoice: Pending Approval']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()){
+      this.changeTab.emit(InvoicesOrgTabId.ManualInvoicePending);
+      this.tabComponent.selectedItem = InvoicesOrgTabId.ManualInvoicePending;
       this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
     }
   }, 1000);
