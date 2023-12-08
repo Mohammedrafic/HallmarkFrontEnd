@@ -20,7 +20,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, filter, map, merge, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, filter, map, merge, of, switchMap, take, takeUntil } from 'rxjs';
 
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementService,
@@ -63,6 +63,8 @@ import { HelpNavigationService } from '@shared/services';
 import { IsMspAreaStateModel } from '@shared/models/is-msp-area-state.model';
 import { DomainLinks } from '@shared/models/help-site-url.model';
 import { findItemInArrayTree } from './helpers/menu.helper';
+import { GetOrganizationById } from '@admin/store/admin.actions';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-shell',
@@ -170,6 +172,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   private canManageNotificationTemplates: boolean;
   private permissions: CurrentUserPermission[] = [];
   private orderMenuItems: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
+  private user: User;
 
   scrollData:boolean = false;
   loadMoreCotent:string = '';
@@ -243,6 +246,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
           }
 
         });
+    this.user = this.store.selectSnapshot(UserState.user) as User;
+    if (this.user.businessUnitType === BusinessUnitType.Organization) {
+      this.getOrganization();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -415,17 +422,26 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   onGetHelp(): void {
-    this.userService
-    .getHelpSiteUrl()
-    .pipe(
-      take(1),
-    )
-    .subscribe((links: DomainLinks) => {
-      const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-      this.helpService.navigateHelpPage(appArea?.isAgencyArea, links);
-    });
-
-
+    if (this.user.businessUnitType === BusinessUnitType.Hallmark) {
+      this.getOrganization()
+      .pipe(
+        switchMap(() => this.userService.getHelpSiteUrl()),
+        take(1),
+      )
+      .subscribe((links: DomainLinks) => {
+        const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+        this.helpService.navigateHelpPage(appArea?.isAgencyArea, links);
+      });
+    } else {
+      this.userService.getHelpSiteUrl()
+      .pipe(
+        take(1),
+      )
+      .subscribe((links: DomainLinks) => {
+        const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+        this.helpService.navigateHelpPage(appArea?.isAgencyArea, links);
+      });
+    }
   }
 
   toggleChatDialog(): void {
@@ -844,5 +860,20 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   private navigateToEmployeeProfile(): void {
     this.router.navigate(['employee/profile/information']);
+  }
+
+  private getOrganization(): Observable<void> {
+    const user = this.store.selectSnapshot(UserState.user) as User;
+    const lastSelectedOrgId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId) as number;
+    const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+
+    if (user.businessUnitType === BusinessUnitType.Hallmark && appArea.isOrganizationArea && lastSelectedOrgId) {
+      return this.store.dispatch(new GetOrganizationById(lastSelectedOrgId));
+    } else if (user.businessUnitType != BusinessUnitType.Agency && appArea.isOrganizationArea) {
+      const id = user.businessUnitId as number;
+      return this.store.dispatch(new GetOrganizationById(id));
+    }
+
+    return of(undefined as void);
   }
 }
