@@ -13,7 +13,7 @@ import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
+import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {
   GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData,
@@ -35,6 +35,8 @@ import { User } from '../../../shared/models/user.model';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 //import { analyticsConstants, Period } from '../constants/analytics.constant';
 import { toNumber, uniqBy } from 'lodash';
+
+
 @Component({
   selector: 'app-credential-expiry',
   templateUrl: './credential-expiry.component.html',
@@ -95,7 +97,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
-  selectedOrganizations: Organisation[];
+  selectedOrganizations: Organisation[] = [];
 
 
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
@@ -112,7 +114,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
-  public organizations: Organisation[];
+  public organizations: Organisation[] = [];
   //public defaultOrganizations:number[] =[];
   public defaultRegions:(number|undefined)[] =[];
   public defaultLocations:(number|undefined)[]=[];
@@ -159,17 +161,23 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     this.initForm();
     this.user = this.store.selectSnapshot(UserState.user);
     const user = this.store.selectSnapshot(UserState.user);
-    if (user?.businessUnitType != null) {
-      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-    }   
+    if (this.user?.id != null) {
+      this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
+            
+    }
+
+    //if (user?.businessUnitType != null) {
+    //  this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
+    //}   
     //this.SetReportData();    
   }
   ngOnInit(): void {
 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.loadperiod();
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
-      this.loadperiod();
+     
       this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
       this.credentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
 
@@ -193,7 +201,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
           
         }
       });
-      this.SetReportData();
+      //this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
@@ -204,7 +212,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+     // this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || BusinessUnitType.MSP ? this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
@@ -295,7 +305,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
           let locationsList: Location[] = [];
           let departmentsList: Department[] = [];
           this.selectedOrganizations = data;
-          if (data.length == 1) {
+          if (data.length == 1 && this.organizations) {
             let orgList = this.organizations?.filter((x) => data[0] == x.organizationId);
             orgList.forEach((value) => {
               regionsList.push(...value.regions);
@@ -316,15 +326,17 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
           this.masterRegionsList = this.regionsList;
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
-
-          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-          }
-          else {
-            this.isResetFilter = true;
+          if (this.bussinessControl?.value.length == "1") {
+            if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+              this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+            }
+            else {
+              this.isResetFilter = true;
+            }
           }
           let businessIdData = [];
-          businessIdData.push(data);
+         //businessIdData.push(data);
+          businessIdData = data;
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
@@ -442,7 +454,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       {
       //"OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
         "OrganizationParamCREXP": this.selectedOrganizations?.length == 0 ? "null" :
-          this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+          this.selectedOrganizations?.map((list) => list).join(","),
       "StartDateParamCREXP": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionParamCREXP": regionIds.length == 0 ? "null" : regionIds,
