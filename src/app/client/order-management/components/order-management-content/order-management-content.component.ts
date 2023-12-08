@@ -1366,16 +1366,21 @@ public RedirecttoIRPOrder(order:Order)
 
     this.preservedOrderService.setPreservedOrder();
 
+    if (this.selectedReOrder) {
+      const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedReOrder.selected.order);
+
+      if (rowIndex !== -1) {
+        this.focusToRowWithoutSelect(rowIndex);
+        this.scrollToSelectedReorder();
+      }
+    }
+
     if (this.selectedCandidate && this.selectedCandidateMeta) {
       this.selectedCandidate.selected = this.selectedCandidateMeta;
       const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedCandidateMeta.order);
 
       if (rowIndex !== -1) {
-        // focus row without select
-        const row = this.gridWithChildRow.getRowByIndex(rowIndex);
-        row.scrollIntoView(true);
-        this.gridWithChildRow.detailRowModule.expand(rowIndex);
-
+        this.focusToRowWithoutSelect(rowIndex);
       }
     }
     if(this.isShowVMSPositions)
@@ -3389,5 +3394,18 @@ public RedirecttoIRPOrder(order:Order)
         }
       }
     }
+  }
+
+  private focusToRowWithoutSelect(rowIndex: number): void {
+    const row = this.gridWithChildRow.getRowByIndex(rowIndex);
+    row.scrollIntoView(true);
+    this.gridWithChildRow.detailRowModule.expand(rowIndex);
+  }
+
+  @OutsideZone
+  private scrollToSelectedReorder(): void {
+    setTimeout(() => {
+      this.gridWithChildRow.element.querySelector('.reorder-row.selected')?.scrollIntoView(true);
+    }, 300);
   }
 }
