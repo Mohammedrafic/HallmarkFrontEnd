@@ -118,6 +118,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public canCreateOrder : boolean;
   public optionFields = { text: 'statusText', value: 'statusText' };
   public comments: Comment[] = [];
+  public agencyCanRevert: boolean;
   private statusSelect: DropDownListComponent;
 
   get isRejected(): boolean {
@@ -487,9 +488,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       takeUntil(this.unsubscribe$)
     ).subscribe((value) => {
       this.candidateJob = value;
-      const agencyCanRevert = this.isAgency && value.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected;
+      this.agencyCanRevert = this.isAgency && value.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected;
 
-      if (agencyCanRevert) {
+      if (this.agencyCanRevert ) {
         this.store.dispatch(new GetAgencyAvailableSteps(value.organizationId, value.jobId));
       }
       

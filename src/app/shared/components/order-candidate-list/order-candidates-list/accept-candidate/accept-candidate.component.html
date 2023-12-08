@@ -13,7 +13,7 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content">
-        <div class="input-group dropdown bootstrap" *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length">
+        <div class="input-group dropdown bootstrap" *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length && this.agencyCanRevert ">
           <ejs-dropdownlist
             #statusSelect
             [fields]="optionFields"
@@ -29,7 +29,7 @@
         </div>
         <div *ngIf="!isCancelled" class="status-actions">
           <button
-            *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length"
+            *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length && this.agencyCanRevert"
             ejs-button
             [isPrimary]="true"
             [disabled]="!revertStatusSelected"
