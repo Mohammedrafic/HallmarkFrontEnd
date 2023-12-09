@@ -70,8 +70,8 @@
               data.unreadComments
             }}</span>
           </button>
-          <button 
-            ejs-button 
+          <button
+            ejs-button
             cssClass="default-icon-button e-flat e-primary with-badge"
             [disabled]="!data.documentsCount"
             (click)="openDetailsTab = true"
@@ -144,7 +144,7 @@
     </e-column>
     <e-column field="jobTitle" headerText="JOB TITLE" width="120" minWidth="100" maxWidth="200"></e-column>
     <e-column field="organizationName" headerText="Organization" width="155" minWidth="135" maxWidth="200"></e-column>
-    <e-column 
+    <e-column
       field="numberOfPositions"
       headerText="AVAIL POS."
       headerTextAlign="Right"
@@ -158,7 +158,7 @@
         </div>
       </ng-template>
     </e-column>
-    <e-column 
+    <e-column
     field="expectedWorkWeek"
     headerText="Expected work week"
     textAlign="Left"
@@ -292,7 +292,8 @@
           *ngFor="let child of data.reOrders"
           [reOrder]="child"
           [order]="data"
-          [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
+          [selected]="(selectedReOrder?.selected?.order === data.orderId || data.id)
+            && (selectedReOrder?.selected.reOrder === child.orderId || child.id)"
           [hideAgency]="true"
           (clickEvent)="onOpenReorderDialog($event, data)"
         ></app-grid-subrow-reorder>
