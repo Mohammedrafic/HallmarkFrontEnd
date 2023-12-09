@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Inject,
   Input,
+  NgZone,
   OnDestroy,
   OnInit,
   Output,
@@ -99,6 +100,7 @@ import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
   '@shared/components/order-reorders-container/store/re-order.actions';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { OutsideZone } from '@core/decorators';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
@@ -197,6 +199,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
     private orderManagementService: OrderManagementService,
     private cd: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
   ) {
     super();
     this.listenRedirectFromExtension();
@@ -303,7 +306,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       }
     }
 
-      
+
 
   }
 
@@ -360,7 +363,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.gridWithChildRow.selectRow(index);
       }
     }
-    
+
+    if (this.selectedReOrder) {
+      const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedReOrder.selected.order);
+      if (rowIndex !== -1) {
+        this.focusToRowWithoutSelect(rowIndex);
+        this.scrollToSelectedReorder();
+      }
+    }
+
     this.openPerDiemDetails();
     this.openMyAgencyTabWithCandidate();
     this.contentLoadedHandler(this.cd);
@@ -486,7 +497,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
     this.cd.detectChanges();
   }
-  
+
   private prepopulateAgencyFilterFormStructure(): void {
     if (this.filters.regionIds) {
       this.OrderFilterFormGroup.get('regionIds')?.setValue([...this.filters.regionIds]);
@@ -502,7 +513,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
     }else if(this.filters.organizationIds){
       this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.filters.organizationIds]);
-    }        
+    }
     this.generateFilterChips();
     // this.dispatchNewPage();
   }
@@ -1013,6 +1024,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.clearSelection(this.gridWithChildRow);
         this.previousSelectedOrderId = null;
         this.orderManagementPagerState = null;
+        this.selectedReOrder = null;
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
@@ -1153,5 +1165,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       .subscribe(() => {
         this.store.dispatch(new SaveReOrderPageSettings(pageNumber, pageSize, true));
       });
+  }
+
+  private focusToRowWithoutSelect(rowIndex: number): void {
+    const row = this.gridWithChildRow.getRowByIndex(rowIndex);
+    row.scrollIntoView(true);
+    this.gridWithChildRow.detailRowModule.expand(rowIndex);
+  }
+
+  @OutsideZone
+  private scrollToSelectedReorder(): void {
+    setTimeout(() => {
+      this.gridWithChildRow.element.querySelector('.reorder-row.selected')?.scrollIntoView(true);
+    }, 300);
   }
 }
