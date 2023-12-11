@@ -254,7 +254,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.subscribeForSettings();
       this.cd.detectChanges();
     }
-    console.log(this.disableAnyAction,this.disableButton,this.disableEditButton)
   }
 
   ngAfterViewInit(): void {
