@@ -1,10 +1,11 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Injectable()
 export class CandidateCancellationDialogService {
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder, private http: HttpClient ) {}
 
   createCandidateCancellationForm(hasEndDateControl: boolean): FormGroup {
     if (hasEndDateControl) {

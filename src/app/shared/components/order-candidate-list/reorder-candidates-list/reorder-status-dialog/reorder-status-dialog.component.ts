@@ -9,6 +9,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import {
+  cancelCandidateJobforIRP,
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
   GetRejectReasonsForOrganisation,
@@ -54,6 +55,7 @@ import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { canceldto } from '../../interfaces/order-candidate.interface';
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -354,6 +356,24 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public resetStatusesFormControl(): void {
     this.jobStatusControl.reset();
   }
+
+  public cancelledCandidatefromIRP(cancelCandidateDto : canceldto): void {
+    if(this.candidateJob){
+      this.store.dispatch(
+        new cancelCandidateJobforIRP({
+          organizationId : this.candidateJob.organizationId,
+          jobId : this.candidateJob.jobId,
+          createReplacement: false,
+          actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
+          cancellationReasonId: cancelCandidateDto.jobCancellationReason
+        })
+      );
+      this.onCloseDialog();
+    }
+  }
+
+
+
 
   public onReject(): void {
     this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation(SystemType.VMS));

@@ -29,6 +29,7 @@ import { formatDate, formatNumber } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
+  cancelCandidateJobforIRP,
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
   GetRejectReasonsForOrganisation,
@@ -78,6 +79,7 @@ import { OrderManagementService } from '@client/order-management/components/orde
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { UserPermissions } from '@core/enums/user.permissions.enum';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { canceldto } from '../../interfaces/order-candidate.interface';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -319,6 +321,23 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.jobStatusControl.reset();
     this.selectedApplicantStatus = null;
   }
+
+  public cancelledCandidatefromIRP(cancelCandidateDto : canceldto): void {
+    if(this.candidateJob){
+      this.store.dispatch(
+        new cancelCandidateJobforIRP({
+          organizationId : this.candidateJob.organizationId,
+          jobId : this.candidateJob.jobId,
+          createReplacement: false,
+          actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
+          cancellationReasonId: cancelCandidateDto.jobCancellationReason
+        
+        })
+      );
+      this.updateDetails.emit();
+    }
+  }
+
 
   public onClose(): void {
     if (this.form.dirty) {

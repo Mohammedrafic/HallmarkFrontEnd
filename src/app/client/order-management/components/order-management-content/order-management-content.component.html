@@ -1611,6 +1611,7 @@
   [filters]="filters"
   (saveEmitter)="updateGrid()"
   (reOpenPositionSuccess)="updatePositionDetails($event)"
+  (successEmitterIRP)="updatePositionDetailsforIRP($event)" 
 ></app-child-order-dialog>
 
 <app-close-order
