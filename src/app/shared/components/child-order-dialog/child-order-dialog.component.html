@@ -38,12 +38,19 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="!isAgency && (order?.extensionFromId == null && candidate?.extensionFromId == null)"
+              *ngIf="!isAgency"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
-              [disabled]="disableAddExtension || isAgencySuspended"
+              [disabled]="disableAddExtension || isAgencySuspended || isdisabledExtension"
               text="Add Extension"
             ></app-button>
+            <app-button
+            *ngIf="(order?.extensionFromId == null && candidate?.extensionFromId == null)"
+            (clickEmitter)="showExtensionDialog()"
+            [type]="buttonTypeEnum.OUTLINED"
+            [disabled]="true"
+            text="Add Extension"
+          ></app-button>
             <button
               ejs-button
               cssClass="e-outline"
