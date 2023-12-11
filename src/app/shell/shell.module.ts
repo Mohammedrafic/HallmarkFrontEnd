@@ -56,6 +56,7 @@ import {
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { ShellRoutingModule } from './shell-routing.module';
 import { ShellPageComponent } from './shell.component';
+import { MenuGuard } from '@core/guards/menu.guard';
 
 
 const sidebarIcons = {
@@ -117,6 +118,7 @@ const sidebarIcons = {
   providers: [
     AdminGuard,
     OrganizationGuard,
+    MenuGuard,
     AgencyGuard,
     EmployeeGuard,
     HelpNavigationService,
