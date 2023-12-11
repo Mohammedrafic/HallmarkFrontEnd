@@ -87,7 +87,7 @@ export const InvoiceAuditHistoryTableColumnsDefinition = (): ColumnDefinitionMod
 
         {
             headerName: 'MODIFIED DATE',
-            field: 'jsonData.lastModifiedAt',
+            field: 'modifiedOn',
             minWidth: 100,
             filter: 'agDateColumnFilter',
             valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY HH:mm'),
@@ -252,7 +252,7 @@ export const agencyInvoiceAuditHistoryTableColumnsDefinition = (): ColumnDefinit
 
         {
             headerName: 'MODIFIED DATE',
-            field: 'jsonData.lastModifiedAt',
+            field: 'modifiedOn',
             minWidth: 100,
             filter: 'agDateColumnFilter',
             valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY HH:mm'),

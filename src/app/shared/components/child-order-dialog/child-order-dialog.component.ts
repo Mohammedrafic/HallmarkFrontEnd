@@ -83,7 +83,7 @@ import {
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderStatus } from '@shared/enums/order-management';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
-import { OrderStatusText } from '@shared/enums/status';
+import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { Comment } from '@shared/models/comment.model';
 import {
@@ -213,6 +213,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public isOrganization: boolean;
   public selectedOrder$: Observable<Order>;
   public orderStatusText = OrderStatusText;
+  public CandidatesStatusText = CandidatesStatusText;
   public disabledCloseButton = true;
   public disabledCloseButtonforIRP = true;
   public acceptForm = AcceptFormComponent.generateFormGroup();

@@ -12,6 +12,7 @@ import { PendingChangesGuard } from '@shared/guards/pending-changes.guard';
 import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
 import { AssociateListComponent } from '@shared/components/associate-list/associate-list.component';
 import { NotificationResolver } from '@core/resolvers/notification.resolver';
+import { AgencyVisibilityFlagResolverService } from '@core/resolvers/agency-visibility-flag.resolver';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -58,6 +59,7 @@ const routes: Routes = [
         data: {
           isAgencyArea: true,
         },
+        resolve:[AgencyVisibilityFlagResolverService],
       },
       {
         path: 'candidates',

@@ -169,4 +169,10 @@ export namespace TimesheetDetails {
 
     constructor(public readonly force: boolean, public readonly message?: string, public readonly title?: string) {}
   }
+
+  export class UpdateRecordSucceed {
+    static readonly type = TimesheetDetailsActions.UpdateRecordSucceed;
+
+    constructor() {}
+  }
 }

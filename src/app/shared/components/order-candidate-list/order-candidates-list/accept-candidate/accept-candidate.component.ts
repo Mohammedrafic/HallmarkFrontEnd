@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -56,7 +57,7 @@ import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-s
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { formatNumber } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
-import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListComponent, SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 
 @Component({
@@ -68,7 +69,11 @@ import { OrderManagementService } from '@client/order-management/components/orde
 })
 export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
-
+  @ViewChild('statusSelect') set setStatusSelect (content: DropDownListComponent) {
+    if (content) {
+      this.statusSelect = content;
+    }
+  }
   @Output() closeModalEvent: EventEmitter<void> = new EventEmitter();
   @Output() updateDetails = new EventEmitter<void>();
 
@@ -113,6 +118,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public canCreateOrder : boolean;
   public optionFields = { text: 'statusText', value: 'statusText' };
   public comments: Comment[] = [];
+  public agencyCanRevert: boolean;
+  private statusSelect: DropDownListComponent;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -236,9 +243,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           filter((confirm) => confirm),
           take(1)
         ).subscribe(() => {
+          this.resetStatusSelectValue();
           this.closeDialog();
         });
     } else {
+      this.resetStatusSelectValue();
       this.closeDialog();
     }
   }
@@ -479,9 +488,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       takeUntil(this.unsubscribe$)
     ).subscribe((value) => {
       this.candidateJob = value;
-      const agencyCanRevert = this.isAgency && value.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected;
+      this.agencyCanRevert = this.isAgency && value.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected;
 
-      if (agencyCanRevert) {
+      if (this.agencyCanRevert ) {
         this.store.dispatch(new GetAgencyAvailableSteps(value.organizationId, value.jobId));
       }
       
@@ -596,6 +605,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.billRatesData = [];
     this.isReadOnly = false;
     this.isWithdraw = false;
+    this.resetStatusSelectValue();
     this.form.markAsPristine();
   }
 
@@ -609,5 +619,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
     });
+  }
+
+  private resetStatusSelectValue(): void {
+    if (this.statusSelect) {
+      this.statusSelect.value = null as unknown as number;
+    }
   }
 }

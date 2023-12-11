@@ -27,6 +27,7 @@ body.light {
   --input-border-color: #{$secondary-dark-blue-40};
   --bg-input-field-disabled: #{$secondary-dark-blue-50};
   --menu-item-hover: #{$secondary-dark-blue-50};
+  --selected-list-item: #{$secondary-dark-blue-45-1};
 
   --border-drop-area: #{$secondary-dark-blue-40};
   --grid-row-border: #{$grid-row-border};
@@ -89,6 +90,7 @@ body.dark {
   --input-border-color: #{$secondary-dark-blue-15};
   --bg-input-field-disabled: #{$bg-gray-200};
   --menu-item-hover: #{$primary-active-blue-70};
+  --selected-list-item: #{$primary-active-blue};
 
   --border-drop-area: #{$secondary-dark-blue-50};
   --grid-row-border: #{$sidebar-background};

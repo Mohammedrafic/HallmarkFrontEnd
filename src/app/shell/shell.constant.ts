@@ -154,6 +154,7 @@ export const HelpNavigationLinks = (
       'candidate-details': '/Topics_Org/Candidate_assignment.html',
       'associate-list': '/Topics_Org/Associated_agencies.html',
       'timesheets': '/Topics_Org/Timesheets.html',
+      'scheduling': 'Topics_IRP/Scheduling.html',
       'invoices': '/Topics_Org/Invoices.html',
     });
   }

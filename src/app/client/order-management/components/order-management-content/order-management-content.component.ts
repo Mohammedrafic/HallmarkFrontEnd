@@ -1366,14 +1366,21 @@ public RedirecttoIRPOrder(order:Order)
 
     this.preservedOrderService.setPreservedOrder();
 
+    if (this.selectedReOrder) {
+      const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedReOrder.selected.order);
+
+      if (rowIndex !== -1) {
+        this.focusToRowWithoutSelect(rowIndex);
+        this.scrollToSelectedReorder();
+      }
+    }
+
     if (this.selectedCandidate && this.selectedCandidateMeta) {
       this.selectedCandidate.selected = this.selectedCandidateMeta;
       const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedCandidateMeta.order);
 
       if (rowIndex !== -1) {
-        this.gridWithChildRow.selectRow(rowIndex);
-        this.gridWithChildRow.detailRowModule.expand(rowIndex);
-
+        this.focusToRowWithoutSelect(rowIndex);
       }
     }
     if(this.isShowVMSPositions)
@@ -1515,7 +1522,6 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   public onRowClick(event: RowSelectEventArgs): void {
-
     if(!this.redirecttoIRPfromVMS){
       this.redirecttoIRPfromVMS=!this.redirecttoIRPfromVMS;
      return;
@@ -2707,7 +2713,7 @@ public RedirecttoIRPOrder(order:Order)
         orderStatus: res.orderStatus,
         candidateStatus: res.applicantStatus.applicantStatus,
       };
-
+      this.cd.detectChanges();
       this.dispatchAgencyOrderCandidatesList(this.selectedCandidate.orderId, this.selectedCandidate.organizationId,
         this.selectedCandidate.irpOrderMetadata);
     });
@@ -2816,7 +2822,7 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed,
       ""
     ));
-    if (isIrp && (this.selectedOrder?.extensionFromId === null)) {
+    if (isIrp && (this.selectedDataRow?.extensionFromId === null)) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
         organizationId,
@@ -2826,7 +2832,7 @@ public RedirecttoIRPOrder(order:Order)
         irpIncludeDeploy,
         ""
       ));
-    } else if(isIrp && (this.selectedOrder?.extensionFromId !== null)) {
+    } else if(isIrp && (this.selectedDataRow?.extensionFromId !== null)) {
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
         orderId,
         organizationId,
@@ -3389,5 +3395,18 @@ public RedirecttoIRPOrder(order:Order)
         }
       }
     }
+  }
+
+  private focusToRowWithoutSelect(rowIndex: number): void {
+    const row = this.gridWithChildRow.getRowByIndex(rowIndex);
+    row.scrollIntoView(true);
+    this.gridWithChildRow.detailRowModule.expand(rowIndex);
+  }
+
+  @OutsideZone
+  private scrollToSelectedReorder(): void {
+    setTimeout(() => {
+      this.gridWithChildRow.element.querySelector('.reorder-row.selected')?.scrollIntoView(true);
+    }, 300);
   }
 }

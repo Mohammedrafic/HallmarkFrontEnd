@@ -26,11 +26,19 @@
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
+              <ejs-chiplist #chipList class="events-off" *ngIf="irpCandidates?.status && activeSystem === OrderManagementIRPSystemId.IRP">
+                <e-chips>
+                  <e-chip
+                    [text]="CandidatesStatusText[irpCandidates.status]"
+                    [cssClass]="CandidatesStatusText[irpCandidates.status] | chipsCssClass"
+                  ></e-chip>
+                </e-chips>
+              </ejs-chiplist>
             </div>
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="!isAgency"
+              *ngIf="!isAgency && (order?.extensionFromId == null && candidate?.extensionFromId == null)"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
               [disabled]="disableAddExtension || isAgencySuspended"

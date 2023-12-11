@@ -18,8 +18,7 @@ export class HelpNavigationService {
   ) {}
 
   navigateHelpPage(isAgency: boolean, links: DomainLinks): void {
-    const { isIRPEnabled, isVMCEnabled } =
-    this.store.selectSnapshot(AdminState.organization)?.preferences || {};
+    const { isIRPEnabled, isVMCEnabled } = this.store.selectSnapshot(AdminState.organization)?.preferences || {};
 
     let isIrpHelpSystem = false;
 

@@ -263,6 +263,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.listenResizeContent();
     this.subscribeOnAddRecordSucceed();
     this.changeColDefs();
+    this.subscribeOnTUpdateRecordSucceed();
   }
 
   public override ngOnDestroy(): void {
@@ -324,7 +325,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
         this.saveRecords(false);
-        this.closeDetails.emit();
       });
     } else {
       this.saveRecords();
@@ -420,6 +420,17 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         takeUntil(this.componentDestroy()),
       )
       .subscribe(() => this.timeSheetChanged.emit(true));
+  }
+
+  private subscribeOnTUpdateRecordSucceed(): void {
+    this.actions$
+      .pipe(
+        filter(() => this.checkTabStatusApproved()),
+        ofActionDispatched(TimesheetDetails.UpdateRecordSucceed),
+        takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+        this.closeDetails.emit();
+      });
   }
 
   private createForm(): void {

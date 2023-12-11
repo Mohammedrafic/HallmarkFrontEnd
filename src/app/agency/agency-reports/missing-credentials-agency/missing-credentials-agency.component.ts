@@ -14,7 +14,7 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetCommonReportFilterOptions, GetLogiReportData, ClearLogiReportState, GetCommonReportAgencyCandidateSearch, GetAgencyCommonFilterReportOptions, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetCommonReportCandidateSearch , GetCommonReportCredentialSearch } from '@organization-management/store/logi-report.action';
+import { GetCommonReportFilterOptions, GetLogiReportData, ClearLogiReportState, GetCommonReportAgencyCandidateSearch, GetAgencyCommonFilterReportOptions, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetCommonReportCandidateSearch, GetCommonReportCredentialSearch } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -29,7 +29,7 @@ import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
   CommonAgencyCandidateSearchFilter, CommonReportFilter,
-   SearchCandidate,  AgencyCommonFilterReportOptions, CommonCredentialSearchFilter, SearchCredential
+  SearchCandidate, AgencyCommonFilterReportOptions, CommonCredentialSearchFilter, SearchCredential
 } from '../models/agency-common-report.model';
 import { OutsideZone } from "@core/decorators";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
@@ -88,6 +88,13 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
   @Select(LogiReportState.getOrganizationsByAgency)
   public organizationsByAgency$: Observable<DataSourceItem[]>;
 
+  @Select(SecurityState.organisations)
+  public organizationData$: Observable<Organisation[]>;
+
+  @Select(SecurityState.isOrganizaionsLoaded)
+  isOrganizaionsLoaded$: Observable<boolean>;
+
+
   @Select(LogiReportState.getOrganizationsStructure)
   public getOrganizationsStructure$: Observable<OrganizationStructure[]>;
 
@@ -109,7 +116,7 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
   credentialNameFields: FieldSettingsModel = { text: 'name', value: 'id' };
   credentialWaterMark: string = 'BLS';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  private fixedCanidateStatusesTypes: number[] = [4, 5, 10, 12];  
+  private fixedCanidateStatusesTypes: number[] = [4, 5, 10, 12];
   @Select(UserState.lastSelectedAgencyId)
   private agencyId$: Observable<number>;
 
@@ -155,7 +162,7 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
   public masterRegionsList: OrganizationRegion[] = [];
   public masterLocationsList: OrganizationLocation[] = [];
   public masterDepartmentsList: OrganizationDepartment[] = [];
-  public associatedOrganizations: DataSourceItem[] = [];
+  public associatedOrganizations: DataSourceItem[] | Organisation[] = [];
   public credentialFilterData: { [key: number]: SearchCredential; }[] = [];
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
@@ -176,14 +183,32 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
+    const user = this.store.selectSnapshot(UserState.user); //&& user?.businessUnitType == BusinessUnitType.Agency
+    if (user) {
+      this.isOrganizaionsLoaded$.pipe(takeUntil(this.unsubscribe$)).subscribe((flag) => {
+        if (!flag) {
+          this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
+        }
+      });
+    }
     this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.orderFilterColumnsSetup();
       if (data != null && data != undefined) {
         this.defaultAgency = data.toString();
-
-        this.store.dispatch(new GetOrganizationsByAgency())
         this.store.dispatch(new ClearLogiReportState());
+        //if(this.user?.businessUnitType == BusinessUnitType.Agency){
+        this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: Organisation[]) => {
+          if (data != null && data != undefined) {
+            this.associatedOrganizations = data;
+            let modifedOrgStructure = data.map(({ organizationId, name, regions }) => ({ organizationId: organizationId, organizationName: name, regions: regions }));
+            this.organizations = uniqBy(modifedOrgStructure, 'organizationId');
+            this.filterColumns.businessIds.dataSource = this.organizations;
+            this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
+            this.agencyMissingCredentialReportForm.get(AgencyMissingCredientialConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
+            this.changeDetectorRef.detectChanges();
+          }
+        });
+        /*}else{
         this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
           if (data != null && data != undefined) {
             this.associatedOrganizations = data;
@@ -201,6 +226,7 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
             });
           }
         });
+        }*/
       }
 
 
@@ -374,7 +400,7 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
     }
 
     let { accrualReportTypes, businessIds, candidateName, candidateStatuses, departmentIds, jobId, locationIds,
-      regionIds, credentialName, IsOptionalRequred, startDate, endDate} = this.agencyMissingCredentialReportForm.getRawValue();
+      regionIds, credentialName, IsOptionalRequred, startDate, endDate } = this.agencyMissingCredentialReportForm.getRawValue();
     if (!this.agencyMissingCredentialReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
     }
@@ -382,11 +408,11 @@ export class MissingCredentialsAgencyComponent implements OnInit, OnDestroy {
       this.isResetFilter = false;
       this.message = ""
     }
-    
+
     regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
-    
+
     this.paramsData =
     {
       "AgenciesParamAFTS": this.defaultAgency,

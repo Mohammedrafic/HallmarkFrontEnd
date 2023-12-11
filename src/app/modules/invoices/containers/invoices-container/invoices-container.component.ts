@@ -238,7 +238,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           if(id.length == 1){ 
             this.addManualInvoiceDisable = false;
           }
-          if(id.length > 0){            
+          if(id.length > 0 && id[0] != 0){            
             this.store.dispatch(new Invoices.GetOrganizationStructure(id[id.length - 1], true));
           }
         }),
@@ -746,7 +746,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             DialogAction.Open,
             this.isAgency,
             {
-              invoiceIds: this.gridSelections.selectedInvoiceIds,
+              invoiceIds: this.gridSelections.rowNodes.map((node) => node.data.invoiceId) ,
               organizationIds: [this.organizationId],
             },
             null,
@@ -860,8 +860,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             this.store.dispatch(new PreservedFilters.SaveFiltersByPageName(this.getPageName(),filterState.state),);
           }else{
             if(this.organizationMultiSelectControl.value){
-              filters.agencyOrganizationIds = this.organizationMultiSelectControl.value;
-              this.agencyOrganizationIds = this.organizationMultiSelectControl.value;
+              filters.agencyOrganizationIds = this.organizationMultiSelectControl.value.length > 0 ? this.organizationMultiSelectControl.value : [];
+              this.agencyOrganizationIds = this.organizationMultiSelectControl.value.length > 0 ? this.organizationMultiSelectControl.value : [];
             }
             this.resetFilters(true);
           }
