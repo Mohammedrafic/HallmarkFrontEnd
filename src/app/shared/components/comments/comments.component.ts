@@ -23,6 +23,7 @@ import {
   SaveCommentSuccess,
   UpdateGridCommentsCounter,
 } from './store/comments.actions';
+import { BusinessUnit } from '@shared/models/business-unit.model';
 
 enum CommentsFilter {
   All = 'All',
@@ -188,6 +189,8 @@ export class CommentsComponent {
       new: true,
       commentContainerId: this.commentContainerId,
       isRead: true,
+      bussinessUnitType: user.businessUnitType == 3 ? "Organization" :  
+      user.businessUnitType == 4 ? "Agency" : user.businessUnitType == 1 ? "Hallmark" : "" 
     };
     this.comments.push(comment);
     if(this.useStyle === true){

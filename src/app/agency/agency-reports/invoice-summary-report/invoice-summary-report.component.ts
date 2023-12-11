@@ -96,6 +96,14 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
   @Select(LogiReportState.getOrganizationsByAgency)
   public organizationsByAgency$: Observable<DataSourceItem[]>;
 
+
+  @Select(SecurityState.organisations)
+  public organizationData$: Observable<Organisation[]>;
+
+  @Select(SecurityState.isOrganizaionsLoaded)
+  isOrganizaionsLoaded$: Observable<boolean>;
+
+
   @Select(LogiReportState.getOrganizationsStructure)
   public getOrganizationsStructure$: Observable<OrganizationStructure[]>;
 
@@ -156,7 +164,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
   public masterRegionsList: OrganizationRegion[] = [];
   public masterLocationsList: OrganizationLocation[] = [];
   public masterDepartmentsList: OrganizationDepartment[] = [];
-  public associatedOrganizations: DataSourceItem[] = [];
+  public associatedOrganizations: DataSourceItem[] | Organisation[] = [];
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -176,14 +184,34 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
+    const user = this.store.selectSnapshot(UserState.user); //&& user?.businessUnitType == BusinessUnitType.Agency
+    if (user) {
+      this.isOrganizaionsLoaded$.pipe(takeUntil(this.unsubscribe$)).subscribe((flag) => {
+        if (!flag) {
+          this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
+        }
+      });
+    }
     this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.orderFilterColumnsSetup();
       if (data != null && data != undefined) {
         this.defaultAgency = data.toString();
         this.loadInvoiceStatus();
-        this.store.dispatch(new GetOrganizationsByAgency())
         this.store.dispatch(new ClearLogiReportState());
+        //if(this.user?.businessUnitType == BusinessUnitType.Agency){
+        this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: Organisation[]) => {
+          if (data != null && data != undefined) {
+            this.associatedOrganizations = data;
+            let modifedOrgStructure = data.map(({ organizationId, name, regions }) => ({ organizationId: organizationId, organizationName: name, regions: regions }));
+            this.organizations = uniqBy(modifedOrgStructure, 'organizationId');
+            this.filterColumns.businessIds.dataSource = this.organizations;
+            this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
+            this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
+            this.changeDetectorRef.detectChanges();
+          }
+        });
+        /*}else{
+        this.store.dispatch(new GetOrganizationsByAgency())
         this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
           if (data != null && data != undefined) {
             this.associatedOrganizations = data;
@@ -201,6 +229,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
             });
           }
         });
+          }*/
       }
 
 

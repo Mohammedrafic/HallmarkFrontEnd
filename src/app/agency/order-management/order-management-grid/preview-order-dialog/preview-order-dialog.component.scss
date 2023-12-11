@@ -13,6 +13,8 @@
 
 .order-tabs {
   position: relative;
+  padding-top: 24px;
+
 
   span {
     margin-left: 12px;
@@ -41,10 +43,6 @@
       overflow-y: auto;
     }
   }
-}
-
-.header-container.dialog-header {
-  height: 70px;
 }
 
 .preview-dialog {

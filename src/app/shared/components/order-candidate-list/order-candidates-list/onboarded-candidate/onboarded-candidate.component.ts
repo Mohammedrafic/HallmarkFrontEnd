@@ -310,8 +310,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         jobId: this.candidateJob.jobId,
         jobCancellationDto,
         candidatePayRate: this.candidateJob.candidatePayRate,
-      }));
-      this.updateDetails.emit();
+      })).pipe(
+        take(1),
+      ).subscribe(() => {
+        this.updateDetails.emit();
+      });
+     
     }
   }
 

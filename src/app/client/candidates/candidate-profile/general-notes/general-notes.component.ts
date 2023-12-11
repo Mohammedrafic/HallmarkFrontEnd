@@ -70,6 +70,7 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
       headerName: 'Note',
       flex: 1,
       minWidth: 185,
+      tooltipField: 'note',
     },
     {
       field: 'createdByName',
@@ -95,6 +96,7 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   public readonly candidateTabsEnum: typeof CandidateTabsEnum = CandidateTabsEnum;
   public exportOrientation$ = new Subject<ExportedFileType>();
   public columnsToExport: ExportColumn[] = GeneralNoteExportCols;
+  tooltipInteraction: boolean;
 
   public constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -115,6 +117,7 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
     this.getCategories();
     this.selectedTab$ = this.candidatesService.getSelectedTab$();
     this.watchForDefaultExport();
+    this.tooltipInteraction = true;
   }
 
   public ngOnDestroy(): void {

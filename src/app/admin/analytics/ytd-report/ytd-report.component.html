@@ -69,9 +69,10 @@
               </ejs-dropdownlist>
             </div>
           </div>
-          <div class="input-container calendar">
-            <label>Month(s)<span class="required">*</span></label>
-            <div class="input-group dropdown">
+          <div class="bootstrap dropdown-container" >
+           
+            <div class="input-group dropdown ">
+              <label>Month(s)<span class="required">*</span></label>
               <!--<ejs-dropdownlist appValidateWithMessage
                     formControlName="month"
                     [fields]="commonFields"
@@ -79,7 +80,7 @@
                     [allowFiltering]="true"
                     placeholder="Month">
   </ejs-dropdownlist>-->
-              <ejs-multiselect mode="CheckBox" formControlName="month" placeholder="All"
+              <ejs-multiselect mode="CheckBox" formControlName="month" placeholder="All" appValidateWithMessage
                                [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="monthList"
                                [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
               </ejs-multiselect>

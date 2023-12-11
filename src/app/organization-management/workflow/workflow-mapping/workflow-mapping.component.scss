@@ -162,7 +162,7 @@ tr.highlight {
 
   &:last-of-type .e-customized-expand-cell,
   &:last-of-type .e-detailrowcollapse {
-    border-bottom: 1px solid $grid-row-border;
+    border-bottom: 1px solid var(--grid-header-border);
   }
 }
 
