@@ -81,6 +81,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   partneredOrganizations:OrganizationStructure[] = [];
   public isAgency:boolean = false;
+  public isAgencyVisibilityFlagEnabled = false;
 
   public optionFields = {
     text: 'name',
@@ -120,12 +121,13 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   }
 
   ngOnInit(): void {
+    this.isAgencyVisibilityFlagEnabled = this.store.selectSnapshot(SecurityState.isAgencyVisibilityFlagEnabled);
     this.onOrderFilteringOptionsChange();
     const user = this.store.selectSnapshot(UserState.user);
-    if(user){
+    if(this.isAgencyVisibilityFlagEnabled){
       this.agencyOrganizations();
       this.isOrganizaionsLoaded$.pipe(takeUntil(this.destroy$)).subscribe((flag) => {
-        if(!flag){               
+        if(user && !flag){               
             this.store.dispatch(new GetOrganizationsStructureAll(user?.id));  
          }
       });
@@ -152,6 +154,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         if (isEmpty(value)) {
           this.clearRLDByLevel(RLDLevel.Orginization);
         } else {
+          if(this.isAgencyVisibilityFlagEnabled){
             let filteredOrg = this.partneredOrganizations.filter(el => {
               return value.find(element => {
                 return element == el.organizationId;
@@ -159,7 +162,10 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
             });
             const regions =  getRegionsFromOrganizationStructure(filteredOrg);
             this.filterColumns.regionIds.dataSource = sortByField(regions, 'name');
-         // this.store.dispatch(new GetOrganizationStructure(value));
+          }else{
+             this.store.dispatch(new GetOrganizationStructure(value));
+          }
+            
         }
         this.cd.detectChanges();
       })
@@ -286,8 +292,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           statuses = orderStatuses;
           candidateStatusesData = candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
         }
-
-        //  this.filterColumns.organizationIds.dataSource = partneredOrganizations;
+        if(!this.isAgencyVisibilityFlagEnabled){
+           this.filterColumns.organizationIds.dataSource = partneredOrganizations;
+        }
         this.filterColumns.skillIds.dataSource = masterSkills;
         this.filterColumns.candidateStatuses.dataSource = candidateStatusesData;
         this.filterColumns.orderStatuses.dataSource = statuses;
@@ -359,15 +366,15 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     });
   }
 
-  static generateFilterColumns(): any {
+  static generateFilterColumns(isAgencyVisibilityFlag:boolean = false): any {
     return {
       orderPublicId: { type: ControlTypes.Text, valueType: ValueType.Text },
       organizationIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'organizationName',
-        valueId: 'organizationId',
+        valueField: isAgencyVisibilityFlag ? 'name' : 'organizationName',
+        valueId: isAgencyVisibilityFlag ? 'id' : 'organizationId',
       },
       regionIds: {
         type: ControlTypes.Multiselect,
