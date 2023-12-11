@@ -70,6 +70,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() disableEditButton = false;
 
+  @Input() disableButton = false;
+
   @Input() hasEditTimesheetRecordsPermission: boolean;
 
   @Input() hasApproveRejectRecordsPermission: boolean;
@@ -77,7 +79,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   @Input() hasApproveRejectMileagesPermission: boolean;
 
   @Input() canRecalculateTimesheet: boolean;
-  public disableButton: boolean = false;
 
   @Input() set selectedTab(selectedTab: RecordFields) {
     this.currentTab = selectedTab;
@@ -251,9 +252,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.setActionBtnState();
       this.initEditBtnsState();
       this.subscribeForSettings();
-      this.subscribeAgency();
       this.cd.detectChanges();
     }
+    console.log(this.disableAnyAction,this.disableButton,this.disableEditButton)
   }
 
   ngAfterViewInit(): void {
@@ -567,28 +568,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     }
   }
 
-  private subscribeAgency():void{
-    const { organizationId } = this.store.snapshot().timesheets.timesheetDetails;
-    this.settingsViewService.getViewSettingKey(
-      OrganizationSettingKeys.AgencyCanEditApprovedTimesheet,
-      OrganizationalHierarchy.Location,
-      organizationId as number,
-      organizationId as number,
-      false,
-      this.timesheetDetails.jobId
-    ).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(({ AgencyCanEditApprovedTimesheet }) => {
-      if (AgencyCanEditApprovedTimesheet == 'true') {
-        this.disableButton = true;
-      }
-      else {
-        this.disableButton = false;
-      }
-
-    })
-
-  }
+  
 
   private initEditBtnsState(): void {
     const currentTabMapping: Map<RecordFields, boolean> = new Map<RecordFields, boolean>()
