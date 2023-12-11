@@ -2721,22 +2721,23 @@ public RedirecttoIRPOrder(order:Order)
 
   updatePositionDetailsforIRP(position: IRPOrderPosition): void{
     this.getOrders(true);
-    this.store.dispatch(new GetOrderById(position.orderId, position.organizationId));
     this.getIrpCandidatesforExtension$.pipe(take(2), filter(Boolean)).subscribe((res) => {
       res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
       const orderData = this.selectedCandidateforIRP as IRPOrderPosition;
       if (orderData.isTemplate) {
-        this.store.dispatch(new GetSelectedOrderById(position.orderId, true));
-        this.navigateToOrderTemplateForm(position.orderId, true);
+        this.store.dispatch(new GetSelectedOrderById(this.selectedOrder.id, true));
+        this.navigateToOrderTemplateForm(this.selectedOrder.id, true);
       }
       else {
         this.selectedDataRow = orderData as unknown as IRPOrderManagement;
-        this.dispatchAgencyOrderCandidatesList(position.orderId, orderData.organizationId, true);
+        this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, orderData.organizationId, true);
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
         this.orderPositionSelected$.next({ state: false });
         this.openDetails.next(true);
-    }
+      }
+      this.store.dispatch(new GetOrderById(this.selectedOrder.id, this.selectedOrder.organizationId as number, undefined, true, "IRP"));
+      this.cd.detectChanges();
     });
    }
 

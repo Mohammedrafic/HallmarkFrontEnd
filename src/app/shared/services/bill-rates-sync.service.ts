@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BaseObservable, DateTimeHelper } from '@core/helpers';
+import { BaseObservable } from '@core/helpers';
 import { BillRate, BillRateCalculationType } from '@shared/models';
 
 @Injectable({
@@ -20,10 +20,10 @@ export class BillRatesSyncService {
     const sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
       (billRate) => billRate.billRateConfig.id === billRateType
     );
-    
+
     for (const billRate of sortedBillRates) {
       const timeStamp = new Date(billRate.effectiveDate).getTime();
-      if (timeStamp < jobStartDateTimeStamp) {
+      if (timeStamp <= jobStartDateTimeStamp) {
         billRateForSync = billRate;
         break;
       }
@@ -48,7 +48,7 @@ export class BillRatesSyncService {
     if(billRates != null){
       return billRates.sort((item1: BillRate, item2: BillRate) => {
         return new Date(item2.effectiveDate).getTime() - new Date(item1.effectiveDate).getTime();
-      });  
+      });
     } else {
       return billRates;
     }
