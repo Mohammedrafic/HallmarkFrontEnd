@@ -143,9 +143,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public groupInvoicesBy: GroupInvoicesOption;
 
-  // public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
+  public readonly unitOrganizationsFields = baseDropdownFieldsSettings;
 
-  public readonly unitOrganizationsFields: FieldSettingsModel = { text: 'name', value: 'organizationId' };
+  public readonly unitAgencyOrganizationsFields: FieldSettingsModel = { text: 'name', value: 'organizationId' };
 
   public readonly bulkActionConfig: BulkActionConfig = {
     approve: true,
@@ -176,7 +176,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public businessUnitId?: number;
   public agencyOrganizationIds:Array<number> = [];
 
-  public organizationsList: Organisation[];
+  public organizationsList: any;
 
   public navigatedInvoiceId: number | null;
 
@@ -201,6 +201,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public allOption: string = "All";
   public noorgSelection:boolean = false;
   public addManualInvoiceDisable:boolean = false;
+  public isAgencyVisibilityFlagEnabled = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -220,6 +221,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.context = { componentParent: this };
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
+
+    this.isAgencyVisibilityFlagEnabled = this.store.selectSnapshot(SecurityState.isAgencyVisibilityFlagEnabled);
 
     if (this.isAgency) {
       this.organizationId$ = this.organizationMultiSelectControl.valueChanges
@@ -303,11 +306,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
             this.showmsg = true;
             this.store.dispatch(new Invoices.SelectOrganization(0));
           }),
-         switchMap(() => this.store.dispatch(new GetOrganizationsStructureAll(user?.id!))),
-          switchMap(() => this.agencyOrganizations$),
-          tap((organizations: Organisation[]) => {
-            this.organizationsList = organizations;
-            this.organizationsList.map(ele=>ele.id = ele.organizationId);
+         switchMap(() => !this.isAgencyVisibilityFlagEnabled ? this.store.dispatch(new Invoices.GetOrganizations()) : this.store.dispatch(new GetOrganizationsStructureAll(user?.id!))),
+          switchMap(() => !this.isAgencyVisibilityFlagEnabled ? this.organizations$ : this.agencyOrganizations$),
+          tap((organizations: any) => {            
+            if(this.isAgencyVisibilityFlagEnabled){        
+              let organizationsList : Organisation[] = organizations;
+              this.organizationsList = organizationsList;   
+              this.organizationsList.map((ele:Organisation)=>ele.id = ele.organizationId);
+            }else{
+              let organizationsList : DataSourceItem[] = organizations;
+              this.organizationsList = organizationsList; 
+              this.organizationsList.map((ele:DataSourceItem)=>ele.organizationId = ele.id);
+            }
             if(organizations.length == 0 && this.showmsg){
               this.store.dispatch(new Invoices.ClearInvoices())
               this.showmsg = false;
@@ -322,7 +332,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         .subscribe((orgId: number) => {
           this.agencyOrganizationIds = [];
           const value = this.businessUnitId
-            ? (this.organizationsList || []).filter(org => org.id === this.businessUnitId)[0].id
+            ? (this.organizationsList || []).filter((org:any) => org.id === this.businessUnitId)[0].id
             : orgId;
 
           this.organizationControl.setValue(this.navigatedOrgId || value, { emitEvent: true, onlySelf: false });
@@ -836,7 +846,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           if(this.agencyOrganizationIds.length == 0 && filterState.state.agencyOrganizationIds != null && filterState.state.agencyOrganizationIds.length > 0){
             let agencyOrganizationIds= [];
             filterState.state.agencyOrganizationIds.forEach(element => {
-              if(this.organizationsList.find((item)=> item.id == element)){
+              if(this.organizationsList.find((item:any)=> item.id == element)){
                 agencyOrganizationIds.push(element);
               }
             });

@@ -126,6 +126,7 @@ const routes: Routes = [
         data: {
           isAgencyArea: true,
         },
+        resolve:[AgencyVisibilityFlagResolverService],
       },
       {
         path: 'order-management/notification/:notificationId',
