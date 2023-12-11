@@ -51,6 +51,11 @@ export interface CancelIrpCandidateDto {
   cancellationReasonId?: number;
 }
 
+export interface canceldto {
+  actualEndDate: string | null;
+  jobCancellationReason?: number;
+}
+
 export interface RejectedIrpCandidateDto {
   organizationId: number;
   employeeId: number;
