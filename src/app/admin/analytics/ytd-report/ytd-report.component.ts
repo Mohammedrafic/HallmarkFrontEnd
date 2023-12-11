@@ -431,7 +431,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
 
     let currentDate = new Date(Date.now());
     let selectedMonthDate = new Date(year, month, 0);
-    debugger;
+    //debugger;
     this.paramsData =
     {
       //"HostName": this.baseUrl,
@@ -549,12 +549,15 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     this.isClearAll = true;
     this.ytdreportReportForm.get(ytdReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.ytdreportReportForm.get(ytdReportConstants.formControlNames.LocationIds)?.setValue([]);
+    let currentDate = new Date();
+          this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([currentDate.getMonth() + 1]);
+          this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
-    this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Year)?.setValue([]);
+   // this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Year)?.setValue([]);
    // this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([]);
-    this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([this.defaultMonth]);
+    //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([this.defaultMonth]);
    // this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SearchBy)?.setValue([]);
     this.filteredItems = [];
     this.locations = [];
@@ -563,6 +566,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     //this.filterColumns.departmentIds.dataSource = [];
   }
   public onFilterApply(): void {
+    this.ytdreportReportForm.markAllAsTouched();
     let { regionIds, locationIds,  agingGroupIds } = this.ytdreportReportForm.getRawValue();
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
@@ -576,9 +580,18 @@ export class YtdReportComponent implements OnInit, OnDestroy {
         return;
       }
     }
-    this.filteredItems = [];
-    this.SearchReport();
-    this.store.dispatch(new ShowFilterDialog(false));
+    //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.updateValueAndValidity({ emitEvent: false });
+    //this.changeDetectorRef.detectChanges();
+
+    if(this.ytdreportReportForm.valid)
+    {
+      this.filteredItems = [];
+      this.SearchReport();
+    
+      this.store.dispatch(new ShowFilterDialog(false));
+    }
+    
+    
   }
   public showToastMessage(regionsLength: number, locationsLength: number, departmentsLength: number) {
     this.message = "";
