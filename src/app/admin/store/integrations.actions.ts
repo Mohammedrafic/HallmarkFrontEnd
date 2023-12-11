@@ -16,3 +16,8 @@ export class GetNewInterfaceList {
   static readonly type = `${integrationsStatePrefix} Get Latest Interface List`;
   constructor(public payload: IntegrationFilterDto) { }
 }
+
+export class GetRecentRunsList {
+  static readonly type = `${integrationsStatePrefix} GetRecentRunsListQuery`;
+  constructor(public payload: IntegrationFilterDto) { }
+}

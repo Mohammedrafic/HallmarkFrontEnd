@@ -87,6 +87,7 @@ import { IntegrationsState } from './store/integrations.state';
 import { MonthlyIntegrationsFailureComponent } from './organization-integrations/widgets/monthly-integrations-fail/monthly-integrations-fail.component';
 import { NewInterfacesComponent } from './organization-integrations/widgets/new-interfaces/new-interfaces.component';
 import { WidgetWrapperModule } from '../dashboard/widgets/widget-wrapper/widget-wrapper.module';
+import { GetRecentRunListComponent } from './organization-integrations/widgets/get-recent-run-list/get-recent-run-list.component';
 
 const sidebarIcons = {
   Download,
@@ -132,7 +133,8 @@ const sidebarIcons = {
     OrganizationIntegrationsComponent,
     MonthlyIntegrationsComponent,
     MonthlyIntegrationsFailureComponent,
-    NewInterfacesComponent
+    NewInterfacesComponent,
+    GetRecentRunListComponent
   ],
     imports: [
         CommonModule,

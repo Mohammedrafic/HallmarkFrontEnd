@@ -9,7 +9,7 @@ import { map, shareReplay } from 'rxjs/operators';
 import { ChartAccumulation } from '../../../dashboard/models/chart-accumulation-widget.model';
 import { IntegrationFilterDto, IntegraionFailFilterDto } from '../../../shared/models/integrations.model';
 import { IntegrationMonthReportModel, NewInterfaceListModel, NewInterfaceListdata } from '../models/IntegrationMonthReportModel';
-
+import { RecentRunsListModel } from '../models/RecentRunsListModel';
 @Injectable({
   providedIn: 'root'
 })
@@ -76,6 +76,11 @@ export class OrgintegrationsService {
       })
     );
 
+  }
+
+  public getRecentRunsList(filter: IntegrationFilterDto): Observable<RecentRunsListModel[]> {
+    return this.httpClient.post<RecentRunsListModel[]>(`${this.baseUrl}/getRecentRunsList`, { ...filter }).pipe(
+      map((data) => data))
   }
 }
  
