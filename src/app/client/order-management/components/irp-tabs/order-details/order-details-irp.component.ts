@@ -274,7 +274,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.watchForSpecialProjectCategory();
     this.setReasonAutopopulate();
     this.subscribeForSettings();
-    this.setDistributionBasedOnAgencyStatus();
   }
 
   private subscribeForSettings() {
@@ -413,33 +412,36 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
   private watchForOrderTypeControl(): void {
     this.orderTypeForm.get('orderType')?.valueChanges.pipe(
+      tap((value) => {
+        this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
+        this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
+        this.changeDetection.markForCheck();
+        this.clearFormLists();
+        if (value === IrpOrderType.LongTermAssignment) {
+          this.orderFormsArrayConfig =
+            [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
+          this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
+        } else {
+          this.orderFormsArrayConfig =
+            [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
+          this.orderFormsConfig = perDiemConfig(this.selectedSystem);
+        }
+  
+        this.initForms(value);
+        this.setConfigDataSources();
+        this.getAllShifts();
+        this.setReasonAutopopulate();
+        this.populateSelectedOrganizationStructure();
+        this.watchForSpecialProjectCategory();
+        this.orderDetailsService.disableFieldsForNotEditableOrder(
+          this.selectedOrder,
+          this.generalInformationForm
+        );
+        this.updateSpecialProjectValidation(this.specialProjectConfigurationSettings);
+      }),
+      switchMap(() => this.setDistributionBasedOnAgencyStatus()),
       takeUntil(this.componentDestroy())
-    ).subscribe((value: number) => {
-      this.generalInformationForm.get('shiftStartTime')?.reset({ emitEvent: false });
-      this.generalInformationForm.get('shiftEndTime')?.reset({ emitEvent: false });
-      this.changeDetection.markForCheck();
-      this.clearFormLists();
-      if (value === IrpOrderType.LongTermAssignment) {
-        this.orderFormsArrayConfig =
-          [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
-        this.orderFormsConfig = LongTermAssignmentConfig(this.selectedSystem);
-      } else {
-        this.orderFormsArrayConfig =
-          [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
-        this.orderFormsConfig = perDiemConfig(this.selectedSystem);
-      }
-
-      this.initForms(value);
-      this.setConfigDataSources();
-      this.getAllShifts();
-      this.setReasonAutopopulate();
-      this.populateSelectedOrganizationStructure();
-      this.watchForSpecialProjectCategory();
-      this.orderDetailsService.disableFieldsForNotEditableOrder(
-        this.selectedOrder,
-        this.generalInformationForm
-      );
-      this.updateSpecialProjectValidation(this.specialProjectConfigurationSettings);
+    ).subscribe(() => {
       this.changeDetection.markForCheck();
     });
   }
@@ -1385,8 +1387,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     return internalTieringWasSelected && allInternalSelected;
   }
 
-  private setDistributionBasedOnAgencyStatus(): void {
-    this.organization$
+  private setDistributionBasedOnAgencyStatus() {
+    return this.organization$
     .pipe(
       filter((struct) => !!struct),
       switchMap(() => combineLatest([
@@ -1394,20 +1396,19 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         this.associateAgencies$,
       ])),
       filter((data) => !!data[0] && !!data[1]),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe((data) => {
-      const orderDistributions = data[0].jobDistributions?.filter((dist): boolean => {
-        if ((dist.jobDistributionOption as unknown as IrpOrderJobDistribution) === IrpOrderJobDistribution.SelectedExternal) {
-          return !!data[1].find((agency) => agency.agencyId === dist.agencyId);
-        }
-
-        return !!dist;
-      }).map((option) => option.jobDistributionOption);
-      const uniqueOptions = Array.from(new Set(orderDistributions));
-
-      this.jobDistributionForm.get('jobDistribution')?.patchValue(uniqueOptions);
-    });
+      tap((data) => {
+        const orderDistributions = data[0].jobDistributions?.filter((dist): boolean => {
+          if ((dist.jobDistributionOption as unknown as IrpOrderJobDistribution) === IrpOrderJobDistribution.SelectedExternal) {
+            return !!data[1].find((agency) => agency.agencyId === dist.agencyId);
+          }
+  
+          return !!dist;
+        }).map((option) => option.jobDistributionOption);
+        const uniqueOptions = Array.from(new Set(orderDistributions));
+  
+        this.jobDistributionForm.get('jobDistribution')?.patchValue(uniqueOptions);
+      }),
+    );
   }
 
   private createDistributionForm(isLongTermAssignment: boolean): void {
