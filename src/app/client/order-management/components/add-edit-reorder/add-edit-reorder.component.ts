@@ -178,6 +178,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.reorderForm.get('reorderDate')?.setValue(dates.length ? dates[0] : null);
     this.multipleReorderDates = dates;
     this.setDefaultBillRate(dates);
+    this.cdr.markForCheck();
   }
 
   private setDefaultBillRate(dates: Date[]): void {
@@ -186,6 +187,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
         this.predefinedBillrates, new Date(DateTimeHelper.setUtcTimeZone(dates[0])),
       );
       regularBillRate && this.reorderForm.get('billRate')?.setValue(regularBillRate.rateHour);
+    } else {
+      this.reorderForm.get('billRate')?.setValue(null);
     }
   }
 
