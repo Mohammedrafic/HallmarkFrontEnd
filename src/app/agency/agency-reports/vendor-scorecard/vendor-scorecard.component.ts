@@ -463,6 +463,10 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       "reportPulledMessageVSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
       "DateRangeCS": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
       "PeriodVSR": period == null ? 0 : period,
+      "ActiveAgencyVSR":0,
+      "AgenciesVSR":this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
+      this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
+      "OrderIDVSR":"",
       "UseridVSR": this.user?.id,
     };
     
