@@ -1,10 +1,16 @@
 import { Injectable } from '@angular/core';
 
-import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { Observable, tap } from 'rxjs';
+import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
+import { Observable, catchError, of, tap } from 'rxjs';
 
-import { DocumentViewerModel, FileGroup } from './document-viewer.state.model';
-import { GetFiles, GetFilesSucceeded, GetGroupedFiles, GetPdfFiles, GetPdfFilesSucceeded } from './document-viewer.actions';
+import { DocumentViewerModel, FileGroup, Status, Statuses } from './document-viewer.state.model';
+import {
+  GetFiles,
+  GetFilesSucceeded,
+  GetGroupedFiles,
+  GetPdfFiles,
+  GetPdfFilesSucceeded
+} from './document-viewer.actions';
 import { DocumentViewerService } from 'src/app/document-viewer/services/document-viewer.service';
 
 @State<DocumentViewerModel>({
@@ -14,6 +20,7 @@ import { DocumentViewerService } from 'src/app/document-viewer/services/document
     fileHash: '',
   },
 })
+
 @Injectable()
 export class DocumentViewerState {
   @Selector()
@@ -21,7 +28,7 @@ export class DocumentViewerState {
     return state.groupedFiles;
   }
 
-  constructor(private documentViewerService: DocumentViewerService) {}
+  constructor(private documentViewerService: DocumentViewerService, private store: Store) {}
 
   @Action(GetFiles)
   GetFiles(
@@ -32,20 +39,17 @@ export class DocumentViewerState {
       tap((payload: Blob) => {
         dispatch(new GetFilesSucceeded(payload));
         return payload;
-      }),
+      })
     );
   }
 
   @Action(GetPdfFiles)
-  GetPdfFiles(
-    { dispatch }: StateContext<DocumentViewerModel>,
-    { fileHash, fileId }: GetPdfFiles
-  ): Observable<Blob> {
+  GetPdfFiles({ dispatch }: StateContext<DocumentViewerModel>, { fileHash, fileId }: GetPdfFiles): Observable<Blob> {
     return this.documentViewerService.getPdfFile(fileHash, fileId).pipe(
       tap((payload: Blob) => {
         dispatch(new GetPdfFilesSucceeded(payload));
         return payload;
-      }),
+      })
     );
   }
 
@@ -61,4 +65,5 @@ export class DocumentViewerState {
       })
     );
   }
+
 }
