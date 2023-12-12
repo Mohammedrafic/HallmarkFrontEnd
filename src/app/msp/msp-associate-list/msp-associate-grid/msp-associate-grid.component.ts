@@ -56,7 +56,6 @@ export class MSPAssociateGridComponent extends AbstractGridConfigurationComponen
   }
 
   ngOnInit(): void {
-    this.getAgencies();
     this.subscribeOnMspAssociateAgencyDialogEvent();
     this.subscribeOnBusinessUnitChange();
     this.subscribeOnPageChanges();
@@ -121,18 +120,5 @@ export class MSPAssociateGridComponent extends AbstractGridConfigurationComponen
         this.store.dispatch(new GetMspAssociateAgency());
         this.dispatchNewPage();
       });
-  }
-
-  private getAgencies(): void {
-    this.mspAssociateListPage$
-      .pipe(
-        map((data) => {
-          return data;
-        }),
-        takeWhile(() => this.isAlive),
-      )
-      .subscribe((data) => {
-        this.mspAgencyData = data;
-      });
-  }
+  }  
 }
