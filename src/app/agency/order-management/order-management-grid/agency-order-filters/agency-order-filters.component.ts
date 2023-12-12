@@ -373,8 +373,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: isAgencyVisibilityFlag ? 'name' : 'organizationName',
-        valueId: isAgencyVisibilityFlag ? 'id' : 'organizationId',
+        valueField: !isAgencyVisibilityFlag ? 'name' : 'organizationName',
+        valueId: !isAgencyVisibilityFlag ? 'id' : 'organizationId',
       },
       regionIds: {
         type: ControlTypes.Multiselect,
